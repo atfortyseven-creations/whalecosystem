@@ -29,6 +29,8 @@ interface ProjectNode {
     ramUsage?: number;
     uptime?: number;
     logs?: any[];
+    trackedAsset?: string;
+    dexFilter?: string;
 }
 
 export default function DashboardClient() {
@@ -39,6 +41,7 @@ export default function DashboardClient() {
   const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [newNodeName, setNewNodeName] = useState('');
   const [newNodeType, setNewNodeType] = useState<NodeType>('INTELLIGENCE_ROUTER');
+  const [newNodeAsset, setNewNodeAsset] = useState('ALL');
 
   const { isConnected, address } = useAccount();
 
@@ -68,7 +71,9 @@ export default function DashboardClient() {
             cpuUsage: p.cpuUsage,
             ramUsage: p.ramUsage,
             uptime: p.uptime,
-            logs: p.logs || []
+            logs: p.logs || [],
+            trackedAsset: p.trackedAsset || 'ALL',
+            dexFilter: p.dexFilter || 'ALL'
         }));
         setNodes(mappedNodes);
     } catch(e){}
@@ -82,6 +87,24 @@ export default function DashboardClient() {
   useEffect(() => {
     fetchProjects();
     fetchVariables();
+  }, [address]);
+
+  // PHASE 6: Heartbeat — poll /api/pulse every 5s to hydrate CPU/RAM/Uptime
+  useEffect(() => {
+    if (!address) return;
+    const tick = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/pulse?wallet=${address}`);
+        if (!res.ok) return;
+        const metrics: {id:string; cpuUsage:number; ramUsage:number; uptime:number}[] = await res.json();
+        setNodes(prev => prev.map(n => {
+          const m = metrics.find(x => x.id === n.id);
+          if (!m) return n;
+          return { ...n, cpuUsage: m.cpuUsage, ramUsage: m.ramUsage, uptime: m.uptime };
+        }));
+      } catch(_) {}
+    }, 5000);
+    return () => clearInterval(tick);
   }, [address]);
 
   // ZK Scanner Polling Logic
@@ -127,7 +150,8 @@ export default function DashboardClient() {
     try {
         const res = await fetch('/api/projects', {
           method: 'POST',
-          body: JSON.stringify({ name: newNodeName, wallet: address })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newNodeName, wallet: address, trackedAsset: newNodeAsset })
         });
         
         if (!res.ok) {
@@ -436,6 +460,19 @@ export default function DashboardClient() {
                                     </button>
                                 </div>
                             </div>
+
+                            {newNodeType === 'INTELLIGENCE_ROUTER' && (
+                            <div className="space-y-3">
+                                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Intelligence Target <span className="text-[#e0ff00]">/</span> Asset Filter</label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {['ALL','ETH','BTC','USDT','BNB','SOL'].map(asset => (
+                                        <button key={asset} onClick={() => setNewNodeAsset(asset)}
+                                            className={`py-3 rounded-xl border text-xs font-black uppercase tracking-widest transition-all ${newNodeAsset === asset ? 'bg-[#e0ff00]/10 border-[#e0ff00]/50 text-[#e0ff00] shadow-[0_0_20px_rgba(224,255,0,0.1)]' : 'bg-black/50 border-white/5 text-white/40 hover:border-white/20 hover:text-white/70'}`}
+                                        >{asset}</button>
+                                    ))}
+                                </div>
+                            </div>
+                            )}
 
                             <div className="space-y-4">
                                 <label className="text-xs font-bold uppercase tracking-widest text-white/50">Instance Name</label>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { encryptValue, decryptValue } from '@/lib/crypto';
 
 export async function GET(req: Request) {
   try {
@@ -12,7 +13,16 @@ export async function GET(req: Request) {
       where: { userId: wallet },
       orderBy: { updatedAt: 'desc' }
     });
-    return NextResponse.json(variables);
+
+    // Decrypt all values before returning to the client
+    const decrypted = await Promise.all(
+      variables.map(async (v) => ({
+        ...v,
+        value: await decryptValue(v.value)
+      }))
+    );
+
+    return NextResponse.json(decrypted);
   } catch (error) {
     console.error('[VARIABLES_GET]', error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -36,19 +46,17 @@ export async function POST(req: Request) {
         });
     } catch(e) {}
 
-    // Upsert using the composite unique constraint: @@unique([userId, key])
+    // Encrypt the value before persisting to PostgreSQL
+    const encryptedValue = await encryptValue(value);
+
     const variable = await prisma.variable.upsert({
-      where: {
-         userId_key: {
-            userId: wallet,
-            key: key
-         }
-      },
-      update: { value, description },
-      create: { userId: wallet, key, value, description }
+      where: { userId_key: { userId: wallet, key } },
+      update: { value: encryptedValue, description },
+      create: { userId: wallet, key, value: encryptedValue, description }
     });
 
-    return NextResponse.json(variable);
+    // Return the decrypted version to the UI (don't expose ciphertext)
+    return NextResponse.json({ ...variable, value });
   } catch (error) {
     console.error('[VARIABLES_POST]', error);
     return new NextResponse("Internal Error", { status: 500 });
