@@ -19,10 +19,11 @@ export async function POST(req: Request) {
         }
 
         // Store the verified mobile address into the session UUID for the desktop to consume
-        await safeRedisSet(`qr:${token}`, JSON.stringify({ address }), 'EX', 60);
+        await safeRedisSet(`qr:${token}`, JSON.stringify({ address, syncedAt: Date.now() }), 'EX', 300);
 
         return new NextResponse('OK', { status: 200 });
     } catch (e: any) {
+        console.error('[QR_SYNC_FATAL]', e);
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }

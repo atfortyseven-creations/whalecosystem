@@ -28,23 +28,17 @@ export async function GET(request: Request) {
     }
 
     try {
-        const data = JSON.parse(val);
-        if (data.address) {
-            // Authing the session via cookie
-            const cookieStore = await cookies();
-            cookieStore.set('human_session', data.address, {
-                httpOnly: false, // The frontend might need to verify
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-                maxAge: 60 * 60 * 24 * 7 // 7 days
-            });
-            
-            // Delete the consumed token
-            await safeRedisSet(`qr:${id}`, 'CONSUMED', 'EX', 10);
-            return NextResponse.json({ status: 'complete', address: data.address });
+        const valStr = val as string;
+        if (valStr.startsWith('{')) {
+            const data = JSON.parse(valStr);
+            if (data.address) {
+                // Delete the consumed token
+                await safeRedisSet(`qr:${id}`, 'CONSUMED', 'EX', 10);
+                return NextResponse.json({ status: 'complete', address: data.address });
+            }
         }
     } catch (e) {
+        console.error('[QR_SESSION_PARSE_ERROR]', e);
         return NextResponse.json({ status: 'error', message: 'Payload invalid' }, { status: 500 });
     }
     
