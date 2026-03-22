@@ -12,13 +12,23 @@ if (!IS_EDGE && isServer) {
     } catch (e) {}
 }
 
+const memoryStore = new Map<string, any>();
+
 function createMockRedis(name?: string) {
     return {
         on: () => {},
-        get: async () => null,
-        set: async () => 'OK',
-        setex: async () => 'OK',
-        del: async () => 0,
+        get: async (k: string) => memoryStore.get(k) || null,
+        set: async (k: string, v: any) => { memoryStore.set(k, v); return 'OK'; },
+        setex: async (k: string, s: number, v: any) => { 
+            memoryStore.set(k, v); 
+            setTimeout(() => memoryStore.delete(k), s * 1000);
+            return 'OK'; 
+        },
+        del: async (k: string) => { 
+            const r = memoryStore.has(k) ? 1 : 0; 
+            memoryStore.delete(k); 
+            return r; 
+        },
         status: 'mock',
         __isMock: true
     };
@@ -215,7 +225,7 @@ export const createSubClient = (name: string) => createRedisClient({ name, isSub
 export async function safeRedisGet(key: string): Promise<string | null> {
     try {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
-            return null;
+            return await (redisClient as any).get(key);
         }
         return await Promise.race([
             redisClient.get(key),
@@ -228,7 +238,14 @@ export async function safeRedisGet(key: string): Promise<string | null> {
 
 export async function safeRedisSet(key: string, value: string, ...args: any[]): Promise<void> {
     try {
-        if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) return;
+        if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
+            if (args.length >= 2 && args[0] === 'EX') {
+                await (redisClient as any).setex(key, args[1], value);
+            } else {
+                await (redisClient as any).set(key, value);
+            }
+            return;
+        }
         // Fire-and-forget with a 500ms timeout — never block the response path
         await Promise.race([
             redisClient.set(key, value, ...args),
