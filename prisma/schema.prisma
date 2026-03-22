@@ -2033,6 +2033,8 @@ model ApiWebhookLog {
 
 model Project {
   id          String       @id @default(uuid())
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
   name        String
   description String?
   status      String       @default("DRAFT")
@@ -2041,6 +2043,8 @@ model Project {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   deployments Deployment[]
+
+  @@index([userId])
 }
 
 model Deployment {
@@ -2051,14 +2055,21 @@ model Deployment {
   status    String   @default("PENDING")
   txHash    String?
   createdAt DateTime @default(now())
+  
+  @@index([projectId])
 }
 
 model Variable {
   id          String   @id @default(uuid())
-  key         String   @unique
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  key         String
   value       String
   description String?
   updatedAt   DateTime @updatedAt
+  
+  @@unique([userId, key])
+  @@index([userId])
 }
 
 model Log {

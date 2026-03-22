@@ -35,7 +35,7 @@ export default function DashboardClient() {
   const [newNodeName, setNewNodeName] = useState('');
   const [newNodeType, setNewNodeType] = useState<NodeType>('INTELLIGENCE_ROUTER');
 
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   // Real features
   useGodView();
@@ -51,8 +51,9 @@ export default function DashboardClient() {
   const [scannerSuccess, setScannerSuccess] = useState(false);
 
   const fetchProjects = async () => {
+    if (!address) return;
     try { 
-        const res = await fetch('/api/projects'); 
+        const res = await fetch(`/api/projects?wallet=${address}`); 
         const data = await res.json(); 
         const mappedNodes = data.map((p:any, i:number) => ({
             id: p.id,
@@ -65,13 +66,14 @@ export default function DashboardClient() {
   };
 
   const fetchVariables = async () => {
-    try { const res = await fetch('/api/variables'); setVariables(await res.json()); } catch(e){}
+    if (!address) return;
+    try { const res = await fetch(`/api/variables?wallet=${address}`); setVariables(await res.json()); } catch(e){}
   };
 
   useEffect(() => {
     fetchProjects();
     fetchVariables();
-  }, []);
+  }, [address]);
 
   // ZK Scanner Polling Logic
   useEffect(() => {
@@ -108,14 +110,14 @@ export default function DashboardClient() {
   }, [isScannerPolling, qrSession]);
 
   const handleDeployNode = async () => {
-    if(!newNodeName) return;
+    if(!newNodeName || !address) return;
     setIsDeployModalOpen(false);
     const tempId = 'temp-' + Date.now();
     setNodes(prev => [...prev, { id: tempId, name: newNodeName, type: newNodeType, status: 'deploying' }]);
     
     await fetch('/api/projects', {
       method: 'POST',
-      body: JSON.stringify({ name: newNodeName })
+      body: JSON.stringify({ name: newNodeName, wallet: address })
     });
     setNewNodeName("");
     
@@ -126,10 +128,10 @@ export default function DashboardClient() {
   };
 
   const handleDeleteNode = async (id: string) => {
-    if(id.startsWith('temp')) return;
+    if(id.startsWith('temp') || !address) return;
     setActiveNodeId(null);
     setNodes(prev => prev.filter(n => n.id !== id));
-    await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+    await fetch(`/api/projects/${id}?wallet=${address}`, { method: 'DELETE' });
     fetchProjects();
   };
 
