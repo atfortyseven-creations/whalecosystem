@@ -1,0 +1,61 @@
+name: Whale Alert Production Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    name: Legendary Validation
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 🛰️ Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: 🧹 Lint Check
+        run: npm run lint
+
+      - name: 🛡️ Type Validation (TypeScript)
+        run: npx tsc --noEmit
+
+      - name: 💎 Prisma Schema Validation
+        run: npx prisma validate
+        env:
+          DATABASE_URL: "postgresql://[REDACTED_DB_USER]:[REDACTED_DB_PASS]@localhost:5432/mydb?schema=public"
+
+      - name: 🏗️ Contract Compilation Check
+        run: npx hardhat compile
+
+      - name: 🚀 Production Build Simulation
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: "redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@v4
+      - name: 🛡️ Slither Static Analysis
+        uses: crytic/slither-action@v0.4.0
+        continue-on-error: true # Allow pipeline to continue for now, but report results
+        with:
+          target: '.'
+          sarif: results.sarif
+
+

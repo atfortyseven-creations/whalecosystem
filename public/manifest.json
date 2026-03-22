@@ -1,0 +1,44 @@
+{
+    "manifest_version": 3,
+    "name": "Whale Alert Pro | Elite Whale Intelligence",
+    "version": "2.5.0",
+    "description": "The leading platform for elite on-chain whale tracking and forensic intelligence.",
+    "icons": {
+        "16": "assets/icon-16.png",
+        "48": "assets/icon-48.png",
+        "128": "assets/icon-128.png"
+    },
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "Access Vault",
+        "default_icon": {
+            "16": "assets/icon-16.png",
+            "48": "assets/icon-48.png"
+        }
+    },
+    "permissions": [
+        "storage",
+        "activeTab",
+        "unlimitedStorage"
+    ],
+    "host_permissions": [
+        "https://*.whalealert.pro/*",
+        "https://min-api.cryptocompare.com/*",
+        "https://mainnet.base.org/*",
+        "https://wallet-human-polymarket-id-production.up.railway.app/*"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "assets/*",
+                "next/static/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}

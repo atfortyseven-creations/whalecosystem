@@ -1,0 +1,67 @@
+/*
+  ═══════════════════════════════════════════════════════
+  SOVEREIGN DASHBOARD DARK SHELL — NUCLEAR CSS OVERRIDE
+  This file is ONLY imported on /dashboard.
+  It overrides ALL global theme variables to dark mode.
+  ═══════════════════════════════════════════════════════
+*/
+
+/* Override all CSS variables at the root for dashboard */
+[data-dashboard="true"],
+[data-dashboard="true"] *:not(canvas):not(svg):not(img) {
+  --aztec-parchment: #080808 !important;
+  --bg-page: #080808 !important;
+  --bg-surface: #0a0a0a !important;
+  --bg-card: #111111 !important;
+  --text-primary: #ffffff !important;
+  --text-secondary: rgba(255, 255, 255, 0.6) !important;
+  --border-main: rgba(255, 255, 255, 0.06) !important;
+  --glass-bg: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Force the root shell to be dark */
+[data-dashboard="true"] {
+  background-color: #080808 !important;
+  color: #ffffff !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100 !important;
+  display: flex !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* Sidebar */
+.dashboard-shell-aside {
+  background-color: #0a0a0a !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  min-height: 100% !important;
+}
+
+/* Top header bar */
+.dashboard-shell-header {
+  background-color: #0a0a0a !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Main content area */
+.dashboard-shell-main {
+  background-color: #080808 !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  height: 100% !important;
+}
+
+/* Force nav items to be visible on dark bg */
+[data-dashboard="true"] button,
+[data-dashboard="true"] a {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-dashboard="true"] button:hover,
+[data-dashboard="true"] a:hover {
+  color: rgba(255, 255, 255, 0.7) !important;
+}

@@ -1,0 +1,191 @@
+import { useState, useCallback } from 'react';
+import { useWalletClient, usePublicClient, useAccount } from 'wagmi';
+import { lifiService } from '@/lib/wallet/lifi-service';
+import { parseUnits } from 'viem';
+
+export interface SwapParams {
+    fromChain: number;
+    toChain: number;
+    fromToken: string; // Can be symbol or address
+    toToken: string; // Can be symbol or address
+    fromAmount: string;
+    fromTokenAddress?: string; // Optional direct address
+    toTokenAddress?: string; // Optional direct address
+    slippage?: number;
+}
+
+// Token address mapping
+const TOKEN_MAP: Record<number, Record<string, string>> = {
+    1: { // Ethereum
+        'USDT': '0xdac17f958d2ee523a2206206994597c13d831ec7',
+        'USDC': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753',
+        'ETH': '0x0000000000000000000000000000000000000000',
+        'WETH': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+    },
+    137: { // Polygon
+        'USDT': '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+        'USDC': '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753', // Standard OP WLD
+        'POL': '0x0000000000000000000000000000000000000000',
+        'MATIC': '0x0000000000000000000000000000000000000000'
+    },
+    8453: { // Base
+        'USDC': '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        'ETH': '0x0000000000000000000000000000000000000000',
+        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753'
+    },
+    480: { // World Chain
+        'WLD': '0x2cFc85d8E48F8EAB294be644d9E25C3030863003',
+        'USDC': '0x79A02482A880bCE3F13e09Da970dC34db4CD68d7',
+        'ETH': '0x0000000000000000000000000000000000000000'
+    },
+    10: { // Optimism
+        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753',
+        'USDC': '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
+        'ETH': '0x0000000000000000000000000000000000000000'
+    },
+    42161: { // Arbitrum
+        'USDC': '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753',
+        'ETH': '0x0000000000000000000000000000000000000000'
+    }
+};
+
+/**
+ * [Elite] hook for Transaction Execution
+ * Manages Approval -> Sign -> Broadcast -> DB Sync
+ */
+export function useEliteSwap() {
+    const { address } = useAccount();
+    const { data: walletClient } = useWalletClient();
+    const publicClient = usePublicClient();
+    
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [status, setStatus] = useState<'idle' | 'quoting' | 'approving' | 'signing' | 'broadcasting' | 'synced' | 'failed'>('idle');
+
+    // Helper function to resolve token address from symbol
+    const resolveTokenAddress = (tokenSymbolOrAddress: string, chainId: number): string => {
+        // If it's already an address (starts with 0x and is 42 chars), return it
+        if (tokenSymbolOrAddress.startsWith('0x') && tokenSymbolOrAddress.length === 42) {
+            return tokenSymbolOrAddress;
+        }
+        
+        // Otherwise, look it up in the TOKEN_MAP
+        const chainTokens = TOKEN_MAP[chainId];
+        if (!chainTokens) {
+            throw new Error(`Chain ${chainId} not supported`);
+        }
+        
+        const address = chainTokens[tokenSymbolOrAddress.toUpperCase()];
+        if (!address) {
+            throw new Error(`Token ${tokenSymbolOrAddress} not found on chain ${chainId}`);
+        }
+        
+        return address;
+    };
+
+    const executeSwap = useCallback(async (params: SwapParams) => {
+        if (!address || !walletClient || !publicClient) {
+            setError('Wallet not connected');
+            throw new Error('Wallet not connected');
+        }
+
+        setLoading(true);
+        setError(null);
+        setStatus('quoting');
+
+        try {
+            // 1. RESOLVE TOKEN ADDRESSES
+            const fromTokenAddress = params.fromTokenAddress || resolveTokenAddress(params.fromToken, params.fromChain);
+            const toTokenAddress = params.toTokenAddress || resolveTokenAddress(params.toToken, params.toChain);
+
+            console.log('[Elite] Resolved Tokens:', {
+                from: `${params.fromToken} -> ${fromTokenAddress}`,
+                to: `${params.toToken} -> ${toTokenAddress}`
+            });
+
+            // 2. GET QUOTE FROM LI.FI
+            console.log('[Elite] Fetching Elite quote...');
+            const quote = await lifiService.getQuote({
+                fromChain: params.fromChain,
+                toChain: params.toChain,
+                fromToken: fromTokenAddress,
+                toToken: toTokenAddress,
+                fromAmount: params.fromAmount,
+                fromAddress: address,
+                toAddress: address,
+                slippage: params.slippage || 0.005
+            });
+
+            const { transactionRequest, estimate } = quote;
+
+            // 3. [MEV PROTECTION] Verify slippage and price impact
+            if (estimate?.priceImpact && estimate.priceImpact > 0.05) {
+                throw new Error('[SECURITY] Excessive price impact detected. Execution halted.');
+            }
+
+            // 4. EXECUTE
+            setStatus('signing');
+            console.log('[Elite] Requesting signature for Elite execution...');
+            
+            const hash = await walletClient.sendTransaction({
+                to: transactionRequest.to as `0x${string}`,
+                data: transactionRequest.data as `0x${string}`,
+                value: BigInt(transactionRequest.value || '0'),
+                gas: transactionRequest.gasLimit ? BigInt(transactionRequest.gasLimit) : undefined,
+            });
+
+            setStatus('broadcasting');
+            console.log(`[Elite] Broadcast successful. Hash: ${hash}`);
+
+            // 5. [DUAL PERSISTENCE] Sync with Backend
+            await fetch('/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    hash,
+                    userId: address,
+                    type: params.fromChain === params.toChain ? 'SWAP' : 'BRIDGE',
+                    fromChain: params.fromChain,
+                    toChain: params.toChain,
+                    fromToken: fromTokenAddress,
+                    toToken: toTokenAddress,
+                    fromAmount: params.fromAmount,
+                    metadata: {
+                        aggregator: 'Li.Fi',
+                        quoteId: quote.id,
+                        slippage: params.slippage
+                    }
+                })
+            }).catch(e => console.error('[Elite] DB Sync Failed:', e));
+
+            setStatus('synced');
+            console.log('[Elite] Transaction complete');
+            
+            return hash;
+
+        } catch (err: any) {
+            console.error('[Elite] Execution Error:', err);
+            setError(err.message || 'Transaction failed');
+            setStatus('failed');
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [address, walletClient, publicClient]);
+
+    return {
+        executeSwap,
+        resolveTokenAddress,
+        loading,
+        error,
+        status,
+        reset: () => {
+            setStatus('idle');
+            setError(null);
+        }
+    };
+}
+

@@ -1,0 +1,137 @@
+"use client";
+
+import React, { useEffect, useRef } from 'react';
+
+export function UniversalEliteWallpaper() {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d', { alpha: false });
+        if (!ctx) return;
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let animationFrameId: number;
+
+        const resize = () => {
+            const dpr = window.devicePixelRatio || 1;
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.scale(dpr, dpr);
+        };
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        interface CircuitNode {
+            x: number;
+            y: number;
+            vx: number;
+            vy: number;
+        }
+
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const nodes: CircuitNode[] = [];
+        const NODE_COUNT = isMobile ? 15 : 40;
+        const MAX_DIST = isMobile ? 120 : 200;
+
+        for (let i = 0; i < NODE_COUNT; i++) {
+            nodes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * (isMobile ? 0.2 : 0.4),
+                vy: (Math.random() - 0.5) * (isMobile ? 0.2 : 0.4)
+            });
+        }
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // ── Background: Institutional Dark Alpha ──────────────────────
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+            bgGradient.addColorStop(0, '#000000');
+            bgGradient.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+ 
+            // ── Sub-Pixel Institutional Grid ───────────────────────────────
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.05)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < width; i += 60) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < height; i += 60) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(width, i);
+                ctx.stroke();
+            }
+ 
+            // ── Pulse Gradient Accent ──────────────────────────────────────
+            const pulseOpacity = (Math.sin(Date.now() / 2500) * 0.02) + 0.03;
+            const glow = ctx.createRadialGradient(
+                width / 2, height * 0.3, 0,
+                width / 2, height * 0.3, width
+            );
+            glow.addColorStop(0, `rgba(6, 182, 212, ${pulseOpacity})`);
+            glow.addColorStop(1, 'transparent');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, width, height);
+ 
+            // ── Institutional Connectivity Mesh ────────────────────────────
+            nodes.forEach((node, i) => {
+                node.x += node.vx;
+                node.y += node.vy;
+ 
+                if (node.x < 0 || node.x > width) node.vx *= -1;
+                if (node.y < 0 || node.y > height) node.vy *= -1;
+ 
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 1, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+                ctx.fill();
+ 
+                nodes.slice(i + 1).forEach(other => {
+                    const dx = node.x - other.x;
+                    const dy = node.y - other.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+ 
+                    if (dist < MAX_DIST) {
+                        ctx.beginPath();
+                        ctx.moveTo(node.x, node.y);
+                        ctx.lineTo(other.x, other.y);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.1 * (1 - dist / MAX_DIST)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            animationFrameId = requestAnimationFrame(draw);
+        };
+
+        animationFrameId = requestAnimationFrame(draw);
+
+        return () => {
+            window.removeEventListener('resize', resize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            className="fixed inset-0 w-full h-full pointer-events-none z-[-1] outline-none border-none m-0 p-0 block"
+        />
+    );
+}

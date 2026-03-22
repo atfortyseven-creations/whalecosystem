@@ -1,0 +1,664 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* UNIVERSAL A11Y FOCUS */
+:focus-visible {
+  outline: 2px solid #00f2ea;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px rgba(0, 242, 234, 0.1);
+  border-radius: 2px;
+}
+
+/* SYSTEM_REV_1.0.42_LEGENDARY_REFRESH */
+@layer base {
+  /* Rendering Optimization for long pages */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+    contain: paint layout;
+  }
+
+  /* GPU Layer Acceleration for standard cards */
+  .premium-card-gpu {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  :root {
+    /* --- AZTEC NETWORK BRAND PALETTE --- */
+    --aztec-parchment: #F2EEE1;
+    --aztec-ink: #1A1400;
+    
+    /* Core colors */
+    --aztec-chartreuse: #D4FF2B;
+    --aztec-orchid: #FF2DF4;
+    --aztec-aqua: #2BFAE9;
+    --aztec-vermillion: #FF1A1A;
+    
+    /* Base colors */
+    --aztec-malachite: #001F18;
+    --aztec-aubergine: #2E0026;
+    --aztec-lapis: #00122E;
+    --aztec-oxblood: #2E0700;
+
+    /* Base Variables mapping */
+    --bg-page: var(--aztec-parchment);
+    --bg-surface: var(--aztec-parchment);
+    --bg-card: var(--aztec-parchment);
+
+    --text-primary: var(--aave-carbon);
+    --text-secondary: var(--aave-gray);
+    --text-muted: #a3a3a3;
+
+    --border-main: rgba(33, 29, 29, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(33, 29, 29, 0.05);
+    
+    /* Premium Accents */
+    --accent-primary: var(--aave-purple);
+    --accent-glow: rgba(152, 150, 255, 0.2);
+
+    /* Glass blur sizes */
+    --zk-glass-blur: 20px;
+    --zk-glass-blur-heavy: 40px;
+  }
+
+  .dark {
+    /* --- AAVE DARK MODE --- */
+    --bg-page: var(--aave-carbon);
+    --bg-surface: #1a1a1a;
+    --bg-card: #212121;
+
+    --text-primary: #ffffff;
+    --text-secondary: var(--aave-gray);
+    --text-muted: #525252;
+
+    --border-main: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(33, 29, 29, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    
+    /* Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--aave-purple) 0%, var(--aave-purple-light) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--aave-teal) 0%, var(--aave-teal-light) 100%);
+    --gradient-surface: linear-gradient(135deg, rgba(152, 150, 255, 0.05) 0%, rgba(57, 190, 183, 0.05) 100%);
+    
+    /* Premium Glows */
+    --glow-purple: 0 0 40px rgba(152, 150, 255, 0.3);
+    --glow-teal: 0 0 40px rgba(0, 130, 123, 0.3);
+    --glow-blue: 0 0 40px rgba(0, 138, 255, 0.3);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    /* === STRATOSPHERIC GPU RENDERING === */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Subpixel rendering on retina/high-DPI */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+
+    /* Prevent horizontal layout overflow */
+    overflow-x: hidden;
+    width: 100%;
+    /* Allow full vertical scrolling — auto instead of 100% */
+    min-height: 100%;
+    height: auto;
+
+    /* === FLUID RESPONSIVE FONT SCALE ===
+       Optimized for "No Eye Strain" across all viewports.
+       PC: 17px base, Mobile: 14px base.
+    */
+    font-size: clamp(14px, 1vw + 10px, 17px);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Sane minimum width: never go below 320px (smallest iPhone SE) */
+    min-width: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    /* iOS safe-area support (notch / home bar) */
+    padding-left:   env(safe-area-inset-left);
+    padding-right:  env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+
+    /* iOS momentum scroll */
+    -webkit-overflow-scrolling: touch;
+
+    /* Prevent accidental pinch-zoom while allowing pan — handled by viewport meta */
+    touch-action: pan-x pan-y;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    user-select: text;
+
+    @apply antialiased bg-[var(--bg-page)] text-[var(--aztec-ink)] cursor-default transition-colors duration-300;
+  }
+
+  ::selection {
+    background-color: rgba(209, 37, 199, 0.3); /* #D125C7 with 30% opacity */
+    color: var(--aztec-ink);
+  }
+
+   /* === INPUT ZOOM PREVENTION ===
+      iOS Safari zooms in if font-size < 16px.
+      We use 16px explicitly, then scale via CSS transform
+      inside each component if needed.
+   */
+   input, textarea, select {
+     font-size: 16px !important;
+     touch-action: manipulation;
+     -webkit-appearance: none;
+     -moz-appearance: none;
+     appearance: none;
+   }
+ 
+   /* === GLOBAL GPU LAYER HINTS ===
+      Every element participates in the GPU paint system.
+      Only `transform` and `opacity` are allowed to animate
+      without triggering layout — enforce that contract here.
+   */
+   * {
+     /* Do NOT set will-change here — that forces ALL elements onto GPU layers
+        and kills memory. Only set it on animated elements via .transform-gpu utility. */
+     -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
+     text-rendering: optimizeLegibility;
+     /* Prevent each element from overriding the global pan-only touch action */
+     touch-action: inherit;
+     box-sizing: border-box;
+   }
+  /* Senior absolute layout correction */
+  .max-w-7xl {
+    max-width: 80rem !important; /* Reset to standard (1280px approx at 16px rem) */
+  }
+  
+  .max-w-5xl {
+    max-width: 64rem !important;
+  }
+
+  .max-w-4xl {
+    max-width: 56rem !important;
+  }
+
+  h1, .font-aztec-h1 {
+    font-family: 'Playfair Display', 'Arizona Serif', serif;
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.05em;
+  }
+
+  h2, .font-aztec-h2 {
+    font-family: 'Roboto Mono', 'Oracle Triple', monospace;
+    font-weight: 500;
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+  }
+
+  h3, .font-aztec-h3 {
+    font-family: 'Inter', 'MD Thermochrome', sans-serif;
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+  }
+
+  h4, .font-aztec-h4 {
+    font-family: 'Garamond', 'Francesco', serif;
+    font-weight: 400;
+    line-height: 0.95;
+  }
+
+  p, .font-aztec-body {
+    font-family: 'Inter', 'Oracle Standard', sans-serif;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+  }
+
+  .font-aztec-text {
+    font-family: 'Playfair Display', 'Arizona Text', serif;
+    font-weight: 300;
+    line-height: 1.35;
+  }
+
+  code, .font-mono {
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  /* HIGH-FIDELITY PAPER GRAIN TEXTURE */
+  .noise-bg {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+}
+
+/* ============================================================
+   STRATOSPHERIC GPU RENDERING UTILITIES
+   Deep compositor layer forcing for animated components.
+   Only apply these to elements that ACTUALLY animate —
+   misuse wastes VRAM and defeats the purpose.
+   ============================================================ */
+
+/* Viewport Virtualization — skip layout for off-screen content */
+.optimize-visibility {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 900px;
+}
+
+/* Full GPU compositor layer — for heavy animated cards/overlays */
+.transform-gpu {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+.z-stratosphere {
+  z-index: 9999 !important;
+}
+
+/* GPU scroll container — use on long scrollable lists */
+.scroll-gpu {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* Smooth scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+ 
+ /* Respect user preference: disable animations when reduced-motion is requested */
+ @media (prefers-reduced-motion: reduce) {
+   .animate-prism-shift {
+     animation: none !important;
+   }
+ }
+
+/* Hide scrollbar while maintaining functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+  .font-aztec-serif {
+    font-family: var(--font-aztec-serif), serif;
+  }
+
+  .font-aztec-mono {
+    font-family: var(--font-aztec-mono), monospace;
+  }
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Utilitarios de brillo sutil */
+  .glow-text {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+  
+  /* ZK-Vault Glassmorphism */
+  .glass-vault {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--zk-glass-blur));
+    -webkit-backdrop-filter: blur(var(--zk-glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+  
+  .glass-pearl {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(45px);
+    -webkit-backdrop-filter: blur(45px);
+  }
+  
+  /* Pearlescent Shimmer Animation */
+  @keyframes pearl-shimmer {
+    0%, 100% {
+      background-position: 0% 50%;
+      opacity: 0;
+    }
+    50% {
+      background-position: 100% 50%;
+      opacity: 1;
+    }
+  }
+  
+  .pearl-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .pearl-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    animation: pearl-shimmer 2s ease-in-out infinite;
+  }
+  
+  /* Premium Glassmorphism Effects */
+  .glass-premium {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-border);
+  }
+  
+  .glass-card {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  /* Premium Glow Effects */
+  .glow-purple {
+    box-shadow: var(--glow-purple);
+  }
+  
+  .glow-green {
+    box-shadow: var(--glow-green);
+  }
+  
+  .glow-text-purple {
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3);
+  }
+  
+  .glow-text-green {
+    text-shadow: 0 0 30px rgba(16, 185, 129, 0.6), 0 0 60px rgba(16, 185, 129, 0.3);
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Premium Hover Effects */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  /* --- Sovereign Web3 Aesthetics --- */
+  .noise-bg {
+    position: relative;
+    isolation: isolate;
+  }
+  
+  .noise-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='filter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/baseFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23filter)'/%3E%3C/svg%3E");
+  }
+
+  .mesh-gradient {
+    background-color: #050505;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(225,39%,10%,1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(339,49%,10%,1) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(253,16%,7%,1) 0, transparent 50%),
+      radial-gradient(at 50% 100%, hsla(225,39%,10%,1) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(339,49%,10%,1) 0, transparent 50%);
+  }
+
+  .glass-sovereign {
+    background: rgba(255, 255, 255, 0.01);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  .text-glow-soft {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* === AZTEC SOVEREIGN AESTHETICS & EFFECTS === */
+.bg-noise {
+  position: relative;
+}
+.bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: -150%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacty='0.05'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  animation: noise-shift 8s steps(10) infinite;
+  z-index: 50;
+  mix-blend-mode: overlay;
+}
+
+@keyframes noise-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -5%); }
+  20% { transform: translate(-10%, 5%); }
+  30% { transform: translate(5%, -10%); }
+  40% { transform: translate(-5%, 15%); }
+  50% { transform: translate(-10%, 5%); }
+  60% { transform: translate(15%, 0); }
+  70% { transform: translate(0, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+.custom-cursor-none {
+  cursor: none !important;
+}
+.custom-cursor-none * {
+  cursor: none !important;
+}
+
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 10s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* =============================================
+   LIQUID PRISM BACKGROUND — Static Color Shift
+   ============================================= */
+@keyframes prism-shift {
+  0%   { filter: hue-rotate(0deg)   saturate(2)   brightness(1.1); }
+  25%  { filter: hue-rotate(40deg)  saturate(2.4) brightness(1.25); }
+  50%  { filter: hue-rotate(80deg)  saturate(2.6) brightness(1.15); }
+  75%  { filter: hue-rotate(-40deg) saturate(2.4) brightness(1.2); }
+  100% { filter: hue-rotate(0deg)   saturate(2)   brightness(1.1); }
+}
+
+@keyframes liquid {
+  0% { transform: translate(-10%, -10%) rotate(0deg) scale(1.1); }
+  33% { transform: translate(10%, 10%) rotate(120deg) scale(1.3); }
+  66% { transform: translate(-5%, 15%) rotate(240deg) scale(0.9); }
+  100% { transform: translate(-10%, -10%) rotate(360deg) scale(1.1); }
+}
+
+.animate-liquid {
+  animation: liquid 20s infinite linear;
+}
+
+.animate-prism-shift {
+  animation: prism-shift 30s linear infinite !important;
+  /* NO CSS TRANSFORMS TO PREVENT WOBBLE */
+  transform: none !important;
+  will-change: filter !important;
+  
+  /* Universal Premium Sizing & Blur */
+  width: 160vw !important;
+  height: 160vh !important;
+  left: -30vw !important;
+  top: -30vh !important;
+  filter: blur(80px) saturate(2) brightness(1.1) !important;
+}
+
+/* ============================================================
+   RESPONSIVE LAYOUT — NO ZOOM HACK
+   All breakpoints use fluid clamp() values and flex/grid.
+   The body never gets CSS zoom — that property breaks stacking
+   contexts and subpixel rendering entirely.
+
+   MOBILE (< 768px)
+   - Stack everything vertically (handled by Tailwind sm: prefix)
+   - font-size driven by clamp() on html
+   - Touch targets ≥ 48px (WCAG 2.5.5)
+
+   TABLET (768px – 1279px)
+   - 2-column grids
+   - Slightly smaller padding
+
+   PC (≥ 1280px)
+   - Full 3-column grid, sticky headers
+============================================================ */
+
+/* Safe-area utility for fixed/sticky elements */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-left   { padding-left:   env(safe-area-inset-left); }
+.safe-right  { padding-right:  env(safe-area-inset-right); }
+
+/* Minimum touch target size for buttons on mobile */
+@media (max-width: 1023px) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Slightly larger tap targets on very small phones */
+}
+
+/* Reduce blur on mobile for GPU budget */
+@media (max-width: 767px) {
+  .animate-prism-shift {
+    filter: blur(30px) saturate(1.8) brightness(1.05) !important;
+  }
+  /* Disable content-visibility on mobile — causes layout jumps */
+  .optimize-visibility {
+    content-visibility: visible;
+  }
+}
+
+/* Tablet: medium breakpoint adjustments */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .animate-prism-shift {
+    filter: blur(60px) saturate(2) brightness(1.1) !important;
+  }
+}
+
+/* PC: full resolution */
+@media (min-width: 1280px) {
+  .animate-prism-shift {
+    filter: blur(80px) saturate(2) brightness(1.1) !important;
+  }
+}
+
+/* Global Application Zoom (Excluding Landing) - REMOVED for Absolute Scaling Perfection */
+@media (min-width: 1024px) {
+  .app-zoom-effect {
+    zoom: 1.0;
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  /* ... existing code ... */
+}
+
+/* ============================================================
+   EXTREME PERFORMANCE ALIGNMENT (Developers-Portal Level)
+   Forces the UI into a ultra-fluent state by stripping 
+   expensive GPU filters on mobile devices.
+   ============================================================ */
+.perf-ultra {
+  /* On small screens, blurs are the #1 fps killer */
+  @media (max-width: 1024px) {
+    *, ::before, ::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Compensate for lost blur depth with more opaque backgrounds */
+    .backdrop-blur-3xl, .backdrop-blur-2xl, .backdrop-blur-xl, .backdrop-blur-lg, .backdrop-blur-md, .backdrop-blur-sm, .backdrop-blur {
+       backdrop-filter: none !important;
+       -webkit-backdrop-filter: none !important;
+    }
+    
+    .bg-white\/10 { background-color: var(--aztec-parchment) !important; color: var(--aztec-ink); }
+    .bg-white\/20 { background-color: var(--aztec-parchment) !important; color: var(--aztec-ink); }
+    .bg-white\/40 { background-color: var(--aztec-parchment) !important; color: var(--aztec-ink); }
+    .bg-slate-950\/80 { background-color: var(--aztec-ink) !important; }
+    
+    /* Disable costly animations on active layout items */
+    .animate-blob, .animate-liquid, .animate-prism-shift {
+      animation: none !important;
+    }
+  }
+}

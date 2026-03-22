@@ -1,0 +1,156 @@
+.next/types/app/api/sse/portfolio/route.ts(12,13): error TS2344: Type 'OmitWithTag<typeof import("C:/Users/admin/.gemini/antigravity/scratch/Wallet Human Polymarket ID/app/api/sse/portfolio/route"), "GET" | "POST" | "revalidate" | "config" | "DELETE" | "HEAD" | ... 9 more ... | "maxDuration", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'emitPortfolioEvent' is incompatible with index signature.
+    Type '(walletAddress: string, event: any) => void' is not assignable to type 'never'.
+app/api/admin/blocked-ips/route.ts(12,36): error TS2339: Property 'get' does not exist on type 'Promise<ReadonlyRequestCookies>'.
+app/api/auth/signin/route.ts(22,26): error TS2339: Property 'valid' does not exist on type 'boolean'.
+app/api/auth/signin/route.ts(24,34): error TS2339: Property 'error' does not exist on type 'boolean'.
+app/api/identity/token/route.ts(4,29): error TS2307: Cannot find module '@/lib/auth/get-auth-user' or its corresponding type declarations.
+app/api/network/whale/alpha-events/route.ts(18,53): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+app/api/network/whale/alpha-events/route.ts(37,22): error TS2339: Property 'dex' does not exist on type 'WhaleMovement'.
+app/api/network/whale/alpha-events/route.ts(38,26): error TS2339: Property 'winRate' does not exist on type 'WhaleMovement'.
+app/api/network/whale/alpha-events/route.ts(45,25): error TS2551: Property 'gasUsd' does not exist on type 'WhaleMovement'. Did you mean 'gasUsed'?
+app/api/network/whale/alpha-events/route.ts(46,37): error TS2551: Property 'blockConfirmations' does not exist on type 'WhaleMovement'. Did you mean 'confirmations'?
+app/api/notifications/broadcast/route.ts(19,13): error TS2322: Type '{ userId: string; user: { connect: { walletAddress: string; }; }; title: any; message: any; type: any; isGlobal: true; actionUrl: any; }' is not assignable to type '(Without<NotificationCreateInput, NotificationUncheckedCreateInput> & NotificationUncheckedCreateInput) | (Without<...> & NotificationCreateInput)'.
+  Types of property 'user' are incompatible.
+    Type '{ connect: { walletAddress: string; }; }' is not assignable to type 'undefined'.
+app/api/payment/webhook/route.ts(143,46): error TS2339: Property 'current_period_end' does not exist on type 'Response<Subscription>'.
+app/api/payment/webhook/route.ts(182,18): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/payment/webhook/route.ts(184,67): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/payment/webhook/route.ts(187,46): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/payment/webhook/route.ts(190,46): error TS2339: Property 'current_period_end' does not exist on type 'Response<Subscription>'.
+app/api/payment/webhook/route.ts(195,64): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/payment/webhook/route.ts(201,18): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/payment/webhook/route.ts(206,46): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/payment/webhook/route.ts(214,76): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
+app/api/v1/whale/route.ts(48,15): error TS2561: Object literal may only specify known properties, but 'lastUsed' does not exist in type '(Without<ApiKeyUpdateInput, ApiKeyUncheckedUpdateInput> & ApiKeyUncheckedUpdateInput) | (Without<...> & ApiKeyUpdateInput)'. Did you mean to write 'lastUsedAt'?
+app/api/v1/whale/route.ts(58,11): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+app/api/wallet/tokens/route.ts(14,25): error TS2339: Property 'id' does not exist on type '{ name?: string | null | undefined; email?: string | null | undefined; image?: string | null | undefined; }'.
+app/api/wallet/tokens/route.ts(57,25): error TS2339: Property 'id' does not exist on type '{ name?: string | null | undefined; email?: string | null | undefined; image?: string | null | undefined; }'.
+app/api/webhooks/moonpay/route.ts(63,14): error TS7017: Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+app/api/webhooks/moonpay/route.ts(64,12): error TS7017: Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+app/api/webhooks/stripe/route.ts(130,13): error TS2322: Type '"LIFETIME_VIP"' is not assignable to type 'PlanTier | undefined'.
+app/api/webhooks/sumsub/route.ts(77,25): error TS2322: Type '"VERIFIED"' is not assignable to type 'IdentityTier | EnumIdentityTierFieldUpdateOperationsInput | undefined'.
+app/api/whale/alerts/check/route.ts(105,49): error TS2339: Property 'safeToFixed' does not exist on type 'AssetTransfersWithMetadataResult'.
+app/api/whale/alerts/check/route.ts(105,61): error TS2304: Cannot find name 'value'.
+app/api/whale/smart-analysis/route.ts(67,7): error TS2554: Expected 1 arguments, but got 2.
+app/network/mining/page.tsx(303,50): error TS18048: 'stats' is possibly 'undefined'.
+components/CreateMarketForm.tsx(2,31): error TS2307: Cannot find module './governance/ProposeMarket' or its corresponding type declarations.
+components/dashboard/BalanceCard.tsx(23,37): error TS2345: Argument of type 'Element' is not assignable to parameter of type 'string | number | null | undefined'.
+components/dashboard/BalanceCard.tsx(25,68): error TS2554: Expected 1 arguments, but got 2.
+components/defi/ZapButton.tsx(81,120): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"UNLOCKING"' have no overlap.
+components/defi/ZapButton.tsx(81,204): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"SWAPPING"' have no overlap.
+components/defi/ZapButton.tsx(81,229): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"STAKING"' have no overlap.
+components/defi/ZapButton.tsx(82,43): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"SWAPPING"' have no overlap.
+components/defi/ZapButton.tsx(82,68): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"STAKING"' have no overlap.
+components/defi/ZapButton.tsx(82,147): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED"' and '"UNLOCKING"' have no overlap.
+components/defi/ZapButton.tsx(87,120): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"SWAPPING"' have no overlap.
+components/defi/ZapButton.tsx(87,203): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"STAKING"' have no overlap.
+components/defi/ZapButton.tsx(88,43): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"STAKING"' have no overlap.
+components/defi/ZapButton.tsx(88,122): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED"' and '"SWAPPING"' have no overlap.
+components/defi/ZapButton.tsx(93,120): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED" | "COMPLETED"' and '"STAKING"' have no overlap.
+components/defi/ZapButton.tsx(94,96): error TS2367: This comparison appears to be unintentional because the types '"PENDING" | "FAILED"' and '"STAKING"' have no overlap.
+components/history/Constellation.tsx(10,43): error TS2307: Cannot find module 'react-force-graph-3d' or its corresponding type declarations.
+components/history/Constellation.tsx(17,22): error TS2554: Expected 1 arguments, but got 0.
+components/history/Constellation.tsx(121,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: {}, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ ref: RefObject<any>; graphData: GraphData; nodeLabel: string; nodeAutoColorBy: string; nodeRelSize: number; linkColor: () => string; linkWidth: number; linkDirectionalParticles: number; ... 6 more ...; enableNodeDrag: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'ref' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: {}): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ ref: RefObject<any>; graphData: GraphData; nodeLabel: string; nodeAutoColorBy: string; nodeRelSize: number; linkColor: () => string; linkWidth: number; linkDirectionalParticles: number; ... 6 more ...; enableNodeDrag: boolean; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'ref' does not exist on type 'IntrinsicAttributes'.
+components/landing/feature-cards-data.ts(1,1): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+components/landing/Hero3D.tsx(13,17): error TS2554: Expected 1 arguments, but got 0.
+components/premium/CryptoNewsFeed.tsx(191,49): error TS2694: Namespace 'global.JSX' has no exported member 'Element'.
+components/premium/TransactionHeatmap.tsx(17,11): error TS7034: Variable 'days' implicitly has type 'any[]' in some locations where its type cannot be determined.
+components/premium/TransactionHeatmap.tsx(45,41): error TS7005: Variable 'days' implicitly has an 'any[]' type.
+components/premium/ZKProofTerminal.tsx(326,61): error TS2322: Type 'string' is not assignable to type 'never'.
+components/ui/LanguageSelector.tsx(49,55): error TS2345: Argument of type '"en" | "es" | "ru" | "de"' is not assignable to parameter of type '"en"'.
+  Type '"es"' is not assignable to type '"en"'.
+components/wallet/NFCHardware.tsx(9,45): error TS2339: Property 'simulateScan' does not exist on type '{ isSupported: boolean; status: NFCStatus; startScan: () => Promise<void>; serialNumber: string | null; reset: () => void; }'.
+hooks/useMarketData.ts(33,73): error TS2304: Cannot find name 'totalValueUSD'.
+hooks/useMarketStream.ts(6,31): error TS2307: Cannot find module '@/lib/bybit/markets' or its corresponding type declarations.
+hooks/useSmartWebSockets.ts(131,17): error TS2322: Type 'number' is not assignable to type 'string'.
+lib/auth/passkey.ts(14,8): error TS2305: Module '"@simplewebauthn/browser"' has no exported member 'RegistrationResponseJSON'.
+lib/auth/passkey.ts(15,8): error TS2305: Module '"@simplewebauthn/browser"' has no exported member 'AuthenticationResponseJSON'.
+lib/blockchain/KMS.ts(3,26): error TS2307: Cannot find module '@scure/bip39/wordlists/english' or its corresponding type declarations.
+lib/event-horizon/ghost-network/rpc-protector.ts(25,38): error TS2551: Property 'sendTransaction' does not exist on type 'JsonRpcProvider'. Did you mean 'getTransaction'?
+lib/middleware/apiAuth.ts(55,64): error TS2339: Property 'ip' does not exist on type 'NextRequest'.
+lib/omega/sovereign-vault/encryption.ts(79,17): error TS2322: Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'BufferSource'.
+  Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'ArrayBufferView<ArrayBuffer>'.
+    Types of property 'buffer' are incompatible.
+      Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+        Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength
+lib/omega/sovereign-vault/ipfs.ts(18,36): error TS2322: Type 'Blob | Uint8Array<ArrayBufferLike>' is not assignable to type 'BlobPart'.
+  Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'BlobPart'.
+    Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'ArrayBufferView<ArrayBuffer>'.
+      Types of property 'buffer' are incompatible.
+        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+          Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength
+lib/security/premium-security.ts(60,44): error TS2322: Type 'Date | null' is not assignable to type 'Date | undefined'.
+  Type 'null' is not assignable to type 'Date | undefined'.
+lib/security/secure-storage.ts(184,36): error TS2349: This expression is not callable.
+  Type 'Boolean' has no call signatures.
+lib/services/init.ts(13,40): error TS7017: Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+lib/signals/SignalEngine.ts(389,51): error TS2304: Cannot find name 'value'.
+lib/signals/SignalEngine.ts(391,51): error TS2304: Cannot find name 'value'.
+lib/signals/SignalEngine.ts(396,122): error TS2304: Cannot find name 'histogram'.
+lib/signals/SignalEngine.ts(398,85): error TS2304: Cannot find name 'histogram'.
+lib/signals/SignalEngine.ts(416,66): error TS2304: Cannot find name 'nearestSupport'.
+lib/signals/SignalEngine.ts(416,109): error TS2304: Cannot find name 'distanceToSupport'.
+lib/signals/SignalEngine.ts(419,69): error TS2304: Cannot find name 'nearestResistance'.
+lib/signals/SignalEngine.ts(419,115): error TS2304: Cannot find name 'distanceToResistance'.
+lib/signals/SignalEngine.ts(433,66): error TS2304: Cannot find name 'riskReward'.
+lib/wallet/addressBook.ts(51,7): error TS2561: Object literal may only specify known properties, but 'note' does not exist in type 'Without<AddressBookEntryCreateInput, AddressBookEntryUncheckedCreateInput> & AddressBookEntryUncheckedCreateInput'. Did you mean to write 'notes'?
+lib/wallet/swap.ts(2,16): error TS7016: Could not find a declaration file for module 'qs'. 'C:/Users/admin/.gemini/antigravity/scratch/Wallet Human Polymarket ID/node_modules/qs/lib/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/qs` if it exists or add a new declaration (.d.ts) file containing `declare module 'qs';`
+src/context/LanguageContext.tsx(16,61): error TS2345: Argument of type '"es"' is not assignable to parameter of type '"en" | (() => "en")'.
+src/context/LanguageContext.tsx(33,25): error TS2367: This comparison appears to be unintentional because the types '"en"' and '"es"' have no overlap.
+src/context/LanguageContext.tsx(34,21): error TS2345: Argument of type '"en" | "es"' is not assignable to parameter of type '"en"'.
+  Type '"es"' is not assignable to type '"en"'.
+test/HumanFiGovernance.test.ts(2,10): error TS2305: Module '"hardhat"' has no exported member 'ethers'.
+test/HumanFiGovernance.test.ts(4,35): error TS2307: Cannot find module '@nomiclabs/hardhat-ethers/signers' or its corresponding type declarations.
+test/HumanFiGovernance.test.ts(27,23): error TS2339: Property 'deployed' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(32,34): error TS2339: Property 'owner' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(36,34): error TS2339: Property 'worldId' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(40,34): error TS2339: Property 'zapContract' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(51,25): error TS2339: Property 'createProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(52,18): error TS2339: Property 'emit' does not exist on type 'Assertion'.
+test/HumanFiGovernance.test.ts(54,44): error TS2339: Property 'getProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(66,25): error TS2339: Property 'createProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(67,21): error TS2339: Property 'revertedWithCustomError' does not exist on type 'Assertion'.
+test/HumanFiGovernance.test.ts(71,25): error TS2339: Property 'createProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(72,21): error TS2339: Property 'revertedWithCustomError' does not exist on type 'Assertion'.
+test/HumanFiGovernance.test.ts(80,34): error TS2339: Property 'getProposalCount' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(82,27): error TS2339: Property 'createProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(83,34): error TS2339: Property 'getProposalCount' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(85,27): error TS2339: Property 'createProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(86,34): error TS2339: Property 'getProposalCount' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(95,48): error TS2339: Property 'updateShares' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(97,34): error TS2339: Property 'getUserVotingPower' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(98,34): error TS2339: Property 'getTotalVotingPower' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(105,42): error TS2339: Property 'updateShares' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(107,34): error TS2339: Property 'getUserVotingPower' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(115,40): error TS2339: Property 'updateShares' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(116,21): error TS2551: Property 'revertedWith' does not exist on type 'Assertion'. Did you mean 'rejectedWith'?
+test/HumanFiGovernance.test.ts(122,48): error TS2339: Property 'updateShares' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(123,34): error TS2339: Property 'getTotalVotingPower' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(125,48): error TS2339: Property 'updateShares' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(126,34): error TS2339: Property 'getTotalVotingPower' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(129,48): error TS2339: Property 'updateShares' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(130,34): error TS2339: Property 'getTotalVotingPower' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(136,27): error TS2339: Property 'setQuorumPercentage' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(137,34): error TS2339: Property 'quorumPercentage' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(142,25): error TS2339: Property 'setQuorumPercentage' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(143,21): error TS2551: Property 'revertedWith' does not exist on type 'Assertion'. Did you mean 'rejectedWith'?
+test/HumanFiGovernance.test.ts(147,27): error TS2339: Property 'setApprovalThreshold' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(148,34): error TS2339: Property 'approvalThreshold' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(153,27): error TS2339: Property 'setZapContract' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(154,34): error TS2339: Property 'zapContract' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(159,25): error TS2339: Property 'setZapContract' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(160,21): error TS2339: Property 'revertedWithCustomError' does not exist on type 'Assertion'.
+test/HumanFiGovernance.test.ts(170,27): error TS2339: Property 'createProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(172,44): error TS2339: Property 'getProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(181,25): error TS2339: Property 'getProposal' does not exist on type 'HumanFiGovernance'.
+test/HumanFiGovernance.test.ts(182,21): error TS2339: Property 'revertedWithCustomError' does not exist on type 'Assertion'.
+test/smoke_test.ts(2,10): error TS2305: Module '"hardhat"' has no exported member 'ethers'.
