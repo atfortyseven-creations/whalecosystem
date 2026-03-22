@@ -357,8 +357,8 @@ export default function DashboardClient() {
                                                 <span className="text-cyan-400">[{new Date(log.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
                                                 <span className={log.action === 'SELL' ? 'text-red-400' : log.action === 'BUY' ? 'text-emerald-400' : 'text-[#e0ff00]'}>[{log.chain}] {log.action}</span>
                                              </div>
-                                             <div className="text-white">Detected transfer: <span className="font-bold">{log.amount.toLocaleString(undefined, {maximumFractionDigits: 1})} {log.asset}</span> <span className="text-white/40">(${log.usdNum.toLocaleString()})</span></div>
-                                             <div className="text-white/20 truncate text-[9px]">HASH: {log.hash}</div>
+                                             <div className="text-white">Detected transfer: <span className="font-bold">{(log.amount ?? 0).toLocaleString(undefined, {maximumFractionDigits: 1})} {log.asset}</span> <span className="text-white/40">(${(log.usdNum ?? 0).toLocaleString()})</span></div>
+                                             <div className="text-white/20 truncate text-[9px]">HASH: {log.hash ?? '—'}</div>
                                          </motion.div>
                                      ))}
                                      {unifiedWhaleFeed.length === 0 && <div className="h-full flex items-center justify-center text-white/30 animate-pulse">Awaiting cross-chain telemetry blocks...</div>}
