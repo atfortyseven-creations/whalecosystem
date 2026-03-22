@@ -54,12 +54,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         {(!pathname.startsWith('/developers')) && <HighHzWallpaper />}
 
                         {/* Reignited Institutional Header */}
-                        {!(
-                            pathname === '/' || 
-                            walletStealthMode ||
-                            pathname.startsWith('/docs') || 
-                            pathname.startsWith('/privacy') || 
-                            pathname.startsWith('/terms')
+                        {(
+                            pathname === '/network' || 
+                            pathname === '/portfolio' || 
+                            pathname === '/support' || 
+                            pathname === '/academy' || 
+                            pathname === '/dashboard' ||
+                            pathname === '/vip' ||
+                            pathname === '/'
                         ) && <InstitutionalHeader />}
 
                         {/* Global Utility Hub */}
