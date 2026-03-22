@@ -376,7 +376,7 @@ export function MarketHeatmap24h() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 30_000);
+    const interval = setInterval(fetchData, 15_000); // 15s for live feel
     return () => clearInterval(interval);
   }, [fetchData]);
 
@@ -406,44 +406,44 @@ export function MarketHeatmap24h() {
   const GAP = 3;
 
   return (
-    <div className="bg-[var(--aztec-parchment)] border border-[var(--aztec-ink)]/10 rounded-[2.5rem] overflow-hidden shadow-xl shadow-[var(--aztec-ink)]/5">
+    <div className="bg-[#0d0d0d] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-xl">
       {/* Header */}
       <div className="flex items-center justify-between px-8 pt-7 pb-4">
         <div>
-          <h2 className="text-lg font-black text-[var(--aztec-ink)] tracking-tight">
-            Heatmap <span className="text-[var(--aztec-ink)]/30 font-light">24h</span>
+          <h2 className="text-lg font-black text-white tracking-tight">
+            Heatmap <span className="text-white/30 font-light">24h</span>
           </h2>
-          <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest mt-0.5">
-            {TABS.find(t => t.key === activeTab)?.desc}
+          <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-0.5">
+            {TABS.find(t => t.key === activeTab)?.desc} · LIVE BINANCE
           </p>
         </div>
 
         <div className="flex items-center gap-4">
           {lastUpdate && (
-            <span className="text-[10px] font-mono text-slate-300">
+            <span className="text-[10px] font-mono text-white/30">
               {lastUpdate.toLocaleTimeString()}
             </span>
           )}
           <button
             onClick={fetchData}
-            className="p-2 rounded-xl border border-slate-100 hover:border-slate-300 transition-all group"
+            className="p-2 rounded-xl border border-white/10 hover:border-white/30 transition-all group"
           >
-            <RefreshCw size={13} className="text-slate-400 group-hover:text-slate-700 group-hover:rotate-180 transition-all duration-500" />
+            <RefreshCw size={13} className="text-white/40 group-hover:text-white group-hover:rotate-180 transition-all duration-500" />
           </button>
         </div>
       </div>
 
       {/* Tab Switcher */}
       <div className="px-8 pb-4">
-        <div className="flex gap-1 p-1 bg-slate-50 border border-slate-100 rounded-2xl w-fit">
+        <div className="flex gap-1 p-1 bg-white/5 border border-white/10 rounded-2xl w-fit">
           {TABS.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${
                 activeTab === tab.key
-                  ? "bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] shadow-sm"
-                  : "text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-ink)] hover:bg-[var(--aztec-parchment)]"
+                  ? "bg-white text-black shadow-sm"
+                  : "text-white/40 hover:text-white hover:bg-white/5"
               }`}
             >
               {tab.icon}
@@ -456,7 +456,7 @@ export function MarketHeatmap24h() {
       {/* Heatmap Canvas */}
       <div
         ref={containerRef}
-        className="relative mx-6 mb-6 rounded-2xl overflow-hidden bg-[var(--aztec-parchment)] shadow-inner"
+        className="relative mx-6 mb-6 rounded-2xl overflow-hidden bg-[#0a0a0a] shadow-inner border border-white/5"
         style={{ height: 380 }}
       >
         {loading ? (
@@ -520,15 +520,15 @@ export function MarketHeatmap24h() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between px-8 pb-6">
+        <div className="flex items-center justify-between px-8 pb-6 border-t border-white/5 pt-4">
         {activeTab === "chgPct" ? (
           <div className="flex items-center gap-3">
             {[
-              { color: "bg-rose-600", label: "Bearish > -5%" },
+              { color: "bg-rose-600", label: "Bear > -5%" },
               { color: "bg-rose-700", label: "-2% to -5%" },
               { color: "bg-slate-600", label: "~0%" },
               { color: "bg-emerald-700", label: "+2% to +5%" },
-              { color: "bg-emerald-500", label: "Bullish > +5%" },
+              { color: "bg-emerald-500", label: "Bull > +5%" },
             ].map(l => (
               <div key={l.label} className="flex items-center gap-1.5">
                 <div className={`w-3 h-3 rounded-sm ${l.color}`} />
