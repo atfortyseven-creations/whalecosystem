@@ -19,6 +19,7 @@ import { initializeBackgroundServices } from "@/lib/services/init";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { AztecNoise } from "@/components/ui/AztecNoise";
 import { ReactNode } from "react";
+import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -142,9 +143,11 @@ export default async function RootLayout({
           <CookieProvider>
              <GoogleTagManager gtmId="GTM-52B9SCRM" />
               <Providers cookies={cookies}>
-                <ClientLayout>
-                  {children}
-                </ClientLayout>
+                <MobileEnforcer>
+                  <ClientLayout>
+                    {children}
+                  </ClientLayout>
+                </MobileEnforcer>
                 <Toaster richColors position="top-right" />
                 <CookieConsent />
                 <OfflineDetector />
