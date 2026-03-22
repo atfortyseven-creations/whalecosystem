@@ -25,7 +25,7 @@ export const Footer = () => {
                     <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight">
                         <span className="text-[var(--aztec-orchid)]">{t.footer.cta.title}</span>
                         <br />
-                        <span className="text-[var(--aztec-ink)]">Whale Alert</span>
+                        <span className="font-aztec-h2 text-[var(--aztec-ink)] tracking-tight">Whale Alert Corporation.</span>
                     </h2>
                     
                     <p className="text-xl text-[var(--aztec-ink)]/60 mb-12 max-w-2xl mx-auto italic">

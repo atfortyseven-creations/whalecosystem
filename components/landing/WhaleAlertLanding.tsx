@@ -72,7 +72,7 @@ export function WhaleAlertLanding() {
           transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
-          <div className="font-aztec-h2 text-[12px] uppercase tracking-[0.6em] text-[var(--aztec-ink)] opacity-40 mb-12">The Protocol of Sovereign Privacy</div>
+
           <h1 className="font-aztec-h1 text-[clamp(2.5rem,10vw,14rem)] leading-[0.85] text-[var(--aztec-ink)] mb-12 drop-shadow-sm">
             Introduction <br/> to <span className="italic">Aztec</span>.
           </h1>
