@@ -2044,11 +2044,15 @@ model Project {
   updatedAt   DateTime     @updatedAt
   deployments Deployment[]
 
-  // [NEW] Real-Time Operational Metrics
+  // [PHASE 1] Real-Time Operational Metrics
   cpuUsage Float @default(0.0)
   ramUsage Float @default(0.0)
   uptime   Int   @default(0)
   logs     Log[]
+
+  // [PHASE 3] Segmented Intelligence Routing
+  trackedAsset String @default("ALL") // ETH | BTC | USDT | BNB | ALL
+  dexFilter    String @default("ALL") // Uniswap | Binance | ALL
 
   @@index([userId])
 }
