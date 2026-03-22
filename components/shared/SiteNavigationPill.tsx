@@ -1,0 +1,43 @@
+"use client";
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Crown, LayoutDashboard, Globe, HelpCircle, Tag } from 'lucide-react';
+
+export function SiteNavigationPill() {
+    const pathname = usePathname();
+
+    const navLinks = [
+        { href: '/#pricing', label: 'Pricing', icon: Tag, active: false },
+        { href: '/#faq', label: 'FAQ', icon: HelpCircle, active: false },
+        { href: '/network', label: 'Network', icon: Globe, active: pathname.startsWith('/network') },
+        { href: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, active: pathname.startsWith('/portfolio') },
+    ];
+
+    return (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden lg:flex items-center gap-8 bg-white/40 backdrop-blur-3xl px-10 py-4 rounded-[2.5rem] border border-black/5 shadow-2xl hover:bg-white/60 transition-all group">
+            {navLinks.map((link) => (
+                <Link 
+                    key={link.href} 
+                    href={link.href} 
+                    className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
+                        link.active ? 'text-[var(--aztec-ink)]' : 'text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-ink)]'
+                    }`}
+                >
+                    <link.icon size={12} className={link.active ? 'text-[var(--aztec-orchid)]' : 'text-[var(--aztec-ink)]/20'} />
+                    {link.label}
+                </Link>
+            ))}
+            <div className="w-px h-4 bg-black/5" />
+            <Link 
+                href="/vip" 
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 ${
+                    pathname === '/vip' ? 'text-[var(--aztec-orchid)]' : 'text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-orchid)]'
+                }`}
+            >
+                <Crown size={12} /> WHALE VIP
+            </Link>
+        </div>
+    );
+}

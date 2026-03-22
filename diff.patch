@@ -1,0 +1,77 @@
+diff --git a/components/landing/WhaleAlertLanding.tsx b/components/landing/WhaleAlertLanding.tsx
+index ec64f63..224ba5c 100644
+--- a/components/landing/WhaleAlertLanding.tsx
++++ b/components/landing/WhaleAlertLanding.tsx
+@@ -466,22 +466,6 @@ export function WhaleAlertLanding() {
+         style={{ width: progressWidth }}
+       />
+ 
+-      {/* ── NAV ─────────────────────────────────────────────────────── */}
+-      <nav className="fixed top-2 left-1/2 -translate-x-1/2 z-40 flex items-center gap-8 bg-black/70 backdrop-blur-xl border border-white/10 rounded-full px-6 py-3 shadow-2xl">
+-        <span className="font-black text-white uppercase tracking-widest text-sm">Whale Alert Corp.</span>
+-        <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase tracking-widest text-white/50">
+-          <a href="#features" className="hover:text-white transition-colors">API</a>
+-          <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+-          <a href="#security" className="hover:text-white transition-colors">Security</a>
+-          <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+-          <Link href="/network" className="hover:text-white transition-colors">Network</Link>
+-        </div>
+-        <Link href="/api-marketplace">
+-          <button className="bg-white text-black text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full hover:bg-white/90 transition-colors ml-2">
+-            Get API Key
+-          </button>
+-        </Link>
+-      </nav>
+ 
+       {/* ── SECTION 1: HERO ─────────────────────────────────────────── */}
+       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-10 overflow-hidden">
+@@ -502,13 +486,12 @@ export function WhaleAlertLanding() {
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.9, delay: 0.3 }}
+             className="font-black tracking-tighter leading-[0.88] mb-6"
+-            style={{ fontSize: "clamp(2.8rem, 10vw, 9rem)" }}
++            style={{ fontSize: "clamp(2.8rem, 10vw, 8rem)" }}
+           >
+             Whale Alert
+-            <br />
+-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-blue-300 to-emerald-300">
+-              Corporation
+-            </span>
++            <div className="text-[0.25em] font-bold text-white/40 tracking-[0.3em] uppercase mt-4">
++              la plataforma líder
++            </div>
+           </motion.h1>
+ 
+           <motion.p
+@@ -589,7 +572,7 @@ export function WhaleAlertLanding() {
+       {/* ── SECTION 2: WHY WHALE ALERT ─────────────────────────────── */}
+       <Section className="max-w-6xl mx-auto">
+         <div className="text-center mb-16">
+-          <div className="text-xs font-black uppercase tracking-[0.4em] text-violet-400 mb-4">¿Por qué Whale Alert Corporation?</div>
++            <div className="text-xs font-black uppercase tracking-[0.4em] text-violet-400 mb-4">¿Por qué Whale Alert?</div>
+           <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-white mb-6">
+             Inteligencia institucional.<br />
+             <span className="text-white/40">Sin compromisos.</span>
+@@ -949,7 +932,7 @@ print(f"Ventas ballena BTC > $5M: {len(sells)}")
+         <div className="relative z-10 max-w-6xl mx-auto">
+           <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-20">
+             <div className="text-center md:text-left">
+-              <span className="font-black text-white uppercase tracking-[0.3em] text-xl block mb-4">Whale Alert Corp.</span>
++              <span className="font-black text-white uppercase tracking-[0.3em] text-xl block mb-4">Whale Alert</span>
+               <p className="text-white/40 max-w-xs text-sm leading-relaxed">
+                 Empoderando a la élite financiera con inteligencia on-chain determinista y latencia de grado institucional.
+               </p>
+@@ -983,7 +966,7 @@ print(f"Ventas ballena BTC > $5M: {len(sells)}")
+           </div>
+           
+           <div className="flex flex-col md:flex-row items-center justify-between pt-12 border-t border-white/5 text-[10px] uppercase tracking-[0.3em] text-white/20 font-black">
+-            <div>© 2026 Whale Alert Corporation. All rights reserved.</div>
++            <div>© 2026 Whale Alert. All rights reserved.</div>
+             <div className="mt-4 md:mt-0 flex items-center gap-6">
+                <span>Lanzadera Submission Phase</span>
+                <span className="w-1 h-1 rounded-full bg-white/20" />
+@@ -995,3 +978,4 @@ print(f"Ventas ballena BTC > $5M: {len(sells)}")
+     </div>
+   );
+ }
++
