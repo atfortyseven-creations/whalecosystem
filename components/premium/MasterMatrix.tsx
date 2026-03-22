@@ -67,10 +67,8 @@ export function MasterMatrix() {
     const fmt = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 
     return (
-        <div className="relative min-h-screen bg-[var(--aztec-ink)] text-[var(--aztec-ink)] font-sans selection:bg-[var(--aztec-orchid)]/20 selection:text-[var(--aztec-ink)] overflow-x-hidden">
-            <div className="absolute inset-0 z-0">
-                <Image src="/models/update/logan-voss-VTWMWadBMvM-unsplash.jpg" alt="Background" fill className="object-cover opacity-60" />
-            </div>
+        <div className="relative min-h-screen bg-transparent text-[var(--aztec-ink)] font-sans selection:bg-[var(--aztec-orchid)]/20 selection:text-[var(--aztec-ink)] overflow-x-hidden">
+            {/* Global wallpaper is provided by ClientLayout */}
 
             <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
                 {/* Institutional Header is handled by ClientLayout */}
