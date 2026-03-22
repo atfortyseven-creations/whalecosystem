@@ -21,22 +21,24 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { isConnected } = useAccount();
     const { walletStealthMode } = useSettings();    
+/*
     // Global Wallet Connection Tracking
     useAccountEffect({
         onConnect(data) {
             // If they are just returning to the site and land on the homepage
             if (data.isReconnected) {
                 if (pathname === '/') {
-                    router.push('/network');
+                    // router.push('/network');
                 }
                 return;
             }
             // Fresh connection from any page
             if (pathname !== '/network') {
-                router.push('/network');
+                // router.push('/network');
             }
         }
     });
+*/
 
     // Handled purely by useAccountEffect above to permit manual return navigation.
 
