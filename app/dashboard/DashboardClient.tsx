@@ -12,6 +12,7 @@ import { useGodView } from '@/hooks/useGodView';
 import { PremiumToasts } from '@/components/premium/ToastManager';
 import { useAccount } from 'wagmi';
 import { useWhaleFeed } from '@/hooks/useWhaleFeed';
+import { toast } from 'sonner';
 
 import LiquidationHeatmap from '@/components/premium/LiquidationHeatmap';
 import AztecPrivacyHub from '@/components/premium/AztecPrivacyHub';
@@ -115,16 +116,28 @@ export default function DashboardClient() {
     const tempId = 'temp-' + Date.now();
     setNodes(prev => [...prev, { id: tempId, name: newNodeName, type: newNodeType, status: 'deploying' }]);
     
-    await fetch('/api/projects', {
-      method: 'POST',
-      body: JSON.stringify({ name: newNodeName, wallet: address })
-    });
-    setNewNodeName("");
-    
-    // Simulate deployment time for immersion
-    setTimeout(() => {
-        fetchProjects();
-    }, 1500);
+    try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          body: JSON.stringify({ name: newNodeName, wallet: address })
+        });
+        
+        if (!res.ok) {
+            setNodes(prev => prev.filter(n => n.id !== tempId));
+            toast.error("Deployment Failed: Database synchronization required.");
+            return;
+        }
+
+        setNewNodeName("");
+        
+        // Simulate deployment time for immersion
+        setTimeout(() => {
+            fetchProjects();
+        }, 1500);
+    } catch (e) {
+        setNodes(prev => prev.filter(n => n.id !== tempId));
+        toast.error("Network Error during deployment.");
+    }
   };
 
   const handleDeleteNode = async (id: string) => {
