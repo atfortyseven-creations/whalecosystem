@@ -1,20 +1,2041 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// ============================================================================
+// HUMANID.FI - ENTERPRISE PRODUCTION SCHEMA (POSTGRESQL)
+// ============================================================================
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql" // Scaling to production grade
+  url      = env("DATABASE_URL")
 }
+
+// ----------------------------------------------------------------------------
+// 1. ENUMS (STRICT BUSINESS RULES)
+// ----------------------------------------------------------------------------
+
+enum PlanTier {
+  FREE
+  STANDARD
+  STARTER
+  PRO
+  ELITE
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IdentityTier {
+  GHOST
+  INITIATE
+  HUMAN
+  SOVEREIGN
+}
+
+enum MarketStatus {
+  ACTIVE
+  PAUSED
+  RESOLVED
+  DISPUTED
+}
+
+enum TransactionStatus {
+  PENDING_RELAY
+  SUBMITTED
+  CONFIRMED
+  FAILED
+}
+
+enum ProposalStatus {
+  PENDING
+  VOTING
+  APPROVED
+  REJECTED
+  CREATED
+  RESOLVED
+  CANCELLED
+  EXECUTED
+}
+
+enum VoteChoice {
+  FOR
+  AGAINST
+  ABSTAIN
+}
+
+enum FeeType {
+  TRADING_FEE
+  CREATION_FEE
+  RESOLUTION_FEE
+}
+
+enum DistributionStatus {
+  PENDING
+  PUBLISHED
+  EXPIRED
+  ARCHIVED
+}
+
+enum ZapStatus {
+  PENDING
+  SWAPPING
+  BUYING
+  COMPLETED
+  FAILED
+  PARTIAL_FAIL
+}
+
+// ----------------------------------------------------------------------------
+// 2. USERS (See updated model below with NextAuth support)
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// 2.1. SESSIONS (Security & Authentication)
+// ----------------------------------------------------------------------------
+
+model Session {
+  id            String    @id @default(cuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  authUserId    String?
+  authUser      AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  sessionToken String  @unique
+  accessToken  String?
+  refreshToken String?
+
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  lastActivity  DateTime @default(now())
+  ipAddress     String?
+  userAgent     String?
+  fingerprint   String? // [NEW] Browser fingerprint for session hijacking detection
+  isCompromised Boolean @default(false) // [NEW] Flag for suspicious sessions
+
+  // [NEW] Enhanced Session Tracking
+  deviceType String? // mobile, desktop, tablet
+  browser    String? // Chrome, Firefox, Safari
+  os         String? // Windows, macOS, iOS, Android
+  country    String? // Spain, USA, etc
+  city       String? // Madrid, New York, etc
+  latitude   Float?
+  longitude  Float?
+
+  @@index([userId])
+  @@index([authUserId])
+  @@index([expiresAt])
+  @@index([sessionToken])
+  @@index([fingerprint])
+}
+
+// ----------------------------------------------------------------------------
+// 2.2. SECURITY MONITORING
+// ----------------------------------------------------------------------------
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  type      String // 'LOGIN', 'LOGOUT', 'IP_CHANGE', 'FINGERPRINT_MISMATCH', 'RATE_LIMIT', 'BLOCKED', 'FAILED_LOGIN'
+  userId    String?
+  ipAddress String
+  userAgent String?
+  metadata  Json?
+  severity  String // 'INFO', 'WARNING', 'CRITICAL'
+  timestamp DateTime @default(now())
+
+  @@index([type, timestamp])
+  @@index([userId, timestamp])
+  @@index([ipAddress, timestamp])
+}
+
+model BlockedIP {
+  id        String    @id @default(cuid())
+  ipAddress String    @unique
+  reason    String
+  blockedAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([ipAddress])
+}
+
+// ----------------------------------------------------------------------------
+// 3. DASHBOARD & FINANCE
+// ----------------------------------------------------------------------------
+
+model TreasurySnapshot {
+  id                String   @id @default(cuid())
+  date              DateTime @default(now())
+  totalValueLocked  Decimal  @db.Decimal(18, 2) // Real financial precision
+  circulatingSupply Decimal
+  protocolRevenue   Decimal
+  blockNumber       BigInt?
+  txHash            String?
+}
+
+model IntelItem {
+  id             String   @id @default(cuid())
+  source         String
+  title          String
+  category       String   @default("FINANCE")
+  url            String   @unique
+  publishedAt    DateTime @default(now())
+  sentimentScore Float?
+  aiSummary      String?  @db.Text
+  priority       String   @default("NORMAL")
+  createdAt      DateTime @default(now())
+
+  @@index([publishedAt])
+}
+
+// ----------------------------------------------------------------------------
+// 4. MARKETS & TRADING
+// ----------------------------------------------------------------------------
+
+model Market {
+  slug      String       @id
+  question  String
+  category  String
+  status    MarketStatus @default(ACTIVE)
+  endDate   DateTime
+  volume    Decimal      @default(0)
+  liquidity Decimal      @default(0)
+  riskLevel RiskLevel    @default(LOW)
+  trades    Trade[]
+}
+
+model Trade {
+  id         String   @id @default(cuid())
+  userWallet String
+  marketSlug String
+  amount     Decimal
+  position   String
+  timestamp  DateTime @default(now())
+
+  user   User   @relation(fields: [userWallet], references: [walletAddress])
+  market Market @relation(fields: [marketSlug], references: [slug])
+}
+
+// ----------------------------------------------------------------------------
+// 5. GOVERNANCE
+// ----------------------------------------------------------------------------
+
+model MarketProposal {
+  id                 String @id @default(cuid())
+  question           String
+  description        String @db.Text
+  outcomes           Json // Postgres soporta JSON nativo
+  resolutionCriteria String @db.Text
+  category           String
+
+  creatorAddress   String
+  creator          User   @relation(fields: [creatorAddress], references: [walletAddress])
+  creatorNullifier String @unique
+
+  votesFor        Int @default(0)
+  votesAgainst    Int @default(0)
+  votingThreshold Int @default(100)
+
+  status          ProposalStatus @default(PENDING)
+  createdAt       DateTime       @default(now())
+  votingEndsAt    DateTime
+  approvedAt      DateTime?
+  marketCreatedAt DateTime?
+
+  proposalId   String? @unique
+  polymarketId String? @unique
+  conditionId  String?
+
+  totalFeesAccrued  Decimal  @default(0) @db.Decimal(18, 6)
+  lastRoyaltyUpdate DateTime @default(now())
+
+  txStatus        TransactionStatus @default(PENDING_RELAY)
+  txHash          String?           @unique
+  onChainId       Int?              @unique
+  executedAt      DateTime?
+  executionTxHash String?
+
+  votes     ProposalVote[]
+  royalties RoyaltyAccrual[]
+
+  @@index([status, votingEndsAt])
+  @@index([creatorAddress])
+}
+
+model ProposalVote {
+  id         String         @id @default(cuid())
+  proposalId String
+  proposal   MarketProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  nullifierHash String
+  voterAddress  String
+  voter         User   @relation(fields: [voterAddress], references: [walletAddress])
+
+  vote    VoteChoice
+  votedAt DateTime   @default(now())
+
+  merkleRoot        String
+  proof             Json // Postgres soporta JSON nativo
+  verificationLevel String  @default("orb")
+  ipfsHash          String?
+
+  txHash       String?
+  txStatus     TransactionStatus @default(PENDING_RELAY)
+  errorMessage String?
+
+  @@unique([proposalId, nullifierHash])
+  @@index([proposalId, votedAt])
+}
+
+model Vote {
+  id         String @id @default(cuid())
+  userWallet String
+  user       User   @relation(fields: [userWallet], references: [walletAddress])
+}
+
+// ----------------------------------------------------------------------------
+// 6. UTILITIES
+// ----------------------------------------------------------------------------
+
+model RoyaltyAccrual {
+  id           String         @id @default(cuid())
+  proposalId   String
+  proposal     MarketProposal @relation(fields: [proposalId], references: [id])
+  amount       Decimal        @db.Decimal(18, 6)
+  feeType      FeeType
+  txHash       String         @unique
+  blockNumber  BigInt
+  timestamp    DateTime       @default(now())
+  merkleTreeId String?
+  claimed      Boolean        @default(false)
+  claimedAt    DateTime?
+  claimTxHash  String?
+
+  @@index([proposalId, timestamp])
+}
+
+model MerkleDistribution {
+  id           String             @id @default(cuid())
+  periodStart  DateTime
+  periodEnd    DateTime
+  merkleRoot   String             @unique
+  totalAmount  Decimal            @db.Decimal(18, 6)
+  ipfsHash     String
+  treeData     Json // Postgres soporta JSON nativo
+  totalClaims  Int                @default(0)
+  totalClaimed Decimal            @default(0) @db.Decimal(18, 6)
+  status       DistributionStatus @default(PENDING)
+  publishedAt  DateTime?
+  expiresAt    DateTime
+  claims       RewardClaim[]
+
+  @@index([periodEnd, status])
+}
+
+model RewardClaim {
+  id             String             @id @default(cuid())
+  merkleTreeId   String
+  distribution   MerkleDistribution @relation(fields: [merkleTreeId], references: [id])
+  claimerAddress String
+  claimer        User               @relation(fields: [claimerAddress], references: [walletAddress])
+  amount         Decimal            @db.Decimal(18, 6)
+  merkleProof    Json // Postgres soporta JSON nativo
+  leafIndex      Int
+  claimedAt      DateTime           @default(now())
+  txHash         String             @unique
+  gasUsed        BigInt
+
+  @@unique([merkleTreeId, claimerAddress])
+}
+
+model ZapTransaction {
+  id             String    @id @default(cuid())
+  userAddress    String
+  user           User      @relation(fields: [userAddress], references: [walletAddress])
+  wldAmount      Decimal   @db.Decimal(18, 6)
+  wldPriceUSD    Decimal   @db.Decimal(18, 6)
+  usdcReceived   Decimal   @db.Decimal(18, 6)
+  slippage       Decimal   @db.Decimal(5, 4)
+  dexUsed        String
+  marketId       String
+  outcomeIndex   Int
+  sharesReceived Decimal   @db.Decimal(18, 6)
+  txHash         String    @unique
+  blockNumber    BigInt
+  gasUsed        BigInt
+  gasPaidBy      String
+  status         ZapStatus
+  errorMessage   String?
+  initiatedAt    DateTime  @default(now())
+  completedAt    DateTime?
+
+  @@index([userAddress, initiatedAt])
+}
+
+model UserMetrics {
+  id                    String   @id @default(cuid())
+  userAddress           String   @unique
+  user                  User     @relation(fields: [userAddress], references: [walletAddress])
+  proposalsCreated      Int      @default(0)
+  votescast             Int      @default(0)
+  zapsExecuted          Int      @default(0)
+  totalWLDZapped        Decimal  @default(0) @db.Decimal(18, 6)
+  totalRoyaltiesEarned  Decimal  @default(0) @db.Decimal(18, 6)
+  totalRoyaltiesClaimed Decimal  @default(0) @db.Decimal(18, 6)
+  successfulProposals   Int      @default(0)
+  reputationScore       Int      @default(0)
+  firstSeenAt           DateTime @default(now())
+  lastActiveAt          DateTime @default(now())
+
+  @@index([reputationScore])
+}
+
+// ----------------------------------------------------------------------------
+// 7. SUPPORT SYSTEM (The Void)
+// ----------------------------------------------------------------------------
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model SupportTicket {
+  id        String       @id @default(cuid())
+  userId    String? // Optional: User might be anonymous or "Ghost"
+  user      User?        @relation(fields: [userId], references: [walletAddress])
+  section   String // 'general', 'technical', 'governance', 'other'
+  message   String       @db.Text
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Admin fields
+  adminNotes String? @db.Text
+  priority   String  @default("NORMAL")
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ----------------------------------------------------------------------------
+// NEXTAUTH.JS MODELS (Google OAuth)
+// ----------------------------------------------------------------------------
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model NextAuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Update User model to support OAuth
+model User {
+  clerkId              String?      @unique
+  walletAddress        String       @id
+  snxAccountId         String?      @unique // 🛡️ Elite SNX V3 Account ID
+
+  worldIdNullifierHash String?      @unique
+  email                String?      @unique
+  stripeCustomerId     String?      @unique @map("stripe_customer_id")
+  tier                 IdentityTier @default(GHOST)
+  reputation           Int          @default(0)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  lastActive           DateTime     @default(now())
+
+  @@index([clerkId])
+
+  // NextAuth fields
+  name          String?
+  username      String?      @unique
+  emailVerified DateTime?
+  image         String?
+
+  // Relations
+  proposals       MarketProposal[]
+  proposalVotes   ProposalVote[]
+  zapTransactions ZapTransaction[]
+  rewardClaims    RewardClaim[]
+  metrics         UserMetrics?
+  trades          Trade[]
+  simpleVotes     Vote[]
+  sessions        Session[]
+  supportTickets  SupportTicket[]
+  kycRecord       KYCRecord?
+  snapshots       PortfolioSnapshot[]
+
+  accounts         Account[]
+  nextAuthSessions NextAuthSession[]
+
+  // [NEW] Phase 1 Relations
+  settings      UserSettings?
+  contacts          Contact[]
+  notifications     Notification[]
+  watchedWallets    WatchedWallet[]
+  stats             UserStats? // Relation to UserStats
+
+  // Referral Relations
+  referralsSent     Referral[] @relation("Referrer")
+  referralsReceived Referral?  @relation("Referee")
+  // [NEW] Virtual Card
+  virtualCard   VirtualCard?
+
+  // [NEW] Security & Premium Features
+  alertRules    AlertRule[]
+  subscriptions Subscription[]
+
+  apiKeys       ApiKey[]
+  signals       UserSignal[]
+  activities    UserActivity[]
+  blockchainTransactions BlockchainTransaction[]
+
+  // [NEW] Exchange Relations
+  exchangeOrders   ExchangeOrder[]
+  exchangePositions ExchangePosition[]
+  exchangeBalances ExchangeBalance[]
+
+  @@index([reputation])
+}
+
+model BlockchainTransaction {
+  id              String            @id @default(cuid())
+  hash            String            @unique
+  userId          String
+  user            User              @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  type            String            // 'SWAP', 'BRIDGE', 'TRANSFER'
+  status          TransactionStatus @default(PENDING_RELAY)
+  fromChain       Int
+  toChain         Int
+  fromToken       String
+  toToken         String
+  fromAmount      String
+  toAmount        String?
+  gasPrice        String?
+  gasUsed         BigInt?
+  effectiveGasPrice BigInt?
+  nonce           Int?
+  error           String?
+  metadata        Json?             // Para guardar el aggregatorId (Li.Fi), quotes, etc.
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([hash])
+  @@index([status])
+}
+
+model ApiKey {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  name          String?
+  userId        String
+  user          User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  
+  isActive      Boolean  @default(true)
+  isSubAccount  Boolean  @default(false)
+  plan          String   @default("free") // Legacy field, keeping for backwards compatibility
+  
+  // Seguridad Institucional
+  hmacSecret    String?  
+  ipWhitelist   String[] 
+  
+  // Analytics
+  requests      BigInt   @default(0)
+  lastUsedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([key])
+  @@index([userId])
+}
+
+// ----------------------------------------------------------------------------
+// AUTH SYSTEM (Real Email Verification & Sessions)
+// ----------------------------------------------------------------------------
+
+model AuthUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String?  @unique
+  passwordHash String
+  name         String?
+  verified     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // [NEW] Internal Wallet Data
+  walletAddress       String?  @unique
+  // REMOVED (SECURITY FIX): encryptedMnemonic, encryptedPrivateKey, walletSalt
+  // These should be managed by a Hardware KMS or specialized MPC like Fireblocks/Turnkey
+  
+  clerkId             String?  @unique
+  stripeCustomerId    String?  @unique @map("stripe_customer_id")
+  strigaUserId        String?  @unique
+
+  verificationCodes VerificationCode[]
+  userSettings      UserSettings?
+  contacts          UserContact[]
+  notifications     UserNotification[]
+  sessions          Session[]
+  authenticators    Authenticator[]
+  wallets           WalletAccount[]
+  addressBook       AddressBookEntry[]
+  timeLockVaults    TimeLockVault[]
+  deadMansSwitch    DeadMansSwitch?
+  socialRecovery    SocialRecovery?
+  aiRebalancerPlans AIRebalancerPlan[]
+  // [NEW] Virtual Card
+  virtualCard       VirtualCard?
+
+  @@index([email])
+}
+
+model PortfolioSnapshot {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  timestamp  DateTime @default(now())
+  totalUsd   Float
+  
+  @@index([userId, timestamp])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  code      String
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, code])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// PHASE 1: ADVANCED USER MANAGEMENT FEATURES
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// EMAIL SUBSCRIPTIONS SYSTEM
+// ----------------------------------------------------------------------------
+
+model EmailSubscriber {
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+
+  // Subscription status
+  subscribed       Boolean @default(true)
+  unsubscribeToken String  @unique @default(cuid())
+
+  // Preferences
+  frequency String   @default("weekly") // daily, weekly, monthly
+  topics    String[] // ["updates", "news", "releases"]
+
+  // Timestamps
+  subscribedAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+  @@index([subscribed])
+}
+
+// ----------------------------------------------------------------------------
+// NEWS & UPDATES SYSTEM
+// ----------------------------------------------------------------------------
+
+model NewsUpdate {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  content     String @db.Text
+  category    String // "feature", "update", "announcement", "defi-news", "web3-news"
+
+  // Media
+  imageUrl  String?
+  lottieUrl String?
+
+  // Metadata
+  author      String?
+  publishedAt DateTime @default(now())
+  featured    Boolean  @default(false)
+
+  // SEO
+  slug String   @unique
+  tags String[]
+
+  @@index([publishedAt])
+  @@index([category])
+  @@index([featured])
+}
+
+// ----------------------------------------------------------------------------
+// USER SETTINGS (Persistent)
+// ----------------------------------------------------------------------------
+
+model UserSettings {
+  id         String    @id @default(cuid())
+  userId     String?   @unique
+  authUserId String?   @unique
+  user       User?     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  authUser   AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  // Appearance & UI
+  theme        String @default("light") // light, dark, auto
+  language     String @default("en") // en (System Language)
+  currency     String @default("USD") // USD, EUR, GBP, JPY, MXN
+  searchEngine String @default("Google") // Google, DuckDuckGo, Brave
+
+  // Privacy & Security
+  showProfile   Boolean @default(true)
+  showActivity  Boolean @default(false)
+  hideBalances  Boolean @default(false) // Mask balances with ****
+  privacyMode   Boolean @default(true) // Block 3rd party trackers
+  strictMode    Boolean @default(false) // Whitelist-only transactions
+  humanMetrics  Boolean @default(false) // Send anonymous usage data
+
+  // Notifications
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  transactionAlerts  Boolean @default(true)
+  marketingEmails    Boolean @default(false)
+  
+  // Telegram Settings
+  telegramEnabled    Boolean @default(false)
+  telegramChatId     String?
+  telegramTopicId    String?
+  telegramUsername   String?
+  whaleThreshold     Float   @default(500000000) // $500,000,000
+  whaleBtcThreshold  Float   @default(50)
+  whaleAudioMuted    Boolean @default(false)
+
+  // Trading
+  defaultSlippage     Float   @default(0.5)
+  defaultGasPrice     String  @default("medium")
+  confirmTransactions Boolean @default(true)
+
+  // Smart Wallet Security
+  walletStealthMode         Boolean @default(false)
+  requirePasswordForSigning Boolean @default(true)
+  autoLockDuration          Int     @default(15) // minutes
+
+  // Advanced Settings
+  testNetsEnabled  Boolean @default(false)
+  ipfsGateway      String  @default("https://ipfs.io/ipfs/")
+  customRPC        String?
+  stateLogsEnabled Boolean @default(false)
+
+  // Contacts (JSON array)
+  contacts Json @default("[]") // Array of {id, name, address, memo}
+
+  // Notifications granular (JSON object)
+  notificationsConfig Json @default("{\"governance\":true,\"transactional\":true,\"security\":true}")
+
+  // Intelligence & AI Configuration
+  intelligenceConfig Json @default("{\"tacticalThreshold\":500000000,\"signalSensitivity\":0.8,\"agentAutonomy\":false,\"alphaAlerts\":true}")
+  
+  // Atomic Execution & Network Configuration
+  executionConfig Json @default("{\"gaslessMode\":true,\"bundlerRef\":\"pimlico-mainnet\",\"sessionKeys\":false,\"priorityFee\":\"dynamic\"}")
+  
+  // Matrix UI & Aesthetic Configuration
+  uiConfig Json @default("{\"density\":\"standard\",\"animations\":true,\"colorProfile\":\"arctic\",\"glassIntensity\":0.6}")
+
+  // Privacy & Cookies
+  cookiePreferences Json? // { "essential": true, "analytics": boolean, "marketing": boolean }
+
+  // Backup
+  lastBackupAt    DateTime?
+  backupFrequency String    @default("weekly") // daily, weekly, monthly
+
+  // Sync & Versioning
+  version      Int      @default(1) // Optimistic locking version
+  lastSyncAt   DateTime @default(now())
+  syncHash     String?  // MD5 hash for change detection
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  history UserSettingsHistory[]
+
+  @@index([authUserId, lastSyncAt])
+  @@index([version])
+}
+
+// ----------------------------------------------------------------------------
+// USER SETTINGS HISTORY (Audit Trail)
+// ----------------------------------------------------------------------------
+
+model UserSettingsHistory {
+  id           String   @id @default(cuid())
+  settingsId   String
+  settings     UserSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+  authUserId   String
+  
+  // Change tracking
+  field        String?  // Field that changed (null if multiple)
+  previousValue Json?   // Previous value
+  newValue      Json?   // New value
+  fullSnapshot  Json    // Complete settings snapshot
+  
+  // Metadata
+  changeType   String   // 'UPDATE', 'CREATE', 'BULK_UPDATE'
+  changedAt    DateTime @default(now())
+  ipAddress    String?
+  userAgent    String?
+  
+  @@index([authUserId, changedAt])
+  @@index([settingsId, changedAt])
+  @@index([field])
+}
+
+// ----------------------------------------------------------------------------
+// CONTACTS MANAGEMENT
+// ----------------------------------------------------------------------------
+
+model Contact {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  // Contact Info
+  name          String
+  email         String?
+  walletAddress String?
+  ens           String?
+
+  // Metadata
+  notes    String?
+  tags     String[] // ["friend", "business", "vip"]
+  favorite Boolean  @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([walletAddress])
+  @@index([favorite])
+}
+
+model UserContact {
+  id         String   @id @default(cuid())
+  authUserId String
+  authUser   AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  // Contact Info
+  name          String
+  email         String?
+  walletAddress String?
+  ens           String?
+
+  // Metadata
+  notes    String?
+  tags     String[] // ["friend", "business", "vip"]
+  favorite Boolean  @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authUserId])
+  @@index([walletAddress])
+  @@index([favorite])
+}
+
+// ----------------------------------------------------------------------------
+// NOTIFICATIONS SYSTEM
+// ----------------------------------------------------------------------------
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  // Content
+  title   String
+  message String
+  type    String // "transaction", "market", "system", "social"
+
+  // Status
+  read     Boolean @default(false)
+  archived Boolean @default(false)
+  isGlobal Boolean @default(false) // [NEW] For admin broadcasts
+
+  // Metadata
+  actionUrl String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@index([isGlobal])
+}
+
+model WatchedWallet {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  // Wallet Info
+  address String
+  label   String
+  tags    String[] @default([])
+  
+  // Alert Settings (The Green Bell)
+  alertsEnabled Boolean @default(true)
+  
+  // Forensics & Categorization
+  forensics     Json?
+  category      String? // e.g., "Exchange", "DeFi", "Whale", "Scammer"
+
+  // Stats (Cached)
+  lastValue Float?
+  lastCheck DateTime @default(now())
+  metadata  Json?    // [NEW] Multi-chain wealth breakdown
+
+  // Migration Catch-up
+  note           String?
+  isWhale        Boolean?  @default(false)
+  isSmart        Boolean?  @default(false)
+  change24h      Float?
+  lastActive     DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, address])
+  @@index([userId])
+  @@index([address])
+}
+
+// ----------------------------------------------------------------------------
+// GLOBAL WHALE TRACKING (São Paulo Merge Persistence)
+// ----------------------------------------------------------------------------
+
+model WhaleSnapshot {
+  id            String   @id @default(cuid())
+  address       String
+  label         String
+  usdEstimate   Float
+  btcBalance    Float?
+  ethBalance    Float?
+  chain         String   // BTC, ETH
+  tier          String   // MEGA, LARGE, ALPHA
+  isSatoshiEra  Boolean  @default(false)
+  txCount       Int      @default(0)
+  trend         String   @default("stable") // accumulating, distributing, stable
+  timestamp     DateTime @default(now())
+
+  @@index([address, timestamp])
+  @@index([timestamp])
+}
+
+// ----------------------------------------------------------------------------
+// WALLET ANALYTICS (Comprehensive Blockchain Analysis Cache)
+// ----------------------------------------------------------------------------
+
+model WalletAnalytics {
+  id                String   @id @default(cuid())
+  address           String   @unique
+  
+  // Core Metrics (Real Blockchain Data)
+  totalTransactions Int      @default(0)
+  activityScore     Float    @default(0)    // 0-100 based on 24h activity
+  riskScore         Float    @default(0)    // 0-100 based on patterns
+  blockchainRank    Int?                    // Estimated percentile rank
+  
+  // 10 Legendary Features (stored as JSON for flexibility)
+  metadata          Json?    // Contains: transactionHeatmap, topCounterparties, tokenFlowAnalysis,
+                             // historicalBalance, smartContractInteractions, nftPortfolio,
+                             // stakingPositions, liquidityPools, profitLossBreakdown, whaleMovements
+  
+  lastUpdated       DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  
+  @@index([address, lastUpdated])
+  @@index([totalTransactions])
+  @@index([activityScore])
+}
+
+
+model UserNotification {
+  id         String   @id @default(cuid())
+  authUserId String
+  authUser   AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  // Content
+  title   String
+  message String
+  type    String // "transaction", "market", "system", "social"
+  
+  // Status
+  read     Boolean @default(false)
+  archived Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  
+  @@index([authUserId])
+}
+
+// ----------------------------------------------------------------------------
+// REFERRAL SYSTEM
+// ----------------------------------------------------------------------------
+
+model Referral {
+  id            String   @id @default(cuid())
+  referrerId    String
+  referrer      User     @relation("Referrer", fields: [referrerId], references: [walletAddress])
+  
+  refereeId     String   @unique
+  referee       User     @relation("Referee", fields: [refereeId], references: [walletAddress])
+  
+  status        String   @default("PENDING") // PENDING, ACTIVE, COMPLETED
+  totalEarnings Decimal  @default(0) @db.Decimal(18, 6)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([referrerId])
+}
+
+// ----------------------------------------------------------------------------
+// WALLET TRANSACTION HISTORY
+// ----------------------------------------------------------------------------
+
+enum WalletTransactionType {
+  SEND
+  RECEIVE
+  SWAP
+  CONTRACT
+  NFT_TRANSFER
+  STAKE
+  UNSTAKE
+}
+
+enum WalletTransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model Transaction {
+  id            String                  @id @default(cuid())
+  authUserId    String
+  hash          String                  @unique
+  chainId       Int
+  type          WalletTransactionType
+  status        WalletTransactionStatus
+  from          String
+  to            String
+  value         Decimal                 @db.Decimal(32, 18)
+  tokenAddress  String?
+  tokenSymbol   String?
+  gasUsed       BigInt?
+  gasPrice      Decimal?                @db.Decimal(32, 18)
+  timestamp     DateTime                @default(now())
+  
+  // [NEW] Sync Metadata
+  blockNumber   BigInt?
+  source        String?                 @default("INTERNAL") // 'ALCHEMY_SYNC', 'WEBSOCKET', 'INTERNAL'
+  syncedAt      DateTime?               @default(now())
+  
+  metadata      Json?
+
+  @@index([authUserId, timestamp])
+  @@index([hash])
+  @@index([chainId])
+  @@index([type])
+  @@index([status])
+  @@index([blockNumber])
+}
+
+// ----------------------------------------------------------------------------
+// ADDRESS BOOK & CONTACTS
+// ----------------------------------------------------------------------------
+
+model AddressBookEntry {
+  id         String   @id @default(cuid())
+  authUserId String
+  authUser   AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  name       String
+  address    String
+  network    String?
+  ensName    String?
+  label      String?
+  notes      String?  @db.Text
+  isFavorite Boolean  @default(false)
+  chainId    Int?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([authUserId, address])
+  @@index([authUserId])
+  @@index([authUserId, isFavorite])
+}
+
+// ----------------------------------------------------------------------------
+// 9. WHALE TRACKER & GAMIFICATION MODELS
+// ----------------------------------------------------------------------------
+
+model WhaleActivity {
+  id              String   @id @default(cuid())
+  walletAddress   String
+  type            String   // TRANSFER, SWAP, MINT, BURN
+  token           String
+  amount          Decimal  @db.Decimal(32, 18)
+  usdValue        Decimal  @db.Decimal(18, 2)
+  fromAddress     String
+  toAddress       String
+  transactionHash String   @unique
+  blockNumber     BigInt
+  chain           String   @default("BITCOIN") // BITCOIN, BASE, BSC
+  metadata        Json?    // For DEX-specific analytics (price impact, charts, etc.)
+  status          String   @default("CONFIRMED") // PENDING, CONFIRMED
+  timestamp       DateTime
+  
+  @@index([walletAddress])
+  @@index([timestamp])
+  @@index([usdValue])
+}
+
+model UserStats {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [walletAddress])
+  
+  totalProfitUSD   Decimal  @default(0) @db.Decimal(18, 2)
+  copyTradeWinRate Decimal  @default(0) @db.Decimal(5, 2)
+  totalCopyTrades  Int      @default(0)
+  currentStreak    Int      @default(0)
+  bestStreak       Int      @default(0)
+  
+  lastTradeAt      DateTime?
+  updatedAt        DateTime @updatedAt
+
+  @@index([totalProfitUSD])
+  @@index([copyTradeWinRate])
+}
+
+model Leaderboard {
+  id        String   @id // Composite: userId-metric
+  userId    String
+  username  String
+  metric    String   // PROFIT, WIN_RATE, STREAK
+  value     Decimal  @db.Decimal(18, 2)
+  rank      Int
+  updatedAt DateTime @default(now())
+
+  @@index([metric, rank])
+}
+
+model Achievement {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // FIRST_TRADE, WEEK_STREAK, etc
+  tier      String   // BRONZE, SILVER, GOLD, DIAMOND
+  metadata  Json
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, type, tier])
+}
+
+// ----------------------------------------------------------------------------
+// WEBAUTHN / BIOMETRICS
+// ----------------------------------------------------------------------------
+
+model Authenticator {
+  id                   String   @id @default(cuid())
+  credentialID         String   @unique
+  credentialPublicKey  String   @db.Text
+  counter              BigInt
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+  
+  userId               String
+  user                 AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt            DateTime @default(now())
+  lastUsedAt           DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ----------------------------------------------------------------------------
+// MULTI-ACCOUNT / WALLETS
+// ----------------------------------------------------------------------------
+
+enum WalletType {
+  PRIMARY     // The main address derived from seed (Index 0)
+  DERIVED     // Additional HD addresses (Index 1, 2...)
+  IMPORTED    // Imported private key (Encrypted)
+  WATCH_ONLY  // Public address only
+  HARDWARE    // Ledger/Trezor
+}
+
+model WalletAccount {
+  id             String     @id @default(cuid())
+  userId         String
+  user           AuthUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  address        String
+  name           String
+  type           WalletType @default(DERIVED)
+  
+  // For HD Wallets
+  derivationPath String?    // e.g. "m/44'/60'/0'/0/1"
+  index          Int?       // e.g. 1
+  
+  // For Imported (Encrypted)
+  encryptedKey   String?    @db.Text
+  
+  isVisible      Boolean    @default(true)
+  color          String?    // UI customization
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([userId, address])
+  @@index([userId])
+}
+
+// ----------------------------------------------------------------------------
+// 10. ADVANCED WALLET INNOVATIONS (PHASE 2)
+// ----------------------------------------------------------------------------
+
+model TimeLockVault {
+  id           String   @id @default(cuid())
+  userId       String
+  authUser     AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  amount       Decimal  @db.Decimal(32, 18)
+  tokenSymbol  String   @default("ETH")
+  unlockDate   DateTime
+  txHash       String?  @unique
+  status       String   @default("LOCKED") // LOCKED, UNLOCKED, WITHDRAWN
+  
+  unlockTxHash String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([unlockDate])
+  @@index([status])
+}
+
+model DeadMansSwitch {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  authUser          AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  beneficiaryAddress String
+  inactivityPeriod   Int      // In months
+  lastPingAt         DateTime @default(now())
+  status             String   @default("ACTIVE") // ACTIVE, EXPIRED, EXECUTED
+  
+  checkFrequencyDays Int      @default(7)
+  executionTxHash    String?  @unique
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([lastPingAt])
+}
+
+model SocialRecovery {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  authUser     AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  threshold    Int      @default(3)
+  totalGuardians Int    @default(5)
+  status       String   @default("INACTIVE") // INACTIVE, ACTIVE, RECOVERING
+  
+  guardians    Guardian[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Guardian {
+  id               String   @id @default(cuid())
+  recoveryId       String
+  recovery         SocialRecovery @relation(fields: [recoveryId], references: [id], onDelete: Cascade)
+  
+  email            String
+  address          String?  // Optional: Guardian's wallet
+  status           String   @default("PENDING") // PENDING, VERIFIED
+  
+  hasApproved      Boolean  @default(false)
+  approvedAt       DateTime?
+  
+  createdAt        DateTime @default(now())
+
+  @@unique([recoveryId, email])
+  @@index([recoveryId])
+}
+
+model AIRebalancerPlan {
+  id           String   @id @default(cuid())
+  userId       String
+  authUser     AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  strategy     String   // CONSERVATIVE, BALANCED, AGGRESSIVE
+  payload      Json     // The rebalancing plan details
+  executed     Boolean  @default(false)
+  
+  txHashes     String[] // Sub-transactions for the swaps
+  createdAt    DateTime @default(now())
+  executedAt   DateTime?
+
+  @@index([userId])
+  @@index([createdAt])
+}
+// ----------------------------------------------------------------------------
+// 8. VIRTUAL CARD ISSUANCE (Human Card)
+// ----------------------------------------------------------------------------
+
+model VirtualCard {
+  id            String   @id @default(cuid())
+  userId        String?  @unique
+  authUserId    String?  @unique
+  user          User?    @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  authUser      AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+
+  cardNumber    String   // Masked or encrypted in real prod
+  cvv           String
+  expiry        String   // MM/YY
+  tier          String   @default("BLACK") // BLACK, METAL, SILVER
+  status        String   @default("ACTIVE")
+  brand         String   @default("VISA")
+  strigaCardId  String?  @unique
+  
+  // Real Spending Logic (Linked Balance)
+  linkedAddress String
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([authUserId])
+  @@index([linkedAddress])
+}
+
+// ----------------------------------------------------------------------------
+// 11. MISSING SECURITY & PREMIUM MODELS
+// ----------------------------------------------------------------------------
+
+model AlertRule {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  
+  name       String
+  enabled    Boolean  @default(true)
+  conditions Json
+  actions    Json
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  
+  status    String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED
+  tier      PlanTier @default(FREE)
+  
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, status])
+  @@index([expiresAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  resource  String
+  metadata  Json?
+  ip        String?
+  userAgent String?
+  timestamp DateTime @default(now())
+  
+  @@index([userId, timestamp])
+  @@index([action])
+}
+
+model UserSignal {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+  
+  // Signal Content
+  chain     String
+  token     String
+  amount    Decimal  @db.Decimal(32, 18)
+  usdValue  Decimal  @db.Decimal(18, 2)
+  txHash    String
+  from      String
+  to        String
+  timestamp DateTime
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model UserActivity {
+  id            String   @id @default(cuid())
+  userAddress   String
+  user          User     @relation(fields: [userAddress], references: [walletAddress], onDelete: Cascade)
+  type          String   // 'TRADE_EXECUTION', 'EXECUTION_SUCCESS', 'EXECUTION_FAILURE', 'ORDER_PLACE'
+  action        String   // e.g., 'BUY 0.5 ETH'
+  chainId       Int
+  txHash        String?
+  metadata      Json?
+  timestamp     DateTime @default(now())
+
+  @@index([userAddress, timestamp])
+}
+
+// ============================================================================
+// TRADING SYSTEM (Live Trading Engine for 30 Pairs)
+// ============================================================================
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
+}
+
+enum OrderStatus {
+  PENDING
+  FILLED
+  PARTIALLY_FILLED
+  CANCELLED
+  REJECTED
+}
+
+enum PositionSide {
+  LONG
+  SHORT
+}
+
+model TradingOrder {
+  id            String      @id @default(cuid())
+  userId        String
+  userAddress   String
+  symbol        String      // BTCUSDT, ETHUSDT, etc.
+  side          OrderSide
+  type          OrderType
+  quantity      Float
+  price         Float?      // null for market orders
+  leverage      Int         @default(1)
+  status        OrderStatus @default(PENDING)
+  filledQty     Float       @default(0)
+  avgFillPrice  Float?
+  tpPrice       Float?      // Take profit
+  slPrice       Float?      // Stop loss
+  createdAt     DateTime    @default(now())
+  filledAt      DateTime?
+  cancelledAt   DateTime?
+  txHash        String?     // For on-chain record
+  metadata      Json?       // Additional order data
+
+  @@index([userAddress, createdAt])
+  @@index([status, symbol])
+  @@index([userId])
+}
+
+model TradingPosition {
+  id               String       @id @default(cuid())
+  userId           String
+  userAddress      String
+  symbol           String
+  side             PositionSide
+  entryPrice       Float
+  quantity         Float
+  leverage         Int
+  liquidationPrice Float
+  unrealizedPnl    Float        @default(0)
+  realizedPnl      Float        @default(0)
+  isOpen           Boolean      @default(true)
+  openedAt         DateTime     @default(now())
+  closedAt         DateTime?
+  tpPrice          Float?
+  slPrice          Float?
+  closePrice       Float?
+  metadata         Json?
+
+  @@index([userAddress, isOpen])
+  @@index([userId, isOpen])
+  @@index([symbol, isOpen])
+}
+
+model UserTradingBalance {
+  id          String   @id @default(cuid())
+  userAddress String   @unique
+  balance     Float    @default(0) // 🛡️ PURGED MOCK: No initial demo capital
+  equity      Float    @default(0)
+  margin      Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userAddress])
+}
+
+// ----------------------------------------------------------------------------
+// 8. REAL EXCHANGE ENGINE (The "Legendary" Core)
+// ----------------------------------------------------------------------------
+
+enum ExchangeOrderSide {
+  BUY
+  SELL
+}
+
+enum ExchangeOrderType {
+  LIMIT
+  MARKET
+  STOP_LIMIT
+  STOP_MARKET
+}
+
+enum ExchangeOrderStatus {
+  OPEN
+  PARTIALLY_FILLED
+  FILLED
+  CANCELED
+  REJECTED
+  EXPIRED
+  PENDING_EXECUTION
+}
+
+model ExchangeOrder {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [walletAddress])
+  
+  symbol        String      // e.g. "ETH/USDT"
+  side          ExchangeOrderSide
+  type          ExchangeOrderType
+  status        ExchangeOrderStatus @default(OPEN)
+  
+  originalQty   Decimal     @db.Decimal(32, 18)
+  executedQty   Decimal     @default(0) @db.Decimal(32, 18)
+  price         Decimal     @db.Decimal(32, 18) // Limit Price
+  stopPrice     Decimal?    @db.Decimal(32, 18) // Trigger Price
+  
+  averagePrice  Decimal     @default(0) @db.Decimal(32, 18)
+  
+  // Fee Handling
+  feePaid       Decimal     @default(0) @db.Decimal(32, 18)
+  feeCurrency   String      // e.g. "ETH" or "USDT"
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  closedAt      DateTime?
+
+  // 🛡️ PUBLIC LEDGER FIELDS
+  txHash        String?
+  explorerUrl   String?
+  metadata      Json?
+
+  trades        ExchangeTrade[]
+
+  @@index([userId, symbol, status])
+  @@index([status, symbol, side, price]) // Matching Engine Index
+}
+
+model ExchangePosition {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [walletAddress])
+  
+  symbol            String      // e.g. "BTC/USDT"
+  side              String      // "LONG" | "SHORT"
+  size              Decimal     @db.Decimal(32, 18)
+  entryPrice        Decimal     @db.Decimal(32, 18)
+  markPrice         Decimal     @db.Decimal(32, 18)
+  liquidationPrice  Decimal     @db.Decimal(32, 18)
+  leverage          Int         @default(1)
+  margin            Decimal     @db.Decimal(32, 18)
+  isolated          Boolean     @default(false)
+  
+  unrealizedPnl     Decimal     @default(0) @db.Decimal(32, 18)
+  pnlPercent        Decimal     @default(0) @db.Decimal(32, 18)
+  realizedPnl       Decimal     @default(0) @db.Decimal(32, 18)
+  
+  status            String      @default("OPEN") // OPEN | CLOSED
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  closedAt          DateTime?
+  metadata          Json?
+
+  @@index([userId, symbol, status])
+}
+
+model ExchangeTrade {
+  id            String        @id @default(cuid())
+  orderId       String
+  order         ExchangeOrder @relation(fields: [orderId], references: [id])
+  
+  symbol        String
+  side          ExchangeOrderSide
+  price         Decimal       @db.Decimal(32, 18)
+  qty           Decimal       @db.Decimal(32, 18)
+  quoteQty      Decimal       @db.Decimal(32, 18) // price * qty
+  
+  fee           Decimal       @db.Decimal(32, 18)
+  feeCurrency   String
+  
+  isMaker       Boolean       @default(false)
+  timestamp     DateTime      @default(now())
+
+  // 🛡️ PUBLIC LEDGER FIELDS
+  txHash        String?
+  explorerUrl   String?
+  metadata      Json?
+  
+  @@index([orderId])
+  @@index([symbol, timestamp])
+}
+
+model ExchangeBalance {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [walletAddress])
+  
+  asset         String   // e.g. "ETH", "USDT"
+  free          Decimal  @default(0) @db.Decimal(32, 18)
+  locked        Decimal  @default(0) @db.Decimal(32, 18) // Locked in open orders
+  
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([userId, asset])
+}
+
+model ExchangeCandle {
+  id        String   @id @default(cuid())
+  symbol    String   // e.g. "BTCUSDT"
+  interval  String   // e.g. "1m", "5m", "1h", "1d"
+  timestamp BigInt   // Unix timestamp in milliseconds
+  
+  open      Decimal  @db.Decimal(32, 18)
+  high      Decimal  @db.Decimal(32, 18)
+  low       Decimal  @db.Decimal(32, 18)
+  close     Decimal  @db.Decimal(32, 18)
+  volume    Decimal  @db.Decimal(32, 18)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([symbol, interval, timestamp])
+  @@index([symbol, interval, timestamp])
+}
+
+// ----------------------------------------------------------------------------
+// 9. REAL CASHIER (Deposit Listener)
+// ----------------------------------------------------------------------------
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model Deposit {
+  id            String        @id @default(cuid())
+  userId        String
+  
+  txHash        String        @unique
+  network       String        // "ETH", "POLYGON", "BASE"
+  blockNumber   BigInt
+  
+  asset         String        // "USDT", "ETH"
+  amount        Decimal       @db.Decimal(32, 18)
+  
+  status        DepositStatus @default(PENDING)
+  timestamp     DateTime      @default(now())
+
+  // Relation to user
+  // user          User          @relation(fields: [userId], references: [walletAddress])
+  
+  @@index([txHash])
+  @@index([status])
+}
+
+// ============================================================================
+// IDENTITY VERIFICATION (KYC/AML)
+// ============================================================================
+
+model KYCRecord {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  
+  // Compliance Status
+  status        KYCStatus @default(PENDING)
+  riskLevel     String    @default("LOW") // LOW, MEDIUM, HIGH, PROHIBITED
+  
+  // Provider Metadata (Sumsub/Veriff)
+  applicantId   String?   @unique
+  inspectionId  String?
+  
+  // Verified Data (Encrypted/Hashed where legally required)
+  documentType  String?
+  issuingCountry String?
+  dateOfBirth   DateTime?
+  
+  // Audit Trail
+  submittedAt   DateTime  @default(now())
+  verifiedAt    DateTime?
+  reviewedBy    String?   // 'AI_AUTO' or Admin ID
+  rejectionReason String?
+  
+  // Travel Rule & AML
+  isSanctioned  Boolean   @default(false)
+  isPEP         Boolean   @default(false) // Politically Exposed Person
+  
+  user          User      @relation(fields: [userId], references: [walletAddress])
+  
+  @@index([status])
+  @@index([riskLevel])
+}
+
+enum KYCStatus {
+  PENDING
+  IN_REVIEW
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+model NewsArticle {
+  id               String   @id @default(cuid())
+  externalId       String   @unique // ID from source (e.g., CryptoPanic ID)
+  title            String
+  summary          String?  @db.Text
+  content          String?  @db.Text
+  url              String
+  imageUrl         String?
+  source           String
+  category         String?
+  publishedAt      DateTime
+  
+  // AI Analysis (Legendary Fact-Checking)
+  veracityScore    Float?   // 0 to 100 (Truth percentage)
+  veracityAnalysis String?  @db.Text // AI explanation
+  isFake           Boolean  @default(false)
+  sentiment        String?  // bullish, bearish, neutral
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([publishedAt])
+  @@index([category])
+  @@index([isFake])
+}
+
+// ----------------------------------------------------------------------------
+// 10. LEGENDARY WALLET INTELLIGENCE (Analytics & Persistence)
+// ----------------------------------------------------------------------------
+
+model WalletIntelligence {
+  id            String   @id @default(cuid())
+  address       String   @unique
+  
+  // Aggregated Stats
+  totalValueUsd Float    @default(0)
+  pnl24h        Float    @default(0)
+  change24h     Float    @default(0)
+  txCount       Int      @default(0)
+  
+  // Analytics Scores
+  riskScore      Float   @default(50)
+  diversityScore Float   @default(0)
+  activityScore  Float   @default(0)
+  rank           Int     @default(4)
+  
+  // Metadata
+  lastUpdated      DateTime @updatedAt
+  updateCount      Int      @default(0)
+  lastCheck        DateTime @default(now())
+  category         String?
+  forensics        Json?
+  strategicSummary String?  @db.Text
+  whaleEvidence    String[]
+  influenceScore   Int      @default(0)
+
+  // Relations
+  yieldPositions YieldPosition[]
+  nftHoldings    NFTHolding[]
+  flowAnalysis   FlowAnalysis[]
+  dappActivities DAppInteraction[]
+}
+
+model YieldPosition {
+  id            String   @id @default(cuid())
+  walletId      String
+  wallet        WalletIntelligence @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  protocol      String   // "Lido", "Aave", "Uniswap"
+  type          String   // "staking", "lending", "farming"
+  amount        Float
+  apy           Float
+  earnedUsd     Float    @default(0)
+  asset         String   // symbol
+  valueUsd      Float    @default(0)
+  onChain       Boolean  @default(false)
+  details       Json?
+  
+  lastUpdated   DateTime @default(now())
+
+  @@index([walletId, protocol])
+}
+
+model NFTHolding {
+  id            String   @id @default(cuid())
+  walletId      String
+  wallet        WalletIntelligence @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  contract      String
+  tokenId       String
+  name          String
+  collection    String
+  image         String?  @db.Text
+  floorPrice    Float?
+  
+  lastUpdated   DateTime @default(now())
+
+  @@index([walletId, contract])
+}
+
+model FlowAnalysis {
+  id            String   @id @default(cuid())
+  walletId      String
+  wallet        WalletIntelligence @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  period        String   // "24h", "7d", "30d"
+  inflow        Float
+  outflow       Float
+  
+  topSenders    Json     // Array of {address, amount, count}
+  topReceivers  Json
+  
+  createdAt     DateTime @default(now())
+
+  @@index([walletId, period])
+}
+
+model DAppInteraction {
+  id            String   @id @default(cuid())
+  walletId      String
+  wallet        WalletIntelligence @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  protocol      String
+  count         Int      @default(0)
+  gasSpentUsd   Float    @default(0)
+  latestActivity DateTime @default(now())
+
+  @@index([walletId, protocol])
+}
+
+
+// ----------------------------------------------------------------------------
+// 8. DARK POOL & GLOBAL INTELLIGENCE (PHASE 6)
+// ----------------------------------------------------------------------------
+
+model GlobalWhaleEvent {
+  id          String   @id @default(cuid())
+  hash        String
+  logIndex    Int
+  wallet      String
+  token       String
+  amount      String
+  usdValue    Decimal  @db.Decimal(18, 2)
+  action      String   @default("TRANSFER")
+  tier        String   @default("INSTITUTIONAL")
+  dex         String   @default("Mainnet Transfer")
+  timestamp   DateTime @default(now())
+  blockNumber BigInt
+
+  @@unique([hash, logIndex])
+  @@index([timestamp])
+  @@index([usdValue])
+}
+
+model BlockScanTracker {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g., "whale_radar_mainnet"
+  lastBlock   String   // String to support BigInt values
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+// ----------------------------------------------------------------------------
+// WHALE ALERT CORPORATION — API MARKETPLACE
+// ----------------------------------------------------------------------------
+
+model ApiSubscription {
+  id                    String    @id @default(cuid())
+  userId                String
+  tier                  String    // starter | pro | institutional
+  status                String    @default("active") // active | past_due | canceled | disputed | suspended
+  
+  stripeSubscriptionId  String    @unique
+  stripeCustomerId      String
+  price                 Float     // USD per month
+  
+  // API Key — never stored raw, always SHA-256 hashed
+  keyHash               String    @unique
+  keyPrefix             String    // First 16 chars for display (wac_live_XXXXXXX)
+  
+  // Plan limits
+  dailyRequestLimit     Int       @default(10000)  // -1 = unlimited
+  whaleThresholdUsd     Int       @default(500000)
+  maxApiKeys            Int       @default(1)
+  
+  // Access window
+  currentPeriodEnd      DateTime?
+  gracePeriodEnd        DateTime?
+  
+  // Security & Evidence
+  purchaseIp            String    @default("")
+  purchaseCountry       String    @default("")
+  suspendedAt           DateTime?
+  suspensionReason      String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Security & Delivery (Institutional/Pro)
+  webhookUrl           String?
+  ipWhitelist          String[]  @default([])
+  hmacSecret           String?   // For signing requests
+  
+  usageLogs             ApiUsageLog[]
+  webhookLogs           ApiWebhookLog[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([stripeCustomerId])
+}
+
+model ApiUsageLog {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  subscription   ApiSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  endpoint       String
+  ip             String
+  statusCode     Int
+  
+  createdAt      DateTime @default(now())
+  
+  @@index([subscriptionId, createdAt])
+  @@index([createdAt])
+}
+
+model ApiPurchaseIntent {
+  id              String   @id @default(cuid())
+  clerkUserId     String
+  planId          String
+  stripeSessionId String   @unique
+  ip              String
+  country         String
+  userAgent       String   @db.Text
+  isSuspiciousIp  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  
+  @@index([clerkUserId])
+  @@index([createdAt])
+}
+
+model ApiWebhookLog {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  subscription   ApiSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  url            String
+  payload        Json
+  responseCode   Int?
+  responseBody   String?  @db.Text
+  error          String?
+  
+  createdAt      DateTime @default(now())
+
+  @@index([subscriptionId])
+  @@index([createdAt])
+}
+
+
+
+// ============================================================================
+// MODERNO: INSTITUTIONAL DASHBOARD EXTENSIONS (PORTED)
+// ============================================================================
 
 model Project {
   id          String       @id @default(uuid())
   name        String
   description String?
-  status      String       @default("DRAFT") // DRAFT, LIVE, RESOLVING, CLOSED
+  status      String       @default("DRAFT")
   liquidity   Float        @default(0.0)
   oracle      String       @default("UMAOvl")
   createdAt   DateTime     @default(now())
@@ -26,8 +2047,8 @@ model Deployment {
   id        String   @id @default(uuid())
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  action    String   // e.g. "CREATE", "UPDATE_LIQUIDITY", "RESOLVE"
-  status    String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  action    String
+  status    String   @default("PENDING")
   txHash    String?
   createdAt DateTime @default(now())
 }
@@ -43,7 +2064,7 @@ model Variable {
 model Log {
   id        String   @id @default(uuid())
   message   String
-  level     String   @default("INFO") // INFO, WARN, ERROR
-  source    String   @default("SYSTEM") // ZK_ENGINE, DB, WAGMI
+  level     String   @default("INFO")
+  source    String   @default("SYSTEM")
   createdAt DateTime @default(now())
 }
