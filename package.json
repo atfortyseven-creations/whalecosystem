@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "echo 'LEGENDARY_BUILD_777' && npm run build:contracts && prisma generate && npx prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
-    "build:railway": "echo 'LEGENDARY_BUILD_777' && npm run build:contracts && prisma generate && npx prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
+    "build": "echo 'LEGENDARY_BUILD_777' && npm run build:contracts && prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
+    "build:railway": "echo 'LEGENDARY_BUILD_777' && npm run build:contracts && prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
     "build:contracts": "hardhat compile",
     "build:extension": "node scripts/extension-build.js",
     "start": "cross-env NODE_ENV=production node --import tsx server.ts",
