@@ -107,16 +107,13 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
 
     const Redis = require('ioredis');
     return new Redis(REDIS_URL, {
-        maxRetriesPerRequest: null,
+        maxRetriesPerRequest: 1, // FAST FAIL: Don't queue requests if Redis is down
         enableReadyCheck: false,
-        connectTimeout: 3000, // FAST FAIL: Don't block the API for 10s
+        connectTimeout: 1000, // AGGRESSIVE: 1s or fail
         retryStrategy(times: number) {
-            // [LEGENDARY-RESILIENCE] Capped backoff
-            const delay = Math.min(100 * Math.pow(2, times), 5000); 
-            if (times % 10 === 0) { // Log every 10th retry to avoid log spam
-                console.warn(`[Redis:${config.name || 'Client'}] ⚠️ Connection attempt #${times} — retrying in ${delay}ms...`);
-            }
-            return delay;
+            // [LEGENDARY-RESILIENCE] Skip retries if infrastructure is failing
+            if (times > 3) return null; // STOP retrying after 3 attempts
+            return Math.min(times * 100, 1000);
         },
         reconnectOnError(err: any) {
             const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND'];
