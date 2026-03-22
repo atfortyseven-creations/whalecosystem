@@ -101,127 +101,63 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ── PHASE 2: WHY AZTEC? (Technical Use-Cases) ── */}
-      <section className="bg-[var(--aztec-ink)] py-48 px-6 relative z-10">
-          <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col lg:flex-row items-baseline justify-between mb-32 border-b border-white/5 pb-20">
-                  <div className="max-w-3xl">
-                      <div className="font-aztec-h2 text-[12px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.6em] mb-12">Applications Ecosystem</div>
-                      <h2 className="font-aztec-h1 text-8xl text-white mb-12">Why <span className="italic text-[var(--aztec-orchid)]">Aztec?</span></h2>
-                      <p className="font-aztec-body text-2xl text-white/50 leading-relaxed">
-                          Built for a wide range of applications: Aztec supports everything from DeFi to remittances with absolute cryptographic sovereignty.
-                      </p>
-                  </div>
-                  <div className="mt-12 lg:mt-0 text-right hidden xl:block">
-                      <div className="font-aztec-h1 text-9xl text-white/5">$27.6T</div>
-                      <div className="font-aztec-h2 text-[10px] text-white/40 uppercase tracking-widest mt-2">Stablecoin volume in 2024</div>
-                  </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {DATA.applications.map((app, i) => (
-                      <div key={i} className="group relative aspect-[4/5] bg-[#111] overflow-hidden rounded-[2.5rem] p-10 flex flex-col justify-end border border-white/5 hover:border-[var(--aztec-orchid)]/50 transition-all duration-700 will-change-transform">
-                          <div className="absolute inset-0 opacity-40 group-hover:opacity-80 transition-opacity duration-1000 grayscale group-hover:grayscale-0">
-                              <Image src={app.img} alt={app.title} fill className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
-                          </div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-[var(--aztec-ink)] via-[var(--aztec-ink)]/60 to-transparent opacity-90" />
-                          <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-4">
-                              <div className="w-12 h-12 mb-6 text-[var(--aztec-chartreuse)] opacity-50 group-hover:opacity-100 transition-opacity">
-                                <app.icon strokeWidth={1.5} size={32} />
-                              </div>
-                              <h3 className="font-aztec-h3 text-3xl text-[var(--aztec-parchment)] mb-4">{app.title}</h3>
-                              <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{app.desc}</p>
-                          </div>
-                      </div>
-                  ))}
-              </div>
-          </div>
-      </section>
-
-      {/* ── PHASE 3: INSTITUTIONAL COMPLIANCE (System Visuals) ── */}
-      <section className="py-48 px-6 bg-[var(--aztec-parchment)] relative overflow-hidden">
-          <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center relative z-10">
-              <div className="relative aspect-square rounded-[4rem] overflow-hidden shadow-2xl border border-black/5 will-change-transform">
-                   <Image src="/models/update/Aztec Image_12.jpg" alt="Institutional Privacy Infrastructure" fill className="object-cover" />
-                   <div className="absolute inset-0 bg-[var(--aztec-ink)]/10 mix-blend-multiply" />
-                   <div className="absolute bottom-12 left-12 right-12 p-8 glass-sovereign rounded-3xl backdrop-blur-md">
-                        <div className="font-aztec-mono text-[var(--aztec-chartreuse)] text-[10px] mb-4">SOVEREIGN_AUDIT_PROTOCOL_V1</div>
-                        <p className="font-aztec-body text-xs text-white/80 leading-relaxed">
-                            Encrypted viewing keys allow for compliant auditing without exposing user data to the public network.
-                        </p>
-                   </div>
-              </div>
-
-              <div>
-                  <div className="font-aztec-h2 text-[12px] text-[var(--aztec-orchid)] uppercase tracking-[0.5em] mb-12">Institutional Grade</div>
-                  <h2 className="font-aztec-h1 text-8xl text-[var(--aztec-ink)] leading-[0.8] mb-12">
-                      Sovereign <br/> <span className="italic">Compliance</span>.
-                  </h2>
-                  <div className="space-y-12">
-                      <p className="font-aztec-body text-2xl text-[var(--aztec-ink)]/60 leading-relaxed">
-                          Aztec enables privacy-preserving compliance for institutions and businesses transacting on public blockchains. No more adoption capping due to lack of privacy.
-                      </p>
-                      <div className="flex gap-16">
-                          <div>
-                              <div className="font-aztec-h1 text-6xl text-[var(--aztec-ink)]">24/7</div>
-                              <div className="font-aztec-h2 text-[10px] uppercase tracking-widest text-[var(--aztec-ink)]/40 mt-2">Zero-Knowledge Audits</div>
-                          </div>
-                          <div>
-                              <div className="font-aztec-h1 text-6xl text-[var(--aztec-ink)]">0%</div>
-                              <div className="font-aztec-h2 text-[10px] uppercase tracking-widest text-[var(--aztec-ink)]/40 mt-2">Data Leakage Risk</div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-
-      {/* ── PHASE 4: THE ARCHITECTURAL EXPLAINER ── */}
-      <section className="bg-[var(--aztec-ink)] py-48 px-6">
-          <div className="max-w-6xl mx-auto flex flex-col items-center">
-              <div className="font-aztec-h2 text-[12px] text-[var(--aztec-aqua)] uppercase tracking-[0.6em] mb-12">System Architecture</div>
-              <h2 className="font-aztec-h1 text-6xl md:text-8xl text-white mb-24 text-center">Privacy Without <br/><span className="italic text-[var(--aztec-aqua)]">Compromise.</span></h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-24 items-center mb-32">
-                  <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10">
-                      <Image src="/models/update/Aztec Image_03.jpg" alt="Noir Programming Model" fill className="object-cover opacity-60 scale-105" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="p-8 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl">
-                             <h4 className="font-aztec-h3 text-xl text-white mb-2">Noir: The SDK</h4>
-                             <p className="font-aztec-body text-xs text-white/60">Aztec's domain-specific language for writing private smart contracts.</p>
-                          </div>
-                      </div>
-                  </div>
-                  <div className="space-y-8">
-                     <h3 className="font-aztec-h3 text-4xl text-white uppercase italic tracking-tighter">Programmable <br/> Encrypted State.</h3>
-                     <p className="font-aztec-body text-xl text-white/40 leading-relaxed font-light">
-                        Aztec abstracts complex ZK proofs into a simple execution environment where users interact with both encrypted user states and public execution environments fluidly.
-                     </p>
-                  </div>
-              </div>
-          </div>
-      </section>
-
-      {/* ── PHASE 5: THE DIAMOND RECAP ── */}
-      <section className="relative py-64 px-6 overflow-hidden bg-[var(--aztec-parchment)]">
-          <div className="max-w-5xl mx-auto text-center relative z-10">
-              <div className="w-64 h-64 mx-auto mb-20 relative will-change-transform">
-                  <Image src="/models/update/gradient-pink-diamond-balls-assortment (2).png" alt="Corporate Diamond Shield" fill className="object-contain animate-blob mix-blend-multiply" />
-              </div>
-              <h2 className="font-aztec-h1 text-7xl md:text-9xl text-[var(--aztec-ink)] uppercase leading-none mb-12">
-                  Building the First <br/> <span className="italic text-[var(--aztec-orchid)]">Privacy</span> Network.
+      {/* ── PHASE 2: BENTO EXPLAINER (4 PHOTOS) ── */}
+      <section className="bg-[var(--aztec-ink)] py-32 px-6 relative z-10 border-t border-white/10">
+          <div className="max-w-7xl mx-auto flex flex-col items-center">
+              <div className="font-aztec-h2 text-[12px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.6em] mb-12">Whale Alert Network</div>
+              <h2 className="font-aztec-h1 text-5xl md:text-7xl text-white mb-20 text-center uppercase tracking-tighter">
+                  Institutional <span className="italic text-[var(--aztec-orchid)]">Intelligence</span>
               </h2>
-              <p className="font-aztec-body text-3xl text-[var(--aztec-ink)]/60 max-w-3xl mx-auto leading-relaxed mb-20 px-8">
-                  Stablecoin transaction volume surpassed $27.6 trillion in 2024 – but adoption is capped without privacy. Aztec eliminates the cap.
-              </p>
-              <motion.button
-                onClick={handleEnterArchive}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="px-24 py-10 bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] font-aztec-h1 text-2xl uppercase tracking-[0.1em] rounded-full shadow-2xl hover:shadow-[var(--aztec-chartreuse)]/40 transition-all font-black"
-              >
-                Claim Sovereignty
-              </motion.button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
+                  {/* Card 1: What is Whale Alert Network (Purpose) */}
+                  <div className="group relative aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-black border border-white/5 hover:border-[var(--aztec-orchid)]/30 transition-all duration-700">
+                      <Image src="/models/update/Aztec Image_04.jpg" alt="Whale Alert Network" fill className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-[2s]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                      <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><Globe className="text-[var(--aztec-orchid)]" /> Global Network</h3>
+                          <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
+                              Whale Alert Network is the premier institutional terminal for tracking oceanic dark pool movements. We decode the hidden flow of trillions of dollars across public ledgers, converting raw hexadecimal data into actionable, high-frequency kinetic intelligence.
+                          </p>
+                      </div>
+                  </div>
+
+                  {/* Card 2: System Architecture (Technical structure) */}
+                  <div className="group relative aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-black border border-white/5 hover:border-[var(--aztec-chartreuse)]/30 transition-all duration-700">
+                      <Image src="/models/update/Aztec Image_03.jpg" alt="System Architecture" fill className="object-cover opacity-50 grayscale group-hover:scale-105 transition-transform duration-[2s]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                      <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><Cpu className="text-[var(--aztec-chartreuse)]" /> Absolute Architecture</h3>
+                          <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
+                              Built on a proprietary triple-stack infrastructure. Our execution nodes synchronize directly with sovereign RPC endpoints, bypassing bloated middleware to deliver sub-millisecond settlement visualization across all Layer-1 and Layer-2 topologies.
+                          </p>
+                      </div>
+                  </div>
+
+                  {/* Card 3: Scalability (Performance and throughput) */}
+                  <div className="group relative aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-black border border-white/5 hover:border-[var(--aztec-aqua)]/30 transition-all duration-700">
+                      <Image src="/models/update/Aztec Image_06.jpg" alt="Scalability" fill className="object-cover opacity-50 grayscale mix-blend-screen group-hover:scale-105 transition-transform duration-[2s]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                      <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><Zap className="text-[var(--aztec-aqua)]" /> Infinite Scalability</h3>
+                          <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
+                              The system dynamically shards incoming data feeds across isolated processing clusters. Whether parsing ten transactions per second or ten thousand during a black swan event, the sovereign dashboard maintains an unyielding 120Hz refresh rate.
+                          </p>
+                      </div>
+                  </div>
+
+                  {/* Card 4: Global Security (Sovereign Privacy) */}
+                  <div className="group relative aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-black border border-white/5 hover:border-[var(--aztec-parchment)]/30 transition-all duration-700">
+                      <Image src="/models/update/Aztec Image_12.jpg" alt="Sovereign Privacy Security" fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-[2s]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                      <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><ShieldCheck className="text-[var(--aztec-parchment)]" /> Cryptographic Aegis</h3>
+                          <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
+                              Your identity remains yours. Whale Alert utilizes advanced Zero-Knowledge session proofs to sync your mobile device strictly to your terminal monitor. No centralized databases hold your unencrypted biometric wallet keys.
+                          </p>
+                      </div>
+                  </div>
+              </div>
           </div>
       </section>
 
