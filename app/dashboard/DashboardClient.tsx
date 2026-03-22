@@ -18,13 +18,17 @@ import LiquidationHeatmap from '@/components/premium/LiquidationHeatmap';
 import AztecPrivacyHub from '@/components/premium/AztecPrivacyHub';
 
 type NodeType = 'INTELLIGENCE_ROUTER' | 'SOVEREIGN_VAULT';
-type InnerTab = 'telemetry' | 'environment' | 'metrics' | 'security' | 'zk_sync';
+type InnerTab = 'telemetry' | 'environment' | 'metrics' | 'security' | 'zk_sync' | 'kernel';
 
 interface ProjectNode {
     id: string;
     name: string;
     type: NodeType;
     status: 'deploying' | 'live';
+    cpuUsage?: number;
+    ramUsage?: number;
+    uptime?: number;
+    logs?: any[];
 }
 
 export default function DashboardClient() {
@@ -60,7 +64,11 @@ export default function DashboardClient() {
             id: p.id,
             name: p.name,
             type: i % 2 === 0 ? 'INTELLIGENCE_ROUTER' : 'SOVEREIGN_VAULT',
-            status: 'live'
+            status: 'live',
+            cpuUsage: p.cpuUsage,
+            ramUsage: p.ramUsage,
+            uptime: p.uptime,
+            logs: p.logs || []
         }));
         setNodes(mappedNodes);
     } catch(e){}
@@ -250,11 +258,19 @@ export default function DashboardClient() {
                                 <ArrowLeft size={20} />
                             </button>
                             <div>
-                                <h2 className="text-xl font-black mb-1 flex items-center gap-3">
+                                <h2 className="text-xl font-black mb-1 flex flex-wrap items-center gap-3">
                                     {activeNode.name}
-                                    <span className="text-[9px] font-mono bg-[#e0ff00]/10 text-[#e0ff00] px-2 py-0.5 rounded-sm border border-[#e0ff00]/30 tracking-widest uppercase">Active Link</span>
+                                    <span className="text-[9px] font-mono bg-[#e0ff00]/10 text-[#e0ff00] px-2 py-0.5 rounded-sm border border-[#e0ff00]/30 tracking-widest uppercase">Live Metrics</span>
                                 </h2>
-                                <p className="text-xs text-white/40 font-mono">{activeNode.id}</p>
+                                <p className="text-xs text-white/60 font-mono flex flex-wrap items-center gap-2">
+                                    <span>{activeNode.id.split('-')[0]}</span>
+                                    <span className="text-white/20">|</span>
+                                    <span className="text-cyan-400">CPU: {(activeNode.cpuUsage || 0.0).toFixed(1)}%</span>
+                                    <span className="text-white/20">|</span>
+                                    <span className="text-purple-400">RAM: {(activeNode.ramUsage || 0.0).toFixed(1)}GB</span>
+                                    <span className="text-white/20">|</span>
+                                    <span className="text-emerald-400">UP: {activeNode.uptime || 0}s</span>
+                                </p>
                             </div>
                         </div>
                         <button onClick={() => handleDeleteNode(activeNode.id)} className="p-2 text-red-500/50 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-colors">
@@ -267,8 +283,9 @@ export default function DashboardClient() {
                         {activeNode.type === 'INTELLIGENCE_ROUTER' ? (
                             <>
                                 <InnerTabBtn active={innerTab==='telemetry'} onClick={()=>setInnerTab('telemetry')} icon={Terminal} label="Live Telemetry" />
+                                <InnerTabBtn active={innerTab==='kernel'} onClick={()=>setInnerTab('kernel')} icon={Database} label="System Logs" />
                                 <InnerTabBtn active={innerTab==='metrics'} onClick={()=>setInnerTab('metrics')} icon={Flame} label="Liquidation Heatmap" />
-                                <InnerTabBtn active={innerTab==='environment'} onClick={()=>setInnerTab('environment')} icon={Database} label="Env Vault" />
+                                <InnerTabBtn active={innerTab==='environment'} onClick={()=>setInnerTab('environment')} icon={Settings2} label="Env Vault" />
                             </>
                         ) : (
                             <>
@@ -280,6 +297,29 @@ export default function DashboardClient() {
 
                     {/* Node Inner Content */}
                     <div className="flex-1 overflow-y-auto bg-[#050505] p-6 custom-scrollbar relative">
+                        {innerTab === 'kernel' && (
+                            <div className="h-full flex flex-col bg-[#080808] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                                <div className="p-4 border-b border-white/10 bg-black flex items-center justify-between text-[11px] font-mono text-emerald-400">
+                                    <span className="flex items-center gap-2">KERNEL_LINK // {activeNode.id}</span>
+                                    <span className="flex items-center gap-2 animate-pulse"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"/> SYNCED</span>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-5 space-y-4 font-mono text-[11px] text-white/60">
+                                    {(activeNode.logs || []).map((log:any) => (
+                                        <div key={log.id} className="flex flex-col border-b border-white/5 pb-3">
+                                            <div className="flex justify-between items-center mb-1.5">
+                                                <span className="text-emerald-500 font-bold">[{new Date(log.createdAt).toLocaleTimeString()}]</span>
+                                                <span className="text-white/20 bg-white/5 px-2 py-0.5 rounded text-[9px] uppercase tracking-widest">{log.source}</span>
+                                            </div>
+                                            <span className="text-white/90 leading-relaxed">{log.message}</span>
+                                        </div>
+                                    ))}
+                                    {(!activeNode.logs || activeNode.logs.length === 0) && (
+                                        <div className="text-white/30 italic flex h-full items-center justify-center">No operational logs found in DB.</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        
                         {innerTab === 'telemetry' && (
                             <div className="h-full flex flex-col bg-black border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
                                 <div className="p-3 border-b border-white/10 bg-white/5 flex items-center justify-between text-[11px] font-mono text-[#e0ff00]">

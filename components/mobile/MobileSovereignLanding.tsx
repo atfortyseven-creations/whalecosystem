@@ -161,12 +161,12 @@ export function MobileSovereignLanding() {
                         <button 
                             onClick={() => {
                                 if (!isConnected) {
-                                    toast.error('Please connect your wallet first.');
+                                    open({ view: 'Connect' });
                                     return;
                                 }
                                 setView('scanner');
                             }}
-                            className={`w-full mt-6 bg-transparent border-2 border-white/20 text-white font-bold py-6 rounded-2xl flex items-center justify-between px-8 uppercase tracking-widest transition-all active:scale-[0.98] ${!isConnected ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/5'}`}
+                            className={`w-full mt-6 bg-transparent border-2 border-white/20 text-white font-bold py-6 rounded-2xl flex items-center justify-between px-8 uppercase tracking-widest transition-all active:scale-[0.98] ${!isConnected ? 'opacity-50 hover:bg-white/5 opacity-100' : 'hover:bg-white/5'}`}
                         >
                             <div className="flex items-center gap-4">
                                 <QrCode size={24} />

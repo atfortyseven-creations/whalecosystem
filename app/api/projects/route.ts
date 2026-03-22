@@ -11,7 +11,10 @@ export async function GET(req: Request) {
     const projects = await prisma.project.findMany({
       where: { userId: wallet },
       orderBy: { createdAt: 'desc' },
-      include: { deployments: true }
+      include: { 
+        deployments: true, 
+        logs: { orderBy: { createdAt: 'desc' }, take: 50 } 
+      }
     });
     return NextResponse.json(projects);
   } catch (error) {
@@ -55,6 +58,16 @@ export async function POST(req: Request) {
           action: 'CREATE',
           status: 'SUCCESS',
           txHash: `0x${Buffer.from(project.id).toString('hex').slice(0, 16)}`
+        }
+    });
+
+    // Initialize the Real-Time Operational Log stream per Phase 1 Realification
+    await prisma.log.create({
+        data: {
+            projectId: project.id,
+            message: `Node provisioned successfully. Master kernel linked to sovereign wallet signature.`,
+            level: 'INFO',
+            source: 'KERNEL'
         }
     });
 

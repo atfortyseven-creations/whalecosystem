@@ -2044,6 +2044,12 @@ model Project {
   updatedAt   DateTime     @updatedAt
   deployments Deployment[]
 
+  // [NEW] Real-Time Operational Metrics
+  cpuUsage Float @default(0.0)
+  ramUsage Float @default(0.0)
+  uptime   Int   @default(0)
+  logs     Log[]
+
   @@index([userId])
 }
 
@@ -2073,9 +2079,15 @@ model Variable {
 }
 
 model Log {
-  id        String   @id @default(uuid())
-  message   String
-  level     String   @default("INFO")
-  source    String   @default("SYSTEM")
+  id      String @id @default(uuid())
+  message String
+  level   String @default("INFO")
+  source  String @default("SYSTEM")
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
+
+  @@index([projectId])
 }
