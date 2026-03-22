@@ -4,8 +4,18 @@ import { prisma } from '@/lib/prisma';
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
+    const { searchParams } = new URL(req.url);
+    const wallet = searchParams.get('wallet');
+
+    if (!wallet) return new NextResponse("Unauthorized Multi-Tenant Connection", { status: 401 });
+
     const body = await req.json();
     const { name, description, status, liquidity, oracle } = body;
+
+    const existing = await prisma.project.findUnique({ where: { id } });
+    if (!existing || existing.userId !== wallet) {
+        return new NextResponse("Node Not Found or Unauthorized Ownership", { status: 404 });
+    }
 
     const project = await prisma.project.update({
       where: { id },
@@ -18,7 +28,6 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       }
     });
 
-    // Real deterministic fingerprint: SHA-256(projectId + ISO timestamp) — no Math.random
     const { createHash } = await import('crypto');
     const realTxHash = '0x' + createHash('sha256')
       .update(`${id}-${new Date().toISOString()}`)
@@ -33,14 +42,6 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       }
     });
 
-    await prisma.log.create({
-      data: {
-        message: `Project ${id} updated gracefully.`,
-        level: 'INFO',
-        source: 'DB'
-      }
-    });
-
     return NextResponse.json(project);
   } catch (error) {
     console.error('[PROJECT_PATCH]', error);
@@ -51,21 +52,19 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
+    const { searchParams } = new URL(req.url);
+    const wallet = searchParams.get('wallet');
+
+    if (!wallet) return new NextResponse("Unauthorized Multi-Tenant Connection", { status: 401 });
     
-    // Check if it exists to avoid crash
+    // Authorization Check: Only owner can delete their node
     const existing = await prisma.project.findUnique({ where: { id } });
-    if (!existing) return new NextResponse("Not Found", { status: 404 });
+    if (!existing || existing.userId !== wallet) {
+        return new NextResponse("Node Not Found or Unauthorized Ownership", { status: 404 });
+    }
 
     const project = await prisma.project.delete({
       where: { id }
-    });
-
-    await prisma.log.create({
-      data: {
-        message: `Project ${id} has been destroyed from the network.`,
-        level: 'WARN',
-        source: 'SYSTEM'
-      }
     });
 
     return NextResponse.json(project);
