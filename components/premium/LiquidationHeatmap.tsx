@@ -14,14 +14,24 @@ const TIMEFRAME_MAP: Record<string, string> = {
 };
 
 async function fetchBinanceKlines(symbol: string, interval: string, limit = 200) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
-  const res = await fetch(url);
-  const raw: any[][] = await res.json();
-  // Each kline: [openTime, open, high, low, close, volume, ...]
-  return raw.map(k => ({
-    time: Math.floor(Number(k[0]) / 1000) as Time,
-    value: parseFloat(k[4]), // close price
-  }));
+  try {
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    
+    const raw: any[][] = await res.json();
+    if (!Array.isArray(raw)) return [];
+
+    const klines = raw.map((k: any) => ({
+      time: Math.floor(Number(k[0]) / 1000) as Time,
+      value: parseFloat(k[4]), // close price
+    }));
+
+    // Ensure strict ascending chronology required by Lightweight-Charts to prevent React crashing
+    return klines.filter((k, i, arr) => i === 0 || k.time > arr[i - 1].time);
+  } catch (err) {
+    return []; // Suppress all generic DOM exceptions
+  }
 }
 
 export default function LiquidationHeatmap() {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Terminal, Database, Sparkles, LayoutGrid, Flame, Shield, LockKeyhole, Plus, Settings2, ScanLine, Activity, CheckCircle2 } from 'lucide-react';
+import { Crown, Terminal, Database, Sparkles, LayoutGrid, Flame, Shield, LockKeyhole, Plus, Settings2, ScanLine, Activity, CheckCircle2, X, ChevronRight, Server, Hexagon, ArrowLeft, Trash2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import ContextMenu from '@/components/premium/ContextMenu';
 
@@ -16,44 +16,54 @@ import { useWhaleFeed } from '@/hooks/useWhaleFeed';
 import LiquidationHeatmap from '@/components/premium/LiquidationHeatmap';
 import AztecPrivacyHub from '@/components/premium/AztecPrivacyHub';
 
-type TabType = 'canvas' | 'variables' | 'logs' | 'heatmap' | 'privacy' | 'scanner';
+type NodeType = 'INTELLIGENCE_ROUTER' | 'SOVEREIGN_VAULT';
+type InnerTab = 'telemetry' | 'environment' | 'metrics' | 'security' | 'zk_sync';
+
+interface ProjectNode {
+    id: string;
+    name: string;
+    type: NodeType;
+    status: 'deploying' | 'live';
+}
 
 export default function DashboardClient() {
-  const [activeTab, setActiveTab] = useState<TabType>('canvas');
+  const [nodes, setNodes] = useState<ProjectNode[]>([]);
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [innerTab, setInnerTab] = useState<InnerTab>('telemetry');
   
-  // Real Wagmi verification: user must have an active wallet connection.
-  const { isConnected } = useAccount();
-  const isPremium = isConnected;
+  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [newNodeName, setNewNodeName] = useState('');
+  const [newNodeType, setNewNodeType] = useState<NodeType>('INTELLIGENCE_ROUTER');
 
+  const { isConnected } = useAccount();
+
+  // Real features
   useGodView();
   useBinanceWebSocket('btcusdt');
   const currentPrice = useMarketStore(state => state.currentPrice);
-  
-  // Live Telemetry Stream
   const { unifiedWhaleFeed } = useWhaleFeed();
 
-  const [projects, setProjects] = useState<any[]>([]);
   const [variables, setVariables] = useState<any[]>([]);
-  const [isCreating, setIsCreating] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
 
-  // Live ZK Scanner State
+  // ZK Scanner State
   const [qrSession, setQrSession] = useState<string | null>(null);
   const [isScannerPolling, setIsScannerPolling] = useState(false);
   const [scannerSuccess, setScannerSuccess] = useState(false);
 
-  const tabs = [
-    { id: 'canvas' as const, label: 'Ecosystem Canvas', icon: LayoutGrid },
-    { id: 'variables' as const, label: 'Environment', icon: Database },
-    { id: 'logs' as const, label: 'Live Telemetry', icon: Terminal },
-    { id: 'scanner' as const, label: 'ZK Scanner API', icon: ScanLine },
-    { id: 'heatmap' as const, label: 'Heatmap', icon: Flame },
-    { id: 'privacy' as const, label: 'Aztec Shield', icon: Shield },
-  ];
-
   const fetchProjects = async () => {
-    try { const res = await fetch('/api/projects'); setProjects(await res.json()); } catch(e){}
+    try { 
+        const res = await fetch('/api/projects'); 
+        const data = await res.json(); 
+        const mappedNodes = data.map((p:any, i:number) => ({
+            id: p.id,
+            name: p.name,
+            type: i % 2 === 0 ? 'INTELLIGENCE_ROUTER' : 'SOVEREIGN_VAULT',
+            status: 'live'
+        }));
+        setNodes(mappedNodes);
+    } catch(e){}
   };
+
   const fetchVariables = async () => {
     try { const res = await fetch('/api/variables'); setVariables(await res.json()); } catch(e){}
   };
@@ -63,22 +73,19 @@ export default function DashboardClient() {
     fetchVariables();
   }, []);
 
-  // Legendary Functionality: Live ZK Session Sync
+  // ZK Scanner Polling Logic
   useEffect(() => {
-    if (activeTab === 'scanner' && !qrSession && !scannerSuccess) {
+    if (innerTab === 'zk_sync' && activeNodeId && !qrSession && !scannerSuccess) {
         const initQr = async () => {
             try {
                 const res = await fetch('/api/auth/qr-session', { method: 'POST' });
                 const data = await res.json();
-                if (data.sessionId) {
-                    setQrSession(data.sessionId);
-                    setIsScannerPolling(true);
-                }
+                if (data.sessionId) { setQrSession(data.sessionId); setIsScannerPolling(true); }
             } catch(e) {}
         };
         initQr();
     }
-  }, [activeTab, qrSession, scannerSuccess]);
+  }, [innerTab, activeNodeId, qrSession, scannerSuccess]);
 
   useEffect(() => {
       if (!isScannerPolling || !qrSession) return;
@@ -100,250 +107,324 @@ export default function DashboardClient() {
       return () => clearInterval(interval);
   }, [isScannerPolling, qrSession]);
 
-
-  const handleCreateProject = async () => {
-    if(!newProjectName) return;
+  const handleDeployNode = async () => {
+    if(!newNodeName) return;
+    setIsDeployModalOpen(false);
+    const tempId = 'temp-' + Date.now();
+    setNodes(prev => [...prev, { id: tempId, name: newNodeName, type: newNodeType, status: 'deploying' }]);
+    
     await fetch('/api/projects', {
       method: 'POST',
-      body: JSON.stringify({ name: newProjectName })
+      body: JSON.stringify({ name: newNodeName })
     });
-    setNewProjectName("");
-    setIsCreating(false);
-    fetchProjects();
+    setNewNodeName("");
+    
+    // Simulate deployment time for immersion
+    setTimeout(() => {
+        fetchProjects();
+    }, 1500);
   };
 
-  const handleDeleteProject = async (id: string) => {
+  const handleDeleteNode = async (id: string) => {
+    if(id.startsWith('temp')) return;
+    setActiveNodeId(null);
+    setNodes(prev => prev.filter(n => n.id !== id));
     await fetch(`/api/projects/${id}`, { method: 'DELETE' });
     fetchProjects();
   };
 
+  const activeNode = nodes.find(n => n.id === activeNodeId);
+
   return (
     <ContextMenu>
-      <div className="min-h-screen bg-[#050505] text-white pb-20 font-sans selection:bg-[#e0ff00] selection:text-black">
-        {/* Railway-style grid background */}
-        <div className="absolute inset-0 bg-[url('https://railway.app/illustrations/grid.svg')] bg-center opacity-20 pointer-events-none" />
-        <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-[#b37feb]/10 via-[#0a051a]/50 to-transparent blur-3xl -z-10" />
+      <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-[#e0ff00] selection:text-black flex flex-col relative overflow-hidden">
         
-        <div className="max-w-7xl mx-auto px-6 pt-12">
-          {/* Header */}
-          <header className="flex items-end justify-between mb-12 relative z-10 border-b border-white/10 pb-6">
-            <div className="flex items-center gap-6">
-              <div className="w-14 h-14 bg-black rounded-xl flex items-center justify-center shadow-2xl border border-white/20">
-                <Crown size={24} className="text-[#e0ff00]" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-black tracking-tight mb-1 flex items-center gap-3">
-                  System Infrastructure
-                  <span className="text-[10px] font-mono bg-[#e0ff00]/10 text-[#e0ff00] px-2 py-1 rounded-md border border-[#e0ff00]/30 shadow-[0_0_15px_rgba(224,255,0,0.2)]">LIVE & ACTIVE</span>
-                </h1>
-                <div className="flex items-center gap-4 text-sm font-mono text-white/40">
-                  <span>us-east-1 (Ethereum Mainnet)</span>
-                  {currentPrice > 0 && (
-                    <span className="text-[#e0ff00]">
-                      BTC_USD: {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </header>
+        {/* Railway Canvas Background */}
+        <div className="absolute inset-0 bg-[#080808]">
+            <div className="absolute inset-0 bg-[url('https://railway.app/illustrations/grid.svg')] bg-center opacity-30 pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#e0ff00]/5 via-[#0a051a]/50 to-transparent blur-3xl -z-10" />
+        </div>
+        
+        {/* Canvas Toolbar */}
+        <div className="relative z-10 w-full h-16 border-b border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-between px-8">
+             <div className="flex items-center gap-4">
+                 <div className="w-8 h-8 rounded-lg bg-[#e0ff00]/10 border border-[#e0ff00]/30 flex items-center justify-center">
+                     <Hexagon size={16} className="text-[#e0ff00]" />
+                 </div>
+                 <span className="font-bold text-sm tracking-widest uppercase">Ecosystem Canvas</span>
+             </div>
+             
+             <button 
+                onClick={() => setIsDeployModalOpen(true)}
+                className="bg-white hover:bg-gray-200 text-black px-5 py-2 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl"
+             >
+                <Plus size={16} /> Deploy Architecture
+             </button>
+        </div>
 
-          <div className="grid grid-cols-12 gap-8 relative z-10">
-            {/* Sidebar Navigation (Railway-style) */}
-            <div className="col-span-12 md:col-span-3">
-              <nav className="space-y-1 sticky top-8">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-                  
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm ${
-                        isActive 
-                          ? 'bg-white/10 text-white font-bold translate-x-1 border-l-2 border-[#e0ff00]' 
-                          : 'hover:bg-white/5 text-white/50 hover:text-white/80 font-medium'
-                      }`}
+        {/* Dynamic Canvas Area */}
+        <main className="flex-1 relative z-10 p-12 overflow-y-auto no-scrollbar">
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 transition-all duration-700 ${activeNodeId ? 'w-[calc(100%-600px)] opacity-50 blur-sm pointer-events-none scale-95 origin-left' : 'w-full'}`}>
+                {nodes.map(node => (
+                    <motion.div 
+                        layoutId={`node-${node.id}`}
+                        key={node.id} 
+                        onClick={() => {
+                            if (node.status === 'deploying') return;
+                            setActiveNodeId(node.id);
+                            setInnerTab(node.type === 'INTELLIGENCE_ROUTER' ? 'telemetry' : 'security');
+                        }}
+                        className={`group p-6 rounded-2xl border transition-all cursor-pointer relative overflow-hidden shadow-2xl ${node.status === 'deploying' ? 'bg-white/5 border-dashed border-white/20' : 'bg-[#111] border-white/10 hover:border-[#e0ff00]/50 hover:-translate-y-1'}`}
                     >
-                      <Icon size={16} className={isActive ? 'text-[#e0ff00]' : ''} />
-                      <span className="tracking-wide">{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
+                        <div className="flex justify-between items-start mb-6">
+                            <div className={`p-3 rounded-xl ${node.type === 'INTELLIGENCE_ROUTER' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-purple-500/10 text-purple-400'}`}>
+                                {node.type === 'INTELLIGENCE_ROUTER' ? <Server size={20} /> : <Shield size={20} />}
+                            </div>
+                            {node.status === 'live' ? (
+                                <div className="flex items-center gap-2 text-[10px] font-mono text-[#e0ff00] bg-[#e0ff00]/10 px-2 py-1 rounded-md">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#e0ff00] animate-pulse" /> LIVE
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 text-[10px] font-mono text-white/50 bg-white/5 px-2 py-1 rounded-md">
+                                    <Activity size={12} className="animate-spin" /> DEPLOYING
+                                </div>
+                            )}
+                        </div>
+                        
+                        <h3 className="font-bold text-lg mb-1 tracking-tight truncate">{node.name}</h3>
+                        <p className="text-xs text-white/40 font-mono mb-6">{node.id.split('-')[0].toUpperCase()}</p>
+
+                        <div className="flex items-center gap-3 border-t border-white/5 pt-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                            {node.type === 'INTELLIGENCE_ROUTER' ? (
+                                <>
+                                   <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-white/60"><Terminal size={12} /> Telecom</div>
+                                   <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-white/60"><Flame size={12} /> Metrics</div>
+                                </>
+                            ) : (
+                                <>
+                                   <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-white/60"><LockKeyhole size={12} /> ZK Vault</div>
+                                   <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-white/60"><ScanLine size={12} /> Auth API</div>
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                ))}
+                
+                {nodes.length === 0 && (
+                    <div className="col-span-full h-64 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center text-white/30 hover:text-white/60 hover:border-white/30 transition-all cursor-pointer" onClick={() => setIsDeployModalOpen(true)}>
+                        <Plus size={40} className="mb-4" />
+                        <p className="font-bold uppercase tracking-widest text-sm">Deploy First Architecture</p>
+                    </div>
+                )}
             </div>
+        </main>
 
-            {/* Main Content Area */}
-            <div className="col-span-12 md:col-span-9 bg-[#0c0c0c] border border-white/10 rounded-2xl min-h-[600px] overflow-hidden shadow-2xl relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#e0ff00]/50 to-transparent" />
-              
-              <AnimatePresence mode="wait">
-                {activeTab === 'canvas' && (
-                  <motion.div key="canvas" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8">
-                    <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-xl font-bold flex items-center gap-2"><LayoutGrid size={20}/> Projects Registry</h2>
-                      <button onClick={() => setIsCreating(true)} className="bg-white text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors">
-                        <Plus size={16} /> Deploy Registry
-                      </button>
-                    </div>
-
-                    {isCreating && (
-                      <div className="mb-8 p-6 bg-white/5 border border-white/10 rounded-xl flex items-center gap-4">
-                        <input 
-                          type="text" 
-                          placeholder="e.g. WHALE-BTC-PREDICT" 
-                          className="bg-black border border-white/20 rounded-lg px-4 py-2 text-white outline-none focus:border-[#e0ff00] w-64"
-                          value={newProjectName}
-                          onChange={(e) => setNewProjectName(e.target.value)}
-                        />
-                        <button onClick={handleCreateProject} className="bg-[#e0ff00] text-black px-4 py-2 rounded-lg text-sm font-bold">Deploy DB Sync</button>
-                        <button onClick={() => setIsCreating(false)} className="text-white/50 text-sm hover:text-white">Cancel</button>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {projects.map((p) => (
-                        <div key={p.id} className="group p-6 bg-white/5 border border-white/10 hover:border-white/30 rounded-xl transition-all relative overflow-hidden">
-                          <div className="flex justify-between items-start mb-4">
-                            <h3 className="font-bold text-lg">{p.name}</h3>
-                            <button onClick={() => handleDeleteProject(p.id)} className="text-red-500/50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">Untrack</button>
-                          </div>
-                          <div className="flex items-center gap-2 mb-4">
-                            <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                            <span className="text-xs font-mono text-cyan-400">DB REGISTRATION OK</span>
-                          </div>
-                          <div className="w-full bg-black/50 rounded-lg p-3 text-xs font-mono text-white/50">
-                            ID: {p.id.split('-')[0]}...
-                          </div>
-                        </div>
-                      ))}
-                      {projects.length === 0 && !isCreating && (
-                        <div className="col-span-2 text-center py-20 text-white/30 font-mono border border-dashed border-white/10 rounded-xl">
-                          No database projects found. Register a new name to track it on postgres.
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeTab === 'variables' && (
-                  <motion.div key="variables" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8">
-                     <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-xl font-bold flex items-center gap-2"><Database size={20}/> Locked Environment Vars</h2>
-                    </div>
-                    {/* Read-only viewer */}
-                    <div className="text-white/40 font-mono text-sm space-y-4">
-                        {variables.map(v => (
-                            <div key={v.id} className="flex gap-4 items-center bg-black/40 p-4 rounded-lg border border-white/5">
-                                <span className="text-[#e0ff00] w-1/3">{v.key}</span>
-                                <span className="text-white">{v.value}</span>
+        {/* Sliding Context Drawer (The "Inside" of a Node) */}
+        <AnimatePresence>
+            {activeNode && (
+                <motion.div 
+                    initial={{ x: '100%', opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: '100%', opacity: 0 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                    className="absolute top-16 right-0 bottom-0 w-full md:w-[600px] lg:w-[800px] bg-[#0c0c0c] border-l border-white/10 shadow-2xl z-40 flex flex-col"
+                >
+                    <header className="px-8 py-6 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md">
+                        <div className="flex items-center gap-6">
+                            <button onClick={() => setActiveNodeId(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
+                                <ArrowLeft size={20} />
+                            </button>
+                            <div>
+                                <h2 className="text-xl font-black mb-1 flex items-center gap-3">
+                                    {activeNode.name}
+                                    <span className="text-[9px] font-mono bg-[#e0ff00]/10 text-[#e0ff00] px-2 py-0.5 rounded-sm border border-[#e0ff00]/30 tracking-widest uppercase">Active Link</span>
+                                </h2>
+                                <p className="text-xs text-white/40 font-mono">{activeNode.id}</p>
                             </div>
-                        ))}
-                        {variables.length === 0 && <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">No variables defined globally. API read-only.</div>}
+                        </div>
+                        <button onClick={() => handleDeleteNode(activeNode.id)} className="p-2 text-red-500/50 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-colors">
+                            <Trash2 size={18} />
+                        </button>
+                    </header>
+
+                    {/* Node Inner Navigation */}
+                    <div className="px-8 border-b border-white/5 flex gap-6 overflow-x-auto no-scrollbar bg-black/20">
+                        {activeNode.type === 'INTELLIGENCE_ROUTER' ? (
+                            <>
+                                <InnerTabBtn active={innerTab==='telemetry'} onClick={()=>setInnerTab('telemetry')} icon={Terminal} label="Live Telemetry" />
+                                <InnerTabBtn active={innerTab==='metrics'} onClick={()=>setInnerTab('metrics')} icon={Flame} label="Liquidation Heatmap" />
+                                <InnerTabBtn active={innerTab==='environment'} onClick={()=>setInnerTab('environment')} icon={Database} label="Env Vault" />
+                            </>
+                        ) : (
+                            <>
+                                <InnerTabBtn active={innerTab==='security'} onClick={()=>setInnerTab('security')} icon={Shield} label="Aztec Privacy Hub" />
+                                <InnerTabBtn active={innerTab==='zk_sync'} onClick={()=>setInnerTab('zk_sync')} icon={ScanLine} label="ZK Sync Gateway" />
+                            </>
+                        )}
                     </div>
-                  </motion.div>
-                )}
 
-                {/* Legendary Functionality: Real-Time WebSockets Feed */}
-                {activeTab === 'logs' && (
-                  <motion.div key="logs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-0 h-full flex flex-col">
-                     <div className="p-4 border-b border-white/10 bg-black/60 flex items-center justify-between text-xs font-mono text-[#e0ff00]">
-                         <div className="flex items-center gap-2">
-                             <Terminal size={14} /> LIVE_TELEMETRY_STREAM_CONNECTED
-                         </div>
-                         <div className="flex items-center gap-2 animate-pulse">
-                             <div className="w-2 h-2 rounded-full bg-[#e0ff00]"></div> LISTENING
-                         </div>
-                     </div>
-                     <div className="flex-1 overflow-y-auto p-4 space-y-2 font-mono text-xs max-h-[500px]">
-                         {unifiedWhaleFeed.slice(0, 50).map(log => (
-                             <motion.div initial={{opacity:0, x:-10}} animate={{opacity:1, x:0}} key={log.id} className="flex flex-col sm:flex-row gap-2 sm:gap-4 border-b border-white/5 pb-2">
-                                 <span className="text-blue-400 shrink-0">[{new Date(log.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
-                                 <span className={log.action === 'SELL' ? 'text-red-400 shrink-0' : log.action === 'BUY' ? 'text-emerald-400 shrink-0' : 'text-[#e0ff00] shrink-0'}>[{log.chain}]</span>
-                                 <span className="text-white">Detected transfer: {log.amount.toLocaleString(undefined, {maximumFractionDigits: 1})} {log.asset} <span className="text-white/40">(${log.usdNum.toLocaleString()})</span></span>
-                                 <span className="text-white/20 truncate hidden sm:block">HASH: {log.hash}</span>
-                             </motion.div>
-                         ))}
-                         {unifiedWhaleFeed.length === 0 && <span className="text-white/20 animate-pulse">Waiting for oceanic quantum telemetry...</span>}
-                     </div>
-                  </motion.div>
-                )}
-
-                {/* Legendary Functionality: Live ZK Scanner Polling */}
-                {activeTab === 'scanner' && (
-                  <motion.div key="scanner" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 flex flex-col items-center justify-center min-h-[500px] gap-12">
-                     {scannerSuccess ? (
-                         <div className="text-center space-y-6 flex flex-col items-center">
-                             <div className="w-24 h-24 rounded-full bg-[#e0ff00]/20 flex items-center justify-center border border-[#e0ff00]">
-                                 <CheckCircle2 size={40} className="text-[#e0ff00]" />
-                             </div>
-                             <div>
-                                 <h3 className="text-3xl font-black uppercase italic tracking-tighter text-[#e0ff00]">Sync Established</h3>
-                                 <p className="text-sm text-white/50 font-sans mt-2">Mobile node linked to master terminal logically. Device handshake complete.</p>
-                             </div>
-                         </div>
-                     ) : (
-                        <>
-                            <div className="text-center space-y-4 max-w-sm">
-                               <h3 className="text-2xl font-black uppercase italic tracking-tighter">Live Mobile Link</h3>
-                               <p className="text-sm text-[#A3A6AF] font-sans">Open Sovereign Companion on your mobile device and scan this live API endpoint to link your session natively.</p>
+                    {/* Node Inner Content */}
+                    <div className="flex-1 overflow-y-auto bg-[#050505] p-6 custom-scrollbar relative">
+                        {innerTab === 'telemetry' && (
+                            <div className="h-full flex flex-col bg-black border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                                <div className="p-3 border-b border-white/10 bg-white/5 flex items-center justify-between text-[11px] font-mono text-[#e0ff00]">
+                                    <span className="flex items-center gap-2"><Terminal size={12}/> WSS://WHALE.NETWORK/STREAM</span>
+                                    <span className="flex items-center gap-2 animate-pulse"><div className="w-1.5 h-1.5 bg-[#e0ff00] rounded-full"/> RECEIVING</span>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4 space-y-3 font-mono text-xs">
+                                     {unifiedWhaleFeed.slice(0, 100).map(log => (
+                                         <motion.div initial={{opacity:0, x:-5}} animate={{opacity:1, x:0}} key={log.id} className="flex flex-col gap-1 border-b border-white/5 pb-3">
+                                             <div className="flex items-center justify-between">
+                                                <span className="text-cyan-400">[{new Date(log.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
+                                                <span className={log.action === 'SELL' ? 'text-red-400' : log.action === 'BUY' ? 'text-emerald-400' : 'text-[#e0ff00]'}>[{log.chain}] {log.action}</span>
+                                             </div>
+                                             <div className="text-white">Detected transfer: <span className="font-bold">{log.amount.toLocaleString(undefined, {maximumFractionDigits: 1})} {log.asset}</span> <span className="text-white/40">(${log.usdNum.toLocaleString()})</span></div>
+                                             <div className="text-white/20 truncate text-[9px]">HASH: {log.hash}</div>
+                                         </motion.div>
+                                     ))}
+                                     {unifiedWhaleFeed.length === 0 && <div className="h-full flex items-center justify-center text-white/30 animate-pulse">Awaiting cross-chain telemetry blocks...</div>}
+                                </div>
                             </div>
+                        )}
 
-                            <div className="w-80 h-80 border-2 border-dashed border-[#e0ff00]/30 rounded-[3rem] flex items-center justify-center relative bg-black/50 backdrop-blur-md p-10">
-                                <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-[#e0ff00] rounded-tl-[2rem] m-6" />
-                                <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-[#e0ff00] rounded-tr-[2rem] m-6" />
-                                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-[#e0ff00] rounded-bl-[2rem] m-6" />
-                                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[#e0ff00] rounded-br-[2rem] m-6" />
-                                
-                                <div className="bg-white p-4 rounded-2xl shadow-2xl">
-                                   {qrSession ? (
-                                       <QRCodeSVG 
-                                          value={qrSession} 
-                                          size={200} 
-                                          level="H"
-                                          fgColor="#000000"
-                                          bgColor="#ffffff"
-                                       />
-                                   ) : (
-                                       <div className="w-[200px] h-[200px] flex items-center justify-center animate-pulse">
-                                           <span className="text-[10px] font-mono text-black/40 uppercase text-center leading-loose">Waiting for<br/>Backend Node API...</span>
+                        {innerTab === 'metrics' && (
+                            <div className="h-full">
+                                <LiquidationHeatmap />
+                            </div>
+                        )}
+
+                        {innerTab === 'environment' && (
+                            <div className="space-y-4">
+                                <div className="p-5 border border-[#e0ff00]/20 bg-[#e0ff00]/5 rounded-2xl flex gap-4 text-sm font-medium text-[#e0ff00]">
+                                    <LockKeyhole size={20} className="shrink-0" />
+                                    These variables are injected natively into the router execution context. Modifying them requires root signature.
+                                </div>
+                                {variables.map(v => (
+                                    <div key={v.id} className="flex gap-4 items-center bg-black/40 p-4 rounded-xl border border-white/5">
+                                        <span className="text-white/40 font-mono text-xs w-1/3 truncate">{v.key}</span>
+                                        <input type="password" disabled value={v.value} className="bg-transparent text-white font-mono text-xs outline-none flex-1 opacity-50 select-none" />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {innerTab === 'security' && (
+                             <AztecPrivacyHub />
+                        )}
+
+                        {innerTab === 'zk_sync' && (
+                            <div className="h-full flex flex-col items-center justify-center py-12">
+                               {scannerSuccess ? (
+                                   <div className="text-center space-y-6 flex flex-col items-center">
+                                       <div className="w-20 h-20 rounded-full bg-[#e0ff00]/20 flex items-center justify-center border border-[#e0ff00] shadow-[0_0_30px_rgba(224,255,0,0.3)]">
+                                           <CheckCircle2 size={32} className="text-[#e0ff00]" />
                                        </div>
-                                   )}
+                                       <div>
+                                           <h3 className="text-2xl font-black uppercase italic tracking-tighter text-[#e0ff00]">Sync Established</h3>
+                                           <p className="text-xs text-white/50 font-sans mt-2">Mobile node linked to active Sovereign Vault.</p>
+                                       </div>
+                                   </div>
+                               ) : (
+                                  <>
+                                      <div className="text-center space-y-3 max-w-sm mb-10">
+                                         <h3 className="text-xl font-black uppercase italic tracking-tighter">Live Mobile Auth</h3>
+                                         <p className="text-xs text-white/40 font-sans leading-relaxed">Open Sovereign Companion on your mobile device and scan this live API endpoint to link your session natively.</p>
+                                      </div>
+          
+                                      <div className="w-64 h-64 border-2 border-dashed border-white/20 rounded-[2rem] flex items-center justify-center relative bg-black/50 p-6 shadow-2xl">
+                                          <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white rounded-tl-[1.5rem] m-4" />
+                                          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-white rounded-tr-[1.5rem] m-4" />
+                                          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-white rounded-bl-[1.5rem] m-4" />
+                                          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white rounded-br-[1.5rem] m-4" />
+                                          
+                                          <div className="bg-white p-3 rounded-2xl shadow-xl w-full h-full flex items-center justify-center">
+                                             {qrSession ? (
+                                                 <QRCodeSVG value={qrSession} size={180} level="H" fgColor="#000000" bgColor="#ffffff" />
+                                             ) : (
+                                                 <div className="text-[9px] font-mono text-black/40 uppercase text-center animate-pulse">Negotiating Handshake...</div>
+                                             )}
+                                          </div>
+                                      </div>
+                                  </>
+                               )}
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+
+        {/* Deploy New Architecture Modal */}
+        <AnimatePresence>
+            {isDeployModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-6">
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl bg-[#111] border border-white/10 rounded-3xl shadow-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)]">
+                        <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center">
+                            <h3 className="text-xl font-black tracking-tight text-white">Deploy Architecture</h3>
+                            <button onClick={() => setIsDeployModalOpen(false)} className="text-white/40 hover:text-white transition-colors"><X size={24} /></button>
+                        </div>
+                        <div className="p-8 space-y-8">
+                            
+                            <div className="space-y-4">
+                                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Select Node Protocol</label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button onClick={() => setNewNodeType('INTELLIGENCE_ROUTER')} className={`p-6 rounded-2xl border text-left transition-all ${newNodeType === 'INTELLIGENCE_ROUTER' ? 'bg-[#e0ff00]/5 border-[#e0ff00]/50 shadow-[0_0_30px_rgba(224,255,0,0.1)]' : 'bg-black/50 border-white/5 hover:border-white/20 hover:bg-black'}`}>
+                                        <Server size={24} className={`mb-4 ${newNodeType === 'INTELLIGENCE_ROUTER' ? 'text-[#e0ff00]' : 'text-white/40'}`} />
+                                        <div className="font-bold text-sm mb-1 text-white">Intelligence Router</div>
+                                        <div className="text-xs text-white/40 leading-relaxed">Deploys an active WebSocket telemetry listener and real-time biometric Heatmap node.</div>
+                                    </button>
+                                    
+                                    <button onClick={() => setNewNodeType('SOVEREIGN_VAULT')} className={`p-6 rounded-2xl border text-left transition-all ${newNodeType === 'SOVEREIGN_VAULT' ? 'bg-[#C056DD]/5 border-[#C056DD]/50 shadow-[0_0_30px_rgba(192,86,221,0.1)]' : 'bg-black/50 border-white/5 hover:border-white/20 hover:bg-black'}`}>
+                                        <Shield size={24} className={`mb-4 ${newNodeType === 'SOVEREIGN_VAULT' ? 'text-[#C056DD]' : 'text-white/40'}`} />
+                                        <div className="font-bold text-sm mb-1 text-white">Sovereign Vault</div>
+                                        <div className="text-xs text-white/40 leading-relaxed">Deploys an Aztec Privacy Hub instance connected to the ZK Identity Sync Gateway.</div>
+                                    </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 text-[10px] font-mono text-[#e0ff00]/60 uppercase tracking-[0.4em] animate-pulse">
-                               <Activity size={14} /> retrieving_live_api &bull; scanning
+                            <div className="space-y-4">
+                                <label className="text-xs font-bold uppercase tracking-widest text-white/50">Instance Name</label>
+                                <input 
+                                    autoFocus
+                                    type="text" 
+                                    className="w-full bg-black/50 border border-white/10 focus:border-white/30 rounded-xl px-5 py-4 text-white text-lg font-mono outline-none transition-all placeholder:text-white/20"
+                                    placeholder="e.g. WHALE-ORACLE-ALPHA"
+                                    value={newNodeName}
+                                    onChange={e => setNewNodeName(e.target.value)}
+                                />
                             </div>
-                        </>
-                     )}
-                  </motion.div>
-                )}
 
-                {activeTab === 'heatmap' && (
-                  <motion.div key="heatmap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8">
-                     <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><Flame size={20} className="text-[#e0ff00]"/> Live Orderbook Heatmap</h2>
-                     <div className="bg-black/60 rounded-3xl p-2 border border-white/5 shadow-2xl">
-                         <LiquidationHeatmap />
-                     </div>
-                  </motion.div>
-                )}
+                        </div>
+                        <div className="px-8 py-5 border-t border-white/5 bg-black/40 flex justify-end gap-3">
+                            <button onClick={() => setIsDeployModalOpen(false)} className="px-6 py-3 rounded-xl text-sm font-bold text-white/60 hover:text-white transition-colors">Cancel</button>
+                            <button 
+                                onClick={handleDeployNode} 
+                                disabled={!newNodeName.trim()}
+                                className="bg-white text-black px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Execute Protocol
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
 
-                {activeTab === 'privacy' && (
-                  <motion.div key="privacy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8">
-                     <AztecPrivacyHub />
-                  </motion.div>
-                )}
-
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
       </div>
       <PremiumToasts />
     </ContextMenu>
   );
+}
+
+function InnerTabBtn({ active, onClick, icon: Icon, label }: any) {
+    return (
+        <button 
+            onClick={onClick}
+            className={`py-4 px-2 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap text-[11px] font-black uppercase tracking-widest ${active ? 'border-white text-white' : 'border-transparent text-white/40 hover:text-white/80'}`}
+        >
+            <Icon size={14} className={active ? '' : 'opacity-50'}/> {label}
+        </button>
+    );
 }
 
 function Camera(props: any) { return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2-2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> }
