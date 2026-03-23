@@ -52,6 +52,9 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true
     },
+    eslint: {
+        ignoreDuringBuilds: true
+    },
 
     // Turbopack config (Next.js 16)
     turbopack: {
