@@ -8,7 +8,7 @@
     "build:railway": "echo 'LEGENDARY_BUILD_777' && npm run build:contracts && npx prisma db push --accept-data-loss && prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build",
     "build:contracts": "hardhat compile",
     "build:extension": "node scripts/extension-build.js",
-    "start": "cross-env NODE_ENV=production node --import tsx server.ts",
+    "start": "npx tsx scripts/production-cluster.ts",
     "start:gateway": "npx tsx services/gateway/server.ts",
     "start:scanner": "npx tsx services/scanner/index.ts",
     "start:all": "npm run start & npm run start:gateway & npm run start:scanner & npm run start:alerts",
