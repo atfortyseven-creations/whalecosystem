@@ -38,12 +38,8 @@ export function MobileSovereignLanding() {
     const { isConnected, address } = useAccount();
     const [view, setView] = useState<'landing' | 'scanner'>('landing');
 
-    const handleMetaMaskDeepLink = useCallback(() => {
-        if (typeof window !== 'undefined' && (window as any).ethereum) {
-            open({ view: 'Connect' });
-        } else {
-            window.location.href = 'https://metamask.app.link/dapp/www.humanidfi.com';
-        }
+    const handleSovereignConnect = useCallback(() => {
+        open({ view: 'Connect' });
     }, [open]);
 
     const handleScanClick = useCallback(() => {
@@ -190,17 +186,17 @@ export function MobileSovereignLanding() {
                         Sovereign<br />Access.
                     </h2>
                     <p className="text-[#050505]/55 text-center text-[1.05rem] font-medium mb-12">
-                        Connect to the decentralized matrix<br />and monitor the flow.
+                        Connect your identity to the matrix.<br />Google, X, and Web3 supported.
                     </p>
 
                     <div className="space-y-4">
                         {!isConnected ? (
                             <button
-                                onClick={handleMetaMaskDeepLink}
+                                onClick={handleSovereignConnect}
                                 className="w-full bg-[#050505] text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-black/10"
                             >
                                 <Hexagon size={22} className="text-indigo-400" />
-                                Connect MetaMask
+                                Institutional Login
                             </button>
                         ) : (
                             <div className="w-full bg-green-50 border border-green-200 font-bold py-6 rounded-2xl flex items-center justify-center gap-3">
