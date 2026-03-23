@@ -401,7 +401,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                 <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/50 rounded-full p-1.5 border border-[#1F1F1F]/5 shadow-sm overflow-x-auto max-w-[600px] scrollbar-hide">
                     <ViewTab icon={<PieChart size={18}/>} label="Portfolio" active={activeView==='portfolio'} onClick={()=>setActiveView('portfolio')} />
                     <ViewTab icon={<BarChart2 size={18}/>} label="Analytics" active={activeView==='analytics'} onClick={()=>setActiveView('analytics')} />
-                    <ViewTab icon={<Network size={18} className={activeView === 'network' ? 'text-[#00f2ea]' : ''} />} label="Sovereign" active={activeView==='network'} onClick={()=>setActiveView('network')} />
+                    <ViewTab icon={<Network size={18} className={activeView === 'network' ? 'text-[#00f2ea]' : ''} />} label="Network" active={activeView==='network'} onClick={()=>setActiveView('network')} />
                     <ViewTab icon={<Zap size={18}/>} label="Activity" active={activeView==='activity'} onClick={()=>setActiveView('activity')} />
                     <ViewTab icon={<Gift size={18}/>} label="Referrals" active={activeView==='referrals'} onClick={()=>setActiveView('referrals')} />
                     <ViewTab icon={<Settings size={18}/>} label="Settings" active={activeView==='settings'} onClick={()=>setActiveView('settings')} />

@@ -158,7 +158,7 @@ export function QrScanner({ className }: QrScannerProps) {
                         </div>
                         <button onClick={startCamera}
                             className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--aztec-orchid)] to-purple-600 text-white font-mono text-[11px] uppercase tracking-widest font-bold shadow-[0_0_30px_rgba(168,85,247,0.35)] active:scale-95 transition-all flex items-center justify-center gap-3">
-                            <Camera size={16} /> Activate Sovereign Camera
+                            <Camera size={16} /> Activate Camera
                         </button>
                     </motion.div>
                 )}

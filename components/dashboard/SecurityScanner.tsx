@@ -59,7 +59,7 @@ export default function SecurityScanner() {
             {/* Header / Search */}
             <div style={{ padding: '24px', borderBottom: '1px solid var(--az-border)' }}>
                 <div className="az-label-lime" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Shield size={12} /> ANTI-RUGPULL SECURITY SCANNER
+                    <Shield size={12} /> CONTRACT SCANNER
                 </div>
                 <form onSubmit={scan} style={{ display: 'flex', gap: 12 }}>
                     <select 
@@ -179,13 +179,7 @@ export default function SecurityScanner() {
                                 </div>
                             </div>
 
-                            {/* Footer / Info */}
-                            <div className="az-explainer" style={{ marginTop: 32 }}>
-                                <div className="az-explainer-title">SOBRE EL ANÁLISIS</div>
-                                <div className="az-explainer-body">
-                                    Este escaneo utiliza la motor de seguridad de <strong>GoPlus Labs</strong> para analizar el contrato en tiempo real. Aunque un score de 100/100 es excelente, nunca inviertas dinero que no puedas permitirte perder. Los estafadores siempre buscan nuevas formas de engañar.
-                                </div>
-                            </div>
+
                         </motion.div>
                     )}
                 </AnimatePresence>

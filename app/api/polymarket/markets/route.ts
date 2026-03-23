@@ -16,6 +16,13 @@ export async function GET(req: Request) {
     const category = searchParams.get('category') || 'all';
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
+    const CAT_MAP: Record<string, string> = {
+        crypto: 'crypto',
+        politics: 'politics',
+        sports: 'sports',
+        economics: 'business',
+    };
+
     try {
         // Fetch top markets by volume from Gamma API (richer data)
         const gammaUrl = new URL(`${GAMMA_API}/markets`);
@@ -24,8 +31,10 @@ export async function GET(req: Request) {
         gammaUrl.searchParams.set('closed', 'false');
         gammaUrl.searchParams.set('order', 'volume24hr');
         gammaUrl.searchParams.set('ascending', 'false');
-        if (category !== 'all') {
-            gammaUrl.searchParams.set('tag_slug', category);
+        
+        const tag = CAT_MAP[category];
+        if (tag) {
+            gammaUrl.searchParams.set('tag_slug', tag);
         }
 
         const res = await fetch(gammaUrl.toString(), {
@@ -40,29 +49,31 @@ export async function GET(req: Request) {
         const markets = await res.json();
 
         // Normalize and enrich the data
-        const normalized = (Array.isArray(markets) ? markets : markets.data || []).map((m: any) => ({
-            id: m.id || m.conditionId,
-            slug: m.slug,
-            question: m.question,
-            description: m.description?.slice(0, 200),
-            category: m.category || m.tags?.[0]?.label || 'Crypto',
-            // Outcome prices (YES probability 0-1)
-            yesPrice: parseFloat(m.outcomes?.find((o: any) => o.name === 'Yes')?.price || m.bestAsk || '0.5'),
-            noPrice: parseFloat(m.outcomes?.find((o: any) => o.name === 'No')?.price || '0.5'),
-            // Volume in USDC
-            volume24h: parseFloat(m.volume24hr || m.volume || '0'),
-            volumeTotal: parseFloat(m.volumeNum || m.volume || '0'),
-            // Liquidity
-            liquidity: parseFloat(m.liquidity || '0'),
-            // Meta
-            endDate: m.endDate || m.resolutionTime,
-            conditionId: m.conditionId,
-            image: m.image,
-            // Computed: edge (distance from 50/50 = opportunity signal)
-            edge: Math.abs(0.5 - parseFloat(m.outcomes?.find((o: any) => o.name === 'Yes')?.price || '0.5')),
-            // Best EV opportunity signal
-            evSignal: calcEV(parseFloat(m.outcomes?.find((o: any) => o.name === 'Yes')?.price || '0.5')),
-        }));
+        const normalized = (Array.isArray(markets) ? markets : markets.data || []).map((m: any) => {
+            const outcomes = Array.isArray(m.outcomes) ? m.outcomes : [];
+            const findPrice = (name: string) => parseFloat(outcomes.find((o: any) => o.name === name)?.price || '0');
+            
+            const yesPrice = findPrice('Yes') || parseFloat(m.bestAsk || '0.5');
+            const noPrice = findPrice('No') || (1 - yesPrice);
+
+            return {
+                id: m.id || m.conditionId,
+                slug: m.slug,
+                question: m.question,
+                description: m.description?.slice(0, 200),
+                category: m.category || m.tags?.[0]?.label || 'Crypto',
+                yesPrice,
+                noPrice,
+                volume24h: parseFloat(m.volume24hr || m.volume || '0'),
+                volumeTotal: parseFloat(m.volumeNum || m.volume || '0'),
+                liquidity: parseFloat(m.liquidity || '0'),
+                endDate: m.endDate || m.resolutionTime,
+                conditionId: m.conditionId,
+                image: m.image,
+                edge: Math.abs(0.5 - yesPrice),
+                evSignal: calcEV(yesPrice),
+            };
+        });
 
         // Sort by edge (best arbitrage opportunities first)
         normalized.sort((a: any, b: any) => b.volume24h - a.volume24h);

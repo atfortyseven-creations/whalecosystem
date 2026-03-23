@@ -692,7 +692,7 @@ function ActivityTab() {
                     {loading ? (
                         <>
                             <div className="w-4 h-4 border-2 border-[#a855f7] border-t-transparent rounded-full animate-spin"></div>
-                            Connecting to Sovereign Engine Database...
+                            Connecting to Engine Database...
                         </>
                     ) : (
                         "No activity recorded in the database or current session."

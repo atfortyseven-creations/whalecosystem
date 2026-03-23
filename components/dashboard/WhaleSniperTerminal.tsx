@@ -29,7 +29,7 @@ export default function WhaleSniperTerminal() {
       case 'copy':
         if (address) {
           navigator.clipboard.writeText(address);
-          toast.success('Sovereign Address copied to clipboard.');
+          toast.success('Address copied to clipboard.');
         } else {
           toast.error('No ID linked. Cannot copy.');
         }

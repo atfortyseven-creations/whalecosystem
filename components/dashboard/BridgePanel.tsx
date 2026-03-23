@@ -34,7 +34,7 @@ export default function BridgePanel() {
                     >
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h4 className="font-mono text-[11px] uppercase tracking-widest text-white font-bold">Sovereign Bridge</h4>
+                                <h4 className="font-mono text-[11px] uppercase tracking-widest text-white font-bold">Device Bridge</h4>
                                 <p className="text-[9px] font-mono text-white/30 tracking-wide mt-0.5">Generate QR → Scan on mobile</p>
                             </div>
                             <button onClick={() => setOpen(false)}

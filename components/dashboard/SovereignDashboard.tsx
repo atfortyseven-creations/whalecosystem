@@ -166,13 +166,6 @@ function PolymarketPanel() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
-            {/* Explainer */}
-            <Explainer title="Polymarket Oracle — Cómo Funciona">
-                <strong>¿Qué es esto?</strong> Un terminal conectado en directo a la API de <strong>Polymarket</strong>, el mayor mercado de predicciones del mundo. Cada mercado es un contrato inteligente en Polygon donde la gente apuesta si un evento ocurrirá (SÍ) o no (NO). El precio refleja la probabilidad en tiempo real según las apuestas del mercado.<br /><br />
-                <strong>¿Cómo interactúas?</strong> Haz clic en cualquier fila para ver el análisis completo. El sistema calcula señales de <strong>Valor Esperado (EV)</strong>: si el precio YES está en 0.15 pero la probabilidad real es mayor, el sistema marca <strong>STRONG BUY</strong>. Pulsa "OPEN ON POLYMARKET" para ir directamente al contrato y depositar USDC desde tu wallet MetaMask.<br /><br />
-                <strong>Actualización automática:</strong> Cada 30 segundos sin refrescar la página. Los datos son 100% reales y vienen directamente de la blockchain de Polygon.
-            </Explainer>
-
             {/* Stats bar */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                 {[
@@ -265,7 +258,7 @@ function PolymarketPanel() {
                             className="az-detail-panel"
                         >
                             <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                                <div className="az-label-lime" style={{ marginBottom: 8 }}>ANÁLISIS DE MERCADO</div>
+                                <div className="az-label-lime" style={{ marginBottom: 8 }}>DETAILS</div>
                                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, marginBottom: 16 }}>{selected.question}</p>
                                 {/* Probability bars */}
                                 {[
@@ -296,7 +289,7 @@ function PolymarketPanel() {
                                     </div>
                                 ))}
                                 <div style={{ marginTop: 16 }}>
-                                    <div className="az-label" style={{ marginBottom: 6 }}>SEÑAL INTELIGENCIA</div>
+                                    <div className="az-label" style={{ marginBottom: 6 }}>SIGNAL</div>
                                     <span className={(EV[selected.evSignal] || EV.NEUTRAL).cls} style={{ fontSize: 9 }}>
                                         {(EV[selected.evSignal] || EV.NEUTRAL).label}
                                     </span>
@@ -316,7 +309,7 @@ function PolymarketPanel() {
                                     className="az-btn-primary"
                                     style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
                                 >
-                                    APOSTAR EN POLYMARKET <ExternalLink size={11} />
+                                    TRADE <ExternalLink size={11} />
                                 </a>
                                 <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
                                     Requiere USDC en Polygon. Se abrirá MetaMask para confirmar.
@@ -369,13 +362,6 @@ function DeFiYieldPanel() {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-            <Explainer title="DeFi Yield Matrix — Cómo Funciona">
-                <strong>¿Qué es esto?</strong> Un escáner conectado a <strong>DeFiLlama</strong>, la base de datos DeFi más grande del mundo, con datos de +2000 protocolos en todas las cadenas. Muestra en tiempo real dónde están pagando más intereses por depositar stablecoins (USDC, USDT) o activos volátiles (ETH, BTC).<br /><br />
-                <strong>¿Cómo interactúas?</strong> Haz clic en cualquier pool para ver el análisis: APY base + recompensas adicionales, TVL, riesgo de impermanent loss y cuánto ganarías al mes depositando $1,000. Pulsa <strong>"DESPLEGAR CAPITAL"</strong> para ir directamente al protocolo. Si tienes MetaMask conectado, el protocolo reconocerá tu wallet automáticamente y te pedirá aprobación ERC-20 + depósito.<br /><br />
-                <strong>Risk Score:</strong> 1 = Solo stablecoins sin IL (el más seguro) · 5 = Activos volátiles + baja liquidez. Filtra por "STABLE ONLY" para ver solo oportunidades sin riesgo de precio.
-            </Explainer>
-
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                 {[
@@ -490,7 +476,7 @@ function DeFiYieldPanel() {
                             className="az-detail-panel"
                         >
                             <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                                <div className="az-label-lime" style={{ marginBottom: 4 }}>ANÁLISIS DE RENDIMIENTO</div>
+                                <div className="az-label-lime" style={{ marginBottom: 4 }}>DETAILS</div>
                                 <div className="az-header-lg" style={{ fontFamily: 'var(--font-mono)', marginBottom: 2 }}>{selected.symbol}</div>
                                 <div className="az-label" style={{ marginBottom: 16 }}>{selected.project} · {selected.chainFull || selected.chain}</div>
                                 {/* APY hero */}
@@ -530,7 +516,7 @@ function DeFiYieldPanel() {
                             <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                                 <a href={selected.url} target="_blank" rel="noopener noreferrer"
                                     className="az-btn-primary" style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}>
-                                    DESPLEGAR CAPITAL <ExternalLink size={11} />
+                                    DEPOSIT <ExternalLink size={11} />
                                 </a>
                                 <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
                                     MetaMask pedirá aprobación ERC-20 + depósito.
@@ -552,6 +538,12 @@ function PortfolioPanel() {
     const { address, isConnected } = useAccount();
     const { data: ethBalance } = useBalance({ address });
 
+    // REAL ERC-20 BALANCES
+    const { data: usdc } = useBalance({ address, token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' });
+    const { data: usdt } = useBalance({ address, token: '0xdAC17F958D2ee523a2206206994597C13D831ec7' });
+    const { data: weth } = useBalance({ address, token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' });
+    const { data: link } = useBalance({ address, token: '0x514910771AF9Ca656af840dff83E8264EcF986CA' });
+
     if (!isConnected) {
         return (
             <div className="az-loading-center">
@@ -559,37 +551,34 @@ function PortfolioPanel() {
                 <div style={{ textAlign: 'center' }}>
                     <div className="az-label" style={{ marginBottom: 8 }}>WALLET NO CONECTADO</div>
                     <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', maxWidth: 280, lineHeight: 1.6 }}>
-                        Conecta tu wallet MetaMask o WalletConnect desde la barra superior para ver tu portfolio en tiempo real, incluyendo balances de ETH, ERC-20 y posiciones DeFi activas.
+                        Conecta tu wallet para ver tu portfolio en tiempo real. Los datos se leen directamente de la blockchain.
                     </p>
                 </div>
             </div>
         );
     }
 
+    const tokens = [
+        { s: 'USDC', n: 'USD Coin', b: usdc?.formatted || '0.00' },
+        { s: 'USDT', n: 'Tether USD', b: usdt?.formatted || '0.00' },
+        { s: 'WETH', n: 'Wrapped Ether', b: weth?.formatted || '0.00' },
+        { s: 'LINK', n: 'Chainlink', b: link?.formatted || '0.00' },
+    ].filter(t => parseFloat(t.b) >= 0);
+
     return (
         <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 24 }} className="az-scroll">
-            <Explainer title="Portfolio Tracker en Tiempo Real">
-                <strong>¿Qué puedes hacer aquí?</strong> Con tu wallet conectado, este panel lee directamente de la blockchain tu saldo de ETH, tokens ERC-20 y posiciones en protocolos DeFi. No se almacena ningún dato privado — todo se lee on-chain en tiempo real.<br /><br />
-                <strong>Interacción blockchain:</strong> Los botones de "Enviar" o "Aprobar" en este panel invocarán directamente las funciones del contrato inteligente mediante <strong>Wagmi + MetaMask</strong>. Firmarás cada transacción con tu llave privada almacenada en tu wallet, jamás en el servidor.
-            </Explainer>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                     {/* Connected wallet info */}
                     <div className="az-surface-2" style={{ padding: 16 }}>
-                        <div className="az-label" style={{ marginBottom: 8 }}>WALLET CONECTADO</div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                            <div>
-                                <div className="az-label" style={{ fontSize: 8, marginBottom: 4 }}>DIRECCIÓN</div>
-                                <div className="az-value-sm" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, wordBreak: 'break-all' }}>{address}</div>
-                            </div>
-                        </div>
+                        <div className="az-label" style={{ marginBottom: 8 }}>DIRECCIÓN ACTIVA</div>
+                        <div className="az-value-sm" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, wordBreak: 'break-all', color: 'var(--az-lime)' }}>{address}</div>
                     </div>
 
                     {/* ETH Balance */}
                     {ethBalance && (
                         <div className="az-surface-2 az-accent-left" style={{ padding: 16 }}>
-                            <div className="az-label" style={{ marginBottom: 8 }}>BALANCE ETHEREUM</div>
+                            <div className="az-label" style={{ marginBottom: 8 }}>BALANCE NATIVO (ETH)</div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                                 <div className="az-hero-stat-value" style={{ color: 'var(--az-lime)' }}>{parseFloat(ethBalance.formatted).toFixed(4)}</div>
                                 <div className="az-label">{ethBalance.symbol}</div>
@@ -602,34 +591,28 @@ function PortfolioPanel() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                    {/* Live Tokens Mock/Real */}
                     <div className="az-surface-2" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                         <div style={{ padding: 16, borderBottom: '1px solid var(--az-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div className="az-label" style={{ fontSize: 11, color: '#fff' }}>TOKENS ERC-20 (SIMULADO)</div>
+                            <div className="az-label" style={{ fontSize: 11, color: '#fff' }}>ACTIVOS ERC-20</div>
                             <RefreshCw size={10} color="rgba(255,255,255,0.3)" />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {[
-                                { s: 'USDC', n: 'USD Coin', b: '1,240.50', v: '$1,240.50' },
-                                { s: 'WETH', n: 'Wrapped Ether', b: '0.45', v: '$1,520.10' },
-                                { s: 'LINK', n: 'Chainlink', b: '120.00', v: '$2,160.00' },
-                                { s: 'PEPE', n: 'Pepe', b: '95,000,000', v: '$740.20' },
-                            ].map(t => (
+                            {tokens.map(t => (
                                 <div key={t.s} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                     <div>
                                         <div className="az-value-sm" style={{ fontWeight: 700 }}>{t.s}</div>
                                         <div className="az-label" style={{ fontSize: 8, textTransform: 'none' }}>{t.n}</div>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <div className="az-value-sm">{t.b}</div>
-                                        <div className="az-label" style={{ fontSize: 8 }}>{t.v}</div>
+                                        <div className="az-value-sm">{parseFloat(t.b).toLocaleString(undefined, { maximumFractionDigits: 4 })}</div>
+                                        <div className="az-label" style={{ fontSize: 8 }}>ON-CHAIN</div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <div style={{ padding: 12, borderTop: '1px solid var(--az-border)', textAlign: 'center' }}>
                             <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>
-                                TOKEN SCANNER v5.1 — Requiere Alchemy API Key para modo producción real.
+                                Datos consultados vía Web3 Provider.
                             </p>
                         </div>
                     </div>
@@ -653,9 +636,9 @@ export default function SovereignDashboard() {
     }, []);
 
     const TABS: { id: Tab; label: string; icon: React.ReactNode; badge?: string }[] = [
-        { id: 'polymarket', label: 'POLYMARKET ORACLE',  icon: <Globe size={12} />,     badge: 'LIVE' },
-        { id: 'defi',       label: 'YIELD MATRIX',       icon: <BarChart2 size={12} />, badge: 'REAL' },
-        { id: 'security',   label: 'SECURITY SCANNER',   icon: <Shield size={12} />,    badge: 'NEW' },
+        { id: 'polymarket', label: 'MARKETS',  icon: <Globe size={12} /> },
+        { id: 'defi',       label: 'EARN',       icon: <BarChart2 size={12} /> },
+        { id: 'security',   label: 'SCANNER',   icon: <Shield size={12} /> },
         { id: 'portfolio',  label: 'PORTFOLIO',           icon: <Wallet size={12} /> },
     ];
 
@@ -669,8 +652,8 @@ export default function SovereignDashboard() {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span className="az-dot-live" />
-                        <span className="az-label-lime">SOVEREIGN INTELLIGENCE v5.0</span>
+                        <div style={{ width: 8, height: 8, background: 'var(--az-lime)', borderRadius: '1px' }} />
+                        <span className="az-label" style={{ color: '#fff', letterSpacing: '0.15em', fontWeight: 900 }}>TERMINAL</span>
                     </div>
                     <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.08)' }} />
                     <span className="az-label">{clock}</span>
@@ -692,13 +675,9 @@ export default function SovereignDashboard() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <Activity size={10} color={wsConnected ? "var(--az-emerald)" : "rgba(255,255,255,0.25)"} className={wsConnected ? "animate-pulse" : ""} />
-                        <span className="az-label">POLYMARKET</span>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--az-emerald)' }} />
-                        <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.08)' }} />
-                        <span className="az-label">DEFILLAMA</span>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--az-emerald)' }} />
+                        <span className="az-label" style={{ fontSize: 8 }}>NETWORK STATUS</span>
                     </div>
                     <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.08)' }} />
                     {isConnected ? (
@@ -721,14 +700,6 @@ export default function SovereignDashboard() {
                     <button key={t.id} onClick={() => setTab(t.id)} className={`az-tab${tab === t.id ? ' active' : ''}`}>
                         {t.icon}
                         {t.label}
-                        {t.badge && (
-                            <span className="az-badge" style={{
-                                background: tab === t.id ? 'var(--az-lime)' : 'rgba(255,255,255,0.06)',
-                                border: 'none',
-                                color: tab === t.id ? 'var(--az-ink)' : 'rgba(255,255,255,0.30)',
-                                padding: '2px 6px', fontSize: 7
-                            }}>{t.badge}</span>
-                        )}
                     </button>
                 ))}
             </div>

@@ -16,7 +16,7 @@ export default function AppChainStatus() {
                         <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#1F1F1F]">Human AppChain</h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Sovereign Network Live</span>
+                            <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Network Live</span>
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@ export default function AppChainStatus() {
                 <div className="bg-[#1F1F1F] rounded-3xl p-6 space-y-4 text-white">
                     <div className="flex items-center gap-2 opacity-40">
                         <Cpu size={14} />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Sovereign AI</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest">AI Engine</span>
                     </div>
                     <div>
                         <div className="text-2xl font-black text-[#00f2ea] tracking-tight">Active</div>
@@ -68,7 +68,7 @@ export default function AppChainStatus() {
             <div className="space-y-4 pt-4 border-t border-[#1F1F1F]/5">
                 <div className="flex items-center justify-between">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1F1F1F]/40 flex items-center gap-2">
-                        <Activity size={12} /> Live Sovereignty Feed
+                        <Activity size={12} /> Live Network Feed
                     </h4>
                     <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded italic">Syncing...</span>
                 </div>
