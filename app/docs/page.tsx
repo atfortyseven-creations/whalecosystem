@@ -115,16 +115,21 @@ export default function DocsPage() {
                         <div className="space-y-6">
                             <h3 className="font-aztec-h2 text-[10px] font-black text-[var(--aztec-parchment)] uppercase tracking-widest leading-loose">Paginación Rápida</h3>
                             <nav className="flex flex-col gap-2 font-aztec-mono text-[10px] uppercase tracking-wider">
-                                {indices.map((idx, i) => (
-                                    <button 
-                                        key={i} 
-                                        onClick={() => goToPage(idx.target)}
-                                        className={`flex items-center gap-3 p-2 border transition-all ${currentPage >= idx.target && (i === indices.length - 1 || currentPage < indices[i+1].target) ? 'bg-[var(--aztec-chartreuse)]/10 border-[var(--aztec-chartreuse)]/30 text-[var(--aztec-chartreuse)]' : 'border-transparent text-[var(--aztec-parchment)]/40 hover:text-[var(--aztec-parchment)] hover:border-[var(--aztec-parchment)]/10'}`}
-                                    >
-                                        {idx.icon}
-                                        {idx.label}
-                                    </button>
-                                ))}
+                                {indices.map((idx, i) => {
+                                    const isCurrent = currentPage >= idx.target;
+                                    const isBeforeNext = i === indices.length - 1 || currentPage < indices[i+1].target;
+                                    const isActive = isCurrent && isBeforeNext;
+                                    return (
+                                        <button 
+                                            key={i} 
+                                            onClick={() => goToPage(idx.target)}
+                                            className={`flex items-center gap-3 p-2 border transition-all ${isActive ? 'bg-[var(--aztec-chartreuse)]/10 border-[var(--aztec-chartreuse)]/30 text-[var(--aztec-chartreuse)]' : 'border-transparent text-[var(--aztec-parchment)]/40 hover:text-[var(--aztec-parchment)] hover:border-[var(--aztec-parchment)]/10'}`}
+                                        >
+                                            {idx.icon}
+                                            {idx.label}
+                                        </button>
+                                    );
+                                })}
                             </nav>
                         </div>
 
