@@ -87,10 +87,10 @@ server.listen(PORT, () => {
     console.log(`\n=================================================`);
     console.log(`🏛️  SOVEREIGN VAULT DAEMON - ONLINE`);
     console.log(`=================================================`);
-    console.log(`📡 Endorsement: LOCAL COLD STORAGE ACTIVE`);
-    console.log(`📍 Port: ${PORT}`);
-    console.log(`📁 Storage: ${STORAGE_DIR}`);
-    console.log(`🔐 Secret: ${SECRET_KEY}`);
+    console.log(`📡 STATUS: ACTIVE & LISTENING`);
+    console.log(`📍 ADDRESS: http://localhost:${PORT}`);
+    console.log(`📁 STORAGE: ${STORAGE_DIR}`);
+    console.log(`🔐 ACCESS: RESTRICTED VIA QUANTUM SECRET`);
     console.log(`-------------------------------------------------\n`);
     console.log(`Waiting for Railway production to teleport data...`);
 });

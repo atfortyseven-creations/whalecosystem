@@ -99,12 +99,12 @@ export default clerkMiddleware(async (auth, request) => {
     // STRICT CONTENT SECURITY POLICY (CSP)
     const cspHeader = `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com;
-      style-src 'self' 'unsafe-inline' fonts.googleapis.com;
-      img-src 'self' blob: data: *.google-analytics.com *.googletagmanager.com *.clerk.com res.cloudinary.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com https://*.walletconnect.com https://*.reown.com;
+      style-src 'self' 'unsafe-inline' fonts.googleapis.com https://fonts.googleapis.com;
+      img-src 'self' blob: data: *.google-analytics.com *.googletagmanager.com *.clerk.com res.cloudinary.com https://*.walletconnect.com https://*.reown.com https://www.humanidfi.com;
       font-src 'self' fonts.gstatic.com data:;
-      connect-src 'self' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com wss://*.reown.com https://*.reown.com https://api.walletconnect.com wss://api.walletconnect.com;
-      frame-src 'self' *.clerk.accounts.dev;
+      connect-src 'self' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.walletconnect.com https://*.walletconnect.com https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us;
+      frame-src 'self' *.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com;
       upgrade-insecure-requests;
     `.replace(/\s{2,}/g, ' ').trim();
 
