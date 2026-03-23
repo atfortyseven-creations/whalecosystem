@@ -37,7 +37,7 @@ export function MobileSovereignLanding() {
     const { isConnected, address } = useAccount();
     const { connect, connectors } = useConnect();
     const { signMessageAsync } = useSignMessage();
-    const [view, setView] = useState<'landing' | 'scanner' | 'selector'>('landing');
+    const [view, setView] = useState<'landing' | 'scanner'>('landing');
     const [isSigned, setIsSigned] = useState(false);
     const [isSigning, setIsSigning] = useState(false);
     const [isInappBrowser, setIsInappBrowser] = useState(false);
@@ -52,46 +52,16 @@ export function MobileSovereignLanding() {
         if (savedSign === 'true') setIsSigned(true);
     }, [address]);
 
-    const handleSovereignConnect = useCallback(() => {
-        // Instead of AppKit, we show our custom institutional selector
-        setView('selector');
-    }, []);
-
-    const handleInjectedConnect = useCallback(async () => {
+    const handleSovereignConnect = useCallback(async () => {
         const injected = connectors.find((c: any) => c.id === 'injected' || c.id === 'io.metamask' || c.id === 'metaMaskSDK');
-        if (injected) {
+        
+        if (isInappBrowser && injected) {
             connect({ connector: injected });
-            setView('landing');
         } else {
-            // Fallback to metamask deep link if no provider
+            // Force redirect to metamask deep link if no provider or external browser
             window.location.href = `https://metamask.app.link/dapp/${window.location.host}`;
         }
-    }, [connect, connectors]);
-
-    const handleOpenInApp = (app: 'metamask' | 'chrome' | 'firefox') => {
-        const url = window.location.href;
-        const noProtocol = url.replace(/^https?:\/\//, '');
-        
-        switch(app) {
-            case 'metamask':
-                window.location.href = `https://metamask.app.link/dapp/${noProtocol}`;
-                break;
-            case 'chrome':
-                window.location.href = `googlechromes://${noProtocol}`;
-                // Fallback for Android
-                setTimeout(() => {
-                    window.location.href = `intent://${noProtocol}#Intent;scheme=https;package=com.android.chrome;end`;
-                }, 500);
-                break;
-            case 'firefox':
-                window.location.href = `firefox://open-url?url=${url}`;
-                // Fallback for Android
-                setTimeout(() => {
-                    window.location.href = `intent://${noProtocol}#Intent;scheme=https;package=org.mozilla.firefox;end`;
-                }, 500);
-                break;
-        }
-    };
+    }, [connect, connectors, isInappBrowser]);
 
     const handleSignAndAuthorize = async () => {
         if (!address) return;
@@ -114,7 +84,7 @@ export function MobileSovereignLanding() {
 
     const handleScanClick = useCallback(() => {
         if (!isConnected) {
-            setView('selector');
+            handleSovereignConnect();
             return;
         }
         if (!isSigned) {
@@ -122,88 +92,12 @@ export function MobileSovereignLanding() {
             return;
         }
         setView('scanner');
-    }, [isConnected, isSigned, handleSignAndAuthorize]);
+    }, [isConnected, isSigned, handleSignAndAuthorize, handleSovereignConnect]);
 
     if (view === 'scanner') {
         return <MobileQRScanner onBack={() => setView('landing')} />;
     }
 
-    if (view === 'selector') {
-        return (
-            <div className="fixed inset-0 z-[1000] bg-[var(--aztec-parchment)] flex flex-col p-8 pt-20 overflow-y-auto">
-                <div className="absolute inset-0 bg-noise opacity-20 pointer-events-none" />
-                
-                <button onClick={() => setView('landing')} className="absolute top-8 left-8 text-black/40 font-black text-[10px] uppercase tracking-widest border-b border-black/10 pb-1">
-                    ← Close Portal
-                </button>
-
-                <div className="space-y-4 mb-16 relative z-10">
-                    <h2 className="text-4xl font-black tracking-tighter text-[#050505] leading-none">
-                        Identity<br /><span className="text-indigo-500 italic">Initialization</span>.
-                    </h2>
-                    <p className="text-black/50 text-sm font-medium leading-relaxed">
-                        Select your preferred gateway to establish a secure handshake with the Whale Alert Network.
-                    </p>
-                </div>
-
-                <div className="space-y-4 relative z-10">
-                    <button 
-                        onClick={handleInjectedConnect}
-                        className="w-full bg-[#050505] text-white p-6 rounded-3xl flex items-center justify-between group active:scale-[0.98] transition-transform shadow-2xl shadow-indigo-500/10"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="p-2 bg-indigo-500/20 rounded-xl group-hover:bg-indigo-500 transition-colors">
-                                <Smartphone size={24} className="text-indigo-400 group-hover:text-white" />
-                            </div>
-                            <div className="text-left leading-none">
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-50">Browser Extension</div>
-                                <div className="text-xl font-black uppercase tracking-tight italic">Abrir MetaMask</div>
-                            </div>
-                        </div>
-                        <MoveRight size={20} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                    </button>
-
-                    <button 
-                        onClick={() => handleOpenInApp('chrome')}
-                        className="w-full bg-white border border-black/5 p-6 rounded-3xl flex items-center justify-between group active:scale-[0.98] transition-transform"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="p-2 bg-blue-100 rounded-xl group-hover:bg-blue-600 transition-colors">
-                                <Zap size={24} className="text-blue-600 group-hover:text-white" />
-                            </div>
-                            <div className="text-left leading-none">
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-black/30">Google Workspace</div>
-                                <div className="text-xl font-black uppercase tracking-tight">Abrir Chrome</div>
-                            </div>
-                        </div>
-                        <MoveRight size={20} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                    </button>
-
-                    <button 
-                        onClick={() => handleOpenInApp('firefox')}
-                        className="w-full bg-white border border-black/5 p-6 rounded-3xl flex items-center justify-between group active:scale-[0.98] transition-transform"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="p-2 bg-orange-100 rounded-xl group-hover:bg-orange-600 transition-colors">
-                                <Eye size={24} className="text-orange-600 group-hover:text-white" />
-                            </div>
-                            <div className="text-left leading-none">
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-black/30">Mozilla Core</div>
-                                <div className="text-xl font-black uppercase tracking-tight">Abrir Mozilla</div>
-                            </div>
-                        </div>
-                        <MoveRight size={20} className="opacity-20 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                </div>
-
-                <div className="mt-16 text-center">
-                    <p className="text-[9px] font-black font-mono text-black/20 uppercase tracking-[0.4em]">
-                        Sovereign End-to-End Encryption Enabled
-                    </p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans overflow-y-auto snap-y snap-mandatory scroll-smooth mobile-hide-scrollbar relative">
