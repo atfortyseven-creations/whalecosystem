@@ -40,6 +40,17 @@ export function MobileSovereignLanding() {
     const [view, setView] = useState<'landing' | 'scanner' | 'selector'>('landing');
     const [isSigned, setIsSigned] = useState(false);
     const [isSigning, setIsSigning] = useState(false);
+    const [isInappBrowser, setIsInappBrowser] = useState(false);
+
+    useEffect(() => {
+        // Detect if we are in an in-app browser (like Metamask, Coinbase, etc)
+        const hasProvider = typeof window !== 'undefined' && !!(window as any).ethereum;
+        setIsInappBrowser(hasProvider);
+
+        // Check for persistent signature
+        const savedSign = sessionStorage.getItem(`sovereign_signed_${address}`);
+        if (savedSign === 'true') setIsSigned(true);
+    }, [address]);
 
     const handleSovereignConnect = useCallback(() => {
         // Instead of AppKit, we show our custom institutional selector
@@ -89,10 +100,13 @@ export function MobileSovereignLanding() {
             const message = `Authorize Sovereign Handshake for ${address}\nTimestamp: ${Date.now()}`;
             await signMessageAsync({ message });
             setIsSigned(true);
+            if (address) {
+                sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
+            }
             toast.success('Identity Verified');
             setView('scanner'); // Auto transition to scanner after signature
         } catch (e) {
-            toast.error('Signature Required to access terminal');
+            toast.error('Signature Required');
         } finally {
             setIsSigning(false);
         }
@@ -333,7 +347,7 @@ export function MobileSovereignLanding() {
                                 className="w-full bg-[#050505] text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-black/10"
                             >
                                 <Smartphone size={22} className="text-indigo-400" />
-                                Connect MetaMask
+                                {isInappBrowser ? 'Connect MetaMask' : 'Open in MetaMask'}
                             </button>
                         ) : !isSigned ? (
                             <button
