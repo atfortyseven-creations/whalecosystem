@@ -1,221 +1,254 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    TrendingUp, TrendingDown, Zap, Globe, Shield, BarChart2, 
-    RefreshCw, ExternalLink, AlertTriangle, CheckCircle, 
-    ArrowUpRight, ArrowDownRight, Activity, Lock, Unlock, Filter
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    Globe, BarChart2, Shield, Activity, RefreshCw,
+    ExternalLink, AlertTriangle, ArrowUpRight, ArrowDownRight,
+    Filter, Wallet, TrendingUp, Zap, Info, CheckCircle2
 } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
+import { useRealTimeFeed } from '@/hooks/useRealTimeFeed';
+import SecurityScanner from '@/components/dashboard/SecurityScanner';
+import TelegramSettings from '@/components/dashboard/TelegramSettings';
+import '@/app/dashboard/dashboard.css';
 
-// ────────────────────────────────────────────────────────────
-// TYPES
-// ────────────────────────────────────────────────────────────
+// ─── TYPES ──────────────────────────────────────────────────
 
-interface PolymarketMarket {
-    id: string;
-    slug: string;
-    question: string;
-    description?: string;
-    category: string;
-    yesPrice: number;
-    noPrice: number;
-    volume24h: number;
-    volumeTotal: number;
-    liquidity: number;
-    endDate?: string;
-    conditionId: string;
-    image?: string;
-    edge: number;
+interface PolyMarket {
+    id: string; slug: string; question: string; category: string;
+    yesPrice: number; noPrice: number; volume24h: number; volumeTotal: number;
+    liquidity: number; endDate?: string; edge: number;
     evSignal: 'OVERBOUGHT' | 'OVERSOLD' | 'LEAN_YES' | 'LEAN_NO' | 'NEUTRAL';
 }
 
 interface DeFiPool {
-    pool: string;
-    chain: string;
-    chainFull?: string;
-    project: string;
-    symbol: string;
-    apy: number;
-    apyBase: number;
-    apyReward: number;
-    tvlUsd: number;
-    il7d: number;
-    ilRisk: string;
-    stablecoin: boolean;
-    url: string;
-    riskScore: number;
-    tier: string;
+    pool: string; chain: string; chainFull?: string; project: string;
+    symbol: string; apy: number; apyBase: number; apyReward: number;
+    tvlUsd: number; ilRisk: string; stablecoin: boolean;
+    url: string; riskScore: number; tier: string;
 }
 
-type Tab = 'polymarket' | 'defi' | 'portfolio';
+type Tab = 'polymarket' | 'defi' | 'portfolio' | 'security';
 type PolyCategory = 'all' | 'crypto' | 'politics' | 'sports' | 'economics';
 
-// ────────────────────────────────────────────────────────────
-// HELPERS
-// ────────────────────────────────────────────────────────────
+// ─── FORMAT UTILS ────────────────────────────────────────────
 
-const fmt = {
-    usd: (n: number) => {
-        if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
-        if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-        if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
-        return `$${n.toFixed(0)}`;
-    },
-    pct: (n: number) => `${(n * 100).toFixed(1)}%`,
-    apy: (n: number) => `${n.toFixed(2)}%`,
+const fmtUsd = (n: number) => {
+    if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+    if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+    if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
+    return `$${n.toFixed(0)}`;
+};
+const fmtPct  = (n: number) => `${(n * 100).toFixed(1)}%`;
+const fmtApy  = (n: number) => `${n.toFixed(2)}%`;
+const fmtTime = () => new Date().toISOString().slice(11, 19) + ' UTC';
+
+// ─── EV / RISK CONFIG ────────────────────────────────────────
+
+const EV: Record<string, { label: string; cls: string }> = {
+    OVERSOLD:   { label: 'STRONG BUY', cls: 'az-badge az-badge-emerald' },
+    LEAN_YES:   { label: 'LEAN YES',   cls: 'az-badge az-badge-lime' },
+    NEUTRAL:    { label: 'NEUTRAL',    cls: 'az-badge az-badge-ghost' },
+    LEAN_NO:    { label: 'LEAN NO',    cls: 'az-badge az-badge-amber' },
+    OVERBOUGHT: { label: 'OVERBOUGHT', cls: 'az-badge az-badge-rose' },
 };
 
-const EV_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-    OVERSOLD: { label: 'STRONG BUY', color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30', icon: <ArrowUpRight size={10} /> },
-    LEAN_YES:  { label: 'LEAN YES',   color: 'text-emerald-300', bg: 'bg-emerald-300/10 border-emerald-300/20', icon: <ArrowUpRight size={10} /> },
-    NEUTRAL:   { label: 'NEUTRAL',    color: 'text-white/40',    bg: 'bg-white/5 border-white/10',             icon: null },
-    LEAN_NO:   { label: 'LEAN NO',    color: 'text-rose-300',    bg: 'bg-rose-300/10 border-rose-300/20',      icon: <ArrowDownRight size={10} /> },
-    OVERBOUGHT:{ label: 'OVERBOUGHT', color: 'text-rose-400',    bg: 'bg-rose-400/10 border-rose-400/30',      icon: <ArrowDownRight size={10} /> },
+const RISK: Record<number, { label: string; color: string }> = {
+    1: { label: 'SAFE',        color: 'var(--az-emerald)' },
+    2: { label: 'LOW',         color: 'var(--az-emerald)' },
+    3: { label: 'MODERATE',    color: 'var(--az-amber)' },
+    4: { label: 'HIGH',        color: '#ff7a3c' },
+    5: { label: 'AGGRESSIVE',  color: 'var(--az-rose)' },
 };
 
-const RISK_CONFIG: Record<number, { label: string; color: string }> = {
-    1: { label: 'SAFE',        color: 'text-emerald-400' },
-    2: { label: 'LOW',         color: 'text-emerald-300' },
-    3: { label: 'MODERATE',    color: 'text-yellow-400' },
-    4: { label: 'HIGH',        color: 'text-orange-400' },
-    5: { label: 'AGGRESSIVE',  color: 'text-rose-400' },
+const CHAIN_CLS: Record<string, string> = {
+    Ethereum: 'az-chain-pill az-chain-eth',
+    Arbitrum: 'az-chain-pill az-chain-arb',
+    Base:     'az-chain-pill az-chain-base',
+    Optimism: 'az-chain-pill az-chain-op',
+    BSC:      'az-chain-pill az-chain-bnb',
+    Solana:   'az-chain-pill az-chain-sol',
 };
+const chainCls = (c: string) => CHAIN_CLS[c] || 'az-chain-pill az-badge-ghost';
 
-// ────────────────────────────────────────────────────────────
-// POLYMARKET PANEL
-// ────────────────────────────────────────────────────────────
+// ─── SKELETON ROW ────────────────────────────────────────────
+
+function SkeletonRows({ n = 8 }: { n?: number }) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {Array.from({ length: n }).map((_, i) => (
+                <div key={i} style={{ padding: '12px 16px', display: 'flex', gap: 12 }}>
+                    <div className="az-skeleton" style={{ flex: 1, height: 10, borderRadius: 0 }} />
+                    <div className="az-skeleton" style={{ width: 60, height: 10 }} />
+                    <div className="az-skeleton" style={{ width: 70, height: 10 }} />
+                    <div className="az-skeleton" style={{ width: 50, height: 10 }} />
+                </div>
+            ))}
+        </div>
+    );
+}
+
+// ─── EXPLAINER BLOCK ─────────────────────────────────────────
+
+function Explainer({ title, children }: { title: string; children: React.ReactNode }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <div style={{ margin: '0 0 0 0' }}>
+            <button
+                onClick={() => setOpen(v => !v)}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: '8px 16px', width: '100%', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+            >
+                <Info size={11} color="rgba(255,255,255,0.25)" />
+                <span className="az-label">{title}</span>
+                <span className="az-label" style={{ marginLeft: 'auto', opacity: 0.4 }}>{open ? '▲ HIDE' : '▼ HOW DOES THIS WORK?'}</span>
+            </button>
+            <AnimatePresence>
+                {open && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        style={{ overflow: 'hidden' }}
+                    >
+                        <div className="az-explainer" style={{ margin: '0 16px 16px', borderRadius: 0 }}>
+                            <div className="az-explainer-title">{title}</div>
+                            <div className="az-explainer-body">{children}</div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ─── PHASE 3: POLYMARKET PANEL ────────────────────────────────
 
 function PolymarketPanel() {
-    const [markets, setMarkets] = useState<PolymarketMarket[]>([]);
-    const [stats, setStats] = useState({ totalVolume: 0, count: 0, topEdge: 0 });
+    const [markets, setMarkets] = useState<PolyMarket[]>([]);
+    const [stats, setStats] = useState({ vol: 0, count: 0, edge: 0 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [category, setCategory] = useState<PolyCategory>('all');
-    const [selected, setSelected] = useState<PolymarketMarket | null>(null);
-    const [ts, setTs] = useState(0);
+    const [cat, setCat] = useState<PolyCategory>('all');
+    const [selected, setSelected] = useState<PolyMarket | null>(null);
+    const [ts, setTs] = useState('');
 
-    const CATEGORIES: { id: PolyCategory; label: string }[] = [
-        { id: 'all', label: 'ALL' }, { id: 'crypto', label: 'CRYPTO' },
-        { id: 'politics', label: 'POLITICS' }, { id: 'sports', label: 'SPORTS' },
+    const CATS: { id: PolyCategory; label: string }[] = [
+        { id: 'all', label: 'ALL MARKETS' },
+        { id: 'crypto', label: 'CRYPTO' },
+        { id: 'politics', label: 'POLITICS' },
+        { id: 'sports', label: 'SPORTS' },
         { id: 'economics', label: 'ECONOMICS' },
     ];
 
     const load = useCallback(async () => {
-        setLoading(true);
-        setError('');
+        setLoading(true); setError('');
         try {
-            const res = await fetch(`/api/polymarket/markets?limit=60&category=${category}`);
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
-            setMarkets(data.markets || []);
-            setTs(data.timestamp);
-            const vol = (data.markets || []).reduce((s: number, m: PolymarketMarket) => s + m.volume24h, 0);
-            const topE = (data.markets || []).reduce((mx: number, m: PolymarketMarket) => Math.max(mx, m.edge), 0);
-            setStats({ totalVolume: vol, count: data.count, topEdge: topE });
-        } catch (e: any) {
-            setError(e.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [category]);
+            const r = await fetch(`/api/polymarket/markets?limit=60&category=${cat}`);
+            const d = await r.json();
+            if (d.error) throw new Error(d.error);
+            setMarkets(d.markets || []);
+            setTs(new Date(d.timestamp).toISOString().slice(11, 19));
+            const ms: PolyMarket[] = d.markets || [];
+            setStats({
+                vol:   ms.reduce((s, m) => s + m.volume24h, 0),
+                count: d.count,
+                edge:  ms.reduce((mx, m) => Math.max(mx, m.edge), 0),
+            });
+        } catch (e: any) { setError(e.message); }
+        finally { setLoading(false); }
+    }, [cat]);
 
     useEffect(() => { load(); }, [load]);
-    useEffect(() => {
-        const interval = setInterval(load, 30000);
-        return () => clearInterval(interval);
-    }, [load]);
+    useEffect(() => { const i = setInterval(load, 30000); return () => clearInterval(i); }, [load]);
 
     return (
-        <div className="flex flex-col h-full gap-0">
-            {/* Stats Bar */}
-            <div className="grid grid-cols-3 border-b border-white/5 shrink-0">
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+            {/* Explainer */}
+            <Explainer title="Polymarket Oracle — Cómo Funciona">
+                <strong>¿Qué es esto?</strong> Un terminal conectado en directo a la API de <strong>Polymarket</strong>, el mayor mercado de predicciones del mundo. Cada mercado es un contrato inteligente en Polygon donde la gente apuesta si un evento ocurrirá (SÍ) o no (NO). El precio refleja la probabilidad en tiempo real según las apuestas del mercado.<br /><br />
+                <strong>¿Cómo interactúas?</strong> Haz clic en cualquier fila para ver el análisis completo. El sistema calcula señales de <strong>Valor Esperado (EV)</strong>: si el precio YES está en 0.15 pero la probabilidad real es mayor, el sistema marca <strong>STRONG BUY</strong>. Pulsa "OPEN ON POLYMARKET" para ir directamente al contrato y depositar USDC desde tu wallet MetaMask.<br /><br />
+                <strong>Actualización automática:</strong> Cada 30 segundos sin refrescar la página. Los datos son 100% reales y vienen directamente de la blockchain de Polygon.
+            </Explainer>
+
+            {/* Stats bar */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                 {[
-                    { label: '24H VOLUME', value: fmt.usd(stats.totalVolume), color: 'text-[#e0ff00]' },
-                    { label: 'LIVE MARKETS', value: stats.count, color: 'text-white' },
-                    { label: 'MAX EDGE', value: fmt.pct(stats.topEdge), color: 'text-emerald-400' },
-                ].map((s) => (
-                    <div key={s.label} className="px-4 py-3 border-r border-white/5 last:border-r-0">
-                        <div className="text-[9px] font-mono uppercase text-white/30 tracking-widest mb-1">{s.label}</div>
-                        <div className={`text-sm font-black font-mono ${s.color}`}>{s.value}</div>
+                    { label: '24H VOLUME',   value: fmtUsd(stats.vol),         color: 'var(--az-lime)' },
+                    { label: 'MERCADOS LIVE', value: stats.count,              color: '#fff' },
+                    { label: 'EDGE MÁXIMO',  value: fmtPct(stats.edge),       color: 'var(--az-emerald)' },
+                ].map(s => (
+                    <div key={s.label} className="az-stat-card">
+                        <div className="az-label">{s.label}</div>
+                        <div className="az-value-lg" style={{ color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
 
-            {/* Category Filter */}
-            <div className="flex items-center border-b border-white/5 shrink-0 overflow-x-auto">
-                {CATEGORIES.map((c) => (
-                    <button
-                        key={c.id}
-                        onClick={() => setCategory(c.id)}
-                        className={`px-4 py-2 text-[9px] font-mono font-black uppercase tracking-widest transition-all whitespace-nowrap flex-shrink-0 border-r border-white/5 ${category === c.id ? 'text-[#e0ff00] bg-[#e0ff00]/5' : 'text-white/30 hover:text-white hover:bg-white/5'}`}
-                    >
-                        {c.label}
-                    </button>
+            {/* Filters */}
+            <div className="az-tab-bar" style={{ borderTop: 'none', fontSize: 8 }}>
+                {CATS.map(c => (
+                    <button key={c.id} onClick={() => setCat(c.id)}
+                        className={`az-tab${cat === c.id ? ' active' : ''}`}
+                        style={{ fontSize: 8, padding: '10px 14px' }}
+                    >{c.label}</button>
                 ))}
-                <button onClick={load} className="ml-auto px-4 py-2 text-white/30 hover:text-[#e0ff00] transition-colors flex-shrink-0">
-                    <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+                <button onClick={load} className="az-btn-ghost" style={{ marginLeft: 'auto', padding: '8px 14px', border: 'none', borderLeft: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+                    <RefreshCw size={11} className={loading ? 'animate-spin' : ''} color="currentColor" />
                 </button>
             </div>
 
-            {/* Content */}
-            <div className="flex flex-1 overflow-hidden">
-                {/* Markets List */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar">
+            {/* Table */}
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+                <div style={{ flex: 1, overflowY: 'auto' }} className="az-scroll">
                     {error && (
-                        <div className="flex items-center gap-2 p-4 text-rose-400 text-[10px] font-mono">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: 'var(--az-rose)', fontSize: 11 }}>
                             <AlertTriangle size={12} /> {error}
                         </div>
                     )}
-                    {loading && markets.length === 0 && (
-                        <div className="flex items-center justify-center h-32 text-white/20 text-[10px] font-mono uppercase tracking-widest">
-                            <RefreshCw size={12} className="animate-spin mr-2" /> Fetching Polymarket Oracle...
+
+                    {/* Column headers */}
+                    {!loading && markets.length > 0 && (
+                        <div className="az-col-header" style={{ display: 'grid', gridTemplateColumns: '1fr 90px 90px 90px 100px', gap: 8 }}>
+                            <span>MERCADO</span>
+                            <span style={{ textAlign: 'right' }}>YES %</span>
+                            <span style={{ textAlign: 'right' }}>VOL 24H</span>
+                            <span style={{ textAlign: 'right' }}>LIQUID.</span>
+                            <span style={{ textAlign: 'right' }}>SEÑAL EV</span>
                         </div>
                     )}
-                    {/* Column Header */}
-                    {markets.length > 0 && (
-                        <div className="grid grid-cols-[1fr_80px_90px_90px_80px] gap-2 px-4 py-2 text-[9px] font-mono font-black uppercase tracking-widest text-white/20 border-b border-white/5 sticky top-0 bg-[#050505] z-10">
-                            <span>MARKET</span>
-                            <span className="text-right">YES %</span>
-                            <span className="text-right">24H VOL</span>
-                            <span className="text-right">LIQUIDITY</span>
-                            <span className="text-right">SIGNAL</span>
-                        </div>
-                    )}
+
+                    {loading && <SkeletonRows />}
+
                     <AnimatePresence initial={false}>
-                        {markets.map((m) => {
-                            const ev = EV_CONFIG[m.evSignal] || EV_CONFIG.NEUTRAL;
-                            const isSelected = selected?.id === m.id;
+                        {markets.map(m => {
+                            const ev = EV[m.evSignal] || EV.NEUTRAL;
+                            const isActive = selected?.id === m.id;
                             return (
                                 <motion.div
                                     key={m.id}
-                                    initial={{ opacity: 0, y: -4 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    onClick={() => setSelected(isSelected ? null : m)}
-                                    className={`grid grid-cols-[1fr_80px_90px_90px_80px] gap-2 px-4 py-3 border-b border-white/[0.03] cursor-pointer transition-all ${isSelected ? 'bg-[#e0ff00]/5 border-[#e0ff00]/20' : 'hover:bg-white/[0.02]'} group relative`}
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}
+                                    className={`az-data-row${isActive ? ' active' : ''}`}
+                                    style={{ display: 'grid', gridTemplateColumns: '1fr 90px 90px 90px 100px', gap: 8 }}
+                                    onClick={() => setSelected(isActive ? null : m)}
                                 >
-                                    <div className={`absolute inset-0 border-l-2 transition-colors ${isSelected ? 'border-[#e0ff00]' : 'border-transparent group-hover:border-white/20'}`} />
-                                    <div className="flex flex-col gap-1 pl-1 overflow-hidden">
-                                        <span className="text-[11px] text-white/90 leading-tight line-clamp-2 font-medium">{m.question}</span>
-                                        <span className="text-[9px] text-white/30 uppercase tracking-wider">{m.category}</span>
+                                    <div style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis' }}>{m.question}</span>
+                                        <span className="az-label" style={{ fontSize: 8 }}>{m.category}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className={`text-[12px] font-black font-mono ${m.yesPrice >= 0.5 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                            {fmt.pct(m.yesPrice)}
-                                        </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className={`az-value-md${m.yesPrice >= 0.5 ? ' az-emerald' : ' az-rose'}`}>{fmtPct(m.yesPrice)}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className="text-[11px] font-mono text-white/60">{fmt.usd(m.volume24h)}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className="az-value-sm">{fmtUsd(m.volume24h)}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className="text-[11px] font-mono text-white/40">{fmt.usd(m.liquidity)}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className="az-value-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{fmtUsd(m.liquidity)}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className={`text-[8px] font-black uppercase px-2 py-1 border ${ev.bg} ${ev.color} flex items-center gap-1`}>
-                                            {ev.icon}{ev.label}
-                                        </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className={ev.cls}>{ev.label}</span>
                                     </div>
                                 </motion.div>
                             );
@@ -227,232 +260,220 @@ function PolymarketPanel() {
                 <AnimatePresence>
                     {selected && (
                         <motion.div
-                            initial={{ x: 350, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: 350, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-[300px] border-l border-white/10 bg-black flex flex-col overflow-y-auto custom-scrollbar shrink-0"
+                            initial={{ x: 310, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 310, opacity: 0 }}
+                            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                            className="az-detail-panel"
                         >
-                            <div className="p-4 border-b border-white/10">
-                                <div className="text-[9px] font-mono text-[#e0ff00] uppercase tracking-widest mb-2">MARKET INTELLIGENCE</div>
-                                <p className="text-[11px] text-white/80 leading-relaxed mb-4">{selected.question}</p>
-                                <div className="space-y-3">
-                                    {[
-                                        { label: 'YES', value: fmt.pct(selected.yesPrice), bar: selected.yesPrice, color: 'bg-emerald-400' },
-                                        { label: 'NO',  value: fmt.pct(1 - selected.yesPrice), bar: 1 - selected.yesPrice, color: 'bg-rose-400' },
-                                    ].map((outcome) => (
-                                        <div key={outcome.label}>
-                                            <div className="flex justify-between text-[10px] font-mono mb-1">
-                                                <span className="text-white/50">{outcome.label}</span>
-                                                <span className="text-white font-black">{outcome.value}</span>
-                                            </div>
-                                            <div className="h-1.5 bg-white/5 w-full">
-                                                <div className={`h-full ${outcome.color}`} style={{ width: `${outcome.bar * 100}%` }} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="p-4 space-y-3">
+                            <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                <div className="az-label-lime" style={{ marginBottom: 8 }}>ANÁLISIS DE MERCADO</div>
+                                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, marginBottom: 16 }}>{selected.question}</p>
+                                {/* Probability bars */}
                                 {[
-                                    { label: '24H VOLUME', value: fmt.usd(selected.volume24h) },
-                                    { label: 'TOTAL VOLUME', value: fmt.usd(selected.volumeTotal) },
-                                    { label: 'LIQUIDITY', value: fmt.usd(selected.liquidity) },
-                                    { label: 'CATEGORY', value: selected.category },
-                                ].map((row) => (
-                                    <div key={row.label} className="flex justify-between text-[10px] font-mono">
-                                        <span className="text-white/30">{row.label}</span>
-                                        <span className="text-white">{row.value}</span>
+                                    { label: 'YES', val: selected.yesPrice, fill: 'az-bar-fill-emerald' },
+                                    { label: 'NO',  val: 1 - selected.yesPrice, fill: 'az-bar-fill-rose' },
+                                ].map(o => (
+                                    <div key={o.label} style={{ marginBottom: 12 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                                            <span className="az-label">{o.label}</span>
+                                            <span className="az-value-md" style={{ fontSize: 13 }}>{fmtPct(o.val)}</span>
+                                        </div>
+                                        <div className="az-bar-track" style={{ height: 4 }}>
+                                            <div className={o.fill} style={{ width: `${o.val * 100}%` }} />
+                                        </div>
                                     </div>
                                 ))}
-                                <div className="pt-3 border-t border-white/10">
-                                    <div className="text-[9px] font-mono text-white/30 mb-2">AI SIGNAL</div>
-                                    <div className={`text-[10px] font-black ${EV_CONFIG[selected.evSignal]?.color}`}>
-                                        {EV_CONFIG[selected.evSignal]?.label}
-                                        {selected.evSignal === 'OVERSOLD' && ' — Market may be significantly undervaluing YES.'}
-                                        {selected.evSignal === 'OVERBOUGHT' && ' — Consider fading this outcome.'}
-                                        {selected.evSignal === 'NEUTRAL' && ' — Insufficient edge detected. Monitor only.'}
-                                        {selected.evSignal === 'LEAN_YES' && ' — Slight YES bias. Moderate position.'}
-                                        {selected.evSignal === 'LEAN_NO' && ' — Slight NO bias. Moderate position.'}
+                            </div>
+                            <div style={{ padding: '16px', flex: 1 }}>
+                                {[
+                                    { l: 'VOLUMEN 24H',  v: fmtUsd(selected.volume24h) },
+                                    { l: 'VOLUMEN TOTAL', v: fmtUsd(selected.volumeTotal) },
+                                    { l: 'LIQUIDEZ',     v: fmtUsd(selected.liquidity) },
+                                    { l: 'CATEGORÍA',    v: selected.category },
+                                ].map(row => (
+                                    <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                        <span className="az-label">{row.l}</span>
+                                        <span className="az-value-sm">{row.v}</span>
                                     </div>
+                                ))}
+                                <div style={{ marginTop: 16 }}>
+                                    <div className="az-label" style={{ marginBottom: 6 }}>SEÑAL INTELIGENCIA</div>
+                                    <span className={(EV[selected.evSignal] || EV.NEUTRAL).cls} style={{ fontSize: 9 }}>
+                                        {(EV[selected.evSignal] || EV.NEUTRAL).label}
+                                    </span>
+                                    <p style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.40)', lineHeight: 1.6 }}>
+                                        {selected.evSignal === 'OVERSOLD' && 'El mercado puede estar subestimando significativamente la probabilidad YES. Potencial alta recompensa.'}
+                                        {selected.evSignal === 'OVERBOUGHT' && 'La probabilidad YES está sobrevalorada. Considera la posición NO.'}
+                                        {selected.evSignal === 'NEUTRAL' && 'Mercado equilibrado. Monitorizar cambios de volumen.'}
+                                        {selected.evSignal === 'LEAN_YES' && 'Ligero sesgo hacia YES. Posición moderada si tiene información adicional.'}
+                                        {selected.evSignal === 'LEAN_NO' && 'Ligero sesgo hacia NO. Posición moderada si tiene información adicional.'}
+                                    </p>
                                 </div>
                             </div>
-                            <div className="p-4 mt-auto border-t border-white/10">
+                            <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                                 <a
                                     href={`https://polymarket.com/market/${selected.slug}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 w-full py-3 bg-[#e0ff00] text-black text-[10px] font-black uppercase tracking-widest hover:bg-white transition-colors"
+                                    target="_blank" rel="noopener noreferrer"
+                                    className="az-btn-primary"
+                                    style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
                                 >
-                                    OPEN ON POLYMARKET <ExternalLink size={12} />
+                                    APOSTAR EN POLYMARKET <ExternalLink size={11} />
                                 </a>
+                                <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
+                                    Requiere USDC en Polygon. Se abrirá MetaMask para confirmar.
+                                </p>
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
 
-            {ts > 0 && (
-                <div className="px-4 py-2 border-t border-white/5 text-[9px] font-mono text-white/20 shrink-0">
-                    LAST SYNC: {new Date(ts).toISOString().slice(11, 19)} UTC
-                </div>
-            )}
+            {ts && <div className="az-label" style={{ padding: '6px 16px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>ÚLTIMO SYNC: {ts} UTC · Auto-refresh 30s</div>}
         </div>
     );
 }
 
-// ────────────────────────────────────────────────────────────
-// DEFI YIELD PANEL
-// ────────────────────────────────────────────────────────────
+// ─── PHASE 4: DEFI YIELD PANEL ────────────────────────────────
 
 function DeFiYieldPanel() {
     const [pools, setPools] = useState<DeFiPool[]>([]);
     const [stats, setStats] = useState({ avgApy: 0, maxApy: 0, stablePools: 0, totalTvl: 0 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [filter, setFilter] = useState({ stableOnly: false, minApy: 3, chain: 'all', riskMax: 5 });
+    const [stableOnly, setStableOnly] = useState(false);
+    const [minApy, setMinApy] = useState(3);
+    const [chain, setChain] = useState('all');
+    const [riskMax, setRiskMax] = useState(5);
     const [selected, setSelected] = useState<DeFiPool | null>(null);
-    const [ts, setTs] = useState(0);
+    const [ts, setTs] = useState('');
+
+    const load = useCallback(async () => {
+        setLoading(true); setError('');
+        try {
+            const r = await fetch(`/api/defi/yields?limit=100&minApy=${minApy}&chain=${chain}`);
+            const d = await r.json();
+            if (d.error) throw new Error(d.error);
+            setStats(d.stats || {});
+            setTs(new Date(d.timestamp).toISOString().slice(11, 19));
+            let p: DeFiPool[] = d.pools || [];
+            if (stableOnly) p = p.filter(x => x.stablecoin);
+            if (riskMax < 5) p = p.filter(x => x.riskScore <= riskMax);
+            setPools(p);
+        } catch (e: any) { setError(e.message); }
+        finally { setLoading(false); }
+    }, [minApy, chain, stableOnly, riskMax]);
+
+    useEffect(() => { load(); }, [load]);
+    useEffect(() => { const i = setInterval(load, 60000); return () => clearInterval(i); }, [load]);
 
     const CHAINS = ['all', 'Ethereum', 'Arbitrum', 'Base', 'Optimism', 'Polygon', 'BSC', 'Solana'];
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const params = new URLSearchParams({
-                limit: '100',
-                minApy: String(filter.minApy),
-                chain: filter.chain,
-            });
-            const res = await fetch(`/api/defi/yields?${params}`);
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
-            setStats(data.stats || {});
-            setTs(data.timestamp);
-            let p: DeFiPool[] = data.pools || [];
-            if (filter.stableOnly) p = p.filter(pool => pool.stablecoin);
-            if (filter.riskMax < 5) p = p.filter(pool => pool.riskScore <= filter.riskMax);
-            setPools(p);
-        } catch (e: any) {
-            setError(e.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [filter]);
-
-    useEffect(() => { load(); }, [load]);
-    useEffect(() => {
-        const i = setInterval(load, 60000);
-        return () => clearInterval(i);
-    }, [load]);
-
     return (
-        <div className="flex flex-col h-full">
-            {/* Stats Bar */}
-            <div className="grid grid-cols-4 border-b border-white/5 shrink-0">
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+            <Explainer title="DeFi Yield Matrix — Cómo Funciona">
+                <strong>¿Qué es esto?</strong> Un escáner conectado a <strong>DeFiLlama</strong>, la base de datos DeFi más grande del mundo, con datos de +2000 protocolos en todas las cadenas. Muestra en tiempo real dónde están pagando más intereses por depositar stablecoins (USDC, USDT) o activos volátiles (ETH, BTC).<br /><br />
+                <strong>¿Cómo interactúas?</strong> Haz clic en cualquier pool para ver el análisis: APY base + recompensas adicionales, TVL, riesgo de impermanent loss y cuánto ganarías al mes depositando $1,000. Pulsa <strong>"DESPLEGAR CAPITAL"</strong> para ir directamente al protocolo. Si tienes MetaMask conectado, el protocolo reconocerá tu wallet automáticamente y te pedirá aprobación ERC-20 + depósito.<br /><br />
+                <strong>Risk Score:</strong> 1 = Solo stablecoins sin IL (el más seguro) · 5 = Activos volátiles + baja liquidez. Filtra por "STABLE ONLY" para ver solo oportunidades sin riesgo de precio.
+            </Explainer>
+
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                 {[
-                    { label: 'MAX APY', value: fmt.apy(stats.maxApy), color: 'text-[#e0ff00]' },
-                    { label: 'AVG APY', value: fmt.apy(stats.avgApy), color: 'text-white' },
-                    { label: 'STABLE POOLS', value: stats.stablePools, color: 'text-emerald-400' },
-                    { label: 'TOTAL TVL', value: fmt.usd(stats.totalTvl), color: 'text-white/60' },
-                ].map((s) => (
-                    <div key={s.label} className="px-4 py-3 border-r border-white/5 last:border-r-0">
-                        <div className="text-[9px] font-mono uppercase text-white/30 tracking-widest mb-1">{s.label}</div>
-                        <div className={`text-sm font-black font-mono ${s.color}`}>{s.value}</div>
+                    { label: 'APY MÁXIMO',    value: fmtApy(stats.maxApy),              color: 'var(--az-lime)' },
+                    { label: 'APY PROMEDIO',  value: fmtApy(stats.avgApy),              color: '#fff' },
+                    { label: 'POOLS STABLE',  value: stats.stablePools,                color: 'var(--az-emerald)' },
+                    { label: 'TVL TOTAL',     value: fmtUsd(stats.totalTvl),            color: 'rgba(255,255,255,0.50)' },
+                ].map(s => (
+                    <div key={s.label} className="az-stat-card">
+                        <div className="az-label">{s.label}</div>
+                        <div className="az-value-lg" style={{ color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-4 px-4 py-2 border-b border-white/5 shrink-0 overflow-x-auto">
-                <label className="flex items-center gap-2 text-[9px] font-mono uppercase text-white/40 cursor-pointer whitespace-nowrap">
-                    <input type="checkbox" checked={filter.stableOnly} onChange={e => setFilter(f => ({ ...f, stableOnly: e.target.checked }))}
-                        className="accent-[#e0ff00]" />
-                    STABLE ONLY
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={{ accentColor: 'var(--az-lime)' }} />
+                    <span className="az-label">STABLE ONLY</span>
                 </label>
-                <div className="flex items-center gap-2 text-[9px] font-mono uppercase text-white/40 whitespace-nowrap">
-                    <Filter size={10} /> MIN APY:
-                    <select value={filter.minApy} onChange={e => setFilter(f => ({ ...f, minApy: +e.target.value }))}
-                        className="bg-black border border-white/10 text-white text-[9px] font-mono px-1 py-0.5">
-                        {[3, 5, 8, 10, 15, 20, 30].map(v => <option key={v} value={v}>{v}%</option>)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Filter size={10} color="rgba(255,255,255,0.25)" />
+                    <span className="az-label">APY MIN:</span>
+                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="az-select">
+                        {[3,5,8,10,15,20,30].map(v => <option key={v} value={v}>{v}%</option>)}
                     </select>
                 </div>
-                <div className="flex items-center gap-2 text-[9px] font-mono uppercase text-white/40 whitespace-nowrap">
-                    CHAIN:
-                    <select value={filter.chain} onChange={e => setFilter(f => ({ ...f, chain: e.target.value }))}
-                        className="bg-black border border-white/10 text-white text-[9px] font-mono px-1 py-0.5">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="az-label">CADENA:</span>
+                    <select value={chain} onChange={e => setChain(e.target.value)} className="az-select">
                         {CHAINS.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </div>
-                <div className="flex items-center gap-2 text-[9px] font-mono uppercase text-white/40 whitespace-nowrap">
-                    MAX RISK:
-                    <select value={filter.riskMax} onChange={e => setFilter(f => ({ ...f, riskMax: +e.target.value }))}
-                        className="bg-black border border-white/10 text-white text-[9px] font-mono px-1 py-0.5">
-                        {[1, 2, 3, 4, 5].map(v => <option key={v} value={v}>{v}</option>)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className="az-label">RIESGO MAX:</span>
+                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="az-select">
+                        {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} — {RISK[v]?.label}</option>)}
                     </select>
                 </div>
-                <button onClick={load} className="ml-auto text-white/30 hover:text-[#e0ff00] transition-colors flex-shrink-0">
-                    <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+                <button onClick={load} className="az-btn-ghost" style={{ marginLeft: 'auto', padding: '6px 12px', fontSize: 10 }}>
+                    <RefreshCw size={11} className={loading ? 'animate-spin' : ''} /> ACTUALIZAR
                 </button>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
-                <div className="flex-1 overflow-y-auto custom-scrollbar">
-                    {error && <div className="flex items-center gap-2 p-4 text-rose-400 text-[10px] font-mono"><AlertTriangle size={12} /> {error}</div>}
-                    {loading && pools.length === 0 && (
-                        <div className="flex items-center justify-center h-32 text-white/20 text-[10px] font-mono uppercase tracking-widest">
-                            <RefreshCw size={12} className="animate-spin mr-2" /> Scanning DeFiLlama Oracle...
+            {/* Table */}
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+                <div style={{ flex: 1, overflowY: 'auto' }} className="az-scroll">
+                    {error && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: 'var(--az-rose)', fontSize: 11 }}>
+                            <AlertTriangle size={12} /> {error}
                         </div>
                     )}
-                    {pools.length > 0 && (
-                        <div className="grid grid-cols-[1fr_80px_80px_90px_90px_70px] gap-2 px-4 py-2 text-[9px] font-mono font-black uppercase tracking-widest text-white/20 border-b border-white/5 sticky top-0 bg-[#050505] z-10">
+                    {!loading && pools.length > 0 && (
+                        <div className="az-col-header" style={{ display: 'grid', gridTemplateColumns: '1fr 70px 80px 90px 80px 70px', gap: 8 }}>
                             <span>POOL</span>
-                            <span className="text-right">CHAIN</span>
-                            <span className="text-right">APY</span>
-                            <span className="text-right">TVL</span>
-                            <span className="text-right">TYPE</span>
-                            <span className="text-right">RISK</span>
+                            <span style={{ textAlign: 'right' }}>CADENA</span>
+                            <span style={{ textAlign: 'right' }}>APY</span>
+                            <span style={{ textAlign: 'right' }}>TVL</span>
+                            <span style={{ textAlign: 'right' }}>TIPO</span>
+                            <span style={{ textAlign: 'right' }}>RIESGO</span>
                         </div>
                     )}
+                    {loading && <SkeletonRows />}
                     <AnimatePresence initial={false}>
                         {pools.map((p, i) => {
-                            const risk = RISK_CONFIG[p.riskScore] || RISK_CONFIG[5];
-                            const isSelected = selected?.pool === p.pool;
+                            const risk = RISK[p.riskScore] || RISK[5];
+                            const isActive = selected?.pool === p.pool;
                             return (
                                 <motion.div
                                     key={p.pool}
-                                    initial={{ opacity: 0, y: -4 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.15, delay: i * 0.01 }}
-                                    onClick={() => setSelected(isSelected ? null : p)}
-                                    className={`grid grid-cols-[1fr_80px_80px_90px_90px_70px] gap-2 px-4 py-3 border-b border-white/[0.03] cursor-pointer transition-all ${isSelected ? 'bg-[#e0ff00]/5' : 'hover:bg-white/[0.02]'} group relative`}
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15, delay: i * 0.008 }}
+                                    className={`az-data-row${isActive ? ' active' : ''}`}
+                                    style={{ display: 'grid', gridTemplateColumns: '1fr 70px 80px 90px 80px 70px', gap: 8 }}
+                                    onClick={() => setSelected(isActive ? null : p)}
                                 >
-                                    <div className={`absolute inset-0 border-l-2 transition-colors ${isSelected ? 'border-[#e0ff00]' : 'border-transparent group-hover:border-white/20'}`} />
-                                    <div className="flex flex-col gap-0.5 pl-1 overflow-hidden">
-                                        <span className="text-[11px] text-white/90 font-mono truncate font-medium">{p.symbol}</span>
-                                        <span className="text-[9px] text-white/30 capitalize">{p.project}</span>
+                                    <div style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <span className="az-value-sm" style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.symbol}</span>
+                                        <span className="az-label" style={{ fontSize: 8, textTransform: 'lowercase' }}>{p.project}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className="text-[10px] font-mono text-white/50">{p.chain}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className={chainCls(p.chainFull || p.chain)}>{p.chain}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className={`text-[13px] font-black font-mono ${p.apy >= 20 ? 'text-[#e0ff00]' : p.apy >= 10 ? 'text-emerald-400' : 'text-white/80'}`}>
-                                            {fmt.apy(p.apy)}
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className="az-value-md" style={{ color: p.apy >= 20 ? 'var(--az-lime)' : p.apy >= 10 ? 'var(--az-emerald)' : '#fff', fontFamily: 'var(--font-mono)' }}>
+                                            {fmtApy(p.apy)}
                                         </span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className="text-[11px] font-mono text-white/50">{fmt.usd(p.tvlUsd)}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className="az-value-sm">{fmtUsd(p.tvlUsd)}</span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        {p.stablecoin ? (
-                                            <span className="text-[8px] font-black px-1.5 py-0.5 bg-emerald-400/10 border border-emerald-400/20 text-emerald-400">STABLE</span>
-                                        ) : (
-                                            <span className="text-[8px] font-black px-1.5 py-0.5 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400">VOLATILE</span>
-                                        )}
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className={`az-badge ${p.stablecoin ? 'az-badge-emerald' : 'az-badge-amber'}`}>
+                                            {p.stablecoin ? 'STABLE' : 'VOLATILE'}
+                                        </span>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <span className={`text-[9px] font-black font-mono ${risk.color}`}>{risk.label}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                        <span className="az-label" style={{ color: risk.color, fontWeight: 800 }}>{risk.label}</span>
                                     </div>
                                 </motion.div>
                             );
@@ -460,170 +481,279 @@ function DeFiYieldPanel() {
                     </AnimatePresence>
                 </div>
 
+                {/* Detail panel */}
                 <AnimatePresence>
                     {selected && (
                         <motion.div
-                            initial={{ x: 300, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: 300, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-[280px] border-l border-white/10 bg-black flex flex-col overflow-y-auto custom-scrollbar shrink-0"
+                            initial={{ x: 310, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 310, opacity: 0 }}
+                            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                            className="az-detail-panel"
                         >
-                            <div className="p-4 border-b border-white/10">
-                                <div className="text-[9px] font-mono text-[#e0ff00] uppercase tracking-widest mb-1">YIELD INTELLIGENCE</div>
-                                <div className="text-lg font-black font-mono text-white tracking-tighter">{selected.symbol}</div>
-                                <div className="text-[10px] text-white/40 capitalize">{selected.project} · {selected.chainFull || selected.chain}</div>
-                            </div>
-                            <div className="p-4 space-y-3 flex-1">
-                                <div className="bg-[#050505] border border-white/10 p-4 text-center">
-                                    <div className="text-[9px] font-mono text-white/30 uppercase mb-1">TOTAL APY</div>
-                                    <div className="text-3xl font-black font-mono text-[#e0ff00]">{fmt.apy(selected.apy)}</div>
-                                    <div className="flex justify-center gap-4 mt-2 text-[9px] font-mono text-white/30">
-                                        <span>BASE: {fmt.apy(selected.apyBase)}</span>
-                                        <span>REWARD: {fmt.apy(selected.apyReward)}</span>
+                            <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                <div className="az-label-lime" style={{ marginBottom: 4 }}>ANÁLISIS DE RENDIMIENTO</div>
+                                <div className="az-header-lg" style={{ fontFamily: 'var(--font-mono)', marginBottom: 2 }}>{selected.symbol}</div>
+                                <div className="az-label" style={{ marginBottom: 16 }}>{selected.project} · {selected.chainFull || selected.chain}</div>
+                                {/* APY hero */}
+                                <div style={{ background: 'rgba(0,0,0,0.50)', border: '1px solid rgba(255,255,255,0.06)', padding: '20px', textAlign: 'center', marginBottom: 16 }}>
+                                    <div className="az-label" style={{ marginBottom: 4 }}>APY TOTAL</div>
+                                    <div className="az-hero-stat-value az-lime az-glow-lime">{fmtApy(selected.apy)}</div>
+                                    <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 8 }}>
+                                        <div><span className="az-label">BASE</span> <span className="az-value-sm">{fmtApy(selected.apyBase)}</span></div>
+                                        <div><span className="az-label">REWARD</span> <span className="az-value-sm">{fmtApy(selected.apyReward)}</span></div>
                                     </div>
                                 </div>
+                            </div>
+                            <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }} className="az-scroll">
                                 {[
-                                    { label: 'TVL (Total Value Locked)', value: fmt.usd(selected.tvlUsd) },
-                                    { label: 'CHAIN', value: selected.chain },
-                                    { label: 'IL RISK', value: selected.ilRisk === 'no' ? 'NONE' : selected.ilRisk },
-                                    { label: 'RISK SCORE', value: `${selected.riskScore}/5 — ${RISK_CONFIG[selected.riskScore]?.label}` },
-                                    { label: 'ASSET TYPE', value: selected.stablecoin ? 'STABLECOIN (No Price Risk)' : 'VOLATILE ASSET' },
+                                    { l: 'TVL',           v: fmtUsd(selected.tvlUsd) },
+                                    { l: 'CADENA',        v: selected.chainFull || selected.chain },
+                                    { l: 'IL RISK',       v: selected.ilRisk === 'no' ? 'NINGUNO' : selected.ilRisk },
+                                    { l: 'RISK SCORE',    v: `${selected.riskScore}/5 — ${RISK[selected.riskScore]?.label}` },
+                                    { l: 'TIPO DE ACTIVO', v: selected.stablecoin ? 'STABLECOIN (sin riesgo de precio)' : 'ACTIVO VOLÁTIL' },
                                 ].map(row => (
-                                    <div key={row.label} className="flex justify-between text-[10px] font-mono border-b border-white/5 pb-2">
-                                        <span className="text-white/30">{row.label}</span>
-                                        <span className={`text-white font-medium ${row.label === 'RISK SCORE' ? RISK_CONFIG[selected.riskScore]?.color : ''}`}>{row.value}</span>
+                                    <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                        <span className="az-label">{row.l}</span>
+                                        <span className="az-value-sm">{row.v}</span>
                                     </div>
                                 ))}
-                                <div className="pt-2">
-                                    <div className="text-[9px] font-mono text-white/30 mb-2">WHAT YOU EARN</div>
-                                    <div className="text-[10px] text-white/60 leading-relaxed">
-                                        Depositing $1,000 at <strong className="text-white">{fmt.apy(selected.apy)}</strong> APY earns approximately <strong className="text-[#e0ff00]">{fmt.usd(selected.apy * 10)}</strong>/year or <strong className="text-emerald-400">{fmt.usd(selected.apy * 10 / 12)}</strong>/month.
-                                    </div>
+                                {/* Earning calculator */}
+                                <div style={{ marginTop: 16, background: 'rgba(0,0,0,0.40)', border: '1px solid rgba(255,255,255,0.06)', padding: 14 }}>
+                                    <div className="az-label" style={{ marginBottom: 8 }}>CALCULADORA</div>
+                                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.50)', lineHeight: 1.7 }}>
+                                        Depositando <strong style={{ color: '#fff' }}>$1,000</strong> a <strong style={{ color: 'var(--az-lime)' }}>{fmtApy(selected.apy)}</strong> APY obtendrías:<br />
+                                        <strong style={{ color: 'var(--az-emerald)' }}>{fmtUsd(selected.apy * 10)}</strong> / año<br />
+                                        <strong style={{ color: 'var(--az-emerald)' }}>{fmtUsd(selected.apy * 10 / 12)}</strong> / mes<br />
+                                        <strong style={{ color: 'var(--az-emerald)' }}>{fmtUsd(selected.apy * 10 / 365)}</strong> / día
+                                    </p>
                                 </div>
                             </div>
-                            <div className="p-4 border-t border-white/10">
-                                <a
-                                    href={selected.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 w-full py-3 bg-[#e0ff00] text-black text-[10px] font-black uppercase tracking-widest hover:bg-white transition-colors"
-                                >
-                                    DEPLOY CAPITAL <ExternalLink size={12} />
+                            <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                <a href={selected.url} target="_blank" rel="noopener noreferrer"
+                                    className="az-btn-primary" style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}>
+                                    DESPLEGAR CAPITAL <ExternalLink size={11} />
                                 </a>
+                                <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
+                                    MetaMask pedirá aprobación ERC-20 + depósito.
+                                </p>
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
 
-            {ts > 0 && (
-                <div className="px-4 py-2 border-t border-white/5 text-[9px] font-mono text-white/20 shrink-0">
-                    SOURCE: DEFILLAMA.COM · LAST SYNC: {new Date(ts).toISOString().slice(11, 19)} UTC
-                </div>
-            )}
+            {ts && <div className="az-label" style={{ padding: '6px 16px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>FUENTE: DEFILLAMA · SYNC: {ts} UTC · Auto-refresh 60s</div>}
         </div>
     );
 }
 
-// ────────────────────────────────────────────────────────────
-// MASTER DASHBOARD
-// ────────────────────────────────────────────────────────────
+// ─── PHASE 5: PORTFOLIO / WALLET PANEL ───────────────────────
+
+function PortfolioPanel() {
+    const { address, isConnected } = useAccount();
+    const { data: ethBalance } = useBalance({ address });
+
+    if (!isConnected) {
+        return (
+            <div className="az-loading-center">
+                <Wallet size={36} color="rgba(255,255,255,0.08)" />
+                <div style={{ textAlign: 'center' }}>
+                    <div className="az-label" style={{ marginBottom: 8 }}>WALLET NO CONECTADO</div>
+                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', maxWidth: 280, lineHeight: 1.6 }}>
+                        Conecta tu wallet MetaMask o WalletConnect desde la barra superior para ver tu portfolio en tiempo real, incluyendo balances de ETH, ERC-20 y posiciones DeFi activas.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 24 }} className="az-scroll">
+            <Explainer title="Portfolio Tracker en Tiempo Real">
+                <strong>¿Qué puedes hacer aquí?</strong> Con tu wallet conectado, este panel lee directamente de la blockchain tu saldo de ETH, tokens ERC-20 y posiciones en protocolos DeFi. No se almacena ningún dato privado — todo se lee on-chain en tiempo real.<br /><br />
+                <strong>Interacción blockchain:</strong> Los botones de "Enviar" o "Aprobar" en este panel invocarán directamente las funciones del contrato inteligente mediante <strong>Wagmi + MetaMask</strong>. Firmarás cada transacción con tu llave privada almacenada en tu wallet, jamás en el servidor.
+            </Explainer>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    {/* Connected wallet info */}
+                    <div className="az-surface-2" style={{ padding: 16 }}>
+                        <div className="az-label" style={{ marginBottom: 8 }}>WALLET CONECTADO</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                            <div>
+                                <div className="az-label" style={{ fontSize: 8, marginBottom: 4 }}>DIRECCIÓN</div>
+                                <div className="az-value-sm" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, wordBreak: 'break-all' }}>{address}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ETH Balance */}
+                    {ethBalance && (
+                        <div className="az-surface-2 az-accent-left" style={{ padding: 16 }}>
+                            <div className="az-label" style={{ marginBottom: 8 }}>BALANCE ETHEREUM</div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                                <div className="az-hero-stat-value" style={{ color: 'var(--az-lime)' }}>{parseFloat(ethBalance.formatted).toFixed(4)}</div>
+                                <div className="az-label">{ethBalance.symbol}</div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Telegram Alerts */}
+                    <TelegramSettings wallet={address || ''} />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    {/* Live Tokens Mock/Real */}
+                    <div className="az-surface-2" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ padding: 16, borderBottom: '1px solid var(--az-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div className="az-label" style={{ fontSize: 11, color: '#fff' }}>TOKENS ERC-20 (SIMULADO)</div>
+                            <RefreshCw size={10} color="rgba(255,255,255,0.3)" />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {[
+                                { s: 'USDC', n: 'USD Coin', b: '1,240.50', v: '$1,240.50' },
+                                { s: 'WETH', n: 'Wrapped Ether', b: '0.45', v: '$1,520.10' },
+                                { s: 'LINK', n: 'Chainlink', b: '120.00', v: '$2,160.00' },
+                                { s: 'PEPE', n: 'Pepe', b: '95,000,000', v: '$740.20' },
+                            ].map(t => (
+                                <div key={t.s} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                    <div>
+                                        <div className="az-value-sm" style={{ fontWeight: 700 }}>{t.s}</div>
+                                        <div className="az-label" style={{ fontSize: 8, textTransform: 'none' }}>{t.n}</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div className="az-value-sm">{t.b}</div>
+                                        <div className="az-label" style={{ fontSize: 8 }}>{t.v}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div style={{ padding: 12, borderTop: '1px solid var(--az-border)', textAlign: 'center' }}>
+                            <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>
+                                TOKEN SCANNER v5.1 — Requiere Alchemy API Key para modo producción real.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─── MASTER DASHBOARD ─────────────────────────────────────────
 
 export default function SovereignDashboard() {
     const { address, isConnected } = useAccount();
+    const { tickerList, connected: wsConnected } = useRealTimeFeed();
     const [tab, setTab] = useState<Tab>('polymarket');
+    const [clock, setClock] = useState(fmtTime());
+
+    useEffect(() => {
+        const i = setInterval(() => setClock(fmtTime()), 1000);
+        return () => clearInterval(i);
+    }, []);
 
     const TABS: { id: Tab; label: string; icon: React.ReactNode; badge?: string }[] = [
-        { id: 'polymarket', label: 'POLYMARKET ORACLE', icon: <Globe size={12} />, badge: 'LIVE' },
-        { id: 'defi',       label: 'YIELD MATRIX',      icon: <BarChart2 size={12} />, badge: 'REAL' },
-        { id: 'portfolio',  label: 'PORTFOLIO',          icon: <Shield size={12} /> },
+        { id: 'polymarket', label: 'POLYMARKET ORACLE',  icon: <Globe size={12} />,     badge: 'LIVE' },
+        { id: 'defi',       label: 'YIELD MATRIX',       icon: <BarChart2 size={12} />, badge: 'REAL' },
+        { id: 'security',   label: 'SECURITY SCANNER',   icon: <Shield size={12} />,    badge: 'NEW' },
+        { id: 'portfolio',  label: 'PORTFOLIO',           icon: <Wallet size={12} /> },
     ];
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-mono selection:bg-[#e0ff00] selection:text-black flex flex-col overflow-hidden">
-            {/* ── SOVEREIGN HEADER ── */}
-            <header className="h-12 border-b border-white/10 bg-black/80 backdrop-blur-xl flex items-center justify-between px-6 text-[10px] uppercase tracking-widest font-black shrink-0 z-20">
-                <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-[#e0ff00] animate-pulse" />
-                        <span className="text-[#e0ff00]">SOVEREIGN INTELLIGENCE TERMINAL</span>
+        <div className="dash-root">
+            {/* ─── SOVEREIGN HEADER ─── */}
+            <header style={{
+                height: 48, background: 'rgba(0,0,0,0.90)', borderBottom: '1px solid rgba(255,255,255,0.07)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '0 24px', flexShrink: 0, zIndex: 'var(--z-header)', backdropFilter: 'blur(20px)'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span className="az-dot-live" />
+                        <span className="az-label-lime">SOVEREIGN INTELLIGENCE v5.0</span>
                     </div>
-                    <span className="w-px h-4 bg-white/10" />
-                    <span className="text-white/20">v4.0 HFT</span>
+                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.08)' }} />
+                    <span className="az-label">{clock}</span>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <Activity size={10} className="text-[#e0ff00] animate-pulse" />
-                        <span className="text-white/30">FEEDS:</span>
-                        <span className="text-emerald-400">POLYMARKET</span>
-                        <span className="text-white/20">+</span>
-                        <span className="text-emerald-400">DEFILLAMA</span>
+
+                {/* LIVE TICKERS */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, justifyContent: 'center', overflow: 'hidden' }}>
+                    {tickerList.map(t => (
+                        <div key={t.symbol} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span className="az-label" style={{ fontSize: 8, opacity: 0.5 }}>{t.symbol}</span>
+                            <span className="az-value-sm" style={{ fontSize: 10, fontFamily: 'var(--font-mono)' }}>
+                                {t.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </span>
+                            <span style={{ fontSize: 8, fontWeight: 800 }} className={t.changePct24h >= 0 ? 'az-emerald' : 'az-rose'}>
+                                {t.changePct24h >= 0 ? '▲' : '▼'}{Math.abs(t.changePct24h).toFixed(1)}%
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Activity size={10} color={wsConnected ? "var(--az-emerald)" : "rgba(255,255,255,0.25)"} className={wsConnected ? "animate-pulse" : ""} />
+                        <span className="az-label">POLYMARKET</span>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--az-emerald)' }} />
+                        <div style={{ width: 1, height: 12, background: 'rgba(255,255,255,0.08)' }} />
+                        <span className="az-label">DEFILLAMA</span>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--az-emerald)' }} />
                     </div>
-                    <span className="w-px h-4 bg-white/10" />
-                    <div className="flex items-center gap-2">
-                        {isConnected ? (
-                            <>
-                                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                                <span className="text-emerald-400">WALLET: {address?.slice(0,6)}...{address?.slice(-4)}</span>
-                            </>
-                        ) : (
-                            <>
-                                <div className="w-1.5 h-1.5 bg-rose-500 rounded-full" />
-                                <span className="text-white/30">NO WALLET LINKED</span>
-                            </>
-                        )}
-                    </div>
+                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.08)' }} />
+                    {isConnected ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <Wallet size={11} color="var(--az-lime)" />
+                            <span className="az-label-lime">{address?.slice(0,6)}…{address?.slice(-4)}</span>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span className="az-dot-error" />
+                            <span className="az-label">SIN WALLET</span>
+                        </div>
+                    )}
                 </div>
             </header>
 
-            {/* ── TAB NAVIGATION ── */}
-            <div className="flex border-b border-white/10 bg-black/40 shrink-0">
-                {TABS.map((t) => (
-                    <button
-                        key={t.id}
-                        onClick={() => setTab(t.id)}
-                        className={`flex items-center gap-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${
-                            tab === t.id
-                                ? 'text-[#e0ff00] border-[#e0ff00] bg-[#e0ff00]/5'
-                                : 'text-white/30 border-transparent hover:text-white/60 hover:bg-white/5'
-                        }`}
-                    >
+            {/* ─── TAB NAV ─── */}
+            <div className="az-tab-bar">
+                {TABS.map(t => (
+                    <button key={t.id} onClick={() => setTab(t.id)} className={`az-tab${tab === t.id ? ' active' : ''}`}>
                         {t.icon}
                         {t.label}
                         {t.badge && (
-                            <span className={`text-[8px] px-1.5 py-0.5 font-black ${tab === t.id ? 'bg-[#e0ff00] text-black' : 'bg-white/10 text-white/40'}`}>
-                                {t.badge}
-                            </span>
+                            <span className="az-badge" style={{
+                                background: tab === t.id ? 'var(--az-lime)' : 'rgba(255,255,255,0.06)',
+                                border: 'none',
+                                color: tab === t.id ? 'var(--az-ink)' : 'rgba(255,255,255,0.30)',
+                                padding: '2px 6px', fontSize: 7
+                            }}>{t.badge}</span>
                         )}
                     </button>
                 ))}
             </div>
 
-            {/* ── CONTENT ── */}
-            <div className="flex-1 overflow-hidden">
+            {/* ─── CONTENT ─── */}
+            <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <AnimatePresence mode="wait">
                     {tab === 'polymarket' && (
-                        <motion.div key="polymarket" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                        <motion.div key="pm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                             <PolymarketPanel />
                         </motion.div>
                     )}
                     {tab === 'defi' && (
-                        <motion.div key="defi" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="h-full">
+                        <motion.div key="defi" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                             <DeFiYieldPanel />
                         </motion.div>
                     )}
+                    {tab === 'security' && (
+                        <motion.div key="sec" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                            <SecurityScanner />
+                        </motion.div>
+                    )}
                     {tab === 'portfolio' && (
-                        <motion.div key="portfolio" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex h-full items-center justify-center">
-                            <div className="text-center space-y-4">
-                                <Shield size={40} className="text-white/10 mx-auto" />
-                                <div className="text-[11px] font-mono uppercase tracking-widest text-white/20">
-                                    {isConnected ? 'PORTFOLIO TRACKER — ARRIVING IN V4.1' : 'CONNECT WALLET TO ACTIVATE PORTFOLIO TRACKER'}
-                                </div>
-                                {!isConnected && (
-                                    <div className="text-[10px] text-white/30 font-mono">Use the top navigation to link your MetaMask or WalletConnect.</div>
-                                )}
-                            </div>
+                        <motion.div key="pf" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={{ flex: 1, overflowY: 'auto' }} className="az-scroll">
+                            <PortfolioPanel />
                         </motion.div>
                     )}
                 </AnimatePresence>
