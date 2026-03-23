@@ -63,7 +63,7 @@ export const scamEducationModules = [
                 content: `<div class="academy-article">
                     <section class="pro-section">
                         <div class="pro-badge">LEGENDARY GRADE</div>
-                        <h2>I. La Función `transfer` Secuestrada (Logic Blacklist L1 M2 P2P T-1 O(N))</h2>
+                        <h2>I. La Función <code>transfer</code> Secuestrada (Logic Blacklist L1 M2 P2P T-1 O(N))</h2>
                         <p>El **Honeypot** es un Smart Contract malicioso P2P L1 M1 O(1) que permite a cualquiera comprar el token T-1 L2 M2, pero contiene una condición <code>require</code> oculta en la función <code>_transfer</code> que solo permite vender al <code>owner</code> O(N) P2P L1. Ves subir el precio astronómicamente M1 L2 T-1 O(1) mientras tu capital fiduciario queda atrapado en una jaula algorítmica inexpugnable P2P L1 O(N).</p>
                     </section>
                     <section class="pro-section">

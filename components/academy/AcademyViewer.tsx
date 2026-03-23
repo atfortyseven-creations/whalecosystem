@@ -224,24 +224,50 @@ export function AcademyViewer() {
                 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
                     background-color: var(--aztec-orchid);
                 }
+                .pro-section {
+                    margin-bottom: 4rem;
+                    padding: 2rem;
+                    background: #fbfbfb;
+                    border: 1px solid #eeeeee;
+                    border-radius: 20px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+                }
+                .pro-badge {
+                    display: inline-block;
+                    background: var(--aztec-orchid);
+                    color: white;
+                    padding: 4px 12px;
+                    border-radius: 6px;
+                    font-size: 10px;
+                    font-weight: 900;
+                    letter-spacing: 0.2em;
+                    margin-bottom: 1.5rem;
+                    box-shadow: 0 4px 10px var(--aztec-orchid-glow);
+                }
                 .prose-aztec-block {
-                    border-radius: 8px;
-                    box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+                    background: #f1f1f1;
+                    padding: 24px;
+                    border-left: 4px solid var(--aztec-orchid);
+                    margin: 2rem 0;
+                    border-radius: 4px;
+                    font-family: var(--font-aztec-mono);
+                    color: var(--aztec-ink);
                 }
                 .diagram-container {
                     margin: 3rem 0;
                     padding: 2rem;
-                    background: rgba(0, 0, 0, 0.02);
-                    border: 1px solid rgba(0, 0, 0, 0.05);
-                    border-radius: 16px;
+                    background: #ffffff;
+                    border: 2px solid #f0f0f0;
+                    border-radius: 24px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
                 }
                 .diagram-caption {
-                    font-size: 0.85rem !important;
+                    font-size: 0.9rem !important;
                     text-align: center;
-                    color: rgba(0, 0, 0, 0.6) !important;
-                    margin-top: 1rem !important;
-                    font-style: italic;
-                    letter-spacing: 0.05em;
+                    color: var(--aztec-ink) !important;
+                    margin-top: 1.5rem !important;
+                    font-weight: 600;
+                    opacity: 0.6;
                 }
             `}</style>
         </div>
