@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { ShieldAlert, Zap, Lock, Crosshair, AlertTriangle, Fingerprint, Activity, Ban } from 'lucide-react';
@@ -12,12 +12,19 @@ export default function ExecutionDock() {
   const { isConnected, address } = useAccount();
   const filters = useSniperStore((state) => state.filters);
   const currentPrice = useSniperStore((state) => state.currentPrice);
+  const addExecutedTrade = useSniperStore((state) => state.addExecutedTrade);
   
   const [isArmed, setIsArmed] = useState(false);
   
-  // Real wagmi transaction hooks (Mocking execution with a 0 value to yourself to prove Web3 connectivity without risk)
   const { data: hash, isPending, sendTransaction, error: txError } = useSendTransaction();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+
+  // Feed confirmed transactions to the Tactical History store
+  useEffect(() => {
+    if (isConfirmed && hash) {
+      addExecutedTrade(hash, 0, currentPrice); // Recording 0 amount as it's a test tx, but recording the exact price tick it fired at
+    }
+  }, [isConfirmed, hash, addExecutedTrade]);
 
   const handleLethalExecution = async () => {
     if (!isConnected || !address) {

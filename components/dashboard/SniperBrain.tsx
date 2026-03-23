@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { useSniperStore } from '@/store/useSniperStore';
-import { Filter, Database, TrendingUp, Settings2 } from 'lucide-react';
+import { Filter, Database, TrendingUp, Settings2, History } from 'lucide-react';
 
 export default function SniperBrain() {
   const filters = useSniperStore((state) => state.filters);
   const updateFilters = useSniperStore((state) => state.updateFilters);
+  const executedTrades = useSniperStore((state) => state.executedTrades);
 
   // Local state for input handling before pushing to global Zustand store 
   // (Prevents re-renders on every keystroke in the global store)
@@ -113,6 +114,30 @@ export default function SniperBrain() {
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] text-white/30">GWEI</span>
           </div>
+        </div>
+      </div>
+
+      <div className="h-px bg-white/5 my-2" />
+
+      {/* ── TACTICAL HISTORY ── */}
+      <div className="flex-1 min-h-[100px] flex flex-col">
+        <label className="text-[9px] uppercase font-black tracking-widest flex items-center gap-2 text-[#e0ff00]/60 mb-2">
+          <History size={10} /> LOCAL DEPLOYMENT HISTORY
+        </label>
+        <div className="flex-1 bg-black border border-white/5 rounded-sm p-3 overflow-y-auto no-scrollbar space-y-2">
+          {executedTrades.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-[10px] text-white/20 italic">
+              NO LETHAL EXECUTIONS RECORDED IN CURRENT SESSION.
+            </div>
+          ) : (
+            executedTrades.map((trade, idx) => (
+              <div key={`${trade.hash}-${idx}`} className="flex items-center justify-between text-[10px] bg-white/5 px-3 py-2 rounded-sm border border-white/5">
+                 <span className="text-emerald-400 font-mono truncate max-w-[120px]">{trade.hash}</span>
+                 <span className="text-white/40">[{new Date(trade.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
+                 <span className="text-white font-black font-mono">${trade.priceAtExecution.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

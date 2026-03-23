@@ -56,12 +56,54 @@ interface SniperState {
   filters: SniperFilters;
   metrics: SniperMetrics;
 
+  // Tactical History
+  executedTrades: { hash: string; amount: number; priceAtExecution: number; timestamp: number }[];
+
   // HFT Actions
   setPrice: (price: number, latency?: number) => void;
   pushAlert: (alert: Web3WhaleAlert) => void;
   updateFilters: (updates: Partial<SniperFilters>) => void;
   setConnectionStatus: (status: boolean) => void;
+  addExecutedTrade: (hash: string, amount: number, priceAtExecution: number) => void;
 }
+
+// ── Web Audio API (HFT Tactical Sounds) ──
+let audioCtx: AudioContext | null = null;
+
+const playTacticalBeep = (usdValue: number, action: string) => {
+  try {
+    if (typeof window === 'undefined') return; // Server-side guard
+    if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    // Only play sounds if user has interacted with DOM (AudioContext rules)
+    if (audioCtx.state === 'suspended') return;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    // Frequency based on severity
+    let freq = 400; // Baseline
+    if (usdValue > 10000000) freq = 800; // $10M+ Massive alert (High pitch)
+    else if (usdValue > 5000000) freq = 600; // $5M+
+
+    // Action modifies wave form
+    osc.type = action === 'BUY' ? 'sine' : action === 'SELL' ? 'square' : 'triangle';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+    // Envelope (Very short blip)
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.1);
+  } catch (e) {
+    // Silent fail for Audio API
+  }
+};
 
 // -----------------------------------------------------------------------------
 // 2. ZUSTAND STORE (HFT OPTIMIZED - ZERO RENDER PROPAGATION)
@@ -72,6 +114,7 @@ export const useSniperStore = create<SniperState>((set) => ({
   // Initial State
   currentPrice: 0,
   alerts: [],
+  executedTrades: [],
   filters: {
     minVolumeUsd: 1000000, // 1M USD Default
     targetAssets: ['ETH', 'BTC'],
@@ -104,6 +147,9 @@ export const useSniperStore = create<SniperState>((set) => ({
       if (alert.usdValue < state.filters.minVolumeUsd) return state;
       if (!state.filters.targetAssets.includes(alert.asset)) return state;
 
+      // Play deterministic zero-latency sound
+      playTacticalBeep(alert.usdValue, alert.action);
+
       // Circular Buffer implementation (unshift + slice)
       const newBuffer = [alert, ...state.alerts].slice(0, MAX_BUFFER_SIZE);
       return { alerts: newBuffer };
@@ -114,4 +160,9 @@ export const useSniperStore = create<SniperState>((set) => ({
 
   setConnectionStatus: (status) =>
     set((state) => ({ metrics: { ...state.metrics, activeConnection: status } })),
+
+  addExecutedTrade: (hash, amount, priceAtExecution) =>
+    set((state) => ({
+      executedTrades: [{ hash, amount, priceAtExecution, timestamp: Date.now() }, ...state.executedTrades].slice(0, 50)
+    })),
 }));
