@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 // Only importing what is actually used — tree-shaken for minimal bundle size
 import { QrCode, Smartphone, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect, useSignMessage } from 'wagmi';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { toast } from 'sonner';
 
@@ -34,21 +34,161 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
 });
 
 export function MobileSovereignLanding() {
-    const { open } = useAppKit();
     const { isConnected, address } = useAccount();
-    const [view, setView] = useState<'landing' | 'scanner'>('landing');
+    const { connect, connectors } = useConnect();
+    const { signMessageAsync } = useSignMessage();
+    const [view, setView] = useState<'landing' | 'scanner' | 'selector'>('landing');
+    const [isSigned, setIsSigned] = useState(false);
+    const [isSigning, setIsSigning] = useState(false);
 
     const handleSovereignConnect = useCallback(() => {
-        open({ view: 'Connect' });
-    }, [open]);
+        // Instead of AppKit, we show our custom institutional selector
+        setView('selector');
+    }, []);
+
+    const handleInjectedConnect = useCallback(async () => {
+        const injected = connectors.find((c: any) => c.id === 'injected' || c.id === 'io.metamask' || c.id === 'metaMaskSDK');
+        if (injected) {
+            connect({ connector: injected });
+            setView('landing');
+        } else {
+            // Fallback to metamask deep link if no provider
+            window.location.href = `https://metamask.app.link/dapp/${window.location.host}`;
+        }
+    }, [connect, connectors]);
+
+    const handleOpenInApp = (app: 'metamask' | 'chrome' | 'firefox') => {
+        const url = window.location.href;
+        const noProtocol = url.replace(/^https?:\/\//, '');
+        
+        switch(app) {
+            case 'metamask':
+                window.location.href = `https://metamask.app.link/dapp/${noProtocol}`;
+                break;
+            case 'chrome':
+                window.location.href = `googlechromes://${noProtocol}`;
+                // Fallback for Android
+                setTimeout(() => {
+                    window.location.href = `intent://${noProtocol}#Intent;scheme=https;package=com.android.chrome;end`;
+                }, 500);
+                break;
+            case 'firefox':
+                window.location.href = `firefox://open-url?url=${url}`;
+                // Fallback for Android
+                setTimeout(() => {
+                    window.location.href = `intent://${noProtocol}#Intent;scheme=https;package=org.mozilla.firefox;end`;
+                }, 500);
+                break;
+        }
+    };
+
+    const handleSignAndAuthorize = async () => {
+        if (!address) return;
+        setIsSigning(true);
+        try {
+            const message = `Authorize Sovereign Handshake for ${address}\nTimestamp: ${Date.now()}`;
+            await signMessageAsync({ message });
+            setIsSigned(true);
+            toast.success('Identity Verified');
+            setView('scanner'); // Auto transition to scanner after signature
+        } catch (e) {
+            toast.error('Signature Required to access terminal');
+        } finally {
+            setIsSigning(false);
+        }
+    };
 
     const handleScanClick = useCallback(() => {
-        // Remove the isConnected check to allow direct access to scanner
+        if (!isConnected) {
+            setView('selector');
+            return;
+        }
+        if (!isSigned) {
+            handleSignAndAuthorize();
+            return;
+        }
         setView('scanner');
-    }, []);
+    }, [isConnected, isSigned, handleSignAndAuthorize]);
 
     if (view === 'scanner') {
         return <MobileQRScanner onBack={() => setView('landing')} />;
+    }
+
+    if (view === 'selector') {
+        return (
+            <div className="fixed inset-0 z-[1000] bg-[var(--aztec-parchment)] flex flex-col p-8 pt-20 overflow-y-auto">
+                <div className="absolute inset-0 bg-noise opacity-20 pointer-events-none" />
+                
+                <button onClick={() => setView('landing')} className="absolute top-8 left-8 text-black/40 font-black text-[10px] uppercase tracking-widest border-b border-black/10 pb-1">
+                    ← Close Portal
+                </button>
+
+                <div className="space-y-4 mb-16 relative z-10">
+                    <h2 className="text-4xl font-black tracking-tighter text-[#050505] leading-none">
+                        Identity<br /><span className="text-indigo-500 italic">Initialization</span>.
+                    </h2>
+                    <p className="text-black/50 text-sm font-medium leading-relaxed">
+                        Select your preferred gateway to establish a secure handshake with the Whale Alert Network.
+                    </p>
+                </div>
+
+                <div className="space-y-4 relative z-10">
+                    <button 
+                        onClick={handleInjectedConnect}
+                        className="w-full bg-[#050505] text-white p-6 rounded-3xl flex items-center justify-between group active:scale-[0.98] transition-transform shadow-2xl shadow-indigo-500/10"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="p-2 bg-indigo-500/20 rounded-xl group-hover:bg-indigo-500 transition-colors">
+                                <Smartphone size={24} className="text-indigo-400 group-hover:text-white" />
+                            </div>
+                            <div className="text-left leading-none">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-50">Browser Extension</div>
+                                <div className="text-xl font-black uppercase tracking-tight italic">Abrir MetaMask</div>
+                            </div>
+                        </div>
+                        <MoveRight size={20} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+                    </button>
+
+                    <button 
+                        onClick={() => handleOpenInApp('chrome')}
+                        className="w-full bg-white border border-black/5 p-6 rounded-3xl flex items-center justify-between group active:scale-[0.98] transition-transform"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="p-2 bg-blue-100 rounded-xl group-hover:bg-blue-600 transition-colors">
+                                <Zap size={24} className="text-blue-600 group-hover:text-white" />
+                            </div>
+                            <div className="text-left leading-none">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-black/30">Google Workspace</div>
+                                <div className="text-xl font-black uppercase tracking-tight">Abrir Chrome</div>
+                            </div>
+                        </div>
+                        <MoveRight size={20} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+                    </button>
+
+                    <button 
+                        onClick={() => handleOpenInApp('firefox')}
+                        className="w-full bg-white border border-black/5 p-6 rounded-3xl flex items-center justify-between group active:scale-[0.98] transition-transform"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="p-2 bg-orange-100 rounded-xl group-hover:bg-orange-600 transition-colors">
+                                <Eye size={24} className="text-orange-600 group-hover:text-white" />
+                            </div>
+                            <div className="text-left leading-none">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1 text-black/30">Mozilla Core</div>
+                                <div className="text-xl font-black uppercase tracking-tight">Abrir Mozilla</div>
+                            </div>
+                        </div>
+                        <MoveRight size={20} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                </div>
+
+                <div className="mt-16 text-center">
+                    <p className="text-[9px] font-black font-mono text-black/20 uppercase tracking-[0.4em]">
+                        Sovereign End-to-End Encryption Enabled
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -195,24 +335,33 @@ export function MobileSovereignLanding() {
                                 <Smartphone size={22} className="text-indigo-400" />
                                 Connect MetaMask
                             </button>
+                        ) : !isSigned ? (
+                            <button
+                                onClick={handleSignAndAuthorize}
+                                disabled={isSigning}
+                                className="w-full bg-indigo-600 text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-indigo-500/20"
+                            >
+                                <CheckCircle2 size={22} className="text-white" />
+                                {isSigning ? 'Authorizing...' : 'Sign & Authorize'}
+                            </button>
                         ) : (
                             <div className="w-full bg-green-50 border border-green-200 font-bold py-6 rounded-2xl flex items-center justify-center gap-3">
                                 <CheckCircle2 size={22} className="text-green-500" />
                                 <span className="text-lg text-[#050505]">
-                                    {address?.slice(0, 6)}…{address?.slice(-4)}
+                                    Identity Linked
                                 </span>
                             </div>
                         )}
 
                         <button
                             onClick={handleScanClick}
-                            className="w-full mt-2 bg-transparent border-2 border-[#050505]/10 text-[#050505] font-black py-6 rounded-2xl flex items-center justify-between px-8 uppercase tracking-widest transition-all active:scale-[0.98] hover:bg-black/5"
+                            className={`w-full mt-2 bg-transparent border-2 ${isSigned ? 'border-indigo-500 text-indigo-600' : 'border-[#050505]/10 text-[#050505]/40'} font-black py-6 rounded-2xl flex items-center justify-between px-8 uppercase tracking-widest transition-all active:scale-[0.98]`}
                         >
                             <div className="flex items-center gap-4">
                                 <QrCode size={22} />
                                 <span>Scan PC Screen</span>
                             </div>
-                            <MoveRight size={22} className="text-[#050505]/20" />
+                            <MoveRight size={22} className="opacity-20" />
                         </button>
                     </div>
                 </motion.div>
@@ -223,46 +372,77 @@ export function MobileSovereignLanding() {
 
 // ─── QR SCANNER VIEW ──────────────────────────────────────────────────────────
 function MobileQRScanner({ onBack }: { onBack: () => void }) {
-    const { address } = useAccount();
+    const { address, isConnected } = useAccount();
 
     useEffect(() => {
-        if (!address) {
-            toast.error('Please connect your MetaMask wallet first.');
+        if (!isConnected || !address) {
+            toast.error('Identity handshake required.');
             onBack();
             return;
         }
 
         let scanner: Html5QrcodeScanner | null = null;
-        try {
-            scanner = new Html5QrcodeScanner(
-                'sovereign-qr-reader',
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                false
-            );
-            scanner.render(async (decodedText) => {
-                if (scanner) scanner.clear();
-                try {
-                    const res = await fetch('/api/auth/qr-sync', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token: decodedText, address }),
-                    });
-                    if (res.ok) {
-                        toast.success('Successfully connected to PC!');
-                    } else {
-                        toast.error('Sync failed: ' + await res.text());
+        
+        // Use a small timeout to ensure DOM is ready
+        const timeout = setTimeout(() => {
+            try {
+                // Clear any existing instance first
+                const existing = document.getElementById('sovereign-qr-reader');
+                if (existing) existing.innerHTML = '';
+
+                scanner = new Html5QrcodeScanner(
+                    'sovereign-qr-reader',
+                    { 
+                        fps: 15, 
+                        qrbox: { width: 250, height: 250 },
+                        aspectRatio: 1.0
+                    },
+                    false
+                );
+
+                scanner.render(async (decodedText) => {
+                    if (scanner) {
+                        try {
+                            await scanner.clear();
+                        } catch (e) {}
                     }
-                } catch (e: any) {
-                    toast.error('Sync error: ' + e.message);
-                } finally {
-                    onBack();
-                }
-            }, () => {});
-        } catch (e) {
-            console.error('Scanner init error:', e);
-        }
-        return () => { scanner?.clear().catch(() => {}); };
-    }, [address, onBack]);
+                    
+                    try {
+                        const res = await fetch('/api/auth/qr-sync', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: decodedText, address }),
+                        });
+                        if (res.ok) {
+                            toast.success('Neural Handshake Complete', {
+                                description: 'PC Terminal is now unlocked.'
+                            });
+                        } else {
+                            const errText = await res.text();
+                            toast.error('Sync failed: ' + errText);
+                        }
+                    } catch (e: any) {
+                        toast.error('Handshake Error');
+                    } finally {
+                        onBack();
+                    }
+                }, (error) => {
+                    // Quietly handle scan errors (common during focus etc)
+                });
+            } catch (e) {
+                console.error('Scanner init error:', e);
+                toast.error('Camera Access Failed');
+                onBack();
+            }
+        }, 100);
+
+        return () => { 
+            clearTimeout(timeout);
+            if (scanner) {
+                scanner.clear().catch(() => {});
+            }
+        };
+    }, [address, isConnected, onBack]);
 
     return (
         <div className="h-[100dvh] bg-[#050505] text-white flex flex-col w-full">
