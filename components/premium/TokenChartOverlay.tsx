@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Maximize2, Activity, ShieldCheck, Droplets, TrendingUp, TrendingDown } from 'lucide-react';
+import { X, Activity, Droplets, TrendingUp, TrendingDown, ShieldCheck } from 'lucide-react';
 import { WhaleMomentumChart } from '@/components/network/whale/WhaleMomentumChart';
 import { useVIPStore, EMPTY_ARRAY } from '@/lib/vip-store';
 
@@ -14,19 +14,24 @@ interface OverlayProps {
 export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
     const s = symbol.toUpperCase().trim();
     const tokenEvents = useVIPStore(state => state.tokenFeeds[s] || EMPTY_ARRAY);
-    const candles = useVIPStore(state => state.candleFeeds[s] || EMPTY_ARRAY);
-    
-    const lastPrice = candles.length > 0 ? candles[0].haClose : 0;
-    const isBull = candles.length > 1 ? candles[0].haClose >= candles[1].haClose : true;
+    const candles    = useVIPStore(state => state.candleFeeds[s] || EMPTY_ARRAY);
 
-    // Prevent body scroll
+    const lastPrice  = candles.length > 0 ? candles[0].haClose : 0;
+    const prevPrice  = candles.length > 1 ? candles[1].haClose : lastPrice;
+    const pct        = prevPrice > 0 ? ((lastPrice - prevPrice) / prevPrice) * 100 : 0;
+    const isBull     = pct >= 0;
+    const vol1h      = candles.reduce((acc, c) => acc + (c.volume || 0), 0);
+    const minP       = candles.length > 0 ? Math.min(...candles.map(c => c.haLow))  : 0;
+    const maxP       = candles.length > 0 ? Math.max(...candles.map(c => c.haHigh)) : 0;
+
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = 'unset'; };
     }, []);
 
-    const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
-    const fmtVol = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+    const fmt  = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
+    const fmtC = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+    const fmtP = (n: number, maxFrac = 0) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: maxFrac }).format(n);
 
     return (
         <AnimatePresence>
@@ -34,123 +39,147 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-2xl flex flex-col p-4 md:p-10 safe-top safe-bottom"
+                className="fixed inset-0 z-[9999] bg-[#080808]/95 backdrop-blur-3xl flex flex-col overflow-hidden"
             >
-                {/* Immersive Background Elements */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
-                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/20 blur-[120px] rounded-full" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-rose-500/10 blur-[120px] rounded-full" />
+                {/* Ambient Glow */}
+                <div className="absolute inset-0 pointer-events-none">
+                    <div className={`absolute top-0 left-1/4 w-[50%] h-[30%] blur-[160px] rounded-full opacity-10 ${isBull ? 'bg-emerald-400' : 'bg-rose-500'}`} />
+                    <div className="absolute bottom-0 right-0 w-[30%] h-[40%] bg-[var(--aztec-orchid)]/10 blur-[120px] rounded-full" />
                 </div>
 
-                {/* Header Section */}
-                <div className="flex items-center justify-between z-10 mb-8">
+                {/* ── TOP HEADER BAR ── */}
+                <div className="relative z-10 flex items-center justify-between px-8 pt-6 pb-4 border-b border-white/5">
+                    
+                    {/* Left: Token identity */}
                     <div className="flex items-center gap-6">
-                        <div className="flex flex-col">
+                        <div>
                             <div className="flex items-baseline gap-3">
-                                <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase">{s}</h1>
-                                <span className={`text-xl font-mono font-bold ${isBull ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                <span className="font-aztec-h1 text-5xl uppercase text-white tracking-tighter leading-none">{s}</span>
+                                <span className={`font-mono text-2xl font-black tracking-tighter ${isBull ? 'text-emerald-400' : 'text-rose-400'}`}>
                                     {fmt(lastPrice)}
                                 </span>
-                            </div>
-                            <div className="flex items-center gap-4 mt-2">
-                                <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
-                                    <Activity className="w-3 h-3 text-cyan-400" />
-                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Live Matrix</span>
-                                </div>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                                    Immersive Heikin-Ashi Analysis
+                                <span className={`font-aztec-h2 text-[11px] uppercase tracking-[0.25em] px-2.5 py-1 rounded-full border ${
+                                    isBull 
+                                        ? 'text-emerald-400 border-emerald-400/30 bg-emerald-400/5' 
+                                        : 'text-rose-400 border-rose-400/30 bg-rose-400/5'
+                                }`}>
+                                    {isBull ? '+' : ''}{pct.toFixed(2)}%
                                 </span>
+                            </div>
+                            {/* Sub-row: compact meta */}
+                            <div className="flex items-center gap-5 mt-2">
+                                <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/20">Heikin-Ashi 1m</span>
+                                <span className="w-px h-3 bg-white/10" />
+                                <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/20">
+                                    Vol — <span className="text-white/50">${fmtC(vol1h)}</span>
+                                </span>
+                                <span className="w-px h-3 bg-white/10" />
+                                <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/20">
+                                    {minP > 0 && maxP > 0 ? `${fmtP(minP, 0)} — ${fmtP(maxP, 0)}` : '—'}
+                                </span>
+                                <span className="w-px h-3 bg-white/10" />
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--aztec-orchid)] animate-pulse" />
+                                    <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-[var(--aztec-orchid)]/80">Live</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <button 
+
+                    {/* Right: Close */}
+                    <button
                         onClick={onClose}
-                        className="p-4 hover:bg-white/10 rounded-full transition-colors text-white group"
+                        className="p-2.5 rounded-xl hover:bg-white/5 border border-white/10 hover:border-white/20 transition-all text-white/40 hover:text-white group"
                     >
-                        <X className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                        <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
                     </button>
                 </div>
 
-                {/* Main Viewport */}
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-8 overflow-hidden z-10">
-                    
-                    {/* Immersive Chart (Left 3/4) */}
-                    <div className="lg:col-span-3 flex flex-col bg-white/[0.02] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl">
-                        <div className="flex-1 p-6 relative">
+                {/* ── MAIN CONTENT ── */}
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-0 overflow-hidden z-10">
+
+                    {/* Chart */}
+                    <div className="flex flex-col overflow-hidden border-r border-white/5">
+                        <div className="flex-1 p-6">
                             <WhaleMomentumChart symbol={s} showAxes={true} />
                         </div>
                     </div>
 
-                    {/* Metadata & Signals (Right 1/4) */}
-                    <div className="flex flex-col gap-8 h-full overflow-hidden">
-                        
-                        {/* Token Core Metrics */}
-                        <div className="bg-white/[0.03] border border-white/10 rounded-[32px] p-6 space-y-6">
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-500 tracking-widest">
-                                <span>Core Telemetry</span>
-                                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    {/* Right Sidebar */}
+                    <div className="flex flex-col overflow-hidden bg-[#050505]">
+
+                        {/* Stats strip */}
+                        <div className="px-5 py-4 border-b border-white/5 grid grid-cols-2 gap-4">
+                            <div>
+                                <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">1h Volume</div>
+                                <div className="font-mono text-sm font-black text-white">${fmtC(vol1h)}</div>
                             </div>
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase">Volume (1H)</span>
-                                    <p className="text-xl font-black text-white font-mono">${fmtVol(candles.reduce((acc, c) => acc + c.volume, 0))}</p>
+                            <div>
+                                <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">Momentum</div>
+                                <div className={`font-aztec-h2 text-[11px] uppercase tracking-wide font-black ${isBull ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {isBull ? '▲ Bullish' : '▼ Bearish'}
                                 </div>
-                                <div className="space-y-1">
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase">Trend Strength</span>
-                                    <p className={`text-xl font-black font-mono ${isBull ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                        {isBull ? 'STRONG' : 'WEAK'}
-                                    </p>
-                                </div>
+                            </div>
+                            <div>
+                                <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">24h Low</div>
+                                <div className="font-mono text-sm font-black text-white/70">{minP > 0 ? fmtP(minP, 0) : '—'}</div>
+                            </div>
+                            <div>
+                                <div className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/20 mb-1">24h High</div>
+                                <div className="font-mono text-sm font-black text-white/70">{maxP > 0 ? fmtP(maxP, 0) : '—'}</div>
                             </div>
                         </div>
 
-                        {/* Recent Large Transfers (Specific to this Token) */}
-                        <div className="flex-1 flex flex-col bg-white/[0.03] border border-white/10 rounded-[32px] overflow-hidden">
-                            <div className="p-6 border-b border-white/10 flex items-center justify-between">
-                                <span className="text-[10px] font-black uppercase text-white tracking-[0.2em]">Live Flow</span>
-                                <Droplets className="w-4 h-4 text-cyan-400 animate-pulse" />
+                        {/* Flow header */}
+                        <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Droplets className="w-3.5 h-3.5 text-[var(--aztec-orchid)] animate-pulse" />
+                                <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-white/50">Whale Flow</span>
                             </div>
-                            
-                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                                {tokenEvents.length > 0 ? (
-                                    <div className="space-y-3">
-                                        {tokenEvents.slice(0, 20).map((e, i) => (
-                                            <div key={i} className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-2">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-[10px] font-mono text-cyan-400">{e.wallet.slice(0, 8)}...</span>
-                                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded ${e.action === 'BUY' ? 'text-emerald-400 bg-emerald-400/10' : 'text-rose-400 bg-rose-400/10'}`}>
-                                                        {e.action}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between items-baseline">
-                                                    <span className="text-[14px] font-black text-white font-mono">{fmt(e.usdNum)}</span>
-                                                    <span className="text-[10px] text-slate-500 font-bold">{e.token}</span>
-                                                </div>
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500/60" />
+                        </div>
+
+                        {/* Flow list */}
+                        <div className="flex-1 overflow-y-auto custom-scrollbar">
+                            {tokenEvents.length > 0 ? (
+                                <div className="divide-y divide-white/[0.03]">
+                                    {tokenEvents.slice(0, 25).map((e, i) => (
+                                        <div key={i} className="px-5 py-3 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="font-mono text-[10px] text-white/30 group-hover:text-white/50 transition-colors">
+                                                    {e.wallet.slice(0, 10)}…
+                                                </span>
+                                                <span className="font-mono text-[13px] font-black text-white">{fmt(e.usdNum)}</span>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="h-full flex items-center justify-center opacity-30">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">No Flow Detected</span>
-                                    </div>
-                                )}
+                                            <div className="flex flex-col items-end gap-0.5">
+                                                <span className={`font-aztec-h2 text-[9px] uppercase tracking-[0.25em] px-2 py-0.5 rounded border ${
+                                                    e.action === 'BUY' 
+                                                        ? 'text-emerald-400 border-emerald-400/20 bg-emerald-400/5' 
+                                                        : 'text-rose-400 border-rose-400/20 bg-rose-400/5'
+                                                }`}>{e.action}</span>
+                                                <span className="font-aztec-h2 text-[8px] uppercase tracking-[0.3em] text-white/20">{e.token}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="h-full flex flex-col items-center justify-center gap-3 p-8 opacity-30">
+                                    <Activity className="w-8 h-8 text-white" />
+                                    <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.4em] text-white text-center">
+                                        Awaiting flow data
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer signature */}
+                        <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
+                            <span className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/15">Whale Alert Corporation.</span>
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-1 h-1 rounded-full bg-[var(--aztec-orchid)] animate-pulse" />
+                                <span className="font-aztec-h2 text-[8px] uppercase tracking-[0.35em] text-white/15">ha v1.02</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Footer Controls */}
-                <div className="mt-8 flex justify-center items-center gap-10 opacity-40 hover:opacity-100 transition-opacity z-10 text-white">
-                    <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-emerald-500" />
-                        <span className="text-[8px] font-black uppercase tracking-widest">Heikin-Ashi v1.02</span>
-                    </div>
-                    <div className="h-4 w-px bg-white/10" />
-                    <div className="flex items-center gap-2">
-                        <TrendingDown className="w-4 h-4 text-rose-500" />
-                        <span className="text-[8px] font-black uppercase tracking-widest">Persistent Sync Active</span>
                     </div>
                 </div>
             </motion.div>

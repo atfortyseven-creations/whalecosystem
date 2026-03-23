@@ -110,16 +110,17 @@ export function DropdownNav() {
                 }`}>
                     
                     {/* Logo Section */}
-                    <Link href="/" className="flex items-center gap-3 px-4 group">
-                        <div className="relative w-10 h-10">
+                    <Link href="/" className="flex items-center gap-4 px-4 group">
+                        <div className="relative w-14 h-14 shrink-0">
                             <img 
                                 src="/models/update/gradient-pink-diamond-balls-assortment (2).png"
-                                alt="Whale Alert"
-                                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-lg"
+                                alt="Whale Alert Corporation"
+                                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-[0_0_12px_rgba(192,86,221,0.6)]"
                             />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-xl font-black text-white tracking-tighter leading-none">WHALE ALERT</span>
+                        <div className="flex flex-col leading-none">
+                            <span className="font-aztec-h2 text-[15px] uppercase tracking-[0.12em] text-white leading-tight">Whale Alert</span>
+                            <span className="font-aztec-h2 text-[11px] uppercase tracking-[0.3em] text-[var(--aztec-orchid)] leading-tight">Corporation.</span>
                         </div>
                     </Link>
 
