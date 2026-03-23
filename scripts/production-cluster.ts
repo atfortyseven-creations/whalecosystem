@@ -39,16 +39,22 @@ startProcess('INDEXER', 'npx', ['tsx', 'scripts/whale-worker.ts']);
 console.log("📡 [Sync] Sovereign Vault Scheduler Active.");
 setInterval(async () => {
     console.log("🔄 [Sync] Triggering Sovereign Vault Garbage Collection...");
-    try {
-        // We trigger the internal API to move old data to the local vault
-        const res = await fetch('http://localhost:3000/api/vault/sync', {
-            method: 'POST',
-            body: JSON.stringify({ payload_type: 'security_events' })
-        });
-        const data = await res.json();
-        console.log(`✅ [Sync] GC Result: ${data.message || 'Complete'}`);
-    } catch (err: any) {
-        console.warn(`⚠️ [Sync] Scheduler failed (Normal if Local Vault is offline): ${err.message}`);
+    const payloadTypes = ['security_events', 'intel_items'];
+    
+    for (const payload_type of payloadTypes) {
+        try {
+            console.log(`📡 [Sync] Moving ${payload_type} to local vault...`);
+            // We trigger the internal API to move old data to the local vault
+            const res = await fetch('http://localhost:3000/api/vault/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payload_type })
+            });
+            const data = await res.json();
+            console.log(`✅ [Sync] ${payload_type} GC Result: ${data.message || 'Complete'}`);
+        } catch (err: any) {
+            console.warn(`⚠️ [Sync] ${payload_type} sync failed: ${err.message}`);
+        }
     }
 }, 1000 * 60 * 60 * 24); // 24 hours
 

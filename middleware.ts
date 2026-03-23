@@ -96,25 +96,25 @@ export default clerkMiddleware(async (auth, request) => {
     // 4. Final Header Injection & CSP
     const response = NextResponse.next();
 
-    // STRICT CONTENT SECURITY POLICY (CSP)
+    // STRICT CONTENT SECURITY POLICY (CSP) - EXPANDED FOR REOWN/APPKIT RELIABILITY
     const cspHeader = `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com https://*.walletconnect.com https://*.reown.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://accounts.google.com;
       style-src 'self' 'unsafe-inline' fonts.googleapis.com https://fonts.googleapis.com;
-      img-src 'self' blob: data: *.google-analytics.com *.googletagmanager.com *.clerk.com res.cloudinary.com https://*.walletconnect.com https://*.reown.com https://www.humanidfi.com;
+      img-src 'self' blob: data: *.google-analytics.com *.googletagmanager.com *.clerk.com res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://www.humanidfi.com https://*.googleusercontent.com;
       font-src 'self' fonts.gstatic.com data:;
-      connect-src 'self' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.walletconnect.com https://*.walletconnect.com https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us;
-      frame-src 'self' *.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com;
+      connect-src 'self' *.clerk.accounts.dev *.google-analytics.com *.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us;
+      frame-src 'self' *.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com;
       upgrade-insecure-requests;
     `.replace(/\s{2,}/g, ' ').trim();
 
     const securityHeaders = {
       'Content-Security-Policy': cspHeader,
       'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
+      'X-Frame-Options': 'SAMEORIGIN', // Changed from DENY to allow AppKit frames
       'X-XSS-Protection': '1; mode=block',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'X-Robots-Tag': 'noindex, nofollow', // Inhuman protection: hide deep pages from search engines
+      'X-Robots-Tag': 'noindex, nofollow',
     };
 
     Object.entries(securityHeaders).forEach(([key, val]) => {

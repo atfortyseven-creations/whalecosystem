@@ -41,6 +41,26 @@ const server = http.createServer((req, res) => {
             return;
         }
 
+        // 2. Pre-flight Disk Check (Institutional Safety)
+        try {
+            const stats = fs.statfsSync(STORAGE_DIR);
+            const freeSpaceGB = (Number(stats.bavail) * Number(stats.bsize)) / (1024 ** 3);
+            
+            if (freeSpaceGB < 0.5) { // Minimum 500MB safety margin
+                throw new Error(`Insufficient disk space (Only ${freeSpaceGB.toFixed(2)} GB left)`);
+            }
+            
+            // Write access test
+            const testFile = path.join(STORAGE_DIR, '.health_check');
+            fs.writeFileSync(testFile, 'OK');
+            fs.unlinkSync(testFile);
+        } catch (healthErr) {
+            console.error(`[Vault] ⚠️  Health Check Failed: ${healthErr.message}`);
+            res.writeHead(503, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Vault Not Ready', detail: healthErr.message }));
+            return;
+        }
+
         let body = '';
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
@@ -51,10 +71,10 @@ const server = http.createServer((req, res) => {
                 const filename = `${payload_type}_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
                 const filePath = path.join(STORAGE_DIR, filename);
 
-                // 2. Atomic Save to Local Storage
+                // 3. Atomic Save to Local Storage
                 fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
 
-                console.log(`[Vault] ✅ Ingested ${data.length} records (${payload_type}) from ${source}`);
+                console.log(`[Vault] ✅ Ingested ${data?.length || 0} records (${payload_type}) from ${source}`);
                 console.log(`[Vault] 💾 Stored at: ${filePath}`);
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -71,10 +91,22 @@ const server = http.createServer((req, res) => {
         });
     } else if (req.url === '/vault/status' && req.method === 'GET') {
         const files = fs.readdirSync(STORAGE_DIR);
+        let diskInfo = { status: 'Unknown' };
+        
+        try {
+            const stats = fs.statfsSync(STORAGE_DIR);
+            diskInfo = {
+                status: 'HEALTHY',
+                free_gb: ((Number(stats.bavail) * Number(stats.bsize)) / (1024 ** 3)).toFixed(2),
+                total_gb: ((Number(stats.blocks) * Number(stats.bsize)) / (1024 ** 3)).toFixed(2)
+            };
+        } catch (e) { diskInfo.status = 'ERROR: ' + e.message; }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ 
             status: 'ACTIVE', 
             storage_path: STORAGE_DIR,
+            disk: diskInfo,
             archived_files: files.length 
         }));
     } else {
