@@ -24,11 +24,9 @@ export async function GET(req: Request) {
     };
 
     try {
-        // Fetch top markets by volume from Gamma API (richer data)
+        // Fetch recent/top markets (allowing both active and recently closed for persistence)
         const gammaUrl = new URL(`${GAMMA_API}/markets`);
         gammaUrl.searchParams.set('limit', String(limit));
-        gammaUrl.searchParams.set('active', 'true');
-        gammaUrl.searchParams.set('closed', 'false');
         gammaUrl.searchParams.set('order', 'volume24hr');
         gammaUrl.searchParams.set('ascending', 'false');
         
@@ -72,6 +70,8 @@ export async function GET(req: Request) {
                 image: m.image,
                 edge: Math.abs(0.5 - yesPrice),
                 evSignal: calcEV(yesPrice),
+                active: m.active !== undefined ? m.active : true,
+                closed: m.closed !== undefined ? m.closed : false,
             };
         });
 

@@ -20,6 +20,7 @@ interface PolyMarket {
     yesPrice: number; noPrice: number; volume24h: number; volumeTotal: number;
     liquidity: number; endDate?: string; edge: number;
     evSignal: 'OVERBOUGHT' | 'OVERSOLD' | 'LEAN_YES' | 'LEAN_NO' | 'NEUTRAL';
+    active?: boolean; closed?: boolean;
 }
 
 interface DeFiPool {
@@ -145,7 +146,7 @@ function PolymarketPanel() {
     const load = useCallback(async () => {
         setLoading(true); setError('');
         try {
-            const r = await fetch(`/api/polymarket/markets?limit=60&category=${cat}`);
+            const r = await fetch(`/api/polymarket/markets?limit=100&category=${cat}`);
             const d = await r.json();
             if (d.error) throw new Error(d.error);
             setMarkets(d.markets || []);
@@ -228,7 +229,12 @@ function PolymarketPanel() {
                                     onClick={() => setSelected(isActive ? null : m)}
                                 >
                                     <div style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis' }}>{m.question}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            {(!m.active || m.closed) && (
+                                                <span className="az-badge az-badge-rose" style={{ fontSize: 7, padding: '2px 4px', flexShrink: 0 }}>CERRADO</span>
+                                            )}
+                                            <span style={{ fontSize: 11, color: (!m.active || m.closed) ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis' }}>{m.question}</span>
+                                        </div>
                                         <span className="az-label" style={{ fontSize: 8 }}>{m.category}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -303,17 +309,25 @@ function PolymarketPanel() {
                                 </div>
                             </div>
                             <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                <a
-                                    href={`https://polymarket.com/market/${selected.slug}`}
-                                    target="_blank" rel="noopener noreferrer"
-                                    className="az-btn-primary"
-                                    style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
-                                >
-                                    TRADE <ExternalLink size={11} />
-                                </a>
-                                <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
-                                    Requiere USDC en Polygon. Se abrirá MetaMask para confirmar.
-                                </p>
+                                {(!selected.active || selected.closed) ? (
+                                    <div className="az-surface-2" style={{ padding: 12, textAlign: 'center', color: 'var(--az-rose)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em' }}>
+                                        MERCADO CERRADO
+                                    </div>
+                                ) : (
+                                    <>
+                                        <a
+                                            href={`https://polymarket.com/market/${selected.slug}`}
+                                            target="_blank" rel="noopener noreferrer"
+                                            className="az-btn-primary"
+                                            style={{ width: '100%', justifyContent: 'center', textDecoration: 'none' }}
+                                        >
+                                            TRADE <ExternalLink size={11} />
+                                        </a>
+                                        <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
+                                            Requiere USDC en Polygon. Se abrirá MetaMask para confirmar.
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         </motion.div>
                     )}
