@@ -977,9 +977,35 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Optimización de rutas multi-hop y fragmentación de liquidez inteligente.",
                 readTime: 230,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. Más allá del Smart Order Routing (SOR)</h2>
-                        <p>Los agregadores de primera generación simplemente buscaban el mejor precio en un solo paso. La segunda generación (vía 1inch Pathfinder o CoW Swap) utiliza algoritmos de búsqueda en grafos para fragmentar una sola orden en múltiples rutas y protocolos simultáneamente, minimizando el impacto de mercado total mediante la 'coincidencia de intenciones'.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Más Allá del Smart Order Routing (SOR): Arquitectura de Grafos</h2>
+                        <p>Los agregadores de primera generación modelaban la liquidez como una lista comparativa simple. La segunda generación inició una revolución cognitiva modelando la liquidez descentralizada como un <strong>Grafo Dirigido con Peso</strong>. Cada DEX es un nodo; cada par de activos es una arista ponderada con la cotización en tiempo real. Plataformas como <strong>1inch Pathfinder v3</strong> resuelven el Problema del Camino Más Corto Generalizado (Bellman-Ford adaptado) para fragmentar una sola orden en docenas de micro-rutas concurrentes que consumen bolsas de liquidez descoordinadas simultáneamente, reduciendo el impacto total de mercado a fracciones de punto básico.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. CoW Protocol y la Tecnología de Coincidencia de Intenciones (Intent-Based)</h2>
+                        <p>La innovación más radical es el paradigma <strong>Intent-Based Execution</strong>. El usuario firma un Intento que describe el resultado deseado sin especificar cómo. Los <em>Solvers</em> compiten codiciosamente en una subasta interna, incluyendo coincidencias P2P entre usuarios opuestos que eliminan el AMM completamente. El resultado son precios estructuralmente superiores a los de cualquier DEX individual, con protección inherente contra MEV.</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 180" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <ellipse cx="150" cy="90" rx="100" ry="45" fill="rgba(77,148,255,0.1)" stroke="#4d94ff" stroke-width="2" />
+                                <text x="150" y="85" fill="#4d94ff" text-anchor="middle" style="font-weight: bold;">Usuario A</text>
+                                <text x="150" y="105" fill="#fff" text-anchor="middle" style="font-size: 11px;">Vende 1000 ETH</text>
+                                
+                                <ellipse cx="650" cy="90" rx="100" ry="45" fill="rgba(255,77,77,0.1)" stroke="#ff4d4d" stroke-width="2" />
+                                <text x="650" y="85" fill="#ff4d4d" text-anchor="middle" style="font-weight: bold;">Usuario B</text>
+                                <text x="650" y="105" fill="#fff" text-anchor="middle" style="font-size: 11px;">Compra 1000 ETH</text>
+
+                                <path d="M250 90 L370 70" stroke="#4dff88" stroke-width="2" stroke-dasharray="4" />
+                                <path d="M550 90 L430 110" stroke="#4dff88" stroke-width="2" stroke-dasharray="4" />
+                                
+                                <rect x="370" y="55" width="100" height="70" fill="rgba(77,255,136,0.15)" stroke="#4dff88" stroke-width="2" rx="8" />
+                                <text x="420" y="85" fill="#4dff88" text-anchor="middle" style="font-weight: bold; font-size: 11px;">CoW</text>
+                                <text x="420" y="105" fill="#fff" text-anchor="middle" style="font-size: 10px;">Solver P2P</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 1: Coincidencia de Órdenes P2P en CoW Protocol, eliminando AMM slippage y MEV por completo.</p>
+                        </div>
                     </section>
                 </div>`
             },
@@ -989,9 +1015,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Hedging y optimización de rangos basados en correlación y reversión a la media.",
                 readTime: 250,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. Provisión de Liquidez como Estrategia de Volatilidad</h2>
-                        <p>Ser LP en un AMM es equivalente a vender una opción de volatilidad (Short Vol). El arbitraje estadístico permite a los LPs mitigar el riesgo de delta mediante el uso de derivados o la apertura de posiciones inversas en pools altamente correlacionados. El objetivo es capturar el 'Fee Income' mientras se mantiene una exposición neutral al mercado.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Provisión de Liquidez como Venta de Volatilidad (Short Vol)</h2>
+                        <p>Contribuir al libro de liquidez de un AMM es funcionalmente equivalente a escribir opciones de <em>straddle</em> en el mercado de derivados TradFi. Al depositar un par de activos, el LP acuerda implícitamente vender el activo que se aprecia y adquirir el que se deprecia a medida que los arbitragistas reequilibran el ratio del pool. Esta dinámica genera una pérdida estructural no lineal (Impermanent Loss) que se convierte en un derivado de volatilidad vendido implícitamente. El capital del LP solo es rematablemente rentable si los ingresos por comisiones (Fee Income) superan el coste de la volatilidad realizada (Realized Vol) durante el período completo de provisión.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Delta Hedging Cuantitativo y Market Making Neutral</h2>
+                        <p>Los fondos cuantitativos Tier-1 (como Arrakis Finance o Gamma Strategies) gestionan LPs programados con estrategias activas de <strong>Delta Hedging</strong>: cada vez que el precio se aleja del rango de provisión, el algoritmo abre posiciones inversas en perpetuos (Hyperliquid, dYdX) para neutralizar la exposición direccional. El resultado es una estrategia pura de captura de comisiones, inmune al precio subyacente. El análisis forense de estas estrategias revela grandes posiciones LP on-chain correlacionadas con tamaños equivalentes de posición corta en perps off-chain: la firma inequívoca de un Delta-Neutral Market Maker institucional.</p>
                     </section>
                 </div>`
             },
@@ -1001,9 +1033,36 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Análisis de riesgos sistémicos en protocolos de crédito y derivados.",
                 readTime: 250,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Mecanismo de Liquidación</h2>
-                        <p>En protocolos de Lending (Aave, Maker), la insolvencia se evita mediante subastas de liquidación activadas cuando el ratio de colateral cae por debajo del umbral crítico. El análisis forense de una cascada implica rastrear cómo una liquidación masiva genera slippage, el cual reduce el precio del colateral e induce nuevas liquidaciones en un bucle de retroalimentación negativa potente.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Dinámica de la Insolvencia: Correlación Reversa y Cascada</h2>
+                        <p>Los protocolos de crédito (Aave, MakerDAO) mantienen la solvencia mediante un mecanismo de liquidación atomizado. Cuando el valor del colateral (LTV) cruza el umbral crítico, se activa una subasta donde agentes externos (Liquidators) compran el colateral con descuento. El riesgo sistémico surge cuando una caída abrupta en el precio de un activo (ej. ETH) liquida miles de posiciones simultáneamente, inundando el mercado con órdenes de venta que hunden más el precio, creando una espiral de retroalimentación negativa denominada <strong>Cascada de Liquidación</strong>.</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 220" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <!-- Price Drop -->
+                                <path d="M50 50 L150 150 L250 100 L350 200" stroke="#ff4d4d" stroke-width="3" fill="none" />
+                                <text x="50" y="40" fill="#ff4d4d">Caída de Precio</text>
+
+                                <!-- Trigger -->
+                                <line x1="150" y1="150" x2="450" y2="150" stroke="#fff" stroke-dasharray="4" />
+                                <text x="460" y="155" fill="#fff" style="font-size: 10px;">Umbral de Liquidación</text>
+
+                                <!-- Loop -->
+                                <circle cx="550" cy="110" r="50" fill="none" stroke="#ffa600" stroke-width="2" stroke-dasharray="5" />
+                                <text x="550" y="105" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">LOOP</text>
+                                <text x="550" y="125" fill="#fff" text-anchor="middle" style="font-size: 10px;">Venta Forzada -> +Slippage</text>
+                                
+                                <path d="M500 110 L450 110" stroke="#ff4d4d" marker-end="url(#arrowhead)" />
+                                <path d="M600 110 L650 110" stroke="#ff4d4d" marker-end="url(#arrowhead)" />
+                            </svg>
+                            <p class="diagram-caption">Figura 1: Mecánica de retroalimentación en cascadas de liquidación sistémica.</p>
+                        </div>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Análisis Forense: El "Bad Debt" y la Socialización de Pérdidas</h2>
+                        <p>En condiciones de extrema volatilidad, el slippage en los DEX puede ser mayor que el incentivo de liquidación. Si la deuda supera el valor recuperable del colateral, el protocolo incurre en <strong>Bad Debt</strong> (Deuda Incobrable). Para un fondo institucional, este es el riesgo último de contraparte: la insolvencia del pool de liquidez, que obliga al protocolo a acuñar tokens de gobernanza de forma inflacionaria o a socializar las pérdidas entre los depositantes (Backstop Facilitiy).</p>
                     </section>
                 </div>`
             },
@@ -1013,9 +1072,44 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Tokenización y reutilización de posiciones de liquidez en el ecosistema DeFi.",
                 readTime: 240,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Reciclaje del Capital</h2>
-                        <p>Los NFTs de Uniswap V3 o los tokens LP de Balancer no son solo recibos de depósito; representan derechos de flujo de caja que pueden ser colateralizados. Los 'Liquidity Derivatives' permiten a los fondos obtener préstamos contra sus posiciones de mercado, liberando liquidez sin cerrar sus rangos de provisión activos.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Compositividad Financiera: LPs como Activos de Reserva</h2>
+                        <p>En la arquitectura DeFi tradicional, ser un Liquidity Provider (LP) significaba tener capital pasivo. La revolución de los <strong>Derivados de Liquidez</strong> ha transformado los recibos de depósito (LP Tokens o ERC-721 en Uniswap V3) en colateral hiper-eficiente. Al tokenizar la posición de liquidez, un fondo puede mantener su exposición a las comisiones del pool mientras utiliza ese mismo "derecho de cobro" como garantía para obtener préstamos o apalancamiento.</p>
+                    </section>
+                    
+                    <section class="pro-section">
+                        <h2>II. Riesgo de Rehipoteca y Fragmentación de Capas</h2>
+                        <p>Este paradigma introduce el riesgo de <strong>Rehipoteca Encadenada</strong>. Si un LP Token de Uniswap se deposita en una bóveda (Vault), y ese token de la bóveda se usa como colateral en Aave, una falla en el AMM subyacente colapsa toda la torre de crédito. El analista institucional debe mapear la profundidad de la pila de compositividad para evaluar el "efecto contagio" en caso de un desequilibrio atómico en el pool original.</p>
+                        
+                        <div class="technical-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Capa</th>
+                                        <th>Activo</th>
+                                        <th>Riesgo Forense</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Base</td>
+                                        <td>Asset A + Asset B</td>
+                                        <td>Impermanent Loss, Price Risk</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Derivada</td>
+                                        <td>LP Token (Receipt)</td>
+                                        <td>Smart Contract Bug (AMM)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Compositiva</td>
+                                        <td>Collateralized LP</td>
+                                        <td>Liquidation Cascade, Solvency</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1025,9 +1119,35 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Convergencia entre regulación financiera y descentralización programable.",
                 readTime: 300,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. La Capa de Cumplimiento (Compliance Layer)</h2>
-                        <p>El futuro institucional de las criptofinanzas no reside en el mempool público, sino en redes 'permissioned' (ej. Canton Network, Hyperledger Bevel) y sub-redes privadas de Ethereum. Estas plataformas integran KYT (Know Your Transaction) y AML en el nivel de protocolo, garantizando que el capital solo interactúe con contrapartes verificadas sin perder las ventajas de la ejecución atómica.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. La Red Privada vs Mempool Público</h2>
+                        <p>El flujo institucional está migrando del mempool público hacia entornos <strong>Permissioned</strong> y Order Flow Privado. La adopción de redes como <em>Enterprise Ethereum</em> o subnets privadas permite a las instituciones cumplir con KYC/AML a nivel de protocolo, garantizando que sus transacciones no interactúen con billeteras sancionadas. Esto crea un mercado de dos niveles: el DeFi público permissionless y el DeFi institucional amurallado.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Programabilidad del Cumplimiento (Compliance-as-Code)</h2>
+                        <p>El futuro reside en los <strong>Privacy-Preserving Protocols</strong> que utilizan Zero-Knowledge Proofs (ZKP) para demostrar cumplimiento regulatorio sin exponer la estrategia de trading o el balance total. Para la Whale Academy, esto representa el clímax de la soberanía: control absoluto de la identidad y el flujo de datos, operando con eficiencia institucional pero con la privacidad del "Bosque Oscuro".</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 150" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <rect x="50" y="50" width="150" height="50" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
+                                <text x="125" y="80" fill="#4dff88" text-anchor="middle">Institución</text>
+                                
+                                <path d="M200 75 L300 75" stroke="#fff" marker-end="url(#arrowhead)" />
+                                <text x="250" y="65" fill="#fff" text-anchor="middle" style="font-size: 10px;">ZK-Proof</text>
+                                
+                                <rect x="300" y="40" width="200" height="70" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
+                                <text x="400" y="70" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">Compliance Validator</text>
+                                <text x="400" y="90" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Protocol Level)</text>
+                                
+                                <path d="M500 75 L600 75" stroke="#4d94ff" marker-end="url(#arrowhead)" />
+                                
+                                <rect x="620" y="50" width="150" height="50" fill="rgba(77,148,255,0.1)" stroke="#4d94ff" stroke-width="2" />
+                                <text x="695" y="80" fill="#4d94ff" text-anchor="middle">Market Access</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 5: Flujo de validación institucional mediante pruebas de conocimiento cero.</p>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1037,9 +1157,24 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Nuevos paradigmas de eficiencia en gas mediante almacenamiento efímero.",
                 readTime: 280,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Costo del Estado Permanente</h2>
-                        <p>Historicamente, cada actualización de balance en un AMM requería un <code>SSTORE</code> costoso (20,000 gas). Con el EIP-1153 (Transient Storage), los protocolos como Uniswap V4 pueden gestionar 'Flash Accountancy', donde los balances netos se verifican solo al final de la transacción (Settlement), permitiendo swaps multi-hop con un costo marginal cercano a cero.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Optimización del Gas: Del Almacenamiento Persistente al Efímero</h2>
+                        <p>Históricamente, la EVM penalizaba la complejidad de los swaps multi-hop debido al alto costo del opcode <code>SSTORE</code> (20,000 gas), que escribe datos en el estado permanente de la blockchain. El <strong>EIP-1153</strong> introduce el <em>Transient Storage</em> (<code>TSTORE</code> / <code>TLOAD</code>), permitiendo a los protocolos almacenar datos que se borran automáticamente al final de la transacción. Esto habilita el paradigma de <strong>Flash Accounting</strong>, donde el sistema solo verifica que el "Net Balance" sea cero al clímax de la ejecución, ignorando los estados intermedios costosos.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Uniswap V4 y el Diseño de Single-Singleton</h2>
+                        <p>A diferencia de V3, donde cada pool es un contrato independiente, Uniswap V4 utiliza un único contrato (Singleton) para todos los pools. Combinado con Flash Liquidity, esto elimina la necesidad de transferir tokens entre contratos durante un swap complejo. Para el analista forense, esto significa que las transacciones de V4 tendrán un rastro de <strong>Internal Calls</strong> mucho más limpio, con transferencias de tokens reales ocurriendo solo en la entrada y salida de la "burbuja" de ejecución.</p>
+                        
+                        <div class="technical-box">
+                            <strong>Beneficios del Almacenamiento Transitorio:</strong>
+                            <ul>
+                                <li>Reducción del ~90% en costos de gas para rutas complejas.</li>
+                                <li>Eliminación de ataques de reentrada basados en estados intermedios de balance.</li>
+                                <li>Capacidad de implementar "Hooks" personalizados que ejecutan lógica arbitraria antes/después del swap sin penalización de gas excesiva.</li>
+                            </ul>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1049,9 +1184,36 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Diferenciación de tipos de órdenes y su impacto en la rentabilidad de los LPs.",
                 readTime: 250,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. Anatomía del Flujo Informado</h2>
-                        <p>El flujo informado proviene de actores que poseen una ventaja de datos (ej. conocimiento de un movimiento inminente en un CEX). En el momento en que este flujo llega al AMM, el LP se convierte en un 'vendedor forzado' a un precio desactualizado. El análisis forense detecta esto mediante la correlación entre swaps de gran volumen y cambios bruscos de volatilidad en segundos previos.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Asimetría de Información: El Predador del LP</h2>
+                        <p>En el ecosistema DeFi, no todo el volumen es igual. El <strong>Flujo Informado</strong> proviene de actores que poseen datos externos (ej. cambios de precio en Binance o Coinbase antes de que se reflejen on-chain) y utilizan el AMM como contraparte forzada. El LP sufre <strong>LVR (Loss-Versus-Rebalancing)</strong>, una pérdida real frente a una estrategia de arbitraje ideal. El "Flujo Tóxico" es aquel que extrae valor sistemáticamente del pool, dejando al LP con una "bolsa" de activos depreciados.</p>
+                    </section>
+                    
+                    <section class="pro-section">
+                        <h2>II. Heurísticas de Detección Forense</h2>
+                        <p>Un analista institucional identifica el flujo tóxico mediante el análisis de <strong>Sub-Second Arbitrage</strong>. Si una transacción de gran volumen ocurre inmediatamente después de un movimiento de precio en un CEX, y es seguida por un rebalanceo del pool, es flujo informado. Las instituciones utilizan <em>Dynamic Fees</em> o <em>Private RPCs</em> para mitigar esta extracción, intentando atraer flujo "Retail" (no informado) que es el que genera rentabilidad real para el Market Maker.</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 200" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <rect x="50" y="40" width="120" height="40" fill="rgba(255,77,77,0.1)" stroke="#ff4d4d" stroke-width="2" />
+                                <text x="110" y="65" fill="#ff4d4d" text-anchor="middle">Binance Price 📉</text>
+                                
+                                <path d="M170 60 L300 100" stroke="#fff" marker-end="url(#arrowhead)" />
+                                <text x="235" y="75" fill="#fff" text-anchor="middle" style="font-size: 10px;">Información Arrabalera</text>
+                                
+                                <rect x="300" y="80" width="200" height="60" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
+                                <text x="400" y="110" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">AMM Arbitrage 🚨</text>
+                                <text x="400" y="130" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Toxic Flow)</text>
+                                
+                                <path d="M500 110 L630 110" stroke="#4dff88" marker-end="url(#arrowhead)" />
+                                
+                                <rect x="630" y="80" width="120" height="60" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
+                                <text x="690" y="110" fill="#4dff88" text-anchor="middle">LP Profit: ❌</text>
+                                <text x="690" y="130" fill="#fff" text-anchor="middle" style="font-size: 10px;">Extracto LVR</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 7: Circuito de extracción de valor mediante flujo informado y arbitraje latente.</p>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1061,9 +1223,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Evaluación de la solvencia de protocolos y el riesgo de ejecución atómica.",
                 readTime: 230,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Riesgo del Smart Contract</h2>
-                        <p>En DeFi, la contraparte no es una persona, sino un código. El riesgo de contraparte se manifiesta en fallas lógicas, reentradas o manipulación de oráculos. Para una institución, la gestión de este riesgo implica auditorías en tiempo real y sistemas de 'Circuit Breakers' que desconecten el flujo de capital si se detectan anomalías en el estado del contrato.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. El Smart Contract como Contraparte Solvente</h2>
+                        <p>En el mercado tradicional, el riesgo de contraparte se gestiona mediante colaterales en cámaras de compensación. En DeFi, la contraparte es el <strong>Código</strong>. El riesgo no es solo la insolvencia financiera, sino la <em>falla lógica</em>. Un contrato puede ser solvente hoy pero vulnerable a una manipulación de estado mañana. La Whale Academy enfoca el análisis en la <strong>Inmutabilidad Selectiva</strong>: ¿puede el dueño del contrato pausar retiros o alterar los oráculos de precio unilateralmente?</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Auditoría del Poder: Admin Keys y Timelocks</h2>
+                        <p>El riesgo institucional más subestimado es el compromiso de las llaves de administración. Si un protocolo tiene una Wallet de 1 de 1 controlando el timelock, el riesgo de contraparte es humano, no algorítmico. Exigimos estructuras de <strong>Multisig (Gnosis Safe)</strong> con un quórum de actores independientes y un retraso mínimo de 48 horas en cambios críticos, permitiendo al capital institucional evacuar antes de que una política maliciosa o errónea entre en vigor.</p>
                     </section>
                 </div>`
             },
@@ -1073,9 +1241,24 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Vulnerabilidades estructurales en la toma de decisiones descentralizada.",
                 readTime: 220,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Dilema de la Gobernanza</h2>
-                        <p>Los protocolos DeFi se rigen por DAOs donde el poder de voto suele estar concentrado en grandes ballenas. El riesgo pro-cíclico surge cuando las decisiones de la gobernanza (como reducir colaterales en mercados alcistas) exacerban la volatilidad. Para un analista forense, esto implica monitorear la concentración de tokens de voto y los periodos de 'timelock' para anticipar cambios de política que puedan poner en riesgo la estabilidad sistémica.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. La Plutocracia Algorítmica: El Riesgo de Concentración de Votos</h2>
+                        <p>La gobernanza DeFi (DAOs) se basa frecuentemente en el modelo <em>1 Token = 1 Vote</em>. Para una institución, esto representa un riesgo pro-cíclico masivo: una "ballena" o un competidor puede adquirir una posición dominante en el mercado secundario para forzar cambios en los parámetros de riesgo (ej. aumentar el LTV de un activo basura) y extraer valor del protocolo. El análisis forense de la gobernanza rastrea la <strong>Concentración Gini</strong> de los tokens de voto y la procedencia del capital (ej. ¿fue el voto financiado mediante un préstamo relámpago o Flash Loan?).</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Vectores de Ataque en Propuestas (Proposal Attacks)</h2>
+                        <p>Los atacantes sofisticados utilizan el <strong>Governance Layering</strong>: envían múltiples propuestas aparentemente inofensivas que, al ejecutarse en conjunto, crean una vulnerabilidad crítica. La defensa institucional exige periodos de <em>Timelock</em> obligatorios (mínimo 2-7 días) y sistemas de <strong>Guardianes de Pausa</strong> que puedan vetar propuestas maliciosas antes de su activación. La soberanía en este contexto implica no solo poseer activos, sino auditar activamente cada <code>calldata</code> enviado a la dirección del <em>Governor</em>.</p>
+                        
+                        <div class="technical-box">
+                            <strong>Indicadores de Riesgo de Gobernanza:</strong>
+                            <ul>
+                                <li><strong>Quórum Artificial:</strong> Uso de delegación masiva de última hora.</li>
+                                <li><strong>Dark DAO:</strong> Mercados secundarios para comprar votos sin poseer el activo subyacente.</li>
+                                <li><strong>Incentivos Desalineados:</strong> Votantes con posiciones cortas (Short) en el activo que están gobernando.</li>
+                            </ul>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1085,9 +1268,34 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Análisis forense de la degradación del precio de ejecución en entornos de baja liquidez.",
                 readTime: 240,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Fenómeno del Price Impact</h2>
-                        <p>El Price Impact es la variación inmediata del precio causada por el volumen de una transacción. En un AMM de producto constante, este impacto es determinista: <code>Impacto = 1 - (k / (x + Δx) * y)</code>.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Mecánica de Impacto: El Costo de la Liquidez Finita</h2>
+                        <p>En un AMM de Producto Constante (<em>x * y = k</em>), toda orden de mercado altera el ratio de reservas y, por tanto, el precio. El <strong>Price Impact</strong> es la diferencia entre el precio de mercado actual y el precio de ejecución estimado <em>antes</em> de considerar los costos de red. Es una propiedad matemática intrínseca del tamaño de la orden frente a la profundidad del pool. Para órdenes institucionales de gran escala, el impacto puede ser del 5-20%, lo que exige estrategias de <strong>Fragmentación Temporal</strong> o el uso de algoritmos TWAP off-chain.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Slippage: La Incertidumbre del Tiempo de Bloque</h2>
+                        <p>A diferencia del Impacto, el <strong>Slippage</strong> (Deslizamiento) es la diferencia entre el precio esperado al enviar la transacción y el precio real al momento de la inclusión en el bloque. En redes de alta latencia o durante picos de volatilidad, el slippage puede ser devastador. La Whale Academy enseña el uso de <strong>Slippage Tolerance Masks</strong>: límites estrictos en el contrato que revierten la transacción si el precio final se desvía más de un micro-porcentaje predefinido (ej. 0.01%).</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 200" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <!-- Curve -->
+                                <path d="M100 180 Q150 150 700 30" stroke="#4d94ff" stroke-width="2" fill="none" />
+                                <text x="100" y="40" fill="#4d94ff">Curva de Producto Constante</text>
+
+                                <!-- Impact -->
+                                <circle cx="200" cy="140" r="5" fill="#4dff88" />
+                                <text x="210" y="145" fill="#4dff88" style="font-size: 10px;">Punto A (Initial)</text>
+                                
+                                <path d="M200 140 L500 65" stroke="#ff4d4d" stroke-dasharray="2" marker-end="url(#arrowhead)" />
+                                <text x="350" y="90" fill="#ff4d4d" style="font-weight: bold; font-size: 12px;">PRICE IMPACT</text>
+                                
+                                <circle cx="500" cy="65" r="5" fill="#ff4d4d" />
+                                <text x="510" y="70" fill="#ff4d4d" style="font-size: 10px;">Punto B (Execution)</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 10: Visualización geométrica del impacto de precio en un pool de liquidez finita.</p>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1097,9 +1305,39 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Decodificación de las métricas de rentabilidad real para proveedores de liquidez.",
                 readTime: 270,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. IL: El Espejismo de la Reversión</h2>
-                        <p>El Impermanent Loss (IL) mide la diferencia de valor entre mantener activos en un pool frente a holdearlos en una billetera. Sin embargo, el IL asume que el precio eventualmente volverá al punto de entrada, una premisa peligrosa en mercados direccionales donde el 'loss' se vuelve permanente.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Impermanent Loss (IL): El Costo de Oportunidad Convexo</h2>
+                        <p>El IL es la métrica tradicional que describe la pérdida de un LP al comparar su saldo contra una estrategia de <em>Holding</em> pasivo. Debido a la fórmula $x \cdot y = k$, el LP siempre vende el activo que sube y compra el que baja. Geométricamente, el IL es una función convexa: la pérdida se acelera a medida que el precio se desvía del punto de entrada. Para la Whale Academy, el IL es un "espejismo" que ignora que el precio rara vez regresa al equilibrio original, convirtiéndose en una pauta de pérdida permanente.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Loss-Versus-Rebalancing (LVR): La Fuga de Valor Atómica</h2>
+                        <p>A diferencia del IL, el <strong>LVR (Loss-Versus-Rebalancing)</strong> captura la pérdida real frente a una estrategia de arbitraje óptima. Es una métrica "path-independent" que mide cuánto valor extraen los arbitragistas (Searchers) cada vez que el precio en los exchanges centralizados (CEX) se mueve antes que en el AMM. El LVR es el costo de no tener un oráculo instantáneo. Las instituciones miden el LVR para decidir en qué pools proveer liquidez, buscando aquellos con menor latencia de sincronización y mayores comisiones de protección.</p>
+                        
+                        <div class="technical-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Métrica</th>
+                                        <th>Foco</th>
+                                        <th>Nivel de Análisis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Impermanent Loss</td>
+                                        <td>Saldo vs Holding</td>
+                                        <td>Retail / Básico</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LVR</td>
+                                        <td>Pérdida por Arbitraje</td>
+                                        <td>Institucional / Quante</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1109,9 +1347,36 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Provisión de liquidez oportunista y extracción de fees en un solo bloque.",
                 readTime: 230,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. La Mecánica del Francotirador de Liquidez</h2>
-                        <p>JIT Liquidity es una forma sofisticada de MEV. Cuando un searcher detecta un swap grande en el mempool, añade una cantidad ingente de liquidez en un rango extremadamente estrecho un paso antes del swap, y la retira inmediatamente después (Burn) en el mismo bloque.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. JIT Liquidity: El Francotirador de Comisiones</h2>
+                        <p>La liquidez <strong>Just-In-Time (JIT)</strong> es una variante de MEV donde un <em>Searcher</em> detecta una orden de gran volumen en el mempool y, en lugar de hacer front-run al precio, inyecta una cantidad masiva de liquidez concentrada en el único <em>Tick</em> donde se ejecutará el swap. Al hacerlo, el Searcher captura la gran mayoría de las comisiones generadas por ese trade, "diluyendo" a los LPs pasivos que estaban allí previamente. La liquidez entra y sale en el mismo bloque cinematográfico mediante una transacción atómica.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Impacto en el Ecosistema y Defensa</h2>
+                        <p>Aunque el usuario que realiza el swap se beneficia (recibe un precio mejor debido a la liquidez masiva inyectada), los LPs de largo plazo sufren una canibalización de sus ingresos. El análisis forense identifica JIT Liquidity mediante el patrón <strong>Mint -> Swap -> Burn</strong> en el mismo índice de transacción. La Whale Academy considera esto una "liquidez predadora" que obliga a los LPs institucionales a evolucionar hacia modelos de liquidez dinámica y Hooks de protección para penalizar retiros ultra-rápidos.</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 180" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <rect x="50" y="70" width="100" height="40" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
+                                <text x="100" y="95" fill="#4dff88" text-anchor="middle">Mint (JIT)</text>
+                                
+                                <path d="M150 90 L250 90" stroke="#fff" marker-end="url(#arrowhead)" />
+                                
+                                <rect x="250" y="50" width="300" height="80" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
+                                <text x="400" y="85" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">User Large Swap 💸</text>
+                                <text x="400" y="105" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Captura de Fees)</text>
+                                
+                                <path d="M550 90 L650 90" stroke="#fff" marker-end="url(#arrowhead)" />
+                                
+                                <rect x="650" y="70" width="100" height="40" fill="rgba(255,77,77,0.1)" stroke="#ff4d4d" stroke-width="2" />
+                                <text x="700" y="95" fill="#ff4d4d" text-anchor="middle">Burn (Exit)</text>
+                                
+                                <text x="400" y="150" fill="#fff" text-anchor="middle" style="font-size: 10px; font-style: italic;">Transacción Atómica de Bloque Único</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 12: Ciclo de vida de una posiciónpredadora JIT Liquidity en un bloque EVM.</p>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1121,9 +1386,35 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Dinámicas de convergencia de precios entre mercados off-chain and on-chain.",
                 readTime: 240,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El AMM como Receptor de Precios</h2>
-                        <p>En el estado actual, la mayoría de los AMMs son receptores de precios (Price Takers) de exchanges centralizados como Binance. El descubrimiento de precio ocurre mediante el arbitraje atómico que 'empuja' el precio del pool hacia el equilibrio global.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. El AMM como Esclavo de los Exchanges Centralizados (CEX)</h2>
+                        <p>En la microestructura actual del mercado, el descubrimiento de precios genuino ocurre en los Order Books de alta frecuencia de los CEX (Binance, Coinbase). El AMM actúa como un "seguidor de precio" (Price Taker). La convergencia se logra mediante el <strong>Arbitraje de Sincronización</strong>: cuando el precio en Binance se mueve, un Searcher ejecuta un swap en el AMM para capturar la diferencia, empujando algorítmicamente la constante <em>K</em> hacia el nuevo precio global equilibrado. El AMM no "sabe" cuánto vale el activo; solo reacciona a la presión de flujo externa.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Eficiencia de Información y Latencia Atómica</h2>
+                        <p>Para una institución, la velocidad de este descubrimiento es crítica. Si la latencia de sincronización es alta, el pool queda expuesto a un LVR masivo. El análisis forense mide el <strong>Time-to-Sync</strong>: el intervalo entre un movimiento significativo en el CEX y la primera transacción de arbitraje en el bloque EVM. Los protocolos modernos intentan reducir esta dependencia integrando oráculos de baja latencia (ej. Pyth) que permiten al AMM ajustar sus comisiones dinámicamente según la volatilidad externa detectada en microsegundos.</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 150" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <rect x="50" y="50" width="120" height="50" fill="rgba(77,148,255,0.1)" stroke="#4d94ff" stroke-width="2" />
+                                <text x="110" y="80" fill="#4d94ff" text-anchor="middle">Binance (CEX)</text>
+                                
+                                <path d="M170 75 L300 75" stroke="#fff" marker-end="url(#arrowhead)" />
+                                <text x="235" y="65" fill="#fff" text-anchor="middle" style="font-size: 10px;">Information Shift</text>
+                                
+                                <rect x="300" y="40" width="200" height="70" fill="rgba(255,166,0,0.1)" stroke="#ffa600" stroke-width="2" />
+                                <text x="400" y="70" fill="#ffa600" text-anchor="middle" style="font-weight: bold;">Arbitrage Delivery 📦</text>
+                                <text x="400" y="90" fill="#fff" text-anchor="middle" style="font-size: 10px;">(Price Discovery Agent)</text>
+                                
+                                <path d="M500 75 L630 75" stroke="#4dff88" marker-end="url(#arrowhead)" />
+                                
+                                <rect x="630" y="50" width="120" height="50" fill="rgba(77,255,136,0.1)" stroke="#4dff88" stroke-width="2" />
+                                <text x="690" y="80" fill="#4dff88" text-anchor="middle">Uniswap (AMM)</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 13: El flujo de información de precio desde mercados centralizados hacia la liquidez on-chain.</p>
+                        </div>
                     </section>
                 </div>`
             },
@@ -1133,9 +1424,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Diseño de protocolos que capturan y redistribuyen el valor extraíble (MEV) a los LPs.",
                 readTime: 260,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Fin del Arbitraje Laissez-Faire</h2>
-                        <p>Los McAMMs (MEV-Capturing AMMs) integran mecanismos de subasta en el propio contrato para que el valor del 'primer trade' de un bloque sea capturado por el protocolo en lugar de por searchers externos.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. McAMMs: Capturando el "Top-of-Block" (ToB)</h2>
+                        <p>Tradicionalmente, el primer trade de un bloque (que suele ser el arbitraje de sincronización de precios) es capturado íntegramente por un <em>MEV Searcher</em>. Los <strong>MEV-Aware AMMs (McAMMs)</strong>, como las arquitecturas propuestas por <em>Sorella</em> o <em>CoW AMM</em>, integran una subasta interna de bloques. El protocolo vende el derecho a ser la primera transacción del bloque al mejor postor, y los beneficios de esa subasta se distribuyen de vuelta a los LPs o se utilizan para quemar el token nativo, neutralizando la externalidad negativa del MEV.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. LVR-Reduction y Sovereign Liquidity</h2>
+                        <p>Para la Whale Academy, un McAMM es la herramienta definitiva de <strong>Soberanía de Liquidez</strong>. Al capturar el valor del arbitraje, el protocolo reduce efectivamente el LVR del pool, permitiendo a los LPs ser rentables incluso con volúmenes retail menores. Es una transición de un modelo de "Mercado Abierto al Robo" hacia un modelo de "Mercado de Acceso Subastado", donde la plusvalía del flujo informado se queda dentro del ecosistema institucional.</p>
                     </section>
                 </div>`
             },
@@ -1145,9 +1442,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Dinámicas de ejecución y latencia en el emparejamiento de órdenes discretas.",
                 readTime: 240,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. Física del Order Book On-Chain</h2>
-                        <p>La microestructura de un AMM V3 se asemeja a un libro de órdenes centralizado (CLOB), pero con ejecución determinista por bloque. El Tick Spacing actúa como el 'step size' del mercado.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Física de la Ejecución On-Chain: Ticks y Espaciado</h2>
+                        <p>En la liquidez concentrada (Uniswap V3), el precio no es un continuo, sino una serie de puntos discretos denominados <strong>Ticks</strong>. El <code>tickSpacing</code> define la granularidad del mercado: un espaciado pequeño (ej. 1 tick = 0.01%) permite una precisión quirúrgica pero aumenta los costos de gas para los LPs; un espaciado grande reduce el gas pero aumenta el slippage para el usuario. La Whale Academy analiza el tick spacing como la "resolución" de una cámara: a mayor resolución, mejor descubrimiento de precio pero mayor carga de datos computacionales.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Latencia de Ejecución y Barreras de Gas</h2>
+                        <p>La microestructura on-chain está limitada por el <em>Block Time</em> (12 segundos en Mainnet, 2 segundos en L2). Esta latencia estructural impide el Market Making agresivo de alta frecuencia. Los fondos institucionales operan mediante <strong>Limit Orders Virtuales</strong>, pre-posicionando liquidez en ticks específicos para que se activen automáticamente cuando el precio "atraviesa" el rango, eliminando la necesidad de monitoreo constante de la terminal.</p>
                     </section>
                 </div>`
             },
@@ -1157,9 +1460,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Gestión algorítmica del balance de activos para la provisión de liquidez sostenible.",
                 readTime: 260,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Riesgo de Inventario en AMMs</h2>
-                        <p>Un creador de mercado (Market Maker) en DeFi no es neutral; su inventario fluctúa con cada trade. La optimización de inventario consiste en ajustar los rangos de liquidez para incentivar trades que devuelvan la cartera al balance deseado (Skewing).</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Gestión de Inventario: El Arte del Skewing</h2>
+                        <p>En la creación de mercado profesional, un LP no es un agente pasivo; es un gestor de inventario. Si el mercado tiene una fuerte tendencia alcista, el LP acumula "inventario largo" (Long Inventory) de forma natural. La optimización consiste en ajustar los rangos de liquidez (Skewing) para incentivar operaciones que devuelvan la cartera a un estado neutral, aumentando las comisiones en el lado opuesto del flujo dominante para compensar el riesgo de precio.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Reequilibrio Algorítmico vs Arbitraje Externo</h2>
+                        <p>Las instituciones utilizan algoritmos de <strong>Auto-Rebalancing</strong> que ejecutan micro-swaps defensivos en exchanges externos para proteger el inventario principal. El análisis forense de un Market Maker exitoso revela una correlación negativa perfecta entre su balance en el AMM y sus posiciones en el mercado de futuros (Perpetuals), garantizando una rentabilidad basada puramente en el <em>Spread</em> y no en la dirección del activo.</p>
                     </section>
                 </div>`
             },
@@ -1169,9 +1478,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Sistemas de crédito institucional basados en identidad y reputación on-chain.",
                 readTime: 230,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. Evolución del Crédito DeFi</h2>
-                        <p>Los préstamos tradicionales en DeFi requieren exceso de garantía (Overcollateralized). La nueva generación (Maple, Goldfinch) permite préstamos con garantías parciales o nulas para instituciones.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Crédito Institucional: Más Allá del Colateral 1:1</h2>
+                        <p>El DeFi tradicional está limitado por el requerimiento de sobre-colateralización. La evolución institucional exige el <strong>Undercollateralized Lending</strong> (Préstamos con Garantía Parcial). Protocolos como <em>Maple Finance</em> o <em>TrueFi</em> operan mediante "Credit Delegators": expertos que evalúan la solvencia off-chain de prestatarios institucionales y habilitan líneas de crédito basadas en reputación y contratos legales vinculantes, utilizando la blockchain solo como capa de liquidación atómica.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. RWA (Real World Assets) como Garantía</h2>
+                        <p>El clímax de esta tendencia es la integración de <strong>Activos del Mundo Real (RWA)</strong>. Facturas comerciales, bonos del tesoro (T-Bills) y bienes raíces se tokenizan para servir como colateral en préstamos DeFi. Esto permite al capital institucional obtener liquidez global contra activos tradicionalmente ilíquidos, fusionando la seguridad jurídica del sistema antiguo con la velocidad transaccional del nuevo paradigma.</p>
                     </section>
                 </div>`
             },
@@ -1181,9 +1496,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Apalancamiento de la capa de seguridad de Ethereum para servicios auxiliares.",
                 readTime: 260,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. La Seguridad como Servicio (SaaS)</h2>
-                        <p>EigenLayer permite a los validadores de Ethereum reutilizar su ETH stakeado para asegurar otros protocolos (AVS - Actively Validated Services).</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. EigenLayer y la Hipoteca de Seguridad</h2>
+                        <p>El <strong>Re-staking</strong> es una primitiva financiera que permite a los validadores de Ethereum "re-prometer" su Beacon Chain ETH para asegurar servicios adicionales (AVS) como puentes, oráculos o redes de disponibilidad de datos. Esto crea una <strong>Capa de Seguridad Compartida</strong> que reduce dramáticamente el costo de lanzar nuevos protocolos. Para la Whale Academy, es la máxima expresión de la eficiencia del capital: un solo activo asegurando múltiples redes simultáneamente.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Riesgo Sistémico y Efecto de Apalancamiento de Seguridad</h2>
+                        <p>Sin embargo, el re-staking introduce un riesgo de <strong>Liquidez en Cascada</strong>. Si un AVS sufre un compromiso y "slashea" (confisca) el ETH de los validadores, la seguridad de la propia red Ethereum podría verse comprometida si el volumen de re-staking es demasiado alto. El análisis institucional exige monitorear el ratio de <em>Double-Slashing</em> para garantizar que el apalancamiento de seguridad no cruce el umbral de estabilidad sistémica.</p>
                     </section>
                 </div>`
             },
@@ -1193,9 +1514,15 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Dinámicas de oferta/demanda elástica y paridad descentralizada.",
                 readTime: 250,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. La Paridad como Equilibrio Incentivado</h2>
-                        <p>Las stablecoins algorítmicas (ej. FRAX, DAI) mantienen su paridad no solo con reservas, sino mediante incentivos de arbitraje.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. El Trilema de la Estabilidad Algorítmica</h2>
+                        <p>Las stablecoins algorítmicas puras (que mantienen la paridad solo mediante algoritmos de expansión/contracción de oferta) han evolucionado hacia modelos híbridos. La Whale Academy analiza el modelo de <strong>Delta-Neutral Backing</strong> (ej. Ethena USDe), que utiliza posiciones cortas en futuros para neutralizar la volatilidad del colateral de staking. No es magia algorítmica; es ingeniería financiera de derivados aplicada a la estabilidad de precios.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. Mecanismos de Arbitraje y "Peg Stability Modules" (PSM)</h2>
+                        <p>La defensa institucional del "peg" (la paridad 1:1) se basa en módulos PSM que permiten intercambiar activos volátiles por activos estables de reserva con slippage cero. El análisis forense de una "desvinculación" (De-peg) rastrea el agotamiento de estos PSMs. Una stablecoin soberana debe poseer reservas diversificadas y una capacidad de respuesta atómica ante crisis de liquidez para mantener la confianza del mercado institucional.</p>
                     </section>
                 </div>`
             },
@@ -1205,9 +1532,30 @@ uint256 userSharesSafe = (amount * totalSupply) / totalAssets;
                 description: "Optimización radical del capital mediante la segmentación de ticks y rangos de ejecución.",
                 readTime: 260,
                 content: `<div class="academy-article">
-                    <section>
-                        <h2>I. El Paradigma de la Densidad de Liquidez</h2>
-                        <p>En Uniswap V3, la liquidez no es una función global continua, sino un conjunto de posiciones discretas en rangos de precios. La fórmula fundamental <code>L = Δy / Δ√P</code> define la cantidad de activos necesarios para mover el precio.</p>
+                    <section class="pro-section">
+                        <div class="pro-badge">LEGENDARY GRADE</div>
+                        <h2>I. Matemática de la Densidad de Liquidez</h2>
+                        <p>Uniswap V3 introdujo el concepto de <strong>Liquidez Concentrada</strong>, permitiendo a los LPs inyectar capital solo en los rangos donde ocurre el volumen (ej. justo alrededor del peg para stablecoins). Esto aumenta la eficiencia del capital hasta en un <strong>4000x</strong> en comparación con V2. La fórmula de densidad $L = \frac{\Delta y}{\Delta \sqrt{P}}$ es el pilar de la AMM Forensics: permite calcular exactamente cuánto capital se necesita para mover el mercado de un tick a otro.</p>
+                    </section>
+
+                    <section class="pro-section">
+                        <h2>II. El Clímax de la Ingeniería Financiera en AMMs</h2>
+                        <p>La soberanía total en el Market Making se alcanza cuando el LP utiliza <strong>Range Orders</strong> como órdenes de límite institucionales. Al posicionar liquidez concentrada, el LP no solo gana comisiones, sino que ejecuta una estrategia de entrada/salida de activos con precisión milimétrica. Con la finalización de este módulo, el analista de la Whale Academy posee el conocimiento para diseccionar, operar y dominar el flujo institucional en la frontera descentralizada.</p>
+                        
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 200" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <!-- Range -->
+                                <rect x="300" y="50" width="200" height="100" fill="rgba(77,148,255,0.2)" stroke="#4d94ff" stroke-width="2" />
+                                <text x="400" y="40" fill="#4d94ff" text-anchor="middle" style="font-weight: bold;">Rango Concentrado (V3)</text>
+                                
+                                <path d="M50 150 Q200 150 300 100 L500 100 Q600 50 750 50" stroke="#fff" stroke-width="2" fill="none" />
+                                <text x="100" y="140" fill="#fff" style="font-size: 10px;">Curva V2 (Inactiva)</text>
+                                
+                                <circle cx="400" cy="100" r="5" fill="#4dff88" />
+                                <text x="400" y="120" fill="#4dff88" text-anchor="middle" style="font-size: 11px; font-weight: bold;">MAX PROFIT ZONE</text>
+                            </svg>
+                            <p class="diagram-caption">Figura 20: Densidad de liquidez infinita en rangos concentrados frente al modelo V2.</p>
+                        </div>
                     </section>
                 </div>`
             }

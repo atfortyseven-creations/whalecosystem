@@ -65,7 +65,7 @@ export function AcademyViewer() {
         <div className="flex h-[calc(100vh-80px)] mt-20 bg-transparent border-t border-[var(--aztec-ink)]/10 relative z-20 overflow-hidden">
             
             {/* STICKY SIDEBAR NAVIGATION (Table of Contents) */}
-            <div className="hidden lg:flex w-80 flex-shrink-0 border-r border-[#1a1a1a] bg-black/40 flex-col h-full overflow-hidden backdrop-blur-xl relative">
+            <div className="hidden lg:flex w-80 flex-shrink-0 border-r border-[var(--aztec-ink)]/10 bg-white/90 flex-col h-full overflow-hidden backdrop-blur-xl relative">
                 
                 {/* Decorative border glow */}
                 <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[var(--aztec-orchid)]/50 to-transparent" />
@@ -88,7 +88,7 @@ export function AcademyViewer() {
                             placeholder="Filtrar base de datos..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="font-aztec-body w-full pl-10 pr-4 py-3 bg-[var(--aztec-parchment)] border border-[#333] rounded-xl text-[13px] font-medium text-[var(--aztec-ink)] placeholder:text-[var(--aztec-ink)]/30 focus:outline-none focus:border-[var(--aztec-orchid)] transition-all shadow-inner"
+                            className="font-aztec-body w-full pl-10 pr-4 py-3 bg-[var(--aztec-parchment)] border border-[var(--aztec-ink)]/20 rounded-xl text-[13px] font-medium text-[var(--aztec-ink)] placeholder:text-[var(--aztec-ink)]/30 focus:outline-none focus:border-[var(--aztec-orchid)] transition-all shadow-inner"
                         />
                     </div>
                 </div>
@@ -107,7 +107,7 @@ export function AcademyViewer() {
                                         className={`text-left pl-4 py-2 pr-2 text-[12px] font-aztec-body transition-all relative flex items-center group
                                             ${activeSection === article.id 
                                             ? 'text-[var(--aztec-ink)] font-black bg-[var(--aztec-orchid)]/5' 
-                                            : 'text-[var(--aztec-ink)]/50 hover:text-[var(--aztec-orchid)] hover:bg-white/5 font-medium'
+                                            : 'text-[var(--aztec-ink)]/50 hover:text-[var(--aztec-orchid)] hover:bg-[var(--aztec-ink)]/5 font-medium'
                                         }`}
                                     >
                                         {activeSection === article.id && (
@@ -128,7 +128,7 @@ export function AcademyViewer() {
             {/* MAIN CONTINUOUS SCROLL CONTENT AREA */}
             <div 
                 ref={contentRef}
-                className="flex-1 overflow-y-auto custom-scrollbar relative w-full bg-[#050505]"
+                className="flex-1 overflow-y-auto custom-scrollbar relative w-full bg-white"
             >
                 {/* Decorative background mesh */}
                 <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-[var(--aztec-orchid)]/5 rounded-full blur-[150px] pointer-events-none" />
@@ -147,7 +147,7 @@ export function AcademyViewer() {
                     {filteredModules.map((module) => (
                         <div key={module.id} className="mb-40">
                             {/* Module Header Segment */}
-                            <div className="sticky top-0 z-30 bg-[#050505]/90 backdrop-blur-xl pt-8 pb-4 border-b border-[var(--aztec-ink)]/10 mb-16">
+                            <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl pt-8 pb-4 border-b border-[var(--aztec-ink)]/10 mb-16">
                                 <h2 className="font-aztec-h1 text-4xl md:text-5xl text-[var(--aztec-ink)] tracking-tight">
                                     {module.title}
                                 </h2>
@@ -231,14 +231,14 @@ export function AcademyViewer() {
                 .diagram-container {
                     margin: 3rem 0;
                     padding: 2rem;
-                    background: rgba(255, 255, 255, 0.02);
-                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    background: rgba(0, 0, 0, 0.02);
+                    border: 1px solid rgba(0, 0, 0, 0.05);
                     border-radius: 16px;
                 }
                 .diagram-caption {
                     font-size: 0.85rem !important;
                     text-align: center;
-                    color: rgba(255, 255, 255, 0.4) !important;
+                    color: rgba(0, 0, 0, 0.6) !important;
                     margin-top: 1rem !important;
                     font-style: italic;
                     letter-spacing: 0.05em;
