@@ -55,11 +55,13 @@ export default function RadarFeed() {
           {alerts.map((alert) => (
             <motion.div
               key={alert.id}
-              initial={{ opacity: 0, x: -10, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-              animate={{ opacity: 1, x: 0, backgroundColor: 'rgba(0, 0, 0, 0)' }}
+              initial={{ opacity: 0, x: -10, filter: 'brightness(1.5)' }}
+              animate={{ opacity: 1, x: 0, filter: 'brightness(1)' }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 border border-white/[0.02] bg-[#080808] hover:bg-[#0c0c0c] transition-colors rounded-sm group"
+              className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 border-b border-white/[0.02] bg-[#050505] hover:bg-[#080808] transition-all group relative cursor-crosshair"
             >
+              <div className="absolute inset-0 border border-[#e0ff00]/0 group-hover:border-[#e0ff00]/30 transition-colors pointer-events-none z-10" />
+              
               {/* TIME & CHAIN */}
               <div className="flex flex-col justify-center">
                 <span className="text-[10px] text-white/60">
@@ -81,8 +83,10 @@ export default function RadarFeed() {
               </div>
 
               {/* VOLUME USD */}
-              <div className="flex items-center justify-end">
-                <span className="text-[11px] font-black font-mono text-white">
+              <div className="flex items-center justify-end z-20">
+                <span className={`text-[11px] font-black font-mono tracking-tighter ${
+                  alert.usdValue >= 10000000 ? 'text-[#e0ff00] drop-shadow-[0_0_8px_rgba(224,255,0,0.5)]' : 'text-white'
+                }`}>
                   ${alert.usdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </span>
               </div>
@@ -95,8 +99,8 @@ export default function RadarFeed() {
               </div>
 
               {/* ACTION (BUY/SELL) WITH FLASH */}
-              <div className="flex items-center justify-end">
-                 <span className={`text-[9px] font-black px-2 py-1 rounded-sm w-full text-center tracking-widest ${
+              <div className="flex items-center justify-end z-20">
+                 <span className={`text-[9px] font-black px-2 py-1 w-full text-center tracking-widest uppercase ${
                    alert.action === 'BUY' 
                      ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' 
                      : alert.action === 'SELL'
@@ -111,8 +115,12 @@ export default function RadarFeed() {
         </AnimatePresence>
 
         {alerts.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center opacity-30 gap-4">
-            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          <div className="flex h-full flex-col items-center justify-center opacity-30 gap-6">
+            <div className="relative">
+              <div className="w-12 h-12 border border-[#e0ff00]/20 rounded-none animate-[spin_3s_linear_infinite]" />
+              <div className="w-12 h-12 border border-[#e0ff00]/40 rounded-none absolute inset-0 animate-[spin_2s_linear_infinite_reverse]" />
+              <div className="w-2 h-2 bg-[#e0ff00] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full shadow-[0_0_15px_#e0ff00]" />
+            </div>
             <span className="text-[10px] uppercase tracking-widest">
               Awaiting Mempool Ignition...
               <br/>

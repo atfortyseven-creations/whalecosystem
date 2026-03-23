@@ -81,31 +81,35 @@ export default function ContextMenu({ onAction, children }: ContextMenuProps) {
           exit={{ opacity: 0, scale: 0.9, y: 5 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
           style={{ top: position.y, left: position.x }}
-          className="fixed z-[9999] min-w-[220px] rounded-xl bg-[#0D0A1A]/90 backdrop-blur-xl border border-white/10 p-2 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.8)] focus:outline-none"
+          className="fixed z-[9999] min-w-[240px] rounded-sm bg-[#050505]/95 backdrop-blur-2xl border border-white/10 p-2 shadow-[0_0_40px_rgba(0,0,0,0.9)] focus:outline-none ring-1 ring-[#e0ff00]/10"
         >
           {/* Header */}
-          <div className="px-3 py-2 mb-1 border-b border-white/5">
-            <span className="text-[10px] font-black text-[#B37FEB] uppercase tracking-widest">Sovereign Action</span>
+          <div className="px-3 py-2 mb-1 border-b border-white/10 flex items-center justify-between">
+            <span className="text-[9px] font-black text-[#e0ff00] uppercase tracking-widest flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#e0ff00] animate-pulse" />
+                SOVEREIGN COMMAND
+            </span>
+            <span className="text-[8px] font-mono text-white/30 tracking-widest">v9.9.9</span>
           </div>
           
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 mt-2">
             {menuItems.map((item) => (
               <div key={item.id}>
-                {item.separator && <div className="h-[1px] bg-white/5 my-1" />}
+                {item.separator && <div className="h-[1px] bg-white/10 my-1" />}
                 <button
                   onClick={() => {
                     handleAction(item.label);
                     if (onAction) onAction(item.id);
                   }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors group text-sm"
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#e0ff00]/10 text-white/50 hover:text-[#e0ff00] transition-all group text-xs uppercase tracking-widest font-black"
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon size={16} className="text-[#B37FEB] group-hover:text-purple-300" />
-                    <span className="font-medium font-sans">{item.label}</span>
+                    <item.icon size={14} className="text-white/40 group-hover:text-[#e0ff00] transition-colors" />
+                    <span>{item.label}</span>
                   </div>
                   {item.hotkey && (
-                    <span className="text-[10px] font-mono opacity-40 group-hover:opacity-100 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
-                      {item.hotkey}
+                    <span className="text-[9px] font-mono opacity-20 group-hover:opacity-100 bg-white/5 px-2 py-0.5 rounded-sm border border-white/10 group-hover:border-[#e0ff00]/30 transition-all group-hover:text-[#e0ff00]">
+                      [{item.hotkey}]
                     </span>
                   )}
                 </button>

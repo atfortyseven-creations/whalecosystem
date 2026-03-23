@@ -149,8 +149,8 @@ export default function ExecutionDock() {
                 disabled={isPending || isConfirming}
                 className={`py-5 px-6 rounded-sm text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border ${
                     isArmed 
-                     ? 'bg-rose-500/20 text-rose-500 border-rose-500 shadow-[0_0_20px_rgba(225,29,72,0.3)]' 
-                     : 'bg-black text-white/40 border-white/10 hover:border-white/30 hover:text-white/80'
+                     ? 'bg-rose-500/10 text-rose-500 border-rose-500 shadow-[0_0_30px_rgba(225,29,72,0.4)] ring-1 ring-rose-500/50' 
+                     : 'bg-[#050505] text-white/40 border-white/10 hover:border-[#e0ff00]/40 hover:text-[#e0ff00] hover:shadow-[0_0_15px_rgba(224,255,0,0.1)]'
                 }`}
             >
                 <Fingerprint size={16} className={isArmed ? 'animate-pulse' : ''} />
@@ -161,8 +161,8 @@ export default function ExecutionDock() {
                 disabled={!isArmed || isQuoting || isPending || isConfirming}
                 className={`h-full px-8 relative group overflow-hidden rounded-sm transition-all border ${
                     isArmed && !isQuoting && !isPending && !isConfirming
-                     ? 'bg-rose-500/10 border-rose-500/50 text-rose-500 cursor-pointer hover:bg-rose-600 hover:text-white hover:border-rose-600'
-                     : 'bg-black border-white/5 text-white/10 cursor-not-allowed'
+                     ? 'bg-[#050505] border-rose-500/50 text-rose-500 cursor-crosshair hover:bg-rose-500/20 hover:text-white hover:border-rose-500 hover:shadow-[0_0_30px_rgba(225,29,72,0.6)]'
+                     : 'bg-[#050505] border-white/5 text-white/10 cursor-not-allowed'
                 }`}
             >
                 <div className="relative flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-[0.2em]">

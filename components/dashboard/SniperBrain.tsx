@@ -68,7 +68,7 @@ export default function SniperBrain() {
                 onClick={() => toggleAsset(asset)}
                 className={`px-3 py-1 text-[10px] font-bold rounded-sm border transition-all ${
                   isActive 
-                    ? 'bg-white text-black border-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' 
+                    ? 'bg-[#e0ff00]/10 border-[#e0ff00]/40 text-[#e0ff00] drop-shadow-[0_0_8px_rgba(224,255,0,0.4)] ring-1 ring-[#e0ff00]/20' 
                     : 'bg-transparent text-white/40 border-white/10 hover:border-white/30 hover:text-white/80'
                 }`}
               >
@@ -124,17 +124,19 @@ export default function SniperBrain() {
         <label className="text-[9px] uppercase font-black tracking-widest flex items-center gap-2 text-[#e0ff00]/60 mb-2">
           <History size={10} /> LOCAL DEPLOYMENT HISTORY
         </label>
-        <div className="flex-1 bg-black border border-white/5 rounded-sm p-3 overflow-y-auto no-scrollbar space-y-2">
+        <div className="flex-1 bg-[#050505] border border-white/5 rounded-sm p-3 overflow-y-auto custom-scrollbar space-y-2 relative">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-[#e0ff00]/5 blur-xl pointer-events-none" />
+          
           {executedTrades.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-[10px] text-white/20 italic">
+            <div className="h-full flex items-center justify-center text-[9px] uppercase font-black tracking-widest text-[#e0ff00]/20">
               NO LETHAL EXECUTIONS RECORDED IN CURRENT SESSION.
             </div>
           ) : (
             executedTrades.map((trade, idx) => (
-              <div key={`${trade.hash}-${idx}`} className="flex items-center justify-between text-[10px] bg-white/5 px-3 py-2 rounded-sm border border-white/5">
-                 <span className="text-emerald-400 font-mono truncate max-w-[120px]">{trade.hash}</span>
-                 <span className="text-white/40">[{new Date(trade.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
-                 <span className="text-white font-black font-mono">${trade.priceAtExecution.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              <div key={`${trade.hash}-${idx}`} className="flex items-center justify-between text-[10px] bg-[#0c0c0c] px-3 py-2 rounded-sm border border-emerald-500/10 group hover:border-[#e0ff00]/20 transition-all">
+                 <span className="text-emerald-400 group-hover:text-[#e0ff00] transition-colors font-mono truncate max-w-[120px]">{trade.hash}</span>
+                 <span className="text-white/30 font-mono">[{new Date(trade.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
+                 <span className="text-white font-black font-mono tracking-tighter">${trade.priceAtExecution.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>
             ))
           )}
