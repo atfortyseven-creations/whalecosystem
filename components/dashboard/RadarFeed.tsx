@@ -41,8 +41,8 @@ export default function RadarFeed() {
   }, [unifiedWhaleFeed, pushAlert]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#050505] p-2">
-      <div className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white/30 border-b border-white/5 mb-2">
+    <div className="flex flex-col absolute inset-0 bg-[#050505] p-2">
+      <div className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white/30 border-b border-white/5 mb-2 shrink-0">
         <span>TIME</span>
         <span>SIGNATURE // ROUTE</span>
         <span className="text-right">VOLUME (USD)</span>

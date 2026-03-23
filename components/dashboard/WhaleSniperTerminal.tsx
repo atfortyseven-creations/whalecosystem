@@ -102,37 +102,41 @@ export default function WhaleSniperTerminal() {
       </header>
 
       {/* ── MAIN TERMINAL GRID (CSS GRID EXACT SPECS) ── */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[3fr_1fr] grid-rows-[auto_1fr] h-[calc(100vh-40px)] gap-px bg-white/5 p-px">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_350px] lg:grid-rows-[1fr_auto] h-[calc(100vh-40px)] gap-px bg-white/10 p-px">
         
-        {/* Module 1: RADAR FEED (Left, Takes up most vertical space) */}
-        <div className="bg-[#050505] row-span-2 flex flex-col overflow-hidden relative group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-white/40">
-            <span className="flex items-center gap-2"><Activity size={12} /> RADAR_STREAM // MEMPOOL_CAPTURE</span>
-            <span>REALTIME_WSS</span>
+        {/* Module 1: RADAR FEED (Left, Takes up full height on LG) */}
+        <div className="bg-[#050505] lg:row-span-2 flex flex-col overflow-hidden relative group h-full">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#e0ff00]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-white/40 shrink-0">
+            <span className="flex items-center gap-2"><Activity size={12} className="text-[#e0ff00]" /> RADAR_STREAM // MEMPOOL_CAPTURE</span>
+            <span className="text-white/20">REALTIME_WSS</span>
           </div>
-          <div className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="flex-1 relative">
+            <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
               <RadarFeed />
+            </div>
           </div>
         </div>
 
         {/* Module 2: SNIPER BRAIN / FILTERS (Top Right) */}
-        <div className="bg-[#0a0a0a] flex flex-col border-b border-white/5 relative">
-          <div className="px-4 py-2 border-b border-white/5 bg-black/40 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#e0ff00]/60">
+        <div className="bg-[#050505] flex flex-col border-b border-white/5 relative min-h-[350px] lg:min-h-0">
+          <div className="px-4 py-2 border-b border-white/5 bg-black/40 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#e0ff00]/60 shrink-0">
             <Crosshair size={12} /> TACTICAL_PARAMETERS
           </div>
-          <div className="flex-1 p-4 overflow-y-auto no-scrollbar">
-              <SniperBrain />
+          <div className="flex-1 relative">
+             <div className="absolute inset-0 p-4 overflow-y-auto custom-scrollbar">
+                <SniperBrain />
+             </div>
           </div>
         </div>
 
         {/* Module 3: EXECUTION DOCK (Bottom Right) */}
-        <div className="bg-[#080808] flex flex-col relative overflow-hidden">
+        <div className="bg-[#050505] flex flex-col relative overflow-hidden h-[300px] shrink-0">
           <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-[80px] rounded-full pointer-events-none" />
-          <div className="px-4 py-2 border-b border-white/5 bg-black/40 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500/60">
+          <div className="px-4 py-2 border-b border-white/5 bg-black/40 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500/60 shrink-0">
             <Zap size={12} /> LETHAL_EXECUTION
           </div>
-          <div className="flex-1 p-4 overflow-y-auto no-scrollbar flex flex-col justify-end">
+          <div className="flex-1 p-4 flex flex-col justify-end">
               <ExecutionDock />
           </div>
         </div>

@@ -33,7 +33,7 @@ export default function SniperBrain() {
   };
 
   return (
-    <div className="flex flex-col gap-6 font-mono text-white/80">
+    <div className="absolute inset-0 p-4 flex flex-col gap-6 font-mono text-white/80 overflow-y-auto custom-scrollbar">
       
       {/* ── MIN VOLUME THRESHOLD ── */}
       <div className="space-y-2">

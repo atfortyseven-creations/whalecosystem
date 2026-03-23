@@ -80,7 +80,7 @@ export default function ExecutionDock() {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full h-full relative">
+    <div className="flex flex-col gap-6 absolute inset-0 p-4 overflow-y-auto custom-scrollbar">
       
       {/* ── PRICE TICKER ── */}
       <div className="flex flex-col gap-1 items-end z-10">
