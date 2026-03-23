@@ -21,6 +21,7 @@ export function InstitutionalHeader() {
     const [showProfile, setShowProfile] = useState(false);
 
     const navLinks = [
+        { href: '#', label: 'System', active: false, isSystem: true }, // Highlighted system link
         { href: '/vip', label: 'Whale Vip', active: pathname === '/vip' },
         { href: '/dashboard', label: 'Whale Dashboard', active: pathname === '/dashboard' },
         { href: '/network', label: 'Whale Activity', active: pathname === '/network' },
@@ -55,12 +56,14 @@ export function InstitutionalHeader() {
                 <nav className="hidden xl:flex items-center gap-8">
                     {navLinks.map((link) => (
                         <Link 
-                            key={link.href}
+                            key={link.label}
                             href={link.href}
-                            className={`text-[10px] font-aztec-mono font-black uppercase tracking-[0.2em] transition-all ${
+                            className={`text-[10px] font-aztec-mono font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
+                                link.isSystem ? 'bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(180,255,0,0.2)] hover:scale-105' :
                                 link.active ? 'text-[var(--aztec-orchid)] drop-shadow-[0_0_8px_rgba(209,37,199,0.2)]' : 'text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-ink)]'
                             }`}
                         >
+                            {link.isSystem && <Globe size={12} className="animate-spin-slow" />}
                             {link.label}
                         </Link>
                     ))}

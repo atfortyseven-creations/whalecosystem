@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 // Only importing what is actually used — tree-shaken for minimal bundle size
-import { QrCode, Hexagon, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight } from 'lucide-react';
+import { QrCode, Smartphone, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { useAccount } from 'wagmi';
 import { Html5QrcodeScanner } from 'html5-qrcode';
@@ -43,12 +43,9 @@ export function MobileSovereignLanding() {
     }, [open]);
 
     const handleScanClick = useCallback(() => {
-        if (!isConnected) {
-            open({ view: 'Connect' });
-            return;
-        }
+        // Remove the isConnected check to allow direct access to scanner
         setView('scanner');
-    }, [isConnected, open]);
+    }, []);
 
     if (view === 'scanner') {
         return <MobileQRScanner onBack={() => setView('landing')} />;
@@ -195,8 +192,8 @@ export function MobileSovereignLanding() {
                                 onClick={handleSovereignConnect}
                                 className="w-full bg-[#050505] text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-black/10"
                             >
-                                <Hexagon size={22} className="text-indigo-400" />
-                                Institutional Login
+                                <Smartphone size={22} className="text-indigo-400" />
+                                Connect MetaMask
                             </button>
                         ) : (
                             <div className="w-full bg-green-50 border border-green-200 font-bold py-6 rounded-2xl flex items-center justify-center gap-3">
@@ -229,6 +226,12 @@ function MobileQRScanner({ onBack }: { onBack: () => void }) {
     const { address } = useAccount();
 
     useEffect(() => {
+        if (!address) {
+            toast.error('Please connect your MetaMask wallet first.');
+            onBack();
+            return;
+        }
+
         let scanner: Html5QrcodeScanner | null = null;
         try {
             scanner = new Html5QrcodeScanner(

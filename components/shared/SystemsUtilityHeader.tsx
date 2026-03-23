@@ -16,10 +16,8 @@ export function SystemsUtilityHeader() {
     const { disconnect } = useDisconnect();
 
     const icons = [
-        { id: 'history', icon: Clock, label: 'History' },
         { id: 'notifications', icon: Bell, label: 'Notifications' },
         { id: 'privacy', icon: Eye, label: 'Privacy' },
-        { id: 'settings', icon: Settings, label: 'Settings' },
     ];
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -39,11 +37,6 @@ export function SystemsUtilityHeader() {
 
     return (
         <div className="flex flex-wrap justify-center items-center gap-4 relative w-full" ref={dropdownRef}>
-            {/* Currency Switcher */}
-            <div className="flex items-center">
-                <CurrencySwitcher />
-            </div>
-
             {/* Utility Icons */}
             <div className="flex items-center gap-5">
                 {icons.map((item, i) => (
@@ -87,7 +80,7 @@ export function SystemsUtilityHeader() {
                             {isConnected && address ? truncateAddress(address) : 'Disconnected'}
                         </span>
                         <span className="text-[8px] font-black text-[var(--aztec-orchid)] uppercase tracking-widest mt-0.5">
-                            {isConnected ? 'Sovereign Connected' : 'Connect Terminal'}
+                            {isConnected ? 'CONNECTED WALLET' : 'Connect Terminal'}
                         </span>
                     </div>
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isDropdownOpen ? 'bg-[var(--aztec-orchid)] text-white' : 'bg-black/5 border border-black/10 group-hover:bg-[var(--aztec-orchid)] group-hover:text-white'}`}>
@@ -108,33 +101,22 @@ export function SystemsUtilityHeader() {
                             <div className="absolute inset-0 noise-bg opacity-[0.05]" />
                             
                             <div className="relative z-10 flex flex-col gap-4">
-                                <div className="p-4 bg-[var(--aztec-parchment)] border border-[var(--aztec-ink)]/10 rounded-[1.5rem] flex items-center justify-between group cursor-pointer hover:border-[var(--aztec-chartreuse)] transition-all" onClick={() => {
+                                <button className="p-4 bg-[var(--aztec-parchment)] border border-[var(--aztec-ink)]/10 rounded-[1.5rem] flex items-center justify-between group cursor-pointer hover:border-[var(--aztec-chartreuse)] transition-all w-full text-left" onClick={() => {
                                     if(address) navigator.clipboard.writeText(address);
                                 }}>
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] font-black text-[var(--aztec-ink)]/50 font-aztec-mono uppercase tracking-widest mb-1">Active Sovereign</span>
-                                        <span className="text-[11px] font-aztec-mono font-black text-[var(--aztec-ink)]">{truncateAddress(address!)}</span>
+                                        <span className="text-[9px] font-black text-[var(--aztec-ink)]/50 font-aztec-mono uppercase tracking-widest mb-1">Copy Address</span>
+                                        <span className="text-[11px] font-aztec-mono font-black text-[var(--aztec-ink)]">{address}</span>
                                     </div>
-                                    <User size={16} className="text-[var(--aztec-ink)]/30 group-hover:text-[var(--aztec-ink)] transition-colors" />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-2">
-                                    <button onClick={() => setActivePanel('history')} className="py-3 px-4 bg-[var(--aztec-ink)]/5 border border-[var(--aztec-ink)]/10 rounded-xl text-[9px] font-aztec-mono font-black text-[var(--aztec-ink)]/50 uppercase tracking-widest hover:bg-[var(--aztec-ink)]/10 hover:text-[var(--aztec-ink)] transition-all flex flex-col items-center gap-2">
-                                        <Clock size={14} />
-                                        Archive
-                                    </button>
-                                    <button onClick={() => setActivePanel('settings')} className="py-3 px-4 bg-[var(--aztec-ink)]/5 border border-[var(--aztec-ink)]/10 rounded-xl text-[9px] font-aztec-mono font-black text-[var(--aztec-ink)]/50 uppercase tracking-widest hover:bg-[var(--aztec-ink)]/10 hover:text-[var(--aztec-ink)] transition-all flex flex-col items-center gap-2">
-                                        <Settings size={14} />
-                                        Settings
-                                    </button>
-                                </div>
+                                    <User size={16} className="text-[var(--aztec-ink)]/30 group-hover:text-[var(--aztec-ink)] transition-colors flex-shrink-0 ml-2" />
+                                </button>
 
                                 <button 
                                     onClick={() => {
                                         setIsDropdownOpen(false);
                                         disconnect();
                                     }}
-                                    className="w-full py-3 bg-[#ff0033]/10 border border-[#ff0033]/20 text-[#ff0033] rounded-xl text-[9px] font-aztec-mono font-black uppercase tracking-widest hover:bg-[#ff0033]/20 transition-all"
+                                    className="w-full py-4 bg-[#ff0033]/10 border border-[#ff0033]/20 text-[#ff0033] rounded-2xl text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-[#ff0033]/20 transition-all font-bold"
                                 >
                                     Disconnect Session
                                 </button>

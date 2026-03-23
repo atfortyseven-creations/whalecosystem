@@ -15,33 +15,21 @@ import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
+import { LinkedGate } from '@/components/shared/LinkedGate';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
     const { isConnected } = useAccount();
     const { walletStealthMode } = useSettings();    
-/*
-    // Global Wallet Connection Tracking
-    useAccountEffect({
-        onConnect(data) {
-            // If they are just returning to the site and land on the homepage
-            if (data.isReconnected) {
-                if (pathname === '/') {
-                    // router.push('/network');
-                }
-                return;
-            }
-            // Fresh connection from any page
-            if (pathname !== '/network') {
-                // router.push('/network');
-            }
-        }
-    });
-*/
-
-    // Handled purely by useAccountEffect above to permit manual return navigation.
-
+    
+    // Wrap site in the mobile linkage gate for PC users
+    const isPublicPath = pathname.startsWith('/docs') || pathname.startsWith('/privacy') || pathname.startsWith('/terms');
+    const content = !isPublicPath ? (
+        <LinkedGate>
+            {children}
+        </LinkedGate>
+    ) : children;
 
     return (
         <>
@@ -70,7 +58,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         
                         <ZoomWrapper>
                             <main className="relative z-10 w-full flex-1 flex flex-col">
-                                {children}
+                                {content}
                             </main>
                         </ZoomWrapper>
                     </div>
@@ -78,6 +66,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                     {/* Unified Footer AFTER the main content */}
                     {!(
                         pathname === '/' || 
+                        pathname.startsWith('/dashboard') ||
                         pathname.startsWith('/academy') || 
                         pathname.startsWith('/support') || 
                         pathname.startsWith('/network') ||
@@ -90,4 +79,3 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         </>
     );
 }
-

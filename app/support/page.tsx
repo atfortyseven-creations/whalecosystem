@@ -50,7 +50,7 @@ export default function SupportPage() {
                 <div className="text-center mb-32">
                     {/* Header Removed */}
                     <h1 className="font-aztec-h1 text-[clamp(2.5rem,8vw,6rem)] font-black leading-[0.85] tracking-tight text-[var(--aztec-ink)] mb-10 uppercase italic">
-                        Sovereign <br/> <span className="text-[var(--aztec-orchid)]">Assistance</span>.
+                        Support <br/> <span className="text-[var(--aztec-orchid)]">Assistance</span>.
                     </h1>
                 </div>
 
@@ -89,35 +89,35 @@ export default function SupportPage() {
                         <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
                             <div className="space-y-8">
                                 <div className="space-y-4">
-                                    <label className="font-aztec-mono text-[10px] uppercase font-black tracking-[0.4em] text-[var(--aztec-ink)]/40 block border-l-2 border-[var(--aztec-chartreuse)] pl-4">SOVEREIGN_IDENTITY</label>
+                                    <label className="font-aztec-mono text-[10px] uppercase font-black tracking-[0.4em] text-[var(--aztec-ink)]/40 block border-l-2 border-[var(--aztec-chartreuse)] pl-4">FULL NAME</label>
                                     <input
                                         required
                                         value={form.name}
                                         onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full bg-black/5 border border-black/5 px-8 py-5 text-[var(--aztec-ink)] font-aztec-mono text-[11px] uppercase tracking-widest outline-none focus:border-[var(--aztec-chartreuse)] transition-all placeholder:text-[var(--aztec-ink)]/10"
-                                        placeholder="SIGNATURE_REQUIRED"
+                                        className="w-full bg-black/5 border border-black/5 px-8 py-5 text-[var(--aztec-ink)] font-aztec-mono text-[11px] uppercase tracking-widest outline-none focus:border-[var(--aztec-chartreuse)] transition-all placeholder:text-[var(--aztec-ink)]/20"
+                                        placeholder="ENTER YOUR NAME"
                                     />
                                 </div>
                                 <div className="space-y-4">
-                                    <label className="font-aztec-mono text-[10px] uppercase font-black tracking-[0.4em] text-[var(--aztec-ink)]/40 block border-l-2 border-[var(--aztec-orchid)] pl-4">INTELLIGENCE_ROUTE</label>
+                                    <label className="font-aztec-mono text-[10px] uppercase font-black tracking-[0.4em] text-[var(--aztec-ink)]/40 block border-l-2 border-[var(--aztec-orchid)] pl-4">EMAIL ADDRESS</label>
                                     <input
                                         type="email"
                                         required
                                         value={form.email}
                                         onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                                        className="w-full bg-black/5 border border-black/5 px-8 py-5 text-[var(--aztec-ink)] font-aztec-mono text-[11px] uppercase tracking-widest outline-none focus:border-[var(--aztec-orchid)] transition-all placeholder:text-[var(--aztec-ink)]/10"
-                                        placeholder="EMAIL_ENCRYPTED"
+                                        className="w-full bg-black/5 border border-black/5 px-8 py-5 text-[var(--aztec-ink)] font-aztec-mono text-[11px] uppercase tracking-widest outline-none focus:border-[var(--aztec-orchid)] transition-all placeholder:text-[var(--aztec-ink)]/20"
+                                        placeholder="ENTER YOUR EMAIL"
                                     />
                                 </div>
                                 <div className="space-y-4">
-                                    <label className="font-aztec-mono text-[10px] uppercase font-black tracking-[0.4em] text-[var(--aztec-ink)]/40 block border-l-2 border-black/10 pl-4">TRANSMISSION_CONTENT</label>
+                                    <label className="font-aztec-mono text-[10px] uppercase font-black tracking-[0.4em] text-[var(--aztec-ink)]/40 block border-l-2 border-black/10 pl-4">MESSAGE</label>
                                     <textarea
                                         required
                                         rows={4}
                                         value={form.message}
                                         onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
-                                        className="w-full bg-black/5 border border-black/5 px-8 py-5 text-[var(--aztec-ink)] font-aztec-mono text-[11px] uppercase tracking-widest outline-none focus:border-[var(--aztec-ink)] transition-all placeholder:text-[var(--aztec-ink)]/10 resize-none"
-                                        placeholder="TRANSMIT_INQUIRY_VIA_SECURE_CHANNEL"
+                                        className="w-full bg-black/5 border border-black/5 px-8 py-5 text-[var(--aztec-ink)] font-aztec-mono text-[11px] uppercase tracking-widest outline-none focus:border-[var(--aztec-ink)] transition-all placeholder:text-[var(--aztec-ink)]/20 resize-none"
+                                        placeholder="HOW CAN WE HELP?"
                                     />
                                 </div>
                             </div>

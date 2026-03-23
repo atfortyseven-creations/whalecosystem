@@ -8,9 +8,9 @@
 
 :root {
   /* Core palette */
-  --az-ink:        #050505;
-  --az-ink-2:      #0a0a0a;
-  --az-ink-3:      #111111;
+  --az-ink:        #120321; /* Deep Midnight Purple */
+  --az-ink-2:      #1a0530; 
+  --az-ink-3:      #240a42;
   --az-border:     rgba(255,255,255,0.06);
   --az-border-2:   rgba(255,255,255,0.12);
 

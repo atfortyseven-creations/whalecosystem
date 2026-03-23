@@ -150,21 +150,21 @@ export function ConnectWalletModal() {
 
                                     {/* Action Matrix */}
                                     <div className="grid grid-cols-1 gap-4">
-                                        {/* PRIMARY: Sovereign Ledger */}
+                                        {/* PRIMARY: Institutional Sync (MetaMask) */}
                                         <button 
-                                            onClick={handleSovereignLedger}
+                                            onClick={handleInstitutionalSync}
                                             className="group relative w-full p-6 sm:p-8 bg-[var(--aztec-ink)] rounded-[2.5rem] flex items-center justify-between transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-[var(--aztec-ink)]/20 overflow-hidden"
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] duration-1000" />
                                             
                                             <div className="flex items-center gap-6 relative z-10">
                                                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[1.5rem] bg-[var(--aztec-parchment)]/10 border border-white/5 flex items-center justify-center">
-                                                    <Mail className="text-[var(--aztec-parchment)]" size={24} />
+                                                    <Smartphone className="text-[var(--aztec-parchment)]" size={24} />
                                                 </div>
                                                 <div className="text-left">
                                                     <div className="text-[10px] font-aztec-mono font-black text-[var(--aztec-chartreuse)] uppercase tracking-[0.2em] mb-1">Recommended</div>
-                                                    <div className="text-lg sm:text-2xl font-aztec-serif font-black text-[var(--aztec-parchment)] uppercase tracking-tight">Whale Alert Ledger</div>
-                                                    <div className="text-[10px] font-aztec-mono text-[var(--aztec-parchment)]/40 uppercase tracking-widest mt-1">Create Wallet from Email / Social</div>
+                                                    <div className="text-lg sm:text-2xl font-aztec-serif font-black text-[var(--aztec-parchment)] uppercase tracking-tight">Connect MetaMask</div>
+                                                    <div className="text-[10px] font-aztec-mono text-[var(--aztec-parchment)]/40 uppercase tracking-widest mt-1">Institutional Extension / Mobile App</div>
                                                 </div>
                                             </div>
                                             <ChevronRight className="text-[var(--aztec-parchment)]/20 group-hover:text-[var(--aztec-parchment)] transition-colors relative z-10" size={24} />
@@ -180,25 +180,25 @@ export function ConnectWalletModal() {
                                                     <QrCode className="text-[var(--aztec-orchid)] group-hover:text-[var(--aztec-parchment)]" size={24} />
                                                 </div>
                                                 <div className="text-left">
-                                                    <div className="text-[10px] font-aztec-mono font-black text-[var(--aztec-orchid)] uppercase tracking-[0.2em] mb-1">Device Handshake</div>
-                                                    <div className="text-lg sm:text-2xl font-aztec-serif font-black text-[var(--aztec-ink)] uppercase tracking-tight">Sovereign App Sync</div>
-                                                    <div className="text-[10px] font-aztec-mono text-[var(--aztec-ink)]/40 uppercase tracking-widest mt-1">Connect via Mobile Camera</div>
+                                                    <div className="text-[10px] font-aztec-mono font-black text-[var(--aztec-orchid)] uppercase tracking-[0.2em] mb-1">System Handshake</div>
+                                                    <div className="text-lg sm:text-2xl font-aztec-serif font-black text-[var(--aztec-ink)] uppercase tracking-tight">Scan PC Screen</div>
+                                                    <div className="text-[10px] font-aztec-mono text-[var(--aztec-ink)]/40 uppercase tracking-widest mt-1">Link your mobile identity</div>
                                                 </div>
                                             </div>
                                             <ChevronRight className="text-[var(--aztec-ink)]/20 group-hover:text-[var(--aztec-ink)] transition-colors" size={24} />
                                         </button>
 
-                                        {/* TERTIARY: Institutional Sync */}
+                                        {/* TERTIARY: Social/Email Ledger (Secondary option now) */}
                                         <button 
-                                            onClick={handleInstitutionalSync}
+                                            onClick={handleSovereignLedger}
                                             className="group w-full p-6 sm:p-5 bg-transparent border border-[var(--aztec-ink)]/10 rounded-3xl flex items-center justify-between transition-all hover:bg-[var(--aztec-ink)]/5 active:scale-[0.98]"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl border border-[var(--aztec-ink)]/10 flex items-center justify-center group-hover:bg-[var(--aztec-ink)] transition-colors">
-                                                    <Smartphone className="text-[var(--aztec-ink)] group-hover:text-[var(--aztec-parchment)]" size={18} />
+                                                    <Mail className="text-[var(--aztec-ink)] group-hover:text-[var(--aztec-parchment)]" size={18} />
                                                 </div>
                                                 <div className="text-left">
-                                                    <div className="text-md font-aztec-serif font-black text-[var(--aztec-ink)] uppercase tracking-tight">Standard Extension Sync</div>
+                                                    <div className="text-md font-aztec-serif font-black text-[var(--aztec-ink)] uppercase tracking-tight">Whale Alert Ledger</div>
                                                 </div>
                                             </div>
                                             <Fingerprint className="text-[var(--aztec-ink)]/10 group-hover:text-[var(--aztec-ink)] transition-all group-hover:scale-110" size={18} />

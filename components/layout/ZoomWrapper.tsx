@@ -16,7 +16,10 @@ export function ZoomWrapper({ children }: { children: React.ReactNode }) {
     }, [pathname]);
 
     return (
-        <div className={zoomClass}>
+        <div 
+            className={zoomClass}
+            style={pathname.startsWith('/dashboard') ? { zoom: '1.2' } : {}}
+        >
             {children}
         </div>
     );

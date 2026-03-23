@@ -38,7 +38,7 @@ export function UtilityPanels() {
         notifications: (
             <div className="space-y-4">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[var(--aztec-parchment)]">System Access Logs</h3>
+                    <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[var(--aztec-parchment)]">Log Session</h3>
                     <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${sessionsLoading ? 'bg-slate-600' : 'bg-[var(--aztec-chartreuse)] animate-pulse shadow-[0_0_10px_var(--aztec-chartreuse)]'}`} />
                         <span className="text-[10px] font-mono font-bold text-[var(--aztec-parchment)]/50 uppercase tracking-widest">{sessionsLoading ? 'Syncing...' : 'Encrypted Connect'}</span>
