@@ -1,12 +1,7 @@
 "use client";
 
-import WhaleSniperTerminal from '@/components/dashboard/WhaleSniperTerminal';
-import ContextMenu from '@/components/premium/ContextMenu';
+import SovereignDashboard from '@/components/dashboard/SovereignDashboard';
 
 export default function DashboardClient() {
-  return (
-    <ContextMenu>
-      <WhaleSniperTerminal />
-    </ContextMenu>
-  );
+  return <SovereignDashboard />;
 }
