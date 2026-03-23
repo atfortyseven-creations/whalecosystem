@@ -8,6 +8,10 @@ import { useSniperStore } from '@/store/useSniperStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
+// Optional: Add default native ETH address and target token (e.g. USDC on ETH Mainnet)
+const NATIVE_ETH = "0xEeeeeEeeeEeEeeEeEqEeeEEEeeeeEeeeeeeeEEeE";
+const TARGET_USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+
 export default function ExecutionDock() {
   const { isConnected, address } = useAccount();
   const filters = useSniperStore((state) => state.filters);
@@ -26,24 +30,51 @@ export default function ExecutionDock() {
     }
   }, [isConfirmed, hash, addExecutedTrade]);
 
+  const [isQuoting, setIsQuoting] = useState(false);
+
   const handleLethalExecution = async () => {
     if (!isConnected || !address) {
       toast.error('Cannot execute: No identity linked.');
       return;
     }
     
-    // Safety check - requires active armed state
     if (!isArmed) return;
 
     try {
-      // PROVE IT WORKS: We execute a 0 ETH transaction to OURSELVES to trigger MetaMask/Wallet popup
-      // This guarantees the frontend is interacting perfectly with real Web3 state without losing funds.
+      setIsQuoting(true);
+      // REAL WEB3 INTERACTION: Fetching a real swap quote from 0x Protocol 
+      // Swapping 0.001 ETH to USDC as a baseline sniper action
+      const sellAmount = parseEther('0.001').toString(); 
+      
+      const response = await fetch(
+        `https://api.0x.org/swap/v1/quote?sellToken=${NATIVE_ETH}&buyToken=${TARGET_USDC}&sellAmount=${sellAmount}&takerAddress=${address}&slippagePercentage=${filters.slippageTolerance / 100}`,
+        {
+          headers: {
+            '0x-api-key': 'd10eefd5-bd84-4861-bb38-4e36dc6fa8e9' // Demo/Public key for 0x
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.validationErrors?.[0]?.reason || err.reason || "Failed to fetch DEX routing.");
+      }
+
+      const quote = await response.json();
+
+      setIsQuoting(false);
+      
+      // Execute the genuine DEX swap transaction
       sendTransaction({
-        to: address,
-        value: parseEther('0'), 
+        to: quote.to,
+        data: quote.data,
+        value: BigInt(quote.value), 
       });
-      setIsArmed(false); // Disarm immediately after firing
+      
+      setIsArmed(false);
     } catch (e: any) {
+      setIsQuoting(false);
+      setIsArmed(false);
       toast.error(`Execution failed: ${e.shortMessage || e.message}`);
     }
   };
@@ -66,11 +97,11 @@ export default function ExecutionDock() {
 
       {/* ── EXECUTION STATS ── */}
       <div className="space-y-3 bg-[#0a0a0a] border border-white/5 p-4 rounded-sm z-10 relative overflow-hidden">
-         {isPending || isConfirming ? (
+         {isQuoting || isPending || isConfirming ? (
              <div className="absolute inset-0 bg-[#e0ff00]/10 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
                  <div className="flex items-center gap-3 text-[#e0ff00] font-black uppercase tracking-widest text-xs">
                      <Activity size={16} className="animate-spin" /> 
-                     {isPending ? 'AWAITING WALLET SIGNATURE...' : 'BROADCASTING TO MEMPOOL...'}
+                     {isQuoting ? 'ROUTING DEX LIQUIDITY...' : isPending ? 'AWAITING WALLET SIGNATURE...' : 'BROADCASTING TO MEMPOOL...'}
                  </div>
                  {hash && <span className="text-[9px] font-mono mt-2 text-[#e0ff00]/60">{hash.slice(0, 10)}...{hash.slice(-8)}</span>}
              </div>
@@ -127,9 +158,9 @@ export default function ExecutionDock() {
             </button>
             <button 
                 onClick={handleLethalExecution}
-                disabled={!isArmed || isPending || isConfirming}
+                disabled={!isArmed || isQuoting || isPending || isConfirming}
                 className={`h-full px-8 relative group overflow-hidden rounded-sm transition-all border ${
-                    isArmed && !isPending && !isConfirming
+                    isArmed && !isQuoting && !isPending && !isConfirming
                      ? 'bg-rose-500/10 border-rose-500/50 text-rose-500 cursor-pointer hover:bg-rose-600 hover:text-white hover:border-rose-600'
                      : 'bg-black border-white/5 text-white/10 cursor-not-allowed'
                 }`}
