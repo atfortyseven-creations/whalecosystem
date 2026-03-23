@@ -340,89 +340,85 @@ export function $1BWhaleNotification() {
     }, [whaleEvents]);
 
     return (
-        <div className="fixed bottom-10 right-10 z-[200] flex flex-col gap-6 items-end pointer-events-none">
+        <div className="fixed bottom-10 right-10 z-[200] flex flex-col gap-4 items-end pointer-events-none">
             <AnimatePresence mode="popLayout">
                 {activeTransfers.map((whale) => (
                     <motion.div
                         key={whale.id}
                         layout
-                        initial={{ x: 400, opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-                        animate={{ x: 0, opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                        exit={{ x: 400, opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        className="w-[450px] bg-[var(--aztec-ink)]/90 backdrop-blur-3xl rounded-[2.5rem] p-1 shadow-[0_50px_100px_rgba(0,0,0,0.5),0_0_40px_rgba(212,255,0,0.1)] pointer-events-auto relative group overflow-hidden"
+                        initial={{ x: 400, opacity: 0, clipPath: 'inset(0% 100% 0% 0%)' }}
+                        animate={{ x: 0, opacity: 1, clipPath: 'inset(0% 0% 0% 0%)' }}
+                        exit={{ x: 400, opacity: 0, filter: 'blur(10px)' }}
+                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        className="w-[420px] bg-[var(--aztec-ink)] border border-white/10 border-l-4 border-l-[var(--aztec-chartreuse)] p-6 pointer-events-auto relative shadow-2xl"
                     >
-                        {/* Shimmer Border Assembly */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-[var(--aztec-chartreuse)] via-[var(--aztec-orchid)] to-[var(--aztec-chartreuse)] opacity-20 group-hover:opacity-40 transition-opacity duration-1000 bg-[length:200%_auto] animate-shimmer" />
+                        {/* Static Brutalist Grid Background */}
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
                         
-                        <div className="relative bg-[var(--aztec-ink)]/95 backdrop-blur-xl rounded-[2.3rem] p-6 h-full border border-white/5 overflow-hidden">
-                            {/* Inner ambient glow */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--aztec-orchid)]/10 rounded-full blur-3xl" />
-                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[var(--aztec-chartreuse)]/10 rounded-full blur-3xl" />
+                        <div className="relative z-10 flex flex-col gap-6 h-full">
                             
-                            {/* Close Button */}
-                            <button 
-                                onClick={() => setActiveTransfers(prev => prev.filter(t => t.id !== whale.id))}
-                                className="absolute top-6 right-6 p-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 hover:border-white/20 transition-all z-20 text-[var(--aztec-parchment)]/30 hover:text-[var(--aztec-parchment)]"
-                            >
-                                <X size={12} />
-                            </button>
-
                             {/* Header */}
-                            <div className="flex items-center gap-4 mb-6 relative z-10">
-                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--aztec-chartreuse)] to-[var(--aztec-orchid)] p-[1px] shadow-[0_0_20px_var(--aztec-orchid)]">
-                                    <div className="w-full h-full bg-[var(--aztec-ink)] rounded-2xl flex items-center justify-center">
-                                        <Shield size={20} className="text-[var(--aztec-chartreuse)] drop-shadow-[0_0_8px_var(--aztec-chartreuse)]" />
+                            <div className="flex justify-between items-start">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-[var(--aztec-chartreuse)] text-black p-2 flex items-center justify-center relative">
+                                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-white" />
+                                        <Zap size={16} className="fill-black" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h3 className="font-aztec-mono font-black text-sm text-white tracking-widest uppercase leading-none">
+                                            $1B+ TRANSFER DETECTED
+                                        </h3>
+                                        <div className="text-[10px] font-aztec-mono text-[var(--aztec-parchment)]/50 tracking-[0.2em] mt-1.5 uppercase">
+                                            ON-CHAIN SIGNATURE CONFIRMED
+                                        </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <h3 className="font-aztec-serif font-black text-xl italic text-[var(--aztec-parchment)] tracking-tighter leading-none mb-1">
-                                        Critical Alert
-                                    </h3>
-                                    <div className="text-[9px] font-aztec-mono uppercase tracking-[0.2em] text-[var(--aztec-chartreuse)]">
-                                        Level 5 Entity Detected
-                                    </div>
-                                </div>
+                                <button 
+                                    onClick={() => setActiveTransfers(prev => prev.filter(t => t.id !== whale.id))}
+                                    className="p-1.5 hover:bg-white/10 transition-colors text-white/40 hover:text-white border border-transparent hover:border-white/20"
+                                >
+                                    <X size={14} />
+                                </button>
                             </div>
 
-                            {/* Core Metrics */}
-                            <div className="bg-black/40 border border-white/5 rounded-3xl p-5 mb-5 space-y-4 relative z-10 backdrop-blur-md">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-aztec-mono font-black uppercase text-white/30 tracking-widest">Asset Magnitude</span>
-                                    <div className="flex items-end gap-2 flex-wrap">
-                                        <span className="font-aztec-mono text-2xl font-black text-[var(--aztec-chartreuse)] tracking-tighter drop-shadow-[0_0_12px_var(--aztec-chartreuse)] break-all leading-none">
+                            {/* Core Metrics Block */}
+                            <div className="bg-black border border-white/10 p-5 space-y-5">
+                                <div className="flex flex-col gap-1.5">
+                                    <span className="text-[10px] font-aztec-mono text-[var(--aztec-orchid)] uppercase tracking-widest">Global Asset Volume</span>
+                                    <div className="flex items-baseline gap-3 flex-wrap">
+                                        <span className="font-aztec-mono text-3xl font-black text-white tracking-tighter break-all">
                                             {whale.amount}
                                         </span>
-                                        <span className="text-[12px] font-black font-sans text-white/80 mb-1">{whale.token}</span>
+                                        <span className="text-xs font-black text-[var(--aztec-chartreuse)] uppercase tracking-widest">{whale.token}</span>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase text-white/30 tracking-widest">
-                                            <Globe size={10} /> USD Anchor
+                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-dashed border-white/10">
+                                    <div className="flex flex-col gap-1.5">
+                                        <span className="text-[9px] font-aztec-mono uppercase text-white/40 tracking-widest flex items-center gap-1.5">
+                                            <Globe size={10} /> USD EQUIVALENT
                                         </span>
-                                        <span className="font-mono text-xs font-black text-[var(--aztec-parchment)]">${(whale.usdNum / 1000000000).toFixed(2)}B</span>
+                                        <span className="font-aztec-mono text-xs font-black text-[var(--aztec-parchment)]">${(whale.usdNum / 1000000000).toFixed(2)}B USD</span>
                                     </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase text-white/30 tracking-widest">
-                                            <Globe size={10} /> EUR Anchor
+                                    <div className="flex flex-col gap-1.5">
+                                        <span className="text-[9px] font-aztec-mono uppercase text-white/40 tracking-widest flex items-center gap-1.5">
+                                            <Globe size={10} /> EUR EQUIVALENT
                                         </span>
-                                        <span className="font-mono text-xs font-black text-[var(--aztec-orchid)] drop-shadow-[0_0_8px_var(--aztec-orchid)]">€{((whale.usdNum * 0.92) / 1000000000).toFixed(2)}B</span>
+                                        <span className="font-aztec-mono text-xs font-black text-[var(--aztec-parchment)]">€{((whale.usdNum * 0.92) / 1000000000).toFixed(2)}B EUR</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Footer / Trace */}
-                            <div className="flex items-center justify-between relative z-10">
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-1.5 text-[8px] font-black uppercase text-white/30 tracking-widest">
-                                        <Fingerprint size={10} className="text-[var(--aztec-orchid)]" /> Entity Trace
+                            <div className="flex items-center justify-between border-t border-white/10 pt-5">
+                                <div className="flex flex-col gap-1.5">
+                                    <div className="flex items-center gap-1.5 text-[9px] font-aztec-mono uppercase text-[var(--aztec-chartreuse)] tracking-widest">
+                                        <Fingerprint size={12} /> SENDER TRACE
                                     </div>
-                                    <span className="font-mono text-[9px] text-[var(--aztec-parchment)]/60">{whale.wallet.slice(0, 16)}...</span>
+                                    <span className="font-aztec-mono text-[11px] text-white/60 bg-white/5 py-1 px-2 border border-white/10">{whale.wallet.slice(0, 16)}...</span>
                                 </div>
-                                <button className="px-6 py-2.5 bg-[var(--aztec-parchment)] text-[var(--aztec-ink)] rounded-xl font-black uppercase text-[10px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                                    Audit
+                                <button className="px-6 py-2.5 bg-[#e0ff00] text-black font-aztec-mono text-[10px] font-black uppercase tracking-widest border border-transparent hover:border-[#e0ff00] hover:bg-black hover:text-[#e0ff00] transition-colors leading-tight text-center">
+                                    EXECUTE <br/> AUDIT
                                 </button>
                             </div>
                         </div>

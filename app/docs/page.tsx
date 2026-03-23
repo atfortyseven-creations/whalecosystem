@@ -119,7 +119,7 @@ export default function DocsPage() {
                                     <button 
                                         key={i} 
                                         onClick={() => goToPage(idx.target)}
-                                        className={\`flex items-center gap-3 p-2 border transition-all \${currentPage >= idx.target && (i === indices.length - 1 || currentPage < indices[i+1].target) ? 'bg-[var(--aztec-chartreuse)]/10 border-[var(--aztec-chartreuse)]/30 text-[var(--aztec-chartreuse)]' : 'border-transparent text-[var(--aztec-parchment)]/40 hover:text-[var(--aztec-parchment)] hover:border-[var(--aztec-parchment)]/10'}\`}
+                                        className={`flex items-center gap-3 p-2 border transition-all ${currentPage >= idx.target && (i === indices.length - 1 || currentPage < indices[i+1].target) ? 'bg-[var(--aztec-chartreuse)]/10 border-[var(--aztec-chartreuse)]/30 text-[var(--aztec-chartreuse)]' : 'border-transparent text-[var(--aztec-parchment)]/40 hover:text-[var(--aztec-parchment)] hover:border-[var(--aztec-parchment)]/10'}`}
                                     >
                                         {idx.icon}
                                         {idx.label}
@@ -210,13 +210,13 @@ export default function DocsPage() {
                 </main>
             </div>
             
-             <style jsx global>{\`
+             <style jsx global>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(182,234,38,0.5); }
                 .list-square { list-style-type: square; }
                 .list-diamond { list-style-type: disc; } /* standard fallback */
-            \`}</style>
+            `}</style>
         </div>
     );
 }
