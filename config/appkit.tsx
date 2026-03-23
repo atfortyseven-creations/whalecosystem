@@ -28,8 +28,8 @@ const dedicatedMainnet = {
     ...mainnet,
     rpcUrls: {
         ...mainnet.rpcUrls,
-        default: { http: ['https://go.getblock.us/81e6b261aadf450aa75481b48b253a50'] },
-        public: { http: ['https://go.getblock.us/81e6b261aadf450aa75481b48b253a50'] }
+        default: { http: ['https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff'] },
+        public: { http: ['https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff'] }
     }
 };
 
@@ -38,8 +38,8 @@ const dedicatedBsc = {
     ...bsc,
     rpcUrls: {
         ...bsc.rpcUrls,
-        default: { http: ['https://go.getblock.us/aece34fd45ec4d9fa884d338cf4fa037'] },
-        public: { http: ['https://go.getblock.us/aece34fd45ec4d9fa884d338cf4fa037'] }
+        default: { http: ['https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517'] },
+        public: { http: ['https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517'] }
     }
 };
 
@@ -69,8 +69,8 @@ export const wagmiAdapter = new WagmiAdapter({
     projectId,
     networks,
     transports: {
-        [mainnet.id]: http('https://go.getblock.us/81e6b261aadf450aa75481b48b253a50'),
-        [bsc.id]: http('https://go.getblock.us/aece34fd45ec4d9fa884d338cf4fa037'),
+        [mainnet.id]: http('https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff'),
+        [bsc.id]: http('https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517'),
         [polygon.id]: http(),
         [base.id]: http(process.env.GETBLOCK_BASE_RPC || base.rpcUrls.default.http[0]),
         [arbitrum.id]: http(),
