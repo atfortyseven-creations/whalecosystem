@@ -1,255 +1,222 @@
 "use client";
 
-import React from 'react';
-import { BookOpen, Key, Layers, Code2, Globe, Cpu, Zap, ChevronRight, Terminal, Shield, Network, Lock, Workflow, Activity, Fingerprint } from 'lucide-react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, ChevronRight, Terminal, Shield, Network, ChevronLeft, FastForward, Rewind, Search } from 'lucide-react';
 import Image from 'next/image';
 
+const parseAztecMD = (str: string) => {
+    if (!str) return '';
+    let html = str
+        .replace(/^### (.*$)/gim, '<h3 class="font-aztec-h1 text-xl text-[var(--aztec-orchid)] mt-8 mb-3 uppercase tracking-widest">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 class="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mt-12 mb-4 tracking-light">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 class="font-aztec-h1 text-4xl lg:text-5xl font-black text-[var(--aztec-chartreuse)] uppercase mb-8 tracking-tighter leading-[0.9] border-b border-[var(--aztec-chartreuse)]/20 pb-4">$1</h1>')
+        .replace(/^\* (.*$)/gim, '<li class="ml-6 mb-2 list-square marker:text-[var(--aztec-orchid)]">$1</li>')
+        .replace(/^- (.*$)/gim, '<li class="ml-6 mb-2 list-diamond marker:text-[var(--aztec-chartreuse)]">$1</li>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-black">$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em class="text-[var(--aztec-orchid)] italic">$1</em>')
+        .replace(/```typescript\n([\s\S]*?)```/gim, '<pre class="bg-[#050505] p-6 border border-[var(--aztec-parchment)]/10 text-[11px] overflow-x-auto my-6 text-[var(--aztec-parchment)]/80 custom-scrollbar shadow-2xl">$1</pre>')
+        .replace(/`(.*?)`/gim, '<code class="bg-black border border-[var(--aztec-parchment)]/10 px-1.5 py-0.5 text-[var(--aztec-chartreuse)] text-[10px] font-mono">$1</code>')
+        .replace(/\n\n/gim, '<br/><br/>');
+    return html;
+};
+
 export default function DocsPage() {
+    const [pages, setPages] = useState<any[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [jumpInput, setJumpInput] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/docs-400.json')
+            .then(res => res.json())
+            .then(data => {
+                setPages(data);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load generic docs", err);
+                setIsLoading(false);
+            });
+    }, []);
+
+    const handleJump = (e: React.FormEvent) => {
+        e.preventDefault();
+        const num = parseInt(jumpInput, 10);
+        if (!isNaN(num) && num >= 0 && num <= 400 && pages[num]) {
+            setCurrentPage(num);
+            setJumpInput('');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    const goToPage = (num: number) => {
+        if (num >= 0 && num < pages.length) {
+            setCurrentPage(num);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-[var(--aztec-ink)] flex items-center justify-center font-aztec-mono text-[var(--aztec-chartreuse)] uppercase tracking-widest text-xs">
+                Iniciando Protocolo de Documentación [400 Pages]...
+            </div>
+        );
+    }
+
+    if (pages.length === 0) {
+        return (
+            <div className="min-h-screen bg-[var(--aztec-ink)] flex items-center justify-center font-aztec-mono text-rose-500 uppercase tracking-widest text-xs">
+                Error Crítico: Falla al cargar la matriz de datos.
+            </div>
+        );
+    }
+
+    const currentDoc = pages[currentPage];
+
+    // Build standard indices for the sidebar based on blocks
+    const indices = [
+        { label: "Génesis e Índice", target: 0, icon: <BookOpen size={12} className="text-[var(--aztec-orchid)]" /> },
+        { label: "Filosofía Arquitectónica", target: 1, icon: <Shield size={12} className="text-[var(--aztec-chartreuse)]" /> },
+        { label: "Análisis del Sistema N1", target: 11, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
+        { label: "Análisis del Sistema N2", target: 100, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
+        { label: "Análisis del Sistema N3", target: 200, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
+        { label: "Análisis del Sistema N4", target: 300, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
+        { label: "Motor HFT", target: 381, icon: <Network size={12} className="text-[var(--aztec-orchid)]" /> },
+        { label: "Conclusión Inmortal", target: 391, icon: <BookOpen size={12} className="text-[var(--aztec-chartreuse)]" /> }
+    ];
+
     return (
         <div className="min-h-screen bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] font-sans relative overflow-hidden">
-            {/* Immersive Wallpaper Injection */}
             <div className="absolute inset-0 z-0">
                 <Image 
                     src="/models/update/simon-lee-hbFd11O0nwc-unsplash.jpg" 
                     alt="Sovereign Architecture" 
                     fill 
-                    className="object-cover opacity-[0.15] mix-blend-screen" 
+                    className="object-cover opacity-[0.10] mix-blend-screen grayscale" 
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-[var(--aztec-ink)]/80 via-transparent to-[var(--aztec-ink)] pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--aztec-ink)]/90 via-transparent to-[var(--aztec-ink)] pointer-events-none" />
             </div>
 
-            <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[300px,1fr] gap-12 lg:gap-20 pt-32 lg:pt-40 pb-20 lg:pb-32 px-4 md:px-6 lg:px-12 relative z-10">
+            <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[280px,1fr] xl:grid-cols-[320px,1fr] gap-8 lg:gap-16 pt-32 lg:pt-40 pb-20 lg:pb-32 px-4 md:px-6 lg:px-12 relative z-10">
                 
                 {/* Aztec Restructured Sidebar */}
                 <aside className="hidden lg:block h-fit sticky top-40 text-[var(--aztec-parchment)]">
-                    <div className="bg-[var(--aztec-parchment)]/5 backdrop-blur-xl border border-[var(--aztec-parchment)]/10 shadow-2xl p-8 relative">
+                    <div className="bg-[var(--aztec-parchment)]/5 backdrop-blur-xl border border-[var(--aztec-parchment)]/10 shadow-2xl p-6 relative flex flex-col gap-8">
                         {/* Decorative Corners */}
                         <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[var(--aztec-chartreuse)] opacity-60" />
                         <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[var(--aztec-chartreuse)] opacity-60" />
 
-                        <div className="font-aztec-mono text-[10px] uppercase tracking-[0.4em] text-[var(--aztec-parchment)]/40 mb-8 border-b border-[var(--aztec-parchment)]/10 pb-4 flex items-center gap-3">
-                            <BookOpen size={14} className="text-[var(--aztec-orchid)]" /> WHALE ALERT OVERVIEW
+                        <div className="font-aztec-mono text-[9px] uppercase tracking-[0.4em] text-[var(--aztec-parchment)]/40 border-b border-[var(--aztec-parchment)]/10 pb-4 flex items-center gap-2">
+                            <BookOpen size={14} className="text-[var(--aztec-orchid)]" /> MAINFRAME DOCS [400 PG]
                         </div>
 
-                        <div className="space-y-10">
-                            <div className="space-y-4">
-                                <h3 className="font-aztec-h2 text-sm font-black text-[var(--aztec-parchment)] uppercase tracking-widest">Foundational Topics</h3>
-                                <nav className="flex flex-col gap-3 font-aztec-mono text-[11px] uppercase tracking-wider">
-                                    <a href="#overview" className="text-[var(--aztec-orchid)] font-black flex items-center gap-2 hover:translate-x-1 transition-transform">
-                                        <ChevronRight size={12} /> Getting Started
-                                    </a>
-                                    <a href="#devnet" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> Setting up Devnet
-                                    </a>
-                                    <a href="#ai-tooling" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> AI Forensic Tooling
-                                    </a>
-                                </nav>
-                            </div>
-                            
-                            <div className="space-y-4">
-                                <h3 className="font-aztec-h2 text-sm font-black text-[var(--aztec-parchment)] uppercase tracking-widest">Tutorials</h3>
-                                <nav className="flex flex-col gap-3 font-aztec-mono text-[11px] uppercase tracking-wider">
-                                    <a href="#local-network" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> Sentinel on Local Network
-                                    </a>
-                                    <a href="#contracts" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> Intelligence Scripts
-                                    </a>
-                                    <a href="#tracking-contract" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> Write a Tracking Module
-                                    </a>
-                                    <a href="#private-alerts" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> Private Alert Subscriptions
-                                    </a>
-                                </nav>
-                            </div>
-                            
-                            <div className="space-y-4">
-                                <h3 className="font-aztec-h2 text-sm font-black text-[var(--aztec-parchment)] uppercase tracking-widest">Applications Ecosystem</h3>
-                                <nav className="flex flex-col gap-3 font-aztec-mono text-[11px] uppercase tracking-wider">
-                                    <a href="#ecosystem" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> DeFi & Yield Assets
-                                    </a>
-                                    <a href="#compliance" className="text-[var(--aztec-parchment)]/50 hover:text-[var(--aztec-parchment)] transition-all flex items-center gap-2 hover:translate-x-1">
-                                        <div className="w-1 h-1 bg-[var(--aztec-parchment)]/20" /> Forensic Compliance
-                                    </a>
-                                </nav>
-                            </div>
+                        <div className="space-y-6">
+                            <h3 className="font-aztec-h2 text-[10px] font-black text-[var(--aztec-parchment)] uppercase tracking-widest leading-loose">Paginación Rápida</h3>
+                            <nav className="flex flex-col gap-2 font-aztec-mono text-[10px] uppercase tracking-wider">
+                                {indices.map((idx, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => goToPage(idx.target)}
+                                        className={\`flex items-center gap-3 p-2 border transition-all \${currentPage >= idx.target && (i === indices.length - 1 || currentPage < indices[i+1].target) ? 'bg-[var(--aztec-chartreuse)]/10 border-[var(--aztec-chartreuse)]/30 text-[var(--aztec-chartreuse)]' : 'border-transparent text-[var(--aztec-parchment)]/40 hover:text-[var(--aztec-parchment)] hover:border-[var(--aztec-parchment)]/10'}\`}
+                                    >
+                                        {idx.icon}
+                                        {idx.label}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+
+                        {/* Pagination Jump Tool */}
+                        <div className="pt-6 border-t border-[var(--aztec-parchment)]/10">
+                            <form onSubmit={handleJump} className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--aztec-parchment)]/30" size={14} />
+                                <input 
+                                    type="number" 
+                                    min="0" 
+                                    max="400" 
+                                    placeholder="Ir a Pág (0-400)..." 
+                                    value={jumpInput}
+                                    onChange={e => setJumpInput(e.target.value)}
+                                    className="w-full bg-black border border-[var(--aztec-parchment)]/20 py-2.5 pl-9 pr-3 text-[10px] font-aztec-mono uppercase tracking-widest text-[var(--aztec-parchment)] focus:outline-none focus:border-[var(--aztec-chartreuse)]/50 transition-colors placeholder:text-[var(--aztec-parchment)]/30"
+                                />
+                            </form>
                         </div>
                     </div>
                 </aside>
 
-                {/* Main Content */}
-                <main className="space-y-40">
+                {/* Main Content Area */}
+                <main className="flex flex-col min-h-[70vh]">
                     
-                    {/* Introduction Section */}
-                    <section id="overview" className="relative glitch-hover">
-                        <div className="font-aztec-mono text-[11px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.5em] mb-6 flex items-center gap-4">
+                    {/* Header Paginador / Categoría */}
+                    <div className="flex items-center justify-between mb-8 border-b border-[var(--aztec-parchment)]/10 pb-6 flex-wrap gap-4">
+                        <div className="font-aztec-mono text-[10px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.5em] flex items-center gap-4">
                             <div className="w-8 h-[1px] bg-[var(--aztec-chartreuse)]/40" />
-                            WHALE ALERT CORP • CORE ENGINE
+                            {currentDoc.category} // EXTRACCIÓN GLOBAL
                         </div>
-                        <h1 className="font-aztec-h1 text-[clamp(2.5rem,6vw,6rem)] font-black leading-[0.85] tracking-tight text-[var(--aztec-parchment)] mb-10 uppercase break-words hyphens-auto">
-                            Introduction <br/> <span className="text-[var(--aztec-orchid)]">to Whale Alert.</span>
-                        </h1>
-                        <div className="space-y-8">
-                            <p className="font-aztec-body text-2xl text-[var(--aztec-parchment)]/90 max-w-3xl leading-relaxed border-l-4 border-[var(--aztec-orchid)] pl-8 py-2 italic font-bold">
-                                Whale Alert's typography reflects its uncompromising, institutional ethos. Real-time elite intelligence for on-chain use cases.
-                            </p>
-                            <p className="font-aztec-body text-xl text-[var(--aztec-parchment)]/70 max-w-3xl leading-relaxed">
-                                The canonical guide to interfacing with our bespoke forensic engines. Extract deterministic transaction flows, perfectly reconstruct L1/L2 callstacks, trace dark-pool routing via automated MEV searchers, and pipe unadulterated intelligence directly to your proprietary institutional trading systems via our zero-copy, zero-latency WebSockets.
-                            </p>
+                        <div className="font-aztec-mono text-[10px] uppercase tracking-widest text-[var(--aztec-parchment)]/40 bg-black/40 border border-white/5 px-4 py-2">
+                            PÁGINA <span className="text-white font-black">{currentDoc.id}</span> DE 400
                         </div>
-                        <div className="mt-12 flex gap-6">
-                            <button className="px-8 py-4 bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] font-aztec-mono font-black text-[11px] uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_30px_rgba(182,234,38,0.3)]">
-                                Initialize Compliance
-                            </button>
-                            <button className="px-8 py-4 bg-transparent border border-[var(--aztec-parchment)]/20 text-[var(--aztec-parchment)] font-aztec-mono font-bold text-[11px] uppercase tracking-widest hover:bg-[var(--aztec-parchment)]/5 transition-all flex items-center gap-2">
-                                Read Documentation <ChevronRight size={14} />
-                            </button>
-                        </div>
-                    </section>
+                    </div>
 
-                    {/* Applications Ecosystem */}
-                    <section id="ecosystem" className="space-y-16 border-t border-[var(--aztec-parchment)]/10 pt-20">
-                        <div className="space-y-4">
-                            <h2 className="font-aztec-h1 text-4xl lg:text-6xl font-black text-[var(--aztec-parchment)] uppercase tracking-tight">Applications Ecosystem</h2>
-                            <h3 className="font-aztec-h2 text-xl lg:text-3xl text-[var(--aztec-orchid)] italic">Why Whale Alert?</h3>
-                            <p className="font-aztec-body text-lg text-[var(--aztec-parchment)]/70 max-w-3xl leading-relaxed mt-4 border-l-2 border-[var(--aztec-parchment)]/10 pl-6">
-                                Built for a wide range of applications: Whale Alert supports DeFi, remittances, payments, capital markets, identity management, and even zero-sum games like trading.
-                            </p>
-                        </div>
+                    {/* Contenido Renderizado */}
+                    <article 
+                        className="flex-1 font-aztec-body text-lg lg:text-xl text-[var(--aztec-parchment)]/70 leading-relaxed break-words"
+                        dangerouslySetInnerHTML={{ __html: parseAztecMD(currentDoc.content) }}
+                    />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {/* Card 1 */}
-                            <div className="bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/10 p-8 hover:border-[var(--aztec-chartreuse)]/30 transition-all group glitch-hover">
-                                <Activity className="text-[var(--aztec-chartreuse)] mb-6 duration-500 group-hover:scale-110" size={32} />
-                                <h4 className="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mb-3">DeFi & Yield Assets</h4>
-                                <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60">Private decentralized finance tracking with institutional-grade security.</p>
-                            </div>
+                    {/* Footer Nav Controls */}
+                    <div className="mt-20 pt-8 border-t border-[var(--aztec-parchment)]/10 flex items-center justify-between">
+                        <button 
+                            onClick={() => goToPage(0)}
+                            disabled={currentPage === 0}
+                            className="p-3 border border-[var(--aztec-parchment)]/10 text-[var(--aztec-parchment)]/50 hover:bg-[var(--aztec-parchment)]/5 hover:text-white disabled:opacity-20 transition-all hidden md:block"
+                        >
+                            <Rewind size={16} />
+                        </button>
+
+                        <div className="flex items-center gap-4 flex-1 md:flex-none justify-center">
+                            <button 
+                                onClick={() => goToPage(currentPage - 1)}
+                                disabled={currentPage === 0}
+                                className="px-6 py-3 bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/20 text-[10px] font-aztec-mono font-black uppercase tracking-widest text-[var(--aztec-parchment)] hover:border-[var(--aztec-chartreuse)]/50 hover:text-[var(--aztec-chartreuse)] disabled:opacity-30 transition-all flex items-center gap-3"
+                            >
+                                <ChevronLeft size={16} /> Anterior
+                            </button>
                             
-                            {/* Card 2 */}
-                            <div className="bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/10 p-8 hover:border-[var(--aztec-orchid)]/30 transition-all group glitch-hover">
-                                <Globe className="text-[var(--aztec-orchid)] mb-6 duration-500 group-hover:scale-110" size={32} />
-                                <h4 className="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mb-3">Global Remittances</h4>
-                                <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60">Instant, private cross-border payments surveillance for everyone.</p>
-                            </div>
+                            <span className="font-aztec-mono text-[10px] font-black uppercase text-[var(--aztec-parchment)]/30 hidden sm:block">
+                                [{currentPage} / 400]
+                            </span>
 
-                            {/* Card 3 */}
-                            <div className="bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/10 p-8 hover:border-[var(--aztec-chartreuse)]/30 transition-all group glitch-hover">
-                                <div className="text-[var(--aztec-chartreuse)] mb-6 font-aztec-h1 text-4xl leading-none duration-500 group-hover:scale-110">$27.6T</div>
-                                <h4 className="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mb-3">Stablecoin Volume</h4>
-                                <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60">Monitored throughout 2024 through our institutional data nodes.</p>
-                            </div>
-
-                             {/* Card 4 */}
-                            <div className="bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/10 p-8 hover:border-[var(--aztec-orchid)]/30 transition-all group glitch-hover">
-                                <Network className="text-[var(--aztec-orchid)] mb-6 duration-500 group-hover:scale-110" size={32} />
-                                <h4 className="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mb-3">Capital Markets</h4>
-                                <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60">Tokenized real-world assets tracked with privacy-preserving compliance.</p>
-                            </div>
-
-                             {/* Card 5 */}
-                            <div className="bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/10 p-8 hover:border-[var(--aztec-chartreuse)]/30 transition-all group glitch-hover">
-                                <Fingerprint className="text-[var(--aztec-chartreuse)] mb-6 duration-500 group-hover:scale-110" size={32} />
-                                <h4 className="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mb-3">Identity Mgmt</h4>
-                                <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60">Verifiable, private identity tracking for sovereign digital beings.</p>
-                            </div>
-
-                            {/* Card 6 */}
-                            <div className="bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/10 p-8 hover:border-[var(--aztec-orchid)]/30 transition-all group glitch-hover">
-                                <Cpu className="text-[var(--aztec-orchid)] mb-6 duration-500 group-hover:scale-110" size={32} />
-                                <h4 className="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mb-3">Verifiable AI/ML</h4>
-                                <p className="font-aztec-body text-sm text-[var(--aztec-parchment)]/60">Encrypted machine learning models enforcing forensic transparency on public blockchains.</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Institutional Compliance Section */}
-                    <section id="compliance" className="space-y-12 border-t border-[var(--aztec-parchment)]/10 pt-20">
-                        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 mb-8">
-                            <div className="flex items-center gap-6">
-                                <div className="p-5 bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/20 text-[var(--aztec-parchment)] shrink-0 shadow-lg">
-                                    <Shield size={40} className="text-[var(--aztec-chartreuse)]" />
-                                </div>
-                                <div>
-                                    <h2 className="font-aztec-h1 text-4xl lg:text-6xl font-black text-[var(--aztec-parchment)] uppercase tracking-tight leading-[0.9]">
-                                        Institutional Grade <br/> <span className="text-[var(--aztec-orchid)] italic">Sovereign Compliance.</span>
-                                    </h2>
-                                    <div className="font-aztec-mono text-[10px] text-[var(--aztec-parchment)]/40 uppercase tracking-[0.4em] mt-4">INSTITUTIONAL FORENSIC COMPLIANCE</div>
-                                </div>
-                            </div>
+                            <button 
+                                onClick={() => goToPage(currentPage + 1)}
+                                disabled={currentPage === 400}
+                                className="px-6 py-3 bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-white disabled:opacity-30 disabled:bg-[var(--aztec-parchment)]/10 transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(182,234,38,0.2)]"
+                            >
+                                Siguiente <ChevronRight size={16} />
+                            </button>
                         </div>
 
-                        <p className="font-aztec-body text-xl text-[var(--aztec-parchment)]/80 leading-relaxed max-w-4xl border-l-[3px] border-[var(--aztec-chartreuse)] pl-8">
-                            Whale Alert enables privacy-preserving compliance for institutions and businesses transacting on public blockchains. No more adoption capping due to lack of privacy documentation or forensic exposure.
-                        </p>
-
-                        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mt-8">
-                            <div className="flex items-center gap-6 p-6 border border-[var(--aztec-parchment)]/10 bg-[var(--aztec-ink)]/50 glitch-hover">
-                                <div className="text-4xl font-aztec-h1 font-black text-[var(--aztec-chartreuse)]">24/7</div>
-                                <div className="font-aztec-mono text-[11px] font-bold uppercase tracking-widest text-[var(--aztec-parchment)]">Zero-Knowledge Audits</div>
-                            </div>
-                            <div className="flex items-center gap-6 p-6 border border-[var(--aztec-parchment)]/10 bg-[var(--aztec-ink)]/50 glitch-hover">
-                                <div className="text-4xl font-aztec-h1 font-black text-[var(--aztec-orchid)]">0%</div>
-                                <div className="font-aztec-mono text-[11px] font-bold uppercase tracking-widest text-[var(--aztec-parchment)]">Data Leakage Risk</div>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    {/* Contract Tutorial Example adapted */}
-                    <section id="tracking-contract" className="space-y-12 border-t border-[var(--aztec-parchment)]/10 pt-20">
-                         <div className="flex items-center gap-6 mb-8">
-                            <div className="p-4 bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/20 text-[var(--aztec-parchment)] shrink-0">
-                                <Terminal size={32} />
-                            </div>
-                            <div>
-                                <h2 className="font-aztec-h1 text-3xl lg:text-5xl font-black text-[var(--aztec-parchment)] uppercase tracking-tight">Verify AI-Driven Proofs</h2>
-                                <div className="font-aztec-mono text-[10px] text-[var(--aztec-parchment)]/30 uppercase tracking-[0.4em] mt-2">WHALE ALERT CONTRACTS</div>
-                            </div>
-                        </div>
-                        
-                        <p className="font-aztec-body text-lg text-[var(--aztec-parchment)]/80 leading-relaxed max-w-3xl">
-                            In this guide, we will create our first sovereign smart contract integration. We will build a simple private listener, where you can keep your own encrypted analytics - so no one knows what liquidity ID you are tracing or when you execute! This contract will get you started with the basic setup and syntax of the Whale API.
-                        </p>
-
-                        <div className="space-y-6 max-w-4xl">
-                            <h4 className="font-aztec-mono text-[10px] font-black uppercase tracking-[0.3em] text-[var(--aztec-chartreuse)]">1. Initialize Compliance</h4>
-                            <div className="border border-[var(--aztec-parchment)]/10 bg-[var(--aztec-ink)] relative h-[250px] flex flex-col shadow-2xl glitch-hover">
-                                <div className="bg-[var(--aztec-ink)] px-6 py-3 border-b border-[var(--aztec-parchment)]/10 flex items-center justify-between shrink-0">
-                                    <span className="text-[10px] font-aztec-mono uppercase tracking-widest text-[var(--aztec-parchment)]/40">TypeScript / Whale.js</span>
-                                    <Code2 size={14} className="text-[var(--aztec-parchment)]/20" />
-                                </div>
-                                <pre
-                                    className="p-6 lg:p-8 text-[11px] lg:text-[13px] font-mono text-[var(--aztec-parchment)]/80 leading-relaxed overflow-x-auto flex-1 custom-scrollbar"
-                                    dangerouslySetInnerHTML={{ __html: [
-                                        `<span style="color:var(--aztec-orchid)">import</span> { WhaleDelivery, SovereignLogger } <span style="color:var(--aztec-orchid)">from</span> '@whale-alert/sdk';`,
-                                        ``,
-                                        `<span style="color:var(--aztec-parchment);opacity:0.4">// Sovereign initializer decorator</span>`,
-                                        `@initializer`,
-                                        `@external("private")`,
-                                        `<span style="color:var(--aztec-orchid)">export async function</span> initializeSentinel(headstart: <span style="color:var(--aztec-chartreuse)">u64</span>, owner: <span style="color:var(--aztec-chartreuse)">WhaleAddress</span>) {`,
-                                        `    <span style="color:var(--aztec-parchment);opacity:0.4">// Delivers strict on-chain constrained notes</span>`,
-                                        `    <span style="color:var(--aztec-orchid)">await</span> <span style="color:var(--aztec-chartreuse)">this</span>.storage.clusters.at(owner).add(headstart).deliver(`,
-                                        `        WhaleDelivery.ONCHAIN_CONSTRAINED,`,
-                                        `    );`,
-                                        `}`,
-                                    ].join('\n') }}
-                                />
-                            </div>
-                        </div>
-                    </section>
+                        <button 
+                            onClick={() => goToPage(400)}
+                            disabled={currentPage === 400}
+                            className="p-3 border border-[var(--aztec-parchment)]/10 text-[var(--aztec-parchment)]/50 hover:bg-[var(--aztec-parchment)]/5 hover:text-white disabled:opacity-20 transition-all hidden md:block"
+                        >
+                            <FastForward size={16} />
+                        </button>
+                    </div>
 
                 </main>
             </div>
             
-             <style jsx global>{`
+             <style jsx global>{\`
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(182,234,38,0.5); }
-            `}</style>
+                .list-square { list-style-type: square; }
+                .list-diamond { list-style-type: disc; } /* standard fallback */
+            \`}</style>
         </div>
     );
 }
