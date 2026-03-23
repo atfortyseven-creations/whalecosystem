@@ -116,7 +116,7 @@ export function AcademyViewer() {
                                                 className="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--aztec-orchid)]" 
                                             />
                                         )}
-                                        <span className="truncate leading-tight">{article.title.substring(article.title.indexOf('.') + 1).trim()}</span>
+                                        <span className="truncate leading-tight">{(article.title || '').substring((article.title || '').indexOf('.') + 1).trim()}</span>
                                     </button>
                                 ))}
                             </div>
