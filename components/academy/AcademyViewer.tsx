@@ -175,7 +175,7 @@ export function AcademyViewer() {
                                         <div className="mb-8 space-y-4">
                                             <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-[var(--aztec-orchid)]/80 font-mono">
                                                 <span className="flex items-center gap-1.5 bg-[var(--aztec-orchid)]/10 px-3 py-1 rounded-full"><ClockIcon size={12} /> {article.readTime} MIN READ</span>
-                                                <span className="text-[var(--aztec-ink)]/30">ID: {article.id.toUpperCase()}</span>
+                                                 <span className="text-[var(--aztec-ink)]/30">ID: {article.id?.toUpperCase() || ''}</span>
                                             </div>
                                             
                                             <h3 className="font-aztec-h1 text-4xl md:text-6xl text-[var(--aztec-ink)] tracking-tight leading-[1.1]">

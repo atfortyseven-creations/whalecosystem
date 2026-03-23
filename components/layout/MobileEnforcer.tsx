@@ -15,8 +15,9 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             const isMobileDevice = /android|mobi|iphone|ipod|ipad/i.test(userAgent.toLowerCase());
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             
-            // Strictly enforce mobile view ONLY on actual phones/tablets, not just resized PC windows
-            setIsMobile((isMobileDevice || isTouch) && window.innerWidth < 1024);
+            // ONLY enforce mobile view on actual mobile devices (phones/tablets) 
+            // PC users with touch screens or resized windows should NEVER see the mobile landing page.
+            setIsMobile(isMobileDevice && window.innerWidth < 1024);
         };
         checkMobile();
         setMounted(true);
