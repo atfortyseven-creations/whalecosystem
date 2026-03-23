@@ -59,12 +59,16 @@ interface SniperState {
   // Tactical History
   executedTrades: { hash: string; amount: number; priceAtExecution: number; timestamp: number }[];
 
+  // Global UI States
+  isArmed: boolean;
+
   // HFT Actions
   setPrice: (price: number, latency?: number) => void;
   pushAlert: (alert: Web3WhaleAlert) => void;
   updateFilters: (updates: Partial<SniperFilters>) => void;
   setConnectionStatus: (status: boolean) => void;
   addExecutedTrade: (hash: string, amount: number, priceAtExecution: number) => void;
+  setArmed: (armed: boolean) => void;
 }
 
 // ── Web Audio API (HFT Tactical Sounds) ──
@@ -115,6 +119,7 @@ export const useSniperStore = create<SniperState>((set) => ({
   currentPrice: 0,
   alerts: [],
   executedTrades: [],
+  isArmed: false,
   filters: {
     minVolumeUsd: 1000000, // 1M USD Default
     targetAssets: ['ETH', 'BTC'],
@@ -165,4 +170,6 @@ export const useSniperStore = create<SniperState>((set) => ({
     set((state) => ({
       executedTrades: [{ hash, amount, priceAtExecution, timestamp: Date.now() }, ...state.executedTrades].slice(0, 50)
     })),
+    
+  setArmed: (armed) => set({ isArmed: armed }),
 }));

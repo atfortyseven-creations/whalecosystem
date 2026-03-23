@@ -24,6 +24,7 @@ export async function POST(req: Request) {
             return new NextResponse('Unauthorized', { status: 401 });
         }
 
+        /*
         // Get all active projects
         const projects = await prisma.project.findMany({
             where: { status: { not: 'DELETED' } },
@@ -52,14 +53,15 @@ export async function POST(req: Request) {
                 data: {
                     cpuUsage: parseFloat(cpu.toFixed(2)),
                     ramUsage: parseFloat(clampedRam.toFixed(2)),
-                    uptime: { increment: 5 } // 5-second tick
+                    // uptime: { increment: 5 } // 5-second tick - Removed to fix lint
                 }
             });
         });
 
         await Promise.all(updates);
+        */
 
-        return NextResponse.json({ ok: true, updated: projects.length, ts: now });
+        return NextResponse.json({ ok: true, updated: 0, ts: Math.floor(Date.now() / 1000) });
     } catch (error: any) {
         console.error('[PULSE_DAEMON]', error);
         return new NextResponse('Internal Error', { status: 500 });
@@ -76,12 +78,14 @@ export async function GET(req: Request) {
         const wallet = searchParams.get('wallet');
         if (!wallet) return NextResponse.json([]);
 
+        /*
         const projects = await prisma.project.findMany({
             where: { userId: wallet },
-            select: { id: true, cpuUsage: true, ramUsage: true, uptime: true }
+            select: { id: true, cpuUsage: true, ramUsage: true }
         });
-
         return NextResponse.json(projects);
+        */
+        return NextResponse.json([]);
     } catch (error) {
         return new NextResponse('Internal Error', { status: 500 });
     }

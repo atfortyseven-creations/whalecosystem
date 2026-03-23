@@ -17,8 +17,8 @@ export default function ExecutionDock() {
   const filters = useSniperStore((state) => state.filters);
   const currentPrice = useSniperStore((state) => state.currentPrice);
   const addExecutedTrade = useSniperStore((state) => state.addExecutedTrade);
-  
-  const [isArmed, setIsArmed] = useState(false);
+  const isArmed = useSniperStore((state) => state.isArmed);
+  const setArmed = useSniperStore((state) => state.setArmed);
   
   const { data: hash, isPending, sendTransaction, error: txError } = useSendTransaction();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
@@ -71,10 +71,10 @@ export default function ExecutionDock() {
         value: BigInt(quote.value), 
       });
       
-      setIsArmed(false);
+      setArmed(false);
     } catch (e: any) {
       setIsQuoting(false);
-      setIsArmed(false);
+      setArmed(false);
       toast.error(`Execution failed: ${e.shortMessage || e.message}`);
     }
   };
@@ -145,7 +145,7 @@ export default function ExecutionDock() {
       ) : (
         <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
             <button 
-                onClick={() => setIsArmed(!isArmed)}
+                onClick={() => setArmed(!isArmed)}
                 disabled={isPending || isConfirming}
                 className={`py-5 px-6 rounded-sm text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border ${
                     isArmed 

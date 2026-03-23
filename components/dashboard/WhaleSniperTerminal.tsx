@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { Activity, Skull, Zap, Crosshair } from 'lucide-react';
 import { useSniperStore } from '@/store/useSniperStore';
+import ContextMenu from '@/components/premium/ContextMenu';
+import { toast } from 'sonner';
 
 // Note: Logic inside these modules will be built in Phase 2
 import RadarFeed from './RadarFeed';
@@ -14,6 +16,7 @@ export default function WhaleSniperTerminal() {
   const { address, isConnected } = useAccount();
   const metrics = useSniperStore((state) => state.metrics);
   const setConnectionStatus = useSniperStore((state) => state.setConnectionStatus);
+  const setArmed = useSniperStore((state) => state.setArmed);
 
   // Phase 1 Mock Connection Setup (Zero-render WS Simulation)
   useEffect(() => {
@@ -21,8 +24,42 @@ export default function WhaleSniperTerminal() {
     return () => setConnectionStatus(false);
   }, []);
 
+  const handleContextMenuAction = (actionId: string) => {
+    switch (actionId) {
+      case 'copy':
+        if (address) {
+          navigator.clipboard.writeText(address);
+          toast.success('Sovereign Address copied to clipboard.');
+        } else {
+          toast.error('No ID linked. Cannot copy.');
+        }
+        break;
+      case 'alert':
+        toast.success('Whale Alert configured for current viewport thresholds.');
+        break;
+      case 'ai':
+        toast.promise(
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+          {
+            loading: 'Initializing Oracle Intelligence...',
+            success: 'Market Analysis: Extreme Volatility detected. Proceed with caution.',
+            error: 'AI Node unreachable.',
+          }
+        );
+        break;
+      case 'trade':
+        setArmed(true);
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        break;
+      case 'terminal':
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#050505] text-[#e0e0e0] font-mono selection:bg-[#fff] selection:text-[#000] flex flex-col relative overflow-hidden">
+    <ContextMenu onAction={handleContextMenuAction}>
+     <div className="min-h-screen bg-[#050505] text-[#e0e0e0] font-mono selection:bg-[#fff] selection:text-[#000] flex flex-col relative overflow-hidden">
       
       {/* ── TOP NAV BAR (MILITARY THEME) ── */}
       <header className="h-10 border-b border-white/10 bg-black flex items-center justify-between px-6 text-[10px] uppercase tracking-widest font-black">
@@ -101,7 +138,7 @@ export default function WhaleSniperTerminal() {
         </div>
 
       </main>
-
-    </div>
+     </div>
+    </ContextMenu>
   );
 }
