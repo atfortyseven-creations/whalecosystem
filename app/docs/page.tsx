@@ -1,227 +1,121 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { BookOpen, ChevronRight, Terminal, Shield, Network, ChevronLeft, FastForward, Rewind, Search } from 'lucide-react';
-import Image from 'next/image';
+import React from 'react';
+import { ArrowRight, Book, Terminal, Code, Cpu, Shield, Zap, Layers } from 'lucide-react';
+import Link from 'next/link';
 
-const parseAztecMD = (str: string) => {
-    if (!str) return '';
-    let html = str
-        .replace(/^### (.*$)/gim, '<h3 class="font-aztec-h1 text-xl text-[var(--aztec-orchid)] mt-8 mb-3 uppercase tracking-widest">$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2 class="font-aztec-h1 text-2xl text-[var(--aztec-parchment)] uppercase mt-12 mb-4 tracking-light">$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1 class="font-aztec-h1 text-4xl lg:text-5xl font-black text-[var(--aztec-chartreuse)] uppercase mb-8 tracking-tighter leading-[0.9] border-b border-[var(--aztec-chartreuse)]/20 pb-4">$1</h1>')
-        .replace(/^\* (.*$)/gim, '<li class="ml-6 mb-2 list-square marker:text-[var(--aztec-orchid)]">$1</li>')
-        .replace(/^- (.*$)/gim, '<li class="ml-6 mb-2 list-diamond marker:text-[var(--aztec-chartreuse)]">$1</li>')
-        .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-black">$1</strong>')
-        .replace(/\*(.*?)\*/gim, '<em class="text-[var(--aztec-orchid)] italic">$1</em>')
-        .replace(/```typescript\n([\s\S]*?)```/gim, '<pre class="bg-[#050505] p-6 border border-[var(--aztec-parchment)]/10 text-[11px] overflow-x-auto my-6 text-[var(--aztec-parchment)]/80 custom-scrollbar shadow-2xl">$1</pre>')
-        .replace(/`(.*?)`/gim, '<code class="bg-black border border-[var(--aztec-parchment)]/10 px-1.5 py-0.5 text-[var(--aztec-chartreuse)] text-[10px] font-mono">$1</code>')
-        .replace(/\n\n/gim, '<br/><br/>');
-    return html;
-};
-
-export default function DocsPage() {
-    const [pages, setPages] = useState<any[]>([]);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [jumpInput, setJumpInput] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        fetch('/docs-400.json')
-            .then(res => res.json())
-            .then(data => {
-                setPages(data);
-                setIsLoading(false);
-            })
-            .catch(err => {
-                console.error("Failed to load generic docs", err);
-                setIsLoading(false);
-            });
-    }, []);
-
-    const handleJump = (e: React.FormEvent) => {
-        e.preventDefault();
-        const num = parseInt(jumpInput, 10);
-        if (!isNaN(num) && num >= 0 && num <= 400 && pages[num]) {
-            setCurrentPage(num);
-            setJumpInput('');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
-
-    const goToPage = (num: number) => {
-        if (num >= 0 && num < pages.length) {
-            setCurrentPage(num);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-[var(--aztec-ink)] flex items-center justify-center font-aztec-mono text-[var(--aztec-chartreuse)] uppercase tracking-widest text-xs">
-                Iniciando Protocolo de Documentación [400 Pages]...
-            </div>
-        );
+export default function DocsLanding() {
+  const cards = [
+    {
+      title: 'Guides',
+      desc: 'Learn how to build, deploy, and manage sovereign agents on the Whale Alert Network.',
+      icon: <Book className="text-cyan-500" />,
+      href: '/docs/get-started',
+      links: [
+        { label: 'Introduction to Whale Alert', href: '/docs/intro' },
+        { label: 'Quickstart Guide', href: '/docs/quickstart' },
+        { label: 'Core Concepts', href: '/docs/core-concepts' },
+      ]
+    },
+    {
+      title: 'API Reference',
+      desc: 'Detailed documentation for the Whale Alert REST and WebSocket APIs.',
+      icon: <Terminal className="text-purple-500" />,
+      href: '/docs/api/usage',
+      links: [
+        { label: 'Authentication', href: '/docs/api/reference/tokens' },
+        { label: 'Agent Endpoints', href: '/docs/api/reference/agents' },
+        { label: 'Tool Registry', href: '/docs/api/reference/tools' },
+      ]
+    },
+    {
+      title: 'Whale Code',
+      desc: 'Master the proprietary scripting language for programmable data surveillance.',
+      icon: <Code className="text-emerald-500" />,
+      href: '/docs/whale-code/overview',
+      links: [
+        { label: 'Whale Code SDK', href: '/docs/whale-code/sdk/quickstart' },
+        { label: 'Skill Development', href: '/docs/whale-code/skills' },
+        { label: 'Subagent Patterns', href: '/docs/whale-code/subagents' },
+      ]
     }
+  ];
 
-    if (pages.length === 0) {
-        return (
-            <div className="min-h-screen bg-[var(--aztec-ink)] flex items-center justify-center font-aztec-mono text-rose-500 uppercase tracking-widest text-xs">
-                Error Crítico: Falla al cargar la matriz de datos.
-            </div>
-        );
-    }
+  return (
+    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      {/* Hero Section */}
+      <section className="space-y-6 border-b border-slate-200/5 pb-10">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase font-web3">
+          Whale Alert <br/><span className="text-cyan-500">Corporation™</span> Docs
+        </h1>
+        <p className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed">
+          Welcome to the official technical repository of the Whale Alert Corporation. 
+          Everything you need to orchestrate institutional-grade data surveillance and sovereign agent networks.
+        </p>
+      </section>
 
-    const currentDoc = pages[currentPage];
+      {/* Grid Sections */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {cards.map((card) => (
+          <div key={card.title} className="group p-8 rounded-[2rem] border border-slate-200/5 bg-white/5 hover:bg-white/[0.08] transition-all hover:border-cyan-500/20 shadow-2xl relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
+               {React.cloneElement(card.icon as React.ReactElement<any>, { size: 40 })}
+             </div>
+             
+             <div className="space-y-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  {React.cloneElement(card.icon as React.ReactElement<any>, { size: 20 })}
+                  <h2 className="text-xl font-black uppercase tracking-widest font-web3">{card.title}</h2>
+                </div>
+                <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+                  {card.desc}
+                </p>
+                <div className="pt-4 flex flex-col gap-2">
+                  {card.links.map(link => (
+                    <Link 
+                      key={link.label}
+                      href={link.href}
+                      className="text-xs text-slate-500 hover:text-cyan-400 flex items-center gap-2 transition-colors uppercase font-black tracking-widest"
+                    >
+                      <ArrowRight size={10} /> {link.label}
+                    </Link>
+                  ))}
+                </div>
+                <Link 
+                  href={card.href}
+                  className="mt-8 inline-flex items-center gap-2 px-6 py-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-cyan-500/20 hover:bg-cyan-500 hover:text-white transition-all"
+                >
+                  Explore {card.title}
+                </Link>
+             </div>
+          </div>
+        ))}
+      </div>
 
-    // Build standard indices for the sidebar based on blocks
-    const indices = [
-        { label: "Génesis e Índice", target: 0, icon: <BookOpen size={12} className="text-[var(--aztec-orchid)]" /> },
-        { label: "Filosofía Arquitectónica", target: 1, icon: <Shield size={12} className="text-[var(--aztec-chartreuse)]" /> },
-        { label: "Análisis del Sistema N1", target: 11, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
-        { label: "Análisis del Sistema N2", target: 100, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
-        { label: "Análisis del Sistema N3", target: 200, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
-        { label: "Análisis del Sistema N4", target: 300, icon: <Terminal size={12} className="text-[var(--aztec-parchment)]" /> },
-        { label: "Motor HFT", target: 381, icon: <Network size={12} className="text-[var(--aztec-orchid)]" /> },
-        { label: "Conclusión Inmortal", target: 391, icon: <BookOpen size={12} className="text-[var(--aztec-chartreuse)]" /> }
-    ];
-
-    return (
-        <div className="min-h-screen bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] font-sans relative overflow-hidden">
-            <div className="absolute inset-0 z-0">
-                <Image 
-                    src="/models/update/simon-lee-hbFd11O0nwc-unsplash.jpg" 
-                    alt="Sovereign Architecture" 
-                    fill 
-                    className="object-cover opacity-[0.10] mix-blend-screen grayscale" 
-                    priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-[var(--aztec-ink)]/90 via-transparent to-[var(--aztec-ink)] pointer-events-none" />
-            </div>
-
-            <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[280px,1fr] xl:grid-cols-[320px,1fr] gap-8 lg:gap-16 pt-32 lg:pt-40 pb-20 lg:pb-32 px-4 md:px-6 lg:px-12 relative z-10">
-                
-                {/* Aztec Restructured Sidebar */}
-                <aside className="hidden lg:block h-fit sticky top-40 text-[var(--aztec-parchment)]">
-                    <div className="bg-[var(--aztec-parchment)]/5 backdrop-blur-xl border border-[var(--aztec-parchment)]/10 shadow-2xl p-6 relative flex flex-col gap-8">
-                        {/* Decorative Corners */}
-                        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[var(--aztec-chartreuse)] opacity-60" />
-                        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[var(--aztec-chartreuse)] opacity-60" />
-
-                        <div className="font-aztec-mono text-[9px] uppercase tracking-[0.4em] text-[var(--aztec-parchment)]/40 border-b border-[var(--aztec-parchment)]/10 pb-4 flex items-center gap-2">
-                            <BookOpen size={14} className="text-[var(--aztec-orchid)]" /> MAINFRAME DOCS [400 PG]
-                        </div>
-
-                        <div className="space-y-6">
-                            <h3 className="font-aztec-h2 text-[10px] font-black text-[var(--aztec-parchment)] uppercase tracking-widest leading-loose">Paginación Rápida</h3>
-                            <nav className="flex flex-col gap-2 font-aztec-mono text-[10px] uppercase tracking-wider">
-                                {indices.map((idx, i) => {
-                                    const isCurrent = currentPage >= idx.target;
-                                    const isBeforeNext = i === indices.length - 1 || currentPage < indices[i+1].target;
-                                    const isActive = isCurrent && isBeforeNext;
-                                    return (
-                                        <button 
-                                            key={i} 
-                                            onClick={() => goToPage(idx.target)}
-                                            className={`flex items-center gap-3 p-2 border transition-all ${isActive ? 'bg-[var(--aztec-chartreuse)]/10 border-[var(--aztec-chartreuse)]/30 text-[var(--aztec-chartreuse)]' : 'border-transparent text-[var(--aztec-parchment)]/40 hover:text-[var(--aztec-parchment)] hover:border-[var(--aztec-parchment)]/10'}`}
-                                        >
-                                            {idx.icon}
-                                            {idx.label}
-                                        </button>
-                                    );
-                                })}
-                            </nav>
-                        </div>
-
-                        {/* Pagination Jump Tool */}
-                        <div className="pt-6 border-t border-[var(--aztec-parchment)]/10">
-                            <form onSubmit={handleJump} className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--aztec-parchment)]/30" size={14} />
-                                <input 
-                                    type="number" 
-                                    min="0" 
-                                    max="400" 
-                                    placeholder="Ir a Pág (0-400)..." 
-                                    value={jumpInput}
-                                    onChange={e => setJumpInput(e.target.value)}
-                                    className="w-full bg-black border border-[var(--aztec-parchment)]/20 py-2.5 pl-9 pr-3 text-[10px] font-aztec-mono uppercase tracking-widest text-[var(--aztec-parchment)] focus:outline-none focus:border-[var(--aztec-chartreuse)]/50 transition-colors placeholder:text-[var(--aztec-parchment)]/30"
-                                />
-                            </form>
-                        </div>
+      {/* Featured Architecture Section */}
+      <section className="p-10 rounded-[3rem] bg-gradient-to-br from-cyan-950/20 to-black border border-cyan-500/10 shadow-3xl">
+          <div className="flex flex-col lg:flex-row gap-12 items-center">
+              <div className="space-y-6 flex-1">
+                  <div className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.4em]">Zero-Knowledge Settlement</div>
+                  <h3 className="text-3xl font-black uppercase tracking-tighter leading-none font-web3">
+                    Programmable Privacy Core
+                  </h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    Whale Alert Protocol utilizes advanced ZK-proofs to ensure that sovereign identities remain untraceable while maintaining 100% regulatory transparency where required. Our "Neural Handshake" technology is the gold standard for cross-device synchronization.
+                  </p>
+                  <Link href="/docs/core-concepts" className="inline-flex items-center gap-2 text-[10px] font-black text-white hover:text-cyan-400 transition-colors uppercase tracking-widest">
+                    Study Architecture <ArrowRight size={14} />
+                  </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-4 w-full lg:w-1/3">
+                  {[Cpu, Shield, Zap, Layers].map((Icon, i) => (
+                    <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-cyan-400 hover:border-cyan-500/30 transition-all">
+                       <Icon size={32} strokeWidth={1} />
                     </div>
-                </aside>
-
-                {/* Main Content Area */}
-                <main className="flex flex-col min-h-[70vh]">
-                    
-                    {/* Header Paginador / Categoría */}
-                    <div className="flex items-center justify-between mb-8 border-b border-[var(--aztec-parchment)]/10 pb-6 flex-wrap gap-4">
-                        <div className="font-aztec-mono text-[10px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.5em] flex items-center gap-4">
-                            <div className="w-8 h-[1px] bg-[var(--aztec-chartreuse)]/40" />
-                            {currentDoc.category} // EXTRACCIÓN GLOBAL
-                        </div>
-                        <div className="font-aztec-mono text-[10px] uppercase tracking-widest text-[var(--aztec-parchment)]/40 bg-black/40 border border-white/5 px-4 py-2">
-                            PÁGINA <span className="text-white font-black">{currentDoc.id}</span> DE 400
-                        </div>
-                    </div>
-
-                    {/* Contenido Renderizado */}
-                    <article 
-                        className="flex-1 font-aztec-body text-lg lg:text-xl text-[var(--aztec-parchment)]/70 leading-relaxed break-words"
-                        dangerouslySetInnerHTML={{ __html: parseAztecMD(currentDoc.content) }}
-                    />
-
-                    {/* Footer Nav Controls */}
-                    <div className="mt-20 pt-8 border-t border-[var(--aztec-parchment)]/10 flex items-center justify-between">
-                        <button 
-                            onClick={() => goToPage(0)}
-                            disabled={currentPage === 0}
-                            className="p-3 border border-[var(--aztec-parchment)]/10 text-[var(--aztec-parchment)]/50 hover:bg-[var(--aztec-parchment)]/5 hover:text-white disabled:opacity-20 transition-all hidden md:block"
-                        >
-                            <Rewind size={16} />
-                        </button>
-
-                        <div className="flex items-center gap-4 flex-1 md:flex-none justify-center">
-                            <button 
-                                onClick={() => goToPage(currentPage - 1)}
-                                disabled={currentPage === 0}
-                                className="px-6 py-3 bg-[var(--aztec-ink)] border border-[var(--aztec-parchment)]/20 text-[10px] font-aztec-mono font-black uppercase tracking-widest text-[var(--aztec-parchment)] hover:border-[var(--aztec-chartreuse)]/50 hover:text-[var(--aztec-chartreuse)] disabled:opacity-30 transition-all flex items-center gap-3"
-                            >
-                                <ChevronLeft size={16} /> Anterior
-                            </button>
-                            
-                            <span className="font-aztec-mono text-[10px] font-black uppercase text-[var(--aztec-parchment)]/30 hidden sm:block">
-                                [{currentPage} / 400]
-                            </span>
-
-                            <button 
-                                onClick={() => goToPage(currentPage + 1)}
-                                disabled={currentPage === 400}
-                                className="px-6 py-3 bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-white disabled:opacity-30 disabled:bg-[var(--aztec-parchment)]/10 transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(182,234,38,0.2)]"
-                            >
-                                Siguiente <ChevronRight size={16} />
-                            </button>
-                        </div>
-
-                        <button 
-                            onClick={() => goToPage(400)}
-                            disabled={currentPage === 400}
-                            className="p-3 border border-[var(--aztec-parchment)]/10 text-[var(--aztec-parchment)]/50 hover:bg-[var(--aztec-parchment)]/5 hover:text-white disabled:opacity-20 transition-all hidden md:block"
-                        >
-                            <FastForward size={16} />
-                        </button>
-                    </div>
-
-                </main>
-            </div>
-            
-             <style jsx global>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(182,234,38,0.5); }
-                .list-square { list-style-type: square; }
-                .list-diamond { list-style-type: disc; } /* standard fallback */
-            `}</style>
-        </div>
-    );
+                  ))}
+              </div>
+          </div>
+      </section>
+    </div>
+  );
 }

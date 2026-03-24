@@ -73,12 +73,12 @@ export function WhaleAlertLanding() {
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
 
-          <h1 className="font-aztec-h1 text-[clamp(2.5rem,10vw,14rem)] leading-[0.85] text-[var(--aztec-ink)] mb-12 drop-shadow-sm">
-            Introduction <br/> to <span className="italic">Aztec</span>.
+          <h1 className="font-aztec-h1 text-[clamp(2.5rem,10vw,12rem)] leading-[0.85] text-[var(--aztec-ink)] mb-12 drop-shadow-sm">
+            Whale Alert <br/> Corporation<sup className="text-[0.2em] align-top ml-2 opacity-50 font-sans">TM</sup>
           </h1>
           
           <p className="font-aztec-body text-xl md:text-3xl text-[var(--aztec-ink)]/60 max-w-4xl mx-auto leading-relaxed mb-16 px-4">
-             Aztec’s technology provides programmable privacy for real-world use cases, ensuring your data remains your own while transacting on public blockchains.
+             Whale Alert’s technology provides programmable data surveillance for institutional use cases, ensuring your data remains sovereign while transacting on public blockchains.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
