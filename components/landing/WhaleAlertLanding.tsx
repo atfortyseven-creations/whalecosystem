@@ -104,9 +104,9 @@ export function WhaleAlertLanding() {
       {/* ── PHASE 2: BENTO EXPLAINER (4 PHOTOS) ── */}
       <section className="bg-[var(--aztec-ink)] py-32 px-6 relative z-10 border-t border-white/10">
           <div className="max-w-7xl mx-auto flex flex-col items-center">
-              <div className="font-aztec-h2 text-[12px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.6em] mb-12">Whale Alert Network</div>
+              <div className="font-aztec-h2 text-[12px] text-[var(--aztec-chartreuse)] uppercase tracking-[0.6em] mb-12">Global Intelligence</div>
               <h2 className="font-aztec-h1 text-5xl md:text-7xl text-white mb-20 text-center uppercase tracking-tighter">
-                  Institutional <span className="italic text-[var(--aztec-orchid)]">Intelligence</span>
+                  Whale Alert <span className="italic text-[var(--aztec-orchid)]">Protocol</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
@@ -115,9 +115,9 @@ export function WhaleAlertLanding() {
                       <Image src="/models/update/Aztec Image_04.jpg" alt="Whale Alert Network" fill className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-[2s]" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                       <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><Globe className="text-[var(--aztec-orchid)]" /> Global Network</h3>
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3">Global Network</h3>
                           <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
-                              Whale Alert Network is the premier institutional terminal for tracking oceanic dark pool movements. We decode the hidden flow of trillions of dollars across public ledgers, converting raw hexadecimal data into actionable, high-frequency kinetic intelligence.
+                              Whale Alert is the premier terminal for tracking oceanic dark pool movements. We decode the hidden flow of trillions of dollars across public ledgers, converting raw hexadecimal data into actionable, high-frequency kinetic intelligence.
                           </p>
                       </div>
                   </div>
@@ -127,7 +127,7 @@ export function WhaleAlertLanding() {
                       <Image src="/models/update/Aztec Image_03.jpg" alt="System Architecture" fill className="object-cover opacity-50 grayscale group-hover:scale-105 transition-transform duration-[2s]" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                       <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><Cpu className="text-[var(--aztec-chartreuse)]" /> Absolute Architecture</h3>
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3">Core Architecture</h3>
                           <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
                               Built on a proprietary triple-stack infrastructure. Our execution nodes synchronize directly with sovereign RPC endpoints, bypassing bloated middleware to deliver sub-millisecond settlement visualization across all Layer-1 and Layer-2 topologies.
                           </p>
@@ -139,7 +139,7 @@ export function WhaleAlertLanding() {
                       <Image src="/models/update/Aztec Image_06.jpg" alt="Scalability" fill className="object-cover opacity-50 grayscale mix-blend-screen group-hover:scale-105 transition-transform duration-[2s]" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                       <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><Zap className="text-[var(--aztec-aqua)]" /> Infinite Scalability</h3>
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3">Scalable Throughput</h3>
                           <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
                               The system dynamically shards incoming data feeds across isolated processing clusters. Whether parsing ten transactions per second or ten thousand during a black swan event, the sovereign dashboard maintains an unyielding 120Hz refresh rate.
                           </p>
@@ -151,7 +151,7 @@ export function WhaleAlertLanding() {
                       <Image src="/models/update/Aztec Image_12.jpg" alt="Sovereign Privacy Security" fill className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-[2s]" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                       <div className="absolute inset-0 p-10 flex flex-col justify-end">
-                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3"><ShieldCheck className="text-[var(--aztec-parchment)]" /> Cryptographic Aegis</h3>
+                          <h3 className="font-aztec-h3 text-3xl text-white mb-4 flex items-center gap-3">Data Privacy</h3>
                           <p className="font-aztec-body text-sm text-white/60 leading-relaxed max-w-sm">
                               Your identity remains yours. Whale Alert utilizes advanced Zero-Knowledge session proofs to sync your mobile device strictly to your terminal monitor. No centralized databases hold your unencrypted biometric wallet keys.
                           </p>
