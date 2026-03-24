@@ -29,10 +29,6 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       symbol: 'ETH',
       decimals: 18,
     },
-    rpcUrls: [
-      'https://eth-mainnet.g.alchemy.com/v2/',
-      'https://ethereum-rpc.publicnode.com',
-      process.env.ETH_RPC_URL || '',
       'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff',
     ].filter(Boolean),
     blockExplorerUrls: ['https://etherscan.io'],
@@ -49,10 +45,6 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       symbol: 'BNB',
       decimals: 18,
     },
-    rpcUrls: [
-      'https://bsc-dataseed.binance.org',
-      'https://binance.llamarpc.com',
-      process.env.BNB_RPC_URL || 'https://1rpc.io/bnb',
       'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517',
     ].filter(Boolean),
     blockExplorerUrls: ['https://bscscan.com'],
