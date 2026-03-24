@@ -16,6 +16,7 @@ import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
 import { LinkedGate } from '@/components/shared/LinkedGate';
+import { AuroraBackground } from '@/components/ui/AuroraBackground';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -37,7 +38,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <ConnectWalletModal />
             
             <TitaniumGate>
-                <div className="flex flex-col min-h-screen">
+                <AuroraBackground />
+                <div className="flex flex-col min-h-screen relative z-0">
                     <div className="flex-1 flex flex-col relative w-full">
                         {(!pathname.startsWith('/developers')) && <HighHzWallpaper />}
 
@@ -50,11 +52,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                             pathname === '/dashboard' ||
                             pathname === '/vip' ||
                             pathname === '/'
-                        ) && <InstitutionalHeader />}
+                        ) && (
+                            <div className="glass-aztek sticky top-0 z-50">
+                                <InstitutionalHeader />
+                            </div>
+                        )}
 
                         {/* Global Utility Hub */}
-                        <UtilityPanels />
-                        <$1BWhaleNotification />
+                        <div className="relative z-40">
+                          <UtilityPanels />
+                          <$1BWhaleNotification />
+                        </div>
                         
                         <ZoomWrapper>
                             <main className="relative z-10 w-full flex-1 flex flex-col">

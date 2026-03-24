@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function VipPage() {
   return (
-    <main className="min-h-screen bg-transparent">
+    <main className="min-h-screen glass-aztek">
       <MasterMatrixComponent />
     </main>
   );

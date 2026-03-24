@@ -699,10 +699,10 @@ export default function SovereignDashboard() {
     return (
         <div className="dash-root">
             {/* ─── SOVEREIGN HEADER ─── */}
-            <header style={{
-                height: 48, background: 'var(--az-ink)', borderBottom: '1px solid rgba(255,255,255,0.07)',
+            <header className="glass-aztek" style={{
+                height: 48, borderBottom: '1px solid rgba(255,255,255,0.07)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0 24px', flexShrink: 0, zIndex: 'var(--z-header)', backdropFilter: 'blur(20px)'
+                padding: '0 24px', flexShrink: 0, zIndex: 'var(--z-header)'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                     <span className="az-label">{clock}</span>
@@ -739,7 +739,7 @@ export default function SovereignDashboard() {
             </header>
 
             {/* ─── TAB NAV ─── */}
-            <div className="az-tab-bar">
+            <div className="az-tab-bar glass-aztek">
                 {TABS.map(t => (
                     <button key={t.id} onClick={() => setTab(t.id)} className={`az-tab${tab === t.id ? ' active' : ''}`}>
                         {t.icon}
