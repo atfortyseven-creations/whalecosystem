@@ -46,3 +46,10 @@ logs/
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Railway Deploy Fix
+.git/objects/pack/
+*.pack
+*.idx
+node_modules/
+.next/

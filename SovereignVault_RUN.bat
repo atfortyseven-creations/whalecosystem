@@ -1,4 +1,4 @@
-@echo off
+7echo off
 setlocal EnableDelayedExpansion
 
 :: 🏛️  SOVEREIGN VAULT DAEMON (PRO-ACTIVE MANAGER)
