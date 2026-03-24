@@ -51,7 +51,10 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true
     },
-
+    devIndicators: {
+        appIsrStatus: false,
+        buildActivity: false,
+    },
 
     // External packages
     serverExternalPackages: [

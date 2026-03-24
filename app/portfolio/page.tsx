@@ -16,25 +16,31 @@ import {
   User
 } from 'lucide-react';
 
+interface Tab {
+  id: number;
+  title: string;
+  url: string;
+}
+
 export default function PortfolioPage() {
-  const { t } = useLanguage();
+  // const { t } = useLanguage(); 
   const { address, isConnected } = useAccount();
   const { isLoaded } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [tabs, setTabs] = useState([{ id: 0, title: 'Network Hub', url: 'aztek://hub' }]);
+  const [tabs, setTabs] = useState<Tab[]>([{ id: 0, title: 'Network Hub', url: 'aztek://hub' }]);
 
   useEffect(() => setMounted(true), []);
 
   const addTab = () => {
-    const newId = Math.max(...tabs.map(t => t.id)) + 1;
-    setTabs([...tabs, { id: newId, title: 'New Tab', url: 'about:blank' }]);
-    setActiveTab(newId);
+    const nextId = tabs.length > 0 ? Math.max(...tabs.map((item: Tab) => item.id)) + 1 : 0;
+    setTabs([...tabs, { id: nextId, title: 'New Tab', url: 'about:blank' }]);
+    setActiveTab(nextId);
   };
 
   const removeTab = (id: number) => {
     if (tabs.length === 1) return;
-    const newTabs = tabs.filter(t => t.id !== id);
+    const newTabs = tabs.filter((t: Tab) => t.id !== id);
     setTabs(newTabs);
     if (activeTab === id) setActiveTab(newTabs[0].id);
   };
@@ -45,7 +51,7 @@ export default function PortfolioPage() {
     <div className="flex flex-col h-screen overflow-hidden text-[var(--aztec-ink)] font-aztec-mono">
       {/* ── BROWSER CHROME: TABSTRIP ── */}
       <div className="flex items-center gap-1 bg-black/10 px-2 pt-2 border-b border-white/5 overflow-x-auto no-scrollbar">
-        {tabs.map((tab) => (
+        {tabs.map((tab: Tab) => (
           <div 
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -71,7 +77,7 @@ export default function PortfolioPage() {
       <div className="flex items-center gap-4 px-4 py-3 bg-black/5 border-b border-white/5">
         <div className="flex items-center gap-3 px-4 py-1.5 flex-1 bg-black/20 rounded-lg border border-white/5">
           <Globe size={14} className="text-white/30" />
-          <span className="text-xs text-white/60 truncate">{tabs.find(t => t.id === activeTab)?.url}</span>
+          <span className="text-xs text-white/60 truncate">{tabs.find((t: Tab) => t.id === activeTab)?.url}</span>
         </div>
         <div className="flex items-center gap-4">
           {/* CWI IDENTITY STATUS */}
