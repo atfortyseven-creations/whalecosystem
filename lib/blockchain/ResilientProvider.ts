@@ -8,8 +8,8 @@ interface RPCEndpoint {
 }
 
 /** Pre-configured Resilient Providers for the Whale Alert ecosystem (CU-SHIELD) */
-const GETBLOCK_ETH_HTTPS = 'https://go.getblock.us/81e6b261aadf450aa75481b48b253a50';
-const GETBLOCK_BSC_HTTPS = 'https://go.getblock.us/aece34fd45ec4d9fa884d338cf4fa037';
+const GETBLOCK_ETH_HTTPS = 'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff';
+const GETBLOCK_BSC_HTTPS = 'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517';
 
 /**
  * ResilientProvider

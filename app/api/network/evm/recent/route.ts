@@ -49,7 +49,7 @@ const CHAINS: ChainConfig[] = [
     label: 'ETHEREUM',
     chainId: 1,
     rpcUrls: [
-      'https://go.getblock.us/81e6b261aadf450aa75481b48b253a50',
+      'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff',
       process.env.ETH_RPC_URL || '',
       'https://eth.llamarpc.com',
     ].filter(Boolean),
@@ -72,7 +72,7 @@ const CHAINS: ChainConfig[] = [
     label: 'BSC',
     chainId: 56,
     rpcUrls: [
-      'https://go.getblock.us/aece34fd45ec4d9fa884d338cf4fa037', // User Dedicated BSC Node
+      'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517', // User Dedicated BSC Node
       process.env.BSC_RPC_URL || '',
       'https://binance.llamarpc.com',
       'https://bsc-dataseed.binance.org',
