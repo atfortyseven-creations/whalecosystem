@@ -57,13 +57,24 @@ export async function GET() {
 
         const snapshotMap = new Map(snapshots.map(s => [s.address, s]));
 
+        // JOIN with WalletAnalytics for real PNL/Metadata (Phase 6)
+        const analytics = await prisma.walletAnalytics.findMany({
+            where: { address: { in: addresses } }
+        });
+        const analyticsMap = new Map(analytics.map(a => [a.address.toLowerCase(), a]));
+
         const leaderboard = result.map((r, index) => {
             const snap = snapshotMap.get(r.walletAddress);
+            const analytic = analyticsMap.get(r.walletAddress.toLowerCase());
+            const metadata = analytic?.metadata as any;
+            const pnlData = metadata?.profitLossBreakdown || { totalPnlUsd: 0 };
+
             return {
                 rank: index + 1,
                 address: r.walletAddress,
                 label: snap?.label || `Whale-${r.walletAddress.slice(2, 6)}`,
                 volume24h: Number(r._sum.usdValue || 0),
+                pnlUsd: pnlData.totalPnlUsd || 0, // REAL PNL from WalletAnalytics memory
                 txCount: r._count.id,
                 chain: snap?.chain || 'ETH',
                 tier: snap?.tier || (Number(r._sum.usdValue) > 1000000 ? 'MEGA' : 'ALPHA'),

@@ -103,7 +103,7 @@ export default function EntityNexusPage() {
                                         </div>
                                         <div>
                                             <div className="text-[10px] text-stone-400 uppercase font-bold tracking-widest mb-1">Direct Links</div>
-                                            <div className="text-xl font-bold text-stone-900">{Math.floor(Math.random() * 50) + 10} Nodes</div>
+                                            <div className="text-xl font-bold text-stone-900">{(entity as any).linkedNodeCount ?? '—'} Nodes</div>
                                         </div>
                                         <div className="col-span-2 md:col-span-1 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-8">
                                             <button className="w-full h-full flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors">

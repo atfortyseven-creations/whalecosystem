@@ -248,13 +248,8 @@ export class IntelligenceService {
             });
         } catch (error) {
             console.error(`[IntelligenceService] AI Forensic Analysis failed for ${address}:`, error);
-            forensics = {
-                riskScore: 50,
-                summary: "Forensic analysis is analyzing the grid. Base on-chain data suggests standard elite activity.",
-                labels: ["Elite Profile"],
-                isWhale: stats.transactions > 1000,
-                isExchanges: false
-            } as any;
+            // Phase 6: No synthetic profiles. Reporting must be 100% honest.
+            forensics = undefined;
         }
 
         const report: IntelligenceReport = {

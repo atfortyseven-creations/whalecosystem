@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, Activity, AlertTriangle, CheckCircle, X, History, Filter } from 'lucide-react';
 import { useVIPStore } from '@/lib/vip-store';
@@ -26,22 +26,30 @@ export default function AlertsPage() {
         });
     };
 
+    const prevEthPriceRef = React.useRef<number>(0);
+
     // Derived Intelligent Alerts from Store Data
     useEffect(() => {
         if (!ethPrice || ethPrice === 0) return;
 
-        // 1. Price Spike detection
-        if (Math.random() > 0.98) {
-            addAlert({
-                id: `price-${Date.now()}`,
-                type: 'price_spike',
-                title: 'High Volatility Detected',
-                body: `ETH price movement exceeded 0.5% in < 30s. Current: $${ethPrice.toLocaleString()}`,
-                severity: 'medium',
-                ts: Date.now(),
-                read: false,
-            });
+        // 1. REAL Price Spike detection: ≥0.5% movement since last tick
+        const prev = prevEthPriceRef.current;
+        if (prev > 0) {
+            const deltaPct = Math.abs((ethPrice - prev) / prev);
+            if (deltaPct >= 0.005) {
+                const direction = ethPrice > prev ? '▲' : '▼';
+                addAlert({
+                    id: `price-${Date.now()}`,
+                    type: 'price_spike',
+                    title: 'High Volatility Detected',
+                    body: `ETH moved ${direction} ${(deltaPct * 100).toFixed(2)}% in one interval. Current: $${ethPrice.toLocaleString()}`,
+                    severity: deltaPct >= 0.02 ? 'high' : 'medium',
+                    ts: Date.now(),
+                    read: false,
+                });
+            }
         }
+        prevEthPriceRef.current = ethPrice;
 
         // 2. Whale alerts from the central event stream
         const largeEvent = whaleEvents.find(e => e.usdNum > 2_000_000);

@@ -40,7 +40,7 @@ export function TokenActivityBar({ symbol }: TokenActivityBarProps) {
     // Institutional Fallback for Price Discovery
     const fallbackPrices: Record<string, number> = { BTC: 68420.50, ETH: 3512.20, BNB: 590.10, SOL: 145.40, LINK: 18.20, MATIC: 0.72 };
     const finalPrice = prices[symbol.toUpperCase()] || fallbackPrices[symbol.toUpperCase()] || 0;
-    const finalChange = (changes || {})[symbol.toUpperCase()] || (Math.random() * 4 - 2); // Dynamic fallback for live feel
+    const finalChange: number | null = (changes || {})[symbol.toUpperCase()] ?? null; // null when unavailable — no fake fallback
 
     return (
         <div className="flex flex-col bg-white border-t border-slate-100 p-6 space-y-6">
@@ -53,12 +53,19 @@ export function TokenActivityBar({ symbol }: TokenActivityBarProps) {
                         {finalPrice > 0 ? fmt(finalPrice) : '---'}
                     </span>
                 </div>
-                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border ${
-                    finalChange >= 0 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'
-                }`}>
-                    {finalChange >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                    {Math.abs(finalChange).toFixed(2)}%
-                </div>
+                {finalChange !== null ? (
+                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border ${
+                        finalChange >= 0 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'
+                    }`}>
+                        {finalChange >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                        {Math.abs(finalChange).toFixed(2)}%
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border bg-slate-50 text-slate-400 border-slate-100">
+                        <Activity size={10} />
+                        —
+                    </div>
+                )}
             </div>
 
             {/* Gravity / Sentido Bar */}

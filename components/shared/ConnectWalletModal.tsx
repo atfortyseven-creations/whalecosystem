@@ -82,6 +82,8 @@ export function ConnectWalletModal() {
     const handleMobileSync = async () => {
         setView('qr');
         try {
+            // Institutional Pre-flight: Clear old session
+            setQrSession(null);
             const res = await fetch('/api/auth/qr-session', { method: 'POST' });
             const data = await res.json();
             if (data.sessionId) {

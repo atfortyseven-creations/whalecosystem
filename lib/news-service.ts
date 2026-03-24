@@ -22,30 +22,9 @@ export class NewsDataService {
     // CONSTANTS
     private static readonly TARGET_LIMIT = 50;
 
-    // FALLBACK DATA (For maximum elegance even when API fails)
-    private static readonly FALLBACK_NEWS: NewsArticle[] = Array(50).fill(0).map((_, i) => ({
-        id: `fallback-${i}`,
-        title: [
-            "Bitcoin reaches new all-time high amid massive Elite adoption",
-            "La inteligencia artificial transforma el sector salud: Nuevos descubrimientos",
-            "Global markets react positively to US inflation data",
-            "Apple reveals new devices with revolutionary holographic technology",
-            "SpaceX successfully launches manned mission to Mars: A milestone for humanity",
-        ][i % 5],
-        link: "https://polymarket.com",
-        description: "Deep analysis of the latest trends setting the pace of the global digital and technological economy.",
-        content: "Contenido completo no disponible en modo fallback.",
-        pubDate: new Date().toISOString(),
-        source: "Nexus Global",
-        imageUrl: [
-            "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1611974765270-ca1258634369?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80"
-        ][i % 5],
-        category: ['technology']
-    }));
+    // [PHASE 6] FALLBACK DATA ERADICATED
+    // All news must be sourced from live feeds.
+    private static readonly FALLBACK_NEWS: NewsArticle[] = [];
 
     // ESTRATEGIAS DE PARALELISMO
     // To achieve 50 items quickly without slow sequential pagination,
@@ -67,7 +46,7 @@ export class NewsDataService {
 
     static async fetchByCategory(categoryName: string): Promise<NewsArticle[]> {
         if (!this.API_KEY) {
-            console.warn("[NewsDataService] Missing NEWSDATA_API_KEY");
+            console.warn("[NewsDataService] Missing NEWSDATA_API_KEY. Returning empty set (0% Simulation).");
             return [];
         }
 
@@ -95,17 +74,17 @@ export class NewsDataService {
 
             // Verify we have enough articles
             if (allArticles.length === 0) {
-                console.warn("[NewsService] API returned 0 items. Using FALLBACK data for elegance.");
-                return this.FALLBACK_NEWS;
+                console.warn("[NewsService] API returned 0 items. Maintaining 0% Simulation policy.");
+                return [];
             }
 
             // Note: Deduplication happens in the Processor
             return allArticles;
 
         } catch (error) {
-            console.error("[NewsService Critical Failure]:", error);
-            // Graceful Fallback
-            return this.FALLBACK_NEWS;
+            console.error("[NewsService Critical API Failure]:", error);
+            // No synthetic fallbacks allowed per Phase 6 requirements
+            return [];
         }
     }
 
