@@ -297,48 +297,44 @@ export function MarketHeatmap24h() {
   const [activeTab, setActiveTab] = useState<MetricKey>("volume24h");
   const [coins, setCoins] = useState<CoinData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [hoveredCoin, setHoveredCoin] = useState<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ w: 900, h: 400 });
 
-    const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async () => {
+    setError(null);
     try {
-      const tickersRes = await fetch("https://fapi.binance.com/fapi/v1/ticker/24hr");
-      
+      // Fetch tickers (Volume + Chg%) and real liquidations in parallel (server-side proxy, no CORS)
+      const [tickersRes, liqRes] = await Promise.allSettled([
+        fetch("/api/network/live?tickers=1").then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch("/api/vip/liquidations-24h"),
+      ]);
+
+      // Binance tickers — direct call (may be blocked by CORS in browser)
       let tickers: any[] = [];
-      if (tickersRes.ok) {
-        tickers = await tickersRes.json();
+      try {
+        const binRes = await fetch("https://fapi.binance.com/fapi/v1/ticker/24hr", {
+          signal: AbortSignal.timeout(6000),
+        });
+        if (binRes.ok) tickers = await binRes.json();
+      } catch {}
+
+      if (!tickers || tickers.length < 5) {
+        // No Math.random() fallback — show a real error state
+        setError("Binance Futures data unavailable. Retrying...");
+        setLoading(false);
+        return;
       }
 
-      // If API fails or returns little data, use premium mock fallback (The "Old Backend" Restoration)
-      if (!tickers || tickers.length < 5) {
-        const mockTickers = DISPLAY_TOKENS.map(t => ({
-          symbol: t.symbol,
-          quoteVolume: (Math.random() * 500_000_000 + 100_000_000).toString(),
-          priceChangePercent: ((Math.random() - 0.4) * 8).toFixed(2),
-          lastPrice: (t.symbol === "BTCUSDT" ? 65000 : t.symbol === "ETHUSDT" ? 3500 : 100).toString(),
-          volume: (Math.random() * 10000).toString(),
-          priceChange: (Math.random() * 100).toString(),
-        }));
-        
-        const mapped = DISPLAY_TOKENS.map((token, i) => {
-          const t = mockTickers[i];
-          const price = parseFloat(t.lastPrice);
-          return {
-            symbol: token.symbol,
-            name: token.name,
-            volume24h: parseFloat(t.quoteVolume),
-            chgPct: parseFloat(t.priceChangePercent),
-            liquidation: parseFloat(t.quoteVolume) * 0.001 * (Math.random() * 5),
-            openInterest: parseFloat(t.quoteVolume) * 0.15,
-            price,
-          };
-        });
-        setCoins(mapped);
-        setLoading(false);
-        setLastUpdate(new Date());
-        return;
+      // Real liquidation data from our server-side API (avoids CORS)
+      const liqMap: Record<string, number> = {};
+      if (liqRes.status === "fulfilled" && liqRes.value.ok) {
+        const liqData = await liqRes.value.json();
+        for (const item of liqData.data ?? []) {
+          liqMap[item.symbol] = item.liquidationUsd;
+        }
       }
 
       const tickerMap: Record<string, any> = {};
@@ -347,17 +343,15 @@ export function MarketHeatmap24h() {
       const mapped: CoinData[] = DISPLAY_TOKENS.map((token) => {
         const t = tickerMap[token.symbol];
         if (!t) return null;
-        
         const price = parseFloat(t.lastPrice || "0");
         if (price <= 0) return null;
-
         return {
           symbol: token.symbol,
           name: token.name,
           volume24h: parseFloat(t.quoteVolume || "0"),
           chgPct: parseFloat(t.priceChangePercent || "0"),
-          // Forensic Liquidation Model (Restored Logic)
-          liquidation: Math.abs(parseFloat(t.priceChange || "0")) * parseFloat(t.volume || "0") * 0.08,
+          // Real liquidation data from /api/vip/liquidations-24h
+          liquidation: liqMap[token.symbol] ?? 0,
           openInterest: parseFloat(t.quoteVolume || "0") * 0.12,
           price,
         };
@@ -367,20 +361,9 @@ export function MarketHeatmap24h() {
       setLastUpdate(new Date());
     } catch (e) {
       console.error("[Heatmap] fetch error", e);
-      
-      // FAIL-SAFE: If API is blocked (CORS) or down, immediate mock data restoration
+      // Never fall back to Math.random() — show error state
       if (coins.length === 0) {
-        const mockData = DISPLAY_TOKENS.map(t => ({
-          symbol: t.symbol,
-          name: t.name,
-          volume24h: Math.random() * 500_000_000 + 100_000_000,
-          chgPct: (Math.random() - 0.4) * 8,
-          liquidation: Math.random() * 5_000_000,
-          openInterest: Math.random() * 50_000_000,
-          price: t.symbol === "BTCUSDT" ? 68000 : t.symbol === "ETHUSDT" ? 3500 : 1.5,
-        }));
-        setCoins(mockData);
-        setLastUpdate(new Date());
+        setError("Market data temporarily unavailable.");
       }
     } finally {
       setLoading(false);

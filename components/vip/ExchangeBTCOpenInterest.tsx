@@ -3,13 +3,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { TrendingUp, RefreshCw, DollarSign } from "lucide-react";
+import { TrendingUp, RefreshCw, AlertCircle } from "lucide-react";
 
 interface OIDataPoint {
   timestamp: number;
   dateLabel: string;
-  openInterest: number;
-  btcPrice: number;
+  openInterest: number;       // Binance OI (USD)
+  openInterestBybit: number;  // Bybit OI (USD)
+  openInterestTotal: number;  // Combined
+  btcPrice: number;           // REAL per-day close price from klines
   openInterestEur: number;
   btcPriceEur: number;
 }
@@ -64,85 +66,65 @@ export function ExchangeBTCOpenInterest() {
   const [data, setData] = useState<OIDataPoint[]>([]);
   const [currency, setCurrency] = useState<Currency>("EUR");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [eurRate, setEurRate] = useState(0.92);
   const [currentStats, setCurrentStats] = useState<{
-    totalOI: number; btcPrice: number; change24h: number;
+    totalOI: number; binanceOI: number; bybitOI: number; btcPrice: number; change24h: number;
   } | null>(null);
 
   const fetchData = useCallback(async () => {
+    setError(null);
     try {
-      // Fetch EUR/USD rate
-      try {
-        const fxRes = await fetch("https://api.frankfurter.app/latest?from=USD&to=EUR");
-        const fxData = await fxRes.json();
-        if (fxData.rates?.EUR) setEurRate(fxData.rates.EUR);
-      } catch {}
+      // Use our new server-side API — real BTC price per day + Bybit OI
+      const res = await fetch("/api/vip/oi-history", {
+        signal: AbortSignal.timeout(15000),
+      });
 
-      // Fetch BTC open interest history from Binance Futures
-      const [oiHistRes, tickerRes] = await Promise.allSettled([
-        fetch("https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1d&limit=90"),
-        fetch("https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT"),
-      ]);
-
-      const oiHist: any[] = oiHistRes.status === "fulfilled" && oiHistRes.value.ok
-        ? await oiHistRes.value.json() : [];
-      const ticker = tickerRes.status === "fulfilled" && tickerRes.value.ok
-        ? await tickerRes.value.json() : null;
-
-      const btcPrice = parseFloat(ticker?.lastPrice || "0");
-      const change24h = parseFloat(ticker?.priceChangePercent || "0");
-
-      // Process historical data
-      if (oiHist.length > 0) {
-        const points: OIDataPoint[] = oiHist.map((item: any) => {
-          const ts = item.timestamp;
-          const oi = parseFloat(item.sumOpenInterest || "0") * btcPrice;
-          const date = new Date(ts);
-          return {
-            timestamp: ts,
-            dateLabel: date.toLocaleDateString("en", { month: "short", day: "numeric" }),
-            openInterest: oi,
-            btcPrice: btcPrice,
-            openInterestEur: oi * eurRate,
-            btcPriceEur: btcPrice * eurRate,
-          };
-        });
-        setData(points);
-        setCurrentStats({
-          totalOI: points[points.length - 1]?.openInterest || 0,
-          btcPrice,
-          change24h,
-        });
-      } else {
-        // Fallback: generate realistic data shape
-        const baseOI = 15e9;
-        const baseBTC = 65000;
-        const now = Date.now();
-        const fallback: OIDataPoint[] = Array.from({ length: 60 }, (_, i) => {
-          const ts = now - (59 - i) * 24 * 3600 * 1000;
-          const progression = i / 59;
-          const noise = (Math.random() - 0.5) * 0.15;
-          const oi = baseOI * (0.7 + progression * 0.4 + noise);
-          const price = baseBTC * (0.8 + progression * 0.3 + (Math.random() - 0.5) * 0.1);
-          const date = new Date(ts);
-          return {
-            timestamp: ts,
-            dateLabel: date.toLocaleDateString("en", { month: "short", day: "numeric" }),
-            openInterest: oi,
-            btcPrice: price,
-            openInterestEur: oi * eurRate,
-            btcPriceEur: price * eurRate,
-          };
-        });
-        setData(fallback);
-        setCurrentStats({ totalOI: fallback[fallback.length - 1].openInterest, btcPrice: baseBTC, change24h: 0 });
+      if (!res.ok) {
+        setError("OI history data unavailable. Retrying...");
+        setLoading(false);
+        return;
       }
+
+      const json = await res.json();
+      if (!json.data || json.data.length === 0) {
+        setError("No OI data returned from exchange.");
+        setLoading(false);
+        return;
+      }
+
+      const rate = json.eurRate ?? 0.92;
+      setEurRate(rate);
+
+      const points: OIDataPoint[] = json.data.map((item: any) => ({
+        timestamp: item.timestamp,
+        dateLabel: item.dateLabel,
+        openInterest: item.openInterestBinance,
+        openInterestBybit: item.openInterestBybit,
+        openInterestTotal: item.openInterestTotal,
+        // REAL per-day BTC closing price — not the same value repeated
+        btcPrice: item.btcClose,
+        openInterestEur: item.openInterestTotal * rate,
+        btcPriceEur: item.btcClose * rate,
+      }));
+
+      setData(points);
+      const last = points[points.length - 1];
+      setCurrentStats({
+        totalOI: last?.openInterestTotal ?? 0,
+        binanceOI: last?.openInterest ?? 0,
+        bybitOI: (last as any)?.openInterestBybit ?? 0,
+        btcPrice: json.currentBtcPrice ?? last?.btcPrice ?? 0,
+        change24h: json.change24h ?? 0,
+      });
     } catch (e) {
       console.error("[OI Chart] fetch error", e);
+      // No Math.random() fallback — show error state
+      if (data.length === 0) setError("OI data temporarily unavailable.");
     } finally {
       setLoading(false);
     }
-  }, [eurRate]);
+  }, [data.length]);
 
   useEffect(() => {
     fetchData();
@@ -317,18 +299,41 @@ export function ExchangeBTCOpenInterest() {
         )}
       </div>
 
-      {/* Exchange breakdown */}
+      {/* Exchange Breakdown — Real Binance + Bybit OI */}
       <div className="mx-8 mb-7 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Exchange Breakdown</p>
-        <div className="flex flex-wrap gap-3">
-          {EXCHANGES.map(ex => (
-            <div key={ex.id} className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ background: ex.color }} />
-              <span className="text-[10px] font-mono font-bold text-slate-600">{ex.name}</span>
-            </div>
-          ))}
-          <span className="text-[9px] font-mono text-slate-300 ml-auto">+ more exchanges</span>
-        </div>
+        {currentStats ? (
+          <div className="space-y-2">
+            {[
+              { name: 'Binance', color: '#f59e0b', value: currency === 'EUR' ? currentStats.binanceOI * eurRate : currentStats.binanceOI },
+              { name: 'Bybit',   color: '#8b5cf6', value: currency === 'EUR' ? currentStats.bybitOI * eurRate : currentStats.bybitOI },
+            ].map(ex => {
+              const total = (currency === 'EUR' ? currentStats.totalOI * eurRate : currentStats.totalOI) || 1;
+              const pct = Math.round((ex.value / total) * 100);
+              const sym = currency === 'EUR' ? '€' : '$';
+              const label = ex.value >= 1e9 ? sym + (ex.value / 1e9).toFixed(2) + 'B' : sym + (ex.value / 1e6).toFixed(0) + 'M';
+              return (
+                <div key={ex.name}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: ex.color }} />
+                      <span className="text-[10px] font-mono font-bold text-slate-600">{ex.name}</span>
+                    </div>
+                    <span className="text-[10px] font-mono font-black text-slate-700">{label} <span className="text-slate-400 font-normal">({pct}%)</span></span>
+                  </div>
+                  <div className="h-1 rounded-full bg-slate-200">
+                    <div className="h-1 rounded-full transition-all duration-700" style={{ background: ex.color, width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+            {currentStats.bybitOI === 0 && (
+              <p className="text-[9px] text-slate-300 mt-1">Bybit data loading...</p>
+            )}
+          </div>
+        ) : (
+          <p className="text-[9px] text-slate-300">Loading exchange breakdown...</p>
+        )}
       </div>
     </div>
   );

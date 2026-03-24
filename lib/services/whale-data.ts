@@ -2,13 +2,9 @@ import { ethers } from 'ethers';
 import { safeRedisGet, safeRedisSet } from '../redis/client';
 
 /**
- * 🌌 THE LEGENDARY WHALE INTELLIGENCE MATRIX V7.0 🌌
- * Real-time Elite Flow Analysis via Sovereign RPC Infrastructure.
- * 
- * DESIGN PRINCIPLES:
- * 1. ZERO NOISE: Only high-impact movements are processed.
- * 2. TOTAL TRANSPARENCY: Every byte of transaction telemetry is preserved.
- * 3. SOVEREIGN FETCH: Direct GetBlock node interaction for maximum reliability.
+ * 🌌 WHALE INTELLIGENCE MATRIX V8.0 — ZERO SYNTHETIC DATA
+ * 100% real on-chain data. No Math.random(). No MATRIX_SYNC padding.
+ * No generateSyntheticMovements(). Every event is a verified chain event.
  */
 
 export interface WhaleMovement {
@@ -20,9 +16,9 @@ export interface WhaleMovement {
     amount: string;
     usdNum: number;
     ts: number;
-    action: string;
+    action: 'BUY' | 'SELL' | 'TRANSFER';
     label?: string;
-    tier: 'MEGA tier' | 'ELITE' | 'Standard Transfer' | 'ALPHA';
+    tier: 'MEGA tier' | 'ELITE' | 'ALPHA';
     confidence: number;
     chain: 'ETH' | 'BNB';
     gasPriceGwei: string;
@@ -32,11 +28,36 @@ export interface WhaleMovement {
     method: string;
     telemetryTag: string;
     priorityFeeGwei?: string;
-    // V6.0 Extended Fields
     dex?: string;
     winRate?: number;
     gasUsd?: number;
 }
+
+// ─── Known DEX Router Addresses ───────────────────────────────────────────────
+// If `to` is in this set → tokens flow INTO router → SELL
+// If `from` is in this set → tokens flow OUT OF router → BUY
+const DEX_ROUTERS_ETH = new Set([
+    '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', // Uniswap V2 Router
+    '0xe592427a0aece92de3edee1f18e0157c05861564', // Uniswap V3 SwapRouter
+    '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45', // Uniswap V3 UniversalRouter
+    '0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b', // Uniswap Universal Router 2
+    '0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f', // SushiSwap Router
+    '0x1111111254fb6c44bac0bed2854e76f90643097d', // 1inch v4
+    '0x1111111254eeb25477b68fb85ed929f73a960582', // 1inch v5
+    '0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad', // Uniswap Universal Router 1.2
+    '0x00000000009726632680fb29d3f7a9734e3010e2', // Paraswap Augustus
+    '0xdef171fe48cf0115b1d80b88dc8eab59176fee57', // Paraswap v5
+    '0x6a000f20005980200259b80c5102003040001068', // ParaSwap v6
+    '0x6131b5fae19ea4f9d964eac0408e4408b66337b5', // KyberSwap
+]);
+
+const DEX_ROUTERS_BNB = new Set([
+    '0x10ed43c718714eb63d5aa57b78b54704e256024e', // PancakeSwap V2
+    '0x13f4ea83d0bd40e75c8222255bc855a974568dd4', // PancakeSwap V3
+    '0x1b81d678ffb9c0263b24a97847620c99d213eb14', // PancakeSwap Universal
+    '0x1111111254fb6c44bac0bed2854e76f90643097d', // 1inch v4 BSC
+    '0x1111111254eeb25477b68fb85ed929f73a960582', // 1inch v5 BSC
+]);
 
 const RPC_CONFIG = {
     ETH: [
@@ -51,35 +72,34 @@ const RPC_CONFIG = {
 
 const BINANCE_24_TOKENS: Record<string, Record<string, { symbol: string; decimals: number }>> = {
     ETH: {
-        '0xdAC17F958D2ee523a2206206994597C13D831ec7': { symbol: 'USDT', decimals: 6 },
-        '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': { symbol: 'USDC', decimals: 6 },
-        '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599': { symbol: 'WBTC', decimals: 8 },
-        '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0': { symbol: 'MATIC', decimals: 18 },
-        '0x514910771AF9Ca656af840dff83E8264EcF986CA': { symbol: 'LINK', decimals: 18 },
-        '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE': { symbol: 'SHIB', decimals: 18 },
-        '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984': { symbol: 'UNI', decimals: 18 },
-        '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84': { symbol: 'stETH', decimals: 18 },
-        '0x6B175474E89094C44Da98b954EedeAC495271d0F': { symbol: 'DAI', decimals: 18 },
-        '0x4d224452801ACEd8B2F0aebE155379bb5D594381': { symbol: 'APE', decimals: 18 },
+        '0xdac17f958d2ee523a2206206994597c13d831ec7': { symbol: 'USDT', decimals: 6 },
+        '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': { symbol: 'USDC', decimals: 6 },
+        '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599': { symbol: 'WBTC', decimals: 8 },
+        '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0': { symbol: 'MATIC', decimals: 18 },
+        '0x514910771af9ca656af840dff83e8264ecf986ca': { symbol: 'LINK', decimals: 18 },
+        '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce': { symbol: 'SHIB', decimals: 18 },
+        '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984': { symbol: 'UNI', decimals: 18 },
+        '0xae7ab96520de3a18e5e111b5eaab095312d7fe84': { symbol: 'stETH', decimals: 18 },
+        '0x6b175474e89094c44da98b954eedeac495271d0f': { symbol: 'DAI', decimals: 18 },
+        '0x4d224452801aced8b2f0aebe155379bb5d594381': { symbol: 'APE', decimals: 18 },
         '0x5a3e113b306b7445778a488c037803080f582781': { symbol: 'LDO', decimals: 18 },
-        '0xB0bA364bdcc6A4Cc67D926AcD6E0170A55809D41': { symbol: 'ARB', decimals: 18 },
+        '0xb0ba364bdcc6a4cc67d926acd6e0170a55809d41': { symbol: 'ARB', decimals: 18 },
         '0x4200000000000000000000000000000000000042': { symbol: 'OP', decimals: 18 },
         '0xca11bde05977b3631167028862be2a173976ca11': { symbol: 'STRK', decimals: 18 },
         '0x163580175b4b418682358432b4a3f124b8401309': { symbol: 'WLD', decimals: 18 },
         '0x85f17cf997934a597031b2e18a9ab6ebd4b9f6a4': { symbol: 'NEAR', decimals: 18 },
-        '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c': { symbol: 'WBNB', decimals: 18 },
-        '0x582A9973E80f68Eea305f38339BDf7311145662d': { symbol: 'FDUSD', decimals: 18 },
-        '0x6982508145454Ce325dDbE47a25d4ec3d2311933': { symbol: 'PEPE', decimals: 18 },
-        '0x3d43d1a847e62c01111a133AB8ae16335B519288': { symbol: 'FET', decimals: 18 },
+        '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c': { symbol: 'WBNB', decimals: 18 },
+        '0x582a9973e80f68eea305f38339bdf7311145662d': { symbol: 'FDUSD', decimals: 18 },
+        '0x6982508145454ce325ddbe47a25d4ec3d2311933': { symbol: 'PEPE', decimals: 18 },
+        '0x3d43d1a847e62c01111a133ab8ae16335b519288': { symbol: 'FET', decimals: 18 },
     },
     BNB: {
-        '0x55d398326f99059fF775485246999027B3197955': { symbol: 'USDT', decimals: 18 },
-        '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d': { symbol: 'USDC', decimals: 18 },
-        '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56': { symbol: 'BUSD', decimals: 18 },
-        '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c': { symbol: 'BTCB', decimals: 18 },
-        '0x2170Ed0880ac9A755fd29B2688956BD959F933F8': { symbol: 'ETH', decimals: 18 },
-        '0xc2132D05D31c914a87C6611C10748AEb04B58e8F': { symbol: 'USDT-POLY', decimals: 6 },
-        '0xc5f0f33f021dB372c83713092296d3dB926366E4': { symbol: 'FDUSD', decimals: 18 },
+        '0x55d398326f99059ff775485246999027b3197955': { symbol: 'USDT', decimals: 18 },
+        '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d': { symbol: 'USDC', decimals: 18 },
+        '0xe9e7cea3dedca5984780bafc599bd69add087d56': { symbol: 'BUSD', decimals: 18 },
+        '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c': { symbol: 'BTCB', decimals: 18 },
+        '0x2170ed0880ac9a755fd29b2688956bd959f933f8': { symbol: 'ETH', decimals: 18 },
+        '0xc5f0f33f021db372c83713092296d3db926366e4': { symbol: 'FDUSD', decimals: 18 },
         '0xba2ae61e3911e232972153b8c239d12ff833e248': { symbol: 'DOGE', decimals: 8 },
         '0xbf5140a22578168fd562dc21700662a630864670': { symbol: 'MATIC', decimals: 18 },
     }
@@ -87,20 +107,18 @@ const BINANCE_24_TOKENS: Record<string, Record<string, { symbol: string; decimal
 
 import { ethereumResilientProvider, bscResilientProvider } from '../blockchain/ResilientProvider';
 
-// ... (BINANCE_24_TOKENS definition)
+// ─── Price Feed (static estimates only for BUY/SELL USD sizing) ───────────────
+const FEED_PRICES: Record<string, number> = {
+    ETH: 3500, BNB: 610, BTC: 89000, USDT: 1, USDC: 1, FDUSD: 1,
+    LINK: 17, MATIC: 0.5, SHIB: 0.00003, PEPE: 0.00001, FET: 1.5,
+    UNI: 12, DAI: 1, SOL: 140, DOGE: 0.15, TRX: 0.12, DOT: 7,
+    ADA: 0.5, XRP: 0.6, AVAX: 40, APE: 1.2, LDO: 2.1, ARB: 1.1,
+    OP: 2.5, STRK: 0.4, WLD: 2.2, NEAR: 5.5, WBNB: 610, stETH: 3480,
+    BTCB: 89000, BUSD: 1, WBTC: 89000,
+};
 
 class WhaleDataService {
     private static instance: WhaleDataService;
-    
-    // Estimates to avoid frequent API calls for prices during block processing
-    private readonly FEED_PRICES: Record<string, number> = { 
-        ETH: 3500, BNB: 610, BTC: 89000, USDT: 1, USDC: 1, FDUSD: 1, 
-        LINK: 17, MATIC: 0.5, SHIB: 0.00003, PEPE: 0.00001, FET: 1.5,
-        UNI: 12, DAI: 1, SOL: 140, DOGE: 0.15, TRX: 0.12, DOT: 7, 
-        ADA: 0.5, XRP: 0.6, AVAX: 40, APE: 1.2, LDO: 2.1, ARB: 1.1,
-        OP: 2.5, STRK: 0.4, WLD: 2.2, NEAR: 5.5
-    };
-
     private constructor() {}
 
     public static getInstance(): WhaleDataService {
@@ -110,89 +128,107 @@ class WhaleDataService {
         return WhaleDataService.instance;
     }
 
-    /**
-     * Elite Tier Classification
-     * - MEGA tier: > $10M USD
-     * - ELITE: > $1M USD
-     * - ALPHA: >= $250k USD
-     */
     private classifyTier(usdValue: number): WhaleMovement['tier'] {
         if (usdValue >= 10_000_000) return 'MEGA tier';
         if (usdValue >= 1_000_000) return 'ELITE';
         return 'ALPHA';
     }
 
+    /**
+     * Determine BUY / SELL / TRANSFER using real DEX router detection.
+     * - `to` in DEX_ROUTERS → tokens flowing INTO the swap → SELL
+     * - `from` in DEX_ROUTERS → tokens flowing OUT OF swap → BUY
+     * - otherwise → TRANSFER (no swap involvement)
+     */
+    private classifyAction(
+        from: string,
+        to: string,
+        chain: 'ETH' | 'BNB'
+    ): 'BUY' | 'SELL' | 'TRANSFER' {
+        const routerSet = chain === 'ETH' ? DEX_ROUTERS_ETH : DEX_ROUTERS_BNB;
+        const fromLower = from.toLowerCase();
+        const toLower = to.toLowerCase();
+        if (routerSet.has(toLower)) return 'SELL';   // sending tokens to DEX
+        if (routerSet.has(fromLower)) return 'BUY';  // receiving tokens from DEX
+        return 'TRANSFER';
+    }
+
     private async processRecentBlocks(chain: 'ETH' | 'BNB', blockCount: number = 20): Promise<WhaleMovement[]> {
         const resilient = chain === 'ETH' ? ethereumResilientProvider : bscResilientProvider;
         const provider = resilient.getProvider() as any;
-        
+
         try {
             const latestHeight = await provider.getBlockNumber();
             const fromBlock = latestHeight - blockCount;
 
-            // 1. Scan ERC-20 Transfers via getLogs (Much more efficient than scanning every TX)
             const tokenAddresses = Object.keys(BINANCE_24_TOKENS[chain]);
-            const logPromises = tokenAddresses.map(address => 
+            const logPromises = tokenAddresses.map(address =>
                 provider.getLogs({
                     fromBlock,
                     toBlock: latestHeight,
                     address,
-                    topics: [ethers.id("Transfer(address,address,uint256)")]
+                    topics: [ethers.id('Transfer(address,address,uint256)')]
                 }).catch(() => [])
             );
 
             const allLogs = (await Promise.all(logPromises)).flat();
             const movements: WhaleMovement[] = [];
 
-            // 2. Process logs in parallel (limited)
-            for (const log of allLogs.slice(0, 40)) {
+            for (const log of allLogs.slice(0, 60)) {
                 try {
                     const tokenMeta = BINANCE_24_TOKENS[chain][log.address.toLowerCase()];
                     if (!tokenMeta) continue;
 
-                    const from = ethers.stripZerosLeft(log.topics[1]);
-                    const to = ethers.stripZerosLeft(log.topics[2]);
+                    const fromAddr = ('0x' + log.topics[1].slice(26)).toLowerCase();
+                    const toAddr   = ('0x' + log.topics[2].slice(26)).toLowerCase();
                     const amountRaw = BigInt(log.data);
-                    
-                    const valueInAsset = parseFloat(ethers.formatUnits(amountRaw, tokenMeta.decimals));
-                    const usdValue = valueInAsset * (this.FEED_PRICES[tokenMeta.symbol] || 1);
 
-                    if (usdValue < 15000) continue;
+                    const valueInAsset = parseFloat(ethers.formatUnits(amountRaw, tokenMeta.decimals));
+                    const usdValue = valueInAsset * (FEED_PRICES[tokenMeta.symbol] ?? 1);
+
+                    if (usdValue < 15_000) continue;
+
+                    // ── REAL BUY/SELL DETECTION ──────────────────────────
+                    const action = this.classifyAction(fromAddr, toAddr, chain);
 
                     movements.push({
                         id: `SIG-${chain}-${log.transactionHash.slice(2, 10).toUpperCase()}`,
                         hash: log.transactionHash,
-                        from,
-                        to,
+                        from: fromAddr,
+                        to: toAddr,
                         token: tokenMeta.symbol,
                         amount: valueInAsset.toLocaleString(undefined, { maximumFractionDigits: 4 }),
                         usdNum: usdValue,
-                        ts: Date.now(), // Estimate or fetch block if needed, but Date.now is faster for feed
-                        action: log.transactionHash.charCodeAt(0) % 2 === 0 ? 'BUY' : 'SELL',
+                        ts: Date.now(),
+                        action,
                         tier: this.classifyTier(usdValue),
                         confidence: 100,
                         chain,
-                        gasPriceGwei: '0', // Optimized: skip fetching for feed speed
+                        gasPriceGwei: '0',
                         gasUsed: '0',
                         blockNumber: log.blockNumber,
                         confirmations: latestHeight - log.blockNumber + 1,
-                        method: 'ERC20 Transfer',
+                        method: action === 'TRANSFER' ? 'ERC20 Transfer' : `DEX ${action}`,
                         telemetryTag: usdValue > 1_000_000 ? 'MEGA_SIG_ALERT' : 'ELITE_ALPHA',
-                        dex: chain === 'ETH' ? 'Uniswap V3' : 'PancakeSwap V3',
-                        winRate: 98,
-                        gasUsd: 15
+                        dex: action !== 'TRANSFER' ? (chain === 'ETH' ? 'Uniswap V3' : 'PancakeSwap V3') : undefined,
+                        winRate: undefined,
+                        gasUsd: undefined,
                     });
-                } catch (e) { continue; }
+                } catch { continue; }
             }
 
-            // 3. Native Transfers (Fetch blocks but skip receipt)
+            // Native ETH/BNB large transfers
             const block = await provider.getBlock(latestHeight, true);
             if (block?.transactions) {
                 for (const tx of block.transactions) {
                     const val = parseFloat(ethers.formatEther(tx.value || 0n));
-                    const usdVal = val * (chain === 'ETH' ? this.FEED_PRICES.ETH : this.FEED_PRICES.BNB);
-                    
-                    if (usdVal > 50000 && movements.length < 50) {
+                    const usdVal = val * (chain === 'ETH' ? FEED_PRICES.ETH : FEED_PRICES.BNB);
+
+                    if (usdVal > 50_000 && movements.length < 60) {
+                        const fromAddr = (tx.from || '').toLowerCase();
+                        const toAddr = (tx.to || 'Contract').toLowerCase();
+                        const action = this.classifyAction(fromAddr, toAddr, chain);
+
                         movements.push({
                             id: `SIG-${chain}-${tx.hash.slice(2, 10).toUpperCase()}`,
                             hash: tx.hash,
@@ -202,7 +238,7 @@ class WhaleDataService {
                             amount: val.toLocaleString(undefined, { maximumFractionDigits: 4 }),
                             usdNum: usdVal,
                             ts: block.timestamp * 1000,
-                            action: tx.hash.charCodeAt(1) % 2 === 0 ? 'BUY' : 'SELL',
+                            action,
                             tier: this.classifyTier(usdVal),
                             confidence: 100,
                             chain,
@@ -212,132 +248,64 @@ class WhaleDataService {
                             confirmations: 1,
                             method: 'Native Transfer',
                             telemetryTag: usdVal > 1_000_000 ? 'MEGA_SIG_ALERT' : 'ELITE_ALPHA',
-                            dex: 'Direct Chain',
-                            winRate: 99,
-                            gasUsd: 2
+                            dex: undefined,
+                            winRate: undefined,
+                            gasUsd: undefined,
                         });
                     }
                 }
             }
 
-            return movements.sort((a,b) => b.usdNum - a.usdNum).slice(0, 50);
+            return movements.sort((a, b) => b.usdNum - a.usdNum).slice(0, 50);
         } catch (error) {
-            console.error(`[LegendaryService] Optimized Scan Failure on ${chain}:`, error);
-            return this.generateSyntheticMovements(chain, 5);
+            console.error(`[WhaleService V8] Scan failure on ${chain}:`, error);
+            // Return empty — NEVER return synthetic data
+            return [];
         }
     }
 
-    private generateSyntheticMovements(chain: 'ETH' | 'BNB', count: number): WhaleMovement[] {
-        const tokens = Object.values(BINANCE_24_TOKENS[chain]).map(t => t.symbol);
-        const movements: WhaleMovement[] = [];
-        
-        for (let i = 0; i < count; i++) {
-            const token = tokens[Math.floor(Math.random() * tokens.length)];
-            const usdNum = 250000 + (Math.random() * 5000000);
-            const isBuy = Math.random() > 0.45;
-            
-            movements.push({
-                id: `SYNTH-${chain}-${Math.random().toString(36).substring(7).toUpperCase()}`,
-                hash: `0xsynthetic${Math.random().toString(16).substring(2)}`,
-                from: '0x' + Math.random().toString(16).substring(2, 42),
-                to: '0x' + Math.random().toString(16).substring(2, 42),
-                token,
-                amount: (usdNum / (this.FEED_PRICES[token] || 1)).toFixed(2),
-                usdNum,
-                ts: Date.now() - (Math.random() * 5000),
-                action: isBuy ? 'BUY' : 'SELL',
-                tier: this.classifyTier(usdNum),
-                confidence: 99,
-                chain,
-                gasPriceGwei: '0.1',
-                gasUsed: '21000',
-                blockNumber: 0,
-                confirmations: 12,
-                method: 'Synthetic Alpha',
-                telemetryTag: 'CONTINUITY_CORE',
-                dex: 'Legendary Mesh',
-                winRate: 99,
-                gasUsd: 0.01
-            });
-        }
-        return movements;
-    }
+    public async getLatestWhaleActivity(
+        limit: number = 60,
+        token?: string,
+        minUsd?: number
+    ): Promise<WhaleMovement[]> {
+        const cacheKey = token
+            ? `whale_v8_real_${token}_${minUsd ?? '0'}`
+            : `whale_v8_real_matrix_${minUsd ?? '0'}`;
 
-    public async getLatestWhaleActivity(limit: number = 60, token?: string, minUsd?: number): Promise<WhaleMovement[]> {
-        const cacheKey = token ? `legendary_whale_v7_${token}_${minUsd || '0'}` : `legendary_whale_v7_matrix_${minUsd || '0'}`;
-        
         try {
             const cached = await safeRedisGet(cacheKey);
             if (cached) return JSON.parse(cached);
 
+            // Scan ETH and BNB in parallel — real data only
             const [ethMovements, bnbMovements] = await Promise.all([
                 this.processRecentBlocks('ETH', 5),
-                this.processRecentBlocks('BNB', 5)
+                this.processRecentBlocks('BNB', 5),
             ]);
 
             let allMovements = [...ethMovements, ...bnbMovements];
-            
-            // Absolute Matrix Guarantee: Ensure EVERY token in the 24-token roster has active flow data
-            const matrixTokens = [
-                "BTC", "ETH", "BNB", "SOL", "XRP", "ADA", "DOGE", "SHIB", "DOT", "LINK", 
-                "MATIC", "AVAX", "TRX", "UNI", "PEPE", "FET", "DAI", "APE", "LDO", "ARB", 
-                "OP", "STRK", "WLD", "NEAR"
-            ];
-            
-            matrixTokens.forEach(t => {
-                const existingCount = allMovements.filter(m => m.token.toUpperCase() === t).length;
-                const needed = 3 - existingCount;
-                
-                if (needed > 0) {
-                    for (let i = 0; i < needed; i++) {
-                        const usdNum = 25000 + (Math.random() * 2000000);
-                        allMovements.push({
-                            id: `ULTRA-${t}-${Math.random().toString(36).substring(7).toUpperCase()}`,
-                            hash: `0xultrafast${Math.random().toString(16).substring(2)}`,
-                            from: '0x' + Math.random().toString(16).substring(2, 42),
-                            to: '0x' + Math.random().toString(16).substring(2, 42),
-                            token: t,
-                            amount: (usdNum / (this.FEED_PRICES[t] || 1)).toFixed(2),
-                            usdNum,
-                            ts: Date.now() - (Math.random() * 5000) - (i * 2000),
-                            action: Math.random() > 0.45 ? 'BUY' : 'SELL',
-                            tier: this.classifyTier(usdNum),
-                            confidence: 100,
-                            chain: Math.random() > 0.5 ? 'ETH' : 'BNB',
-                            gasPriceGwei: '0.1',
-                            gasUsed: '21000',
-                            blockNumber: 0,
-                            confirmations: 24,
-                            method: 'Perfection Flow',
-                            telemetryTag: 'MATRIX_SYNC',
-                            dex: 'Arctic Hub',
-                            winRate: 99,
-                            gasUsd: 0.05
-                        });
-                    }
-                }
-            });
 
+            // Filter by token/minUsd if requested
             if (token && typeof token === 'string' && token.length > 0) {
-                allMovements = allMovements.filter(m => m.token.toUpperCase() === token.toUpperCase());
+                allMovements = allMovements.filter(
+                    m => m.token.toUpperCase() === token.toUpperCase()
+                );
             }
-
             if (minUsd && typeof minUsd === 'number') {
                 allMovements = allMovements.filter(m => m.usdNum >= minUsd);
             }
 
             allMovements = allMovements.sort((a, b) => b.ts - a.ts).slice(0, limit);
 
-            // 15s cache
+            // Cache 15s — real data refreshes frequently enough
             await safeRedisSet(cacheKey, JSON.stringify(allMovements), 'EX', '15');
             return allMovements;
         } catch (error) {
-            console.error('[Alpha Events V7] Recovery Mode Engaged:', error);
-            // Ultimate fallback: return at least some synthetic data if everything else fails
-            return this.generateSyntheticMovements('ETH', 8);
+            console.error('[WhaleService V8] Fatal error — returning empty:', error);
+            // Return empty array — NO synthetic fallback
+            return [];
         }
     }
 }
 
 export const whaleService = WhaleDataService.getInstance();
-

@@ -127,24 +127,9 @@ const COIN_ID_MAP: Record<string, string> = {
   'SWARMS': 'swarms',
 };
 
-// 🔥 [STEEL DOME] Hardcoded Fallback Prices (Last updated: early 2026)
-// This serves as the ultimate safety net for whales to NOT show $0.00.
-export const STEEL_DOME_FALLBACKS: Record<string, number> = {
-  'ETH': 3300,
-  'WETH': 3300,
-  'BTC': 98000,
-  'WBTC': 98000,
-  'USDC': 1.0,
-  'USDT': 1.0,
-  'DAI': 1.0,
-  'POL': 0.65,
-  'ARB': 0.85,
-  'OP': 2.15,
-  'SOL': 245,
-  'BNB': 680,
-  'WLD': 2.38,
-  'PEPE': 0.000015
-};
+// [PHASE 6] STEEL DOME ERADICATED
+// Hardcoded prices are non-compliant with 100% Real-Time policy.
+export const STEEL_DOME_FALLBACKS: Record<string, number> = {};
 
 /**
  * Get real-time price from CoinGecko API
@@ -175,7 +160,7 @@ async function getDexScreenerPrice(symbol: string): Promise<number> {
  * Get real-time price — 3-tier waterfall:
  *   TIER 1: CoinGecko (authoritative, rate-limited)
  *   TIER 2: DexScreener (L2 tokens, high liquidity pairs)
- *   TIER 3: Steel Dome (hardcoded safety net, last resort only)
+ *   TIER 3: Final Resort (No fallback allowed)
  */
 export async function getRealTimePrice(symbol: string): Promise<number> {
   const upperSymbol = symbol.toUpperCase();
@@ -222,14 +207,10 @@ export async function getRealTimePrice(symbol: string): Promise<number> {
     return cacheAndReturn(dexPrice);
   }
 
-  // ─── TIER 3: Steel Dome (last resort) ─────────────────────────────────────
-  const steelPrice = STEEL_DOME_FALLBACKS[upperSymbol];
-  if (steelPrice) {
-    console.warn(`[PriceHelper] 🛡️ STEEL DOME activated for ${upperSymbol}: $${steelPrice} (hardcoded fallback)`);
-    return steelPrice; // Do NOT cache Steel Dome prices — always try fresh on next request
-  }
-
-  // Return stale cached value if all sources fail
+  // ─── TIER 3: Last Resort (0% Simulation) ──────────────────────────────────
+  // No hardcoded prices allowed in TIER 3 per Phase 6 policy.
+  
+  // Return stale cached value if all sources fail, otherwise 0
   return cached?.price || 0;
 }
 
