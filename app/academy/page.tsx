@@ -21,13 +21,12 @@ export default function AcademyPage() {
     }, []);
 
     return (
-        <div className="relative min-h-screen bg-white text-slate-900 font-sans selection:bg-cyan-100 selection:text-cyan-900 overflow-x-hidden">
-            <div className="absolute inset-0 bg-white z-0" />
-
+        <div className="relative min-h-screen bg-transparent text-white font-aztec-body overflow-x-hidden">
             <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
-
-                <main className="flex-1 overflow-y-auto no-scrollbar pb-24 relative z-10">
-                    <AcademyViewer />
+                <main className="flex-1 overflow-y-auto no-scrollbar pb-24 relative z-10 px-6 mt-10">
+                    <div className="max-w-7xl mx-auto glass-aztek rounded-3xl p-8">
+                        <AcademyViewer />
+                    </div>
                 </main>
             </div>
             

@@ -8,9 +8,9 @@
 
 :root {
   /* Core palette */
-  --az-ink:        #120321; /* Deep Midnight Purple */
-  --az-ink-2:      #1a0530; 
-  --az-ink-3:      #240a42;
+  --az-ink:        transparent; /* Reveal AuroraBackground */
+  --az-ink-2:      rgba(26, 20, 0, 0.4); /* Match glass-aztek base */
+  --az-ink-3:      rgba(26, 20, 0, 0.6);
   --az-border:     rgba(255,255,255,0.06);
   --az-border-2:   rgba(255,255,255,0.12);
 
@@ -53,7 +53,7 @@
 /* ─── GLOBAL RESET ─── */
 .dash-root { 
   font-family: var(--font-display);
-  background: var(--az-ink);
+  background: transparent;
   color: var(--az-parchment);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
