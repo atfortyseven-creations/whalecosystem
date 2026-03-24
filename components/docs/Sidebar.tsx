@@ -13,12 +13,11 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
   const sections = [
     {
       title: 'Guides',
-      icon: <Book size={14} />,
       items: [
-        { label: 'Letta Code ↗', href: 'https://letta.code', external: true },
-        { label: 'Letta Code SDK ↗', href: 'https://letta.sdk', external: true },
+        { label: 'Whale Code ↗', href: 'https://whale.code', external: true },
+        { label: 'Whale Code SDK ↗', href: 'https://whale.sdk', external: true },
         { label: 'Get started', href: '/docs/get-started' },
-        { label: 'Intro to Letta', href: '/docs/intro' },
+        { label: 'Intro to Whale Alert', href: '/docs/intro' },
         { label: 'Quickstart (API)', href: '/docs/quickstart' },
         { label: 'Models', href: '/docs/models' },
         { label: 'Pricing', href: '/docs/pricing' },
@@ -46,7 +45,6 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
     },
     {
       title: 'API Reference',
-      icon: <Terminal size={14} />,
       items: [
         { label: 'Using the API', href: '/docs/api/usage' },
         { label: 'Introduction', href: '/docs/api/intro' },
@@ -68,7 +66,6 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
     },
     {
       title: 'Whale Code',
-      icon: <Code size={14} />,
       items: [
         { label: 'Get started', isCategory: true },
         { label: 'Overview', href: '/docs/whale-code/overview' },
@@ -81,7 +78,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
         { label: 'Providers', href: '/docs/whale-code/providers' },
         { label: 'Permissions', href: '/docs/whale-code/permissions' },
         { label: 'Hooks', href: '/docs/whale-code/hooks' },
-        { label: 'Letta Code SDK', isCategory: true },
+        { label: 'Whale Code SDK', isCategory: true },
         { label: 'Quickstart', href: '/docs/whale-code/sdk/quickstart' },
         { label: 'Migrate Claude SDK', href: '/docs/whale-code/sdk/migrate' },
         { label: 'Reference', isCategory: true },
@@ -95,20 +92,19 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
   ];
 
   return (
-    <aside className={`w-72 h-[calc(100vh-64px)] hidden lg:block overflow-y-auto ${theme === 'light' ? 'bg-slate-50' : 'bg-[#0F0F10]'} border-r ${theme === 'light' ? 'border-slate-200' : 'border-white/5'} p-6 custom-scrollbar`}>
-      <nav className="space-y-8">
+    <aside className={`w-80 h-[calc(100vh-64px)] hidden lg:block overflow-y-auto ${theme === 'light' ? 'bg-white' : 'bg-black'} border-r ${theme === 'light' ? 'border-black/10' : 'border-white/10'} p-10 custom-scrollbar`}>
+      <nav className="space-y-12">
         {sections.map((section) => (
-          <div key={section.title} className="space-y-4">
-            <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] ${theme === 'light' ? 'text-slate-400' : 'text-slate-500'}`}>
-              {section.icon}
+          <div key={section.title} className="space-y-6">
+            <div className={`text-[10px] font-black uppercase tracking-[0.4em] ${theme === 'light' ? 'text-black/40' : 'text-white/40'}`}>
               {section.title}
             </div>
             
-            <div className="flex flex-col gap-1.5 ml-1">
+            <div className="flex flex-col gap-2">
               {section.items.map((item, idx) => {
                 if (item.isCategory) {
                   return (
-                    <div key={`${section.title}-cat-${idx}`} className={`mt-4 mb-2 text-[9px] font-black uppercase tracking-[0.2em] ${theme === 'light' ? 'text-slate-300' : 'text-slate-600'}`}>
+                    <div key={`${section.title}-cat-${idx}`} className={`mt-6 mb-2 text-[9px] font-black uppercase tracking-[0.25em] ${theme === 'light' ? 'text-black/20' : 'text-white/20'}`}>
                       {item.label}
                     </div>
                   );
@@ -120,14 +116,13 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
                     key={item.label}
                     href={item.href || '#'}
                     target={item.external ? '_blank' : undefined}
-                    className={`group flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-all ${
+                    className={`group flex items-center justify-between py-1 text-[11px] transition-all uppercase tracking-widest ${
                       isActive 
-                        ? (theme === 'light' ? 'bg-cyan-50/50 text-cyan-600 font-bold border border-cyan-100' : 'bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20')
-                        : (theme === 'light' ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-400 hover:bg-white/5 hover:text-slate-100')
+                        ? (theme === 'light' ? 'text-black font-black border-l-2 border-black pl-4' : 'text-white font-black border-l-2 border-white pl-4')
+                        : (theme === 'light' ? 'text-black/40 hover:text-black hover:pl-2' : 'text-white/40 hover:text-white hover:pl-2')
                     }`}
                   >
                     <span>{item.label}</span>
-                    {item.external && <ArrowUpRight size={10} className="opacity-40 group-hover:opacity-100" />}
                   </Link>
                 );
               })}

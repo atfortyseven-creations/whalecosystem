@@ -8,109 +8,100 @@ export default function DocsLanding() {
   const cards = [
     {
       title: 'Guides',
-      desc: 'Learn how to build, deploy, and manage sovereign agents on the Whale Alert Network.',
-      icon: <Book className="text-cyan-500" />,
+      desc: 'Institutional protocols for orchestrating sovereign agent networks on the Whale Alert Protocol.',
       href: '/docs/get-started',
       links: [
-        { label: 'Introduction to Whale Alert', href: '/docs/intro' },
+        { label: 'Intro to Whale Alert', href: '/docs/intro' },
         { label: 'Quickstart Guide', href: '/docs/quickstart' },
         { label: 'Core Concepts', href: '/docs/core-concepts' },
       ]
     },
     {
       title: 'API Reference',
-      desc: 'Detailed documentation for the Whale Alert REST and WebSocket APIs.',
-      icon: <Terminal className="text-purple-500" />,
+      desc: 'High-frequency telemetry access for Whale Alert REST and WebSocket architectures.',
       href: '/docs/api/usage',
       links: [
         { label: 'Authentication', href: '/docs/api/reference/tokens' },
         { label: 'Agent Endpoints', href: '/docs/api/reference/agents' },
-        { label: 'Tool Registry', href: '/docs/api/reference/tools' },
+        { label: 'Protocol Models', href: '/docs/api/reference/models' },
       ]
     },
     {
       title: 'Whale Code',
-      desc: 'Master the proprietary scripting language for programmable data surveillance.',
-      icon: <Code className="text-emerald-500" />,
+      desc: 'Proprietary DSL for programmable data surveillance and kinetic flow analysis.',
       href: '/docs/whale-code/overview',
       links: [
         { label: 'Whale Code SDK', href: '/docs/whale-code/sdk/quickstart' },
-        { label: 'Skill Development', href: '/docs/whale-code/skills' },
-        { label: 'Subagent Patterns', href: '/docs/whale-code/subagents' },
+        { label: 'Hooks & Skills', href: '/docs/whale-code/skills' },
+        { label: 'Execution Patterns', href: '/docs/whale-code/subagents' },
       ]
     }
   ];
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+    <div className="space-y-32 animate-in fade-in duration-1000">
       {/* Hero Section */}
-      <section className="space-y-6 border-b border-slate-200/5 pb-10">
-        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase font-web3">
-          Whale Alert <br/><span className="text-cyan-500">Corporation™</span> Docs
+      <section className="space-y-12">
+        <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] uppercase font-web3">
+          Whale Alert <br/> Corporation™ <br/> <span className="opacity-20">Repository</span>
         </h1>
-        <p className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed">
-          Welcome to the official technical repository of the Whale Alert Corporation. 
-          Everything you need to orchestrate institutional-grade data surveillance and sovereign agent networks.
+        <p className="text-xl text-black/40 dark:text-white/40 max-w-2xl leading-relaxed uppercase tracking-tight font-black">
+          THE OFFICIAL TECHNICAL REPOSITORY FOR INSTITUTIONAL-GRADE DATA SURVEILLANCE AND SOVEREIGN AGENT ORCHESTRATION.
         </p>
       </section>
 
       {/* Grid Sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-black/10 dark:bg-white/10 border border-black/10 dark:border-white/10">
         {cards.map((card) => (
-          <div key={card.title} className="group p-8 rounded-[2rem] border border-slate-200/5 bg-white/5 hover:bg-white/[0.08] transition-all hover:border-cyan-500/20 shadow-2xl relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity">
-               {React.cloneElement(card.icon as React.ReactElement<any>, { size: 40 })}
-             </div>
-             
-             <div className="space-y-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  {React.cloneElement(card.icon as React.ReactElement<any>, { size: 20 })}
-                  <h2 className="text-xl font-black uppercase tracking-widest font-web3">{card.title}</h2>
-                </div>
-                <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+          <div key={card.title} className="group p-12 bg-white dark:bg-black transition-all hover:bg-zinc-50 dark:hover:bg-zinc-950 flex flex-col justify-between min-h-[400px]">
+             <div className="space-y-8">
+                <h2 className="text-2xl font-black uppercase tracking-tighter font-web3 border-b border-black/5 dark:border-white/10 pb-4">{card.title}</h2>
+                <p className="text-xs text-black/40 dark:text-white/40 leading-relaxed uppercase tracking-widest font-black">
                   {card.desc}
                 </p>
-                <div className="pt-4 flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   {card.links.map(link => (
                     <Link 
                       key={link.label}
                       href={link.href}
-                      className="text-xs text-slate-500 hover:text-cyan-400 flex items-center gap-2 transition-colors uppercase font-black tracking-widest"
+                      className="text-[10px] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white flex items-center gap-2 transition-colors uppercase font-black tracking-[0.2em]"
                     >
-                      <ArrowRight size={10} /> {link.label}
+                      {link.label}
                     </Link>
                   ))}
                 </div>
-                <Link 
-                  href={card.href}
-                  className="mt-8 inline-flex items-center gap-2 px-6 py-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl text-[10px] font-black uppercase tracking-widest border border-cyan-500/20 hover:bg-cyan-500 hover:text-white transition-all"
-                >
-                  Explore {card.title}
-                </Link>
              </div>
+             
+             <Link 
+               href={card.href}
+               className="mt-12 inline-flex items-center justify-center py-4 border border-black dark:border-white text-[10px] font-black uppercase tracking-[0.4em] hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+             >
+               Explore
+             </Link>
           </div>
         ))}
       </div>
 
       {/* Featured Architecture Section */}
-      <section className="p-10 rounded-[3rem] bg-gradient-to-br from-cyan-950/20 to-black border border-cyan-500/10 shadow-3xl">
-          <div className="flex flex-col lg:flex-row gap-12 items-center">
-              <div className="space-y-6 flex-1">
-                  <div className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.4em]">Zero-Knowledge Settlement</div>
-                  <h3 className="text-3xl font-black uppercase tracking-tighter leading-none font-web3">
-                    Programmable Privacy Core
+      <section className="py-24 border-t border-black/10 dark:border-white/10">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+              <div className="space-y-10">
+                  <div className="text-[10px] font-black text-black/40 dark:text-white/40 uppercase tracking-[0.4em]">Proprietary Layer</div>
+                  <h3 className="text-4xl font-black uppercase tracking-tighter leading-none font-web3">
+                    Zero-Knowledge Settlement <br/> Architecture
                   </h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">
-                    Whale Alert Protocol utilizes advanced ZK-proofs to ensure that sovereign identities remain untraceable while maintaining 100% regulatory transparency where required. Our "Neural Handshake" technology is the gold standard for cross-device synchronization.
+                  <p className="text-sm text-black/60 dark:text-white/60 leading-relaxed uppercase tracking-widest font-black">
+                    Whale Alert Protocol utilizes advanced ZK-proofs to ensure sovereign identities remain untraceable. 
+                    Our "Neural Handshake" technology is the institutional gold standard for cross-device synchronization.
                   </p>
-                  <Link href="/docs/core-concepts" className="inline-flex items-center gap-2 text-[10px] font-black text-white hover:text-cyan-400 transition-colors uppercase tracking-widest">
-                    Study Architecture <ArrowRight size={14} />
+                  <Link href="/docs/core-concepts" className="inline-flex items-center gap-4 text-[10px] font-black hover:opacity-50 transition-all uppercase tracking-[0.4em]">
+                    STudy Infrastructure ———
                   </Link>
               </div>
-              <div className="grid grid-cols-2 gap-4 w-full lg:w-1/3">
-                  {[Cpu, Shield, Zap, Layers].map((Icon, i) => (
-                    <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-cyan-400 hover:border-cyan-500/30 transition-all">
-                       <Icon size={32} strokeWidth={1} />
+              <div className="grid grid-cols-2 gap-1 border border-black/10 dark:border-white/10 bg-black/10 dark:bg-white/10">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-square bg-white dark:bg-black flex items-center justify-center">
+                       <div className={`w-8 h-8 border-2 ${i % 2 === 0 ? 'border-black dark:border-white' : 'border-black/20 dark:border-white/20'} rotate-45`} />
                     </div>
                   ))}
               </div>
