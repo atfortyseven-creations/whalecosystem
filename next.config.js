@@ -41,10 +41,6 @@ const nextConfig = {
         ]
     },
 
-    reactStrictMode: true,
-    compiler: {
-        removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
-    },
     compress: true,
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
@@ -56,10 +52,6 @@ const nextConfig = {
         ignoreDuringBuilds: true
     },
 
-    // Turbopack config (Next.js 16)
-    turbopack: {
-        root: __dirname,
-    },
 
     // External packages
     serverExternalPackages: [
