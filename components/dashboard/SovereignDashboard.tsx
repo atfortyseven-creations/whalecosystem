@@ -102,9 +102,9 @@ function Explainer({ title, children }: { title: string; children: React.ReactNo
                 onClick={() => setOpen(v => !v)}
                 style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: '8px 16px', width: '100%', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
             >
-                <Info size={11} color="rgba(255,255,255,0.25)" />
+                <Info size={11} color="var(--az-ink-3)" />
                 <span className="az-label">{title}</span>
-                <span className="az-label" style={{ marginLeft: 'auto', opacity: 0.4 }}>{open ? '▲ HIDE' : '▼ HOW DOES THIS WORK?'}</span>
+                <span className="az-label" style={{ marginLeft: 'auto', color: 'var(--az-ink-3)' }}>{open ? '▲ HIDE' : '▼ HOW DOES THIS WORK?'}</span>
             </button>
             <AnimatePresence>
                 {open && (
@@ -201,7 +201,7 @@ function PolymarketPanel() {
                 <div style={{ flex: 1, overflowY: 'auto' }} className="az-scroll">
                     {error && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: 'var(--az-rose)', fontSize: 11 }}>
-                            <AlertTriangle size={12} /> {error}
+                            <AlertTriangle size={12} /> <span style={{ color: 'var(--az-rose)' }}>{error}</span>
                         </div>
                     )}
 
@@ -400,7 +400,7 @@ function DeFiYieldPanel() {
                     <span className="az-label">STABLE ONLY</span>
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Filter size={10} color="rgba(255,255,255,0.25)" />
+                    <Filter size={10} color="var(--az-ink-3)" />
                     <span className="az-label">APY MIN:</span>
                     <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="az-select">
                         {[3,5,8,10,15,20,30].map(v => <option key={v} value={v}>{v}%</option>)}
@@ -428,7 +428,7 @@ function DeFiYieldPanel() {
                 <div style={{ flex: 1, overflowY: 'auto' }} className="az-scroll">
                     {error && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: 'var(--az-rose)', fontSize: 11 }}>
-                            <AlertTriangle size={12} /> {error}
+                            <AlertTriangle size={12} /> <span style={{ color: 'var(--az-rose)' }}>{error}</span>
                         </div>
                     )}
                     {!loading && pools.length > 0 && (
@@ -462,7 +462,7 @@ function DeFiYieldPanel() {
                                         <span className={chainCls(p.chainFull || p.chain)}>{p.chain}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="az-value-md" style={{ color: p.apy >= 20 ? 'var(--az-lime)' : p.apy >= 10 ? 'var(--az-emerald)' : '#fff', fontFamily: 'var(--font-mono)' }}>
+                                        <span className="az-value-md" style={{ color: p.apy >= 20 ? 'var(--az-lime)' : p.apy >= 10 ? 'var(--az-emerald)' : 'var(--az-ink)', fontFamily: 'var(--font-mono)' }}>
                                             {fmtApy(p.apy)}
                                         </span>
                                     </div>
@@ -522,9 +522,6 @@ function DeFiYieldPanel() {
                                 <div style={{ marginTop: 16, background: 'rgba(0,0,0,0.40)', border: '1px solid rgba(255,255,255,0.06)', padding: 14 }}>
                                     <div className="az-label" style={{ marginBottom: 8 }}>CALCULADORA</div>
                                     <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.50)', lineHeight: 1.7 }}>
-                                        Depositando <strong style={{ color: '#fff' }}>$1,000</strong> a <strong style={{ color: 'var(--az-lime)' }}>{fmtApy(selected.apy)}</strong> APY obtendrías:<br />
-                                        <strong style={{ color: 'var(--az-emerald)' }}>{fmtUsd(selected.apy * 10)}</strong> / año<br />
-                                        <strong style={{ color: 'var(--az-emerald)' }}>{fmtUsd(selected.apy * 10 / 12)}</strong> / mes<br />
                                         <strong style={{ color: 'var(--az-emerald)' }}>{fmtUsd(selected.apy * 10 / 365)}</strong> / día
                                     </p>
                                 </div>
@@ -610,10 +607,10 @@ function PortfolioPanel() {
                     {/* Valuta Anchor */}
                     <div className="az-surface-2" style={{ padding: 16, borderLeft: '3px solid var(--az-lime)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                            <div className="az-label" style={{ fontSize: 10, color: '#fff' }}>GLOBAL ANCHOR</div>
+                            <div className="az-label" style={{ fontSize: 10, color: 'var(--az-ink)' }}>GLOBAL ANCHOR</div>
                             <CurrencySwitcher />
                         </div>
-                        <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', lineHeight: 1.5, textTransform: 'uppercase', fontStyle: 'italic' }}>
+                        <p style={{ fontSize: 9, color: 'var(--az-ink)', opacity: 0.4, lineHeight: 1.5, textTransform: 'uppercase', fontStyle: 'italic' }}>
                             All asset valuations across the terminal are translated in real-time to the selected valuta.
                         </p>
                     </div>
@@ -642,12 +639,12 @@ function PortfolioPanel() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                     <div className="az-surface-2" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                         <div style={{ padding: 16, borderBottom: '1px solid var(--az-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div className="az-label" style={{ fontSize: 11, color: '#fff' }}>ACTIVOS DETECTADOS</div>
-                            <RefreshCw size={10} color="rgba(255,255,255,0.3)" />
+                            <div className="az-label" style={{ fontSize: 11, color: 'var(--az-ink)' }}>ACTIVOS DETECTADOS</div>
+                            <RefreshCw size={10} color="var(--az-ink-3)" />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             {tokens.map(t => (
-                                <div key={t.s} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                <div key={t.s} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid var(--az-border-2)' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-white/5 border border-white/10`}>
                                             <span className="text-[10px] font-black">{t.s.slice(0, 1)}</span>
