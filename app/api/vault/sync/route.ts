@@ -60,7 +60,8 @@ export async function POST(request: Request) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${vaultSecret}`
+                'Authorization': `Bearer ${vaultSecret}`,
+                'bypass-tunnel-reminder': 'true'
             },
             body: JSON.stringify({
                 source: 'Railway-Production',
