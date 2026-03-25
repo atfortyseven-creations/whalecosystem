@@ -95,8 +95,8 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ── PHASE 2: GOD-TIER 3D SUBMARINE BREAKDOWN (Temporarily Disabled for Diagnostic) ── */}
-      {/* <SubmarineDeconstruction3D /> */}
+      {/* ── PHASE 2: GOD-TIER 3D SUBMARINE BREAKDOWN ── */}
+      <SubmarineDeconstruction3D />
 
       {/* ── FOOTER & LEGAL (The Ultimate Downhead) ── */}
       <footer className="bg-[var(--aztec-parchment)] text-[var(--aztec-ink)]/50 py-32 px-12 border-t border-[var(--aztec-ink)]/10">
