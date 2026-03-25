@@ -161,6 +161,73 @@ export function WhaleAlertLanding() {
           </div>
       </section>
 
+
+      {/* ── PHASE 3: APPLICATIONS SHOWCASE ── */}
+      <section className="bg-[var(--aztec-parchment)] py-40 px-6 relative z-10 border-t border-[var(--aztec-ink)]/5 overflow-hidden">
+        <div className="absolute inset-0 noise-bg opacity-[0.03] pointer-events-none" />
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-24">
+            <div>
+              <div className="font-aztec-h2 text-[11px] text-[var(--aztec-orchid)] uppercase tracking-[0.6em] mb-6">
+                Sovereign Applications
+              </div>
+              <h2 className="font-aztec-h1 text-5xl md:text-7xl text-[var(--aztec-ink)] uppercase tracking-tighter leading-[0.9]">
+                Built For<br />Every<br /><span className="italic text-[var(--aztec-orchid)]">Use Case</span>
+              </h2>
+            </div>
+            <p className="font-aztec-body text-lg text-[var(--aztec-ink)]/50 max-w-sm leading-relaxed">
+              From sovereign personal vaults to trillion-dollar institutional compliance layers — the protocol adapts to your scale.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {DATA.applications.map((app, i) => {
+              const Icon = app.icon;
+              return (
+                <motion.div
+                  key={app.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.07, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+                  className="group relative rounded-[2rem] overflow-hidden bg-[var(--aztec-ink)]/[0.03] border border-[var(--aztec-ink)]/5 hover:border-[var(--aztec-orchid)]/20 hover:bg-[var(--aztec-orchid)]/[0.03] transition-all duration-500 p-8 flex flex-col gap-6"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--aztec-ink)]/5 flex items-center justify-center group-hover:bg-[var(--aztec-orchid)]/10 transition-all duration-500">
+                    <Icon size={22} className="text-[var(--aztec-ink)]/40 group-hover:text-[var(--aztec-orchid)] transition-colors duration-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-aztec-h3 text-lg text-[var(--aztec-ink)] font-black leading-tight mb-3">
+                      {app.title}
+                    </h3>
+                    <p className="font-aztec-body text-xs text-[var(--aztec-ink)]/40 leading-relaxed">
+                      {app.desc}
+                    </p>
+                  </div>
+                  <div className="mt-auto flex items-center gap-2 text-[9px] font-aztec-mono font-black uppercase tracking-[0.3em] text-[var(--aztec-orchid)] opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <span>Explore</span>
+                    <ChevronRight size={10} />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Stats Bar */}
+          <div className="mt-28 grid grid-cols-2 md:grid-cols-4 gap-1">
+            {DATA.stats.map((s) => (
+              <div
+                key={s.val}
+                className="p-10 border border-[var(--aztec-ink)]/5 first:rounded-l-[2rem] last:rounded-r-[2rem] flex flex-col gap-2 hover:bg-[var(--aztec-ink)]/[0.02] transition-all"
+              >
+                <div className="font-aztec-h1 text-4xl md:text-5xl text-[var(--aztec-ink)] tracking-tighter">{s.val}</div>
+                <div className="font-aztec-h2 text-[10px] text-[var(--aztec-ink)]/60 uppercase tracking-[0.3em]">{s.label}</div>
+                <div className="font-aztec-body text-xs text-[var(--aztec-ink)]/30">{s.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── FOOTER & LEGAL (The Ultimate Downhead) ── */}
       <footer className="bg-[var(--aztec-parchment)] text-[var(--aztec-ink)]/50 py-32 px-12 border-t border-[var(--aztec-ink)]/10">
         <div className="max-w-7xl mx-auto">
@@ -206,12 +273,13 @@ export function WhaleAlertLanding() {
 
             <div className="pt-20 border-t border-[var(--aztec-ink)]/5 flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="font-aztec-mono text-[9px] uppercase tracking-[0.5em] opacity-40">
-                    © 2024 WHALE ALERT CORP — ALL RIGHTS RESERVED
+                    © 2025 WHALE ALERT CORP — ALL RIGHTS RESERVED
                 </div>
-                <div className="font-aztec-h1 text-4xl opacity-5 select-none tracking-tighter">AZTEC PROTOCOL</div>
+                <div className="font-aztec-h1 text-4xl opacity-5 select-none tracking-tighter">WHALE ALERT</div>
             </div>
         </div>
       </footer>
     </div>
   );
 }
+
