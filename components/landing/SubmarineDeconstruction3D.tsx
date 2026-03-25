@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ScrollControls, useScroll, Html, Float, Stars, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Noise, Vignette } from "@react-three/postprocessing";
@@ -300,6 +300,12 @@ function TyphoonRig() {
 
 // --- Main Export Component ---
 export default function SubmarineDeconstruction3D() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <section className="relative w-full h-[400vh] bg-[#020202]">
       
@@ -318,34 +324,33 @@ export default function SubmarineDeconstruction3D() {
       </div>
 
       <div className="sticky top-0 w-full h-screen overflow-hidden">
-        <Canvas gl={{ antialias: false, powerPreference: "high-performance", alpha: false }} dpr={[1, 2]}>
-          <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={35} />
-          
-          <color attach="background" args={['#020202']} />
-          <fog attach="fog" args={['#020202', 15, 45]} />
-          
-          <ambientLight intensity={0.4} />
-          {/* Chartreuse Light targeting the bow */}
-          <directionalLight position={[-10, -10, 10]} intensity={1.5} color="#a3e33f" />
-          {/* Orchid Light targeting the rear / reactors */}
-          <directionalLight position={[10, 10, -10]} intensity={2} color="#b450ff" />
-          {/* Top highlight */}
-          <pointLight position={[0, 10, 0]} intensity={2} color="#ffffff" distance={20} />
+        {isMounted ? (
+          <Canvas gl={{ antialias: false, powerPreference: "high-performance", alpha: false }} dpr={[1, 2]}>
+            <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={35} />
+            
+            <color attach="background" args={['#020202']} />
+            <fog attach="fog" args={['#020202', 15, 45]} />
+            
+            <ambientLight intensity={0.4} />
+            <directionalLight position={[-10, -10, 10]} intensity={1.5} color="#a3e33f" />
+            <directionalLight position={[10, 10, -10]} intensity={2} color="#b450ff" />
+            <pointLight position={[0, 10, 0]} intensity={2} color="#ffffff" distance={20} />
 
-          {/* Deep Ocean Matrix Visuals */}
-          <Stars radius={100} depth={50} count={5000} factor={4} saturation={1} fade speed={0.5} />
-          
-          <ScrollControls pages={4} damping={0.15}>
-            <TyphoonRig />
-          </ScrollControls>
+            <Stars radius={100} depth={50} count={5000} factor={4} saturation={1} fade speed={0.5} />
+            
+            <ScrollControls pages={4} damping={0.15}>
+              <TyphoonRig />
+            </ScrollControls>
 
-          {/* Cinematic Post-Processing */}
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.8} />
-            <Noise opacity={0.06} />
-            <Vignette eskil={false} offset={0.05} darkness={1.2} />
-          </EffectComposer>
-        </Canvas>
+            <EffectComposer>
+              <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.8} />
+              <Noise opacity={0.06} />
+              <Vignette eskil={false} offset={0.05} darkness={1.2} />
+            </EffectComposer>
+          </Canvas>
+        ) : (
+          <div className="w-full h-full bg-[#020202]" />
+        )}
 
         {/* Ambient Subtle Gradients */}
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#020202] via-transparent to-[#020202]" />
