@@ -234,8 +234,8 @@ export function WhaleAlertLanding() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-24 mb-32">
                 <div className="col-span-1 md:col-span-2 space-y-8">
                     <div className="font-aztec-h1 text-6xl text-[var(--aztec-ink)] flex items-center gap-4">
-                      <div className="w-14 h-14 relative">
-                        <Image src="/models/update/gradient-pink-diamond-balls-assortment (2).png" alt="Logo" fill className="object-contain mix-blend-multiply" />
+                      <div className="w-16 h-16 relative bg-white rounded-full p-2 shadow-xl border border-black/5 flex items-center justify-center">
+                        <Image src="/official-whale-legendary.png" alt="Legendary Logo" fill className="object-contain p-2" />
                       </div>
                       Whale Alert <span className="italic">Corp</span>.
                     </div>

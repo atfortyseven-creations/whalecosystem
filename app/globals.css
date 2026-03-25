@@ -685,10 +685,10 @@
        -webkit-backdrop-filter: none !important;
     }
     
-    .bg-white\/10 { background-color: var(--aztec-parchment) !important; color: var(--aztec-ink); }
-    .bg-white\/20 { background-color: var(--aztec-parchment) !important; color: var(--aztec-ink); }
-    .bg-white\/40 { background-color: var(--aztec-parchment) !important; color: var(--aztec-ink); }
-    .bg-slate-950\/80 { background-color: var(--aztec-ink) !important; }
+    .bg-white\/10 { background-color: rgba(255,255,255,0.05) !important; }
+    .bg-white\/20 { background-color: rgba(255,255,255,0.1) !important; }
+    .bg-white\/40 { background-color: rgba(255,255,255,0.15) !important; }
+    .bg-slate-950\/80 { background-color: rgba(5, 5, 5, 0.8) !important; }
     
     /* Disable costly animations on active layout items */
     .animate-blob, .animate-liquid, .animate-prism-shift {

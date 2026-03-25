@@ -23,7 +23,7 @@
   --az-rose:       #ff4060;
   --az-emerald:    #00e87a;
   --az-amber:      #ffa725;
-  --az-parchment:  #e8e2d8;
+  --az-parchment:  rgba(255,255,255,0.85); /* Institutional White */
 
   /* Typography scale */
   --font-display:  'Space Grotesk', sans-serif;

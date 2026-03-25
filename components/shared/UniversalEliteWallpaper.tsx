@@ -140,10 +140,10 @@ export function UniversalEliteWallpaper() {
             <div 
                 className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04] transition-opacity duration-1000"
                 style={{
-                    backgroundImage: 'url(/official-whale.png)',
+                    backgroundImage: 'url(/official-whale-legendary.png)',
                     backgroundRepeat: 'repeat',
                     backgroundSize: isMobile ? '50px' : '70px', // Responsive sizing
-                    filter: 'grayscale(1) brightness(1.5)', 
+                    filter: 'grayscale(1) brightness(1.2)', // Legendary blending
                     transform: 'translate3d(0,0,0)', // GPU Force
                     backfaceVisibility: 'hidden',
                 }}
