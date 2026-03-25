@@ -129,9 +129,21 @@ export function UniversalEliteWallpaper() {
     }, []);
 
     return (
-        <canvas
-            ref={canvasRef}
-            className="fixed inset-0 w-full h-full pointer-events-none z-[-1] outline-none border-none m-0 p-0 block"
-        />
+        <>
+            <canvas
+                ref={canvasRef}
+                className="fixed inset-0 w-full h-full pointer-events-none z-[-2] outline-none border-none m-0 p-0 block"
+            />
+            {/* ── Institutional Watermark System (Phase 38) ────────────────── */}
+            <div 
+                className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04]"
+                style={{
+                    backgroundImage: 'url(/official-whale.png)',
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: '60px',
+                    filter: 'grayscale(1) brightness(2)', // Ensure it looks like a watermark on dark
+                }}
+            />
+        </>
     );
 }
