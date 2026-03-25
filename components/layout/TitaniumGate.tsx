@@ -63,7 +63,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     className="w-24 h-24"
                  >
                     <img 
-                        src="/whale-logo.png" 
+                        src="/official-whale.png" 
                         alt="Loading" 
                         className="w-full h-full object-contain drop-shadow-2xl"
                     />
