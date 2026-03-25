@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import { InstitutionalPortfolioView } from '@/components/bsv/InstitutionalPortfolioView';
 import { LegendaryLoader } from '@/components/ui/LegendaryLoader';
 
