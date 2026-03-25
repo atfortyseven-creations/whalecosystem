@@ -6,7 +6,7 @@ import { docContent } from '@/lib/docs/data';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export function DynamicDocPage() {
+export default function DynamicDocPage() {
   const params = useParams();
   const rawSlug = params?.slug;
   const slug = Array.isArray(rawSlug) ? rawSlug.join('/') : (rawSlug || '');

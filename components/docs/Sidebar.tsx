@@ -36,7 +36,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
         { label: 'Messages', href: '/docs/messages' },
         { label: 'Memory', href: '/docs/memory' },
         { label: 'Tools', href: '/docs/tools' },
-        { label: 'Skills ↗', href: '/docs/skills', external: true },
+        { label: 'Skills ↗', href: '/docs/whale-code/skills' },
         { label: 'Filesystem', href: '/docs/filesystem' },
         { label: 'AgentFile (.af)', href: '/docs/agent-file' },
         { label: 'Docker server', href: '/docs/docker' },
@@ -49,7 +49,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
         { label: 'Advanced', isCategory: true },
         { label: 'Integrations', href: '/docs/integrations' },
         { label: 'Development tools', href: '/docs/dev-tools' },
-        { label: 'Community tools', href: '/docs/community' },
+        { label: 'Community', href: '/docs/community' },
         { label: 'Discord', href: 'https://discord.gg/whalealert', external: true },
       ]
     },
