@@ -237,7 +237,7 @@ function PolymarketPanel() {
                                             {(!m.active || m.closed) && (
                                                 <span className="az-badge az-badge-rose" style={{ fontSize: 7, padding: '2px 4px', flexShrink: 0 }}>CERRADO</span>
                                             )}
-                                            <span style={{ fontSize: 11, color: (!m.active || m.closed) ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis' }}>{m.question}</span>
+                                            <span style={{ fontSize: 11, color: (!m.active || m.closed) ? 'var(--az-ink-3)' : 'var(--az-ink)', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis', fontWeight: 600 }}>{m.question}</span>
                                         </div>
                                         <span className="az-label" style={{ fontSize: 8 }}>{m.category}</span>
                                     </div>
@@ -248,7 +248,7 @@ function PolymarketPanel() {
                                         <span className="az-value-sm">{fmtUsd(m.volume24h)}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="az-value-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>{fmtUsd(m.liquidity)}</span>
+                                        <span className="az-value-sm" style={{ color: 'var(--az-ink-3)', fontWeight: 600 }}>{fmtUsd(m.liquidity)}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                         <span className={ev.cls}>{ev.label}</span>
@@ -269,7 +269,7 @@ function PolymarketPanel() {
                         >
                             <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                                 <div className="az-label-lime" style={{ marginBottom: 8 }}>DETAILS</div>
-                                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, marginBottom: 16 }}>{selected.question}</p>
+                                <p style={{ fontSize: 12, color: 'var(--az-ink)', lineHeight: 1.6, marginBottom: 16, fontWeight: 700 }}>{selected.question}</p>
                                 {/* Probability bars */}
                                 {[
                                     { label: 'YES', val: selected.yesPrice, fill: 'az-bar-fill-emerald' },
@@ -303,7 +303,7 @@ function PolymarketPanel() {
                                     <span className={(EV[selected.evSignal] || EV.NEUTRAL).cls} style={{ fontSize: 9 }}>
                                         {(EV[selected.evSignal] || EV.NEUTRAL).label}
                                     </span>
-                                    <p style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.40)', lineHeight: 1.6 }}>
+                                    <p style={{ marginTop: 8, fontSize: 11, color: 'var(--az-ink-3)', lineHeight: 1.6, fontWeight: 600 }}>
                                         {selected.evSignal === 'OVERSOLD' && 'El mercado puede estar subestimando significativamente la probabilidad YES. Potencial alta recompensa.'}
                                         {selected.evSignal === 'OVERBOUGHT' && 'La probabilidad YES está sobrevalorada. Considera la posición NO.'}
                                         {selected.evSignal === 'NEUTRAL' && 'Mercado equilibrado. Monitorizar cambios de volumen.'}
@@ -327,7 +327,7 @@ function PolymarketPanel() {
                                         >
                                             TRADE <ExternalLink size={11} />
                                         </a>
-                                        <p style={{ marginTop: 8, fontSize: 9, color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
+                                        <p style={{ marginTop: 8, fontSize: 9, color: 'var(--az-ink-3)', textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
                                             Requiere USDC en Polygon. Se abrirá MetaMask para confirmar.
                                         </p>
                                     </>
