@@ -1,4 +1,4 @@
-import { PrivateKey, P2PKH, Address, Transaction } from '@bsv/sdk';
+import { PrivateKey, P2PKH, Transaction, PublicKey } from '@bsv/sdk';
 import * as bip32 from '@scure/bip32';
 import * as bip39 from '@scure/bip39';
 
@@ -9,6 +9,7 @@ import * as bip39 from '@scure/bip39';
 export class CwiIdentity {
   private masterNode: bip32.HDKey | null = null;
   private identityNode: bip32.HDKey | null = null;
+  private changeNode: bip32.HDKey | null = null;
 
   constructor(mnemonic?: string) {
     if (mnemonic) {
@@ -19,8 +20,10 @@ export class CwiIdentity {
   public initFromMnemonic(mnemonic: string) {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     this.masterNode = bip32.HDKey.fromMasterSeed(seed);
-    // SirDeggen Standard: m/0'/0'
+    // SirDeggen Standard: m/0'/0' (Receive)
     this.identityNode = this.masterNode.derive("m/0'/0'");
+    // SirDeggen Standard: m/0'/1' (Change)
+    this.changeNode = this.masterNode.derive("m/0'/1'");
   }
 
   public getPublicKey(): string {
@@ -30,20 +33,41 @@ export class CwiIdentity {
 
   public getAddress(): string {
     if (!this.identityNode || !this.identityNode.privateKey) return '';
-    const priv = PrivateKey.fromWIF(this.getWIF());
-    return Address.fromPrivateKey(priv).toString();
+    const priv = PrivateKey.fromWif(this.getWIF());
+    return PublicKey.fromPrivateKey(priv).toAddress();
+  }
+
+  public getChangeAddress(): string {
+    if (!this.changeNode || !this.changeNode.privateKey) return '';
+    const priv = PrivateKey.fromWif(this.getChangeWIF());
+    return PublicKey.fromPrivateKey(priv).toAddress();
   }
 
   public getWIF(): string {
     if (!this.identityNode || !this.identityNode.privateKey) return '';
-    // Construct real WIF from raw private key
-    return PrivateKey.fromRandom().toWIF(); // Fallback for standard SDK interface in this context
+    return PrivateKey.fromHex(Buffer.from(this.identityNode.privateKey).toString('hex')).toWif();
   }
 
-  public async signTransaction(tx: any): Promise<any> {
+  public getChangeWIF(): string {
+    if (!this.changeNode || !this.changeNode.privateKey) return '';
+    return PrivateKey.fromHex(Buffer.from(this.changeNode.privateKey).toString('hex')).toWif();
+  }
+
+  public async signTransaction(tx: Transaction): Promise<Transaction> {
     if (!this.identityNode || !this.identityNode.privateKey) throw new Error('Identity not initialized');
-    // Real transaction signing logic would go here using @bsv/sdk Transaction class
+    // In @bsv/sdk v2, tx.sign() iterates through inputs with templates
+    // The calling code (SendAssetModal) will set the P2PKH template
+    await tx.sign();
     return tx; 
+  }
+
+  public async encrypt(data: Uint8Array, counterpartyPubKey: string): Promise<string> {
+    // Basic ECIES Storage Placeholder
+    return Buffer.from(data).toString('base64');
+  }
+
+  public async decrypt(data: string, counterpartyPubKey: string): Promise<Uint8Array> {
+    return new Uint8Array(Buffer.from(data, 'base64'));
   }
 
   public isInitialized(): boolean {

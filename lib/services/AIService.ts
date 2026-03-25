@@ -9,7 +9,7 @@ declare global {
 }
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '',
+    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
 });
 
 import { ForensicAnalysis, ForensicSignal } from './ai-types';

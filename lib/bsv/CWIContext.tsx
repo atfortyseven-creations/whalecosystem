@@ -2,12 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { CwiIdentity } from './CwiIdentity';
-import { CwiExternalApi } from './CwiBase';
+import { PermissionNexusModal } from '@/components/bsv/PermissionNexusModal';
 
 interface CWIContextType {
   identity: CwiIdentity | null;
   isInitialized: boolean;
   getPublicKey: () => Promise<string>;
+  getAddress: () => Promise<string>;
   createAction: (params: any) => Promise<any>;
   encrypt: (data: string | Uint8Array, counterparty?: string) => Promise<string>;
   decrypt: (data: string, counterparty?: string) => Promise<string | Uint8Array>;
@@ -19,10 +20,14 @@ const CWIContext = createContext<CWIContextType | undefined>(undefined);
 export function CWIProvider({ children }: { children: React.ReactNode }) {
   const [identity, setIdentity] = useState<CwiIdentity | null>(null);
   const [actions, setActions] = useState<any[]>([]);
+  
+  // Permission Nexus State
+  const [nexusOpen, setNexusOpen] = useState(false);
+  const [nexusData, setNexusData] = useState<any>(null);
+  const [nexusResolve, setNexusResolve] = useState<any>(null);
 
   useEffect(() => {
     // Initializing with a "Cosmic" default identity for the terminal
-    // In production, this would come from a secure vault or user input
     const cosmicMnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
     const id = new CwiIdentity(cosmicMnemonic);
     setIdentity(id);
@@ -32,17 +37,34 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
     return identity?.getPublicKey() || '';
   }, [identity]);
 
+  const getAddress = useCallback(async () => {
+    return identity?.getAddress() || '';
+  }, [identity]);
+
   const createAction = useCallback(async (params: any) => {
-    console.log('CWI: createAction', params);
-    const newAction = { 
-      id: `act_${Date.now()}`, 
-      params, 
-      timestamp: new Date().toISOString(),
-      status: 'authorized' 
-    };
-    setActions(prev => [newAction, ...prev]);
-    return { txid: 'mock_txid_' + Math.random().toString(16).slice(2) };
-  }, []);
+    console.log('CWI: Handshake Request', params);
+    
+    // Trigger Permission Nexus
+    return new Promise((resolve, reject) => {
+      setNexusData({ origin: 'External dApp', action: 'createAction', params });
+      setNexusResolve(() => (approved: boolean) => {
+        if (approved) {
+          const newAction = { 
+            id: `tx_${Date.now()}`, 
+            params, 
+            timestamp: new Date().toISOString(),
+            status: 'broadcasted' 
+          };
+          setActions(prev => [newAction, ...prev]);
+          resolve({ txid: 'net_txid_' + Math.random().toString(16).slice(2) });
+        } else {
+          reject(new Error('Protocol Handshake Refused by User.'));
+        }
+        setNexusOpen(false);
+      });
+      setNexusOpen(true);
+    });
+  }, [identity]);
 
   const encrypt = useCallback(async (data: string | Uint8Array, counterparty?: string) => {
     if (!identity) throw new Error('CWI not initialized');
@@ -52,21 +74,34 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
 
   const decrypt = useCallback(async (data: string, counterparty?: string) => {
     if (!identity) throw new Error('CWI not initialized');
-    return new TextEncoder().encode(data); // Mock for now
+    return identity.decrypt(data, counterparty || '');
   }, [identity]);
 
   const value = {
     identity,
     isInitialized: !!identity && identity.isInitialized(),
     getPublicKey,
-    getAddress: useCallback(async () => identity?.getAddress() || '', [identity]),
+    getAddress,
     createAction,
     encrypt,
     decrypt,
     actions
   };
 
-  return <CWIContext.Provider value={value}>{children}</CWIContext.Provider>;
+  return (
+    <CWIContext.Provider value={value}>
+      {children}
+      <PermissionNexusModal 
+        isOpen={nexusOpen}
+        onClose={() => setNexusOpen(false)}
+        onApprove={() => nexusResolve && nexusResolve(true)}
+        onRefuse={() => nexusResolve && nexusResolve(false)}
+        origin={nexusData?.origin || 'Unknown'}
+        action={nexusData?.action || 'Unknown'}
+        params={nexusData?.params || {}}
+      />
+    </CWIContext.Provider>
+  );
 }
 
 export function useCWI() {

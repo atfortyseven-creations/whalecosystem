@@ -8,12 +8,13 @@ import {
   ChevronRight, Database, Cpu, Globe
 } from 'lucide-react';
 import { useCWI } from '@/lib/bsv/CWIContext';
-import { InstitutionalHeader } from '../layout/InstitutionalHeader';
+import { InstitutionalHeader } from '../shared/InstitutionalHeader';
 
-import { InstitutionalPortfolioView } from '@/components/bsv/InstitutionalPortfolioView';
 import { SendAssetModal } from './SendAssetModal';
 import { ReceiveAssetModal } from './ReceiveAssetModal';
 import { QrScannerModal } from './QrScannerModal';
+
+import { UtxoManager } from '@/lib/bsv/UtxoManager';
 
 /**
  * INSTITUTIONAL PORTFOLIO VIEW (SIRDEGGEN SUBSTRATE v4)
@@ -22,8 +23,9 @@ import { QrScannerModal } from './QrScannerModal';
 export const InstitutionalPortfolioView = () => {
   const { identity, actions } = useCWI();
   const [activeTab, setActiveTab] = useState('assets');
-  const [balance, setBalance] = useState('0.10000000'); // Initial simulated balance
+  const [balance, setBalance] = useState('0.00000000'); 
   const [pulse, setPulse] = useState(false);
+  const utxoManager = React.useMemo(() => new UtxoManager(), []);
 
   // Modal States
   const [isSendOpen, setIsSendOpen] = useState(false);
@@ -31,11 +33,24 @@ export const InstitutionalPortfolioView = () => {
   const [isScanOpen, setIsScanOpen] = useState(false);
   const [scannedAddress, setScannedAddress] = useState('');
 
-  // Simulate real-time substrate logic for the "Legendary" feel
+  // Live Substrate Recovery
   useEffect(() => {
-    const interval = setInterval(() => setPulse(p => !p), 3000);
+    const fetchProtocolData = async () => {
+      if (identity) {
+        const address = identity.getAddress();
+        const utxos = await utxoManager.getUtxos(address);
+        const satoshis = utxos.reduce((acc, u) => acc + u.value, 0);
+        setBalance((satoshis / 100000000).toFixed(8));
+      }
+    };
+    
+    fetchProtocolData();
+    const interval = setInterval(() => {
+      setPulse(p => !p);
+      fetchProtocolData();
+    }, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [identity, utxoManager]);
 
   const handleScan = (data: string) => {
     setScannedAddress(data);

@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
 });
 
 const VERSION_ID = "v2-parallel-sync-777";
