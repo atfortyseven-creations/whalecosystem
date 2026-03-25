@@ -9,6 +9,7 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from "@/lib/store/ui-store";
 import AntiPhishing from "@/components/security/AntiPhishing";
+import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 
 const DATA = {
     stats: [
@@ -31,7 +32,7 @@ const DATA = {
 
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { isConnected } = useAccount();
+  const { isConnected } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
   const router = useRouter();
 

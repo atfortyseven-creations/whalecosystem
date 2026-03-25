@@ -95,7 +95,10 @@ export function MobileSovereignLanding() {
     }, [isConnected, isSigned, handleSignAndAuthorize, handleSovereignConnect]);
 
     if (view === 'scanner') {
-        return <MobileQRScanner onBack={() => setView('landing')} />;
+        return <MobileQRScanner 
+            onBack={() => setView('landing')} 
+            signMessageAsync={signMessageAsync}
+        />;
     }
 
 
@@ -263,11 +266,11 @@ export function MobileSovereignLanding() {
 
                         <button
                             onClick={handleScanClick}
-                            className={`w-full mt-2 bg-transparent border-2 ${isSigned ? 'border-indigo-500 text-indigo-600' : 'border-[#050505]/10 text-[#050505]/40'} font-black py-6 rounded-2xl flex items-center justify-between px-8 uppercase tracking-widest transition-all active:scale-[0.98]`}
+                            className={`w-full mt-2 bg-transparent border-2 ${isSigned ? 'border-indigo-500 text-indigo-600' : 'border-[#050505]/10 text-[#050505]/40'} font-black py-6 rounded-2xl flex items-center justify-between px-8 uppercase tracking-widest transition-all active:scale-[0.98] shadow-sm`}
                         >
                             <div className="flex items-center gap-4">
                                 <QrCode size={22} />
-                                <span>Scan PC Screen</span>
+                                <span>{isSigned ? 'Scan PC Screen' : 'Identify to Scan'}</span>
                             </div>
                             <MoveRight size={22} className="opacity-20" />
                         </button>
@@ -279,7 +282,7 @@ export function MobileSovereignLanding() {
 }
 
 // ─── QR SCANNER VIEW ──────────────────────────────────────────────────────────
-function MobileQRScanner({ onBack }: { onBack: () => void }) {
+function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, signMessageAsync: any }) {
     const { address, isConnected } = useAccount();
 
     useEffect(() => {
@@ -316,10 +319,17 @@ function MobileQRScanner({ onBack }: { onBack: () => void }) {
                     }
                     
                     try {
+                        // [LEGENDARY HANDSHAKE] Sign the token to prove mobile ownership
+                        toast.info('Authenticating PC Session...');
+                        const signature = await signMessageAsync({ message: decodedText });
+
+                        // The decodedText is "SOVEREIGN_HANDSHAKE:uuid"
+                        const token = decodedText.split(':')[1];
+
                         const res = await fetch('/api/auth/qr-sync', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ token: decodedText, address }),
+                            body: JSON.stringify({ token, address, signature }),
                         });
                         if (res.ok) {
                             toast.success('Neural Handshake Complete', {

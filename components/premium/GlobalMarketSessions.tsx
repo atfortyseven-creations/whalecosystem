@@ -127,7 +127,7 @@ export function GlobalMarketSessions() {
         >
             <div className="flex flex-col items-center justify-center text-center space-y-12 mb-20">
                 <div className="space-y-4">
-                    <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.5em]">
+                    <h2 className="text-sm font-black text-slate-600 uppercase tracking-[0.5em]">
                         Schedule
                     </h2>
                     <div className="flex items-center gap-4 px-6 py-3 bg-white/40 backdrop-blur-3xl rounded-[2rem] border border-white/20 shadow-xl">
@@ -148,7 +148,7 @@ export function GlobalMarketSessions() {
                             className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                                 activeTab === region.id 
                                 ? 'bg-white text-slate-950 shadow-md border border-slate-100 scale-105' 
-                                : 'text-slate-500 hover:text-slate-800'
+                                : 'text-slate-700 hover:text-slate-950'
                             }`}
                         >
                             {region.label}
@@ -172,19 +172,19 @@ export function GlobalMarketSessions() {
                         <div className="overflow-x-auto no-scrollbar">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-slate-200/50">
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">País</th>
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Mercado</th>
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Producto</th>
-                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-right">Apertura</th>
+                                    <tr className="border-b border-slate-300">
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">País</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Mercado</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Producto</th>
+                                        <th className="pb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 text-right">Apertura</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {activeRegion.markets.map((m, i) => (
                                         <tr key={i} className="group hover:bg-white/50 transition-colors">
                                             <td className="py-5 text-sm font-black text-slate-950 uppercase tracking-tighter pr-4">{m.country}</td>
-                                            <td className="py-5 text-xs font-bold text-slate-600 pr-4">{m.market}</td>
-                                            <td className="py-5 text-xs font-medium text-slate-500 pr-4">{m.product}</td>
+                                            <td className="py-5 text-xs font-bold text-slate-700 pr-4">{m.market}</td>
+                                            <td className="py-5 text-xs font-medium text-slate-600 pr-4">{m.product}</td>
                                             <td className="py-5 text-xs font-mono font-black text-slate-950 text-right">{m.hours}</td>
                                         </tr>
                                     ))}
@@ -202,7 +202,7 @@ export function GlobalMarketSessions() {
                             </div>
                             <div className="p-8 bg-[var(--aave-purple)]/5 rounded-[2rem] border border-[var(--aave-purple)]/10 flex gap-6 items-start">
                                 <Zap size={20} className="text-[var(--aave-purple)] mt-1 flex-shrink-0" />
-                                <p className="text-xs text-slate-500 leading-loose font-medium">
+                                <p className="text-xs text-slate-700 leading-loose font-medium">
                                     La operativa con **criptomonedas** está disponible las 24 horas del día, los 7 días de la semana. Ten en cuenta que esto excluye los reinicios obligatorios del servidor alrededor de medianoche y los periodos de mantenimiento general.
                                 </p>
                             </div>

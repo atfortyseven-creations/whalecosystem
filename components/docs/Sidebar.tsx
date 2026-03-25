@@ -12,6 +12,16 @@ interface SidebarProps {
 export function Sidebar({ theme, currentPath }: SidebarProps) {
   const sections = [
     {
+      title: 'Institutional Protocol',
+      items: [
+        { label: 'Sovereign Identity', href: '/docs/protocol/identity' },
+        { label: 'Neural Intelligence', href: '/docs/protocol/intelligence' },
+        { label: 'Security Architecture', href: '/docs/protocol/security' },
+        { label: 'Liquidity Analytics', href: '/docs/protocol/liquidity' },
+        { label: 'Audit & Compliance', href: '/docs/protocol/compliance' },
+      ]
+    },
+    {
       title: 'Guides',
       items: [
         { label: 'Whale Code ↗', href: 'https://whale.code', external: true },

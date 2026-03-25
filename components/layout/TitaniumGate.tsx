@@ -36,17 +36,35 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     useEffect(() => {
         setMounted(true);
     }, []);
-
     useEffect(() => {
-        if (!mounted) return;
+        const checkAccess = () => {
+            if (!mounted) return;
 
-        if (isConnected || isPublicPage) {
-            setState('APP');
-        } else {
-            setState('AUTH'); // Instantly unmount private content
-            // REDIRECT TO LANDING PAGE instantly if wallet is disconnected and trying to access private content
+            // Priority 1: Wagmi is connected
+            if (isConnected) {
+                setState('APP');
+                return;
+            }
+
+            // Priority 2: Public Page
+            if (isPublicPage) {
+                setState('APP');
+                return;
+            }
+
+            // Priority 3: Sovereign Handshake (Cookie)
+            const hasHandshake = typeof document !== 'undefined' && document.cookie.includes('sovereign_handshake=');
+            if (hasHandshake) {
+                setState('APP');
+                return;
+            }
+
+            // Otherwise: Access Denied
+            setState('AUTH');
             router.push('/');
-        }
+        };
+
+        checkAccess();
     }, [isConnected, isPublicPage, router, mounted]);
 
     // Loader - Wait for client hydration to avoid wallet flicker
