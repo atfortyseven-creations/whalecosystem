@@ -5,15 +5,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Landmark, Bell, Eye, EyeOff, Search, User, ChevronDown, Activity, Globe, Zap, Settings, HelpCircle, LifeBuoy, Fingerprint, Menu, X } from 'lucide-react';
-import { useAccount } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { useSmartAccount } from '@/hooks/useSmartAccount';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useUIStore } from '@/lib/store/ui-store';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 
 export function InstitutionalHeader() {
     const pathname = usePathname();
-    const { address: eoaAddress, isConnected: isEoaConnected } = useAccount();
+    const { address: eoaAddress, isConnected: isEoaConnected } = useSovereignAccount();
     const { smartAddress, isConnected, isLoading: isSaLoading } = useSmartAccount();
     const { openConnectModal } = useUIStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,7 +64,7 @@ export function InstitutionalHeader() {
                             href={link.href}
                             className={`text-[10px] font-aztec-mono font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
                                 link.isSystem ? 'bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(180,255,0,0.2)] hover:scale-105' :
-                                link.active ? 'text-[var(--aztec-orchid)] drop-shadow-[0_0_8px_rgba(209,37,199,0.2)]' : 'text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-ink)]'
+                                link.active ? 'text-[var(--aztec-orchid)] drop-shadow-[0_0_8px_rgba(209,37,199,0.2)]' : 'text-[var(--aztec-ink)]/70 hover:text-[var(--aztec-ink)]'
                             }`}
                         >
                             {link.isSystem && <Globe size={12} className="animate-spin-slow" />}
@@ -107,7 +107,7 @@ export function InstitutionalHeader() {
                                     className={`p-6 rounded-2xl text-[12px] font-aztec-mono font-black uppercase tracking-[0.3em] transition-all border ${
                                         link.active 
                                         ? 'bg-[var(--aztec-chartreuse)]/10 text-[var(--aztec-chartreuse)] border-[var(--aztec-chartreuse)]/20' 
-                                        : 'bg-[var(--aztec-ink)]/5 text-[var(--aztec-ink)]/50 border-[var(--aztec-ink)]/5 hover:text-[var(--aztec-ink)] hover:bg-[var(--aztec-ink)]/10'
+                                        : 'bg-[var(--aztec-ink)]/5 text-[var(--aztec-ink)]/70 border-[var(--aztec-ink)]/5 hover:text-[var(--aztec-ink)] hover:bg-[var(--aztec-ink)]/10'
                                     }`}
                                 >
                                     {link.label}

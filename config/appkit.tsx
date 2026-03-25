@@ -87,7 +87,7 @@ const metadata = {
     description: 'Sovereign Institutional Intelligence',
     url: 'https://www.humanidfi.com',
     icons: [
-        'https://www.humanidfi.com/models/update/gradient-pink-diamond-balls-assortment (2).png'
+        '/official-whale-legendary.png'
     ],
     redirect: {
         native: 'whalealert://',

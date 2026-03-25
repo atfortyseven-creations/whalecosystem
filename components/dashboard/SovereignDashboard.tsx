@@ -173,7 +173,7 @@ function PolymarketPanel() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                 {[
                     { label: '24H VOLUME',   value: fmtUsd(stats.vol),         color: 'var(--az-lime)' },
-                    { label: 'MERCADOS LIVE', value: stats.count,              color: '#fff' },
+                    { label: 'MERCADOS LIVE', value: stats.count,              color: 'var(--az-ink)' },
                     { label: 'EDGE MÁXIMO',  value: fmtPct(stats.edge),       color: 'var(--az-emerald)' },
                 ].map(s => (
                     <div key={s.label} className="az-stat-card">
@@ -382,9 +382,9 @@ function DeFiYieldPanel() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                 {[
                     { label: 'APY MÁXIMO',    value: fmtApy(stats.maxApy),              color: 'var(--az-lime)' },
-                    { label: 'APY PROMEDIO',  value: fmtApy(stats.avgApy),              color: '#fff' },
+                    { label: 'APY PROMEDIO',  value: fmtApy(stats.avgApy),              color: 'var(--az-ink)' },
                     { label: 'POOLS STABLE',  value: stats.stablePools,                color: 'var(--az-emerald)' },
-                    { label: 'TVL TOTAL',     value: fmtUsd(stats.totalTvl),            color: 'rgba(255,255,255,0.50)' },
+                    { label: 'TVL TOTAL',     value: fmtUsd(stats.totalTvl),            color: 'rgba(26, 20, 0, 0.50)' },
                 ].map(s => (
                     <div key={s.label} className="az-stat-card">
                         <div className="az-label">{s.label}</div>

@@ -232,7 +232,7 @@ export function ConnectWalletModal() {
                                         <div className="relative z-10 w-[240px] h-[240px] flex items-center justify-center bg-white rounded-2xl overflow-hidden p-2">
                                             {qrSession ? (
                                                 <QRCodeSVG 
-                                                    value={qrSession} 
+                                                    value={`SOVEREIGN_HANDSHAKE:${qrSession}`} 
                                                     size={220} 
                                                     level="H"
                                                     bgColor="#FFFFFF"

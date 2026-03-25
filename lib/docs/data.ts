@@ -1,127 +1,237 @@
 export const docContent: Record<string, { title: string; category: string; content: string }> = {
-  'intro': {
-    title: 'Introduction to Whale Alert',
-    category: 'Guides',
+  'protocol/identity': {
+    title: 'Sovereign Identity Protocol',
+    category: 'Institutional Protocol',
     content: `
-# Introduction to Whale Alert Corporation
+# Sovereign Identity & Neural Handshake
 
-Whale Alert Corporation™ is the definitive institutional platform for on-chain data surveillance. 
-Our protocol enables the secure tracking of massive capital movements with absolute precision.
+The **Sovereign Identity Protocol** is the definitive standard for institutional session bridging on the Whale Alert Protocol.
 
-## The Network Intelligence Layer
-Unlike generic block explorers, the Whale Alert Protocol utilizes a proprietary **Neural Handshake** system to synchronize telemetry across decentralized nodes. 
+## The Neural Handshake
+The "Neural Handshake" is a cryptographic synchronization mechanism that links a mobile wallet session with a PC terminal.
 
-### Core Pillars
-* **Data Sovereignty**: Your terminal sessions remain private through ZK-proof verification.
-* **Institutional Speed**: 120Hz refresh rates with sub-millisecond settlement visualization.
-* **Global Protocol**: Unified access to the world's most liquid dark pools and institutional vaults.
+### Key Features
+* **Zero-Knowledge Handshake**: Verify your identity without exposing your private keys to the PC environment.
+* **Biometric Inheritance**: Secure your session using mobile biometric sensors (FaceID/TouchID).
+* **Cross-Device Persistence**: Stay authenticated for 7 days via secure, encrypted cookies.
+
+## Technical Orchestration
+1. **QR Generation**: The PC generates a unique, short-lived session token.
+2. **Mobile Signing**: The mobile device signs the token using the verified wallet address.
+3. **Session Fulfillment**: The backend verifies the signature and issues an institutional session cookie to the PC.
     `
   },
-  'quickstart': {
-    title: 'Quickstart (API)',
+  'protocol/intelligence': {
+    title: 'Neural Intelligence Hub',
+    category: 'Institutional Protocol',
+    content: `
+# Neural Intelligence Hub
+
+The **Neural Hub** is the heart of the Whale Alert surveillance engine. It processes millions of raw transactions to distill high-conviction institutional signals.
+
+## Signal Extraction
+Using **Kinetic Heuristics**, the Hub identifies patterns of accumulation, distribution, and wash-trading across all major liquidity pools.
+
+### intelligence Metrics
+* **Whale Intensity (WI)**: A metric measuring the concentration of capital movement within a specific block.
+* **Flow Velocity**: The speed at which assets are moving between exchange cold wallets.
+* **Dark Pool Proximity**: Identification of transactions originating from or destined for institutional dark pools.
+    `
+  },
+  'protocol/security': {
+    title: 'Security & Anti-Phishing',
+    category: 'Institutional Protocol',
+    content: `
+# Institutional Security Protocols
+
+Whale Alert Corporation™ employs a multi-layered security architecture to protect institutional data and user privacy.
+
+## Legendary Security Proxy
+All outbound requests are routed through the **Legendary Security Proxy**, which obfuscates the terminal's IP and session metadata.
+
+### Safeguards
+* **Anti-Phishing Layer**: Automatic detection and blocking of malicious redirection attempts.
+* **Titanium Gate**: A strict whitelisting system that prevents unauthorized access to private terminal areas.
+* **Signature Verification**: Every significant action within the terminal requires a cryptographic signature from a verified sovereign device.
+    `
+  },
+  'protocol/liquidity': {
+    title: 'Liquidity & Dark Pool Analytics',
+    category: 'Institutional Protocol',
+    content: `
+# Liquidity Analytics
+
+The terminal provide deep visibility into global liquidity across L1 and L2 networks.
+
+## Dark Pool Monitoring
+Monitor private institutional order books and OTC desk movements that are invisible to standard explorers.
+
+### Analytics Suite
+* **L1/L2 Bridge Monitoring**: Track massive capital migrations between Ethereum, Base, Arbitrum, and Solana.
+* **Liquidity Heatmaps**: Real-time visualization of where institutional capital is pooling.
+    `
+  },
+  'protocol/compliance': {
+    title: 'Institutional Audit & Compliance',
+    category: 'Institutional Protocol',
+    content: `
+# Compliance & Audit Protocols
+
+Whale Alert Corporation™ ensures that all telemetry and monitoring activities align with global institutional standards.
+
+## Immutable Audit Trails
+Maintain complete, encrypted logs of all surveillance activity for internal compliance and regulatory oversight.
+
+### Compliance Features
+* **ESG Alignment**: Monitoring for capital flows associated with verified green-energy and ethical initiatives.
+* **Sanctioned Entity Filtering**: Real-time alerts for flows interacting with restricted sovereign addresses.
+    `
+  },
+  'intro': {
+    title: 'Institutional Overview',
     category: 'Guides',
     content: `
-# Quickstart (API)
+# Institutional Overview
 
-Follow these steps to integrate the Whale Alert API into your custom institutional dashboard.
+Whale Alert Corporation™ is the global leader in high-fidelity on-chain data surveillance. 
 
-## 1. Authentication
-Obtain your corporate access token from the Network Portal and initialize the secure client.
-
-\`\`\`typescript
-import { WhaleCorporation } from '@whale-alert/sdk';
-
-const client = new WhaleCorporation({
-  apiKey: 'YOUR_CORPORATE_TOKEN',
-  network: 'mainnet'
-});
-\`\`\`
-
-## 2. Real-Time Subscription
-Listen for capital movements exceeding $1B USD with zero-latency synchronization.
-
-\`\`\`typescript
-client.on('flow.tx.massive', (tx) => {
-  console.log('🚨 WHALE ALERT:', tx.usdValue);
-});
-\`\`\`
+## The Mission
+Our mission is to provide sovereign entities with the tools required to navigate the complex landscape of global digital capital flows with absolute precision and security.
     `
   },
   'get-started': {
-    title: 'Get Started with Whale Alert',
+    title: 'Terminal Quickstart',
     category: 'Guides',
     content: `
 # Get Started
 
-Welcome to the official technical repository. This guide will help you initialize your institutional terminal and synchronize with the Whale Alert Protocol.
+Initialize your Legendary Terminal session in three steps.
 
-## Prerequisites
-* **Corporate Access Token**: Obtain this from your account manager.
-* **Neural Handshake Link**: Ensure your PC and Mobile devices are linked via the Titanium Gate.
-
-## Installation
-The Whale Code SDK is the primary interface for terminal orchestration.
-
-\`\`\`bash
-npm install @whale-alert/corporation-sdk
-\`\`\`
-    `
-  },
-  'core-concepts': {
-    title: 'Core Concepts',
-    category: 'Guides',
-    content: `
-# Core Concepts
-
-Understanding the underlying architecture of the Whale Alert Protocol is essential for high-frequency flow analysis.
-
-## 1. Zero-Knowledge Settlement
-Every capital movement detected is verified through a decentralized ZK-sharding process. This ensures that while the source and destination are public, the **strategic telemetry** of the monitoring agent remains private.
-
-## 2. Kinetic Flow Visualization
-Data is not just tracked; it is visualized as a kinetic pulse. The Whale Alert Protocol converts hexadecimal raw data into 120Hz kinetic streams.
-
-## 3. Sovereign Subagents
-Agents are the building blocks of the network. Each subagent operates with its own localized memory and execution context.
-    `
-  },
-  'api/usage': {
-    title: 'Using the Whale Alert API',
-    category: 'API Reference',
-    content: `
-# Using the API
-
-The Whale Alert REST and WebSocket APIs provide low-latency access to the global network telemetry.
-
-## Base URL
-The production environment operates on the sovereign endpoint:
-\`https://api.whalealert.pro/v2\`
-
-## Authentication
-All requests must include the \`X-Whale-Token\` header.
-
-\`\`\`bash
-curl -H "X-Whale-Token: YOUR_TOKEN" \\
-     https://api.whalealert.pro/v2/flows/massive
-\`\`\`
+1. **Connect Wallet**: Authenticate via MetaMask or WalletConnect.
+2. **Perform Handshake**: Sync your PC screen with your mobile device.
+3. **Calibrate Feed**: Set your surveillance filters for specific asset classes.
     `
   },
   'whale-code/overview': {
-    title: 'Whale Code Overview',
+    title: 'Whale Code DSL',
     category: 'Whale Code',
     content: `
 # Whale Code™ Overview
 
-Whale Code is the proprietary domain-specific language (DSL) for programmable data surveillance.
-
-## Why Whale Code?
-Standard scripting environments lack the kinetic precision required for institutional flow analysis. 
-Whale Code bridges pure blockchain telemetry with autonomous agent logic.
-
-### Key Features
-* **Stateful Subagents**: Agents with persistent ZK-memory layers.
-* **Auto-Looping Protocols**: Continuous state re-evaluation at the execution node level.
-* **Deep Hooks**: Direct integration with dark pool settlement systems.
+Whale Code is a proprietary, domain-specific language designed for high-frequency data surveillance. It bridges the gap between raw blockchain telemetry and autonomous agent logic.
     `
-  }
+  },
+  'whale-code/quickstart': {
+    title: 'Quickstart (Whale Code)',
+    category: 'Whale Code',
+    content: `
+# Quickstart (Whale Code)
+
+Get your first surveillance script running in under 2 minutes.
+
+\`\`\`whale
+on flow(amount > $100M) {
+  signal_terminal("Institutional Whale Detected");
+}
+\`\`\`
+    `
+  },
+  'whale-code/memory': {
+    title: 'ZK-Memory Layers',
+    category: 'Whale Code',
+    content: `
+# Memory Management
+
+Whale Code subagents utilize a multi-layered memory architecture.
+
+* **Hot Memory**: Sub-millisecond access for real-time heuristics.
+* **Cold Memory**: Persistent ZK-storage for historical pattern matching.
+    `
+  },
+  'api/reference/agents': {
+    title: 'Agent API Reference',
+    category: 'API Reference',
+    content: `
+# Agent API
+
+Manage and orchestrate institutional subagents via REST.
+
+## Endpoints
+* \`GET /v2/agents\`: List active subagents.
+* \`POST /v2/agents\`: Deploy a new surveillance unit.
+    `
+  },
+  'api/reference/tokens': {
+    title: 'Access Tokens & Identity',
+    category: 'API Reference',
+    content: `
+# Access Tokens
+
+Manage corporate identity and API access layers.
+
+## Generation
+Tokens are generated via the **Neural Handshake Portal** and are cryptographically bound to your sovereign device.
+    `
+  },
+  'pricing': {
+    title: 'Sovereign Tiers',
+    category: 'Guides',
+    content: `
+# Institutional Tiers
+
+* **Elite**: $1B+ Flow monitoring, ZK-Privacy, 1ms Latency.
+* **Pro**: Full surveillance suite, 10ms Latency.
+    `
+  },
+  'tools': {
+    title: 'Protocol Tools',
+    category: 'Guides',
+    content: `
+# Tools & Utilities
+
+The protocol provides a suite of tools for institutional developers.
+
+* **Whale-CLI**: Terminal-based tracking.
+* **Handshake-Bridge**: Secure device linking.
+    `
+  },
+  'setup': {
+    title: 'Infrastructure Setup',
+    category: 'Guides',
+    content: `
+# Server Setup
+
+Deploy the Whale Alert Protocol on your own institutional hardware.
+
+## Docker Deployment
+\`\`\`bash
+docker run -p 3000:3000 whale-corporation/terminal:latest
+\`\`\`
+    `
+  },
+  'messages': { title: 'Neural Messages', category: 'Guides', content: '# Neural Messages\n\nEncrypted communication between sovereign subagents.' },
+  'memory': { title: 'ZK-Memory', category: 'Guides', content: '# ZK-Memory\n\nPersistent and hot memory layers for autonomous units.' },
+  'filesystem': { title: 'Sovereign Filesystem', category: 'Guides', content: '# Filesystem\n\nVirtual institutional filesystem for agent data storage.' },
+  'agent-file': { title: 'AgentFile (.af)', category: 'Guides', content: '# AgentFile (.af)\n\nThe definitive configuration standard for sovereign agents.' },
+  'providers': { title: 'Model Providers', category: 'Guides', content: '# Model Providers\n\nInstitutional integration with OpenAI, Anthropic, and local LLM nodes.' },
+  'tutorials/first-steps': { title: 'First Steps', category: 'Tutorials', content: '# First Steps\n\nYour first 10 minutes in the Whale Alert Corporation environment.' },
+  'tutorials/retrieval': { title: 'Advanced Retrieval', category: 'Tutorials', content: '# Advanced Retrieval\n\nExtracting signal from noise using RAG and Neural Hub heuristics.' },
+  'tutorials/patterns': { title: 'Multi-Agent Patterns', category: 'Tutorials', content: '# Multi-Agent Patterns\n\nOrchestrating swarms of subagents for global market surveillance.' },
+  'integrations': { title: 'Institutional Integrations', category: 'Advanced', content: '# Integrations\n\nConnecting Whale Alert to Bloomberg, Reuters, and proprietary bank feeds.' },
+  'dev-tools': { title: 'Development Tools', category: 'Advanced', content: '# Dev Tools\n\nThe internal suite for building and debugging Whale Code subagents.' },
+  'api/intro': { title: 'API Introduction', category: 'API Reference', content: '# API Introduction\n\nHigh-performance access to the world\'s most liquid telemetry.' },
+  'api/sdks': { title: 'Client SDKs', category: 'API Reference', content: '# Client SDKs\n\nNative libraries for TypeScript, Python, and Rust.' },
+  'api/reference/blocks': { title: 'Blocks API', category: 'API Reference', content: '# Blocks API\n\nAccess raw ledger state and block-level heuristics.' },
+  'api/reference/archives': { title: 'Archives API', category: 'API Reference', content: '# Archives API\n\nHistorical telemetry spanning since the genesis of the protocol.' },
+  'api/reference/mcp': { title: 'MCP Servers', category: 'API Reference', content: '# MCP Servers\n\nModel Context Protocol integration for AI-driven surveillance.' },
+  'whale-code/skills': { title: 'Agent Skills', category: 'Whale Code', content: '# Agent Skills\n\nModular capabilities that can be dynamically loaded into subagents.' },
+  'whale-code/hooks': { title: 'Deep Hooks', category: 'Whale Code', content: '# Deep Hooks\n\nDirect kernel-level integration with the Whale Alert monitoring engine.' },
+  'whale-code/reference/commands': { title: 'Slash Commands', category: 'Whale Code', content: '# Slash Commands\n\nThe interface for human-to-agent terminal communication.' },
+  'whale-code/reference/cli': { title: 'CLI Reference', category: 'Whale Code', content: '# CLI Reference\n\nCommand-line toolset for institutional DevOps.' },
+  'api/reference/tools': { title: 'Tools API', category: 'API Reference', content: '# Tools API\n\nManage and call sovereign agent tools.' },
+  'api/reference/runs': { title: 'Runs API', category: 'API Reference', content: '# Runs API\n\nMonitor and manage active execution runs.' },
+  'api/reference/conversations': { title: 'Conversations API', category: 'API Reference', content: '# Conversations API\n\nSecure communication logs between agents and operators.' },
+  'whale-code/reference/auto-loop': { title: 'Auto-Looping', category: 'Whale Code', content: '# Auto-Looping Protocols\n\nContinuous state re-evaluation at the node level.' },
+  'whale-code/reference/docker': { title: 'Docker Reference', category: 'Whale Code', content: '# Docker Reference\n\nContainerization standards for sovereign subagents.' },
+  'whale-code/reference/inner-workings': { title: 'Inner Workings', category: 'Whale Code', content: '# Inner Workings\n\nDeep dive into the kinetic flow engine and ZK-memory synchronization.' }
 };

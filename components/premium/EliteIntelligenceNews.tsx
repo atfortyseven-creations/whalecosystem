@@ -61,7 +61,7 @@ export function EliteIntelligenceNews() {
                             <h3 className="text-[1.3rem] font-black text-slate-900 leading-[1.1] group-hover:text-[var(--aave-purple)] transition-colors uppercase tracking-tight">
                                 {item.title}
                             </h3>
-                            <p className="text-[14px] text-slate-500 font-medium leading-relaxed">
+                            <p className="text-[14px] text-slate-700 font-medium leading-relaxed">
                                 {item.body.substring(0, 300)}{item.body.length > 300 ? '...' : ''}
                             </p>
                         </motion.div>
@@ -71,7 +71,7 @@ export function EliteIntelligenceNews() {
                 {news.length === 0 && !isValidating && (
                     <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
                         <Newspaper size={40} className="text-slate-300 mb-4" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Awaiting Oracle Synchronization</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">Awaiting Oracle Synchronization</p>
                     </div>
                 )}
             </div>

@@ -9,6 +9,7 @@ import {
     TrendingUp, LineChart, Globe, Zap, Scale, BarChart3,
     Newspaper, X, Menu
 } from 'lucide-react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { InmersiveConstellations } from '@/components/shared/InmersiveConstellations';
 import { GlobalMarketSessions } from '@/components/premium/GlobalMarketSessions';
@@ -91,8 +92,8 @@ function TransactionRow({ item, index }: { item: any, index: number }) {
                     </div>
                     <div className="sm:hidden flex-1">
                         <div className="flex items-center gap-3">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{item.tier?.replace(' tier', '') || 'INST'}</span>
-                             <span className={`text-[9px] font-black uppercase tracking-widest ${item.type?.includes('SELL') ? 'text-rose-600' : 'text-emerald-500'}`}>{item.type || 'TX'}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">{item.tier?.replace(' tier', '') || 'INST'}</span>
+                             <span className={`text-[9px] font-black uppercase tracking-widest ${item.type?.includes('SELL') ? 'text-rose-700' : 'text-emerald-700'}`}>{item.type || 'TX'}</span>
                         </div>
                         <div className="text-[10px] font-mono font-black text-slate-900 mt-0.5">{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
@@ -104,14 +105,14 @@ function TransactionRow({ item, index }: { item: any, index: number }) {
                 {/* Main Transaction Info */}
                 <div className="flex-1 min-w-0 space-y-2 sm:space-y-3 w-full">
                     <div className="hidden sm:flex items-center gap-4">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                             {item.tier?.replace(' tier', '') || 'Institutional'}
                         </span>
-                        <div className="h-1 w-1 rounded-full bg-slate-300" />
+                        <div className="h-1 w-1 rounded-full bg-slate-400" />
                         <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
-                            item.type?.includes('SELL') ? 'text-rose-600' : 
-                            item.type?.includes('BUY') ? 'text-emerald-500' : 
-                            'text-slate-500'
+                            item.type?.includes('SELL') ? 'text-rose-700' : 
+                            item.type?.includes('BUY') ? 'text-emerald-700' : 
+                            'text-slate-600'
                         }`}>
                             {item.type || 'EXCHANGE TRANSFER'}
                         </span>
@@ -133,7 +134,7 @@ function TransactionRow({ item, index }: { item: any, index: number }) {
                 {/* Market Value & Time - Hidden on mobile, moved to visual status div */}
                 <div className="hidden sm:block text-right space-y-1 shrink-0">
                     <div className="text-slate-950 text-xl font-black tracking-tighter font-mono">${item.usdValue.toLocaleString()}</div>
-                    <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest flex items-center justify-end gap-2">
+                    <div className="text-slate-600 text-[10px] font-black uppercase tracking-widest flex items-center justify-end gap-2">
                         <Database size={10} /> {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 </div>
@@ -220,6 +221,7 @@ export function WhaleTrackerDashboard() {
     const { unifiedWhaleFeed, isLoading } = useWhaleFeed();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('ALL');
+    const { address, isConnected } = useSovereignAccount();
     const [showNews, setShowNews] = useState(false);
 
     const filtered = useMemo(() => {
@@ -299,7 +301,7 @@ export function WhaleTrackerDashboard() {
                             </motion.div>
                             <div className="space-y-4">
                                 <h1 className="text-4xl sm:text-8xl font-black uppercase tracking-tighter leading-none text-slate-950">
-                                    Search your <span className="text-slate-300">Transaction</span>
+                                    Search your <span className="text-slate-500">Transaction</span>
                                 </h1>
                             </div>
                         </div>
@@ -312,14 +314,14 @@ export function WhaleTrackerDashboard() {
                         {/* Professional Search & Intelligence Submenu Toggle */}
                         <div className="w-full max-w-4xl flex gap-8 items-center">
                             <div className="flex-1 relative group">
-                                <div className="absolute inset-y-0 left-10 flex items-center pointer-events-none text-slate-300 group-focus-within:text-emerald-600 transition-colors">
+                                <div className="absolute inset-y-0 left-10 flex items-center pointer-events-none text-slate-500 group-focus-within:text-emerald-700 transition-colors">
                                     <Search size={28} />
                                 </div>
                                 <input 
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="QUERY BY TX HASH / WALLET SIGNATURE / ASSET..."
-                                    className="w-full bg-white border border-slate-200 rounded-3xl sm:rounded-[3.5rem] py-6 sm:py-10 pl-16 sm:pl-24 pr-4 sm:pr-40 text-sm sm:text-lg font-bold tracking-tight outline-none focus:border-cyan-500/50 focus:shadow-[0_50px_100px_-20px_rgba(6,182,212,0.15)] transition-all text-slate-950 placeholder:text-slate-300 shadow-xl shadow-slate-200/50"
+                                    className="w-full bg-white border border-slate-200 rounded-3xl sm:rounded-[3.5rem] py-6 sm:py-10 pl-16 sm:pl-24 pr-4 sm:pr-40 text-sm sm:text-lg font-bold tracking-tight outline-none focus:border-cyan-500/50 focus:shadow-[0_50px_100px_-20px_rgba(6,182,212,0.15)] transition-all text-slate-950 placeholder:text-slate-400 shadow-xl shadow-slate-200/50"
                                 />
                             </div>
                         </div>
@@ -345,10 +347,10 @@ export function WhaleTrackerDashboard() {
                             </div>
                             <div className="flex items-center gap-10">
                                 <div className="text-right">
-                                    <div className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Observational Load</div>
+                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Observational Load</div>
                                     <div className="text-base font-mono font-black text-slate-950">{filtered.length} Sequences identified</div>
                                 </div>
-                                <div className="w-px h-12 bg-slate-200" />
+                                <div className="w-px h-12 bg-slate-300" />
                             </div>
                         </div>
 

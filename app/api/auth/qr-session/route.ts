@@ -32,7 +32,17 @@ export async function GET(request: Request) {
         if (valStr.startsWith('{')) {
             const data = JSON.parse(valStr);
             if (data.address) {
-                // Delete the consumed token
+                // [SESSION] Establish verified handshake cookie on the PC browser
+                const cookieStore = await cookies();
+                cookieStore.set('sovereign_handshake', data.address, {
+                    maxAge: 7 * 24 * 60 * 60, // 7 days
+                    path: '/',
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    httpOnly: false // Accessible by client-side hooks
+                });
+
+                // Delete the consumed token from Redis
                 await safeRedisSet(`qr:${id}`, 'CONSUMED', 'EX', 10);
                 return NextResponse.json({ status: 'complete', address: data.address });
             }
