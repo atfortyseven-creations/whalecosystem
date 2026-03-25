@@ -63,11 +63,11 @@ export const metadata = {
   icons: [
     {
       rel: 'icon',
-      url: '/official-whale.png',
+      url: '/official-whale-legendary.png',
     },
     {
       rel: 'apple-touch-icon',
-      url: '/official-whale.png',
+      url: '/official-whale-legendary.png',
     },
   ],
   manifest: '/manifest.webmanifest',
@@ -83,7 +83,7 @@ export const metadata = {
     siteName: 'Whale Alert Network',
     images: [
       {
-        url: '/official-whale.png',
+        url: '/official-whale-legendary.png',
         width: 1200,
         height: 630,
         alt: 'Whale Alert Network Elite Matrix Interface',
@@ -96,7 +96,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Whale Alert Network | Elite Whale Intelligence',
     description: 'The world\'s most precise whale alert tool for legendary on-chain detection.',
-    images: ['/official-whale.png'],
+    images: ['/official-whale-legendary.png'],
     creator: '@WhaleAlertPro',
   },
   alternates: {
