@@ -95,36 +95,38 @@ const metadata = {
     }
 }
 
-// Create the modal instance
-createAppKit({
-    adapters: [wagmiAdapter],
-    networks,
-    projectId,
-    metadata,
-    features: {
-        analytics: true,
-        email: true, 
-        socials: ['google', 'x', 'github', 'discord', 'apple'],
-        swaps: false,
-        onramp: false,
-    },
-    themeMode: 'light',
-    themeVariables: {
-        '--w3m-accent': '#1D1A10',
-        '--w3m-color-mix': '#F2ECD8',
-        '--w3m-border-radius-master': '2rem',
-        '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif'
-    },
-    enableInjected: true,
-    enableEIP6963: true,
-    enableWalletConnect: true,
-    featuredWalletIds: [
-        'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-        '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
-        'fd20dc4261a8140cb8f1d41804b4c71eeb9ce33da3ec76cd022ade0b4974f0d7', // Coinbase Wallet
-    ],
-    allWallets: 'SHOW'
-})
+// Create the modal instance - Only on the client
+if (typeof window !== 'undefined') {
+    createAppKit({
+        adapters: [wagmiAdapter],
+        networks,
+        projectId,
+        metadata,
+        features: {
+            analytics: true,
+            email: true, 
+            socials: ['google', 'x', 'github', 'discord', 'apple'],
+            swaps: false,
+            onramp: false,
+        },
+        themeMode: 'light',
+        themeVariables: {
+            '--w3m-accent': '#1D1A10',
+            '--w3m-color-mix': '#F2ECD8',
+            '--w3m-border-radius-master': '2rem',
+            '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif'
+        },
+        enableInjected: true,
+        enableEIP6963: true,
+        enableWalletConnect: true,
+        featuredWalletIds: [
+            'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+            '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
+            'fd20dc4261a8140cb8f1d41804b4c71eeb9ce33da3ec76cd022ade0b4974f0d7', // Coinbase Wallet
+        ],
+        allWallets: 'SHOW'
+    })
+}
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
     const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies)

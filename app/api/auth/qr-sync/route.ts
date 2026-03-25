@@ -12,7 +12,10 @@ export async function POST(req: Request) {
         // [SECURITY] Verify Signature of the token (Session ID)
         // This ensures the mobile user intentionally authorized THIS specific PC session.
         try {
-            const { verifyMessage } = await import('viem');
+            // Institutional dynamic import hardening
+            const viem = await import('viem');
+            const verifyMessage = viem.verifyMessage;
+
             const isValid = await verifyMessage({
                 address: address as `0x${string}`,
                 message: `SOVEREIGN_HANDSHAKE:${token}`,
@@ -20,11 +23,12 @@ export async function POST(req: Request) {
             });
 
             if (!isValid) {
+                console.error(`[Handshake:Denied] Invalid signature for ${address} on token ${token}`);
                 return new NextResponse('Verification Failed: Invalid Sovereign Handshake', { status: 401 });
             }
         } catch (verifError) {
-            console.error('[QR_SYNC_VERIF_ERROR]', verifError);
-            return new NextResponse('Verification Engine Error', { status: 500 });
+            console.error('[Handshake:VerifError]', verifError);
+            return new NextResponse('Verification Engine Error (Check Server Environment)', { status: 500 });
         }
 
         const status = await safeRedisGet(`qr:${token}`);

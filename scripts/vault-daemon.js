@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 /**
  * SOVEREIGN VAULT DAEMON (V1.0)
@@ -68,13 +69,24 @@ const server = http.createServer((req, res) => {
                 const payload = JSON.parse(body);
                 const { payload_type, data, source } = payload;
 
-                const filename = `${payload_type}_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+                // 3. Atomic Save to Local Storage with UHRP Verification
+                const uhrp_hash = crypto.createHash('sha256').update(body).digest('hex');
+                const filename = `${payload_type}_${uhrp_hash.slice(0, 16)}_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
                 const filePath = path.join(STORAGE_DIR, filename);
 
-                // 3. Atomic Save to Local Storage
-                fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
+                const enrichedPayload = {
+                    ...payload,
+                    uhrp_metadata: {
+                        hash: uhrp_hash,
+                        algorithm: 'sha256',
+                        protocol: 'Sovereign-Vault-V1.1'
+                    }
+                };
+
+                fs.writeFileSync(filePath, JSON.stringify(enrichedPayload, null, 2));
 
                 console.log(`[Vault] ✅ Ingested ${data?.length || 0} records (${payload_type}) from ${source}`);
+                console.log(`[Vault] 🔒 UHRP Hash: ${uhrp_hash}`);
                 console.log(`[Vault] 💾 Stored at: ${filePath}`);
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });

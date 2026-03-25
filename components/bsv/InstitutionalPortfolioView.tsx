@@ -15,6 +15,7 @@ import { Transaction, P2PKH, PrivateKey } from '@bsv/sdk';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import * as bip39 from 'bip39';
+import { BRC100Wallet } from './BRC100Wallet';
 
 // ─────────────────────────────────────────────────────────────────
 //  UTILITY: truncate address for display
@@ -168,6 +169,16 @@ function HomeView({ identity, balance, balanceFiat, pulse, loading, onRefresh, o
                     <ActionBtn icon={QrIcon} label="Scan QR" color="aqua" onClick={onScan} />
                     <ActionBtn icon={Plus} label="Create Wallet" color="white" onClick={onCreate} />
                 </div>
+
+                {address && (
+                    <motion.section 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-8"
+                    >
+                        <BRC100Wallet />
+                    </motion.section>
+                )}
 
                 {!address && (
                     <div className="p-6 rounded-3xl border border-[var(--aztec-orchid)]/20 bg-[var(--aztec-orchid)]/5 flex gap-4 items-start">
