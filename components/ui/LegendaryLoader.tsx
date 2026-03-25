@@ -11,7 +11,7 @@ interface LegendaryLoaderProps {
 
 export function LegendaryLoader({ title, subtitle }: LegendaryLoaderProps) {
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/95 backdrop-blur-3xl overflow-hidden">
             <UniversalEliteWallpaper />
             
             <div className="relative z-10 flex flex-col items-center">
@@ -36,7 +36,7 @@ export function LegendaryLoader({ title, subtitle }: LegendaryLoaderProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter uppercase mb-2"
+                    className="text-2xl md:text-4xl font-aztec-serif font-black text-white tracking-tighter uppercase mb-2 text-center"
                 >
                     {title}
                 </motion.h2>
@@ -46,7 +46,7 @@ export function LegendaryLoader({ title, subtitle }: LegendaryLoaderProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-[10px] md:text-xs font-bold text-slate-500 tracking-[0.3em] uppercase"
+                        className="text-[10px] md:text-xs font-bold text-[var(--aztec-chartreuse)] tracking-[0.4em] uppercase text-center"
                     >
                         {subtitle}
                     </motion.p>

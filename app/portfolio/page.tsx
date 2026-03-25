@@ -21,18 +21,17 @@ interface Tab {
 
 export default function PortfolioPage() {
   const { address, isConnected } = useAccount();
-  const { isLoaded } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
-  const [tabs, setTabs] = useState<Tab[]>([{ 
-    id: 0, 
-    title: 'Network Hub', 
-    url: 'aztek://hub',
-    status: 'secure'
-  }]);
   const [isCwiCollapsed, setIsCwiCollapsed] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  const [activeTab, setActiveTab] = useState(0);
+  const [tabs, setTabs] = useState<Tab[]>([
+    { id: 0, title: 'Network Hub', url: 'aztek://hub', status: 'secure' }
+  ]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const addTab = () => {
     const nextId = tabs.length > 0 ? Math.max(...tabs.map((item: Tab) => item.id)) + 1 : 0;
@@ -55,12 +54,12 @@ export default function PortfolioPage() {
     }
   };
 
-  if (!mounted || !isLoaded) return <LegendaryLoader title="CWI Substrate" subtitle="Initializing SirDeggen Edition..." />;
+  if (!mounted) return <LegendaryLoader title="CWI Substrate" subtitle="Initializing SirDeggen Edition..." />;
 
   const activeTabData = tabs.find((t: Tab) => t.id === activeTab) || tabs[0];
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-[var(--aztec-ink)] font-aztec-mono selection:bg-[var(--aztec-orchid)]/30">
+    <div className="flex flex-col min-h-[calc(100vh-80px)] w-full overflow-hidden text-[var(--aztec-ink)] font-aztec-mono selection:bg-[var(--aztec-orchid)]/30">
       
       {/* ── SIRDEGGEN EDITION: BROWSER CHROME ── */}
       <div className="flex items-center gap-1 bg-black/40 px-2 pt-2 border-b border-white/5 overflow-x-auto no-scrollbar backdrop-blur-3xl">
