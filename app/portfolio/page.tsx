@@ -16,15 +16,15 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-80px)] w-full p-6 md:p-12 overflow-hidden bg-transparent">
-      {/* ── SIRDEGGEN EDITION: FULL BROWSER STACK ── */}
-      <div className="flex-1 w-full max-w-[1920px] mx-auto">
+    <div className="flex flex-col h-[calc(100vh-80px)] w-full overflow-hidden bg-[#050505]">
+      {/* ── SIRDEGGEN EDITION: FULL BROWSER STACK (IMMERSIVE) ── */}
+      <div className="flex-1 w-full max-w-full">
         <SirDeggenBrowser initialUrl="aztek://hub" />
       </div>
 
-      <div className="mt-8 text-center">
-        <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.5em]">
-          Whale Alert Terminal • Powered by SirDeggen Technology
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none opacity-20">
+        <p className="text-[8px] font-black text-white uppercase tracking-[0.8em]">
+          SirDeggen Technology Substrate v3.0
         </p>
       </div>
     </div>
