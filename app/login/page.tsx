@@ -53,7 +53,7 @@ export default function LoginPage() {
                 >
                     <div className="mb-12">
                       <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-slate-100 shadow-sm relative group-hover:scale-110 transition-transform duration-700">
-                        <img src="/models/aave-brand-assets/Logo/Logomark-purple.svg" className="w-10 h-10 drop-shadow-md" alt="Aave" />
+                        <img src="/official-whale-legendary.png" className="w-12 h-12 drop-shadow-md object-contain" alt="Whale Alert" />
                       </div>
                       <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.5em] mb-3">Corporate Hub</h2>
                       <h1 className="text-2xl font-black text-slate-950 tracking-tight">Welcome to the Family.</h1>

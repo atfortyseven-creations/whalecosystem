@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Send via Resend
     const result = await resend.emails.send({
-      from: 'Whale Alert VIP <alerts@WhaleAlert IDfi.com>',
+      from: 'Whale Alert Institutional <alerts@institutional.pro>',
       to: [to],
       subject,
       html,
@@ -137,7 +137,7 @@ function formatWhaleAlertEmail(data: {
     </div>
     <div class="footer">
       Whale Alert VIP - Whale Tracking Platform<br>
-      <a href="https://WhaleAlert IDfi.com/vip" style="color: #667eea;">Manage Alerts</a>
+      <a href="/vip" style="color: #ffffff;">Manage Alerts</a>
     </div>
   </div>
 </body>

@@ -5,8 +5,12 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 
 // Sticker images from public/models
 const STICKERS = [
-    { src: '/models/5ec47565-dec1-46e9-ab91-67e1e759705e.png', alt: 'Rocket', size: 60 },
-    { src: '/models/421ed50f-ed5f-45e1-bbdb-575b26e45707.png', alt: 'Star', size: 50 },
+    { src: '/official-whale-legendary.png', alt: 'Whale', size: 60 },
+    { src: '/official-whale-legendary.png', alt: 'Whale', size: 50 },
+    { src: '/official-whale-legendary.png', alt: 'Whale', size: 40 },
+    { src: '/official-whale-legendary.png', alt: 'Whale', size: 70 },
+    { src: '/official-whale-legendary.png', alt: 'Whale', size: 55 },
+    { src: '/official-whale-legendary.png', alt: 'Whale', size: 45 },
 ];
 
 export function ParallaxStickers() {

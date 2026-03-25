@@ -113,8 +113,8 @@ export function DropdownNav() {
                     <Link href="/" className="flex items-center gap-4 px-4 group">
                         <div className="relative w-14 h-14 shrink-0">
                             <img 
-                                src="/models/update/gradient-pink-diamond-balls-assortment (2).png"
-                                alt="Whale Alert Corporation"
+                                src="/official-whale-legendary.png"
+                                alt="Whale Alert"
                                 className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-[0_0_12px_rgba(192,86,221,0.6)]"
                             />
                         </div>

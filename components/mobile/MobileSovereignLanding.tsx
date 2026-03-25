@@ -125,7 +125,7 @@ export function MobileSovereignLanding() {
                             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                         />
                         <img
-                            src="/icon.png"
+                            src="/official-whale-legendary.png"
                             alt="Whale Alert Network"
                             width={192}
                             height={192}

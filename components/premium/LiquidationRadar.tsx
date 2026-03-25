@@ -158,7 +158,7 @@ export function LiquidationRadar() {
   const totalShorts = data.reduce((s,d) => s + d.shorts, 0);
 
   return (
-    <div className="w-full h-full min-h-[440px] flex flex-col bg-[#FAFAFA] border border-stone-200 shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cream-paper.png')" }}>
+    <div className="w-full h-full min-h-[440px] flex flex-col bg-[#080808] border border-white/10 shadow-xl relative overflow-hidden">
       
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-b from-stone-200/50 to-transparent" />
 

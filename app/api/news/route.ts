@@ -14,9 +14,11 @@ async function fetchOgImage(url: string): Promise<string> {
         const html = await res.text();
         const match = html.match(/<meta property="og:image" content="([^"]+)"/);
         if (match && match[1]) return match[1];
-        return "/news-placeholder.jpg";
+    if (url.includes('bloomberg')) return "/official-whale-legendary.png";
+    if (url.includes('reuters')) return "/official-whale-legendary.png";
+    return "/official-whale-legendary.png";
     } catch (e) {
-        return "/news-placeholder.jpg";
+        return "/official-whale-legendary.png";
     }
 }
 

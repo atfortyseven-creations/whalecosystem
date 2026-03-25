@@ -292,7 +292,7 @@ export function WhaleTrackerDashboard() {
                                 className="w-80 h-80 flex items-center justify-center mx-auto relative group"
                             >
                                 <img 
-                                    src="/models/update/gradient-pink-diamond-balls-assortment (2).png" 
+                                    src="/official-whale-legendary.png" 
                                     className="w-full h-full object-contain transition-transform duration-500 scale-125 group-hover:scale-150 drop-shadow-2xl" 
                                     alt="Whale Alert Pro"
                                 />

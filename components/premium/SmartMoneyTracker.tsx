@@ -153,7 +153,7 @@ export function SmartMoneyTracker() {
 
 
   return (
-    <div className="w-full bg-[#FAFAFA] border border-stone-200 shadow-sm relative overflow-hidden" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cream-paper.png')" }}>
+    <div className="w-full bg-[#080808] border border-white/10 shadow-xl relative overflow-hidden">
       {/* El borde desgarrado superior simulado (opcional SVG o simplemente border-top con textura) */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-b from-stone-200/50 to-transparent" />
 

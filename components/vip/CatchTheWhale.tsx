@@ -73,9 +73,9 @@ export function CatchTheWhale() {
                     className="w-80 h-80 flex items-center justify-center mx-auto relative group"
                 >
                     <img 
-                        src="/models/update/gradient-pink-diamond-balls-assortment (2).png" 
-                        className="w-full h-full object-contain transition-transform duration-500 scale-125 group-hover:scale-150 drop-shadow-2xl" 
-                        alt="Whale Alert Diamond"
+                        src="/official-whale-legendary.png" 
+                        alt="Whale Alert Logo"
+                        className="w-full h-full object-contain p-4"
                     />
                 </motion.div>
                 

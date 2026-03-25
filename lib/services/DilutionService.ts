@@ -77,7 +77,7 @@ export class DilutionService {
 
             try {
                 await resend.emails.send({
-                    from: 'Whale Alert <alerts@WhaleAlert IDfi.com>',
+                    from: 'Sovereign Whale <alerts@institutional.pro>',
                     to: user.email,
                     subject: `⚠️ DILUTION ALERT: ${unlock.tokenSymbol}`,
                     html: `

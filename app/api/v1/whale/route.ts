@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   if (!apiKeyHeader) {
     return NextResponse.json(
-      { error: 'Missing x-api-key header', docs: 'https://www.WhaleAlert IDfi.com/desarrollador' },
+      { error: 'Missing x-api-key header', docs: '/developer' },
       { status: 401, headers: corsHeaders() }
     );
   }
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
           where: { id: validKey.id },
           data: { 
               requests: { increment: 1 },
-              lastUsed: new Date()
+              lastUsedAt: new Date()
           }
       }).catch(err => console.error('Failed to update stats', err));
 

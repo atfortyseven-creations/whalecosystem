@@ -15,9 +15,9 @@ export function SecurityGrowthSection() {
             <div className="py-32 flex flex-col items-center justify-center text-center relative rounded-[3rem] overflow-hidden my-24 shadow-2xl">
                 <div className="absolute inset-0 z-0">
                     <img 
-                        src="/models/fondoparaseguridad.jpg" 
-                        alt="Security Background" 
-                        className="w-full h-full object-cover opacity-40 mix-blend-overlay scale-110"
+                        src="/models/update/Aztec Image_01.jpg" 
+                        alt="Security Background"
+                        className="w-full h-full object-cover rounded-3xl"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#F5F5DC] via-transparent to-[#F5F5DC]" />
                 </div>

@@ -75,7 +75,7 @@ export function SwapQualitySection() {
           >
             <div className="relative w-full aspect-square max-w-[500px] mx-auto rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl bg-black/40">
               <Image
-                src="/models/humandefiwhale.jpg"
+                src="/models/update/Aztec Image_03.jpg"
                 alt="Whale Alert Whale Monitor"
                 fill
                 className="object-cover transition-transform duration-1000 group-hover:scale-110"
