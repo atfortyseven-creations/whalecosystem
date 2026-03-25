@@ -29,11 +29,11 @@ function startProcess(name: string, command: string, args: string[]) {
 
 // 1. Start the Next.js Production Server (UI & API)
 console.log("🌐 [Web] Starting Next.js Production Engine...");
-startProcess('WEB-UI', 'node', ['--max-old-space-size=1536', '--import', 'tsx', 'server.ts']);
+startProcess('WEB-UI', 'node', ['--max-old-space-size=512', '--import', 'tsx', 'server.ts']);
 
 // 2. Start the Whale Worker (Blockchain Indexer)
 console.log("🐋 [Worker] Starting Whale Tracking Indexer...");
-startProcess('INDEXER', 'node', ['--max-old-space-size=1536', '--import', 'tsx', 'scripts/whale-worker.ts']);
+startProcess('INDEXER', 'node', ['--max-old-space-size=512', '--import', 'tsx', 'scripts/whale-worker.ts']);
 
 // 3. Start the Scheduled Sync Manager (Sovereign Vault - Every 24h)
 console.log("📡 [Sync] Sovereign Vault Scheduler Active.");
