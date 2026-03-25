@@ -57,8 +57,9 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     identity,
-    isInitialized: !!identity,
+    isInitialized: !!identity && identity.isInitialized(),
     getPublicKey,
+    getAddress: useCallback(async () => identity?.getAddress() || '', [identity]),
     createAction,
     encrypt,
     decrypt,
