@@ -5,8 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { ScrollControls, useScroll, Html, Float, Stars, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Noise, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
-import { ShieldAlert, Cpu, Orbit, Zap, Waves, Crosshair, Radar, Target, Network } from "lucide-react";
-import dynamic from 'next/dynamic';
+import { ShieldAlert, Zap, Crosshair, Radar, Target, Network } from "lucide-react";
 
 // --- HTML Annotation Component ---
 function Annotation({ title, description, icon: Icon, visible, side = "right" }: { title: string, description: string, icon: any, visible: boolean, side?: "left" | "right" | "top" | "bottom" }) {

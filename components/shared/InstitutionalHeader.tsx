@@ -40,7 +40,7 @@ export function InstitutionalHeader() {
                 <Link href="/" className="flex items-center gap-4 group">
                     <div className="relative w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-black/10 p-1.5">
                         <img 
-                            src="/corporate-logo.jpg" 
+                            src="/official-whale-legendary.png" 
                             alt="Whale Alert" 
                             className="w-full h-full object-contain drop-shadow-lg"
                         />
