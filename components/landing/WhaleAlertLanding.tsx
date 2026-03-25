@@ -61,31 +61,42 @@ export function WhaleAlertLanding() {
         </div>
 
         <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
+          initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 2, ease: [0.23, 1, 0.32, 1] }}
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
 
-          <h1 className="font-aztec-h1 text-[clamp(2.5rem,10vw,12rem)] leading-[0.85] text-[var(--aztec-ink)] mb-12 drop-shadow-sm">
-            Whale Alert <br/> Corporation<sup className="text-[0.2em] align-top ml-2 opacity-50 font-sans">TM</sup>
+          <h1 className="font-aztec-h1 text-[clamp(2.5rem,10vw,12rem)] leading-[0.85] text-[var(--aztec-ink)] mb-12 drop-shadow-sm tracking-tight">
+            Whale Alert <br/><span className="italic font-light opacity-80">Corporation</span><sup className="text-[0.2em] align-top ml-2 opacity-50 font-sans font-normal">TM</sup>
           </h1>
           
           <p className="font-aztec-body text-xl md:text-3xl text-[var(--aztec-ink)]/60 max-w-4xl mx-auto leading-relaxed mb-16 px-4">
-             Whale Alert&apos;s technology provides programmable data surveillance for institutional use cases, ensuring your data remains sovereign while transacting on public blockchains.
+             Providing programmable <span className="text-[var(--aztec-ink)] font-bold">data surveillance</span> for institutional sovereigns. Your capital, your identity, absolute digital permanence.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-12">
             <motion.button
               onClick={handleEnterArchive}
-              whileHover={{ backgroundColor: "var(--aztec-chartreuse)", scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-16 py-6 bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] font-aztec-h2 text-[11px] uppercase tracking-[0.4em] transition-all duration-500 rounded-full shadow-xl"
+              whileHover={{ 
+                backgroundColor: "var(--aztec-chartreuse)", 
+                scale: 1.05,
+                boxShadow: "0 20px 40px -10px rgba(180, 255, 0, 0.4)" 
+              }}
+              whileTap={{ scale: 0.98 }}
+              className="px-20 py-7 bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] font-aztec-h2 text-[12px] uppercase tracking-[0.5em] transition-all duration-700 rounded-full shadow-2xl relative group overflow-hidden"
             >
-              Initialize Compliance
+              <span className="relative z-10">Initialize Compliance</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </motion.button>
-            <Link href="/docs" className="font-aztec-h2 text-[11px] uppercase tracking-[0.4em] text-[var(--aztec-ink)] hover:text-[var(--aztec-orchid)] transition-all flex items-center gap-2">
-              Read Documentation <ChevronRight size={14} />
+            <Link href="/docs" className="group font-aztec-h2 text-[11px] uppercase tracking-[0.4em] text-[var(--aztec-ink)] hover:text-[var(--aztec-orchid)] transition-all flex items-center gap-3">
+              Technical Documentation 
+              <motion.div 
+                animate={{ x: [0, 5, 0] }} 
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <ChevronRight size={14} className="text-[var(--aztec-orchid)]" />
+              </motion.div>
             </Link>
           </div>
         </motion.div>
