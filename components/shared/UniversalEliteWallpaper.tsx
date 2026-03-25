@@ -39,20 +39,20 @@ export function UniversalEliteWallpaper() {
 
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const nodes: CircuitNode[] = [];
-        const NODE_COUNT = isMobile ? 15 : 40;
-        const MAX_DIST = isMobile ? 120 : 200;
+        const NODE_COUNT = isMobile ? 35 : 70; // High individual density
+        const MAX_DIST = isMobile ? 150 : 250;
 
         for (let i = 0; i < NODE_COUNT; i++) {
             nodes.push({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                vx: (Math.random() - 0.5) * (isMobile ? 0.2 : 0.4),
-                vy: (Math.random() - 0.5) * (isMobile ? 0.2 : 0.4)
+                vx: (Math.random() - 0.5) * (isMobile ? 0.35 : 0.5),
+                vy: (Math.random() - 0.5) * (isMobile ? 0.35 : 0.5)
             });
         }
 
         const draw = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, width, height);
             
             // ── Background: Institutional Dark Alpha ──────────────────────
             const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
@@ -97,8 +97,8 @@ export function UniversalEliteWallpaper() {
                 if (node.y < 0 || node.y > height) node.vy *= -1;
  
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, 1, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(212, 255, 43, 0.2)'; // Aztek Chartreuse
+                ctx.arc(node.x, node.y, 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(212, 255, 43, 0.3)'; // Aztek Chartreuse
                 ctx.fill();
  
                 nodes.slice(i + 1).forEach(other => {
@@ -110,8 +110,8 @@ export function UniversalEliteWallpaper() {
                         ctx.beginPath();
                         ctx.moveTo(node.x, node.y);
                         ctx.lineTo(other.x, other.y);
-                        ctx.strokeStyle = `rgba(212, 255, 43, ${0.1 * (1 - dist / MAX_DIST)})`;
-                        ctx.lineWidth = 0.5;
+                        ctx.strokeStyle = `rgba(212, 255, 43, ${0.15 * (1 - dist / MAX_DIST)})`;
+                        ctx.lineWidth = 0.6;
                         ctx.stroke();
                     }
                 });
@@ -128,20 +128,24 @@ export function UniversalEliteWallpaper() {
         };
     }, []);
 
+    const isMobile = typeof window !== 'undefined' ? (window.innerWidth < 768) : false;
+
     return (
         <>
             <canvas
                 ref={canvasRef}
-                className="fixed inset-0 w-full h-full pointer-events-none z-[-2] outline-none border-none m-0 p-0 block"
+                className="fixed inset-0 w-full h-full pointer-events-none z-[-2] outline-none border-none m-0 p-0 block will-change-transform"
             />
             {/* ── Institutional Watermark System (Phase 38) ────────────────── */}
             <div 
-                className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04]"
+                className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04] transition-opacity duration-1000"
                 style={{
                     backgroundImage: 'url(/official-whale.png)',
                     backgroundRepeat: 'repeat',
-                    backgroundSize: '60px',
-                    filter: 'grayscale(1) brightness(2)', // Ensure it looks like a watermark on dark
+                    backgroundSize: isMobile ? '50px' : '70px', // Responsive sizing
+                    filter: 'grayscale(1) brightness(1.5)', 
+                    transform: 'translate3d(0,0,0)', // GPU Force
+                    backfaceVisibility: 'hidden',
                 }}
             />
         </>
