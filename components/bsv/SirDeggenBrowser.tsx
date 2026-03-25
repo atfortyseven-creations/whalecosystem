@@ -26,26 +26,49 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
     if (!iframeRef.current || !identity) return;
     const cwipublicKey = identity.getPublicKey();
     
+    // Check if we are browsing our own domain to hide the header
+    const isSameOrigin = url.includes(window.location.host);
+    
     const script = `
-      window.CWI = {
-        getPublicKey: async () => "${cwipublicKey}",
-        createAction: async (params) => {
-          window.parent.postMessage({ type: 'CWI_ACTION', params }, '*');
-          return { txid: 'authorized_via_whale_terminal' };
-        },
-        encrypt: async (p) => "encrypted_placeholder",
-        decrypt: async (p) => "decrypted_placeholder",
-        version: "1.42.0-SirDeggen"
-      };
-      console.log('Whale Terminal: CWI Substrate Injected.');
+      (function() {
+        window.CWI = {
+          getPublicKey: async () => "${cwipublicKey}",
+          createAction: async (params) => {
+            window.parent.postMessage({ type: 'CWI_ACTION', params }, '*');
+            return { txid: 'authorized_via_whale_terminal' };
+          },
+          encrypt: async (p) => "encrypted_placeholder",
+          decrypt: async (p) => "decrypted_placeholder",
+          version: "1.42.0-SirDeggen"
+        };
+        
+        if (${isSameOrigin}) {
+          const style = document.createElement('style');
+          style.innerHTML = 'header, footer, .no-browser-chrome { display: none !important; }';
+          document.head.appendChild(style);
+        }
+        
+        console.log('Whale Terminal: CWI Substrate Injected.');
+      })();
     `;
     
     try {
+      // For same-origin, we can use direct access if needed, but postMessage is safer
       iframeRef.current.contentWindow?.postMessage({ type: 'INJECT_CWI', script }, '*');
+      
+      // Also try direct injection if same-origin (fallback for environments that block postMessage scripts)
+      if (isSameOrigin) {
+        const doc = iframeRef.current.contentDocument;
+        if (doc) {
+          const s = doc.createElement('script');
+          s.textContent = script;
+          doc.head.appendChild(s);
+        }
+      }
     } catch (e) {
       console.error('CWI: Injection failed', e);
     }
-  }, [identity]);
+  }, [identity, url]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -103,11 +126,11 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
       </div>
 
       {/* ── VIEWPORT ── */}
-      <div className="flex-1 relative bg-black/10">
+      <div className="flex-1 relative bg-[#050505]">
         {url === 'aztek://hub' ? (
-          <div className="p-12 h-screen overflow-y-auto">
+          <div className="p-12 h-screen overflow-y-auto bg-[#050505]">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-12">
-               <h2 className="text-4xl font-aztec-serif font-black text-white uppercase tracking-tighter">SirDeggen <span className="text-[var(--aztec-orchid)]">Home</span></h2>
+               <h2 className="text-4xl font-aztec-serif font-black text-white uppercase tracking-tighter">SirDeggen <span className="text-[var(--aztec-orchid)]">Hub</span></h2>
                <div className="grid grid-cols-2 gap-8">
                   {[
                     { name: 'Showcase', desc: 'BSV-Browser Demo Apps', icon: Globe, href: 'https://mobile.bsvb.tech/' },
@@ -126,7 +149,7 @@ export function SirDeggenBrowser({ initialUrl = 'aztek://hub' }: SirDeggenBrowse
           <iframe 
             ref={iframeRef}
             src={url.startsWith('http') ? url : `https://www.google.com/search?q=${encodeURIComponent(url)}`}
-            className="w-full h-full border-none bg-white"
+            className="w-full h-full border-none bg-black no-browser-chrome"
             onLoad={injectCWI}
           />
         )}
