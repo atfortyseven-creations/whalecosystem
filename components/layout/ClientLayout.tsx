@@ -10,7 +10,7 @@ import { HighHzWallpaper } from '@/components/landing/HighHzWallpaper';
 import { SystemsUtilityHeader } from '@/components/shared/SystemsUtilityHeader';
 import { ConnectWalletModal } from '@/components/shared/ConnectWalletModal';
 import { GlobalTokenTicker } from '@/components/shared/GlobalTokenTicker';
-import { UtilityPanels, $1BWhaleNotification } from '@/components/shared/UtilityPanels';
+import { UtilityPanels, BillionWhaleNotification } from '@/components/shared/UtilityPanels';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { useSettings } from '@/src/context/SettingsContext';
@@ -61,7 +61,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         {/* Global Utility Hub */}
                         <div className="relative z-40">
                           <UtilityPanels />
-                          <$1BWhaleNotification />
+                          <BillionWhaleNotification />
                         </div>
                         
                         <ZoomWrapper>

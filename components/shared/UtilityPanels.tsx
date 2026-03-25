@@ -315,7 +315,7 @@ function SettingToggle({ label, description, active, onToggle, color = 'chartreu
     );
 }
 
-export function $1BWhaleNotification() {
+export function BillionWhaleNotification() {
     const whaleEvents = useVIPStore((state: VIPStoreState) => state.whaleEvents);
     const [activeTransfers, setActiveTransfers] = useState<WhaleEvent[]>([]);
 
