@@ -10,6 +10,7 @@ import { WorldProvider } from "@/src/context/WorldContext";
 
 import { SessionProvider } from "next-auth/react";
 import { ReactLenis } from 'lenis/react';
+import { CWIProvider } from "@/lib/bsv/CWIContext";
 
 export default function Providers({ children, initialState, cookies }: { children: React.ReactNode, initialState?: State, cookies?: string | null }) {
     return (
@@ -21,7 +22,9 @@ export default function Providers({ children, initialState, cookies }: { childre
                     <SettingsProvider>
                         <LanguageProvider>
                             <WorldProvider>
-                                {children}
+                                <CWIProvider>
+                                    {children}
+                                </CWIProvider>
                             </WorldProvider>
                         </LanguageProvider>
                     </SettingsProvider>
