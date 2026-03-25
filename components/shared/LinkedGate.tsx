@@ -135,7 +135,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <QRCodeSVG value={qrSession} size={180} level="H" bgColor="#FFFFFF" fgColor="#000000" includeMargin={false} />
+                                    <QRCodeSVG value={`SOVEREIGN_HANDSHAKE:${qrSession}`} size={180} level="H" bgColor="#FFFFFF" fgColor="#000000" includeMargin={false} />
                                 </motion.div>
                             ) : (
                                 <motion.div

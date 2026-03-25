@@ -402,7 +402,7 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
 
             <style dangerouslySetInnerHTML={{ __html: `
                 #sovereign-qr-reader { border: none !important; border-radius: 2.5rem !important; overflow: hidden; background: #000; position: relative; }
-                #sovereign-qr-reader video { width: 100% !important; height: 100% !important; object-cover: cover !important; border-radius: 2.5rem !important; }
+                #sovereign-qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 2.5rem !important; }
                 #sovereign-qr-reader__scan_region { border: none !important; }
                 #sovereign-qr-reader img { display: none !important; }
                 .legendary-scan-overlay {
