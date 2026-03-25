@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ScrollControls, useScroll, Html, Float, Environment, Stars, PerspectiveCamera } from "@react-three/drei";
+import { ScrollControls, useScroll, Html, Float, Stars, PerspectiveCamera } from "@react-three/drei";
 import { EffectComposer, Bloom, Noise, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
-import { ShieldAlert, Cpu, Network, Zap, Waves } from "lucide-react";
+import { ShieldAlert, Cpu, Orbit, Zap, Waves, Crosshair, Radar, Target, Network } from "lucide-react";
+import dynamic from 'next/dynamic';
 
 // --- HTML Annotation Component ---
 function Annotation({ title, description, icon: Icon, visible, side = "right" }: { title: string, description: string, icon: any, visible: boolean, side?: "left" | "right" | "top" | "bottom" }) {
@@ -13,177 +14,285 @@ function Annotation({ title, description, icon: Icon, visible, side = "right" }:
     <Html
       transform
       distanceFactor={15}
-      position={[side === "left" ? -2 : side === "right" ? 2 : 0, side === "top" ? 2 : side === "bottom" ? -2 : 0, 0]}
+      position={[side === "left" ? -4 : side === "right" ? 4 : 0, side === "top" ? 3 : side === "bottom" ? -3 : 0, 0]}
       style={{
-        transition: "all 0.5s ease-out",
+        transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
         opacity: visible ? 1 : 0,
         pointerEvents: visible ? "auto" : "none",
-        transform: `scale(${visible ? 1 : 0.8})`,
+        transform: `scale(${visible ? 1 : 0.95}) translateY(${visible ? 0 : 10}px)`,
+        zIndex: visible ? 100 : 0
       }}
     >
-      <div className="w-[320px] bg-[var(--aztec-ink)]/90 backdrop-blur-md rounded-2xl p-6 border border-[var(--aztec-orchid)]/50 shadow-[0_0_30px_rgba(180,80,255,0.2)]">
+      <div className="w-[320px] bg-black/40 backdrop-blur-3xl rounded-3xl p-6 border border-white/10 shadow-2xl relative">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-[var(--aztec-orchid)]/20 flex items-center justify-center">
-            <Icon size={20} className="text-[var(--aztec-orchid)] animate-pulse" />
+          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shadow-inner">
+            <Icon size={14} className="text-white/90" />
           </div>
-          <h4 className="font-aztec-h3 text-white text-lg uppercase tracking-tight leading-tight">
+          <h4 className="text-white text-sm font-medium tracking-wide">
             {title}
           </h4>
         </div>
-        <p className="font-aztec-body text-xs text-white/70 leading-relaxed font-medium">
+        <p className="text-white/60 text-xs leading-relaxed font-light">
           {description}
         </p>
-        {/* Hacker connecting lines based on side */}
-        <div className={`absolute bg-[var(--aztec-orchid)]/40 ${side === 'right' ? 'h-[1px] w-12 top-1/2 -left-12 -translate-y-1/2' : side === 'left' ? 'h-[1px] w-12 top-1/2 -right-12 -translate-y-1/2' : side === 'top' ? 'w-[1px] h-12 left-1/2 -bottom-12 -translate-x-1/2' : 'w-[1px] h-12 left-1/2 -top-12 -translate-x-1/2'}`} />
+        
+        {/* Elegant connecting lines */}
+        <div className={`absolute bg-white/20 ${side === 'right' ? 'h-[1px] w-12 top-1/2 -left-12 -translate-y-1/2' : side === 'left' ? 'h-[1px] w-12 top-1/2 -right-12 -translate-y-1/2' : side === 'top' ? 'w-[1px] h-12 left-1/2 -bottom-12 -translate-x-1/2' : 'w-[1px] h-12 left-1/2 -top-12 -translate-x-1/2'}`} />
+        <div className={`absolute w-1.5 h-1.5 rounded-full ${side === 'right' ? 'top-1/2 -left-12 -translate-y-1/2 -translate-x-1/2 bg-white/50' : side === 'left' ? 'top-1/2 -right-12 -translate-y-1/2 translate-x-1/2 bg-white/50' : side === 'top' ? 'left-1/2 -bottom-12 -translate-x-1/2 translate-y-1/2 bg-white/50' : 'left-1/2 -top-12 -translate-x-1/2 -translate-y-1/2 bg-white/50'}`} />
       </div>
     </Html>
   );
 }
 
-// --- Procedural 3D Submarine Rig ---
-function SubmarineRig() {
+// --- Procedural 3D Submarine Rig (Typhoon Project-941 Akula) ---
+function TyphoonRig() {
   const scroll = useScroll();
   const group = useRef<THREE.Group>(null);
   
-  // Component Refs for Exploded View
-  const noseRef = useRef<THREE.Mesh>(null);
-  const coreRef = useRef<THREE.Mesh>(null);
-  const tailRef = useRef<THREE.Mesh>(null);
-  const engineRef = useRef<THREE.Mesh>(null);
-  const antennaRef = useRef<THREE.Mesh>(null);
+  // Outer Hull (X-Ray Target)
+  const hullMaterialRef = useRef<THREE.MeshPhysicalMaterial>(null);
+  const hullRef = useRef<THREE.Mesh>(null);
   
-  // Annotation States
-  const [showNose, setShowNose] = React.useState(false);
-  const [showCore, setShowCore] = React.useState(false);
-  const [showTail, setShowTail] = React.useState(false);
+  // Internal Components for Defragmentation
+  const leftPressureHullRef = useRef<THREE.Mesh>(null);
+  const rightPressureHullRef = useRef<THREE.Mesh>(null);
+  const missileSilosRef = useRef<THREE.Group>(null);
+  const reactorRoomRef = useRef<THREE.Mesh>(null);
+  const torpedoRoomRef = useRef<THREE.Mesh>(null);
+  const sailRef = useRef<THREE.Mesh>(null);
+  
+  // Annotation Visibility States
+  const [showHull, setShowHull] = React.useState(false);
+  const [showSilos, setShowSilos] = React.useState(false);
+  const [showPressureHulls, setShowPressureHulls] = React.useState(false);
+  const [showReactor, setShowReactor] = React.useState(false);
+  const [showTorpedo, setShowTorpedo] = React.useState(false);
 
-  // Material setup (Wireframe + Glass effect)
-  const hullMaterial = new THREE.MeshPhysicalMaterial({
-    color: "#0a0a0a",
-    metalness: 0.9,
-    roughness: 0.1,
-    transmission: 0.5,
-    thickness: 0.5,
-    wireframe: true,
-    emissive: "#b450ff",
-    emissiveIntensity: 0.2,
-  });
-
-  const coreMaterial = new THREE.MeshStandardMaterial({
+  // Procedural Materials
+  const internalMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: "#b450ff",
     emissive: "#b450ff",
-    emissiveIntensity: 2,
-    wireframe: false,
-  });
+    emissiveIntensity: 0.5,
+    metalness: 0.8,
+    roughness: 0.2,
+  }), []);
+
+  const titaniumMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#a3e33f",
+    emissive: "#a3e33f",
+    emissiveIntensity: 0.2,
+    metalness: 1.0,
+    roughness: 0.4,
+  }), []);
+
+  const siloMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#ff3333",
+    emissive: "#ff1111",
+    emissiveIntensity: 0.3,
+    metalness: 0.9,
+    roughness: 0.1,
+  }), []);
 
   useFrame((state, delta) => {
-    if (!group.current) return;
+    if (!group.current || !hullMaterialRef.current) return;
 
-    // Scroll progress (0 to 1)
-    const r1 = scroll.range(0 / 4, 1 / 4); // Phase 1: Dive & Initial rotate
-    const r2 = scroll.range(1 / 4, 1 / 4); // Phase 2: Explode Core
-    const r3 = scroll.range(2 / 4, 1 / 4); // Phase 3: Total Deconstruction
+    // Scroll Offsets
+    // 0.0 - 0.2: Entry
+    // 0.2 - 0.4: X-Ray Activation (Hull fades to glass)
+    // 0.4 - 0.8: Defragmentation (Explosion)
+    
+    const xrayPhase = scroll.range(0.15, 0.25); // Fade to transparent
+    const defragPhase = scroll.range(0.4, 0.5); // Explode outwards
+    const spinPhase = scroll.range(0, 1);       // Full scroll rotation
 
-    // Overall Rotation
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, Math.PI * 2 * r1 + (Math.PI * 1.5 * scroll.offset), 4, delta);
-    group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, -Math.PI / 8 * r1, 4, delta);
+    // 1. Overall rotation (Parallax & Cinematic Pan)
+    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, Math.PI * 1.5 + (Math.PI * 0.8 * spinPhase), 4, delta);
+    group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, Math.sin(state.clock.elapsedTime * 0.5) * 0.05, 2, delta);
+    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -Math.PI / 16 + (Math.PI / 12 * defragPhase), 2, delta);
 
-    // Exploded View Translations
-    if (noseRef.current && tailRef.current && coreRef.current && engineRef.current && antennaRef.current) {
-      // Nose moves forward
-      noseRef.current.position.y = THREE.MathUtils.damp(noseRef.current.position.y, 3 + (4 * r2) + (2 * r3), 6, delta);
-      // Tail moves backward
-      tailRef.current.position.y = THREE.MathUtils.damp(tailRef.current.position.y, -3 - (4 * r2) - (2 * r3), 6, delta);
-      // Core expands slightly
-      coreRef.current.scale.setScalar(THREE.MathUtils.damp(coreRef.current.scale.x, 1 + (0.5 * r2), 4, delta));
-      // Engine separates
-      engineRef.current.position.y = THREE.MathUtils.damp(engineRef.current.position.y, -4 - (5 * r2) - (4 * r3), 6, delta);
-      engineRef.current.rotation.y += delta * 2 * (1 + r2 * 5); // Spin engine faster on explode
-      // Antenna extends
-      antennaRef.current.position.x = THREE.MathUtils.damp(antennaRef.current.position.x, 1 + (2 * r3), 4, delta);
+    // 2. X-Ray Hull Material Transition
+    // Transition from Solid Black Titanium to Glassy Wireframe Translucent
+    hullMaterialRef.current.transmission = THREE.MathUtils.damp(hullMaterialRef.current.transmission, xrayPhase * 0.95, 4, delta);
+    hullMaterialRef.current.opacity = THREE.MathUtils.damp(hullMaterialRef.current.opacity, 1 - (xrayPhase * 0.8), 4, delta);
+    hullMaterialRef.current.roughness = THREE.MathUtils.damp(hullMaterialRef.current.roughness, 0.5 - (xrayPhase * 0.5), 4, delta);
+    hullMaterialRef.current.wireframe = xrayPhase > 0.8;
+
+    // 3. Defragmentation Explosive Assembly
+    if (leftPressureHullRef.current && rightPressureHullRef.current && torpedoRoomRef.current && reactorRoomRef.current && missileSilosRef.current && sailRef.current) {
+        
+        // Twin Pressure Hulls split horizontally (Catamaran architecture)
+        leftPressureHullRef.current.position.x = THREE.MathUtils.damp(leftPressureHullRef.current.position.x, -0.6 - (1.5 * defragPhase), 5, delta);
+        rightPressureHullRef.current.position.x = THREE.MathUtils.damp(rightPressureHullRef.current.position.x, 0.6 + (1.5 * defragPhase), 5, delta);
+        
+        // Missiles elevate vertically from silos
+        missileSilosRef.current.position.y = THREE.MathUtils.damp(missileSilosRef.current.position.y, 1.2 + (5 * defragPhase), 4, delta);
+        
+        // Sail lifts and spins slightly
+        sailRef.current.position.y = THREE.MathUtils.damp(sailRef.current.position.y, 2.5 + (3 * defragPhase), 5, delta);
+        sailRef.current.rotation.y = THREE.MathUtils.damp(sailRef.current.rotation.y, defragPhase * Math.PI / 4, 3, delta);
+
+        // Torpedo Room pushes forward (Z axis)
+        torpedoRoomRef.current.position.z = THREE.MathUtils.damp(torpedoRoomRef.current.position.z, 6 + (5 * defragPhase), 5, delta);
+        
+        // Reactors push backwards and split
+        reactorRoomRef.current.position.z = THREE.MathUtils.damp(reactorRoomRef.current.position.z, -5 - (4 * defragPhase), 5, delta);
     }
 
-    // Trigger annotations
-    setShowNose(scroll.offset > 0.15);
-    setShowCore(scroll.offset > 0.4);
-    setShowTail(scroll.offset > 0.65);
+    // Trigger UI Annotations based on scroll depth
+    setShowHull(scroll.offset > 0.05 && scroll.offset < 0.35);    // Early view
+    setShowPressureHulls(scroll.offset > 0.3 && scroll.offset < 0.8); // Mid explode
+    setShowSilos(scroll.offset > 0.45 && scroll.offset < 0.9);        // Explode peak
+    setShowTorpedo(scroll.offset > 0.6 && scroll.offset < 0.95);
+    setShowReactor(scroll.offset > 0.7);
   });
 
+  // Calculate 20x ICBM Silo positions (2 rows of 10)
+  const silos = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < 10; i++) {
+        arr.push({ x: -0.4, z: i * 0.6 - 1.5 }); // Left Row
+        arr.push({ x: 0.4, z: i * 0.6 - 1.5 });  // Right Row
+    }
+    return arr;
+  }, []);
+
+  // Calculate 6x Torpedo Tubes
+  const torpedoTubes = useMemo(() => {
+      return [
+          { x: -0.3, y: 0.2 }, { x: 0.3, y: 0.2 },
+          { x: -0.4, y: -0.2 }, { x: 0.4, y: -0.2 },
+          { x: -0.2, y: -0.6 }, { x: 0.2, y: -0.6 }
+      ];
+  }, []);
+
   return (
-    <group ref={group} position={[0, 0, 0]}>
-      <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
+    <group ref={group} position={[0, -1, 0]}>
+      <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.3}>
         
-        {/* 1. NOSE CONE (Sonar) */}
-        <mesh ref={noseRef} position={[0, 3, 0]} material={hullMaterial}>
-          <coneGeometry args={[1.5, 4, 16]} />
+        {/* === OUTER HULL (AKULA MAIN CASING) === */}
+        <mesh ref={hullRef} position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <capsuleGeometry args={[2.2, 12, 16, 32]} />
+          <meshPhysicalMaterial 
+            ref={hullMaterialRef}
+            color="#050505"
+            metalness={0.9}
+            roughness={0.4}
+            transmission={0}
+            transparent={true}
+            opacity={1}
+            thickness={1.5}
+            envMapIntensity={2}
+            clearcoat={1}
+            emissive="#a3e33f"
+            emissiveIntensity={0.05}
+          />
           <Annotation 
-            visible={showNose} 
-            side="right"
-            title="Sonar de Cero Conocimiento" 
-            description="Escaneamos rastros gigantes en el radar sin revelar tu identidad ni ubicación. Operaciones Stealth habilitadas 24/7." 
-            icon={Waves} 
+            visible={showHull} 
+            side="top"
+            title="Cobertura Aislante" 
+            description="Una capa externa diseñada para fluir por los mercados digitales de forma silenciosa. Whale Alert Network protege tus movimientos desde el primer momento." 
+            icon={ShieldAlert} 
           />
         </mesh>
 
-        {/* 2. MAIN HULL / CORE */}
-        <mesh position={[0, 0, 0]} material={hullMaterial}>
-          <cylinderGeometry args={[1.5, 1.5, 6, 16]} />
-          
-          <mesh ref={coreRef} material={coreMaterial}>
-            <cylinderGeometry args={[0.5, 0.5, 4, 8]} />
+        {/* === TWIN PRESSURE HULLS (CATAMARAN) === */}
+        {/* Left Pressure Hull */}
+        <mesh ref={leftPressureHullRef} position={[-0.6, 0, 1]} rotation={[Math.PI / 2, 0, 0]} material={titaniumMaterial}>
+            <cylinderGeometry args={[0.8, 0.8, 10, 16]} />
+        </mesh>
+        
+        {/* Right Pressure Hull */}
+        <mesh ref={rightPressureHullRef} position={[0.6, 0, 1]} rotation={[Math.PI / 2, 0, 0]} material={titaniumMaterial}>
+            <cylinderGeometry args={[0.8, 0.8, 10, 16]} />
             <Annotation 
-              visible={showCore} 
-              side="left"
-              title="El Núcleo Ballena" 
-              description="El cerebro del sistema. Ejecuta contratos inteligentes institucionales y procesa liquidaciones a velocidad luz." 
-              icon={Cpu} 
+                visible={showPressureHulls} 
+                side="right"
+                title="Estructura Central Doble" 
+                description="Dos unidades de seguridad independientes. Mantenemos tu identidad y tu capital en compartimentos aislados para garantizar una privacidad impecable." 
+                icon={Network} 
             />
-          </mesh>
+        </mesh>
 
-          {/* ANTENNA / COMMS */}
-          <mesh ref={antennaRef} position={[1, 2, 0]} rotation={[0, 0, -Math.PI/4]} material={hullMaterial}>
-            <cylinderGeometry args={[0.1, 0.1, 2, 8]} />
+        {/* === 20x ICBM SILOS (R-39 STURGEON) === */}
+        <group ref={missileSilosRef} position={[0, 1.2, 1]}>
+             {silos.map((pos, i) => (
+                 <mesh key={i} position={[pos.x, 0, pos.z]} material={siloMaterial}>
+                     <cylinderGeometry args={[0.25, 0.25, 2.5, 12]} />
+                 </mesh>
+             ))}
              <Annotation 
-              visible={showCore} 
-              side="top"
-              title="Blindaje Institucional" 
-              description="Cortafuegos cuántico. Las mismas defensas que protegen billones de dólares en capital L1 y L2." 
-              icon={ShieldAlert} 
+                visible={showSilos} 
+                side="left"
+                title="Sistemas de Ejecución Paralela" 
+                description="Múltiples unidades trabajando en sintonía para procesar miles de transacciones de forma veloz y segura, asegurando liquidez constante." 
+                icon={Target} 
             />
-          </mesh>
+        </group>
+
+        {/* === SAIL / CONNING TOWER === */}
+        <mesh ref={sailRef} position={[0, 2.5, -2]} material={internalMaterial}>
+            {/* Base of the sail */}
+            <boxGeometry args={[1.5, 2, 3]} />
+            {/* Hydroplanes on sail */}
+            <mesh position={[-1.2, 0, 0]} material={internalMaterial}>
+                <boxGeometry args={[1.5, 0.1, 0.5]} />
+            </mesh>
+            <mesh position={[1.2, 0, 0]} material={internalMaterial}>
+                <boxGeometry args={[1.5, 0.1, 0.5]} />
+            </mesh>
+             <Annotation 
+                visible={showHull} // Show early alongside the hull
+                side="bottom"
+                title="Centro de Navegación" 
+                description="El corazón inteligente de Whale Alert Network. Monitorea y analiza las corrientes del mercado para guiarte de forma segura en tus decisiones." 
+                icon={Radar} 
+            />
         </mesh>
 
-        {/* 3. TAIL COMPARTMENT */}
-        <mesh ref={tailRef} position={[0, -3, 0]} material={hullMaterial}>
-          <cylinderGeometry args={[1.5, 0.8, 2, 16]} />
-          <Annotation 
-            visible={showTail} 
-            side="right"
-            title="Antena Relé de Alto Cifrado" 
-            description="Retransmisión P2P. Mensajería encriptada extremo a extremo para alianzas estratégicas bajo la superficie." 
-            icon={Network} 
-          />
-        </mesh>
+        {/* === TORPEDO ROOM (BOW) === */}
+        <group ref={torpedoRoomRef} position={[0, 0, 6]}>
+            <mesh material={internalMaterial} position={[0, 0, -0.5]}>
+                <sphereGeometry args={[1.1, 16, 16]} />
+            </mesh>
+            {torpedoTubes.map((pos, i) => (
+                <mesh key={i} position={[pos.x, pos.y, 0.5]} rotation={[Math.PI / 2, 0, 0]} material={siloMaterial}>
+                    <cylinderGeometry args={[0.1, 0.1, 1.5, 8]} />
+                </mesh>
+            ))}
+             <Annotation 
+                visible={showTorpedo} 
+                side="right"
+                title="Módulos de Respuesta Rápida" 
+                description="Herramientas de previsión activa. Se aseguran de que ningún observador externo pueda rastrear tus interacciones diarias." 
+                icon={Crosshair} 
+            />
+        </group>
 
-        {/* 4. ENGINE / PROPULSION */}
-        <mesh ref={engineRef} position={[0, -4, 0]} material={coreMaterial}>
-          <torusGeometry args={[0.6, 0.2, 8, 16]} />
-          <mesh position={[0, 0, 0]} rotation={[Math.PI/2, 0, 0]}>
-             <boxGeometry args={[0.2, 2, 0.2]} />
-             <meshBasicMaterial color="#ffffff" />
-          </mesh>
-          <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI/2]}>
-             <boxGeometry args={[0.2, 2, 0.2]} />
-             <meshBasicMaterial color="#ffffff" />
-          </mesh>
-           <Annotation 
-            visible={showTail} 
-            side="bottom"
-            title="Motor de Rendimiento GPU" 
-            description="Ingesta masiva de bloques. El motor consume el mempool entero y te devuelve resultados en milisegundos." 
-            icon={Zap} 
-          />
-        </mesh>
+        {/* === NUCLEAR REACTORS & PROPULSION (STERN) === */}
+        <group ref={reactorRoomRef} position={[0, 0, -5]}>
+            {/* Left Reactor */}
+            <mesh position={[-0.6, 0, 0]} material={siloMaterial}>
+                <sphereGeometry args={[0.7, 16, 16]} />
+            </mesh>
+            {/* Right Reactor */}
+            <mesh position={[0.6, 0, 0]} material={siloMaterial}>
+                <sphereGeometry args={[0.7, 16, 16]} />
+            </mesh>
+            {/* Propellers */}
+            <mesh position={[-0.8, 0, -2]} rotation={[Math.PI / 2, 0, 0]} material={titaniumMaterial}>
+                <cylinderGeometry args={[0.5, 0.5, 1, 12]} />
+            </mesh>
+            <mesh position={[0.8, 0, -2]} rotation={[Math.PI / 2, 0, 0]} material={titaniumMaterial}>
+                <cylinderGeometry args={[0.5, 0.5, 1, 12]} />
+            </mesh>
+             <Annotation 
+                visible={showReactor} 
+                side="bottom"
+                title="Motor de Sincronización" 
+                description="La energía pura y escalable que mantiene a nuestra red estructurada. Confianza total en tiempos de respuesta para una experiencia sin fricción." 
+                icon={Zap} 
+            />
+        </group>
 
       </Float>
     </group>
@@ -193,49 +302,54 @@ function SubmarineRig() {
 // --- Main Export Component ---
 export default function SubmarineDeconstruction3D() {
   return (
-    <section className="relative w-full h-[300vh] bg-[#020202]">
+    <section className="relative w-full h-[400vh] bg-[#020202]">
       
       {/* Absolute Header Overlay */}
-      <div className="absolute top-20 w-full text-center z-10 pointer-events-none px-6">
-        <div className="font-aztec-h2 text-[12px] text-[var(--aztec-orchid)] uppercase tracking-[0.6em] mb-4">
-          Renderizado God-Tier WebGL
+      <div className="absolute top-[5vh] w-full text-center z-10 pointer-events-none px-6">
+        <div className="text-[12px] text-white/50 uppercase tracking-[0.4em] mb-4 font-light">
+          Innovación Visual Interactiva
         </div>
-        <h2 className="font-aztec-h1 text-4xl md:text-6xl text-white uppercase tracking-tighter">
-          Descomposición <span className="text-[var(--aztec-orchid)] italic">Inmersiva</span>
+        <h2 className="text-4xl md:text-6xl text-white font-light tracking-wide transition-opacity duration-1000 mix-blend-difference">
+          Exposición <span className="font-medium italic">Estructural</span>
         </h2>
-        <p className="font-aztec-body text-sm text-white/50 max-w-xl mx-auto mt-4 font-bold">
-          Scroll para desmontar la arquitectura. Gráficos en tiempo real procesados a 240Hz directamente en el núcleo del navegador. No backend required.
+        <p className="text-[13px] text-white/60 max-w-lg mx-auto mt-6 font-light tracking-wide leading-relaxed">
+          Haz scroll con suavidad para adentrarte en la arquitectura de Whale Alert Network. 
+          Desliza para separar sus componentes y descubrir el núcleo de nuestro ecosistema.
         </p>
       </div>
 
       <div className="sticky top-0 w-full h-screen overflow-hidden">
-        <Canvas gl={{ antialias: false, powerPreference: "high-performance" }}>
-          <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
+        <Canvas gl={{ antialias: false, powerPreference: "high-performance", alpha: false }} dpr={[1, 2]}>
+          <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={35} />
           
           <color attach="background" args={['#020202']} />
-          <fog attach="fog" args={['#020202', 10, 40]} />
+          <fog attach="fog" args={['#020202', 15, 45]} />
           
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={2} color="#b450ff" />
-          <directionalLight position={[-10, -10, -5]} intensity={1} color="#a3e33f" />
+          <ambientLight intensity={0.4} />
+          {/* Chartreuse Light targeting the bow */}
+          <directionalLight position={[-10, -10, 10]} intensity={1.5} color="#a3e33f" />
+          {/* Orchid Light targeting the rear / reactors */}
+          <directionalLight position={[10, 10, -10]} intensity={2} color="#b450ff" />
+          {/* Top highlight */}
+          <pointLight position={[0, 10, 0]} intensity={2} color="#ffffff" distance={20} />
 
-          {/* Galaxy / Ocean Depth Feel */}
-          <Stars radius={50} depth={50} count={3000} factor={4} saturation={1} fade speed={1} />
+          {/* Deep Ocean Matrix Visuals */}
+          <Stars radius={100} depth={50} count={5000} factor={4} saturation={1} fade speed={0.5} />
           
-          <ScrollControls pages={3} damping={0.25}>
-            <SubmarineRig />
+          <ScrollControls pages={4} damping={0.15}>
+            <TyphoonRig />
           </ScrollControls>
 
           {/* Cinematic Post-Processing */}
           <EffectComposer>
-            <Bloom luminanceThreshold={0.5} mipmapBlur intensity={1.5} />
-            <Noise opacity={0.05} />
-            <Vignette eskil={false} offset={0.1} darkness={1.1} />
+            <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.8} />
+            <Noise opacity={0.06} />
+            <Vignette eskil={false} offset={0.05} darkness={1.2} />
           </EffectComposer>
         </Canvas>
 
-        {/* Scanlines Overlay for Cypherpunk Vibe */}
-        <div className="absolute inset-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSJyZ2JhKDAsMCwwLDApIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDBMNCAwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] mix-blend-overlay" />
+        {/* Ambient Subtle Gradients */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-[#020202] via-transparent to-[#020202]" />
       </div>
     </section>
   );

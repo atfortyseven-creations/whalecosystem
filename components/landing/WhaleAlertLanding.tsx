@@ -10,7 +10,9 @@ import { useRouter } from 'next/navigation';
 import { useUIStore } from "@/lib/store/ui-store";
 import AntiPhishing from "@/components/security/AntiPhishing";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
-import SubmarineDeconstruction3D from "./SubmarineDeconstruction3D";
+import dynamic from 'next/dynamic';
+
+const SubmarineDeconstruction3D = dynamic(() => import('./SubmarineDeconstruction3D'), { ssr: false });
 
 const DATA = {
     stats: [

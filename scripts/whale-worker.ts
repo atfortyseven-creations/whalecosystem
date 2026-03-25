@@ -569,12 +569,16 @@ async function startBsvWorker() {
 
                 const bsvPrice = await getRealTimePrice("BSV") || 70;
 
-                for (const tx of txs) {
-                    // Whatsonchain returns basic info, we filter by value if available or fetch details
-                    // For massive scale, we only fetch details for potential whales
-                    // (This is a simplified Teranode-logic simulation)
-                    
-                    // placeholder for value check — in production we'd use a more direct P2P stream
+                if (Array.isArray(txs)) {
+                    for (const tx of txs) {
+                        // Whatsonchain returns basic info, we filter by value if available or fetch details
+                        // For massive scale, we only fetch details for potential whales
+                        // (This is a simplified Teranode-logic simulation)
+                        
+                        // placeholder for value check — in production we'd use a more direct P2P stream
+                    }
+                } else {
+                    console.warn(`⚠️ [BSV Worker] Invalid or rate-limited tx payload from Whatsonchain for block ${currentHeight}`, txs);
                 }
                 lastHeight = currentHeight;
             }
