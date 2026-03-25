@@ -162,9 +162,7 @@
     "@nomicfoundation/hardhat-ignition": "^0.15.13",
     "@nomicfoundation/ignition-core": "^0.15.13",
     "dotenv": "^17.2.3",
-    "cross-env": "^7.0.3"
-  },
-  "devDependencies": {
+    "cross-env": "^7.0.3",
     "@prisma/adapter-pg": "^6.0.0",
     "@prisma/client": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
