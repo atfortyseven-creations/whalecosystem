@@ -35,10 +35,10 @@ export async function GET(request: Request) {
                 // [SESSION] Establish verified handshake cookie on the PC browser
                 const cookieStore = await cookies();
                 cookieStore.set('sovereign_handshake', data.address, {
-                    maxAge: 7 * 24 * 60 * 60, // 7 days
+                    maxAge: 30 * 24 * 60 * 60, // Extend to 30 days for institutional persistence
                     path: '/',
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
+                    secure: true, // Always secure for institutional protocol
+                    sameSite: 'lax', // Lax for better compatibility with wallet redirects
                     httpOnly: false // Accessible by client-side hooks
                 });
 

@@ -69,9 +69,10 @@ export default clerkMiddleware(async (auth, request) => {
     const clerkAuth = await auth();
     const humanSession = request.cookies.get('human_session');
     const nextAuthToken = request.cookies.get('next-auth.session-token');
+    const sovereignHandshake = request.cookies.get('sovereign_handshake');
     const kycStatusCookie = request.cookies.get('kyc_status');
     
-    const isAuthenticated = !!clerkAuth?.userId || !!humanSession || !!nextAuthToken;
+    const isAuthenticated = !!clerkAuth?.userId || !!humanSession || !!nextAuthToken || !!sovereignHandshake;
 
     if (isProtectedRoute(request)) {
       if (!isAuthenticated) {

@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 // Only importing what is actually used — tree-shaken for minimal bundle size
-import { QrCode, Smartphone, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight } from 'lucide-react';
+import { QrCode, Smartphone, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight, Shield } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
 
 // GPU-accelerated background pattern — rendered once, never re-rendered
@@ -281,9 +281,13 @@ export function MobileSovereignLanding() {
     );
 }
 
+
 // ─── QR SCANNER VIEW ──────────────────────────────────────────────────────────
 function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, signMessageAsync: any }) {
     const { address, isConnected } = useAccount();
+    const [isScanning, setIsScanning] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const scannerRef = useRef<Html5Qrcode | null>(null);
 
     useEffect(() => {
         if (!isConnected || !address) {
@@ -292,111 +296,186 @@ function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, sig
             return;
         }
 
-        let scanner: Html5QrcodeScanner | null = null;
-        
-        // Use a small timeout to ensure DOM is ready
-        const timeout = setTimeout(() => {
+        // Initialize scanner IMMEDIATELY on mount (button click has already happened)
+        const initScanner = async () => {
             try {
-                // Clear any existing instance first
-                const existing = document.getElementById('sovereign-qr-reader');
-                if (existing) existing.innerHTML = '';
+                const scanner = new Html5Qrcode('sovereign-qr-reader');
+                scannerRef.current = scanner;
 
-                scanner = new Html5QrcodeScanner(
-                    'sovereign-qr-reader',
-                    { 
-                        fps: 15, 
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0
-                    },
-                    false
-                );
+                const config = {
+                    fps: 20, // Faster for smoother legendary feel
+                    qrbox: { width: 260, height: 260 },
+                    aspectRatio: 1.0
+                };
 
-                scanner.render(async (decodedText) => {
-                    if (scanner) {
+                await scanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    async (decodedText) => {
+                        if (isProcessing) return;
+                        
+                        // [LEGENDARY NORMALIZATION]
+                        const cleanText = decodedText.trim();
+                        if (!cleanText.startsWith('SOVEREIGN_HANDSHAKE:')) return;
+
+                        setIsProcessing(true);
+                        
                         try {
-                            await scanner.clear();
-                        } catch (e) {}
-                    }
-                    
-                    try {
-                        // [LEGENDARY HANDSHAKE] Sign the token to prove mobile ownership
-                        toast.info('Authenticating PC Session...');
-                        const signature = await signMessageAsync({ message: decodedText });
-
-                        // The decodedText is "SOVEREIGN_HANDSHAKE:uuid"
-                        const token = decodedText.split(':')[1];
-
-                        const res = await fetch('/api/auth/qr-sync', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ token, address, signature }),
-                        });
-                        if (res.ok) {
-                            toast.success('Neural Handshake Complete', {
-                                description: 'PC Terminal is now unlocked.'
+                            // Stop scanner immediately to prevent double-scans
+                            await scanner.stop();
+                            
+                            toast.info('Authenticating PC Session...', {
+                                icon: <Zap className="text-amber-400 animate-pulse" size={18} />
                             });
-                        } else {
-                            const errText = await res.text();
-                            toast.error('Sync failed: ' + errText);
+
+                            // [Handshake Signature]
+                            const signature = await signMessageAsync({ message: cleanText });
+                            const token = cleanText.split(':')[1];
+
+                            const res = await fetch('/api/auth/qr-sync', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ token, address, signature }),
+                            });
+
+                            if (res.ok) {
+                                // Provide haptic feedback if available
+                                if (window.navigator?.vibrate) window.navigator.vibrate([100, 50, 100]);
+                                
+                                toast.success('Handshake Complete', {
+                                    description: 'PC Terminal is now unlocked.'
+                                });
+                                setTimeout(onBack, 1500); // Leave success message visible briefly
+                            } else {
+                                const errText = await res.text();
+                                toast.error('Sync failed: ' + errText);
+                                setIsProcessing(false);
+                                // Restart scanner
+                                await scanner.start({ facingMode: "environment" }, config, () => {}, () => {});
+                            }
+                        } catch (e: any) {
+                            console.error('[HANDSHAKE_ERROR]', e);
+                            toast.error('Handshake Cancelled or Error');
+                            setIsProcessing(false);
+                            // Restart scanner
+                            try {
+                                await scanner.start({ facingMode: "environment" }, config, () => {}, () => {});
+                            } catch(e2) {}
                         }
-                    } catch (e: any) {
-                        toast.error('Handshake Error');
-                    } finally {
-                        onBack();
-                    }
-                }, (error) => {
-                    // Quietly handle scan errors (common during focus etc)
-                });
+                    },
+                    (error) => { /* Quiet */ }
+                );
+                setIsScanning(true);
             } catch (e) {
                 console.error('Scanner init error:', e);
-                toast.error('Camera Access Failed');
+                toast.error('Camera Access Failed. Check permissions.');
                 onBack();
             }
-        }, 100);
+        };
+
+        initScanner();
 
         return () => { 
-            clearTimeout(timeout);
-            if (scanner) {
-                scanner.clear().catch(() => {});
+            if (scannerRef.current) {
+                scannerRef.current.stop().catch(() => {});
             }
         };
     }, [address, isConnected, onBack]);
 
     return (
-        <div className="h-[100dvh] bg-[#050505] text-white flex flex-col w-full">
+        <div className="h-[100dvh] bg-[#050505] text-white flex flex-col w-full relative overflow-hidden">
+            {/* Background Handshaking Glow */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 blur-[130px] rounded-full" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 blur-[130px] rounded-full" />
+
             <style dangerouslySetInnerHTML={{ __html: `
-                #sovereign-qr-reader { border: none !important; }
-                #sovereign-qr-reader button { background: #7c3aed; color: white; font-weight: 900; border-radius: 100px; border: none; padding: 14px 28px; text-transform: uppercase; margin-bottom: 20px; cursor: pointer; font-family: inherit; font-size: 13px; letter-spacing: 1px; }
-                #sovereign-qr-reader a, #sovereign-qr-reader img { display: none !important; }
-                #sovereign-qr-reader span { color: rgba(255,255,255,0.4) !important; font-family: inherit; font-size: 13px; margin-top: 10px; display: block; }
-                #sovereign-qr-reader video { border-radius: 2rem !important; }
-                #qr-shaded-region { border-color: rgba(0,0,0,0.85) !important; border-width: 36px !important; }
+                #sovereign-qr-reader { border: none !important; border-radius: 2.5rem !important; overflow: hidden; background: #000; position: relative; }
+                #sovereign-qr-reader video { width: 100% !important; height: 100% !important; object-cover: cover !important; border-radius: 2.5rem !important; }
+                #sovereign-qr-reader__scan_region { border: none !important; }
+                #sovereign-qr-reader img { display: none !important; }
+                .legendary-scan-overlay {
+                    position: absolute;
+                    inset: 0;
+                    border: 2px solid rgba(255,255,255,0.1);
+                    border-radius: 2.5rem;
+                    pointer-events: none;
+                    z-index: 10;
+                }
+                .scan-line {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 2px;
+                    background: linear-gradient(to right, transparent, #818cf8, transparent);
+                    box-shadow: 0 0 15px #818cf8;
+                    animation: scanning 2s linear infinite;
+                }
+                @keyframes scanning {
+                    0% { top: 10%; opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { top: 90%; opacity: 0; }
+                }
             ` }} />
 
-            <header className="px-6 py-8 flex items-center justify-between">
+            <header className="px-6 py-8 flex items-center justify-between relative z-20">
                 <button
                     onClick={onBack}
-                    className="text-white/70 hover:text-white px-5 py-2.5 bg-white/10 rounded-full text-sm font-bold transition-colors"
+                    className="flex items-center gap-2 group"
                 >
-                    ← Back
+                    <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors">
+                         <MoveRight className="rotate-180" size={20} />
+                    </div>
+                    <span className="font-bold tracking-tight text-white/50 group-hover:text-white transition-colors">Abort Sync</span>
                 </button>
-                <QrCode className="text-indigo-400" size={26} />
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Network Live</span>
+                </div>
             </header>
 
-            <div className="flex-1 flex flex-col items-center justify-center -mt-8 p-6">
-                <div className="w-full max-w-[380px]">
-                    <div
-                        id="sovereign-qr-reader"
-                        className="bg-[#0a0a0a] rounded-[2rem] border border-white/10 overflow-hidden"
-                    />
+            <div className="flex-1 flex flex-col items-center justify-center -mt-10 p-8 relative z-10">
+                <div className="w-full max-w-[340px] aspect-square relative group">
+                    {/* Scanner Frame Decor */}
+                    <div className="absolute -inset-4 border border-white/5 rounded-[3rem] transition-all duration-700 group-hover:border-indigo-500/20" />
+                    <div className="absolute -inset-0.5 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 rounded-[2.6rem] blur-sm animate-pulse" />
+                    
+                    <div id="sovereign-qr-reader" className="w-full h-full">
+                         {isProcessing && (
+                            <div className="absolute inset-0 bg-black/80 z-20 flex items-center justify-center rounded-[2.5rem] backdrop-blur-md">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
+                                    <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400">Syncing Matrix...</p>
+                                </div>
+                            </div>
+                         )}
+                         <div className="legendary-scan-overlay">
+                            {!isProcessing && <div className="scan-line" />}
+                         </div>
+                    </div>
+
+                    {/* Corner Accents */}
+                    <div className="absolute -top-1 -left-1 w-10 h-10 border-t-2 border-l-2 border-indigo-500 rounded-tl-3xl opacity-50" />
+                    <div className="absolute -top-1 -right-1 w-10 h-10 border-t-2 border-r-2 border-indigo-500 rounded-tr-3xl opacity-50" />
+                    <div className="absolute -bottom-1 -left-1 w-10 h-10 border-b-2 border-l-2 border-indigo-500 rounded-bl-3xl opacity-50" />
+                    <div className="absolute -bottom-1 -right-1 w-10 h-10 border-b-2 border-r-2 border-indigo-500 rounded-br-3xl opacity-50" />
                 </div>
-                <div className="mt-12 text-center max-w-[300px]">
-                    <h3 className="font-black text-3xl tracking-tighter mb-3 text-white">Scan to Connect</h3>
-                    <p className="text-white/50 text-base leading-relaxed font-medium">
-                        Point your camera at the <span className="text-indigo-400 font-bold">QR code</span> on your PC screen to securely log in.
+
+                <div className="mt-14 text-center space-y-4">
+                    <h3 className="font-black text-3xl tracking-tighter text-white">Neural Handshake</h3>
+                    <p className="text-white/40 text-[1rem] leading-relaxed max-w-[260px] mx-auto font-medium">
+                        Point your scanner at the <span className="text-white font-bold">QR Identity Matrix</span> on your PC terminal.
                     </p>
                 </div>
             </div>
+
+            <footer className="p-10 text-center">
+                <div className="bg-white/5 border border-white/5 py-4 px-6 rounded-2xl flex items-center justify-center gap-3">
+                    <Shield size={16} className="text-indigo-400" />
+                    <span className="text-[11px] font-bold text-white/50 uppercase tracking-[0.1em]">Verified Session: {address?.slice(0,6)}...{address?.slice(-4)}</span>
+                </div>
+            </footer>
         </div>
     );
 }

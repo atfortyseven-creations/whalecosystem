@@ -37,7 +37,17 @@ export async function POST(req: Request) {
         }
 
         // Store the verified mobile address into the session UUID for the desktop to consume
-        await safeRedisSet(`qr:${token}`, JSON.stringify({ address, signature, syncedAt: Date.now() }), 'EX', 300);
+        // Normalize: Lowercase address and stringify payload
+        const normalizedAddress = address.toLowerCase();
+        
+        await safeRedisSet(`qr:${token}`, JSON.stringify({ 
+            address: normalizedAddress, 
+            signature, 
+            syncedAt: Date.now(),
+            protocol: 'LEGENDARY_HANDSHAKE_v1'
+        }), 'EX', 300);
+
+        console.log(`[Handshake:Success] Sync verified for ${normalizedAddress} on token ${token}`);
 
         return new NextResponse('Handshake Verified', { status: 200 });
     } catch (e: any) {
