@@ -47,15 +47,34 @@ function Annotation({ title, description, icon: Icon, visible, side = "right" }:
 // --- The Typhoon Rig: Optimized with zero external scroll dependencies ---
 function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
   const groupRef = useRef<THREE.Group>(null);
+  const scanRef = useRef<THREE.Group>(null);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   // 0.0 -> 0.4: Solid -> Transparent
   const transparency = Math.min(scrollProgress * 2.5, 1);
   // 0.4 -> 1.0: Explode
   const explode = Math.max(0, (scrollProgress - 0.4) / 0.6);
 
-  useFrame((_, delta) => {
+  useEffect(() => {
+    const handleMouse = (e: MouseEvent) => {
+      setMouse({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: -(e.clientY / window.innerHeight - 0.5) * 2
+      });
+    };
+    window.addEventListener('mousemove', handleMouse);
+    return () => window.removeEventListener('mousemove', handleMouse);
+  }, []);
+
+  useFrame((state, delta) => {
     if (groupRef.current) {
+      // Rotation + Mouse Parallax
       groupRef.current.rotation.y += delta * 0.1;
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, mouse.y * 0.1, 0.1);
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, -mouse.x * 0.1, 0.1);
+    }
+    if (scanRef.current) {
+      scanRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 5;
     }
   });
 
@@ -82,6 +101,15 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
 
   return (
     <group ref={groupRef}>
+      {/* Sovereign Scan Ring */}
+      <group ref={scanRef}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[3, 0.02, 16, 100]} />
+          <meshStandardMaterial color={reactColor} emissive={reactColor} emissiveIntensity={5} transparent opacity={0.6} />
+        </mesh>
+        <pointLight intensity={1} color={reactColor} distance={5} />
+      </group>
+
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
         <group scale={1.8}>
           
@@ -115,6 +143,16 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
               </mesh>
             ))}
             <Annotation visible={scrollProgress > 0.4} side="left" title="Logic Silos" description="Compartmentalized zero-knowledge proof execution nodes." icon={Target} />
+          </group>
+
+          {/* Logic Nodes (Data Points) */}
+          <group>
+            {Array.from({ length: 20 }).map((_, i) => (
+              <mesh key={i} position={[Math.sin(i) * 5, Math.cos(i) * 5, Math.tan(i) * 2]} scale={0.05}>
+                <sphereGeometry />
+                <meshStandardMaterial color={reactColor} emissive={reactColor} emissiveIntensity={2} />
+              </mesh>
+            ))}
           </group>
 
         </group>
