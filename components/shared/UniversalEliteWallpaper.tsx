@@ -62,7 +62,7 @@ export function UniversalEliteWallpaper() {
             ctx.fillRect(0, 0, width, height);
  
             // ── Sub-Pixel Institutional Grid ───────────────────────────────
-            ctx.strokeStyle = 'rgba(6, 182, 212, 0.05)';
+            ctx.strokeStyle = 'rgba(212, 255, 43, 0.05)'; // Aztek Chartreuse
             ctx.lineWidth = 0.5;
             for (let i = 0; i < width; i += 60) {
                 ctx.beginPath();
@@ -83,7 +83,7 @@ export function UniversalEliteWallpaper() {
                 width / 2, height * 0.3, 0,
                 width / 2, height * 0.3, width
             );
-            glow.addColorStop(0, `rgba(6, 182, 212, ${pulseOpacity})`);
+            glow.addColorStop(0, `rgba(255, 45, 244, ${pulseOpacity})`); // Aztek Orchid
             glow.addColorStop(1, 'transparent');
             ctx.fillStyle = glow;
             ctx.fillRect(0, 0, width, height);
@@ -98,7 +98,7 @@ export function UniversalEliteWallpaper() {
  
                 ctx.beginPath();
                 ctx.arc(node.x, node.y, 1, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+                ctx.fillStyle = 'rgba(212, 255, 43, 0.2)'; // Aztek Chartreuse
                 ctx.fill();
  
                 nodes.slice(i + 1).forEach(other => {
@@ -110,7 +110,7 @@ export function UniversalEliteWallpaper() {
                         ctx.beginPath();
                         ctx.moveTo(node.x, node.y);
                         ctx.lineTo(other.x, other.y);
-                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.1 * (1 - dist / MAX_DIST)})`;
+                        ctx.strokeStyle = `rgba(212, 255, 43, ${0.1 * (1 - dist / MAX_DIST)})`;
                         ctx.lineWidth = 0.5;
                         ctx.stroke();
                     }

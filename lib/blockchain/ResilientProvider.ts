@@ -54,8 +54,15 @@ export class ResilientProvider {
         console.log(`📡 [WS:SHIELD] Initializing stream for chain ${this.chainId} at ${url}`);
         this.wsProvider = new ethers.WebSocketProvider(url);
         
-        this.wsProvider.on("error", (err) => {
+        this.wsProvider.on("error", (err: any) => {
             console.warn(`⚠️ [WS:SHIELD] Stream Error (${this.chainId}):`, err.message);
+            
+            // [RESILIENCE] If 401/403 (Auth failure), don't spam reconnect - fallback to polling
+            if (err.message.includes('401') || err.message.includes('403')) {
+                console.error(`💀 [WS:SHIELD] AUTHENTICATION FAILURE (401/403) for chain ${this.chainId}. Disabling WebSocket for this session.`);
+                this.wsProvider = undefined; 
+                return;
+            }
             this.reconnectWS();
         });
     } catch (e: any) {

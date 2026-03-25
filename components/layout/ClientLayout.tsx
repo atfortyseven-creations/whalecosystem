@@ -16,7 +16,7 @@ import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
 import { LinkedGate } from '@/components/shared/LinkedGate';
-import { AuroraBackground } from '@/components/ui/AuroraBackground';
+import { UniversalEliteWallpaper } from '@/components/shared/UniversalEliteWallpaper';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -38,7 +38,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <ConnectWalletModal />
             
             <TitaniumGate>
-                <AuroraBackground />
+                <UniversalEliteWallpaper />
                 <div className="flex flex-col min-h-screen relative z-0">
                     <div className="flex-1 flex flex-col relative w-full">
                         {(!pathname.startsWith('/developers')) && <HighHzWallpaper />}
