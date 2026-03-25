@@ -38,16 +38,19 @@ export function InstitutionalHeader() {
             {/* Left: Brand Identity */}
             <div className="flex items-center gap-6 relative z-10">
                 <Link href="/" className="flex items-center gap-4 group">
-                    <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <div className="relative w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 bg-black/5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-black/10 p-1 backdrop-blur-md">
                         <img 
                             src="/models/update/gradient-pink-diamond-balls-assortment (2).png" 
                             alt="Whale Alert" 
-                            className="w-full h-full object-contain mix-blend-multiply"
+                            className="w-full h-full object-contain filter drop-shadow-md brightness-110 contrast-125 mix-blend-multiply"
                         />
                     </div>
-                    <h1 className="text-2xl font-aztec-serif font-black text-[var(--aztec-ink)] uppercase tracking-tighter leading-none">
-                        Whale Alert
-                    </h1>
+                    <div className="flex flex-col">
+                        <h1 className="text-3xl font-aztec-serif font-black text-[var(--aztec-ink)] uppercase tracking-tighter leading-none flex items-start">
+                            Whale Alert<sup className="text-[10px] ml-1 mt-1 font-sans opacity-60 tracking-normal">TM</sup>
+                        </h1>
+                        <span className="text-[9px] font-aztec-mono font-black uppercase tracking-[0.4em] text-[var(--aztec-orchid)] mt-1 drop-shadow-sm">Corporation</span>
+                    </div>
                 </Link>
 
                 <div className="h-10 w-px bg-black/5 hidden md:block" />

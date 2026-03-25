@@ -20,7 +20,7 @@ export class UtxoManager {
    */
   public async getUtxos(address: string): Promise<UTXO[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}/address/${address}/unspent`);
+      const response = await axios.get(`${this.baseUrl}/address/${address}/unspent`, { timeout: 10000 });
       return response.data.map((u: any) => ({
         txid: u.tx_hash,
         vout: u.tx_pos,
@@ -30,6 +30,34 @@ export class UtxoManager {
     } catch (e) {
       console.error('UtxoManager: Failed to fetch UTXOs', e);
       return [];
+    }
+  }
+
+  /**
+   * Fetches the raw transaction hex by TXID.
+   */
+  public async getRawTx(txid: string): Promise<string> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/tx/${txid}/hex`, { timeout: 10000 });
+      return response.data;
+    } catch (e) {
+      console.error(`UtxoManager: Failed to fetch Raw TX for ${txid}`, e);
+      throw new Error(`Failed to fetch source transaction ${txid}`);
+    }
+  }
+
+  /**
+   * Broadcasts a raw transaction hex to the mainnet.
+   */
+  public async broadcastTransaction(rawTx: string): Promise<string> {
+    try {
+      const response = await axios.post(`${this.baseUrl}/tx/raw`, {
+        txhex: rawTx
+      }, { timeout: 15000 });
+      return response.data; // txid
+    } catch (e: any) {
+      console.error('UtxoManager: Broadcast failed', e.response?.data || e.message);
+      throw new Error(e.response?.data || 'Failed to broadcast transaction to Mainnet.');
     }
   }
 

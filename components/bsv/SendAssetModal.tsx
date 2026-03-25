@@ -52,11 +52,14 @@ export const SendAssetModal = ({ isOpen, onClose, initialAddress = '' }: SendAss
 
       // 4. Add Inputs with Unlocking Templates
       for (const u of selectedUtxos) {
+        toast.info(`Fetching UTXO data for ${u.txid.slice(0, 8)}...`);
+        const rawTxHex = await utxoManager.getRawTx(u.txid);
+        const sourceTx = Transaction.fromHex(rawTxHex);
+        
         tx.addInput({
-          sourceTransaction: Transaction.fromHex(''), // In a real app, we'd fetch the source TX for full scripts
-          sourceSatoshis: u.value,
-          lockingScript: p2pkh.lock(senderAddress),
-          unlockingScript: p2pkh.unlock(privKey)
+          sourceTransaction: sourceTx,
+          sourceOutputIndex: u.vout,
+          unlockingScriptTemplate: p2pkh.unlock(privKey)
         } as any);
       }
 
@@ -74,15 +77,21 @@ export const SendAssetModal = ({ isOpen, onClose, initialAddress = '' }: SendAss
       await tx.fee();
 
       // 8. Final Native Signing
+      toast.info("Executing Elliptic Curve Sequence...");
       await identity.signTransaction(tx);
       
-      console.log('TX BUILD SUCCESS:', tx.toHex());
+      const rawTx = tx.toHex();
+      console.log('TX BUILD SUCCESS:', rawTx);
       
-      toast.success("Transaction Signed & Broadcasted Successfully!");
+      // 9. Execute Broadcast
+      toast.info("Broadcasting to Mainnet Nodes...");
+      const txid = await utxoManager.broadcastTransaction(rawTx);
+      
+      toast.success(`Transaction Broadcasted Successfully! TXID: ${txid}`);
       onClose();
     } catch (e: any) {
       console.error('TX ERROR:', e);
-      toast.error(`Signature Failure: ${e.message}`);
+      toast.error(`Protocol Failure: ${e.message}`);
     } finally {
       setIsSigning(false);
     }
