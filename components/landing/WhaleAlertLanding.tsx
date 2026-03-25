@@ -50,9 +50,7 @@ export function WhaleAlertLanding() {
       
       {/* ── PHASE 1: AZTEC HERO ── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 px-6 overflow-hidden">
-        <div 
-          className="absolute inset-0 z-0 hidden md:block"
-        >
+        <div className="absolute inset-0 z-0 hidden md:block">
            <Image 
              src="/models/update/logan-voss-VTWMWadBMvM-unsplash.jpg" 
              alt="Background Logans Voss Immersion" 
@@ -74,7 +72,7 @@ export function WhaleAlertLanding() {
           </h1>
           
           <p className="font-aztec-body text-xl md:text-3xl text-[var(--aztec-ink)]/60 max-w-4xl mx-auto leading-relaxed mb-16 px-4">
-             Whale Alert’s technology provides programmable data surveillance for institutional use cases, ensuring your data remains sovereign while transacting on public blockchains.
+             Whale Alert&apos;s technology provides programmable data surveillance for institutional use cases, ensuring your data remains sovereign while transacting on public blockchains.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
@@ -90,7 +88,7 @@ export function WhaleAlertLanding() {
               Read Documentation <ChevronRight size={14} />
             </Link>
           </div>
-        </div>
+        </motion.div>
         
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 opacity-20 hidden md:block">
             <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-px h-16 bg-black" />
@@ -154,5 +152,3 @@ export function WhaleAlertLanding() {
     </div>
   );
 }
-
-
