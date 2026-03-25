@@ -63,7 +63,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     className="w-24 h-24"
                  >
                     <img 
-                        src="/models/update/gradient-pink-diamond-balls-assortment (2).png" 
+                        src="/whale-logo.png" 
                         alt="Loading" 
                         className="w-full h-full object-contain drop-shadow-2xl"
                     />

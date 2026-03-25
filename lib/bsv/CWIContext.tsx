@@ -6,6 +6,7 @@ import { PermissionNexusModal } from '@/components/bsv/PermissionNexusModal';
 
 interface CWIContextType {
   identity: CwiIdentity | null;
+  setIdentity: (id: CwiIdentity | null) => void;
   isInitialized: boolean;
   getPublicKey: () => Promise<string>;
   getAddress: () => Promise<string>;
@@ -26,12 +27,7 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
   const [nexusData, setNexusData] = useState<any>(null);
   const [nexusResolve, setNexusResolve] = useState<any>(null);
 
-  useEffect(() => {
-    // Initializing with a "Cosmic" default identity for the terminal
-    const cosmicMnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
-    const id = new CwiIdentity(cosmicMnemonic);
-    setIdentity(id);
-  }, []);
+  // No default identity — user must create or import a wallet
 
   const getPublicKey = useCallback(async () => {
     return identity?.getPublicKey() || '';
@@ -79,6 +75,7 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     identity,
+    setIdentity,
     isInitialized: !!identity && identity.isInitialized(),
     getPublicKey,
     getAddress,
