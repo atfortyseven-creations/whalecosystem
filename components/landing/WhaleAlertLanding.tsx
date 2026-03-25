@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Landmark, Globe, Building2, Fingerprint, Cpu, Target, Zap, ShieldCheck, Lock, Activity, ChevronRight, Twitter, Github } from "lucide-react";
 import Link from "next/link";
 import Image from 'next/image';
@@ -44,22 +44,14 @@ export function WhaleAlertLanding() {
     else openConnectModal();
   };
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  const heroBgY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-
   return (
     <div ref={containerRef} className="relative w-full overflow-x-hidden bg-[var(--aztec-parchment)] selection:bg-[var(--aztec-orchid)]/30 bg-noise">
       <AntiPhishing />
       
       {/* ── PHASE 1: AZTEC HERO ── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 px-6 overflow-hidden">
-        <motion.div 
-          style={{ y: heroBgY }} 
-          className="absolute inset-0 z-0 will-change-transform hidden md:block"
+        <div 
+          className="absolute inset-0 z-0 hidden md:block"
         >
            <Image 
              src="/models/update/logan-voss-VTWMWadBMvM-unsplash.jpg" 
@@ -68,7 +60,7 @@ export function WhaleAlertLanding() {
              priority 
              className="object-cover opacity-20 mix-blend-multiply brightness-[1.05]" 
            />
-        </motion.div>
+        </div>
 
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
@@ -98,7 +90,7 @@ export function WhaleAlertLanding() {
               Read Documentation <ChevronRight size={14} />
             </Link>
           </div>
-        </motion.div>
+        </div>
         
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 opacity-20 hidden md:block">
             <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-px h-16 bg-black" />
@@ -162,4 +154,5 @@ export function WhaleAlertLanding() {
     </div>
   );
 }
+
 
