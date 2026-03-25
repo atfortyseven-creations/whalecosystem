@@ -97,6 +97,7 @@ export function MobileSovereignLanding() {
     if (view === 'scanner') {
         return <MobileQRScanner 
             onBack={() => setView('landing')} 
+            setView={setView}
             signMessageAsync={signMessageAsync}
         />;
     }
@@ -283,7 +284,7 @@ export function MobileSovereignLanding() {
 
 
 // ─── QR SCANNER VIEW ──────────────────────────────────────────────────────────
-function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, signMessageAsync: any }) {
+function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => void, setView: (v: 'landing' | 'scanner') => void, signMessageAsync: any }) {
     const { address, isConnected } = useAccount();
     const [isScanning, setIsScanning] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -321,12 +322,17 @@ function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, sig
                         setIsProcessing(true);
                         
                         try {
-                            // Stop scanner immediately to prevent double-scans
-                            await scanner.stop();
-                            
-                            toast.info('Authenticating PC Session...', {
-                                icon: <Zap className="text-amber-400 animate-pulse" size={18} />
+                            toast.info('Establishing Neural Handshake...', {
+                                icon: <Zap className="text-[var(--aztec-orchid)] animate-pulse" size={18} />
                             });
+
+                            // Stop scanner early to free up device resources
+                            try {
+                                await scanner.stop();
+                                setIsScanning(false);
+                            } catch (stopErr) {
+                                // Ignore already-stopped error
+                            }
 
                             // [Handshake Signature]
                             const signature = await signMessageAsync({ message: cleanText });
@@ -342,16 +348,21 @@ function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, sig
                                 // Provide haptic feedback if available
                                 if (window.navigator?.vibrate) window.navigator.vibrate([100, 50, 100]);
                                 
-                                toast.success('Handshake Complete', {
-                                    description: 'PC Terminal is now unlocked.'
+                                toast.success('Sync Verified', {
+                                    description: 'Institutional handshake complete.'
                                 });
-                                setTimeout(onBack, 1500); // Leave success message visible briefly
+                                // Delay transition to ensure user reads the success message
+                                setTimeout(() => setView('landing'), 2000);
                             } else {
                                 const errText = await res.text();
-                                toast.error('Sync failed: ' + errText);
+                                console.error('[Handshake:SyncError]', errText);
+                                toast.error('Sync Handshake Failed', { description: errText });
                                 setIsProcessing(false);
-                                // Restart scanner
-                                await scanner.start({ facingMode: "environment" }, config, () => {}, () => {});
+                                // Restart scanner safely
+                                if (!isScanning) {
+                                  await scanner.start({ facingMode: "environment" }, config, () => {}, () => {});
+                                  setIsScanning(true);
+                                }
                             }
                         } catch (e: any) {
                             console.error('[HANDSHAKE_ERROR]', e);
@@ -377,6 +388,7 @@ function MobileQRScanner({ onBack, signMessageAsync }: { onBack: () => void, sig
 
         return () => { 
             if (scannerRef.current) {
+                // Background fire-and-forget stop to avoid blocking React unmount
                 scannerRef.current.stop().catch(() => {});
             }
         };

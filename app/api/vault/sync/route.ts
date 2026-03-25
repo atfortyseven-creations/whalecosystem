@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma'; // Assuming this is the path to Prisma client
+import { prisma } from '@/lib/prisma';
+import { Uhrp } from '@/lib/vault/uhrp';
 
 // Secure Garbage Collector API: Pushes stale data to the Local Sovereign Vault
 // and instantly purges it from Railway's cloud DB to save space.
@@ -51,7 +52,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: 'No records to archive at this time.' });
         }
 
-        // 1. Send Data to Local Sovereign Vault via Cloudflare Tunnel
+        // 1. Generate UHRP Content-Addressable Hash
+        const uhrp_hash = Uhrp.generateHash(dataToArchive);
+
+        // 2. Send Data to Local Sovereign Vault via Cloudflare Tunnel
         const response = await fetch(`${vaultUrl}/vault/ingest`, {
             method: 'POST',
             headers: {
@@ -61,6 +65,7 @@ export async function POST(request: Request) {
             body: JSON.stringify({
                 source: 'Railway-Production',
                 payload_type,
+                uhrp_hash,
                 data: dataToArchive
             })
         });

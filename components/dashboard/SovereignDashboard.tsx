@@ -5,13 +5,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
     Globe, BarChart2, Shield, Activity, RefreshCw,
     ExternalLink, AlertTriangle, ArrowUpRight, ArrowDownRight,
-    Filter, Wallet, TrendingUp, Zap, Info, CheckCircle2
+    Filter, Wallet, TrendingUp, Zap, Info, CheckCircle2, MessageSquare
 } from 'lucide-react';
 import { useAccount, useBalance } from 'wagmi';
 import { useRealTimeFeed } from '@/hooks/useRealTimeFeed';
 import SecurityScanner from '@/components/dashboard/SecurityScanner';
 import TelegramSettings from '@/components/dashboard/TelegramSettings';
 import { CurrencySwitcher } from '@/components/shared/CurrencySwitcher';
+import { SovereignIdentityCard } from '@/components/bsv/SovereignIdentityCard';
+import { SovereignMessenger } from '@/components/bsv/SovereignMessenger';
 import { useCurrencyStore } from '@/lib/store/currency-store';
 import '@/app/dashboard/dashboard.css';
 
@@ -604,6 +606,9 @@ function PortfolioPanel() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    {/* [PILLAR 2] Sovereign Identity Profile */}
+                    <SovereignIdentityCard handle="ceo@humanidfi.com" />
+
                     {/* Valuta Anchor */}
                     <div className="az-surface-2" style={{ padding: 16, borderLeft: '3px solid var(--az-lime)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -680,6 +685,7 @@ export default function SovereignDashboard() {
     const { tickerList, connected: wsConnected } = useRealTimeFeed();
     const [tab, setTab] = useState<Tab>('polymarket');
     const [clock, setClock] = useState(fmtTime());
+    const [showChat, setShowChat] = useState(false);
 
     useEffect(() => {
         const i = setInterval(() => setClock(fmtTime()), 1000);
@@ -769,6 +775,34 @@ export default function SovereignDashboard() {
                         </motion.div>
                     )}
                 </AnimatePresence>
+            </div>
+
+            {/* [PILLAR 3] Sovereign Messenger Floating UI */}
+            <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-4">
+                <AnimatePresence>
+                    {showChat && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 50, scale: 0.9, rotate: -2 }}
+                            animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+                            exit={{ opacity: 0, y: 50, scale: 0.9, rotate: -2 }}
+                            className="w-[380px] h-[550px] shadow-[0_32px_64px_rgba(0,0,0,0.8)] border border-[var(--aztec-orchid)]/20 rounded-[2.5rem] overflow-hidden bg-black"
+                        >
+                            <SovereignMessenger />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <motion.button
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowChat(!showChat)}
+                    className={`relative w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-2xl transition-all duration-500 z-10 ${showChat ? 'bg-[var(--aztec-orchid)] text-black rotate-90' : 'bg-black border border-white/10 text-[var(--aztec-orchid)]'}`}
+                >
+                    <MessageSquare size={24} />
+                    {!showChat && (
+                         <div className="absolute top-0 right-0 w-4 h-4 bg-[var(--aztec-orchid)] rounded-full border-4 border-black animate-ping" />
+                    )}
+                </motion.button>
             </div>
         </div>
     );
