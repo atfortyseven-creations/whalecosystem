@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 import { InstitutionalPortfolioView } from '@/components/bsv/InstitutionalPortfolioView';
 import { LegendaryLoader } from '@/components/ui/LegendaryLoader';
+import "@/app/dashboard/dashboard.css";
 
 export default function PortfolioPage() {
   const [mounted, setMounted] = useState(false);
@@ -16,8 +18,10 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] w-full overflow-hidden bg-[#050505]">
-      <InstitutionalPortfolioView />
-    </div>
+    <InstitutionalShell title="Whale Portfolio" subtitle="Sovereign Capital Architecture" badge="PORTFOLIO" badgeVariant="orchid">
+      <div style={{ height: "calc(100vh - 160px)", overflow: "hidden" }}>
+        <InstitutionalPortfolioView />
+      </div>
+    </InstitutionalShell>
   );
 }
