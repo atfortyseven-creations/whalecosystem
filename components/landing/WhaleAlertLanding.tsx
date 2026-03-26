@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useUIStore } from "@/lib/store/ui-store";
 import AntiPhishing from "@/components/security/AntiPhishing";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import { LegendaryCursor } from "@/components/landing/LegendaryCursor";
 
 // Letta-inspired Marquee
 const MarqueeBanner = () => {
@@ -208,34 +209,7 @@ const LettaHoverPixelLogo = () => {
 };
 
 const CustomCursor = () => {
-  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener("mousemove", updateMousePosition);
-    return () => window.removeEventListener("mousemove", updateMousePosition);
-  }, []);
-
-  if (!isClient) return null;
-
-  return (
-    <>
-      <motion.div
-        className="fixed top-0 left-0 w-3 h-3 rounded-full bg-white mix-blend-difference pointer-events-none z-[9999]"
-        animate={{ x: mousePosition.x - 6, y: mousePosition.y - 6 }}
-        transition={{ type: "spring", stiffness: 800, damping: 28, mass: 0.1 }}
-      />
-      <motion.div
-        className="fixed top-0 left-0 w-10 h-10 rounded-full border border-white/50 bg-white/5 pointer-events-none z-[9998] mix-blend-difference"
-        animate={{ x: mousePosition.x - 20, y: mousePosition.y - 20 }}
-        transition={{ type: "spring", stiffness: 250, damping: 20, mass: 0.5 }}
-      />
-    </>
-  );
+  return null; // Replaced by LegendaryCursor below
 };
 
 export function WhaleAlertLanding() {
@@ -267,7 +241,7 @@ export function WhaleAlertLanding() {
         onMouseMove={handleMouseMove}
         className="relative w-full overflow-x-hidden bg-[#050505] selection:bg-[var(--aztec-orchid)]/30 cursor-none"
     >
-      <CustomCursor />
+      <LegendaryCursor />
       <AntiPhishing />
       
       {/* ── PHASE 1: AZTEC HERO (Mandatory Preservation, Restored Space Background & Glow) ── */}
@@ -314,14 +288,15 @@ export function WhaleAlertLanding() {
           transition={{ duration: 2, ease: [0.23, 1, 0.32, 1] }}
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
-          {/* Replaced ShieldCheck with the requested Vector Image */}
-          <div className="w-48 h-48 md:w-80 md:h-80 mx-auto mb-8 relative transform transition-transform hover:scale-105 duration-1000 group">
+          {/* Giant Whale Logo — mix-blend-multiply removes white background naturally */}
+          <div className="w-[min(90vw,700px)] h-[min(50vw,400px)] mx-auto mb-8 relative">
                <Image 
-                   src="/official-whale-vector.png" 
-                   alt="Whale Alert Vector Logo" 
+                   src="/ballena-checkpoint.png" 
+                   alt="Whale Alert Logo" 
                    fill 
                    priority
-                   className="object-contain drop-shadow-[0_0_80px_rgba(255,255,255,0.1)] transition-all duration-1000 group-hover:drop-shadow-[0_0_120px_rgba(255,255,255,0.3)]"
+                   className="object-contain"
+                   style={{ mixBlendMode: 'multiply', filter: 'brightness(1.1) contrast(1.05)' }}
                />
           </div>
 
