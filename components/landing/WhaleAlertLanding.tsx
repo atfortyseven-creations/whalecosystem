@@ -207,6 +207,37 @@ const LettaHoverPixelLogo = () => {
     );
 };
 
+const CustomCursor = () => {
+  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const updateMousePosition = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", updateMousePosition);
+    return () => window.removeEventListener("mousemove", updateMousePosition);
+  }, []);
+
+  if (!isClient) return null;
+
+  return (
+    <>
+      <motion.div
+        className="fixed top-0 left-0 w-3 h-3 rounded-full bg-white mix-blend-difference pointer-events-none z-[9999]"
+        animate={{ x: mousePosition.x - 6, y: mousePosition.y - 6 }}
+        transition={{ type: "spring", stiffness: 800, damping: 28, mass: 0.1 }}
+      />
+      <motion.div
+        className="fixed top-0 left-0 w-10 h-10 rounded-full border border-white/50 bg-white/5 pointer-events-none z-[9998] mix-blend-difference"
+        animate={{ x: mousePosition.x - 20, y: mousePosition.y - 20 }}
+        transition={{ type: "spring", stiffness: 250, damping: 20, mass: 0.5 }}
+      />
+    </>
+  );
+};
+
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isConnected } = useSovereignAccount();
@@ -234,8 +265,9 @@ export function WhaleAlertLanding() {
     <div 
         ref={containerRef} 
         onMouseMove={handleMouseMove}
-        className="relative w-full overflow-x-hidden bg-[#050505] selection:bg-[var(--aztec-orchid)]/30"
+        className="relative w-full overflow-x-hidden bg-[#050505] selection:bg-[var(--aztec-orchid)]/30 cursor-none"
     >
+      <CustomCursor />
       <AntiPhishing />
       
       {/* ── PHASE 1: AZTEC HERO (Mandatory Preservation, Restored Space Background & Glow) ── */}
@@ -247,7 +279,7 @@ export function WhaleAlertLanding() {
              alt="Background Logans Voss Immersion" 
              fill 
              priority 
-             className="object-cover opacity-60 mix-blend-screen" 
+             className="object-cover opacity-15 mix-blend-screen grayscale" 
            />
         </div>
 
@@ -282,14 +314,14 @@ export function WhaleAlertLanding() {
           transition={{ duration: 2, ease: [0.23, 1, 0.32, 1] }}
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
-          {/* Replaced ShieldCheck with the requested Gemini Image */}
-          <div className="w-32 h-32 md:w-48 md:h-48 rounded-2xl shadow-[0_0_60px_rgba(255,255,255,0.05)] flex items-center justify-center mx-auto mb-8 relative border border-white/10 overflow-hidden transform transition-transform hover:scale-110 hover:shadow-[0_0_100px_rgba(255,255,255,0.15)] duration-500">
+          {/* Replaced ShieldCheck with the requested Vector Image */}
+          <div className="w-48 h-48 md:w-80 md:h-80 mx-auto mb-8 relative transform transition-transform hover:scale-105 duration-1000 group">
                <Image 
-                   src="/Gemini_Generated_Image_dzte5edzte5edzte.png" 
-                   alt="Whale Alert Generated Logo" 
+                   src="/official-whale-vector.png" 
+                   alt="Whale Alert Vector Logo" 
                    fill 
                    priority
-                   className="object-cover"
+                   className="object-contain drop-shadow-[0_0_80px_rgba(255,255,255,0.1)] transition-all duration-1000 group-hover:drop-shadow-[0_0_120px_rgba(255,255,255,0.3)]"
                />
           </div>
 
