@@ -4,8 +4,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
-import { ShieldCheck, Target, Lock, Cpu, Activity } from "lucide-react";
+import { ShieldCheck, Target, Lock, Cpu, Activity, Share2, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// --- Cosmic Mathematical Timeline ---
+const mapProgress = (scroll: number, start: number, end: number) => {
+  return Math.max(0, Math.min(1, (scroll - start) / (end - start)));
+};
+
+// Smooth easing for organic movement
+const easeInOutCubic = (x: number): number => {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+};
 
 // --- The Core Typhoon Rig in Three.js ---
 function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
@@ -27,22 +37,47 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
     return () => window.removeEventListener('mousemove', handleMouse);
   }, []);
 
-  // Compute animations based on scroll
-  // 0.0 to 0.4: Solid submarine transitioning to transparency
-  const transparency = Math.min(scrollProgress * 2.5, 1);
-  // 0.4 to 1.0: Explode Deconstruction
-  const explode = Math.max(0, (scrollProgress - 0.4) / 0.6);
+  // --- Phase Calculators ---
+  const phaseIntro = easeInOutCubic(mapProgress(scrollProgress, 0.0, 0.15));
+  const phaseDeconstruct = easeInOutCubic(mapProgress(scrollProgress, 0.15, 0.35));
+  const phaseZoom = easeInOutCubic(mapProgress(scrollProgress, 0.35, 0.55));
+  const phaseNetwork = easeInOutCubic(mapProgress(scrollProgress, 0.55, 0.75));
+  const phaseVault = easeInOutCubic(mapProgress(scrollProgress, 0.75, 0.90));
+  const phaseOutro = easeInOutCubic(mapProgress(scrollProgress, 0.90, 1.0));
 
   useFrame((state, delta) => {
     if (groupRef.current) {
-      // Automatic gentle rotation + Mouse parallax
-      groupRef.current.rotation.y += delta * 0.15;
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, mouse.y * 0.15, 0.1);
-      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, -mouse.x * 0.15, 0.1);
+      // 1. Base Rotation + Mouse parallax
+      const baseRotationY = state.clock.elapsedTime * 0.1;
+      
+      // 2. Zoom Rotation (Submarine turns to face user during zoom, then spins wildly in Network phase)
+      const targetRotY = baseRotationY + (phaseZoom * Math.PI / 4) + (phaseNetwork * state.clock.elapsedTime * 0.5);
+      const targetRotX = mouse.y * 0.2 + (phaseZoom * 0.2) - (phaseVault * 0.5);
+      const targetRotZ = -mouse.x * 0.2 + (phaseNetwork * 0.2);
+
+      // Smooth interpolation for rotation
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotY, 0.1);
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotX, 0.1);
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, targetRotZ, 0.1);
+
+      // 3. Group Positioning (Enter from bottom, scale up during zoom, sink during vault)
+      const startY = -8 + (phaseIntro * 8); 
+      const vaultY = -phaseVault * 5;
+      const outroY = -phaseOutro * 10;
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, startY + vaultY + outroY, 0.1);
+
+      // 4. Group Scale
+      const targetScale = 1.8 + (phaseZoom * 1.5) - (phaseVault * 0.5) - (phaseOutro * 1.5);
+      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.1));
     }
+
     if (scanRef.current) {
-      // Oscillate scan ring back and forth along the X axis
-      scanRef.current.position.x = Math.sin(state.clock.elapsedTime * 1.5) * 4;
+      // Fast erratic scanning during Network phase, slow during Intro
+      const scanSpeed = 1.5 + (phaseNetwork * 5);
+      scanRef.current.position.x = Math.sin(state.clock.elapsedTime * scanSpeed) * 4;
+      // Scan ring scales big during network
+      const ringScale = 1 + (phaseNetwork * 2);
+      scanRef.current.scale.setScalar(ringScale);
     }
   });
 
@@ -50,7 +85,7 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
     color: "#ffffff",
     wireframe: true,
     transparent: true,
-    opacity: 0.1 + (transparency * 0.2),
+    opacity: 0.05 + (phaseIntro * 0.15) - (phaseZoom * 0.15),
   });
 
   const hullMaterial = new THREE.MeshStandardMaterial({
@@ -58,13 +93,13 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
     roughness: 0.8,
     metalness: 0.5,
     transparent: true,
-    opacity: 1 - transparency,
+    opacity: phaseIntro - phaseZoom, // Disappears entirely during zoom
   });
 
   const innerMaterial = new THREE.MeshStandardMaterial({
     color: reactColor,
     emissive: reactColor,
-    emissiveIntensity: 0.5 + explode * 1.5,
+    emissiveIntensity: 0.5 + phaseDeconstruct * 1.5 + phaseNetwork * 2,
     roughness: 0.2,
     metalness: 0.8,
   });
@@ -72,19 +107,19 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
   return (
     <group ref={groupRef}>
       {/* Sovereign Scan Ring */}
-      <group ref={scanRef}>
+      <group ref={scanRef} visible={phaseIntro > 0 && phaseOutro < 1}>
         <mesh rotation={[0, Math.PI / 2, 0]}>
           <torusGeometry args={[1.5, 0.015, 16, 100]} />
-          <meshBasicMaterial color={reactColor} transparent opacity={0.8} />
+          <meshBasicMaterial color={reactColor} transparent opacity={0.6 + phaseNetwork * 0.4} />
         </mesh>
-        <pointLight intensity={1} color={reactColor} distance={3} />
+        <pointLight intensity={1 + phaseNetwork} color={reactColor} distance={4} />
       </group>
 
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-        <group scale={1.8}>
+        <group>
           
-          {/* Outer Hull (Splits Apart) */}
-          <group position={[0, explode * 2, 0]}>
+          {/* Outer Hull (Splits Apart radially) */}
+          <group position={[0, phaseDeconstruct * 3, 0]}>
             <mesh material={hullMaterial} rotation={[0, 0, Math.PI / 2]}>
               <capsuleGeometry args={[0.8, 4, 16, 32]} />
             </mesh>
@@ -94,53 +129,68 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
           </group>
 
           {/* Lower Hull (Sinks) */}
-          <group position={[0, -explode * 2, 0]}>
+          <group position={[0, -phaseDeconstruct * 3, 0]}>
             <mesh material={hullMaterial} rotation={[0, 0, Math.PI / 2]}>
               <capsuleGeometry args={[0.78, 3.9, 16, 32]} />
             </mesh>
           </group>
 
           {/* The Inner Core (Institutional Reactor) */}
-          <mesh rotation={[0, 0, Math.PI / 2]} scale={0.5 + explode * 0.2}>
+          <mesh rotation={[0, 0, Math.PI / 2]} scale={0.5 + phaseDeconstruct * 0.2 + phaseZoom * 0.5}>
             <cylinderGeometry args={[0.4, 0.4, 6, 16]} />
-            <meshStandardMaterial color={reactColor} emissive={reactColor} emissiveIntensity={1} wireframe={explode > 0.5} />
+            <meshStandardMaterial 
+                color={reactColor} 
+                emissive={reactColor} 
+                emissiveIntensity={1 + phaseZoom} 
+                wireframe={phaseDeconstruct > 0.5 || phaseNetwork > 0} 
+            />
           </mesh>
 
           {/* Logic Silos (Data Slots) */}
-          <group position={[explode * 3, 0.5 + explode * 1.5, 0]}>
+          <group position={[phaseDeconstruct * 3 + phaseNetwork * 5, 0.5 + phaseDeconstruct * 1.5, 0]}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <mesh key={i} position={[(i - 2.5) * 0.4, 0, 0]} material={innerMaterial}>
+              <mesh key={`silo-${i}`} position={[(i - 2.5) * 0.4 * (1 + phaseZoom), 0, 0]} material={innerMaterial}>
                 <cylinderGeometry args={[0.08, 0.08, 1, 8]} />
               </mesh>
             ))}
           </group>
 
-          {/* Cryptographic Vault (Bottom expansion) */}
-          <group position={[-explode * 3, -0.5 - explode * 1.5, 0]}>
+          {/* Cryptographic Vault (Revealed during Phase 4) */}
+          <group position={[-phaseDeconstruct * 3 - phaseNetwork * 5, -0.5 - phaseDeconstruct * 1.5 - phaseVault * 2, 0]}>
              {Array.from({ length: 4 }).map((_, i) => (
-              <mesh key={`vault-${i}`} position={[(i - 1.5) * 0.5, 0, 0]}>
+              <mesh key={`vault-${i}`} position={[(i - 1.5) * 0.5 * (1 + phaseVault), 0, 0]}>
                 <boxGeometry args={[0.3, 0.3, 0.3]} />
-                <meshStandardMaterial color={orchidColor} emissive={orchidColor} emissiveIntensity={1.5} wireframe={true} />
+                <meshStandardMaterial 
+                    color={orchidColor} 
+                    emissive={orchidColor} 
+                    emissiveIntensity={1.5 + phaseVault * 2} 
+                    wireframe={true} 
+                />
               </mesh>
             ))}
           </group>
 
-          {/* Data Nodes (Floating particles) */}
+          {/* Cosmic Data Nodes (The Immersive Swarm) */}
           <group>
-            {[...Array(25)].map((_, i) => {
-              const x = Math.sin(i * 1.1) * 3;
-              const y = Math.cos(i * 2.3) * 2;
-              const z = Math.sin(i * 3.7) * 2;
+            {[...Array(60)].map((_, i) => {
+              // Mathematical spiral placement
+              const theta = i * 0.4;
+              const radius = 1 + (i * 0.05);
+              const x = Math.cos(theta) * radius;
+              const y = Math.sin(theta) * radius;
+              const z = (i - 30) * 0.1;
               
-              // Only disperse them when exploding
-              const posX = x * (1 + explode * 1.5);
-              const posY = y * (1 + explode * 2);
-              const posZ = z * (1 + explode * 1.8);
+              // Extreme dispersion during Network Phase
+              const dispersion = 1 + phaseDeconstruct * 1.5 + phaseNetwork * 15;
+              
+              const posX = x * dispersion;
+              const posY = y * dispersion;
+              const posZ = z * dispersion * 2;
 
               return (
-                <mesh key={`node-${i}`} position={[posX, posY, posZ]} scale={0.03}>
+                <mesh key={`node-${i}`} position={[posX, posY, posZ]} scale={0.02 + (phaseNetwork * 0.05)}>
                   <sphereGeometry />
-                  <meshBasicMaterial color={i % 3 === 0 ? orchidColor : reactColor} />
+                  <meshBasicMaterial color={i % 4 === 0 ? orchidColor : reactColor} transparent opacity={0.3 + phaseNetwork * 0.7} />
                 </mesh>
               );
             })}
@@ -152,91 +202,132 @@ function TyphoonRig({ scrollProgress }: { scrollProgress: number }) {
   );
 }
 
-// --- DOM Overlay Annotations ---
+// --- Flawless Minimalist DOM Overlays ---
 function DOMAnnotations({ scrollProgress }: { scrollProgress: number }) {
-  // We use Framer Motion to sync DOM elements with the scroll state for perfect robustness 
-  // without interfering with WebGL contexts.
-  const showOuter = scrollProgress > 0.1 && scrollProgress < 0.6;
-  const showInner = scrollProgress >= 0.5;
+  // Letta-inspired crisp fading based strictly on phase bounds
+  const showIntro = scrollProgress > 0.02 && scrollProgress < 0.20;
+  const showDeconstruct = scrollProgress >= 0.20 && scrollProgress < 0.40;
+  const showZoom = scrollProgress >= 0.40 && scrollProgress < 0.60;
+  const showNetwork = scrollProgress >= 0.60 && scrollProgress < 0.80;
+  const showVault = scrollProgress >= 0.80 && scrollProgress < 0.95;
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30, filter: "blur(5px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: "easeOut" } },
+    exit: { opacity: 0, scale: 0.95, filter: "blur(10px)", transition: { duration: 0.4 } }
+  };
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-10 hidden md:block">
+    <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center p-8 md:p-24 overflow-hidden">
+      
+      {/* 1. Introductory Assembly */}
       <AnimatePresence>
-        {showOuter && (
+        {showIntro && (
           <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.8 }}
-            className="absolute top-[30%] left-[10%] max-w-[280px]"
+            variants={cardVariants}
+            initial="hidden" animate="visible" exit="exit"
+            className="absolute bottom-[15%] right-[10%] max-w-[320px] text-right"
           >
-            <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-[var(--aztec-chartreuse)]/30 rounded-2xl p-6 shadow-2xl relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--aztec-chartreuse)] to-transparent rounded-t-2xl opacity-50" />
-              <div className="w-10 h-10 bg-[var(--aztec-chartreuse)]/10 rounded-full flex items-center justify-center mb-4 border border-[var(--aztec-chartreuse)]/20 shadow-[0_0_15px_rgba(212,255,43,0.1)]">
-                <ShieldCheck className="text-[var(--aztec-chartreuse)]" size={20} />
+            <div className="flex justify-end mb-4">
+                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10 backdrop-blur-md">
+                    <Eye className="text-white/80" size={24} />
+                </div>
+            </div>
+            <h3 className="text-white font-aztec-serif italic text-3xl mb-2">Absolute <span className="text-[var(--aztec-orchid)]">Immersion</span></h3>
+            <p className="text-white/50 text-[11px] uppercase font-aztec-mono tracking-widest leading-relaxed">
+              Unveiling the Sovereign Architecture. Scroll to descend into the ultimate institutional data engine.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 2. Deconstruction */}
+      <AnimatePresence>
+        {showDeconstruct && (
+          <motion.div 
+            variants={cardVariants}
+            initial="hidden" animate="visible" exit="exit"
+            className="absolute top-[25%] left-[10%] max-w-[320px]"
+          >
+            <div className="w-10 h-10 bg-[var(--aztec-chartreuse)]/10 rounded-full flex items-center justify-center mb-4 border border-[var(--aztec-chartreuse)]/20 shadow-[0_0_15px_rgba(212,255,43,0.1)]">
+              <ShieldCheck className="text-[var(--aztec-chartreuse)]" size={20} />
+            </div>
+            <h3 className="text-white font-aztec-mono text-[12px] uppercase tracking-[0.4em] font-bold mb-2">
+              Titanium Shielding
+            </h3>
+            <p className="text-[var(--aztec-chartreuse)]/60 text-[11px] uppercase font-aztec-mono tracking-widest leading-relaxed">
+              Pressure hulls decoupling. Cryptographic shielding disengages to reveal the inner state machine.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 3. The Core Zoom */}
+      <AnimatePresence>
+        {showZoom && (
+          <motion.div 
+            variants={cardVariants}
+            initial="hidden" animate="visible" exit="exit"
+            className="absolute bottom-[20%] right-[10%] max-w-[340px]"
+          >
+            <div className="bg-[#0a0a0a]/90 backdrop-blur-xl border-l-[3px] border-[var(--aztec-orchid)] p-8 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <Cpu size={80} />
               </div>
-              <h3 className="text-white font-aztec-mono text-[11px] uppercase tracking-[0.3em] font-bold mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[var(--aztec-chartreuse)] rounded-full animate-pulse" />
-                Titanium Hull
+              <h3 className="text-white font-aztec-serif italic text-2xl mb-3 relative z-10">
+                Institutional <span className="text-[var(--aztec-orchid)]">Logic Core</span>
               </h3>
-              <p className="text-white/50 text-[10px] uppercase font-aztec-mono tracking-widest leading-relaxed">
-                Impenetrable zero-knowledge cryptographic shielding protecting sovereign data from public ledgers.
+              <p className="text-white/60 text-[10px] uppercase font-aztec-mono tracking-widest leading-relaxed relative z-10">
+                Programmable zero-knowledge execution nodes. 100% mathematical certainty, 0% data leakage.
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* 4. Network Expansion */}
       <AnimatePresence>
-        {showInner && (
+        {showNetwork && (
           <motion.div 
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            transition={{ duration: 0.8 }}
-            className="absolute top-[20%] right-[10%] max-w-[280px]"
+            variants={cardVariants}
+            initial="hidden" animate="visible" exit="exit"
+            className="absolute top-[30%] left-[8%] md:left-[20%] max-w-[400px]"
           >
-            <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-[var(--aztec-orchid)]/30 rounded-2xl p-6 shadow-2xl relative">
-              <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-l from-[var(--aztec-orchid)] to-transparent rounded-t-2xl opacity-50" />
-              <div className="w-10 h-10 bg-[var(--aztec-orchid)]/10 rounded-full flex items-center justify-center mb-4 border border-[var(--aztec-orchid)]/20 shadow-[0_0_15px_rgba(180,80,255,0.1)]">
-                <Cpu className="text-[var(--aztec-orchid)]" size={20} />
-              </div>
-              <h3 className="text-white font-aztec-mono text-[11px] uppercase tracking-[0.3em] font-bold mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-[var(--aztec-orchid)] rounded-full animate-pulse" />
-                Logic Silos
-              </h3>
-              <p className="text-white/50 text-[10px] uppercase font-aztec-mono tracking-widest leading-relaxed">
-                Compartmentalized execution nodes ensuring programmable institutional compliance without data leaks.
-              </p>
+            <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-px bg-gradient-to-r from-transparent to-[var(--aztec-chartreuse)]" />
+                <Share2 className="text-[var(--aztec-chartreuse)]" size={28} />
+                <h3 className="text-white font-aztec-mono text-[14px] uppercase tracking-[0.4em] font-black">
+                    Cosmic Distribution
+                </h3>
             </div>
+            <p className="text-white/70 text-lg font-aztec-serif italic leading-relaxed pl-20">
+              Thousands of sovereign data points dispersing across the global network in real-time. Absolute resilience.
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* 5. The Sovereign Vault */}
       <AnimatePresence>
-        {showInner && (
+        {showVault && (
           <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="absolute bottom-[20%] left-[20%] max-w-[280px]"
+            variants={cardVariants}
+            initial="hidden" animate="visible" exit="exit"
+            className="absolute bottom-[30%] left-1/2 -translate-x-1/2 text-center w-[90%] max-w-[500px]"
           >
-            <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl relative">
-               <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
-                <Lock className="text-white/80" size={20} />
-              </div>
-              <h3 className="text-white font-aztec-mono text-[11px] uppercase tracking-[0.3em] font-bold mb-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-white/50 rounded-full" />
-                Sovereign Vault
-              </h3>
-              <p className="text-white/50 text-[10px] uppercase font-aztec-mono tracking-widest leading-relaxed">
-                Decentralized institutional archiving architecture synchronized directly to your localized hardware daemon.
-              </p>
+            <div className="w-16 h-16 bg-white/5 mx-auto rounded-3xl flex items-center justify-center mb-6 border border-white/20 shadow-[0_20px_40px_-10px_rgba(255,255,255,0.1)]">
+              <Lock className="text-white" size={32} />
             </div>
+            <h3 className="text-white font-aztec-h1 text-5xl mb-4 tracking-tight drop-shadow-2xl">
+              Sovereign <span className="text-[var(--aztec-orchid)]/80 italic font-light">Permanence</span>
+            </h3>
+            <p className="text-white/50 text-[11px] uppercase font-aztec-mono tracking-[0.3em] leading-relaxed">
+              Your assets descend into absolute cold storage. untouchable by algorithms. Protected by the deep network.
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
@@ -250,14 +341,13 @@ export default function SubmarineDeconstruction3D() {
   useEffect(() => {
     setMounted(true);
     
-    // Robust Native Scroll Listener
+    // Robust Native Scroll Listener for 800vh terrain
     const handleScroll = () => {
       if (!sectionRef.current) return;
       
       const { top, height } = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // Calculate how far the section has travelled
       const totalScrollableDistance = height - windowHeight;
       const amountScrolled = -top;
       
@@ -267,47 +357,45 @@ export default function SubmarineDeconstruction3D() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial call
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   if (!mounted) {
-    // Elegant fallback during SSR to prevent hydration mismatch entirely
     return <section className="relative w-full h-screen bg-[#050505]" />;
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full h-[300vh] bg-[#050505] selection:bg-[var(--aztec-orchid)]/30">
+    // Transform into a monstrous 800vh storytelling scroll terrain
+    <section ref={sectionRef} className="relative w-full h-[800vh] bg-[#050505] selection:bg-[var(--aztec-orchid)]/30">
       
       <div className="sticky top-0 w-full h-screen overflow-hidden flex items-center justify-center bg-noise">
-        {/* Deep Depth Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] z-10 pointer-events-none opacity-80" />
+        {/* Deep Environment Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050505_100%)] z-10 pointer-events-none opacity-90" />
         
-        {/* DOM Annotations mapped to scroll state */}
+        {/* Storytelling DOM Overlays */}
         <DOMAnnotations scrollProgress={scroll} />
 
-        {/* The Legendary WebGL Canvas */}
-        <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+        {/* 240Hz High-Performance WebGL Engine */}
+        <Canvas camera={{ position: [0, 0, 12], fov: 45 }} dpr={[1, 2]} performance={{ max: 1 }}>
           <color attach="background" args={['#050505']} />
-          <fog attach="fog" args={['#050505', 8, 20]} />
+          <fog attach="fog" args={['#050505', 10, 30]} />
           
-          {/* Institutional Lighting setup */}
-          <ambientLight intensity={0.4} />
-          <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={1} color="#b450ff" />
-          <pointLight position={[10, -10, -10]} intensity={0.5} color="#D4FF2B" />
+          <ambientLight intensity={0.2} />
+          <spotLight position={[-15, 15, 15]} angle={0.2} penumbra={1} intensity={1.5} color="#b450ff" />
+          <pointLight position={[15, -15, -15]} intensity={0.5} color="#D4FF2B" />
           
           <TyphoonRig scrollProgress={scroll} />
         </Canvas>
 
-        {/* Absolute Decorative Watermarks */}
-        <div className="absolute top-12 left-12 opacity-10 font-aztec-mono text-[9px] uppercase tracking-[0.6em] text-white pointer-events-none hidden md:block z-0">
-          Structural Anatomy / Project 941 / Akula Class
+        {/* Cinematic Watermarks */}
+        <div className="absolute top-12 left-12 opacity-10 font-aztec-mono text-[9px] uppercase tracking-[0.6em] text-white pointer-events-none hidden md:block z-0 mix-blend-overlay">
+          Protocol: Sovereign Deep / Phase {Math.floor(scroll * 6)} / Matrix Active
         </div>
         
-        <div className="absolute bottom-12 right-12 text-right opacity-30 font-aztec-serif italic text-white/50 text-7xl select-none pointer-events-none hidden md:block z-0">
-          Whale Alert
+        <div className="absolute bottom-12 right-12 text-right opacity-10 font-aztec-serif italic text-white text-[10vw] leading-none select-none pointer-events-none hidden md:block z-0 mix-blend-overlay">
+          WHALE
         </div>
       </div>
     </section>
