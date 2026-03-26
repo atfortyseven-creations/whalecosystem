@@ -1,30 +1,80 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
+import React, { useState } from 'react';
+import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 import { AcademyViewer } from '@/components/academy/AcademyViewer';
+import { BookOpen, GraduationCap, Shield, Cpu, TrendingUp, Lock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import "@/app/dashboard/dashboard.css";
+
+const TRACKS = [
+  { icon: Shield,     label: "ZK Privacy Fundamentals", level: "Beginner",      badge: "FOUNDATION", color: "var(--az-emerald)" },
+  { icon: TrendingUp, label: "On-Chain Whale Analysis", level: "Intermediate",  badge: "CORE",       color: "var(--az-lime)"    },
+  { icon: Cpu,        label: "Aztec Protocol Engineering", level: "Advanced",   badge: "ELITE",      color: "var(--az-orchid)"  },
+  { icon: Lock,       label: "Sovereign Vault Setup",    level: "Intermediate",  badge: "TOOLKIT",    color: "var(--az-amber)"   },
+];
 
 export default function AcademyPage() {
-    return (
-        <div className="relative min-h-screen bg-transparent text-white font-aztec-body overflow-x-hidden">
-            <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
-                <main className="flex-1 relative z-10 px-6 mt-10 pb-20">
-                    <div className="max-w-[1600px] mx-auto glass-aztek rounded-[2rem] p-px overflow-hidden shadow-2xl">
-                        <div className="bg-black/40 backdrop-blur-md rounded-[2rem] overflow-hidden w-full h-[85vh]">
-                            <AcademyViewer />
-                        </div>
-                    </div>
-                </main>
-            </div>
-            
-            <style jsx global>{`
-                /* Enhanced Academy Scrollbar overrides */
-                .academy-scroll-container::-webkit-scrollbar { width: 10px; }
-                .academy-scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-left: 1px solid rgba(255,255,255,0.05); }
-                .academy-scroll-container::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
-                .academy-scroll-container::-webkit-scrollbar-thumb:hover { background-color: var(--aztec-orchid); border-radius: 10px; }
-            `}</style>
+  return (
+    <InstitutionalShell title="Whale Academy" subtitle="Sovereign Knowledge Architecture" badge="EDUCATION" badgeVariant="orchid">
+      <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+
+        {/* ─── Stats ─── */}
+        <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", background: "white" }}>
+          <div className="grid grid-cols-2 md:grid-cols-4">
+            {[
+              { label: "Learning Tracks", value: "12", color: "var(--az-ink)" },
+              { label: "Total Modules", value: "80+", color: "var(--az-lime)" },
+              { label: "Graduates", value: "4,200", color: "var(--az-emerald)" },
+              { label: "Completion Rate", value: "91%", color: "var(--az-orchid)" },
+            ].map((s, i) => (
+              <div key={i} className="az-stat-card" style={{ borderRight: i < 3 ? "1px solid rgba(26,20,0,0.06)" : "none" }}>
+                <span className="az-label">{s.label}</span>
+                <span className="az-value-xl" style={{ color: s.color }}>{s.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
-    );
+
+        {/* ─── Track selection ─── */}
+        <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", background: "white" }}>
+          <div className="az-col-header flex items-center gap-2" style={{ background: "rgba(26,20,0,0.03)", color: "rgba(26,20,0,0.5)" }}>
+            <GraduationCap size={10} />
+            AVAILABLE LEARNING TRACKS
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            {TRACKS.map((t, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ background: "rgba(26,20,0,0.02)" }}
+                className="p-6 cursor-pointer"
+                style={{ borderRight: i < 3 ? "1px solid rgba(26,20,0,0.05)" : "none" }}
+              >
+                <div style={{ width: 36, height: 36, background: "rgba(26,20,0,0.04)", border: "1px solid rgba(26,20,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+                  <t.icon size={18} style={{ color: t.color }} />
+                </div>
+                <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 7, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: t.color, marginBottom: 6, background: "rgba(26,20,0,0.04)", padding: "2px 6px", display: "inline-block", border: `1px solid ${t.color}30` }}>{t.badge}</div>
+                <div className="az-header-sm" style={{ marginBottom: 4 }}>{t.label}</div>
+                <div className="az-label" style={{ color: "rgba(26,20,0,0.35)" }}>{t.level}</div>
+                <div className="az-bar-track" style={{ marginTop: 12 }}>
+                  <div className="az-bar-fill-lime" style={{ width: i === 0 ? "90%" : i === 1 ? "65%" : i === 2 ? "40%" : "55%" }} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── Academy Viewer ─── */}
+        <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", overflow: "hidden" }}>
+          <div className="az-col-header flex items-center gap-2" style={{ background: "rgba(26,20,0,0.03)", color: "rgba(26,20,0,0.5)" }}>
+            <BookOpen size={10} />
+            INSTITUTIONAL KNOWLEDGE VIEWER
+          </div>
+          <div style={{ height: "60vh", background: "rgba(0,0,0,0.97)", overflow: "hidden" }}>
+            <AcademyViewer />
+          </div>
+        </div>
+      </div>
+    </InstitutionalShell>
+  );
 }
