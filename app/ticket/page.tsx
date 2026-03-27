@@ -8,6 +8,7 @@ import { useWalletStore } from "@/lib/store/wallet-store";
 import { useBlockNumber } from 'wagmi';
 import { toast } from "sonner";
 import Image from "next/image";
+import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
 import "@/app/dashboard/dashboard.css";
 
 // ─── PURE ENGINEERED GOLDEN TICKET SVG ───
@@ -77,11 +78,9 @@ function EngineeredGoldenTicket() {
                 {/* Perforation Verticals */}
                 <line x1="640" y1="40" x2="640" y2="360" stroke="#B1871C" strokeWidth="5" strokeDasharray="16,12" strokeLinecap="round" filter="url(#engraving)" />
 
-                {/* Center Engraved Golden W */}
-                <g filter="url(#engraving)" transform="translate(320, 100)">
-                   <path d="M20 40 L60 140 L100 70 L140 140 L180 40" fill="none" stroke="#AD8218" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
-                <text x="400" y="280" fontFamily="monospace" fontSize="24" fill="#A87A13" fontWeight="bold" letterSpacing="18" textAnchor="middle" filter="url(#engraving)">GOLD TICKET</text>
+                {/* Center Engraved Minimalist Typography */}
+                <text x="400" y="230" fontFamily="system-ui, -apple-system, sans-serif" fontSize="26" fill="#A87A13" fontWeight="200" letterSpacing="24" textAnchor="middle" filter="url(#engraving)">GOLD WHALE TICKET</text>
+                <text x="400" y="280" fontFamily="monospace" fontSize="11" fill="#B1871C" fontWeight="bold" letterSpacing="14" textAnchor="middle" filter="url(#engraving)" opacity="0.7">SOVEREIGN PROTOCOL</text>
 
                 {/* Tear Off Text */}
                 <g filter="url(#engraving)">
@@ -145,47 +144,139 @@ function FloatingTicket3D() {
     );
 }
 
-// ─── SLIDE TO CLAIM ───
-function SlideToClaim({ onClaim, disabled }: { onClaim: () => Promise<boolean>; disabled: boolean }) {
-    const [claiming, setClaiming] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const background = useTransform(x, [0, 200], ["rgba(255,255,255,1)", "rgba(240, 230, 210, 1)"]);
-    const textOpacity = useTransform(x, [0, 150], [1, 0]);
+// ─── 240HZ IMMERSIVE LIQUID VALIDATOR ───
+function ImmersiveCursorClaim({ onClaim, disabled }: { onClaim: () => Promise<boolean>; disabled: boolean }) {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isHolding, setIsHolding] = useState(false);
+    const [exploded, setExploded] = useState(false);
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const progress = useMotionValue(0);
 
-    const handleDragEnd = async () => {
-        if (x.get() > 180) {
-            setClaiming(true);
-            const success = await onClaim();
-            if (!success) {
-                setClaiming(false);
-                x.set(0);
-            }
-        } else {
-            x.set(0);
+    // Cosmic fluid mechanics for profound structural responsiveness
+    const springConfig = { damping: 25, stiffness: 400, mass: 0.05 };
+    const springX = useSpring(mouseX, springConfig);
+    const springY = useSpring(mouseY, springConfig);
+    
+    const ringScale = useSpring(isHovered ? (isHolding ? 1.5 : 1) : 0, { damping: 20, stiffness: 300 });
+    const progressSpring = useSpring(progress, { damping: 40, stiffness: 200 });
+
+    const claimFired = useRef(false);
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            mouseX.set(e.clientX);
+            mouseY.set(e.clientY);
+        };
+        if (isHovered && !exploded) {
+            window.addEventListener('mousemove', handleMouseMove, { passive: true });
         }
-    };
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, [isHovered, exploded, mouseX, mouseY]);
+
+    // High-frequency filling synchronized to display refresh rate
+    useEffect(() => {
+        let frame: number;
+        let lastTime = performance.now();
+        
+        const updateFill = (time: number) => {
+            if (isHolding && !claimFired.current) {
+                const delta = time - lastTime;
+                lastTime = time;
+                
+                const current = progress.get();
+                if (current >= 100) {
+                    claimFired.current = true;
+                    setExploded(true);
+                    onClaim();
+                } else {
+                    progress.set(current + (delta * 0.16)); 
+                }
+                frame = requestAnimationFrame(updateFill);
+            } else if (!isHolding && !claimFired.current) {
+                progress.set(0);
+            }
+        };
+
+        if (isHolding && !claimFired.current) {
+            lastTime = performance.now();
+            frame = requestAnimationFrame(updateFill);
+        } else {
+            if (!claimFired.current) progress.set(0);
+        }
+        
+        return () => cancelAnimationFrame(frame);
+    }, [isHolding, progress, onClaim]);
 
     if (disabled) return null;
 
     return (
-        <motion.div ref={containerRef} style={{ background }} className="relative w-full max-w-[320px] h-14 mx-auto border border-black/10 rounded-full flex items-center px-1 overflow-hidden mt-8 shadow-sm">
-            <motion.div style={{ opacity: textOpacity }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="font-mono text-[10px] text-black/40 tracking-[0.2em] font-bold">SLIDE TO SECURE RECORD</span>
-            </motion.div>
-            
-            <motion.div
-                drag={claiming ? false : "x"}
-                dragConstraints={containerRef}
-                dragSnapToOrigin={false}
-                dragElastic={0.05}
-                onDragEnd={handleDragEnd}
-                style={{ x }}
-                className="w-12 h-12 bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing z-10 shadow-md hover:scale-[1.02] transition-transform"
-            >
-                {claiming ? <Loader2 size={16} className="text-white animate-spin" /> : <ChevronRight size={20} className="text-white ml-0.5" />}
-            </motion.div>
-        </motion.div>
+        <div 
+            className="relative w-full max-w-[400px] h-24 mx-auto border border-black/10 rounded-3xl flex items-center justify-center overflow-hidden cursor-none transition-colors bg-white/40 hover:bg-black/[0.03] hover:shadow-inner"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => { setIsHovered(false); setIsHolding(false); if(!claimFired.current) progress.set(0); }}
+            onMouseDown={() => { if(!exploded) setIsHolding(true); }}
+            onMouseUp={() => setIsHolding(false)}
+            style={{ willChange: 'background-color, box-shadow' }}
+        >
+            <span className="font-mono text-xs text-black/40 tracking-[0.3em] font-bold z-10 select-none pointer-events-none transition-opacity duration-300">
+                {exploded ? "GENESIS ANCHORED" : isHolding ? "MAINTAIN PRESSURE..." : "ENGAGE LIQUID VALIDATION"}
+            </span>
+
+            {/* Render fluid portal overlay */}
+            {isHovered && !exploded && (
+                <motion.div
+                    style={{
+                        x: springX,
+                        y: springY,
+                        scale: ringScale,
+                        translateX: "-50%",
+                        translateY: "-50%",
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        zIndex: 100,
+                        pointerEvents: "none",
+                        willChange: "transform"
+                    }}
+                    className="flex items-center justify-center mix-blend-difference"
+                >
+                    <div className="absolute w-20 h-20 rounded-full border border-white/30 backdrop-blur-md" />
+                    <motion.svg width="120" height="120" viewBox="0 0 120 120" className="absolute -rotate-90 origin-center">
+                        <motion.circle 
+                            cx="60" cy="60" r="56" 
+                            fill="none" 
+                            stroke="#fff" 
+                            strokeWidth="4" 
+                            strokeDasharray="351.85"
+                            strokeDashoffset={useTransform(progressSpring, [0, 100], [351.85, 0])} 
+                            strokeLinecap="round"
+                        />
+                    </motion.svg>
+                    <motion.div 
+                        initial={false}
+                        animate={{ scale: isHolding ? 0.7 : 0.3, opacity: isHolding ? 1 : 0.5 }}
+                        transition={{ ease: "easeOut", duration: 0.15 }}
+                        style={{ willChange: "transform, opacity" }}
+                        className="w-20 h-20 bg-white rounded-full blur-[4px]"
+                    />
+                </motion.div>
+            )}
+
+            {/* Cosmic Explosion / Whale Morph */}
+            {exploded && (
+                <motion.div 
+                    initial={{ scale: 0, opacity: 1, rotate: 0 }}
+                    animate={{ scale: [0, 4, 8], opacity: [1, 1, 0], rotate: [0, 15, 30] }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none"
+                    style={{ willChange: "transform, opacity" }}
+                >
+                    <div className="absolute w-24 h-24 bg-gradient-to-tr from-[#D4AF37] to-white blur-3xl rounded-full" />
+                    <CorporateWhaleLogo className="w-20 h-20 text-[#D4AF37] blur-[1px] absolute" />
+                </motion.div>
+            )}
+        </div>
     );
 }
 
@@ -373,7 +464,7 @@ export default function GoldenTicketPage() {
               ) : status === "unclaimed" ? (
                   <div className="text-center">
                       {walletAddress ? (
-                          <SlideToClaim onClaim={executeClaim} disabled={false} />
+                          <ImmersiveCursorClaim onClaim={executeClaim} disabled={false} />
                       ) : (
                           <div className="flex items-center justify-center gap-3 mt-8 py-5 bg-black/[0.03] border border-black/5 rounded-2xl font-mono text-[10px] text-black/50 uppercase tracking-[0.2em] shadow-inner select-none pointer-events-none">
                               <Lock size={12} className="text-black/30" /> CONNECT WALLET TO PROCEED
