@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCookieConsent, CookieCategory } from './CookieContext';
-import { Cookie, Shield, Check, X, ChevronRight, BarChart2, Megaphone, ExternalLink } from 'lucide-react';
+import { Shield, ChevronRight, BarChart2, Megaphone, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import Link from 'next/link';
@@ -15,16 +15,31 @@ export function CookieConsent() {
 
     if (!showBanner) return null;
 
-    const handleSavePreferences = () => {
+    const handleSavePreferences = async () => {
         updateConsent(tempConsent);
+        try {
+            await fetch('/api/cookies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ consent: tempConsent })
+            });
+        } catch(e) {}
     };
 
     const toggleCategory = (category: CookieCategory) => {
         if (category === 'essential') return;
-        setTempConsent(prev => ({
-            ...prev,
-            [category]: !prev[category]
-        }));
+        setTempConsent(prev => ({ ...prev, [category]: !prev[category] }));
+    };
+
+    const handleAcceptAll = async () => {
+        acceptAll();
+        try {
+            await fetch('/api/cookies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ consent: { essential: true, analytics: true, marketing: true } })
+            });
+        } catch(e) {}
     };
 
     return (
@@ -34,60 +49,57 @@ export function CookieConsent() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 100, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="fixed bottom-4 left-4 right-4 z-[9999] flex justify-center pointer-events-none"
+                className="fixed bottom-4 left-4 right-4 z-[9999] flex justify-center pointer-events-none font-aztec-body"
             >
                 <div className="w-full max-w-5xl pointer-events-auto">
                     {/* Main Banner */}
-                    <div className="relative overflow-hidden border-2 border-[var(--aztec-ink)] bg-[var(--aztec-parchment)] shadow-[20px_20px_0px_var(--aztec-ink)] p-8 md:p-12">
-                        <div className="absolute inset-0 noise-bg opacity-[0.05] pointer-events-none" />
-                        
-                        {/* Background Glow */}
+                    <div className="relative overflow-hidden border border-black/10 bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-6 md:p-8">
+                        <div className="absolute inset-0 noise-bg opacity-[0.03] pointer-events-none" />
 
-
-                        <div className="relative z-10 grid md:grid-cols-[1fr,auto] gap-8 md:gap-12 items-center">
+                        <div className="relative z-10 grid md:grid-cols-[1fr,auto] gap-6 md:gap-10 items-center">
                             
                             {/* Text Content */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-[var(--aztec-ink)] text-[var(--aztec-chartreuse)]">
-                                        <Shield size={24} />
+                                    <div className="p-2 bg-black text-white rounded-full shadow-sm">
+                                        <Shield size={18} />
                                     </div>
-                                    <h2 className="font-aztec-serif text-2xl font-black text-[var(--aztec-ink)] uppercase tracking-tight">
-                                        Data Sovereignity Protocol
+                                    <h2 className="font-aztec-h1 text-xl font-bold text-black uppercase tracking-tight">
+                                        Data Sovereignty Protocol
                                     </h2>
                                 </div>
-                                <p className="font-aztec-mono text-[11px] text-[var(--aztec-ink)]/70 leading-relaxed max-w-2xl uppercase tracking-wider font-bold">
-                                    We utilize localized caching and data-integrity packets to optimize your interface with the Aztec Network. Your identity remains private.
+                                <p className="font-mono text-[10px] text-black/60 leading-relaxed max-w-2xl uppercase tracking-[0.1em] font-medium">
+                                    We utilize localized telemetry and encrypted signatures to maintain network integrity. Your navigation is secure.
                                 </p>
                                 <div className="flex items-center gap-6">
                                     <button 
                                         onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-                                        className="flex items-center gap-2 font-aztec-mono text-[10px] font-black text-[var(--aztec-ink)] hover:text-[var(--aztec-orchid)] transition-colors uppercase tracking-[0.2em]"
+                                        className="flex items-center gap-2 font-mono text-[9px] font-bold text-black hover:text-black/60 transition-colors uppercase tracking-[0.2em]"
                                     >
                                         {isDetailsOpen ? 'HIDE PROTOCOLS' : 'ADJUST PARAMETERS'} 
-                                        <ChevronRight size={14} className={cn("transition-transform", isDetailsOpen ? "rotate-90" : "")} />
+                                        <ChevronRight size={12} className={cn("transition-transform", isDetailsOpen ? "rotate-90" : "")} />
                                     </button>
                                     <Link 
                                         href="/privacy" 
-                                        className="flex items-center gap-1.5 font-aztec-mono text-[10px] font-black text-[var(--aztec-ink)]/40 hover:text-[var(--aztec-ink)] transition-colors uppercase tracking-[0.2em]"
+                                        className="flex items-center gap-1.5 font-mono text-[9px] font-bold text-black/40 hover:text-black transition-colors uppercase tracking-[0.2em]"
                                     >
                                         LEGAL DOCS
-                                        <ExternalLink size={12} />
+                                        <ExternalLink size={10} />
                                     </Link>
                                 </div>
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-3 min-w-[300px]">
+                            <div className="flex flex-col sm:flex-row gap-3 min-w-[280px]">
                                 <button
                                     onClick={rejectAll}
-                                    className="px-8 py-4 border-2 border-[var(--aztec-ink)] text-[var(--aztec-ink)] font-aztec-mono text-[11px] font-black uppercase tracking-widest hover:bg-[var(--aztec-ink)] hover:text-[var(--aztec-parchment)] transition-all"
+                                    className="flex-1 px-6 py-3 border border-black/10 rounded-full text-black font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-black/5 transition-all"
                                 >
                                     REJECT ALL
                                 </button>
                                 <button
-                                    onClick={acceptAll}
-                                    className="px-8 py-4 bg-[var(--aztec-ink)] text-[var(--aztec-parchment)] font-aztec-mono text-[11px] font-black uppercase tracking-widest hover:bg-[var(--aztec-chartreuse)] hover:text-[var(--aztec-ink)] transition-all"
+                                    onClick={handleAcceptAll}
+                                    className="flex-1 px-6 py-3 bg-black rounded-full text-white font-mono text-[10px] font-bold uppercase tracking-widest hover:scale-105 shadow-[0_4px_15px_rgba(0,0,0,0.15)] transition-all"
                                 >
                                     INITIALIZE
                                 </button>
@@ -99,57 +111,59 @@ export function CookieConsent() {
                             {isDetailsOpen && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                    animate={{ height: "auto", opacity: 1, marginTop: 32 }}
+                                    animate={{ height: "auto", opacity: 1, marginTop: 24 }}
                                     exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                    className="overflow-hidden border-t border-white/5 pt-8"
+                                    className="overflow-hidden border-t border-black/5 pt-6"
                                 >
                                     <div className="grid gap-4 md:grid-cols-3">
                                         
                                         {/* Essential */}
-                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-4">
+                                        <div className="p-5 rounded-2xl bg-black/5 border border-black/5 flex flex-col gap-4">
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <Shield size={18} className="text-emerald-400" />
-                                                    <span className="font-bold text-sm">Escenciales</span>
+                                                <div className="flex items-center gap-3 text-black">
+                                                    <Shield size={16} />
+                                                    <span className="font-bold text-sm">Essential</span>
                                                 </div>
-                                                <Switch checked={true} disabled />
+                                                <Switch checked={true} disabled className="data-[state=checked]:bg-black" />
                                             </div>
-                                            <p className="text-xs text-gray-500">
-                                                Necessary for the platform to function (Authentication, Security, World ID). Cannot be deactivated.
+                                            <p className="text-xs text-black/50">
+                                                Core session matrices & Authentication nodes. Unbypassable.
                                             </p>
                                         </div>
 
                                         {/* Analytics */}
-                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-4">
+                                        <div className="p-5 rounded-2xl bg-black/5 border border-black/5 flex flex-col gap-4">
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <BarChart2 size={18} className="text-emerald-400" />
-                                                    <span className="font-bold text-sm">Analytics</span>
+                                                <div className="flex items-center gap-3 text-black">
+                                                    <BarChart2 size={16} />
+                                                    <span className="font-bold text-sm">Telemetry</span>
                                                 </div>
                                                 <Switch 
                                                     checked={tempConsent.analytics} 
                                                     onCheckedChange={() => toggleCategory('analytics')} 
+                                                    className="data-[state=checked]:bg-black"
                                                 />
                                             </div>
-                                            <p className="text-xs text-gray-500">
-                                                Nos ayuda a mejorar el rendimiento de la plataforma y el rastreo de ballenas en tiempo real.
+                                            <p className="text-xs text-black/50">
+                                                Anonymized traffic vectors to reinforce stability.
                                             </p>
                                         </div>
 
                                         {/* Marketing */}
-                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/5 flex flex-col gap-4">
+                                        <div className="p-5 rounded-2xl bg-black/5 border border-black/5 flex flex-col gap-4">
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <Megaphone size={18} className="text-emerald-400" />
-                                                    <span className="font-bold text-sm">Marketing</span>
+                                                <div className="flex items-center gap-3 text-black">
+                                                    <Megaphone size={16} />
+                                                    <span className="font-bold text-sm">Transmissions</span>
                                                 </div>
                                                 <Switch 
                                                     checked={tempConsent.marketing} 
                                                     onCheckedChange={() => toggleCategory('marketing')} 
+                                                    className="data-[state=checked]:bg-black"
                                                 />
                                             </div>
-                                            <p className="text-xs text-gray-500">
-                                                Utilizadas para anuncios de funciones institucionales y ofertas exclusivas de API.
+                                            <p className="text-xs text-black/50">
+                                                API signals and institutional upgrade relays.
                                             </p>
                                         </div>
 
@@ -158,9 +172,9 @@ export function CookieConsent() {
                                     <div className="mt-8 flex justify-end">
                                         <button
                                             onClick={handleSavePreferences}
-                                            className="px-8 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-black hover:bg-emerald-500 hover:text-black transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+                                            className="px-8 py-3 rounded-full bg-black/5 border border-black/10 text-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all shadow-sm"
                                         >
-                                            GUARDAR PREFERENCIAS
+                                            Enact Directives
                                         </button>
                                     </div>
                                 </motion.div>
@@ -172,5 +186,3 @@ export function CookieConsent() {
         </AnimatePresence>
     );
 }
-
-

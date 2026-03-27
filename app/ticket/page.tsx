@@ -8,7 +8,7 @@ import { useWalletStore } from "@/lib/store/wallet-store";
 import { useBlockNumber } from 'wagmi';
 import { toast } from "sonner";
 import Image from "next/image";
-import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
+
 import "@/app/dashboard/dashboard.css";
 
 // ─── PURE ENGINEERED GOLDEN TICKET SVG (MONOCHROME VARIANT) ───
@@ -410,10 +410,10 @@ export default function GoldenTicketPage() {
                   
                   <div className="flex flex-col items-center">
                       <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 mb-2">Global Limit</div>
-                      <div className="font-aztec-h1 text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#A87A13] bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
+                      <div className="font-aztec-h1 text-4xl md:text-5xl font-bold bg-gradient-to-r from-black to-[#666] bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
                          10,000
                       </div>
-                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#D4AF37]/50 mt-1">Max Supply</div>
+                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/50 mt-1">Max Supply</div>
                   </div>
               </div>
 
@@ -444,12 +444,12 @@ export default function GoldenTicketPage() {
           <div className="w-full max-w-[400px]">
               {status === "loading" ? (
                   <div className="h-20 flex items-center justify-center">
-                      <Loader2 size={24} className="text-[#D4AF37]/50 animate-spin" />
+                      <Loader2 size={24} className="text-black/50 animate-spin" />
                   </div>
               ) : status === "unclaimed" ? (
                   <div className="text-center">
                       {walletAddress ? (
-                          <ImmersiveCursorClaim onClaim={executeClaim} disabled={false} />
+                          <CircularGestureClaim onClaim={executeClaim} disabled={false} />
                       ) : (
                           <div className="flex items-center justify-center gap-3 mt-8 py-5 bg-black/[0.03] border border-black/5 rounded-2xl font-mono text-[10px] text-black/50 uppercase tracking-[0.2em] shadow-inner select-none pointer-events-none">
                               <Lock size={12} className="text-black/30" /> CONNECT WALLET TO PROCEED
@@ -463,11 +463,11 @@ export default function GoldenTicketPage() {
                       className="bg-white border border-black/5 rounded-3xl p-6 text-center shadow-2xl shadow-black/5 space-y-6"
                   >
                       <div className="flex flex-col items-center justify-center space-y-2 pb-4 border-b border-black/5">
-                          <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center shrink-0 mb-2">
-                             <Fingerprint size={24} className="text-green-500" />
+                          <div className="w-12 h-12 bg-black/5 rounded-full flex items-center justify-center shrink-0 mb-2">
+                             <Fingerprint size={24} className="text-black" />
                           </div>
                           <h3 className="font-aztec-body text-2xl font-bold text-black drop-shadow-sm">Identity Secured</h3>
-                          <div className="text-[10px] font-mono font-bold text-[#D4AF37] tracking-[0.2em] uppercase">You are unique in the world</div>
+                          <div className="text-[10px] font-mono font-bold text-black/60 tracking-[0.2em] uppercase">You are unique in the world</div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4 text-left px-2">

@@ -57,12 +57,12 @@ export function InstitutionalHeader() {
                 <div className="h-10 w-px bg-black/5 hidden md:block" />
 
                 {/* Desktop Navigation */}
-                <nav className="hidden xl:flex items-center gap-8">
+                <nav className="hidden xl:flex flex-1 justify-center items-center gap-4 2xl:gap-8 mx-8">
                     {navLinks.map((link) => (
                         <Link 
                             key={link.label}
                             href={link.href}
-                            className={`text-[10px] font-aztec-mono font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
+                            className={`text-[9px] font-aztec-mono font-black uppercase tracking-[0.25em] transition-all flex items-center gap-2 whitespace-nowrap ${
                                 link.isSystem ? 'bg-white text-black px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(255,255,255,0.2)] hover:scale-105' :
                                 link.isTicket ? 'bg-white/10 text-white border border-white/30 px-4 py-1.5 rounded-full hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.1)]' :
                                 link.active ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'text-white/50 hover:text-white'
