@@ -2,23 +2,22 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Bell, Eye, Settings, User } from 'lucide-react';
+import { Bell, Eye, User } from 'lucide-react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useDisconnect } from 'wagmi';
-import { useAppKit } from '@reown/appkit/react';
 import { useUIStore } from '@/lib/store/ui-store';
 import { CurrencySwitcher } from './CurrencySwitcher';
 
+// ─── IVORY SYSTEMS UTILITY HEADER ───
+// Perfectly visible on cream/ivory background
 export function SystemsUtilityHeader() {
     const { address, isConnected } = useSovereignAccount();
     const { activePanel, setActivePanel, openConnectModal } = useUIStore();
-    const { open } = useAppKit();
-
     const { disconnect } = useDisconnect();
 
     const icons = [
         { id: 'notifications', icon: Bell, label: 'Notifications' },
-        { id: 'privacy', icon: Eye, label: 'Privacy' },
+        { id: 'privacy',       icon: Eye,  label: 'Privacy'        },
     ];
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -37,34 +36,42 @@ export function SystemsUtilityHeader() {
     }, []);
 
     return (
-        <div className="flex flex-wrap justify-center items-center gap-4 relative w-full" ref={dropdownRef}>
-            {/* Utility Icons */}
-            <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 relative" ref={dropdownRef}>
+
+            {/* Utility icon buttons */}
+            <div className="flex items-center gap-1">
                 {icons.map((item, i) => (
                     <motion.button
                         key={i}
-                        whileHover={{ scale: 1.1, color: 'var(--aztec-orchid)' }}
-                        whileTap={{ scale: 0.9 }}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
                         onClick={() => setActivePanel(activePanel === item.id ? null : item.id as any)}
-                        className={`transition-colors p-1 ${activePanel === item.id ? 'text-white' : 'text-white/50 hover:text-white'}`}
+                        className="relative w-8 h-8 flex items-center justify-center rounded-lg transition-all"
+                        style={{
+                            background: activePanel === item.id ? 'rgba(0,0,0,0.08)' : 'transparent',
+                            color: activePanel === item.id ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.35)',
+                        }}
                         title={item.label}
                     >
-                        <item.icon size={18} strokeWidth={activePanel === item.id ? 2.5 : 1.5} />
+                        <item.icon size={15} strokeWidth={activePanel === item.id ? 2.5 : 1.8} />
                         {item.id === 'notifications' && (
-                            <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                            <div
+                                className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full animate-pulse"
+                                style={{ background: 'rgba(0,0,0,0.6)' }}
+                            />
                         )}
                     </motion.button>
                 ))}
             </div>
 
             {/* Separator */}
-            <div className="hidden sm:block w-px h-6 bg-white/10" />
+            <div className="w-px h-5" style={{ background: 'rgba(0,0,0,0.1)' }} />
 
             {/* Wallet Connection Pill */}
             <div className="relative">
-                <motion.button 
+                <motion.button
                     whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -74,59 +81,89 @@ export function SystemsUtilityHeader() {
                             openConnectModal();
                         }
                     }}
-                    className={`flex items-center gap-3 ${isConnected ? 'bg-white' : 'bg-white/5'} backdrop-blur-md border ${isDropdownOpen ? 'border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'border-white/10'} pl-4 pr-1.5 py-1.5 rounded-full shadow-sm cursor-pointer hover:border-white/20 transition-all group`}
+                    className="flex items-center gap-2.5 pl-3.5 pr-1.5 py-1.5 rounded-full transition-all border cursor-pointer group"
+                    style={{
+                        background: isConnected ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.04)',
+                        borderColor: isDropdownOpen ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)',
+                        boxShadow: isDropdownOpen ? '0 2px 12px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.04)',
+                    }}
                 >
                     <div className="flex flex-col items-start leading-none text-left">
-                        <span className={`text-[10px] font-aztec-mono font-black uppercase tracking-widest ${isConnected ? 'text-black' : 'text-white'}`}>
+                        <span
+                            className="font-mono text-[9px] font-black uppercase tracking-widest"
+                            style={{ color: 'rgba(0,0,0,0.75)' }}
+                        >
                             {isConnected && address ? truncateAddress(address) : 'Disconnected'}
                         </span>
-                        <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${isConnected ? 'text-black/60' : 'text-white/50'}`}>
-                            {isConnected ? 'CONNECTED WALLET' : 'Connect Terminal'}
+                        <span
+                            className="font-mono text-[7px] font-bold uppercase tracking-widest mt-0.5"
+                            style={{ color: 'rgba(0,0,0,0.35)' }}
+                        >
+                            {isConnected ? 'Connected Wallet' : 'Connect Terminal'}
                         </span>
                     </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isDropdownOpen ? 'bg-black text-white' : isConnected ? 'bg-black/10 text-black group-hover:bg-black group-hover:text-white' : 'bg-white/10 border border-white/10 text-white group-hover:bg-white group-hover:text-black'}`}>
-                        <User size={14} className="group-hover:scale-110 transition-transform" />
+                    <div
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
+                        style={{
+                            background: isDropdownOpen ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0.08)',
+                            color: isDropdownOpen ? '#F7F2EA' : 'rgba(0,0,0,0.5)',
+                        }}
+                    >
+                        <User size={12} />
                     </div>
                 </motion.button>
 
-                {/* Aztec Dropdown Menu */}
+                {/* Ivory Dropdown */}
                 <AnimatePresence>
                     {isDropdownOpen && isConnected && (
                         <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute top-full right-0 mt-3 w-64 bg-[#0a0a0a] backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl p-4 z-[9999] overflow-hidden"
+                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                            className="absolute top-full right-0 mt-2 w-64 rounded-2xl border p-3 z-[9999] overflow-hidden"
+                            style={{
+                                background: 'linear-gradient(135deg, #FDFAF5, #F4EDE0)',
+                                borderColor: 'rgba(0,0,0,0.08)',
+                                boxShadow: '0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)',
+                            }}
                         >
-                            <div className="absolute inset-0 noise-bg opacity-[0.05]" />
-                            
-                            <div className="relative z-10 flex flex-col gap-4">
-                                <button className="p-4 bg-white/5 border border-white/5 rounded-[1.5rem] flex items-center justify-between group cursor-pointer hover:border-white/20 transition-all w-full text-left" onClick={() => {
-                                    if(address) navigator.clipboard.writeText(address);
-                                }}>
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black text-white/50 font-aztec-mono uppercase tracking-widest mb-1">Copy Address</span>
-                                        <span className="text-[11px] font-aztec-mono font-black text-white">{address}</span>
-                                    </div>
-                                    <User size={16} className="text-white/30 group-hover:text-white transition-colors flex-shrink-0 ml-2" />
-                                </button>
+                            {/* Address row */}
+                            <button
+                                className="w-full p-3.5 rounded-xl border flex items-center justify-between gap-3 hover:border-black/15 transition-all text-left group"
+                                style={{ background: 'rgba(0,0,0,0.03)', borderColor: 'rgba(0,0,0,0.06)' }}
+                                onClick={() => { if (address) navigator.clipboard.writeText(address); }}
+                            >
+                                <div className="flex flex-col min-w-0">
+                                    <span className="font-mono text-[8px] font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(0,0,0,0.35)' }}>
+                                        Copy Address
+                                    </span>
+                                    <span className="font-mono text-[10px] font-black truncate" style={{ color: 'rgba(0,0,0,0.75)' }}>
+                                        {address}
+                                    </span>
+                                </div>
+                                <User size={14} style={{ color: 'rgba(0,0,0,0.25)', flexShrink: 0 }} />
+                            </button>
 
-                                <button 
-                                    onClick={() => {
-                                        setIsDropdownOpen(false);
-                                        // 1. Wagmi Disconnect
-                                        disconnect();
-                                        // 2. Clear Sovereign Local Cookie
-                                        document.cookie = 'sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                                        // 3. Force full state wipe to allow fresh handshake
-                                        window.location.reload();
-                                    }}
-                                    className="w-full py-4 bg-white border border-white text-black rounded-2xl text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-white/90 transition-all font-bold"
-                                >
-                                    Disconnect Session
-                                </button>
-                            </div>
+                            <div className="h-px my-3" style={{ background: 'rgba(0,0,0,0.06)' }} />
+
+                            {/* Disconnect */}
+                            <button
+                                onClick={() => {
+                                    setIsDropdownOpen(false);
+                                    disconnect();
+                                    document.cookie = 'sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                                    window.location.reload();
+                                }}
+                                className="w-full py-3 rounded-xl font-mono text-[9px] font-black uppercase tracking-widest transition-all border"
+                                style={{
+                                    background: 'rgba(0,0,0,0.88)',
+                                    borderColor: 'rgba(0,0,0,0.88)',
+                                    color: '#F7F2EA',
+                                }}
+                            >
+                                Disconnect Session
+                            </button>
                         </motion.div>
                     )}
                 </AnimatePresence>
