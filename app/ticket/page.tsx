@@ -9,7 +9,89 @@ import { toast } from "sonner";
 import Image from "next/image";
 import "@/app/dashboard/dashboard.css";
 
-// ─── 3D TICKET COMPONENT ───
+// ─── PURE ENGINEERED GOLDEN TICKET SVG ───
+function EngineeredGoldenTicket() {
+    return (
+        <div className="w-full h-full relative" style={{ filter: 'drop-shadow(0px 25px 45px rgba(180,140,40,0.35))' }}>
+            {/* The Ticket Shape layer */}
+            <svg 
+               width="100%" 
+               height="100%" 
+               viewBox="0 0 800 400" 
+               preserveAspectRatio="none" 
+               className="absolute inset-0 z-0"
+            >
+                <defs>
+                    <linearGradient id="ticketBase" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#DFBB5E" />
+                        <stop offset="30%" stopColor="#EAD284" />
+                        <stop offset="50%" stopColor="#FFF2CD" />
+                        <stop offset="70%" stopColor="#EAD284" />
+                        <stop offset="100%" stopColor="#C49B30" />
+                    </linearGradient>
+                    <filter id="innerBevel" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="-2" dy="-2" stdDeviation="3" floodColor="#ffffff" floodOpacity="0.8" />
+                        <feDropShadow dx="3" dy="3" stdDeviation="4" floodColor="#7A5A10" floodOpacity="0.4" />
+                    </filter>
+                    <filter id="engraving" x="-10%" y="-10%" width="120%" height="120%">
+                        <feDropShadow dx="1" dy="1" stdDeviation="1" floodColor="#ffffff" floodOpacity="0.7"/>
+                        <feDropShadow dx="-1" dy="-1" stdDeviation="1" floodColor="#805d15" floodOpacity="0.5"/>
+                    </filter>
+                </defs>
+
+                {/* Base Ticket Body */}
+                <path id="ticketPath" d="
+                    M 40,0 
+                    L 760,0 
+                    A 40,40 0 0,0 800,40 
+                    L 800,160 
+                    A 30,30 0 0,1 800,240 
+                    L 800,360 
+                    A 40,40 0 0,0 760,400 
+                    L 40,400 
+                    A 40,40 0 0,0 0,360 
+                    L 0,240 
+                    A 30,30 0 0,1 0,160 
+                    L 0,40 
+                    A 40,40 0 0,0 40,0 Z
+                " fill="url(#ticketBase)" />
+
+                {/* Inner Beveled Border Ring */}
+                <path d="
+                    M 55,15 
+                    L 745,15 
+                    A 25,25 0 0,0 785,55 
+                    L 785,145 
+                    A 45,45 0 0,1 785,255 
+                    L 785,345 
+                    A 25,25 0 0,0 745,385 
+                    L 55,385 
+                    A 25,25 0 0,0 15,345 
+                    L 15,255 
+                    A 45,45 0 0,1 15,145 
+                    L 15,55 
+                    A 25,25 0 0,0 55,15 Z
+                " fill="none" stroke="#C49E31" strokeWidth="4" filter="url(#innerBevel)" />
+
+                {/* Perforation Verticals */}
+                <line x1="640" y1="40" x2="640" y2="360" stroke="#B1871C" strokeWidth="5" strokeDasharray="16,12" strokeLinecap="round" filter="url(#engraving)" />
+
+                {/* Center Engraved Golden W */}
+                <g filter="url(#engraving)" transform="translate(320, 100)">
+                   <path d="M20 40 L60 140 L100 70 L140 140 L180 40" fill="none" stroke="#AD8218" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+                <text x="400" y="280" fontFamily="monospace" fontSize="24" fill="#A87A13" fontWeight="bold" letterSpacing="18" textAnchor="middle" filter="url(#engraving)">GENESIS FILE</text>
+
+                {/* Tear Off Text */}
+                <g filter="url(#engraving)">
+                    <text transform="translate(720, 200) rotate(90)" fontFamily="monospace" fontSize="18" fill="#A87A13" fontWeight="bold" letterSpacing="12" textAnchor="middle">NODE SIG</text>
+                </g>
+            </svg>
+        </div>
+    );
+}
+
+// ─── 3D INTERACTIVE WRAPPER ───
 function FloatingTicket3D() {
     const ref = useRef<HTMLDivElement>(null);
     const mouseX = useMotionValue(0.5);
@@ -23,7 +105,7 @@ function FloatingTicket3D() {
     // Specular lighting effect
     const glareX = useSpring(useTransform(mouseX, [0, 1], [0, 100]), springConfig);
     const glareY = useSpring(useTransform(mouseY, [0, 1], [0, 100]), springConfig);
-    const background = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.4) 0%, transparent 50%)`;
+    const background = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.45) 0%, transparent 60%)`;
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!ref.current) return;
@@ -44,25 +126,19 @@ function FloatingTicket3D() {
             <motion.div
                 ref={ref}
                 style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                className="relative w-full max-w-[400px] aspect-[16/9] rounded-2xl shadow-[0_30px_60px_-15px_rgba(212,175,55,0.4)] md:shadow-[0_50px_100px_-20px_rgba(212,175,55,0.3)] transition-shadow duration-500 overflow-hidden cursor-crosshair group bg-[#F5ECDB]"
+                className="relative w-full max-w-[420px] aspect-[2/1] transition-transform duration-300 ease-out cursor-crosshair group"
             >
-                {/* 3D Ticket Image */}
-                <Image 
-                    src="/golden-ticket-3d.jpg" 
-                    alt="Golden Ticket 3D" 
-                    fill 
-                    className="object-cover scale-[1.05]"
-                    priority
-                />
+                {/* 100% Mathematically Engineered 3D Ticket */}
+                <EngineeredGoldenTicket />
                 
-                {/* Glare effect matching mouse */}
+                {/* Interactive Dynamic Glare */}
                 <motion.div 
-                    style={{ background }}
-                    className="absolute inset-0 z-10 opacity-50 mix-blend-overlay transition-opacity duration-300"
+                    style={{ 
+                        background,
+                        clipPath: 'polygon(5% 0%, 95% 0%, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0% 95%, 0% 5%)'
+                    }}
+                    className="absolute inset-0 z-20 rounded-[2.5rem] mix-blend-overlay transition-opacity duration-300 pointer-events-none"
                 />
-                
-                {/* Edge Highlights */}
-                <div className="absolute inset-0 rounded-2xl border border-white/40 pointer-events-none z-20" />
             </motion.div>
         </div>
     );

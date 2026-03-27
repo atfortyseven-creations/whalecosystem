@@ -81,7 +81,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         pathname.startsWith('/network') ||
                         pathname.startsWith('/docs') ||
                         pathname.startsWith('/privacy') ||
-                        pathname.startsWith('/terms')
+                        pathname.startsWith('/terms') ||
+                        pathname.startsWith('/ticket')
                     ) && <Downhead />}
                 </div>
             </TitaniumGate>
