@@ -19,9 +19,7 @@ export default function PortfolioPage() {
 
   return (
     <InstitutionalShell title="Whale Portfolio" subtitle="Sovereign Capital Architecture" badge="PORTFOLIO" badgeVariant="orchid">
-      <div style={{ height: "calc(100vh - 160px)", overflow: "hidden" }}>
         <InstitutionalPortfolioView />
-      </div>
     </InstitutionalShell>
   );
 }

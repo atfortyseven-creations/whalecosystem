@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useMotionValue, useTransform, useSpring, useMotionTemplate } from "framer-motion";
-import { ChevronRight, Lock, Loader2, Fingerprint } from "lucide-react";
+import { ChevronRight, Lock, Loader2, Fingerprint, Activity, Clock } from "lucide-react";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useWalletStore } from "@/lib/store/wallet-store";
+import { useBlockNumber } from 'wagmi';
 import { toast } from "sonner";
 import Image from "next/image";
 import "@/app/dashboard/dashboard.css";
@@ -196,6 +197,7 @@ export default function GoldenTicketPage() {
   const [status, setStatus] = useState<"loading" | "unclaimed" | "claimed">("loading");
   const [ticket, setTicket] = useState<any>(null);
   const [globalCount, setGlobalCount] = useState<number | null>(null);
+  const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Poll Global Counter
   useEffect(() => {
@@ -317,13 +319,39 @@ export default function GoldenTicketPage() {
           <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center justify-center mb-6"
+              className="flex flex-col items-center justify-center mb-10 w-full"
           >
-              <div className="font-aztec-h1 text-5xl md:text-7xl font-bold bg-gradient-to-r from-black via-[#333] to-black bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
-                 {globalCount !== null ? globalCount.toLocaleString() : "—"}
+              <div className="flex items-center gap-12 text-center mb-6 w-full max-w-2xl px-8 py-6 rounded-3xl bg-white/40 border border-black/5 shadow-2xl backdrop-blur-3xl justify-center">
+                  <div className="flex flex-col items-center">
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 mb-2">Genesis Vault</div>
+                      <div className="font-aztec-h1 text-4xl md:text-5xl font-bold bg-gradient-to-r from-black to-[#444] bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
+                         {globalCount !== null ? globalCount.toLocaleString() : "—"}
+                      </div>
+                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/30 mt-1">Claimed</div>
+                  </div>
+                  
+                  <div className="w-px h-16 bg-black/10" />
+                  
+                  <div className="flex flex-col items-center">
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 mb-2">Global Limit</div>
+                      <div className="font-aztec-h1 text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#A87A13] bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
+                         10,000
+                      </div>
+                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#D4AF37]/50 mt-1">Max Supply</div>
+                  </div>
               </div>
-              <div className="text-sm text-black/40 mt-2 tracking-widest font-light">
-                 tickets claimed
+
+              {/* Live Network Feeds */}
+              <div className="flex items-center gap-6 text-[10px] font-mono uppercase tracking-[0.2em] text-black/50 bg-black/5 px-6 py-2 rounded-full border border-black/5">
+                  <div className="flex items-center gap-2">
+                       <Activity size={12} className="text-green-600 animate-pulse" />
+                       <span>L1 Sync Active</span>
+                  </div>
+                  <div className="w-1 h-1 rounded-full bg-black/20" />
+                  <div className="flex items-center gap-2">
+                       <Clock size={12} />
+                       <span>Block: {blockNumber ? blockNumber.toString() : '---'}</span>
+                  </div>
               </div>
           </motion.div>
 

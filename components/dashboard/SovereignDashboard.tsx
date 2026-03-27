@@ -15,6 +15,7 @@ import { CurrencySwitcher } from '@/components/shared/CurrencySwitcher';
 import { SovereignIdentityCard } from '@/components/bsv/SovereignIdentityCard';
 import { SovereignMessenger } from '@/components/bsv/SovereignMessenger';
 import { useCurrencyStore } from '@/lib/store/currency-store';
+import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 import '@/app/dashboard/dashboard.css';
 
 // ─── TYPES ──────────────────────────────────────────────────
@@ -700,8 +701,8 @@ export default function SovereignDashboard() {
     ];
 
     return (
-        <div className="dash-root">
-            {/* ─── SOVEREIGN HEADER ─── */}
+        <InstitutionalShell title="Whale Dashboard" subtitle="Global Liquidity Matrix" badge="DASHBOARD" badgeVariant="lime">
+            {/* ─── LIVE TICKER HEADER ─── */}
             <header className="glass-aztek" style={{
                 height: 48, borderBottom: '1px solid rgba(255,255,255,0.07)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -799,11 +800,14 @@ export default function SovereignDashboard() {
                     className={`relative w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-2xl transition-all duration-500 z-10 ${showChat ? 'bg-[var(--aztec-orchid)] text-black rotate-90' : 'bg-black border border-white/10 text-[var(--aztec-orchid)]'}`}
                 >
                     <MessageSquare size={24} />
+                    {showChat && (
+                        <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                    )}
                     {!showChat && (
                          <div className="absolute top-0 right-0 w-4 h-4 bg-[var(--aztec-orchid)] rounded-full border-4 border-black animate-ping" />
                     )}
                 </motion.button>
             </div>
-        </div>
+        </InstitutionalShell>
     );
 }
