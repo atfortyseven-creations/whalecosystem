@@ -1,114 +1,126 @@
 "use client";
 
-import React from 'react';
-import { Twitter, Github, Globe, MessageCircle, ArrowUpRight, Smartphone, Monitor, Sparkles } from 'lucide-react';
-import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { PremiumButton } from '../ui/PremiumButton';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useSpring, useTransform } from 'framer-motion';
+import { Twitter, Github, Lock, Database, ArrowUpRight, Globe, Code } from 'lucide-react';
 import Link from 'next/link';
 
 export const Footer = () => {
-    const { t } = useLanguage();
+    // Custom immersive cursor bounded only to the footer domain
+    const footerRef = useRef<HTMLElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
     
+    const cursorX = useSpring(0, { stiffness: 150, damping: 20 });
+    const cursorY = useSpring(0, { stiffness: 150, damping: 20 });
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+        if (!footerRef.current) return;
+        const rect = footerRef.current.getBoundingClientRect();
+        cursorX.set(e.clientX - rect.left);
+        cursorY.set(e.clientY - rect.top);
+    };
+
+    const handleMouseEnter = () => setIsHovered(true);
+    const handleMouseLeave = () => setIsHovered(false);
+
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        setIsMobile(window.innerWidth < 768);
+    }, []);
+
     return (
-        <footer className="relative z-10 bg-[var(--aztec-parchment)] border-t border-[var(--aztec-ink)]/5">
-            {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--aztec-orchid)]/5 to-transparent pointer-events-none" />
-            
-            <div className="relative max-w-7xl mx-auto px-6 py-24">
-                {/* Main CTA Section */}
-                <div className="text-center mb-20">
-                    <div className="inline-flex items-center gap-2 bg-[var(--aztec-ink)]/5 px-4 py-2 rounded-full mb-8 border border-[var(--aztec-ink)]/10">
-                        <Sparkles className="w-4 h-4 text-[var(--aztec-orchid)]" />
-                        <span className="text-sm text-[var(--aztec-ink)]/80">{t.footer.cta.badge}</span>
+        <footer 
+            ref={footerRef} 
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className="relative z-10 bg-[#050505] border-t border-white/5 overflow-hidden text-white/80 pb-12 pt-28 font-sans"
+        >
+            {/* Immersive Cursor */}
+            {!isMobile && (
+                <motion.div
+                    className="pointer-events-none absolute w-96 h-96 rounded-full mix-blend-screen z-0 opacity-0 transition-opacity duration-300"
+                    style={{
+                        x: cursorX,
+                        y: cursorY,
+                        translateX: '-50%',
+                        translateY: '-50%',
+                        opacity: isHovered ? 1 : 0,
+                        background: 'radial-gradient(circle, rgba(147,51,234,0.15) 0%, rgba(147,51,234,0) 70%)'
+                    }}
+                />
+            )}
+            {!isMobile && (
+                <motion.div
+                    className="pointer-events-none absolute w-10 h-10 border border-white/20 rounded-full mix-blend-screen z-50 flex items-center justify-center transition-opacity duration-300"
+                    style={{
+                        x: cursorX,
+                        y: cursorY,
+                        translateX: '-50%',
+                        translateY: '-50%',
+                        opacity: isHovered ? 1 : 0,
+                    }}
+                    animate={{ scale: isHovered ? [1, 1.1, 1] : 1 }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                >
+                    <div className="w-1.5 h-1.5 bg-[var(--aztec-orchid)] rounded-full shadow-[0_0_10px_var(--aztec-orchid)]" />
+                </motion.div>
+            )}
+
+            {/* Atmosphere Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-30" />
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[var(--aztec-orchid)]/30 to-transparent pointer-events-none" />
+
+            <div className="relative z-10 max-w-7xl mx-auto px-8 md:px-12">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
+                    
+                    {/* Brand Identity */}
+                    <div className="md:col-span-5 flex flex-col items-start">
+                        <div className="flex items-center gap-3 mb-6 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-2xl">
+                            <span className="text-xl">👾</span>
+                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Whale Alert Network</span>
+                        </div>
+                        <p className="text-[13px] font-sans text-white/40 leading-relaxed max-w-sm tracking-wide">
+                            Advanced on-chain analytics and sovereign privacy infrastructure. Built exclusively for global financial institutions and elite market makers.
+                        </p>
                     </div>
-                    
-                    <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight">
-                        <span className="text-[var(--aztec-orchid)]">{t.footer.cta.title}</span>
-                        <br />
-                        <span className="font-aztec-h2 text-[var(--aztec-ink)] tracking-tight">Whale Alert Corporation.</span>
-                    </h2>
-                    
-                    <p className="text-xl text-[var(--aztec-ink)]/60 mb-12 max-w-2xl mx-auto italic">
-                        {t.footer.cta.subtitle}
-                    </p>
-                    
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <Link href="/portfolio">
-                            <PremiumButton 
-                                variant="gradient" 
-                                size="lg"
-                                leftIcon={<Smartphone className="w-5 h-5" />}
-                            >
-                                <div className="text-left">
-                                    <div className="font-bold">{t.footer.mobile.title}</div>
-                                    <div className="text-xs opacity-80">{t.footer.mobile.subtitle}</div>
-                                </div>
-                            </PremiumButton>
-                        </Link>
-                        
-                        <PremiumButton 
-                            variant="secondary" 
-                            size="lg"
-                            leftIcon={<Monitor className="w-5 h-5" />}
-                        >
-                            <div className="text-left">
-                                <div className="font-bold">{t.footer.extension.title}</div>
-                                <div className="text-xs opacity-80">{t.footer.extension.subtitle}</div>
+
+                    {/* Elite Navigation */}
+                    <div className="md:col-span-7 grid grid-cols-2 gap-12 md:pl-16">
+                        {/* Platform */}
+                        <div className="flex flex-col gap-8">
+                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-[var(--aztec-orchid)] flex items-center gap-3">
+                                <span className="w-4 h-[1px] bg-[var(--aztec-orchid)]" /> Platform
+                            </h4>
+                            <div className="flex flex-col gap-5">
+                                <FooterLink href="/vip">VIP Archive</FooterLink>
+                                <FooterLink href="/network">Network Portal</FooterLink>
+                                <FooterLink href="/academy">Whale Academy</FooterLink>
+                                <FooterLink href="/support">Core Support</FooterLink>
                             </div>
-                        </PremiumButton>
+                        </div>
+
+                        {/* Connect */}
+                        <div className="flex flex-col gap-8">
+                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-[var(--aztec-chartreuse)] flex items-center gap-3">
+                                <span className="w-4 h-[1px] bg-[var(--aztec-chartreuse)]" /> Connect
+                            </h4>
+                            <div className="flex flex-col gap-5">
+                                <FooterLink href="https://twitter.com/whalecosystem" external icon={<Twitter size={15} />}>Twitter / X</FooterLink>
+                                <FooterLink href="https://github.com/atfortyseven/M47-Terminal" external icon={<Github size={15} />}>Github Repository</FooterLink>
+                                <FooterLink href="/docs" icon={<Code size={15} />}>Technical Docs</FooterLink>
+                                <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy Policy</FooterLink>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Footer Links */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-                    <div>
-                        <h3 className="text-[var(--aztec-ink)] font-bold mb-4">{t.footer.sections.product}</h3>
-                        <ul className="space-y-3">
-                            <li><FooterLink href="/terminal">Terminal</FooterLink></li>
-                            <li><FooterLink href="/portfolio">Portfolio Social</FooterLink></li>
-                            <li><FooterLink href="/marketplace">API Marketplace</FooterLink></li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-[var(--aztec-ink)] font-bold mb-4">{t.footer.sections.developers}</h3>
-                        <ul className="space-y-3">
-                            <li><FooterLink href="/docs">API Documentation</FooterLink></li>
-                            <li><FooterLink href="/docs#whale-v1">Whale Intelligence</FooterLink></li>
-                            <li><FooterLink href="/docs#webhooks">Webhooks Pro</FooterLink></li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-[var(--aztec-ink)] font-bold mb-4">{t.footer.sections.company}</h3>
-                        <ul className="space-y-3">
-                            <li><FooterLink href="/about">Sobre Nosotros</FooterLink></li>
-                            <li><FooterLink href="/manifesto">Manifiesto</FooterLink></li>
-                            <li><FooterLink href="/contact">Contacto</FooterLink></li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-[var(--aztec-ink)] font-bold mb-4">{t.footer.sections.legal}</h3>
-                        <ul className="space-y-3">
-                            <li><FooterLink href="/privacy">Privacidad</FooterLink></li>
-                            <li><FooterLink href="/terms">Terms</FooterLink></li>
-                            <li><FooterLink href="/security">Seguridad Core</FooterLink></li>
-                        </ul>
-                    </div>
-                </div>
-
-                {/* Bottom Bar */}
-                <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="text-[var(--aztec-ink)]/60 text-sm">
-                        {t.footer.rights}
-                    </div>
-                    
-                    <div className="flex gap-4">
-                        <SocialIcon icon={<Twitter size={20} />} href="https://twitter.com" />
-                        <SocialIcon icon={<Github size={20} />} href="https://github.com" />
-                        <SocialIcon icon={<Globe size={20} />} href="#" />
-                        <SocialIcon icon={<MessageCircle size={20} />} href="#" />
+                {/* Secure Baseline */}
+                <div className="pt-8 flex flex-col items-center gap-6">
+                    <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                    <div className="text-[9px] font-aztec-mono font-black uppercase tracking-[0.4em] text-white/20 flex items-center justify-center gap-4 hover:text-white/40 transition-colors">
+                        <Globe size={11} className="opacity-50" />
+                        <span>© 2026 WHALE ALERT CORP — ALL RIGHTS RESERVED</span>
                     </div>
                 </div>
             </div>
@@ -116,28 +128,29 @@ export const Footer = () => {
     );
 };
 
-const FooterLink = ({ href, children }: { href: string, children: React.ReactNode }) => (
-    <a 
+interface FooterLinkProps {
+    href: string;
+    children: React.ReactNode;
+    external?: boolean;
+    icon?: React.ReactNode;
+}
+
+const FooterLink = ({ href, children, external = false, icon }: FooterLinkProps) => (
+    <Link 
         href={href} 
-        className="group flex items-center gap-1 text-sm text-[var(--aztec-ink)]/50 hover:text-[var(--aztec-ink)] transition-colors"
+        target={external ? "_blank" : "_self"}
+        rel={external ? "noopener noreferrer" : ""}
+        className="group flex items-center gap-4 text-[13px] font-sans font-semibold text-white/40 hover:text-white transition-all w-fit relative"
     >
-        {children}
+        {/* Animated indicator line */}
+        <div className="absolute -left-4 w-1 h-[1px] bg-white opacity-0 group-hover:opacity-100 group-hover:-left-6 transition-all duration-300" />
+        
+        {icon && <span className="text-white/20 group-hover:text-[var(--aztec-orchid)] transition-colors duration-300">{icon}</span>}
+        <span className="tracking-wide group-hover:translate-x-1 transition-transform duration-300">{children}</span>
+        
         <ArrowUpRight 
-            size={10} 
-            className="opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" 
+            size={12} 
+            className="opacity-0 -translate-y-2 translate-x-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300 text-[var(--aztec-orchid)]" 
         />
-    </a>
+    </Link>
 );
-
-const SocialIcon = ({ icon, href }: { icon: React.ReactNode, href: string }) => (
-    <a 
-        href={href} 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="glass-card p-3 rounded-full text-white/50 hover:text-white hover:bg-white/10 hover:scale-110 transition-all"
-    >
-        {icon}
-    </a>
-);
-
-

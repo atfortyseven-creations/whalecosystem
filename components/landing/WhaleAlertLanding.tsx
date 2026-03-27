@@ -12,6 +12,7 @@ import AntiPhishing from "@/components/security/AntiPhishing";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { LegendaryCursor } from "@/components/landing/LegendaryCursor";
 import { DownheadSection } from "@/components/landing/DownheadSection";
+import { Footer } from "@/components/layout/Footer";
 
 // Letta-inspired Marquee
 const MarqueeBanner = () => {
@@ -254,7 +255,7 @@ export function WhaleAlertLanding() {
              alt="Background Logans Voss Immersion" 
              fill 
              priority 
-             className="object-cover opacity-15 mix-blend-screen grayscale" 
+             className="object-cover opacity-45 mix-blend-screen grayscale" 
            />
         </div>
 
@@ -343,54 +344,7 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ── RESTORED ORIGINAL DOWNHEAD FOOTER + LETTA HOVER EFFCT ── */}
-      <footer className="relative z-10 bg-[#0a0a0a] border-t border-white/10 pt-24 pb-12 px-6 md:px-12 w-full overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20 relative z-10">
-                <div className="col-span-1 md:col-span-2 space-y-8">
-                    {/* The Interactive Hover Pixel Logo Component */}
-                    <LettaHoverPixelLogo />
-
-                    <p className="font-aztec-body text-xl max-w-md leading-relaxed text-white/60 mt-4">
-                        Advanced on-chain analytics and sovereign privacy infrastructure. Built exclusively for global financial institutions and elite market makers.
-                    </p>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="font-aztec-h2 text-[10px] uppercase tracking-[0.4em] text-white">Platform</div>
-                    <div className="flex flex-col gap-4">
-                        <Link href="/vip" className="font-aztec-body text-sm hover:text-[var(--aztec-orchid)] text-white/70 transition-colors">VIP Archive</Link>
-                        <Link href="/network" className="font-aztec-body text-sm hover:text-[var(--aztec-orchid)] text-white/70 transition-colors">Network Portal</Link>
-                        <Link href="/academy" className="font-aztec-body text-sm hover:text-[var(--aztec-orchid)] text-white/70 transition-colors">Whale Academy</Link>
-                        <Link href="/support" className="font-aztec-body text-sm hover:text-[var(--aztec-orchid)] text-white/70 transition-colors">Core Support</Link>
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    <div className="font-aztec-h2 text-[10px] uppercase tracking-[0.4em] text-white">Connect</div>
-                    <div className="flex flex-col gap-4">
-                        <a href="https://twitter.com/aztecnetwork" target="_blank" className="font-aztec-body text-white/70 text-sm flex items-center justify-between hover:text-[var(--aztec-orchid)] transition-colors group border-b border-white/5 pb-2">
-                             <span>Twitter / X</span>
-                             <Twitter size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </a>
-                        <a href="https://github.com/AztecProtocol" target="_blank" className="font-aztec-body text-white/70 text-sm flex items-center justify-between hover:text-[var(--aztec-orchid)] transition-colors group border-b border-white/5 pb-2">
-                             <span>Github Repository</span>
-                             <Github size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </a>
-                        <Link href="/docs" className="font-aztec-body text-white/70 text-sm hover:text-[var(--aztec-orchid)] transition-colors">Technical Docs</Link>
-                        <Link href="/privacy" className="font-aztec-body text-white/70 text-sm hover:text-[var(--aztec-orchid)] transition-colors">Privacy Policy</Link>
-                    </div>
-                </div>
-            </div>
-
-            <div className="pt-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
-                <div className="font-aztec-mono text-[9px] uppercase tracking-[0.5em] opacity-40 text-white">
-                    © 2026 WHALE ALERT CORP — ALL RIGHTS RESERVED
-                </div>
-                <div className="font-aztec-h1 text-4xl opacity-[0.03] text-white select-none tracking-tighter">WHALE ALERT</div>
-            </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
