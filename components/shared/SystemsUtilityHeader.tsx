@@ -3,13 +3,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Bell, Eye, Settings, User } from 'lucide-react';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { useUIStore } from '@/lib/store/ui-store';
 import { CurrencySwitcher } from './CurrencySwitcher';
 
 export function SystemsUtilityHeader() {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected } = useSovereignAccount();
     const { activePanel, setActivePanel, openConnectModal } = useUIStore();
     const { open } = useAppKit();
 

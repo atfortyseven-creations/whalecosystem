@@ -21,7 +21,7 @@ export function InstitutionalHeader() {
     const [showProfile, setShowProfile] = useState(false);
 
     const navLinks = [
-        { href: '#', label: 'System', active: false, isSystem: true }, // Highlighted system link
+        { href: '/dashboard', label: 'System', active: pathname === '/dashboard', isSystem: true }, // Highlighted system link
         { href: '/vip', label: 'Whale Vip', active: pathname === '/vip' },
         { href: '/dashboard', label: 'Whale Dashboard', active: pathname === '/dashboard' },
         { href: '/network', label: 'Whale Activity', active: pathname === '/network' },

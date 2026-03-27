@@ -48,16 +48,16 @@ export default function SupportPage() {
       <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
 
         {/* ─── Stats row ─── */}
-        <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", background: "white" }}>
+        <div className="border" style={{ borderColor: "rgba(255,255,255,0.05)", background: "#0a0a0a" }}>
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
               { label: "Avg Response", value: "< 2h", color: "var(--az-emerald)" },
               { label: "Uptime", value: "99.97%", color: "var(--az-lime)"},
-              { label: "Issues Resolved", value: "12,450", color: "var(--az-ink)"},
+              { label: "Issues Resolved", value: "12,450", color: "rgba(255,255,255,0.9)"},
               { label: "Support Agents", value: "24 / 7", color: "var(--az-orchid)"},
             ].map((stat, i) => (
-              <div key={i} className="az-stat-card" style={{ borderRight: i < 3 ? "1px solid rgba(26,20,0,0.06)" : "none" }}>
-                <span className="az-label">{stat.label}</span>
+              <div key={i} className="az-stat-card" style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                <span className="az-label" style={{ color: "rgba(255,255,255,0.4)" }}>{stat.label}</span>
                 <span className="az-value-xl" style={{ color: stat.color }}>{stat.value}</span>
               </div>
             ))}
@@ -67,8 +67,8 @@ export default function SupportPage() {
         {/* ─── Contact + FAQ Grid ─── */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Contact Form */}
-          <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", background: "white" }}>
-            <div className="az-col-header flex items-center gap-2" style={{ background: "rgba(26,20,0,0.03)", color: "rgba(26,20,0,0.5)" }}>
+          <div className="border" style={{ borderColor: "rgba(255,255,255,0.05)", background: "#0a0a0a" }}>
+            <div className="az-col-header flex items-center gap-2" style={{ background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.5)" }}>
               <Mail size={10} />
               SECURE DISPATCH CHANNEL
             </div>
@@ -78,7 +78,7 @@ export default function SupportPage() {
                 { id: "email", label: "EMAIL ADDRESS", type: "email", value: form.email, placeholder: "sovereign@network.io" },
               ].map(f => (
                 <div key={f.id} className="space-y-1">
-                  <label className="az-label" style={{ borderLeft: "2px solid var(--az-lime)", paddingLeft: 8, display: "block" }}>{f.label}</label>
+                  <label className="az-label" style={{ borderLeft: "2px solid var(--az-lime)", paddingLeft: 8, display: "block", color: "rgba(255,255,255,0.5)" }}>{f.label}</label>
                   <input
                     type={f.type}
                     required
@@ -86,18 +86,18 @@ export default function SupportPage() {
                     onChange={e => setForm(p => ({ ...p, [f.id]: e.target.value }))}
                     placeholder={f.placeholder}
                     className="az-input"
-                    style={{ background: "rgba(26,20,0,0.03)", color: "var(--az-ink)", border: "1px solid rgba(26,20,0,0.10)" }}
+                    style={{ background: "#050505", color: "rgba(255,255,255,0.9)", border: "1px solid rgba(255,255,255,0.1)" }}
                   />
                 </div>
               ))}
               <div className="space-y-1">
-                <label className="az-label" style={{ borderLeft: "2px solid rgba(26,20,0,0.15)", paddingLeft: 8, display: "block" }}>MESSAGE</label>
+                <label className="az-label" style={{ borderLeft: "2px solid rgba(255,255,255,0.15)", paddingLeft: 8, display: "block", color: "rgba(255,255,255,0.5)" }}>MESSAGE</label>
                 <textarea
                   required rows={5} value={form.message}
                   onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
                   placeholder="Describe your situation..."
                   className="az-input resize-none"
-                  style={{ background: "rgba(26,20,0,0.03)", color: "var(--az-ink)", border: "1px solid rgba(26,20,0,0.10)" }}
+                  style={{ background: "#050505", color: "rgba(255,255,255,0.9)", border: "1px solid rgba(255,255,255,0.1)" }}
                 />
               </div>
               <button type="submit" disabled={isSending} className="az-btn-primary w-full justify-center">
@@ -108,21 +108,21 @@ export default function SupportPage() {
           </div>
 
           {/* FAQ */}
-          <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", background: "white" }}>
-            <div className="az-col-header flex items-center gap-2" style={{ background: "rgba(26,20,0,0.03)", color: "rgba(26,20,0,0.5)" }}>
+          <div className="border" style={{ borderColor: "rgba(255,255,255,0.05)", background: "#0a0a0a" }}>
+            <div className="az-col-header flex items-center gap-2" style={{ background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.5)" }}>
               <MessageSquare size={10} />
               FREQUENTLY ASKED — SOVEREIGN PROTOCOL
             </div>
             <div>
               {FAQ_ITEMS.map((item, i) => (
-                <div key={i} className="az-data-row border-b" style={{ borderColor: "rgba(26,20,0,0.05)", flexDirection: "column", alignItems: "flex-start", padding: 0 }}>
+                <div key={i} className="az-data-row border-b" style={{ borderColor: "rgba(255,255,255,0.05)", flexDirection: "column", alignItems: "flex-start", padding: 0 }}>
                   <button
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
                     style={{ width: "100%", textAlign: "left", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "none", border: "none", cursor: "pointer" }}
                   >
-                    <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, fontWeight: 600, color: "var(--az-ink)" }}>{item.q}</span>
+                    <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.9)" }}>{item.q}</span>
                     <motion.span animate={{ rotate: openFaq === i ? 90 : 0 }} transition={{ duration: 0.2 }}>
-                      <ChevronRight size={14} style={{ color: "rgba(26,20,0,0.30)" }} />
+                      <ChevronRight size={14} style={{ color: "rgba(255,255,255,0.3)" }} />
                     </motion.span>
                   </button>
                   <motion.div
@@ -131,7 +131,7 @@ export default function SupportPage() {
                     transition={{ duration: 0.25 }}
                     style={{ overflow: "hidden", width: "100%" }}
                   >
-                    <p className="az-explainer-body" style={{ padding: "4px 16px 16px 16px" }}>{item.a}</p>
+                    <p className="az-explainer-body" style={{ padding: "4px 16px 16px 16px", color: "rgba(255,255,255,0.5)" }}>{item.a}</p>
                   </motion.div>
                 </div>
               ))}
@@ -140,20 +140,20 @@ export default function SupportPage() {
         </div>
 
         {/* ─── Channels ─── */}
-        <div className="border" style={{ borderColor: "rgba(26,20,0,0.08)", background: "white" }}>
-          <div className="az-col-header" style={{ background: "rgba(26,20,0,0.03)", color: "rgba(26,20,0,0.5)" }}>CONTACT CHANNELS</div>
+        <div className="border" style={{ borderColor: "rgba(255,255,255,0.05)", background: "#0a0a0a" }}>
+          <div className="az-col-header" style={{ background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.5)" }}>CONTACT CHANNELS</div>
           <div className="grid grid-cols-1 md:grid-cols-3">
             {[
               { icon: Smartphone, label: "Mobile Direct", desc: "Optimized for iPhone 16 Pro Max with zero-latency forensic intelligence on the go.", color: "var(--az-emerald)" },
               { icon: Globe, label: "Web Terminal", desc: "Full desktop power on MacBook Pro: dark pool routing, L1/L2 callstack analysis.", color: "var(--az-lime)" },
               { icon: Twitter, label: "@whalecosystem", link: "https://x.com/whalecosystem?s=20", desc: "Real-time intelligence pulses and latency-critical updates on Twitter/X.", color: "var(--az-orchid)" },
             ].map((ch, i) => (
-              <div key={i} className="p-6" style={{ borderRight: i < 2 ? "1px solid rgba(26,20,0,0.06)" : "none" }}>
-                <div style={{ width: 36, height: 36, background: "rgba(26,20,0,0.04)", border: "1px solid rgba(26,20,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+              <div key={i} className="p-6" style={{ borderRight: i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                <div style={{ width: 36, height: 36, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
                   <ch.icon size={18} style={{ color: ch.color }} />
                 </div>
-                <div className="az-header-sm" style={{ marginBottom: 4 }}>{ch.label}</div>
-                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, color: "rgba(26,20,0,0.50)", lineHeight: 1.6 }}>{ch.desc}</div>
+                <div className="az-header-sm" style={{ marginBottom: 4, color: "rgba(255,255,255,0.9)" }}>{ch.label}</div>
+                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>{ch.desc}</div>
                 {ch.link && (
                   <a href={ch.link} target="_blank" rel="noopener noreferrer" className="az-btn-lime-outline" style={{ marginTop: 12 }}>
                     <Zap size={10} /> Follow Now
