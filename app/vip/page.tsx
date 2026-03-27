@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { MasterMatrix as MasterMatrixComponent } from "@/components/premium/MasterMatrix";
+import { InstitutionalShell } from "@/components/shared/InstitutionalShell";
 import "@/app/dashboard/dashboard.css";
 
 export const metadata: Metadata = {
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function VipPage() {
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <InstitutionalShell title="Whale VIP" subtitle="Sovereign Transaction Nexus" badge="PREMIUM" badgeVariant="amber">
       <MasterMatrixComponent />
-    </div>
+    </InstitutionalShell>
   );
 }

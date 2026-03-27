@@ -115,7 +115,12 @@ export function SystemsUtilityHeader() {
                                 <button 
                                     onClick={() => {
                                         setIsDropdownOpen(false);
+                                        // 1. Wagmi Disconnect
                                         disconnect();
+                                        // 2. Clear Sovereign Local Cookie
+                                        document.cookie = 'sovereign_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                                        // 3. Force full state wipe to allow fresh handshake
+                                        window.location.reload();
                                     }}
                                     className="w-full py-4 bg-[#ff0033]/10 border border-[#ff0033]/20 text-[#ff0033] rounded-2xl text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-[#ff0033]/20 transition-all font-bold"
                                 >
