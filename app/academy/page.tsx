@@ -14,6 +14,8 @@ const TRACKS = [
   { icon: Lock,       label: "Sovereign Vault Setup",      level: "Intermediate" },
 ];
 
+import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
+
 // ─── WHALE HERO (identical animation to VIP/Network) ───
 function WhaleAcademyHero() {
   return (
@@ -27,7 +29,7 @@ function WhaleAcademyHero() {
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 100%, rgba(255,255,255,0.05), transparent)' }} />
 
-      {/* Whale Logo */}
+      {/* Corporate Whale Logo */}
       <motion.div
         initial={{ opacity: 0, scale: 0.7, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -35,24 +37,17 @@ function WhaleAcademyHero() {
         className="relative mb-6"
       >
         <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="relative"
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="relative w-[120px] h-[120px] flex items-center justify-center"
         >
           {/* Glow pulse ring */}
           <motion.div
-            animate={{ scale: [1, 1.12, 1], opacity: [0.06, 0.18, 0.06] }}
+            animate={{ scale: [1, 1.12, 1], opacity: [0.1, 0.3, 0.1] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-full bg-white/20 blur-2xl"
+            className="absolute inset-0 rounded-full bg-yellow-500/20 blur-3xl z-0"
           />
-          <Image
-            src="/official-whale-monochrome.png"
-            alt="Whale Academy"
-            width={110}
-            height={110}
-            className="relative z-10 drop-shadow-[0_8px_32px_rgba(255,255,255,0.12)] invert select-none"
-            priority
-          />
+          <CorporateWhaleLogo className="w-full h-full relative z-10" />
         </motion.div>
       </motion.div>
 

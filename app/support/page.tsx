@@ -29,6 +29,8 @@ const CHANNELS = [
   { icon: Twitter, label: "@whalecosystem", link: "https://x.com/whalecosystem?s=20", desc: "Real-time intelligence pulses and latency-critical network status updates broadcast on X." },
 ];
 
+import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
+
 // ─── WHALE HERO ───
 function WhaleSupportHero() {
   return (
@@ -37,7 +39,7 @@ function WhaleSupportHero() {
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 40px)' }} />
 
-      {/* Whale Logo */}
+      {/* Corporate Whale Logo */}
       <motion.div
         initial={{ opacity: 0, scale: 0.7, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -45,24 +47,17 @@ function WhaleSupportHero() {
         className="relative mb-8"
       >
         <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="relative"
+          animate={{ y: [-10, 10, -10] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="relative w-32 h-32 flex items-center justify-center"
         >
           {/* Glow ring */}
           <motion.div
-            animate={{ scale: [1, 1.08, 1], opacity: [0.08, 0.18, 0.08] }}
+            animate={{ scale: [1, 1.08, 1], opacity: [0.1, 0.3, 0.1] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-full bg-black/20 blur-2xl"
+            className="absolute inset-0 rounded-full bg-yellow-500/20 blur-3xl z-0"
           />
-          <Image
-            src="/official-whale-monochrome.png"
-            alt="Whale Support"
-            width={120}
-            height={120}
-            className="relative z-10 drop-shadow-[0_8px_32px_rgba(0,0,0,0.18)] select-none"
-            priority
-          />
+          <CorporateWhaleLogo className="w-full h-full relative z-10" />
         </motion.div>
       </motion.div>
 
