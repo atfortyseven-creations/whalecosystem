@@ -6,8 +6,6 @@ import { Clock as ClockIcon, Search, Hash, Target } from 'lucide-react';
 import { ACADEMY_MODULES } from '@/lib/data/academy-data';
 
 // ─── MEMOIZED ARTICLE ────────────────────────────────────────────────────────
-// React.memo ensures this component only re-renders if its own props change,
-// preventing full-list re-renders when the sidebar active state updates.
 const ArticleBlock = memo(function ArticleBlock({
     article,
     index,
@@ -16,72 +14,86 @@ const ArticleBlock = memo(function ArticleBlock({
     index: number;
 }) {
     return (
-        // content-visibility: auto is the single biggest rendering optimization
-        // for long article lists. It lets the browser skip layout/paint for
-        // off-screen articles entirely, reducing initial render by ~80%.
         <article
             key={article.id}
             id={article.id}
-            className="group relative academy-article"
+            className="group relative academy-article border-b border-white/5 pb-24 mb-24 last:border-0"
         >
-            <div className="absolute -left-12 top-2 hidden xl:flex flex-col items-center">
-                <div className="w-8 flex justify-end">
-                    <span
-                        className="text-[10px] font-black text-white/20 uppercase tracking-widest rotate-180"
-                        style={{ writingMode: 'vertical-rl' }}
-                    >
-                        LOG_{index.toString().padStart(3, '0')}
-                    </span>
-                </div>
+            <div className="absolute -left-16 top-0 hidden 2xl:flex flex-col items-center">
+                <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.5em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
+                    MODULE_{index.toString().padStart(3, '0')}
+                </span>
             </div>
 
-            <div className="mb-8 space-y-4">
-                <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-[var(--aztec-orchid)]/80 font-mono">
-                    <span className="flex items-center gap-1.5 bg-[var(--aztec-orchid)]/10 px-3 py-1 rounded-full border border-[var(--aztec-orchid)]/20 shadow-[0_0_15px_rgba(209,37,199,0.1)]">
+            <div className="mb-12 space-y-6">
+                <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] font-mono">
+                    <span className="flex items-center gap-2 bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full border border-yellow-500/20 shadow-[0_0_20px_rgba(234,179,8,0.1)]">
                         <ClockIcon size={12} /> {article.readTime} MIN READ
                     </span>
-                    <span className="text-white/30">
-                        ID: {article.id?.toUpperCase() || ''}
+                    <span className="bg-white/5 text-white/30 px-3 py-1.5 rounded-full border border-white/10">
+                        DEPTH: SECURE_ALPHA
+                    </span>
+                    <span className="text-white/20 ml-auto">
+                        REF: {article.id?.toUpperCase()}
                     </span>
                 </div>
 
-                <h3 className="font-aztec-h1 text-4xl md:text-6xl text-white tracking-tight leading-[1.1] drop-shadow-md">
+                <h3 className="font-aztec-h1 text-5xl md:text-7xl lg:text-8xl text-white tracking-tighter leading-[0.95] drop-shadow-2xl">
                     {article.title}
                 </h3>
 
-                <p className="font-aztec-body text-xl md:text-2xl text-white/70 leading-relaxed border-l-2 border-[var(--aztec-orchid)]/50 pl-6 italic">
+                <p className="font-aztec-body text-xl md:text-2xl text-white/60 leading-relaxed max-w-3xl">
                     {article.description}
                 </p>
             </div>
 
             <div
-                className="prose-aztec prose max-w-none prose-headings:font-aztec-h1 prose-headings:tracking-tight prose-headings:text-white prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-4 prose-h3:text-2xl prose-h3:text-white/80 prose-h3:mt-8 prose-p:font-aztec-body prose-p:text-white/70 prose-p:leading-relaxed prose-p:text-lg md:prose-p:text-xl prose-strong:text-white prose-strong:font-black prose-ul:text-white/70 prose-li:marker:text-[var(--aztec-orchid)]"
+                className="prose-aztec-v3 prose max-w-none prose-invert
+                prose-headings:font-aztec-h2 prose-headings:tracking-tighter prose-headings:text-white
+                prose-h2:text-4xl prose-h2:mt-20 prose-h2:mb-8 prose-h2:font-black
+                prose-p:font-aztec-body prose-p:text-white/70 prose-p:leading-[1.8] prose-p:text-xl md:prose-p:text-2xl
+                prose-strong:text-white prose-strong:font-black
+                prose-ul:text-white/70 prose-li:marker:text-yellow-500/50"
                 dangerouslySetInnerHTML={{ __html: article.content }}
             />
-
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mt-32" />
         </article>
     );
 });
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+// ─── CORPORATE MINI LOGO ───
+function AcademyLogo() {
+    return (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 opacity-80 group-hover:opacity-100 transition-opacity">
+            <path d="M 20,40 Q 30,15 50,40 Q 70,65 85,35 L 80,75 Q 50,90 20,70 L 15,45 Q 15,40 20,40 Z" fill="#DFBB5E" />
+            <path d="M 50,40 L 60,65 L 75,45" fill="none" stroke="#C49B30" strokeWidth="3" />
+        </svg>
+    );
+}
+
 export function AcademyViewer() {
     const [searchQuery, setSearchQuery] = useState('');
     const [time, setTime] = useState(new Date());
     const [activeSection, setActiveSection] = useState<string>('');
+    const [scrollProgress, setScrollProgress] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!contentRef.current) return;
+            const element = contentRef.current;
+            const totalHeight = element.scrollHeight - element.clientHeight;
+            const progress = (element.scrollTop / totalHeight) * 100;
+            setScrollProgress(progress);
+        };
+        const el = contentRef.current;
+        el?.addEventListener('scroll', handleScroll);
+        return () => el?.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
-
-    const timeString = time.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-    });
 
     const filteredModules = React.useMemo(() => {
         if (!searchQuery.trim()) return ACADEMY_MODULES;
@@ -95,7 +107,6 @@ export function AcademyViewer() {
         })).filter(module => module.articles.length > 0);
     }, [searchQuery]);
 
-    // Intersection observer for sidebar active state
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -103,7 +114,7 @@ export function AcademyViewer() {
                     if (entry.isIntersecting) setActiveSection(entry.target.id);
                 });
             },
-            { rootMargin: '-20% 0px -80% 0px' }
+            { rootMargin: '-30% 0px -60% 0px' }
         );
         const sections = document.querySelectorAll('article[id]');
         sections.forEach((s) => observer.observe(s));
@@ -116,164 +127,155 @@ export function AcademyViewer() {
 
     return (
         <>
-            {/* Global styles injected via dangerouslySetInnerHTML — deploy-safe, no styled-jsx required */}
             <style dangerouslySetInnerHTML={{ __html: `
-                .academy-article {
-                    content-visibility: auto;
-                    contain-intrinsic-size: 1px 1200px;
+                .academy-article { content-visibility: auto; contain-intrinsic-size: 1px 1500px; }
+                .academy-scroll-container::-webkit-scrollbar { width: 3px; }
+                .academy-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+                .academy-scroll-container::-webkit-scrollbar-thumb { 
+                    background: linear-gradient(to bottom, transparent, #DFBB5E, transparent);
+                    border-radius: 10px;
                 }
                 .sidebar-hide-scroll::-webkit-scrollbar { display: none; }
                 .sidebar-hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-                .pro-section {
-                    margin-bottom: 4rem; padding: 2rem; background: rgba(0,0,0,0.2);
-                    border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                    position: relative; overflow: hidden;
-                    backdrop-filter: blur(10px);
-                }
-                .pro-section::after {
-                    content: "WHALE ALERT NETWORK - INSTITUTIONAL PROPERTY";
-                    position: absolute; bottom: 10px; right: 10px;
-                    font-size: 8px; font-family: var(--font-aztec-mono);
-                    color: white; opacity: 0.1; pointer-events: none;
-                }
-                .pro-badge { display: none !important; }
-                .prose-aztec-block {
-                    background: rgba(255,255,255,0.02); padding: 24px;
-                    border-left: 2px solid var(--aztec-orchid);
-                    margin: 2rem 0; border-radius: 4px;
-                    font-family: var(--font-aztec-mono); color: rgba(255,255,255,0.8);
-                }
-                .diagram-container {
-                    margin: 3rem 0; padding: 2rem; background: rgba(0,0,0,0.3);
-                    border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                }
-                .diagram-caption {
-                    font-size: 0.9rem !important; text-align: center;
-                    color: rgba(255,255,255,0.5) !important; margin-top: 1.5rem !important;
-                    font-weight: 600;
-                }
-                .no-copy {
-                    user-select: none; -webkit-user-select: none;
-                    -moz-user-select: none; -ms-user-select: none;
-                }
-                .watermark-overlay {
-                    position: fixed; inset: 0; pointer-events: none;
-                    z-index: 5; opacity: 0.03;
-                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Ctext x='10' y='60' font-family='monospace' font-size='11' fill='%23fff' transform='rotate(-25)'%3EWHALE ALERT NETWORK%3C/text%3E%3Ctext x='10' y='85' font-family='monospace' font-size='9' fill='%23fff' transform='rotate(-25)'%3EINSTITUTIONAL PROPERTY%3C/text%3E%3C/svg%3E");
-                    background-repeat: repeat;
-                }
+                .no-copy { user-select: none; -webkit-user-select: none; }
+                .glass-sidebar { background: rgba(5,5,5,0.8); backdrop-filter: blur(100px); }
+                .prose-aztec-v3 p { margin-bottom: 2rem; }
+                .module-category { writing-mode: vertical-rl; text-orientation: mixed; }
             ` }} />
 
-            <div className="flex w-full h-full bg-transparent relative z-20 overflow-hidden text-white font-aztec-body">
+            <div className="flex w-full h-full bg-[#050505] relative z-20 overflow-hidden text-white font-aztec-body shadow-2xl">
+                
+                {/* PROGRESS BAR (STRATOSPHERIC PRECISION) */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/5 z-[100]">
+                    <motion.div 
+                        className="h-full bg-gradient-to-r from-yellow-600 via-yellow-200 to-yellow-600 shadow-[0_0_15px_rgba(234,179,8,0.5)]"
+                        style={{ width: `${scrollProgress}%` }}
+                    />
+                </div>
 
-                {/* SIDEBAR */}
-                <div
-                    className="hidden lg:flex w-[320px] flex-shrink-0 border-r border-white/10 bg-black/20 flex-col h-full overflow-y-auto sidebar-hide-scroll backdrop-blur-2xl relative no-copy"
-                    style={{ contain: 'content' }}
-                    onContextMenu={(e) => e.preventDefault()}
-                >
-                    <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[var(--aztec-orchid)]/30 to-transparent pointer-events-none" />
-
-                    <div className="p-8 border-b border-white/5 flex-shrink-0 bg-transparent sticky top-0 z-10 backdrop-blur-3xl shadow-sm">
-                        <h2 className="font-aztec-h1 text-2xl font-black uppercase tracking-widest text-white mb-1 flex items-center gap-3">
-                            <Target size={20} className="text-[var(--aztec-orchid)]" />
-                            Whale Academy
-                        </h2>
-                        <div className="flex items-center gap-2 text-[10px] font-aztec-h2 font-bold text-white/40 mb-6 uppercase tracking-widest">
-                            <ClockIcon size={12} className="text-[var(--aztec-orchid)]" />
-                            {timeString}
+                {/* SIDEBAR: KNOWLEDGE INDEX */}
+                <aside className="hidden lg:flex w-[380px] flex-shrink-0 border-r border-white/5 glass-sidebar flex-col h-full relative no-copy">
+                    <div className="p-10 border-b border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
+                        <div className="flex items-center gap-4 mb-2 group cursor-pointer">
+                            <AcademyLogo />
+                            <div>
+                                <h2 className="font-aztec-h1 text-2xl font-black uppercase tracking-tighter text-white">
+                                    Knowledge <span className="text-yellow-500">Hub</span>
+                                </h2>
+                                <p className="text-[7px] font-mono text-white/30 uppercase tracking-[0.5em] font-black">Institutional Repository</p>
+                            </div>
                         </div>
-                        <div className="relative">
-                            <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+                        
+                        <div className="mt-8 relative">
+                            <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
                             <input
                                 type="text"
-                                placeholder="Filtrar base de datos..."
+                                placeholder="Search archives..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="font-aztec-body w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-[13px] font-medium text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--aztec-orchid)] transition-all shadow-inner focus:bg-white/10"
+                                className="w-full pl-11 pr-4 py-4 bg-white/[0.03] border border-white/5 rounded-2xl text-[12px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:border-yellow-500/50 transition-all focus:bg-white/[0.06] shadow-inner"
                             />
                         </div>
                     </div>
 
-                    <div className="flex-1 p-4 space-y-6">
+                    <div className="flex-1 overflow-y-auto sidebar-hide-scroll p-6 space-y-10">
                         {filteredModules.map((module) => (
-                            <div key={module.id} className="space-y-2">
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--aztec-orchid)]/80 px-2 drop-shadow-sm">
+                            <div key={module.id} className="relative pl-4">
+                                <div className="absolute left-0 top-0 bottom-0 w-px bg-white/10" />
+                                <h3 className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-4 flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/50" />
                                     {module.title}
                                 </h3>
-                                <div className="flex flex-col gap-0.5 border-l border-white/10 ml-2 py-1">
+                                <div className="flex flex-col gap-1">
                                     {module.articles.map(article => (
                                         <button
                                             key={article.id}
                                             onClick={() => scrollToSection(article.id)}
-                                            className={`text-left pl-4 py-2 pr-2 text-[12px] font-aztec-body transition-all relative flex items-center rounded-r-lg
+                                            className={`text-left px-4 py-3 text-[13px] transition-all rounded-xl flex items-center justify-between group
                                                 ${activeSection === article.id
-                                                    ? 'text-white font-black bg-gradient-to-r from-[var(--aztec-orchid)]/20 to-transparent border-l-2 border-[var(--aztec-orchid)]'
-                                                    : 'text-white/50 hover:text-white hover:bg-white/5 font-medium border-l-2 border-transparent'
+                                                    ? 'text-white font-black bg-white/[0.05] shadow-lg border border-white/5'
+                                                    : 'text-white/40 hover:text-white/70 hover:bg-white/[0.02] font-medium border border-transparent'
                                                 }`}
                                         >
-                                            <span className="truncate leading-tight">
-                                                {(article.title || '').substring((article.title || '').indexOf('.') + 1).trim()}
+                                            <span className="truncate max-w-[240px]">
+                                                {article.title}
                                             </span>
+                                            {activeSection === article.id && (
+                                                <div className="w-1 h-1 rounded-full bg-yellow-500" />
+                                            )}
                                         </button>
                                     ))}
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
 
-                {/* MAIN CONTENT */}
-                <div
+                    <div className="p-8 border-t border-white/5 bg-black/40">
+                        <div className="flex items-center justify-between text-[8px] font-mono text-white/20 uppercase tracking-widest font-black">
+                            <span>Status: Synchronized</span>
+                            <span className="animate-pulse flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full bg-green-500" /> Secure
+                            </span>
+                        </div>
+                    </div>
+                </aside>
+
+                {/* MAIN CONTENT: CLASS-LEVEL EDUCATION */}
+                <main
                     ref={contentRef}
-                    className="flex-1 overflow-y-auto academy-scroll-container relative w-full bg-transparent no-copy"
+                    className="flex-1 overflow-y-auto academy-scroll-container bg-transparent relative no-copy"
                     onContextMenu={(e) => e.preventDefault()}
                 >
-                    <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-[var(--aztec-orchid)]/5 rounded-full blur-[150px] pointer-events-none" />
-                    <div className="watermark-overlay" />
-
-                    <div className="max-w-[1200px] mx-auto px-6 lg:px-20 py-16 lg:py-24 relative z-10">
-                        <div className="mb-32 text-center">
-                            <h1 className="font-aztec-h1 text-5xl md:text-8xl text-white tracking-tighter mb-6 uppercase drop-shadow-lg">
-                                Archivos <br /><span className="text-[var(--aztec-orchid)]">Clasificados</span>
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none" />
+                    
+                    <div className="max-w-[900px] mx-auto px-8 lg:px-16 py-24 lg:py-40 relative z-10">
+                        <header className="mb-48 border-l-4 border-yellow-500/30 pl-12">
+                            <h1 className="font-aztec-h1 text-6xl md:text-9xl text-white tracking-tighter mb-8 uppercase leading-[0.85]">
+                                Strategic <br />
+                                <span className="bg-gradient-to-r from-yellow-200 via-yellow-500 to-yellow-200 bg-clip-text text-transparent">Intelligence</span>
                             </h1>
-                            <p className="font-aztec-body text-xl text-white/50 max-w-2xl mx-auto border-t border-white/10 pt-6">
-                                Compendio institucional de máxima profundidad. Desplácese para asimilar la totalidad de la base de datos estructural de la red.
+                            <p className="font-aztec-body text-2xl lg:text-3xl text-white/40 max-w-2xl leading-relaxed font-light">
+                                60 years of sovereign expertise consolidated into a single cryptographic knowledge architecture.
                             </p>
-                        </div>
+                        </header>
 
                         {filteredModules.map((module) => (
-                            <div key={module.id} className="mb-40">
-                                <div className="sticky top-0 z-30 bg-black/40 backdrop-blur-2xl pt-8 pb-4 border-b border-white/10 mb-16 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 mx-[-16px]">
-                                    <h2 className="font-aztec-h1 text-4xl md:text-5xl text-white tracking-tight drop-shadow-sm">
-                                        {module.title}
-                                    </h2>
-                                    <p className="font-aztec-body text-[var(--aztec-chartreuse)]/80 mt-3 font-bold uppercase tracking-widest text-xs">
-                                        {module.description}
-                                    </p>
+                            <section key={module.id} className="mb-64">
+                                <div className="flex items-start gap-12 mb-24 sticky top-0 z-20 pt-8 bg-[#050505]/80 backdrop-blur-xl -mx-8 px-8 pb-8 border-b border-white/5">
+                                    <div className="flex flex-col">
+                                        <h2 className="font-aztec-h1 text-5xl md:text-6xl text-white tracking-tighter">
+                                            {module.title}
+                                        </h2>
+                                        <p className="text-[10px] font-mono text-yellow-500 uppercase tracking-[0.5em] mt-3 font-black">
+                                            {module.description}
+                                        </p>
+                                    </div>
+                                    <div className="ml-auto hidden sm:flex items-center gap-3 bg-white/5 px-6 py-2 rounded-full border border-white/10">
+                                        <Target size={14} className="text-yellow-500" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/50">{module.articles.length} FILES</span>
+                                    </div>
                                 </div>
 
-                                <div className="space-y-32">
+                                <div className="space-y-40">
                                     {module.articles.map((article, index) => (
                                         <ArticleBlock key={article.id} article={article} index={index} />
                                     ))}
                                 </div>
-                            </div>
+                            </section>
                         ))}
 
                         {filteredModules.length === 0 && (
-                            <div className="text-center py-20">
-                                <Hash size={48} className="mx-auto text-white/20 mb-4" />
-                                <p className="text-xl font-bold text-white/50">
-                                    El Archivo Solicitado No Existe en la Base de Datos.
+                            <div className="text-center py-40 border border-dashed border-white/10 rounded-3xl">
+                                <Hash size={48} className="mx-auto text-white/10 mb-6" />
+                                <p className="text-2xl font-black text-white/30 uppercase tracking-widest opacity-50">
+                                    No classified files match query.
                                 </p>
                             </div>
                         )}
                     </div>
-                </div>
+                </main>
             </div>
         </>
     );
 }
+
