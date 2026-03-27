@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useMotionValue, useTransform, useSpring, useMotionTemplate } from "framer-motion";
-import { ChevronRight, Lock, Loader2, Sparkles, Fingerprint } from "lucide-react";
+import { ChevronRight, Lock, Loader2, Fingerprint } from "lucide-react";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useWalletStore } from "@/lib/store/wallet-store";
 import { toast } from "sonner";
@@ -288,13 +288,27 @@ export default function GoldenTicketPage() {
   const { date, time } = formatDateTime(ticket?.claimedAt);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col font-sans relative selection:bg-[var(--aztec-orchid)]/20 overflow-hidden">
+    <div className="min-h-screen bg-[var(--aztec-parchment)] text-black flex flex-col font-sans relative selection:bg-[var(--aztec-orchid)]/20 overflow-hidden">
       
-      {/* Immersive Landing-Page Ambient White Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_#FFFFFF_0%,_transparent_60%)]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[1000px] max-h-[1000px] bg-[radial-gradient(circle_at_center,_rgba(212,175,55,0.03)_0%,_transparent_70%)] rounded-full blur-3xl opacity-80" />
-          <div className="absolute inset-0 opacity-[0.015] mix-blend-multiply" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }} />
+      {/* Exact Landing Page Wallpaper — HighHzWallpaper replica */}
+      <div className="fixed z-[-10] inset-0 overflow-hidden bg-[var(--aztec-parchment)]">
+          {/* Aztec Backdrop — identical settings to main site */}
+          <div className="absolute inset-0 z-0">
+              <Image
+                  src="/models/update/Aztec Image_02.jpg"
+                  alt=""
+                  fill
+                  className="object-cover opacity-[0.15] mix-blend-multiply brightness-[1.1]"
+                  priority
+              />
+          </div>
+          {/* Paper Grain Texture */}
+          <div
+              className="absolute inset-0 opacity-[0.15] pointer-events-none noise-bg z-10"
+              style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden' }}
+          />
+          {/* Depth Shield */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5 pointer-events-none z-20" />
       </div>
 
       <div className="flex-1 relative z-10 flex flex-col items-center justify-center p-6 max-w-5xl mx-auto w-full pt-20 pb-32">
@@ -305,12 +319,11 @@ export default function GoldenTicketPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center justify-center mb-6"
           >
-              {/* Minimalist Top spacing, removed 'Live' indicator per user request */}
               <div className="font-aztec-h1 text-5xl md:text-7xl font-bold bg-gradient-to-r from-black via-[#333] to-black bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
-                 {globalCount !== null ? globalCount.toLocaleString() : "..."}
+                 {globalCount !== null ? globalCount.toLocaleString() : "—"}
               </div>
-              <div className="font-mono text-xs uppercase tracking-[0.4em] text-black/40 mt-3">
-                 Total Tickets Claimed Worldwide
+              <div className="text-sm text-black/40 mt-2 tracking-widest font-light">
+                 tickets claimed
               </div>
           </motion.div>
 
