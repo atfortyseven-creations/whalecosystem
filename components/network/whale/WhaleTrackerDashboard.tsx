@@ -230,8 +230,8 @@ export function WhaleTrackerDashboard() {
     }, [unifiedWhaleFeed, searchQuery, activeTab]);
 
     return (
-        <div className="relative min-h-screen bg-[#050505] text-white/90 font-sans selection:bg-white/20 selection:text-white overflow-x-hidden">
-            <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
+        <div className="relative text-white/90 font-sans selection:bg-white/20 selection:text-white overflow-x-hidden">
+            <div className="relative z-10 w-full max-w-[2560px] mx-auto flex flex-col">
                 <AnimatePresence>
                     {showNews && (
                         <>
@@ -263,7 +263,7 @@ export function WhaleTrackerDashboard() {
                     )}
                 </AnimatePresence>
 
-                <main className="flex-1 max-w-7xl mx-auto w-full pt-32 pb-48 px-8 space-y-32">
+                <main className="flex-1 max-w-7xl mx-auto w-full pt-32 pb-16 px-8 space-y-32">
                     <div className="flex flex-col items-center text-center space-y-16">
                         <div className="space-y-6">
                             <motion.div 
@@ -360,21 +360,7 @@ export function WhaleTrackerDashboard() {
                         </div>
                     </div>
                 </main>
-
-                <footer className="h-20 border-t border-white/5 flex items-center justify-between px-12 bg-black/40 backdrop-blur-3xl sticky bottom-0 z-50">
-                    <div className="flex items-center gap-12">
-                         <div className="flex items-center gap-3">
-                             <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                             <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">Whale Alert Institutional Access</span>
-                         </div>
-                    </div>
-                </footer>
             </div>
-            
-            <style jsx global>{`
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-            `}</style>
         </div>
     );
 }

@@ -30,12 +30,12 @@ export function InstitutionalShell({
 
 
       {/* ─── Deep Inner Scrollable Viewpoint ─── */}
-      <div className="flex-1 overflow-y-auto relative z-10" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex-1 overflow-y-auto relative z-10" data-scroll-container style={{ scrollbarWidth: 'none' }}>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="h-full min-h-0 container mx-auto"
+          className="min-h-full container mx-auto pb-10"
         >
           {children}
         </motion.div>

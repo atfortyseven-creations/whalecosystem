@@ -4,7 +4,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { AcademyViewer } from '@/components/academy/AcademyViewer';
 import { Shield, Cpu, TrendingUp, Lock, BookOpen } from 'lucide-react';
-import Image from 'next/image';
+import { InstitutionalShell } from "@/components/shared/InstitutionalShell";
+import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
 import "@/app/dashboard/dashboard.css";
 
 const TRACKS = [
@@ -14,9 +15,7 @@ const TRACKS = [
   { icon: Lock,       label: "Sovereign Vault Setup",      level: "Intermediate" },
 ];
 
-import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
-
-// ─── WHALE HERO (identical animation to VIP/Network) ───
+// ─── WHALE HERO ───
 function WhaleAcademyHero() {
   return (
     <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-12 pb-8 px-6 text-center bg-[#050505] overflow-hidden border-b border-white/5">
@@ -41,7 +40,6 @@ function WhaleAcademyHero() {
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="relative w-[120px] h-[120px] flex items-center justify-center"
         >
-          {/* Glow pulse ring */}
           <motion.div
             animate={{ scale: [1, 1.12, 1], opacity: [0.1, 0.3, 0.1] }}
             transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
@@ -97,15 +95,9 @@ function WhaleAcademyHero() {
 
 export default function AcademyPage() {
   return (
-    <div className="flex flex-col h-[calc(100vh-105px)] bg-[#050505] text-white overflow-hidden">
-
-      {/* Hero with whale */}
+    <InstitutionalShell title="Whale Academy" subtitle="Sovereign Knowledge Hub" badge="LEARN">
       <WhaleAcademyHero />
-
-      {/* Full-height viewer — sidebar + content scroll natively */}
-      <div className="flex-1 min-h-0 overflow-hidden">
-        <AcademyViewer />
-      </div>
-    </div>
+      <AcademyViewer />
+    </InstitutionalShell>
   );
 }

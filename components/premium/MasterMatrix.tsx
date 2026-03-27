@@ -67,11 +67,9 @@ export function MasterMatrix() {
     const fmt = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 
     return (
-        <div className="relative min-h-screen bg-[#050505] text-white/90 font-sans selection:bg-cyan-500/20 selection:text-white overflow-x-hidden">
-            {/* Global wallpaper is provided by ClientLayout */}
-
-            <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
-                <main className="flex-1 overflow-y-auto no-scrollbar pb-24 relative z-10">
+        <div className="relative text-white/90 font-sans selection:bg-cyan-500/20 selection:text-white overflow-x-hidden">
+            <div className="relative z-10 w-full max-w-[2560px] mx-auto flex flex-col">
+                <div className="pb-24 relative z-10">
                     <div className="px-8 pt-12 max-w-[2400px] mx-auto">
                     </div>
                     <CatchTheWhale />
@@ -184,10 +182,7 @@ export function MasterMatrix() {
                             </div>
                         )}
                     </section>
-                </main>
-
-                <footer className="h-12 border-t border-white/5 flex items-center justify-between px-8 bg-black/40 backdrop-blur-3xl relative z-50">
-                </footer>
+                </div>
 
                 <AnimatePresence>
                     {selectedSymbolForOverlay && (
@@ -198,14 +193,6 @@ export function MasterMatrix() {
                     )}
                 </AnimatePresence>
             </div>
-            
-            <style jsx global>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(6,182,212,0.2); }
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-            `}</style>
         </div>
     );
 }

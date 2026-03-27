@@ -63,10 +63,7 @@ const ArticleBlock = memo(function ArticleBlock({
 // ─── CORPORATE MINI LOGO ───
 function AcademyLogo() {
     return (
-        <svg viewBox="0 0 100 100" className="w-8 h-8 opacity-80 group-hover:opacity-100 transition-opacity">
-            <path d="M 20,40 Q 30,15 50,40 Q 70,65 85,35 L 80,75 Q 50,90 20,70 L 15,45 Q 15,40 20,40 Z" fill="#ffffff" />
-            <path d="M 50,40 L 60,65 L 75,45" fill="none" stroke="#aaaaaa" strokeWidth="3" />
-        </svg>
+        <img src="/logo-landingpage.png" alt="Whale" className="w-8 h-8 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
     );
 }
 
@@ -78,16 +75,16 @@ export function AcademyViewer() {
     const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        const scrollEl = document.querySelector('[data-scroll-container]') as HTMLElement | null;
         const handleScroll = () => {
-            if (!contentRef.current) return;
-            const element = contentRef.current;
+            const element = scrollEl || document.documentElement;
             const totalHeight = element.scrollHeight - element.clientHeight;
-            const progress = (element.scrollTop / totalHeight) * 100;
+            const progress = totalHeight > 0 ? (element.scrollTop / totalHeight) * 100 : 0;
             setScrollProgress(progress);
         };
-        const el = contentRef.current;
-        el?.addEventListener('scroll', handleScroll);
-        return () => el?.removeEventListener('scroll', handleScroll);
+        const target = scrollEl || window;
+        target.addEventListener('scroll', handleScroll);
+        return () => target.removeEventListener('scroll', handleScroll);
     }, []);
 
     useEffect(() => {
@@ -143,7 +140,7 @@ export function AcademyViewer() {
                 .module-category { writing-mode: vertical-rl; text-orientation: mixed; }
             ` }} />
 
-            <div className="flex w-full h-full bg-[#050505] relative z-20 overflow-hidden text-white font-aztec-body shadow-2xl">
+            <div className="flex w-full bg-[#050505] relative z-20 text-white font-aztec-body shadow-2xl" style={{ minHeight: '80vh' }}>
                 
                 {/* PROGRESS BAR (STRATOSPHERIC PRECISION) */}
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/5 z-[100]">
@@ -154,7 +151,7 @@ export function AcademyViewer() {
                 </div>
 
                 {/* SIDEBAR: KNOWLEDGE INDEX */}
-                <aside className="hidden lg:flex w-[380px] flex-shrink-0 border-r border-white/5 glass-sidebar flex-col h-full relative no-copy">
+                <aside className="hidden lg:flex w-[380px] flex-shrink-0 border-r border-white/5 glass-sidebar flex-col min-h-[80vh] relative no-copy sticky top-0 self-start" style={{ maxHeight: '100vh', overflowY: 'auto' }}>
                     <div className="p-10 border-b border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
                         <div className="flex items-center gap-4 mb-2 group cursor-pointer">
                             <AcademyLogo />
@@ -223,7 +220,7 @@ export function AcademyViewer() {
                 {/* MAIN CONTENT: CLASS-LEVEL EDUCATION */}
                 <main
                     ref={contentRef}
-                    className="flex-1 overflow-y-auto academy-scroll-container bg-transparent relative no-copy"
+                    className="flex-1 bg-transparent relative no-copy overflow-y-auto"
                     onContextMenu={(e) => e.preventDefault()}
                 >
                     <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
