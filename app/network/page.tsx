@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function WhaleHubPage() {
     return (
-        <InstitutionalShell title="Whale Activity" subtitle="Real-time Network Velocity" badge="LIVE" badgeVariant="emerald">
+        <InstitutionalShell title="Whale Activity" subtitle="Real-time Network Velocity" badge="LIVE">
             <WhaleTrackerDashboard />
         </InstitutionalShell>
     );

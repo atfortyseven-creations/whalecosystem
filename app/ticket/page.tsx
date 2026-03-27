@@ -11,11 +11,10 @@ import Image from "next/image";
 import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
 import "@/app/dashboard/dashboard.css";
 
-// ─── PURE ENGINEERED GOLDEN TICKET SVG ───
+// ─── PURE ENGINEERED GOLDEN TICKET SVG (MONOCHROME VARIANT) ───
 function EngineeredGoldenTicket() {
     return (
-        <div className="w-full h-full relative" style={{ filter: 'drop-shadow(0px 25px 45px rgba(180,140,40,0.35))' }}>
-            {/* The Ticket Shape layer */}
+        <div className="w-full h-full relative" style={{ filter: 'drop-shadow(0px 25px 45px rgba(0,0,0,0.15))' }}>
             <svg 
                width="100%" 
                height="100%" 
@@ -25,23 +24,22 @@ function EngineeredGoldenTicket() {
             >
                 <defs>
                     <linearGradient id="ticketBase" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#DFBB5E" />
-                        <stop offset="30%" stopColor="#EAD284" />
-                        <stop offset="50%" stopColor="#FFF2CD" />
-                        <stop offset="70%" stopColor="#EAD284" />
-                        <stop offset="100%" stopColor="#C49B30" />
+                        <stop offset="0%" stopColor="#ffffff" />
+                        <stop offset="30%" stopColor="#f5f5f5" />
+                        <stop offset="50%" stopColor="#e0e0e0" />
+                        <stop offset="70%" stopColor="#f5f5f5" />
+                        <stop offset="100%" stopColor="#cccccc" />
                     </linearGradient>
                     <filter id="innerBevel" x="-20%" y="-20%" width="140%" height="140%">
                         <feDropShadow dx="-2" dy="-2" stdDeviation="3" floodColor="#ffffff" floodOpacity="0.8" />
-                        <feDropShadow dx="3" dy="3" stdDeviation="4" floodColor="#7A5A10" floodOpacity="0.4" />
+                        <feDropShadow dx="3" dy="3" stdDeviation="4" floodColor="#000000" floodOpacity="0.1" />
                     </filter>
                     <filter id="engraving" x="-10%" y="-10%" width="120%" height="120%">
                         <feDropShadow dx="1" dy="1" stdDeviation="1" floodColor="#ffffff" floodOpacity="0.7"/>
-                        <feDropShadow dx="-1" dy="-1" stdDeviation="1" floodColor="#805d15" floodOpacity="0.5"/>
+                        <feDropShadow dx="-1" dy="-1" stdDeviation="1" floodColor="#000000" floodOpacity="0.2"/>
                     </filter>
                 </defs>
 
-                {/* Base Ticket Body */}
                 <path id="ticketPath" d="
                     M 40,0 
                     L 760,0 
@@ -58,7 +56,6 @@ function EngineeredGoldenTicket() {
                     A 40,40 0 0,0 40,0 Z
                 " fill="url(#ticketBase)" />
 
-                {/* Inner Beveled Border Ring */}
                 <path d="
                     M 55,15 
                     L 745,15 
@@ -73,18 +70,15 @@ function EngineeredGoldenTicket() {
                     A 45,45 0 0,1 15,145 
                     L 15,55 
                     A 25,25 0 0,0 55,15 Z
-                " fill="none" stroke="#C49E31" strokeWidth="4" filter="url(#innerBevel)" />
+                " fill="none" stroke="#e0e0e0" strokeWidth="4" filter="url(#innerBevel)" />
 
-                {/* Perforation Verticals */}
-                <line x1="640" y1="40" x2="640" y2="360" stroke="#B1871C" strokeWidth="5" strokeDasharray="16,12" strokeLinecap="round" filter="url(#engraving)" />
+                <line x1="640" y1="40" x2="640" y2="360" stroke="#000000" strokeWidth="2" strokeDasharray="16,12" strokeLinecap="round" filter="url(#engraving)" opacity="0.4" />
 
-                {/* Center Engraved Minimalist Typography */}
-                <text x="400" y="230" fontFamily="system-ui, -apple-system, sans-serif" fontSize="26" fill="#A87A13" fontWeight="200" letterSpacing="24" textAnchor="middle" filter="url(#engraving)">GOLD WHALE TICKET</text>
-                <text x="400" y="280" fontFamily="monospace" fontSize="11" fill="#B1871C" fontWeight="bold" letterSpacing="14" textAnchor="middle" filter="url(#engraving)" opacity="0.7">SOVEREIGN PROTOCOL</text>
+                <text x="400" y="230" fontFamily="system-ui, -apple-system, sans-serif" fontSize="26" fill="#000000" fontWeight="200" letterSpacing="24" textAnchor="middle" filter="url(#engraving)" opacity="0.8">WHALE NODE TICKET</text>
+                <text x="400" y="280" fontFamily="monospace" fontSize="11" fill="#000000" fontWeight="bold" letterSpacing="14" textAnchor="middle" filter="url(#engraving)" opacity="0.4">SOVEREIGN PROTOCOL</text>
 
-                {/* Tear Off Text */}
-                <g filter="url(#engraving)">
-                    <text transform="translate(720, 200) rotate(90)" fontFamily="monospace" fontSize="18" fill="#A87A13" fontWeight="bold" letterSpacing="12" textAnchor="middle">NODE SIG</text>
+                <g filter="url(#engraving)" opacity="0.6">
+                    <text transform="translate(720, 200) rotate(90)" fontFamily="monospace" fontSize="18" fill="#000000" fontWeight="bold" letterSpacing="12" textAnchor="middle">NODE SIG</text>
                 </g>
             </svg>
         </div>
@@ -97,12 +91,10 @@ function FloatingTicket3D() {
     const mouseX = useMotionValue(0.5);
     const mouseY = useMotionValue(0.5);
 
-    // Smooth physics
     const springConfig = { damping: 20, stiffness: 100, mass: 0.5 };
     const rotateX = useSpring(useTransform(mouseY, [0, 1], [15, -15]), springConfig);
     const rotateY = useSpring(useTransform(mouseX, [0, 1], [-20, 20]), springConfig);
     
-    // Specular lighting effect
     const glareX = useSpring(useTransform(mouseX, [0, 1], [0, 100]), springConfig);
     const glareY = useSpring(useTransform(mouseY, [0, 1], [0, 100]), springConfig);
     const background = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.45) 0%, transparent 60%)`;
@@ -128,10 +120,8 @@ function FloatingTicket3D() {
                 style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
                 className="relative w-full max-w-[420px] aspect-[2/1] transition-transform duration-300 ease-out cursor-crosshair group"
             >
-                {/* 100% Mathematically Engineered 3D Ticket */}
                 <EngineeredGoldenTicket />
                 
-                {/* Interactive Dynamic Glare */}
                 <motion.div 
                     style={{ 
                         background,
@@ -144,139 +134,133 @@ function FloatingTicket3D() {
     );
 }
 
-// ─── 240HZ IMMERSIVE LIQUID VALIDATOR ───
-function ImmersiveCursorClaim({ onClaim, disabled }: { onClaim: () => Promise<boolean>; disabled: boolean }) {
-    const [isHovered, setIsHovered] = useState(false);
-    const [isHolding, setIsHolding] = useState(false);
-    const [exploded, setExploded] = useState(false);
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
-    const progress = useMotionValue(0);
-
-    // Cosmic fluid mechanics for profound structural responsiveness
-    const springConfig = { damping: 25, stiffness: 400, mass: 0.05 };
-    const springX = useSpring(mouseX, springConfig);
-    const springY = useSpring(mouseY, springConfig);
-    
-    const ringScale = useSpring(isHovered ? (isHolding ? 1.5 : 1) : 0, { damping: 20, stiffness: 300 });
-    const progressSpring = useSpring(progress, { damping: 40, stiffness: 200 });
-    const dashOffset = useTransform(progressSpring, [0, 100], [351.85, 0]);
-
+// ─── 240HZ IMMERSIVE CIRCULAR GESTURE VALIDATOR ───
+function CircularGestureClaim({ onClaim, disabled }: { onClaim: () => Promise<boolean>; disabled: boolean }) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [status, setStatus] = useState<"IDLE" | "VERIFYING" | "VALIDATED">("IDLE");
+    const angleSum = useRef(0);
+    const lastAngle = useRef<number | null>(null);
     const claimFired = useRef(false);
+
+    const pointsRef = useRef<{x: number, y: number, t: number}[]>([]);
+    
+    useEffect(() => {
+        let frame: number;
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const render = () => {
+            const now = performance.now();
+            pointsRef.current = pointsRef.current.filter(p => now - p.t < 400); 
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (pointsRef.current.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(pointsRef.current[0].x, pointsRef.current[0].y);
+                 for (let i = 1; i < pointsRef.current.length; i++) {
+                     const p = pointsRef.current[i];
+                     ctx.lineTo(p.x, p.y);
+                 }
+                 ctx.strokeStyle = "rgba(0,0,0,0.8)";
+                 ctx.lineWidth = 3;
+                 ctx.lineCap = "round";
+                 ctx.lineJoin = "round";
+                 ctx.stroke();
+            }
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+            ctx.fillStyle = status === "VALIDATED" ? "#000" : "rgba(0,0,0,0.15)";
+            ctx.fill();
+
+            if (!claimFired.current) {
+                const progress = Math.min(Math.abs(angleSum.current) / (Math.PI * 2), 1);
+                if (progress > 0 && progress < 1) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 32, -Math.PI/2, -Math.PI/2 + (progress * Math.PI * 2));
+                    ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+
+            frame = requestAnimationFrame(render);
+        };
+        frame = requestAnimationFrame(render);
+        return () => cancelAnimationFrame(frame);
+    }, [status]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            mouseX.set(e.clientX);
-            mouseY.set(e.clientY);
-        };
-        if (isHovered && !exploded) {
-            window.addEventListener('mousemove', handleMouseMove, { passive: true });
-        }
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, [isHovered, exploded, mouseX, mouseY]);
-
-    // High-frequency filling synchronized to display refresh rate
-    useEffect(() => {
-        let frame: number;
-        let lastTime = performance.now();
-        
-        const updateFill = (time: number) => {
-            if (isHolding && !claimFired.current) {
-                const delta = time - lastTime;
-                lastTime = time;
+            if (claimFired.current || status === "VALIDATED") return;
+            if (!containerRef.current) return;
+            
+            const rect = containerRef.current.getBoundingClientRect();
+            if (e.clientX > rect.left - 50 && e.clientX < rect.right + 50 &&
+                e.clientY > rect.top - 50 && e.clientY < rect.bottom + 50) {
                 
-                const current = progress.get();
-                if (current >= 100) {
-                    claimFired.current = true;
-                    setExploded(true);
-                    onClaim();
-                } else {
-                    progress.set(current + (delta * 0.16)); 
+                setStatus("VERIFYING");
+                
+                const lx = e.clientX - rect.left;
+                const ly = e.clientY - rect.top;
+                
+                pointsRef.current.push({ x: lx, y: ly, t: performance.now() });
+
+                const cx = rect.width / 2;
+                const cy = rect.height / 2;
+                const angle = Math.atan2(ly - cy, lx - cx);
+
+                if (lastAngle.current !== null) {
+                    let diff = angle - lastAngle.current;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    angleSum.current += diff;
+
+                    if (Math.abs(angleSum.current) >= Math.PI * 1.95) {
+                        claimFired.current = true;
+                        setStatus("VALIDATED");
+                        onClaim();
+                    }
                 }
-                frame = requestAnimationFrame(updateFill);
-            } else if (!isHolding && !claimFired.current) {
-                progress.set(0);
+                lastAngle.current = angle;
+            } else {
+                setStatus("IDLE");
+                angleSum.current = 0;
+                lastAngle.current = null;
+                pointsRef.current = [];
             }
         };
 
-        if (isHolding && !claimFired.current) {
-            lastTime = performance.now();
-            frame = requestAnimationFrame(updateFill);
-        } else {
-            if (!claimFired.current) progress.set(0);
-        }
-        
-        return () => cancelAnimationFrame(frame);
-    }, [isHolding, progress, onClaim]);
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, [status, onClaim]);
 
     if (disabled) return null;
 
     return (
         <div 
-            className="relative w-full max-w-[400px] h-24 mx-auto border border-black/10 rounded-3xl flex items-center justify-center overflow-hidden cursor-none transition-colors bg-white/40 hover:bg-black/[0.03] hover:shadow-inner"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => { setIsHovered(false); setIsHolding(false); if(!claimFired.current) progress.set(0); }}
-            onMouseDown={() => { if(!exploded) setIsHolding(true); }}
-            onMouseUp={() => setIsHolding(false)}
-            style={{ willChange: 'background-color, box-shadow' }}
+            ref={containerRef}
+            className="relative w-full max-w-[400px] h-32 mx-auto border border-black/10 rounded-3xl flex items-center justify-center overflow-hidden cursor-crosshair bg-white hover:shadow-inner transition-all duration-500"
         >
-            <span className="font-mono text-xs text-black/40 tracking-[0.3em] font-bold z-10 select-none pointer-events-none transition-opacity duration-300">
-                {exploded ? "GENESIS ANCHORED" : isHolding ? "MAINTAIN PRESSURE..." : "ENGAGE LIQUID VALIDATION"}
+            <canvas 
+                ref={canvasRef} 
+                width={400} 
+                height={128} 
+                className="absolute inset-0 z-0 pointer-events-none"
+            />
+            <span className="font-mono text-[10px] text-black/40 tracking-[0.2em] font-bold z-10 select-none pointer-events-none transition-opacity">
+                {status === "VALIDATED" 
+                    ? "HUMAN VERIFIED" 
+                    : status === "VERIFYING" 
+                        ? `TRACKING ${(Math.min(Math.abs(angleSum.current) / (Math.PI*2), 1) * 100).toFixed(0)}%`
+                        : "DRAW A CIRCLE TO VERIFY"}
             </span>
-
-            {/* Render fluid portal overlay */}
-            {isHovered && !exploded && (
-                <motion.div
-                    style={{
-                        x: springX,
-                        y: springY,
-                        scale: ringScale,
-                        translateX: "-50%",
-                        translateY: "-50%",
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        zIndex: 100,
-                        pointerEvents: "none",
-                        willChange: "transform"
-                    }}
-                    className="flex items-center justify-center mix-blend-difference"
-                >
-                    <div className="absolute w-20 h-20 rounded-full border border-white/30 backdrop-blur-md" />
-                    <motion.svg width="120" height="120" viewBox="0 0 120 120" className="absolute -rotate-90 origin-center">
-                        <motion.circle 
-                            cx="60" cy="60" r="56" 
-                            fill="none" 
-                            stroke="#fff" 
-                            strokeWidth="4" 
-                            strokeDasharray="351.85"
-                            strokeDashoffset={dashOffset} 
-                            strokeLinecap="round"
-                        />
-                    </motion.svg>
-                    <motion.div 
-                        initial={false}
-                        animate={{ scale: isHolding ? 0.7 : 0.3, opacity: isHolding ? 1 : 0.5 }}
-                        transition={{ ease: "easeOut", duration: 0.15 }}
-                        style={{ willChange: "transform, opacity" }}
-                        className="w-20 h-20 bg-white rounded-full blur-[4px]"
-                    />
-                </motion.div>
-            )}
-
-            {/* Cosmic Explosion / Whale Morph */}
-            {exploded && (
-                <motion.div 
-                    initial={{ scale: 0, opacity: 1, rotate: 0 }}
-                    animate={{ scale: [0, 4, 8], opacity: [1, 1, 0], rotate: [0, 15, 30] }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                    className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none"
-                    style={{ willChange: "transform, opacity" }}
-                >
-                    <div className="absolute w-24 h-24 bg-gradient-to-tr from-[#D4AF37] to-white blur-3xl rounded-full" />
-                    <CorporateWhaleLogo className="w-20 h-20 text-[#D4AF37] blur-[1px] absolute" />
-                </motion.div>
-            )}
         </div>
     );
 }

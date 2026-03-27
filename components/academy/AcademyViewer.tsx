@@ -27,7 +27,7 @@ const ArticleBlock = memo(function ArticleBlock({
 
             <div className="mb-12 space-y-6">
                 <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] font-mono">
-                    <span className="flex items-center gap-2 bg-yellow-500/10 text-yellow-500 px-4 py-1.5 rounded-full border border-yellow-500/20 shadow-[0_0_20px_rgba(234,179,8,0.1)]">
+                    <span className="flex items-center gap-2 bg-white/5 text-white px-4 py-1.5 rounded-full border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                         <ClockIcon size={12} /> {article.readTime} MIN READ
                     </span>
                     <span className="bg-white/5 text-white/30 px-3 py-1.5 rounded-full border border-white/10">
@@ -53,7 +53,7 @@ const ArticleBlock = memo(function ArticleBlock({
                 prose-h2:text-4xl prose-h2:mt-20 prose-h2:mb-8 prose-h2:font-black
                 prose-p:font-aztec-body prose-p:text-white/70 prose-p:leading-[1.8] prose-p:text-xl md:prose-p:text-2xl
                 prose-strong:text-white prose-strong:font-black
-                prose-ul:text-white/70 prose-li:marker:text-yellow-500/50"
+                prose-ul:text-white/70 prose-li:marker:text-white/50"
                 dangerouslySetInnerHTML={{ __html: article.content }}
             />
         </article>
@@ -64,8 +64,8 @@ const ArticleBlock = memo(function ArticleBlock({
 function AcademyLogo() {
     return (
         <svg viewBox="0 0 100 100" className="w-8 h-8 opacity-80 group-hover:opacity-100 transition-opacity">
-            <path d="M 20,40 Q 30,15 50,40 Q 70,65 85,35 L 80,75 Q 50,90 20,70 L 15,45 Q 15,40 20,40 Z" fill="#DFBB5E" />
-            <path d="M 50,40 L 60,65 L 75,45" fill="none" stroke="#C49B30" strokeWidth="3" />
+            <path d="M 20,40 Q 30,15 50,40 Q 70,65 85,35 L 80,75 Q 50,90 20,70 L 15,45 Q 15,40 20,40 Z" fill="#ffffff" />
+            <path d="M 50,40 L 60,65 L 75,45" fill="none" stroke="#aaaaaa" strokeWidth="3" />
         </svg>
     );
 }
@@ -132,7 +132,7 @@ export function AcademyViewer() {
                 .academy-scroll-container::-webkit-scrollbar { width: 3px; }
                 .academy-scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
                 .academy-scroll-container::-webkit-scrollbar-thumb { 
-                    background: linear-gradient(to bottom, transparent, #DFBB5E, transparent);
+                    background: linear-gradient(to bottom, transparent, #ffffff, transparent);
                     border-radius: 10px;
                 }
                 .sidebar-hide-scroll::-webkit-scrollbar { display: none; }
@@ -148,7 +148,7 @@ export function AcademyViewer() {
                 {/* PROGRESS BAR (STRATOSPHERIC PRECISION) */}
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/5 z-[100]">
                     <motion.div 
-                        className="h-full bg-gradient-to-r from-yellow-600 via-yellow-200 to-yellow-600 shadow-[0_0_15px_rgba(234,179,8,0.5)]"
+                        className="h-full bg-gradient-to-r from-white/20 via-white to-white/20 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                         style={{ width: `${scrollProgress}%` }}
                     />
                 </div>
@@ -160,7 +160,7 @@ export function AcademyViewer() {
                             <AcademyLogo />
                             <div>
                                 <h2 className="font-aztec-h1 text-2xl font-black uppercase tracking-tighter text-white">
-                                    Knowledge <span className="text-yellow-500">Hub</span>
+                                    Knowledge <span className="text-white/60">Hub</span>
                                 </h2>
                                 <p className="text-[7px] font-mono text-white/30 uppercase tracking-[0.5em] font-black">Institutional Repository</p>
                             </div>
@@ -173,7 +173,7 @@ export function AcademyViewer() {
                                 placeholder="Search archives..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-11 pr-4 py-4 bg-white/[0.03] border border-white/5 rounded-2xl text-[12px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:border-yellow-500/50 transition-all focus:bg-white/[0.06] shadow-inner"
+                                className="w-full pl-11 pr-4 py-4 bg-white/[0.03] border border-white/5 rounded-2xl text-[12px] font-medium text-white placeholder:text-white/20 focus:outline-none focus:border-white/50 transition-all focus:bg-white/[0.06] shadow-inner"
                             />
                         </div>
                     </div>
@@ -183,7 +183,7 @@ export function AcademyViewer() {
                             <div key={module.id} className="relative pl-4">
                                 <div className="absolute left-0 top-0 bottom-0 w-px bg-white/10" />
                                 <h3 className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/50" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-white/50" />
                                     {module.title}
                                 </h3>
                                 <div className="flex flex-col gap-1">
@@ -201,7 +201,7 @@ export function AcademyViewer() {
                                                 {article.title}
                                             </span>
                                             {activeSection === article.id && (
-                                                <div className="w-1 h-1 rounded-full bg-yellow-500" />
+                                                <div className="w-1 h-1 rounded-full bg-white" />
                                             )}
                                         </button>
                                     ))}
@@ -214,7 +214,7 @@ export function AcademyViewer() {
                         <div className="flex items-center justify-between text-[8px] font-mono text-white/20 uppercase tracking-widest font-black">
                             <span>Status: Synchronized</span>
                             <span className="animate-pulse flex items-center gap-1">
-                                <div className="w-1 h-1 rounded-full bg-green-500" /> Secure
+                                <div className="w-1 h-1 rounded-full bg-white" /> Secure
                             </span>
                         </div>
                     </div>
@@ -226,13 +226,13 @@ export function AcademyViewer() {
                     className="flex-1 overflow-y-auto academy-scroll-container bg-transparent relative no-copy"
                     onContextMenu={(e) => e.preventDefault()}
                 >
-                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
                     
                     <div className="max-w-[900px] mx-auto px-8 lg:px-16 py-24 lg:py-40 relative z-10">
-                        <header className="mb-48 border-l-4 border-yellow-500/30 pl-12">
+                        <header className="mb-48 border-l-4 border-white/30 pl-12">
                             <h1 className="font-aztec-h1 text-6xl md:text-9xl text-white tracking-tighter mb-8 uppercase leading-[0.85]">
                                 Strategic <br />
-                                <span className="bg-gradient-to-r from-yellow-200 via-yellow-500 to-yellow-200 bg-clip-text text-transparent">Intelligence</span>
+                                <span className="bg-gradient-to-r from-white/70 via-white to-white/70 bg-clip-text text-transparent">Intelligence</span>
                             </h1>
                             <p className="font-aztec-body text-2xl lg:text-3xl text-white/40 max-w-2xl leading-relaxed font-light">
                                 60 years of sovereign expertise consolidated into a single cryptographic knowledge architecture.
@@ -246,12 +246,12 @@ export function AcademyViewer() {
                                         <h2 className="font-aztec-h1 text-5xl md:text-6xl text-white tracking-tighter">
                                             {module.title}
                                         </h2>
-                                        <p className="text-[10px] font-mono text-yellow-500 uppercase tracking-[0.5em] mt-3 font-black">
+                                        <p className="text-[10px] font-mono text-white/60 uppercase tracking-[0.5em] mt-3 font-black">
                                             {module.description}
                                         </p>
                                     </div>
                                     <div className="ml-auto hidden sm:flex items-center gap-3 bg-white/5 px-6 py-2 rounded-full border border-white/10">
-                                        <Target size={14} className="text-yellow-500" />
+                                        <Target size={14} className="text-white/60" />
                                         <span className="text-[10px] font-black uppercase tracking-widest text-white/50">{module.articles.length} FILES</span>
                                     </div>
                                 </div>

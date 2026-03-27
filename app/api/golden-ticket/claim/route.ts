@@ -42,15 +42,11 @@ export async function POST(req: NextRequest) {
       }, { status: 409 });
     }
 
-    // Count existing tickets for serial code
-    const totalTickets = await prisma.goldenTicket.count();
-    const serialNumber = String(totalTickets + 1).padStart(6, '0');
-    const serialCode = `WHALE-GEN-${serialNumber}`;
-
+    // Create ticket with a temporary unique serialCode to avoid P2002 Race Condition on concurrent claims
     const ticket = await prisma.goldenTicket.create({
       data: {
         userAddress: address,
-        serialCode,
+        serialCode: `PENDING-${address}-${Date.now()}`,
         tier: 'GENESIS',
         badgeColor: 'GOLD',
         networkLaunchEligible: true,
@@ -58,9 +54,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Update with final sequential serialCode based on actual ticketNumber assigned by DB
+    const serialNumber = String(ticket.ticketNumber).padStart(6, '0');
+    const finalTicket = await prisma.goldenTicket.update({
+      where: { id: ticket.id },
+      data: { serialCode: `WHALE-GEN-${serialNumber}` }
+    });
+
     return NextResponse.json({
       success: true,
-      ticket,
+      ticket: finalTicket,
       message: 'Genesis Ticket claimed successfully. Your golden badge is reserved.'
     }, { status: 201 });
 

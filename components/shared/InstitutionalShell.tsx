@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import React from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Activity, Cpu } from "lucide-react";
+import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
 
 interface InstitutionalShellProps {
   children: React.ReactNode;
@@ -13,53 +12,47 @@ interface InstitutionalShellProps {
   badgeVariant?: "lime" | "emerald" | "rose" | "orchid" | "amber";
 }
 
-// ─── THE MASTER STACK SHELL ───
+// ─── THE MASTER STACK SHELL (PURE MONOCHROME) ───
 export function InstitutionalShell({ 
   children, 
   title, 
   subtitle,
-  badge,
-  badgeVariant = "orchid"
+  badge
 }: InstitutionalShellProps) {
 
-  // Exact brand colors derived from the 300B logic
-  const colors = {
-      lime: "var(--aztec-chartreuse)",
-      emerald: "#10b981",
-      rose: "#f43f5e",
-      orchid: "var(--aztec-orchid)",
-      amber: "#fbbf24",
-  };
-  const activeColor = colors[badgeVariant];
-
   return (
-    <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FDFBF7] text-[#1A1A1A] overflow-hidden relative font-aztec-body">
+    <div className="flex flex-col h-[calc(100vh-105px)] bg-white text-black overflow-hidden relative font-aztec-body">
       
-      {/* ─── Global Depth Scanlines (Ivory Variant) ─── */}
-      <div className="absolute inset-0 pointer-events-none z-0 mix-blend-multiply opacity-[0.03]" style={{ background: "repeating-linear-gradient(0deg,transparent,transparent 2px,#000 2px,#000 4px)" }} />
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-black/5 to-transparent z-10" />
+      {/* ─── Global Depth Scanlines (Monochrome Variant) ─── */}
+      <div className="absolute inset-0 pointer-events-none z-0 mix-blend-multiply opacity-[0.02]" style={{ background: "repeating-linear-gradient(0deg,transparent,transparent 2px,#000 2px,#000 4px)" }} />
+      <div className="absolute top-0 inset-x-0 h-px bg-black/[0.03] z-10" />
 
-      {/* ─── Stack Sub-Header (The Ivory Banner) ─── */}
-      <div className="flex-shrink-0 px-6 lg:px-12 py-5 relative z-30 bg-white/60 backdrop-blur-3xl border-b border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* ─── Centered Logo + Minimal Header ─── */}
+      <div className="flex-shrink-0 relative z-30 bg-white border-b border-black/[0.04] shadow-[0_10px_30px_rgba(0,0,0,0.01)] py-8 px-6 flex flex-col items-center justify-center text-center">
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <CorporateWhaleLogo className="w-12 h-12 text-black mb-5 mx-auto" />
+        </motion.div>
         
-        {/* Title Identity */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4 relative">
+          <h1 className="font-aztec-h1 text-3xl md:text-5xl text-black tracking-tighter leading-none m-0 uppercase selection:bg-black/10">
+            {title}
+          </h1>
           {badge && (
-            <span className="font-mono text-[8px] font-bold tracking-[0.2em] uppercase px-3 py-1 rounded-sm bg-black/5 border border-black/10" style={{ color: activeColor }}>
+            <span className="absolute -right-2 top-0 translate-x-full -translate-y-1/2 font-mono text-[8px] font-black tracking-[0.4em] uppercase px-3 py-1 bg-black text-white shadow-sm">
               {badge}
             </span>
           )}
-          <div className="flex flex-col">
-              <h1 className="font-aztec-h1 text-2xl md:text-3xl text-[#1A1A1A] tracking-tighter leading-none m-0">
-                {title}
-              </h1>
-              {subtitle && (
-                <span className="font-mono text-[9px] text-black/40 tracking-[0.2em] font-medium uppercase mt-1">
-                  — {subtitle}
-                </span>
-              )}
-          </div>
         </div>
+        
+        {subtitle && (
+          <span className="font-mono text-[10px] text-black/40 tracking-[0.3em] font-bold uppercase mt-3 block selection:bg-black/10">
+            {subtitle}
+          </span>
+        )}
       </div>
 
       {/* ─── Deep Inner Scrollable Viewpoint ─── */}
@@ -67,8 +60,8 @@ export function InstitutionalShell({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="h-full min-h-0"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="h-full min-h-0 container mx-auto"
         >
           {children}
         </motion.div>

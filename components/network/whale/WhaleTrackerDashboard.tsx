@@ -79,19 +79,15 @@ function TransactionRow({ item, index }: { item: any, index: number }) {
             >
                 <div className="shrink-0 flex items-center gap-4 w-full sm:w-auto">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl sm:rounded-[1.5rem] bg-white/[0.02] flex items-center justify-center border border-white/5 overflow-hidden relative shadow-sm group-hover:border-white/10 transition-colors">
-                         <div className={`absolute inset-0 opacity-10 ${
-                             item.type?.includes('SELL') ? 'bg-rose-500' : 
-                             item.type?.includes('BUY') ? 'bg-emerald-500' : 
-                             'bg-slate-500'
-                         }`} />
-                        {item.type?.includes('SELL') ? <Scale className="text-rose-500 relative z-10" size={18} /> : 
-                         item.type?.includes('BUY') ? <Zap className="text-emerald-500 relative z-10" size={18} /> :
+                         <div className={`absolute inset-0 opacity-10 bg-white`} />
+                        {item.type?.includes('SELL') ? <Scale className="text-white relative z-10" size={18} /> : 
+                         item.type?.includes('BUY') ? <Zap className="text-white relative z-10" size={18} /> :
                          <Activity className="text-white/50 relative z-10" size={18} />}
                     </div>
                     <div className="sm:hidden flex-1">
                         <div className="flex items-center gap-3">
                             <span className="text-[9px] font-black uppercase tracking-widest text-white/40">{item.tier?.replace(' tier', '') || 'INST'}</span>
-                             <span className={`text-[9px] font-black uppercase tracking-widest ${item.type?.includes('SELL') ? 'text-rose-500' : 'text-emerald-500'}`}>{item.type || 'TX'}</span>
+                             <span className={`text-[9px] font-black uppercase tracking-widest text-white/70`}>{item.type || 'TX'}</span>
                         </div>
                         <div className="text-[10px] font-mono font-black text-white/90 mt-0.5">{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
@@ -106,11 +102,7 @@ function TransactionRow({ item, index }: { item: any, index: number }) {
                             {item.tier?.replace(' tier', '') || 'Institutional'}
                         </span>
                         <div className="h-1 w-1 rounded-full bg-white/20" />
-                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
-                            item.type?.includes('SELL') ? 'text-rose-500' : 
-                            item.type?.includes('BUY') ? 'text-emerald-500' : 
-                            'text-white/50'
-                        }`}>
+                        <span className={`text-[10px] font-black uppercase tracking-[0.2em] text-white/80`}>
                             {item.type || 'EXCHANGE TRANSFER'}
                         </span>
                     </div>
@@ -190,7 +182,7 @@ function TransactionRow({ item, index }: { item: any, index: number }) {
                                     <span className="text-white/40 font-bold tracking-tight">Valuation:</span>
                                     <span>${item.usdValue.toLocaleString()} USD</span>
                                     <span className="text-white/20 mx-1">|</span>
-                                    <span className="text-cyan-500">({(item.usdValue * 0.92).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} EUR)</span>
+                                    <span className="text-white/60">({(item.usdValue * 0.92).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} EUR)</span>
                                 </div>
                                 
                                 <a 
@@ -238,7 +230,7 @@ export function WhaleTrackerDashboard() {
     }, [unifiedWhaleFeed, searchQuery, activeTab]);
 
     return (
-        <div className="relative min-h-screen bg-[#050505] text-white/90 font-sans selection:bg-cyan-500/20 selection:text-white overflow-x-hidden">
+        <div className="relative min-h-screen bg-[#050505] text-white/90 font-sans selection:bg-white/20 selection:text-white overflow-x-hidden">
             <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
                 <AnimatePresence>
                     {showNews && (
@@ -279,7 +271,7 @@ export function WhaleTrackerDashboard() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="w-80 h-80 flex items-center justify-center mx-auto relative group"
                             >
-                                <div className="absolute inset-0 bg-blue-500/10 blur-3xl rounded-full" />
+                                <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full" />
                                 <img 
                                     src="/official-whale-legendary.png" 
                                     className="w-full h-full object-contain transition-transform duration-500 scale-125 group-hover:scale-150 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] relative z-10" 
@@ -299,14 +291,14 @@ export function WhaleTrackerDashboard() {
 
                         <div className="w-full max-w-4xl flex gap-8 items-center">
                             <div className="flex-1 relative group">
-                                <div className="absolute inset-y-0 left-10 flex items-center pointer-events-none text-white/40 group-focus-within:text-cyan-500 transition-colors">
+                                <div className="absolute inset-y-0 left-10 flex items-center pointer-events-none text-white/40 group-focus-within:text-white transition-colors">
                                     <Search size={28} />
                                 </div>
                                 <input 
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="QUERY BY TX HASH / WALLET SIGNATURE / ASSET..."
-                                    className="w-full bg-white/[0.02] border border-white/10 rounded-3xl sm:rounded-[3.5rem] py-6 sm:py-10 pl-16 sm:pl-24 pr-4 sm:pr-40 text-sm sm:text-lg font-bold tracking-tight outline-none focus:border-cyan-500/50 focus:shadow-[0_0_50px_rgba(6,182,212,0.15)] transition-all text-white placeholder:text-white/30 shadow-xl"
+                                    className="w-full bg-white/[0.02] border border-white/10 rounded-3xl sm:rounded-[3.5rem] py-6 sm:py-10 pl-16 sm:pl-24 pr-4 sm:pr-40 text-sm sm:text-lg font-bold tracking-tight outline-none focus:border-white/50 focus:shadow-[0_0_50px_rgba(255,255,255,0.05)] transition-all text-white placeholder:text-white/30 shadow-xl"
                                 />
                             </div>
                         </div>
@@ -341,9 +333,9 @@ export function WhaleTrackerDashboard() {
                         <div className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] sm:rounded-[5rem] overflow-hidden shadow-2xl relative">
                             {isLoading && (
                                 <div className="h-[700px] flex flex-col items-center justify-center gap-10">
-                                    <div className="w-16 h-16 border-[6px] border-white/5 border-t-cyan-500 animate-spin rounded-full shadow-lg" />
+                                    <div className="w-16 h-16 border-[6px] border-white/5 border-t-white animate-spin rounded-full shadow-lg" />
                                     <div className="text-center space-y-3">
-                                        <span className="block text-[12px] uppercase font-black tracking-[0.6em] text-cyan-500 animate-pulse">Synchronizing Block Data</span>
+                                        <span className="block text-[12px] uppercase font-black tracking-[0.6em] text-white animate-pulse">Synchronizing Block Data</span>
                                         <span className="block text-[10px] font-black text-white/30 uppercase tracking-widest">Resolving Ledger State</span>
                                     </div>
                                 </div>

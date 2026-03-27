@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function VipPage() {
   return (
-    <InstitutionalShell title="Whale VIP" subtitle="Sovereign Transaction Nexus" badge="PREMIUM" badgeVariant="amber">
+    <InstitutionalShell title="Whale VIP" subtitle="Sovereign Transaction Nexus" badge="PREMIUM">
       <MasterMatrixComponent />
     </InstitutionalShell>
   );
