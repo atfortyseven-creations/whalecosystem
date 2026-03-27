@@ -4,120 +4,193 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, Bell, Eye, EyeOff, Search, User, ChevronDown, Activity, Globe, Zap, Settings, HelpCircle, LifeBuoy, Fingerprint, Menu, X, Ticket } from 'lucide-react';
-import { useAppKit } from '@reown/appkit/react';
-import { useSmartAccount } from '@/hooks/useSmartAccount';
+import { Globe, Menu, X, Ticket } from 'lucide-react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useUIStore } from '@/lib/store/ui-store';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
+import Image from 'next/image';
 
-// ─── CORPORATE IDENTITY: THE GOLDEN WHALE ───
-import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
-
+// ─── IVORY INSTITUTIONAL HEADER ───
+// Crema/Ivory premium palette — 100% visible, senior Web3 grade
 export function InstitutionalHeader() {
     const pathname = usePathname();
-    const { address: eoaAddress, isConnected: isEoaConnected } = useSovereignAccount();
-    const { smartAddress, isConnected, isLoading: isSaLoading } = useSmartAccount();
+    const { address: eoaAddress, isConnected } = useSovereignAccount();
     const { openConnectModal } = useUIStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isStealth, setIsStealth] = useState(false);
-    const [showProfile, setShowProfile] = useState(false);
 
     const navLinks = [
-        { href: '/dashboard', label: 'System', active: pathname === '/dashboard', isSystem: true }, // Highlighted system link
-        { href: '/vip', label: 'Whale Vip', active: pathname === '/vip' },
-        { href: '/dashboard', label: 'Whale Dashboard', active: pathname === '/dashboard' },
-        { href: '/network', label: 'Whale Activity', active: pathname === '/network' },
-        { href: '/portfolio', label: 'Whale Portfolio', active: pathname === '/portfolio' },
-        { href: '/support', label: 'Whale Support', active: pathname === '/support' },
-        { href: '/academy', label: 'Whale Academy', active: pathname === '/academy' },
-        { href: '/ticket', label: 'Gold Ticket', active: pathname === '/ticket', isTicket: true },
+        { href: '/dashboard',  label: 'System',          active: pathname === '/dashboard',  isSystem: true  },
+        { href: '/vip',        label: 'Whale VIP',        active: pathname === '/vip'                         },
+        { href: '/network',    label: 'Whale Activity',   active: pathname === '/network'                     },
+        { href: '/portfolio',  label: 'Whale Portfolio',  active: pathname === '/portfolio'                   },
+        { href: '/support',    label: 'Whale Support',    active: pathname === '/support'                     },
+        { href: '/academy',    label: 'Whale Academy',    active: pathname === '/academy'                     },
+        { href: '/ticket',     label: 'Gold Ticket',      active: pathname === '/ticket',     isTicket: true  },
     ];
 
     return (
         <>
-        <header className="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-[#050505]/90 backdrop-blur-3xl sticky top-0 z-[100] transition-all duration-500 shadow-sm">
-            <div className="absolute inset-0 opacity-[0.05] pointer-events-none noise-bg" />
-            
-            {/* Left: Brand Identity */}
-            <div className="flex items-center gap-6 relative z-10">
-                <Link href="/" className="flex items-center gap-4 group">
-                    <div className="relative w-14 h-14 flex items-center justify-center group-hover:rotate-[5deg] transition-all duration-700 bg-white/5 rounded-full shadow-[0_5px_25px_rgba(0,0,0,0.6)] border border-white/10 p-2">
-                        <img src="/official-whale-monochrome.png" alt="Whale Logo" className="w-full h-full object-contain invert mix-blend-screen opacity-90" />
-                    </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-3xl font-aztec-serif font-black text-white uppercase tracking-tighter leading-none flex items-start">
-                            Whale Alert<sup className="text-[10px] ml-0.5 mt-1 font-sans opacity-60 tracking-normal">TM</sup>
-                        </h1>
-                        <span className="text-[9px] font-aztec-mono font-black uppercase tracking-[0.4em] text-white/50 mt-1 drop-shadow-sm">Corporation</span>
+        {/* ─── MAIN IVORY HEADER ─── */}
+        <header
+            className="relative flex items-center justify-between px-6 lg:px-10 border-b sticky top-0 z-[100] transition-all duration-300"
+            style={{
+                background: 'linear-gradient(135deg, #FDFAF5 0%, #F7F2EA 50%, #FDFAF5 100%)',
+                borderColor: 'rgba(0,0,0,0.07)',
+                boxShadow: '0 1px 0 rgba(0,0,0,0.04), 0 4px 24px rgba(0,0,0,0.06)',
+                minHeight: '68px',
+            }}
+        >
+            {/* Paper grain texture overlay */}
+            <div className="absolute inset-0 opacity-[0.025] pointer-events-none noise-bg" />
+            {/* Subtle top edge light */}
+            <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, transparent)' }} />
+
+            {/* LEFT: Brand Identity */}
+            <div className="flex items-center gap-5 relative z-10 flex-shrink-0">
+                <Link href="/" className="flex items-center gap-3.5 group">
+                    <motion.div
+                        whileHover={{ scale: 1.05, rotate: 3 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                        className="relative w-11 h-11 flex items-center justify-center rounded-full border shadow-sm"
+                        style={{ background: 'rgba(0,0,0,0.04)', borderColor: 'rgba(0,0,0,0.08)' }}
+                    >
+                        <Image
+                            src="/official-whale-monochrome.png"
+                            alt="Whale Logo"
+                            width={28}
+                            height={28}
+                            className="object-contain"
+                        />
+                    </motion.div>
+                    <div className="flex flex-col leading-none">
+                        <span className="font-aztec-serif text-[18px] font-black text-black uppercase tracking-tighter leading-none">
+                            Whale Alert
+                        </span>
+                        <span className="font-mono text-[7px] font-bold uppercase tracking-[0.4em] mt-0.5" style={{ color: 'rgba(0,0,0,0.35)' }}>
+                            Corporation
+                        </span>
                     </div>
                 </Link>
 
+                {/* Vertical divider */}
+                <div className="hidden lg:block h-8 w-px" style={{ background: 'rgba(0,0,0,0.08)' }} />
 
-                <div className="h-10 w-px bg-black/5 hidden md:block" />
-
-                {/* Desktop Navigation */}
-                <nav className="hidden xl:flex flex-1 justify-center items-center gap-4 2xl:gap-8 mx-8">
-                    {navLinks.map((link) => (
-                        <Link 
-                            key={link.label}
-                            href={link.href}
-                            className={`text-[9px] font-aztec-mono font-black uppercase tracking-[0.25em] transition-all flex items-center gap-2 whitespace-nowrap ${
-                                link.isSystem ? 'bg-white text-black px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(255,255,255,0.2)] hover:scale-105' :
-                                link.isTicket ? 'bg-white/10 text-white border border-white/30 px-4 py-1.5 rounded-full hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.1)]' :
-                                link.active ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'text-white/50 hover:text-white'
-                            }`}
-                        >
-                            {link.isSystem && <Globe size={12} className="animate-spin-slow" />}
-                            {link.isTicket && <Ticket size={12} className="text-white" />}
-                            {link.label}
-                            {link.isTicket && <span className="ml-0.5 inline-block w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
-                        </Link>
-                    ))}
+                {/* ─── DESKTOP NAV ─── */}
+                <nav className="hidden xl:flex items-center gap-1">
+                    {navLinks.map((link) => {
+                        if (link.isSystem) return (
+                            <Link
+                                key={link.label}
+                                href={link.href}
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[9px] font-mono font-black uppercase tracking-[0.22em] transition-all hover:scale-105"
+                                style={{
+                                    background: 'rgba(0,0,0,0.88)',
+                                    color: '#F7F2EA',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                }}
+                            >
+                                <Globe size={10} />
+                                {link.label}
+                            </Link>
+                        );
+                        if (link.isTicket) return (
+                            <Link
+                                key={link.label}
+                                href={link.href}
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[9px] font-mono font-black uppercase tracking-[0.22em] border transition-all hover:shadow-md"
+                                style={{
+                                    background: link.active ? 'rgba(0,0,0,0.07)' : 'transparent',
+                                    borderColor: 'rgba(0,0,0,0.15)',
+                                    color: 'rgba(0,0,0,0.7)',
+                                }}
+                            >
+                                <Ticket size={10} />
+                                {link.label}
+                                <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#000', opacity: 0.5 }} />
+                            </Link>
+                        );
+                        return (
+                            <Link
+                                key={link.label}
+                                href={link.href}
+                                className="relative px-3 py-1.5 text-[9px] font-mono font-black uppercase tracking-[0.22em] whitespace-nowrap transition-all rounded-lg group"
+                                style={{
+                                    color: link.active ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.4)',
+                                    background: link.active ? 'rgba(0,0,0,0.06)' : 'transparent',
+                                }}
+                            >
+                                <span className="relative z-10 group-hover:text-black transition-colors" style={{ color: 'inherit' }}>
+                                    {link.label}
+                                </span>
+                                {link.active && (
+                                    <motion.div
+                                        layoutId="nav-active-pill"
+                                        className="absolute inset-0 rounded-lg"
+                                        style={{ background: 'rgba(0,0,0,0.06)' }}
+                                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                                    />
+                                )}
+                                {/* Hover underline */}
+                                <span
+                                    className="absolute bottom-0.5 left-3 right-3 h-px opacity-0 group-hover:opacity-30 transition-opacity"
+                                    style={{ background: '#000' }}
+                                />
+                            </Link>
+                        );
+                    })}
                 </nav>
             </div>
 
-            {/* Right: Institutional Actions */}
-            <div className="flex items-center gap-5 relative z-10">
+            {/* RIGHT: Utility area */}
+            <div className="flex items-center gap-3 relative z-10 flex-shrink-0">
                 <div className="hidden lg:block">
                     <SystemsUtilityHeader />
                 </div>
-                
-                {/* Mobile Menu Toggle - Hidden when hub is active at lg */}
-                <button 
+
+                {/* Mobile hamburger */}
+                <motion.button
+                    whileTap={{ scale: 0.93 }}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="lg:hidden p-3 bg-white/5 border border-white/10 rounded-2xl text-white hover:bg-white/10 transition-all active:scale-95 shadow-sm"
+                    className="xl:hidden flex items-center justify-center w-9 h-9 rounded-xl border transition-all"
+                    style={{ borderColor: 'rgba(0,0,0,0.1)', background: isMenuOpen ? 'rgba(0,0,0,0.06)' : 'transparent' }}
                 >
-                    {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
+                    {isMenuOpen ? <X size={16} style={{ color: 'rgba(0,0,0,0.7)' }} /> : <Menu size={16} style={{ color: 'rgba(0,0,0,0.5)' }} />}
+                </motion.button>
             </div>
 
-            {/* Mobile Navigation Overlay */}
+            {/* ─── MOBILE MENU DRAWER ─── */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="absolute top-full left-0 right-0 bg-white/40 backdrop-blur-3xl border-b border-black/5 p-8 flex flex-col gap-6 xl:hidden shadow-2xl z-[90]"
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-0 right-0 border-b z-[90] p-6"
+                        style={{
+                            background: 'linear-gradient(135deg, #FDFAF5 0%, #F7F2EA 100%)',
+                            borderColor: 'rgba(0,0,0,0.07)',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
+                        }}
                     >
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-2 gap-2">
                             {navLinks.map((link) => (
-                                <Link 
+                                <Link
                                     key={link.href}
                                     href={link.href}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className={`p-6 rounded-2xl text-[12px] font-aztec-mono font-black uppercase tracking-[0.3em] transition-all border ${
-                                        link.active 
-                                        ? 'bg-white/10 text-white border-white/20' 
-                                        : 'bg-black/5 text-black/70 border-black/5 hover:text-black hover:bg-black/10'
-                                    }`}
+                                    className="px-4 py-3 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.25em] transition-all border"
+                                    style={{
+                                        background: link.active ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.02)',
+                                        borderColor: link.active ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.06)',
+                                        color: link.active ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
+                                    }}
                                 >
                                     {link.label}
                                 </Link>
                             ))}
                         </div>
-                        <div className="pt-6 border-t border-white/10 flex justify-center scale-110">
+                        <div className="mt-5 pt-5 border-t flex justify-center" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
                             <SystemsUtilityHeader />
                         </div>
                     </motion.div>

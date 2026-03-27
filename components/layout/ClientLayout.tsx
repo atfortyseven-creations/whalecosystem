@@ -53,9 +53,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                             pathname === '/vip' ||
                             pathname === '/'
                         ) && (
-                            <div className="glass-aztek sticky top-0 z-50">
-                                <InstitutionalHeader />
-                            </div>
+                            <InstitutionalHeader />
                         )}
 
                         {/* Global Utility Hub */}
