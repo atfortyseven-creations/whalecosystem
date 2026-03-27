@@ -160,6 +160,7 @@ function ImmersiveCursorClaim({ onClaim, disabled }: { onClaim: () => Promise<bo
     
     const ringScale = useSpring(isHovered ? (isHolding ? 1.5 : 1) : 0, { damping: 20, stiffness: 300 });
     const progressSpring = useSpring(progress, { damping: 40, stiffness: 200 });
+    const dashOffset = useTransform(progressSpring, [0, 100], [351.85, 0]);
 
     const claimFired = useRef(false);
 
@@ -249,7 +250,7 @@ function ImmersiveCursorClaim({ onClaim, disabled }: { onClaim: () => Promise<bo
                             stroke="#fff" 
                             strokeWidth="4" 
                             strokeDasharray="351.85"
-                            strokeDashoffset={useTransform(progressSpring, [0, 100], [351.85, 0])} 
+                            strokeDashoffset={dashOffset} 
                             strokeLinecap="round"
                         />
                     </motion.svg>
