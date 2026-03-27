@@ -80,7 +80,7 @@ function EngineeredGoldenTicket() {
                 <g filter="url(#engraving)" transform="translate(320, 100)">
                    <path d="M20 40 L60 140 L100 70 L140 140 L180 40" fill="none" stroke="#AD8218" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
                 </g>
-                <text x="400" y="280" fontFamily="monospace" fontSize="24" fill="#A87A13" fontWeight="bold" letterSpacing="18" textAnchor="middle" filter="url(#engraving)">GENESIS FILE</text>
+                <text x="400" y="280" fontFamily="monospace" fontSize="24" fill="#A87A13" fontWeight="bold" letterSpacing="18" textAnchor="middle" filter="url(#engraving)">GOLD TICKET</text>
 
                 {/* Tear Off Text */}
                 <g filter="url(#engraving)">
@@ -305,10 +305,7 @@ export default function GoldenTicketPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center justify-center mb-6"
           >
-              <div className="flex items-center gap-2 mb-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                 <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/40 font-bold">Genesis Ledger Live</span>
-              </div>
+              {/* Minimalist Top spacing, removed 'Live' indicator per user request */}
               <div className="font-aztec-h1 text-5xl md:text-7xl font-bold bg-gradient-to-r from-black via-[#333] to-black bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
                  {globalCount !== null ? globalCount.toLocaleString() : "..."}
               </div>
@@ -323,7 +320,7 @@ export default function GoldenTicketPage() {
           {/* Explanation Text */}
           <div className="max-w-xl text-center mb-12">
               <p className="font-aztec-body text-base md:text-lg text-black/60 leading-relaxed font-normal not-italic">
-                  The Genesis Golden Ticket is a permanent, non-transferable cryptographic signature cementing your presence in the Whale Alert ecosystem. Every single participant is strictly unique globally, verifying institutional loyalty directly on-chain.
+                  Only users who claim the Gold Ticket prior to the system's launch will unlock exclusive access to all upcoming implementations within the Whale Alert Network.
               </p>
           </div>
 

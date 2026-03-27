@@ -339,7 +339,7 @@ export function WhaleAlertLanding() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button onClick={handleEnterArchive} className="px-8 py-3 bg-white text-black text-xs font-medium rounded shadow-lg hover:bg-white/90 transition-all hover:scale-105">Connect Terminal</button>
-              <Link href="/ticket" className="px-8 py-3 bg-transparent border border-yellow-500/30 text-yellow-400 text-xs font-medium rounded hover:bg-yellow-500/10 transition-all hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.1)]">Claim Genesis Ticket</Link>
+              <Link href="/ticket" className="px-8 py-3 bg-transparent border border-yellow-500/30 text-yellow-400 text-xs font-medium rounded hover:bg-yellow-500/10 transition-all hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.1)]">Claim Gold Ticket</Link>
             </div>
         </div>
       </section>
