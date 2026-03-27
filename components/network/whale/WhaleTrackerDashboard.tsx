@@ -273,7 +273,7 @@ export function WhaleTrackerDashboard() {
                             >
                                 <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full" />
                                 <img 
-                                    src="/official-whale-legendary.png" 
+                                    src="/official-whale-monochrome.png" 
                                     className="w-full h-full object-contain transition-transform duration-500 scale-125 group-hover:scale-150 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] relative z-10" 
                                     alt="Whale Alert Pro"
                                 />

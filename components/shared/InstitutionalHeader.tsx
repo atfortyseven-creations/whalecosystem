@@ -43,13 +43,13 @@ export function InstitutionalHeader() {
             <div className="flex items-center gap-6 relative z-10">
                 <Link href="/" className="flex items-center gap-4 group">
                     <div className="relative w-14 h-14 flex items-center justify-center group-hover:rotate-[5deg] transition-all duration-700 bg-white/5 rounded-full shadow-[0_5px_25px_rgba(0,0,0,0.6)] border border-white/10 p-2">
-                        <CorporateWhaleLogo className="w-full h-full" />
+                        <img src="/official-whale-monochrome.png" alt="Whale Logo" className="w-full h-full object-contain invert mix-blend-screen opacity-90" />
                     </div>
                     <div className="flex flex-col">
                         <h1 className="text-3xl font-aztec-serif font-black text-white uppercase tracking-tighter leading-none flex items-start">
                             Whale Alert<sup className="text-[10px] ml-0.5 mt-1 font-sans opacity-60 tracking-normal">TM</sup>
                         </h1>
-                        <span className="text-[9px] font-aztec-mono font-black uppercase tracking-[0.4em] text-[var(--aztec-orchid)] mt-1 drop-shadow-sm">Corporation</span>
+                        <span className="text-[9px] font-aztec-mono font-black uppercase tracking-[0.4em] text-white/50 mt-1 drop-shadow-sm">Corporation</span>
                     </div>
                 </Link>
 
@@ -63,15 +63,15 @@ export function InstitutionalHeader() {
                             key={link.label}
                             href={link.href}
                             className={`text-[10px] font-aztec-mono font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
-                                link.isSystem ? 'bg-[var(--aztec-chartreuse)] text-black px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(180,255,0,0.2)] hover:scale-105' :
-                                link.isTicket ? 'bg-gradient-to-r from-yellow-600/20 to-yellow-400/10 text-yellow-400 border border-yellow-500/30 px-4 py-1.5 rounded-full hover:from-yellow-500/30 hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.15)]' :
+                                link.isSystem ? 'bg-white text-black px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(255,255,255,0.2)] hover:scale-105' :
+                                link.isTicket ? 'bg-white/10 text-white border border-white/30 px-4 py-1.5 rounded-full hover:bg-white/20 hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.1)]' :
                                 link.active ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'text-white/50 hover:text-white'
                             }`}
                         >
                             {link.isSystem && <Globe size={12} className="animate-spin-slow" />}
-                            {link.isTicket && <Ticket size={12} className="text-yellow-400" />}
+                            {link.isTicket && <Ticket size={12} className="text-white" />}
                             {link.label}
-                            {link.isTicket && <span className="ml-0.5 inline-block w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />}
+                            {link.isTicket && <span className="ml-0.5 inline-block w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
                         </Link>
                     ))}
                 </nav>
@@ -109,8 +109,8 @@ export function InstitutionalHeader() {
                                     onClick={() => setIsMenuOpen(false)}
                                     className={`p-6 rounded-2xl text-[12px] font-aztec-mono font-black uppercase tracking-[0.3em] transition-all border ${
                                         link.active 
-                                        ? 'bg-[var(--aztec-chartreuse)]/10 text-[var(--aztec-chartreuse)] border-[var(--aztec-chartreuse)]/20' 
-                                        : 'bg-[var(--aztec-ink)]/5 text-[var(--aztec-ink)]/70 border-[var(--aztec-ink)]/5 hover:text-[var(--aztec-ink)] hover:bg-[var(--aztec-ink)]/10'
+                                        ? 'bg-white/10 text-white border-white/20' 
+                                        : 'bg-black/5 text-black/70 border-black/5 hover:text-black hover:bg-black/10'
                                     }`}
                                 >
                                     {link.label}
