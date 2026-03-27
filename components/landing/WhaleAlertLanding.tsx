@@ -288,15 +288,15 @@ export function WhaleAlertLanding() {
           transition={{ duration: 2, ease: [0.23, 1, 0.32, 1] }}
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
-          {/* Giant Whale Logo — mix-blend-multiply removes white background naturally */}
+          {/* Main Landing Whale Logo */}
           <div className="w-[min(90vw,700px)] h-[min(50vw,400px)] mx-auto mb-8 relative">
                <Image 
-                   src="/ballena-checkpoint.png" 
+                   src="/logo-landingpage.png" 
                    alt="Whale Alert Logo" 
                    fill 
                    priority
                    className="object-contain"
-                   style={{ mixBlendMode: 'multiply', filter: 'brightness(1.1) contrast(1.05)' }}
+                   style={{ filter: 'invert(1)' }}
                />
           </div>
 
