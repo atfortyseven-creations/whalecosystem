@@ -22,7 +22,16 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
     const isFirstRender = useRef(true);
 
     useEffect(() => { qrSessionRef.current = qrSession; }, [qrSession]);
-    useEffect(() => { setIsMounted(true); }, []);
+    useEffect(() => { 
+        setIsMounted(true); 
+        // FIX #3: Check for existing handshake cookie on mount to prevent double-locking
+        if (typeof document !== 'undefined') {
+            const hasProtocolHandshake = document.cookie.split('; ').some(row => row.startsWith('sovereign_handshake=0x'));
+            if (hasProtocolHandshake && !isLinked) {
+                setLinked(true);
+            }
+        }
+    }, [isLinked, setLinked]);
 
     // ─── CRITICAL FIX: Auto-unlock when EVM wallet connected ──────────────────
     useEffect(() => {
@@ -96,8 +105,13 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
             >
                 <div className="absolute top-0 right-0 w-40 h-40 bg-[var(--aztec-orchid)]/10 blur-[60px] rounded-full pointer-events-none" />
 
-                <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-8 shadow-xl">
-                    <Shield className="text-[var(--aztec-chartreuse)]" size={32} />
+                <div className="w-20 h-20 relative flex items-center justify-center mb-8">
+                    <motion.div
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                        className="absolute inset-0 bg-[var(--aztec-orchid)]/20 blur-2xl rounded-full"
+                    />
+                    <img src="/logo-landingpage.png" alt="Whale" className="w-full h-full object-contain relative z-10" />
                 </div>
 
                 <h2 className="text-4xl font-aztec-serif font-black text-[var(--aztec-ink)] tracking-tighter mb-4 uppercase">
@@ -135,7 +149,22 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <QRCodeSVG value={`SOVEREIGN_HANDSHAKE:${qrSession}`} size={180} level="H" bgColor="#FFFFFF" fgColor="#000000" includeMargin={false} />
+                                    <QRCodeSVG 
+                                        value={`SOVEREIGN_HANDSHAKE:${qrSession}`} 
+                                        size={200} 
+                                        level="H" 
+                                        bgColor="#FFFFFF" 
+                                        fgColor="#000000" 
+                                        includeMargin={false}
+                                        imageSettings={{
+                                            src: "/logo-landingpage.png",
+                                            x: undefined,
+                                            y: undefined,
+                                            height: 40,
+                                            width: 40,
+                                            excavate: true,
+                                        }}
+                                    />
                                 </motion.div>
                             ) : (
                                 <motion.div

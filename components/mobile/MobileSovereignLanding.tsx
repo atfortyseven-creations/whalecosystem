@@ -52,16 +52,19 @@ export function MobileSovereignLanding() {
         if (savedSign === 'true') setIsSigned(true);
     }, [address]);
 
+    // FIX #2: Use WalletConnect modal (works universally on iOS, Android, all wallets)
+    // Previously used MetaMask deep link which broke the session context on iOS
+    const { open: openWalletModal } = useAppKit();
+
     const handleSovereignConnect = useCallback(async () => {
-        const injected = connectors.find((c: any) => c.id === 'injected' || c.id === 'io.metamask' || c.id === 'metaMaskSDK');
-        
-        if (isInappBrowser && injected) {
-            connect({ connector: injected });
-        } else {
-            // Force redirect to metamask deep link if no provider or external browser
-            window.location.href = `https://metamask.app.link/dapp/${window.location.host}`;
+        if (isInappBrowser) {
+            // Already inside a wallet in-app browser — connect injected provider directly
+            const injected = connectors.find((c: any) => c.id === 'injected' || c.id === 'io.metamask' || c.id === 'metaMaskSDK' || c.id === 'coinbaseWallet');
+            if (injected) { connect({ connector: injected }); return; }
         }
-    }, [connect, connectors, isInappBrowser]);
+        // Universal: WalletConnect modal — iOS, Android, MetaMask, Coinbase, Rainbow, etc.
+        openWalletModal();
+    }, [connect, connectors, isInappBrowser, openWalletModal]);
 
     const handleSignAndAuthorize = async () => {
         if (!address) return;
@@ -297,14 +300,54 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
             return;
         }
 
-        // Initialize scanner IMMEDIATELY on mount (button click has already happened)
+        // [LEGENDARY HANDSHAKE ENGINE]
         const initScanner = async () => {
+            const video = document.createElement('video');
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            let animationFrameId: number;
+
+            // Strategy A: Native BarcodeDetector (Android/Chrome/Safari 17+)
+            if ('BarcodeDetector' in window && (window as any).BarcodeDetector.getSupportedFormats().then((f: string[]) => f.includes('qr_code'))) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    video.srcObject = stream;
+                    video.setAttribute('playsinline', 'true');
+                    video.play();
+                    setIsScanning(true);
+
+                    const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+                    
+                    const detectLoop = async () => {
+                        if (isProcessing) return;
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            const barcodes = await detector.detect(video);
+                            if (barcodes.length > 0) {
+                                handleScan(barcodes[0].rawValue);
+                                return;
+                            }
+                        }
+                        animationFrameId = requestAnimationFrame(detectLoop);
+                    };
+                    detectLoop();
+                    
+                    // Cleanup function closure logic
+                    return () => {
+                        cancelAnimationFrame(animationFrameId);
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+                } catch (e) {
+                    console.warn('Native BarcodeDetector failed, falling back to Html5Qrcode');
+                }
+            }
+
+            // Strategy B: Html5Qrcode Fallback (Optimized Legacy)
             try {
                 const scanner = new Html5Qrcode('sovereign-qr-reader');
                 scannerRef.current = scanner;
 
                 const config = {
-                    fps: 20, // Faster for smoother legendary feel
+                    fps: 30, // Max performance for institutional feel
                     qrbox: { width: 260, height: 260 },
                     aspectRatio: 1.0
                 };
@@ -312,79 +355,59 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
                 await scanner.start(
                     { facingMode: "environment" },
                     config,
-                    async (decodedText) => {
-                        if (isProcessing) return;
-                        
-                        // [LEGENDARY NORMALIZATION]
-                        const cleanText = decodedText.trim();
-                        if (!cleanText.startsWith('SOVEREIGN_HANDSHAKE:')) return;
-
-                        setIsProcessing(true);
-                        
-                        try {
-                            toast.info('Establishing Neural Handshake...', {
-                                icon: <Zap className="text-[var(--aztec-orchid)] animate-pulse" size={18} />
-                            });
-
-                            // Stop scanner early to free up device resources
-                            try {
-                                await scanner.stop();
-                                setIsScanning(false);
-                            } catch (stopErr) {
-                                // Ignore already-stopped error
-                            }
-
-                            // [Handshake Signature]
-                            const signature = await signMessageAsync({ message: cleanText });
-                            const token = cleanText.split(':')[1];
-
-                            const res = await fetch('/api/auth/qr-sync', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ token, address, signature }),
-                            });
-
-                            if (res.ok) {
-                                // Provide haptic feedback if available
-                                if (window.navigator?.vibrate) window.navigator.vibrate([100, 50, 100]);
-                                
-                                toast.success('Sync Verified', {
-                                    description: 'Institutional handshake complete.'
-                                });
-                                // Delay transition to ensure user reads the success message
-                                setTimeout(() => setView('landing'), 2000);
-                            } else {
-                                const errText = await res.text();
-                                console.error('[Handshake:SyncError]', errText);
-                                toast.error('Sync Handshake Failed', { description: errText });
-                                setIsProcessing(false);
-                                // Restart scanner safely
-                                if (!isScanning) {
-                                  await scanner.start({ facingMode: "environment" }, config, () => {}, () => {});
-                                  setIsScanning(true);
-                                }
-                            }
-                        } catch (e: any) {
-                            console.error('[HANDSHAKE_ERROR]', e);
-                            toast.error('Handshake Cancelled or Error');
-                            setIsProcessing(false);
-                            // Restart scanner
-                            try {
-                                await scanner.start({ facingMode: "environment" }, config, () => {}, () => {});
-                            } catch(e2) {}
-                        }
-                    },
-                    (error) => { /* Quiet */ }
+                    (text) => handleScan(text),
+                    () => { /* Quiet validation */ }
                 );
                 setIsScanning(true);
             } catch (e) {
-                console.error('Scanner init error:', e);
-                toast.error('Camera Access Failed. Check permissions.');
+                console.error('Handshake Init Error:', e);
+                toast.error('Optics failure. Check permissions.');
                 onBack();
             }
         };
 
+        const handleScan = async (decodedText: string) => {
+            if (isProcessing) return;
+            const cleanText = decodedText.trim();
+            if (!cleanText.startsWith('SOVEREIGN_HANDSHAKE:')) return;
+
+            setIsProcessing(true);
+            if (window.navigator?.vibrate) window.navigator.vibrate([100, 50, 100]); // Haptic confirmation
+
+            try {
+                toast.info('Neural Handshake Detected...', {
+                    icon: <Zap className="text-indigo-400 animate-pulse" size={18} />
+                });
+
+                // Signature challenge
+                const signature = await signMessageAsync({ message: cleanText });
+                const token = cleanText.split(':')[1];
+
+                const res = await fetch('/api/auth/qr-sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, address, signature }),
+                });
+
+                if (res.ok) {
+                    toast.success('Synchronization Permanent', {
+                        description: 'Your identity is now coupled with the PC terminal.'
+                    });
+                    setTimeout(() => setView('landing'), 1500);
+                } else {
+                    throw new Error('Sync Refused');
+                }
+            } catch (e) {
+                toast.error('Handshake Interrupted');
+                setIsProcessing(false);
+            }
+        };
+
         initScanner();
+
+        return () => { 
+            if (scannerRef.current) scannerRef.current.stop().catch(() => {});
+        };
 
         return () => { 
             if (scannerRef.current) {
@@ -429,7 +452,20 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
                     90% { opacity: 1; }
                     100% { top: 90%; opacity: 0; }
                 }
+                .neural-matrix-bg {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(99,102,241,0.05) 50%, rgba(0,0,0,0) 100%);
+                    background-size: 100% 400%;
+                    animation: matrixFlow 15s linear infinite;
+                }
+                @keyframes matrixFlow {
+                    0% { background-position: 0% 0%; }
+                    100% { background-position: 0% 100%; }
+                }
             ` }} />
+
+            <div className="absolute inset-0 neural-matrix-bg pointer-events-none" />
 
             <header className="px-6 py-8 flex items-center justify-between relative z-20">
                 <button
