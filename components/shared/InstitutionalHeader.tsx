@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, Bell, Eye, EyeOff, Search, User, ChevronDown, Activity, Globe, Zap, Settings, HelpCircle, LifeBuoy, Fingerprint, Menu, X } from 'lucide-react';
+import { Landmark, Bell, Eye, EyeOff, Search, User, ChevronDown, Activity, Globe, Zap, Settings, HelpCircle, LifeBuoy, Fingerprint, Menu, X, Ticket } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { useSmartAccount } from '@/hooks/useSmartAccount';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
@@ -28,6 +28,7 @@ export function InstitutionalHeader() {
         { href: '/portfolio', label: 'Whale Portfolio', active: pathname === '/portfolio' },
         { href: '/support', label: 'Whale Support', active: pathname === '/support' },
         { href: '/academy', label: 'Whale Academy', active: pathname === '/academy' },
+        { href: '/ticket', label: 'Genesis Ticket', active: pathname === '/ticket', isTicket: true },
     ];
 
     return (
@@ -64,11 +65,14 @@ export function InstitutionalHeader() {
                             href={link.href}
                             className={`text-[10px] font-aztec-mono font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
                                 link.isSystem ? 'bg-[var(--aztec-chartreuse)] text-[var(--aztec-ink)] px-4 py-1.5 rounded-full shadow-[0_4px_10px_rgba(180,255,0,0.2)] hover:scale-105' :
+                                link.isTicket ? 'bg-gradient-to-r from-yellow-600/20 to-yellow-400/10 text-yellow-400 border border-yellow-500/30 px-4 py-1.5 rounded-full hover:from-yellow-500/30 hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.15)]' :
                                 link.active ? 'text-[var(--aztec-orchid)] drop-shadow-[0_0_8px_rgba(209,37,199,0.2)]' : 'text-[var(--aztec-ink)]/70 hover:text-[var(--aztec-ink)]'
                             }`}
                         >
                             {link.isSystem && <Globe size={12} className="animate-spin-slow" />}
+                            {link.isTicket && <Ticket size={12} className="text-yellow-400" />}
                             {link.label}
+                            {link.isTicket && <span className="ml-0.5 inline-block w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />}
                         </Link>
                     ))}
                 </nav>

@@ -11,6 +11,7 @@ import { useUIStore } from "@/lib/store/ui-store";
 import AntiPhishing from "@/components/security/AntiPhishing";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { LegendaryCursor } from "@/components/landing/LegendaryCursor";
+import { DownheadSection } from "@/components/landing/DownheadSection";
 
 // Letta-inspired Marquee
 const MarqueeBanner = () => {
@@ -320,6 +321,8 @@ export function WhaleAlertLanding() {
           </div>
         </motion.div>
       </section>
+      
+      <DownheadSection />
 
       {/* ── LETTA-STYLE ARCHITECTURE ── */}
       <section className="relative z-10">

@@ -533,9 +533,46 @@ model User {
   projects  Project[]
   variables Variable[]
 
+  // [GOLDEN TICKET] Genesis Insider Program
+  goldenTicket GoldenTicket?
+
   @@index([clerkId])
   @@index([reputation])
 }
+
+// ----------------------------------------------------------------------------
+// GOLDEN TICKET: One-per-user Genesis Insider Badge
+// ----------------------------------------------------------------------------
+
+model GoldenTicket {
+  id            String   @id @default(cuid())
+  ticketNumber  Int      @unique @default(autoincrement()) // Sequential forever-unique ID
+  userAddress   String   @unique // ONE ticket per wallet, enforced at DB level
+  user          User     @relation(fields: [userAddress], references: [walletAddress], onDelete: Cascade)
+
+  // Badge Metadata
+  serialCode    String   @unique // e.g. "WHALE-GEN-000001" displayed in UI
+  tier          String   @default("GENESIS") // Always GENESIS for first drop
+  badgeColor    String   @default("GOLD")    // Visual badge variant: GOLD, PLATINUM, etc.
+  
+  // Status
+  isActive      Boolean  @default(true)
+  revokedAt     DateTime?
+  revokedReason String?
+
+  // Network Launch Context
+  networkLaunchEligible Boolean @default(true) // Gets the golden badge at network launch
+  twitterHandle         String? // Optional: user can link their Twitter/X handle
+
+  // Time
+  claimedAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userAddress])
+  @@index([ticketNumber])
+  @@index([claimedAt])
+}
+
 
 model BlockchainTransaction {
   id                String            @id @default(cuid())

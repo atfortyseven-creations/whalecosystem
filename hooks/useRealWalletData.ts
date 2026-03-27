@@ -4,6 +4,7 @@ import axios from 'axios';
 import { matchNewsToMarket } from '@/utils/news-matcher';
 import { Asset, NewsItem, Position, Transaction } from '@/types/wallet';
 import { useAuth } from '@/hooks/useAuth';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 // Dirección de Bridged USDC en Polygon
@@ -31,8 +32,10 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         enabled: isAuthenticated && !isWeb3Connected
     });
 
-    // Priority: 1. Manual override (Account Switcher), 2. Web3 Connected, 3. Managed/Auth
-    const effectiveAddress = overrideAddress || web3Address || managedWallet?.address;
+    const { address: sovereignAddress } = useWalletStore();
+    
+    // Priority: 1. Manual override, 2. Web3 Connected, 3. Sovereign Store, 4. Managed/Auth
+    const effectiveAddress = overrideAddress || web3Address || sovereignAddress || managedWallet?.address;
 
     // [DEBUG] Monitor address resolution changes
     // console.log('[useRealWalletData] Address Resolution:', { effectiveAddress, isConnected, isAuthenticated, isWeb3Connected });
