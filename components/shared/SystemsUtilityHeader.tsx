@@ -51,7 +51,7 @@ export function SystemsUtilityHeader() {
                     >
                         <item.icon size={18} strokeWidth={activePanel === item.id ? 2.5 : 1.5} />
                         {item.id === 'notifications' && (
-                            <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-[var(--aztec-orchid)] rounded-full animate-pulse shadow-[0_0_8px_rgba(255,45,244,0.8)]" />
+                            <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                         )}
                     </motion.button>
                 ))}
@@ -74,17 +74,17 @@ export function SystemsUtilityHeader() {
                             openConnectModal();
                         }
                     }}
-                    className={`flex items-center gap-3 ${isConnected ? 'bg-[var(--aztec-chartreuse)]' : 'bg-white/5'} backdrop-blur-md border ${isDropdownOpen ? 'border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'border-white/10'} pl-4 pr-1.5 py-1.5 rounded-full shadow-sm cursor-pointer hover:border-white/20 transition-all group`}
+                    className={`flex items-center gap-3 ${isConnected ? 'bg-white' : 'bg-white/5'} backdrop-blur-md border ${isDropdownOpen ? 'border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'border-white/10'} pl-4 pr-1.5 py-1.5 rounded-full shadow-sm cursor-pointer hover:border-white/20 transition-all group`}
                 >
                     <div className="flex flex-col items-start leading-none text-left">
                         <span className={`text-[10px] font-aztec-mono font-black uppercase tracking-widest ${isConnected ? 'text-black' : 'text-white'}`}>
                             {isConnected && address ? truncateAddress(address) : 'Disconnected'}
                         </span>
-                        <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${isConnected ? 'text-black/60' : 'text-[var(--aztec-orchid)]'}`}>
+                        <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${isConnected ? 'text-black/60' : 'text-white/50'}`}>
                             {isConnected ? 'CONNECTED WALLET' : 'Connect Terminal'}
                         </span>
                     </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isDropdownOpen ? 'bg-white text-black' : 'bg-white/10 border border-white/10 text-white group-hover:bg-white group-hover:text-black'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isDropdownOpen ? 'bg-black text-white' : isConnected ? 'bg-black/10 text-black group-hover:bg-black group-hover:text-white' : 'bg-white/10 border border-white/10 text-white group-hover:bg-white group-hover:text-black'}`}>
                         <User size={14} className="group-hover:scale-110 transition-transform" />
                     </div>
                 </motion.button>
@@ -122,7 +122,7 @@ export function SystemsUtilityHeader() {
                                         // 3. Force full state wipe to allow fresh handshake
                                         window.location.reload();
                                     }}
-                                    className="w-full py-4 bg-[#ff0033]/10 border border-[#ff0033]/20 text-[#ff0033] rounded-2xl text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-[#ff0033]/20 transition-all font-bold"
+                                    className="w-full py-4 bg-white border border-white text-black rounded-2xl text-[10px] font-aztec-mono font-black uppercase tracking-widest hover:bg-white/90 transition-all font-bold"
                                 >
                                     Disconnect Session
                                 </button>
