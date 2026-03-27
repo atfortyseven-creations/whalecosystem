@@ -696,3 +696,52 @@
     }
   }
 }
+
+/* ============================================================
+   PHASE 9: IVORY & CREAM ARCHITECTURE GLOBAL OVERRIDES
+   300B Parameter Intelligence - Inverting Dark Mode Utility Classes
+   ============================================================ */
+.text-white { color: #1A1A1A !important; }
+.text-white\/90 { color: rgba(26,26,26,0.9) !important; }
+.text-white\/80 { color: rgba(26,26,26,0.8) !important; }
+.text-white\/70 { color: rgba(26,26,26,0.7) !important; }
+.text-white\/60 { color: rgba(26,26,26,0.6) !important; }
+.text-white\/50 { color: rgba(26,26,26,0.5) !important; }
+.text-white\/40 { color: rgba(26,26,26,0.4) !important; }
+.text-white\/30 { color: rgba(26,26,26,0.3) !important; }
+.text-white\/20 { color: rgba(26,26,26,0.2) !important; }
+.text-white\/10 { color: rgba(26,26,26,0.1) !important; }
+.text-white\/5 { color: rgba(26,26,26,0.05) !important; }
+
+.bg-\[\#050505\] { background-color: #FDFBF7 !important; }
+.bg-\[\#0a0a0a\] { background-color: #FDFBF7 !important; }
+.bg-\[\#111111\] { background-color: #FDFBF7 !important; }
+.bg-black { background-color: #FDFBF7 !important; }
+.bg-black\/40 { background-color: rgba(255,255,255,0.6) !important; backdrop-filter: blur(24px) !important; }
+.bg-black\/80 { background-color: rgba(253,251,247,0.9) !important; backdrop-filter: blur(24px) !important; }
+.bg-black\/90 { background-color: rgba(253,251,247,0.95) !important; backdrop-filter: blur(24px) !important; }
+
+.bg-white\/5 { background-color: rgba(0,0,0,0.03) !important; }
+.bg-white\/10 { background-color: rgba(0,0,0,0.05) !important; }
+.bg-white\/20 { background-color: rgba(0,0,0,0.08) !important; }
+.bg-white\/40 { background-color: rgba(0,0,0,0.1) !important; }
+.bg-white\/\[0\.02\] { background-color: rgba(0,0,0,0.02) !important; }
+.bg-white\/\[0\.03\] { background-color: rgba(0,0,0,0.03) !important; }
+.bg-white\/\[0\.05\] { background-color: rgba(0,0,0,0.04) !important; }
+.bg-white\/\[0\.1\] { background-color: rgba(0,0,0,0.05) !important; }
+
+.border-white\/5 { border-color: rgba(0,0,0,0.05) !important; }
+.border-white\/10 { border-color: rgba(0,0,0,0.1) !important; }
+.border-white\/20 { border-color: rgba(0,0,0,0.15) !important; }
+.border-white { border-color: #1A1A1A !important; }
+
+.hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.03) !important; }
+.hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.05) !important; }
+.hover\:bg-white\/20:hover { background-color: rgba(0,0,0,0.08) !important; }
+.hover\:text-white:hover { color: #1A1A1A !important; }
+.hover\:text-white\/80:hover { color: rgba(26,26,26,0.8) !important; }
+.hover\:text-white\/90:hover { color: rgba(26,26,26,0.9) !important; }
+.hover\:border-white\/20:hover { border-color: rgba(0,0,0,0.15) !important; }
+
+.text-cyan-400 { color: #0099AA !important; }
+.text-cyan-500 { color: #0099AA !important; }
