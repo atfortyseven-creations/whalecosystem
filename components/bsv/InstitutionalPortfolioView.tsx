@@ -45,9 +45,10 @@ export function InstitutionalPortfolioView() {
     const balanceFiat = `$${(parseFloat(balance || "0") * 3100).toFixed(2)}`;
 
     return (
-        <div className="flex flex-col h-full bg-[#050505] text-white overflow-hidden rounded-bl-3xl">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(147,51,234,0.05),transparent_50%)] pointer-events-none" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.05),transparent_50%)] pointer-events-none" />
+        <div className="flex flex-col relative text-white selection:bg-white/10">
+            {/* Soft decorative backdrops */}
+            <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
 
             <AnimatePresence mode="wait">
                 {view === 'HOME' && (
@@ -112,7 +113,7 @@ function HomeView({ address, balance, balanceFiat, pulse, loading, onRefresh, on
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col h-full overflow-y-auto"
+            className="flex flex-col"
         >
             <section className="px-8 pt-16 pb-10 flex flex-col items-center text-center relative">
                 {address && (
@@ -388,7 +389,7 @@ function ModalView({ title, subtitle, icon, onBack, children }: any) {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
-            className="flex flex-col h-full overflow-y-auto"
+            className="flex flex-col"
         >
             <div className="flex items-center gap-5 px-8 pt-12 pb-8 border-b border-white/5 shrink-0">
                 <button onClick={onBack} className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all">
@@ -402,7 +403,7 @@ function ModalView({ title, subtitle, icon, onBack, children }: any) {
                     <h2 className="text-2xl font-aztec-serif font-black uppercase tracking-tight">{title}</h2>
                 </div>
             </div>
-            <div className="flex-1 p-8 overflow-y-auto">
+            <div className="flex-1 p-8">
                 {children}
             </div>
         </motion.div>

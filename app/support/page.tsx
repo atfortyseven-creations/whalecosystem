@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smartphone, Twitter, Globe, ChevronDown, Mail, MessageSquare, Zap, Shield, Clock, CheckCircle, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 import "@/app/dashboard/dashboard.css";
 
 const FAQ_ITEMS = [
@@ -71,7 +72,7 @@ function WhaleSupportHero() {
           Sovereign Assistance Protocol
         </p>
         <h1 className="font-aztec-h1 text-5xl md:text-6xl lg:text-7xl text-black tracking-tighter leading-none mb-4">
-          Whale Support
+          Whale Alert <span className="text-black/50">Support</span>
         </h1>
         <p className="font-sans text-base text-black/50 max-w-lg mx-auto leading-relaxed">
           Elite-grade assistance for every node in the network. We operate 24/7 to ensure your sovereign session runs flawlessly.
@@ -109,13 +110,13 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="min-h-full bg-white text-black font-aztec-body overflow-x-hidden">
+    <InstitutionalShell title="Whale Support" subtitle="Sovereign Assistance Protocol" badge="SUPPORT" badgeVariant="emerald">
+      <div className="selection:bg-black/5">
+        {/* Hero */}
+        <WhaleSupportHero />
 
-      {/* Hero */}
-      <WhaleSupportHero />
-
-      {/* Divider */}
-      <div className="w-full h-px bg-black/[0.06]" />
+        {/* Divider */}
+        <div className="w-full h-px bg-black/[0.06]" />
 
       {/* Stats Row */}
       <motion.div
@@ -266,5 +267,6 @@ export default function SupportPage() {
 
       </div>
     </div>
+  </InstitutionalShell>
   );
 }

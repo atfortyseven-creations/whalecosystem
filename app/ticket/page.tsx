@@ -24,11 +24,11 @@ function EngineeredGoldenTicket() {
             >
                 <defs>
                     <linearGradient id="ticketBase" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#ffffff" />
-                        <stop offset="30%" stopColor="#f5f5f5" />
-                        <stop offset="50%" stopColor="#e0e0e0" />
-                        <stop offset="70%" stopColor="#f5f5f5" />
-                        <stop offset="100%" stopColor="#cccccc" />
+                        <stop offset="0%" stopColor="#FFF2AC" />
+                        <stop offset="25%" stopColor="#FFD700" />
+                        <stop offset="50%" stopColor="#FDB931" />
+                        <stop offset="75%" stopColor="#E6B800" />
+                        <stop offset="100%" stopColor="#B8860B" />
                     </linearGradient>
                     <filter id="innerBevel" x="-20%" y="-20%" width="140%" height="140%">
                         <feDropShadow dx="-2" dy="-2" stdDeviation="3" floodColor="#ffffff" floodOpacity="0.8" />
@@ -70,7 +70,7 @@ function EngineeredGoldenTicket() {
                     A 45,45 0 0,1 15,145 
                     L 15,55 
                     A 25,25 0 0,0 55,15 Z
-                " fill="none" stroke="#e0e0e0" strokeWidth="4" filter="url(#innerBevel)" />
+                " fill="none" stroke="#D4AF37" strokeWidth="4" filter="url(#innerBevel)" />
 
                 <line x1="640" y1="40" x2="640" y2="360" stroke="#000000" strokeWidth="2" strokeDasharray="16,12" strokeLinecap="round" filter="url(#engraving)" opacity="0.4" />
 
@@ -409,26 +409,15 @@ export default function GoldenTicketPage() {
                   <div className="w-px h-16 bg-black/10" />
                   
                   <div className="flex flex-col items-center">
-                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 mb-2">Global Limit</div>
+                      <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 mb-2">Remaining Supply</div>
                       <div className="font-aztec-h1 text-4xl md:text-5xl font-bold bg-gradient-to-r from-black to-[#666] bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
-                         10,000
+                         { (10000 - (globalCount || 0)).toLocaleString() }
                       </div>
-                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/50 mt-1">Max Supply</div>
+                      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/50 mt-1">Global Limit Remaining</div>
                   </div>
               </div>
 
-              {/* Live Network Feeds */}
-              <div className="flex items-center gap-6 text-[10px] font-mono uppercase tracking-[0.2em] text-black/50 bg-black/5 px-6 py-2 rounded-full border border-black/5">
-                  <div className="flex items-center gap-2">
-                       <Activity size={12} className="text-green-600 animate-pulse" />
-                       <span>L1 Sync Active</span>
-                  </div>
-                  <div className="w-1 h-1 rounded-full bg-black/20" />
-                  <div className="flex items-center gap-2">
-                       <Clock size={12} />
-                       <span>Block: {blockNumber ? blockNumber.toString() : '---'}</span>
-                  </div>
-              </div>
+
           </motion.div>
 
           {/* Golden Ticket 3D Render */}
