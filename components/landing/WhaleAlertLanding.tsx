@@ -334,11 +334,11 @@ export function WhaleAlertLanding() {
         <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner">
             <h2 className="font-aztec-body text-4xl font-light mb-4">Whale Alert Network</h2>
             <p className="font-aztec-body text-white/50 text-sm mb-12 max-w-md mx-auto">
-               The memory-first agent. Try for free with your own API keys or our institutional node.
+               The definitive on-chain sovereign intelligence protocol. Connect your wallet to access the elite terminal.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="px-8 py-3 bg-white text-black text-xs font-medium rounded shadow-lg hover:bg-white/90 transition-all hover:scale-105">Enter the Terminal</button>
-              <button className="px-8 py-3 bg-transparent border border-white/20 text-white text-xs font-medium rounded hover:bg-white/10 transition-all hover:scale-105">Install the CLI</button>
+              <button onClick={handleEnterArchive} className="px-8 py-3 bg-white text-black text-xs font-medium rounded shadow-lg hover:bg-white/90 transition-all hover:scale-105">Connect Terminal</button>
+              <Link href="/ticket" className="px-8 py-3 bg-transparent border border-yellow-500/30 text-yellow-400 text-xs font-medium rounded hover:bg-yellow-500/10 transition-all hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.1)]">Claim Genesis Ticket</Link>
             </div>
         </div>
       </section>
@@ -351,8 +351,8 @@ export function WhaleAlertLanding() {
                     {/* The Interactive Hover Pixel Logo Component */}
                     <LettaHoverPixelLogo />
 
-                    <p className="font-aztec-body text-xl max-w-md leading-relaxed text-white/60">
-                        The definitive ADE (Agent Development Environment) for on-chain sovereign privacy. Built for global institutions.
+                    <p className="font-aztec-body text-xl max-w-md leading-relaxed text-white/60 mt-4">
+                        Advanced on-chain analytics and sovereign privacy infrastructure. Built exclusively for global financial institutions and elite market makers.
                     </p>
                 </div>
 
