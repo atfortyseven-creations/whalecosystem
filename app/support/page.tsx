@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Smartphone, Twitter, Globe, ChevronDown, Mail, MessageSquare, Zap, Shield, Clock, CheckCircle, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import "@@/app/dashboard/dashboard.css";
+import "@/app/dashboard/dashboard.css";
 
 const FAQ_ITEMS = [
   { q: "How do I connect my wallet?", a: "Click 'Connect Wallet' in the top right. We support MetaMask, WalletConnect, and Coinbase Wallet. No email or password required — pure sovereignty from block zero." },
