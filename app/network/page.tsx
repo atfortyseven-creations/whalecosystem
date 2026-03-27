@@ -1,5 +1,4 @@
 import { WhaleTrackerDashboard } from '@/components/network/whale/WhaleTrackerDashboard';
-import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 import "@/app/dashboard/dashboard.css";
 import type { Metadata } from 'next';
 
@@ -10,16 +9,8 @@ export const metadata: Metadata = {
 
 export default function WhaleHubPage() {
     return (
-        <InstitutionalShell 
-            title="Whale Network" 
-            subtitle="Protocol Activity Substrate" 
-            badge="NETWORK" 
-            badgeVariant="emerald"
-        >
-            <div style={{ height: "calc(100vh - 160px)", overflow: "hidden" }}>
-                <WhaleTrackerDashboard />
-            </div>
-        </InstitutionalShell>
+        <div className="min-h-screen bg-[#050505]">
+            <WhaleTrackerDashboard />
+        </div>
     );
 }
-

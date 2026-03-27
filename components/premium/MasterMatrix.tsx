@@ -55,7 +55,7 @@ export function MasterMatrix() {
         return {
             globalHeat: heat,
             deltaStream: (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%',
-            deltaColor: delta >= 0 ? 'text-cyan-600' : 'text-rose-600'
+            deltaColor: delta >= 0 ? 'text-cyan-400' : 'text-rose-400'
         };
     }, [whaleEvents]);
 
@@ -67,12 +67,10 @@ export function MasterMatrix() {
     const fmt = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 
     return (
-        <div className="relative min-h-screen bg-transparent text-[var(--aztec-ink)] font-sans selection:bg-[var(--aztec-orchid)]/20 selection:text-[var(--aztec-ink)] overflow-x-hidden">
+        <div className="relative min-h-screen bg-[#050505] text-white/90 font-sans selection:bg-cyan-500/20 selection:text-white overflow-x-hidden">
             {/* Global wallpaper is provided by ClientLayout */}
 
             <div className="relative z-10 w-full max-w-[2560px] mx-auto min-h-screen flex flex-col">
-                {/* Institutional Header is handled by ClientLayout */}
-
                 <main className="flex-1 overflow-y-auto no-scrollbar pb-24 relative z-10">
                     <div className="px-8 pt-12 max-w-[2400px] mx-auto">
                     </div>
@@ -89,16 +87,16 @@ export function MasterMatrix() {
                         </div>
 
                         <div className="lg:col-span-12 space-y-4">
-                            <div className="bg-[var(--aztec-parchment)]/30 backdrop-blur-3xl border border-[var(--aztec-ink)]/5 rounded-[2.5rem] p-8 shadow-xl shadow-[var(--aztec-ink)]/5 group hover:border-[var(--aztec-ink)]/20 transition-all duration-500 overflow-hidden relative">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(182,234,38,0.03),_transparent_70%)] pointer-events-none" />
+                            <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-8 shadow-xl group hover:border-white/10 transition-all duration-500 overflow-hidden relative">
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(6,182,212,0.03),_transparent_70%)] pointer-events-none" />
                                 <TacticalPulseIntelligence />
-                                <div className="mt-8 pt-8 border-t border-[var(--aztec-ink)]/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                                <div className="mt-8 pt-8 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Heat</p>
-                                        <div className="text-2xl font-mono font-black text-cyan-600">{globalHeat} <span className="text-[10px] text-slate-300 font-bold uppercase">{Number(globalHeat) > 8 ? 'Optimal' : 'Standard'}</span></div>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Global Heat</p>
+                                        <div className="text-2xl font-mono font-black text-cyan-400">{globalHeat} <span className="text-[10px] text-white/20 font-bold uppercase">{Number(globalHeat) > 8 ? 'Optimal' : 'Standard'}</span></div>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Delta Stream</p>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Delta Stream</p>
                                         <div className={`text-2xl font-mono font-black ${deltaColor}`}>{deltaStream}</div>
                                     </div>
                                 </div>
@@ -124,8 +122,8 @@ export function MasterMatrix() {
                                                 }}
                                                 className={`px-4 py-2 rounded-xl text-[10px] font-aztec-mono font-black uppercase tracking-widest transition-all border ${
                                                     isSelected 
-                                                        ? 'bg-[var(--aztec-chartreuse)]/10 text-[var(--aztec-chartreuse)] border-[var(--aztec-chartreuse)]/20 shadow-sm' 
-                                                        : 'bg-[var(--aztec-parchment)]/20 text-[var(--aztec-ink)]/40 border-[var(--aztec-ink)]/5 hover:border-[var(--aztec-ink)]/20 hover:text-[var(--aztec-ink)]'
+                                                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 shadow-sm' 
+                                                        : 'bg-white/[0.02] text-white/40 border-white/5 hover:border-white/20 hover:text-white/80'
                                                 }`}
                                             >
                                                 {token}
@@ -138,32 +136,32 @@ export function MasterMatrix() {
 
                         {activeTokenFilter ? (
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                <div className="lg:col-span-8 border border-[var(--aztec-ink)]/5 rounded-[3.5rem] bg-[var(--aztec-parchment)]/40 shadow-2xl p-10 overflow-hidden relative group h-[700px]">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--aztec-parchment)]/20 to-transparent opacity-50 pointer-events-none" />
+                                <div className="lg:col-span-8 border border-white/5 rounded-[3.5rem] bg-white/[0.02] shadow-2xl p-10 overflow-hidden relative group h-[700px]">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-50 pointer-events-none" />
                                     <WhaleMomentumChart symbol={activeTokenFilter} onClick={() => setSelectedSymbolForOverlay(activeTokenFilter)} />
                                 </div>
                                 <div className="lg:col-span-4 flex flex-col gap-6">
-                                    <div className="flex-1 bg-[var(--aztec-parchment)]/50 backdrop-blur-xl rounded-[3rem] border border-[var(--aztec-ink)]/5 p-8 overflow-y-auto custom-scrollbar shadow-xl">
+                                    <div className="flex-1 bg-white/[0.02] backdrop-blur-xl rounded-[3rem] border border-white/5 p-8 overflow-y-auto custom-scrollbar shadow-xl">
                                         <div className="flex items-center justify-between mb-6">
-                                            <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">Persistent Activity: {activeTokenFilter}</h3>
+                                            <h3 className="text-xs font-black text-white/50 uppercase tracking-[0.3em]">Persistent Activity: {activeTokenFilter}</h3>
                                             <button 
                                                 onClick={() => setActiveTokenFilter(null)}
-                                                className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors"
+                                                className="px-3 py-1 bg-white/[0.05] hover:bg-white/10 text-white/50 rounded-lg text-[9px] font-black uppercase tracking-widest transition-colors"
                                             >
                                                 Back to Grid
                                             </button>
                                         </div>
                                         <div className="space-y-4">
                                             {filteredFeed.slice(0, 50).map((tx) => (
-                                                <div key={tx.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-500/30 transition-all">
+                                                <div key={tx.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/30 transition-all">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-1 h-8 rounded-full shrink-0 ${tx.action === 'BUY' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                                                        <span className="text-sm font-black font-mono text-slate-900">${fmt(tx.usdNum)}</span>
-                                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${tx.action === 'BUY' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{tx.action}</span>
+                                                        <span className="text-sm font-black font-mono text-white/90">${fmt(tx.usdNum)}</span>
+                                                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${tx.action === 'BUY' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>{tx.action}</span>
                                                     </div>
                                                     <button 
                                                         onClick={() => navigator.clipboard.writeText(tx.wallet)}
-                                                        className="text-[11px] font-mono text-slate-400 hover:text-emerald-600 truncate text-left sm:text-right"
+                                                        className="text-[11px] font-mono text-white/40 hover:text-emerald-400 truncate text-left sm:text-right"
                                                     >
                                                         {tx.wallet.slice(0, 8)}...{tx.wallet.slice(-6)}
                                                     </button>
@@ -176,7 +174,7 @@ export function MasterMatrix() {
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                                 {selectedTokens.map((token: string) => (
-                                    <div key={token} className="group flex flex-col bg-[var(--aztec-parchment)]/30 backdrop-blur-xl border border-[var(--aztec-ink)]/5 rounded-[2.5rem] overflow-hidden hover:border-[var(--aztec-chartreuse)]/30 transition-all hover:scale-[1.02] shadow-sm hover:shadow-xl">
+                                    <div key={token} className="group flex flex-col bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-cyan-500/30 transition-all hover:scale-[1.02] shadow-sm hover:shadow-xl">
                                         <div className="h-64 relative">
                                             <WhaleMomentumChart symbol={token} compact onClick={() => setSelectedSymbolForOverlay(token)} />
                                         </div>
@@ -188,7 +186,7 @@ export function MasterMatrix() {
                     </section>
                 </main>
 
-                <footer className="h-12 border-t border-[var(--aztec-ink)]/5 flex items-center justify-between px-8 bg-[var(--aztec-parchment)]/30 backdrop-blur-3xl relative z-50">
+                <footer className="h-12 border-t border-white/5 flex items-center justify-between px-8 bg-black/40 backdrop-blur-3xl relative z-50">
                 </footer>
 
                 <AnimatePresence>
@@ -203,7 +201,7 @@ export function MasterMatrix() {
             
             <style jsx global>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.05); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(6,182,212,0.2); }
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
