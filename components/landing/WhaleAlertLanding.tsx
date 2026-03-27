@@ -14,6 +14,26 @@ import { LegendaryCursor } from "@/components/landing/LegendaryCursor";
 import { DownheadSection } from "@/components/landing/DownheadSection";
 import { Footer } from "@/components/layout/Footer";
 
+// ─── CORPORATE IDENTITY: THE GOLDEN WHALE ───
+function CorporateWhaleLogo({ className = "" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 100 100" className={`${className} drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]`}>
+            <defs>
+                <linearGradient id="whaleGoldHero" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DFBB5E" />
+                    <stop offset="50%" stopColor="#FFF2CD" />
+                    <stop offset="100%" stopColor="#C49B30" />
+                </linearGradient>
+            </defs>
+            <path 
+                d="M 20,40 Q 30,15 50,40 Q 70,65 85,35 L 80,75 Q 50,90 20,70 L 15,45 Q 15,40 20,40 Z" 
+                fill="url(#whaleGoldHero)" 
+            />
+            <path d="M 50,40 L 60,65 L 75,45" fill="none" stroke="#C49B30" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+    );
+}
+
 // Letta-inspired Marquee
 const MarqueeBanner = () => {
   return (
@@ -187,12 +207,7 @@ const LettaHoverPixelLogo = () => {
         <div className="group flex items-center gap-4 cursor-pointer">
             {/* The Icon: switches to alien on hover */}
             <div className="w-16 h-16 relative bg-white/5 rounded-2xl shadow-xl border border-white/10 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:bg-[#111111] group-hover:border-[#4B55E5]/50 group-hover:shadow-[0_0_15px_rgba(75,85,229,0.3)]">
-                 <Image 
-                    src="/official-whale-legendary.png" 
-                    alt="Legendary Logo" 
-                    fill 
-                    className="object-contain p-2 transition-opacity duration-300 group-hover:opacity-0" 
-                 />
+                 <CorporateWhaleLogo className="w-10 h-10 transition-opacity duration-300 group-hover:opacity-0" />
                  <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-3xl">
                      👾
                  </span>
@@ -291,15 +306,8 @@ export function WhaleAlertLanding() {
           className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
         >
           {/* Main Landing Whale Logo */}
-          <div className="w-[min(90vw,700px)] h-[min(50vw,400px)] mx-auto mb-8 relative">
-               <Image 
-                   src="/logo-landingpage.png" 
-                   alt="Whale Alert Logo" 
-                   fill 
-                   priority
-                   className="object-contain"
-                   style={{ filter: 'invert(1)' }}
-               />
+          <div className="w-[min(90vw,700px)] h-[min(50vw,400px)] mx-auto mb-12 relative flex items-center justify-center group">
+               <CorporateWhaleLogo className="w-64 h-64 md:w-80 md:h-80 group-hover:scale-110 transition-transform duration-[2s]" />
           </div>
 
           <h1 className="font-aztec-body font-light tracking-tight text-[clamp(2.5rem,8vw,6rem)] leading-none text-white mb-6 drop-shadow-2xl">
