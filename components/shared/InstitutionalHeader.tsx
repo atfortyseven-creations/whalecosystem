@@ -28,7 +28,7 @@ export function InstitutionalHeader() {
         { href: '/portfolio', label: 'Whale Portfolio', active: pathname === '/portfolio' },
         { href: '/support', label: 'Whale Support', active: pathname === '/support' },
         { href: '/academy', label: 'Whale Academy', active: pathname === '/academy' },
-        { href: '/ticket', label: 'Genesis Ticket', active: pathname === '/ticket', isTicket: true },
+        { href: '/ticket', label: 'Gold Ticket', active: pathname === '/ticket', isTicket: true },
     ];
 
     return (
