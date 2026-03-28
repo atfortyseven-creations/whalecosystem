@@ -44,49 +44,31 @@ export const metadata = {
   description: 'The world\'s most advanced whale alert tool for real-time elite on-chain intelligence. Track whales across 24 crypto assets with institutional-grade forensic instrumentation.',
   keywords: [
     'Whale Alert Network', 'Whale Alert', 'Whale Tracker', 'Elite Whale Intelligence', 
-    'On-chain Forensic Analytics', 'Crypto Whale Detector', 'Binance Whale Alerts',
-    'Real-time Crypto Tracking', 'Institutional Flow Analysis'
+    'On-chain Forensic Analytics', 'Crypto Whale Detector', 'Institutional Flow Analysis'
   ],
-  authors: [{ name: 'Whale Alert Pro Team' }],
-  metadataBase: new URL('https://whalealert.pro'),
+  authors: [{ name: 'Sovereign Institutional Team' }],
+  metadataBase: new URL('https://humanidfi.com'),
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
   },
-  icons: [
-    {
-      rel: 'icon',
-      url: '/official-whale-legendary.png',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: '/official-whale-legendary.png',
-    },
-  ],
-  manifest: '/manifest.webmanifest',
+  manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
-    title: 'Whale Alert Network',
+    statusBarStyle: 'black-translucent',
+    title: 'Whale Alert',
   },
   openGraph: {
-    title: 'Whale Alert Network | Real-Time Elite Intelligence',
-    description: 'Track elite flows of millions in real time. The definitive whale alert tool for serious traders. Pure signal, zero noise.',
-    url: 'https://whalealert.pro',
+    title: 'Whale Alert Network | Sovereign Intelligence',
+    description: 'Track elite flows of millions in real time. The definitive whale alert tool.',
+    url: 'https://humanidfi.com',
     siteName: 'Whale Alert Network',
     images: [
       {
-        url: '/official-whale-legendary.png',
+        url: '/official-whale-monochrome.png',
         width: 1200,
-        height: 630,
-        alt: 'Whale Alert Network Elite Matrix Interface',
+        height: 1200,
+        alt: 'Whale Alert Network Elite Matrix',
       },
     ],
     locale: 'en_US',
@@ -94,26 +76,19 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Whale Alert Network | Elite Whale Intelligence',
-    description: 'The world\'s most precise whale alert tool for legendary on-chain detection.',
-    images: ['/official-whale-legendary.png'],
-    creator: '@WhaleAlertPro',
-  },
-  alternates: {
-    canonical: 'https://whalealert.pro',
+    title: 'Whale Alert Network',
+    description: 'Sovereign On-chain Analytics.',
+    images: ['/official-whale-monochrome.png'],
   },
 }
 
 export const viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#39FF14' },
-    { media: '(prefers-color-scheme: dark)',  color: '#39FF14' },
-  ],
+  themeColor: '#FAF9F6', // Perfect Ivory Monochrome Match
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   minimumScale: 1,
-  userScalable: true,
+  userScalable: false,
   viewportFit: 'cover',
   interactiveWidget: 'resizes-visual',
 }
@@ -133,10 +108,8 @@ export default async function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
         <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          <meta name="theme-color" content="#F2EEE1" />
         </head>
         <body className={`${inter.className} ${martel.variable} ${robotoMono.variable} perf-ultra`}>
           <AztecNoise />
@@ -160,4 +133,3 @@ export default async function RootLayout({
     </ClerkProvider>
   )
 }
-

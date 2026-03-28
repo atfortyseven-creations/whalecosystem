@@ -1,0 +1,22 @@
+{
+  "name": "Whale Alert Network",
+  "short_name": "Whale Alert",
+  "description": "The definitive sovereign on-chain intelligence protocol.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F6",
+  "theme_color": "#FAF9F6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/official-whale-monochrome.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/official-whale-monochrome.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
