@@ -11,7 +11,7 @@ import Image from 'next/image';
 interface PolyMarket {
     id: string; slug: string; question: string; category: string;
     yesPrice: number; noPrice: number; volume24h: number; volumeTotal: number;
-    evSignal: string; image?: string; active: boolean;
+    evSignal: string; image?: string; active: boolean; conditionId?: string;
 }
 
 const fmtUsd = (n: number) => {
@@ -86,7 +86,7 @@ export default function PolymarketPanel() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    marketId: selected.id,
+                    marketId: selected.conditionId || selected.id,
                     direction,
                     amount: tradeAmount,
                     userAddress: window.ethereum?.selectedAddress || '0xUserContextPending'

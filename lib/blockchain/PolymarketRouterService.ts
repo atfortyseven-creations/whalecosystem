@@ -43,13 +43,15 @@ export class PolymarketRouterService {
             
             // We pad marketId to uint256. If it's a condition string, it usually passes as hex.
             // For safety in this builder, we construct the native viem encoding.
-            // Replace mock IDs with BigInt representations if necessary.
+            if (!marketId || typeof marketId !== 'string' || !marketId.startsWith('0x') || marketId.length !== 66) {
+                throw new Error(`Invalid or missing conditionId for market ${marketId}. Real on-chain execution requires a valid bytes32 conditionId.`);
+            }
+
             let conditionIdBig: bigint;
             try {
-                conditionIdBig = BigInt(marketId.startsWith('0x') ? marketId : `0x${marketId}`);
+                conditionIdBig = BigInt(marketId);
             } catch {
-                // Generar un condition ID hash predictivo si el ID de Gamma no está en formato hex
-                conditionIdBig = BigInt(123456789); // Placeholder seguro para parseo de IDs no hex de Gamma
+                throw new Error(`Failed to parse conditionId into BigInt: ${marketId}`);
             }
 
             const data = encodeFunctionData({

@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 // Only importing what is actually used — tree-shaken for minimal bundle size
-import { QrCode, Smartphone, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight, Shield } from 'lucide-react';
+import { QrCode, Smartphone, ShoppingBag, Eye, Zap, ChevronDown, CheckCircle2, MoveRight, Shield, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAppKit } from '@reown/appkit/react';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
 
-// GPU-accelerated background pattern — rendered once, never re-rendered
+// ─── GPU-ACCELERATED BACKGROUND ────────────────────────────────────────────
 const AnimatedPattern = React.memo(function AnimatedPattern() {
     return (
         <>
@@ -33,6 +33,7 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
     );
 });
 
+// ─── MAIN COMPONENT ─────────────────────────────────────────────────────────
 export function MobileSovereignLanding() {
     const { isConnected, address } = useAccount();
     const { connect, connectors } = useConnect();
@@ -52,38 +53,57 @@ export function MobileSovereignLanding() {
         if (savedSign === 'true') setIsSigned(true);
     }, [address]);
 
-    // FIX #2: Use WalletConnect modal (works universally on iOS, Android, all wallets)
-    // Previously used MetaMask deep link which broke the session context on iOS
+    // Use WalletConnect / AppKit modal (works universally on iOS, Android, all wallets)
+    // CRITICAL: This is far superior to manual deep-linking (e.g. metamask.app.link/dapp)
+    // because manual link forces the user out of Safari/Chrome into the MetaMask in-app browser.
+    // The AppKit modal connects via WebSockets, allowing the user to stay in Safari, approve
+    // the transaction in MetaMask via deep link, and return cleanly to Safari with full session state.
     const { open: openWalletModal } = useAppKit();
 
     const handleSovereignConnect = useCallback(async () => {
         if (isInappBrowser) {
             // Already inside a wallet in-app browser — connect injected provider directly
-            const injected = connectors.find((c: any) => c.id === 'injected' || c.id === 'io.metamask' || c.id === 'metaMaskSDK' || c.id === 'coinbaseWallet');
-            if (injected) { connect({ connector: injected }); return; }
+            const priority = ['io.metamask', 'metaMaskSDK', 'injected', 'coinbaseWalletSDK', 'trust'];
+            let injected = null;
+            for (const id of priority) {
+                injected = connectors.find((c: any) => c.id === id);
+                if (injected) break;
+            }
+            if (!injected) injected = connectors[0];
+            if (injected) {
+                try {
+                    connect({ connector: injected });
+                } catch (e) {
+                    toast.error('Connection failed in injected provider.');
+                }
+            }
+            return;
         }
+        
         // Universal: WalletConnect modal — iOS, Android, MetaMask, Coinbase, Rainbow, etc.
         openWalletModal();
     }, [connect, connectors, isInappBrowser, openWalletModal]);
 
-    const handleSignAndAuthorize = async () => {
+    const handleSignAndAuthorize = useCallback(async () => {
         if (!address) return;
         setIsSigning(true);
         try {
             const message = `Authorize Sovereign Handshake for ${address}\nTimestamp: ${Date.now()}`;
             await signMessageAsync({ message });
             setIsSigned(true);
-            if (address) {
-                sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
+            sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
+            toast.success('Identity Verified ✓', { description: 'Now scan the QR on your PC terminal.' });
+            setView('scanner');
+        } catch (e: any) {
+            if (e?.name === 'UserRejectedRequestError' || e?.code === 4001) {
+                toast.error('Signature rejected', { description: 'You must sign to authorize the handshake.' });
+            } else {
+                toast.error('Signature failed', { description: 'Please retry or reconnect your wallet.' });
             }
-            toast.success('Identity Verified');
-            setView('scanner'); // Auto transition to scanner after signature
-        } catch (e) {
-            toast.error('Signature Required');
         } finally {
             setIsSigning(false);
         }
-    };
+    }, [address, signMessageAsync]);
 
     const handleScanClick = useCallback(() => {
         if (!isConnected) {
@@ -98,13 +118,12 @@ export function MobileSovereignLanding() {
     }, [isConnected, isSigned, handleSignAndAuthorize, handleSovereignConnect]);
 
     if (view === 'scanner') {
-        return <MobileQRScanner 
-            onBack={() => setView('landing')} 
+        return <MobileQRScanner
+            onBack={() => setView('landing')}
             setView={setView}
             signMessageAsync={signMessageAsync}
         />;
     }
-
 
     return (
         <div className="h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans overflow-y-auto snap-y snap-mandatory scroll-smooth mobile-hide-scrollbar relative">
@@ -119,7 +138,6 @@ export function MobileSovereignLanding() {
                     transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center z-10"
                 >
-                    {/* Corporate logo — double size, GPU-composited glow */}
                     <div className="w-48 h-48 mx-auto mb-10 relative flex items-center justify-center">
                         <motion.div
                             aria-hidden="true"
@@ -156,9 +174,7 @@ export function MobileSovereignLanding() {
                     className="absolute bottom-10 flex flex-col items-center gap-1 text-[#050505]/25"
                     aria-hidden="true"
                 >
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-black">
-                        Scroll Down for Intelligence
-                    </span>
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-black">Scroll Down for Intelligence</span>
                     <ChevronDown size={22} className="animate-bounce" />
                 </motion.div>
             </section>
@@ -238,33 +254,37 @@ export function MobileSovereignLanding() {
                         Sovereign<br />Access.
                     </h2>
                     <p className="text-[#050505]/55 text-center text-[1.05rem] font-medium mb-12">
-                        Connect your identity to the matrix.<br />Google, X, and Web3 supported.
+                        Connect your wallet to sync with<br />the PC terminal in one tap.
                     </p>
 
                     <div className="space-y-4">
                         {!isConnected ? (
-                            <button
-                                onClick={handleSovereignConnect}
-                                className="w-full bg-[#050505] text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-black/10"
-                            >
-                                <Smartphone size={22} className="text-indigo-400" />
-                                {isInappBrowser ? 'Connect MetaMask' : 'Open in MetaMask'}
-                            </button>
+                            <>
+                                <button
+                                    onClick={handleSovereignConnect}
+                                    className="w-full bg-[#050505] text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-black/10"
+                                >
+                                    <Smartphone size={22} className="text-indigo-400" />
+                                    {isInappBrowser ? 'Connect MetaMask' : 'Open Wallet App'}
+                                </button>
+                                {/* Hint for users who don't understand */}
+                                <p className="text-center text-[11px] text-[#050505]/35 font-medium leading-relaxed px-4">
+                                    Tap above to securely connect via WalletConnect, retaining full session capability inside Safari/Chrome.
+                                </p>
+                            </>
                         ) : !isSigned ? (
                             <button
                                 onClick={handleSignAndAuthorize}
                                 disabled={isSigning}
-                                className="w-full bg-indigo-600 text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-indigo-500/20"
+                                className="w-full bg-indigo-600 text-white font-black uppercase tracking-widest py-6 rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-transform shadow-lg shadow-indigo-500/20 disabled:opacity-60"
                             >
                                 <CheckCircle2 size={22} className="text-white" />
-                                {isSigning ? 'Authorizing...' : 'Sign & Authorize'}
+                                {isSigning ? 'Authorizing...' : 'Sign & Authorize Identity'}
                             </button>
                         ) : (
                             <div className="w-full bg-green-50 border border-green-200 font-bold py-6 rounded-2xl flex items-center justify-center gap-3">
                                 <CheckCircle2 size={22} className="text-green-500" />
-                                <span className="text-lg text-[#050505]">
-                                    Identity Linked
-                                </span>
+                                <span className="text-lg text-[#050505]">Identity Linked</span>
                             </div>
                         )}
 
@@ -274,10 +294,20 @@ export function MobileSovereignLanding() {
                         >
                             <div className="flex items-center gap-4">
                                 <QrCode size={22} />
-                                <span>{isSigned ? 'Scan PC Screen' : 'Identify to Scan'}</span>
+                                <span>{isSigned ? 'Scan PC Screen' : 'Connect First to Scan'}</span>
                             </div>
                             <MoveRight size={22} className="opacity-20" />
                         </button>
+
+                        {/* Connected address indicator */}
+                        {isConnected && address && (
+                            <div className="flex items-center justify-center gap-2 pt-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                <span className="text-[11px] font-mono text-[#050505]/40">
+                                    {address.slice(0, 6)}...{address.slice(-4)}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </section>
@@ -285,13 +315,30 @@ export function MobileSovereignLanding() {
     );
 }
 
-
 // ─── QR SCANNER VIEW ──────────────────────────────────────────────────────────
-function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => void, setView: (v: 'landing' | 'scanner') => void, signMessageAsync: any }) {
+function MobileQRScanner({ onBack, setView, signMessageAsync }: {
+    onBack: () => void,
+    setView: (v: 'landing' | 'scanner') => void,
+    signMessageAsync: any
+}) {
     const { address, isConnected } = useAccount();
     const [isScanning, setIsScanning] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [cameraError, setCameraError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
     const scannerRef = useRef<Html5Qrcode | null>(null);
+    const cleanupRef = useRef<(() => void) | null>(null);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (cleanupRef.current) cleanupRef.current();
+            if (scannerRef.current) {
+                scannerRef.current.stop().catch(() => {});
+                scannerRef.current = null;
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (!isConnected || !address) {
@@ -300,71 +347,8 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
             return;
         }
 
-        // [LEGENDARY HANDSHAKE ENGINE]
-        const initScanner = async () => {
-            const video = document.createElement('video');
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            let animationFrameId: number;
-
-            // Strategy A: Native BarcodeDetector (Android/Chrome/Safari 17+)
-            if ('BarcodeDetector' in window && (window as any).BarcodeDetector.getSupportedFormats().then((f: string[]) => f.includes('qr_code'))) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    video.srcObject = stream;
-                    video.setAttribute('playsinline', 'true');
-                    video.play();
-                    setIsScanning(true);
-
-                    const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
-                    
-                    const detectLoop = async () => {
-                        if (isProcessing) return;
-                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                            const barcodes = await detector.detect(video);
-                            if (barcodes.length > 0) {
-                                handleScan(barcodes[0].rawValue);
-                                return;
-                            }
-                        }
-                        animationFrameId = requestAnimationFrame(detectLoop);
-                    };
-                    detectLoop();
-                    
-                    // Cleanup function closure logic
-                    return () => {
-                        cancelAnimationFrame(animationFrameId);
-                        stream.getTracks().forEach(t => t.stop());
-                    };
-                } catch (e) {
-                    console.warn('Native BarcodeDetector failed, falling back to Html5Qrcode');
-                }
-            }
-
-            // Strategy B: Html5Qrcode Fallback (Optimized Legacy)
-            try {
-                const scanner = new Html5Qrcode('sovereign-qr-reader');
-                scannerRef.current = scanner;
-
-                const config = {
-                    fps: 30, // Max performance for institutional feel
-                    qrbox: { width: 260, height: 260 },
-                    aspectRatio: 1.0
-                };
-
-                await scanner.start(
-                    { facingMode: "environment" },
-                    config,
-                    (text) => handleScan(text),
-                    () => { /* Quiet validation */ }
-                );
-                setIsScanning(true);
-            } catch (e) {
-                console.error('Handshake Init Error:', e);
-                toast.error('Optics failure. Check permissions.');
-                onBack();
-            }
-        };
+        setCameraError(null);
+        setIsScanning(false);
 
         const handleScan = async (decodedText: string) => {
             if (isProcessing) return;
@@ -372,14 +356,13 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
             if (!cleanText.startsWith('SOVEREIGN_HANDSHAKE:')) return;
 
             setIsProcessing(true);
-            if (window.navigator?.vibrate) window.navigator.vibrate([100, 50, 100]); // Haptic confirmation
+            if (window.navigator?.vibrate) window.navigator.vibrate([100, 50, 100]);
 
             try {
                 toast.info('Neural Handshake Detected...', {
                     icon: <Zap className="text-indigo-400 animate-pulse" size={18} />
                 });
 
-                // Signature challenge
                 const signature = await signMessageAsync({ message: cleanText });
                 const token = cleanText.split(':')[1];
 
@@ -390,60 +373,140 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
                 });
 
                 if (res.ok) {
-                    toast.success('Synchronization Permanent', {
+                    toast.success('Synchronization Complete', {
                         description: 'Your identity is now coupled with the PC terminal.'
                     });
-                    setTimeout(() => setView('landing'), 1500);
+                    // Stop scanner cleanly before transitioning
+                    if (scannerRef.current) {
+                        await scannerRef.current.stop().catch(() => {});
+                        scannerRef.current = null;
+                    }
+                    setTimeout(() => setView('landing'), 1200);
                 } else {
-                    throw new Error('Sync Refused');
+                    const errText = await res.text();
+                    throw new Error(errText || 'Sync Refused');
                 }
-            } catch (e) {
-                toast.error('Handshake Interrupted');
+            } catch (e: any) {
+                if (e?.name === 'UserRejectedRequestError' || e?.code === 4001) {
+                    toast.error('Signature rejected', { description: 'You must sign the handshake to sync.' });
+                } else {
+                    toast.error('Handshake Failed', { description: e?.message || 'Please retry.' });
+                }
                 setIsProcessing(false);
+            }
+        };
+
+        const initScanner = async () => {
+            // ── Strategy A: Native BarcodeDetector API (Chrome Android, Safari 17+) ──
+            if ('BarcodeDetector' in window) {
+                try {
+                    const formats = await (window as any).BarcodeDetector.getSupportedFormats();
+                    if (formats.includes('qr_code')) {
+                        const stream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                        });
+                        const video = document.getElementById('sovereign-video') as HTMLVideoElement;
+                        if (!video) return;
+                        video.srcObject = stream;
+                        video.setAttribute('playsinline', 'true'); // CRITICAL for iOS
+                        video.setAttribute('autoplay', 'true');
+                        video.muted = true;
+                        await video.play();
+                        setIsScanning(true);
+
+                        const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+                        let rafId: number;
+                        let running = true;
+
+                        const detectLoop = async () => {
+                            if (!running) return;
+                            try {
+                                if (video.readyState >= video.HAVE_ENOUGH_DATA) {
+                                    const barcodes = await detector.detect(video);
+                                    if (barcodes.length > 0) {
+                                        running = false;
+                                        cancelAnimationFrame(rafId);
+                                        stream.getTracks().forEach(t => t.stop());
+                                        await handleScan(barcodes[0].rawValue);
+                                        return;
+                                    }
+                                }
+                            } catch (_) {}
+                            rafId = requestAnimationFrame(detectLoop);
+                        };
+                        detectLoop();
+
+                        cleanupRef.current = () => {
+                            running = false;
+                            cancelAnimationFrame(rafId);
+                            stream.getTracks().forEach(t => t.stop());
+                        };
+                        return; // Success — skip Strategy B
+                    }
+                } catch (e) {
+                    console.warn('[Scanner] BarcodeDetector failed, falling back to Html5Qrcode:', e);
+                }
+            }
+
+            // ── Strategy B: Html5Qrcode (universal fallback — iOS Safari, Firefox Android) ──
+            try {
+                // Ensure the element exists with a clean ID
+                const el = document.getElementById('sovereign-qr-reader');
+                if (!el) { setCameraError('Scanner element not found. Please refresh.'); return; }
+
+                const scanner = new Html5Qrcode('sovereign-qr-reader', { verbose: false });
+                scannerRef.current = scanner;
+
+                await scanner.start(
+                    { facingMode: 'environment' },
+                    { fps: 20, qrbox: { width: 240, height: 240 }, aspectRatio: 1.0 },
+                    (text) => handleScan(text),
+                    () => { /* quiet scan errors */ }
+                );
+                setIsScanning(true);
+
+                cleanupRef.current = () => {
+                    if (scannerRef.current) {
+                        scannerRef.current.stop().catch(() => {});
+                        scannerRef.current = null;
+                    }
+                };
+            } catch (e: any) {
+                console.error('[Scanner] Html5Qrcode init failed:', e);
+                if (e?.name === 'NotAllowedError' || (e?.message && e.message.includes('Permission'))) {
+                    setCameraError('Camera access denied. Please allow camera access in your browser settings, then retry.');
+                } else if (e?.name === 'NotFoundError') {
+                    setCameraError('No camera found on this device.');
+                } else {
+                    setCameraError('Camera failed to start. Please refresh and try again.');
+                }
             }
         };
 
         initScanner();
 
-        return () => { 
-            if (scannerRef.current) scannerRef.current.stop().catch(() => {});
+        return () => {
+            if (cleanupRef.current) { cleanupRef.current(); cleanupRef.current = null; }
         };
-
-        return () => { 
-            if (scannerRef.current) {
-                // Background fire-and-forget stop to avoid blocking React unmount
-                scannerRef.current.stop().catch(() => {});
-            }
-        };
-    }, [address, isConnected, onBack]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [address, isConnected, onBack, retryCount]);
 
     return (
         <div className="h-[100dvh] bg-[#050505] text-white flex flex-col w-full relative overflow-hidden">
-            {/* Background Handshaking Glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 blur-[130px] rounded-full" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 blur-[130px] rounded-full" />
 
             <style dangerouslySetInnerHTML={{ __html: `
-                #sovereign-qr-reader { border: none !important; border-radius: 2.5rem !important; overflow: hidden; background: #000; position: relative; }
+                #sovereign-qr-reader { border: none !important; border-radius: 2.5rem !important; overflow: hidden; background: #000; }
                 #sovereign-qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 2.5rem !important; }
                 #sovereign-qr-reader__scan_region { border: none !important; }
-                #sovereign-qr-reader img { display: none !important; }
-                .legendary-scan-overlay {
-                    position: absolute;
-                    inset: 0;
-                    border: 2px solid rgba(255,255,255,0.1);
-                    border-radius: 2.5rem;
-                    pointer-events: none;
-                    z-index: 10;
-                }
+                #sovereign-qr-reader img[alt="Info icon"] { display: none !important; }
+                #sovereign-qr-reader__dashboard_section_csr button { display: none !important; }
+                #sovereign-video { width: 100%; height: 100%; object-fit: cover; border-radius: 2.5rem; }
                 .scan-line {
                     position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 2px;
+                    top: 0; left: 0; width: 100%; height: 2px;
                     background: linear-gradient(to right, transparent, #818cf8, transparent);
-                    box-shadow: 0 0 15px #818cf8;
                     animation: scanning 2s linear infinite;
                 }
                 @keyframes scanning {
@@ -452,76 +515,100 @@ function MobileQRScanner({ onBack, setView, signMessageAsync }: { onBack: () => 
                     90% { opacity: 1; }
                     100% { top: 90%; opacity: 0; }
                 }
-                .neural-matrix-bg {
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(99,102,241,0.05) 50%, rgba(0,0,0,0) 100%);
-                    background-size: 100% 400%;
-                    animation: matrixFlow 15s linear infinite;
-                }
-                @keyframes matrixFlow {
-                    0% { background-position: 0% 0%; }
-                    100% { background-position: 0% 100%; }
-                }
             ` }} />
 
-            <div className="absolute inset-0 neural-matrix-bg pointer-events-none" />
-
             <header className="px-6 py-8 flex items-center justify-between relative z-20">
-                <button
-                    onClick={onBack}
-                    className="flex items-center gap-2 group"
-                >
+                <button onClick={() => { if (cleanupRef.current) cleanupRef.current(); onBack(); }} className="flex items-center gap-2 group">
                     <div className="p-3 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors">
-                         <MoveRight className="rotate-180" size={20} />
+                        <MoveRight className="rotate-180" size={20} />
                     </div>
-                    <span className="font-bold tracking-tight text-white/50 group-hover:text-white transition-colors">Abort Sync</span>
+                    <span className="font-bold tracking-tight text-white/50 group-hover:text-white transition-colors">Back</span>
                 </button>
                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Network Live</span>
+                    <div className={`w-2 h-2 rounded-full ${isScanning ? 'bg-green-500 animate-pulse' : 'bg-amber-400 animate-pulse'}`} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                        {isScanning ? 'Camera Live' : 'Initializing...'}
+                    </span>
                 </div>
             </header>
 
             <div className="flex-1 flex flex-col items-center justify-center -mt-10 p-8 relative z-10">
-                <div className="w-full max-w-[340px] aspect-square relative group">
-                    {/* Scanner Frame Decor */}
-                    <div className="absolute -inset-4 border border-white/5 rounded-[3rem] transition-all duration-700 group-hover:border-indigo-500/20" />
-                    <div className="absolute -inset-0.5 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 rounded-[2.6rem] blur-sm animate-pulse" />
-                    
-                    <div id="sovereign-qr-reader" className="w-full h-full">
-                         {isProcessing && (
+                {cameraError ? (
+                    <div className="w-full max-w-[340px] flex flex-col items-center gap-6 text-center">
+                        <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center">
+                            <AlertCircle size={36} className="text-red-400" />
+                        </div>
+                        <div>
+                            <h3 className="font-black text-xl text-white mb-2">Camera Access Required</h3>
+                            <p className="text-white/50 text-sm leading-relaxed">{cameraError}</p>
+                        </div>
+                        <button
+                            onClick={() => setRetryCount(c => c + 1)}
+                            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 transition-colors px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-sm"
+                        >
+                            <RefreshCw size={16} /> Retry Camera
+                        </button>
+                        <p className="text-white/30 text-xs">
+                            iOS: Settings → Safari → Camera → Allow<br />
+                            Android: Browser settings → Site permissions → Camera
+                        </p>
+                    </div>
+                ) : (
+                    <div className="w-full max-w-[340px] aspect-square relative group">
+                        <div className="absolute -inset-4 border border-white/5 rounded-[3rem] transition-all duration-700 group-hover:border-indigo-500/20" />
+                        <div className="absolute -inset-0.5 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 rounded-[2.6rem] blur-sm" />
+
+                        {'BarcodeDetector' in (typeof window !== 'undefined' ? window : {}) ? (
+                            <video
+                                id="sovereign-video"
+                                className="w-full h-full rounded-[2.5rem] bg-black"
+                                playsInline
+                                muted
+                                autoPlay
+                            />
+                        ) : (
+                            <div id="sovereign-qr-reader" className="w-full h-full rounded-[2.5rem] overflow-hidden" />
+                        )}
+
+                        {isProcessing && (
                             <div className="absolute inset-0 bg-black/80 z-20 flex items-center justify-center rounded-[2.5rem] backdrop-blur-md">
                                 <div className="flex flex-col items-center">
                                     <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
                                     <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-400">Syncing Matrix...</p>
                                 </div>
                             </div>
-                         )}
-                         <div className="legendary-scan-overlay">
-                            {!isProcessing && <div className="scan-line" />}
-                         </div>
+                        )}
+
+                        {isScanning && !isProcessing && (
+                            <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden pointer-events-none z-10">
+                                <div className="scan-line" />
+                                <div className="absolute inset-0 border-2 border-white/10 rounded-[2.5rem]" />
+                            </div>
+                        )}
+
+                        <div className="absolute -top-1 -left-1 w-10 h-10 border-t-2 border-l-2 border-indigo-500 rounded-tl-3xl opacity-50" />
+                        <div className="absolute -top-1 -right-1 w-10 h-10 border-t-2 border-r-2 border-indigo-500 rounded-tr-3xl opacity-50" />
+                        <div className="absolute -bottom-1 -left-1 w-10 h-10 border-b-2 border-l-2 border-indigo-500 rounded-bl-3xl opacity-50" />
+                        <div className="absolute -bottom-1 -right-1 w-10 h-10 border-b-2 border-r-2 border-indigo-500 rounded-br-3xl opacity-50" />
                     </div>
+                )}
 
-                    {/* Corner Accents */}
-                    <div className="absolute -top-1 -left-1 w-10 h-10 border-t-2 border-l-2 border-indigo-500 rounded-tl-3xl opacity-50" />
-                    <div className="absolute -top-1 -right-1 w-10 h-10 border-t-2 border-r-2 border-indigo-500 rounded-tr-3xl opacity-50" />
-                    <div className="absolute -bottom-1 -left-1 w-10 h-10 border-b-2 border-l-2 border-indigo-500 rounded-bl-3xl opacity-50" />
-                    <div className="absolute -bottom-1 -right-1 w-10 h-10 border-b-2 border-r-2 border-indigo-500 rounded-br-3xl opacity-50" />
-                </div>
-
-                <div className="mt-14 text-center space-y-4">
-                    <h3 className="font-black text-3xl tracking-tighter text-white">Neural Handshake</h3>
-                    <p className="text-white/40 text-[1rem] leading-relaxed max-w-[260px] mx-auto font-medium">
-                        Point your scanner at the <span className="text-white font-bold">QR Identity Matrix</span> on your PC terminal.
-                    </p>
-                </div>
+                {!cameraError && (
+                    <div className="mt-14 text-center space-y-3">
+                        <h3 className="font-black text-3xl tracking-tighter text-white">Neural Handshake</h3>
+                        <p className="text-white/40 text-[1rem] leading-relaxed max-w-[260px] mx-auto font-medium">
+                            Point at the <span className="text-white font-bold">QR Matrix</span> on your PC terminal.
+                        </p>
+                    </div>
+                )}
             </div>
 
             <footer className="p-10 text-center">
                 <div className="bg-white/5 border border-white/5 py-4 px-6 rounded-2xl flex items-center justify-center gap-3">
                     <Shield size={16} className="text-indigo-400" />
-                    <span className="text-[11px] font-bold text-white/50 uppercase tracking-[0.1em]">Verified Session: {address?.slice(0,6)}...{address?.slice(-4)}</span>
+                    <span className="text-[11px] font-bold text-white/50 uppercase tracking-[0.1em]">
+                        Verified: {address?.slice(0, 6)}...{address?.slice(-4)}
+                    </span>
                 </div>
             </footer>
         </div>

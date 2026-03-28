@@ -55,7 +55,7 @@ export function MasterMatrix() {
         return {
             globalHeat: heat,
             deltaStream: (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%',
-            deltaColor: delta >= 0 ? 'text-cyan-400' : 'text-rose-400'
+            deltaColor: delta >= 0 ? 'text-white/90' : 'text-white/50'
         };
     }, [whaleEvents]);
 
@@ -67,7 +67,7 @@ export function MasterMatrix() {
     const fmt = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
 
     return (
-        <div className="relative text-white/90 font-sans selection:bg-cyan-500/20 selection:text-white overflow-x-hidden">
+        <div className="relative text-white/90 font-sans selection:bg-white/10 selection:text-white overflow-x-hidden">
             <div className="relative z-10 w-full max-w-[2560px] mx-auto flex flex-col">
                 <div className="pb-24 relative z-10">
                     <div className="px-8 pt-12 max-w-[2400px] mx-auto">
@@ -85,13 +85,12 @@ export function MasterMatrix() {
                         </div>
 
                         <div className="lg:col-span-12 space-y-4">
-                            <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-8 shadow-xl group hover:border-white/10 transition-all duration-500 overflow-hidden relative">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(6,182,212,0.03),_transparent_70%)] pointer-events-none" />
+                            <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 shadow-sm group hover:border-white/20 transition-all duration-500 overflow-hidden relative">
                                 <TacticalPulseIntelligence />
                                 <div className="mt-8 pt-8 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Global Heat</p>
-                                        <div className="text-2xl font-mono font-black text-cyan-400">{globalHeat} <span className="text-[10px] text-white/20 font-bold uppercase">{Number(globalHeat) > 8 ? 'Optimal' : 'Standard'}</span></div>
+                                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">Global Heat</p>
+                                        <div className="text-2xl font-mono font-black text-white/90">{globalHeat} <span className="text-[10px] text-white/40 font-bold uppercase">{Number(globalHeat) > 8 ? 'Optimal' : 'Standard'}</span></div>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Delta Stream</p>
@@ -120,8 +119,8 @@ export function MasterMatrix() {
                                                 }}
                                                 className={`px-4 py-2 rounded-xl text-[10px] font-aztec-mono font-black uppercase tracking-widest transition-all border ${
                                                     isSelected 
-                                                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 shadow-sm' 
-                                                        : 'bg-white/[0.02] text-white/40 border-white/5 hover:border-white/20 hover:text-white/80'
+                                                        ? 'bg-white/10 text-white/90 border-white/20 shadow-sm' 
+                                                        : 'bg-white/[0.02] text-white/50 border-white/10 hover:border-white/20 hover:text-white/90'
                                                 }`}
                                             >
                                                 {token}
@@ -172,7 +171,7 @@ export function MasterMatrix() {
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                                 {selectedTokens.map((token: string) => (
-                                    <div key={token} className="group flex flex-col bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-cyan-500/30 transition-all hover:scale-[1.02] shadow-sm hover:shadow-xl">
+                                    <div key={token} className="group flex flex-col bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[2.5rem] overflow-hidden hover:border-white/30 transition-all hover:scale-[1.02] shadow-sm hover:shadow-xl">
                                         <div className="h-64 relative">
                                             <WhaleMomentumChart symbol={token} compact onClick={() => setSelectedSymbolForOverlay(token)} />
                                         </div>
