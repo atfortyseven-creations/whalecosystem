@@ -53,26 +53,26 @@ export const TacticalPulseIntelligence: React.FC = () => {
         <div className="flex flex-col gap-6 relative z-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {metrics.map((m, idx) => (
-                    <div key={idx} className="group relative flex flex-col p-6 rounded-[2rem] border border-slate-100 hover:border-cyan-500/30 transition-all duration-500 bg-white shadow-xl shadow-slate-200/40">
+                    <div key={idx} className="group relative flex flex-col p-6 rounded-[2rem] border border-white/5 hover:border-white/20 transition-all duration-500 bg-white/[0.02] shadow-sm">
                         <div className="flex justify-between items-start mb-4">
-                            <span className="text-[11px] text-slate-400 uppercase tracking-[0.2em] font-black">{m.label}</span>
-                            <div className={`w-1.5 h-1.5 rounded-full shadow-[0_0_8px] ${m.trend === 'up' ? 'bg-[var(--aave-teal)] shadow-[var(--aave-teal)]/50' : m.trend === 'down' ? 'bg-rose-600 shadow-rose-600/50' : 'bg-slate-300'}`} />
+                            <span className="text-[11px] text-white/50 uppercase tracking-[0.2em] font-black">{m.label}</span>
+                            <div className={`w-1.5 h-1.5 rounded-full ${m.trend === 'up' ? 'bg-[#14f195]' : m.trend === 'down' ? 'bg-[#f43f5e]' : 'bg-white/30'}`} />
                         </div>
                         
-                        <div className="text-3xl font-black font-mono text-slate-900 tracking-tighter group-hover:text-[var(--aave-teal)] transition-colors duration-500">
+                        <div className="text-3xl font-black font-mono text-white/90 tracking-tighter transition-colors duration-500">
                             {m.value}
                         </div>
 
-                        <div className="mt-4 w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="mt-4 w-full h-1 bg-white/5 rounded-full overflow-hidden">
                             <div 
-                                className="h-full bg-gradient-to-r from-[var(--aave-teal)] via-[var(--aave-purple)] to-[var(--aave-teal)] transition-all duration-[1500ms] ease-out shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                                className="h-full bg-white/90 transition-all duration-[1500ms] ease-out"
                                 style={{ width: `${m.intensity * 100}%` }}
                             />
                         </div>
 
-                        <div className="mt-6 pt-6 border-t border-slate-50 transition-all duration-500">
-                            <p className="text-[8px] font-black uppercase leading-relaxed tracking-wider text-slate-400">
-                                <span className="text-[var(--aave-teal)] block mb-1">Strategic Logic:</span>
+                        <div className="mt-6 pt-6 border-t border-white/5 transition-all duration-500">
+                            <p className="text-[8px] font-black uppercase leading-relaxed tracking-wider text-white/40">
+                                <span className="text-white/90 block mb-1">Strategic Logic:</span>
                                 {m.description}
                             </p>
                         </div>
