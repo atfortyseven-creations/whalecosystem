@@ -20,8 +20,6 @@ export function InstitutionalHeader() {
 
     const navLinks = [
         { href: '/dashboard',  label: 'System',          active: pathname === '/dashboard',  isSystem: true  },
-        { href: '/vip',        label: 'Whale VIP',        active: pathname === '/vip'                         },
-        { href: '/network',    label: 'Whale Activity',   active: pathname === '/network'                     },
         { href: '/portfolio',  label: 'Whale Portfolio',  active: pathname === '/portfolio'                   },
         { href: '/support',    label: 'Whale Support',    active: pathname === '/support'                     },
         { href: '/academy',    label: 'Whale Academy',    active: pathname === '/academy'                     },

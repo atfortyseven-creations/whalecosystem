@@ -143,7 +143,7 @@ export function AcademyViewer() {
             <div className="flex w-full bg-[#050505] relative z-20 text-white font-aztec-body shadow-2xl" style={{ minHeight: '80vh' }}>
                 
                 {/* PROGRESS BAR (STRATOSPHERIC PRECISION) */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/5 z-[100]">
+                <div className="fixed top-auto left-0 right-0 h-[2px] bg-white/5 z-[100]" style={{ top: '105px' }}>
                     <motion.div 
                         className="h-full bg-gradient-to-r from-white/20 via-white to-white/20 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                         style={{ width: `${scrollProgress}%` }}
@@ -151,7 +151,7 @@ export function AcademyViewer() {
                 </div>
 
                 {/* SIDEBAR: KNOWLEDGE INDEX */}
-                <aside className="hidden lg:flex w-[380px] flex-shrink-0 border-r border-white/5 glass-sidebar flex-col min-h-[80vh] relative no-copy sticky top-0 self-start" style={{ maxHeight: '100vh', overflowY: 'auto' }}>
+                <aside className="hidden lg:flex w-[380px] flex-shrink-0 border-r border-white/5 glass-sidebar flex-col relative no-copy sticky top-0 self-start h-[calc(100vh-105px)] overflow-y-auto">
                     <div className="p-10 border-b border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
                         <div className="flex items-center gap-4 mb-2 group cursor-pointer">
                             <AcademyLogo />
@@ -220,7 +220,7 @@ export function AcademyViewer() {
                 {/* MAIN CONTENT: CLASS-LEVEL EDUCATION */}
                 <main
                     ref={contentRef}
-                    className="flex-1 bg-transparent relative no-copy overflow-y-auto"
+                    className="flex-1 bg-transparent relative no-copy"
                     onContextMenu={(e) => e.preventDefault()}
                 >
                     <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />

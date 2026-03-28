@@ -10,6 +10,7 @@ interface InstitutionalShellProps {
   subtitle?: string;
   badge?: string;
   badgeVariant?: "lime" | "emerald" | "rose" | "orchid" | "amber";
+  fullWidth?: boolean;
 }
 
 // ─── THE MASTER STACK SHELL (PURE MONOCHROME) ───
@@ -17,7 +18,8 @@ export function InstitutionalShell({
   children, 
   title, 
   subtitle,
-  badge
+  badge,
+  fullWidth = false
 }: InstitutionalShellProps) {
 
   return (
@@ -35,7 +37,7 @@ export function InstitutionalShell({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="min-h-full container mx-auto pb-10"
+          className={`min-h-full pb-10 ${fullWidth ? 'w-full' : 'container mx-auto'}`}
         >
           {children}
         </motion.div>

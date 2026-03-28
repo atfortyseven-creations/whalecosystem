@@ -95,7 +95,7 @@ function WhaleAcademyHero() {
 
 export default function AcademyPage() {
   return (
-    <InstitutionalShell title="Whale Academy" subtitle="Sovereign Knowledge Hub" badge="LEARN">
+    <InstitutionalShell title="Whale Academy" subtitle="Sovereign Knowledge Hub" badge="LEARN" fullWidth>
       <WhaleAcademyHero />
       <AcademyViewer />
     </InstitutionalShell>

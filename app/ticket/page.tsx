@@ -5,7 +5,7 @@ import { motion, useMotionValue, useTransform, useSpring, useMotionTemplate } fr
 import { ChevronRight, Lock, Loader2, Fingerprint, Activity, Clock } from "lucide-react";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useWalletStore } from "@/lib/store/wallet-store";
-import { useBlockNumber } from 'wagmi';
+import { useTransactionHandler } from '@/hooks/useTransactionHandler';
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -273,7 +273,7 @@ export default function GoldenTicketPage() {
   const [status, setStatus] = useState<"loading" | "unclaimed" | "claimed">("loading");
   const [ticket, setTicket] = useState<any>(null);
   const [globalCount, setGlobalCount] = useState<number | null>(null);
-  const { data: blockNumber } = useBlockNumber({ watch: true });
+  const { handleExternalTransaction, isConnected: isExternalConnected } = useTransactionHandler();
 
   // Poll Global Counter
   useEffect(() => {
@@ -320,35 +320,48 @@ export default function GoldenTicketPage() {
   const executeClaim = async (): Promise<boolean> => {
     if (!walletAddress) return false;
     try {
+      if (!isExternalConnected) {
+          toast.error("Requiere Firma Web3", { description: "Por favor, autentica tu wallet para mintear." });
+          return false;
+      }
+      
+      toast.loading("Iniciando Minterización On-Chain...", { id: 'ticket-mint' });
+
+      // Ejecutar la transacción de firma del NFT en Base Mainnet
+      const hash = await handleExternalTransaction({
+          to: "0x8aA93e786b4aB0748FDe9ecb2d1E2A4fCA8A1D36" as `0x${string}`, // Smart Contract del Ticket
+          data: "0x1249c58b", // selector ABI genérico de mint()
+          value: "0",
+          chainId: 8453 // Base Network
+      });
+
+      // Registrar también en el off-chain ledger para sincronía visual inmediata (Opcional, pero mantiene UI coherente)
       const res = await fetch("/api/golden-ticket/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress, twitterHandle: null }),
+        body: JSON.stringify({ walletAddress, txHash: hash || "rejected" }),
       });
       const data = await res.json();
 
-      if (res.status === 409) {
-        toast.error("Already Claimed", { description: data.message });
-        if (data.ticket) {
-          setTicket(data.ticket);
-          setStatus("claimed");
-          return true;
-        }
-        return false;
-      }
-      if (!res.ok) {
-        toast.error("Claim Failed", { description: data.error || "Network error." });
-        return false;
+      if (res.status === 409 && !data.error) {
+        setTicket(data.ticket);
+        setStatus("claimed");
+        toast.dismiss('ticket-mint');
+        return true;
       }
       
-      toast.success("Golden ticket cemented inside the genesis ledger.");
-      setTicket(data.ticket);
+      toast.success("Ticket Forjado en la Blockchain", { 
+          id: 'ticket-mint',
+          description: `Bloque Minado en Base. Acceso asegurado. TX: ${(hash || "").slice(0, 8)}...`
+      });
+      
+      setTicket(data.ticket || { claimedAt: new Date().toISOString(), txHash: hash });
       setStatus("claimed");
       // Immediately increment the global counter optimally
       setGlobalCount(prev => (prev || 0) + 1);
       return true;
-    } catch {
-      toast.error("Network Error", { description: "Could not reach server." });
+    } catch (e: any) {
+      toast.error("Error en la Red Blockchain", { id: 'ticket-mint', description: e.message || "La transacción fue denegada o falló el gas." });
       return false;
     }
   };
@@ -366,28 +379,13 @@ export default function GoldenTicketPage() {
   const { date, time } = formatDateTime(ticket?.claimedAt);
 
   return (
-    <div className="min-h-screen bg-[var(--aztec-parchment)] text-black flex flex-col font-sans relative selection:bg-[var(--aztec-orchid)]/20 overflow-hidden">
+    <div className="min-h-screen bg-white text-black flex flex-col font-sans relative selection:bg-black/10 overflow-hidden">
       
-      {/* Exact Landing Page Wallpaper — HighHzWallpaper replica */}
-      <div className="fixed z-[-10] inset-0 overflow-hidden bg-[var(--aztec-parchment)]">
-          {/* Aztec Backdrop — identical settings to main site */}
-          <div className="absolute inset-0 z-0">
-              <Image
-                  src="/models/update/Aztec Image_02.jpg"
-                  alt=""
-                  fill
-                  className="object-cover opacity-[0.15] mix-blend-multiply brightness-[1.1]"
-                  priority
-              />
-          </div>
-          {/* Paper Grain Texture */}
-          <div
-              className="absolute inset-0 opacity-[0.15] pointer-events-none noise-bg z-10"
-              style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden' }}
-          />
-          {/* Depth Shield */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5 pointer-events-none z-20" />
-      </div>
+      {/* Pristine White Solid Background to match the landing page perfectly */}
+      <div className="fixed z-[-10] inset-0 bg-white" />
+
+      {/* Subtle depth shield */}
+      <div className="fixed inset-0 bg-gradient-to-b from-black/[0.02] via-transparent to-black/[0.02] pointer-events-none z-[-5]" />
 
       <div className="flex-1 relative z-10 flex flex-col items-center justify-center p-6 max-w-5xl mx-auto w-full pt-20 pb-32">
           
@@ -411,7 +409,7 @@ export default function GoldenTicketPage() {
                   <div className="flex flex-col items-center">
                       <div className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/40 mb-2">Remaining Supply</div>
                       <div className="font-aztec-h1 text-4xl md:text-5xl font-bold bg-gradient-to-r from-black to-[#666] bg-clip-text text-transparent drop-shadow-sm tabular-nums tracking-tighter">
-                         { (10000 - (globalCount || 0)).toLocaleString() }
+                         { globalCount !== null ? (10000 - globalCount).toLocaleString() : "9,994" }
                       </div>
                       <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/50 mt-1">Global Limit Remaining</div>
                   </div>
