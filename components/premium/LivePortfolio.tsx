@@ -1,0 +1,141 @@
+"use client";
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useLivePortfolio } from '@/hooks/useLivePortfolio';
+import { Wallet, TrendingUp, TrendingDown, RefreshCcw, LayoutGrid } from 'lucide-react';
+import { useAccount } from 'wagmi';
+
+export function LivePortfolio() {
+    const { isConnected } = useAccount();
+    const { 
+        usdcBalance, 
+        totalPnl, 
+        change24hUSD, 
+        change24hPercent,
+        polymarketPositions,
+        assets,
+        isLoading,
+        liveTick 
+    } = useLivePortfolio();
+
+    if (!isConnected) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8">
+                <Wallet size={48} className="text-[#888888] mb-4 opacity-50" />
+                <h3 className="text-xl font-black text-[#111111] uppercase tracking-tighter">WALLET DISCONNECTED</h3>
+                <p className="text-sm font-bold text-[#888888] mt-2">Connect Web3 Wallet to view live on-chain balances</p>
+            </div>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 animate-pulse text-center">
+                <RefreshCcw size={32} className="text-[#888888] animate-spin mb-4 mx-auto" />
+                <span className="text-sm font-black uppercase text-[#888888] tracking-widest">SYNCING ON-CHAIN DATA...</span>
+            </div>
+        );
+    }
+
+    const isPositive = change24hUSD >= 0;
+
+    return (
+        <div className="max-w-4xl mx-auto space-y-6">
+            
+            {/* Global PnL Header */}
+            <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                    <span className="flex items-center gap-1.5 text-[8px] font-black text-[#00FFAA] uppercase tracking-widest bg-[#00FFAA]/10 px-2 py-1 rounded">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-pulse" />
+                        LIVE SYNC • {new Date(liveTick).toLocaleTimeString()}
+                    </span>
+                </div>
+                
+                <h2 className="text-[11px] font-bold text-[#888888] uppercase tracking-widest mb-2">Net Worth (USDC + Assets)</h2>
+                <div className="flex items-end gap-4">
+                    <h1 className="text-5xl font-black text-[#111111] font-mono tracking-tighter">
+                        ${Number(totalPnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </h1>
+                    <div className={`flex items-center gap-1.5 mb-2 font-mono font-black ${isPositive ? 'text-[#00FFAA]' : 'text-[#f97316]'}`}>
+                        {isPositive ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                        <span className="text-xl">{isPositive ? '+' : ''}{change24hUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span className="text-sm">({isPositive ? '+' : ''}{change24hPercent.toFixed(2)}%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* Spot Balances */}
+                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm">
+                    <h3 className="text-xs font-black text-[#111111] uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <Wallet size={16} className="text-[#888888]" />
+                        Spot Balances
+                    </h3>
+                    
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center border-b border-[#E5E5E5] pb-3">
+                            <span className="text-sm font-bold text-[#111111] font-mono">USDC (Polygon Native)</span>
+                            <span className="text-lg font-black text-[#111111] font-mono">${Number(usdcBalance).toLocaleString()}</span>
+                        </div>
+                        {assets?.slice(0, 3).map((asset: any) => (
+                            asset.symbol !== 'USDC' && (
+                                <div key={asset.symbol} className="flex justify-between items-center border-b border-[#E5E5E5] pb-3 last:border-0 last:pb-0">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-bold text-[#111111] font-mono">{asset.symbol}</span>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-lg font-black text-[#111111] font-mono">${(asset.valueUSD || 0).toLocaleString()}</div>
+                                        <div className="text-xs font-bold text-[#888888] font-mono">{parseFloat(asset.balanceFormatted).toFixed(4)}</div>
+                                    </div>
+                                </div>
+                            )
+                        ))}
+                    </div>
+                </div>
+
+                {/* Polymarket Positions */}
+                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm">
+                    <h3 className="text-xs font-black text-[#111111] uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <LayoutGrid size={16} className="text-[#888888]" />
+                        Active Prediction Markets
+                    </h3>
+                    
+                    {polymarketPositions.length === 0 ? (
+                        <div className="text-center py-8 text-[#888888]">
+                            <p className="text-xs font-bold uppercase tracking-widest">NO ACTIVE POSITIONS</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {polymarketPositions.map((pos: any, idx: number) => {
+                                const isPosPnL = pos.pnl >= 0;
+                                return (
+                                    <div key={idx} className="border-b border-[#E5E5E5] pb-4 last:border-0 last:pb-0">
+                                        <p className="text-xs font-bold text-[#111111] leading-tight mb-2 truncate max-w-[280px]">
+                                            {pos.marketTitle}
+                                        </p>
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${pos.outcome === "YES" ? 'bg-[#06b6d4]/10 text-[#06b6d4]' : 'bg-[#f97316]/10 text-[#f97316]'}`}>
+                                                    {pos.outcome} <span className="opacity-50">({pos.shares.toFixed(2)} Shares)</span>
+                                                </span>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-sm font-black text-[#111111] font-mono">${pos.value.toFixed(2)}</div>
+                                                <div className={`text-[10px] font-black font-mono ${isPosPnL ? 'text-[#00FFAA]' : 'text-[#f97316]'}`}>
+                                                    {isPosPnL ? '+' : ''}{pos.pnl.toFixed(2)} ({isPosPnL ? '+' : ''}{pos.pnlPercent.toFixed(1)}%)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                </div>
+
+            </div>
+        </div>
+    );
+}

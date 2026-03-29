@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, ArrowUp, ArrowDown } from 'lucide-react';
+import { Activity, ArrowUp, ArrowDown, Timer } from 'lucide-react';
+import { PolymarketExecutionPanel } from './PolymarketExecutionPanel';
 
 const PERFECTION_TOKENS = [
     "BTC", "ETH", "BNB", "SOL", "XRP", "ADA", "DOGE", "SHIB", "DOT", "LINK", 
@@ -77,8 +78,8 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
 
     if (!state) {
         return (
-            <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl p-6 h-32 flex items-center justify-center animate-pulse w-full">
-                <span className="text-[10px] font-black uppercase text-[#050505]/20 tracking-widest">INITIALIZING {symbol}...</span>
+            <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl p-6 h-32 flex items-center justify-center w-full">
+                <span className="text-[12px] font-bold uppercase text-[#888888] tracking-widest">NO SIGNAL YET</span>
             </div>
         );
     }
@@ -157,34 +158,56 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
                     </motion.div>
                 </div>
 
-                {/* 3. Metrics (Right-aligned, compact) */}
-                <div className="flex-shrink-0 flex flex-col items-end text-right w-48 space-y-2 mt-4 md:mt-0">
+                {/* 3. Metrics (Right-aligned, dense impact) */}
+                <div className="flex-shrink-0 flex flex-col items-end text-right w-64 space-y-3 mt-4 md:mt-0">
+                    
+                    {/* Expiry Countdown (Simulated based on Gravity tick) */}
+                    {state.gravityScore > 70 && (
+                        <div className="flex items-center gap-2 justify-end">
+                            <Timer size={14} className="text-[#888888]" />
+                            <span className="text-[18px] font-sans font-bold text-[#111111] uppercase whitespace-nowrap drop-shadow-[0_0_8px_rgba(0,255,170,0.5)]">
+                                04M 37S
+                            </span>
+                        </div>
+                    )}
+
                     {/* Gravity Score */}
                     <div className="flex items-center gap-2 justify-end">
-                        <span className="text-[10px] font-bold text-[#050505]/40 uppercase tracking-widest">Gravity</span>
+                        <span className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Gravity</span>
                         <div className="flex items-center gap-1">
-                            <span className="text-sm font-black font-mono text-[#050505]">{state.gravityScore.toFixed(1)}G</span>
-                            {state.direction === 'BULLISH' ? <ArrowUp size={14} className="text-cyan-500" /> : state.direction === 'BEARISH' ? <ArrowDown size={14} className="text-orange-500" /> : <Activity size={14} className="text-slate-400" />}
+                            <span className="text-[20px] font-black font-mono text-[#111111] drop-shadow-sm">{state.gravityScore.toFixed(1)}G</span>
+                            {state.direction === 'BULLISH' ? <ArrowUp size={18} className="text-cyan-500" /> : state.direction === 'BEARISH' ? <ArrowDown size={18} className="text-orange-500" /> : <Activity size={18} className="text-slate-400" />}
                         </div>
                     </div>
 
                     {/* VIGOR */}
                     <div className="flex items-center gap-2 justify-end">
-                        <span className="text-[10px] font-bold text-[#050505]/40 uppercase tracking-widest">Vigor</span>
-                        <span className={`text-xs font-black font-mono ${state.institutionalIsAccumulation ? 'text-cyan-500' : 'text-orange-500'}`}>
-                            {state.institutionalVigorPercent.toFixed(0)}% {state.institutionalIsAccumulation ? 'ACCUM' : 'DIST'} <span className="text-[#050505]/30 ml-1 mr-1">•</span> {state.institutionalIsAccumulation ? '+' : '-'}{fmtCompact(state.institutionalVigorValue)}
+                        <span className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Vigor</span>
+                        <span className={`text-[20px] font-black font-mono ${state.institutionalIsAccumulation ? 'text-cyan-500' : 'text-orange-500'}`}>
+                            {state.institutionalVigorPercent.toFixed(0)}% <span className="text-[12px] inline-block ml-1">{state.institutionalIsAccumulation ? 'ACCUM' : 'DIST'} <span className="text-[#050505]/30 mx-1">•</span> {state.institutionalIsAccumulation ? '+' : '-'}{fmtCompact(state.institutionalVigorValue)}</span>
                         </span>
                     </div>
 
                     {/* Expected Move */}
                     <div className="flex items-center gap-2 justify-end">
-                        <span className="text-[10px] font-bold text-[#050505]/40 uppercase tracking-widest">Exp. Move</span>
-                        <span className="text-xs font-black font-mono text-[#050505]">
+                        <span className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Exp. Move</span>
+                        <span className={`text-[22px] font-black font-mono drop-shadow-md ${state.expectedMove > 0 ? 'text-cyan-600' : 'text-orange-600'}`}>
                             {state.expectedMove > 0 ? '+' : ''}{state.expectedMove.toFixed(2)}%
                         </span>
                     </div>
                 </div>
             </div>
+
+            {/* Execution Layer */}
+            {isSovereignConfluence && (
+                <div className="mt-6 border-t border-[#E5E5E5]/50 pt-4">
+                    <PolymarketExecutionPanel 
+                        symbol={symbol}
+                        probability={state.probabilityOfReversal}
+                        direction={state.direction}
+                    />
+                </div>
+            )}
 
             {/* Hover Tooltip Overlay (Crystal clear glassmorphism) */}
             <AnimatePresence>

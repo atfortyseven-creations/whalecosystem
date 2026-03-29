@@ -6,8 +6,8 @@ import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
 import { PremiumMatrixStack } from "@/components/premium/PremiumMatrixStack";
 import ActivityFeedPanel from '@/components/network/ActivityFeedPanel';
 import PolymarketPanel from '@/components/dashboard/PolymarketPanel';
-import DeFiYieldPanel from '@/components/dashboard/DeFiYieldPanel';
-import { TokenPortfolio } from '@/components/dashboard/TokenPortfolio';
+import { CopyTradingArena } from '@/components/premium/CopyTradingArena';
+import { LivePortfolio } from '@/components/premium/LivePortfolio';
 import { Activity, LayoutGrid, Target, Wallet, BarChart2 } from 'lucide-react';
 import "@/app/dashboard/dashboard.css";
 
@@ -101,17 +101,13 @@ export default function SovereignDashboard() {
 
                             {activeTab === 'DEFI_YIELD' && (
                                 <div className="h-full">
-                                    <DeFiYieldPanel />
+                                    <CopyTradingArena />
                                 </div>
                             )}
 
                             {activeTab === 'PORTFOLIO' && (
-                                <div className="p-6 max-w-4xl mx-auto mt-10">
-                                    <div className="text-center mb-8">
-                                        <h2 className="text-3xl font-bold font-mono text-white mb-2 tracking-tight">CUSTODIA SEGURA</h2>
-                                        <p className="text-sm font-mono text-white/40 uppercase tracking-widest">Verificación On-Chain en Tiempo Real</p>
-                                    </div>
-                                    <TokenPortfolio />
+                                <div className="h-full">
+                                    <LivePortfolio />
                                 </div>
                             )}
                         </motion.div>
