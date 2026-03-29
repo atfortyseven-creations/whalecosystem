@@ -83,7 +83,7 @@ export default function SovereignDashboard() {
                         >
                             {activeTab === 'VIP_MATRIX' && (
                                 <div className="p-0">
-                                    <MasterMatrixComponent />
+                                    <PremiumMatrixStack />
                                 </div>
                             )}
 
