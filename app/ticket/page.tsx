@@ -226,7 +226,22 @@ function CircularGestureClaim({ onClaim, disabled }: { onClaim: () => Promise<bo
                     if (Math.abs(angleSum.current) >= Math.PI * 1.95) {
                         claimFired.current = true;
                         setStatus("VALIDATED");
-                        onClaim();
+                        onClaim().then((success) => {
+                             if (!success) {
+                                 // Reset to allow retries
+                                 claimFired.current = false;
+                                 setStatus("IDLE");
+                                 angleSum.current = 0;
+                                 lastAngle.current = null;
+                                 pointsRef.current = [];
+                             }
+                        }).catch(() => {
+                             claimFired.current = false;
+                             setStatus("IDLE");
+                             angleSum.current = 0;
+                             lastAngle.current = null;
+                             pointsRef.current = [];
+                        });
                     }
                 }
                 lastAngle.current = angle;

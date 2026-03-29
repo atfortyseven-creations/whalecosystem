@@ -311,16 +311,12 @@ export function MobileSovereignLanding() {
     const { signMessageAsync } = useSignMessage();
     
     const [view, setView] = useState<'landing' | 'scanner'>('landing');
-    const [isSigned, setIsSigned] = useState(false);
-    const [isSigning, setIsSigning] = useState(false);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [walletBrowser, setWalletBrowser] = useState<string | null>(null);
 
     useEffect(() => {
         setWalletBrowser(detectWalletBrowser());
-        const savedSign = sessionStorage.getItem(`sovereign_signed_${address}`);
-        if (savedSign === 'true') setIsSigned(true);
-    }, [address]);
+    }, []);
 
     const handleConnectTrigger = useCallback(() => {
         if (walletBrowser) {
@@ -340,29 +336,6 @@ export function MobileSovereignLanding() {
             setIsPickerOpen(true);
         }
     }, [connect, connectors, walletBrowser]);
-
-    const handleSignAuthorize = useCallback(async () => {
-        if (!address) return;
-        setIsSigning(true);
-        try {
-            const signature = await signMessageAsync({ 
-                message: `SOVEREIGN_ACCESS_IDENTITY:${address}\nNONCE:${Date.now()}\nNETWORK:WHALE_ALERT_TERMINAL_HANDSHAKE\nSECURITY:EIP712_EPHEMERAL` 
-            });
-            if (signature) {
-                setIsSigned(true);
-                sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
-                toast.success('IDENTIDAD VINCULADA', { 
-                    description: 'Handshake verificado on-chain. Procede al escaneo.',
-                    className: 'font-black uppercase tracking-widest'
-                });
-                setView('scanner');
-            }
-        } catch (e: any) {
-            toast.error('ACCESO DENEGADO', { description: 'Debes firmar el mensaje de identidad.' });
-        } finally {
-            setIsSigning(false);
-        }
-    }, [address, signMessageAsync]);
 
     if (view === 'scanner') {
         return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
@@ -413,39 +386,21 @@ export function MobileSovereignLanding() {
                                 <Wallet size={20} className="text-white/40 group-active:translate-x-1 transition-transform" />
                                 CONNECT WALLET
                             </button>
-                        ) : !isSigned ? (
-                            <button
-                                onClick={handleSignAuthorize}
-                                disabled={isSigning}
-                                className="w-full h-[88px] bg-indigo-600 text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-xl disabled:opacity-50"
-                            >
-                                {isSigning ? <RefreshCw className="animate-spin" size={20} /> : <Shield size={20} />}
-                                {isSigning ? 'PROCESSING...' : 'SIGN IDENTITY'}
-                            </button>
                         ) : (
-                            <div className="w-full h-[88px] bg-white border-2 border-green-500 text-green-600 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4">
-                                <UserCheck size={20} />
-                                HANDSHAKE READY
-                            </div>
-                        )}
-
-                        <button
-                            onClick={() => {
-                                if (!isConnected) return handleConnectTrigger();
-                                if (!isSigned) return handleSignAuthorize();
-                                setView('scanner');
-                            }}
-                            className={`w-full h-24 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-between px-10 transition-all border-2 ${isSigned ? 'bg-white border-[#050505] text-[#050505] shadow-lg shadow-black/5' : 'bg-transparent border-black/5 text-[#050505]/20'}`}
-                        >
-                            <div className="grid grid-cols-[auto_1fr] gap-6 items-center">
-                                <QrCode size={22} />
-                                <div className="text-left leading-tight">
-                                    <p className="tracking-[0.3em]">SYNC LENS</p>
-                                    <p className="text-[8px] opacity-40 mt-1">{isSigned ? 'FINAL STEP: SCAN QR' : 'REQUIRES SIGNATURE'}</p>
+                            <button
+                                onClick={() => setView('scanner')}
+                                className="w-full h-[88px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[12px] flex items-center justify-between px-10 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
+                            >
+                                <div className="grid grid-cols-[auto_1fr] gap-6 items-center">
+                                    <QrCode size={22} className="text-[#050505]" />
+                                    <div className="text-left leading-tight">
+                                        <p className="tracking-[0.3em]">SYNC LENS</p>
+                                        <p className="text-[9px] opacity-40 mt-1 font-bold">READY: OPEN SCANNER</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <ChevronRight size={18} className="opacity-20" />
-                        </button>
+                                <ChevronRight size={18} className="opacity-20 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        )}
                     </div>
 
                     {isConnected && address && (

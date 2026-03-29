@@ -1,4 +1,4 @@
-import { useAccount, useSendTransaction, useWaitForTransactionReceipt, useConfig } from 'wagmi';
+import { useAccount, useConfig, useChainId, useSwitchChain } from 'wagmi';
 import { estimateGas, sendTransaction } from '@wagmi/core';
 import { parseEther, type Address } from 'viem';
 import { useState } from 'react';
@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 export function useTransactionHandler() {
     const { address, isConnected } = useAccount();
     const config = useConfig();
+    const chainId = useChainId();
+    const { switchChainAsync } = useSwitchChain();
     const [isLoading, setIsLoading] = useState(false);
 
     /**
@@ -31,8 +33,15 @@ export function useTransactionHandler() {
         const id = toast.loading("Confirming transaction in your wallet...");
 
         try {
+            if (chainId !== txData.chainId && switchChainAsync) {
+                toast.loading(`Cambiando a la red ${txData.chainId}...`, { id });
+                await switchChainAsync({ chainId: txData.chainId });
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
             const txValue = typeof txData.value === 'string' ? parseEther(txData.value) : txData.value;
 
+            toast.loading("Calculando gas de la transacción...", { id });
             // 1. Perform safety estimation first (Elite Grade)
             const gas = await estimateGas(config, {
                 account: address,
@@ -40,6 +49,8 @@ export function useTransactionHandler() {
                 value: txValue,
                 data: txData.data,
             });
+
+            toast.loading("Firma la transacción en tu wallet...", { id });
 
             // 2. Send transaction via Wagmi
             const hash = await sendTransaction(config, {
