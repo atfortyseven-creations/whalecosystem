@@ -20,11 +20,11 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-    { id: 'VIP_MATRIX', label: 'SOVEREIGN MATRIX', icon: <Target size={14} /> },
-    { id: 'ACTIVITY', label: 'ON-CHAIN TELEMETRY', icon: <Activity size={14} /> },
-    { id: 'POLYMARKET', label: 'PROBABILITY ENGINE', icon: <BarChart2 size={14} /> },
-    { id: 'DEFI_YIELD', label: 'INSTITUTIONAL YIELD', icon: <LayoutGrid size={14} /> },
-    { id: 'PORTFOLIO', label: 'SOVEREIGN TREASURY', icon: <Wallet size={14} /> },
+    { id: 'VIP_MATRIX', label: 'ORDER BOOK', icon: <Target size={14} /> },
+    { id: 'ACTIVITY', label: 'WHALE FLOW', icon: <Activity size={14} /> },
+    { id: 'POLYMARKET', label: 'MARKETS AVAILABLE', icon: <BarChart2 size={14} /> },
+    { id: 'DEFI_YIELD', label: 'COPY TRADING', icon: <LayoutGrid size={14} /> },
+    { id: 'PORTFOLIO', label: 'PORTFOLIO', icon: <Wallet size={14} /> },
 ];
 
 export default function SovereignDashboard() {
