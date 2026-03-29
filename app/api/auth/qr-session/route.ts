@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
-import { cookies } from 'next/headers';
 
 export async function POST() {
     const sessionId = crypto.randomUUID();
@@ -12,19 +11,24 @@ export async function POST() {
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
         return NextResponse.json({ error: 'Missing Session ID' }, { status: 400 });
     }
 
     const val = await safeRedisGet(`qr:${id}`);
-    
+
     if (!val) {
         return NextResponse.json({ status: 'expired' });
     }
-    
+
     if (val === 'PENDING') {
         return NextResponse.json({ status: 'pending' });
+    }
+
+    // Already consumed (rapid double-poll) — still report complete to unblock the desktop gate
+    if (val === 'CONSUMED') {
+        return NextResponse.json({ status: 'complete' });
     }
 
     try {
@@ -32,25 +36,42 @@ export async function GET(request: Request) {
         if (valStr.startsWith('{')) {
             const data = JSON.parse(valStr);
             if (data.address) {
-                // [SESSION] Establish verified handshake cookie on the PC browser
-                const cookieStore = await cookies();
-                cookieStore.set('sovereign_handshake', data.address, {
-                    maxAge: 30 * 24 * 60 * 60, // Extend to 30 days for institutional persistence
-                    path: '/',
-                    secure: true, // Always secure for institutional protocol
-                    sameSite: 'lax', // Lax for better compatibility with wallet redirects
-                    httpOnly: false // Accessible by client-side hooks
-                });
+                // Mark consumed immediately — prevents race condition on concurrent polls
+                await safeRedisSet(`qr:${id}`, 'CONSUMED', 'EX', 60);
 
-                // Delete the consumed token from Redis
-                await safeRedisSet(`qr:${id}`, 'CONSUMED', 'EX', 10);
-                return NextResponse.json({ status: 'complete', address: data.address });
+                // ─── CRITICAL FIX ───────────────────────────────────────────────
+                // cookies().set() from 'next/headers' does NOT work inside a GET
+                // Route Handler in Next.js App Router — it throws "Cookies can only
+                // be modified in a Server Action or Route Handler" at runtime.
+                // The correct approach for any Route Handler verb is to use
+                // NextResponse with the Set-Cookie header directly.
+                // ────────────────────────────────────────────────────────────────
+                const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
+                const response = NextResponse.json(
+                    { status: 'complete', address: data.address },
+                    {
+                        headers: {
+                            'Set-Cookie': [
+                                `sovereign_handshake=${data.address}`,
+                                'Path=/',
+                                `Max-Age=${THIRTY_DAYS_S}`,
+                                'SameSite=Lax',
+                                // Intentionally NOT HttpOnly — the client gate reads
+                                // document.cookie to detect an existing handshake.
+                            ].join('; '),
+                        },
+                    }
+                );
+
+                console.log(`[QR_SESSION:Complete] Token consumed, cookie set for ${data.address}`);
+                return response;
             }
         }
     } catch (e) {
         console.error('[QR_SESSION_PARSE_ERROR]', e);
         return NextResponse.json({ status: 'error', message: 'Payload invalid' }, { status: 500 });
     }
-    
+
+    // Unexpected state — treat as still pending
     return NextResponse.json({ status: 'pending' });
 }

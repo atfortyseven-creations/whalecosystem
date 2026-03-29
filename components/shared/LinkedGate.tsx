@@ -456,20 +456,29 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // QR Polling
   useEffect(() => {
     if (!isMounted || isLinked) return;
-    const interval = setInterval(async () => {
+    // Use a ref so we can clear it synchronously inside the async callback
+    let intervalId: ReturnType<typeof setInterval>;
+    intervalId = setInterval(async () => {
       const token = qrSessionRef.current;
       if (!token) return;
       try {
         const res = await fetch(`/api/auth/qr-session?id=${token}`);
         const data = await res.json();
         if (data.status === 'complete') {
+          // ─── Stop polling immediately — the cookie is already set by the server
+          clearInterval(intervalId);
           setSyncStatus('SYNCED');
+          // Short delay for the success animation, then open the gate
           setTimeout(() => setLinked(true), 1200);
+        } else if (data.status === 'expired') {
+          // QR expired while user was looking at it — auto-refresh silently
+          clearInterval(intervalId);
+          fetchNewSession();
         }
       } catch (_) {}
     }, 2000);
-    return () => clearInterval(interval);
-  }, [isMounted, isLinked, setLinked]);
+    return () => clearInterval(intervalId);
+  }, [isMounted, isLinked, setLinked, fetchNewSession]);
 
   if (!isMounted) return null;
   if (isLinked || (isWalletConnected && !showSignStep)) return <>{children}</>;

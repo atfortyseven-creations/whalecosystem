@@ -428,39 +428,67 @@ export function MobileSovereignLanding() {
 
 // ─── SCANNER COMPONENT ──────────────────────────────────────────────────────
 function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
+    // Use refs so the scanner callback (captured once in useEffect) always
+    // reads the LATEST values — fixes the stale-closure bug that caused
+    // "Sincronizando Identidad" to hang forever when address was undefined.
+    const isProcessingRef = useRef(false);
+    const addressRef = useRef<string>(address);
+    const signRef = useRef<any>(signMessageAsync);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const scannerRef = useRef<Html5Qrcode | null>(null);
 
-    const handleScan = async (text: string) => {
-        if (isProcessing) return;
+    // Keep refs in sync on every render
+    useEffect(() => { addressRef.current = address; }, [address]);
+    useEffect(() => { signRef.current = signMessageAsync; }, [signMessageAsync]);
+
+    // Stable callback — safe to pass to Html5Qrcode once
+    const handleScan = useCallback(async (text: string) => {
+        if (isProcessingRef.current) return;
         if (!text.startsWith('SOVEREIGN_HANDSHAKE:')) return;
-        
+
+        const currentAddress = addressRef.current;
+        if (!currentAddress) {
+            toast.error('WALLET NO CONECTADA', { description: 'Conecta tu wallet antes de escanear.' });
+            return;
+        }
+
+        isProcessingRef.current = true;
         setIsProcessing(true);
+
         try {
-            const signature = await signMessageAsync({ message: text });
-            const token = text.split(':')[1];
+            // Sign the FULL QR string as the message
+            const signature = await signRef.current({ message: text });
+            // Extract the session UUID — everything after the prefix
+            const token = text.slice('SOVEREIGN_HANDSHAKE:'.length);
             
             const res = await fetch('/api/auth/qr-sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, address, signature }),
+                body: JSON.stringify({ token, address: currentAddress, signature }),
             });
 
             if (res.ok) {
                 toast.success('CONEXIÓN LEGENDARIA', { description: 'Sincronización de terminal completada.' });
-                if (scannerRef.current) await scannerRef.current.stop();
+                if (scannerRef.current) await scannerRef.current.stop().catch(() => {});
                 window.location.reload();
             } else {
                 const errorText = await res.text();
                 toast.error('FALLO DE SINCRONIZACIÓN', { description: errorText || 'Error al verificar identidad' });
+                isProcessingRef.current = false;
                 setIsProcessing(false);
             }
-        } catch (e) {
-            toast.error('FALLO DE PROTOCOLO', { description: e instanceof Error ? e.message : 'Error desconocido' });
+        } catch (e: any) {
+            // User rejected the signing prompt — let them try again
+            const isRejection = e?.code === 4001 || e?.message?.toLowerCase().includes('reject') || e?.message?.toLowerCase().includes('denied');
+            toast.error(
+                isRejection ? 'FIRMA RECHAZADA' : 'FALLO DE PROTOCOLO',
+                { description: isRejection ? 'Debes aprobar la firma en tu wallet para sincronizar.' : (e instanceof Error ? e.message : 'Error desconocido') }
+            );
+            isProcessingRef.current = false;
             setIsProcessing(false);
         }
-    };
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const scanner = new Html5Qrcode('qr-reader');
@@ -468,7 +496,7 @@ function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
         
         scanner.start(
             { facingMode: "environment" },
-            { fps: 30, qrbox: (viewWidth, viewHeight) => {
+            { fps: 15, qrbox: (viewWidth, viewHeight) => {
                 const s = Math.min(viewWidth, viewHeight) * 0.7;
                 return { width: s, height: s };
             }},
@@ -479,7 +507,7 @@ function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
         return () => {
             if (scannerRef.current) scannerRef.current.stop().catch(() => {});
         };
-    }, []);
+    }, [handleScan]);
 
     return (
         <div className="fixed inset-0 bg-[#FAF9F6] z-[10000] flex flex-col p-8 overflow-hidden">
