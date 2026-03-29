@@ -273,13 +273,13 @@ export function MobileSovereignLanding() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                    <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-32 h-32 mx-auto mb-6 mt-8" />
+                    <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-48 h-48 mx-auto mb-6 mt-8 scale-[3] transform-gpu pointer-events-none opacity-90" />
 
-                    <h1 className="text-6xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic">
+                    <h1 className="text-6xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic relative z-10 drop-shadow-md">
                         Whale Alert<br/>Network
                     </h1>
                     
-                    <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-12 max-w-[280px] mx-auto leading-relaxed">
+                    <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-12 max-w-[280px] mx-auto leading-relaxed relative z-10 bg-white/20 backdrop-blur-[2px] rounded-xl py-1">
                         Connect with<br/>PC session.
                     </p>
 
