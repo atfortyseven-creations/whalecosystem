@@ -23,16 +23,14 @@ export function InstitutionalShell({
 }: InstitutionalShellProps) {
 
   return (
-    <div className="flex flex-col h-[calc(100vh-105px)] bg-white text-black overflow-hidden relative font-aztec-body">
+    <div className="flex flex-col min-h-[calc(100vh-105px)] bg-white text-black relative font-aztec-body">
       
       {/* ─── Global Depth Scanlines (Monochrome Variant) ─── */}
       <div className="absolute inset-0 pointer-events-none z-0 mix-blend-multiply opacity-[0.02]" style={{ background: "repeating-linear-gradient(0deg,transparent,transparent 2px,#000 2px,#000 4px)" }} />
       <div className="absolute top-0 inset-x-0 h-px bg-black/[0.03] z-10" />
 
-
-
-      {/* ─── Deep Inner Scrollable Viewpoint ─── */}
-      <div className="flex-1 overflow-y-auto relative z-10" data-scroll-container style={{ scrollbarWidth: 'none' }}>
+      {/* ─── Content flows naturally, scroll is on the page root ─── */}
+      <div className="flex-1 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

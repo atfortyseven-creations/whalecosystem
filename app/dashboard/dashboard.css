@@ -58,8 +58,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow: hidden;
-  height: 100vh;
+  /* overflow: hidden removed — was blocking native wheel scroll */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
