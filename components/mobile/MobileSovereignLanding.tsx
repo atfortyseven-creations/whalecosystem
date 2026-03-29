@@ -39,26 +39,24 @@ function getAppUrl(): string {
 // Receives wc:// URI and returns the final deep link for each wallet
 function buildMetaMaskDeepLink(wcUri: string, os: string): string {
   const encoded = encodeURIComponent(wcUri);
-  return os === 'ios'
-    ? `metamask://wc?uri=${encoded}`
-    : `https://metamask.app.link/wc?uri=${encoded}`;
+  // Always use metamask:// scheme to prevent Android from suggesting web browsers
+  return `metamask://wc?uri=${encoded}`;
 }
 
 function buildTrustDeepLink(wcUri: string): string {
   const encoded = encodeURIComponent(wcUri);
-  return `https://link.trustwallet.com/wc?uri=${encoded}`;
+  return `trust://wc?uri=${encoded}`;
 }
 
 function buildCoinbaseDeepLink(wcUri: string): string {
   const encoded = encodeURIComponent(wcUri);
-  // Coinbase Wallet uses cb-wallet:// on iOS, universal link on Android
-  return `https://go.cb-w.com/wc?uri=${encoded}`;
+  return `cbwallet://wc?uri=${encoded}`;
 }
 
-// Rainbow uses rnbwapp.com universal links — rainbow:// scheme is NOT supported
+// Rainbow uses rnbwapp.com universal links mostly but handles rainbow:// 
 function buildRainbowDeepLink(wcUri: string): string {
   const encoded = encodeURIComponent(wcUri);
-  return `https://rnbwapp.com/wc?uri=${encoded}`;
+  return `rainbow://wc?uri=${encoded}`;
 }
 
 // Fallback dApp-browser deep links (used when WC URI is unavailable)
@@ -132,12 +130,12 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
   );
 });
 
-// ─── CUSTOM WALLET PICKER ──────────────────────────────────────────────────
 const SUPPORTED_WALLETS = [
-  { id: 'metamask', name: 'MetaMask', icon: '/official-whale-monochrome.png', color: '#F6851B' },
-  { id: 'trust',    name: 'Trust Wallet', icon: '🛡️', color: '#3375BB' },
-  { id: 'coinbase', name: 'Coinbase', icon: '🔵', color: '#0052FF' },
-  { id: 'rainbow',  name: 'Rainbow',  icon: '🌈', color: '#001E59' }
+  { id: 'all',      name: 'WalletConnect', icon: '⚡', color: '#3B99FC', desc: 'Auto-detectar apps instaladas' },
+  { id: 'metamask', name: 'MetaMask', icon: '/official-whale-monochrome.png', color: '#F6851B', desc: 'Billetera Popular' },
+  { id: 'trust',    name: 'Trust Wallet', icon: '🛡️', color: '#3375BB', desc: 'Billetera Segura' },
+  { id: 'coinbase', name: 'Coinbase', icon: '🔵', color: '#0052FF', desc: 'Billetera Exchange' },
+  { id: 'rainbow',  name: 'Rainbow',  icon: '🌈', color: '#001E59', desc: 'Billetera Moderna' }
 ];
 
 const STORE_LINKS: Record<string, { ios: string; android: string }> = {
@@ -160,6 +158,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
   const buildWcDeepLink = (walletId: string, wcUri: string): string => {
     switch (walletId) {
+      case 'all':      return wcUri; // This invokes the OS-level intent chooser flawlessly
       case 'metamask': return buildMetaMaskDeepLink(wcUri, os);
       case 'trust':    return buildTrustDeepLink(wcUri);
       case 'coinbase': return buildCoinbaseDeepLink(wcUri);
@@ -272,9 +271,13 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                       </div>
                       <div className="text-left">
                         <span className="font-black text-sm text-[#050505] uppercase tracking-widest block">{wallet.name}</span>
-                        {isThisConnecting && (
+                        {isThisConnecting ? (
                           <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-[0.2em] mt-0.5 block animate-pulse">
-                            Abriendo wallet...
+                            Abriendo app...
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-[#050505]/40 uppercase tracking-[0.1em] mt-0.5 block">
+                            {wallet.desc || ''}
                           </span>
                         )}
                       </div>
@@ -448,9 +451,13 @@ function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
                 toast.success('CONEXIÓN LEGENDARIA', { description: 'Sincronización de terminal completada.' });
                 if (scannerRef.current) await scannerRef.current.stop();
                 window.location.reload();
+            } else {
+                const errorText = await res.text();
+                toast.error('FALLO DE SINCRONIZACIÓN', { description: errorText || 'Error al verificar identidad' });
+                setIsProcessing(false);
             }
         } catch (e) {
-            toast.error('FALLO DE PROTOCOLO');
+            toast.error('FALLO DE PROTOCOLO', { description: e instanceof Error ? e.message : 'Error desconocido' });
             setIsProcessing(false);
         }
     };

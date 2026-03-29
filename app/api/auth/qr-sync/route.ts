@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
+import { verifyMessage } from 'viem';
 
 export async function POST(req: Request) {
     try {
@@ -12,10 +13,6 @@ export async function POST(req: Request) {
         // [SECURITY] Verify Signature of the token (Session ID)
         // This ensures the mobile user intentionally authorized THIS specific PC session.
         try {
-            // Institutional dynamic import hardening
-            const viem = await import('viem');
-            const verifyMessage = viem.verifyMessage;
-
             const isValid = await verifyMessage({
                 address: address as `0x${string}`,
                 message: `SOVEREIGN_HANDSHAKE:${token}`,
