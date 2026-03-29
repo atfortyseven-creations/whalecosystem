@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Search, ExternalLink, Zap, ShieldCheck, Banknote, Loader2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { useAccount } from 'wagmi';
-import { useTransactionHandler } from '@/hooks/useTransactionHandler';
+import { RefreshCw, Search, Banknote, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
+import { useAccount, useSendTransaction, useSwitchChain, useChainId } from 'wagmi';
+import { polymarketRouterService } from '@/lib/blockchain/PolymarketRouterService';
+import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
@@ -22,19 +23,19 @@ const fmtUsd = (n: number) => {
 };
 
 const SIGNAL_COLOR: Record<string, string> = {
-    OVERBOUGHT: 'var(--az-rose)', OVERSOLD: 'var(--az-emerald)',
-    LEAN_YES: 'var(--az-lime)', LEAN_NO: '#f59e0b', NEUTRAL: 'var(--az-ink)',
+    OVERBOUGHT: '#f43f5e', OVERSOLD: '#00FFAA',
+    LEAN_YES: '#00e699', LEAN_NO: '#f59e0b', NEUTRAL: '#888888',
 };
 
 function Skeleton({ count = 6 }) {
     return (
-        <div className="flex flex-col gap-2 p-4">
+        <div className="flex flex-col gap-3 p-6">
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className="flex gap-4 p-4 border border-white/5 bg-white/[0.01] rounded-xl">
-                    <div className="w-12 h-12 bg-white/5 rounded-lg animate-pulse" />
-                    <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-white/5 rounded w-3/4 animate-pulse" />
-                        <div className="h-3 bg-white/5 rounded w-1/4 animate-pulse" />
+                <div key={i} className="flex gap-4 p-5 border border-[#E5E5E5] bg-[#FAF9F6] rounded-2xl">
+                    <div className="w-12 h-12 bg-[#E5E5E5] rounded-xl animate-pulse" />
+                    <div className="flex-1 space-y-3">
+                        <div className="h-5 bg-[#E5E5E5] rounded w-3/4 animate-pulse" />
+                        <div className="h-3 bg-[#E5E5E5] rounded w-1/4 animate-pulse" />
                     </div>
                 </div>
             ))}
@@ -50,10 +51,15 @@ export default function PolymarketPanel() {
     const [ts, setTs] = useState('');
     const [selected, setSelected] = useState<PolyMarket | null>(null);
     const [tradeAmount, setTradeAmount] = useState('100');
+    const [isExecuting, setIsExecuting] = useState<'YES' | 'NO' | null>(null);
 
     const { isConnected } = useAccount();
-    const { handleExternalTransaction } = useTransactionHandler();
-    const [isExecuting, setIsExecuting] = useState<'YES' | 'NO' | null>(null);
+    const chainId = useChainId();
+    const { switchChain } = useSwitchChain();
+    const { sendTransactionAsync } = useSendTransaction();
+    const { usdcBalance } = useLivePortfolio();
+    
+    const isPolygon = chainId === 137;
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -76,46 +82,46 @@ export default function PolymarketPanel() {
             toast.error("Wallet no conectada", { description: "Requiere firma On-Chain para operar en Polymarket." });
             return;
         }
+
+        if (!isPolygon && switchChain) {
+            try {
+                await switchChain({ chainId: 137 });
+            } catch (err) {
+                toast.error("Red Incorrecta", { description: "Debes cambiar a Polygon para ejecutar el trade." });
+                return;
+            }
+        }
+
         if (!selected) return;
 
         setIsExecuting(direction);
+        const toastId = toast.loading(`Generando calldata de ejecución [${direction}]...`);
+        
         try {
-            toast.loading(`Generando calldata de ejecución [${direction}]...`, { id: `poly-${selected.id}` });
+            // Native Direct Execution bypassing proxy API for speed matching ExecutionPanel UI
+            const { tx } = await polymarketRouterService.buildTradeTransaction(
+                selected.conditionId || selected.id, 
+                direction, 
+                tradeAmount
+            );
             
-            const response = await fetch('/api/polymarket/trade', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    marketId: selected.conditionId || selected.id,
-                    direction,
-                    amount: tradeAmount,
-                    userAddress: window.ethereum?.selectedAddress || '0xUserContextPending'
-                })
-            });
+            toast.loading("Esperando firma en el proveedor web3...", { id: toastId });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Execution Engine Error');
-            }
-
-            const { tx } = await response.json();
-            
-            toast.loading("Esperando firma en el proveedor web3...", { id: `poly-${selected.id}` });
-
-            await handleExternalTransaction({
+            const hash = await sendTransactionAsync({
                 to: tx.to as `0x${string}`,
                 data: tx.data as `0x${string}`,
-                value: tx.value || "0",
-                chainId: tx.chainId
+                value: BigInt(tx.value || "0")
             });
             
             toast.success("Trade Confirmado On-Chain", { 
-                id: `poly-${selected.id}`,
-                description: `Has adquirido ${tradeAmount} USDC en acciones de ${direction} para: ${selected.question.slice(0,30)}...` 
+                id: toastId,
+                description: `Has adquirido ${tradeAmount} USDC en acciones de ${direction}. Hash: ${hash.slice(0, 10)}...` 
             });
+            
+            setSelected(null); // Close sidebar on success
         } catch (e: any) {
             toast.error("Trade Fallido", { 
-                id: `poly-${selected.id}`,
+                id: toastId,
                 description: e.message || "Usuario rechazó la transacción on-chain."
             });
         } finally {
@@ -124,157 +130,199 @@ export default function PolymarketPanel() {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 600 }}>
+        <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FFFFFF] text-[#111111] font-sans">
             {/* Controls */}
-            <div className="flex flex-wrap items-center gap-4 p-4 border-b border-white/5 bg-white/[0.02]">
-                <div className="relative flex-1 min-w-[250px]">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+            <div className="flex flex-wrap items-center gap-4 p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+                <div className="relative flex-1 min-w-[250px] max-w-md">
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888]" />
                     <input 
                         value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder="Buscar mercados..." 
-                        className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-xs text-white font-mono outline-none focus:border-white/30 transition-colors"
+                        placeholder="Buscar mercados institucionales..." 
+                        className="w-full bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl pl-11 pr-4 py-3 text-sm text-[#111111] font-medium outline-none focus:border-[#111111] transition-colors shadow-sm"
                     />
                 </div>
-                <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+                <div className="flex bg-[#E5E5E5]/40 p-1.5 rounded-xl border border-[#E5E5E5]">
                     {['all', 'crypto', 'politics', 'sports', 'business'].map(c => (
                         <button 
                             key={c} onClick={() => setCategory(c)}
-                            className={`px-3 py-1.5 rounded-md text-[10px] font-mono font-bold tracking-widest uppercase transition-colors ${category === c ? 'bg-white text-black' : 'text-white/50 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-lg text-xs font-bold tracking-widest uppercase transition-all shadow-sm ${category === c ? 'bg-[#FFFFFF] text-[#111111] border border-[#E5E5E5]' : 'text-[#888888] hover:text-[#111111] border border-transparent hover:bg-white/50'}`}
                         >
                             {c}
                         </button>
                     ))}
                 </div>
-                <button onClick={load} className="text-white/40 hover:text-white flex items-center gap-2 text-[10px] font-mono tracking-widest border border-white/10 rounded-lg px-3 py-2 bg-black/20">
-                    <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> SYNC
+                <button onClick={load} className="ml-auto text-[#888888] hover:text-[#111111] flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border border-[#E5E5E5] rounded-xl px-4 py-3 bg-[#FFFFFF] shadow-sm hover:border-[#111111]/20 transition-all">
+                    <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> SYNC
                 </button>
             </div>
 
             {/* Markets List */}
-            <div className="flex relative">
-                <div className="p-4 space-y-3 flex-1 w-full">
+            <div className="flex flex-1 overflow-hidden relative">
+                <div className="p-6 space-y-4 flex-1 w-full overflow-y-auto no-scrollbar">
                     {loading && <Skeleton />}
                     {!loading && filtered.map(m => (
                         <motion.div 
                             key={m.id}
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                             onClick={() => setSelected(selected?.id === m.id ? null : m)}
-                            className={`flex gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-white/[0.08] border-white/20' : 'bg-white/[0.02] border-white/5 hover:border-white/15'}`}
+                            className={`flex gap-5 p-5 rounded-[1.5rem] border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-[#FAF9F6] border-[#111111]/20 shadow-md' : 'bg-[#FFFFFF] border-[#E5E5E5] hover:border-[#111111]/10 hover:shadow-sm'}`}
                         >
-                            <div className="w-12 h-12 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
-                                {m.image ? <Image src={m.image} alt="" width={48} height={48} className="object-cover" /> : <Banknote size={20} className="text-white/20" />}
+                            <div className="w-14 h-14 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                                {m.image ? <Image src={m.image} alt="" width={56} height={56} className="object-cover" /> : <Banknote size={24} className="text-[#888888]" />}
                             </div>
                             <div className="flex-1 overflow-hidden">
-                                <h3 className="text-sm font-bold text-white tracking-tight leading-tight mb-1">{m.question}</h3>
-                                <div className="flex items-center gap-3 text-[10px] font-mono text-white/40 uppercase tracking-widest">
-                                    <span>{m.category}</span>
+                                <h3 className="text-base font-black text-[#111111] tracking-tight leading-snug mb-2 truncate max-w-[90%]">{m.question}</h3>
+                                <div className="flex items-center gap-3 text-[10px] font-bold text-[#888888] uppercase tracking-widest">
+                                    <span className="bg-[#E5E5E5]/50 px-2 py-0.5 rounded text-[#111111]">{m.category}</span>
                                     <span>•</span>
                                     <span>VOL: {fmtUsd(m.volume24h)}</span>
                                     {m.evSignal !== 'NEUTRAL' && (
                                         <>
                                             <span>•</span>
-                                            <span style={{ color: SIGNAL_COLOR[m.evSignal] || 'white' }}>{m.evSignal.replace('_', ' ')}</span>
+                                            <span style={{ color: SIGNAL_COLOR[m.evSignal] || '#111111' }} className="font-black">{m.evSignal.replace('_', ' ')}</span>
                                         </>
                                     )}
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-[#14f195]/10 border border-[#14f195]/20 min-w-[60px]">
-                                    <span className="text-[9px] text-[#14f195] font-bold uppercase mb-0.5">YES</span>
-                                    <span className="text-xs font-mono font-bold text-[#14f195]">{Math.round(m.yesPrice * 100)}¢</span>
+                            <div className="flex items-center gap-3 shrink-0">
+                                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#00e699]/10 border border-[#00e699]/20 min-w-[65px]">
+                                    <span className="text-[10px] text-[#00dda8] font-black uppercase tracking-widest mb-1">YES</span>
+                                    <span className="text-sm font-mono font-black text-[#00dda8]">{Math.round(m.yesPrice * 100)}¢</span>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-[#f43f5e]/10 border border-[#f43f5e]/20 min-w-[60px]">
-                                    <span className="text-[9px] text-[#f43f5e] font-bold uppercase mb-0.5">NO</span>
-                                    <span className="text-xs font-mono font-bold text-[#f43f5e]">{Math.round((1 - m.yesPrice) * 100)}¢</span>
+                                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/20 min-w-[65px]">
+                                    <span className="text-[10px] text-[#f43f5e] font-black uppercase tracking-widest mb-1">NO</span>
+                                    <span className="text-sm font-mono font-black text-[#f43f5e]">{Math.round((1 - m.yesPrice) * 100)}¢</span>
                                 </div>
                             </div>
                         </motion.div>
                     ))}
                 </div>
 
-                {/* 1-Click Execution Sidebar */}
+                {/* 1-Click Execution Sidebar (Molecular UI Accuracy) */}
                 <AnimatePresence>
                     {selected && (
                         <motion.div
-                            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+                            initial={{ x: '100%', opacity: 0 }} 
+                            animate={{ x: 0, opacity: 1 }} 
+                            exit={{ x: '100%', opacity: 0 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="w-[340px] shrink-0 border-l border-white/10 bg-[#0a0a0a] flex flex-col shadow-2xl sticky top-[130px] h-[calc(100vh-130px)] z-20"
+                            className="w-[420px] shrink-0 border-l border-[#E5E5E5] bg-[#FFFFFF] flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.03)] h-full z-20"
                         >
-                            <div className="p-5 border-b border-white/5">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="w-12 h-12 rounded-lg bg-black/50 border border-white/10 overflow-hidden shrink-0">
-                                        {selected.image ? <Image src={selected.image} alt="" width={48} height={48} className="object-cover" /> : <Banknote size={20} className="text-white/20 m-3" />}
+                            <div className="p-8 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="w-16 h-16 rounded-2xl bg-white border border-[#E5E5E5] overflow-hidden shrink-0 shadow-sm p-1">
+                                        <div className="w-full h-full rounded-xl overflow-hidden relative bg-[#FAF9F6]">
+                                            {selected.image ? <Image src={selected.image} alt="" fill className="object-cover" /> : <Banknote size={24} className="text-[#888888] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1 text-[9px] font-mono text-[#a855f7] tracking-widest border border-[#a855f7]/30 bg-[#a855f7]/10 px-2 py-1 rounded">
-                                        <ShieldCheck size={10} /> ON-CHAIN CTF
-                                    </div>
+                                    <button 
+                                        onClick={() => setSelected(null)}
+                                        className="text-[#888888] hover:text-[#111111] p-1 border border-transparent rounded hover:border-[#E5E5E5]"
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
-                                <h2 className="text-sm font-bold text-white leading-snug">{selected.question}</h2>
+                                <div className="flex items-center gap-1.5 text-[9px] font-black bg-[#E5E5E5]/50 text-[#888888] tracking-widest px-2.5 py-1 rounded inline-flex mb-3">
+                                    <ShieldCheck size={11} /> ON-CHAIN CTF EXECUTION
+                                </div>
+                                <h2 className="text-xl font-black text-[#111111] leading-tight tracking-tight">{selected.question}</h2>
                             </div>
 
-                            <div className="flex-1 p-5 space-y-5 overflow-y-auto">
-                                <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                                    <div className="text-[10px] font-mono tracking-widest text-white/50 mb-3">ODDS IMPLICADAS</div>
+                            <div className="flex-1 p-8 space-y-8 overflow-y-auto">
+                                
+                                {/* ODDS IMPLICADAS REPLICA */}
+                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-6 text-center shadow-sm">
+                                    <div className="flex items-center justify-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] mb-6">
+                                        ODDS IMPLICADAS
+                                    </div>
                                     <div className="flex justify-between items-center px-4">
-                                        <div className="text-center">
-                                            <div className="text-3xl font-black font-mono text-[#14f195]">{Math.round(selected.yesPrice * 100)}%</div>
-                                            <div className="text-[9px] font-mono text-white/40 uppercase tracking-widest mt-1">YES</div>
+                                        <div className="flex-1 text-center">
+                                            <div className="text-5xl font-black font-sans text-[#00e699] tracking-tighter mb-2">{Math.round(selected.yesPrice * 100)}%</div>
+                                            <div className="text-[10px] font-mono font-bold text-[#888888] uppercase tracking-widest">YES</div>
                                         </div>
-                                        <div className="w-px h-10 bg-white/10" />
-                                        <div className="text-center">
-                                            <div className="text-3xl font-black font-mono text-[#f43f5e]">{Math.round((1 - selected.yesPrice) * 100)}%</div>
-                                            <div className="text-[9px] font-mono text-white/40 uppercase tracking-widest mt-1">NO</div>
+                                        <div className="w-px h-16 bg-[#E5E5E5]" />
+                                        <div className="flex-1 text-center">
+                                            <div className="text-5xl font-black font-sans text-[#f43f5e] tracking-tighter mb-2">{Math.round((1 - selected.yesPrice) * 100)}%</div>
+                                            <div className="text-[10px] font-mono font-bold text-[#888888] uppercase tracking-widest">NO</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-mono tracking-widest text-white/50">TAMAÑO DE LA POSICIÓN (USDC)</label>
+                                {/* INPUT REPLICA */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center px-1">
+                                        <label className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] uppercase">TAMAÑO DE LA POSICIÓN (USDC)</label>
+                                    </div>
                                     <div className="relative">
                                         <input 
                                             type="number" 
                                             value={tradeAmount} 
                                             onChange={e => setTradeAmount(e.target.value)}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg py-3 pl-4 pr-16 text-white font-mono text-xl outline-none focus:border-white/30"
+                                            className="w-full bg-[#FFFFFF] border-2 border-[#E5E5E5] rounded-2xl py-4 pl-6 pr-20 text-[#111111] font-mono font-black text-2xl outline-none focus:border-[#111111] transition-all"
                                             placeholder="0"
                                         />
-                                        <button onClick={() => setTradeAmount('1000')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white">MAX</button>
+                                        <button 
+                                            onClick={() => setTradeAmount(usdcBalance || '1000')} 
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-sans font-black bg-[#E5E5E5]/50 hover:bg-[#111111] hover:text-[#FFFFFF] text-[#111111] px-4 py-2 rounded-xl transition-all"
+                                        >
+                                            MAX
+                                        </button>
+                                    </div>
+                                    <div className="flex justify-end text-[10px] font-mono text-[#888888] font-bold px-1">
+                                        Bal: ${usdcBalance}
                                     </div>
                                 </div>
 
-                                <div className="space-y-1 pt-2">
-                                    <div className="flex justify-between text-[10px] font-mono text-white/50">
+                                {/* PAYOUT REPLICA */}
+                                <div className="space-y-3 pt-2">
+                                    <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888]">
                                         <span>Payout Potencial (YES):</span>
-                                        <span className="text-[#14f195]">{fmtUsd(Number(tradeAmount) / selected.yesPrice)}</span>
+                                        <span className="text-[#00e699] font-black">{fmtUsd(Number(tradeAmount) / selected.yesPrice)}</span>
                                     </div>
-                                    <div className="flex justify-between text-[10px] font-mono text-white/50">
+                                    <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888]">
                                         <span>Payout Potencial (NO):</span>
-                                        <span className="text-[#f43f5e]">{fmtUsd(Number(tradeAmount) / (1 - selected.yesPrice))}</span>
+                                        <span className="text-[#f43f5e] font-black">{fmtUsd(Number(tradeAmount) / (1 - selected.yesPrice))}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-5 border-t border-white/5 grid grid-cols-2 gap-3 bg-[#050505]">
+                            {/* BUY BUTTONS REPLICA */}
+                            <div className="p-6 border-t border-[#E5E5E5] bg-[#FFFFFF] flex gap-4">
                                 <button 
                                     onClick={() => handleTrade('YES')}
-                                    disabled={isExecuting !== null || !tradeAmount}
-                                    className="col-span-1 py-3 rounded-lg bg-[#14f195]/10 border border-[#14f195]/30 text-[#14f195] hover:bg-[#14f195] hover:text-black font-black uppercase tracking-widest text-xs flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50"
+                                    disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
+                                    className="flex-1 py-5 rounded-2xl bg-[#00e699]/10 border-2 border-[#00e699]/20 hover:bg-[#00e699]/20 text-[#00dda8] font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50"
                                 >
-                                    {isExecuting === 'YES' ? <Loader2 size={16} className="animate-spin" /> : <>BUY YES <span className="text-[9px] font-mono opacity-60">@{Math.round(selected.yesPrice * 100)}¢</span></>}
+                                    {isExecuting === 'YES' ? <Loader2 size={24} className="animate-spin text-[#00dda8]" /> : <>BUY YES <span className="text-[10px] font-black opacity-80 mt-0.5">@{Math.round(selected.yesPrice * 100)}¢</span></>}
                                 </button>
                                 <button 
                                     onClick={() => handleTrade('NO')}
-                                    disabled={isExecuting !== null || !tradeAmount}
-                                    className="col-span-1 py-3 rounded-lg bg-[#f43f5e]/10 border border-[#f43f5e]/30 text-[#f43f5e] hover:bg-[#f43f5e] hover:text-black font-black uppercase tracking-widest text-xs flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50"
+                                    disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
+                                    className="flex-1 py-5 rounded-2xl bg-[#f43f5e]/10 border-2 border-[#f43f5e]/20 hover:bg-[#f43f5e]/20 text-[#f43f5e] font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50"
                                 >
-                                    {isExecuting === 'NO' ? <Loader2 size={16} className="animate-spin" /> : <>BUY NO <span className="text-[9px] font-mono opacity-60">@{Math.round((1 - selected.yesPrice) * 100)}¢</span></>}
+                                    {isExecuting === 'NO' ? <Loader2 size={24} className="animate-spin text-[#f43f5e]" /> : <>BUY NO <span className="text-[10px] font-black opacity-80 mt-0.5">@{Math.round((1 - selected.yesPrice) * 100)}¢</span></>}
                                 </button>
                             </div>
+                            
+                            {!isPolygon && isConnected && (
+                                <div className="px-6 pb-6 bg-[#FFFFFF]">
+                                    <button 
+                                        onClick={() => switchChain?.({ chainId: 137 })}
+                                        className="w-full bg-[#f59e0b]/10 text-[#f59e0b] font-black uppercase tracking-widest text-xs py-3 rounded-xl flex justify-center items-center gap-2 border border-[#f59e0b]/20"
+                                    >
+                                        <AlertTriangle size={14} /> Network Required: Switch to Polygon
+                                    </button>
+                                </div>
+                            )}
+
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
-            {ts && <div className="text-[10px] font-mono text-white/30 p-2 border-t border-white/5 bg-black/20 text-center">ÚLTIMO SYNC: {ts} — POLYMARKET CLOB API</div>}
+            {ts && <div className="text-[9px] font-mono font-black text-[#888888] p-3 border-t border-[#E5E5E5] bg-[#FAF9F6] text-center uppercase tracking-widest">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00FFAA] mr-2" />
+                CTF ROUTER SYNC: {ts}
+            </div>}
         </div>
     );
 }
