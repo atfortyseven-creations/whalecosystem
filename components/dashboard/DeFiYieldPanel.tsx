@@ -192,8 +192,8 @@ export default function DeFiYieldPanel() {
             </div>
 
             {/* Table */}
-            <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
-                <div style={{ flex: 1, overflowY: 'auto' }} className="az-scroll custom-scrollbar">
+            <div className="flex relative">
+                <div className="custom-scrollbar flex-1 w-full">
                     {error && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: 'var(--az-rose)', fontSize: 11 }}>
                             <AlertTriangle size={12} /> <span>{error}</span>
@@ -255,7 +255,7 @@ export default function DeFiYieldPanel() {
                             animate={{ x: 0, opacity: 1 }} 
                             exit={{ x: 400, opacity: 0 }}
                             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-[360px] flex-shrink-0 border-l border-white/10 bg-[#0a0a0a] flex flex-col absolute right-0 top-0 bottom-0 shadow-2xl z-20"
+                            className="w-[360px] flex-shrink-0 border-l border-white/10 bg-[#0a0a0a] flex flex-col sticky top-[130px] h-[calc(100vh-130px)] shadow-2xl z-20"
                         >
                             <div className="p-6 border-b border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent">
                                 <div className="text-[10px] font-mono tracking-widest text-[#a855f7] mb-2 uppercase flex items-center gap-2 relative">
