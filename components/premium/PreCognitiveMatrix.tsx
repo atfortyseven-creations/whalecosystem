@@ -41,41 +41,42 @@ export function PreCognitiveMatrix({ symbol }: PreCognitiveMatrixProps) {
     useEffect(() => {
         let isMounted = true;
 
-        const fetchStreamWithHeaders = async () => {
-             try {
-                 const response = await fetch(`/api/matrix/stream?asset=${symbol}`, {
-                     headers: { 'Authorization': 'Bearer VIP_ACCESS_99' }
-                 });
+        const fetchStream = async () => {
+            try {
+                const response = await fetch(`/api/matrix/stream?asset=${symbol}`);
 
-                 if (!response.body) throw new Error("ReadableStream not supported");
-                 const reader = response.body.getReader();
-                 const decoder = new TextDecoder("utf-8");
-                 let buffer = '';
+                if (!response.ok) throw new Error(`Stream ${response.status}`);
+                if (!response.body) throw new Error('ReadableStream not supported');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
 
-                 while (isMounted) {
-                     const { done, value } = await reader.read();
-                     if (done) break;
-                     buffer += decoder.decode(value, { stream: true });
-                     const lines = buffer.split('\n\n');
-                     buffer = lines.pop() || '';
+                while (isMounted) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n\n');
+                    buffer = lines.pop() || '';
 
-                     for (const line of lines) {
-                         if (line.startsWith('data: ')) {
-                             try {
-                                 const parsed = JSON.parse(line.slice(6));
-                                 if (isMounted) setState(parsed);
-                             } catch (e) {
-                                 // Handle partial parse errors quietly
-                             }
-                         }
-                     }
-                 }
-             } catch (err) {
-                 if (isMounted) setError("Connection lost.");
-             }
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const parsed = JSON.parse(line.slice(6));
+                                if (isMounted) setState(parsed);
+                            } catch (_) {}
+                        }
+                    }
+                }
+            } catch (err) {
+                if (!isMounted) return;
+                setError('reconnecting...');
+                // Exponential backoff reconnect
+                await new Promise(r => setTimeout(r, 3000));
+                if (isMounted) { setError(null); fetchStream(); }
+            }
         };
 
-        fetchStreamWithHeaders();
+        fetchStream();
         return () => { isMounted = false; };
     }, [symbol]);
 

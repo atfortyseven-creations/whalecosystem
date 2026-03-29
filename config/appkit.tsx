@@ -129,7 +129,14 @@ if (typeof window !== 'undefined') {
 }
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
-    const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies)
+    // Decode URL-encoded cookie string before parsing to prevent JSON SyntaxError
+    let decodedCookies: string | null = null;
+    try {
+        decodedCookies = cookies ? decodeURIComponent(cookies) : null;
+    } catch {
+        decodedCookies = cookies;
+    }
+    const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, decodedCookies)
 
     return (
         <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>
