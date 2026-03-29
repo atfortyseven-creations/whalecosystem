@@ -7,7 +7,8 @@ import { VIPMatrixEngine } from '../../../../lib/engine/SqueezeGravityEngine';
 // ─── Demo fallback data: fired when Binance FAPI is unreachable ──────────────
 // Rich, realistic, non-zero values so users see the Matrix working immediately.
 function getDemoState(asset: string) {
-    const t = Date.now() / 1000;
+    // Use static seed internally when RPC fallback is triggered so user doesn't see fake real-time fluctuation
+    const t = 1711730000;
     const seed = asset === 'BTC' ? 1.5 : asset === 'ETH' ? 2.7 : asset === 'SOL' ? 4.1 : 3.2;
     
     // Oscillating gravity (never stays at 0)
@@ -102,7 +103,7 @@ export async function GET(req: Request) {
                     // Total engine failure — still send demo so user sees live data
                     sendEvent(getDemoState(asset));
                 }
-                await new Promise(resolve => setTimeout(resolve, 400));
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
         }
     });

@@ -37,12 +37,7 @@ const ArticleBlock = memo(function ArticleBlock({
                     <span className="flex items-center gap-2 bg-[#111111] text-[#FAF9F6] px-4 py-1.5 rounded-full shadow-sm">
                         <ClockIcon size={12} /> {article.readTime} MIN READ
                     </span>
-                    <span className="bg-white text-[#888888] px-3 py-1.5 rounded-full border border-[#E5E5E5]">
-                        DEPTH: SECURE_ALPHA
-                    </span>
-                    <span className="text-[#888888]/50 ml-auto bg-transparent border-none">
-                        REF: {article.id?.toUpperCase()}
-                    </span>
+
                 </div>
 
                 <h3 className="font-sans text-4xl md:text-5xl lg:text-6xl font-black text-[#111111] tracking-tighter leading-[1.05]">
@@ -151,10 +146,7 @@ export function AcademyViewer() {
                             <AcademyLogo />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black uppercase tracking-tighter text-[#111111]">
-                                Knowledge <span className="text-[#888888]">Hub</span>
-                            </h2>
-                            <p className="text-[8px] font-mono text-[#888888] uppercase tracking-[0.5em] font-black mt-1">Institutional Repository</p>
+
                         </div>
                     </div>
                     

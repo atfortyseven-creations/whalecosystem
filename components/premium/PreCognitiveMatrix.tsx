@@ -203,7 +203,7 @@ export function PreCognitiveMatrix({ symbol }: PreCognitiveMatrixProps) {
                     <div className="absolute top-5 right-5 flex items-center gap-1.5 z-20">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-[pulse_600ms_ease-in-out_infinite]" />
                         <span className="text-[7px] font-black text-[#00FFAA] uppercase tracking-[0.2em] bg-[#00FFAA]/10 px-1.5 py-0.5 rounded">
-                            {showSovereignOverlay ? 'SOVEREIGN MODE 🟢' : 'ON-CHAIN LIVE • 400ms'}
+                            {showSovereignOverlay ? 'SOVEREIGN MODE 🟢' : 'ON-CHAIN SYNCED'}
                         </span>
                     </div>
                 )}

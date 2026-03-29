@@ -68,10 +68,7 @@ function WhaleSupportHero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
       >
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.4em] text-black/40 mb-3">
-          Sovereign Assistance Protocol
-        </p>
-        <h1 className="font-aztec-h1 text-5xl md:text-6xl lg:text-7xl text-black tracking-tighter leading-none mb-4">
+        <h1 className="font-aztec-h1 text-5xl md:text-6xl lg:text-7xl text-black tracking-tighter leading-none mb-4 mt-3">
           Whale Alert <span className="text-black/50">Support</span>
         </h1>
         <p className="font-sans text-base text-black/50 max-w-lg mx-auto leading-relaxed">
@@ -110,7 +107,7 @@ export default function SupportPage() {
   };
 
   return (
-    <InstitutionalShell title="Whale Support" subtitle="Sovereign Assistance Protocol" badge="SUPPORT" badgeVariant="emerald">
+    <InstitutionalShell title="Whale Support" badge="SUPPORT" badgeVariant="emerald">
       <div className="selection:bg-black/5">
         {/* Hero */}
         <WhaleSupportHero />

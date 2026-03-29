@@ -125,8 +125,8 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
             {/* Live Indicator */}
             {!isSovereignConfluence && !error && (
                 <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-pulse" />
-                    <span className="text-[8px] font-black text-[#00FFAA] tracking-widest uppercase">ON-CHAIN LIVE • 400ms</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-[pulse_2s_infinite]" />
+                    <span className="text-[8px] font-black text-[#00FFAA] tracking-widest uppercase">ON-CHAIN SYNCED</span>
                 </div>
             )}
 

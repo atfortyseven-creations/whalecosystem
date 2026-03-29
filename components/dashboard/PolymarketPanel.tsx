@@ -173,7 +173,8 @@ export default function PolymarketPanel() {
                             className={`flex gap-5 p-5 rounded-[1.5rem] border cursor-pointer transition-all ${selected?.id === m.id ? 'bg-[#FAF9F6] border-[#111111]/20 shadow-md' : 'bg-[#FFFFFF] border-[#E5E5E5] hover:border-[#111111]/10 hover:shadow-sm'}`}
                         >
                             <div className="w-14 h-14 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                                {m.image ? <Image src={m.image} alt="" width={56} height={56} className="object-cover" /> : <Banknote size={24} className="text-[#888888]" />}
+                                {m.image ? <img src={m.image} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.setAttribute('style', 'display: block'); }} /> : null}
+                                <Banknote size={24} className="text-[#888888] scale-110" style={{ display: m.image ? 'none' : 'block' }} />
                             </div>
                             <div className="flex-1 overflow-hidden">
                                 <h3 className="text-base font-black text-[#111111] tracking-tight leading-snug mb-2 truncate max-w-[90%]">{m.question}</h3>
@@ -217,7 +218,8 @@ export default function PolymarketPanel() {
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="w-16 h-16 rounded-2xl bg-white border border-[#E5E5E5] overflow-hidden shrink-0 shadow-sm p-1">
                                         <div className="w-full h-full rounded-xl overflow-hidden relative bg-[#FAF9F6]">
-                                            {selected.image ? <Image src={selected.image} alt="" fill className="object-cover" /> : <Banknote size={24} className="text-[#888888] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
+                                            {selected.image ? <img src={selected.image} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement?.querySelector('svg')?.setAttribute('style', 'display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'); }} /> : null}
+                                            <Banknote size={24} className="text-[#888888] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ display: selected.image ? 'none' : 'block' }} />
                                         </div>
                                     </div>
                                     <button 
