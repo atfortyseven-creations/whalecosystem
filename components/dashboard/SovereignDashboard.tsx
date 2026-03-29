@@ -38,9 +38,9 @@ export default function SovereignDashboard() {
             badgeVariant="orchid"
             fullWidth={true}
         >
-            <div className="w-full h-full flex flex-col bg-[#050505]">
+            <div className="w-full flex flex-col bg-[#050505]">
                 {/* ─── Premium Horizontal Tab Bar ─── */}
-                <div className="border-b border-white/10 bg-[#0a0a0a] sticky top-0 z-40 px-6 pt-6">
+                <div className="border-b border-white/10 bg-[#0a0a0a] sticky top-[65px] z-40 px-6 pt-6">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar pb-[-1px]">
                         {TABS.map((tab) => {
                             const isActive = activeTab === tab.id;
@@ -71,7 +71,7 @@ export default function SovereignDashboard() {
                 </div>
 
                 {/* ─── Main Content Area ─── */}
-                <div className="flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar relative">
+                <div className="w-full relative">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}
