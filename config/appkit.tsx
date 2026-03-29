@@ -82,49 +82,64 @@ export const config = wagmiAdapter.wagmiConfig
 
 const queryClient = new QueryClient()
 
+// CRITICAL: URL must match exactly the domain registered in WalletConnect Cloud.
+// Using a fixed production URL prevents auth failures caused by localhost/preview mismatches.
+const APP_URL = 'https://humanidfi.com';
+
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Sovereign Institutional Intelligence',
-    url: typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com',
-    icons: [
-        typeof window !== 'undefined' ? `${window.location.origin}/official-whale-legendary.png` : 'https://humanidfi.com/official-whale-legendary.png'
-    ],
+    url: APP_URL,
+    icons: [`${APP_URL}/official-whale-legendary.png`],
     redirect: {
-        universal: typeof window !== 'undefined' ? window.location.href : 'https://humanidfi.com'
+        // Universal links / App Links for mobile wallets to redirect back after signing
+        native: 'whalealert://',
+        universal: APP_URL,
     }
 }
 
-// Create the modal instance - Only on the client
-if (typeof window !== 'undefined') {
-    createAppKit({
-        adapters: [wagmiAdapter],
-        networks,
-        projectId,
-        metadata,
-        features: {
-            analytics: true,
-            email: true, 
-            socials: ['google', 'x', 'github', 'discord', 'apple'],
-            swaps: false,
-            onramp: false,
-        },
-        themeMode: 'light',
-        themeVariables: {
-            '--w3m-accent': '#1D1A10',
-            '--w3m-color-mix': '#F2ECD8',
-            '--w3m-border-radius-master': '2rem',
-            '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif'
-        },
-        enableInjected: true,
-        enableEIP6963: true,
-        enableWalletConnect: true,
-        featuredWalletIds: [
-            'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-            '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
-            'fd20dc4261a8140cb8f1d41804b4c71eeb9ce33da3ec76cd022ade0b4974f0d7', // Coinbase Wallet
-        ],
-        allWallets: 'SHOW'
-    })
+// Singleton guard — createAppKit must only be called once per page load.
+// Calling it twice (e.g. due to HMR or context remount) throws an internal error
+// that manifests as the "Algo salió mal" crash screen on mobile browsers.
+let appKitInitialized = false;
+
+if (typeof window !== 'undefined' && !appKitInitialized) {
+    appKitInitialized = true;
+    try {
+        createAppKit({
+            adapters: [wagmiAdapter],
+            networks,
+            projectId,
+            metadata,
+            features: {
+                analytics: true,
+                email: true, 
+                socials: ['google', 'x', 'github', 'discord', 'apple'],
+                swaps: false,
+                onramp: false,
+            },
+            themeMode: 'light',
+            themeVariables: {
+                '--w3m-accent': '#1D1A10',
+                '--w3m-color-mix': '#F2ECD8',
+                '--w3m-border-radius-master': '2rem',
+                '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif'
+            },
+            enableInjected: true,
+            enableEIP6963: true,
+            enableWalletConnect: true,
+            // Wallet IDs from WalletConnect Explorer (https://explorer.walletconnect.com)
+            featuredWalletIds: [
+                'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+                '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
+                'fd20dc4261a8140cb8f1d41804b4c71eeb9ce33da3ec76cd022ade0b4974f0d7', // Coinbase Wallet
+                '1ae92b26df02f0abca6304df07debccd18262fdf15fe789c18682a3bf88d0',   // Rainbow
+            ],
+            allWallets: 'SHOW'
+        });
+    } catch (e) {
+        console.warn('[AppKit] Initialization skipped (already initialized):', e);
+    }
 }
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
