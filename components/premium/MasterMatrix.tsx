@@ -8,7 +8,7 @@ import { InmersiveConstellations } from "@/components/shared/InmersiveConstellat
 import { useVIPStore, VIPStoreState, EMPTY_ARRAY } from "@/lib/vip-store";
 import { TacticalPulseIntelligence } from "@/components/premium/TacticalPulseIntelligence";
 import { LegendaryWhaleLeaderboard } from "@/components/premium/LegendaryWhaleLeaderboard";
-import { TokenActivityBar } from "@/components/premium/TokenActivityBar";
+import { PreCognitiveMatrix } from "@/components/premium/PreCognitiveMatrix";
 import { X, Landmark, Globe, Zap, Cpu, Info, Activity, Fingerprint, Network } from "lucide-react";
 import { MultiChainSovereignty } from "@/components/premium/MultiChainSovereignty";
 import { SystemsUtilityHeader } from "@/components/shared/SystemsUtilityHeader";
@@ -175,7 +175,7 @@ export function MasterMatrix() {
                                         <div className="h-64 relative">
                                             <WhaleMomentumChart symbol={token} compact onClick={() => setSelectedSymbolForOverlay(token)} />
                                         </div>
-                                        <TokenActivityBar symbol={token} />
+                                        <PreCognitiveMatrix symbol={token} />
                                     </div>
                                 ))}
                             </div>
