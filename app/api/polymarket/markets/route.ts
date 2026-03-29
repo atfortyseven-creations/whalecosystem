@@ -49,7 +49,15 @@ export async function GET(req: Request) {
         // Normalize and enrich the data
         const normalized = (Array.isArray(markets) ? markets : markets.data || []).map((m: any) => {
             const outcomes = Array.isArray(m.outcomes) ? m.outcomes : [];
-            const findPrice = (name: string) => parseFloat(outcomes.find((o: any) => o.name === name)?.price || '0');
+            const outcomePrices = Array.isArray(m.outcomePrices) ? m.outcomePrices : [];
+            
+            const findPrice = (name: string) => {
+                const index = outcomes.indexOf(name);
+                if (index !== -1 && outcomePrices[index]) {
+                    return parseFloat(outcomePrices[index]);
+                }
+                return 0;
+            };
             
             const yesPrice = findPrice('Yes') || parseFloat(m.bestAsk || '0.5');
             const noPrice = findPrice('No') || (1 - yesPrice);

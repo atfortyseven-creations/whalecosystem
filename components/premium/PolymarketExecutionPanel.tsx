@@ -6,6 +6,7 @@ import { useSendTransaction, useAccount, useSwitchChain, useChainId } from "wagm
 import { polymarketRouterService } from "@/lib/blockchain/PolymarketRouterService";
 import { useLivePortfolio } from "@/hooks/useLivePortfolio";
 import { X, CheckCircle, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 interface PolymarketExecutionPanelProps {
     symbol: string;
@@ -23,7 +24,7 @@ export function PolymarketExecutionPanel({ symbol, probability, direction, marke
 
     const { address } = useAccount();
     const chainId = useChainId();
-    const { switchChain } = useSwitchChain();
+    const { switchChain, switchChainAsync } = useSwitchChain();
     const { sendTransaction, isPending, isSuccess } = useSendTransaction();
     const { usdcBalance, liveTick } = useLivePortfolio();
 
@@ -36,10 +37,11 @@ export function PolymarketExecutionPanel({ symbol, probability, direction, marke
     }, [isSuccess]);
 
     const handleExecute = async () => {
-        if (!isPolygon && switchChain) {
+        if (!isPolygon && switchChainAsync) {
             try {
-                await switchChain({ chainId: 137 });
-                return; // Let user switch first
+                toast.loading("Switching to Polygon...");
+                await switchChainAsync({ chainId: 137 });
+                await new Promise(r => setTimeout(r, 1000));
             } catch (err) {
                 console.error("Failed to switch chain:", err);
                 return;

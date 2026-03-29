@@ -67,8 +67,8 @@ export function buildCSP(nonce?: string, isDev = false): string {
     // Fonts: Self + Google Fonts
     "font-src 'self' data: https://fonts.gstatic.com",
     
-    // Connect: API endpoints + Web3 providers + Auth + Analytics
-    "connect-src 'self' https://api.exchangerate-api.com https://*.alchemy.com https://*.infura.io https://*.walletconnect.com https://*.reown.com https://*.reown.org https://*.coinbase.com https://*.metamask.io https://*.clerk.com https://*.clerk.accounts.dev wss://*.walletconnect.com wss://*.reown.com wss://*.reown.org wss://*.metamask.io",
+    // Connect: API endpoints + Web3 providers + Auth + Analytics + wallet universal links
+    "connect-src 'self' https://api.exchangerate-api.com https://*.alchemy.com https://*.infura.io https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.org https://*.coinbase.com https://*.metamask.io https://*.clerk.com https://*.clerk.accounts.dev https://trustwallet.com https://*.trustwallet.com https://link.trustwallet.com https://rnbwapp.com https://go.cb-w.com https://relay.walletconnect.com https://*.bridge.walletconnect.org wss://*.walletconnect.com wss://*.walletconnect.org wss://*.reown.com wss://*.reown.org wss://*.metamask.io wss://relay.walletconnect.com wss://*.bridge.walletconnect.org",
     
     // Frames: WalletConnect + Trusted providers + Auth
     "frame-src 'self' https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.clerk.com https://clerk.accounts.dev",
@@ -115,11 +115,11 @@ export function getSecurityHeaders(nonce?: string, isDev = false): SecurityHeade
     // Strict referrer policy
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     
-    // Permissions policy - disable unnecessary features
+    // Permissions policy - disable unnecessary features, but allow camera for QR scanning
     'Permissions-Policy': [
       'geolocation=()',
       'microphone=()',
-      'camera=()',
+      'camera=(self)',   // Required for QR scanner in mobile wallet linking flow
       'payment=(self)',
       'usb=()',
       'magnetometer=()',

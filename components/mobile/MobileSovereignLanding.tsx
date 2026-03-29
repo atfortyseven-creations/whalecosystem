@@ -26,28 +26,53 @@ import { toast } from 'sonner';
 import { CinematicWhaleLogo } from './CinematicWhaleLogo';
 
 // ─── DEEP LINK HELPERS ─────────────────────────────────────────────────────
+// IMPORTANT: These builders receive a real WalletConnect URI (wc:// string)
+// and wrap it in the wallet's universal link scheme.
+// Do NOT pass the dApp origin here — that causes the wallet to open the browser
+// without establishing a WalletConnect session.
+
 function getAppUrl(): string {
   if (typeof window === 'undefined') return 'https://humanidfi.com';
   return window.location.origin;
 }
 
-function buildMetaMaskDeepLink(): string {
-  return `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+// Receives wc:// URI and returns the final deep link for each wallet
+function buildMetaMaskDeepLink(wcUri: string, os: string): string {
+  const encoded = encodeURIComponent(wcUri);
+  return os === 'ios'
+    ? `metamask://wc?uri=${encoded}`
+    : `https://metamask.app.link/wc?uri=${encoded}`;
 }
 
-function buildTrustDeepLink(): string {
-  const dappUrl = encodeURIComponent(getAppUrl());
-  return `https://link.trustwallet.com/open_url?coin_id=60&url=${dappUrl}`;
+function buildTrustDeepLink(wcUri: string): string {
+  const encoded = encodeURIComponent(wcUri);
+  return `https://link.trustwallet.com/wc?uri=${encoded}`;
 }
 
-function buildCoinbaseDeepLink(): string {
-  const dappUrl = encodeURIComponent(getAppUrl());
-  return `https://go.cb-w.com/dapp?cb_url=${dappUrl}`;
+function buildCoinbaseDeepLink(wcUri: string): string {
+  const encoded = encodeURIComponent(wcUri);
+  // Coinbase Wallet uses cb-wallet:// on iOS, universal link on Android
+  return `https://go.cb-w.com/wc?uri=${encoded}`;
 }
 
-function buildRainbowDeepLink(): string {
+// Rainbow uses rnbwapp.com universal links — rainbow:// scheme is NOT supported
+function buildRainbowDeepLink(wcUri: string): string {
+  const encoded = encodeURIComponent(wcUri);
+  return `https://rnbwapp.com/wc?uri=${encoded}`;
+}
+
+// Fallback dApp-browser deep links (used when WC URI is unavailable)
+function buildDappBrowserLink(walletId: string, os: string): string {
   const dappUrl = encodeURIComponent(getAppUrl());
-  return `https://rainbow.me/wc?uri=${dappUrl}`;
+  const links: Record<string, string> = {
+    metamask: os === 'ios'
+      ? `metamask://browser?url=${dappUrl}`
+      : `https://metamask.app.link/dapp/${window.location.host}`,
+    trust: `https://link.trustwallet.com/open_url?coin_id=60&url=${dappUrl}`,
+    coinbase: `https://go.cb-w.com/dapp?cb_url=${dappUrl}`,
+    rainbow: `https://rnbwapp.com/dapp?url=${dappUrl}`,
+  };
+  return links[walletId] || '';
 }
 
 function getMobileOS(): 'ios' | 'android' | 'other' {
@@ -58,14 +83,18 @@ function getMobileOS(): 'ios' | 'android' | 'other' {
   return 'other';
 }
 
-function detectWalletBrowser(): 'metamask' | 'trust' | 'coinbase' | 'other' | null {
+function detectWalletBrowser(): 'metamask' | 'trust' | 'coinbase' | 'rainbow' | 'other' | null {
   if (typeof window === 'undefined') return null;
   const ua = navigator.userAgent.toLowerCase();
   const eth = (window as any).ethereum;
+  // If no injected provider, we are in a regular browser
   if (!eth) return null;
-  if (eth.isMetaMask) return 'metamask';
-  if (eth.isTrust || ua.includes('trust')) return 'trust';
-  if (eth.isCoinbaseBrowser || ua.includes('coinbasebrowser')) return 'coinbase';
+  // Check wallet-specific flags first (most reliable)
+  if (eth.isMetaMask && !eth.isBraveWallet) return 'metamask';
+  if (eth.isTrust || ua.includes('trustwallet') || ua.includes('trust wallet')) return 'trust';
+  if (eth.isCoinbaseBrowser || eth.isCoinbaseWallet || ua.includes('coinbasebrowser') || ua.includes('coinbase')) return 'coinbase';
+  if (eth.isRainbow || ua.includes('rainbow')) return 'rainbow';
+  // Generic injected provider inside an unidentified wallet browser
   return 'other';
 }
 
@@ -105,72 +134,97 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
 
 // ─── CUSTOM WALLET PICKER ──────────────────────────────────────────────────
 const SUPPORTED_WALLETS = [
-  { id: 'metamask', name: 'MetaMask', icon: '/official-whale-monochrome.png', color: '#F6851B', link: buildMetaMaskDeepLink },
-  { id: 'trust', name: 'Trust Wallet', icon: '🛡️', color: '#3375BB', link: buildTrustDeepLink },
-  { id: 'coinbase', name: 'Coinbase', icon: '🔵', color: '#0052FF', link: buildCoinbaseDeepLink },
-  { id: 'rainbow', name: 'Rainbow', icon: '🌈', color: '#001E59', link: buildRainbowDeepLink }
+  { id: 'metamask', name: 'MetaMask', icon: '/official-whale-monochrome.png', color: '#F6851B' },
+  { id: 'trust',    name: 'Trust Wallet', icon: '🛡️', color: '#3375BB' },
+  { id: 'coinbase', name: 'Coinbase', icon: '🔵', color: '#0052FF' },
+  { id: 'rainbow',  name: 'Rainbow',  icon: '🌈', color: '#001E59' }
 ];
+
+const STORE_LINKS: Record<string, { ios: string; android: string }> = {
+  metamask: { ios: 'https://apps.apple.com/app/metamask/id1438144202', android: 'https://play.google.com/store/apps/details?id=io.metamask' },
+  trust:    { ios: 'https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409', android: 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp' },
+  coinbase: { ios: 'https://apps.apple.com/app/coinbase-wallet-nfts-crypto/id1278383455', android: 'https://play.google.com/store/apps/details?id=org.toshi' },
+  rainbow:  { ios: 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021', android: 'https://play.google.com/store/apps/details?id=me.rainbow' },
+};
 
 function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const os = typeof window !== 'undefined' ? getMobileOS() : 'other';
   const { connect, connectors } = useConnect();
+  const [isConnecting, setIsConnecting] = React.useState<string | null>(null);
 
-  const handleWalletSelect = async (wallet: any) => {
-    // Prepare the deep link bases for the selected apps using the universal WC schema
-    const deepLinkBases: Record<string, string> = {
-        metamask: os === 'ios' ? 'metamask://wc?uri=' : 'https://metamask.app.link/wc?uri=',
-        trust: 'https://link.trustwallet.com/wc?uri=',
-        coinbase: 'https://go.cb-w.com/wc?uri=',
-        rainbow: 'rainbow://wc?uri='
-    };
+  const openStoreAsFallback = (walletId: string) => {
+    const links = STORE_LINKS[walletId];
+    if (!links) return;
+    window.open(os === 'ios' ? links.ios : links.android, '_blank');
+  };
 
-    const wcConnector = connectors.find(c => c.id === 'walletConnect' || c.name === 'WalletConnect');
-    
-    if (wcConnector) {
-        try {
-            const provider: any = await wcConnector.getProvider();
-            
-            // Listen for the URI event triggered by the connector immediately after connect
-            provider.on('display_uri', (uri: string) => {
-                const finalUrl = `${deepLinkBases[wallet.id]}${encodeURIComponent(uri)}`;
-                window.location.href = finalUrl;
-            });
+  const buildWcDeepLink = (walletId: string, wcUri: string): string => {
+    switch (walletId) {
+      case 'metamask': return buildMetaMaskDeepLink(wcUri, os);
+      case 'trust':    return buildTrustDeepLink(wcUri);
+      case 'coinbase': return buildCoinbaseDeepLink(wcUri);
+      case 'rainbow':  return buildRainbowDeepLink(wcUri);
+      default:         return buildDappBrowserLink(walletId, os);
+    }
+  };
 
-            // Start connection to trigger the URI generation
-            connect({ connector: wcConnector });
-            
-            // Fallback for store opening
-            setTimeout(() => {
-                const storeLinks: any = {
-                    metamask: os === 'ios' ? 'https://apps.apple.com/app/metamask/id1438144202' : 'https://play.google.com/store/apps/details?id=io.metamask',
-                    trust: os === 'ios' ? 'https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409' : 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp',
-                    coinbase: os === 'ios' ? 'https://apps.apple.com/app/coinbase-wallet-nfts-crypto/id1278383455' : 'https://play.google.com/store/apps/details?id=org.toshi',
-                    rainbow: os === 'ios' ? 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021' : 'https://play.google.com/store/apps/details?id=me.rainbow'
-                };
-                if (storeLinks[wallet.id]) window.open(storeLinks[wallet.id], '_blank');
-            }, 4000);
+  const handleWalletSelect = async (wallet: typeof SUPPORTED_WALLETS[0]) => {
+    setIsConnecting(wallet.id);
 
-            onClose();
-            return;
-        } catch (e) {
-            console.error('WalletConnect interception failed', e);
-        }
+    // Find the AppKit / WalletConnect connector
+    const wcConnector = connectors.find(
+      c => c.id === 'walletConnect' || c.name === 'WalletConnect' || c.id.toLowerCase().includes('walletconnect')
+    );
+
+    if (!wcConnector) {
+      // No WC connector — open the dApp browser link directly
+      window.location.href = buildDappBrowserLink(wallet.id, os);
+      setTimeout(() => openStoreAsFallback(wallet.id), 3000);
+      setIsConnecting(null);
+      onClose();
+      return;
     }
 
-    // Fallback: If WC fails, open standard dapp link
-    const link = wallet.link();
-    window.location.href = link;
-    
-    setTimeout(() => {
-        const storeLinks: any = {
-            metamask: os === 'ios' ? 'https://apps.apple.com/app/metamask/id1438144202' : 'https://play.google.com/store/apps/details?id=io.metamask',
-            trust: os === 'ios' ? 'https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409' : 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp',
-            coinbase: os === 'ios' ? 'https://apps.apple.com/app/coinbase-wallet-nfts-crypto/id1278383455' : 'https://play.google.com/store/apps/details?id=org.toshi',
-            rainbow: os === 'ios' ? 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021' : 'https://play.google.com/store/apps/details?id=me.rainbow'
-        };
-        if (storeLinks[wallet.id]) window.open(storeLinks[wallet.id], '_blank');
-    }, 4000);
-    onClose();
+    try {
+      const provider: any = await wcConnector.getProvider();
+      let uriCaptured = false;
+
+      // STEP 1: Register the display_uri BEFORE calling connect
+      // When WalletConnect generates the pairing URI, redirect the user into the wallet
+      const onDisplayUri = (uri: string) => {
+        if (uriCaptured) return; // guard against double-fire
+        uriCaptured = true;
+        provider.removeListener?.('display_uri', onDisplayUri);
+        const deepLink = buildWcDeepLink(wallet.id, uri);
+        console.log('[WalletPicker] Redirecting to:', deepLink);
+        window.location.href = deepLink;
+      };
+
+      provider.on('display_uri', onDisplayUri);
+
+      // STEP 2: Trigger connection — this causes WC to emit display_uri
+      connect({ connector: wcConnector });
+
+      // STEP 3: Safety timeout — if display_uri never fires (e.g. existing pairing),
+      // fall back to dApp-browser link after 5 seconds and open the store.
+      setTimeout(() => {
+        if (!uriCaptured) {
+          provider.removeListener?.('display_uri', onDisplayUri);
+          window.location.href = buildDappBrowserLink(wallet.id, os);
+          setTimeout(() => openStoreAsFallback(wallet.id), 3000);
+        }
+        setIsConnecting(null);
+      }, 5000);
+
+      onClose();
+    } catch (e) {
+      console.error('[WalletPicker] Connection error:', e);
+      // Hard fallback: open dApp browser link
+      window.location.href = buildDappBrowserLink(wallet.id, os);
+      setTimeout(() => openStoreAsFallback(wallet.id), 3000);
+      setIsConnecting(null);
+      onClose();
+    }
   };
 
   return (
@@ -199,27 +253,41 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             </div>
             
             <div className="space-y-3">
-              {SUPPORTED_WALLETS.map((wallet) => (
-                <button
-                  key={wallet.id}
-                  onClick={() => handleWalletSelect(wallet)}
-                  className="w-full h-20 flex items-center justify-between px-6 bg-[#F9F8F4] border border-black/5 rounded-[2rem] active:scale-[0.98] transition-all group"
-                >
-                  <div className="flex items-center gap-5">
-                    <div className="w-10 h-10 flex items-center justify-center">
+              {SUPPORTED_WALLETS.map((wallet) => {
+                const isThisConnecting = isConnecting === wallet.id;
+                return (
+                  <button
+                    key={wallet.id}
+                    onClick={() => !isConnecting && handleWalletSelect(wallet)}
+                    disabled={!!isConnecting}
+                    className={`w-full h-20 flex items-center justify-between px-6 bg-[#F9F8F4] border border-black/5 rounded-[2rem] transition-all group ${isThisConnecting ? 'scale-[0.98] opacity-80' : 'active:scale-[0.98]'} disabled:cursor-not-allowed`}
+                  >
+                    <div className="flex items-center gap-5">
+                      <div className="w-10 h-10 flex items-center justify-center">
                         {wallet.id === 'metamask' ? (
-                            <img src={wallet.icon} className="w-full h-full object-contain" />
+                          <img src={wallet.icon} className="w-full h-full object-contain" />
                         ) : (
-                            <span className="text-2xl">{wallet.icon}</span>
+                          <span className="text-2xl">{wallet.icon}</span>
                         )}
+                      </div>
+                      <div className="text-left">
+                        <span className="font-black text-sm text-[#050505] uppercase tracking-widest block">{wallet.name}</span>
+                        {isThisConnecting && (
+                          <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-[0.2em] mt-0.5 block animate-pulse">
+                            Abriendo wallet...
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <span className="font-black text-sm text-[#050505] uppercase tracking-widest">{wallet.name}</span>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm transition-opacity">
-                      <ChevronRight size={16} />
-                  </div>
-                </button>
-              ))}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${isThisConnecting ? 'bg-indigo-500 opacity-100' : 'bg-white opacity-0 group-hover:opacity-100'}`}>
+                      {isThisConnecting
+                        ? <RefreshCw size={14} className="text-white animate-spin" />
+                        : <ChevronRight size={16} />
+                      }
+                    </div>
+                  </button>
+                );
+              })}
             </div>
             
             <button 
@@ -256,9 +324,19 @@ export function MobileSovereignLanding() {
 
     const handleConnectTrigger = useCallback(() => {
         if (walletBrowser) {
-            const connector = connectors.find(c => c.id === 'injected' || c.id === walletBrowser);
-            if (connector) connect({ connector });
+            // Inside a wallet's InApp browser, the injected provider IS the wallet.
+            // Never try to match by wallet name — always use 'injected'.
+            const injectedConnector = connectors.find(
+                c => c.id === 'injected' || c.id === 'io.metamask' || c.type === 'injected'
+            );
+            if (injectedConnector) {
+                connect({ connector: injectedConnector });
+            } else if (connectors.length > 0) {
+                // Absolute fallback: use first available connector
+                connect({ connector: connectors[0] });
+            }
         } else {
+            // Not inside a wallet browser — show the picker modal
             setIsPickerOpen(true);
         }
     }, [connect, connectors, walletBrowser]);

@@ -55,7 +55,7 @@ export default function PolymarketPanel() {
 
     const { isConnected, address } = useAccount();
     const chainId = useChainId();
-    const { switchChain } = useSwitchChain();
+    const { switchChain, switchChainAsync } = useSwitchChain();
     const { sendTransactionAsync } = useSendTransaction();
     const { usdcBalance } = useLivePortfolio();
     
@@ -89,28 +89,25 @@ export default function PolymarketPanel() {
         const toastId = toast.loading(`Iniciando enrutamiento [${direction}]...`);
         
         try {
-            let txPayload;
-            
-            if (isPolygon) {
-                const res = await polymarketRouterService.buildTradeTransaction(
-                    selected.conditionId || selected.id, 
-                    direction, 
-                    tradeAmount
-                );
-                txPayload = res.tx;
-                toast.loading("Esperando firma nativa Polygon...", { id: toastId });
-            } else {
-                toast.loading("Calculando ruta óptima Cross-Chain (Enso)...", { id: toastId });
-                const res = await polymarketRouterService.buildCrossChainTradeTransaction(
-                    selected.conditionId || selected.id, 
-                    direction, 
-                    tradeAmount,
-                    address as string,
-                    chainId
-                );
-                txPayload = res.tx;
-                toast.loading("Firma la inyección Cross-Chain en tu wallet...", { id: toastId });
+            if (!isPolygon && switchChainAsync) {
+                toast.loading("Cambiando red a Polygon...", { id: toastId });
+                try {
+                    await switchChainAsync({ chainId: 137 });
+                    // Give Wagmi a moment to register the newly active chain
+                    await new Promise(r => setTimeout(r, 1000));
+                } catch (e) {
+                    throw new Error("Cambio de red a Polygon fue rechazado.");
+                }
             }
+
+            let txPayload;
+            const res = await polymarketRouterService.buildTradeTransaction(
+                selected.conditionId || selected.id, 
+                direction, 
+                tradeAmount
+            );
+            txPayload = res.tx;
+            toast.loading("Esperando firma nativa Polygon...", { id: toastId });
 
             const hash = await sendTransactionAsync({
                 to: txPayload.to as `0x${string}`,
