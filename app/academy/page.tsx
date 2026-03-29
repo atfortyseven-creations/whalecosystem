@@ -18,51 +18,38 @@ const TRACKS = [
 // ─── WHALE HERO ───
 function WhaleAcademyHero() {
   return (
-    <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-12 pb-8 px-6 text-center bg-[#050505] overflow-hidden border-b border-white/5">
-
-      {/* Grid backdrop */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 40px)' }} />
-
-      {/* Deep radial glow */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 100%, rgba(255,255,255,0.05), transparent)' }} />
+    <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-12 pb-8 px-6 text-center bg-[#FAF9F6] border-b border-[#E5E5E5]">
+      
+      {/* Subtle grid backdrop for institutional feel */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg,#111111 0,#111111 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#111111 0,#111111 1px,transparent 1px,transparent 40px)' }} />
 
       {/* Corporate Whale Logo */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.7, y: 20 }}
+        initial={{ opacity: 0, scale: 0.9, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative mb-6"
       >
-        <motion.div
-          animate={{ y: [-10, 10, -10] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="relative w-[120px] h-[120px] flex items-center justify-center"
-        >
-          <motion.div
-            animate={{ scale: [1, 1.12, 1], opacity: [0.1, 0.3, 0.1] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-full bg-yellow-500/20 blur-3xl z-0"
-          />
-          <CorporateWhaleLogo className="w-full h-full relative z-10" />
-        </motion.div>
+        <div className="w-[80px] h-[80px] bg-[#111111] rounded-2xl flex items-center justify-center shadow-lg p-2 mx-auto">
+          <CorporateWhaleLogo className="w-full h-full text-[#FAF9F6]" />
+        </div>
       </motion.div>
 
       {/* Title block */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
         className="relative z-10"
       >
-        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.45em] text-white/30 mb-2">
+        <p className="font-mono text-[10px] font-black uppercase tracking-[0.45em] text-[#111111]/40 mb-3">
           Sovereign Knowledge Hub
         </p>
-        <h1 className="font-aztec-h1 text-4xl md:text-5xl lg:text-6xl text-white tracking-tighter leading-none mb-3">
+        <h1 className="font-sans font-black text-5xl md:text-6xl text-[#111111] tracking-tighter leading-none mb-4">
           Whale Academy
         </h1>
-        <p className="font-sans text-sm text-white/40 max-w-md mx-auto leading-relaxed">
+        <p className="font-sans text-sm text-[#888888] font-bold max-w-md mx-auto leading-relaxed">
           Institutional-grade education for the sovereign on-chain operator. From ZK fundamentals to deep protocol analysis.
         </p>
       </motion.div>
@@ -71,23 +58,19 @@ function WhaleAcademyHero() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.45 }}
-        className="flex flex-wrap items-center justify-center gap-2 mt-7"
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="flex flex-wrap items-center justify-center gap-3 mt-8"
       >
         {TRACKS.map((t, i) => (
           <div
             key={i}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 whitespace-nowrap hover:bg-white/10 hover:border-white/20 transition-all cursor-default"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white whitespace-nowrap hover:border-[#111111]/20 transition-all cursor-default shadow-sm group"
           >
-            <t.icon size={11} className="text-white/50" />
-            <span className="font-mono text-[9px] font-bold text-white/60 uppercase tracking-wider">{t.label}</span>
-            <span className="font-mono text-[8px] text-white/20 ml-0.5">{t.level}</span>
+            <t.icon size={13} className="text-[#888888] group-hover:text-[#111111]" />
+            <span className="font-mono text-[9px] font-black text-[#111111] uppercase tracking-wider">{t.label}</span>
+            <span className="font-mono text-[9px] font-bold text-[#00FFAA] ml-1">{t.level}</span>
           </div>
         ))}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] whitespace-nowrap">
-          <BookOpen size={11} className="text-white/20" />
-          <span className="font-mono text-[9px] font-bold text-white/25 uppercase tracking-wider">More coming</span>
-        </div>
       </motion.div>
     </div>
   );
@@ -95,7 +78,7 @@ function WhaleAcademyHero() {
 
 export default function AcademyPage() {
   return (
-    <InstitutionalShell title="Whale Academy" subtitle="Sovereign Knowledge Hub" badge="LEARN" fullWidth>
+    <InstitutionalShell title="Whale Academy" subtitle="Sovereign Knowledge Hub" fullWidth>
       <WhaleAcademyHero />
       <AcademyViewer />
     </InstitutionalShell>
