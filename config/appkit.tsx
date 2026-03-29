@@ -47,11 +47,12 @@ const dedicatedBsc = {
 const worldchain: AppKitNetwork = {
     id: 480,
     name: 'World Chain',
+    caipNetworkId: 'eip155:480',
+    chainNamespace: 'eip155',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
         default: { http: [`https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "YOUR_ALCHEMY_KEY"}`] }
     },
-
     blockExplorers: {
         default: { name: 'Worldscan', url: 'https://worldscan.org' }
     }
@@ -91,11 +92,6 @@ const metadata = {
     description: 'Sovereign Institutional Intelligence',
     url: APP_URL,
     icons: [`${APP_URL}/official-whale-legendary.png`],
-    redirect: {
-        // Universal links / App Links for mobile wallets to redirect back after signing
-        native: 'whalealert://',
-        universal: APP_URL,
-    }
 }
 
 // Singleton guard — createAppKit must only be called once per page load.
@@ -134,8 +130,10 @@ if (typeof window !== 'undefined' && !appKitInitialized) {
                 '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
                 'fd20dc4261a8140cb8f1d41804b4c71eeb9ce33da3ec76cd022ade0b4974f0d7', // Coinbase Wallet
                 '1ae92b26df02f0abca6304df07debccd18262fdf15fe789c18682a3bf88d0',   // Rainbow
+                'ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef', // Phantom
             ],
-            allWallets: 'SHOW'
+            allWallets: 'SHOW',
+            customWallets: []
         });
     } catch (e) {
         console.warn('[AppKit] Initialization skipped (already initialized):', e);
