@@ -1,21 +1,37 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Copy, AlertTriangle, ShieldCheck, Zap } from 'lucide-react';
 import { useAccount } from 'wagmi';
 
-const ELITE_TRADERS = [
-    { id: 'wallet_1', label: '0x8f...4e1A', pnl: '+482.4%', vigor: '98%', badge: 'APEX PREDATOR', asset: 'BTC' },
-    { id: 'wallet_2', label: '0x2C...9b33', pnl: '+314.1%', vigor: '94%', badge: 'HFT ALGO', asset: 'ETH' },
-    { id: 'wallet_3', label: '0xa1...00fF', pnl: '+289.7%', vigor: '89%', badge: 'LIQUIDITY SNIPER', asset: 'SOL' }
-];
-
 export function CopyTradingArena() {
     const { isConnected } = useAccount();
+    const [eliteTraders, setEliteTraders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const [selectedTrader, setSelectedTrader] = useState<any | null>(null);
     const [isCopying, setIsCopying] = useState(false);
     const [copySuccess, setCopySuccess] = useState<string | null>(null);
+
+    const fetchTraders = async () => {
+        try {
+            const res = await fetch('/api/defi/copy-trading');
+            if (res.ok) {
+                const data = await res.json();
+                setEliteTraders(data.traders || []);
+            }
+        } catch (e) {
+            console.error('Error fetching traders', e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTraders();
+        const interval = setInterval(fetchTraders, 5000); // 5 sec live polling
+        return () => clearInterval(interval);
+    }, []);
 
     const handleCopy = () => {
         setIsCopying(true);
@@ -50,7 +66,12 @@ export function CopyTradingArena() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {ELITE_TRADERS.map((trader) => (
+                {loading ? (
+                    <div className="col-span-full py-12 text-center text-[#888888] font-mono text-sm uppercase tracking-widest flex flex-col items-center">
+                        <Zap className="animate-pulse mb-3" size={24} />
+                        Syncing Market Algorithms...
+                    </div>
+                ) : eliteTraders.map((trader: any) => (
                     <div key={trader.id} className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-6 shadow-sm hover:shadow-lg transition-all relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4">
                             <span className="text-[9px] font-black uppercase tracking-widest bg-[#111111] text-[#00FFAA] px-2 py-1 rounded">

@@ -113,8 +113,51 @@ const SUPPORTED_WALLETS = [
 
 function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const os = typeof window !== 'undefined' ? getMobileOS() : 'other';
+  const { connect, connectors } = useConnect();
 
-  const handleWalletSelect = (wallet: any) => {
+  const handleWalletSelect = async (wallet: any) => {
+    // Prepare the deep link bases for the selected apps using the universal WC schema
+    const deepLinkBases: Record<string, string> = {
+        metamask: os === 'ios' ? 'metamask://wc?uri=' : 'https://metamask.app.link/wc?uri=',
+        trust: 'https://link.trustwallet.com/wc?uri=',
+        coinbase: 'https://go.cb-w.com/wc?uri=',
+        rainbow: 'rainbow://wc?uri='
+    };
+
+    const wcConnector = connectors.find(c => c.id === 'walletConnect' || c.name === 'WalletConnect');
+    
+    if (wcConnector) {
+        try {
+            const provider: any = await wcConnector.getProvider();
+            
+            // Listen for the URI event triggered by the connector immediately after connect
+            provider.on('display_uri', (uri: string) => {
+                const finalUrl = `${deepLinkBases[wallet.id]}${encodeURIComponent(uri)}`;
+                window.location.href = finalUrl;
+            });
+
+            // Start connection to trigger the URI generation
+            connect({ connector: wcConnector });
+            
+            // Fallback for store opening
+            setTimeout(() => {
+                const storeLinks: any = {
+                    metamask: os === 'ios' ? 'https://apps.apple.com/app/metamask/id1438144202' : 'https://play.google.com/store/apps/details?id=io.metamask',
+                    trust: os === 'ios' ? 'https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409' : 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp',
+                    coinbase: os === 'ios' ? 'https://apps.apple.com/app/coinbase-wallet-nfts-crypto/id1278383455' : 'https://play.google.com/store/apps/details?id=org.toshi',
+                    rainbow: os === 'ios' ? 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021' : 'https://play.google.com/store/apps/details?id=me.rainbow'
+                };
+                if (storeLinks[wallet.id]) window.open(storeLinks[wallet.id], '_blank');
+            }, 4000);
+
+            onClose();
+            return;
+        } catch (e) {
+            console.error('WalletConnect interception failed', e);
+        }
+    }
+
+    // Fallback: If WC fails, open standard dapp link
     const link = wallet.link();
     window.location.href = link;
     
@@ -126,7 +169,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             rainbow: os === 'ios' ? 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021' : 'https://play.google.com/store/apps/details?id=me.rainbow'
         };
         if (storeLinks[wallet.id]) window.open(storeLinks[wallet.id], '_blank');
-    }, 3500);
+    }, 4000);
     onClose();
   };
 
