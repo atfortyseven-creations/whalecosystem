@@ -53,7 +53,7 @@ export default function PolymarketPanel() {
     const [tradeAmount, setTradeAmount] = useState('100');
     const [isExecuting, setIsExecuting] = useState<'YES' | 'NO' | null>(null);
 
-    const { isConnected } = useAccount();
+    const { isConnected, address } = useAccount();
     const chainId = useChainId();
     const { switchChain } = useSwitchChain();
     const { sendTransactionAsync } = useSendTransaction();
@@ -83,34 +83,39 @@ export default function PolymarketPanel() {
             return;
         }
 
-        if (!isPolygon && switchChain) {
-            try {
-                await switchChain({ chainId: 137 });
-            } catch (err) {
-                toast.error("Red Incorrecta", { description: "Debes cambiar a Polygon para ejecutar el trade." });
-                return;
-            }
-        }
-
         if (!selected) return;
 
         setIsExecuting(direction);
-        const toastId = toast.loading(`Generando calldata de ejecución [${direction}]...`);
+        const toastId = toast.loading(`Iniciando enrutamiento [${direction}]...`);
         
         try {
-            // Native Direct Execution bypassing proxy API for speed matching ExecutionPanel UI
-            const { tx } = await polymarketRouterService.buildTradeTransaction(
-                selected.conditionId || selected.id, 
-                direction, 
-                tradeAmount
-            );
+            let txPayload;
             
-            toast.loading("Esperando firma en el proveedor web3...", { id: toastId });
+            if (isPolygon) {
+                const res = await polymarketRouterService.buildTradeTransaction(
+                    selected.conditionId || selected.id, 
+                    direction, 
+                    tradeAmount
+                );
+                txPayload = res.tx;
+                toast.loading("Esperando firma nativa Polygon...", { id: toastId });
+            } else {
+                toast.loading("Calculando ruta óptima Cross-Chain (Enso)...", { id: toastId });
+                const res = await polymarketRouterService.buildCrossChainTradeTransaction(
+                    selected.conditionId || selected.id, 
+                    direction, 
+                    tradeAmount,
+                    address as string,
+                    chainId
+                );
+                txPayload = res.tx;
+                toast.loading("Firma la inyección Cross-Chain en tu wallet...", { id: toastId });
+            }
 
             const hash = await sendTransactionAsync({
-                to: tx.to as `0x${string}`,
-                data: tx.data as `0x${string}`,
-                value: BigInt(tx.value || "0")
+                to: txPayload.to as `0x${string}`,
+                data: txPayload.data as `0x${string}`,
+                value: BigInt(txPayload.value || "0")
             });
             
             toast.success("Trade Confirmado On-Chain", { 
@@ -223,7 +228,7 @@ export default function PolymarketPanel() {
                                     </button>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-[9px] font-black bg-[#E5E5E5]/50 text-[#888888] tracking-widest px-2.5 py-1 rounded inline-flex mb-3">
-                                    <ShieldCheck size={11} /> ON-CHAIN CTF EXECUTION
+                                    <ShieldCheck size={11} /> {isPolygon ? 'ON-CHAIN CTF EXECUTION' : 'CROSS-CHAIN ROUTING (ENSO)'}
                                 </div>
                                 <h2 className="text-xl font-black text-[#111111] leading-tight tracking-tight">{selected.question}</h2>
                             </div>
@@ -306,12 +311,10 @@ export default function PolymarketPanel() {
                             
                             {!isPolygon && isConnected && (
                                 <div className="px-6 pb-6 bg-[#FFFFFF]">
-                                    <button 
-                                        onClick={() => switchChain?.({ chainId: 137 })}
-                                        className="w-full bg-[#f59e0b]/10 text-[#f59e0b] font-black uppercase tracking-widest text-xs py-3 rounded-xl flex justify-center items-center gap-2 border border-[#f59e0b]/20"
-                                    >
-                                        <AlertTriangle size={14} /> Network Required: Switch to Polygon
-                                    </button>
+                                    <div className="w-full bg-[#0055ff]/5 text-[#0055ff] font-black uppercase tracking-widest text-[10px] py-3 px-4 rounded-xl flex justify-between items-center gap-2 border border-[#0055ff]/10">
+                                        <span className="flex items-center gap-2"><AlertTriangle size={12} /> ROUTE: L2 ➔ POLYGON (~45s)</span>
+                                        <button onClick={() => switchChain?.({ chainId: 137 })} className="underline hover:opacity-70 text-[9px]">SWITCH NATIVE</button>
+                                    </div>
                                 </div>
                             )}
 
