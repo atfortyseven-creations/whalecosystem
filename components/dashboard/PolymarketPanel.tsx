@@ -151,8 +151,8 @@ export default function PolymarketPanel() {
             </div>
 
             {/* Markets List */}
-            <div className="flex-1 overflow-hidden flex relative">
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+            <div className="flex relative">
+                <div className="p-4 space-y-3 flex-1 w-full">
                     {loading && <Skeleton />}
                     {!loading && filtered.map(m => (
                         <motion.div 
@@ -198,7 +198,7 @@ export default function PolymarketPanel() {
                         <motion.div
                             initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="w-[340px] border-l border-white/10 bg-[#0a0a0a] flex flex-col shadow-2xl absolute right-0 top-0 bottom-0 z-20"
+                            className="w-[340px] shrink-0 border-l border-white/10 bg-[#0a0a0a] flex flex-col shadow-2xl sticky top-[130px] h-[calc(100vh-130px)] z-20"
                         >
                             <div className="p-5 border-b border-white/5">
                                 <div className="flex justify-between items-start mb-3">

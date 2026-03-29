@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
-import { MasterMatrix as MasterMatrixComponent } from "@/components/premium/MasterMatrix";
+import { PremiumMatrixStack } from "@/components/premium/PremiumMatrixStack";
 import ActivityFeedPanel from '@/components/network/ActivityFeedPanel';
 import PolymarketPanel from '@/components/dashboard/PolymarketPanel';
 import DeFiYieldPanel from '@/components/dashboard/DeFiYieldPanel';
