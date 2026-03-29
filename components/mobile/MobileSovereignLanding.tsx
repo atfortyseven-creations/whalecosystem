@@ -23,6 +23,7 @@ import {
 import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
+import { CinematicWhaleLogo } from './CinematicWhaleLogo';
 
 // ─── DEEP LINK HELPERS ─────────────────────────────────────────────────────
 function getAppUrl(): string {
@@ -78,7 +79,7 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
         .web3-dot-pattern {
           background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
           background-size: 32px 32px;
-          will-change: background-position;
+          will-change: transform;
         }
         .aztec-noise {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -93,11 +94,11 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
       ` }} />
       <motion.div
         aria-hidden="true"
-        className="fixed inset-0 web3-dot-pattern pointer-events-none z-0"
-        animate={{ backgroundPosition: ['0px 0px', '32px 32px'] }}
+        className="fixed -inset-[32px] web3-dot-pattern pointer-events-none z-0"
+        animate={{ x: [0, -32], y: [0, -32] }}
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
       />
-      <div className="fixed inset-0 aztec-noise pointer-events-none z-0" />
+      <div className="fixed inset-0 aztec-noise pointer-events-none z-0 mix-blend-overlay" />
     </>
   );
 });
@@ -252,12 +253,8 @@ export function MobileSovereignLanding() {
             <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
             {/* TOP BAR */}
-            <header className="w-full flex items-center justify-between z-20">
-                <div className="w-10 h-10">
-                    <img src="/official-whale-monochrome.png" className="w-full h-full object-contain" alt="Whale" />
-                </div>
+            <header className="w-full flex items-center justify-end z-20 h-10">
                 <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/20">Protocol v4.0.5</span>
                     {isConnected && (
                         <button 
                             onClick={() => disconnect()}
@@ -276,19 +273,14 @@ export function MobileSovereignLanding() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                    <div className="flex items-center gap-3 mb-10 overflow-hidden py-1 px-4 bg-black/[0.03] border border-black/5 rounded-full mx-auto w-fit">
-                        <Activity size={10} className={`${isConnected ? 'text-green-500' : 'text-amber-500 animate-pulse'}`} />
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]/40 leading-none">
-                            {isConnected ? 'Verificado On-Chain' : 'A espera de Bóveda'}
-                        </span>
-                    </div>
+                    <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-32 h-32 mx-auto mb-6 mt-8" />
 
-                    <h1 className="text-7xl font-black tracking-tighter leading-[0.8] mb-8 uppercase italic italic">
-                        Access<br/>Sovereign
+                    <h1 className="text-6xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic">
+                        Whale Alert<br/>Network
                     </h1>
                     
                     <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-12 max-w-[280px] mx-auto leading-relaxed">
-                        Sincroniza tu lente con la terminal<br/>de escritorio mediante firma asimétrica.
+                        Connect with<br/>PC session.
                     </p>
 
                     <div className="w-full space-y-4">
@@ -298,7 +290,7 @@ export function MobileSovereignLanding() {
                                 className="w-full h-[88px] bg-[#050505] text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] group"
                             >
                                 <Wallet size={20} className="text-white/40 group-active:translate-x-1 transition-transform" />
-                                Conectar Bóveda
+                                CONNECT WALLET
                             </button>
                         ) : !isSigned ? (
                             <button
@@ -307,12 +299,12 @@ export function MobileSovereignLanding() {
                                 className="w-full h-[88px] bg-indigo-600 text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-xl disabled:opacity-50"
                             >
                                 {isSigning ? <RefreshCw className="animate-spin" size={20} /> : <Shield size={20} />}
-                                {isSigning ? 'Procesando...' : 'Firmar Identidad'}
+                                {isSigning ? 'PROCESSING...' : 'SIGN IDENTITY'}
                             </button>
                         ) : (
                             <div className="w-full h-[88px] bg-white border-2 border-green-500 text-green-600 rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4">
                                 <UserCheck size={20} />
-                                Handshake Listo
+                                HANDSHAKE READY
                             </div>
                         )}
 
@@ -327,8 +319,8 @@ export function MobileSovereignLanding() {
                             <div className="grid grid-cols-[auto_1fr] gap-6 items-center">
                                 <QrCode size={22} />
                                 <div className="text-left leading-tight">
-                                    <p className="tracking-[0.3em]">Sincronizar Lente</p>
-                                    <p className="text-[8px] opacity-40 mt-1">{isSigned ? 'Paso Final: Escáner' : 'Requiere Firma'}</p>
+                                    <p className="tracking-[0.3em]">SYNC LENS</p>
+                                    <p className="text-[8px] opacity-40 mt-1">{isSigned ? 'FINAL STEP: SCAN QR' : 'REQUIRES SIGNATURE'}</p>
                                 </div>
                             </div>
                             <ChevronRight size={18} className="opacity-20" />
