@@ -64,7 +64,7 @@ export default function PolymarketPanel() {
     const load = useCallback(async () => {
         setLoading(true);
         try {
-            const r = await fetch(`/api/polymarket/markets?category=${category}&limit=50`);
+            const r = await fetch(`/api/polymarket/markets?category=${category}&limit=50&t=${Date.now()}`);
             const d = await r.json();
             if (d.markets) setMarkets(d.markets);
             setTs(new Date().toLocaleTimeString());

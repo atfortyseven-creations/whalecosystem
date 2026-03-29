@@ -1,33 +1,54 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, ArrowDownLeft, Search, Clock, RefreshCw } from 'lucide-react';
 
-const MOCK_ACTIVITY = [
-  { time: "14:32:01", chain: "ETH",  type: "IN",  amount: "$142.4M", from: "0xBinance...", to: "0xCold...",   note: "Exchange Withdrawal",   delta: "+12.4%" },
-  { time: "14:28:44", chain: "ARB",  type: "OUT", amount: "$88.1M",  from: "0xWhale...", to: "0xDeFi...",   note: "LP Deployment",          delta: "-3.2%" },
-  { time: "14:21:18", chain: "BASE", type: "IN",  amount: "$204.9M", from: "0xMM...",    to: "0xCex...",    note: "Market Maker Inflow",    delta: "+28.9%" },
-  { time: "14:15:55", chain: "SOL",  type: "OUT", amount: "$17.3M",  from: "0xFund...",  to: "0xBridge...", note: "Cross-Chain Transfer",   delta: "-1.8%" },
-  { time: "14:09:30", chain: "ETH",  type: "IN",  amount: "$395.0M", from: "0xCBX...",   to: "0xVault...",  note: "Institutional Custody",  delta: "+44.2%" },
-  { time: "13:58:12", chain: "BNB",  type: "OUT", amount: "$55.6M",  from: "0xArb...",   to: "0xPool...",   note: "Liquidity Removal",      delta: "-8.1%" },
-  { time: "13:47:03", chain: "OP",   type: "IN",  amount: "$31.1M",  from: "0xDAO...",   to: "0xGov...",    note: "Governance Allocation",  delta: "+6.3%" },
-  { time: "13:32:50", chain: "ETH",  type: "IN",  amount: "$71.8M",  from: "0xGrw...",   to: "0xLiq...",    note: "Yield Farming Entry",    delta: "+9.7%" },
-];
-
 const CHAIN_COLORS: Record<string, string> = {
-  ETH: "#627eea", ARB: "#28a0f0", BASE: "#0052ff", SOL: "#14f195", BNB: "#f3ba2f", OP: "#ff0420"
+  ethereum: "#627eea", base: "#0052ff", polygon: "#8247e5", arbitrum: "#28a0f0", optimism: "#ff0420", bitcoin: "#f7931a"
 };
 
 export default function ActivityFeedPanel() {
   const [search, setSearch] = useState("");
   const [filterChain, setFilterChain] = useState("ALL");
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = MOCK_ACTIVITY.filter(r => {
-    const matchChain = filterChain === "ALL" || r.chain === filterChain;
-    const matchSearch = r.note.toLowerCase().includes(search.toLowerCase()) || r.amount.includes(search);
-    return matchChain && matchSearch;
+  const fetchActivities = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/whale/activities');
+      if(res.ok) {
+        const data = await res.json();
+        setActivities(data.activities || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch whale activities', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivities();
+    const interval = setInterval(fetchActivities, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const filtered = activities.filter(r => {
+    const rChain = (r.chain || 'ETH').toUpperCase();
+    const matchChain = filterChain === "ALL" || rChain.includes(filterChain) || (filterChain === 'ETH' && rChain === 'ETHEREUM') || (filterChain === 'ARB' && rChain === 'ARBITRUM') || (filterChain === 'OP' && rChain === 'OPTIMISM');
+    const noteMatch = (r.type || '').toLowerCase().includes(search.toLowerCase()) || 
+                      (r.walletLabel || '').toLowerCase().includes(search.toLowerCase());
+    return matchChain && noteMatch;
   });
+
+  const formatAmount = (num: number) => {
+    if(num >= 1e9) return `$${(num/1e9).toFixed(1)}B`;
+    if(num >= 1e6) return `$${(num/1e6).toFixed(1)}M`;
+    if(num >= 1e3) return `$${(num/1e3).toFixed(1)}K`;
+    return `$${num?.toFixed(0) || 0}`;
+  };
 
   return (
     <div className="w-full flex flex-col space-y-6">
@@ -81,28 +102,41 @@ export default function ActivityFeedPanel() {
           <span className="col-span-2">NOTE / DELTA</span>
         </div>
         <div>
-          {filtered.map((row, i) => (
+          {loading && activities.length === 0 ? (
+            <div className="p-8 text-center text-white/40 text-xs font-mono tracking-widest uppercase">
+              <RefreshCw className="animate-spin inline-block mb-2 text-white/20" size={24} /><br/>
+              Syncing mempool...
+            </div>
+          ) : filtered.length === 0 ? (
+             <div className="p-8 text-center text-white/40 text-xs font-mono tracking-widest uppercase">
+              NO ACTIVITY DETECTED
+            </div>
+          ) : filtered.map((row, i) => (
             <motion.div
-              key={i}
+              key={row.id || i}
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.03, duration: 0.25 }}
               className="grid grid-cols-6 gap-4 p-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors"
             >
-              <span className="text-[12px] font-mono text-white/50">{row.time}</span>
-              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, fontWeight: 800, letterSpacing: "0.10em", padding: "2px 6px", display: "inline-flex", alignItems: "center", height: "fit-content", border: `1px solid ${CHAIN_COLORS[row.chain] || "#999"}40`, color: CHAIN_COLORS[row.chain] || "#999", background: `${CHAIN_COLORS[row.chain] || "#999"}12` }}>
-                {row.chain}
+              <span className="text-[12px] font-mono text-white/50">
+                {new Date(row.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second:'2-digit' })}
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, fontWeight: 800, letterSpacing: "0.10em", padding: "2px 6px", display: "inline-flex", alignItems: "center", height: "fit-content", border: `1px solid ${CHAIN_COLORS[(row.chain || 'ethereum').toLowerCase()] || "#999"}40`, color: CHAIN_COLORS[(row.chain || 'ethereum').toLowerCase()] || "#999", background: `${CHAIN_COLORS[(row.chain || 'ethereum').toLowerCase()] || "#999"}12`, textTransform: 'uppercase' }}>
+                {row.chain || 'ETH'}
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                {row.type === "IN" 
+                {row.type === "IN" || row.type === "DEPOSIT" 
                   ? <ArrowDownLeft size={12} style={{ color: "var(--az-emerald)" }} />
                   : <ArrowUpRight size={12} style={{ color: "var(--az-rose)" }} />}
-                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, fontWeight: 700, color: row.type === "IN" ? "var(--az-emerald)" : "var(--az-rose)" }}>{row.type}</span>
+                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, fontWeight: 700, color: (row.type === "IN" || row.type === "DEPOSIT") ? "var(--az-emerald)" : "var(--az-rose)" }}>{row.type || 'TRANSFER'}</span>
               </span>
-              <span className="text-[13px] font-mono font-bold text-white/90">{row.amount}</span>
+              <span className="text-[13px] font-mono font-bold text-white/90">{formatAmount(row.usdValue || row.amount || 0)}</span>
               <span className="col-span-2 flex items-center justify-between">
-                <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{row.note}</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${row.delta.startsWith("+") ? "bg-[#14f195]/10 text-[#14f195]" : "bg-[#f43f5e]/10 text-[#f43f5e]"}`}>{row.delta}</span>
+                <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{row.walletLabel || `${row.walletAddress?.slice(0,6)}...${row.walletAddress?.slice(-4)}`}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${row.type === "IN" || row.type === "DEPOSIT" ? "bg-[#14f195]/10 text-[#14f195]" : "bg-[#f43f5e]/10 text-[#f43f5e]"}`}>
+                  {row.token || 'USDC'}
+                </span>
               </span>
             </motion.div>
           ))}
