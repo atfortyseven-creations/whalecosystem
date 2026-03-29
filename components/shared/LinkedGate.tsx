@@ -469,7 +469,15 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
           clearInterval(intervalId);
           setSyncStatus('SYNCED');
           // Short delay for the success animation, then open the gate
-          setTimeout(() => setLinked(true), 1200);
+          setTimeout(() => {
+              setLinked(true);
+              // Force a global refresh precisely after the gate animation completes.
+              // This ensures that all unmounted header and layout components read the
+              // newly deposited QR authentication cookie and show "Connected".
+              setTimeout(() => {
+                  window.location.reload();
+              }, 1200);
+          }, 1200);
         } else if (data.status === 'expired') {
           // QR expired while user was looking at it — auto-refresh silently
           clearInterval(intervalId);
