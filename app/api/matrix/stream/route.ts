@@ -92,15 +92,11 @@ export async function GET(req: Request) {
             while (isRunning) {
                 try {
                     const output = await VIPMatrixEngine.calculatePrecognitiveState(asset);
-                    // Only send if values are non-trivial (Binance FAPI gave real data)
-                    if (output.gravityScore > 1) {
-                        sendEvent(output);
-                    } else {
-                        // Binance returned zeros — send rich demo fallback instead
-                        sendEvent(getDemoState(asset));
-                    }
-                } catch (_err) {
-                    // Total engine failure — still send demo so user sees live data
+                    // Always send real data over the Matrix Stream
+                    sendEvent(output);
+                } catch (err) {
+                    console.error("[Matrix Stream] Engine tick failed for", asset, err);
+                    // Total engine failure — send rich demo fallback so UI doesn't crash
                     sendEvent(getDemoState(asset));
                 }
                 await new Promise(resolve => setTimeout(resolve, 5000));

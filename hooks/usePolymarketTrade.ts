@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAccount, useReadContract, useWriteContract, useSignTypedData } from 'wagmi';
+import { useAccount, useReadContract, useWriteContract, useSignTypedData, useSwitchChain } from 'wagmi';
 import { parseUnits, maxUint256 } from 'viem';
 import { toast } from 'sonner';
 
@@ -51,12 +51,14 @@ const types = {
 } as const;
 
 export function usePolymarketTrade() {
-    const { address } = useAccount();
-    const [status, setStatus] = useState<"IDLE" | "APPROVING" | "SIGNING" | "POSTING" | "SUCCESS">("IDLE");
+    const { address, chainId } = useAccount();
+    const [status, setStatus] = useState<"IDLE" | "SWITCHING" | "APPROVING" | "SIGNING" | "POSTING" | "SUCCESS">("IDLE");
 
     // Wagmi Hooks
     const { writeContractAsync } = useWriteContract();
     const { signTypedDataAsync } = useSignTypedData();
+    const { switchChainAsync } = useSwitchChain();
+    
     const { data: allowance, refetch: refetchAllowance } = useReadContract({
         address: USDC_ADDRESS,
         abi: ERC20_ABI,
@@ -67,14 +69,21 @@ export function usePolymarketTrade() {
     const trade = async (side: "BUY" | "SELL", amount: string, price: number, tokenId: string) => {
         if (!address) {
             toast.error("Please connect your wallet first");
-            // Optionally try to auto-connect here if you have access to connectors
             return;
         }
 
         try {
+            if (chainId !== POLYGON_CHAIN_ID && switchChainAsync) {
+                setStatus("SWITCHING");
+                toast.info("Switching to Polygon...");
+                await switchChainAsync({ chainId: POLYGON_CHAIN_ID });
+                // Small delay to allow the wallet to settle the network switch
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
             setStatus("APPROVING");
 
-            // 1. Check Allowance (if Buying with USDC) - Simplified for YES/NO buys which use USDC
+            // 1. Check Allowance (if Buying with USDC)
             const amountBigInt = parseUnits(amount, 6); // USDC has 6 decimals
 
             if (side === "BUY") {
@@ -86,8 +95,9 @@ export function usePolymarketTrade() {
                         functionName: "approve",
                         args: [CTF_EXCHANGE, maxUint256],
                     });
-                    // In real app wait for tx receipt here. For now assume success or rely on wallet feedback
-                    await new Promise(r => setTimeout(r, 2000)); // Mock wait
+                    // Actually wait for receipt in a robust app.
+                    // For now mock wait
+                    await new Promise(r => setTimeout(r, 2000)); 
                     await refetchAllowance();
                 }
             }

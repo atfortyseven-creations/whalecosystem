@@ -85,13 +85,12 @@ const queryClient = new QueryClient()
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Sovereign Institutional Intelligence',
-    url: 'https://www.humanidfi.com',
+    url: typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com',
     icons: [
-        '/official-whale-legendary.png'
+        typeof window !== 'undefined' ? `${window.location.origin}/official-whale-legendary.png` : 'https://humanidfi.com/official-whale-legendary.png'
     ],
     redirect: {
-        native: 'whalealert://',
-        universal: 'https://humanidfi.com'
+        universal: typeof window !== 'undefined' ? window.location.href : 'https://humanidfi.com'
     }
 }
 
