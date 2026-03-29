@@ -197,18 +197,19 @@ function CircularGestureClaim({ onClaim, disabled }: { onClaim: () => Promise<bo
     }, [status]);
 
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
+        const handleMove = (clientX: number, clientY: number) => {
             if (claimFired.current || status === "VALIDATED") return;
             if (!containerRef.current) return;
             
             const rect = containerRef.current.getBoundingClientRect();
-            if (e.clientX > rect.left - 50 && e.clientX < rect.right + 50 &&
-                e.clientY > rect.top - 50 && e.clientY < rect.bottom + 50) {
+            // A slightly wider detection zone for fingers
+            if (clientX > rect.left - 80 && clientX < rect.right + 80 &&
+                clientY > rect.top - 80 && clientY < rect.bottom + 80) {
                 
                 setStatus("VERIFYING");
                 
-                const lx = e.clientX - rect.left;
-                const ly = e.clientY - rect.top;
+                const lx = clientX - rect.left;
+                const ly = clientY - rect.top;
                 
                 pointsRef.current.push({ x: lx, y: ly, t: performance.now() });
 
@@ -237,8 +238,31 @@ function CircularGestureClaim({ onClaim, disabled }: { onClaim: () => Promise<bo
             }
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+        
+        const onTouchMove = (e: TouchEvent) => {
+            if (e.touches.length > 0) {
+                const clientX = e.touches[0].clientX;
+                const clientY = e.touches[0].clientY;
+                
+                if (containerRef.current) {
+                     const rect = containerRef.current.getBoundingClientRect();
+                     // If finger is anywhere near the drawing box, prevent screen scrolling
+                     if (clientX > rect.left - 50 && clientX < rect.right + 50 && clientY > rect.top - 50 && clientY < rect.bottom + 50) {
+                         if (e.cancelable) e.preventDefault();
+                     }
+                }
+                handleMove(clientX, clientY);
+            }
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+        
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('touchmove', onTouchMove);
+        };
     }, [status, onClaim]);
 
     if (disabled) return null;
