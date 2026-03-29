@@ -24,12 +24,8 @@ import { toast } from 'sonner';
 
 const QR_TTL = 300;
 
-// ─── NOISE OVERLAY ──────────────────────────────────────────────────────────
-const GrainyOverlay = () => (
-  <div className="absolute inset-0 pointer-events-none opacity-[0.03] animate-pulse" style={{
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-  }} />
-);
+// ─── BACKGROUND EFFECTS ───────────────────────────────────────────────────────
+// (SVG filters removed to prevent mobile 240Hz frame-pacing drops)
 
 // ─── WALLET DEFINITIONS ─────────────────────────────────────────────────────
 const PC_WALLETS = [
@@ -489,7 +485,6 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
 
       {/* ── GATEWAY SCREEN ── */}
       <div className="fixed inset-0 z-[10000] bg-[#FAF9F6] flex items-center justify-center p-8 selection:bg-black selection:text-white font-sans overflow-auto">
-        <GrainyOverlay />
 
         {/* Grid BG */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
@@ -620,10 +615,10 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                               excavate: true,
                             }}
                           />
-                          {/* Scanning line */}
+                          {/* Scanning line (Hardware Accelerated via top-0 + translateY) */}
                           <motion.div
-                            className="absolute inset-x-0 h-0.5 bg-black/10 blur-[1px] z-50 pointer-events-none"
-                            animate={{ top: ["10%", "90%", "10%"] }}
+                            className="absolute inset-x-0 top-0 h-0.5 bg-black/10 blur-[1px] z-50 pointer-events-none will-change-transform"
+                            animate={{ y: [0, 230, 0] }}
                             transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
                           />
                         </motion.div>

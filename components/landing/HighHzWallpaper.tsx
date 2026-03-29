@@ -12,7 +12,8 @@ export function HighHzWallpaper() {
           src="/models/update/Aztec Image_02.jpg" 
           alt="Aztec Wavy Backdrop" 
           fill 
-          className="object-cover opacity-[0.15] mix-blend-multiply brightness-[1.1]"
+          className="object-cover opacity-[0.12] brightness-[1.1]"
+          style={{ transform: 'translate3d(0,0,0)', willChange: 'auto' }}
           priority
         />
       </div>
