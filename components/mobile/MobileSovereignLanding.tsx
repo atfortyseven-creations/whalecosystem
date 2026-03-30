@@ -340,12 +340,24 @@ function PageHero({
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
-          {/* Whale Logo — 2.8x scale baked into CinematicWhaleLogo */}
-          <div className="w-40 h-40 mx-auto mb-4 mt-4">
-            <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-full h-full" />
-          </div>
+          {/* Animated Whale Logo bounded nicely */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: [0, -15, 0], opacity: 1 }}
+            transition={{
+              duration: 1.5,
+              ease: "easeInOut"
+            }}
+            className="w-32 h-32 mx-auto mb-8 mt-4 flex items-center justify-center relative"
+          >
+            <img 
+              src="/official-whale-monochrome.png" 
+              className="w-full h-full object-contain" 
+              alt="Whale Logo" 
+            />
+          </motion.div>
 
-          <h1 className="text-6xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic relative z-10 drop-shadow-md">
+          <h1 className="text-5xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic relative z-10 drop-shadow-md">
             Whale Alert<br />Network
           </h1>
 
@@ -420,13 +432,10 @@ function PagePhilosophy1() {
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-8"
+        className="mb-10 w-full flex justify-center"
       >
-        <p className="text-[9px] font-black uppercase tracking-[0.35em] text-[#050505]/40 mb-2">
-          MANIFIESTO TÉCNICO
-        </p>
-        <h2 className="text-[1.8rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505]">
-          Infraestructura Institucional<br />de Datos
+        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505] text-center border-b-4 border-[#050505] pb-2 inline-block">
+          Manifiesto<br/>Técnico
         </h2>
       </motion.div>
 
@@ -555,6 +564,16 @@ function PagePhilosophy3() {
         </p>
 
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
+          6. Arquitectura Zero-Trust Inquebrantable
+        </h3>
+        <p>
+          Operamos bajo el principio absoluto de que cualquier conexión externa es inherentemente hostil. Por ello, el entorno de operaciones está encapsulado por un Firewall Estocástico multidimensional que opera a nivel "Edge". Esta matriz intercepta y descarta tráfico anómalo en fracciones de milisegundo antes de que alcance nuestra infraestructura en la nube.
+        </p>
+        <p>
+          Nuestro escudo no confía en barreras estáticas convencionales. Empleamos mecanismos de autenticación asimétrica, rotación incesante de secretos en memoria aislada, y limitación de tasa adaptativa. Los métodos predictivos detectan actividad de reconocimiento de red y la aíslan automáticamente. De esta manera, garantizamos una protección matemática de grado militar que mantiene nuestras rutinas operativas en producción cien por ciento secretas, inmutables y, sobre todo, indescifrables frente al escrutinio externo.
+        </p>
+
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-8 text-[#050505] border-b border-black/10 pb-2">
           Conclusión
         </h3>
         <p>
