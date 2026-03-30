@@ -32,37 +32,29 @@ const KNOWN_TOKENS: Array<{
   { symbol: 'SHIB', name: 'Shiba Inu', address: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE', chainId: 1, decimals: 18, logo: 'https://assets.coingecko.com/coins/images/11939/small/shiba.png', coingeckoId: 'shiba-inu' },
 ];
 
-// ─── CoinGecko prices (sin API key, endpoint público) ────────────────────────
+// ─── CoinGecko prices (real-time, cache:no-store) ────────────────────────────
 async function getPrices(ids: string[]): Promise<Record<string, { usd: number; usd_24h_change: number }>> {
-  const fallbacks: Record<string, { usd: number; usd_24h_change: number }> = {
-    'ethereum': { usd: 3100, usd_24h_change: 0 },
-    'worldcoin-wld': { usd: 2.38, usd_24h_change: 0 },
-    'usd-coin': { usd: 1.00, usd_24h_change: 0 },
-  };
-
   try {
     const unique = [...new Set(ids)].join(',');
+    const apiKey = process.env.NEXT_PUBLIC_COINGECKO_KEY || process.env.COINGECKO_KEY || '';
     const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${unique}&vs_currencies=usd&include_24hr_change=true`,
-      { next: { revalidate: 60 } }
+      `https://api.coingecko.com/api/v3/simple/price?ids=${unique}&vs_currencies=usd&include_24hr_change=true${apiKey ? `&x_cg_demo_api_key=${apiKey}` : ''}`,
+      // [REAL-TIME] cache:no-store — never serve stale prices for portfolio valuation
+      { cache: 'no-store', signal: AbortSignal.timeout(6000) }
     );
     if (!res.ok) {
-        console.warn('[onchain-balances] CoinGecko API failed, using fallbacks');
-        return fallbacks;
+      console.warn(`[onchain-balances] CoinGecko ${res.status} — prices unavailable, returning 0 (no fake data)`);
+      return {};
     }
     const data = await res.json();
-    
-    // Ensure data actually contains the requested IDs, if not it might be a weird response, use fallbacks
     if (!data || Object.keys(data).length === 0) {
-        console.warn('[onchain-balances] CoinGecko API returned empty data, using fallbacks');
-        return fallbacks;
+      console.warn('[onchain-balances] CoinGecko returned empty response — returning 0');
+      return {};
     }
-
-    // Merge fallbacks for any missing keys
-    return { ...fallbacks, ...data };
+    return data;
   } catch (err) {
-    console.error('[onchain-balances] CoinGecko fetch exception, using fallbacks', err);
-    return fallbacks;
+    console.error('[onchain-balances] CoinGecko fetch failed — returning 0 (no fake data)', err);
+    return {};
   }
 }
 

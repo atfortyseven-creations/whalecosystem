@@ -9,7 +9,7 @@ interface PriceCache {
 }
 
 let priceCache: PriceCache | null = null;
-const CACHE_DURATION = 30000; // 30 seconds
+const CACHE_DURATION = 15000; // 15 seconds — real-time institutional data
 
 // CoinGecko ID mapping
 const COIN_IDS: Record<string, string> = {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json(result, {
         headers: {
-          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60'
+          'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=10'
         }
       });
     }
@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const apiKey = process.env.NEXT_PUBLIC_COINGECKO_KEY || process.env.COINGECKO_KEY || '';
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd`,
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds}&vs_currencies=usd${apiKey ? `&x_cg_demo_api_key=${apiKey}` : ''}`,
       {
-        headers: {
-          'Accept': 'application/json'
-        },
-        next: { revalidate: 30 } // Next.js cache for 30 seconds
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-store', // [REAL-TIME] bypass Next.js Data Cache entirely
+        signal: AbortSignal.timeout(5000),
       }
     );
 
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(prices, {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60'
+        'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=10'
       }
     });
 
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
     if (priceCache) {
       return NextResponse.json(priceCache.prices, {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+          'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=10',
           'X-Cache-Status': 'stale'
         }
       });

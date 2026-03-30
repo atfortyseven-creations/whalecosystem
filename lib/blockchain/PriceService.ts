@@ -10,7 +10,7 @@ import { LRUCache } from 'lru-cache';
 export class PriceService {
   private static cache = new LRUCache<string, any>({
     max: 2000,
-    ttl: 1000 * 60 * 5, // 5 minutes standard TTL
+    ttl: 1000 * 30, // 30 seconds — real-time institutional requirement
   });
 
   private static MAJORS = ['ETH', 'BTC', 'USDC', 'USDT', 'SOL', 'BNB', 'AVAX', 'MATIC', 'POL', 'ARB', 'OP'];
@@ -126,7 +126,7 @@ export class PriceService {
 
     const res = await fetch(url, { 
       headers, 
-      next: { revalidate: 60 },
+      cache: 'no-store', // [REAL-TIME] no Next.js Data Cache — always fresh
       signal: AbortSignal.timeout(8000)
     });
     if (res.status === 429) {

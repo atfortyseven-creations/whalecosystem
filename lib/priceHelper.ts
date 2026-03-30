@@ -11,7 +11,7 @@ interface PriceCache {
 }
 
 const priceCache: PriceCache = {};
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 30 * 1000; // 30 seconds — institutional real-time requirement
 
 // CoinGecko coin ID mapping (expanded)
 const COIN_ID_MAP: Record<string, string> = {
@@ -301,8 +301,11 @@ export async function getPriceWithChange(symbol: string): Promise<{ price: numbe
     if (!coinId) return { price: 0, change24h: 0 };
 
     try {
-        const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true`;
-        const res = await fetch(url, { next: { revalidate: 300 } } as any);
+        const apiKey = process.env.NEXT_PUBLIC_COINGECKO_KEY;
+        const authParam = apiKey ? `&x_cg_demo_api_key=${apiKey}` : '';
+        const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true${authParam}`;
+        // [REAL-TIME] cache:no-store forces fresh data on every call — no Next.js Data Cache
+        const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(5000) });
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
         return { 
@@ -355,7 +358,8 @@ export async function getBulkPricesWithChange(symbols: string[], skipCache: bool
       const authParam = apiKey ? `&x_cg_demo_api_key=${apiKey}` : '';
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true${authParam}`;
 
-      const fetchOptions: any = skipCache ? { cache: 'no-store' } : { next: { revalidate: 300 } };
+      // [REAL-TIME] Always use cache:no-store for institutional-grade freshness (≤30s)
+      const fetchOptions: any = { cache: 'no-store' };
       
       try {
         const response = await fetch(url, { 
