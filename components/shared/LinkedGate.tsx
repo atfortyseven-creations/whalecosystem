@@ -41,7 +41,7 @@ function HugeAnimatedWhale() {
 
   return (
     <div 
-      className="relative cursor-pointer flex justify-center items-center w-72 h-72 md:w-[440px] md:h-[440px] select-none group" 
+      className="relative cursor-pointer flex justify-center items-center w-56 h-56 md:w-[300px] md:h-[300px] lg:w-[340px] lg:h-[340px] select-none group shrink-0" 
       onClick={handleClick}
     >
       <motion.img
@@ -615,26 +615,26 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-5xl w-full flex flex-col items-center justify-center gap-16 z-10 pt-[5vh]"
+              className="max-w-5xl w-full flex flex-col items-center justify-center gap-6 lg:gap-8 z-10 py-[2vh]"
             >
               {/* ── HUGE CENTERED WHALE LOGO WITH WATER SPLASH ── */}
               <HugeAnimatedWhale />
 
               {/* ── QR & ACTIONS CENTERED TOGETHER ── */}
-              <div className="flex flex-col items-center justify-center gap-12 w-full max-w-sm mx-auto">
+              <div className="flex flex-col items-center justify-center gap-6 lg:gap-8 w-full max-w-sm mx-auto">
                 
                 {/* ── QR PANEL ── */}
-                <div className="relative flex flex-col items-center">
-                  <div className="relative p-10 md:p-14 bg-white rounded-[4rem] md:rounded-[5rem] shadow-[0_120px_240px_-60px_rgba(0,0,0,0.12)] border border-black/[0.04] overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#050505]/[0.02] to-transparent" />
+                <div className="relative flex flex-col items-center shrink-0">
+                  <div className="relative p-6 md:p-8 bg-white rounded-[3rem] md:rounded-[4rem] shadow-[0_120px_240px_-60px_rgba(0,0,0,0.12)] border border-black/[0.04] overflow-hidden group hover:shadow-[0_120px_240px_-40px_rgba(0,0,0,0.16)] transition-all">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#050505]/[0.015] to-transparent" />
 
                     {/* Corner Accents */}
-                    <div className="absolute top-10 left-10 w-16 h-16 border-t-4 border-l-4 border-black/[0.04] rounded-tl-3xl" />
-                    <div className="absolute top-10 right-10 w-16 h-16 border-t-4 border-r-4 border-black/[0.04] rounded-tr-3xl" />
-                    <div className="absolute bottom-10 left-10 w-16 h-16 border-b-4 border-l-4 border-black/[0.04] rounded-bl-3xl" />
-                    <div className="absolute bottom-10 right-10 w-16 h-16 border-b-4 border-r-4 border-black/[0.04] rounded-br-3xl" />
+                    <div className="absolute top-6 left-6 w-12 h-12 border-t-[3px] border-l-[3px] border-black/[0.03] rounded-tl-2xl" />
+                    <div className="absolute top-6 right-6 w-12 h-12 border-t-[3px] border-r-[3px] border-black/[0.03] rounded-tr-2xl" />
+                    <div className="absolute bottom-6 left-6 w-12 h-12 border-b-[3px] border-l-[3px] border-black/[0.03] rounded-bl-2xl" />
+                    <div className="absolute bottom-6 right-6 w-12 h-12 border-b-[3px] border-r-[3px] border-black/[0.03] rounded-br-2xl" />
 
-                    <div className="relative z-10 w-[240px] h-[240px] md:w-[280px] md:h-[280px] flex items-center justify-center">
+                    <div className="relative z-10 w-[180px] h-[180px] md:w-[220px] md:h-[220px] flex items-center justify-center">
                       <AnimatePresence mode="wait">
                         {qrSession && syncStatus !== 'SYNCED' ? (
                           <motion.div
@@ -643,11 +643,11 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                             animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
                             exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
                             transition={{ duration: 0.8 }}
-                            className="relative p-5 bg-white rounded-[2rem] shadow-inner"
+                            className="relative p-4 bg-white rounded-2xl shadow-inner w-full h-full flex items-center justify-center"
                           >
                             <QRCodeSVG
                               value={`SOVEREIGN_HANDSHAKE:${qrSession}`}
-                              size={208}
+                              style={{ width: '100%', height: '100%' }}
                               level="H"
                               bgColor="transparent"
                               fgColor="#050505"
@@ -655,7 +655,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                               imageSettings={{
                                 src: "/official-whale-monochrome.png",
                                 x: undefined, y: undefined,
-                                height: 40, width: 40,
+                                height: 32, width: 32,
                                 excavate: true,
                               }}
                             />
@@ -664,17 +664,17 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                           <motion.div
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="flex flex-col items-center gap-5 text-green-600"
+                            className="flex flex-col items-center gap-4 text-green-600"
                           >
-                            <div className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center border-4 border-green-500/20">
-                              <CheckCircle2 size={48} className="text-green-600" />
+                            <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center border-4 border-green-500/20">
+                              <CheckCircle2 size={40} className="text-green-600" />
                             </div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.4em]">Sincronizado</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em]">Sincronizado</p>
                           </motion.div>
                         ) : (
-                          <div className="flex flex-col items-center gap-4">
-                            <RefreshCw size={40} className="text-black/10 animate-spin" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Asegurando sesión...</span>
+                          <div className="flex flex-col items-center gap-3">
+                            <RefreshCw size={32} className="text-black/10 animate-spin" />
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20">Asegurando sesión...</span>
                           </div>
                         )}
                       </AnimatePresence>
@@ -683,42 +683,42 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                 </div>
 
                 {/* ── ACTION BUTTONS ── */}
-                <div className="flex flex-col items-center w-full space-y-4">
+                <div className="flex flex-col items-center w-full space-y-3 shrink-0">
                   {/* PRIMARY: Custom Wallet Picker */}
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setIsPickerOpen(true)}
-                    className="group w-full h-24 bg-[#050505] text-white rounded-[2.5rem] flex items-center justify-between px-10 relative overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.35)] transition-all"
+                    className="group w-full h-20 md:h-22 bg-[#050505] text-white rounded-[2rem] flex items-center justify-between px-8 relative overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.35)] transition-all"
                   >
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="flex items-center gap-6 relative z-10">
-                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-white/5">
-                        <Wallet size={20} className="text-white/60" />
+                    <div className="flex items-center gap-5 relative z-10">
+                      <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/5">
+                        <Wallet size={18} className="text-white/60" />
                       </div>
                       <div className="text-left">
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Acceso Directo</p>
-                        <p className="text-sm font-black uppercase tracking-[0.15em]">Conectar Wallet</p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-0.5">Acceso Directo</p>
+                        <p className="text-[13px] font-black uppercase tracking-[0.15em]">Conectar Wallet</p>
                       </div>
                     </div>
-                    <ChevronRight size={22} className="text-white/20 group-hover:translate-x-2 transition-transform relative z-10" />
+                    <ChevronRight size={20} className="text-white/20 group-hover:translate-x-1.5 transition-transform relative z-10" />
                   </motion.button>
 
                   {/* Divider */}
-                  <div className="flex items-center gap-6 px-10 opacity-20 w-full">
+                  <div className="flex items-center gap-4 px-10 opacity-20 w-full py-1">
                     <div className="h-px flex-1 bg-black" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] leading-none">O HANDSHAKE</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.4em] leading-none">O HANDSHAKE</span>
                     <div className="h-px flex-1 bg-black" />
                   </div>
 
                   {/* SECONDARY: Mobile Sovereign App info */}
-                  <div className="w-full p-6 bg-black/[0.02] border border-black/5 rounded-[2.5rem] flex items-start gap-5">
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 animate-pulse">
-                      <Smartphone size={18} className="text-indigo-600" />
+                  <div className="w-full p-5 bg-black/[0.02] border border-black/5 rounded-[2rem] flex items-center gap-4">
+                    <div className="w-9 h-9 rounded-2xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 animate-pulse">
+                      <Smartphone size={16} className="text-indigo-600" />
                     </div>
-                    <div className="text-left space-y-1">
-                      <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]/70">Sincronización Móvil</p>
-                      <p className="text-[11px] font-medium text-[#050505]/40 leading-relaxed">
+                    <div className="text-left space-y-0.5">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/70">Sincronización Móvil</p>
+                      <p className="text-[10px] font-medium text-[#050505]/40 leading-relaxed max-w-[220px]">
                         Abre <strong className="text-[#050505]/60">humanidfi.com</strong> en tu móvil y escanea el QR.
                       </p>
                     </div>
@@ -731,9 +731,9 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
 
         {/* HUD Decoration */}
-        <div className="fixed top-10 left-10 flex items-center gap-5 pointer-events-none opacity-15">
+        <div className="fixed top-8 left-8 flex items-center gap-4 pointer-events-none opacity-15">
           <div className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
-          <span className="text-[9px] font-black uppercase tracking-[0.4em]">Handshake Protocol Active</span>
+          <span className="text-[8px] font-black uppercase tracking-[0.4em]">Handshake Protocol Active</span>
         </div>
       </div>
     </>
