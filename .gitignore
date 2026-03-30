@@ -53,3 +53,20 @@ logs/
 *.idx
 node_modules/
 .next/
+
+# Hardhat / Blockchain
+/artifacts/
+/cache/
+/typechain-types/
+.openzeppelin/
+
+# Local Storage (Local Vault / Backups)
+/vault-storage/
+/data/
+/lib/blockchain/abi/*.json
+!/lib/blockchain/abi/SovereignDeadmanSwitch.json
+
+# Build Logs
+build.log
+tsc_output.txt
+tmp_diff.txt

@@ -16,6 +16,7 @@ import { InmersiveConstellations } from '@/components/shared/InmersiveConstellat
 import { PasskeyRegister } from '@/components/auth/PasskeyRegister';
 import { CloudSyncManager } from '@/components/settings/CloudSyncManager';
 import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions';
+import { NukeProfile } from '@/components/privacy/NukeProfile';
 
 export default function SettingsPage() {
     const {
@@ -231,6 +232,8 @@ export default function SettingsPage() {
                                 icon={Database}
                             />
                         </div>
+                        
+                        <NukeProfile />
                     </motion.div>
                 );
 

@@ -46,6 +46,7 @@ function Skeleton({ count = 6 }) {
 export default function PolymarketPanel() {
     const [markets, setMarkets] = useState<PolyMarket[]>([]);
     const [loading, setLoading] = useState(true);
+    const [geoBlocked, setGeoBlocked] = useState(false);
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('all');
     const [ts, setTs] = useState('');
@@ -65,9 +66,14 @@ export default function PolymarketPanel() {
         setLoading(true);
         try {
             const r = await fetch(`/api/polymarket/markets?category=${category}&limit=50&t=${Date.now()}`);
+            if (r.status === 403) {
+                setGeoBlocked(true);
+                return;
+            }
             const d = await r.json();
             if (d.markets) setMarkets(d.markets);
             setTs(new Date().toLocaleTimeString());
+            setGeoBlocked(false);
         } catch (e) { console.error("Error loading Polymarket:", e); }
         finally { setLoading(false); }
     }, [category]);
@@ -160,8 +166,23 @@ export default function PolymarketPanel() {
 
             {/* Markets List */}
             <div className="flex flex-1 overflow-hidden relative">
+                {geoBlocked && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center p-8 bg-[#FAF9F6] backdrop-blur-sm">
+                        <div className="max-w-md w-full p-10 border border-red-200 bg-red-50 rounded-[2rem] text-center flex flex-col items-center">
+                            <ShieldCheck size={64} className="text-red-500 mb-6 opacity-80" />
+                            <h3 className="text-2xl font-black text-[#111111] uppercase tracking-tighter mb-3">GEO-RESTRICTED AREA</h3>
+                            <p className="text-xs font-bold font-mono text-red-800 uppercase tracking-widest leading-relaxed">
+                                Market data and trading features are blocked for your jurisdiction due to regulatory constraints (CFTC/OFAC).
+                            </p>
+                            <a href="/docs/legal/TERMS_OF_SERVICE.md" target="_blank" className="mt-8 text-[10px] font-black uppercase text-red-900 border border-red-300 px-6 py-3 rounded-full hover:bg-red-200 transition-colors inline-block">
+                                Review Terms of Service
+                            </a>
+                        </div>
+                    </div>
+                )}
+
                 <div className="p-6 space-y-4 flex-1 w-full overflow-y-auto no-scrollbar">
-                    {loading && <Skeleton />}
+                    {loading && !geoBlocked && <Skeleton />}
                     {!loading && filtered.map(m => (
                         <motion.div 
                             key={m.id}

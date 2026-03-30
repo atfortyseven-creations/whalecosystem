@@ -61,7 +61,7 @@ export function CopyTradingArena() {
                     Copy Trading Arena
                 </h2>
                 <p className="text-xs font-bold font-mono text-[#888888] uppercase tracking-widest mt-2">
-                    Automated Execution Engine via Hyperliquid / Bybit API
+                    Signal Routing Software (Manual Confirmation Required)
                 </p>
             </div>
 
@@ -105,7 +105,7 @@ export function CopyTradingArena() {
                             className="w-full bg-[#111111] hover:bg-[#222222] text-[#FAF9F6] font-black font-sans uppercase tracking-widest text-[11px] py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                         >
                             <Copy size={16} />
-                            COPY THIS SIGNAL
+                            ROUTE THIS SIGNAL
                         </button>
                     </div>
                 ))}

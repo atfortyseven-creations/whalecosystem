@@ -2132,3 +2132,28 @@ model Log {
 
   @@index([projectId])
 }
+
+// ----------------------------------------------------------------------------
+// 8. SECURITY CONTROLS & COMPLIANCE (GDPR Nuke)
+// ----------------------------------------------------------------------------
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  address   String
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  @@index([address])
+  @@index([action, timestamp])
+}
+
+model DeletedUser {
+  id              String   @id @default(cuid())
+  addressHash     String   @unique
+  nukeTimestamp   DateTime @default(now())
+  proofSignature  String   @db.Text
+  reason          String?
+  
+  @@index([addressHash])
+}

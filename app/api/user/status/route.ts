@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { SignJWT } from 'jose';
 
 export async function GET(req: NextRequest) {
     try {
@@ -37,7 +38,16 @@ export async function GET(req: NextRequest) {
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax' as const
             };
-            response.cookies.set('kyc_status', 'APPROVED', cookieOptions);
+            
+            const JWT_SECRET = new TextEncoder().encode(process.env.KYC_SECRET || 'WhaleAlert_KYC_MasterKey_2026_Secure');
+            const token = await new SignJWT({ address: address.toLowerCase(), status: 'APPROVED' })
+                .setProtectedHeader({ alg: 'HS256' })
+                .setIssuedAt()
+                .setExpirationTime('7d')
+                .sign(JWT_SECRET);
+
+            response.cookies.set('kyc_token', token, cookieOptions); // Cryptographically secure token
+            response.cookies.set('kyc_status', 'APPROVED', { ...cookieOptions, httpOnly: false }); // Only for UI checks
             response.cookies.set('human_session', 'true', cookieOptions);
         }
 

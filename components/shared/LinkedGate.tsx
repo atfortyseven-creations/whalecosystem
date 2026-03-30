@@ -24,6 +24,77 @@ import { toast } from 'sonner';
 
 const QR_TTL = 300;
 
+// ─── HUGE ANIMATED WHALE WITH WATER SPLASH ───────────────────────────────
+function HugeAnimatedWhale() {
+  const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setSplashes((prev) => [...prev, { id: Date.now(), x, y }]);
+  };
+
+  const removeSplash = (id: number) => {
+    setSplashes((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  return (
+    <div 
+      className="relative cursor-pointer flex justify-center items-center w-64 h-64 md:w-[400px] md:h-[400px] select-none group" 
+      onClick={handleClick}
+    >
+      <motion.img
+        src="/official-whale-monochrome.png"
+        className="w-full h-full object-contain relative z-10 drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)] group-hover:drop-shadow-[0_40px_80px_rgba(0,0,0,0.30)] transition-all duration-500"
+        alt="Animated Whale"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        animate={{ y: [0, -20, 0] }}
+        transition={{ y: { duration: 6, repeat: Infinity, ease: "easeInOut" } }}
+      />
+      <AnimatePresence>
+        {splashes.map((splash) => (
+          <WaterSplash key={splash.id} x={splash.x} y={splash.y} onComplete={() => removeSplash(splash.id)} />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function WaterSplash({ x, y, onComplete }: { x: number; y: number; onComplete: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 1000);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <div className="absolute pointer-events-none z-20" style={{ left: x, top: y }}>
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-3 h-3 bg-[#4FC3F7] rounded-full mix-blend-screen"
+          initial={{ opacity: 0.9, x: 0, y: 0, scale: 1 }}
+          animate={{
+            opacity: 0,
+            x: (Math.random() - 0.5) * 300,
+            y: -50 - Math.random() * 300,
+            scale: 0.5 + Math.random(),
+          }}
+          transition={{ duration: 0.6 + Math.random() * 0.4, ease: "easeOut" }}
+        />
+      ))}
+      <motion.div
+        className="absolute w-full h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-[4px] border-[#4FC3F7] rounded-full"
+        style={{ width: 0, height: 0 }}
+        initial={{ opacity: 0.8, width: 10, height: 10, borderWidth: 8 }}
+        animate={{ opacity: 0, width: 250, height: 250, borderWidth: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      />
+    </div>
+  );
+}
+
 // ─── BACKGROUND EFFECTS ───────────────────────────────────────────────────────
 // (SVG filters removed to prevent mobile 240Hz frame-pacing drops)
 
@@ -231,6 +302,7 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
   const { signMessageAsync } = useSignMessage();
   const [isSigning, setIsSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasAcceptedToS, setHasAcceptedToS] = useState(false);
 
   const handleSign = async () => {
     if (!address) return;
@@ -330,14 +402,27 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         )}
       </AnimatePresence>
 
-      {/* Sign Button */}
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleSign}
-        disabled={isSigning}
-        className="w-full h-[72px] bg-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] disabled:opacity-60 disabled:cursor-not-allowed"
-      >
+      {/* Sign Button & Click Wrap */}
+      <div className="w-full space-y-4">
+        <label className="flex items-start gap-3 p-4 bg-[#FAF9F6] border border-black/10 rounded-2xl cursor-pointer hover:bg-black/[0.02] transition-colors text-left shadow-sm">
+          <input 
+            type="checkbox" 
+            className="mt-0.5 w-4 h-4 accent-[#050505] cursor-pointer" 
+            checked={hasAcceptedToS} 
+            onChange={(e) => setHasAcceptedToS(e.target.checked)} 
+          />
+          <span className="text-[9px] font-bold text-[#050505]/70 uppercase tracking-[0.1em] leading-relaxed">
+            I verify I am not a US citizen and I agree to the <a href="/docs/legal/TERMS_OF_SERVICE.md" className="font-black text-black hover:underline hover:text-indigo-600" target="_blank">Master Terms of Service</a>, Privacy Policy & Non-Custodial Waiver.
+          </span>
+        </label>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleSign}
+          disabled={isSigning || !hasAcceptedToS}
+          className="w-full h-[72px] bg-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
         {isSigning ? (
           <>
             <RefreshCw size={18} className="animate-spin" />
@@ -351,6 +436,7 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         )}
       </motion.button>
 
+      </div>
       <button
         onClick={onDisconnect}
         className="text-[10px] font-black text-[#050505]/20 uppercase tracking-[0.4em] hover:text-[#050505]/50 transition-colors"
@@ -522,38 +608,23 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
               <SignContractStep onSigned={handleSigned} onDisconnect={handleDisconnect} />
             </motion.div>
           ) : (
-            /* ── GATEWAY LOCKED SCREEN ── */
+            /* ── INTERACTIVE GATEWAY SCREEN ── */
             <motion.div
               key="gate"
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-20 items-center z-10"
+              className="max-w-5xl w-full flex flex-col items-center justify-center gap-16 z-10 pt-[5vh]"
             >
-              {/* ── LEFT: BRANDING & ACTIONS ── */}
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-16">
-                <div className="flex flex-col items-center lg:items-start gap-10">
-                  <motion.div
-                    className="w-20 h-20 p-2 bg-white rounded-[1.5rem] shadow-[0_15px_30px_rgba(0,0,0,0.05)] border border-black/5"
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <img src="/official-whale-monochrome.png" className="w-full h-full object-contain" alt="Whale" />
-                  </motion.div>
+              {/* ── HUGE CENTERED WHALE LOGO WITH WATER SPLASH ── */}
+              <HugeAnimatedWhale />
 
-                  <div className="space-y-4">
-                    <h1 className="text-8xl font-black tracking-[-0.08em] text-[#050505] leading-[0.8]">
-                      GATEWAY<br /><span className="italic">LOCKED</span>
-                    </h1>
-                    <p className="text-[14px] font-bold text-[#050505]/30 max-w-[380px] leading-relaxed uppercase tracking-[0.08em]">
-                      Acceso restringido. Autentica tu identidad criptográfica para desbloquear el terminal.
-                    </p>
-                  </div>
-                </div>
-
-                {/* ── ACTION BUTTONS ── */}
-                <div className="w-full max-w-sm space-y-4">
+              {/* ── QR & ACTIONS CENTERED TOGETHER ── */}
+              <div className="flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24 w-full">
+                
+                {/* ── LEFT: ACTION BUTTONS ── */}
+                <div className="flex flex-col items-center w-full max-w-sm space-y-4">
                   {/* PRIMARY: Custom Wallet Picker */}
                   <motion.button
                     whileHover={{ scale: 1.01 }}
@@ -575,26 +646,25 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                   </motion.button>
 
                   {/* Divider */}
-                  <div className="flex items-center gap-6 px-10 opacity-20">
+                  <div className="flex items-center gap-6 px-10 opacity-20 w-full">
                     <div className="h-px flex-1 bg-black" />
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] leading-none">O HANDSHAKE</span>
                     <div className="h-px flex-1 bg-black" />
                   </div>
 
                   {/* SECONDARY: Mobile Sovereign App info */}
-                  <div className="p-6 bg-black/[0.02] border border-black/5 rounded-[2.5rem] flex items-start gap-5">
+                  <div className="w-full p-6 bg-black/[0.02] border border-black/5 rounded-[2.5rem] flex items-start gap-5">
                     <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 animate-pulse">
                       <Smartphone size={18} className="text-indigo-600" />
                     </div>
                     <div className="text-left space-y-1">
                       <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]/70">Sincronización Móvil</p>
                       <p className="text-[11px] font-medium text-[#050505]/40 leading-relaxed">
-                        Abre <strong className="text-[#050505]/60">humanidfi.com</strong> en tu móvil y escanea el QR para vincular sin extensión.
+                        Abre <strong className="text-[#050505]/60">humanidfi.com</strong> en tu móvil y escanea el QR.
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
 
               {/* ── RIGHT: QR PANEL ── */}
               <div className="relative flex flex-col items-center">
@@ -620,7 +690,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                         >
                           <QRCodeSVG
                             value={`SOVEREIGN_HANDSHAKE:${qrSession}`}
-                            size={234}
+                            size={208}
                             level="H"
                             bgColor="transparent"
                             fgColor="#050505"
@@ -628,15 +698,9 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                             imageSettings={{
                               src: "/official-whale-monochrome.png",
                               x: undefined, y: undefined,
-                              height: 48, width: 48,
+                              height: 40, width: 40,
                               excavate: true,
                             }}
-                          />
-                          {/* Scanning line (Hardware Accelerated via top-0 + translateY) */}
-                          <motion.div
-                            className="absolute inset-x-0 top-0 h-0.5 bg-black/10 blur-[1px] z-50 pointer-events-none will-change-transform"
-                            animate={{ y: [0, 230, 0] }}
-                            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
                           />
                         </motion.div>
                       ) : syncStatus === 'SYNCED' ? (
@@ -660,42 +724,8 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
 
-                {/* Telemetry Footer */}
-                <div className="mt-10 flex flex-col items-center space-y-5">
-                  <div className="flex items-center gap-10 text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]/40">
-                    <div className="flex items-center gap-2">
-                      <Cpu size={12} className="text-black" />
-                      <span>SSL Encrypted</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Globe size={12} className="text-black" />
-                      <span>Refresco {timeLeft}s</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Activity size={12} className="text-black animate-pulse" />
-                      <span>Live</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="h-px w-10 bg-black/10" />
-                    <div className="flex -space-x-2">
-                      {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="w-8 h-8 rounded-full border-4 border-[#FAF9F6] bg-black/[0.04] flex items-center justify-center grayscale opacity-30">
-                          <Fingerprint size={12} />
-                        </div>
-                      ))}
-                      <div className="w-8 h-8 rounded-full border-4 border-[#FAF9F6] bg-black/[0.04] flex items-center justify-center opacity-30">
-                        <span className="text-[8px] font-black">+14k</span>
-                      </div>
-                    </div>
-                    <div className="h-px w-10 bg-black/10" />
-                  </div>
-
-                  <p className="text-[9px] font-black text-[#050505]/10 uppercase tracking-[0.6em]">
-                    INSTITUTIONAL GRADE V4
-                  </p>
                 </div>
+
               </div>
             </motion.div>
           )}

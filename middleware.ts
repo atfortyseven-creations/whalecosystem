@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { RedisRateLimiter } from './lib/redis/rate-limiter';
+import { runWAF } from './lib/security/waf-engine';
 
 // [SAFE-ENUM] Defined locally to avoid pulling in @prisma/client in Edge Runtime
 enum PlanTier {
@@ -36,12 +37,39 @@ const isKycRequiredRoute = createRouteMatcher([
   '/trade(.*)',
 ]);
 
+const isGeoRestrictedRoute = createRouteMatcher([
+  '/api/polymarket(.*)'
+]);
+
+const RESTRICTED_COUNTRIES = ['US', 'CU', 'IR', 'KP', 'SY'];
+
 export default clerkMiddleware(async (auth, request) => {
   try {
     const { pathname } = request.nextUrl;
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
                request.headers.get('x-real-ip') || 
                '127.0.0.1';
+    const country = request.headers.get('x-vercel-ip-country') || 
+                    request.headers.get('cf-ipcountry') || 
+                    'UNKNOWN';
+
+    // ── LAYER 0: OWASP WAF ENGINE (Before EVERYTHING) ──────────────────────
+    const wafBlock = await runWAF(request);
+    if (wafBlock) return wafBlock;
+
+    // 0. GEOFENCING — Regulatory Firewall (CFTC/OFAC)
+    if (isGeoRestrictedRoute(request)) {
+      if (RESTRICTED_COUNTRIES.includes(country)) {
+        console.warn(`[WhaleFortress] 🚨 Geoblocked Restricted Access from Country: ${country}, IP: ${ip}`);
+        return new NextResponse(
+          JSON.stringify({ 
+            error: 'RESTRICTED_JURISDICTION', 
+            message: `Regulatory constraint: Market data and trading features are blocked for your jurisdiction (${country}).`
+          }), 
+          { status: 403, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     // 1. HONEYPOT TRAP — Instant Block Mentality
     if (isHoneypotRoute(request)) {
@@ -87,8 +115,22 @@ export default clerkMiddleware(async (auth, request) => {
       }
 
       if (isKycRequiredRoute(request)) {
-        const kycStatus = kycStatusCookie?.value;
-        if (kycStatus !== 'APPROVED') {
+        const kycToken = request.cookies.get('kyc_token')?.value;
+        let isApproved = false;
+        
+        if (kycToken) {
+           try {
+               const JWT_SECRET = new TextEncoder().encode(process.env.KYC_SECRET || 'WhaleAlert_KYC_MasterKey_2026_Secure');
+               const { jwtVerify } = await import('jose'); // Dynamic import for edge
+               const { payload } = await jwtVerify(kycToken, JWT_SECRET);
+               if (payload.status === 'APPROVED') isApproved = true;
+           } catch(e) {
+               console.warn(`[WhaleFortress] 🚨 Spoofed/Invalid KYC token intercepted from IP: ${ip}`);
+           }
+        }
+        
+        if (!isApproved) {
+          console.warn(`[WhaleFortress] 🛡️ Blocked unauthorized access to KYC route: ${pathname}`);
           return NextResponse.redirect(new URL('/', request.url).toString());
         }
       }

@@ -42,8 +42,35 @@ module.exports = {
              url: process.env.OPTIMISM_MAINNET_RPC || "https://mainnet.optimism.io",
              accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.length >= 64) ? [process.env.PRIVATE_KEY] : [],
         },
+        // ── Polygon ─────────────────────────────────────────────────────
+        polygonAmoy: {
+            url: process.env.POLYGON_AMOY_RPC || "https://rpc-amoy.polygon.technology",
+            chainId: 80002,
+            accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.length >= 64) ? [process.env.PRIVATE_KEY] : [],
+            gasPrice: 30_000_000_000, // 30 gwei — Amoy safe default
+        },
+        polygon: {
+            url: process.env.POLYGON_MAINNET_RPC || "https://polygon-rpc.com",
+            chainId: 137,
+            accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.length >= 64) ? [process.env.PRIVATE_KEY] : [],
+        },
     },
     gasReporter: {
-        enabled: false,
+        enabled: process.env.REPORT_GAS === "true",
+        currency: "USD",
+    },
+    etherscan: {
+        // Etherscan V2: single API key covers all EVM chains incl. Polygon
+        apiKey: process.env.POLYGONSCAN_API_KEY || "",
+        customChains: [
+            {
+                network: "polygonAmoy",
+                chainId: 80002,
+                urls: {
+                    apiURL:     "https://api-amoy.polygonscan.com/api",
+                    browserURL: "https://amoy.polygonscan.com",
+                },
+            },
+        ],
     },
 };

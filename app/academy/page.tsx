@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AcademyViewer } from '@/components/academy/AcademyViewer';
-import { Shield, Cpu, TrendingUp, Lock, BookOpen } from 'lucide-react';
+import { Shield, Cpu, TrendingUp, Lock, BookOpen, AlertTriangle } from 'lucide-react';
 import { InstitutionalShell } from "@/components/shared/InstitutionalShell";
 import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
 import "@/app/dashboard/dashboard.css";
@@ -13,7 +13,15 @@ import "@/app/dashboard/dashboard.css";
 // ─── WHALE HERO ───
 function WhaleAcademyHero() {
   return (
-    <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-12 pb-8 px-6 text-center bg-[#FAF9F6] border-b border-[#E5E5E5]">
+    <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-20 pb-8 px-6 text-center bg-[#FAF9F6] border-b border-[#E5E5E5]">
+      
+      {/* ── DISCLAIMER BANNER ── */}
+      <div className="w-full bg-[#111111] text-[#FAF9F6] py-3 px-4 flex items-center justify-center gap-3 absolute top-0 left-0 z-50">
+        <AlertTriangle size={14} className="text-[#f59e0b]" />
+        <span className="text-[10px] font-black font-mono tracking-widest uppercase">
+          NO RELIANCE / EDUCATIONAL PURPOSES ONLY DISCLAIMER: Information provided is NOT financial advice.
+        </span>
+      </div>
       
       {/* Subtle grid backdrop for institutional feel */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
