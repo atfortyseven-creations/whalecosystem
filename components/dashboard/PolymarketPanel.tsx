@@ -14,6 +14,8 @@ interface PolyMarket {
     yesPrice: number; noPrice: number; volume24h: number; volumeTotal: number;
     evSignal: string; image?: string; active: boolean; closed?: boolean;
     conditionId?: string; endDate?: string;
+    // Real on-chain execution fields from Gnosis CTF
+    fpmmAddress?: string | null;
 }
 
 const fmtUsd = (n: number) => {
@@ -86,52 +88,69 @@ export default function PolymarketPanel() {
 
     const handleTrade = async (direction: 'YES' | 'NO') => {
         if (!isConnected) {
-            toast.error("Wallet no conectada", { description: "Requiere firma On-Chain para operar en Polymarket." });
+            toast.error('Wallet no conectada', { description: 'Conecta tu wallet para operar en Polymarket.' });
+            return;
+        }
+        if (!selected) return;
+        if (!selected.fpmmAddress) {
+            toast.error('Mercado sin FPMM', { description: 'Este mercado no tiene un contrato FPMM disponible aún. Prueba otro mercado.' });
             return;
         }
 
-        if (!selected) return;
-
         setIsExecuting(direction);
-        const toastId = toast.loading(`Iniciando enrutamiento [${direction}]...`);
-        
+        const toastId = toast.loading(`Preparando ejecución [${direction}]...`);
+
         try {
+            // Step A: Switch to Polygon if needed
             if (!isPolygon && switchChainAsync) {
-                toast.loading("Cambiando red a Polygon...", { id: toastId });
+                toast.loading('Cambiando red a Polygon...', { id: toastId });
                 try {
                     await switchChainAsync({ chainId: 137 });
-                    // Give Wagmi a moment to register the newly active chain
-                    await new Promise(r => setTimeout(r, 1000));
-                } catch (e) {
-                    throw new Error("Cambio de red a Polygon fue rechazado.");
+                    await new Promise(r => setTimeout(r, 1200));
+                } catch {
+                    throw new Error('El cambio a Polygon fue rechazado. Polymarket opera en Polygon Mainnet.');
                 }
             }
 
-            let txPayload;
-            const res = await polymarketRouterService.buildTradeTransaction(
-                selected.conditionId || selected.id, 
-                direction, 
+            // Step 1 of 2: Approve USDC to the FPMM contract
+            toast.loading('Paso 1/2: Autorizando USDC al contrato FPMM...', { id: toastId });
+            const approvalPayload = polymarketRouterService.buildApprovalTransaction(
+                selected.fpmmAddress,
                 tradeAmount
             );
-            txPayload = res.tx;
-            toast.loading("Esperando firma nativa Polygon...", { id: toastId });
+            const approvalHash = await sendTransactionAsync({
+                to: approvalPayload.tx.to as `0x${string}`,
+                data: approvalPayload.tx.data as `0x${string}`,
+                value: BigInt(0),
+            });
+            toast.loading(`Paso 1/2 confirmado. Hash: ${approvalHash.slice(0, 10)}... Paso 2/2 en progreso...`, { id: toastId });
 
-            const hash = await sendTransactionAsync({
-                to: txPayload.to as `0x${string}`,
-                data: txPayload.data as `0x${string}`,
-                value: BigInt(txPayload.value || "0")
+            // Wait a beat for the approval to propagate
+            await new Promise(r => setTimeout(r, 2000));
+
+            // Step 2 of 2: Execute the real FPMM buy()
+            toast.loading('Paso 2/2: Comprando acciones en el FPMM...', { id: toastId });
+            const tradePayload = await polymarketRouterService.buildTradeTransaction(
+                selected.fpmmAddress,
+                direction,
+                tradeAmount
+            );
+            const tradeHash = await sendTransactionAsync({
+                to: tradePayload.tx.to as `0x${string}`,
+                data: tradePayload.tx.data as `0x${string}`,
+                value: BigInt(0),
             });
-            
-            toast.success("Trade Confirmado On-Chain", { 
+
+            toast.success('Trade ejecutado on-chain en Polymarket', {
                 id: toastId,
-                description: `Has adquirido ${tradeAmount} USDC en acciones de ${direction}. Hash: ${hash.slice(0, 10)}...` 
+                description: `Has comprado ${tradeAmount} USDC en acciones ${direction}. Tx: ${tradeHash.slice(0, 18)}...`,
             });
-            
-            setSelected(null); // Close sidebar on success
+
+            setSelected(null);
         } catch (e: any) {
-            toast.error("Trade Fallido", { 
+            toast.error('Error en la ejecución', {
                 id: toastId,
-                description: e.message || "Usuario rechazó la transacción on-chain."
+                description: e.message || 'El usuario rechazó la transacción.',
             });
         } finally {
             setIsExecuting(null);

@@ -73,13 +73,15 @@ export async function GET(req: Request) {
                 volume24h: parseFloat(m.volume24hr || m.volume || '0'),
                 volumeTotal: parseFloat(m.volumeNum || m.volume || '0'),
                 liquidity: parseFloat(m.liquidity || '0'),
-                endDate: m.endDate || m.resolutionTime,
-                conditionId: m.conditionId,
+                // REAL execution fields — fpmmAddress is the Gnosis FPMM contract for this market
+                fpmmAddress: m.market_maker_address || null,
+                conditionId: m.conditionId || null,
+                endDate: m.endDate || m.resolutionTime || null,
+                active: m.active !== undefined ? m.active : true,
+                closed: m.closed !== undefined ? m.closed : false,
                 image: m.image,
                 edge: Math.abs(0.5 - yesPrice),
                 evSignal: calcEV(yesPrice),
-                active: m.active !== undefined ? m.active : true,
-                closed: m.closed !== undefined ? m.closed : false,
             };
         });
 

@@ -1,128 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Alchemy, Network, AssetTransfersCategory, SortingOrder } from 'alchemy-sdk';
-import { prisma } from '@/lib/prisma';
 import rateLimit from '@/lib/rate-limit';
 import { withCache, CacheTTL } from '@/src/lib/cache/redis-cache';
-import { formatErrorResponse } from '@/src/lib/errors/error-handler';
+import { fetchRealWhaleTransfers } from '@/lib/blockchain/WhaleFlowService';
 
-// Global rate limiter (server-side per instance)
+/**
+ * Whale Activities API Route
+ * 100% real on-chain data from Alchemy Asset Transfers.
+ * No synthetic data. No mock fills. Every row is verifiable on-chain.
+ *
+ * Data source: Alchemy getAssetTransfers — ETH Mainnet, Base, Arbitrum, Polygon
+ * Threshold: > $100,000 USD per transaction
+ */
+
 const limiter = rateLimit({
-    interval: 60 * 1000, // 60 seconds
-    uniqueTokenPerInterval: 500, // Max 500 users per second
+    interval: 60 * 1000,
+    uniqueTokenPerInterval: 500,
 });
 
-// Configure Alchemy with GetBlock RPC
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID || process.env.ALCHEMY_API_KEY,
-  network: Network.BASE_MAINNET,
-  url: process.env.BASE_RPC_URL || undefined,
-};
-
-// HACK: Fix for Alchemy SDK "Referrer 'client' is not a valid URL" in Next.js Server
-const originalFetch = global.fetch;
-global.fetch = (url, init) => {
-    if (init && init.referrer === 'client') {
-        delete init.referrer;
-    }
-    return originalFetch(url, init);
-};
-
-const alchemyBase = new Alchemy({ ...config, network: Network.BASE_MAINNET });
-const alchemyEth = new Alchemy({ ...config, network: Network.ETH_MAINNET });
-const alchemyPoly = new Alchemy({ ...config, network: Network.MATIC_MAINNET });
-
-const KNOWN_WHALES: Record<string, string> = {
-  '0x28C6c06298d514Db089934071355E5743bf21d60': 'Binance Hot Wallet',
-  '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb': 'Coinbase',
-  '0x833589f CD6eDb6E08f4c7C32D4f71b54bdA02913': 'USDC Contract',
-};
-
 export async function GET(req: NextRequest) {
-  try {
-    // [SECURITY] Apply Rate Limiting
-    const ip = req.headers.get('x-forwarded-for') || 'anonymous';
     try {
-        await limiter.check(20, ip); // 20 requests per minute per IP
-    } catch {
-        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-    }
-
-    // Fetch from cache or database
-    const cacheKey = 'whale:activities:recent';
-    
-    const activitiesData = await withCache(
-      cacheKey,
-      async () => {
-        // [PRODUCTION] Fetch from database (where the telegram bot saves signals)
-        // Wrapped in try-catch to allow API to survive DB hiccups
-        let activities: any[] = [];
+        const ip = req.headers.get('x-forwarded-for') || 'anonymous';
         try {
-            activities = await prisma.whaleActivity.findMany({
-                orderBy: { timestamp: 'desc' },
-                take: 30, // Last 30 whales
-            });
-        } catch (dbError) {
-            console.error('[API RESILIENCE] Database fetch failed for whales:', dbError);
-            // Return empty array if DB is down, we have cache anyway if it was previously successful
-            activities = [];
+            await limiter.check(20, ip);
+        } catch {
+            return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
         }
 
-        const processedActivities = activities.map((tx: any) => ({
-            id: tx.transactionHash,
-            walletAddress: tx.walletAddress,
-            walletLabel: KNOWN_WHALES[tx.walletAddress] || `${tx.walletAddress.slice(0, 6)}...${tx.walletAddress.slice(-4)}`,
-            type: tx.type || 'TRANSFER',
-            token: tx.token,
-            amount: Number(tx.amount),
-            usdValue: Number(tx.usdValue),
-            timestamp: tx.timestamp,
-            txHash: tx.transactionHash,
-            chain: tx.token === 'BTC' ? 'bitcoin' : (tx.transactionHash.startsWith('0x') ? 'base' : 'ethereum')
-        }));
+        const cacheKey = 'whale:activities:onchain:v2';
 
-        // Enhance with real-time diverse multi-chain algorithmic data
-        if (processedActivities.length < 30) {
-            const tokens = ['ETH', 'USDC', 'USDT', 'SOL', 'ARB', 'OP', 'LINK', 'PEPE', 'BNB'];
-            const chains = ['ethereum', 'base', 'arbitrum', 'optimism', 'polygon', 'solana'];
-            const types = ['IN', 'OUT', 'SWAP', 'DEPOSIT', 'WITHDRAW', 'TRINITY_BRIDGE'];
-            
-            for (let i = processedActivities.length; i < 30; i++) {
-                const isShortTime = Math.random() > 0.5;
-                const token = tokens[Math.floor(Math.random() * tokens.length)];
-                const chain = chains[Math.floor(Math.random() * chains.length)];
-                const amt = Math.floor(Math.random() * 1500000) + 250000;
-                processedActivities.push({
-                    id: `live-tx-${i}-${Date.now()}`,
-                    walletAddress: `0x${Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')}`,
-                    walletLabel: `Institution-${Math.floor(Math.random() * 9999)}`,
-                    type: types[Math.floor(Math.random() * types.length)],
-                    token: token,
-                    amount: amt,
-                    usdValue: amt * (token === 'ETH' ? 3350 : token === 'SOL' ? 145 : token === 'LINK' ? 14 : token === 'BNB' ? 570 : token === 'PEPE' ? 0.000008 : 1),
-                    timestamp: new Date(Date.now() - Math.random() * (isShortTime ? 30000 : 300000)).toISOString(),
-                    txHash: `0x${Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('')}`,
-                    chain: chain
-                });
-            }
-            processedActivities.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-        }
+        const data = await withCache(
+            cacheKey,
+            async () => {
+                // Pull real transfers directly from Alchemy — no DB padding
+                const activities = await fetchRealWhaleTransfers(40);
+                return {
+                    activities,
+                    timestamp: Date.now(),
+                    source: 'alchemy_on_chain',
+                    chains: ['ethereum', 'base', 'arbitrum', 'polygon'],
+                    threshold_usd: 100000,
+                };
+            },
+            // 15-second cache to avoid hammering Alchemy; enough for near-real-time
+            { ttl: 15 }
+        );
 
-        return {
-          activities: processedActivities,
-          timestamp: Date.now(),
-        };
-      },
-      { ttl: CacheTTL.WHALE_ACTIVITY }
-    );
-
-    return NextResponse.json(activitiesData);
-  } catch (error: any) {
-    console.error('[API ERROR] Whale activities:', error);
-    const errorResponse = formatErrorResponse(error);
-    return NextResponse.json(
-      errorResponse,
-      { status: errorResponse.statusCode }
-    );
-  }
+        return NextResponse.json(data);
+    } catch (error: any) {
+        console.error('[API ERROR] Whale activities:', error);
+        return NextResponse.json(
+            { error: error.message, activities: [], timestamp: Date.now() },
+            { status: 500 }
+        );
+    }
 }
-

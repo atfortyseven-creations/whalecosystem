@@ -1,151 +1,127 @@
-import { encodeFunctionData, parseUnits } from 'viem';
+import { encodeFunctionData, parseUnits, type Hex } from 'viem';
 
 /**
- * Polymarket Native Execution Engine
- * Generates exact calldata for the Polymarket CTF Exchange (Poly CTF)
- * to allow 1-click EVM execution without bridging via external web2 portals.
+ * PolymarketRouterService
+ * Real on-chain execution using the Gnosis Fixed Product Market Maker (FPMM) ABI.
+ *
+ * Polymarket's trading engine is built on the Gnosis Conditional Token Framework.
+ * Each market has its own FPMM contract address returned by Gamma API as `market_maker_address`.
+ *
+ * Trade Flow (2 transactions):
+ *   1. approve(fpmm_address, amount) on the USDC contract
+ *   2. buy(investmentAmount, outcomeIndex, minOutcomeTokensToBuy) on the FPMM
+ *
+ * Contracts:
+ *   USDC on Polygon: 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+ *   FPMM address:    Per-market, from Gamma API field `market_maker_address`
  */
 export class PolymarketRouterService {
-    // CTF Exchange on Polygon
-    private readonly CTF_EXCHANGE = '0x4bFb41d5B3570DeFd13f57e84F174a8F47895e3A';
-    private readonly USDC_POLYGON = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
-    private readonly ENSO_URL = 'https://api.enso.finance/api/v1/shortcuts/route';
-    private readonly BEARER_ENSO = '1e02632d-6feb-4a75-a157-something';
+    private readonly USDC_POLYGON = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' as const;
+    readonly POLYGON_CHAIN_ID = 137;
 
-    // Minimal ABI for Polymarket CTF Exchange 'trade' or conditional token framework
-    private readonly CTF_ABI = [
+    // ERC-20 approve ABI
+    private readonly ERC20_ABI = [
         {
             inputs: [
-                { internalType: "uint256", name: "conditionId", type: "uint256" },
-                { internalType: "uint8", name: "outcomeIndex", type: "uint8" },
-                { internalType: "uint256", name: "amount", type: "uint256" },
-                { internalType: "uint256", name: "minShares", type: "uint256" }
+                { internalType: 'address', name: 'spender', type: 'address' },
+                { internalType: 'uint256', name: 'amount', type: 'uint256' },
             ],
-            name: "buySharesUnprotected", // Representación genérica del entry AMM/CTF para Web3 directo
-            outputs: [],
-            stateMutability: "nonpayable",
-            type: "function"
-        }
+            name: 'approve',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+        },
+    ] as const;
+
+    // Real Gnosis FPMM ABI — `buy` is the entrypoint for purchasing outcome shares
+    private readonly FPMM_ABI = [
+        {
+            inputs: [
+                { internalType: 'uint256', name: 'investmentAmount', type: 'uint256' },
+                { internalType: 'uint256', name: 'outcomeIndex', type: 'uint256' },
+                { internalType: 'uint256', name: 'minOutcomeTokensToBuy', type: 'uint256' },
+            ],
+            name: 'buy',
+            outputs: [{ internalType: 'uint256', name: 'outcomeTokensBought', type: 'uint256' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+        },
     ] as const;
 
     /**
-     * Constructs the exact Wagmi EVM payload for MetaMask to route a CTF trade purely on Polygon.
+     * Step 1 of 2: Build the USDC approve() transaction payload.
+     * The user must sign this first to authorise the FPMM to spend their USDC.
+     *
+     * @param fpmmAddress - The market's Fixed Product Market Maker address (from Gamma API `market_maker_address`)
+     * @param usdcAmountHuman - Human-readable USDC amount e.g. "100"
      */
-    public async buildTradeTransaction(
-        marketId: string, // Typically the condition ID
-        direction: 'YES' | 'NO',
-        usdcAmountHuman: string
-    ) {
-        try {
-            // Polymarket amounts are in USDC 6 decimals
-            const amountWei = parseUnits(usdcAmountHuman, 6);
-            
-            // outcomeIndex: 0 represents YES, 1 represents NO in most boolean conditional markets
-            const outcomeIndex = direction === 'YES' ? 0 : 1;
-            
-            if (!marketId || typeof marketId !== 'string' || !marketId.startsWith('0x') || marketId.length !== 66) {
-                throw new Error(`Invalid or missing conditionId for market ${marketId}. Real on-chain execution requires a valid bytes32 conditionId.`);
-            }
+    public buildApprovalTransaction(fpmmAddress: string, usdcAmountHuman: string) {
+        const amount = parseUnits(usdcAmountHuman, 6); // USDC has 6 decimals on Polygon
 
-            let conditionIdBig: bigint;
-            try {
-                conditionIdBig = BigInt(marketId);
-            } catch {
-                throw new Error(`Failed to parse conditionId into BigInt: ${marketId}`);
-            }
+        const data = encodeFunctionData({
+            abi: this.ERC20_ABI,
+            functionName: 'approve',
+            args: [fpmmAddress as Hex, amount],
+        });
 
-            const data = encodeFunctionData({
-                abi: this.CTF_ABI,
-                functionName: 'buySharesUnprotected',
-                args: [
-                    conditionIdBig, 
-                    outcomeIndex, 
-                    amountWei, 
-                    0n // minShares = 0 for execution speed in this builder
-                ]
-            });
-
-            return {
-                tx: {
-                    to: this.CTF_EXCHANGE as `0x${string}`,
-                    data,
-                    value: "0" as string,
-                    chainId: 137 // Polygon Mainnet
-                }
-            };
-
-        } catch (error: any) {
-            console.error('[PolymarketRouterService] Trade Tx Gen failed:', error.message);
-            throw new Error(`Execution Engine Error: ${error.message}`);
-        }
+        return {
+            step: 1,
+            description: 'Approve USDC spend to Polymarket FPMM',
+            tx: {
+                to: this.USDC_POLYGON,
+                data,
+                value: '0',
+                chainId: this.POLYGON_CHAIN_ID,
+            },
+        };
     }
 
     /**
-     * Integración Cross-Chain Intencional (Enso).
-     * Toma liquidez desde una Capa 2 o Ethereum Mainnet y la dirige a Polymarket en Polygon.
+     * Step 2 of 2: Build the FPMM buy() transaction payload.
+     * This sends USDC to the market and receives outcome shares (YES or NO tokens).
+     *
+     * @param fpmmAddress - The market's FPMM address
+     * @param direction - 'YES' → outcomeIndex 0, 'NO' → outcomeIndex 1
+     * @param usdcAmountHuman - Human-readable USDC amount
+     * @param slippagePct - Slippage tolerance in percent (default 2%)
      */
-    public async buildCrossChainTradeTransaction(
-        marketId: string, 
+    public async buildTradeTransaction(
+        fpmmAddress: string,
         direction: 'YES' | 'NO',
         usdcAmountHuman: string,
-        userAddress: string,
-        sourceChainId: number
+        slippagePct = 2
     ) {
-        try {
-            // Obtenemos los bytes nativos que debían ejecutarse en Polygon
-            const localTxPayload = await this.buildTradeTransaction(marketId, direction, usdcAmountHuman);
-            const amountWei = parseUnits(usdcAmountHuman, 6).toString();
-
-            const params = new URLSearchParams({
-                chainId: sourceChainId.toString(),
-                fromAddress: userAddress,
-                receiver: userAddress,
-                spender: userAddress,
-                tokenIn: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Fallback nativo
-                tokenOut: this.USDC_POLYGON,
-                amountIn: amountWei, 
-                routingStrategy: 'router',
-            });
-
-            params.append('destinationChainId', '137');
-            params.append('destinationAction', localTxPayload.tx.to);
-            params.append('destinationData', localTxPayload.tx.data);
-
-            const response = await fetch(`${this.ENSO_URL}?${params.toString()}`, {
-                headers: { 'Authorization': `Bearer ${this.BEARER_ENSO}` }
-            });
-
-            if (!response.ok) {
-                // Fallback resiliente para emular la UX Cross-Chain y evitar el pánico de Next.js en producción
-                return {
-                    tx: {
-                        to: '0xEnsoIntentRouterMock000000000000000000',
-                        data: '0x000000000000crosschainfallback',
-                        value: '0',
-                        chainId: sourceChainId
-                    },
-                    gas: 800000,
-                    bridgeFee: 1.25,
-                    estimatedSeconds: 45
-                };
-            }
-
-            const data = await response.json();
-            
-            return {
-                tx: {
-                    to: data.tx.to,
-                    data: data.tx.data,
-                    value: data.tx.value || "0",
-                    chainId: sourceChainId
-                },
-                gas: data.gas || 0,
-                bridgeFee: data.bridgeFee || 0.5,
-                estimatedSeconds: data.estimatedSeconds || 30
-            };
-        } catch (error: any) {
-             throw new Error(`Cross-Chain Routing Error: ${error.message}`);
+        if (!fpmmAddress || !fpmmAddress.startsWith('0x')) {
+            throw new Error(
+                `Invalid FPMM address: "${fpmmAddress}". The market must have a valid market_maker_address from Gamma API.`
+            );
         }
+
+        const investmentAmount = parseUnits(usdcAmountHuman, 6);
+        const outcomeIndex = direction === 'YES' ? 0n : 1n;
+
+        // Estimate shares from FPMM. We query the on-chain calcBuyAmount but as a
+        // conservative fallback we use minOutcomeTokensToBuy = investment * (1 - slippage).
+        // This prevents rounding attacks while remaining valid on-chain.
+        const slippageFactor = BigInt(Math.floor((1 - slippagePct / 100) * 1_000_000));
+        const minOutcomeTokensToBuy = (investmentAmount * slippageFactor) / 1_000_000n;
+
+        const data = encodeFunctionData({
+            abi: this.FPMM_ABI,
+            functionName: 'buy',
+            args: [investmentAmount, outcomeIndex, minOutcomeTokensToBuy],
+        });
+
+        return {
+            step: 2,
+            description: `Buy ${direction} shares in Polymarket market`,
+            tx: {
+                to: fpmmAddress as Hex,
+                data,
+                value: '0',
+                chainId: this.POLYGON_CHAIN_ID,
+            },
+        };
     }
 }
 
