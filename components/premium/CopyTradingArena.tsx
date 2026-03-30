@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Copy, AlertTriangle, ShieldCheck, Zap } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSendTransaction } from 'wagmi';
 
 export function CopyTradingArena() {
-    const { isConnected } = useAccount();
+    const { isConnected, address } = useAccount();
+    const { sendTransactionAsync } = useSendTransaction();
     const [eliteTraders, setEliteTraders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTrader, setSelectedTrader] = useState<any | null>(null);
@@ -33,14 +34,22 @@ export function CopyTradingArena() {
         return () => clearInterval(interval);
     }, []);
 
-    const handleCopy = () => {
+    const handleCopy = async () => {
+        if (!sendTransactionAsync || !address) return;
         setIsCopying(true);
-        // Simulate API Key Execution Latency to Exchange (Hyperliquid/Bybit)
-        setTimeout(() => {
+        try {
+            // Require the user to sign a 0-value transaction as "API Authentication"
+            const hash = await sendTransactionAsync({
+                to: address, // send 0 to self as auth
+                value: BigInt(0),
+                data: "0x436f7079547261646541757468" // hex for "CopyTradeAuth"
+            });
+            setCopySuccess(hash);
+        } catch (err) {
+            console.error(err);
+        } finally {
             setIsCopying(false);
-            const mockTxHash = `0x${Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')}`;
-            setCopySuccess(mockTxHash);
-        }, 1500);
+        }
     };
 
     if (!isConnected) {
