@@ -364,40 +364,32 @@ function PageHero({
 
 const PILLARS = [
   {
-    type: 'ORDER_BOOK' as const,
-    icon: <Activity size={14} className="text-[#050505]/50" />,
-    title: 'ORDER BOOK',
-    subtitle: 'Motor LOB — Limit Order Book',
-    nature: 'Estructura de árbol binario de búsqueda diseñada para emparejamiento de liquidez de tiempo constante O(log n).',
-    desc: 'Un mapa tridimensional de la profundidad de liquidez. Vectores de órdenes estáticas, márgenes de slippage y bid/ask.',
-    use: 'Liquidity Walls, Spoofing, Market Impact.',
-  },
-  {
     type: 'WHALE_FLOW' as const,
     icon: <Eye size={14} className="text-[#050505]/50" />,
-    title: 'WHALE FLOW',
-    subtitle: 'Heurística de Red',
-    nature: 'Motor de indexación acoplado a RPC. Emplea clustering algorítmico y filtros bayesianos.',
-    desc: 'Decodificador heurístico de la Mempool. Filtra anomalías (volumen V > μ + 3σ) aislando transferencias masivas.',
-    use: 'Alpha Predictivo.',
+    title: 'RASTREO INSTITUCIONAL',
+    subtitle: 'Movimientos de grandes carteras',
+    desc: 'Monitoreamos la blockchain en tiempo real para detectar transferencias masivas. Observa exactamente cuándo y dónde los fondos de inversión mueven su capital.',
   },
   {
     type: 'MARKETS' as const,
     icon: <Zap size={14} className="text-[#050505]/50" />,
-    title: 'MARKETS AVAILABLE',
-    subtitle: 'Fragmentación Activa',
-    nature: 'Base de datos relacional distribuida que mapea metadatos y fragmentación de liquidez.',
-    desc: 'Matriz multidimensional con Open Interest, Funding Rates y volumen.',
-    use: 'Cross-Chain Omniscience.',
+    title: 'MÉTRICAS DEL MERCADO',
+    subtitle: 'El pulso del ecosistema',
+    desc: 'Agregamos los datos más importantes de múltiples plataformas. Visualiza el interés financiero y el apalancamiento oculto de forma clara.',
+  },
+  {
+    type: 'ORDER_BOOK' as const,
+    icon: <Activity size={14} className="text-[#050505]/50" />,
+    title: 'MAPA DE LIQUIDEZ',
+    subtitle: 'Profundidad en vivo',
+    desc: 'Leemos los libros de compras y ventas globales sin retrasos. Identifica muros de soporte y resistencia antes de que el precio llegue a ellos.',
   },
   {
     type: 'COPY_TRADING' as const,
     icon: <Shield size={14} className="text-[#050505]/50" />,
-    title: 'COPY TRADING',
-    subtitle: 'Replicación Simétrica',
-    nature: 'Arquitectura basada en Intenciones (Intents) y emulación Account Abstraction.',
-    desc: 'Expropiación lícita de ventajas institucionales.',
-    use: 'Democratización asimétrica de estrategias.',
+    title: 'INTELIGENCIA DE ÉLITE',
+    subtitle: 'Replicación tecnológica',
+    desc: 'Analizamos la red para detectar y mostrarte las ejecuciones exactas de los traders institucionales más rentables en milisegundos.',
   },
 ];
 
@@ -441,13 +433,15 @@ function PageEcosystem() {
         className="mb-10"
       >
         <p className="text-[9px] font-black uppercase tracking-[0.35em] text-[#050505]/30 mb-2">
-          TAXONOMÍA CIENTÍFICA
+          WHALE ECOSYSTEM
         </p>
         <h2 className="text-[1.8rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505]">
-          Infraestructura<br />Terminal
+          Nuestra<br />Visión
         </h2>
         <p className="text-[10px] text-[#050505]/40 mt-4 leading-relaxed max-w-[320px] font-medium border-l-[1.5px] border-[#050505]/10 pl-3">
-          Cuatro pilares algorítmicos que estructuran la representación de datos en tiempo real. Streams delegados a Isolated Web Workers.
+          Democratizamos el acceso a la información que mueve el mercado. Te ofrecemos las mismas herramientas y datos que utilizan las instituciones a puerta cerrada. 
+          <br /><br />
+          Síguenos en X (Twitter): <span className="font-bold text-[#050505]">@whaleecosystem</span>
         </p>
       </motion.div>
 
@@ -473,19 +467,9 @@ function PageEcosystem() {
             </div>
 
             {/* Texts */}
-            <p className="text-[9px] text-[#050505]/60 leading-[1.6] mb-2 font-medium">
-              <span className="font-black text-[#050505]/80 uppercase tracking-wider text-[8.5px]">Naturaleza: </span>
-              {p.nature}
-            </p>
-            <p className="text-[9px] text-[#050505]/60 leading-[1.6] mb-3 font-medium">
-              <span className="font-black text-[#050505]/80 uppercase tracking-wider text-[8.5px]">Realidad: </span>
+            <p className="text-[10px] text-[#050505]/60 leading-[1.6] mb-4 font-medium">
               {p.desc}
             </p>
-
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#050505]/5 rounded-sm mb-4">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/30 animate-pulse" />
-              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/60">{p.use}</p>
-            </div>
 
             {/* LIVE WIDGET */}
             <LiveTerminalWidgets type={p.type} workerRef={workerRef} />
@@ -506,108 +490,7 @@ function PageEcosystem() {
   );
 }
 
-// ─── PAGE 3 · CONNECT WALLET ──────────────────────────────────────────────────
 
-function PageConnect({
-  isConnected,
-  address,
-  onConnect,
-  onScan,
-  onDisconnect,
-}: {
-  isConnected: boolean;
-  address?: string;
-  onConnect: () => void;
-  onScan: () => void;
-  onDisconnect: () => void;
-}) {
-  return (
-    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#050505] text-white font-sans flex flex-col items-center justify-center px-8 pb-16 pt-16 relative overflow-hidden">
-
-      {/* Ambient glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(6,182,212,0.08)_0%,transparent_100%)] pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-sm flex flex-col items-center text-center z-10"
-      >
-        {/* Logo */}
-        <div className="w-28 h-28 mx-auto mb-8">
-          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-full h-full" />
-        </div>
-
-        {/* Label */}
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-3">
-          ACCESO SOBERANO
-        </p>
-        <h2 className="text-4xl font-black tracking-tighter leading-none uppercase mb-3">
-          Bóveda<br />Criptográfica
-        </h2>
-        <p className="text-[11px] text-white/30 mb-10 leading-relaxed">
-          Sincroniza tu identidad on-chain para<br />acceder a la terminal institucional.
-        </p>
-
-        <div className="w-full space-y-4">
-          {!isConnected ? (
-            <button
-              onClick={onConnect}
-              className="w-full h-[88px] bg-white text-[#050505] rounded-[2.5rem] font-black uppercase tracking-[0.22em] text-[11px] flex items-center justify-center gap-4 active:scale-[0.98] shadow-[0_0_45px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] hover:bg-cyan-50 group relative overflow-hidden transition-all"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Wallet size={20} className="text-[#050505]/50 group-active:translate-x-1 transition-transform" />
-              CONECTAR BILLETERA
-            </button>
-          ) : (
-            <button
-              onClick={onScan}
-              className="w-full h-[88px] bg-cyan-500/10 border border-cyan-500/30 text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-between px-8 shadow-[0_0_30px_rgba(6,182,212,0.1)] active:scale-[0.97] backdrop-blur-md hover:bg-cyan-500/20 transition-colors group"
-            >
-              <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
-                  <QrCode size={18} className="text-cyan-400" />
-                </div>
-                <div className="text-left leading-none">
-                  <p className="tracking-[0.3em] text-cyan-50">SYNC LENS</p>
-                  <p className="text-[8px] text-cyan-400/80 mt-1.5 font-black">READY: OPEN SCANNER</p>
-                </div>
-              </div>
-              <ChevronRight size={16} className="text-cyan-400 opacity-80 group-hover:translate-x-1 transition-transform" />
-            </button>
-          )}
-
-          {isConnected && (
-            <button
-              onClick={onDisconnect}
-              className="w-full py-4 text-[9px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-white/40 transition-colors"
-            >
-              Desconectar
-            </button>
-          )}
-        </div>
-
-        {isConnected && address && (
-          <p className="mt-8 text-[8.5px] font-mono font-black tracking-widest text-white/25 uppercase">
-            ID: <span className="text-cyan-500/60">{address.slice(0, 10)}</span>…{address.slice(-6)}
-          </p>
-        )}
-
-        {/* Disclaimer */}
-        <p className="mt-12 text-[7.5px] text-white/15 uppercase tracking-wider leading-relaxed max-w-[260px] text-center">
-          No reliance · Educational purposes only · Not financial advice
-        </p>
-      </motion.div>
-
-      {/* Fingerprint watermark */}
-      <div className="absolute bottom-4 w-full flex items-center justify-center gap-3 opacity-[0.06] pointer-events-none px-8">
-        <div className="h-px bg-white flex-1" />
-        <Fingerprint size={14} className="text-white" />
-        <div className="h-px bg-white flex-1" />
-      </div>
-    </div>
-  );
-}
 
 // ─── QR SCANNER ───────────────────────────────────────────────────────────────
 
@@ -774,15 +657,6 @@ export function MobileSovereignLanding() {
 
         {/* PAGE 2 — Ecosystem Taxonomy */}
         <PageEcosystem />
-
-        {/* PAGE 3 — Connect Wallet (dark) */}
-        <PageConnect
-          isConnected={isConnected}
-          address={address}
-          onConnect={handleConnectTrigger}
-          onScan={() => setView('scanner')}
-          onDisconnect={() => disconnect()}
-        />
       </div>
     </div>
   );
