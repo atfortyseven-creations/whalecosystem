@@ -30,7 +30,7 @@ contract Constitution is Ownable {
      * @notice The Guardian Court can VETO a proposal if it violates Human Rights.
      * This is the "Checks and Balances" against Mob Rule (DAO tyranny).
      */
-    function vetoProposal(uint256 proposalId, string memory reason) external onlyGuardian {
+    function vetoProposal(uint256 /*proposalId*/, string memory reason) external onlyGuardian {
         // Logic to cancel a DAO proposal in the Governor contract
         emit VetoTriggered(reason);
     }

@@ -545,18 +545,18 @@ model User {
 // ----------------------------------------------------------------------------
 
 model GoldenTicket {
-  id            String   @id @default(cuid())
-  ticketNumber  Int      @unique @default(autoincrement()) // Sequential forever-unique ID
-  userAddress   String   @unique // ONE ticket per wallet, enforced at DB level
-  user          User     @relation(fields: [userAddress], references: [walletAddress], onDelete: Cascade)
+  id           String @id @default(cuid())
+  ticketNumber Int    @unique @default(autoincrement()) // Sequential forever-unique ID
+  userAddress  String @unique // ONE ticket per wallet, enforced at DB level
+  user         User   @relation(fields: [userAddress], references: [walletAddress], onDelete: Cascade)
 
   // Badge Metadata
-  serialCode    String   @unique // e.g. "WHALE-GEN-000001" displayed in UI
-  tier          String   @default("GENESIS") // Always GENESIS for first drop
-  badgeColor    String   @default("GOLD")    // Visual badge variant: GOLD, PLATINUM, etc.
-  
+  serialCode String @unique // e.g. "WHALE-GEN-000001" displayed in UI
+  tier       String @default("GENESIS") // Always GENESIS for first drop
+  badgeColor String @default("GOLD") // Visual badge variant: GOLD, PLATINUM, etc.
+
   // Status
-  isActive      Boolean  @default(true)
+  isActive      Boolean   @default(true)
   revokedAt     DateTime?
   revokedReason String?
 
@@ -565,14 +565,13 @@ model GoldenTicket {
   twitterHandle         String? // Optional: user can link their Twitter/X handle
 
   // Time
-  claimedAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  claimedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userAddress])
   @@index([ticketNumber])
   @@index([claimedAt])
 }
-
 
 model BlockchainTransaction {
   id                String            @id @default(cuid())
@@ -2137,7 +2136,7 @@ model Log {
 // 8. SECURITY CONTROLS & COMPLIANCE (GDPR Nuke)
 // ----------------------------------------------------------------------------
 
-model AuditLog {
+model SecurityAuditLog {
   id        String   @id @default(cuid())
   action    String
   address   String
@@ -2149,11 +2148,11 @@ model AuditLog {
 }
 
 model DeletedUser {
-  id              String   @id @default(cuid())
-  addressHash     String   @unique
-  nukeTimestamp   DateTime @default(now())
-  proofSignature  String   @db.Text
-  reason          String?
-  
+  id             String   @id @default(cuid())
+  addressHash    String   @unique
+  nukeTimestamp  DateTime @default(now())
+  proofSignature String   @db.Text
+  reason         String?
+
   @@index([addressHash])
 }
