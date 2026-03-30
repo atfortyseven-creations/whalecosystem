@@ -111,20 +111,33 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
 
 // ─── SUPPORTED WALLETS ────────────────────────────────────────────────────────
 
-const SUPPORTED_WALLETS = [
-  { id: 'all',      name: 'WalletConnect', icon: '⚡', color: '#3B99FC', desc: 'Auto-detectar apps instaladas' },
-  { id: 'metamask', name: 'MetaMask',      icon: '/official-whale-monochrome.png', color: '#F6851B', desc: 'Billetera Popular' },
-  { id: 'trust',    name: 'Trust Wallet',  icon: '🛡️', color: '#3375BB', desc: 'Billetera Segura' },
-  { id: 'coinbase', name: 'Coinbase',      icon: '🔵', color: '#0052FF', desc: 'Billetera Exchange' },
-  { id: 'rainbow',  name: 'Rainbow',       icon: '🌈', color: '#001E59', desc: 'Billetera Moderna' },
-];
-
 const STORE_LINKS: Record<string, { ios: string; android: string }> = {
   metamask: { ios: 'https://apps.apple.com/app/metamask/id1438144202',               android: 'https://play.google.com/store/apps/details?id=io.metamask' },
   trust:    { ios: 'https://apps.apple.com/app/trust-crypto-bitcoin-wallet/id1288339409', android: 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp' },
   coinbase: { ios: 'https://apps.apple.com/app/coinbase-wallet-nfts-crypto/id1278383455', android: 'https://play.google.com/store/apps/details?id=org.toshi' },
   rainbow:  { ios: 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021', android: 'https://play.google.com/store/apps/details?id=me.rainbow' },
 };
+
+const WALLET_OPTIONS = [
+  { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
+  { id: 'trust',    name: 'TRUST WALLET', desc: 'VIA WALLETCONNECT QR', iconType: 'trust' },
+  { id: 'coinbase', name: 'COINBASE WALLET',desc: 'VIA WALLETCONNECT QR', iconType: 'coinbase' },
+  { id: 'rainbow',  name: 'RAINBOW',      desc: 'VIA WALLETCONNECT QR', iconType: 'rainbow' },
+];
+
+function WalletIcon({ type }: { type: string }) {
+  if (type === 'metamask') return <img src="/official-whale-monochrome.png" className="w-[18px] h-[18px]" alt="MetaMask" />;
+  if (type === 'trust') return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#E84142" stroke="#000000" strokeWidth="2"/></svg>
+  );
+  if (type === 'coinbase') return (
+    <div className="w-[18px] h-[18px] bg-[#0052FF] rounded-full border-[2.5px] border-black" />
+  );
+  if (type === 'rainbow') return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round"><path d="M4 18v-2a8 8 0 0 1 16 0v2" stroke="#FF494A" /><path d="M8 18v-2a4 4 0 0 1 8 0v2" stroke="#FFCF00"/><path d="M12 18v-1a1 1 0 0 1 0 0" stroke="#1198FF"/></svg>
+  );
+  return null;
+}
 
 // ─── WALLET PICKER MODAL ──────────────────────────────────────────────────────
 
@@ -141,7 +154,6 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
   const buildWcDeepLink = (walletId: string, wcUri: string): string => {
     switch (walletId) {
-      case 'all':      return wcUri;
       case 'metamask': return buildMetaMaskDeepLink(wcUri);
       case 'trust':    return buildTrustDeepLink(wcUri);
       case 'coinbase': return buildCoinbaseDeepLink(wcUri);
@@ -150,8 +162,35 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     }
   };
 
-  const handleWalletSelect = async (wallet: typeof SUPPORTED_WALLETS[0]) => {
+  const handleWalletSelect = async (wallet: typeof WALLET_OPTIONS[0]) => {
     setIsConnecting(wallet.id);
+
+    // 1. Precise EIP-6963 / Injected Match
+    let specificConnector = null;
+    const eth = typeof window !== 'undefined' ? (window as any).ethereum : null;
+    
+    if (wallet.id === 'metamask') {
+      specificConnector = connectors.find(c => c.id === 'io.metamask' || c.name === 'MetaMask' || (c.type === 'injected' && eth?.isMetaMask));
+      if (!specificConnector) specificConnector = connectors.find(c => c.type === 'injected'); 
+    } else if (wallet.id === 'trust') {
+      specificConnector = connectors.find(c => c.id === 'com.trustwallet.app' || c.name === 'Trust Wallet' || (c.type === 'injected' && eth?.isTrust));
+    } else if (wallet.id === 'coinbase') {
+      specificConnector = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name === 'Coinbase Wallet' || (c.type === 'injected' && eth?.isCoinbaseWallet));
+    } else if (wallet.id === 'rainbow') {
+      specificConnector = connectors.find(c => c.id === 'me.rainbow' || c.name === 'Rainbow' || (c.type === 'injected' && eth?.isRainbow));
+    }
+
+    if (specificConnector) {
+      try {
+        connect({ connector: specificConnector }, {
+          onSuccess: () => { setIsConnecting(null); onClose(); },
+          onError: () => { setIsConnecting(null); }
+        });
+        return; // Success! Flow intercepted by extension.
+      } catch (err) { }
+    }
+
+    // 2. Fallback to WalletConnect / Deep Link
     const wcConnector = connectors.find(
       c => c.id === 'walletConnect' || c.name === 'WalletConnect' || c.id.toLowerCase().includes('walletconnect')
     );
@@ -162,6 +201,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
       onClose();
       return;
     }
+    
     try {
       const provider: any = await wcConnector.getProvider();
       let uriCaptured = false;
@@ -171,8 +211,17 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
         provider.removeListener?.('display_uri', onDisplayUri);
         window.location.href = buildWcDeepLink(wallet.id, uri);
       };
+      
+      if (provider.disconnect) {
+         try { await provider.disconnect(); } catch(e){}
+      }
       provider.on('display_uri', onDisplayUri);
-      connect({ connector: wcConnector });
+      
+      connect({ connector: wcConnector }, {
+         onSuccess: () => { setIsConnecting(null); onClose(); },
+         onError: () => { setIsConnecting(null); onClose(); }
+      });
+      
       setTimeout(() => {
         if (!uriCaptured) {
           provider.removeListener?.('display_uri', onDisplayUri);
@@ -181,7 +230,6 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
         }
         setIsConnecting(null);
       }, 5000);
-      onClose();
     } catch {
       window.location.href = buildDappBrowserLink(wallet.id, os);
       setTimeout(() => openStoreAsFallback(wallet.id), 3000);
@@ -193,57 +241,58 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[10000] flex items-end justify-center px-4 pb-12">
+        <div className="fixed inset-0 z-[10000] flex items-end justify-center px-4 pb-12 sm:items-center">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-[#050505]/60 backdrop-blur-md"
+            className="absolute inset-0 bg-[#000000]/10 backdrop-blur-[10px]"
           />
           <motion.div
-            initial={{ y: '100%', scale: 0.95 }}
+            initial={{ y: '100%', scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
-            exit={{ y: '100%', scale: 0.95 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-            className="w-full max-w-sm bg-white rounded-[3.5rem] p-8 relative z-10 shadow-2xl overflow-hidden"
+            exit={{ y: '100%', scale: 0.98 }}
+            transition={{ type: 'spring', damping: 32, stiffness: 280 }}
+            className="w-full max-w-[340px] bg-white rounded-[2.8rem] p-6 pt-10 relative z-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-black/5"
           >
-            <div className="flex flex-col items-center mb-8">
-              <div className="w-12 h-1 bg-black/5 rounded-full mb-8" />
-              <img src="/official-whale-monochrome.png" className="w-12 h-12 mb-4" alt="Whale" />
-              <h3 className="text-2xl font-black text-[#050505] tracking-tighter">Bóveda Criptográfica</h3>
-              <p className="text-[11px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] mt-2">Sincronización de Identidad</p>
+            <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 bg-[#FAF9F6] text-[#050505]/40 rounded-full flex items-center justify-center hover:text-black hover:bg-black/5 transition-colors">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+
+            <div className="flex flex-col items-center mb-9">
+              <div className="w-[60px] h-[60px] bg-white border border-black/[0.04] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)] rounded-full flex items-center justify-center mb-5">
+                <img src="/official-whale-monochrome.png" className="w-[30px] h-[30px]" alt="Whale" />
+              </div>
+              <h3 className="text-[20px] font-black text-[#050505] tracking-tight mb-1">Bóveda Criptográfica</h3>
+              <p className="text-[9px] text-[#050505]/40 font-black uppercase tracking-[0.16em]">Sincronización de Identidad</p>
             </div>
-            <div className="space-y-3">
-              {SUPPORTED_WALLETS.map((wallet) => {
+            
+            <div className="space-y-[14px]">
+              {WALLET_OPTIONS.map((wallet) => {
                 const busy = isConnecting === wallet.id;
                 return (
                   <button
                     key={wallet.id}
                     onClick={() => !isConnecting && handleWalletSelect(wallet)}
                     disabled={!!isConnecting}
-                    className={`w-full h-20 flex items-center justify-between px-6 bg-[#F9F8F4] border border-black/5 rounded-[2rem] transition-all group ${busy ? 'scale-[0.98] opacity-80' : 'active:scale-[0.98]'} disabled:cursor-not-allowed`}
+                    className={`w-full h-[68px] flex items-center justify-between px-5 bg-[#FAF9F6] border border-black/[0.04] rounded-[2rem] transition-all group ${busy ? 'scale-[0.98] opacity-80 border-indigo-500/20 shadow-sm' : 'hover:border-black/10 active:scale-[0.98]'} disabled:cursor-not-allowed`}
                   >
-                    <div className="flex items-center gap-5">
-                      <div className="w-10 h-10 flex items-center justify-center">
-                        {wallet.id === 'metamask'
-                          ? <img src={wallet.icon} className="w-full h-full object-contain" alt={wallet.name} />
-                          : <span className="text-2xl">{wallet.icon}</span>
-                        }
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-white rounded-[1rem] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center border border-black/[0.02]">
+                        <WalletIcon type={wallet.iconType} />
                       </div>
-                      <div className="text-left">
-                        <span className="font-black text-sm text-[#050505] uppercase tracking-widest block">{wallet.name}</span>
-                        <span className={`text-[9px] font-bold uppercase tracking-[0.1em] mt-0.5 block ${busy ? 'text-indigo-500 animate-pulse' : 'text-[#050505]/40'}`}>
-                          {busy ? 'Abriendo app...' : wallet.desc}
+                      <div className="text-left flex flex-col justify-center">
+                        <span className="font-black text-[12.5px] text-[#050505] tracking-widest">{wallet.name}</span>
+                        <span className={`text-[8px] font-black uppercase tracking-[0.12em] mt-[1px] ${busy ? 'text-indigo-500 animate-pulse' : 'text-[#050505]/30'}`}>
+                          {busy ? 'CONECTANDO...' : wallet.desc}
                         </span>
                       </div>
-                    </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${busy ? 'bg-indigo-500' : 'bg-white opacity-0 group-hover:opacity-100'}`}>
-                      {busy ? <RefreshCw size={14} className="text-white animate-spin" /> : <ChevronRight size={16} />}
                     </div>
                   </button>
                 );
               })}
             </div>
-            <button onClick={onClose} className="w-full mt-6 py-4 text-[10px] font-black text-[#050505]/30 uppercase tracking-[0.4em] active:opacity-60 transition-opacity">
+
+            <button onClick={onClose} className="w-full mt-7 py-3 mb-1 text-[9.5px] font-black text-[#050505]/25 uppercase tracking-[0.35em] active:opacity-50 transition-opacity">
               Cerrar Puerta
             </button>
           </motion.div>
@@ -377,39 +426,36 @@ function PagePhilosophy1() {
           MANIFIESTO TÉCNICO
         </p>
         <h2 className="text-[1.8rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505]">
-          Introducción y<br />Filosofía Arquitectónica
+          Infraestructura Institucional<br />de Datos
         </h2>
       </motion.div>
 
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
         <p>
-          Cuando me propuse construir nuestro sistema desde cero, mi objetivo no era crear una herramienta visualmente llamativa, sino resolver un problema fundamental de plomería digital: la asimetría en el acceso a los datos de las redes descentralizadas. La información financiera en su estado más puro fluye como un torrente constante, pero el usuario promedio solo recibe gotas filtradas y con retraso temporal.
+          En los mercados financieros, la diferencia entre el éxito y el fracaso a menudo se mide en fracciones de segundo. Históricamente, el acceso a la información pura de las redes descentralizadas ha sido un privilegio exclusivo de grandes instituciones, mientras que el usuario general recibe datos fragmentados y con retrasos.
         </p>
         <p>
-          En este documento, he querido documentar desde una perspectiva estrictamente técnica y académica cómo diseñé y estructuré el backend de nuestro ecosistema. No abordaré temas de interfaz gráfica o renderizado de cliente; el foco de este texto es el motor invisible que ingiere, limpia, procesa y distribuye la información. Lo he escrito con la humildad de quien sabe que no estamos inventando nuevas matemáticas, sino aplicando principios de ingeniería de sistemas de alto rendimiento para garantizar integridad absoluta en los datos.
+          Construimos nuestra plataforma para nivelar ese terreno de juego. Este documento detalla el funcionamiento interno de nuestro centro de operaciones: el "backend" o motor que impulsa todo nuestro sistema. No estamos hablando de ideas teóricas; estamos hablando de una infraestructura sólida y en producción que hoy mismo procesa, analiza y distribuye la realidad del mercado a velocidad institucional. Nuestra ingeniería trabaja de forma invisible para que ustedes puedan tomar decisiones impecables y con total seguridad.
         </p>
 
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          Fase I: La Ingestión de Datos y el Desafío del Tiempo Real
+          1. Conexión Directa en Tiempo Real
         </h3>
         <p>
-          El primer paradigma que tuve que enfrentar fue la naturaleza de la ingesta de datos. En las primeras iteraciones de nuestro servidor, implementé una arquitectura clásica de consultas por intervalos (rutinas de polling mediante peticiones HTTP) hacia proveedores de red públicos. El servidor despertaba cada cierto número de segundos, consultaba el estado de la red, y almacenaba el resultado.
+          El mayor error tecnológico de las plataformas financieras comunes es "preguntar" al mercado qué ha sucedido cada cierta cantidad de segundos. En el mundo institucional, recibir información que tiene cinco o diez segundos de antigüedad equivale a operar a ciegas.
         </p>
         <p>
-          Rápidamente me di cuenta de la severa limitación de este enfoque. El almacenamiento en caché (incluso el diseñado para ser efímero, con duraciones de 60 a 300 segundos) corrompía nuestra promesa de tiempo real. En un entorno donde las transacciones críticas ocurren en milisegundos, entregar un dato en caché equivale a entregar un dato falso.
-        </p>
-        <p>
-          Para solucionar esto, decidí rehacer el sistema de comunicaciones desde la base. Erradiqué por completo las dependencias de consultas estáticas y migré la arquitectura hacia conexiones de red persistentes y bidireccionales (WebSockets) directamente conectadas a los nodos de ejecución. En lugar de "preguntar" cuál era el estado del mercado, nuestro servidor pasó a "escuchar" pasivamente el flujo continuo de eventos. Esto requirió reescribir nuestros manejadores de memoria para asegurar que el torrente masivo de datos entrantes no provocara desbordamientos de memoria (memory leaks) en nuestros servidores. Para mantener la resiliencia de la conexión sin inundar el servidor frente a caídas de red, implementé un algoritmo de reconexión exponencial (Exponential Backoff). El tiempo de espera para restablecer la ingesta se rige por la función matemática del logaritmo de escala:
+          Por eso, la arquitectura de nuestro sistema opera de forma diametralmente opuesta: nosotros "escuchamos" al mercado permanentemente. Mantenemos canales directos y persistentes con las redes financieras. Cada operación ingresa a nuestro sistema en el instante exacto en que ocurre. Además, dado que el internet global puede ser impredecible, integramos de manera nativa un sistema lógico de reconexión inteligente que asegura que nuestro flujo de conexión se estabilice en milisegundos sin sobrecargar nuestros servidores:
         </p>
 
         <img 
-          src="https://latex.codecogs.com/svg.latex?\color{Black}T_{wait}=\min(T_{max},T_{base}\times2^n)" 
+          src="/f_backoff.svg" 
           alt="Exponential Backoff Formula" 
           className={formulaImgStyle}
         />
 
         <p>
-          Donde <span className="font-serif italic font-bold">n</span> es el número de intentos fallidos. Esto garantiza una estabilización geométrica y predecible de la carga en nuestro backend durante periodos críticos de desconexión masiva.
+          El resultado es un flujo de información continuo e implacable.
         </p>
       </div>
 
@@ -426,39 +472,33 @@ function PagePhilosophy2() {
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] text-[#050505] border-b border-black/10 pb-2">
-          Fase II: El Motor de Enrutamiento y Filtrado
+          2. El Radar Inteligente
         </h3>
         <p>
-          Tener acceso al flujo de datos en crudo (raw data) generó un problema secundario: el ruido. La red descentralizada procesa miles de transacciones por segundo, pero el 99% de ellas carecen de relevancia macro-direccional.
+          Capturar miles de transacciones por segundo carece de valor si no sabemos interpretarlas. Una inmensa mayoría de estos movimientos no tienen la fuerza suficiente para cambiar la dirección del mercado.
         </p>
         <p>
-          Para extraer el verdadero valor de estos datos, desarrollé un motor de análisis heurístico al que llamo nuestro enrutador interno. Este motor funciona como un embudo de alta eficiencia en la capa del servidor. Construí algoritmos de evaluación de un solo paso (single-pass algorithms) que leen la carga útil de cada transacción a medida que entra en la memoria de nuestro servidor. El motor evalúa el volumen de activos transferidos contra umbrales dinámicos preestablecidos. En lugar de basarnos en cifras planas estáticas, el filtro emplea una función estadística de anomalías basada en el Z-Score matemático para aislar transferencias masivas en la red:
+          Para solucionar este desafío, desarrollamos lo que internamente llamamos un "radar automático". A medida que los datos entran al servidor a gran velocidad, el motor los analiza al vuelo. En lugar de utilizar métricas rígidas, empleamos un modelo estadístico dinámico: comparamos el tamaño de cada transacción entrante con el comportamiento habitual del mercado en ese momento específico:
         </p>
 
         <img 
-          src="https://latex.codecogs.com/svg.latex?\color{Black}Z=\frac{X-\mu}{\sigma}" 
+          src="/f_zscore.svg" 
           alt="Z-Score Formula" 
           className={formulaImgStyle}
         />
 
         <p>
-          Siendo <span className="font-serif italic font-bold">X</span> el volumen de la transacción entrante, <span className="font-serif italic font-bold">μ</span> la media exponencial móvil del volumen transaccional de la red en esa ventana temporal, y <span className="font-serif italic font-bold">σ</span> su desviación estándar calculada. Solamente si la condición resolutiva arroja un resultado algorítmico de <span className="font-serif italic font-bold">Z {'>'} 3</span>, la transacción se clasifica matemáticamente como altamente anómala (una "cartera mayor").
-        </p>
-        <p>
-          Si una transacción no cumple estrictamente con este perfil matemático, nuestro servidor la descarta de la memoria inmediatamente antes de que consuma ciclos de procesamiento adicionales. Esto garantiza que lo que finalmente se emite hacia nuestros canales de distribución es únicamente el flujo filtrado de alta relevancia, optimizando drásticamente el uso de ancho de banda y capacidad de cómputo.
+          Si el sistema detecta una anomalía matemática de volumen —una transferencia masiva de capital—, la clasifica inmediatamente como un movimiento de gran relevancia (una "ballena"). Si, por el contrario, la transacción no representa un impacto real, el servidor la descarta al instante. Este descarte agresivo nos permite entregar a nuestros usuarios y clientes únicamente la información de alto valor estratégico, maximizando nuestra velocidad de respuesta.
         </p>
 
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          Fase III: La Erradicación Total de la Memoria Caché y Datos Simulados
+          3. Cero Datos Simulados
         </h3>
         <p>
-          A medida que el ecosistema crecía, expandí el backend para manejar la agregación de métricas complejas, como el interés abierto y las tasas de financiamiento de los mercados derivados. En el desarrollo tradicional de servidores, es una práctica común establecer mecanismos de contingencia o amortiguación (valores por defecto) por si el origen de los datos falla. En etapas tempranas, si uno de nuestros nodos perdía conexión, el servidor devolvía el último precio conocido o un valor estático de preservación temporal para evitar errores en las operaciones secundarias.
+          Cuando el capital está en juego, no hay lugar para estimaciones. Gran parte del software tradicional, cuando experimenta un leve fallo de conexión, muestra datos guardados previamente o precios "estimados" temporales para mantener la ilusión de que todo funciona con normalidad. Nosotros consideramos esta práctica inaceptable.
         </p>
         <p>
-          Llegué a la conclusión analítica de que esta práctica, aunque estándar en la industria web tradicional, era éticamente técnica inaceptable para nuestro propósito. Rediseñé el núcleo de nuestros servicios de precios e indexación y configuré las cabeceras de infraestructura para forzar una política estricta de "Cero Almacenamiento Estático" (cache: 'no-store').
-        </p>
-        <p>
-          Adicionalmente, eliminé cualquier valor condicional de respaldo en el código. Si nuestro backend experimenta una disrupción en la lectura de un bloque o en la consulta de un mercado específico, el sistema está programado para reportar la ausencia del dato antes que enviar información artificial o envejecida. Esta transparencia estructural fue fundamental para cimentar la integridad de la base de datos de nuestro ecosistema.
+          Nuestra infraestructura opera bajo una estricta política de transparencia innegociable. Si la información del mercado derivado no está disponible en este mismo segundo, el sistema está programado para informarle, sin excusas, de que el dato está temporalmente ausente. Jamás mostraremos un cálculo antiguo ni una estimación disfrazada de verdad. Esta sinceridad técnica nos garantiza que cada cifra proyectada en nuestras plataformas sea genuina, auditable y completamente real.
         </p>
       </div>
 
@@ -475,59 +515,53 @@ function PagePhilosophy3() {
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] text-[#050505] border-b border-black/10 pb-2">
-          Fase IV: Sincronización de Identidad y Autenticación Segura
+          4. Privacidad Soberana
         </h3>
         <p>
-          Otro pilar complejo de nuestra arquitectura de servidor fue la gestión de sesiones de usuario sin comprometer la filosofía descentralizada de nuestro proyecto. Necesitábamos un mecanismo para enlazar procesos de computación sin requerir bases de datos relacionales tradicionales llenas de correos electrónicos y contraseñas.
+          Garantizar la seguridad de nuestros usuarios sin comprometer su identidad fue un requisito incuestionable de nuestro diseño. Las bases de datos tradicionales, vulnerables y cargadas de correos y contraseñas, son puntos de riesgo y asimetría.
         </p>
         <p>
-          Para ello, diseñé las rutas de autenticación de nuestra interfaz de programación de aplicaciones (API) basándome en sincronizaciones criptográficas transitorias. Construí un protocolo de enlace soberano (Handshake) en el que el servidor genera identificadores únicos universales vinculados estadísticamente a una firma criptográfica temporal.
-        </p>
-        <p>
-           Cuando el sistema debe sincronizar el acceso entre dos puntos, el backend orquesta una validación de mensajes firmados criptográficamente. El servidor recibe un token efímero y una firma digital de la red, y ejecuta la verificación matemática del Algoritmo de Firma Digital de Curva Elíptica (ECDSA):
+          Nuestra solución evita almacenar identidades personales. Cuando usted se conecta, el sistema ejecuta un proceso matemático de validación avanzado —un "apretón de manos digital"— entre su billetera criptográfica y nuestros servidores. Mediante una firma criptográfica, el sistema confirma la legitimidad de la conexión:
         </p>
 
         <img 
-          src="https://latex.codecogs.com/svg.latex?\color{Black}V=\text{Verify}(m,S,Q_{pub})" 
+          src="/f_ecdsa.svg" 
           alt="ECDSA Verification Formula" 
           className={formulaImgStyle}
         />
 
         <p>
-          Donde <span className="font-serif italic font-bold">m</span> es el mensaje original, <span className="font-serif italic font-bold">S</span> es la firma computada por la billetera en la red, y <span className="font-serif italic font-bold">Q_pub</span> representa la clave pública criptográfica subyacente. Únicamente si la ecuación resuelve en <span className="font-serif italic font-bold">V = True</span>, el servidor inscribe la autenticidad del canal de distribución e inyecta inmediatamente una cookie de sesión securizada y firmada a nivel de cabecera HTTP-Only. En ningún momento nuestro servidor almacena claves privadas ni información de identificación permanente; el estado de la sesión reside puramente en la validación transitoria de la prueba probabilística.
+          Esto establece una sesión altamente blindada sin llegar a saber jamás quién es usted. No acumulamos secretos de usuarios ni identidades almacenadas. Toda la seguridad y el control permanecen siempre de su lado.
         </p>
 
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          Fase V: Agregación de Mercados Fractales
+          5. Consolidación de Mercados Fractales
         </h3>
         <p>
-          Finalmente, la arquitectura del servidor tenía que lidiar con la fragmentación logística. La información que proporcionamos no proviene de un solo entorno cerrado, sino que está esparcida a lo largo de una miríada de redes de contratos inteligentes y protocolos subyacentes.
+          El capital macro se distribuye a lo largo de docenas de mercados en paralelo. Presentar información de ecosistemas financieros diferentes y fragmentados suponía nuestro mayor desafío logístico de distribución, puesto que procesarlos uno a uno sería demasiado lento.
         </p>
         <p>
-          Para solucionar esto, estructuré servicios de enrutamiento asíncrono. En lugar de procesar consultas secuenciales (esperar a que responda el protocolo A para luego consultar el protocolo B), el motor ejecuta llamadas concurrentes a través de múltiples hilos lógicos en el servidor. El backend recopila las respuestas fragmentadas, las estandariza mediante interfaces estrictamente tipadas (asegurando que los volúmenes, los intereses abiertos y los márgenes mantengan la misma unidad de precisión decimal).
-        </p>
-        <p>
-          El emparejamiento interno de este flujo de consolidación dentro del servidor se resuelve empleando la inserción matemática vectorial sobre nuestra memoria estructural, logrando resolver el cálculo en una complejidad puramente logarítmica para grandes conjuntos de datos de red asíncrona:
+          Lo solucionamos empleando una arquitectura de sincronización múltiple. Nuestro servidor recauda información lanzando peticiones hacia todas las redes descentralizadas distintas al mismo tiempo, en paralelo. Al recibir las respuestas, las unifica, corrige los decimales para que todos los números hablen el mismo lenguaje y logrando resolver el cálculo en una complejidad ultra eficiente:
         </p>
 
         <img 
-          src="https://latex.codecogs.com/svg.latex?\color{Black}\mathcal{O}(\log%20n)" 
+          src="/f_log.svg" 
           alt="Logarithmic Time Complexity Formula" 
           className={formulaImgStyle}
         />
 
         <p>
-          Al garantizar la inserción en tiempo logarítmico <span className="font-serif italic font-bold">O(log n)</span> en lugar de lineal <span className="font-serif italic font-bold">O(n)</span>, el modelo condensa eficientemente millones de variables en un solo objeto de respuesta multidimensional para finalmente emitirlo a través de nuestro torrente principal de distribución sin latencia teórica en el backend.
+          Toda esa complejidad ocurre a una velocidad extrema para enviarla sin latencia a las pantallas de los inversores como un mapa consolidado y fácil de operar.
         </p>
 
         <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
           Conclusión
         </h3>
         <p>
-          La arquitectura del backend de nuestro sistema no se apoya en magia tecnológica ni afirmaciones grandilocuentes. Es, puramente, el ejercicio disciplinado del manejo óptimo de los datos.
+          La creación de los cimientos de nuestra empresa no se basa en promesas futuristas, sino en la aplicación estricta de principios de ingeniería y negocios de altísimo rendimiento. Hemos eliminado latencias innecesarias, suposiciones de código y prácticas inseguras, condensando todo nuestro esfuerzo técnico para enfocarnos en lo que realmente importa.
         </p>
         <p>
-          He construido este servidor con un enfoque minimalista y de alto rendimiento, removiendo barreras artificiales como memorias cachés perezosas y dependencias de consultas estáticas. Al consolidar conexiones de red en tiempo real, limpieza algorítmica de memoria, y validaciones matemáticas puras para el control de sesiones, he logrado ensamblar una infraestructura robusta. Nuestro servidor se dedica únicamente a escuchar, filtrar con precisión absoluta, y proveer la realidad cruda de la red en fracciones de segundo. Ese es nuestro verdadero logro técnico: hacer que el procesamiento invisible sea tan eficiente que los datos parezcan nacer directamente del usuario.
+          Este servidor está construido pura y duramente para hacer su trabajo a la perfección: escuchar al mercado financiero mundial sin pestañear, filtrar el ruido con disciplina militar y entregar la información en milisegundos. Nuestro mayor logro tecnológico en esta fase de producción constante es lograr que esa inmensa infraestructura sea completamente invisible para usted. Usted solo ve el mercado; puro, dinámico y listo para el análisis, desde el primer segundo.
         </p>
 
         {/* DOWNHEAD / PREMIUM FOOTER */}
