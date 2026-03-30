@@ -19,6 +19,7 @@ import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
 import { CinematicWhaleLogo } from './CinematicWhaleLogo';
+import { LiveTerminalWidgets } from './LiveTerminalWidgets';
 
 // ─── DEEP LINK HELPERS ───────────────────────────────────────────────────────
 
@@ -363,46 +364,75 @@ function PageHero({
 
 const PILLARS = [
   {
+    type: 'ORDER_BOOK' as const,
     icon: <Activity size={14} className="text-[#050505]/50" />,
     title: 'ORDER BOOK',
     subtitle: 'Motor LOB — Limit Order Book',
-    nature: 'Estructura de árbol binario de búsqueda (B-Trees / Red-Black Trees) diseñada para emparejamiento de liquidez de tiempo constante O(log n).',
-    desc: 'Un mapa tridimensional de la profundidad de liquidez y la psique matemática del mercado. Muestra vectores de órdenes estáticas (resting orders), márgenes de slippage y el diferencial dinámico (spread bid/ask) ajustado en tiempo real.',
-    use: 'Análisis de microestructura de mercado, Liquidity Walls, Spoofing, Market Impact milimétrico.',
+    nature: 'Estructura de árbol binario de búsqueda diseñada para emparejamiento de liquidez de tiempo constante O(log n).',
+    desc: 'Un mapa tridimensional de la profundidad de liquidez. Vectores de órdenes estáticas, márgenes de slippage y bid/ask.',
+    use: 'Liquidity Walls, Spoofing, Market Impact.',
   },
   {
+    type: 'WHALE_FLOW' as const,
     icon: <Eye size={14} className="text-[#050505]/50" />,
     title: 'WHALE FLOW',
-    subtitle: 'Heurística de Red y Análisis Mempool',
-    nature: 'Motor de indexación asíncrona profunda acoplado directamente a nodos RPC/WSS. Emplea clustering algorítmico y filtros bayesianos para descartar el ruido minorista.',
-    desc: 'Un decodificador heurístico de la Mempool y de las ejecuciones on-chain. Filtra anomalías estadísticas (donde el volumen V > μ + 3σ) para aislar transacciones de alta capitalización. Analiza la huella de los Smart Contracts, desentramando ruteadores de DEX agregados, Multi-Sigs y puentes.',
+    subtitle: 'Heurística de Red',
+    nature: 'Motor de indexación acoplado a RPC. Emplea clustering algorítmico y filtros bayesianos.',
+    desc: 'Decodificador heurístico de la Mempool. Filtra anomalías (volumen V > μ + 3σ) aislando transferencias masivas.',
     use: 'Alpha Predictivo.',
   },
   {
+    type: 'MARKETS' as const,
     icon: <Zap size={14} className="text-[#050505]/50" />,
     title: 'MARKETS AVAILABLE',
-    subtitle: 'Matriz de Topología y Fragmentación Activa',
-    nature: 'Base de datos relacional de indexación distribuida (Graph Protocol state) que mapea en tiempo dual los metadatos y la fragmentación de liquidez.',
-    desc: 'Una matriz de exposición multidimensional con Open Interest (OI), Funding Rates, Volumen en 24h, y el desvío estándar de liquidez entre distintas Rollups.',
+    subtitle: 'Fragmentación Activa',
+    nature: 'Base de datos relacional distribuida que mapea metadatos y fragmentación de liquidez.',
+    desc: 'Matriz multidimensional con Open Interest, Funding Rates y volumen.',
     use: 'Cross-Chain Omniscience.',
   },
   {
+    type: 'COPY_TRADING' as const,
     icon: <Shield size={14} className="text-[#050505]/50" />,
     title: 'COPY TRADING',
-    subtitle: 'Replicación Simétrica de Calldata',
-    nature: 'Arquitectura basada en Intenciones (Intents) y emulación Account Abstraction (ERC-4337).',
-    desc: 'Expropiación lícita de ventajas algorítmicas institucionales.',
-    use: 'Democratización asimétrica de estrategias algorítmicas de grado industrial.',
+    subtitle: 'Replicación Simétrica',
+    nature: 'Arquitectura basada en Intenciones (Intents) y emulación Account Abstraction.',
+    desc: 'Expropiación lícita de ventajas institucionales.',
+    use: 'Democratización asimétrica de estrategias.',
   },
 ];
 
 function PageEcosystem() {
-  return (
-    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-6 pt-16 pb-10 overflow-y-auto msv-hide-scrollbar relative">
-      
-      {/* Background ambient noise/dots already handled by AnimatedPattern globally, 
-          so it naturally flows here as the background is #FAF9F6 */}
+  const containerRef = useRef<HTMLDivElement>(null);
+  const workerRef = useRef<Worker | null>(null);
 
+  useEffect(() => {
+    // Isolated Worker Init for extreme performance
+    workerRef.current = new Worker(new URL('/workers/terminal-core.js', window.location.origin));
+    
+    // Intersection Observer to connect WS only when visible
+    const observer = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+            console.log('[Terminal] Taxonomía visible. Booting Web Worker WS...');
+            workerRef.current?.postMessage({ cmd: 'START' });
+        } else {
+            console.log('[Terminal] Taxonomía oculta. Severing WS feed...');
+            workerRef.current?.postMessage({ cmd: 'STOP' });
+        }
+    }, { threshold: 0.1 });
+
+    if (containerRef.current) observer.observe(containerRef.current);
+
+    return () => {
+        observer.disconnect();
+        workerRef.current?.terminate();
+        workerRef.current = null;
+    };
+  }, []);
+
+  return (
+    <div id="taxonomia-cientifica" ref={containerRef} className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-6 pt-16 pb-10 overflow-y-auto msv-hide-scrollbar relative">
+      
       {/* HEADER */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -417,12 +447,12 @@ function PageEcosystem() {
           Infraestructura<br />Terminal
         </h2>
         <p className="text-[10px] text-[#050505]/40 mt-4 leading-relaxed max-w-[320px] font-medium border-l-[1.5px] border-[#050505]/10 pl-3">
-          Cuatro pilares algorítmicos que estructuran la representación asíncrona de datos transaccionales en tiempo real. Todas las capas operan en Isolated Web Workers.
+          Cuatro pilares algorítmicos que estructuran la representación de datos en tiempo real. Streams delegados a Isolated Web Workers.
         </p>
       </motion.div>
 
-      {/* PILLARS RAW TEXT */}
-      <div className="flex flex-col gap-8">
+      {/* PILLARS RAW TEXT + WIDGETS */}
+      <div className="flex flex-col gap-10">
         {PILLARS.map((p, i) => (
           <motion.div
             key={p.title}
@@ -442,23 +472,23 @@ function PageEcosystem() {
               </div>
             </div>
 
-            {/* Nature algorítmica */}
-            <p className="text-[9px] text-[#050505]/60 leading-[1.6] mb-3 font-medium">
+            {/* Texts */}
+            <p className="text-[9px] text-[#050505]/60 leading-[1.6] mb-2 font-medium">
               <span className="font-black text-[#050505]/80 uppercase tracking-wider text-[8.5px]">Naturaleza: </span>
               {p.nature}
             </p>
-
-            {/* Qué estamos viendo */}
-            <p className="text-[9px] text-[#050505]/60 leading-[1.6] mb-4 font-medium">
+            <p className="text-[9px] text-[#050505]/60 leading-[1.6] mb-3 font-medium">
               <span className="font-black text-[#050505]/80 uppercase tracking-wider text-[8.5px]">Realidad: </span>
               {p.desc}
             </p>
 
-            {/* Servibilidad tag */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#050505]/5 rounded-sm">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#050505]/5 rounded-sm mb-4">
               <div className="w-1.5 h-1.5 rounded-full bg-[#050505]/30 animate-pulse" />
               <p className="text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/60">{p.use}</p>
             </div>
+
+            {/* LIVE WIDGET */}
+            <LiveTerminalWidgets type={p.type} workerRef={workerRef} />
           </motion.div>
         ))}
       </div>
