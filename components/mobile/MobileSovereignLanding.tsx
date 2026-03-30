@@ -362,130 +362,190 @@ function PageHero({
 
 // ─── PAGE 2 · ECOSYSTEM TAXONOMY ─────────────────────────────────────────────
 
-const PILLARS = [
-  {
-    type: 'WHALE_FLOW' as const,
-    icon: <Eye size={14} className="text-[#050505]/50" />,
-    title: 'RASTREO INSTITUCIONAL',
-    subtitle: 'Movimientos de grandes carteras',
-    desc: 'Monitoreamos la blockchain en tiempo real para detectar transferencias masivas. Observa exactamente cuándo y dónde los fondos de inversión mueven su capital.',
-  },
-  {
-    type: 'MARKETS' as const,
-    icon: <Zap size={14} className="text-[#050505]/50" />,
-    title: 'MÉTRICAS DEL MERCADO',
-    subtitle: 'El pulso del ecosistema',
-    desc: 'Agregamos los datos más importantes de múltiples plataformas. Visualiza el interés financiero y el apalancamiento oculto de forma clara.',
-  },
-  {
-    type: 'ORDER_BOOK' as const,
-    icon: <Activity size={14} className="text-[#050505]/50" />,
-    title: 'MAPA DE LIQUIDEZ',
-    subtitle: 'Profundidad en vivo',
-    desc: 'Leemos los libros de compras y ventas globales sin retrasos. Identifica muros de soporte y resistencia antes de que el precio llegue a ellos.',
-  },
-  {
-    type: 'COPY_TRADING' as const,
-    icon: <Shield size={14} className="text-[#050505]/50" />,
-    title: 'INTELIGENCIA DE ÉLITE',
-    subtitle: 'Replicación tecnológica',
-    desc: 'Analizamos la red para detectar y mostrarte las ejecuciones exactas de los traders institucionales más rentables en milisegundos.',
-  },
-];
+const formulaImgStyle = "h-8 mx-auto my-6 opacity-80 mix-blend-multiply drop-shadow-sm";
 
-function PageEcosystem() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const workerRef = useRef<Worker | null>(null);
-
-  useEffect(() => {
-    // Isolated Worker Init for extreme performance
-    workerRef.current = new Worker(new URL('/workers/terminal-core.js', window.location.origin));
-    
-    // Intersection Observer to connect WS only when visible
-    const observer = new IntersectionObserver((entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting) {
-            console.log('[Terminal] Taxonomía visible. Booting Web Worker WS...');
-            workerRef.current?.postMessage({ cmd: 'START' });
-        } else {
-            console.log('[Terminal] Taxonomía oculta. Severing WS feed...');
-            workerRef.current?.postMessage({ cmd: 'STOP' });
-        }
-    }, { threshold: 0.1 });
-
-    if (containerRef.current) observer.observe(containerRef.current);
-
-    return () => {
-        observer.disconnect();
-        workerRef.current?.terminate();
-        workerRef.current = null;
-    };
-  }, []);
-
+function PagePhilosophy1() {
   return (
-    <div id="taxonomia-cientifica" ref={containerRef} className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-6 pt-16 pb-10 overflow-y-auto msv-hide-scrollbar relative">
-      
-      {/* HEADER */}
+    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-10"
+        className="mb-8"
       >
-        <p className="text-[9px] font-black uppercase tracking-[0.35em] text-[#050505]/30 mb-2">
-          WHALE ECOSYSTEM
+        <p className="text-[9px] font-black uppercase tracking-[0.35em] text-[#050505]/40 mb-2">
+          MANIFIESTO TÉCNICO
         </p>
         <h2 className="text-[1.8rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505]">
-          Nuestra<br />Visión
+          Introducción y<br />Filosofía Arquitectónica
         </h2>
-        <p className="text-[10px] text-[#050505]/40 mt-4 leading-relaxed max-w-[320px] font-medium border-l-[1.5px] border-[#050505]/10 pl-3">
-          Democratizamos el acceso a la información que mueve el mercado. Te ofrecemos las mismas herramientas y datos que utilizan las instituciones a puerta cerrada. 
-          <br /><br />
-          Síguenos en X (Twitter): <span className="font-bold text-[#050505]">@whaleecosystem</span>
-        </p>
       </motion.div>
 
-      {/* PILLARS RAW TEXT + WIDGETS */}
-      <div className="flex flex-col gap-10">
-        {PILLARS.map((p, i) => (
-          <motion.div
-            key={p.title}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-            className="pb-8 border-b border-[#050505]/10 last:border-0 last:pb-0 relative"
-          >
-            {/* Title row */}
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-6 h-6 rounded-full bg-[#050505]/5 flex items-center justify-center">
-                {p.icon}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.18em] leading-none text-[#050505]">{p.title}</h3>
-                <p className="text-[8px] text-[#050505]/40 font-bold uppercase tracking-[0.15em] mt-1">{p.subtitle}</p>
-              </div>
-            </div>
+      <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
+        <p>
+          Cuando me propuse construir nuestro sistema desde cero, mi objetivo no era crear una herramienta visualmente llamativa, sino resolver un problema fundamental de plomería digital: la asimetría en el acceso a los datos de las redes descentralizadas. La información financiera en su estado más puro fluye como un torrente constante, pero el usuario promedio solo recibe gotas filtradas y con retraso temporal.
+        </p>
+        <p>
+          En este documento, he querido documentar desde una perspectiva estrictamente técnica y académica cómo diseñé y estructuré el backend de nuestro ecosistema. No abordaré temas de interfaz gráfica o renderizado de cliente; el foco de este texto es el motor invisible que ingiere, limpia, procesa y distribuye la información. Lo he escrito con la humildad de quien sabe que no estamos inventando nuevas matemáticas, sino aplicando principios de ingeniería de sistemas de alto rendimiento para garantizar integridad absoluta en los datos.
+        </p>
 
-            {/* Texts */}
-            <p className="text-[10px] text-[#050505]/60 leading-[1.6] mb-4 font-medium">
-              {p.desc}
-            </p>
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
+          Fase I: La Ingestión de Datos y el Desafío del Tiempo Real
+        </h3>
+        <p>
+          El primer paradigma que tuve que enfrentar fue la naturaleza de la ingesta de datos. En las primeras iteraciones de nuestro servidor, implementé una arquitectura clásica de consultas por intervalos (rutinas de polling mediante peticiones HTTP) hacia proveedores de red públicos. El servidor despertaba cada cierto número de segundos, consultaba el estado de la red, y almacenaba el resultado.
+        </p>
+        <p>
+          Rápidamente me di cuenta de la severa limitación de este enfoque. El almacenamiento en caché (incluso el diseñado para ser efímero, con duraciones de 60 a 300 segundos) corrompía nuestra promesa de tiempo real. En un entorno donde las transacciones críticas ocurren en milisegundos, entregar un dato en caché equivale a entregar un dato falso.
+        </p>
+        <p>
+          Para solucionar esto, decidí rehacer el sistema de comunicaciones desde la base. Erradiqué por completo las dependencias de consultas estáticas y migré la arquitectura hacia conexiones de red persistentes y bidireccionales (WebSockets) directamente conectadas a los nodos de ejecución. En lugar de "preguntar" cuál era el estado del mercado, nuestro servidor pasó a "escuchar" pasivamente el flujo continuo de eventos. Esto requirió reescribir nuestros manejadores de memoria para asegurar que el torrente masivo de datos entrantes no provocara desbordamientos de memoria (memory leaks) en nuestros servidores. Para mantener la resiliencia de la conexión sin inundar el servidor frente a caídas de red, implementé un algoritmo de reconexión exponencial (Exponential Backoff). El tiempo de espera para restablecer la ingesta se rige por la función matemática del logaritmo de escala:
+        </p>
 
-            {/* LIVE WIDGET */}
-            <LiveTerminalWidgets type={p.type} workerRef={workerRef} />
-          </motion.div>
-        ))}
+        <img 
+          src="https://latex.codecogs.com/svg.latex?\color{Black}T_{wait}=\min(T_{max},T_{base}\times2^n)" 
+          alt="Exponential Backoff Formula" 
+          className={formulaImgStyle}
+        />
+
+        <p>
+          Donde <span className="font-serif italic font-bold">n</span> es el número de intentos fallidos. Esto garantiza una estabilización geométrica y predecible de la carga en nuestro backend durante periodos críticos de desconexión masiva.
+        </p>
       </div>
 
-      {/* SCROLL HINT */}
-      <motion.div
-        className="flex flex-col items-center gap-1 mt-12 mb-4 opacity-20"
-        animate={{ y: [0, 4, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <span className="text-[9px] font-black uppercase tracking-[0.3em]">CONECTAR</span>
-        <ChevronDown size={14} />
+      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">CONTINUAR</span>
+        <ChevronDown size={14} className="text-[#050505]" />
       </motion.div>
+    </div>
+  );
+}
+
+function PagePhilosophy2() {
+  return (
+    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
+      <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] text-[#050505] border-b border-black/10 pb-2">
+          Fase II: El Motor de Enrutamiento y Filtrado
+        </h3>
+        <p>
+          Tener acceso al flujo de datos en crudo (raw data) generó un problema secundario: el ruido. La red descentralizada procesa miles de transacciones por segundo, pero el 99% de ellas carecen de relevancia macro-direccional.
+        </p>
+        <p>
+          Para extraer el verdadero valor de estos datos, desarrollé un motor de análisis heurístico al que llamo nuestro enrutador interno. Este motor funciona como un embudo de alta eficiencia en la capa del servidor. Construí algoritmos de evaluación de un solo paso (single-pass algorithms) que leen la carga útil de cada transacción a medida que entra en la memoria de nuestro servidor. El motor evalúa el volumen de activos transferidos contra umbrales dinámicos preestablecidos. En lugar de basarnos en cifras planas estáticas, el filtro emplea una función estadística de anomalías basada en el Z-Score matemático para aislar transferencias masivas en la red:
+        </p>
+
+        <img 
+          src="https://latex.codecogs.com/svg.latex?\color{Black}Z=\frac{X-\mu}{\sigma}" 
+          alt="Z-Score Formula" 
+          className={formulaImgStyle}
+        />
+
+        <p>
+          Siendo <span className="font-serif italic font-bold">X</span> el volumen de la transacción entrante, <span className="font-serif italic font-bold">μ</span> la media exponencial móvil del volumen transaccional de la red en esa ventana temporal, y <span className="font-serif italic font-bold">σ</span> su desviación estándar calculada. Solamente si la condición resolutiva arroja un resultado algorítmico de <span className="font-serif italic font-bold">Z {'>'} 3</span>, la transacción se clasifica matemáticamente como altamente anómala (una "cartera mayor").
+        </p>
+        <p>
+          Si una transacción no cumple estrictamente con este perfil matemático, nuestro servidor la descarta de la memoria inmediatamente antes de que consuma ciclos de procesamiento adicionales. Esto garantiza que lo que finalmente se emite hacia nuestros canales de distribución es únicamente el flujo filtrado de alta relevancia, optimizando drásticamente el uso de ancho de banda y capacidad de cómputo.
+        </p>
+
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
+          Fase III: La Erradicación Total de la Memoria Caché y Datos Simulados
+        </h3>
+        <p>
+          A medida que el ecosistema crecía, expandí el backend para manejar la agregación de métricas complejas, como el interés abierto y las tasas de financiamiento de los mercados derivados. En el desarrollo tradicional de servidores, es una práctica común establecer mecanismos de contingencia o amortiguación (valores por defecto) por si el origen de los datos falla. En etapas tempranas, si uno de nuestros nodos perdía conexión, el servidor devolvía el último precio conocido o un valor estático de preservación temporal para evitar errores en las operaciones secundarias.
+        </p>
+        <p>
+          Llegué a la conclusión analítica de que esta práctica, aunque estándar en la industria web tradicional, era éticamente técnica inaceptable para nuestro propósito. Rediseñé el núcleo de nuestros servicios de precios e indexación y configuré las cabeceras de infraestructura para forzar una política estricta de "Cero Almacenamiento Estático" (cache: 'no-store').
+        </p>
+        <p>
+          Adicionalmente, eliminé cualquier valor condicional de respaldo en el código. Si nuestro backend experimenta una disrupción en la lectura de un bloque o en la consulta de un mercado específico, el sistema está programado para reportar la ausencia del dato antes que enviar información artificial o envejecida. Esta transparencia estructural fue fundamental para cimentar la integridad de la base de datos de nuestro ecosistema.
+        </p>
+      </div>
+
+      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">CONTINUAR</span>
+        <ChevronDown size={14} className="text-[#050505]" />
+      </motion.div>
+    </div>
+  );
+}
+
+function PagePhilosophy3() {
+  return (
+    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
+      <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] text-[#050505] border-b border-black/10 pb-2">
+          Fase IV: Sincronización de Identidad y Autenticación Segura
+        </h3>
+        <p>
+          Otro pilar complejo de nuestra arquitectura de servidor fue la gestión de sesiones de usuario sin comprometer la filosofía descentralizada de nuestro proyecto. Necesitábamos un mecanismo para enlazar procesos de computación sin requerir bases de datos relacionales tradicionales llenas de correos electrónicos y contraseñas.
+        </p>
+        <p>
+          Para ello, diseñé las rutas de autenticación de nuestra interfaz de programación de aplicaciones (API) basándome en sincronizaciones criptográficas transitorias. Construí un protocolo de enlace soberano (Handshake) en el que el servidor genera identificadores únicos universales vinculados estadísticamente a una firma criptográfica temporal.
+        </p>
+        <p>
+           Cuando el sistema debe sincronizar el acceso entre dos puntos, el backend orquesta una validación de mensajes firmados criptográficamente. El servidor recibe un token efímero y una firma digital de la red, y ejecuta la verificación matemática del Algoritmo de Firma Digital de Curva Elíptica (ECDSA):
+        </p>
+
+        <img 
+          src="https://latex.codecogs.com/svg.latex?\color{Black}V=\text{Verify}(m,S,Q_{pub})" 
+          alt="ECDSA Verification Formula" 
+          className={formulaImgStyle}
+        />
+
+        <p>
+          Donde <span className="font-serif italic font-bold">m</span> es el mensaje original, <span className="font-serif italic font-bold">S</span> es la firma computada por la billetera en la red, y <span className="font-serif italic font-bold">Q_pub</span> representa la clave pública criptográfica subyacente. Únicamente si la ecuación resuelve en <span className="font-serif italic font-bold">V = True</span>, el servidor inscribe la autenticidad del canal de distribución e inyecta inmediatamente una cookie de sesión securizada y firmada a nivel de cabecera HTTP-Only. En ningún momento nuestro servidor almacena claves privadas ni información de identificación permanente; el estado de la sesión reside puramente en la validación transitoria de la prueba probabilística.
+        </p>
+
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
+          Fase V: Agregación de Mercados Fractales
+        </h3>
+        <p>
+          Finalmente, la arquitectura del servidor tenía que lidiar con la fragmentación logística. La información que proporcionamos no proviene de un solo entorno cerrado, sino que está esparcida a lo largo de una miríada de redes de contratos inteligentes y protocolos subyacentes.
+        </p>
+        <p>
+          Para solucionar esto, estructuré servicios de enrutamiento asíncrono. En lugar de procesar consultas secuenciales (esperar a que responda el protocolo A para luego consultar el protocolo B), el motor ejecuta llamadas concurrentes a través de múltiples hilos lógicos en el servidor. El backend recopila las respuestas fragmentadas, las estandariza mediante interfaces estrictamente tipadas (asegurando que los volúmenes, los intereses abiertos y los márgenes mantengan la misma unidad de precisión decimal).
+        </p>
+        <p>
+          El emparejamiento interno de este flujo de consolidación dentro del servidor se resuelve empleando la inserción matemática vectorial sobre nuestra memoria estructural, logrando resolver el cálculo en una complejidad puramente logarítmica para grandes conjuntos de datos de red asíncrona:
+        </p>
+
+        <img 
+          src="https://latex.codecogs.com/svg.latex?\color{Black}\mathcal{O}(\log%20n)" 
+          alt="Logarithmic Time Complexity Formula" 
+          className={formulaImgStyle}
+        />
+
+        <p>
+          Al garantizar la inserción en tiempo logarítmico <span className="font-serif italic font-bold">O(log n)</span> en lugar de lineal <span className="font-serif italic font-bold">O(n)</span>, el modelo condensa eficientemente millones de variables en un solo objeto de respuesta multidimensional para finalmente emitirlo a través de nuestro torrente principal de distribución sin latencia teórica en el backend.
+        </p>
+
+        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
+          Conclusión
+        </h3>
+        <p>
+          La arquitectura del backend de nuestro sistema no se apoya en magia tecnológica ni afirmaciones grandilocuentes. Es, puramente, el ejercicio disciplinado del manejo óptimo de los datos.
+        </p>
+        <p>
+          He construido este servidor con un enfoque minimalista y de alto rendimiento, removiendo barreras artificiales como memorias cachés perezosas y dependencias de consultas estáticas. Al consolidar conexiones de red en tiempo real, limpieza algorítmica de memoria, y validaciones matemáticas puras para el control de sesiones, he logrado ensamblar una infraestructura robusta. Nuestro servidor se dedica únicamente a escuchar, filtrar con precisión absoluta, y proveer la realidad cruda de la red en fracciones de segundo. Ese es nuestro verdadero logro técnico: hacer que el procesamiento invisible sea tan eficiente que los datos parezcan nacer directamente del usuario.
+        </p>
+
+        {/* DOWNHEAD / PREMIUM FOOTER */}
+        <div className="mt-16 pt-10 border-t border-black/5 flex flex-col items-center pb-24">
+          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-6 opacity-60" />
+          <h4 className="text-[18px] font-black tracking-tighter uppercase italic text-[#050505] mb-6">Whale Ecosystem</h4>
+          <div className="flex items-center gap-8">
+            <a href="https://x.com/whaleecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+              <span>Twitter</span>
+            </a>
+            <a href="https://github.com/whaleecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.45-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"></path></svg>
+              <span>GitHub</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -655,8 +715,10 @@ export function MobileSovereignLanding() {
           onDisconnect={() => disconnect()}
         />
 
-        {/* PAGE 2 — Ecosystem Taxonomy */}
-        <PageEcosystem />
+        {/* PHILOSOPHY PAGES */}
+        <PagePhilosophy1 />
+        <PagePhilosophy2 />
+        <PagePhilosophy3 />
       </div>
     </div>
   );
