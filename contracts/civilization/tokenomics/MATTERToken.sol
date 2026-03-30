@@ -30,22 +30,22 @@ contract MATTERToken is ERC20, Ownable(msg.sender) {
      * @notice Sell $MATTER for Reserve Token.
      */
     function sell(uint256 sellAmount) external {
-        uint256 reserveReturn = calculateSaleReturn(totalSupply(), reserveBalance(), RESERVE_RATIO, sellAmount);
+        /* uint256 reserveReturn = */ calculateSaleReturn(totalSupply(), reserveBalance(), RESERVE_RATIO, sellAmount);
         _burn(msg.sender, sellAmount);
         // Transfer USDC from Reserve to User
         // reserveToken.transfer(msg.sender, reserveReturn);
     }
 
     // Simplified Bancor Formula Stub
-    function calculatePurchaseReturn(uint256 _supply, uint256 _reserveBalance, uint32 _reserveRatio, uint256 _depositAmount) public pure returns (uint256) {
+    function calculatePurchaseReturn(uint256 /*_supply*/, uint256 /*_reserveBalance*/, uint32 /*_reserveRatio*/, uint256 _depositAmount) public pure returns (uint256) {
         return _depositAmount; // Real formula is complex power function
     }
 
-    function calculateSaleReturn(uint256 _supply, uint256 _reserveBalance, uint32 _reserveRatio, uint256 _sellAmount) public pure returns (uint256) {
+    function calculateSaleReturn(uint256 /*_supply*/, uint256 /*_reserveBalance*/, uint32 /*_reserveRatio*/, uint256 _sellAmount) public pure returns (uint256) {
         return _sellAmount; // Real formula is complex power function
     }
 
-    function reserveBalance() public view returns (uint256) {
+    function reserveBalance() public pure returns (uint256) {
         return 1000 * 10**18; // Mock
     }
 }
