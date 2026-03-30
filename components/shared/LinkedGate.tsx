@@ -103,7 +103,7 @@ const PC_WALLETS = [
   {
     id: 'metamask',
     name: 'MetaMask',
-    description: 'Browser Extension',
+    description: 'Extension / WalletConnect QR',
     icon: '/official-whale-monochrome.png',
     isImage: true,
     color: '#F6851B',
