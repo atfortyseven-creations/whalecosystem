@@ -41,7 +41,7 @@ function HugeAnimatedWhale() {
 
   return (
     <div 
-      className="relative cursor-pointer flex justify-center items-center w-64 h-64 md:w-[400px] md:h-[400px] select-none group" 
+      className="relative cursor-pointer flex justify-center items-center w-72 h-72 md:w-[440px] md:h-[440px] select-none group" 
       onClick={handleClick}
     >
       <motion.img
@@ -621,10 +621,69 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
               <HugeAnimatedWhale />
 
               {/* ── QR & ACTIONS CENTERED TOGETHER ── */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24 w-full">
+              <div className="flex flex-col items-center justify-center gap-12 w-full max-w-sm mx-auto">
                 
-                {/* ── LEFT: ACTION BUTTONS ── */}
-                <div className="flex flex-col items-center w-full max-w-sm space-y-4">
+                {/* ── QR PANEL ── */}
+                <div className="relative flex flex-col items-center">
+                  <div className="relative p-10 md:p-14 bg-white rounded-[4rem] md:rounded-[5rem] shadow-[0_120px_240px_-60px_rgba(0,0,0,0.12)] border border-black/[0.04] overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#050505]/[0.02] to-transparent" />
+
+                    {/* Corner Accents */}
+                    <div className="absolute top-10 left-10 w-16 h-16 border-t-4 border-l-4 border-black/[0.04] rounded-tl-3xl" />
+                    <div className="absolute top-10 right-10 w-16 h-16 border-t-4 border-r-4 border-black/[0.04] rounded-tr-3xl" />
+                    <div className="absolute bottom-10 left-10 w-16 h-16 border-b-4 border-l-4 border-black/[0.04] rounded-bl-3xl" />
+                    <div className="absolute bottom-10 right-10 w-16 h-16 border-b-4 border-r-4 border-black/[0.04] rounded-br-3xl" />
+
+                    <div className="relative z-10 w-[240px] h-[240px] md:w-[280px] md:h-[280px] flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                        {qrSession && syncStatus !== 'SYNCED' ? (
+                          <motion.div
+                            key={qrSession}
+                            initial={{ opacity: 0, filter: 'blur(10px)', scale: 0.9 }}
+                            animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                            exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
+                            transition={{ duration: 0.8 }}
+                            className="relative p-5 bg-white rounded-[2rem] shadow-inner"
+                          >
+                            <QRCodeSVG
+                              value={`SOVEREIGN_HANDSHAKE:${qrSession}`}
+                              size={208}
+                              level="H"
+                              bgColor="transparent"
+                              fgColor="#050505"
+                              includeMargin={false}
+                              imageSettings={{
+                                src: "/official-whale-monochrome.png",
+                                x: undefined, y: undefined,
+                                height: 40, width: 40,
+                                excavate: true,
+                              }}
+                            />
+                          </motion.div>
+                        ) : syncStatus === 'SYNCED' ? (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="flex flex-col items-center gap-5 text-green-600"
+                          >
+                            <div className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center border-4 border-green-500/20">
+                              <CheckCircle2 size={48} className="text-green-600" />
+                            </div>
+                            <p className="text-[11px] font-black uppercase tracking-[0.4em]">Sincronizado</p>
+                          </motion.div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-4">
+                            <RefreshCw size={40} className="text-black/10 animate-spin" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Asegurando sesión...</span>
+                          </div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── ACTION BUTTONS ── */}
+                <div className="flex flex-col items-center w-full space-y-4">
                   {/* PRIMARY: Custom Wallet Picker */}
                   <motion.button
                     whileHover={{ scale: 1.01 }}
@@ -664,66 +723,6 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                       </p>
                     </div>
                   </div>
-                </div>
-
-              {/* ── RIGHT: QR PANEL ── */}
-              <div className="relative flex flex-col items-center">
-                <div className="relative p-14 bg-white rounded-[5rem] shadow-[0_120px_240px_-60px_rgba(0,0,0,0.12)] border border-black/[0.04] overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#050505]/[0.02] to-transparent" />
-
-                  {/* Corner Accents */}
-                  <div className="absolute top-10 left-10 w-16 h-16 border-t-4 border-l-4 border-black/[0.04] rounded-tl-3xl" />
-                  <div className="absolute top-10 right-10 w-16 h-16 border-t-4 border-r-4 border-black/[0.04] rounded-tr-3xl" />
-                  <div className="absolute bottom-10 left-10 w-16 h-16 border-b-4 border-l-4 border-black/[0.04] rounded-bl-3xl" />
-                  <div className="absolute bottom-10 right-10 w-16 h-16 border-b-4 border-r-4 border-black/[0.04] rounded-br-3xl" />
-
-                  <div className="relative z-10 w-[280px] h-[280px] flex items-center justify-center">
-                    <AnimatePresence mode="wait">
-                      {qrSession && syncStatus !== 'SYNCED' ? (
-                        <motion.div
-                          key={qrSession}
-                          initial={{ opacity: 0, filter: 'blur(10px)', scale: 0.9 }}
-                          animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
-                          exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
-                          transition={{ duration: 0.8 }}
-                          className="relative p-5 bg-white rounded-[2rem] shadow-inner"
-                        >
-                          <QRCodeSVG
-                            value={`SOVEREIGN_HANDSHAKE:${qrSession}`}
-                            size={208}
-                            level="H"
-                            bgColor="transparent"
-                            fgColor="#050505"
-                            includeMargin={false}
-                            imageSettings={{
-                              src: "/official-whale-monochrome.png",
-                              x: undefined, y: undefined,
-                              height: 40, width: 40,
-                              excavate: true,
-                            }}
-                          />
-                        </motion.div>
-                      ) : syncStatus === 'SYNCED' ? (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="flex flex-col items-center gap-5 text-green-600"
-                        >
-                          <div className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center border-4 border-green-500/20">
-                            <CheckCircle2 size={48} className="text-green-600" />
-                          </div>
-                          <p className="text-[11px] font-black uppercase tracking-[0.4em]">Sincronizado</p>
-                        </motion.div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-4">
-                          <RefreshCw size={40} className="text-black/10 animate-spin" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">Asegurando sesión...</span>
-                        </div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
                 </div>
 
               </div>

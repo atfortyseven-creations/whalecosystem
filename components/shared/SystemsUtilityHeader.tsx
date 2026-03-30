@@ -77,8 +77,6 @@ export function SystemsUtilityHeader() {
                         e.stopPropagation();
                         if (isConnected) {
                             setIsDropdownOpen(!isDropdownOpen);
-                        } else {
-                            openConnectModal();
                         }
                     }}
                     className="flex items-center gap-2.5 pl-3.5 pr-1.5 py-1.5 rounded-full transition-all border cursor-pointer group"
