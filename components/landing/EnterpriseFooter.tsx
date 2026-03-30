@@ -183,7 +183,7 @@ export function EnterpriseFooter() {
 
                 {/* Social Links */}
                 <div className="flex justify-center gap-4 mb-12">
-                    <SocialButton icon={<Twitter />} href="https://twitter.com/humanwallet" label="Twitter" />
+                    <SocialButton icon={<Twitter />} href="https://x.com/whalecosystem" label="Twitter / X @whalecosystem" />
                     <SocialButton icon={<Github />} href="https://github.com/humanwallet" label="GitHub" />
                     <SocialButton icon={<MessageCircle />} href="https://discord.gg/humanwallet" label="Discord" />
                     <SocialButton icon={<Send />} href="https://t.me/humanwallet" label="Telegram" />

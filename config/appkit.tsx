@@ -9,8 +9,11 @@ import { createAppKit } from '@reown/appkit/react'
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-// 1. Get projectId
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "0ce6bdc0b433d45ab19d32f130dd4f18";
+// 1. Get projectId — MUST be set in environment variables. No fallback allowed.
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+if (!projectId) {
+    throw new Error('[Security] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not configured. Set this variable in your deployment environment.');
+}
 
 // 2. Interstellar Node Override
 const dedicatedBase = {
@@ -22,7 +25,8 @@ const dedicatedBase = {
     }
 };
 
-const infuraKey = process.env.INFURA_API_KEY || "4307fae544b442c2a40443ac491ffb0e";
+// Infura key — server-side only, never expose in client bundle
+const infuraKey = process.env.INFURA_API_KEY ?? '';
 
 const dedicatedMainnet = {
     ...mainnet,

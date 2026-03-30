@@ -183,7 +183,12 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
   // ── VECTOR 6: Host Header Anomaly ────────────────────────────────────────
   const host = req.headers.get('host') ?? '';
   const expectedHosts = ['www.humanidfi.com', 'humanidfi.com', 'localhost:3000', 'localhost'];
-  if (host && !expectedHosts.some(h => host.includes(h))) {
+  // Preview deployment patterns for Railway and Vercel CI/CD pipelines
+  const PREVIEW_HOST_PATTERNS = [/\.railway\.app$/, /\.up\.railway\.app$/, /\.vercel\.app$/];
+  const isKnownHost =
+    expectedHosts.some(h => host.includes(h)) ||
+    PREVIEW_HOST_PATTERNS.some(p => p.test(host));
+  if (host && !isKnownHost) {
     anomalyScore += 3;
     reasons.push(`HOST_MISMATCH:${host.slice(0, 30)}`);
   }
