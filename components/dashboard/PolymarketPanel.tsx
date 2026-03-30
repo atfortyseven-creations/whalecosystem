@@ -12,7 +12,8 @@ import Image from 'next/image';
 interface PolyMarket {
     id: string; slug: string; question: string; category: string;
     yesPrice: number; noPrice: number; volume24h: number; volumeTotal: number;
-    evSignal: string; image?: string; active: boolean; conditionId?: string;
+    evSignal: string; image?: string; active: boolean; closed?: boolean;
+    conditionId?: string; endDate?: string;
 }
 
 const fmtUsd = (n: number) => {
@@ -196,27 +197,48 @@ export default function PolymarketPanel() {
                             </div>
                             <div className="flex-1 overflow-hidden">
                                 <h3 className="text-base font-black text-[#111111] tracking-tight leading-snug mb-2 truncate max-w-[90%]">{m.question}</h3>
-                                <div className="flex items-center gap-3 text-[10px] font-bold text-[#888888] uppercase tracking-widest">
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-[#888888] uppercase tracking-widest flex-wrap">
+                                    {m.active && !m.closed ? (
+                                        <span className="bg-[#00ffa8]/10 text-[#00dda8] px-2 py-0.5 rounded border border-[#00dda8]/20 flex items-center gap-1">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#00dda8] animate-pulse"/> OPEN
+                                        </span>
+                                    ) : (
+                                        <span className="bg-[#f43f5e]/10 text-[#f43f5e] px-2 py-0.5 rounded border border-[#f43f5e]/20">
+                                            CLOSED
+                                        </span>
+                                    )}
                                     <span className="bg-[#E5E5E5]/50 px-2 py-0.5 rounded text-[#111111]">{m.category}</span>
                                     <span>•</span>
                                     <span>VOL: {fmtUsd(m.volume24h)}</span>
+                                    {m.endDate && (
+                                        <>
+                                            <span>•</span>
+                                            <span>ENDS: {new Date(m.endDate).toLocaleDateString()}</span>
+                                        </>
+                                    )}
                                     {m.evSignal !== 'NEUTRAL' && (
                                         <>
                                             <span>•</span>
-                                            <span style={{ color: SIGNAL_COLOR[m.evSignal] || '#111111' }} className="font-black">{m.evSignal.replace('_', ' ')}</span>
+                                            <span style={{ color: SIGNAL_COLOR[m.evSignal] || '#111111' }} className="font-black border px-1.5 py-0.5 rounded border-current">{m.evSignal.replace('_', ' ')}</span>
                                         </>
                                     )}
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
-                                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#00e699]/10 border border-[#00e699]/20 min-w-[65px]">
-                                    <span className="text-[10px] text-[#00dda8] font-black uppercase tracking-widest mb-1">YES</span>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setSelected(m); }}
+                                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#00e699]/10 border border-[#00e699]/30 min-w-[70px] hover:bg-[#00e699]/20 transition-colors"
+                                >
+                                    <span className="text-[10px] text-[#00dda8] font-black uppercase tracking-widest mb-1">BET YES</span>
                                     <span className="text-sm font-mono font-black text-[#00dda8]">{Math.round(m.yesPrice * 100)}¢</span>
-                                </div>
-                                <div className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/20 min-w-[65px]">
-                                    <span className="text-[10px] text-[#f43f5e] font-black uppercase tracking-widest mb-1">NO</span>
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setSelected(m); }}
+                                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/30 min-w-[70px] hover:bg-[#f43f5e]/20 transition-colors"
+                                >
+                                    <span className="text-[10px] text-[#f43f5e] font-black uppercase tracking-widest mb-1">BET NO</span>
                                     <span className="text-sm font-mono font-black text-[#f43f5e]">{Math.round((1 - m.yesPrice) * 100)}¢</span>
-                                </div>
+                                </button>
                             </div>
                         </motion.div>
                     ))}
