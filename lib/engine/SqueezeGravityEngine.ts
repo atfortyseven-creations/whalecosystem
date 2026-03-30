@@ -31,6 +31,7 @@ export interface PrecognitiveOutput {
     icebergs: GlobalIceberg[];
     probabilityOfReversal: number;
     expectedMove: number;
+    currentPrice: number;
 }
 
 export class VIPMatrixEngine {
@@ -87,7 +88,8 @@ export class VIPMatrixEngine {
                 polyHasData: state.polyHasData,
                 icebergs: state.icebergs,
                 probabilityOfReversal: Number((probReversal * 100).toFixed(1)),
-                expectedMove: Number(expectedMove.toFixed(2))
+                expectedMove: Number(expectedMove.toFixed(2)),
+                currentPrice: state.markPrice
             };
 
         } catch (error) {
@@ -95,7 +97,7 @@ export class VIPMatrixEngine {
             return { 
                 gravityScore: 0, direction: 'NEUTRAL', targetPrice: 0, 
                 institutionalVigorValue: 0, institutionalVigorPercent: 50, institutionalIsAccumulation: false,
-                polyConfluenceValue: 0.5, polyHasData: false, icebergs: [], probabilityOfReversal: 0, expectedMove: 0 
+                polyConfluenceValue: 0.5, polyHasData: false, icebergs: [], probabilityOfReversal: 0, expectedMove: 0, currentPrice: 0 
             };
         }
     }
@@ -121,9 +123,15 @@ export class VIPMatrixEngine {
             let markPrice = Number(priceData.price || premiumData.markPrice || 0);
             
             if (markPrice === 0) {
-               // Absolute fallback if asset doesn't exist on Binance
-               console.warn(`[Matrix Engine] Asset ${asset} not found on Binance, using approximate price.`);
-               markPrice = asset === 'BTC' ? 66500 : asset === 'ETH' ? 3450 : asset === 'SOL' ? 148 : asset === 'BNB' ? 580 : 1.0;
+               // Absolute fallback if asset doesn't exist on Binance, attempt MEXC
+               const mexcRes = await fetch(`https://api.mexc.com/api/v3/ticker/price?symbol=${symbol}`, { next: { revalidate: 0 } }).catch(() => null);
+               const mexcData = mexcRes ? await mexcRes.json().catch(() => ({})) : {};
+               markPrice = Number(mexcData.price || 0);
+
+               if (markPrice === 0) {
+                   console.warn(`[Matrix Engine] Asset ${asset} not found on Binance or MEXC, using approximate price.`);
+                   markPrice = asset === 'BTC' ? 66500 : asset === 'ETH' ? 3450 : asset === 'SOL' ? 148 : asset === 'BNB' ? 580 : 1.0;
+               }
             }
 
             const avgFundingRate = Number(premiumData.lastFundingRate || 0.0001);

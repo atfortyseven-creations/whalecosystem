@@ -22,6 +22,7 @@ interface PrecognitiveState {
     gravityScore: number;
     direction: 'BEARISH' | 'BULLISH' | 'NEUTRAL';
     targetPrice: number;
+    currentPrice?: number;
     institutionalVigorValue: number;
     institutionalVigorPercent: number;
     institutionalIsAccumulation: boolean;
@@ -104,6 +105,9 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
     const gravityActive = state.gravityScore > 70;
     const pmMeetsThreshold = state.polyHasData && state.polyConfluenceValue >= 75; 
     const isSovereignConfluence = vigorActive && gravityActive && pmMeetsThreshold;
+    
+    // Choose what to display in the main price indicator
+    const displayPrice = state.currentPrice ? state.currentPrice : (state.targetPrice || 0);
 
     return (
         <motion.div 
@@ -136,8 +140,12 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
                     <div className="flex items-center gap-2">
                         <span className="text-3xl font-black text-[#050505] tracking-tight">{symbol}</span>
                     </div>
-                    <div className="text-xl font-bold text-[#050505]/70 font-mono mt-1">
-                        ${state.targetPrice > 0 ? state.targetPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '---'}
+                    <div className="text-xl font-bold text-[#050505] font-mono mt-1">
+                        ${displayPrice > 0 ? displayPrice.toLocaleString(undefined, { minimumFractionDigits: displayPrice > 10 ? 2 : 4, maximumFractionDigits: displayPrice > 10 ? 2 : 5 }) : '---'}
+                    </div>
+                    {/* Secondary Target Price (so they know the matrix actually calculated a target) */}
+                    <div className="text-[10px] font-bold text-[#888888] font-mono mt-0.5 uppercase tracking-widest">
+                        TGT ${state.targetPrice > 0 ? state.targetPrice.toLocaleString(undefined, { minimumFractionDigits: state.targetPrice > 10 ? 2 : 4, maximumFractionDigits: state.targetPrice > 10 ? 2 : 5 }) : '---'}
                     </div>
                 </div>
 

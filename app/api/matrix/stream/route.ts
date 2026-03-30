@@ -51,7 +51,8 @@ function getDemoState(asset: string) {
             }
         ],
         probabilityOfReversal: parseFloat((probReversal * 100).toFixed(1)),
-        expectedMove: parseFloat(((polyVal - 0.5) * 4.2).toFixed(2))
+        expectedMove: parseFloat(((polyVal - 0.5) * 4.2).toFixed(2)),
+        currentPrice: icebergPrice
     };
 }
 
