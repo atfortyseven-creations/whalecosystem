@@ -151,33 +151,33 @@ export function UtilityPanels() {
         privacy: (
             <div className="space-y-6">
                 <h3 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[var(--aztec-orchid)] flex items-center gap-2">
-                    <ShieldAlert size={16} /> Fortress Privacy
+                    <ShieldAlert size={16} /> UI Privacy Settings
                 </h3>
                 
                 <div className="p-6 border border-[var(--aztec-orchid)]/30 rounded-3xl bg-[var(--aztec-orchid)]/10 relative overflow-hidden group mb-4">
                     <div className="absolute inset-0 bg-gradient-to-br from-[var(--aztec-orchid)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-duration-500 pointer-events-none" />
                     <div className="relative z-10">
-                        <h4 className="font-aztec-serif font-black text-white text-xl mb-1 italic">Zero-Knowledge Shield</h4>
-                        <p className="text-[10px] text-white/50 font-mono uppercase tracking-widest mb-6">Cryptographic blinding of public endpoints</p>
+                        <h4 className="font-aztec-serif font-black text-white text-xl mb-1 italic">Local Privacy Filters</h4>
+                        <p className="text-[10px] text-white/50 font-mono uppercase tracking-widest mb-6">Manage data visibility on your screen</p>
 
                         <div className="space-y-3">
                             <SettingToggle 
-                                label="Balance Obfuscation" 
-                                description="Replace numeric wealth with hashes" 
+                                label="Mask Balances" 
+                                description="Hide numeric values in the terminal" 
                                 active={hideBalances} 
                                 onToggle={toggleHideBalances} 
                                 color="orchid"
                             />
                             <SettingToggle 
-                                label="Node RPC Blinding" 
-                                description="Route transactions via Tor relays" 
+                                label="Incognito UI" 
+                                description="Obscure sensitive activity locally" 
                                 active={privacyMode} 
                                 onToggle={togglePrivacyMode} 
                                 color="orchid"
                             />
                             <SettingToggle 
-                                label="Header Stealth" 
-                                description="Disable structural nav detection" 
+                                label="Address Cloaking" 
+                                description="Truncate public wallet addresses" 
                                 active={walletStealthMode} 
                                 onToggle={toggleWalletStealthMode} 
                                 color="orchid"
