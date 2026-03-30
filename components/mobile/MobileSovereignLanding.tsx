@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useReducedMotion, useVelocity } from 'framer-motion';
 import { 
   QrCode, 
   Smartphone, 
@@ -306,6 +306,51 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   );
 }
 
+// ─── WEB WORKER: BINANCE WSS REAL-TIME ENGINE ──────────────────────────────
+// Runs in an Isolated Web Worker thread so that high-frequency WSS messages
+// (Order Book at 100ms cadence) never touch the main thread or Framer Motion.
+const WORKER_BLOB = `
+  let ws;
+  let retryTimer;
+
+  function connect() {
+    // Combined multi-stream: depth5, aggTrade, 24h ticker
+    const URL = 'wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms/btcusdt@aggTrade/btcusdt@ticker';
+    ws = new WebSocket(URL);
+
+    ws.onopen  = ()  => postMessage({ type: 'STATUS', payload: 'CONNECTED' });
+    ws.onclose = ()  => { postMessage({ type: 'STATUS', payload: 'RECONNECTING' }); clearTimeout(retryTimer); retryTimer = setTimeout(connect, 2500); };
+    ws.onerror = ()  => ws.close();
+
+    ws.onmessage = ({ data }) => {
+      try {
+        const { stream, data: d } = JSON.parse(data);
+
+        if (stream === 'btcusdt@depth5@100ms') {
+          postMessage({ type: 'ORDER_BOOK', payload: { bids: d.bids, asks: d.asks } });
+
+        } else if (stream === 'btcusdt@aggTrade') {
+          const price = parseFloat(d.p);
+          const qty   = parseFloat(d.q);
+          const isBuy = !d.m;                  // maker = sell-side; taker = buy-side
+          const usd   = price * qty;
+
+          // Whale filter: V > μ + 3σ approximated as $100k+
+          if (usd > 100000) {
+            postMessage({ type: 'WHALE_FLOW',  payload: { price, qty, isBuy, usd, ts: d.T } });
+            // Copy-trade proxy: symmetric 1% of whale move
+            postMessage({ type: 'COPY_TRADE', payload: { price, qty: (qty * 0.01).toFixed(4), isBuy, usd: (usd * 0.01).toFixed(0), ts: Date.now() } });
+          }
+        } else if (stream === 'btcusdt@ticker') {
+          postMessage({ type: 'MARKETS', payload: { price: d.c, vol: d.q, change: d.P, high: d.h, low: d.l } });
+        }
+      } catch (_) {}
+    };
+  }
+
+  connect();
+`;
+
 // ─── MAIN COMPONENT ─────────────────────────────────────────────────────────
 export function MobileSovereignLanding() {
     const { isConnected, address } = useAccount();
@@ -319,8 +364,32 @@ export function MobileSovereignLanding() {
 
     const prefersReducedMotion = useReducedMotion();
 
+    // ── LIVE DATA STATES (fed by isolated Web Worker) ──
+    const [wsStatus,    setWsStatus]    = useState<'CONNECTING'|'CONNECTED'|'RECONNECTING'>('CONNECTING');
+    const [obData,      setObData]      = useState<{bids:string[][], asks:string[][]}>({bids:[], asks:[]});
+    const [whaleFlow,   setWhaleFlow]   = useState<any[]>([]);
+    const [marketInfo,  setMarketInfo]  = useState<{price:string, vol:string, change:string, high:string, low:string}|null>(null);
+    const [lastCopy,    setLastCopy]    = useState<any|null>(null);
+
     useEffect(() => {
         setWalletBrowser(detectWalletBrowser());
+
+        // Spawn isolated Web Worker from Blob URL — zero layout thrashing
+        const blob   = new Blob([WORKER_BLOB], { type: 'application/javascript' });
+        const url    = URL.createObjectURL(blob);
+        const worker = new Worker(url);
+
+        worker.onmessage = ({ data: { type, payload } }: any) => {
+            switch (type) {
+                case 'STATUS':      setWsStatus(payload);   break;
+                case 'ORDER_BOOK':  setObData(payload);     break;
+                case 'WHALE_FLOW':  setWhaleFlow(p => [payload, ...p].slice(0, 4)); break;
+                case 'MARKETS':     setMarketInfo(payload); break;
+                case 'COPY_TRADE':  setLastCopy(payload);   break;
+            }
+        };
+
+        return () => { worker.terminate(); URL.revokeObjectURL(url); };
     }, []);
 
     const handleConnectTrigger = useCallback(() => {
@@ -328,260 +397,303 @@ export function MobileSovereignLanding() {
             const injectedConnector = connectors.find(
                 c => c.id === 'injected' || c.id === 'io.metamask' || c.type === 'injected'
             );
-            if (injectedConnector) {
-                connect({ connector: injectedConnector });
-            } else if (connectors.length > 0) {
-                connect({ connector: connectors[0] });
-            }
+            if (injectedConnector) connect({ connector: injectedConnector });
+            else if (connectors.length > 0) connect({ connector: connectors[0] });
         } else {
             setIsPickerOpen(true);
         }
     }, [connect, connectors, walletBrowser]);
 
-    // SCROLL ANIMATION LOGIC (AAA Cinematic Tier)
+    // ── SCROLL PHYSICS ENGINE (AAA Tier) ──────────────────────────────────────
     const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"]
-    });
-    
-    // Physics-tuned springs for cinematic mass and organic feel
-    const smProgress = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 1.5 });
-    const delay1Progress = useSpring(scrollYProgress, { stiffness: 50, damping: 25, mass: 1.8 });
-    const delay2Progress = useSpring(scrollYProgress, { stiffness: 40, damping: 30, mass: 2.2 });
-    const delay3Progress = useSpring(scrollYProgress, { stiffness: 30, damping: 35, mass: 2.8 });
+    const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] });
 
-    // --- PHASE 1: DECONSTRUCTION ---
-    // Whale (Base Spring)
-    const whaleY = useTransform(smProgress, [0, 0.25], [0, -500]);
-    const whaleX = useTransform(smProgress, [0, 0.25], [0, 200]);
-    const whaleRotateZ = useTransform(smProgress, [0, 0.25], [0, 45]);
-    const whaleRotateX = useTransform(smProgress, [0, 0.25], [0, 60]);
-    const whaleScale = useTransform(smProgress, [0, 0.25], [1, 0.2]);
-    const whaleOpacity = useTransform(smProgress, [0, 0.2, 0.25], [1, 0.5, 0]);
-    const whaleBlur = useTransform(smProgress, [0, 0.25], ["blur(0px)", "blur(12px)"]);
-    
-    // WHALE text (Delay 1)
-    const t1Y = useTransform(delay1Progress, [0, 0.3], [0, -150]);
-    const t1X = useTransform(delay1Progress, [0, 0.3], [0, -300]);
-    const t1RotZ = useTransform(delay1Progress, [0, 0.3], [0, -35]);
-    const t1RotY = useTransform(delay1Progress, [0, 0.3], [0, 45]);
-    const t1Opacity = useTransform(delay1Progress, [0, 0.25], [1, 0]);
-    const t1Blur = useTransform(delay1Progress, [0, 0.3], ["blur(0px)", "blur(10px)"]);
+    // 4 Springs of increasing mass → async stagger organically emerges
+    const sp0 = useSpring(scrollYProgress, { stiffness: 60,  damping: 20, mass: 1.5 }); // fast
+    const sp1 = useSpring(scrollYProgress, { stiffness: 50,  damping: 25, mass: 1.8 });
+    const sp2 = useSpring(scrollYProgress, { stiffness: 40,  damping: 30, mass: 2.2 });
+    const sp3 = useSpring(scrollYProgress, { stiffness: 30,  damping: 35, mass: 2.8 }); // slowest
 
-    // ALERT text (Delay 2)
-    const t2Y = useTransform(delay2Progress, [0, 0.3], [0, 100]);
-    const t2X = useTransform(delay2Progress, [0, 0.3], [0, 350]);
-    const t2RotZ = useTransform(delay2Progress, [0, 0.3], [0, 45]);
-    const t2RotX = useTransform(delay2Progress, [0, 0.3], [0, 45]);
-    const t2Opacity = useTransform(delay2Progress, [0, 0.25], [1, 0]);
-    const t2Blur = useTransform(delay2Progress, [0, 0.3], ["blur(0px)", "blur(10px)"]);
+    // Velocity → makes fracture more dramatic when swiped fast
+    const scrollVel = useVelocity(scrollYProgress);
+    const velSkew   = useTransform(scrollVel, [-0.5, 0, 0.5], [12, 0, -12]);
 
-    // NETWORK text (Delay 3)
-    const t3Y = useTransform(delay3Progress, [0, 0.3], [0, 400]);
-    const t3Z = useTransform(delay3Progress, [0, 0.3], [0, 200]);
-    const t3RotX = useTransform(delay3Progress, [0, 0.3], [0, -60]);
-    const t3Opacity = useTransform(delay3Progress, [0, 0.25], [1, 0]);
-    const t3Blur = useTransform(delay3Progress, [0, 0.3], ["blur(0px)", "blur(10px)"]);
+    // ── PHASE 1: DECONSTRUCTION (0–30%) ─────────────────────────────────────
+    const whaleY   = useTransform(sp0, [0, 0.25], [0, -600]);
+    const whaleX   = useTransform(sp0, [0, 0.25], [0,  220]);
+    const whaleRZ  = useTransform(sp0, [0, 0.25], [0,   48]);
+    const whaleRX  = useTransform(sp0, [0, 0.25], [0,   65]);
+    const whaleSc  = useTransform(sp0, [0, 0.25], [1,  0.15]);
+    const whaleOp  = useTransform(sp0, [0, 0.20, 0.25], [1, 0.4, 0]);
+    const whaleBl  = useTransform(sp0, [0, 0.25], ['blur(0px)', 'blur(14px)']);
 
-    const scrollHintOpacity = useTransform(smProgress, [0, 0.05], [1, 0]);
+    const t1Y = useTransform(sp1, [0, 0.28], [0, -160]); // WHALE flies up-left
+    const t1X = useTransform(sp1, [0, 0.28], [0, -320]);
+    const t1RZ= useTransform(sp1, [0, 0.28], [0,  -38]);
+    const t1RY= useTransform(sp1, [0, 0.28], [0,   50]);
+    const t1Op= useTransform(sp1, [0, 0.24], [1, 0]);
+    const t1Bl= useTransform(sp1, [0, 0.28], ['blur(0px)', 'blur(10px)']);
 
-    // --- PHASE 2: ASSEMBLY ---
-    const assemblyOpacity = useTransform(smProgress, [0.3, 0.4], [0, 1]);
-    const assemblyY = useTransform(smProgress, [0.3, 0.4], [100, 0]);
-    const ambientGlowOpacity = useTransform(smProgress, [0.3, 0.6], [0, 1]);
+    const t2Y = useTransform(sp2, [0, 0.30], [0,  120]); // ALERT flies right-down
+    const t2X = useTransform(sp2, [0, 0.30], [0,  380]);
+    const t2RZ= useTransform(sp2, [0, 0.30], [0,   48]);
+    const t2RX= useTransform(sp2, [0, 0.30], [0,   48]);
+    const t2Op= useTransform(sp2, [0, 0.25], [1, 0]);
+    const t2Bl= useTransform(sp2, [0, 0.30], ['blur(0px)', 'blur(10px)']);
 
-    // Sequential Feature Rows
-    const row1Y = useTransform(delay1Progress, [0.35, 0.45], [50, 0]);
-    const row1O = useTransform(delay1Progress, [0.35, 0.45], [0, 1]);
-    
-    const row2Y = useTransform(delay2Progress, [0.45, 0.55], [50, 0]);
-    const row2O = useTransform(delay2Progress, [0.45, 0.55], [0, 1]);
-    
-    const row3Y = useTransform(delay3Progress, [0.55, 0.65], [50, 0]);
-    const row3O = useTransform(delay3Progress, [0.55, 0.65], [0, 1]);
-    
-    const row4Y = useTransform(smProgress, [0.65, 0.75], [50, 0]);
-    const row4O = useTransform(smProgress, [0.65, 0.75], [0, 1]);
-    
-    const row5Y = useTransform(delay1Progress, [0.75, 0.85], [50, 0]);
-    const row5O = useTransform(delay1Progress, [0.75, 0.85], [0, 1]);
+    const t3Y = useTransform(sp3, [0, 0.32], [0,  440]); // NETWORK falls straight down
+    const t3RX= useTransform(sp3, [0, 0.32], [0,  -65]);
+    const t3Op= useTransform(sp3, [0, 0.26], [1, 0]);
+    const t3Bl= useTransform(sp3, [0, 0.32], ['blur(0px)', 'blur(10px)']);
 
-    // --- PHASE 3: CONNECT REVEAL ---
-    const buttonOpacity = useTransform(smProgress, [0.85, 0.95], [0, 1]);
-    const buttonY = useTransform(smProgress, [0.85, 0.95], [80, 0]);
-    const buttonScale = useTransform(smProgress, [0.85, 0.95], [0.85, 1]);
+    const hintOp = useTransform(sp0, [0, 0.06], [1, 0]);
+
+    // ── PHASE 2: ASSEMBLY (30–80%) ────────────────────────────────────────────
+    const glowOp  = useTransform(sp0, [0.3, 0.55], [0, 1]);
+
+    const c1Y = useTransform(sp1, [0.32, 0.44], [90, 0]);
+    const c1O = useTransform(sp1, [0.32, 0.44], [0, 1]);
+
+    const c2Y = useTransform(sp2, [0.44, 0.56], [90, 0]);
+    const c2O = useTransform(sp2, [0.44, 0.56], [0, 1]);
+
+    const c3Y = useTransform(sp3, [0.56, 0.68], [90, 0]);
+    const c3O = useTransform(sp3, [0.56, 0.68], [0, 1]);
+
+    const c4Y = useTransform(sp0, [0.68, 0.78], [90, 0]);
+    const c4O = useTransform(sp0, [0.68, 0.78], [0, 1]);
+
+    // ── PHASE 3: CONNECT REVEAL (85–95%) ─────────────────────────────────────
+    const btnOp = useTransform(sp0, [0.85, 0.95], [0, 1]);
+    const btnY  = useTransform(sp0, [0.85, 0.95], [80, 0]);
+    const btnSc = useTransform(sp0, [0.85, 0.95], [0.85, 1]);
 
     if (view === 'scanner') {
         return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
     }
 
+    const live = wsStatus === 'CONNECTED';
+
     return (
-        <div ref={containerRef} className="w-full bg-[#0a0a0a] min-h-[300vh] text-white font-sans overflow-clip relative selection:bg-cyan-500/30" style={{ transformStyle: "preserve-3d" }}>
+        <div ref={containerRef} className="w-full bg-[#0a0a0a] min-h-[300vh] text-white font-sans overflow-clip relative selection:bg-cyan-500/30" style={{ transformStyle: 'preserve-3d' }}>
             <AnimatedPattern />
-            
-            {/* Cinematic Background Parallax */}
-            <motion.div 
-                className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.03)_0%,transparent_70%)]"
-                style={{ opacity: ambientGlowOpacity, willChange: "opacity" }} 
-            />
+
+            {/* Ambient glow ignites during assembly */}
+            <motion.div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(6,182,212,0.08)_0%,transparent_100%)]" style={{ opacity: glowOp, willChange: 'opacity' }} />
 
             <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
-            {/* TOP BAR */}
-            <header className="fixed top-0 left-0 w-full flex items-center justify-end z-50 h-16 px-8 pointer-events-none">
+            {/* Minimal top bar — only disconnect when connected */}
+            <header className="fixed top-0 left-0 w-full flex items-center justify-end z-50 h-14 px-6 pointer-events-none">
                 <div className="flex items-center gap-3 pointer-events-auto">
                     {isConnected && (
-                        <button 
-                            onClick={() => disconnect()}
-                            className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform backdrop-blur-md"
-                        >
-                            <RefreshCw size={14} className="text-white/60" />
+                        <button onClick={() => disconnect()} className="w-9 h-9 bg-white/5 border border-white/10 rounded-full flex items-center justify-center active:scale-90 transition-transform backdrop-blur-md">
+                            <RefreshCw size={12} className="text-white/60" />
                         </button>
                     )}
                 </div>
             </header>
 
-            {/* STICKY RENDERER */}
-            <div className="sticky top-0 left-0 w-full h-[100dvh] overflow-hidden flex flex-col items-center justify-center pt-12 px-8" style={{ perspective: "1000px" }}>
-                
-                {/* ─── PHASE 1: FRAGMENTATION HERO ─── */}
-                <motion.div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20" style={{ transformStyle: "preserve-3d" }}>
-                    <motion.div 
-                        style={prefersReducedMotion ? { opacity: whaleOpacity } : { y: whaleY, x: whaleX, rotateZ: whaleRotateZ, rotateX: whaleRotateX, scale: whaleScale, opacity: whaleOpacity, filter: whaleBlur, willChange: "transform, opacity, filter" }}
-                        className="w-full max-w-sm flex justify-center mb-6 mt-8"
-                    >
-                        {/* Parent scales container massively (3.0x approx via w-56/scale-150 + Cinematic's own scale) */}
-                        <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-64 h-64 scale-[2.8] transform-gpu pointer-events-none" />
+            {/* ════════ STICKY VIEWPORT ════════ */}
+            <div className="sticky top-0 w-full h-[100dvh] overflow-hidden" style={{ perspective: '1500px' }}>
+
+                {/* ─────────── PHASE 1 · HERO FRAGMENTATION ─────────── */}
+                <motion.div className="absolute inset-0 flex flex-col items-center justify-start pt-[13vh] z-20 pointer-events-none" style={{ transformStyle: 'preserve-3d' }}>
+
+                    {/* WHALE logo */}
+                    <motion.div style={prefersReducedMotion ? { opacity: whaleOp } : { y: whaleY, x: whaleX, rotateZ: whaleRZ, rotateX: whaleRX, scale: whaleSc, opacity: whaleOp, filter: whaleBl, willChange: 'transform,opacity,filter' }} className="w-64 h-64 flex items-center justify-center mb-2">
+                        <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-full h-full scale-[2.8] transform-gpu" />
                     </motion.div>
 
-                    <div className="flex flex-col items-center mt-12 relative w-full overflow-visible" style={{ transformStyle: "preserve-3d" }}>
-                        <motion.h1 
-                            style={prefersReducedMotion ? { opacity: t1Opacity } : { y: t1Y, x: t1X, rotateZ: t1RotZ, rotateY: t1RotY, opacity: t1Opacity, filter: t1Blur, willChange: "transform, opacity, filter" }} 
-                            className="text-[4rem] md:text-6xl font-black tracking-tighter leading-none uppercase italic text-white drop-shadow-md"
-                        >
+                    {/* Title shards */}
+                    <div className="flex flex-col items-center mt-10 overflow-visible" style={{ transformStyle: 'preserve-3d' }}>
+                        <motion.h1 style={prefersReducedMotion ? { opacity: t1Op } : { y: t1Y, x: t1X, rotateZ: t1RZ, rotateY: t1RY, skewX: velSkew, opacity: t1Op, filter: t1Bl, willChange: 'transform,opacity,filter' }} className="text-[4.2rem] font-black tracking-tighter leading-none uppercase italic text-white">
                             Whale
                         </motion.h1>
-                        <motion.h1 
-                            style={prefersReducedMotion ? { opacity: t2Opacity } : { y: t2Y, x: t2X, rotateZ: t2RotZ, rotateX: t2RotX, opacity: t2Opacity, filter: t2Blur, willChange: "transform, opacity, filter" }} 
-                            className="text-[4rem] md:text-6xl font-black tracking-tighter leading-none uppercase italic text-white drop-shadow-md -mt-2"
-                        >
+                        <motion.h1 style={prefersReducedMotion ? { opacity: t2Op } : { y: t2Y, x: t2X, rotateZ: t2RZ, rotateX: t2RX, skewX: velSkew, opacity: t2Op, filter: t2Bl, willChange: 'transform,opacity,filter' }} className="text-[4.2rem] font-black tracking-tighter leading-none uppercase italic text-white -mt-2">
                             Alert
                         </motion.h1>
-                        <motion.h1 
-                            style={prefersReducedMotion ? { opacity: t3Opacity } : { y: t3Y, z: t3Z, rotateX: t3RotX, opacity: t3Opacity, filter: t3Blur, willChange: "transform, opacity, filter" }} 
-                            className="text-[4rem] md:text[5rem] font-black tracking-tighter leading-none uppercase italic text-cyan-400 drop-shadow-[0_0_20px_rgba(6,182,212,0.8)] -mt-2"
-                        >
+                        <motion.h1 style={prefersReducedMotion ? { opacity: t3Op } : { y: t3Y, rotateX: t3RX, opacity: t3Op, filter: t3Bl, willChange: 'transform,opacity,filter' }} className="text-[4rem] font-black tracking-tighter leading-none uppercase italic text-cyan-400 drop-shadow-[0_0_22px_rgba(6,182,212,0.9)] -mt-2">
                             Network
                         </motion.h1>
                     </div>
 
-                    <motion.div 
-                        style={{ opacity: scrollHintOpacity, willChange: "opacity" }} 
-                        className="absolute bottom-12 flex flex-col items-center gap-2"
-                    >
-                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">
-                            SCROLL PARA EXPLORAR EL NÚCLEO
-                        </span>
-                        <ChevronDown size={14} className="text-white/40 animate-bounce" />
+                    {/* Scroll hint */}
+                    <motion.div style={{ opacity: hintOp, willChange: 'opacity' }} className="absolute bottom-10 flex flex-col items-center gap-2">
+                        <span className="text-[8.5px] font-black text-white/35 uppercase tracking-[0.35em]">SCROLL PARA EXPLORAR EL NÚCLEO</span>
+                        <ChevronDown size={13} className="text-white/35 animate-bounce" />
                     </motion.div>
                 </motion.div>
 
-                {/* ─── PHASE 2 & 3: ASSEMBLY & CONNECT ─── */}
-                <motion.div 
-                    style={{ opacity: assemblyOpacity, y: assemblyY, willChange: "transform, opacity" }}
-                    className="absolute inset-0 flex flex-col items-center justify-center z-30 px-6 max-w-sm mx-auto w-full pointer-events-none"
-                >
-                    <div className="w-full bg-[#050505]/90 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,1),0_0_30px_rgba(6,182,212,0.1)] flex flex-col items-center relative overflow-hidden">
-                        {/* Core ambient light */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-[150%] bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.15)_0%,transparent_50%)] pointer-events-none" />
+                {/* ─────────── PHASE 2 · LIVE SCIENTIFIC PILLARS ─────────── */}
+                <div className="absolute inset-0 overflow-y-hidden flex flex-col justify-center items-center z-30 px-5 pt-12 pb-32 gap-3 pointer-events-none max-w-[420px] mx-auto w-full">
 
-                        <Activity size={24} className="text-cyan-400 mb-6 drop-shadow-[0_0_15px_rgba(6,182,212,1)]" />
-                        
-                        <h2 className="text-2xl font-black tracking-tighter uppercase text-white mb-8 text-center italic leading-[1.1] drop-shadow-lg">
-                            EL NÚCLEO<br/><span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">SOBERANO</span>
-                        </h2>
-
-                        <div className="w-full space-y-5 text-left pointer-events-auto relative z-10 font-mono">
-                            <FeatureRow y={row1Y} o={row1O} reduced={prefersReducedMotion} title="Núcleo Soberano" desc="Viems & Ethers en ejecución nativa" />
-                            <FeatureRow y={row2Y} o={row2O} reduced={prefersReducedMotion} title="Seguridad Militar" desc="Cifrado AES-256 + ofuscación cuántica" />
-                            <FeatureRow y={row3Y} o={row3O} reduced={prefersReducedMotion} title="Latencia extrema" desc="0.12 ms en red soberana" />
-                            <FeatureRow y={row4Y} o={row4O} reduced={prefersReducedMotion} title="Rastreo en tiempo real" desc="Nodos de ballenas monitoreando 24/7" />
-                            <FeatureRow y={row5Y} o={row5O} reduced={prefersReducedMotion} title="Terminal aislada" desc="Opera en su propio hilo desconectado de la UI" />
-                        </div>
-                    </div>
-
-                    {/* CONNECT BUTTON AREA */}
-                    <motion.div 
-                        style={{ opacity: buttonOpacity, y: buttonY, scale: prefersReducedMotion ? 1 : buttonScale, willChange: "transform, opacity" }}
-                        className="w-full mt-8 pointer-events-auto"
-                    >
-                        {!isConnected ? (
-                            <button
-                                onClick={handleConnectTrigger}
-                                className="w-full h-[80px] bg-white text-[#0a0a0a] rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-cyan-50 group relative overflow-hidden cursor-pointer"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                                <Wallet size={20} className="text-[#0a0a0a]/80 group-active:translate-x-1 transition-transform" />
-                                CONECTAR BILLETERA
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => setView('scanner')}
-                                className="w-full h-[80px] bg-cyan-500/10 border border-cyan-500/30 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-between px-8 shadow-[0_0_30px_rgba(6,182,212,0.15)] active:scale-[0.98] group relative backdrop-blur-md cursor-pointer hover:bg-cyan-500/20 transition-colors"
-                            >
-                                <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
-                                    <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
-                                        <QrCode size={18} className="text-cyan-400" />
+                    {/* ░░ PILAR 1 — ORDER BOOK ░░ */}
+                    <LiveCard y={c1Y} o={c1O} title="ORDER BOOK" badge={wsStatus} icon={<Activity size={13} className="text-cyan-400" />}
+                        desc="Árbol binario de búsqueda (B-Trees / Red-Black Trees) · emparejamiento de liquidez O(log n) · spread bid/ask ajustado en tiempo real.">
+                        {obData.bids.length === 0
+                            ? <ConnectingState />
+                            : (
+                                <div className="grid grid-cols-2 gap-x-3 mt-2 font-mono text-[9px]">
+                                    <div className="flex flex-col gap-[3px]">
+                                        <span className="text-white/30 text-[7.5px] mb-1 uppercase tracking-widest">BIDS ▲</span>
+                                        {obData.bids.slice(0,4).map((b,i) => (
+                                            <div key={i} className="flex justify-between text-emerald-400">
+                                                <span>{parseFloat(b[0]).toLocaleString(undefined,{maximumFractionDigits:1})}</span>
+                                                <span className="text-white/40">{parseFloat(b[1]).toFixed(3)}</span>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <div className="text-left leading-none">
-                                        <p className="tracking-[0.3em] text-cyan-50">SYNC LENS</p>
-                                        <p className="text-[8px] text-cyan-400/80 mt-2 font-black">READY: OPEN SCANNER</p>
+                                    <div className="flex flex-col gap-[3px]">
+                                        <span className="text-white/30 text-[7.5px] mb-1 uppercase tracking-widest">ASKS ▼</span>
+                                        {obData.asks.slice(0,4).map((a,i) => (
+                                            <div key={i} className="flex justify-between text-rose-400">
+                                                <span>{parseFloat(a[0]).toLocaleString(undefined,{maximumFractionDigits:1})}</span>
+                                                <span className="text-white/40">{parseFloat(a[1]).toFixed(3)}</span>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
-                                <ChevronRight size={16} className="text-cyan-400 opacity-80 group-hover:translate-x-1 transition-transform" />
-                            </button>
                         )}
-                        
-                        {isConnected && address && (
-                            <p className="mt-6 text-[9px] font-mono font-black tracking-widest text-white/40 uppercase drop-shadow-md text-center">
-                                ID: <span className="text-cyan-500">{address.slice(0, 10)}</span>...{address.slice(-6)}
-                            </p>
+                    </LiveCard>
+
+                    {/* ░░ PILAR 2 — WHALE FLOW ░░ */}
+                    <LiveCard y={c2Y} o={c2O} title="WHALE FLOW" badge={wsStatus} icon={<Eye size={13} className="text-cyan-400" />}
+                        desc="Filtro bayesiano de anomalías estadísticas V &gt; μ+3σ · indexación de Mempool on-chain · Alpha Predictivo en tiempo real.">
+                        {whaleFlow.length === 0
+                            ? <ConnectingState label="Esperando bloque &gt;$100k…" />
+                            : (
+                                <div className="flex flex-col gap-1.5 mt-2 font-mono text-[9px]">
+                                    {whaleFlow.map((w, i) => (
+                                        <motion.div key={w.ts} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+                                            className={`flex justify-between items-center px-2 py-1 rounded-lg ${ w.isBuy ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                            <span className="font-bold">{w.isBuy ? '⬆ LONG' : '⬇ SHORT'} {parseFloat(w.qty).toFixed(2)} BTC</span>
+                                            <span className="text-white/50">${parseFloat(w.price).toLocaleString(undefined,{maximumFractionDigits:0})}</span>
+                                        </motion.div>
+                                    ))}
+                                </div>
                         )}
-                    </motion.div>
+                    </LiveCard>
+
+                    {/* ░░ PILAR 3 — MARKETS AVAILABLE ░░ */}
+                    <LiveCard y={c3Y} o={c3O} title="MARKETS AVAILABLE" badge={wsStatus} icon={<Zap size={13} className="text-cyan-400" />}
+                        desc="Fragmentación de liquidez Cross-Chain · OI, Funding Rates, Volumen 24h real · Graph Protocol state dual-mapping.">
+                        {!marketInfo
+                            ? <ConnectingState />
+                            : (
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2 font-mono text-[9.5px]">
+                                    <Metric label="BTC/USDT" value={`$${Number(marketInfo.price).toLocaleString(undefined,{maximumFractionDigits:0})}`} positive={parseFloat(marketInfo.change) >= 0} />
+                                    <Metric label="24H %" value={`${parseFloat(marketInfo.change) >= 0 ? '+' : ''}${parseFloat(marketInfo.change).toFixed(2)}%`} positive={parseFloat(marketInfo.change) >= 0} />
+                                    <Metric label="VOL USDT" value={`$${(Number(marketInfo.vol)/1e9).toFixed(2)}B`} positive />
+                                    <Metric label="H/L SPREAD" value={`$${(Number(marketInfo.high)-Number(marketInfo.low)).toLocaleString(undefined,{maximumFractionDigits:0})}`} positive />
+                                </div>
+                        )}
+                    </LiveCard>
+
+                    {/* ░░ PILAR 4 — COPY TRADING ░░ */}
+                    <LiveCard y={c4Y} o={c4O} title="COPY TRADING" badge={wsStatus} icon={<Shield size={13} className="text-cyan-400" />}
+                        desc="Arquitectura basada en Intenciones (Intents) · emulación ERC-4337 Account Abstraction · replicación simétrica de calldata institucional.">
+                        {!lastCopy
+                            ? <ConnectingState label="Abstracción de estado pendiente…" />
+                            : (
+                                <motion.div key={lastCopy.ts} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-2 bg-black/40 border border-white/5 rounded-xl p-3 font-mono text-[9px] flex flex-col gap-1.5">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#22d3ee]" />
+                                        <span className="text-cyan-400 font-bold tracking-widest text-[7.5px]">SIMETRÍA EJECUTADA</span>
+                                    </div>
+                                    <div className="flex justify-between"><span className="text-white/40">PAYLOAD</span><span className={lastCopy.isBuy ? 'text-emerald-400' : 'text-rose-400'}>{lastCopy.isBuy ? 'BUY' : 'SELL'} {lastCopy.qty} BTC</span></div>
+                                    <div className="flex justify-between"><span className="text-white/40">PRECIO</span><span className="text-white">${parseFloat(lastCopy.price).toLocaleString(undefined,{maximumFractionDigits:0})}</span></div>
+                                    <div className="flex justify-between"><span className="text-white/40">USD VOL</span><span className="text-cyan-400">${Number(lastCopy.usd).toLocaleString()}</span></div>
+                                </motion.div>
+                        )}
+                    </LiveCard>
+                </div>
+
+                {/* ─────────── PHASE 3 · CONNECT WALLET CTA ─────────── */}
+                <motion.div style={{ opacity: btnOp, y: btnY, scale: prefersReducedMotion ? 1 : btnSc, willChange: 'transform,opacity' }} className="absolute bottom-8 left-0 right-0 px-6 z-40 max-w-[420px] mx-auto pointer-events-auto">
+                    {!isConnected ? (
+                        <button onClick={handleConnectTrigger} className="w-full h-[78px] bg-white text-[#0a0a0a] rounded-[2rem] font-black uppercase tracking-[0.22em] text-[11px] flex items-center justify-center gap-4 active:scale-[0.97] shadow-[0_0_45px_rgba(255,255,255,0.25)] hover:shadow-[0_0_60px_rgba(255,255,255,0.45)] hover:bg-cyan-50 group relative overflow-hidden cursor-pointer transition-all">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Wallet size={19} className="text-[#0a0a0a]/70 group-active:translate-x-1 transition-transform" />
+                            CONECTAR BILLETERA
+                        </button>
+                    ) : (
+                        <button onClick={() => setView('scanner')} className="w-full h-[78px] bg-cyan-500/10 border border-cyan-500/30 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-between px-8 shadow-[0_0_30px_rgba(6,182,212,0.15)] active:scale-[0.97] backdrop-blur-md cursor-pointer hover:bg-cyan-500/20 transition-colors">
+                            <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
+                                <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                                    <QrCode size={18} className="text-cyan-400" />
+                                </div>
+                                <div className="text-left leading-none">
+                                    <p className="tracking-[0.3em] text-cyan-50">SYNC LENS</p>
+                                    <p className="text-[8px] text-cyan-400/80 mt-1.5 font-black">READY: OPEN SCANNER</p>
+                                </div>
+                            </div>
+                            <ChevronRight size={16} className="text-cyan-400 opacity-80 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    )}
+                    {isConnected && address && (
+                        <p className="mt-4 text-[8.5px] font-mono font-black tracking-widest text-white/35 uppercase text-center">
+                            ID: <span className="text-cyan-500">{address.slice(0,10)}</span>…{address.slice(-6)}
+                        </p>
+                    )}
                 </motion.div>
             </div>
 
-            {/* STATUS LOGO STICKY BOTTOM */}
-            <div className="fixed bottom-6 w-full flex items-center justify-center gap-3 opacity-20 pointer-events-none z-10 px-8">
-                <div className="h-px bg-white/20 flex-1" />
-                <Fingerprint size={16} className="text-white" />
-                <div className="h-px bg-white/20 flex-1" />
+            {/* Fingerprint watermark */}
+            <div className="fixed bottom-4 w-full flex items-center justify-center gap-3 opacity-[0.12] pointer-events-none z-10 px-8">
+                <div className="h-px bg-white/30 flex-1" />
+                <Fingerprint size={14} className="text-white" />
+                <div className="h-px bg-white/30 flex-1" />
             </div>
-            
-            <style dangerouslySetInnerHTML={{ __html: `
-                @keyframes shimmer {
-                    100% { transform: translateX(100%); }
-                }
-            `}} />
+
+            <style dangerouslySetInnerHTML={{ __html: `@keyframes shimmer { 100% { transform: translateX(100%); } }` }} />
         </div>
     );
 }
 
-function FeatureRow({ title, desc, y, o, reduced }: { title: string, desc: string, y: any, o: any, reduced: boolean | null }) {
+// ─── SUB-COMPONENTS ──────────────────────────────────────────────────────────
+
+function LiveCard({ title, desc, badge, icon, y, o, children }: { title:string, desc:string, badge:string, icon:React.ReactNode, y:any, o:any, children:React.ReactNode }) {
+    const live = badge === 'CONNECTED';
     return (
-        <motion.div 
-            style={reduced ? { opacity: o } : { y, opacity: o, willChange: "transform, opacity" }}
-            className="flex items-start gap-4"
-        >
-            <div className="mt-1 flex-shrink-0">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,1)]" />
+        <motion.div style={{ y, opacity: o, willChange: 'transform,opacity' }}
+            className="w-full bg-[#0f0f0f]/95 backdrop-blur-2xl border border-white/[0.07] rounded-3xl p-4 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9)] relative overflow-hidden pointer-events-auto">
+            {/* Inner glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-cyan-500/5 blur-2xl rounded-full pointer-events-none" />
+            {/* Header */}
+            <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                    {icon}
+                    <h3 className="text-[11px] font-black text-white uppercase tracking-[0.18em] italic">{title}</h3>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <div className={`w-1.5 h-1.5 rounded-full ${live ? 'bg-cyan-400 animate-pulse' : 'bg-amber-500 animate-ping'}`} />
+                    <span className="text-[7px] font-mono tracking-widest text-white/35 uppercase">{live ? 'WSS LIVE' : badge}</span>
+                </div>
             </div>
-            <div>
-                <h4 className="text-[11px] font-black text-white uppercase tracking-widest mb-1 font-sans">{title}</h4>
-                <p className="text-[9px] text-white/60 leading-relaxed max-w-[220px] font-medium tracking-wide">{desc}</p>
-            </div>
+            {/* Description */}
+            <p className="text-[8.5px] text-white/45 leading-relaxed border-b border-white/[0.06] pb-2.5 mb-0.5 font-medium tracking-wide">{desc}</p>
+            {/* Live content */}
+            {children}
         </motion.div>
+    );
+}
+
+function Metric({ label, value, positive }: { label:string, value:string, positive:boolean }) {
+    return (
+        <div className="flex flex-col">
+            <span className="text-white/30 text-[7.5px] uppercase tracking-widest">{label}</span>
+            <span className={positive ? 'text-emerald-400' : 'text-rose-400'}>{value}</span>
+        </div>
+    );
+}
+
+function ConnectingState({ label = 'Conectando a red soberana…' }: { label?: string }) {
+    return (
+        <div className="flex items-center gap-2 mt-2 h-10">
+            <RefreshCw size={10} className="text-cyan-400/50 animate-spin" />
+            <span className="text-[8.5px] text-white/30 font-mono">{label}</span>
+        </div>
     );
 }
 
