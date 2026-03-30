@@ -9,6 +9,7 @@ import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useUIStore } from '@/lib/store/ui-store';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 import Image from 'next/image';
+import { SplashContainer } from '@/components/shared/SplashContainer';
 
 // ─── IVORY INSTITUTIONAL HEADER ───
 // Crema/Ivory premium palette — 100% visible, senior Web3 grade
@@ -52,13 +53,16 @@ export function InstitutionalHeader() {
                         className="relative w-11 h-11 flex items-center justify-center rounded-full border shadow-sm"
                         style={{ background: 'rgba(0,0,0,0.04)', borderColor: 'rgba(0,0,0,0.08)' }}
                     >
-                        <Image
-                            src="/official-whale-monochrome.png"
-                            alt="Whale Logo"
-                            width={28}
-                            height={28}
-                            className="object-contain"
-                        />
+                        <SplashContainer className="w-full h-full flex items-center justify-center">
+                            <Image
+                                src="/official-whale-monochrome.png"
+                                alt="Whale Logo"
+                                width={28}
+                                height={28}
+                                className="object-contain"
+                                unoptimized={true}
+                            />
+                        </SplashContainer>
                     </motion.div>
                     <div className="flex flex-col leading-none">
                         <span className="font-aztec-serif text-[18px] font-black text-black uppercase tracking-tighter leading-none">

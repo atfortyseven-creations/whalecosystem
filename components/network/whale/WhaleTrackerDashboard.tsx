@@ -14,6 +14,7 @@ import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { InmersiveConstellations } from '@/components/shared/InmersiveConstellations';
 import { GlobalMarketSessions } from '@/components/premium/GlobalMarketSessions';
 import { EliteIntelligenceNews } from '@/components/premium/EliteIntelligenceNews';
+import { SplashContainer } from '@/components/shared/SplashContainer';
 import Link from 'next/link';
 
 // ─── Universal Explorer Logic ──────────────────────────────────────────
@@ -272,11 +273,13 @@ export function WhaleTrackerDashboard() {
                                 className="w-80 h-80 flex items-center justify-center mx-auto relative group"
                             >
                                 <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full" />
-                                <img 
-                                    src="/official-whale-monochrome.png" 
-                                    className="w-full h-full object-contain transition-transform duration-500 scale-125 group-hover:scale-150 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] relative z-10" 
-                                    alt="Whale Alert Pro"
-                                />
+                                <SplashContainer className="w-full h-full transition-transform duration-500 scale-125 group-hover:scale-150 relative z-10 flex items-center justify-center">
+                                    <img 
+                                        src="/official-whale-monochrome.png" 
+                                        className="w-full h-full object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]" 
+                                        alt="Whale Alert Pro"
+                                    />
+                                </SplashContainer>
                             </motion.div>
                             <div className="space-y-4">
                                 <h1 className="text-4xl sm:text-8xl font-black uppercase tracking-tighter leading-none text-white">

@@ -28,7 +28,7 @@ const nextConfig = {
     distDir: isExtension ? 'out' : '.next',
 
     images: {
-        unoptimized: isExtension,
+        unoptimized: true,
         remotePatterns: [
             { protocol: 'https', hostname: 'picsum.photos' },
             { protocol: 'https', hostname: 'cdn.weatherapi.com' },

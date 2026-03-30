@@ -16,9 +16,9 @@ function WhaleAcademyHero() {
     <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-20 pb-8 px-6 text-center bg-[#FAF9F6] border-b border-[#E5E5E5]">
       
       {/* ── DISCLAIMER BANNER ── */}
-      <div className="w-full bg-[#111111] text-[#FAF9F6] py-3 px-4 flex items-center justify-center gap-3 absolute top-0 left-0 z-50">
-        <AlertTriangle size={14} className="text-[#f59e0b]" />
-        <span className="text-[10px] font-black font-mono tracking-widest uppercase">
+      <div className="w-full bg-[#f59e0b] shadow-md border-b-2 border-black/10 py-3 px-4 flex items-center justify-center gap-3 relative z-[60] mb-8">
+        <AlertTriangle size={18} className="text-[#111111]" strokeWidth={2.5} />
+        <span className="text-xs sm:text-sm font-black font-mono tracking-widest uppercase text-[#111111]" style={{ fontWeight: 900 }}>
           NO RELIANCE / EDUCATIONAL PURPOSES ONLY DISCLAIMER: Information provided is NOT financial advice.
         </span>
       </div>
@@ -34,8 +34,8 @@ function WhaleAcademyHero() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative mb-6"
       >
-        <div className="w-[80px] h-[80px] bg-[#111111] rounded-2xl flex items-center justify-center shadow-lg p-2 mx-auto">
-          <CorporateWhaleLogo className="w-full h-full text-[#FAF9F6]" />
+        <div className="w-[80px] h-[80px] bg-white rounded-2xl flex items-center justify-center shadow-xl p-2 mx-auto border border-black/5">
+          <CorporateWhaleLogo className="w-full h-full" />
         </div>
       </motion.div>
 

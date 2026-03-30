@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
+import { SplashContainer } from '@/components/shared/SplashContainer';
 
 const whaleVariants: Variants = {
     swim: {
@@ -103,14 +104,16 @@ export function CinematicWhaleLogo({ src = "/official-whale-monochrome.png", cla
             />
 
             {/* The single persistent Whale Image */}
-            <motion.img 
-                src={src} 
-                alt="Whale"
-                className="w-full h-full object-contain relative z-20 drop-shadow-sm pointer-events-none"
-                style={{ willChange: "transform, filter" }}
-                variants={whaleVariants}
-                animate={activeAnimation}
-            />
+            <SplashContainer className="w-full h-full absolute inset-0 z-20 pointer-events-auto">
+                <motion.img 
+                    src={src} 
+                    alt="Whale"
+                    className="w-full h-full object-contain drop-shadow-sm"
+                    style={{ willChange: "transform, filter" }}
+                    variants={whaleVariants}
+                    animate={activeAnimation}
+                />
+            </SplashContainer>
 
             {/* Micro-indicator of which animation is currently active */}
             <div className="absolute -bottom-6 flex gap-1.5 z-30 pointer-events-none">
