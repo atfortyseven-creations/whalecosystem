@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { 
   QrCode, 
   Smartphone, 
@@ -104,7 +104,7 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
         .mobile-hide-scrollbar::-webkit-scrollbar { display: none; }
         .mobile-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .web3-dot-pattern {
-          background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
           background-size: 32px 32px;
           will-change: transform;
         }
@@ -317,112 +317,271 @@ export function MobileSovereignLanding() {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [walletBrowser, setWalletBrowser] = useState<string | null>(null);
 
+    const prefersReducedMotion = useReducedMotion();
+
     useEffect(() => {
         setWalletBrowser(detectWalletBrowser());
     }, []);
 
     const handleConnectTrigger = useCallback(() => {
         if (walletBrowser) {
-            // Inside a wallet's InApp browser, the injected provider IS the wallet.
-            // Never try to match by wallet name — always use 'injected'.
             const injectedConnector = connectors.find(
                 c => c.id === 'injected' || c.id === 'io.metamask' || c.type === 'injected'
             );
             if (injectedConnector) {
                 connect({ connector: injectedConnector });
             } else if (connectors.length > 0) {
-                // Absolute fallback: use first available connector
                 connect({ connector: connectors[0] });
             }
         } else {
-            // Not inside a wallet browser — show the picker modal
             setIsPickerOpen(true);
         }
     }, [connect, connectors, walletBrowser]);
+
+    // SCROLL ANIMATION LOGIC (AAA Cinematic Tier)
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start start", "end end"]
+    });
+    
+    // Physics-tuned springs for cinematic mass and organic feel
+    const smProgress = useSpring(scrollYProgress, { stiffness: 60, damping: 20, mass: 1.5 });
+    const delay1Progress = useSpring(scrollYProgress, { stiffness: 50, damping: 25, mass: 1.8 });
+    const delay2Progress = useSpring(scrollYProgress, { stiffness: 40, damping: 30, mass: 2.2 });
+    const delay3Progress = useSpring(scrollYProgress, { stiffness: 30, damping: 35, mass: 2.8 });
+
+    // --- PHASE 1: DECONSTRUCTION ---
+    // Whale (Base Spring)
+    const whaleY = useTransform(smProgress, [0, 0.25], [0, -500]);
+    const whaleX = useTransform(smProgress, [0, 0.25], [0, 200]);
+    const whaleRotateZ = useTransform(smProgress, [0, 0.25], [0, 45]);
+    const whaleRotateX = useTransform(smProgress, [0, 0.25], [0, 60]);
+    const whaleScale = useTransform(smProgress, [0, 0.25], [1, 0.2]);
+    const whaleOpacity = useTransform(smProgress, [0, 0.2, 0.25], [1, 0.5, 0]);
+    const whaleBlur = useTransform(smProgress, [0, 0.25], ["blur(0px)", "blur(12px)"]);
+    
+    // WHALE text (Delay 1)
+    const t1Y = useTransform(delay1Progress, [0, 0.3], [0, -150]);
+    const t1X = useTransform(delay1Progress, [0, 0.3], [0, -300]);
+    const t1RotZ = useTransform(delay1Progress, [0, 0.3], [0, -35]);
+    const t1RotY = useTransform(delay1Progress, [0, 0.3], [0, 45]);
+    const t1Opacity = useTransform(delay1Progress, [0, 0.25], [1, 0]);
+    const t1Blur = useTransform(delay1Progress, [0, 0.3], ["blur(0px)", "blur(10px)"]);
+
+    // ALERT text (Delay 2)
+    const t2Y = useTransform(delay2Progress, [0, 0.3], [0, 100]);
+    const t2X = useTransform(delay2Progress, [0, 0.3], [0, 350]);
+    const t2RotZ = useTransform(delay2Progress, [0, 0.3], [0, 45]);
+    const t2RotX = useTransform(delay2Progress, [0, 0.3], [0, 45]);
+    const t2Opacity = useTransform(delay2Progress, [0, 0.25], [1, 0]);
+    const t2Blur = useTransform(delay2Progress, [0, 0.3], ["blur(0px)", "blur(10px)"]);
+
+    // NETWORK text (Delay 3)
+    const t3Y = useTransform(delay3Progress, [0, 0.3], [0, 400]);
+    const t3Z = useTransform(delay3Progress, [0, 0.3], [0, 200]);
+    const t3RotX = useTransform(delay3Progress, [0, 0.3], [0, -60]);
+    const t3Opacity = useTransform(delay3Progress, [0, 0.25], [1, 0]);
+    const t3Blur = useTransform(delay3Progress, [0, 0.3], ["blur(0px)", "blur(10px)"]);
+
+    const scrollHintOpacity = useTransform(smProgress, [0, 0.05], [1, 0]);
+
+    // --- PHASE 2: ASSEMBLY ---
+    const assemblyOpacity = useTransform(smProgress, [0.3, 0.4], [0, 1]);
+    const assemblyY = useTransform(smProgress, [0.3, 0.4], [100, 0]);
+    const ambientGlowOpacity = useTransform(smProgress, [0.3, 0.6], [0, 1]);
+
+    // Sequential Feature Rows
+    const row1Y = useTransform(delay1Progress, [0.35, 0.45], [50, 0]);
+    const row1O = useTransform(delay1Progress, [0.35, 0.45], [0, 1]);
+    
+    const row2Y = useTransform(delay2Progress, [0.45, 0.55], [50, 0]);
+    const row2O = useTransform(delay2Progress, [0.45, 0.55], [0, 1]);
+    
+    const row3Y = useTransform(delay3Progress, [0.55, 0.65], [50, 0]);
+    const row3O = useTransform(delay3Progress, [0.55, 0.65], [0, 1]);
+    
+    const row4Y = useTransform(smProgress, [0.65, 0.75], [50, 0]);
+    const row4O = useTransform(smProgress, [0.65, 0.75], [0, 1]);
+    
+    const row5Y = useTransform(delay1Progress, [0.75, 0.85], [50, 0]);
+    const row5O = useTransform(delay1Progress, [0.75, 0.85], [0, 1]);
+
+    // --- PHASE 3: CONNECT REVEAL ---
+    const buttonOpacity = useTransform(smProgress, [0.85, 0.95], [0, 1]);
+    const buttonY = useTransform(smProgress, [0.85, 0.95], [80, 0]);
+    const buttonScale = useTransform(smProgress, [0.85, 0.95], [0.85, 1]);
 
     if (view === 'scanner') {
         return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
     }
 
     return (
-        <div className="min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-black selection:text-white flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden">
+        <div ref={containerRef} className="w-full bg-[#0a0a0a] min-h-[300vh] text-white font-sans overflow-clip relative selection:bg-cyan-500/30" style={{ transformStyle: "preserve-3d" }}>
             <AnimatedPattern />
+            
+            {/* Cinematic Background Parallax */}
+            <motion.div 
+                className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.03)_0%,transparent_70%)]"
+                style={{ opacity: ambientGlowOpacity, willChange: "opacity" }} 
+            />
+
             <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
             {/* TOP BAR */}
-            <header className="w-full flex items-center justify-end z-20 h-10">
-                <div className="flex items-center gap-3">
+            <header className="fixed top-0 left-0 w-full flex items-center justify-end z-50 h-16 px-8 pointer-events-none">
+                <div className="flex items-center gap-3 pointer-events-auto">
                     {isConnected && (
                         <button 
                             onClick={() => disconnect()}
-                            className="w-10 h-10 bg-white border border-black/5 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+                            className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform backdrop-blur-md"
                         >
-                            <RefreshCw size={14} className="text-[#050505]/40" />
+                            <RefreshCw size={14} className="text-white/60" />
                         </button>
                     )}
                 </div>
             </header>
 
-            {/* HERO SECTION */}
-            <main className="w-full max-w-sm flex flex-col items-center text-center z-10">
+            {/* STICKY RENDERER */}
+            <div className="sticky top-0 left-0 w-full h-[100dvh] overflow-hidden flex flex-col items-center justify-center pt-12 px-8" style={{ perspective: "1000px" }}>
+                
+                {/* ─── PHASE 1: FRAGMENTATION HERO ─── */}
+                <motion.div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20" style={{ transformStyle: "preserve-3d" }}>
+                    <motion.div 
+                        style={prefersReducedMotion ? { opacity: whaleOpacity } : { y: whaleY, x: whaleX, rotateZ: whaleRotateZ, rotateX: whaleRotateX, scale: whaleScale, opacity: whaleOpacity, filter: whaleBlur, willChange: "transform, opacity, filter" }}
+                        className="w-full max-w-sm flex justify-center mb-6 mt-8"
+                    >
+                        {/* Parent scales container massively (3.0x approx via w-56/scale-150 + Cinematic's own scale) */}
+                        <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-64 h-64 scale-[2.8] transform-gpu pointer-events-none" />
+                    </motion.div>
+
+                    <div className="flex flex-col items-center mt-12 relative w-full overflow-visible" style={{ transformStyle: "preserve-3d" }}>
+                        <motion.h1 
+                            style={prefersReducedMotion ? { opacity: t1Opacity } : { y: t1Y, x: t1X, rotateZ: t1RotZ, rotateY: t1RotY, opacity: t1Opacity, filter: t1Blur, willChange: "transform, opacity, filter" }} 
+                            className="text-[4rem] md:text-6xl font-black tracking-tighter leading-none uppercase italic text-white drop-shadow-md"
+                        >
+                            Whale
+                        </motion.h1>
+                        <motion.h1 
+                            style={prefersReducedMotion ? { opacity: t2Opacity } : { y: t2Y, x: t2X, rotateZ: t2RotZ, rotateX: t2RotX, opacity: t2Opacity, filter: t2Blur, willChange: "transform, opacity, filter" }} 
+                            className="text-[4rem] md:text-6xl font-black tracking-tighter leading-none uppercase italic text-white drop-shadow-md -mt-2"
+                        >
+                            Alert
+                        </motion.h1>
+                        <motion.h1 
+                            style={prefersReducedMotion ? { opacity: t3Opacity } : { y: t3Y, z: t3Z, rotateX: t3RotX, opacity: t3Opacity, filter: t3Blur, willChange: "transform, opacity, filter" }} 
+                            className="text-[4rem] md:text[5rem] font-black tracking-tighter leading-none uppercase italic text-cyan-400 drop-shadow-[0_0_20px_rgba(6,182,212,0.8)] -mt-2"
+                        >
+                            Network
+                        </motion.h1>
+                    </div>
+
+                    <motion.div 
+                        style={{ opacity: scrollHintOpacity, willChange: "opacity" }} 
+                        className="absolute bottom-12 flex flex-col items-center gap-2"
+                    >
+                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">
+                            SCROLL PARA EXPLORAR EL NÚCLEO
+                        </span>
+                        <ChevronDown size={14} className="text-white/40 animate-bounce" />
+                    </motion.div>
+                </motion.div>
+
+                {/* ─── PHASE 2 & 3: ASSEMBLY & CONNECT ─── */}
                 <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ opacity: assemblyOpacity, y: assemblyY, willChange: "transform, opacity" }}
+                    className="absolute inset-0 flex flex-col items-center justify-center z-30 px-6 max-w-sm mx-auto w-full pointer-events-none"
                 >
-                    <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-48 h-48 mx-auto mb-6 mt-8 scale-[3] transform-gpu pointer-events-none opacity-90" />
+                    <div className="w-full bg-[#050505]/90 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,1),0_0_30px_rgba(6,182,212,0.1)] flex flex-col items-center relative overflow-hidden">
+                        {/* Core ambient light */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-[150%] bg-[radial-gradient(circle_at_top,rgba(6,182,212,0.15)_0%,transparent_50%)] pointer-events-none" />
 
-                    <h1 className="text-6xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic relative z-10 drop-shadow-md">
-                        Whale Alert<br/>Network
-                    </h1>
-                    
-                    <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-12 max-w-[280px] mx-auto leading-relaxed relative z-10 bg-white/20 backdrop-blur-[2px] rounded-xl py-1">
-                        Connect with<br/>PC session.
-                    </p>
+                        <Activity size={24} className="text-cyan-400 mb-6 drop-shadow-[0_0_15px_rgba(6,182,212,1)]" />
+                        
+                        <h2 className="text-2xl font-black tracking-tighter uppercase text-white mb-8 text-center italic leading-[1.1] drop-shadow-lg">
+                            EL NÚCLEO<br/><span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">SOBERANO</span>
+                        </h2>
 
-                    <div className="w-full space-y-4">
+                        <div className="w-full space-y-5 text-left pointer-events-auto relative z-10 font-mono">
+                            <FeatureRow y={row1Y} o={row1O} reduced={prefersReducedMotion} title="Núcleo Soberano" desc="Viems & Ethers en ejecución nativa" />
+                            <FeatureRow y={row2Y} o={row2O} reduced={prefersReducedMotion} title="Seguridad Militar" desc="Cifrado AES-256 + ofuscación cuántica" />
+                            <FeatureRow y={row3Y} o={row3O} reduced={prefersReducedMotion} title="Latencia extrema" desc="0.12 ms en red soberana" />
+                            <FeatureRow y={row4Y} o={row4O} reduced={prefersReducedMotion} title="Rastreo en tiempo real" desc="Nodos de ballenas monitoreando 24/7" />
+                            <FeatureRow y={row5Y} o={row5O} reduced={prefersReducedMotion} title="Terminal aislada" desc="Opera en su propio hilo desconectado de la UI" />
+                        </div>
+                    </div>
+
+                    {/* CONNECT BUTTON AREA */}
+                    <motion.div 
+                        style={{ opacity: buttonOpacity, y: buttonY, scale: prefersReducedMotion ? 1 : buttonScale, willChange: "transform, opacity" }}
+                        className="w-full mt-8 pointer-events-auto"
+                    >
                         {!isConnected ? (
                             <button
                                 onClick={handleConnectTrigger}
-                                className="w-full h-[88px] bg-[#050505] text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] group"
+                                className="w-full h-[80px] bg-white text-[#0a0a0a] rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-cyan-50 group relative overflow-hidden cursor-pointer"
                             >
-                                <Wallet size={20} className="text-white/40 group-active:translate-x-1 transition-transform" />
-                                CONNECT WALLET
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                                <Wallet size={20} className="text-[#0a0a0a]/80 group-active:translate-x-1 transition-transform" />
+                                CONECTAR BILLETERA
                             </button>
                         ) : (
                             <button
                                 onClick={() => setView('scanner')}
-                                className="w-full h-[88px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[12px] flex items-center justify-between px-10 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
+                                className="w-full h-[80px] bg-cyan-500/10 border border-cyan-500/30 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-between px-8 shadow-[0_0_30px_rgba(6,182,212,0.15)] active:scale-[0.98] group relative backdrop-blur-md cursor-pointer hover:bg-cyan-500/20 transition-colors"
                             >
-                                <div className="grid grid-cols-[auto_1fr] gap-6 items-center">
-                                    <QrCode size={22} className="text-[#050505]" />
-                                    <div className="text-left leading-tight">
-                                        <p className="tracking-[0.3em]">SYNC LENS</p>
-                                        <p className="text-[9px] opacity-40 mt-1 font-bold">READY: OPEN SCANNER</p>
+                                <div className="grid grid-cols-[auto_1fr] gap-4 items-center">
+                                    <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                                        <QrCode size={18} className="text-cyan-400" />
+                                    </div>
+                                    <div className="text-left leading-none">
+                                        <p className="tracking-[0.3em] text-cyan-50">SYNC LENS</p>
+                                        <p className="text-[8px] text-cyan-400/80 mt-2 font-black">READY: OPEN SCANNER</p>
                                     </div>
                                 </div>
-                                <ChevronRight size={18} className="opacity-20 group-hover:translate-x-1 transition-transform" />
+                                <ChevronRight size={16} className="text-cyan-400 opacity-80 group-hover:translate-x-1 transition-transform" />
                             </button>
                         )}
-                    </div>
-
-                    {isConnected && address && (
-                        <div className="mt-12 opacity-20">
-                            <span className="text-[10px] font-mono font-black tracking-widest">
-                                ID: {address.slice(0, 10).toUpperCase()}...{address.slice(-6).toUpperCase()}
-                            </span>
-                        </div>
-                    )}
+                        
+                        {isConnected && address && (
+                            <p className="mt-6 text-[9px] font-mono font-black tracking-widest text-white/40 uppercase drop-shadow-md text-center">
+                                ID: <span className="text-cyan-500">{address.slice(0, 10)}</span>...{address.slice(-6)}
+                            </p>
+                        )}
+                    </motion.div>
                 </motion.div>
-            </main>
-
-            {/* STATUS LOGO */}
-            <div className="w-full flex items-center justify-center gap-3 opacity-[0.05] pointer-events-none mb-4">
-                <div className="h-px bg-black flex-1" />
-                <Fingerprint size={20} />
-                <div className="h-px bg-black flex-1" />
             </div>
+
+            {/* STATUS LOGO STICKY BOTTOM */}
+            <div className="fixed bottom-6 w-full flex items-center justify-center gap-3 opacity-20 pointer-events-none z-10 px-8">
+                <div className="h-px bg-white/20 flex-1" />
+                <Fingerprint size={16} className="text-white" />
+                <div className="h-px bg-white/20 flex-1" />
+            </div>
+            
+            <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes shimmer {
+                    100% { transform: translateX(100%); }
+                }
+            `}} />
         </div>
+    );
+}
+
+function FeatureRow({ title, desc, y, o, reduced }: { title: string, desc: string, y: any, o: any, reduced: boolean | null }) {
+    return (
+        <motion.div 
+            style={reduced ? { opacity: o } : { y, opacity: o, willChange: "transform, opacity" }}
+            className="flex items-start gap-4"
+        >
+            <div className="mt-1 flex-shrink-0">
+                <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,1)]" />
+            </div>
+            <div>
+                <h4 className="text-[11px] font-black text-white uppercase tracking-widest mb-1 font-sans">{title}</h4>
+                <p className="text-[9px] text-white/60 leading-relaxed max-w-[220px] font-medium tracking-wide">{desc}</p>
+            </div>
+        </motion.div>
     );
 }
 
