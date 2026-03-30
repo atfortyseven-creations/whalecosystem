@@ -20,7 +20,7 @@ export const config = createConfig({
             metadata: {
                 name: 'WhaleAlert ID.fi',
                 description: 'The Sovereign Identity & Prediction Market Suite',
-                url: 'https://institutional.pro',
+                url: 'https://humanidfi.com',
                 icons: ['/official-whale-legendary.png'],
             }
         }),
