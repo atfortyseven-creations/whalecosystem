@@ -54,11 +54,11 @@ function processNewsContent(text: string | null | undefined): string {
 
 export async function GET() {
   try {
-    const apiKey = process.env.CRYPTOPANIC_API_KEY;
+    const apiKeysEnv = process.env.CRYPTOPANIC_API_KEYS || process.env.CRYPTOPANIC_API_KEY;
     
     // Fallback de demostración soberana si no existe API key
-    if (!apiKey) {
-      console.warn("Whale News: CRYPTOPANIC_API_KEY no detectada. Retornando datos estructurados simulados (Fallback 0-day).");
+    if (!apiKeysEnv) {
+      console.warn("Whale News: CRYPTOPANIC_API_KEYS no detectada. Retornando datos estructurados simulados (Fallback 0-day).");
       const mockNews = [
         {
           id: 'news-1',
@@ -104,15 +104,34 @@ export async function GET() {
       return NextResponse.json({ success: true, count: 5, articles: mockNews }, { status: 200 });
     }
 
-    // Flujo principal de integración real
-    const url = `https://cryptopanic.com/api/v1/posts/?auth_token=${apiKey}&public=true&filter=important`;
-    const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    // Extracción de llaves del entorno y rotación termodinámica
+    const apiKeys = apiKeysEnv.split(',').map(k => k.trim()).filter(Boolean);
+    let json = null;
+    let success = false;
+    let fetchError = null;
 
-    if (!response.ok) {
-      throw new Error(`CryptoPanic respondió con estado: ${response.status}`);
+    // Flujo principal de integración real (Estructura de Redundancia Multi-Nodo)
+    for (const key of apiKeys) {
+      const url = `https://cryptopanic.com/api/v1/posts/?auth_token=${key}&public=true&filter=important`;
+      const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
+      if (response.ok) {
+        json = await response.json();
+        success = true;
+        break; // Nivel térmico aceptable, detenemos la rotación
+      } else if (response.status === 429) {
+        console.warn(`[Whale News Backend] Threshold de rate limit excedido para la clave terminada en ...${key.slice(-4)}. Rotando hacia el siguiente nodo...`);
+        fetchError = new Error(`CryptoPanic Rate Limit 429`);
+        continue;
+      } else {
+        fetchError = new Error(`CryptoPanic respondió con estado no rotativo: ${response.status}`);
+        break;
+      }
     }
 
-    const json = await response.json();
+    if (!success || !json) {
+      throw fetchError || new Error('Incapacidad algorítmica: Todos los nodos de acceso han colapsado o han sido estrangulados (Rate Limit).');
+    }
     
     // Transformación matemática y sanitaria al estándar de WhaleCosystem
     const processedArticles = (json.results || []).map((article: CryptoPanicArticle) => ({
