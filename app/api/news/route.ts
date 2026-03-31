@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma'; // Invocamos el guardián de persistencia
+import { prisma } from '@/lib/prisma';
 
-export const revalidate = 60; // 1 minuto, dado que ahora tenemos capa de Base de Datos y no requerimos castigar a CryptoPanic
+export const revalidate = 60; // Caché de termodinámica 60s.
 
 interface CryptoPanicArticle {
   id: number;
@@ -21,8 +21,6 @@ interface CryptoPanicArticle {
 // MOTOR HEURÍSTICO DE EXPANSIÓN (500B_MODEL_SIMULATOR)
 // =========================================================================
 function generateDeepAnalysis(title: string, domain: string): string {
-  // Convertimos un simple titular en un reporte institucional soberano y letal de 5 bloques lógicos.
-  
   const block1 = `El flujo termodinámico de metadatos desde los validadores de ${domain} reporta la actividad primordial definida bajo el vector "${title}". La termometría local de este evento sugiere una reubicación de capital transaccional fuera de los promedios heurísticos comunes de las últimas 72 horas. La velocidad de propagación (velocity) asienta un precedente para una volatilidad inminente en los pares derivados de la gobernanza de este entorno.`;
 
   const block2 = `Las entidades institucionales han comenzado a reajustar los escudos criptográficos de protección contra este tipo de volatilidad subyacente. Esto se manifiesta como una reubicación pasiva de colateral, en la que ballenas (Tier-1 wallets) exfiltran silenciosamente liquidez desde los consorcios afectados hacia mecanismos automatizados de rendimiento aislados (Isolated Margin Vaults).`;
@@ -41,42 +39,49 @@ export async function GET() {
     const apiKeysEnv = process.env.CRYPTOPANIC_API_KEYS || process.env.CRYPTOPANIC_API_KEY;
     const apiKeys = apiKeysEnv ? apiKeysEnv.split(',').map(k => k.trim()).filter(Boolean) : [];
     
-    // Si tenemos credenciales, lanzamos sincronización a Postgres
+    let cryptoPanicResults: CryptoPanicArticle[] = [];
+
+    // Extracción Termodinámica Directa
     if (apiKeys.length > 0) {
-      let json = null;
-      
-      // Ciclo termodinámico redundante
       for (const key of apiKeys) {
-        // Obtenemos los 50 posts más críticos
         const url = `https://cryptopanic.com/api/v1/posts/?auth_token=${key}&public=true&filter=important`;
         const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
 
         if (response.ok) {
-          json = await response.json();
+          const json = await response.json();
+          cryptoPanicResults = json.results || [];
           break; // Nodo OK
         } else if (response.status === 429) {
-          continue; // Rate Limit, intenta el siguiente nodo
+          continue; // Purgar a nodo redundante
         }
       }
+    }
 
-      // Si sincronizamos OK, inyectamos en la Base de Datos DE POR VIDA
-      if (json && json.results) {
-        const results: CryptoPanicArticle[] = json.results;
-        
-        // Truncamos preventivamente a 50 máximo para esta sincronización
-        for (const item of results.slice(0, 50)) {
+    // Adaptador de Resultados (Caída segura, 100% On-memory Fallback si BD falla)
+    const fallbackArticles = cryptoPanicResults.slice(0, 50).map(item => {
+      const cleanTitle = item.title.replace(/<[^>]*>?/gm, '').replace(/&quot;/g, '"');
+      const sourceName = item.source?.title || item.domain || 'Whale-Node';
+      return {
+        id: `cp-${item.id}`,
+        title: cleanTitle,
+        description: generateDeepAnalysis(cleanTitle, sourceName),
+        date: new Date(item.published_at).toISOString(),
+        url: item.url,
+        source: sourceName,
+      };
+    });
+
+    // Intentamos inyectar y leer desde Prisma "Para Siempre", protegiendo fallos de DB
+    try {
+      if (cryptoPanicResults.length > 0) {
+        for (const item of cryptoPanicResults.slice(0, 50)) {
           const cleanTitle = item.title.replace(/<[^>]*>?/gm, '').replace(/&quot;/g, '"');
           const sourceName = item.source?.title || item.domain || 'Anon-Node';
           const aiExtendedContent = generateDeepAnalysis(cleanTitle, sourceName);
 
-          // UPSERT garantiza Persistencia Permanente (Clasificado para siempre en nuestro sistema)
           await prisma.intelItem.upsert({
             where: { url: item.url },
-            update: {
-              title: cleanTitle,
-              aiSummary: aiExtendedContent,
-              source: sourceName,
-            },
+            update: { title: cleanTitle, aiSummary: aiExtendedContent, source: sourceName },
             create: {
               url: item.url,
               title: cleanTitle,
@@ -89,51 +94,36 @@ export async function GET() {
           });
         }
       }
-    }
 
-    // ─── RETORNO TOTAL ───
-    // Devolvemos SIEMPRE las 50 noticias más recientes almacenadas "para siempre" en el sistema.
-    // Esto funciona incluso si hoy falló la API, porque las anteriores ya estaban persistidas.
-    const persistentNews = await prisma.intelItem.findMany({
-      orderBy: { publishedAt: 'desc' },
-      take: 50,
-      select: {
-        id: true,
-        title: true,
-        source: true,
-        url: true,
-        publishedAt: true,
-        aiSummary: true,
+      const persistentNews = await prisma.intelItem.findMany({
+        orderBy: { publishedAt: 'desc' },
+        take: 50,
+      });
+
+      if (persistentNews.length > 0) {
+        const mappedArticles = persistentNews.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.aiSummary || generateDeepAnalysis(item.title, item.source),
+          date: item.publishedAt.toISOString(),
+          url: item.url,
+          source: item.source, 
+        }));
+
+        return NextResponse.json({ success: true, count: mappedArticles.length, articles: mappedArticles, timestamp: Date.now() }, { status: 200 });
       }
-    });
-
-    if (persistentNews.length === 0) {
-      throw new Error("Base de datos vacía y sin Fallback activo. Termodinámica no resuelta.");
+    } catch (dbError) {
+      console.warn('[Whale News Backend] Prisma DB Miss/Offline. Activando memoria algorítmica efímera.');
+      // En caso extremo de que Postgres esté desconectado o el schema no migrado
+      return NextResponse.json({ success: true, count: fallbackArticles.length, articles: fallbackArticles, timestamp: Date.now() }, { status: 200 });
     }
 
-    // Adaptamos el payload de Prisma al formato esperado por el Frontend NewsTerminal
-    const mappedArticles = persistentNews.map(item => ({
-      id: item.id,
-      title: item.title,
-      description: item.aiSummary,
-      date: item.publishedAt.toISOString(),
-      url: item.url,
-      source: item.source, 
-    }));
-
-    return NextResponse.json({
-      success: true,
-      count: mappedArticles.length,
-      articles: mappedArticles,
-      timestamp: Date.now()
-    }, { status: 200 });
+    return NextResponse.json({ success: true, count: fallbackArticles.length, articles: fallbackArticles, timestamp: Date.now() }, { status: 200 });
 
   } catch (error: any) {
-    console.error('[Whale News Backend] Fractura en la sincronización o consulta:', error);
-    
-    // Devolvemos 500 informando caída del clúster
+    console.error('[Whale News Backend] Fractura letal:', error);
     return NextResponse.json(
-      { success: false, error: 'Incapacidad de resolver termodinámica de noticias persistentes.' },
+      { success: false, error: 'Aislador de red comprometido.' },
       { status: 500 }
     );
   }

@@ -23,9 +23,9 @@ export function NewsTerminal() {
   // Master-Detail State
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   
-  // Settings State
+  // Settings State (Por defecto es BLANCO PURO)
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [fontSizeRatio, setFontSizeRatio] = useState<number>(1); // Multiplicator
+  const [fontSizeRatio, setFontSizeRatio] = useState<number>(1);
   
   // Lock States
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
@@ -50,16 +50,12 @@ export function NewsTerminal() {
           const flagKey = `has_read_${decoded.id}`;
           
           if (localStorage.getItem(flagKey)) {
-            // Ya la leyó y acaba de recargar -> MUERTE POR REFRESH
             setIsBlockedByCaducity(true);
             setLoading(false);
             return;
           } else {
-            // Es su primera vez, dejamos la marca inquebrantable
             localStorage.setItem(flagKey, 'true');
-            // Eliminamos param visual de la URL para no ensuciar
             window.history.replaceState({}, document.title, window.location.pathname);
-            // Autoseleccionaríamos la noticia más adelante cuando se carguen
           }
         } catch (e) {
           console.warn("Token biométrico de noticias corrompido");
@@ -161,19 +157,19 @@ export function NewsTerminal() {
   // Render para "Muerto por Refresh" One-Time Read Limit
   if (isBlockedByCaducity) {
     return (
-      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mb-6 shadow-2xl">
-          <AlertTriangle className="text-[#F2ECD8]" size={32} />
+      <div className="w-full flex-grow flex flex-col items-center justify-center p-6 text-center bg-white text-black min-h-[calc(100vh-80px)]">
+        <div className="w-20 h-20 bg-black flex items-center justify-center mb-6">
+          <AlertTriangle className="text-white" size={32} />
         </div>
-        <h1 className="font-aztec-serif text-5xl font-black uppercase mb-4 text-black tracking-tighter">CADUCIDAD ALCANZADA</h1>
-        <p className="font-mono text-xs max-w-lg mb-10 tracking-[0.2em] leading-relaxed opacity-60">
-          Usted advirtió una advertencia One-Time Read. La carga residual de este manuscrito ha sido purgada instantáneamente tras refrescar la terminal. Para reconectar el nodo de lectura y obtener acceso vitalicio, active la línea criptográfica institucional.
+        <h1 className="font-sans text-6xl font-black uppercase mb-4 text-black tracking-tighter">ACCESO DENEGADO</h1>
+        <p className="font-mono text-xs max-w-lg mb-10 tracking-widest leading-relaxed opacity-100">
+           LA REGLA SOBERANA DE "UNA SOLA LECTURA" HA SIDO EJECUTADA. LA OPORTUNIDAD DE VISUALIZACIÓN FUE EXPIRADA. OBTENGA ACCESO ABSOLUTO MEDIANTE TRANSFERENCIA ETH.
         </p>
         <button
           onClick={() => setCheckoutOpen(true)}
-          className="bg-black text-[#F2ECD8] font-mono text-xs uppercase px-10 py-5 font-black tracking-widest hover:scale-105 transition-all shadow-xl rounded-lg"
+          className="bg-black text-white font-mono text-sm uppercase px-12 py-5 font-black tracking-widest hover:bg-black/80 transition-all border border-black"
         >
-          DESBLOQUEAR OMNISCIENCIA (1.99$)
+          DESBLOQUEAR TERMINAL FORENSE (0.015 ETH)
         </button>
         <CryptoCheckoutModal isOpen={isCheckoutOpen} onClose={() => setCheckoutOpen(false)} />
       </div>
@@ -182,130 +178,160 @@ export function NewsTerminal() {
 
   if (loading) {
     return (
-      <div className="w-full flex justify-center py-40 opacity-40">
-        <span className="font-mono text-xs uppercase tracking-[0.3em] flex items-center gap-2">
-          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-3 h-3 border border-black border-t-transparent rounded-full" />
+      <div className="w-full min-h-[calc(100vh-80px)] flex justify-center py-40 opacity-100 bg-white">
+        <span className="font-mono text-xs uppercase tracking-[0.3em] flex items-center gap-2 text-black">
+          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-4 h-4 border-2 border-black border-t-transparent" />
           Sincronizando 50 Nodos Forenses...
         </span>
       </div>
     );
   }
 
-  // Estilos termodinámicos
-  const panelBg = isDarkMode ? '#11100f' : '#FDFAF5';
-  const panelText = isDarkMode ? '#e6dfce' : '#11100f';
-  const panelBorder = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+  // Estilos Bloomberg-style: Sharp, flat colors, no shadows, simple borders
+  const panelBg = isDarkMode ? '#000000' : '#FFFFFF';
+  const panelText = isDarkMode ? '#FFFFFF' : '#000000';
+  const panelBorder = isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto min-h-[80vh] flex flex-col lg:flex-row gap-6">
+    <div className="w-full max-w-[1920px] mx-auto flex flex-col lg:flex-row h-[calc(100vh-80px)] border-t" style={{ borderColor: panelBorder }}>
       
-      {/* LEFT PANEL: 50 Noticias de Indexación (35%) */}
-      <div className="w-full lg:w-[35%] lg:h-[80vh] overflow-y-auto pr-2 rounded-xl border flex flex-col space-y-4 pt-1" style={{ borderColor: panelBorder }}>
-        <h2 className="font-aztec-serif text-2xl font-black uppercase sticky top-0 bg-[#F7F2EA] py-4 z-10 select-none">ÍNDICE FORENSE</h2>
+      {/* ───────────────────────────────────────────────────────── 
+          LEFT PANEL: 50 Noticias de Indexación (35%)
+          ───────────────────────────────────────────────────────── */}
+      <div className="w-full lg:w-[30%] h-full overflow-y-auto border-r bg-white" style={{ borderColor: panelBorder, background: panelBg }}>
+        <div className="sticky top-0 bg-inherit border-b z-10 px-6 py-5 flex justify-between items-center" style={{ borderColor: panelBorder }}>
+           <h2 className="font-sans text-3xl font-black uppercase tracking-tighter" style={{ color: panelText }}>ÍNDICE FORENSE</h2>
+           {isNewsSubscribed && (
+              <button
+                onClick={handleSaveToDrive}
+                disabled={isAlreadyBackedUp}
+                className="w-8 h-8 flex items-center justify-center border transition-all"
+                style={{
+                  background: isAlreadyBackedUp ? 'transparent' : panelText,
+                  color: isAlreadyBackedUp ? panelBg : panelBg,
+                  borderColor: panelText
+                }}
+              >
+                {isAlreadyBackedUp ? <ShieldCheck size={14} /> : <Download size={14} />}
+              </button>
+            )}
+        </div>
         
-        {articles.map((article, idx) => {
-          const isActive = selectedArticle?.id === article.id;
-          return (
-            <div
-              key={article.id}
-              onClick={() => setSelectedArticle(article)}
-              className="cursor-pointer p-5 rounded-lg border transition-all hover:-translate-y-1 relative"
-              style={{ 
-                background: isActive ? (isDarkMode ? '#222' : '#000') : panelBg, 
-                color: isActive ? '#F2ECD8' : panelText,
-                borderColor: isActive ? 'transparent' : panelBorder,
-                boxShadow: isActive ? '0 10px 20px rgba(0,0,0,0.1)' : 'none'
-              }}
-            >
-              <div className="font-mono text-[9px] uppercase tracking-widest opacity-60 mb-3 flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: isActive ? '#B6EA26' : (isDarkMode ? '#555' : '#ccc') }}/>
-                {new Date(article.date).toLocaleDateString('es-ES', { month: 'short', day: '2-digit' })} — {new Date(article.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+        <div className="flex flex-col">
+          {articles.map((article, idx) => {
+            const isActive = selectedArticle?.id === article.id;
+            return (
+              <div
+                key={article.id}
+                onClick={() => setSelectedArticle(article)}
+                className="cursor-pointer p-6 border-b transition-colors relative"
+                style={{ 
+                  background: isActive ? panelText : panelBg, 
+                  color: isActive ? panelBg : panelText,
+                  borderColor: panelBorder,
+                }}
+              >
+                <div className="font-mono text-[9px] uppercase tracking-[0.2em] font-bold mb-3 flex items-center gap-2">
+                  <div className="w-2 h-2" style={{ background: isActive ? panelBg : panelText }}/>
+                  {new Date(article.date).toLocaleDateString('es-ES', { month: 'short', day: '2-digit' })} — {new Date(article.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <h3 className="font-sans text-xl font-black leading-none tracking-tight">
+                  {article.title}
+                </h3>
               </div>
-              <h3 className="font-serif text-md md:text-lg font-black leading-snug line-clamp-3">
-                {article.title}
-              </h3>
-            </div>
-          );
-        })}
-        {articles.length === 0 && <div className="p-4 font-mono text-xs opacity-50">Zero intel fetched. Reconectando origen.</div>}
+            );
+          })}
+          {articles.length === 0 && <div className="p-6 font-mono text-xs font-bold uppercase">Zero intel fetched.</div>}
+        </div>
       </div>
 
-      {/* RIGHT PANEL: Máxima Extensión (Master-Detail) (65%) */}
-      <div className="w-full lg:w-[65%] lg:h-[80vh] pb-10 perspective-1000 relative">
-        <AnimatePresence mode="wait">
+      {/* ───────────────────────────────────────────────────────── 
+          RIGHT PANEL: Máxima Extensión (Master-Detail) (70%)
+          ───────────────────────────────────────────────────────── */}
+      <div className="w-full lg:w-[70%] h-full relative" style={{ background: panelBg, color: panelText }}>
+        <AnimatePresence mode="popLayout">
           {selectedArticle && (
             <motion.div
               key={selectedArticle.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full h-full p-8 md:p-12 rounded-xl sticky top-0 overflow-y-auto"
-              style={{ background: panelBg, color: panelText, borderColor: panelBorder, borderWidth: '1px' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0 }} // Flat cuts, no cheesy animations. Institutional feel.
+              className="w-full h-full p-8 md:p-20 overflow-y-auto"
             >
-              {/* Controles Opcionales Superior */}
-              <div className="flex justify-between items-center mb-12">
-                <span className="font-mono text-[10px] uppercase font-bold tracking-widest border px-3 py-1 rounded" style={{ borderColor: panelBorder, opacity: 0.7 }}>
-                   REGISTRO EXACTO: {new Date(selectedArticle.date).toLocaleString('es-ES')}
+              {/* CONTROLES SUPERIORES */}
+              <div className="flex justify-between items-center mb-16 border-b pb-4" style={{ borderColor: panelBorder }}>
+                <span className="font-mono text-[10px] uppercase font-bold tracking-[0.4em]">
+                   T. {new Date(selectedArticle.date).toLocaleString('es-ES')}
                 </span>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   {/* TEXT RESIZER */}
-                  <div className="flex bg-black/5 rounded items-center p-1">
-                     <button onClick={() => setFontSizeRatio(r => Math.max(0.8, r - 0.1))} className="p-2 opacity-50 hover:opacity-100 transition-opacity"><Type size={12} /></button>
-                     <button onClick={() => setFontSizeRatio(1)} className="p-2 opacity-50 hover:opacity-100 font-mono text-[10px] tracking-widest"><Type size={14} /></button>
-                     <button onClick={() => setFontSizeRatio(r => Math.min(1.5, r + 0.1))} className="p-2 opacity-50 hover:opacity-100 transition-opacity"><Type size={16} /></button>
+                  <div className="flex border items-center" style={{ borderColor: panelBorder }}>
+                     <button onClick={() => setFontSizeRatio(r => Math.max(0.8, r - 0.1))} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"><Type size={12} /></button>
+                     <button onClick={() => setFontSizeRatio(1)} className="p-2 font-mono text-[10px] font-bold tracking-widest border-x hover:bg-black/5 dark:hover:bg-white/10" style={{ borderColor: panelBorder }}>RESET</button>
+                     <button onClick={() => setFontSizeRatio(r => Math.min(1.5, r + 0.1))} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"><Type size={16} /></button>
                   </div>
                   {/* GMAIL SHARE BUTTON (Premium) */}
                   {isNewsSubscribed && (
-                    <button onClick={() => setShareModalOpen(true)} className="p-2 rounded-full border border-black/10 hover:bg-black/5 transition-all flex items-center gap-2 group">
+                    <button onClick={() => setShareModalOpen(true)} className="p-2 border hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex items-center" style={{ borderColor: panelBorder }}>
                       <Mail size={16} />
                     </button>
                   )}
                   {/* DARK MODE TOGGLE */}
-                  <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full border hover:bg-black/5 transition-all" style={{ borderColor: panelBorder }}>
-                    {isDarkMode ? <Sun size={16} color="#e6dfce"/> : <Moon size={16} color="#000" />}
+                  <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 border hover:bg-black/5 dark:hover:bg-white/10 transition-colors" style={{ borderColor: panelBorder }}>
+                    {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
                   </button>
                 </div>
               </div>
 
-              {/* Título Principal */}
-              <h1 className="font-aztec-serif text-3xl md:text-5xl font-black tracking-tighter leading-[1.1] mb-12" style={{ fontSize: `${2.5 * fontSizeRatio}rem` }}>
+              {/* TÍTULO */}
+              <h1 className="font-sans font-black tracking-tighter leading-[0.9] mb-16" style={{ fontSize: `${4 * fontSizeRatio}rem`, textWrap: 'balance' }}>
                 {selectedArticle.title}
               </h1>
 
-              {/* CONTENIDO EXPLICADO A LA PERFECCIÓN */}
+              {/* CONTENIDO EXPLOTADO (TEXTO FINANCIERO) */}
               <div 
-                className="font-serif leading-relaxed space-y-8 select-auto"
-                style={{ fontSize: `${1.125 * fontSizeRatio}rem`, color: isDarkMode ? 'rgba(230, 223, 206, 0.85)' : 'rgba(17, 16, 15, 0.85)' }}
+                className="font-serif leading-relaxed space-y-8 select-text w-full max-w-4xl"
+                style={{ fontSize: `${1.2 * fontSizeRatio}rem` }}
               >
-                {/* Dividimos el párrafo por "\n\n" para hacer bloques perfectos */}
-                {(selectedArticle.description || "Incapacidad algorítmica de extraer termodinámica.").split('\n\n').map((paragraph, index) => (
+                {(selectedArticle.description || "Reporte en tránsito. Procesando oráculo criptográfico...").split('\n\n').map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
 
-              {/* Footer Falso: Eliminamos Fuente como se solicitó */}
-              <div className="mt-20 pt-8 border-t flex justify-between" style={{ borderColor: panelBorder }}>
-                  <span className="font-mono text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">CLASSIFIED INTEL</span>
-                  <span className="font-mono text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">Whale Alert Network</span>
+              {/* POLÍTICA DE PRIVACIDAD / DISCLAIMER OFICIAL */}
+              <div className="mt-32 pt-10 border-t flex flex-col gap-6 w-full max-w-4xl" style={{ borderColor: panelBorder }}>
+                  <div className="flex justify-between items-center w-full font-mono text-[9px] uppercase font-black tracking-[0.3em]">
+                     <span>WHALE ALERT NETWORK — CONFIDENTIAL REPORT</span>
+                     <span>DOCUMENTO SOBERANO</span>
+                  </div>
+                  <div className="font-sans text-[10px] leading-relaxed uppercase" style={{ color: isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.5)' }}>
+                    <b>PRIVACY POLICY & DISCLOSURES:</b> TRADING EN MERCADOS DE CRIPTOMONEDAS IMPLICA RIESGOS TOTALES. LA RED NO SE HACE RESPONSABLE POR PÉRDIDAS ASIMÉTRICAS DE CAPITAL BASADAS EN ESTOS REGISTROS FORENSES. ESTE PANEL PROVEE LA METRÍZ DE INTELIGENCIA PURA, SIN EMBARGO "NO RELIANCE / EDUCATIONAL PURPOSES ONLY" DEBE SER ASUMIDO. DATOS PRESERVADOS SIN COMPROMISO PII (ZERO PROTOCOL).
+                  </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* COMPLIANCE OVERLAY SI NO SUSCRITO (En Detail Panel) */}
+        {/* ───────────────────────────────────────────────────────── 
+            CORTINILLA DE PAGO SOBRE PANEL DERECHO
+            ───────────────────────────────────────────────────────── */}
         {!isNewsSubscribed && selectedArticle && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-end p-10 pb-20 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(247,242,234,0.95) 70%, #F7F2EA 100%)' }}>
-            <div className="pointer-events-auto max-w-sm w-full bg-[#11100f] text-[#F7F2EA] p-8 rounded-2xl shadow-2xl flex flex-col items-center text-center">
-              <ShieldCheck size={32} className="mb-4 text-[#B6EA26]"/>
-              <h2 className="font-aztec-serif text-2xl font-black mb-3">ACCESO RETENIDO</h2>
-              <p className="font-mono text-xs uppercase tracking-widest opacity-60 mb-6 leading-relaxed">Solo los nodos suscritos acceden al descifrado infinito de 50 canales integrales.</p>
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-end p-10 pb-20 pointer-events-none" style={{ background: isDarkMode ? 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,1) 100%)' : 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 60%, rgba(255,255,255,1) 100%)' }}>
+            <div className="pointer-events-auto w-full max-w-lg border p-12 flex flex-col items-center text-center shadow-2xl relative overflow-hidden" style={{ background: panelBg, borderColor: panelText }}>
+              <div className="absolute top-0 left-0 w-full h-2" style={{ background: panelText }}></div>
+              <ShieldCheck size={40} className="mb-6" style={{ color: panelText }}/>
+              <h2 className="font-sans text-4xl font-black mb-4 uppercase tracking-tighter" style={{ color: panelText }}>Bloqueo Institucional</h2>
+              <p className="font-mono text-[10px] uppercase font-bold tracking-[0.2em] mb-10 leading-relaxed" style={{ color: panelText, opacity: 0.7 }}>
+                Para acceder a la red neuronal completa y visualizar eternamente las diseciones algorítmicas, formalice su nodo.
+              </p>
               <button
                 onClick={() => setCheckoutOpen(true)}
-                className="w-full py-4 text-xs font-mono font-black uppercase tracking-widest bg-[#F7F2EA] text-black hover:bg-[#B6EA26] transition-colors rounded"
+                className="w-full py-5 text-sm font-mono font-black uppercase tracking-[0.3em] transition-all"
+                style={{ background: panelText, color: panelBg }}
               >
-                1.99 USD / VITALICIO
+                AUTORIZAR PAGO ON-CHAIN
               </button>
             </div>
           </div>
@@ -314,51 +340,58 @@ export function NewsTerminal() {
 
       <CryptoCheckoutModal isOpen={isCheckoutOpen} onClose={() => setCheckoutOpen(false)} />
 
-      {/* GMAIL-LIKE SHARE MODAL */}
+      {/* ───────────────────────────────────────────────────────── 
+          GMAIL-LIKE SHARE MODAL
+          ───────────────────────────────────────────────────────── */}
       <AnimatePresence>
         {shareModalOpen && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.8)' }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.8)' }}
           >
             <motion.div 
-              initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-              className="w-full max-w-md bg-[#F7F2EA] rounded-xl p-8 shadow-2xl relative"
+              initial={{ scale: 0.98, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.98, y: 10 }}
+              className="w-full max-w-md border shadow-2xl relative"
+              style={{ background: panelBg, borderColor: panelText, color: panelText }}
             >
-              <button onClick={() => setShareModalOpen(false)} className="absolute top-6 right-6 opacity-50 hover:opacity-100">
-                <X size={20} />
-              </button>
-
-              <div className="flex items-center gap-3 mb-8">
-                <Mail size={24} />
-                <h3 className="font-aztec-serif text-2xl font-black uppercase leading-none mt-1">Satelital Share</h3>
+              <div className="flex justify-between items-center bg-inherit border-b p-6" style={{ borderColor: panelBorder }}>
+                <div className="flex items-center gap-3">
+                  <Mail size={20} />
+                  <h3 className="font-sans text-xl font-black uppercase tracking-tighter mt-1">Satelital Share</h3>
+                </div>
+                <button onClick={() => setShareModalOpen(false)} className="opacity-50 hover:opacity-100">
+                  <X size={20} />
+                </button>
               </div>
 
               {shareSuccess ? (
-                <div className="text-center py-10 font-mono text-sm uppercase font-bold tracking-widest text-green-700">
-                  Transmisión inmaculada ✓
+                <div className="text-center py-20 font-mono text-sm uppercase font-black tracking-[0.3em]">
+                  Transmisión <br/> Inmaculada ✓
                 </div>
               ) : (
-                <form onSubmit={handleShareSubmit} className="space-y-6">
+                <form onSubmit={handleShareSubmit} className="p-8 space-y-8">
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest opacity-60 mb-2">Destinatario Soberano (Email)</label>
+                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] font-bold mb-3">Destinatario Soberano (Email)</label>
                     <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)}
-                      className="w-full bg-transparent border-b-2 border-black/20 focus:border-black outline-none py-2 font-mono"
+                      className="w-full bg-transparent border-b outline-none py-2 font-mono"
+                      style={{ borderColor: panelBorder, borderBottomWidth: '2px' }}
                       placeholder="ejemplo@corporation.com"
                     />
                   </div>
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest opacity-60 mb-2">Nota encriptada (Opcional)</label>
+                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] font-bold mb-3">Petición Abierta (Nota Opcional)</label>
                     <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3}
-                      className="w-full bg-black/5 rounded-lg p-3 outline-none font-serif text-sm border border-transparent focus:border-black/20"
-                      placeholder="Observa los últimos nodos descubiertos en esta purga..."
+                      className="w-full bg-transparent border outline-none font-serif p-3"
+                      style={{ borderColor: panelBorder }}
+                      placeholder="Identificando turbulencias..."
                     />
                   </div>
-                  <button type="submit" disabled={isSharing} className="w-full bg-black text-[#F7F2EA] font-mono text-xs uppercase font-black py-4 tracking-[0.2em] rounded-lg">
-                    {isSharing ? 'DIFUNDIENDO...' : 'TRANSMITIR ACCESO TEMPORAL (1-Time)'}
+                  <button type="submit" disabled={isSharing} className="w-full font-mono text-[10px] uppercase font-black py-5 tracking-[0.3em] transition-all"
+                    style={{ background: panelText, color: panelBg }}>
+                    {isSharing ? 'DIFUNDIENDO...' : 'TRANSMITIR ACCESO (1-Time)'}
                   </button>
-                  <p className="text-center font-mono text-[8px] uppercase tracking-widest opacity-40">
-                    *El destinatario purgará su visualización inmediatamente después de recargar. Requerirá suscripción para retomar.
+                  <p className="text-center font-mono text-[8px] uppercase tracking-[0.2em] opacity-40">
+                    *El destinatario purgará la visualización al recargar la comunicación.
                   </p>
                 </form>
               )}
