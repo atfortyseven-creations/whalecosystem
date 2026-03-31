@@ -44,7 +44,7 @@ export async function GET() {
     // Extracción Termodinámica Directa
     if (apiKeys.length > 0) {
       for (const key of apiKeys) {
-        const url = `https://cryptopanic.com/api/v1/posts/?auth_token=${key}&public=true&filter=important`;
+        const url = `https://cryptopanic.com/api/v1/posts/?auth_token=${key}&public=true&kind=news`; // <-- Removido filter=important para forzar noticias de HOY.
         const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
 
         if (response.ok) {
