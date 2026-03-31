@@ -38,6 +38,8 @@ export function NewsTerminal() {
   const [shareSent, setShareSent] = useState(false);
   const [isBlockedByCaducity, setIsBlockedByCaducity] = useState(false);
 
+  const [dataSource, setDataSource] = useState<'live' | 'db-cache' | 'none' | null>(null);
+
   // Referencias para scroll programático (auto-scroll al seleccionar)
   const rightPanelRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +70,7 @@ export function NewsTerminal() {
       .then(data => {
         const items: NewsArticle[] = data.articles ?? [];
         setArticles(items);
+        setDataSource(data.source ?? null);
         if (items.length > 0) setSelectedArticle(items[0]);
       })
       .catch(console.error)
@@ -182,9 +185,19 @@ export function NewsTerminal() {
         {/* Cabecera fija del panel izquierdo */}
         <div style={{ borderBottom: `1px solid ${div}`, background: bg }}
              className="sticky top-0 z-10 flex items-center justify-between px-6 py-4">
-          <h2 className="font-black text-2xl uppercase tracking-tighter" style={{ color: text }}>
-            WHALE NEWS
-          </h2>
+          <div>
+            <h2 className="font-black text-2xl uppercase tracking-tighter" style={{ color: text }}>
+              WHALE NEWS
+            </h2>
+            {dataSource && (
+              <span className="font-mono text-[8px] uppercase tracking-[0.25em] flex items-center gap-1.5 mt-0.5"
+                    style={{ color: dataSource === 'live' ? '#16a34a' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }}>
+                <span className="w-1.5 h-1.5 rounded-full inline-block"
+                      style={{ background: dataSource === 'live' ? '#16a34a' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }} />
+                {dataSource === 'live' ? 'En vivo · Tiempo real' : dataSource === 'db-cache' ? 'Caché · Últimos 30 días' : 'Sin datos — Revisar API Keys'}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {isNewsSubscribed && (
               <button onClick={handleDownload}
