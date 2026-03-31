@@ -38,10 +38,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <ConnectWalletModal />
             
             <TitaniumGate>
-                <UniversalEliteWallpaper />
+                {/* Wallpaper global: suprimido en /news para fondo blanco puro */}
+                {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
                 <div className="flex flex-col min-h-screen relative z-0">
                     <div className="flex-1 flex flex-col relative w-full">
-                        {(!pathname.startsWith('/developers')) && <HighHzWallpaper />}
+                        {(!pathname.startsWith('/developers') && !pathname.startsWith('/news')) && <HighHzWallpaper />}
 
                         {/* Reignited Institutional Header */}
                         {(
@@ -51,7 +52,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                             pathname === '/academy' || 
                             pathname === '/dashboard' ||
                             pathname === '/vip' ||
-                            pathname === '/'
+                            pathname === '/' ||
+                            pathname.startsWith('/news')
                         ) && (
                             <InstitutionalHeader />
                         )}
@@ -80,7 +82,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         pathname.startsWith('/docs') ||
                         pathname.startsWith('/privacy') ||
                         pathname.startsWith('/terms') ||
-                        pathname.startsWith('/ticket')
+                        pathname.startsWith('/ticket') ||
+                        pathname.startsWith('/news')
                     ) && <Downhead />}
                 </div>
             </TitaniumGate>
