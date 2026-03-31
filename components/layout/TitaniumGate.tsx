@@ -26,6 +26,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     const { isConnected } = useAccount();
     const [state, setState] = useState<GateState>('AUTH');
     const [mounted, setMounted] = useState(false);
+    const [showIntro, setShowIntro] = useState(true);
     const pathname = usePathname();
     const router = useRouter();
     
@@ -36,6 +37,11 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     useEffect(() => {
         setMounted(true);
+        // Force the institutional loading screen to show for 2.2 seconds before finishing hydration
+        const timer = setTimeout(() => {
+            setShowIntro(false);
+        }, 2200);
+        return () => clearTimeout(timer);
     }, []);
     useEffect(() => {
         const checkAccess = () => {
@@ -68,8 +74,8 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         checkAccess();
     }, [isConnected, isPublicPage, router, mounted]);
 
-    // Loader — Wait for client hydration to avoid wallet flicker
-    if (!mounted) {
+    // Loader — Show institutional loader during hydration and forced intro delay
+    if (!mounted || showIntro) {
         return <WhaleAlertLoader bg="#FFFFFF" color="#000000" />;
     }
 
