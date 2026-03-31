@@ -12,134 +12,167 @@ interface CheckoutProps {
   onClose: () => void;
 }
 
-// ----------------------------------------------------------------------------
-// ESTRUCTURA DE PAGO ETH: OPTIMISM NETWORK (CHAIN_ID: 10)
-// TARGET BILLETERA: 0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a
-// MONTO: 0.015 ETH (~ $49.00 USD)
-// ----------------------------------------------------------------------------
+const TARGET_TREASURY = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
+const TARGET_CHAIN    = 10;    // Optimism Mainnet
+const AMOUNT_ETH      = '0.015';
+const PRICE_USD       = 49.0;
+
+// Tipo de cambio ETH → EUR aproximado (se actualiza en tiempo real desde CoinGecko)
+async function fetchEthEur(): Promise<number | null> {
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur',
+      { cache: 'no-store', signal: AbortSignal.timeout(4000) }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.ethereum?.eur ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
   const { setNewsSubscribed } = useNewsStore();
   const { address, isConnected, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
-  const { sendTransaction, data: rawTxHash, isPending, error: writeError } = useSendTransaction();
-  
-  // Validamos que el ticket se ha integrado en la blockchain
-  const { isLoading: isWaitingReceipt, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash: rawTxHash,
-  });
+  const { sendTransaction, data: txHash, isPending, error: writeError } = useSendTransaction();
+  const { isLoading: isWaiting, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
-  const TARGET_TREASURY = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a';
-  const TARGET_CHAIN = 10; // Optimism Mainnet
-  const AMOUNT_ETH = '0.015'; // Aprox. $49 USD
+  const [ethEurPrice, setEthEurPrice] = useState<number | null>(null);
 
   useEffect(() => {
-    // Escudo de confirmación termodinámica
+    if (isOpen) fetchEthEur().then(setEthEurPrice);
+  }, [isOpen]);
+
+  useEffect(() => {
     if (isConfirmed) {
       setNewsSubscribed(true);
-      setTimeout(() => onClose(), 1500);
+      setTimeout(onClose, 1500);
     }
   }, [isConfirmed, setNewsSubscribed, onClose]);
 
-  const handleTransact = async () => {
-    if (!isConnected) return; // Wagmi o Web3Modal debe interceptarlo antes
+  const handleTransact = () => {
+    if (!isConnected) return;
     if (chainId !== TARGET_CHAIN && switchChain) {
-      // Forzar migración a Optimism
       switchChain({ chainId: TARGET_CHAIN });
-      return; 
+      return;
     }
-    
-    // Emitir pago
-    try {
-      sendTransaction({
-        to: TARGET_TREASURY,
-        value: parseEther(AMOUNT_ETH),
-      });
-    } catch (e) {
-      console.error("Transacción abortada");
-    }
+    sendTransaction({ to: TARGET_TREASURY, value: parseEther(AMOUNT_ETH) });
   };
 
   const isWrongNetwork = isConnected && chainId !== TARGET_CHAIN;
-  const isExecuting = isPending || isWaitingReceipt;
+  const isExecuting    = isPending || isWaiting;
+
+  // Calcular equivalente en EUR
+  const eurEquivalent = ethEurPrice
+    ? (parseFloat(AMOUNT_ETH) * ethEurPrice).toFixed(2)
+    : null;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/95 backdrop-blur-sm"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.85)' }}
         >
           <motion.div
-            initial={{ scale: 0.95, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.95, y: 20 }}
-            className="w-full max-w-lg bg-white border border-black shadow-2xl relative"
+            initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96 }}
+            className="w-full max-w-md bg-white text-black relative"
+            style={{ border: '3px solid #000' }}
           >
-            {/* Cabezal Cero-Rounding */}
-            <div className="flex justify-between items-center bg-black text-white p-6 border-b border-black">
+            {/* HEADER */}
+            <div className="flex justify-between items-center bg-black text-white px-7 py-5">
               <div className="flex items-center gap-3">
-                <ShieldCheck size={24} />
-                <h3 className="font-sans font-black uppercase text-xl tracking-tighter">Acceso Institucional V1</h3>
+                <ShieldCheck size={22} />
+                <span className="font-black text-lg uppercase tracking-tighter">News of today — Acceso Soberano</span>
               </div>
               {!isExecuting && (
                 <button onClick={onClose} className="opacity-60 hover:opacity-100 transition-opacity">
-                  <X size={24} />
+                  <X size={20} />
                 </button>
               )}
             </div>
 
-            <div className="p-8 pb-10 space-y-8 text-black">
-              <div className="text-center space-y-4">
-                <p className="font-mono text-sm tracking-widest uppercase opacity-80 border-b border-black/10 pb-4">
-                  Desbloqueo Termodinámico
-                </p>
-                <div className="flex flex-col items-center pt-2">
-                  <span className="font-sans text-6xl font-black tracking-tighter">49.00</span>
-                  <span className="font-mono text-xs uppercase tracking-widest opacity-60">USD / Equivalente Mensual</span>
+            {/* BODY */}
+            <div className="px-8 py-8 space-y-8">
+              {/* Precio principal */}
+              <div className="text-center space-y-2">
+                <div className="flex items-end justify-center gap-3">
+                  <span className="font-black text-7xl tracking-tighter leading-none">49</span>
+                  <div className="flex flex-col items-start pb-2">
+                    <span className="font-mono text-xs font-bold uppercase tracking-widest">USD / mes</span>
+                    <span className="font-mono text-[10px] opacity-50 uppercase tracking-wider">equivalente</span>
+                  </div>
                 </div>
-                <p className="font-mono text-[10px] leading-relaxed max-w-sm mx-auto opacity-70 border bg-black/5 p-3">
-                  Esta orden transferirá {AMOUNT_ETH} ETH directamente hacia la tesorería de Whale Alert ({TARGET_TREASURY.slice(0,6)}...{TARGET_TREASURY.slice(-4)}) operando en la red Optimism.
+
+                {/* Equivalentes ETH + EUR */}
+                <div className="flex items-center justify-center gap-6 pt-2">
+                  <div className="text-center">
+                    <p className="font-mono text-xs font-black tracking-widest">{AMOUNT_ETH} ETH</p>
+                    <p className="font-mono text-[8px] uppercase tracking-widest opacity-50">En Optimism</p>
+                  </div>
+                  <div className="w-px h-8 bg-black/20" />
+                  <div className="text-center">
+                    <p className="font-mono text-xs font-black tracking-widest">
+                      {eurEquivalent ? `≈ ${eurEquivalent} €` : '— EUR'}
+                    </p>
+                    <p className="font-mono text-[8px] uppercase tracking-widest opacity-50">
+                      {ethEurPrice ? `1 ETH = ${ethEurPrice.toLocaleString('es-ES')} €` : 'Calculando...'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Info transacción */}
+              <div className="bg-black/5 p-4 text-center">
+                <p className="font-mono text-[10px] uppercase tracking-widest leading-relaxed opacity-80">
+                  Transferencia directa a la tesorería Whale Alert<br />
+                  <span className="font-black">{TARGET_TREASURY.slice(0, 6)}...{TARGET_TREASURY.slice(-4)}</span> · Red Optimism
                 </p>
               </div>
 
+              {/* Botón de pago */}
               {isConfirmed ? (
-                 <div className="text-center py-6 font-mono text-sm uppercase font-bold tracking-widest bg-black text-white p-4">
-                    PAGO COMPROBADO <br/> ACCESO FORENSE DESBLOQUEADO
-                 </div>
+                <div className="bg-black text-white text-center py-5 font-mono text-sm font-black uppercase tracking-widest">
+                  PAGO CONFIRMADO ON-CHAIN ✓
+                </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="space-y-3">
                   {!isConnected ? (
-                    <appkit-button /> // Web3Modal Genérico o ConnectWallet
+                    <div className="text-center">
+                      {/* @ts-ignore - Web3Modal custom element */}
+                      <appkit-button />
+                    </div>
                   ) : (
                     <button
                       onClick={handleTransact}
                       disabled={isExecuting}
-                      className="w-full bg-black text-white font-mono text-sm uppercase py-5 font-black tracking-widest hover:bg-black/90 disabled:opacity-50 flex justify-center items-center gap-2"
+                      className="w-full bg-black text-white font-mono text-sm font-black uppercase py-5 tracking-widest hover:bg-black/80 disabled:opacity-40 flex justify-center items-center gap-3 transition-all"
                     >
-                      {isWaitingReceipt ? (
-                         <><Activity size={16} className="animate-pulse" /> COMPILANDO BLOQUE 100%...</>
+                      {isWaiting ? (
+                        <><Activity size={16} className="animate-pulse" /> Verificando en Optimism...</>
                       ) : isPending ? (
-                         "FIRMA VUESTRA TRANSACCIÓN"
+                        'Firma en tu wallet...'
                       ) : isWrongNetwork ? (
-                         "CAMBIAR A RED OPTIMISM"
+                        'Cambiar a Red Optimism →'
                       ) : (
-                         `ABONAR ${AMOUNT_ETH} ETH Y ACCEDER`
+                        `Pagar ${AMOUNT_ETH} ETH y Acceder`
                       )}
                     </button>
                   )}
                   {writeError && (
                     <p className="text-center text-red-600 font-mono text-[9px] uppercase tracking-widest">
-                       FRACTURA DE TRANSACCIÓN: {writeError.message.split('.')[0]}
+                      Error: {writeError.message.split('.')[0]}
                     </p>
                   )}
                 </div>
               )}
-              
-              <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] opacity-30 px-6">
-                Todos los datos transaccionales son verificados on-chain de forma inmutable a través de viem & wagmi shield. PII: Cero.
+
+              {/* Legal */}
+              <p className="text-center font-mono text-[8px] uppercase tracking-widest leading-relaxed opacity-30">
+                Pago irreversible on-chain · Sin datos personales · Privacy by Void · Optimism L2
               </p>
             </div>
           </motion.div>

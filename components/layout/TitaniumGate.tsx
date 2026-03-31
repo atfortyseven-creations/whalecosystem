@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SafeErrorBoundary } from '@/components/ui/SafeErrorBoundary';
+import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { createContext, useContext } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -67,27 +68,9 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         checkAccess();
     }, [isConnected, isPublicPage, router, mounted]);
 
-    // Loader - Wait for client hydration to avoid wallet flicker
+    // Loader — Wait for client hydration to avoid wallet flicker
     if (!mounted) {
-        return (
-            <div className="fixed inset-0 bg-[var(--aztec-parchment)] flex items-center justify-center z-[9999]">
-                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ 
-                        opacity: [0, 1, 0.5, 1],
-                        scale: [0.8, 1, 0.98, 1]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-24 h-24"
-                 >
-                    <img 
-                        src="/official-whale-legendary.png" 
-                        alt="Loading" 
-                        className="w-full h-full object-contain drop-shadow-2xl"
-                    />
-                 </motion.div>
-            </div>
-        );
+        return <WhaleAlertLoader bg="#FFFFFF" color="#000000" />;
     }
 
     return (
