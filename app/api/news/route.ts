@@ -3,14 +3,18 @@ import { NextResponse } from 'next/server';
 // Renovación diaria en Origin (Cache de 24 horas = 86400 segundos) para el endpoint entero
 export const revalidate = 86400;
 
-// Tipos base para la API cruda
-interface NewsDataArticle {
+interface CryptoPanicArticle {
+  id: number;
+  domain: string;
   title: string;
-  description: string;
-  link: string;
-  pubDate: string;
-  image_url: string | null;
-  source_id: string;
+  published_at: string;
+  slug: string;
+  url: string;
+  source: {
+    title: string;
+    region: string;
+    domain: string;
+  };
 }
 
 // Función algorítmica de perfección lingüística y sanitización
@@ -18,7 +22,7 @@ function processNewsContent(text: string | null | undefined): string {
   if (!text) return "";
   let processed = text.toString();
   
-  // 1. Eliminar tags HTML potencialmente inseguros o residuales (mitigación CSP)
+  // 1. Eliminar tags HTML (mitigación CSP)
   processed = processed.replace(/<[^>]*>?/gm, '');
   
   // 2. Decodificar entidades HTML básicas
@@ -28,10 +32,10 @@ function processNewsContent(text: string | null | undefined): string {
                        .replace(/&lt;/g, '<')
                        .replace(/&gt;/g, '>');
 
-  // 3. Mejorar fluidez: eliminar múltiples espacios y puntuación repetida
+  // 3. Mejorar fluidez
   processed = processed.replace(/\s{2,}/g, ' ')
                        .replace(/\.{2,}/g, '.')
-                       .replace(/!+/g, '.') // Convertir exclamaciones a puntos (tono neutral humanizado)
+                       .replace(/!+/g, '.')
                        .replace(/\?+/g, '?');
 
   // 4. Asegurar capitalización profesional
@@ -40,7 +44,7 @@ function processNewsContent(text: string | null | undefined): string {
     processed = processed.charAt(0).toUpperCase() + processed.slice(1);
   }
 
-  // 5. Acortar si es inusualmente largo para mostrarse fluido en el frontend Bento
+  // 5. Acortar si es inusualmente largo
   if (processed.length > 400) {
     processed = processed.substring(0, 397) + '...';
   }
@@ -50,11 +54,11 @@ function processNewsContent(text: string | null | undefined): string {
 
 export async function GET() {
   try {
-    const apiKey = process.env.NEWSDATA_API_KEY;
+    const apiKey = process.env.CRYPTOPANIC_API_KEY;
     
-    // Fallback de demostración soberana si no existe API key, emulando perfección 100% on-chain.
+    // Fallback de demostración soberana si no existe API key
     if (!apiKey) {
-      console.warn("Whale News: NEWSDATA_API_KEY no detectada. Retornando datos estructurados simulados (Fallback 0-day).");
+      console.warn("Whale News: CRYPTOPANIC_API_KEY no detectada. Retornando datos estructurados simulados (Fallback 0-day).");
       const mockNews = [
         {
           id: 'news-1',
@@ -101,31 +105,31 @@ export async function GET() {
     }
 
     // Flujo principal de integración real
-    const url = `https://newsdata.io/api/1/crypto?apikey=${apiKey}&language=es`;
+    const url = `https://cryptopanic.com/api/v1/posts/?auth_token=${apiKey}&public=true&filter=important`;
     const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
 
     if (!response.ok) {
-      throw new Error(`NewsData API respondió con estado: ${response.status}`);
+      throw new Error(`CryptoPanic respondió con estado: ${response.status}`);
     }
 
     const json = await response.json();
     
     // Transformación matemática y sanitaria al estándar de WhaleCosystem
-    const processedArticles = (json.results || []).map((article: NewsDataArticle, index: number) => ({
-      id: article.source_id || `whale-news-${index}-${Date.now()}`,
+    const processedArticles = (json.results || []).map((article: CryptoPanicArticle) => ({
+      id: `whale-news-${article.id}-${Date.now()}`,
       title: processNewsContent(article.title) || 'Noticias Recientes del Ecosistema',
-      description: processNewsContent(article.description),
-      date: article.pubDate,
-      url: article.link,
-      source: article.source_id || 'Whale Algorithmic Source',
-      // No incluimos imágenes para mantener la higiene absoluta CSP y el Minimalismo
+      // CryptoPanic provee encabezados ultracortos. Generamos una descripción termodinámica neutra basada en la fuente.
+      description: `Reporte clasificado emitido desde el nodo verificador de ${article.domain}. Información pura referida a dinámica de red o gobernanza.`,
+      date: article.published_at,
+      url: article.url,
+      source: article.source?.title || article.domain || 'Whale Algorithmic Source',
     }));
 
     return NextResponse.json({
       success: true,
       count: processedArticles.length,
       articles: processedArticles,
-      timestamp: Date.now() // Sirve para validar obsolescencia (24h) en frontend
+      timestamp: Date.now() // Sirve para validar obsolescencia en frontend
     }, { status: 200 });
 
   } catch (error: any) {
