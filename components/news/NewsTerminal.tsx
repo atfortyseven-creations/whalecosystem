@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Download, Mail, Moon, Sun, X, ChevronDown, ChevronUp, Calendar, Lock } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
+import { useAccount } from 'wagmi';
 import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { CryptoCheckoutModal } from './CryptoCheckoutModal';
 
@@ -53,6 +54,11 @@ async function fetchEthEur(): Promise<number | null> {
 // ─────────────────────────────────────────────────────────────────────────────
 export function NewsTerminal() {
   const { isNewsSubscribed, lastBackupDate, setLastBackupDate, archive, upsertDayArticles, getArchiveDates } = useNewsStore();
+  const { address } = useAccount();
+
+  // Whitelist user address for full premium access
+  const IS_WHITELISTED = address?.toLowerCase() === '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a'.toLowerCase();
+  const hasAccess = isNewsSubscribed || IS_WHITELISTED;
 
   const [articles,    setArticles]    = useState<NewsArticle[]>([]);
   const [loading,     setLoading]     = useState(true);
@@ -81,7 +87,7 @@ export function NewsTerminal() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const token  = params.get('share_token');
-      if (token && !isNewsSubscribed) {
+      if (token && !hasAccess) {
         try {
           const decoded = JSON.parse(atob(token));
           const key = `has_read_${decoded.id}`;
@@ -105,7 +111,7 @@ export function NewsTerminal() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [isNewsSubscribed, upsertDayArticles]);
+  }, [hasAccess, upsertDayArticles]);
 
   // Auto-scroll to top when article changes
   useEffect(() => {
@@ -150,6 +156,7 @@ export function NewsTerminal() {
   const TEXT  = isDark ? '#f4f4f4' : '#0a0a0a';
   const DIV   = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)';
   const MUTED = isDark ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.36)';
+  const ACTIVE_BG = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)';
 
   const panelH = `calc(100vh - ${HEADER_H}px)`;
 
@@ -201,7 +208,7 @@ export function NewsTerminal() {
                 </p>
               </div>
               <div className="flex items-center gap-1.5">
-                {isNewsSubscribed && (
+                {hasAccess && (
                   <button onClick={handleDownload} title="Guardar en disco"
                           className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
                           style={{ borderColor: DIV }}>
@@ -261,13 +268,16 @@ export function NewsTerminal() {
               {articles.map(art => {
                 const isActive = selected?.id === art.id;
                 return (
-                  <button key={art.id} onClick={() => setSelected(art)} className="text-left w-full px-6 py-5 border-b transition-colors"
-                    style={{ borderColor: DIV, background: isActive ? TEXT : 'transparent', color: isActive ? BG : TEXT }}>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] font-bold mb-2"
-                       style={{ color: isActive ? (isDark ? '#000' : '#fff') : MUTED }}>
+                  <button key={art.id} onClick={() => setSelected(art)} className="text-left w-full px-6 py-5 border-b transition-all relative group"
+                    style={{ borderColor: DIV, background: isActive ? ACTIVE_BG : 'transparent', color: TEXT }}>
+                    {isActive && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: TEXT }} />
+                    )}
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] font-bold mb-2 transition-colors"
+                       style={{ color: isActive ? TEXT : MUTED }}>
                       {formatShort(art.date)}
                     </p>
-                    <p className="font-sans font-black leading-tight text-[13px]">{art.title}</p>
+                    <p className="font-sans font-black leading-tight text-[13px] group-hover:opacity-80 transition-opacity">{art.title}</p>
                   </button>
                 );
               })}
@@ -313,7 +323,7 @@ export function NewsTerminal() {
                                 className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
                                 style={{ color: MUTED }}>A+</button>
                       </div>
-                      {isNewsSubscribed && (
+                      {hasAccess && (
                         <button onClick={() => setShareOpen(true)}
                                 className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
                                 style={{ borderColor: DIV }}>
@@ -369,7 +379,7 @@ export function NewsTerminal() {
 
                   {/* ANÁLISIS PRINCIPAL */}
                   <div className="px-10 xl:px-16 pt-10 pb-6 max-w-[900px]">
-                      {!isNewsSubscribed ? (
+                      {!hasAccess ? (
                         <div className="relative">
                           {/* Pseudo-content blurred */}
                           <div
