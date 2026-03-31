@@ -22,7 +22,7 @@ export function InstitutionalHeader() {
     const navLinks = [
         { href: '/dashboard',  label: 'System',          active: pathname === '/dashboard',  isSystem: true  },
         { href: '/portfolio',  label: 'Whale Portfolio',  active: pathname === '/portfolio'                   },
-        { href: '/news',       label: 'Whale News',       active: pathname === '/news'                        },
+        { href: '/news',       label: 'News of today',    active: pathname === '/news'                        },
         { href: '/support',    label: 'Whale Support',    active: pathname === '/support'                     },
         { href: '/academy',    label: 'Whale Academy',    active: pathname === '/academy'                     },
         { href: '/ticket',     label: 'Gold Ticket',      active: pathname === '/ticket',     isTicket: true  },

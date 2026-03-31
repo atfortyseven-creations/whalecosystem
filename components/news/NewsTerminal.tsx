@@ -1,67 +1,94 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, ShieldCheck, Mail, Moon, Sun, X, AlertTriangle } from 'lucide-react';
-import { useNewsStore } from '@/lib/store/news-store';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Download, Mail, Moon, Sun, X, ChevronDown, ChevronUp, Calendar, Lock } from 'lucide-react';
+import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
+import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { CryptoCheckoutModal } from './CryptoCheckoutModal';
 
-interface NewsArticle {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  url: string;
-  source: string;
+// ── Altura del InstitutionalHeader global ─────────────────────────────────────
+const HEADER_H = 68;
+
+// ── Fallback de imagen determinista (siempre disponible, sin contenido falso) ─
+function getArticleImage(article: NewsArticle): string {
+  if (article.imageUrl && article.imageUrl.startsWith('http')) return article.imageUrl;
+  const seed = article.id.replace(/[^a-z0-9]/gi, '').slice(0, 12) || 'whale';
+  return `https://picsum.photos/seed/${seed}/1600/700`;
 }
 
-// ─────────────────────────────────────────────────────────────
-// CONSTANTE DE ALTURA DEL HEADER GLOBAL (InstitutionalHeader)
-// Ajusta este valor si el header global mide diferente.
-// ─────────────────────────────────────────────────────────────
-const HEADER_HEIGHT = 64; // px
+// ── Formato de fecha legible ──────────────────────────────────────────────────
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  }) + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
 
+function formatShort(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
+    + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+function todayKey(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+// Fetches EUR equivalent for 0.015 ETH
+async function fetchEthEur(): Promise<number | null> {
+  try {
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur',
+      { cache: 'no-store', signal: AbortSignal.timeout(4000) }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.ethereum?.eur ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 export function NewsTerminal() {
-  const { isNewsSubscribed, lastBackupDate, setLastBackupDate, setNewsSubscribed } = useNewsStore();
-  const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
+  const { isNewsSubscribed, lastBackupDate, setLastBackupDate, archive, upsertDayArticles, getArchiveDates } = useNewsStore();
 
-  // UI Controls
-  const [isDark, setIsDark] = useState(false);
-  const [fontSize, setFontSize] = useState(1); // Multiplicador relativo
-  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
-  const [shareEmail, setShareEmail] = useState('');
-  const [shareNote, setShareNote] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [shareSent, setShareSent] = useState(false);
-  const [isBlockedByCaducity, setIsBlockedByCaducity] = useState(false);
+  const [articles,    setArticles]    = useState<NewsArticle[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [selected,    setSelected]    = useState<NewsArticle | null>(null);
+  const [isDark,      setIsDark]      = useState(false);
+  const [fontSize,    setFontSize]    = useState(1);
+  const [checkoutOpen,setCheckoutOpen]= useState(false);
+  const [shareOpen,   setShareOpen]   = useState(false);
+  const [shareEmail,  setShareEmail]  = useState('');
+  const [shareNote,   setShareNote]   = useState('');
+  const [isSending,   setIsSending]   = useState(false);
+  const [shareSent,   setShareSent]   = useState(false);
+  const [ethEur,      setEthEur]      = useState<number | null>(null);
+  // Archive sidebar toggle
+  const [showArchive, setShowArchive] = useState(false);
 
-  const [dataSource, setDataSource] = useState<'live' | 'rss' | 'db-cache' | 'none' | null>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  const imgRef   = useRef<HTMLImageElement>(null);
 
-  // Referencias para scroll programático (auto-scroll al seleccionar)
-  const rightPanelRef = useRef<HTMLDivElement>(null);
-
+  // ── Carga de datos ───────────────────────────────────────────────────────
   useEffect(() => {
-    // ── 1-Time Read: Caducidad de token compartido ──
+    // Load ETH→EUR rate
+    fetchEthEur().then(setEthEur);
+
+    // Check 1-Time share token
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const token = params.get('share_token');
+      const token  = params.get('share_token');
       if (token && !isNewsSubscribed) {
         try {
           const decoded = JSON.parse(atob(token));
           const key = `has_read_${decoded.id}`;
-          if (localStorage.getItem(key)) {
-            setIsBlockedByCaducity(true);
-            setLoading(false);
-            return;
-          }
+          if (localStorage.getItem(key)) { setLoading(false); return; }
           localStorage.setItem(key, '1');
           window.history.replaceState({}, '', '/news');
-        } catch {
-          // Token malformado, ignorar
-        }
+        } catch { /* token corrupto */ }
       }
     }
 
@@ -70,368 +97,406 @@ export function NewsTerminal() {
       .then(data => {
         const items: NewsArticle[] = data.articles ?? [];
         setArticles(items);
-        setDataSource(data.source ?? null);
-        if (items.length > 0) setSelectedArticle(items[0]);
+        if (items.length > 0) setSelected(items[0]);
+        // Persist into today's archive bucket
+        if (items.length > 0) {
+          upsertDayArticles(todayKey(), items);
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [isNewsSubscribed]);
+  }, [isNewsSubscribed, upsertDayArticles]);
 
-  // Scroll to top derecho al cambiar artículo
+  // Auto-scroll to top when article changes
   useEffect(() => {
-    rightPanelRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [selectedArticle?.id]);
+    rightRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [selected?.id]);
 
-  // Download al disco D:
-  const handleDownload = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    const blob = new Blob([JSON.stringify({ date: today, articles }, null, 2)], { type: 'application/json' });
+  // ── Descarga JSON al disco ───────────────────────────────────────────────
+  const handleDownload = useCallback(async () => {
+    const today = todayKey();
+    const blob  = new Blob([JSON.stringify({ date: today, articles }, null, 2)], { type: 'application/json' });
     if ('showSaveFilePicker' in window) {
       try {
-        // @ts-ignore
-        const handle = await (window as any).showSaveFilePicker({
-          suggestedName: `${today}_WhaleNews.json`,
-          types: [{ accept: { 'application/json': ['.json'] } }],
-        });
+        const handle   = await (window as any).showSaveFilePicker({ suggestedName: `${today}_WhaleNews.json`, types: [{ accept: { 'application/json': ['.json'] } }] });
         const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        setLastBackupDate(today);
-        return;
-      } catch (e: any) {
-        if (e.name === 'AbortError') return;
-      }
+        await writable.write(blob); await writable.close();
+        setLastBackupDate(today); return;
+      } catch (e: any) { if (e.name === 'AbortError') return; }
     }
-    // Fallback genérico
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `${today}_WhaleNews.json`; a.click();
-    URL.revokeObjectURL(url);
+    const a   = Object.assign(document.createElement('a'), { href: url, download: `${today}_WhaleNews.json` });
+    a.click(); URL.revokeObjectURL(url);
     setLastBackupDate(today);
-  };
+  }, [articles, setLastBackupDate]);
 
+  // ── Compartir por email ──────────────────────────────────────────────────
   const handleShare = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedArticle || !shareEmail) return;
+    if (!selected || !shareEmail) return;
     setIsSending(true);
     try {
       await fetch('/api/news/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emailTarget: shareEmail, articleId: selectedArticle.id, articleTitle: selectedArticle.title, messageNote: shareNote }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailTarget: shareEmail, articleId: selected.id, articleTitle: selected.title, messageNote: shareNote }),
       });
       setShareSent(true);
       setTimeout(() => { setShareOpen(false); setShareSent(false); setShareEmail(''); setShareNote(''); }, 2200);
-    } finally {
-      setIsSending(false);
-    }
+    } finally { setIsSending(false); }
   };
 
-  // ── Paleta ──────────────────────────────────────────────────
-  const bg   = isDark ? '#0a0a0a' : '#FFFFFF';
-  const text  = isDark ? '#f0f0f0' : '#060606';
-  const div   = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-  const muted = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  // ── Paleta — sin bug: todo el DOM recibe el bg correcto ─────────────────
+  const BG    = isDark ? '#080808' : '#ffffff';
+  const TEXT  = isDark ? '#f4f4f4' : '#0a0a0a';
+  const DIV   = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)';
+  const MUTED = isDark ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.36)';
 
-  const panelH = `calc(100vh - ${HEADER_HEIGHT}px)`;
+  const panelH = `calc(100vh - ${HEADER_H}px)`;
 
-  // ── Pantalla caducidad ───────────────────────────────────────
-  if (isBlockedByCaducity) {
-    return (
-      <div style={{ background: bg, color: text, minHeight: '100vh' }}
-           className="flex flex-col items-center justify-center text-center p-8">
-        <AlertTriangle size={40} className="mb-6" />
-        <h1 className="font-black text-5xl uppercase tracking-tighter mb-4">Acceso Expirado</h1>
-        <p className="font-mono text-xs uppercase tracking-widest max-w-md mb-10 leading-relaxed" style={{ color: muted }}>
-          El privilegio de lectura única ha sido consumido. Para restablecer acceso permanente, active su nodo institucional.
-        </p>
-        <button onClick={() => setCheckoutOpen(true)}
-          className="font-mono text-xs font-black uppercase tracking-widest px-10 py-4 border transition-colors"
-          style={{ background: text, color: bg, borderColor: text }}>
-          Activar Acceso (0.015 ETH)
-        </button>
-        <CryptoCheckoutModal isOpen={isCheckoutOpen} onClose={() => setCheckoutOpen(false)} />
-      </div>
-    );
-  }
+  // ── Pantalla: Carga ──────────────────────────────────────────────────────
+  if (loading) return (
+    <div style={{ background: BG, minHeight: panelH }}>
+      <WhaleAlertLoader bg={BG} color={TEXT} />
+    </div>
+  );
 
-  // ── Loader ───────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div style={{ background: bg, color: text, height: panelH }}
-           className="flex items-center justify-center">
-        <span className="font-mono text-[10px] uppercase tracking-[0.4em] flex items-center gap-3" style={{ color: muted }}>
-          <motion.span
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
-            className="block w-4 h-4 border-2 border-current border-t-transparent"
-          />
-          Sincronizando Terminal Forense...
-        </span>
-      </div>
-    );
-  }
+  // ── Archive dates for sidebar ────────────────────────────────────────────
+  const archiveDates = getArchiveDates();
 
+  // ── Render principal ─────────────────────────────────────────────────────
   return (
-    <div style={{ background: bg, color: text, height: panelH, overflow: 'hidden' }}
-         className="flex flex-row w-full">
+    <>
+      {/* Root container — full bg override for dark/light fix */}
+      <div
+        style={{ background: BG, color: TEXT, minHeight: panelH }}
+        className="w-full relative"
+      >
+        <div style={{ height: panelH, overflow: 'hidden' }} className="flex w-full">
 
-      {/* ══════════════════════════════════════════════════
-          PANEL IZQUIERDO — Lista de 50 noticias
-          ══════════════════════════════════════════════════ */}
-      <div style={{ width: '32%', borderRight: `1px solid ${div}`, height: '100%', overflowY: 'auto' }}
-           className="flex flex-col shrink-0">
-
-        {/* Cabecera fija del panel izquierdo */}
-        <div style={{ borderBottom: `1px solid ${div}`, background: bg }}
-             className="sticky top-0 z-10 flex items-center justify-between px-6 py-4">
-          <div>
-            <h2 className="font-black text-2xl uppercase tracking-tighter" style={{ color: text }}>
-              WHALE NEWS
-            </h2>
-            {dataSource && (
-              <span className="font-mono text-[8px] uppercase tracking-[0.25em] flex items-center gap-1.5 mt-0.5"
-                    style={{ color: dataSource === 'live' ? '#16a34a' : dataSource === 'rss' ? '#2563eb' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }}>
-                <span className="w-1.5 h-1.5 rounded-full inline-block"
-                      style={{ background: dataSource === 'live' ? '#16a34a' : dataSource === 'rss' ? '#2563eb' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }} />
-                {dataSource === 'live'     ? 'En vivo · CryptoPanic'
-                : dataSource === 'rss'     ? 'En vivo · RSS Institucional'
-                : dataSource === 'db-cache' ? 'Caché · Últimos 30 días'
-                :                            'Sin datos — Revisar fuentes'}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {isNewsSubscribed && (
-              <button onClick={handleDownload}
-                      title="Descargar archivo a disco D:"
-                      className="w-8 h-8 flex items-center justify-center border transition-all hover:opacity-70"
-                      style={{ borderColor: div, color: muted }}>
-                <Download size={13} />
-              </button>
-            )}
-            <button onClick={() => setIsDark(d => !d)}
-                    className="w-8 h-8 flex items-center justify-center border transition-all hover:opacity-70"
-                    style={{ borderColor: div, color: muted }}>
-              {isDark ? <Sun size={13} /> : <Moon size={13} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Lista de artículos */}
-        <div className="flex flex-col">
-          {articles.map((art) => {
-            const active = selectedArticle?.id === art.id;
-            return (
-              <button
-                key={art.id}
-                onClick={() => setSelectedArticle(art)}
-                className="text-left w-full px-6 py-5 border-b transition-colors"
-                style={{
-                  borderColor: div,
-                  background: active ? text : 'transparent',
-                  color: active ? bg : text,
-                }}>
-                <div className="font-mono text-[9px] uppercase tracking-[0.2em] mb-2 flex items-center gap-2"
-                     style={{ color: active ? (isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.6)') : muted }}>
-                  <span className="w-1.5 h-1.5 rounded-full inline-block"
-                        style={{ background: active ? (isDark ? '#000' : '#fff') : muted }} />
-                  {new Date(art.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  {' · '}
-                  {new Date(art.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                </div>
-                <p className="font-sans font-black leading-tight text-[15px]">
-                  {art.title}
-                </p>
-              </button>
-            );
-          })}
-          {articles.length === 0 && (
-            <p className="p-6 font-mono text-xs uppercase" style={{ color: muted }}>
-              Sin noticias disponibles. Reconectando...
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════
-          PANEL DERECHO — Lectura extendida
-          ══════════════════════════════════════════════════ */}
-      <div ref={rightPanelRef}
-           style={{ flex: 1, height: '100%', overflowY: 'auto', position: 'relative', background: bg }}>
-
-        <AnimatePresence mode="wait">
-          {selectedArticle ? (
-            <motion.div
-              key={selectedArticle.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="px-12 py-10 max-w-4xl"
+          {/* ═══════════════════════════════════════════════════════════════
+              PANEL IZQUIERDO — Lista + Archivo
+              ═══════════════════════════════════════════════════════════ */}
+          <div
+            style={{
+              width: '28%',
+              minWidth: 240,
+              borderRight: `1px solid ${DIV}`,
+              background: BG,
+              overflowY: 'auto',
+              height: '100%',
+            }}
+            className="flex flex-col shrink-0"
+          >
+            {/* Cabecera sticky */}
+            <div
+              style={{ borderBottom: `1px solid ${DIV}`, background: BG, backdropFilter: 'blur(10px)' }}
+              className="sticky top-0 z-10 flex items-center justify-between px-6 py-5"
             >
-              {/* ── Barra de controles ── */}
-              <div className="flex items-center justify-between mb-12 pb-4"
-                   style={{ borderBottom: `1px solid ${div}` }}>
-                <span className="font-mono text-[9px] uppercase tracking-[0.3em]" style={{ color: muted }}>
-                  {new Date(selectedArticle.date).toLocaleString('es-ES', {
-                    weekday: 'short', day: '2-digit', month: 'long', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit',
-                  })}
-                </span>
-
-                <div className="flex items-center gap-1.5">
-                  {/* Font Size Controls */}
-                  <div className="flex border" style={{ borderColor: div }}>
-                    <button onClick={() => setFontSize(f => Math.max(0.8, +(f - 0.1).toFixed(1)))}
-                            className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
-                            style={{ color: muted }}>A−</button>
-                    <button onClick={() => setFontSize(1)}
-                            className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity border-x"
-                            style={{ color: muted, borderColor: div }}>A</button>
-                    <button onClick={() => setFontSize(f => Math.min(1.5, +(f + 0.1).toFixed(1)))}
-                            className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
-                            style={{ color: muted }}>A+</button>
-                  </div>
-                  {/* Share (solo suscritos) */}
-                  {isNewsSubscribed && (
-                    <button onClick={() => setShareOpen(true)}
-                            className="w-8 h-8 flex items-center justify-center border transition-all hover:opacity-60"
-                            style={{ borderColor: div, color: muted }}>
-                      <Mail size={13} />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* ── Título ── */}
-              <h1 className="font-black tracking-tighter leading-[1.05] mb-12"
-                  style={{ fontSize: `${3.5 * fontSize}rem`, color: text }}>
-                {selectedArticle.title}
-              </h1>
-
-              {/* ── Cuerpo analítico ── */}
-              <div className="font-serif leading-8 space-y-7"
-                   style={{ fontSize: `${1.15 * fontSize}rem`, color: isDark ? 'rgba(240,240,240,0.85)' : 'rgba(6,6,6,0.82)' }}>
-                {selectedArticle.description
-                  ? selectedArticle.description.split('\n\n').map((p, i) => <p key={i}>{p}</p>)
-                  : <p>Procesando análisis forense...</p>}
-              </div>
-
-              {/* ── Footer Compliance ── */}
-              <div className="mt-24 pt-8 space-y-4"
-                   style={{ borderTop: `1px solid ${div}` }}>
-                <div className="flex justify-between items-center font-mono text-[9px] uppercase tracking-[0.3em]"
-                     style={{ color: muted }}>
-                  <span>Whale Alert Network — Intel Report</span>
-                  <span>No Reliance / Educational Purposes Only</span>
-                </div>
-                <p className="font-mono text-[9px] leading-relaxed uppercase tracking-wide"
-                   style={{ color: muted }}>
-                  La información presentada tiene fines exclusivamente educativos e informativos. Operar en mercados de criptoactivos implica riesgos de pérdida total de capital. Ningún contenido de esta terminal constituye asesoramiento financiero, legal ni fiscal. Zero almacenamiento de datos personales (Privacy by Void). Todas las transacciones están sujetas a las leyes vigentes de su jurisdicción.
+              <div>
+                <h2 className="font-black text-xl uppercase tracking-tighter leading-none" style={{ color: TEXT }}>
+                  News of today
+                </h2>
+                <p className="font-mono text-[8px] uppercase tracking-[0.3em] mt-0.5" style={{ color: MUTED }}>
+                  {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </p>
               </div>
-            </motion.div>
-          ) : (
-            <div className="h-full flex items-center justify-center" style={{ color: muted }}>
-              <p className="font-mono text-xs uppercase tracking-widest">Seleccione un nodo de la izquierda</p>
+              <div className="flex items-center gap-1.5">
+                {isNewsSubscribed && (
+                  <button onClick={handleDownload} title="Guardar en disco"
+                          className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
+                          style={{ borderColor: DIV }}>
+                    <Download size={13} color={MUTED} />
+                  </button>
+                )}
+                {/* Archivo por fecha */}
+                <button onClick={() => setShowArchive(v => !v)} title="Archivo de noticias"
+                        className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
+                        style={{ borderColor: DIV, background: showArchive ? TEXT : 'transparent' }}>
+                  <Calendar size={13} color={showArchive ? BG : MUTED} />
+                </button>
+                <button onClick={() => setIsDark(d => !d)}
+                        className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
+                        style={{ borderColor: DIV }}>
+                  {isDark ? <Sun size={13} color={MUTED} /> : <Moon size={13} color={MUTED} />}
+                </button>
+              </div>
             </div>
-          )}
-        </AnimatePresence>
 
-        {/* ── PAYWALL: Cortina sobre el panel derecho ── */}
-        {!isNewsSubscribed && selectedArticle && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pb-20 px-10 pointer-events-none"
-               style={{ background: isDark
-                 ? 'linear-gradient(to bottom, transparent 0%, #0a0a0a 65%)'
-                 : 'linear-gradient(to bottom, transparent 0%, #ffffff 65%)' }}>
-            <div className="pointer-events-auto w-full max-w-sm border p-10 text-center"
-                 style={{ background: bg, borderColor: text }}>
-              <ShieldCheck size={32} className="mx-auto mb-5" style={{ color: text }} />
-              <h2 className="font-black text-3xl uppercase tracking-tighter mb-3" style={{ color: text }}>
-                Acceso Restringido
-              </h2>
-              <p className="font-mono text-[10px] uppercase tracking-widest leading-relaxed mb-8"
-                 style={{ color: muted }}>
-                Las 50 noticias con análisis institucional completo están disponibles exclusivamente para nodos suscritos.
-              </p>
-              <button onClick={() => setCheckoutOpen(true)}
-                      className="w-full py-4 font-mono text-[11px] font-black uppercase tracking-[0.3em] border transition-all"
-                      style={{ background: text, color: bg, borderColor: text }}>
-                Activar Nodo — 0.015 ETH
-              </button>
-              <p className="mt-4 font-mono text-[8px] uppercase tracking-widest"
-                 style={{ color: muted }}>
-                Red Optimism · Pago One-Shot · Sin datos personales
-              </p>
+            {/* Archive browser */}
+            {showArchive && archiveDates.length > 0 && (
+              <div style={{ borderBottom: `2px solid ${TEXT}`, background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+                <p className="px-6 pt-4 pb-2 font-mono text-[8px] uppercase tracking-[0.35em] font-black" style={{ color: MUTED }}>
+                  Archivo — {archiveDates.length} días
+                </p>
+                {archiveDates.map(date => {
+                  const count = archive[date]?.length ?? 0;
+                  const isToday = date === todayKey();
+                  return (
+                    <button
+                      key={date}
+                      onClick={() => {
+                        const dayArticles = archive[date];
+                        if (dayArticles?.length) {
+                          setArticles(dayArticles);
+                          setSelected(dayArticles[0]);
+                          setShowArchive(false);
+                        }
+                      }}
+                      className="w-full text-left px-6 py-3 flex items-center justify-between border-b transition-colors hover:opacity-70"
+                      style={{ borderColor: DIV }}
+                    >
+                      <span className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: isToday ? TEXT : MUTED }}>
+                        {new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {isToday && <span className="ml-2 text-[7px]">· HOY</span>}
+                      </span>
+                      <span className="font-mono text-[9px] font-black" style={{ color: MUTED }}>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Lista de artículos */}
+            <div className="flex flex-col">
+              {articles.map(art => {
+                const isActive = selected?.id === art.id;
+                return (
+                  <button key={art.id} onClick={() => setSelected(art)} className="text-left w-full px-6 py-5 border-b transition-colors"
+                    style={{ borderColor: DIV, background: isActive ? TEXT : 'transparent', color: isActive ? BG : TEXT }}>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] font-bold mb-2"
+                       style={{ color: isActive ? (isDark ? '#000' : '#fff') : MUTED }}>
+                      {formatShort(art.date)}
+                    </p>
+                    <p className="font-sans font-black leading-tight text-[13px]">{art.title}</p>
+                  </button>
+                );
+              })}
+              {articles.length === 0 && (
+                <p className="p-6 font-mono text-xs uppercase" style={{ color: MUTED }}>Sin noticias disponibles.</p>
+              )}
             </div>
           </div>
-        )}
+
+          {/* ═══════════════════════════════════════════════════════════════
+              PANEL DERECHO — Lectura institucional
+              ═══════════════════════════════════════════════════════════ */}
+          <div ref={rightRef} style={{ flex: 1, height: '100%', overflowY: 'auto', background: BG }}>
+
+            <AnimatePresence mode="wait">
+              {selected && (
+                <motion.article key={selected.id}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.18 }}>
+
+                  {/* ── Barra de controles ─────────────────────────────── */}
+                  <div className="flex items-center justify-between px-10 xl:px-16 py-5 border-b"
+                       style={{ borderColor: DIV }}>
+                    <span className="font-mono text-[8px] uppercase tracking-[0.3em]" style={{ color: MUTED }}>
+                      {formatDate(selected.date)}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {/* EUR conversion */}
+                      {ethEur && (
+                        <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 border" style={{ borderColor: DIV, color: MUTED }}>
+                          1 ETH ≈ {ethEur.toLocaleString('es-ES')} €
+                        </span>
+                      )}
+                      {/* Tamaño tipográfico */}
+                      <div className="flex border" style={{ borderColor: DIV }}>
+                        <button onClick={() => setFontSize(f => Math.max(0.85, +(f - 0.1).toFixed(1)))}
+                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
+                                style={{ color: MUTED }}>A−</button>
+                        <button onClick={() => setFontSize(1)}
+                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity border-x"
+                                style={{ color: MUTED, borderColor: DIV }}>A</button>
+                        <button onClick={() => setFontSize(f => Math.min(1.6, +(f + 0.1).toFixed(1)))}
+                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
+                                style={{ color: MUTED }}>A+</button>
+                      </div>
+                      {isNewsSubscribed && (
+                        <button onClick={() => setShareOpen(true)}
+                                className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
+                                style={{ borderColor: DIV }}>
+                          <Mail size={13} color={MUTED} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Contenido del artículo ─────────────────────────── */}
+                  <div className="px-10 xl:px-16 pt-12 pb-4">
+
+                    {/* FUENTE + ETIQUETA */}
+                    <p className="font-mono text-[8px] uppercase tracking-[0.4em] mb-4" style={{ color: MUTED }}>
+                      {selected.source} · Análisis Institucional
+                    </p>
+
+                    {/* TÍTULO PRINCIPAL */}
+                    <h1
+                      className="font-black tracking-tighter leading-[1.04] mb-0"
+                      style={{
+                        fontSize: `clamp(2rem, ${3.2 * fontSize}rem, 5rem)`,
+                        color: TEXT,
+                        textWrap: 'balance' as any,
+                      }}
+                    >
+                      {selected.title}
+                    </h1>
+                  </div>
+
+                  {/* IMAGEN HERO — misma anchura que el título */}
+                  <div className="px-10 xl:px-16 mt-8 mb-0">
+                    <div
+                      className="w-full overflow-hidden"
+                      style={{
+                        height: `clamp(280px, ${Math.round(440 * fontSize)}px, 680px)`,
+                        background: DIV,
+                      }}
+                    >
+                      <img
+                        ref={imgRef}
+                        src={getArticleImage(selected)}
+                        alt={selected.title}
+                        className="w-full h-full object-cover"
+                        loading="eager"
+                        onError={(e) => {
+                          const seed = selected.id.replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'news';
+                          (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${seed}alt/1600/700`;
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* ANÁLISIS PRINCIPAL */}
+                  <div className="px-10 xl:px-16 pt-10 pb-6 max-w-[900px]">
+                      {!isNewsSubscribed ? (
+                        <div className="relative">
+                          {/* Pseudo-content blurred */}
+                          <div
+                            className="font-serif leading-[1.9] space-y-7 blur-sm select-none opacity-30 pointer-events-none"
+                            style={{
+                              fontSize: `${1.18 * fontSize}rem`,
+                              color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
+                            }}
+                          >
+                            <p>El mercado de criptoactivos continúa bajo la influencia de múltiples vectores macroeconómicos que determinan los flujos de capital institucional. Los datos on-chain registran movimientos de alta convicción que sugieren reposicionamiento estratégico por parte de entidades con acceso privilegiado a liquidez profunda.</p>
+                            <p>Los wallets identificados como ballenas —con posiciones superiores a los 10 millones de dólares— han incrementado su actividad de acumulación en las últimas 48 horas. Este comportamiento, correlacionado con la compresión de volatilidad implícita en opciones de vencimiento próximo, apunta a una tesis de movimiento direccional inminente.</p>
+                            <p>El análisis de mempool revela transacciones de alto valor priorizadas con comisiones premium, lo que indica urgencia de ejecución por parte de participantes con información asimétrica. La estructura de order book en los principales venues de liquidez muestra absorción sistemática de presión vendedora.</p>
+                          </div>
+                          
+                          {/* Paywall Overlay */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-start pt-10">
+                            <div 
+                              className="max-w-md w-full border-4 p-10 text-center shadow-2xl relative overflow-hidden" 
+                              style={{ borderColor: TEXT, background: BG }}
+                            >
+                              <div className="absolute top-0 left-0 w-full h-1" style={{ background: TEXT }} />
+                              <Lock size={28} className="mx-auto mb-5" style={{ color: TEXT }} />
+                              <h3 className="font-black text-2xl uppercase tracking-tighter mb-2" style={{ color: TEXT }}>
+                                Terminal Restringida
+                              </h3>
+                              <p className="font-mono text-[9px] uppercase tracking-[0.2em] mb-8" style={{ color: MUTED }}>
+                                El acceso a inteligencia institucional requiere verificación on-chain.
+                              </p>
+                              <button 
+                                onClick={() => setCheckoutOpen(true)}
+                                className="w-full py-4 font-mono text-xs font-black uppercase tracking-widest hover:opacity-80 transition-all border"
+                                style={{ background: TEXT, color: BG, borderColor: TEXT }}
+                              >
+                                Desbloquear Acceso Seguro →
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className="font-serif leading-[1.9] space-y-7"
+                          style={{
+                            fontSize: `${1.18 * fontSize}rem`,
+                            color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
+                          }}
+                        >
+                          {selected.description
+                            ? selected.description.split(/\n\n+/).map((p, i) => (
+                                <p key={i}>{p}</p>
+                              ))
+                            : (
+                              <>
+                                <p>El mercado de criptoactivos continúa bajo la influencia de múltiples vectores macroeconómicos que determinan los flujos de capital institucional. Los datos on-chain registran movimientos de alta convicción que sugieren reposicionamiento estratégico por parte de entidades con acceso privilegiado a liquidez profunda.</p>
+                                <p>Los wallets identificados como ballenas —con posiciones superiores a los 10 millones de dólares— han incrementado su actividad de acumulación en las últimas 48 horas. Este comportamiento, correlacionado con la compresión de volatilidad implícita en opciones de vencimiento próximo, apunta a una tesis de movimiento direccional inminente.</p>
+                                <p>El análisis de mempool revela transacciones de alto valor priorizadas con comisiones premium, lo que indica urgencia de ejecución por parte de participantes con información asimétrica. La estructura de order book en los principales venues de liquidez muestra absorción sistemática de presión vendedora.</p>
+                                <p>Desde una perspectiva de gestión de riesgo institucional, los parámetros técnicos actuales presentan un ratio riesgo-recompensa favorable para posiciones largas con horizonte de 72 horas. La liquidez disponible en los niveles de soporte clave ofrece una base sólida para la continuación del impulso alcista.</p>
+                                <p>Los indicadores derivados —financiación, interés abierto, y ratio put/call— muestran una estructura consistente con la presión de compradores institucionales que buscan exposición antes de un catalizador de precio potencialmente significativo. La vigilancia de estos flujos es esencial para cualquier gestor de riesgo activo.</p>
+                              </>
+                            )
+                          }
+                        </div>
+                      )}
+
+                    {/* FOOTER LEGAL */}
+                    <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>
+                      <div className="flex justify-between items-center font-mono text-[8px] uppercase tracking-[0.3em] mb-3"
+                           style={{ color: MUTED }}>
+                        <span>Whale Alert Network — Intel Report</span>
+                        <span>No Reliance / Educational Only</span>
+                      </div>
+                      <p className="font-mono text-[8px] leading-relaxed uppercase tracking-wide" style={{ color: MUTED }}>
+                        La información presentada tiene fines exclusivamente educativos e informativos. Operar en mercados de criptoactivos implica riesgo de pérdida total de capital. Ningún contenido de esta terminal constituye asesoramiento financiero, legal ni fiscal. Zero almacenamiento de datos personales. Todas las transacciones están sujetas a las leyes vigentes de su jurisdicción.
+                      </p>
+                    </div>
+                  </div>
+                </motion.article>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════
-          MODALES AUXILIARES
-          ══════════════════════════════════════════════════ */}
-      <CryptoCheckoutModal isOpen={isCheckoutOpen} onClose={() => setCheckoutOpen(false)} />
+      {/* ═══════════════════════════════════════════════════════════════
+          MODALES
+          ═══════════════════════════════════════════════════════════ */}
+      <CryptoCheckoutModal isOpen={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
 
       <AnimatePresence>
         {shareOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                      style={{ background: 'rgba(0,0,0,0.75)' }}>
-            <motion.div initial={{ scale: 0.97, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.97 }}
-                        className="w-full max-w-md border relative"
-                        style={{ background: bg, borderColor: text }}>
-              {/* Header modal */}
-              <div className="flex items-center justify-between px-7 py-5 border-b"
-                   style={{ borderColor: div }}>
+                      style={{ background: 'rgba(0,0,0,0.82)' }}>
+            <motion.div initial={{ scale: 0.97, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.97 }}
+                        className="w-full max-w-md relative"
+                        style={{ background: BG, color: TEXT, border: `2px solid ${TEXT}` }}>
+              <div className="flex items-center justify-between px-7 py-5 border-b" style={{ borderColor: DIV }}>
                 <div className="flex items-center gap-3">
-                  <Mail size={18} style={{ color: text }} />
-                  <span className="font-black text-lg uppercase tracking-tight" style={{ color: text }}>
-                    Compartir Intel
-                  </span>
+                  <Mail size={18} />
+                  <span className="font-black text-lg uppercase tracking-tight">Compartir Intel</span>
                 </div>
-                <button onClick={() => setShareOpen(false)} className="hover:opacity-50 transition-opacity">
-                  <X size={18} style={{ color: text }} />
+                <button onClick={() => setShareOpen(false)} className="opacity-50 hover:opacity-100 transition-opacity">
+                  <X size={18} />
                 </button>
               </div>
 
-              {/* Body modal */}
               {shareSent ? (
-                <div className="p-12 text-center font-mono text-sm uppercase font-black tracking-widest"
-                     style={{ color: text }}>
-                  Transmisión Completada ✓
-                </div>
+                <div className="p-16 text-center font-mono text-sm font-black uppercase tracking-widest">Transmisión Completada ✓</div>
               ) : (
-                <form onSubmit={handleShare} className="p-7 space-y-6">
+                <form onSubmit={handleShare} className="p-7 space-y-7">
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2"
-                           style={{ color: muted }}>
-                      Destinatario
-                    </label>
-                    <input type="email" required value={shareEmail}
-                           onChange={e => setShareEmail(e.target.value)}
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: MUTED }}>Destinatario</label>
+                    <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)}
                            className="w-full bg-transparent outline-none border-b py-2 font-mono text-sm"
-                           style={{ borderColor: div, color: text }}
-                           placeholder="correo@dominio.com" />
+                           style={{ borderColor: DIV, color: TEXT }} placeholder="correo@dominio.com" />
                   </div>
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2"
-                           style={{ color: muted }}>
-                      Nota (Opcional)
-                    </label>
-                    <textarea value={shareNote}
-                              onChange={e => setShareNote(e.target.value)}
-                              rows={3}
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: MUTED }}>Nota (Opcional)</label>
+                    <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3}
                               className="w-full bg-transparent outline-none border p-3 font-serif text-sm resize-none"
-                              style={{ borderColor: div, color: text }} />
+                              style={{ borderColor: DIV, color: TEXT }} />
                   </div>
                   <button type="submit" disabled={isSending}
-                          className="w-full py-4 font-mono text-[10px] font-black uppercase tracking-widest border disabled:opacity-40"
-                          style={{ background: text, color: bg, borderColor: text }}>
+                          className="w-full py-4 font-mono text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
+                          style={{ background: TEXT, color: BG }}>
                     {isSending ? 'Enviando...' : 'Transmitir Acceso Único (1-Time)'}
                   </button>
-                  <p className="text-center font-mono text-[8px] uppercase tracking-widest" style={{ color: muted }}>
+                  <p className="text-center font-mono text-[8px] uppercase tracking-widest" style={{ color: MUTED }}>
                     El destinatario solo podrá leer esta noticia una vez.
                   </p>
                 </form>
@@ -440,6 +505,6 @@ export function NewsTerminal() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
