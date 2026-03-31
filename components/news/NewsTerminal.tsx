@@ -38,7 +38,7 @@ export function NewsTerminal() {
   const [shareSent, setShareSent] = useState(false);
   const [isBlockedByCaducity, setIsBlockedByCaducity] = useState(false);
 
-  const [dataSource, setDataSource] = useState<'live' | 'db-cache' | 'none' | null>(null);
+  const [dataSource, setDataSource] = useState<'live' | 'rss' | 'db-cache' | 'none' | null>(null);
 
   // Referencias para scroll programático (auto-scroll al seleccionar)
   const rightPanelRef = useRef<HTMLDivElement>(null);
@@ -191,10 +191,13 @@ export function NewsTerminal() {
             </h2>
             {dataSource && (
               <span className="font-mono text-[8px] uppercase tracking-[0.25em] flex items-center gap-1.5 mt-0.5"
-                    style={{ color: dataSource === 'live' ? '#16a34a' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }}>
+                    style={{ color: dataSource === 'live' ? '#16a34a' : dataSource === 'rss' ? '#2563eb' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }}>
                 <span className="w-1.5 h-1.5 rounded-full inline-block"
-                      style={{ background: dataSource === 'live' ? '#16a34a' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }} />
-                {dataSource === 'live' ? 'En vivo · Tiempo real' : dataSource === 'db-cache' ? 'Caché · Últimos 30 días' : 'Sin datos — Revisar API Keys'}
+                      style={{ background: dataSource === 'live' ? '#16a34a' : dataSource === 'rss' ? '#2563eb' : dataSource === 'db-cache' ? '#b45309' : '#dc2626' }} />
+                {dataSource === 'live'     ? 'En vivo · CryptoPanic'
+                : dataSource === 'rss'     ? 'En vivo · RSS Institucional'
+                : dataSource === 'db-cache' ? 'Caché · Últimos 30 días'
+                :                            'Sin datos — Revisar fuentes'}
               </span>
             )}
           </div>
