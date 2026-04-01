@@ -353,12 +353,12 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* IMAGEN HERO — APARECE ARRIBA DEL TITULO */}
-                  <div className="px-10 xl:px-16 pt-12 pb-0">
+                  {/* IMAGEN HERO — APARECE ARRIBA DEL TITULO EN FULL BLEED */}
+                  <div className="w-full pb-8">
                     <div
-                      className="w-full overflow-hidden bg-[#111]"
+                      className="w-full overflow-hidden bg-[#080808]"
                       style={{
-                        height: `clamp(280px, ${Math.round(440 * fontSize)}px, 680px)`,
+                        height: `clamp(320px, ${Math.round(480 * fontSize)}px, 720px)`,
                       }}
                     >
                       <motion.img
@@ -417,9 +417,9 @@ export function NewsTerminal() {
                               color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
                             }}
                           >
-                            <p>El mercado de criptoactivos continúa bajo la influencia de múltiples vectores macroeconómicos que determinan los flujos de capital institucional. Los datos on-chain registran movimientos de alta convicción que sugieren reposicionamiento estratégico por parte de entidades con acceso privilegiado a liquidez profunda.</p>
-                            <p>Los wallets identificados como ballenas —con posiciones superiores a los 10 millones de dólares— han incrementado su actividad de acumulación en las últimas 48 horas. Este comportamiento, correlacionado con la compresión de volatilidad implícita en opciones de vencimiento próximo, apunta a una tesis de movimiento direccional inminente.</p>
-                            <p>El análisis de mempool revela transacciones de alto valor priorizadas con comisiones premium, lo que indica urgencia de ejecución por parte de participantes con información asimétrica. La estructura de order book en los principales venues de liquidez muestra absorción sistemática de presión vendedora.</p>
+                            <p>GLOBAL INTELLIGENCE BRIEF — Our thermodynamic telemetry nodes have detected an asymmetric event vector. This development triggers Level-Alpha monitoring protocols within our institutional infrastructure, as its propagation signature exceeds standard baseline metrics. Early warning systems indicate an anomalous concentration of high-value liquidity flows preceding this event horizon.</p>
+                            <p>MACRO LIQUIDITY ANALYSIS — From an institutional liquidity standpoint, Tier-1 operators (wallets holding &gt;$10M in digital assets) are executing quiet but systematic exposure realignments. On-chain flow data points to structural reallocation away from centralized order books toward self-custody layers, a pattern historically correlated with major directional expansions within 48 hours. The latent buy-side pressure suggests an impending delta squeeze.</p>
+                            <p>REGULATORY &amp; PROTOCOL IMPLICATIONS — Correlated analysis across the EVM ecosystem suggests immediate derivatives repricing. Open Interest metrics reflect a structural divergence between retail sentiment and institutional strategic positioning (accumulating heavily hedged longs). Operators equipped with sovereign intelligence engines are advised to maintain a Strategic Observer stance, awaiting 15-minute structural confirmation before committing algorithmic capital. End of sovereign transmission.</p>
                           </div>
                           
                           {/* Paywall Overlay */}
@@ -459,14 +459,12 @@ export function NewsTerminal() {
                                 <p key={i}>{p}</p>
                               ))
                             : (
-                              <>
-                                <p>El mercado de criptoactivos continúa bajo la influencia de múltiples vectores macroeconómicos que determinan los flujos de capital institucional. Los datos on-chain registran movimientos de alta convicción que sugieren reposicionamiento estratégico por parte de entidades con acceso privilegiado a liquidez profunda.</p>
-                                <p>Los wallets identificados como ballenas —con posiciones superiores a los 10 millones de dólares— han incrementado su actividad de acumulación en las últimas 48 horas. Este comportamiento, correlacionado con la compresión de volatilidad implícita en opciones de vencimiento próximo, apunta a una tesis de movimiento direccional inminente.</p>
-                                <p>El análisis de mempool revela transacciones de alto valor priorizadas con comisiones premium, lo que indica urgencia de ejecución por parte de participantes con información asimétrica. La estructura de order book en los principales venues de liquidez muestra absorción sistemática de presión vendedora.</p>
-                                <p>Desde una perspectiva de gestión de riesgo institucional, los parámetros técnicos actuales presentan un ratio riesgo-recompensa favorable para posiciones largas con horizonte de 72 horas. La liquidez disponible en los niveles de soporte clave ofrece una base sólida para la continuación del impulso alcista.</p>
-                                <p>Los indicadores derivados —financiación, interés abierto, y ratio put/call— muestran una estructura consistente con la presión de compradores institucionales que buscan exposición antes de un catalizador de precio potencialmente significativo. La vigilancia de estos flujos es esencial para cualquier gestor de riesgo activo.</p>
-                              </>
-                            )
+                                <>
+                                  <p>GLOBAL INTELLIGENCE BRIEF — Our thermodynamic telemetry nodes have detected an asymmetric event vector. This development triggers Level-Alpha monitoring protocols within our institutional infrastructure, as its propagation signature exceeds standard baseline metrics. Early warning systems indicate an anomalous concentration of high-value liquidity flows preceding this event horizon.</p>
+                                  <p>MACRO LIQUIDITY ANALYSIS — From an institutional liquidity standpoint, Tier-1 operators (wallets holding &gt;$10M in digital assets) are executing quiet but systematic exposure realignments. On-chain flow data points to structural reallocation away from centralized order books toward self-custody layers, a pattern historically correlated with major directional expansions within 48 hours. The latent buy-side pressure suggests an impending delta squeeze.</p>
+                                  <p>REGULATORY &amp; PROTOCOL IMPLICATIONS — Correlated analysis across the EVM ecosystem suggests immediate derivatives repricing. Open Interest metrics reflect a structural divergence between retail sentiment and institutional strategic positioning (accumulating heavily hedged longs). Operators equipped with sovereign intelligence engines are advised to maintain a Strategic Observer stance, awaiting 15-minute structural confirmation before committing algorithmic capital. End of sovereign transmission.</p>
+                                </>
+                              )
                           }
                         </div>
                       )}
