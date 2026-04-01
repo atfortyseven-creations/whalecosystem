@@ -16,6 +16,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
+import { useAppKit } from '@reown/appkit/react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
 import { CinematicWhaleLogo } from './CinematicWhaleLogo';
@@ -152,21 +153,26 @@ function WalletIcon({ type }: { type: string }) {
 function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const os = typeof window !== 'undefined' ? getMobileOS() : 'other';
   const { connect, connectors, error } = useConnect();
+  const { open } = useAppKit();
   const [isConnecting, setIsConnecting] = React.useState<string | null>(null);
 
   const handleWalletSelect = async (wallet: typeof WALLET_OPTIONS[0]) => {
     setIsConnecting(wallet.id);
 
     try {
+        if (wallet.id === 'walletConnect') {
+            onClose();
+            open({ view: 'Connect' });
+            setIsConnecting(null);
+            return;
+        }
+
+        const activeBrowser = detectWalletBrowser();
         let targetConnector = null;
         
         switch(wallet.id) {
-            case 'walletConnect':
-                targetConnector = connectors.find(c => c.id === 'walletConnect' || c.id === 'walletConnectLegacy');
-                break;
             case 'metamask':
                 targetConnector = connectors.find(c => c.id === 'metaMask' || c.id === 'io.metamask');
-                if (!targetConnector) targetConnector = connectors.find(c => c.type === 'injected');
                 break;
             case 'coinbase':
                 targetConnector = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.id === 'coinbaseWallet');
@@ -177,8 +183,10 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             case 'rainbow':
                 targetConnector = connectors.find(c => c.id === 'me.rainbow' || c.name === 'Rainbow');
                 break;
-            default:
-                targetConnector = connectors.find(c => c.type === 'injected');
+        }
+
+        if (!targetConnector && activeBrowser === wallet.id) {
+             targetConnector = connectors.find(c => c.type === 'injected');
         }
 
         if (targetConnector) {
@@ -194,9 +202,22 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                 }
             });
         } else {
-            // Fallback for missing extensions in non-browser context
-            toast.error(`${wallet.name} connector not detected. Please install the app or use WalletConnect.`);
-            setIsConnecting(null);
+            const osId = getMobileOS();
+            if (osId === 'ios' || osId === 'android') {
+                const dappLink = buildDappBrowserLink(wallet.id, osId);
+                if (dappLink) {
+                    window.location.href = dappLink;
+                    setTimeout(() => setIsConnecting(null), 3000);
+                } else {
+                    toast.error(`${wallet.name} not supported for deep linking.`);
+                    setIsConnecting(null);
+                }
+            } else {
+                toast.info(`${wallet.name} no detectado. Abriendo WalletConnect QR...`);
+                setIsConnecting(null);
+                onClose();
+                open({ view: 'Connect' });
+            }
         }
     } catch (e: any) {
         toast.error(`Error: ${e?.message}`);
