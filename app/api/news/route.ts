@@ -15,6 +15,30 @@ export interface NewsArticle {
   date: string; url: string; source: string; imageUrl?: string;
 }
 
+// ─── Pool de imágenes de fallback crypto/fintech (Unsplash) ──────────────────
+const FALLBACK_IMAGES = [
+  'https://images.unsplash.com/photo-1621504450181-5d356f006325?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1639762681485-074b7f4fc060?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1647427017066-896db8edb4b4?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1620331311520-246422fd82f9?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1639762681057-408e52192e55?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&q=80&w=1600',
+  'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&q=80&w=1600',
+];
+
+function getFallbackImage(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return FALLBACK_IMAGES[Math.abs(hash) % FALLBACK_IMAGES.length];
+}
+
 // ─── Utilidad: Decodificador de Entidades HTML ────────────────────────────────
 function decodeHTMLEntities(text: string): string {
   if (!text) return '';
@@ -154,11 +178,14 @@ export async function GET() {
           const articles: NewsArticle[] = results.slice(0, 50).map(item => {
             const clean   = decodeHTMLEntities(item.title.replace(/<[^>]*>?/gm, ''));
             const srcName = item.source?.title || item.domain || 'Whale-Node';
+            const artId   = `cp-${item.id}`;
             return {
-              id: `cp-${item.id}`, title: clean,
+              id: artId, title: clean,
               description: generateDeepAnalysis(clean, srcName),
               date: new Date(item.published_at).toISOString(),
               url: item.url, source: srcName,
+              // CryptoPanic API no provee imageUrl — asignamos fallback determinista
+              imageUrl: getFallbackImage(artId),
             };
           });
           persistToDB(articles).catch(console.warn);
@@ -204,6 +231,7 @@ export async function GET() {
           id: item.id, title: item.title,
           description: item.aiSummary || generateDeepAnalysis(item.title, item.source),
           date: item.publishedAt.toISOString(), url: item.url, source: item.source,
+          imageUrl: getFallbackImage(item.id),
         })),
         timestamp: Date.now(),
       });
