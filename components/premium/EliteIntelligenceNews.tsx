@@ -11,13 +11,27 @@ interface NewsItem {
     body: string;
 }
 
+function decodeHTMLEntities(text: string): string {
+    if (!text) return '';
+    return text
+        .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'").replace(/&apos;/g, "'")
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&#8217;/g, '’').replace(/&#8216;/g, '‘')
+        .replace(/&#8220;/g, '“').replace(/&#8221;/g, '”')
+        .replace(/&#8211;/g, '–').replace(/&#8212;/g, '—')
+        .replace(/&#39;/g, "'")
+        .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+        .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
 const fetcher = async (url: string) => {
     const res = await fetch(url);
     const json = await res.json();
     return json?.Data?.slice(0, 50).map((n: any) => ({
         id: n.id,
-        title: n.title,
-        body: n.body
+        title: decodeHTMLEntities(n.title),
+        body: decodeHTMLEntities(n.body)
     })) || [];
 };
 

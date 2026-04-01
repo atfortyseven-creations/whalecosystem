@@ -12,10 +12,28 @@ import { CryptoCheckoutModal } from './CryptoCheckoutModal';
 const HEADER_H = 68;
 
 // ── Fallback de imagen determinista (siempre disponible, sin contenido falso) ─
+const FALLBACK_BGS = [
+  "https://images.unsplash.com/photo-1621504450181-5d356f006325?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1639762681485-074b7f4fc060?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1647427017066-896db8edb4b4?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1620331311520-246422fd82f9?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1600",
+  "https://images.unsplash.com/photo-1639762681057-408e52192e55?auto=format&fit=crop&q=80&w=1600"
+];
+
 function getArticleImage(article: NewsArticle): string {
   if (article.imageUrl && article.imageUrl.startsWith('http')) return article.imageUrl;
-  const seed = article.id.replace(/[^a-z0-9]/gi, '').slice(0, 12) || 'whale';
-  return `https://picsum.photos/seed/${seed}/1600/700`;
+  
+  let hash = 0;
+  for (let i = 0; i < article.id.length; i++) {
+    hash = article.id.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % FALLBACK_BGS.length;
+  return FALLBACK_BGS[index];
 }
 
 // ── Formato de fecha legible ──────────────────────────────────────────────────
@@ -370,8 +388,15 @@ export function NewsTerminal() {
                         className="w-full h-full object-cover"
                         loading="eager"
                         onError={(e) => {
-                          const seed = selected.id.replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'news';
-                          (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${seed}alt/1600/700`;
+                          const target = e.target as HTMLImageElement;
+                          if (target.dataset.errorHandled) return;
+                          target.dataset.errorHandled = "true";
+                          let hash = 0;
+                          for (let i = 0; i < selected.id.length; i++) {
+                            hash = selected.id.charCodeAt(i) + ((hash << 5) - hash);
+                          }
+                          const index = (Math.abs(hash) + 1) % FALLBACK_BGS.length;
+                          target.src = FALLBACK_BGS[index];
                         }}
                       />
                     </div>

@@ -15,6 +15,27 @@ export interface NewsArticle {
   date: string; url: string; source: string; imageUrl?: string;
 }
 
+// ─── Utilidad: Decodificador de Entidades HTML ────────────────────────────────
+function decodeHTMLEntities(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#8217;/g, '’')
+    .replace(/&#8216;/g, '‘')
+    .replace(/&#8220;/g, '“')
+    .replace(/&#8221;/g, '”')
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8212;/g, '—')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
 // ─── Análisis Institucional Extendido (7 Bloques) ────────────────────────────
 function generateDeepAnalysis(title: string, domain: string): string {
   return [
@@ -74,9 +95,7 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<NewsArticl
 
       if (!title || !link) continue;
 
-      const cleanTitle = title
-        .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
-        .replace(/&#039;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+      const cleanTitle = decodeHTMLEntities(title);
 
       articles.push({
         id:          `rss-${Buffer.from(link).toString('base64').slice(0, 16)}`,
@@ -133,7 +152,7 @@ export async function GET() {
         const results: CryptoPanicArticle[] = json.results ?? [];
         if (results.length > 0) {
           const articles: NewsArticle[] = results.slice(0, 50).map(item => {
-            const clean   = item.title.replace(/<[^>]*>?/gm, '').replace(/&quot;/g, '"');
+            const clean   = decodeHTMLEntities(item.title.replace(/<[^>]*>?/gm, ''));
             const srcName = item.source?.title || item.domain || 'Whale-Node';
             return {
               id: `cp-${item.id}`, title: clean,
