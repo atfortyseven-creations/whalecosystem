@@ -16,20 +16,7 @@ export interface NewsArticle {
 }
 
 // ─── Pool de imágenes de fallback crypto/fintech (Unsplash) ──────────────────
-const FALLBACK_IMAGES = [
-  'https://picsum.photos/seed/crypto1/1600/900?grayscale',
-  'https://picsum.photos/seed/whale2/1600/900?grayscale',
-  'https://picsum.photos/seed/finance3/1600/900?grayscale',
-  'https://picsum.photos/seed/market4/1600/900?grayscale',
-  'https://picsum.photos/seed/bitcoin5/1600/900?grayscale',
-  'https://picsum.photos/seed/ether6/1600/900?grayscale',
-  'https://picsum.photos/seed/defi7/1600/900?grayscale',
-  'https://picsum.photos/seed/tech8/1600/900?grayscale',
-  'https://picsum.photos/seed/data9/1600/900?grayscale',
-  'https://picsum.photos/seed/node10/1600/900?grayscale',
-  'https://picsum.photos/seed/alpha11/1600/900?grayscale',
-  'https://picsum.photos/seed/omega12/1600/900?grayscale',
-];
+const FALLBACK_IMAGES = Array.from({length: 12}, (_, i) => `/api/proxy-image?seed=${i+1}`);
 
 function getFallbackImage(id: string): string {
   let hash = 0;
@@ -63,19 +50,11 @@ function decodeHTMLEntities(text: string): string {
 // ─── Análisis Institucional Extendido (7 Bloques) ────────────────────────────
 function generateDeepAnalysis(title: string, domain: string): string {
   return [
-    `CONTEXTO GLOBAL — El flujo informacional registrado por los nodos de ${domain} documenta el siguiente evento de alto impacto en el ecosistema de activos digitales globales: "${title}". Este acontecimiento activa protocolos de monitoreo de Nivel Alfa dentro de nuestra infraestructura de vigilancia termodinámica, dado que su vector de propagación supera ampliamente los umbrales de atención institucional establecidos para la sesión corriente. Los nodos de alerta temprana han registrado un incremento inusual en el flujo de transacciones de valor superior a $500,000 USD en las últimas 4 horas, correlacionado directamente con este evento.`,
+    `GLOBAL INTELLIGENCE BRIEF — Our thermodynamic telemetry nodes monitoring ${domain} have detected an asymmetric event vector: "${title}". This development triggers Level-Alpha monitoring protocols within our institutional infrastructure, as its propagation signature exceeds standard baseline metrics. Early warning systems indicate an anomalous concentration of high-value liquidity flows preceding this event horizon.`,
 
-    `ANÁLISIS DE LIQUIDEZ MACRO — Desde una perspectiva de liquidez institucional, los operadores de Tier-1 (ballenas con carteras superiores a $10M en activos digitales) han comenzado a reposicionar sus exposiciones de forma silenciosa pero sistemática. Los datos de flujo de fondos on-chain muestran una transferencia masiva desde exchanges centralizados (CEX) hacia wallets de auto-custodia (cold storage), lo que históricamente precede a movimientos de precio significativos de entre 12% y 28% en las primeras 48 horas. La presión compradora latente acumulada durante los últimos 7 días de consolidación lateral podría ser el catalizador de una ruptura técnica violenta.`,
+    `MACRO LIQUIDITY ANALYSIS — From an institutional liquidity standpoint, Tier-1 operators (wallets holding >$10M in digital assets) are executing quiet but systematic exposure realignments. On-chain flow data points to structural reallocation away from centralized order books toward self-custody layers, a pattern historically correlated with major directional expansions within 48 hours. The latent buy-side pressure suggests an impending delta squeeze.`,
 
-    `IMPACTO EN DERIVADOS — El análisis de correlación on-chain aplicado a ${domain} revela que los mercados de derivados han comenzado a descontar una prima de incertidumbre estructural. El Open Interest total en contratos perpetuos ha aumentado un 18.4% en las últimas 6 horas, con una divergencia notable entre el sentimiento de los traders retail (manos débiles, posicionados en cortos) y los operadores institucionales (Tier-1, acumulando largos con stop-loss profundos). Esta dicotomía extrema suele anteceder un short squeeze de alta intensidad o una liquidación masiva de posiciones largas especulativas, dependiendo del próximo catalizador macroeconómico.`,
-
-    `INFRAESTRUCTURA EVM Y RED — A nivel técnico de la infraestructura blockchain, este evento tiene implicaciones directas sobre los protocolos de liquidez descentralizada (DeFi) y los mecanismos de inter-operabilidad entre cadenas (cross-chain bridges). Si el evento impacta de forma directa sobre contratos inteligentes de gobernanza o sobre las rutas de liquidez de stablecoins sistémicas (USDC, USDT, DAI, FRAX), el sistema activará el protocolo de vigilancia Gas Thresholding. Las tarifas de transacción en L1 Ethereum podrían superar los 150-200 Gwei durante el pico de actividad, favoreciendo a operadores con infraestructura en Arbitrum, Optimism, Base o zkSync Era para capturar máxima eficiencia de ejecución.`,
-
-    `CORRELACIONES HISTÓRICAS — Los sistemas de análisis histórico de patrones muestran que eventos de esta naturaleza y magnitud han ocurrido en 23 ocasiones durante los últimos 4 años en el mercado cripto. En el 74% de los casos, el precio del activo más directamente relacionado experimentó una corrección inicial del 5-15% en las primeras 12 horas, seguida de una recuperación del 120-340% en los siguientes 30-90 días. El 26% restante corresponde a eventos que marcaron puntos de inflexión estructurales de largo plazo en los que el activo nunca recuperó sus máximos previos. La diferenciación entre ambos escenarios depende fundamentalmente de la respuesta de la liquidez institucional en las primeras 24 horas.`,
-
-    `DIMENSIÓN REGULATORIA Y COMPLIANCE — Desde el marco regulatorio global, este tipo de eventos generan presión inmediata sobre los organismos supervisores (SEC en EE.UU., ESMA en Europa, FCA en UK, FSA en Japón). Las respuestas regulatorias históricamente han tardado entre 2 y 18 semanas en materializarse en forma de directrices, multas o restricciones operativas. Sin embargo, el impacto anticipado por los mercados ocurre de forma inmediata, con movimientos del precio que descontarán el escenario regulatorio más probable en cuestión de horas. Los operadores con acceso a inteligencia regulatoria avanzada pueden posicionarse antes de que el consenso del mercado incorpore este riesgo en los precios.`,
-
-    `RESOLUCIÓN INSTITUCIONAL FINAL — PROTOCOLO DE ACCIÓN: Mantenga posición de Observador Estratégico con entre el 20% y el 40% de su capital en liquidez seca disponible para respuesta rápida. No ejecute órdenes de mercado (market orders) en las primeras 2 horas post-evento. Espere la confirmación técnica de al menos 3 velas de 15 minutos por encima del soporte clave antes de comprometer capital en posiciones direccionales. La volatilidad implícita elevada actual favorece estrategias de opciones (recolección de prima mediante strangles o condors), no la especulación unidireccional. Mantenga alertas activas para movimientos superiores al 3% en menos de 5 minutos, señal de aceleración institucional. Fin de la transmisión soberana.`,
+    `REGULATORY & PROTOCOL IMPLICATIONS — Correlated analysis across the EVM ecosystem suggests immediate derivatives repricing. Open Interest metrics reflect a structural divergence between retail sentiment and institutional strategic positioning (accumulating heavily hedged longs). Operators equipped with sovereign intelligence engines are advised to maintain a Strategic Observer stance, awaiting 15-minute structural confirmation before committing algorithmic capital. End of sovereign transmission.`
   ].join('\n\n');
 }
 
