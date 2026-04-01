@@ -208,10 +208,10 @@ function NewsCard({
       <div className="relative w-full h-44 mb-4 rounded-xl overflow-hidden bg-black/20 ring-1 ring-white/10 group-hover:ring-blue-500/50 transition-all">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10" />
         <img 
-          src={article.imageUrl || `https://picsum.photos/seed/global/1200/800?grayscale`}
+          src={article.imageUrl ? `/api/proxy-image?url=${encodeURIComponent(article.imageUrl)}` : `/api/proxy-image?seed=${index}`}
           alt={article.title}
           onError={(e) => {
-            e.currentTarget.src = "https://picsum.photos/seed/fallback/1200/800?grayscale";
+            e.currentTarget.src = "/official-whale-monochrome.png";
           }}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
         />

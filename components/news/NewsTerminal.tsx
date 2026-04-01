@@ -11,22 +11,24 @@ import { CryptoCheckoutModal } from './CryptoCheckoutModal';
 // ── Altura del InstitutionalHeader global ─────────────────────────────────────
 const HEADER_H = 68;
 
-// ── Fallback de imagen determinista (siempre disponible, sin contenido falso) ─
+// ── Fallback de imagen determinista por nuestro proxy ─
 const FALLBACK_BGS = [
-  "https://picsum.photos/seed/crypto1/1600/900?grayscale",
-  "https://picsum.photos/seed/whale2/1600/900?grayscale",
-  "https://picsum.photos/seed/finance3/1600/900?grayscale",
-  "https://picsum.photos/seed/market4/1600/900?grayscale",
-  "https://picsum.photos/seed/bitcoin5/1600/900?grayscale",
-  "https://picsum.photos/seed/ether6/1600/900?grayscale",
-  "https://picsum.photos/seed/defi7/1600/900?grayscale",
-  "https://picsum.photos/seed/tech8/1600/900?grayscale",
-  "https://picsum.photos/seed/data9/1600/900?grayscale",
-  "https://picsum.photos/seed/node10/1600/900?grayscale"
+  "/api/proxy-image?seed=1",
+  "/api/proxy-image?seed=2",
+  "/api/proxy-image?seed=3",
+  "/api/proxy-image?seed=4",
+  "/api/proxy-image?seed=5",
+  "/api/proxy-image?seed=6",
+  "/api/proxy-image?seed=7",
+  "/api/proxy-image?seed=8",
+  "/api/proxy-image?seed=9",
+  "/api/proxy-image?seed=10"
 ];
 
 function getArticleImage(article: NewsArticle): string {
-  if (article.imageUrl && article.imageUrl.startsWith('http')) return article.imageUrl;
+  if (article.imageUrl && article.imageUrl.startsWith('http')) {
+    return `/api/proxy-image?url=${encodeURIComponent(article.imageUrl)}`;
+  }
   
   let hash = 0;
   for (let i = 0; i < article.id.length; i++) {
@@ -392,7 +394,7 @@ export function NewsTerminal() {
 
                     {/* TÍTULO PRINCIPAL - Peso medio-alto */}
                     <h1
-                      className="font-medium tracking-tight leading-[1.04] mb-0 translate-y-[-2px]"
+                      className="font-sans font-medium tracking-tight leading-[1.04] mb-0 translate-y-[-2px]"
                       style={{
                         fontSize: `clamp(2rem, ${3.2 * fontSize}rem, 5rem)`,
                         color: TEXT,
