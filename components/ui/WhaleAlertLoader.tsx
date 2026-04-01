@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface WhaleAlertLoaderProps {
   /** Permite sobreescribir el fondo. Por defecto hereda el background del componente padre. */
@@ -48,13 +49,23 @@ export function WhaleAlertLoader({ bg = '#FFFFFF', color = '#000000' }: WhaleAle
           style={{ background: color }}
         />
 
-        {/* Spinner minimalista */}
+        {/* Logo animado de la Ballena Semejante y Perfecto */}
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
-          className="w-6 h-6 border-2 border-t-transparent"
-          style={{ borderColor: color, borderTopColor: 'transparent' }}
-        />
+           animate={{ rotate: 360, scale: [1, 1.02, 1] }}
+           transition={{ 
+             rotate: { repeat: Infinity, duration: 2.5, ease: 'linear' },
+             scale: { repeat: Infinity, duration: 2, ease: 'easeInOut' } 
+           }}
+           className="w-20 h-20 relative flex items-center justify-center shadow-2xl rounded-full"
+        >
+           <Image
+              src="/official-whale-monochrome.png"
+              alt="Whale Spinner"
+              fill
+              className="object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.1)]"
+              priority
+           />
+        </motion.div>
 
         {/* Subtexto */}
         <p
