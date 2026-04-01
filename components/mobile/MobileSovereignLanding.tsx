@@ -120,21 +120,29 @@ const STORE_LINKS: Record<string, { ios: string; android: string }> = {
 
 const WALLET_OPTIONS = [
   { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
-  { id: 'trust',    name: 'TRUST WALLET', desc: 'VIA WALLETCONNECT QR', iconType: 'trust' },
-  { id: 'coinbase', name: 'COINBASE WALLET',desc: 'VIA WALLETCONNECT QR', iconType: 'coinbase' },
-  { id: 'rainbow',  name: 'RAINBOW',      desc: 'VIA WALLETCONNECT QR', iconType: 'rainbow' },
+  { id: 'walletConnect', name: 'WALLETCONNECT', desc: 'MODAL / QR CODE', iconType: 'walletconnect' },
+  { id: 'trust',    name: 'TRUST WALLET', desc: 'MOBILE APP', iconType: 'trust' },
+  { id: 'coinbase', name: 'COINBASE WALLET',desc: 'SMART WALLET / APP', iconType: 'coinbase' },
+  { id: 'rainbow',  name: 'RAINBOW WALLET',      desc: 'MOBILE APP', iconType: 'rainbow' },
 ];
 
 function WalletIcon({ type }: { type: string }) {
-  if (type === 'metamask') return <img src="/official-whale-monochrome.png" className="w-[18px] h-[18px]" alt="MetaMask" />;
+  if (type === 'metamask') return (
+       <svg width="24" height="24" viewBox="0 0 118 110" fill="none"><path d="M115.82 46.5414L105.187 18.2562L82.9096 35.8082L81.242 37.1697L115.82 46.5414ZM52.4172 1.4883L58.98 0L65.5428 1.4883L65.7365 1.58752V20.8845L58.98 23.3644L52.2235 20.8845V1.58752L52.4172 1.4883ZM35.0504 35.8082L12.7731 18.2562L2.1397 46.5414L36.718 37.1697L35.0504 35.8082ZM58.98 27.5308L67.7512 24.3564L85.2731 43.1215L82.1348 45.4031L58.98 56.4143L35.8252 45.4031L32.6869 43.1215L50.2088 24.3564L58.98 27.5308ZM30.7109 46.7894L32.8806 50.1126L53.7733 60.1839L53.8121 69.1614L37.1444 65.5406L20.825 80.3214L15.3232 54.3782L30.7109 46.7894ZM87.2491 46.7894L102.637 54.3782L97.135 80.3214L80.8156 65.5406L64.1479 69.1614L64.1867 60.1839L85.0794 50.1126L87.2491 46.7894ZM115.82 50.4093L91.24 64.9946L103.257 85.083L115.82 50.4093ZM2.1397 50.4093L14.703 85.083L26.72 64.9946L2.1397 50.4093ZM33.5005 69.3102L55.478 74.0718H62.482L84.4595 69.3102L98.53 87.0174L110.163 94.6558L106.637 99.467L97.5613 102.592H81.7086L70.1627 94.0606L67.9542 96.6894H50.0058L47.7973 94.0606L36.2514 102.592H20.3987L11.323 99.467L7.7969 94.6558L19.43 87.0174L33.5005 69.3102Z" fill="#F6851B"/><path d="M55.478 74.0718L49.1921 82.2558L33.5393 86.8686H53.0759L55.4452 79.418L55.4526 74.1565H55.478ZM62.482 74.0718H62.5074L62.5148 79.418L64.8841 86.8686H84.4207L68.7679 82.2558L62.482 74.0718Z" fill="#E2761B"/><path d="M68.7679 82.2558L84.4207 86.8686L81.7086 102.592L70.1627 94.0606L68.7679 82.2558ZM49.1921 82.2558L33.5393 86.8686L36.2514 102.592L47.7973 94.0606L49.1921 82.2558ZM70.1627 94.0606L67.9542 96.6894H50.0058L47.7973 94.0606L58.98 90.787H70.1627ZM106.637 99.467L110.163 94.6558C110.163 94.6558 106.327 94.1598 102.49 97.483L97.5613 102.592H81.7086L86.6373 109.933L106.637 99.467ZM11.323 99.467L7.7969 94.6558C7.7969 94.6558 11.633 94.1598 15.47 97.483L20.3987 102.592H36.2514L31.3227 109.933L11.323 99.467Z" fill="#D7C1B3"/><path d="M58.98 90.7572L50.0058 96.6596L62.2494 109.963H55.7106L58.98 90.787V90.7572ZM58.98 90.7572L58.98 90.787L67.9542 96.6894L55.7106 109.963H62.2494L58.98 90.7572Z" fill="#161616"/><path d="M86.6373 109.933L81.7086 102.592L62.2494 109.933H86.6373ZM31.3227 109.933L36.2514 102.592L55.7106 109.933H31.3227ZM33.5393 86.8686L84.4207 86.8686H53.0759H64.8841L84.4207 86.8686Z" fill="#763D16"/></svg>
+  );
   if (type === 'trust') return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#E84142" stroke="#000000" strokeWidth="2"/></svg>
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#0A65FF" stroke="#000000" strokeWidth="1"/></svg>
   );
   if (type === 'coinbase') return (
-    <div className="w-[18px] h-[18px] bg-[#0052FF] rounded-full border-[2.5px] border-black" />
+    <div className="w-[24px] h-[24px] bg-[#0052FF] rounded-full flex items-center justify-center">
+         <div className="w-[10px] h-[10px] bg-white rounded-sm drop-shadow-sm" />
+    </div>
   );
   if (type === 'rainbow') return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round"><path d="M4 18v-2a8 8 0 0 1 16 0v2" stroke="#FF494A" /><path d="M8 18v-2a4 4 0 0 1 8 0v2" stroke="#FFCF00"/><path d="M12 18v-1a1 1 0 0 1 0 0" stroke="#1198FF"/></svg>
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round"><path d="M4 18v-2a8 8 0 0 1 16 0v2" stroke="#FF494A" /><path d="M8 18v-2a4 4 0 0 1 8 0v2" stroke="#FFCF00"/><path d="M12 18v-1a1 1 0 0 1 0 0" stroke="#1198FF"/></svg>
+  );
+  if (type === 'walletconnect') return (
+    <svg viewBox="0 0 500 500" width="24" height="24" fill="none"><rect width="500" height="500" fill="#3B99FC" rx="100"/><path d="M152 230c54-52 142-52 196 0l11 11c6 6 6 15 0 21l-25 25c-3 3-6 4-10 4-4 0-7-1-10-4l-5-5c-32-31-84-31-118 0l-5 5c-6 6-15 6-21 0l-25-25c-6-6-6-15 0-21l12-11zm198 83-29 29c-6 6-15 6-21 0l-45-45c-3-3-8-3-11 0l-45 45c-6 6-15 6-21 0l-29-29c-6-6-6-15 0-21l45-45c5-6 15-6 21 0l45 45c3 3 8 3 11 0l45-45c6-6 15-6 21 0l45 45c6 6 6 15 0 21z" fill="#FFF"/></svg>
   );
   return null;
 }
@@ -143,98 +151,56 @@ function WalletIcon({ type }: { type: string }) {
 
 function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const os = typeof window !== 'undefined' ? getMobileOS() : 'other';
-  const { connect, connectors } = useConnect();
+  const { connect, connectors, error } = useConnect();
   const [isConnecting, setIsConnecting] = React.useState<string | null>(null);
-
-  const openStoreAsFallback = (walletId: string) => {
-    const links = STORE_LINKS[walletId];
-    if (!links) return;
-    window.open(os === 'ios' ? links.ios : links.android, '_blank');
-  };
-
-  const buildWcDeepLink = (walletId: string, wcUri: string): string => {
-    switch (walletId) {
-      case 'metamask': return buildMetaMaskDeepLink(wcUri);
-      case 'trust':    return buildTrustDeepLink(wcUri);
-      case 'coinbase': return buildCoinbaseDeepLink(wcUri);
-      case 'rainbow':  return buildRainbowDeepLink(wcUri);
-      default:         return buildDappBrowserLink(walletId, os);
-    }
-  };
 
   const handleWalletSelect = async (wallet: typeof WALLET_OPTIONS[0]) => {
     setIsConnecting(wallet.id);
 
-    // 1. Precise EIP-6963 / Injected Match
-    let specificConnector = null;
-    const eth = typeof window !== 'undefined' ? (window as any).ethereum : null;
-    
-    if (wallet.id === 'metamask') {
-      specificConnector = connectors.find(c => c.id === 'io.metamask' || c.name === 'MetaMask' || (c.type === 'injected' && eth?.isMetaMask));
-      if (!specificConnector) specificConnector = connectors.find(c => c.type === 'injected'); 
-    } else if (wallet.id === 'trust') {
-      specificConnector = connectors.find(c => c.id === 'com.trustwallet.app' || c.name === 'Trust Wallet' || (c.type === 'injected' && eth?.isTrust));
-    } else if (wallet.id === 'coinbase') {
-      specificConnector = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name === 'Coinbase Wallet' || (c.type === 'injected' && eth?.isCoinbaseWallet));
-    } else if (wallet.id === 'rainbow') {
-      specificConnector = connectors.find(c => c.id === 'me.rainbow' || c.name === 'Rainbow' || (c.type === 'injected' && eth?.isRainbow));
-    }
-
-    if (specificConnector) {
-      try {
-        connect({ connector: specificConnector }, {
-          onSuccess: () => { setIsConnecting(null); onClose(); },
-          onError: () => { setIsConnecting(null); }
-        });
-        return; // Success! Flow intercepted by extension.
-      } catch (err) { }
-    }
-
-    // 2. Fallback to WalletConnect / Deep Link
-    const wcConnector = connectors.find(
-      c => c.id === 'walletConnect' || c.name === 'WalletConnect' || c.id.toLowerCase().includes('walletconnect')
-    );
-    if (!wcConnector) {
-      window.location.href = buildDappBrowserLink(wallet.id, os);
-      setTimeout(() => openStoreAsFallback(wallet.id), 3000);
-      setIsConnecting(null);
-      onClose();
-      return;
-    }
-    
     try {
-      const provider: any = await wcConnector.getProvider();
-      let uriCaptured = false;
-      const onDisplayUri = (uri: string) => {
-        if (uriCaptured) return;
-        uriCaptured = true;
-        provider.removeListener?.('display_uri', onDisplayUri);
-        window.location.href = buildWcDeepLink(wallet.id, uri);
-      };
-      
-      if (provider.disconnect) {
-         try { await provider.disconnect(); } catch(e){}
-      }
-      provider.on('display_uri', onDisplayUri);
-      
-      connect({ connector: wcConnector }, {
-         onSuccess: () => { setIsConnecting(null); onClose(); },
-         onError: () => { setIsConnecting(null); onClose(); }
-      });
-      
-      setTimeout(() => {
-        if (!uriCaptured) {
-          provider.removeListener?.('display_uri', onDisplayUri);
-          window.location.href = buildDappBrowserLink(wallet.id, os);
-          setTimeout(() => openStoreAsFallback(wallet.id), 3000);
+        let targetConnector = null;
+        
+        switch(wallet.id) {
+            case 'walletConnect':
+                targetConnector = connectors.find(c => c.id === 'walletConnect' || c.id === 'walletConnectLegacy');
+                break;
+            case 'metamask':
+                targetConnector = connectors.find(c => c.id === 'metaMask' || c.id === 'io.metamask');
+                if (!targetConnector) targetConnector = connectors.find(c => c.type === 'injected');
+                break;
+            case 'coinbase':
+                targetConnector = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.id === 'coinbaseWallet');
+                break;
+            case 'trust':
+                targetConnector = connectors.find(c => c.id === 'com.trustwallet.app' || c.name === 'Trust Wallet');
+                break;
+            case 'rainbow':
+                targetConnector = connectors.find(c => c.id === 'me.rainbow' || c.name === 'Rainbow');
+                break;
+            default:
+                targetConnector = connectors.find(c => c.type === 'injected');
         }
+
+        if (targetConnector) {
+            connect({ connector: targetConnector }, {
+                onSuccess: () => {
+                    toast.success("Wallet Connected Successfully");
+                    setIsConnecting(null);
+                    onClose();
+                },
+                onError: (err) => {
+                    toast.error(`Connection failed: ${err.message}`);
+                    setIsConnecting(null);
+                }
+            });
+        } else {
+            // Fallback for missing extensions in non-browser context
+            toast.error(`${wallet.name} connector not detected. Please install the app or use WalletConnect.`);
+            setIsConnecting(null);
+        }
+    } catch (e: any) {
+        toast.error(`Error: ${e?.message}`);
         setIsConnecting(null);
-      }, 5000);
-    } catch {
-      window.location.href = buildDappBrowserLink(wallet.id, os);
-      setTimeout(() => openStoreAsFallback(wallet.id), 3000);
-      setIsConnecting(null);
-      onClose();
     }
   };
 
@@ -264,6 +230,13 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
               </div>
               <h3 className="text-[20px] font-black text-[#050505] tracking-tight mb-1">Bóveda Criptográfica</h3>
               <p className="text-[9px] text-[#050505]/40 font-black uppercase tracking-[0.16em]">Sincronización de Identidad</p>
+              
+              {error && (
+                <div className="mt-4 px-3 py-2 bg-rose-50 text-rose-500 rounded-lg text-[9px] font-bold tracking-widest uppercase border border-rose-100 flex gap-2 w-full text-center items-center justify-center">
+                    <Zap size={10} className="shrink-0" />
+                    <span>Conexión Fallida o Cancelada</span>
+                </div>
+              )}
             </div>
             
             <div className="space-y-[14px]">
@@ -446,7 +419,7 @@ function PagePhilosophy1() {
         </p>
 
         <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-4 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          <Zap size={14} /> 1. Cinética de Tiempo Real
+          1. Cinética de Tiempo Real
         </h3>
         <p>
           Rechazamos categóricamente la latencia y la simulación. Nuestro motor ingiere capitales en tiempo real a través de canales directos asíncronos. Para mitigar fallos en nodos distantes sin degradar el clúster, incorporamos conectividad inquebrantable mediante Exp-Backoff:
@@ -482,7 +455,7 @@ function PagePhilosophy2() {
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
         <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          <Shield size={14} /> 2. Seguridad Soberana & E2EE
+          2. Seguridad Soberana & E2EE
         </h3>
         <p>
           Arquitectamos bajo Zero-Trust absoluto. La conexión entre su interfaz y el núcleo de datos prescinde completamente del almacenamiento de contraseñas u orgánicas vulnerables.
@@ -502,7 +475,7 @@ function PagePhilosophy2() {
         </p>
 
         <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-4 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          <Activity size={14} /> 3. Ingeniería Algorítmica Global
+          3. Ingeniería Algorítmica Global
         </h3>
         <p>
           Observar todos los ecosistemas fragmentivamente degrada el "alpha". Logramos el cruce multichain de blockchains independientes al procesar paralelizadamente en la memoria ram, unificando decimales bajo un grado de complejidad temporal estrictamente óptimo:
@@ -532,7 +505,7 @@ function PagePhilosophy3() {
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
         <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          <Eye size={14} /> 4. Normativas & Compliance
+          4. Normativas & Compliance
         </h3>
         <p>
           El poder institucional requiere alineación jurisdiccional innegociable. Hemos implementado barreras para mantener un blindaje legal ante el más alto nivel de escrutinio.
@@ -559,7 +532,6 @@ function PagePhilosophy3() {
         {/* DOWNHEAD / PREMIUM FOOTER */}
         <div className="mt-16 pt-10 border-t border-black/5 flex flex-col items-center pb-24">
           <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-6 opacity-60 drop-shadow-xl" />
-          <h4 className="text-[18px] font-black tracking-tighter uppercase italic text-[#050505] mb-6">Whale Ecosystem</h4>
           <div className="flex items-center gap-8">
             <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>

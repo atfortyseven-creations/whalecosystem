@@ -14,6 +14,7 @@ import { LegendaryCursor } from "@/components/landing/LegendaryCursor";
 import { DownheadSection } from "@/components/landing/DownheadSection";
 import { Footer } from "@/components/layout/Footer";
 import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
+import { CryptoCheckoutModal } from "@/components/news/CryptoCheckoutModal";
 
 // Letta-inspired Marquee
 const MarqueeBanner = () => {
@@ -48,43 +49,38 @@ const TerminalWindow = ({ title, children, rightIcon = ">>>", className = "" }: 
   </div>
 );
 
-// Letta-inspired Bento Grid
-const LettaFeatures = () => {
+// Sovereign Web3 Features
+const Web3Features = () => {
     return (
         <div className="w-full bg-[#0d0d0d] pt-24 pb-32">
             <div className="max-w-7xl mx-auto px-6">
                 
                 <h2 className="text-center font-aztec-body text-2xl md:text-4xl text-white/80 font-light tracking-tight mb-20">
-                    Designed for deeply sovereign institutions
+                    The Ultimate Sovereign Financial Intelligence
                 </h2>
 
                 <div className="grid grid-cols-1 gap-8">
-                    {/* Big Mockup Bento - Letta Style */}
-                    <TerminalWindow title="PERSISTENT AGENTS" className="min-h-[400px]">
+                    <TerminalWindow title="WHALE FLOW DETECTOR" className="min-h-[400px]">
                         <div className="flex flex-col md:flex-row h-full">
                             <div className="p-12 md:p-16 flex-1 flex flex-col justify-center">
                                 <h3 className="font-aztec-body text-3xl md:text-4xl text-white mb-6">
-                                    Persistent agents instead of stateless sessions
+                                    Real-Time Whale Flow (On-Chain)
                                 </h3>
                                 <p className="font-aztec-body text-lg text-white/50 leading-relaxed max-w-md">
-                                    Build your own deeply personalized agents, each with their own unique global index, designed to evolve with your institutional tracking and compliance needs.
+                                    Our system natively ingests Multi-Layer Capital Flows directly from EVM networks (Polygon, Ethereum, BSC, Base) and Hyperliquid L1. No simulations. Every block hash is verified.
                                 </p>
                             </div>
-                            <div className="flex-1 bg-gradient-to-br from-[var(--aztec-orchid)]/80 to-[var(--aztec-ink)] relative overflow-hidden hidden md:block border-l border-white/10">
+                            <div className="flex-1 bg-gradient-to-br from-[var(--aztec-orchid)]/30 to-[var(--aztec-ink)] relative overflow-hidden hidden md:block border-l border-white/10">
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] bg-[#050505] border border-white/10 shadow-2xl rounded-lg p-6">
                                     <div className="flex items-start gap-4">
                                         <div className="w-8 h-8 rounded-full bg-[var(--aztec-chartreuse)] flex-shrink-0" />
                                         <div className="flex-1">
-                                            <div className="text-white text-sm mb-1">Whale Alert (Core)</div>
-                                            <div className="text-white/40 text-xs mb-4">Tracking high-net-worth inflows...</div>
+                                            <div className="text-white text-sm mb-1">Live L1 Transactions</div>
+                                            <div className="text-white/40 text-xs mb-4">Capturing large algorithmic movements...</div>
                                             <div className="space-y-3">
                                                 <div className="flex justify-between items-center bg-white/5 p-2 rounded text-xs text-white/70">
-                                                    <span>Analyzing Binance Cold Wallet...</span>
-                                                    <span>0.5s</span>
-                                                </div>
-                                                <div className="flex justify-between items-center bg-white/5 p-2 rounded text-xs text-white/70">
-                                                    <span>Executing Zero-Knowledge Proof...</span>
-                                                    <span>1.2s</span>
+                                                    <span>Tracing Hyperliquid Settlement...</span>
+                                                    <span>Verified</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -95,29 +91,30 @@ const LettaFeatures = () => {
                     </TerminalWindow>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                         <TerminalWindow title="LEARNING" className="min-h-[300px]">
+                         <TerminalWindow title="CLOB ORDERBOOK & DYNAMIC MARKETS" className="min-h-[300px]">
                             <div className="flex flex-col h-full bg-[#0a0a0a]">
-                                <div className="h-48 relative overflow-hidden bg-[#050505] border-b border-white/5">
-                                    <Image src="/models/update/Aztec Image_04.jpg" alt="Deep Texture" fill className="object-cover opacity-60 mix-blend-screen" />
-                                </div>
-                                <div className="p-8">
-                                    <h3 className="font-aztec-body text-xl text-white mb-3">Always processing and learning</h3>
-                                    <p className="text-white/50 text-sm leading-relaxed">
-                                        The protocol constantly absorbs block headers and mempool data, maintaining an infinite context of financial shifts.
+                                <div className="p-8 pb-0">
+                                    <h3 className="font-aztec-body text-xl text-white mb-3">Live Order Book & Events</h3>
+                                    <p className="text-white/50 text-sm leading-relaxed mb-6">
+                                        Aggregating Polymarket Gamma API events seamlessly. Users interact with the active markets instantly via EIP-712 signatures.
                                     </p>
+                                </div>
+                                <div className="p-8 mt-auto flex gap-4">
+                                     <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-[#00dda8]">CLOB L1 Tracker</div>
+                                     <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/40">100% Real Time</div>
                                 </div>
                             </div>
                          </TerminalWindow>
                          
-                         <TerminalWindow title="CUSTOM TOOLS" className="min-h-[300px]">
+                         <TerminalWindow title="HYPERLIQUID COPY TRADING & PORTFOLIO" className="min-h-[300px]">
                             <div className="flex flex-col h-full bg-[#0a0a0a] p-8">
-                                <div className="flex-1 font-aztec-mono text-xs text-[var(--aztec-chartreuse)] bg-black border border-white/5 p-4 rounded mb-6 overflow-hidden">
-                                     {`def initialize_sovereign_tool():\n  # Connects to Aztec Network\n  zk_shield = create_proof(capital=1000)\n  return zk_shield.verify()`}
+                                <div className="flex-1 font-aztec-mono text-xs text-indigo-400 bg-black border border-white/5 p-4 rounded mb-6 overflow-hidden">
+                                     {`{ "intent": "COPY", "agent": "0xWhale",\n  "status": "AWAITING_ECDSA",\n  "capital": "$10,000 USDC" }`}
                                 </div>
                                 <div>
-                                    <h3 className="font-aztec-body text-xl text-white mb-3">Attach Custom APIs</h3>
+                                    <h3 className="font-aztec-body text-xl text-white mb-3">Real Portfolio Management</h3>
                                     <p className="text-white/50 text-sm leading-relaxed">
-                                        Extend your agents by linking private institutional endpoints or CEX websockets instantly.
+                                        Experience genuine automated copy-trading flows routed through Hyperliquid's Layer 1 nodes instantly.
                                     </p>
                                 </div>
                             </div>
@@ -216,6 +213,8 @@ export function WhaleAlertLanding() {
   const { openConnectModal } = useUIStore();
   const router = useRouter();
 
+  const [showCheckout, setShowCheckout] = useState(false);
+
   const handleEnterArchive = () => {
     if (isConnected) router.push('/vip');
     else openConnectModal();
@@ -237,7 +236,7 @@ export function WhaleAlertLanding() {
     <div 
         ref={containerRef} 
         onMouseMove={handleMouseMove}
-        className="relative w-full overflow-x-hidden bg-[#050505] selection:bg-[var(--aztec-orchid)]/30 cursor-none"
+        className="relative w-full overflow-x-hidden bg-[#050505] selection:bg-[var(--aztec-orchid)]/30 cursor-auto"
     >
       <LegendaryCursor />
       <AntiPhishing />
@@ -314,21 +313,24 @@ export function WhaleAlertLanding() {
       
       <DownheadSection />
 
-      {/* ── LETTA-STYLE ARCHITECTURE ── */}
       <section className="relative z-10">
         <MarqueeBanner />
-        <LettaFeatures />
+        <Web3Features />
         <CrossPlatformAccess />
         
-        {/* Deep Letta Pre-footer */}
+        {/* Deep Premium Checkout & Subs Footer */}
+        <CryptoCheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
+        
         <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner">
-            <h2 className="font-aztec-body text-4xl font-light mb-4">Whale Alert Network</h2>
+            <h2 className="font-aztec-body text-4xl font-light mb-4">Sovereign Protocol Matrix</h2>
             <p className="font-aztec-body text-white/50 text-sm mb-12 max-w-md mx-auto">
-               The definitive on-chain sovereign intelligence protocol. Connect your wallet to access the elite terminal.
+               Institutional-grade Web3 subscription algorithm (49 EUR) backed by smart contracts and absolute cryptographic neutrality. Connect your wallet to access the elite terminal.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button onClick={handleEnterArchive} className="px-8 py-3 bg-white text-black text-xs font-medium rounded shadow-lg hover:bg-white/90 transition-all hover:scale-105">Connect Terminal</button>
-              <Link href="/ticket" className="px-8 py-3 bg-transparent border border-yellow-500/30 text-yellow-400 text-xs font-medium rounded hover:bg-yellow-500/10 transition-all hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.1)]">Claim Gold Ticket</Link>
+              <button onClick={() => setShowCheckout(true)} className="px-8 py-3 bg-transparent border border-yellow-500/30 text-yellow-400 text-xs font-medium rounded hover:bg-yellow-500/10 transition-all hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+                  Subscribe (49 EUR)
+              </button>
             </div>
         </div>
       </section>
