@@ -79,6 +79,47 @@ function generateDeepAnalysis(title: string, domain: string): string {
   ].join('\n\n');
 }
 
+// ─── Utilidad: extrae la mejor URL de imagen de un bloque XML de item ────────
+function extractImageFromItem(item: string): string | undefined {
+  // 1. media:content url
+  const mc = item.match(/<media:content[^>]+url="([^"]+)"/);
+  if (mc?.[1]) return normalizeImageUrl(mc[1]);
+
+  // 2. media:thumbnail url
+  const mt = item.match(/<media:thumbnail[^>]+url="([^"]+)"/);
+  if (mt?.[1]) return normalizeImageUrl(mt[1]);
+
+  // 3. enclosure url (solo si es imagen)
+  const enc = item.match(/<enclosure[^>]+url="([^"]+)"[^>]*type="image/);
+  if (enc?.[1]) return normalizeImageUrl(enc[1]);
+  const encAny = item.match(/<enclosure[^>]+url="([^"]+)"/);
+  if (encAny?.[1] && /\.(jpg|jpeg|png|webp|gif)/i.test(encAny[1])) return normalizeImageUrl(encAny[1]);
+
+  // 4. Busca en content:encoded o description (CDATA o texto plano)
+  const cdataBlock = (
+    item.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/) ??
+    item.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/)
+  )?.[1];
+  if (cdataBlock) {
+    const imgInCdata = cdataBlock.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (imgInCdata?.[1]) return normalizeImageUrl(imgInCdata[1]);
+  }
+
+  // 5. Busca img genérico en el bloque
+  const imgTag = item.match(/<img[^>]+src="([^"]+)"/i);
+  if (imgTag?.[1]) return normalizeImageUrl(imgTag[1]);
+
+  return undefined;
+}
+
+function normalizeImageUrl(url: string): string | undefined {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  if (trimmed.startsWith('//')) return `https:${trimmed}`;
+  if (trimmed.startsWith('http')) return trimmed;
+  return undefined;
+}
+
 // ─── Extractor de RSS con imágenes ───────────────────────────────────────────
 async function fetchRSSFeed(url: string, sourceName: string): Promise<NewsArticle[]> {
   try {
@@ -108,21 +149,17 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<NewsArticl
 
       const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1]?.trim() ?? '';
 
-      // Extracción de imagen: media:content, enclosure, og:image en description
-      const imageUrl = (
-        item.match(/<media:content[^>]+url="([^"]+)"/)?.[1] ??
-        item.match(/<enclosure[^>]+url="([^"]+)"/)?.[1] ??
-        item.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1] ??
-        item.match(/<img[^>]+src="([^"]+)"/)?.[1] ??
-        undefined
-      );
-
       if (!title || !link) continue;
 
       const cleanTitle = decodeHTMLEntities(title);
+      const artId = `rss-${Buffer.from(link).toString('base64').slice(0, 16)}`;
+
+      // Extrae imagen real del feed, con fallback garantizado
+      const rawImage = extractImageFromItem(item);
+      const imageUrl = rawImage ?? getFallbackImage(artId);
 
       articles.push({
-        id:          `rss-${Buffer.from(link).toString('base64').slice(0, 16)}`,
+        id:          artId,
         title:       cleanTitle,
         description: generateDeepAnalysis(cleanTitle, sourceName),
         date:        pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
