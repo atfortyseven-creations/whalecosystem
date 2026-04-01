@@ -110,15 +110,15 @@ function getLegendaryImage(title: string, originalUrl?: string): string {
 
   // 2. Keyword Mapping (High-Fidelity Curated Collection) - ONLY for missing/bad images
   const mapping = [
-    { keywords: ['bitcoin', 'btc'], img: 'https://images.unsplash.com/photo-1518546338173-8a9c49d863b7?auto=format&fit=crop&q=80&w=1200' },
-    { keywords: ['ethereum', 'eth', 'ether'], img: 'https://images.unsplash.com/photo-1622630998477-20aa696fa4a5?auto=format&fit=crop&q=80&w=1200' },
-    { keywords: ['crash', 'plunge', 'drop', 'falling', 'plummet', 'dip', 'bearish'], img: 'https://images.unsplash.com/photo-1620321023374-d1a68fdd720e?auto=format&fit=crop&q=80&w=1200' }, // Red Chart / Bear
-    { keywords: ['bull', 'surge', 'rally', 'breakout', 'moon', 'ath', 'soar'], img: 'https://images.unsplash.com/photo-1611974714025-e61463a739d4?auto=format&fit=crop&q=80&w=1200' }, // Green Chart / Bull
-    { keywords: ['regulation', 'sec', 'legal', 'law', 'court', 'government', 'fed'], img: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=1200' }, // Gavel/Court
-    { keywords: ['hack', 'scam', 'security', 'theft', 'fraud'], img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1200' }, // Cyber Security
-    { keywords: ['mining', 'energy', 'hashrate'], img: 'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&q=80&w=1200' }, // Tech Hardware
-    { keywords: ['solana', 'sol'], img: 'https://images.unsplash.com/photo-1639322537228-ad7127ef94f4?auto=format&fit=crop&q=80&w=1200' },
-    { keywords: ['nft', 'metaverse', 'digital'], img: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1200' }
+    { keywords: ['bitcoin', 'btc'], img: 'https://picsum.photos/seed/bitcoin/1200/800?grayscale' },
+    { keywords: ['ethereum', 'eth', 'ether'], img: 'https://picsum.photos/seed/eth/1200/800?grayscale' },
+    { keywords: ['crash', 'plunge', 'drop', 'falling', 'plummet', 'dip', 'bearish'], img: 'https://picsum.photos/seed/crash/1200/800?grayscale' },
+    { keywords: ['bull', 'surge', 'rally', 'breakout', 'moon', 'ath', 'soar'], img: 'https://picsum.photos/seed/bull/1200/800?grayscale' },
+    { keywords: ['regulation', 'sec', 'legal', 'law', 'court', 'government', 'fed'], img: 'https://picsum.photos/seed/legal/1200/800?grayscale' },
+    { keywords: ['hack', 'scam', 'security', 'theft', 'fraud'], img: 'https://picsum.photos/seed/hack/1200/800?grayscale' },
+    { keywords: ['mining', 'energy', 'hashrate'], img: 'https://picsum.photos/seed/mining/1200/800?grayscale' },
+    { keywords: ['solana', 'sol'], img: 'https://picsum.photos/seed/sol/1200/800?grayscale' },
+    { keywords: ['nft', 'metaverse', 'digital'], img: 'https://picsum.photos/seed/nft/1200/800?grayscale' }
   ];
 
   // 3. Match Context for Fallback
@@ -129,7 +129,7 @@ function getLegendaryImage(title: string, originalUrl?: string): string {
   }
 
   // 4. Ultimate Fallback
-  return 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=1200'; // Global Crypto/Node visualization
+  return 'https://picsum.photos/seed/global/1200/800?grayscale'; // Global Crypto/Node visualization
 }
 
 /**

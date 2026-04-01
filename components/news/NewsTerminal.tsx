@@ -13,27 +13,21 @@ const HEADER_H = 68;
 
 // ── Fallback de imagen determinista (siempre disponible, sin contenido falso) ─
 const FALLBACK_BGS = [
-  "https://images.unsplash.com/photo-1621504450181-5d356f006325?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1639762681485-074b7f4fc060?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1647427017066-896db8edb4b4?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1620331311520-246422fd82f9?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1600",
-  "https://images.unsplash.com/photo-1639762681057-408e52192e55?auto=format&fit=crop&q=80&w=1600"
+  "https://picsum.photos/seed/crypto1/1600/900?grayscale",
+  "https://picsum.photos/seed/whale2/1600/900?grayscale",
+  "https://picsum.photos/seed/finance3/1600/900?grayscale",
+  "https://picsum.photos/seed/market4/1600/900?grayscale",
+  "https://picsum.photos/seed/bitcoin5/1600/900?grayscale",
+  "https://picsum.photos/seed/ether6/1600/900?grayscale",
+  "https://picsum.photos/seed/defi7/1600/900?grayscale",
+  "https://picsum.photos/seed/tech8/1600/900?grayscale",
+  "https://picsum.photos/seed/data9/1600/900?grayscale",
+  "https://picsum.photos/seed/node10/1600/900?grayscale"
 ];
 
 function getArticleImage(article: NewsArticle): string {
-  if (article.imageUrl) {
-    const url = article.imageUrl.trim();
-    // Normalize protocol-relative URLs
-    if (url.startsWith('//')) return `https:${url}`;
-    if (url.startsWith('http')) return url;
-  }
-
-  // Deterministic fallback
+  if (article.imageUrl && article.imageUrl.startsWith('http')) return article.imageUrl;
+  
   let hash = 0;
   for (let i = 0; i < article.id.length; i++) {
     hash = article.id.charCodeAt(i) + ((hash << 5) - hash);
@@ -357,17 +351,48 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* ── Contenido del artículo ─────────────────────────── */}
-                  <div className="px-10 xl:px-16 pt-12 pb-4">
+                  {/* IMAGEN HERO — APARECE ARRIBA DEL TITULO */}
+                  <div className="px-10 xl:px-16 pt-12 pb-0">
+                    <div
+                      className="w-full overflow-hidden bg-[#111]"
+                      style={{
+                        height: `clamp(280px, ${Math.round(440 * fontSize)}px, 680px)`,
+                      }}
+                    >
+                      <motion.img
+                        initial={{ opacity: 0, filter: 'blur(10px)' }}
+                        animate={{ opacity: 1, filter: 'blur(0px)' }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        ref={imgRef}
+                        src={getArticleImage(selected)}
+                        alt={selected.title}
+                        className="w-full h-full object-cover grayscale transition-all duration-700"
+                        loading="eager"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (target.dataset.errorHandled) return;
+                          target.dataset.errorHandled = "true";
+                          let hash = 0;
+                          for (let i = 0; i < selected.id.length; i++) {
+                            hash = selected.id.charCodeAt(i) + ((hash << 5) - hash);
+                          }
+                          const index = (Math.abs(hash) + 1) % FALLBACK_BGS.length;
+                          target.src = FALLBACK_BGS[index];
+                        }}
+                      />
+                    </div>
+                  </div>
 
+                  {/* ── Contenido del artículo: Fuente + Título ──────────────── */}
+                  <div className="px-10 xl:px-16 pt-10 pb-4">
                     {/* FUENTE + ETIQUETA */}
                     <p className="font-mono text-[8px] uppercase tracking-[0.4em] mb-4" style={{ color: MUTED }}>
                       {selected.source} · Análisis Institucional
                     </p>
 
-                    {/* TÍTULO PRINCIPAL */}
+                    {/* TÍTULO PRINCIPAL - Peso medio-alto */}
                     <h1
-                      className="font-black tracking-tighter leading-[1.04] mb-0"
+                      className="font-medium tracking-tight leading-[1.04] mb-0 translate-y-[-2px]"
                       style={{
                         fontSize: `clamp(2rem, ${3.2 * fontSize}rem, 5rem)`,
                         color: TEXT,
@@ -378,61 +403,13 @@ export function NewsTerminal() {
                     </h1>
                   </div>
 
-                  {/* IMAGEN HERO */}
-                  <div className="px-10 xl:px-16 mt-8 mb-0">
-                    <div
-                      className="w-full overflow-hidden relative"
-                      style={{
-                        height: `clamp(260px, ${Math.round(420 * fontSize)}px, 640px)`,
-                        background: DIV,
-                      }}
-                    >
-                      {/* Shimmer placeholder mientras carga */}
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          background: `linear-gradient(90deg, ${DIV} 25%, ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'} 50%, ${DIV} 75%)`,
-                          backgroundSize: '200% 100%',
-                          animation: 'shimmer 1.6s infinite',
-                        }}
-                      />
-                      <img
-                        ref={imgRef}
-                        key={selected.id}
-                        src={getArticleImage(selected)}
-                        alt={selected.title}
-                        className="w-full h-full object-cover relative z-10"
-                        loading="eager"
-                        crossOrigin="anonymous"
-                        onLoad={(e) => {
-                          // Muestra la imagen cuando carga
-                          (e.target as HTMLImageElement).style.opacity = '1';
-                        }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          if (target.dataset.errorHandled) return;
-                          target.dataset.errorHandled = 'true';
-                          let hash = 0;
-                          const id = selected.id;
-                          for (let i = 0; i < id.length; i++) {
-                            hash = id.charCodeAt(i) + ((hash << 5) - hash);
-                          }
-                          // Si falla el primer fallback, probar otro del pool
-                          const index = (Math.abs(hash) + 1) % FALLBACK_BGS.length;
-                          target.src = FALLBACK_BGS[index];
-                        }}
-                        style={{ opacity: 0, transition: 'opacity 0.4s ease' }}
-                      />
-                    </div>
-                  </div>
-
                   {/* ANÁLISIS PRINCIPAL */}
                   <div className="px-10 xl:px-16 pt-10 pb-6 max-w-[900px]">
                       {!hasAccess ? (
                         <div className="relative">
                           {/* Pseudo-content blurred */}
                           <div
-                            className="font-serif leading-[1.9] space-y-7 blur-sm select-none opacity-30 pointer-events-none"
+                            className="font-sans font-light tracking-wide leading-[2.2] space-y-7 blur-sm select-none opacity-30 pointer-events-none"
                             style={{
                               fontSize: `${1.18 * fontSize}rem`,
                               color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
@@ -469,64 +446,26 @@ export function NewsTerminal() {
                         </div>
                       ) : (
                         <div
+                          className="font-sans font-light tracking-wide leading-[2.2] space-y-7 opacity-80"
                           style={{
-                            fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
-                            letterSpacing: '0.01em',
-                            color: isDark ? 'rgba(244,244,244,0.88)' : 'rgba(12,10,8,0.86)',
+                            fontSize: `${1.18 * fontSize}rem`,
+                            color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
                           }}
                         >
-                          {(() => {
-                            const paragraphs = selected.description
-                              ? selected.description.split(/\n\n+/).filter(Boolean)
-                              : [
-                                  'El mercado de criptoactivos continúa bajo la influencia de múltiples vectores macroeconómicos que determinan los flujos de capital institucional. Los datos on-chain registran movimientos de alta convicción que sugieren reposicionamiento estratégico por parte de entidades con acceso privilegiado a liquidez profunda.',
-                                  'Los wallets identificados como ballenas —con posiciones superiores a los 10 millones de dólares— han incrementado su actividad de acumulación en las últimas 48 horas. Este comportamiento, correlacionado con la compresión de volatilidad implícita en opciones de vencimiento próximo, apunta a una tesis de movimiento direccional inminente.',
-                                  'El análisis de mempool revela transacciones de alto valor priorizadas con comisiones premium, lo que indica urgencia de ejecución por parte de participantes con información asimétrica. La estructura de order book en los principales venues de liquidez muestra absorción sistemática de presión vendedora.',
-                                  'Desde una perspectiva de gestión de riesgo institucional, los parámetros técnicos actuales presentan un ratio riesgo-recompensa favorable para posiciones largas con horizonte de 72 horas.',
-                                  'Los indicadores derivados —financiación, interés abierto, y ratio put/call— muestran una estructura consistente con la presión de compradores institucionales.',
-                                ];
-                            return paragraphs.map((p, i) => (
-                              <p
-                                key={i}
-                                style={{
-                                  fontSize: i === 0
-                                    ? `${1.32 * fontSize}rem`
-                                    : `${1.18 * fontSize}rem`,
-                                  fontStyle: i === 0 ? 'italic' : 'normal',
-                                  fontWeight: i === 0 ? 400 : 300,
-                                  lineHeight: i === 0 ? 1.75 : 1.9,
-                                  marginBottom: i === 0 ? `${2.2 * fontSize}rem` : `${1.7 * fontSize}rem`,
-                                  paddingBottom: i === 0 ? `${1.4 * fontSize}rem` : 0,
-                                  borderBottom: i === 0
-                                    ? `1px solid ${DIV}`
-                                    : 'none',
-                                  textIndent: i > 0 ? '1.6em' : 0,
-                                }}
-                              >
-                                {/* Letra capital solo en el primer párrafo */}
-                                {i === 0 && p.length > 0 ? (
-                                  <>
-                                    <span
-                                      style={{
-                                        float: 'left',
-                                        fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                                        fontSize: `${4.2 * fontSize}rem`,
-                                        lineHeight: 0.78,
-                                        fontWeight: 700,
-                                        marginRight: '0.12em',
-                                        marginTop: '0.12em',
-                                        color: isDark ? 'rgba(244,244,244,0.95)' : 'rgba(10,10,10,0.92)',
-                                        letterSpacing: '-0.02em',
-                                      }}
-                                    >
-                                      {p[0]}
-                                    </span>
-                                    {p.slice(1)}
-                                  </>
-                                ) : p}
-                              </p>
-                            ));
-                          })()}
+                          {selected.description
+                            ? selected.description.split(/\n\n+/).map((p, i) => (
+                                <p key={i}>{p}</p>
+                              ))
+                            : (
+                              <>
+                                <p>El mercado de criptoactivos continúa bajo la influencia de múltiples vectores macroeconómicos que determinan los flujos de capital institucional. Los datos on-chain registran movimientos de alta convicción que sugieren reposicionamiento estratégico por parte de entidades con acceso privilegiado a liquidez profunda.</p>
+                                <p>Los wallets identificados como ballenas —con posiciones superiores a los 10 millones de dólares— han incrementado su actividad de acumulación en las últimas 48 horas. Este comportamiento, correlacionado con la compresión de volatilidad implícita en opciones de vencimiento próximo, apunta a una tesis de movimiento direccional inminente.</p>
+                                <p>El análisis de mempool revela transacciones de alto valor priorizadas con comisiones premium, lo que indica urgencia de ejecución por parte de participantes con información asimétrica. La estructura de order book en los principales venues de liquidez muestra absorción sistemática de presión vendedora.</p>
+                                <p>Desde una perspectiva de gestión de riesgo institucional, los parámetros técnicos actuales presentan un ratio riesgo-recompensa favorable para posiciones largas con horizonte de 72 horas. La liquidez disponible en los niveles de soporte clave ofrece una base sólida para la continuación del impulso alcista.</p>
+                                <p>Los indicadores derivados —financiación, interés abierto, y ratio put/call— muestran una estructura consistente con la presión de compradores institucionales que buscan exposición antes de un catalizador de precio potencialmente significativo. La vigilancia de estos flujos es esencial para cualquier gestor de riesgo activo.</p>
+                              </>
+                            )
+                          }
                         </div>
                       )}
 

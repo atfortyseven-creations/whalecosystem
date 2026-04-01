@@ -1,6 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { headers } from 'next/headers'
-import { Inter, Martel, Roboto_Mono, Cormorant_Garamond, Playfair_Display } from 'next/font/google'
+import { Inter, Martel, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 import './smooth-scroll.css'
 import Providers from "@/components/Providers";
@@ -33,22 +33,6 @@ const martel = Martel({
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
   variable: '--font-aztec-mono',
-  display: 'swap',
-})
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
   display: 'swap',
 })
 
@@ -182,7 +166,7 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body className={`${inter.className} ${martel.variable} ${robotoMono.variable} ${cormorant.variable} ${playfair.variable} perf-ultra`}>
+        <body className={`${inter.className} ${martel.variable} ${robotoMono.variable} perf-ultra`}>
           <AztecNoise />
           <CookieProvider>
              <GoogleTagManager gtmId="GTM-52B9SCRM" />

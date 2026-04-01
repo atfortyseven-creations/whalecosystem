@@ -164,8 +164,11 @@ function LegendaryNewsCard({ article, index }: { article: NewsArticle; index: nu
       <div className="relative h-64 w-full overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent z-10" />
         <img 
-          src={article.imageUrl || `https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800`}
+          src={article.imageUrl || `https://picsum.photos/seed/cyber/1200/800?grayscale`}
           alt={article.title}
+          onError={(e) => {
+            e.currentTarget.src = "https://picsum.photos/seed/fallback1/1200/800?grayscale";
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 grayscale-[0.3] group-hover:grayscale-0"
         />
         
