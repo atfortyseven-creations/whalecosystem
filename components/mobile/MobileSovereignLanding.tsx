@@ -421,9 +421,9 @@ function PageHero({
   );
 }
 
-// ─── PAGE 2 · ECOSYSTEM TAXONOMY ─────────────────────────────────────────────
+// ─── PAGE 2 · INSTITUTIONAL MANIFESTO ────────────────────────────────────────
 
-const formulaImgStyle = "h-8 mx-auto my-6 opacity-80 mix-blend-multiply drop-shadow-sm";
+const formulaImgStyle = "h-8 mx-auto my-7 opacity-90 mix-blend-multiply drop-shadow-md";
 
 function PagePhilosophy1() {
   return (
@@ -432,8 +432,9 @@ function PagePhilosophy1() {
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-10 w-full flex justify-center"
+        className="mb-10 w-full flex flex-col items-center"
       >
+        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#050505]/40 mb-2">Documento de Arquitectura</span>
         <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505] text-center border-b-4 border-[#050505] pb-2 inline-block">
           Manifiesto<br/>Técnico
         </h2>
@@ -441,20 +442,14 @@ function PagePhilosophy1() {
 
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
         <p>
-          En los mercados financieros, la diferencia entre el éxito y el fracaso a menudo se mide en fracciones de segundo. Históricamente, el acceso a la información pura de las redes descentralizadas ha sido un privilegio exclusivo de grandes instituciones, mientras que el usuario general recibe datos fragmentados y con retrasos.
-        </p>
-        <p>
-          Construimos nuestra plataforma para nivelar ese terreno de juego. Este documento detalla el funcionamiento interno de nuestro centro de operaciones: el "backend" o motor que impulsa todo nuestro sistema. No estamos hablando de ideas teóricas; estamos hablando de una infraestructura sólida y en producción que hoy mismo procesa, analiza y distribuye la realidad del mercado a velocidad institucional. Nuestra ingeniería trabaja de forma invisible para que ustedes puedan tomar decisiones impecables y con total seguridad.
+          En la dimensión macroeconómica, la integridad matemática y el nivel de exposición regulatoria definen el éxito. Whale Alert Network es un ecosistema institucional de alto rendimiento, estructurado bajo protocolos de seguridad paramilitares y normativas compliance globales.
         </p>
 
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          1. Conexión Directa en Tiempo Real
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-4 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
+          <Zap size={14} /> 1. Cinética de Tiempo Real
         </h3>
         <p>
-          El mayor error tecnológico de las plataformas financieras comunes es "preguntar" al mercado qué ha sucedido cada cierta cantidad de segundos. En el mundo institucional, recibir información que tiene cinco o diez segundos de antigüedad equivale a operar a ciegas.
-        </p>
-        <p>
-          Por eso, la arquitectura de nuestro sistema opera de forma diametralmente opuesta: nosotros "escuchamos" al mercado permanentemente. Mantenemos canales directos y persistentes con las redes financieras. Cada operación ingresa a nuestro sistema en el instante exacto en que ocurre. Además, dado que el internet global puede ser impredecible, integramos de manera nativa un sistema lógico de reconexión inteligente que asegura que nuestro flujo de conexión se estabilice en milisegundos sin sobrecargar nuestros servidores:
+          Rechazamos categóricamente la latencia y la simulación. Nuestro motor ingiere capitales en tiempo real a través de canales directos asíncronos. Para mitigar fallos en nodos distantes sin degradar el clúster, incorporamos conectividad inquebrantable mediante Exp-Backoff:
         </p>
 
         <img 
@@ -464,12 +459,18 @@ function PagePhilosophy1() {
         />
 
         <p>
-          El resultado es un flujo de información continuo e implacable.
+          Cada transferencia pasa por un filtro algorítmico microscópico. Evaluamos la desviación de mercado (Z-Score) en microsegundos, aislando las anomalias macro (la "ballena") y purgando el ruido estructural:
         </p>
+
+        <img 
+          src="/f_zscore.svg" 
+          alt="Z-Score Formula" 
+          className={formulaImgStyle}
+        />
       </div>
 
       <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">CONTINUAR</span>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">SIGUIENTE CAPÍTULO</span>
         <ChevronDown size={14} className="text-[#050505]" />
       </motion.div>
     </div>
@@ -480,39 +481,46 @@ function PagePhilosophy2() {
   return (
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] text-[#050505] border-b border-black/10 pb-2">
-          2. El Radar Inteligente
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
+          <Shield size={14} /> 2. Seguridad Soberana & E2EE
         </h3>
         <p>
-          Capturar miles de transacciones por segundo carece de valor si no sabemos interpretarlas. Una inmensa mayoría de estos movimientos no tienen la fuerza suficiente para cambiar la dirección del mercado.
+          Arquitectamos bajo Zero-Trust absoluto. La conexión entre su interfaz y el núcleo de datos prescinde completamente del almacenamiento de contraseñas u orgánicas vulnerables.
         </p>
         <p>
-          Para solucionar este desafío, desarrollamos lo que internamente llamamos un "radar automático". A medida que los datos entran al servidor a gran velocidad, el motor los analiza al vuelo. En lugar de utilizar métricas rígidas, empleamos un modelo estadístico dinámico: comparamos el tamaño de cada transacción entrante con el comportamiento habitual del mercado en ese momento específico:
+          La bóveda encripta la data empleando End-to-End Encryption (E2EE). La sincronización exige la demostración probatoria de la propiedad de su clave privada sin revelarla jamás al servidor, validando la curva elíptica:
         </p>
 
         <img 
-          src="/f_zscore.svg" 
-          alt="Z-Score Formula" 
+          src="/f_ecdsa.svg" 
+          alt="ECDSA Verification Formula" 
           className={formulaImgStyle}
         />
 
         <p>
-          Si el sistema detecta una anomalía matemática de volumen —una transferencia masiva de capital—, la clasifica inmediatamente como un movimiento de gran relevancia (una "ballena"). Si, por el contrario, la transacción no representa un impacto real, el servidor la descarta al instante. Este descarte agresivo nos permite entregar a nuestros usuarios y clientes únicamente la información de alto valor estratégico, maximizando nuestra velocidad de respuesta.
+          Usted tiene soberanía total; nuestra red no tiene ninguna llave maestra de su bóveda.
         </p>
 
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          3. Cero Datos Simulados
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-4 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
+          <Activity size={14} /> 3. Ingeniería Algorítmica Global
         </h3>
         <p>
-          Cuando el capital está en juego, no hay lugar para estimaciones. Gran parte del software tradicional, cuando experimenta un leve fallo de conexión, muestra datos guardados previamente o precios "estimados" temporales para mantener la ilusión de que todo funciona con normalidad. Nosotros consideramos esta práctica inaceptable.
+          Observar todos los ecosistemas fragmentivamente degrada el "alpha". Logramos el cruce multichain de blockchains independientes al procesar paralelizadamente en la memoria ram, unificando decimales bajo un grado de complejidad temporal estrictamente óptimo:
         </p>
+
+        <img 
+          src="/f_log.svg" 
+          alt="Logarithmic Time Complexity Formula" 
+          className={formulaImgStyle}
+        />
+
         <p>
-          Nuestra infraestructura opera bajo una estricta política de transparencia innegociable. Si la información del mercado derivado no está disponible en este mismo segundo, el sistema está programado para informarle, sin excusas, de que el dato está temporalmente ausente. Jamás mostraremos un cálculo antiguo ni una estimación disfrazada de verdad. Esta sinceridad técnica nos garantiza que cada cifra proyectada en nuestras plataformas sea genuina, auditable y completamente real.
+          Esta eficiencia fractal, puramente escrita en Golang, es el pilar para soportar miles de request sin fisuras operativas.
         </p>
       </div>
 
       <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">CONTINUAR</span>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">SIGUIENTE CAPÍTULO</span>
         <ChevronDown size={14} className="text-[#050505]" />
       </motion.div>
     </div>
@@ -523,69 +531,34 @@ function PagePhilosophy3() {
   return (
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] text-[#050505] border-b border-black/10 pb-2">
-          4. Privacidad Soberana
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
+          <Eye size={14} /> 4. Normativas & Compliance
         </h3>
         <p>
-          Garantizar la seguridad de nuestros usuarios sin comprometer su identidad fue un requisito incuestionable de nuestro diseño. Las bases de datos tradicionales, vulnerables y cargadas de correos y contraseñas, son puntos de riesgo y asimetría.
+          El poder institucional requiere alineación jurisdiccional innegociable. Hemos implementado barreras para mantener un blindaje legal ante el más alto nivel de escrutinio.
         </p>
-        <p>
-          Nuestra solución evita almacenar identidades personales. Cuando usted se conecta, el sistema ejecuta un proceso matemático de validación avanzado —un "apretón de manos digital"— entre su billetera criptográfica y nuestros servidores. Mediante una firma criptográfica, el sistema confirma la legitimidad de la conexión:
-        </p>
+        <ul className="list-disc list-inside space-y-3 font-semibold text-[#050505]/90 marker:text-indigo-600">
+          <li>
+            <span className="text-black font-black uppercase text-[12px]">OFAC Sanctions & AML:</span> Chequeamos heurísticamente cada Wallet entrante, bloqueando entidades sujetas a sanción global. KYC sin sesgo con pruebas ZK.
+          </li>
+          <li>
+            <span className="text-black font-black uppercase text-[12px]">CFTC & Geofencing WAF:</span> Rutas restringidas con exclusión territorial en milisegundos detectando VPNs e identificadores IP.
+          </li>
+          <li>
+            <span className="text-black font-black uppercase text-[12px]">GDPR:</span> Control de borrado de huella en caché temporal bajo parámetros ISO 27001 por solicitud autónoma.
+          </li>
+        </ul>
 
-        <img 
-          src="/f_ecdsa.svg" 
-          alt="ECDSA Verification Formula" 
-          className={formulaImgStyle}
-        />
-
-        <p>
-          Esto establece una sesión altamente blindada sin llegar a saber jamás quién es usted. No acumulamos secretos de usuarios ni identidades almacenadas. Toda la seguridad y el control permanecen siempre de su lado.
-        </p>
-
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          5. Consolidación de Mercados Fractales
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-6 text-[#050505] border-b border-black/10 pb-2">
+          Resolución Universal
         </h3>
         <p>
-          El capital macro se distribuye a lo largo de docenas de mercados en paralelo. Presentar información de ecosistemas financieros diferentes y fragmentados suponía nuestro mayor desafío logístico de distribución, puesto que procesarlos uno a uno sería demasiado lento.
-        </p>
-        <p>
-          Lo solucionamos empleando una arquitectura de sincronización múltiple. Nuestro servidor recauda información lanzando peticiones hacia todas las redes descentralizadas distintas al mismo tiempo, en paralelo. Al recibir las respuestas, las unifica, corrige los decimales para que todos los números hablen el mismo lenguaje y logrando resolver el cálculo en una complejidad ultra eficiente:
-        </p>
-
-        <img 
-          src="/f_log.svg" 
-          alt="Logarithmic Time Complexity Formula" 
-          className={formulaImgStyle}
-        />
-
-        <p>
-          Toda esa complejidad ocurre a una velocidad extrema para enviarla sin latencia a las pantallas de los inversores como un mapa consolidado y fácil de operar.
-        </p>
-
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-4 text-[#050505] border-b border-black/10 pb-2">
-          6. Arquitectura Zero-Trust Inquebrantable
-        </h3>
-        <p>
-          Operamos bajo el principio absoluto de que cualquier conexión externa es inherentemente hostil. Por ello, el entorno de operaciones está encapsulado por un Firewall Estocástico multidimensional que opera a nivel "Edge". Esta matriz intercepta y descarta tráfico anómalo en fracciones de milisegundo antes de que alcance nuestra infraestructura en la nube.
-        </p>
-        <p>
-          Nuestro escudo no confía en barreras estáticas convencionales. Empleamos mecanismos de autenticación asimétrica, rotación incesante de secretos en memoria aislada, y limitación de tasa adaptativa. Los métodos predictivos detectan actividad de reconocimiento de red y la aíslan automáticamente. De esta manera, garantizamos una protección matemática de grado militar que mantiene nuestras rutinas operativas en producción cien por ciento secretas, inmutables y, sobre todo, indescifrables frente al escrutinio externo.
-        </p>
-
-        <h3 className="text-[14px] font-black uppercase tracking-[0.15em] mt-8 text-[#050505] border-b border-black/10 pb-2">
-          Conclusión
-        </h3>
-        <p>
-          La creación de los cimientos de nuestra empresa no se basa en promesas futuristas, sino en la aplicación estricta de principios de ingeniería y negocios de altísimo rendimiento. Hemos eliminado latencias innecesarias, suposiciones de código y prácticas inseguras, condensando todo nuestro esfuerzo técnico para enfocarnos en lo que realmente importa.
-        </p>
-        <p>
-          Este servidor está construido pura y duramente para hacer su trabajo a la perfección: escuchar al mercado financiero mundial sin pestañear, filtrar el ruido con disciplina militar y entregar la información en milisegundos. Nuestro mayor logro tecnológico en esta fase de producción constante es lograr que esa inmensa infraestructura sea completamente invisible para usted. Usted solo ve el mercado; puro, dinámico y listo para el análisis, desde el primer segundo.
+          No venimos a adornar interfaces, venimos a empujar la barrera tecnológica de la vigilancia financiera al límite. Cada línea de código, cada modelo matemático enrutado y cada certificado normativo es un escudo forjado para sostener su dominio sobre el entorno financiero más hostil de la web.
         </p>
 
         {/* DOWNHEAD / PREMIUM FOOTER */}
         <div className="mt-16 pt-10 border-t border-black/5 flex flex-col items-center pb-24">
-          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-6 opacity-60" />
+          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-6 opacity-60 drop-shadow-xl" />
           <h4 className="text-[18px] font-black tracking-tighter uppercase italic text-[#050505] mb-6">Whale Ecosystem</h4>
           <div className="flex items-center gap-8">
             <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors">
