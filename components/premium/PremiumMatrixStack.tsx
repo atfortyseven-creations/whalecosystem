@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, ArrowUp, ArrowDown, Timer } from 'lucide-react';
+import { Activity, ArrowUp, ArrowDown, Info, X } from 'lucide-react';
 import { PolymarketExecutionPanel } from './PolymarketExecutionPanel';
 
 const PERFECTION_TOKENS = [
@@ -126,13 +126,6 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
                 </div>
             )}
 
-            {/* Live Indicator */}
-            {!isSovereignConfluence && !error && (
-                <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-[pulse_2s_infinite]" />
-                    <span className="text-[8px] font-black text-[#00FFAA] tracking-widest uppercase">ON-CHAIN SYNCED</span>
-                </div>
-            )}
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 {/* 1. Asset + Price */}
@@ -169,15 +162,6 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
                 {/* 3. Metrics (Right-aligned, dense impact) */}
                 <div className="flex-shrink-0 flex flex-col items-end text-right w-64 space-y-3 mt-4 md:mt-0">
                     
-                    {/* Expiry Countdown (Simulated based on Gravity tick) */}
-                    {state.gravityScore > 70 && (
-                        <div className="flex items-center gap-2 justify-end">
-                            <Timer size={14} className="text-[#888888]" />
-                            <span className="text-[18px] font-sans font-bold text-[#111111] uppercase whitespace-nowrap drop-shadow-[0_0_8px_rgba(0,255,170,0.5)]">
-                                04M 37S
-                            </span>
-                        </div>
-                    )}
 
                     {/* Gravity Score */}
                     <div className="flex items-center gap-2 justify-end">
@@ -266,6 +250,7 @@ function StackedCard({ symbol, index }: { symbol: string; index: number }) {
 
 export function PremiumMatrixStack() {
     const [selectedTokens, setSelectedTokens] = useState<string[]>(PERFECTION_TOKENS.slice(0, 5));
+    const [showInfoModal, setShowInfoModal] = useState(false);
 
     const handleSelectToken = (token: string) => {
         if (selectedTokens.includes(token)) {
@@ -282,25 +267,34 @@ export function PremiumMatrixStack() {
             <div className="w-full max-w-[1600px] mx-auto flex flex-col px-6 md:px-12 py-8">
                 
                 {/* Top Chips Bar for Tokens */}
-                <div className="mb-10 w-full overflow-x-auto no-scrollbar pb-2">
-                    <div className="flex items-center gap-2 min-w-max">
-                        {PERFECTION_TOKENS.map(token => {
-                            const isSelected = selectedTokens.includes(token);
-                            return (
-                                <button
-                                    key={token}
-                                    onClick={() => handleSelectToken(token)}
-                                    className={`px-4 py-2 rounded-full text-[10px] font-mono font-black uppercase tracking-widest transition-all border ${
-                                        isSelected 
-                                            ? 'bg-[#050505] text-white border-[#050505] shadow-md' 
-                                            : 'bg-white text-[#050505]/50 border-[#E5E5E5] hover:border-[#050505]/20 hover:text-[#050505]'
-                                    }`}
-                                >
-                                    {token}
-                                </button>
-                            );
-                        })}
+                <div className="mb-10 w-full flex items-center gap-4">
+                    <div className="flex-grow overflow-x-auto no-scrollbar pb-2">
+                        <div className="flex items-center gap-2 min-w-max">
+                            {PERFECTION_TOKENS.map(token => {
+                                const isSelected = selectedTokens.includes(token);
+                                return (
+                                    <button
+                                        key={token}
+                                        onClick={() => handleSelectToken(token)}
+                                        className={`px-4 py-2 rounded-full text-[10px] font-mono font-black uppercase tracking-widest transition-all border ${
+                                            isSelected 
+                                                ? 'bg-[#050505] text-white border-[#050505] shadow-md' 
+                                                : 'bg-white text-[#050505]/50 border-[#E5E5E5] hover:border-[#050505]/20 hover:text-[#050505]'
+                                        }`}
+                                    >
+                                        {token}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
+                    <button
+                        onClick={() => setShowInfoModal(true)}
+                        className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border border-[#050505]/20 text-[#050505] hover:bg-[#050505] hover:text-white hover:border-[#050505] transition-all shadow-sm group"
+                        title="Cómo funciona The Matrix"
+                    >
+                        <Info size={16} />
+                    </button>
                 </div>
 
                 {/* Main Stacked List */}
@@ -317,6 +311,112 @@ export function PremiumMatrixStack() {
                         NO ASSETS SELECTED
                     </div>
                 )}
+
+            {/* Modal de Información Legendaria */}
+            <AnimatePresence>
+                {showInfoModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-[#050505]/80 backdrop-blur-sm"
+                            onClick={() => setShowInfoModal(false)}
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-2xl bg-[#ffffff] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+                        >
+                            <div className="flex items-center justify-between px-8 py-6 border-b border-[#E5E5E5]">
+                                <h2 className="text-xl font-black text-[#050505] tracking-tight uppercase">LA ARQUITECTURA DE LA VERDAD ON-CHAIN: TERANODE EDITION</h2>
+                                <button onClick={() => setShowInfoModal(false)} className="text-[#050505]/50 hover:text-[#050505] transition-colors">
+                                    <X size={24} />
+                                </button>
+                            </div>
+                            
+                            <div className="p-8 overflow-y-auto font-sans leading-relaxed text-[#050505]/80 space-y-6 text-[15px]">
+                                <p>
+                                    El mercado de criptoactivos no opera bajo el imperio de la fortuna, las ilusiones ópticas o los indicadores técnicos retrospectivos. Se trata de una estructura matemática regida por leyes de física financiera que la mayoría ignora.
+                                </p>
+                                <p>
+                                    Tú estás perdiendo oportunidades porque juegas en una red congestionada y lenta, o confías en agregadores de datos que te mienten con horas de retraso. Nuestra terminal Sovereign Matrix ha erradicado a los intermediarios conectándose directamente al sistema nervioso del capital global: Teranode.
+                                </p>
+                                <p>
+                                    Hemos construido un motor de ejecución institucional directamente sobre la máquina de validación más masiva del planeta (BSV), capaz de ingerir y procesar millones de transacciones por segundo con latencia cero. Esto no es un tablero de métricas; es un nodo de inteligencia forense.
+                                </p>
+
+                                <div className="p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl relative overflow-hidden group hover:border-[#050505]/20 transition-colors">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-400 group-hover:bg-[#050505] transition-colors" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2 flex items-center gap-2">
+                                        <Activity size={14} /> GRAVITY <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— La Inercia Estructural del Mercado</span>
+                                    </h3>
+                                    <p className="text-sm">
+                                        El mercado no se adivina, se pesa. A través de nuestro clúster Kafka nativo de Teranode, leemos todas las transacciones antes de que formen el bloque. Gravity cuantifica la inercia macroscópica de las instituciones en tiempo real.
+                                    </p>
+                                    <p className="text-sm mt-2">
+                                        <strong>Cyan:</strong> El flujo de capital empuja estructuralmente hacia arriba.<br/>
+                                        <strong>Naranja:</strong> Las instituciones están colapsando la liquidez hacia abajo. Quien opera contra la inercia de la Gravedad, opera matemáticamente contra su propio dinero.
+                                    </p>
+                                </div>
+
+                                <div className="p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl relative overflow-hidden group hover:border-[#050505]/20 transition-colors">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 transition-colors" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2">
+                                        VIGOR (% ACCUM/DIST) <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— El Pulso Auténtico del Capital Institucional</span>
+                                    </h3>
+                                    <p className="text-sm border-b border-[#E5E5E5]/50 pb-3 mb-3">
+                                        El pánico minorista y el ruido de redes sociales son distracciones financiadas por el gran capital. VIGOR limpia ese ruido extrayendo la verdad del UTXO (Unspent Transaction Output) procesado por Teranode. Monitoreamos billeteras de +1 Millón USD para determinar su fase exacta de ciclo:
+                                    </p>
+                                    <ul className="text-sm space-y-2">
+                                        <li><strong>Acumulación (ACCUM):</strong> Las firmas están absorbiendo el activo discretamente usando algoritmos de fragmentación.</li>
+                                        <li><strong>Distribución (DIST):</strong> Usan zonas de alta liquidez para salir del mercado mientras el minorista compra creyendo que el precio subirá.</li>
+                                    </ul>
+                                </div>
+
+                                <div className="p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl relative overflow-hidden group hover:border-[#050505]/20 transition-colors">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#050505] transition-colors" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2 flex items-center gap-2">
+                                        EXP. MOVE & TARGET (TGT) <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— Proyección Matemática de Desplazamiento Esperado</span>
+                                    </h3>
+                                    <p className="text-sm">
+                                        Integrando el bloque histórico de Teranode y el volumen de liquidez masiva detectado en nuestras bases de datos PostgreSQL y Aerospike, nuestra IA traza la balística del precio. Te entregamos un porcentaje de volatilidad inminente y un Target Price.
+                                    </p>
+                                    <p className="text-sm mt-2 font-semibold text-[#050505]">
+                                        No usamos magia; determinamos dónde están los bloques profundos de capital asimétrico hacia los que el precio debe confluir por pura física de mercado.
+                                    </p>
+                                </div>
+
+                                <div className="p-5 bg-[#FAF9F6] border border-[#00FFAA]/30 rounded-2xl relative overflow-hidden group shadow-[0_0_15px_rgba(0,255,170,0.05)]">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00FFAA] transition-colors" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2 flex items-center gap-2">
+                                        ABSOLUTE CONFLUENCE <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— Validado por Polymarket</span>
+                                    </h3>
+                                    <p className="text-sm">
+                                        El sello final de la verdad. Al cruzar el poder bruto forense de Teranode con datos reales de mercados de predicción (Polymarket), evaluamos si los eventos externos y las apuestas humanas de capital coinciden con los movimientos de las grandes firmas en cadena.
+                                    </p>
+                                    <p className="text-sm mt-2 font-semibold text-[#050505]">
+                                        Cuando la liquidez masiva on-chain y el consenso de apuestas arriesgadas resuenan en la misma frecuencia, se desata la Confluencia Absoluta.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="p-8 bg-[#050505] text-white">
+                                <p className="text-[13px] leading-relaxed opacity-90 font-medium">
+                                    El capital es ciego para el que no tiene las herramientas correctas. La infraestructura Teranode nos permite ver la luz antes de que ocurra el sonido. Tú decides: seguir intentando sobrevivir bajo el ruido comercial, o conectarte al nodo y operar con la ventaja asimétrica de la élite institucional.
+                                </p>
+                                <button 
+                                    onClick={() => setShowInfoModal(false)}
+                                    className="mt-6 w-full py-4 bg-white text-[#050505] font-black text-sm uppercase tracking-widest hover:bg-[#FAF9F6] transition-colors"
+                                >
+                                    — Desbloquea el Matrix. Domina el tablero.
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
             </div>
         </div>
     );
