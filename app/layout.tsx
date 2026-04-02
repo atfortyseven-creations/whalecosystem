@@ -17,14 +17,7 @@ import { initializeBackgroundServices } from "@/lib/services/init";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { ReactNode } from "react";
 import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
-import dynamic from 'next/dynamic';
-
-// ─── Dynamic (client-only) decoration/utility components ────────────────────
-// Loading them lazily removes them from the SSR critical path — zero
-// added latency, no hydration block on the main thread.
-const AztecNoise      = dynamic(() => import("@/components/ui/AztecNoise").then(m => m.AztecNoise),           { ssr: false });
-const ClientFortress  = dynamic(() => import("@/components/ui/ClientFortress").then(m => m.ClientFortress),   { ssr: false });
-const OfflineDetector = dynamic(() => import("@/components/ui/OfflineScreen").then(m => m.OfflineDetector),  { ssr: false });
+import { ClientOverlays } from "@/components/layout/ClientOverlays";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -173,7 +166,6 @@ export default async function RootLayout({
           />
         </head>
         <body className={`${inter.className} ${martel.variable} ${robotoMono.variable} perf-ultra`}>
-          <AztecNoise />
           <CookieProvider>
              <GoogleTagManager gtmId="GTM-52B9SCRM" />
               <Providers cookies={cookies}>
@@ -184,8 +176,7 @@ export default async function RootLayout({
                 </MobileEnforcer>
                 <Toaster richColors position="top-right" />
                 <CookieConsent />
-                <OfflineDetector />
-                <ClientFortress />
+                <ClientOverlays />
                 <ErrorSuppressor />
               </Providers>
           </CookieProvider>
