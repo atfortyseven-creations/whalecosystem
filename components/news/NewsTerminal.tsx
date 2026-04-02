@@ -283,9 +283,9 @@ export function NewsTerminal() {
               </div>
             )}
 
-            {/* Lista de artículos */}
+            {/* Lista de artículos (Culling Activo: Máximo 50 Nodos en DOM para evitar Memory Saturation) */}
             <div className="flex flex-col">
-              {articles.map(art => {
+              {articles.slice(0, 50).map(art => {
                 const isActive = selected?.id === art.id;
                 return (
                   <button key={art.id} onClick={() => setSelected(art)} className="text-left w-full px-6 py-5 border-b transition-all relative group"

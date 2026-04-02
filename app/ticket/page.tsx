@@ -145,6 +145,35 @@ function QuantumVerificationPanel({ onVerified }: { onVerified: () => void }) {
         TRIANGLE: "Excelente. Ahora dibuja un triángulo",
     };
 
+    // Auto-Healer for iOS Safari VRAM Exhaustion
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const handleContextLost = (e: Event) => {
+            e.preventDefault();
+            console.warn("[Auto-Heal] Canvas context lost due to OS VRAM limits.");
+        };
+
+        const handleContextRestored = () => {
+            console.log("[Auto-Heal] Canvas context restored. Rebooting synthetic matrix.");
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pointsRef.current = [];
+                isDrawing.current = false;
+            }
+        };
+
+        canvas.addEventListener('contextlost', handleContextLost);
+        canvas.addEventListener('contextrestored', handleContextRestored);
+
+        return () => {
+             canvas.removeEventListener('contextlost', handleContextLost);
+             canvas.removeEventListener('contextrestored', handleContextRestored);
+        };
+    }, []);
+
     const runSyntheticHeuristics = (points: {x:number, y:number, t:number}[], expectedShape: VerificationStep) => {
         if (points.length < 5) return false;
         

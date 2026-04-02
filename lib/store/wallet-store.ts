@@ -114,11 +114,35 @@ export const useWalletStore = create<WalletState>()(
             ? new ethers.WebSocketProvider(networkData.wss)
             : new ethers.JsonRpcProvider(networkData.rpc);
 
-          const rawBalance = await provider.getBalance(address);
-          const formattedBalance = ethers.formatEther(rawBalance);
+          let rawBalance;
+          try {
+             rawBalance = await provider.getBalance(address);
+          } catch (failoverError) {
+             if (activeProtocol === 'WSS') {
+                // Auto-healing: WSS connections break upon OS sleep/hibernation. Triggering RPC rescue node.
+                console.warn("[Auto-Heal] WSS terminated unexpectedly. Routing via RPC rescue node.");
+                const fallbackNode = new ethers.JsonRpcProvider(networkData.rpc);
+                rawBalance = await fallbackNode.getBalance(address);
+             } else {
+                 throw failoverError;
+             }
+          }
+
+          // Confidence Delta (Reorg Glitch Interceptor)
+          const oldBalance = parseFloat(get().balance || "0");
+          let numericBalance = parseFloat(ethers.formatEther(rawBalance));
           
-          // Truncate to 4 decimals
-          const displayBalance = parseFloat(formattedBalance).toFixed(4);
+          if (oldBalance > 0.0001 && numericBalance === 0) {
+              console.warn("[Delta Integrity] Potential L2 Chain-Reorg detected. Suspending UI update to prevent zero-balance panic.");
+              await new Promise(r => setTimeout(r, 3000));
+              try {
+                  const retryBalance = await provider.getBalance(address);
+                  numericBalance = parseFloat(ethers.formatEther(retryBalance));
+              } catch(e) {}
+          }
+          
+          // Quantum precision to prevent 'ghosting' of micro-assets (< 0.0001)
+          const displayBalance = numericBalance === 0 ? "0.0" : numericBalance < 0.0001 ? "<0.0001" : numericBalance.toFixed(4);
           set({ balance: displayBalance });
 
           // If it's WSS, close it so we don't leak sockets on interval polling
@@ -153,10 +177,21 @@ export const useWalletStore = create<WalletState>()(
 
           const value = ethers.parseEther(amount);
           
-          // Check balance logic prior to broadcast
+          // Pre-flight algorithm: Predict actual exact cost including dynamic network congestion
           const currentBalance = await provider.getBalance(wallet.address);
-          if (currentBalance < value) {
-            toast.error("Insufficient Capital", { description: "On-chain reserves cannot cover this operation." });
+          
+          let gasCost = 0n;
+          try {
+             const feeData = await provider.getFeeData();
+             const gasEstimate = await wallet.estimateGas({ to, value });
+             gasCost = gasEstimate * (feeData.maxFeePerGas || feeData.gasPrice || 1n);
+          } catch (gasError) {
+             toast.error("Execution Unviable", { description: "The transaction will inherently fail or revert on-chain." });
+             return null;
+          }
+
+          if (currentBalance < (value + gasCost)) {
+            toast.error("Capital Depleted", { description: "You must leave a micro-fraction of funds to cover the network Gas fee." });
             return null;
           }
 
@@ -172,8 +207,20 @@ export const useWalletStore = create<WalletState>()(
             description: `Hash: ${tx.hash.slice(0, 8)}...${tx.hash.slice(-6)}`
           });
 
-          // Await confirmation
-          await tx.wait(1);
+          // Mempool Zombie Lock Prevention
+          try {
+             await Promise.race([
+                 tx.wait(1),
+                 new Promise((_, reject) => setTimeout(() => reject(new Error("MEMPOOL_TIMEOUT")), 60000))
+             ]);
+          } catch (waitError: any) {
+             if (waitError.message === "MEMPOOL_TIMEOUT") {
+                 toast.error("Network Congestion", { id: "tx-broadcast", description: "Transaction is pending in mempool. UI unlocked." });
+                 // Let it be pending in the background without freezing the UI.
+             } else {
+                 throw waitError;
+             }
+          }
 
           if (activeProtocol === 'WSS' && 'destroy' in provider) {
              (provider as any).destroy();

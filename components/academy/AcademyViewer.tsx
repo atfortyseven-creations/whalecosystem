@@ -25,6 +25,7 @@ const ArticleBlock = memo(function ArticleBlock({
             key={article.id}
             id={article.id}
             className="group relative border-b border-[#E5E5E5] pb-24 mb-24 last:border-0 scroll-mt-32"
+            style={{ contentVisibility: 'auto', containIntrinsicSize: '800px' }}
         >
             <div className="absolute -left-16 top-0 hidden 2xl:flex flex-col items-center">
                 <span className="text-[10px] font-black text-[#888888]/30 uppercase tracking-[0.5em] rotate-180" style={{ writingMode: 'vertical-rl' }}>

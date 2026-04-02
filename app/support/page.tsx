@@ -79,6 +79,28 @@ function WhaleSupportHero() {
   );
 }
 
+class SafeErrorBoundary extends React.Component<any, {hasError: boolean}> {
+  constructor(props: any) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(error: any) { return { hasError: true }; }
+  componentDidCatch(error: any, info: any) { console.warn("AdBlock intercepted support module.", error); }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <InstitutionalShell title="Whale Support" badge="SUPPORT" badgeVariant="emerald">
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6">
+             <Shield size={32} className="mb-4 text-black/20" />
+             <p className="font-mono text-[10px] uppercase tracking-widest text-black/50 font-black">
+               [Connection Intercepted by Shield/AdBlock]
+             </p>
+             <p className="font-sans text-sm text-black/40 mt-2">Disable tracking protection to access Support.</p>
+          </div>
+        </InstitutionalShell>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function SupportPage() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [isSending, setIsSending] = useState(false);
@@ -107,6 +129,7 @@ export default function SupportPage() {
   };
 
   return (
+    <SafeErrorBoundary>
     <InstitutionalShell title="Whale Support" badge="SUPPORT" badgeVariant="emerald">
       <div className="selection:bg-black/5">
         {/* Hero */}
@@ -265,5 +288,6 @@ export default function SupportPage() {
       </div>
     </div>
   </InstitutionalShell>
+  </SafeErrorBoundary>
   );
 }

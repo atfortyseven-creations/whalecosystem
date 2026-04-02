@@ -26,26 +26,49 @@ export function InstitutionalPortfolioView() {
     const [pulse, setPulse] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    // Ghost Memory Fix: Ref for address
+    const addressRef = React.useRef(address);
+    useEffect(() => { addressRef.current = address; }, [address]);
+
     // Live balance refresh
     const refreshBalance = useCallback(async () => {
-        if (!address) return;
+        if (!addressRef.current) return;
         setLoading(true);
         try {
             await updateBalance();
             setPulse(p => !p);
         } finally { setLoading(false); }
-    }, [address, updateBalance]);
+    }, [updateBalance]);
 
-    // 550K Quota Throttler & Focus-Aware Polling
+    // 550K Quota Throttler & Focus-Aware Polling & Transak Hyper-Sync
     useEffect(() => {
         let isFocused = true;
         let t: NodeJS.Timeout;
+        let hyperSyncT: NodeJS.Timeout;
 
-        const handleFocus = () => { isFocused = true; refreshBalance(); };
+        const handleFocus = () => { 
+            isFocused = true; 
+            refreshBalance(); 
+        };
         const handleBlur = () => { isFocused = false; };
+
+        // Transak Phantom Deposit Listener
+        const handleMessage = (message: any) => {
+            if (message?.data?.event_id === 'TRANSAK_ORDER_SUCCESSFUL' || message?.data?.event_id === 'TRANSAK_ORDER_COMPLETED') {
+                toast.success("Fiat Confirmed", { description: "Processing on-chain delivery. Hyper-Sync engaged." });
+                // Engage 3-second Hyper-Sync override
+                hyperSyncT = setInterval(() => {
+                    refreshBalance();
+                }, 3000);
+                
+                // Disengage Hyper-Sync after 45 seconds (assumed block finality)
+                setTimeout(() => clearInterval(hyperSyncT), 45000);
+            }
+        };
 
         window.addEventListener('focus', handleFocus);
         window.addEventListener('blur', handleBlur);
+        window.addEventListener('message', handleMessage);
 
         // Initial fetch
         refreshBalance();
@@ -59,8 +82,10 @@ export function InstitutionalPortfolioView() {
 
         return () => {
             clearInterval(t);
+            clearInterval(hyperSyncT);
             window.removeEventListener('focus', handleFocus);
             window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('message', handleMessage);
         };
     }, [refreshBalance]);
 
