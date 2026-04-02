@@ -338,79 +338,79 @@ export function PremiumMatrixStack() {
                             
                             <div className="p-8 overflow-y-auto font-sans leading-relaxed text-[#050505]/80 space-y-6 text-[15px]">
                                 <p>
-                                    El mercado de criptoactivos no opera bajo el imperio de la fortuna, las ilusiones ópticas o los indicadores técnicos retrospectivos. Se trata de una estructura matemática regida por leyes de física financiera que la mayoría ignora.
+                                    El mercado de criptoactivos es altamente volátil y a menudo está influenciado por flujos de capital que no son evidentes a simple vista. Entender este mercado requiere analizar los datos en cadena (on-chain) directamente desde su origen, evitando depender únicamente de indicadores o rumores.
                                 </p>
                                 <p>
-                                    Tú estás perdiendo oportunidades porque juegas en una red congestionada y lenta, o confías en agregadores de datos que te mienten con horas de retraso. Nuestra terminal Sovereign Matrix ha erradicado a los intermediarios conectándose directamente al sistema nervioso del capital global: Teranode.
+                                    A diferencia de muchos agregadores de datos que presentan cierta latencia, nuestra terminal Sovereign Matrix obtiene la información conectándose directamente a Teranode, una infraestructura de validación de alto rendimiento nativa de BSV.
                                 </p>
                                 <p>
-                                    Hemos construido un motor de ejecución institucional directamente sobre la máquina de validación más masiva del planeta (BSV), capaz de ingerir y procesar millones de transacciones por segundo con latencia cero. Esto no es un tablero de métricas; es un nodo de inteligencia forense.
+                                    Esta conexión nos proporciona un entorno de procesamiento veloz y estable, permitiéndonos leer la información de las transacciones en tiempo real. Esto nos da una perspectiva técnica para analizar el comportamiento institucional con honestidad y claridad.
                                 </p>
 
                                 <div className="p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl relative overflow-hidden group hover:border-[#050505]/20 transition-colors">
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-400 group-hover:bg-[#050505] transition-colors" />
                                     <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2 flex items-center gap-2">
-                                        <Activity size={14} /> GRAVITY <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— La Inercia Estructural del Mercado</span>
+                                        <Activity size={14} /> GRAVITY <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— El Flujo de Fondos</span>
                                     </h3>
                                     <p className="text-sm">
-                                        El mercado no se adivina, se pesa. A través de nuestro clúster Kafka nativo de Teranode, leemos todas las transacciones antes de que formen el bloque. Gravity cuantifica la inercia macroscópica de las instituciones en tiempo real.
+                                        Gravity analiza el volumen de las transacciones procesadas (mediante nuestro clúster nativo) para medir hacia dónde se dirigen los capitales más grandes del mercado.
                                     </p>
                                     <p className="text-sm mt-2">
-                                        <strong>Cyan:</strong> El flujo de capital empuja estructuralmente hacia arriba.<br/>
-                                        <strong>Naranja:</strong> Las instituciones están colapsando la liquidez hacia abajo. Quien opera contra la inercia de la Gravedad, opera matemáticamente contra su propio dinero.
+                                        <strong>Cyan:</strong> Indica una tendencia mayoritaria hacia la compra de activos.<br/>
+                                        <strong>Naranja:</strong> Alerta que el capital está prefiriendo la liquidez, aumentando la presión de venta. Seguir estas corrientes ayuda a no operar en contra del mercado.
                                     </p>
                                 </div>
 
                                 <div className="p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl relative overflow-hidden group hover:border-[#050505]/20 transition-colors">
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 transition-colors" />
                                     <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2">
-                                        VIGOR (% ACCUM/DIST) <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— El Pulso Auténtico del Capital Institucional</span>
+                                        VIGOR (% ACCUM/DIST) <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— Actividad Institucional</span>
                                     </h3>
                                     <p className="text-sm border-b border-[#E5E5E5]/50 pb-3 mb-3">
-                                        El pánico minorista y el ruido de redes sociales son distracciones financiadas por el gran capital. VIGOR limpia ese ruido extrayendo la verdad del UTXO (Unspent Transaction Output) procesado por Teranode. Monitoreamos billeteras de +1 Millón USD para determinar su fase exacta de ciclo:
+                                        Vigor examina el comportamiento de las billeteras (UTXO) que manejan grandes volúmenes para inferir la fase actual de los inversores institucionales:
                                     </p>
                                     <ul className="text-sm space-y-2">
-                                        <li><strong>Acumulación (ACCUM):</strong> Las firmas están absorbiendo el activo discretamente usando algoritmos de fragmentación.</li>
-                                        <li><strong>Distribución (DIST):</strong> Usan zonas de alta liquidez para salir del mercado mientras el minorista compra creyendo que el precio subirá.</li>
+                                        <li><strong>Acumulación (ACCUM):</strong> Actores de gran capital absorbiendo activos de manera escalonada en el transcurso del tiempo.</li>
+                                        <li><strong>Distribución (DIST):</strong> Instituciones reduciendo su exposición paulatinamente mientras el mercado minorista aún compra masivamente.</li>
                                     </ul>
                                 </div>
 
                                 <div className="p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl relative overflow-hidden group hover:border-[#050505]/20 transition-colors">
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#050505] transition-colors" />
                                     <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2 flex items-center gap-2">
-                                        EXP. MOVE & TARGET (TGT) <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— Proyección Matemática de Desplazamiento Esperado</span>
+                                        EXP. MOVE & TARGET (TGT) <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— Proyección de Datos</span>
                                     </h3>
                                     <p className="text-sm">
-                                        Integrando el bloque histórico de Teranode y el volumen de liquidez masiva detectado en nuestras bases de datos PostgreSQL y Aerospike, nuestra IA traza la balística del precio. Te entregamos un porcentaje de volatilidad inminente y un Target Price.
+                                        Teniendo como base el registro histórico en cadena y los niveles actuales de liquidez detectados, calculamos la posible variación en precios y sugerimos un "Target" numérico aproximado.
                                     </p>
                                     <p className="text-sm mt-2 font-semibold text-[#050505]">
-                                        No usamos magia; determinamos dónde están los bloques profundos de capital asimétrico hacia los que el precio debe confluir por pura física de mercado.
+                                        Esta estadística te orienta hacia las zonas en donde habitualmente reside una mayor cantidad de interés real de mercado.
                                     </p>
                                 </div>
 
                                 <div className="p-5 bg-[#FAF9F6] border border-[#00FFAA]/30 rounded-2xl relative overflow-hidden group shadow-[0_0_15px_rgba(0,255,170,0.05)]">
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00FFAA] transition-colors" />
                                     <h3 className="font-black text-sm uppercase tracking-widest text-[#050505] mb-2 flex items-center gap-2">
-                                        ABSOLUTE CONFLUENCE <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— Validado por Polymarket</span>
+                                        ABSOLUTE CONFLUENCE <span className="text-[#888888] font-normal tracking-normal text-xs normal-case">— On-Chain + Polymarket</span>
                                     </h3>
                                     <p className="text-sm">
-                                        El sello final de la verdad. Al cruzar el poder bruto forense de Teranode con datos reales de mercados de predicción (Polymarket), evaluamos si los eventos externos y las apuestas humanas de capital coinciden con los movimientos de las grandes firmas en cadena.
+                                        Para encontrar un grado mayor de certidumbre, comparamos directamente nuestros datos algorítmicos en la cadena con los mercados reales de predicción como Polymarket.
                                     </p>
                                     <p className="text-sm mt-2 font-semibold text-[#050505]">
-                                        Cuando la liquidez masiva on-chain y el consenso de apuestas arriesgadas resuenan en la misma frecuencia, se desata la Confluencia Absoluta.
+                                        Cuando las decisiones institucionales on-chain coindicen plenamente con el consenso mundial de predicción, hablamos de una Confluencia Absoluta; un patrón que aumenta la fiabilidad del pronóstico.
                                     </p>
                                 </div>
                             </div>
                             
                             <div className="p-8 bg-[#050505] text-white">
                                 <p className="text-[13px] leading-relaxed opacity-90 font-medium">
-                                    El capital es ciego para el que no tiene las herramientas correctas. La infraestructura Teranode nos permite ver la luz antes de que ocurra el sonido. Tú decides: seguir intentando sobrevivir bajo el ruido comercial, o conectarte al nodo y operar con la ventaja asimétrica de la élite institucional.
+                                    Tener acceso a datos puros y estructurados es clave para visualizar mejor este panorama económico. Las herramientas con las que contamos pretenden simplemente ser precisas y eficientes usando tecnología punta de manera sensata. Depende enteramente de ti cómo decides ejecutar tu estrategia y tus recursos tras consultar los datos analíticos disponibles.
                                 </p>
                                 <button 
                                     onClick={() => setShowInfoModal(false)}
                                     className="mt-6 w-full py-4 bg-white text-[#050505] font-black text-sm uppercase tracking-widest hover:bg-[#FAF9F6] transition-colors"
                                 >
-                                    — Desbloquea el Matrix. Domina el tablero.
+                                    Cerrar y Volver a The Matrix
                                 </button>
                             </div>
                         </motion.div>

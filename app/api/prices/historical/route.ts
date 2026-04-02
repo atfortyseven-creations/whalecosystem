@@ -7,8 +7,8 @@ const limiter = rateLimit({
 });
 
 /**
- * CoinGecko Historical Price Data API
- * Free tier: 50 calls/minute
+ * Institutional Historical Price Data (Klines)
+ * Zero-Latency Binance Backend
  */
 
 interface PriceDataPoint {
@@ -27,104 +27,85 @@ interface HistoricalResponse {
   currentPrice: number;
 }
 
-// CoinGecko coin ID mapping - Expanded for 30 trading pairs logic
-const COIN_MAP: Record<string, string> = {
-  'ETH': 'ethereum',
-  'BTC': 'bitcoin',
-  'MATIC': 'matic-network',
-  'ARB': 'arbitrum',
-  'OP': 'optimism',
-  'BASE': 'ethereum', 
-  'USDC': 'usd-coin',
-  'USDT': 'tether',
-  'DAI': 'dai',
-  'SOL': 'solana',
-  'XRP': 'ripple',
-  'ADA': 'cardano',
-  'AVAX': 'avalanche-2',
-  'DOT': 'polkadot',
-  'LINK': 'chainlink',
-  'UNI': 'uniswap',
-  'BNB': 'binancecoin',
-  'LTC': 'litecoin',
-  'BCH': 'bitcoin-cash',
-  'XLM': 'stellar',
-  'ALGO': 'algorand',
-  'FIL': 'filecoin',
-  'FET': 'fetch-ai',
-  'RNDR': 'render-token',
-  'NEAR': 'near',
-  'INJ': 'injective-protocol',
-  'PEPE': 'pepe',
-  'WLD': 'worldcoin-wld',
+// Map requested symbols to Binance pairings
+const BINANCE_MAP: Record<string, string> = {
+  'ETH': 'ETHUSDT', 'BTC': 'BTCUSDT', 'MATIC': 'MATICUSDT', 'POL': 'POLUSDT', 'ARB': 'ARBUSDT',
+  'OP': 'OPUSDT', 'BASE': 'ETHUSDT', 'USDC': 'USDCUSDT', 'USDT': 'EURUSDT', 'DAI': 'DAIUSDT',
+  'SOL': 'SOLUSDT', 'XRP': 'XRPUSDT', 'ADA': 'ADAUSDT', 'AVAX': 'AVAXUSDT', 'DOT': 'DOTUSDT',
+  'LINK': 'LINKUSDT', 'UNI': 'UNIUSDT', 'BNB': 'BNBUSDT', 'LTC': 'LTCUSDT', 'BCH': 'BCHUSDT',
+  'XLM': 'XLMUSDT', 'ALGO': 'ALGOUSDT', 'FIL': 'FILUSDT', 'FET': 'FETUSDT', 'RNDR': 'RNDRUSDT',
+  'NEAR': 'NEARUSDT', 'INJ': 'INJUSDT', 'PEPE': 'PEPEUSDT', 'WLD': 'WLDUSDT', 'TAO': 'TAOUSDT'
 };
 
 export async function GET(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for') || 'anonymous';
     try {
-        await limiter.check(50, ip); // 50 requests per minute
+        await limiter.check(50, ip);
     } catch {
         return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const { searchParams } = new URL(request.url);
     const symbol = searchParams.get('symbol')?.toUpperCase() || 'ETH';
-    const days = parseInt(searchParams.get('days') || '7');
+    let days = parseInt(searchParams.get('days') || '7');
     const currency = searchParams.get('currency') || 'usd';
 
-    const coinId = COIN_MAP[symbol];
-    if (!coinId) {
+    // Protect against non-USD endpoints that we aren't supporting via Binance trivially
+    if (currency.toLowerCase() !== 'usd') {
+        return NextResponse.json({ error: 'Only USD denomination supported' }, { status: 400 });
+    }
+
+    const binanceSymbol = BINANCE_MAP[symbol];
+    if (!binanceSymbol) {
       return NextResponse.json(
-        { error: `Unsupported symbol: ${symbol}` },
+        { error: `Unsupported symbol for historical klines: ${symbol}` },
         { status: 400 }
       );
     }
 
-    // CoinGecko API (free tier or authenticated)
-    const baseUrl = 'https://api.coingecko.com/api/v3';
-    const apiKey = process.env.NEXT_PUBLIC_COINGECKO_KEY;
-    const authParam = apiKey ? `&x_cg_demo_api_key=${apiKey}` : '';
+    // Determine interval based on requested days to maintain high resolution without hitting payload limits
+    let interval = '1h';
+    let limit = days * 24;
     
-    // Fetch OHLC data
-    const ohlcUrl = `${baseUrl}/coins/${coinId}/ohlc?vs_currency=${currency}&days=${days}${authParam}`;
-    console.log(`[HistoricalAPI] Fetching OHLC for ${coinId} (${days} days)...`);
-    
-    const ohlcRes = await fetch(ohlcUrl, {
-      cache: 'no-store', // Avoid caching provider errors/limitations
-    });
-
-    if (!ohlcRes.ok) {
-      if (ohlcRes.status === 429) {
-          console.error(`[HistoricalAPI] CoinGecko Rate Limit Hit`);
-          return NextResponse.json({ error: 'Market data provider rate limit hit. Using fallback cache...' }, { status: 429 });
-      }
-      throw new Error(`CoinGecko OHLC Error: ${ohlcRes.status}`);
+    if (days <= 1) {
+        interval = '15m';
+        limit = 96;
+    } else if (days > 7 && days <= 30) {
+        interval = '4h';
+        limit = days * 6;
+    } else if (days > 30) {
+        interval = '1d';
+        limit = days;
     }
 
-    const ohlcData = await ohlcRes.json();
+    // Fetch Klines
+    const klinesUrl = `https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=${interval}&limit=${limit}`;
+    const klinesRes = await fetch(klinesUrl, { cache: 'no-store' });
+
+    if (!klinesRes.ok) {
+      throw new Error(`Binance API Error: ${klinesRes.status}`);
+    }
+
+    const klinesData = await klinesRes.json();
     
-    // Transform to our format
-    const priceData: PriceDataPoint[] = ohlcData.map((point: any[]) => ({
-      timestamp: point[0],
-      open: point[1],
-      high: point[2],
-      low: point[3],
-      close: point[4],
-      volume: 0, // OHLC endpoint doesn't include volume
+    // Transform Binance structure
+    // [0] Open time, [1] Open, [2] High, [3] Low, [4] Close, [5] Volume
+    const priceData: PriceDataPoint[] = klinesData.map((kline: any[]) => ({
+      timestamp: kline[0],
+      open: parseFloat(kline[1]),
+      high: parseFloat(kline[2]),
+      low: parseFloat(kline[3]),
+      close: parseFloat(kline[4]),
+      volume: parseFloat(kline[5]),
     }));
 
-    // Get current price
-    const currentPriceUrl = `${baseUrl}/simple/price?ids=${coinId}&vs_currencies=${currency}${authParam}`;
-    const priceRes = await fetch(currentPriceUrl, {
-      next: { revalidate: 60 },
-    });
-    const currentPriceRaw = await priceRes.json();
-    const currentPrice = currentPriceRaw[coinId]?.[currency] || 0;
+    // Get strictly the very latest frame for current price
+    const currentPrice = priceData.length > 0 ? priceData[priceData.length - 1].close : 0;
 
     const response: HistoricalResponse = {
       symbol,
-      currency: currency.toUpperCase(),
+      currency: 'USD',
       data: priceData,
       currentPrice,
     };
@@ -133,17 +114,17 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Price fetch error:', error);
     
-    // Return empty state if API fails, avoid fictitious data at all costs
     return NextResponse.json(
       { 
         symbol: 'UNKNOWN',
         currency: 'USD',
         data: [],
         currentPrice: 0,
-        error: "Real-time market data currently unavailable"
+        error: "Historical market data currently unavailable"
       }, 
       { status: 503 }
     );
   }
 }
+
 

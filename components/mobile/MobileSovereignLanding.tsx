@@ -434,16 +434,16 @@ function PagePhilosophy1() {
         </h2>
       </motion.div>
 
-      <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
+      <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
         <p>
-          En la dimensión macroeconómica, la integridad matemática y el nivel de exposición regulatoria definen el éxito. Whale Alert Network es un ecosistema institucional de alto rendimiento, estructurado bajo protocolos de seguridad paramilitares y normativas compliance globales.
+          En la dimensión macroeconómica contemporánea, la supremacía no se define únicamente por la acumulación transaccional, sino por la integridad matemática absoluta y un nivel de exposición regulatoria meticulosamente calibrado. Whale Alert Network nace como un ecosistema institucional de altísimo rendimiento, forjado desde sus cimientos bajo parámetros de seguridad de grado paramilitar y normativas de compliance globales innegociables. Lo que presentamos aquí no es una simple interfaz, sino una infraestructura algorítmica diseñada para quienes comprenden que en la red no existen segundas oportunidades frente a la vulnerabilidad o la latencia.
         </p>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-4 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
           1. Cinética de Tiempo Real
         </h3>
         <p>
-          Rechazamos categóricamente la latencia y la simulación. Nuestro motor ingiere capitales en tiempo real a través de canales directos asíncronos. Para mitigar fallos en nodos distantes sin degradar el clúster, incorporamos conectividad inquebrantable mediante Exp-Backoff:
+          Rechazamos categóricamente la latencia intermitente, la dependencia de cachés obsoletos y cualquier forma de simulación de datos. Nuestro motor de ingesta procesa flujos de capitales masivos en tiempo real a través de canales asíncronos directos orientados hacia la memoria de la blockchain. Entendemos que en un entorno distribuido el fallo de un nodo distante es una certeza, no una posibilidad; por ello, para mitigar interrupciones sin degradar el rendimiento del clúster principal, hemos integrado robuztamente conectividad inquebrantable empleando algoritmos de Exponential Backoff:
         </p>
 
         <img 
@@ -453,7 +453,7 @@ function PagePhilosophy1() {
         />
 
         <p>
-          Cada transferencia pasa por un filtro algorítmico microscópico. Evaluamos la desviación de mercado (Z-Score) en microsegundos, aislando las anomalias macro (la "ballena") y purgando el ruido estructural:
+          Bajo esta rigurosa arquitectura, cada transferencia detectada atraviesa un filtro algorítmico microscópico. Evaluamos la desviación de mercado (Z-Score) en la escala de los microsegundos, aislando con precisión quirúrgica las anomalías macroestructurales —la auténtica huella de la "ballena"— y purgando despiadadamente el ruido transaccional. La precisión estadística dicta el acceso:
         </p>
 
         <img 
@@ -474,15 +474,15 @@ function PagePhilosophy1() {
 function PagePhilosophy2() {
   return (
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
-      <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
+      <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
         <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
           2. Seguridad Soberana & E2EE
         </h3>
         <p>
-          Arquitectamos bajo Zero-Trust absoluto. La conexión entre su interfaz y el núcleo de datos prescinde completamente del almacenamiento de contraseñas u orgánicas vulnerables.
+          Arquitectamos toda nuestra infraestructura de conexión bajo la premisa inflexible de un Zero-Trust (Confianza Cero) absoluto. El puente enlazado entre la interfaz que usted opera y nuestro núcleo perimetral de datos prescinde por completo del almacenamiento obsoleto de contraseñas, bases de datos expuestas o validaciones orgánicas vulnerables a inyecciones.
         </p>
         <p>
-          La bóveda encripta la data empleando End-to-End Encryption (E2EE). La sincronización exige la demostración probatoria de la propiedad de su clave privada sin revelarla jamás al servidor, validando la curva elíptica:
+          La bóveda criptográfica encripta todo el espectro volumétrico de la información empleando End-to-End Encryption (E2EE) de grado bancario. La sincronización paralela de la identidad exige la demostración probatoria constante de la propiedad de su llave privada sin que el servidor central llegue a conocerla jamás en ningún punto del transporte. Esto se verifica calculando matemáticamente las firmas sobre nuestra curva elíptica:
         </p>
 
         <img 
@@ -492,14 +492,14 @@ function PagePhilosophy2() {
         />
 
         <p>
-          Usted tiene soberanía total; nuestra red no tiene ninguna llave maestra de su bóveda.
+          Usted detenta una soberanía patrimonial invulnerable sobre su sesión; la totalidad de nuestra red operativa ha sido diseñada para matemáticamente impedir que exista alguna "llave maestra" capaz de vulnerar el enclave de su bóveda.
         </p>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-4 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
           3. Ingeniería Algorítmica Global
         </h3>
         <p>
-          Observar todos los ecosistemas fragmentivamente degrada el "alpha". Logramos el cruce multichain de blockchains independientes al procesar paralelizadamente en la memoria ram, unificando decimales bajo un grado de complejidad temporal estrictamente óptimo:
+          En el ecosistema institucional, intentar rastrear redes segmentadas de forma fragmentaria pulveriza la ventaja comercial. Hemos condensado un cruce multichain capaz de indexar flujos constantes de blockchains independientes al procesar enormes matrices probabilísticas en memoria RAM pura. Unificamos decibeles tarifarios y metadatos caóticos bajo un estándar de complejidad temporal logarítmica inmensamente eficiente:
         </p>
 
         <img 
@@ -509,7 +509,7 @@ function PagePhilosophy2() {
         />
 
         <p>
-          Esta eficiencia fractal, puramente escrita en Golang, es el pilar para soportar miles de request sin fisuras operativas.
+          Esta extrema eficiencia fractal de cálculos paralelos, escrita exhaustivamente y probada desde el origen en lenguaje Golang estructurado, constituye el cimiento inquebrantable que da fortaleza al sistema para digerir y devolver decenas de miles de request instantáneas, sin evidenciar ninguna fisura geométrica u operativa a simple vista.
         </p>
       </div>
 
@@ -524,30 +524,30 @@ function PagePhilosophy2() {
 function PagePhilosophy3() {
   return (
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
-      <div className="flex-1 flex flex-col gap-6 text-[15px] leading-[1.85] font-medium text-[#050505]/80">
+      <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
         <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
           4. Normativas & Compliance
         </h3>
         <p>
-          El poder institucional requiere alineación jurisdiccional innegociable. Hemos implementado barreras para mantener un blindaje legal ante el más alto nivel de escrutinio.
+          Para que el apalancamiento de los poderes institucionales transcurra limpiamente, es indispensable e inalterable conservar la total alienación del cumplimiento jurisdiccional. Hemos implantado barreras heurísticas auto-defensivas proyectadas sin reparos para sostener cualquier blindaje jurídico aun en el grado más riguroso y denso de escrutinio investigativo por autoridades financieras internacionales.
         </p>
-        <ul className="list-disc list-inside space-y-3 font-semibold text-[#050505]/90 marker:text-indigo-600">
-          <li>
-            <span className="text-black font-black uppercase text-[12px]">OFAC Sanctions & AML:</span> Chequeamos heurísticamente cada Wallet entrante, bloqueando entidades sujetas a sanción global. KYC sin sesgo con pruebas ZK.
+        <ul className="list-disc list-inside space-y-4 font-semibold text-[#050505]/95 marker:text-indigo-600">
+          <li className="leading-relaxed">
+            <span className="text-black font-black uppercase text-[12px] tracking-wider">OFAC Sanctions & AML:</span> Desplegamos motores audífugos que examinan la procedencia computacional de cada wallet entrante en tiempo real. Bloqueamos instantánea y atemporalmente a entidades conectadas a las prohibiciones globales, habilitando flujos de reconocimiento (KYC) integrados sin riesgo y blindados por la matemática de Zero Knowledge (ZK-Proofs).
           </li>
-          <li>
-            <span className="text-black font-black uppercase text-[12px]">CFTC & Geofencing WAF:</span> Rutas restringidas con exclusión territorial en milisegundos detectando VPNs e identificadores IP.
+          <li className="leading-relaxed">
+            <span className="text-black font-black uppercase text-[12px] tracking-wider">CFTC & Geofencing WAF:</span> Rutas de red constreñidas por barreras fronterizas automáticas con resoluciones de latencia inferiores a los 5 milisegundos. Ejecutamos un peritaje microscópico cortando y descartando simulaciones de mallas de VPNs impenetrables o alteración de enrutadores.
           </li>
-          <li>
-            <span className="text-black font-black uppercase text-[12px]">GDPR:</span> Control de borrado de huella en caché temporal bajo parámetros ISO 27001 por solicitud autónoma.
+          <li className="leading-relaxed">
+            <span className="text-black font-black uppercase text-[12px] tracking-wider">GDPR Universal:</span> Conferimos una absoluta independencia soberana facilitando comandos directos de demolición integral del rastro de metadatos acoplados en cualquier fragmento de caché de memoria RAM con cumplimiento regido a ISO 27001 por libre solicitud del espectador.
           </li>
         </ul>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-6 text-[#050505] border-b border-black/10 pb-2">
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-5 text-[#050505] border-b border-black/10 pb-2">
           Resolución Universal
         </h3>
         <p>
-          No venimos a adornar interfaces, venimos a empujar la barrera tecnológica de la vigilancia financiera al límite. Cada línea de código, cada modelo matemático enrutado y cada certificado normativo es un escudo forjado para sostener su dominio sobre el entorno financiero más hostil de la web.
+          Whale Alert Network no comparece al mercado con la vocación superflua de adornar interfaces visuales interactivas en aplicaciones. Comparecemos únicamente para fragmentar y redefinir cada límite límite tecnológico para la vigilancia financiera implacable institucional. Absolutamente todo bit forjado en cada capa y modelo paramétrico transmutado por nuestros servidores centrales es verdaderamente un muro balístico erguido exclusivamente para soportar su completo y absoluto dominio soberano ante el entorno financiero más hostil en toda la red global en internet de capa intermedia de blockchains.
         </p>
 
         {/* DOWNHEAD / PREMIUM FOOTER */}

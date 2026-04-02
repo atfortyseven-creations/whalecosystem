@@ -7,6 +7,7 @@ import { SettingsProvider } from "@/src/context/SettingsContext";
 import { AppProvider } from "@/components/AppContext";
 import ClientWeb3Provider from '@/components/ClientWeb3Provider';
 import { WorldProvider } from "@/src/context/WorldContext";
+import { MarketWebsocketProvider } from "@/src/context/MarketWebsocketProvider";
 
 import { SessionProvider } from "next-auth/react";
 import { ReactLenis } from 'lenis/react';
@@ -21,11 +22,13 @@ export default function Providers({ children, initialState, cookies }: { childre
                 <ClientWeb3Provider cookies={cookies || null}>
                     <SettingsProvider>
                         <LanguageProvider>
-                            <WorldProvider>
-                                <CWIProvider>
-                                    {children}
-                                </CWIProvider>
-                            </WorldProvider>
+                            <MarketWebsocketProvider>
+                                <WorldProvider>
+                                    <CWIProvider>
+                                        {children}
+                                    </CWIProvider>
+                                </WorldProvider>
+                            </MarketWebsocketProvider>
                         </LanguageProvider>
                     </SettingsProvider>
                 </ClientWeb3Provider>
