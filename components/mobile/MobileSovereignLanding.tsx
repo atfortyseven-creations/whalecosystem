@@ -87,24 +87,34 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
           background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
           background-size: 32px 32px;
           will-change: transform;
+          transform: translateZ(0);
         }
         .msv-snap-container {
           scroll-snap-type: y mandatory;
           overflow-y: scroll;
           -ms-overflow-style: none;
           scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
         }
         .msv-snap-container::-webkit-scrollbar { display: none; }
         .msv-snap-page {
           scroll-snap-align: start;
           scroll-snap-stop: always;
+          contain: layout style paint;
         }
+        @keyframes msv-fade-in-down {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
       ` }} />
       <motion.div
         aria-hidden="true"
         className="fixed -inset-[32px] msv-dot-pattern pointer-events-none z-0"
         animate={{ x: [0, -32], y: [0, -32] }}
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        style={{ willChange: 'transform' }}
       />
     </>
   );
@@ -233,6 +243,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
             className="absolute inset-0 bg-[#000000]/10 backdrop-blur-[10px]"
+            style={{ willChange: 'opacity' }}
           />
           <motion.div
             initial={{ y: '100%', scale: 0.98 }}
@@ -240,6 +251,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             exit={{ y: '100%', scale: 0.98 }}
             transition={{ type: 'spring', damping: 32, stiffness: 280 }}
             className="w-full max-w-[340px] bg-white rounded-[2.8rem] p-6 pt-10 relative z-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-black/5"
+            style={{ willChange: 'transform' }}
           >
             <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 bg-[#FAF9F6] text-[#050505]/40 rounded-full flex items-center justify-center hover:text-black hover:bg-black/5 transition-colors">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -269,6 +281,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                     onClick={() => !isConnecting && handleWalletSelect(wallet)}
                     disabled={!!isConnecting}
                     className={`w-full h-[68px] flex items-center justify-between px-5 bg-[#FAF9F6] border border-black/[0.04] rounded-[2rem] transition-all group ${busy ? 'scale-[0.98] opacity-80 border-indigo-500/20 shadow-sm' : 'hover:border-black/10 active:scale-[0.98]'} disabled:cursor-not-allowed`}
+                    style={{ willChange: 'transform' }}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-white rounded-[1rem] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center border border-black/[0.02]">
@@ -320,6 +333,7 @@ function PageHero({
           <button
             onClick={onDisconnect}
             className="w-10 h-10 bg-white border border-black/5 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+            style={{ willChange: 'transform' }}
           >
             <RefreshCw size={14} className="text-[#050505]/40" />
           </button>
@@ -333,6 +347,7 @@ function PageHero({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
+          style={{ willChange: 'transform, opacity' }}
         >
           {/* Animated Whale Logo bounded nicely */}
           <motion.div
@@ -343,6 +358,7 @@ function PageHero({
               ease: "easeInOut"
             }}
             className="w-32 h-32 mx-auto mb-8 mt-4 flex items-center justify-center relative"
+            style={{ willChange: 'transform' }}
           >
             <img 
               src="/official-whale-monochrome.png" 
@@ -364,6 +380,7 @@ function PageHero({
               <button
                 onClick={onConnect}
                 className="w-full h-[88px] bg-[#050505] text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] group"
+                style={{ willChange: 'transform' }}
               >
                 <Wallet size={20} className="text-white/40 group-active:translate-x-1 transition-transform" />
                 CONNECT WALLET
@@ -372,6 +389,7 @@ function PageHero({
               <button
                 onClick={onScan}
                 className="w-full h-[88px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[12px] flex items-center justify-between px-10 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
+                style={{ willChange: 'transform' }}
               >
                 <div className="grid grid-cols-[auto_1fr] gap-6 items-center">
                   <QrCode size={22} className="text-[#050505]" />
@@ -400,6 +418,7 @@ function PageHero({
         className="flex flex-col items-center gap-1 z-10 opacity-30"
         animate={{ y: [0, 4, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ willChange: 'transform' }}
       >
         <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">EXPLORAR</span>
         <ChevronDown size={14} className="text-[#050505]" />
@@ -427,6 +446,7 @@ function PagePhilosophy1() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         className="mb-10 w-full flex flex-col items-center"
+        style={{ willChange: 'transform, opacity' }}
       >
         <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#050505]/40 mb-2">Documento de Arquitectura</span>
         <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505] text-center border-b-4 border-[#050505] pb-2 inline-block">
@@ -463,7 +483,7 @@ function PagePhilosophy1() {
         />
       </div>
 
-      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={{ willChange: 'transform' }}>
         <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">SIGUIENTE CAPÍTULO</span>
         <ChevronDown size={14} className="text-[#050505]" />
       </motion.div>
@@ -513,7 +533,7 @@ function PagePhilosophy2() {
         </p>
       </div>
 
-      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={{ willChange: 'transform' }}>
         <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">SIGUIENTE CAPÍTULO</span>
         <ChevronDown size={14} className="text-[#050505]" />
       </motion.div>
@@ -636,7 +656,7 @@ function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   return (
     <div className="fixed inset-0 bg-[#FAF9F6] z-[10000] flex flex-col p-8 overflow-hidden">
       <header className="flex items-center justify-between mb-12">
-        <button onClick={onBack} className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-black/5 shadow-sm active:scale-75 transition-transform">
+        <button onClick={onBack} className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-black/5 shadow-sm active:scale-75 transition-transform" style={{ willChange: 'transform' }}>
           <MoveRight size={18} className="rotate-180" />
         </button>
         <div className="flex items-center gap-3">
@@ -718,11 +738,11 @@ export function MobileSovereignLanding() {
   }
 
   return (
-    <div className="w-full h-[100dvh] bg-[#FAF9F6] overflow-hidden relative">
+    <div className="w-full h-[100dvh] bg-[#FAF9F6] overflow-hidden relative" style={{ contain: 'strict' }}>
       <AnimatedPattern />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
-      {/* 3-page snap container */}
+      {/* 4-page snap container */}
       <div className="msv-snap-container w-full h-full">
 
         {/* PAGE 1 — Original Hero */}

@@ -1,39 +1,38 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Activity, Lock, ChevronRight, Twitter, Github } from "lucide-react";
-import Link from "next/link";
+import { ShieldCheck, Activity, Lock } from "lucide-react";
 import Image from 'next/image';
-import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useUIStore } from "@/lib/store/ui-store";
-import AntiPhishing from "@/components/security/AntiPhishing";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
-import { LegendaryCursor } from "@/components/landing/LegendaryCursor";
-import { DownheadSection } from "@/components/landing/DownheadSection";
-import { Footer } from "@/components/layout/Footer";
 import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
-import { CryptoCheckoutModal } from "@/components/news/CryptoCheckoutModal";
+import { Footer } from "@/components/layout/Footer";
+import dynamic from 'next/dynamic';
 
-// Letta-inspired Marquee
-const MarqueeBanner = () => {
-  return (
-    <div className="w-full overflow-hidden bg-[#0a0a0a] py-6 border-y border-white/5 flex relative z-20 shadow-2xl">
-      <motion.div
-        className="flex whitespace-nowrap"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
-      >
-        <span className="font-mono text-xl md:text-3xl text-white/30 tracking-[0.3em] font-bold uppercase">
-          WHALE ALERT <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span> WHALE ALERT <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span>
-        </span>
-      </motion.div>
-    </div>
-  );
-};
+const DynamicLegendaryCursor    = dynamic(() => import("@/components/landing/LegendaryCursor").then(m => m.LegendaryCursor),    { ssr: false });
+const DynamicAntiPhishing       = dynamic(() => import("@/components/security/AntiPhishing"),                                    { ssr: false });
+const DynamicCryptoCheckoutModal= dynamic(() => import("@/components/news/CryptoCheckoutModal").then(m => m.CryptoCheckoutModal),{ ssr: false });
+const DynamicDownheadSection    = dynamic(() => import("@/components/landing/DownheadSection").then(m => m.DownheadSection),    { ssr: false });
 
-// Letta-inspired Strict Terminal Window
+// ─── Letta-inspired Marquee ───────────────────────────────────────────────────
+const MarqueeBanner = () => (
+  <div className="w-full overflow-hidden bg-[#0a0a0a] py-6 border-y border-white/5 flex relative z-20 shadow-2xl">
+    <motion.div
+      className="flex whitespace-nowrap"
+      animate={{ x: ["0%", "-50%"] }}
+      transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
+      style={{ willChange: 'transform' }}
+    >
+      <span className="font-mono text-xl md:text-3xl text-white/30 tracking-[0.3em] font-bold uppercase">
+        WHALE ALERT <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span> WHALE ALERT <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span>
+      </span>
+    </motion.div>
+  </div>
+);
+
+// ─── Terminal Window ──────────────────────────────────────────────────────────
 const TerminalWindow = ({ title, children, rightIcon = ">>>", className = "" }: any) => (
   <div className={`bg-[#0a0a0a] border border-white/10 overflow-hidden ${className}`}>
      <div className="bg-[#111111] border-b border-white/5 px-4 py-2 flex justify-between items-center font-aztec-mono text-[9px] text-white/50 uppercase tracking-[0.3em]">
@@ -49,164 +48,128 @@ const TerminalWindow = ({ title, children, rightIcon = ">>>", className = "" }: 
   </div>
 );
 
-// Sovereign Web3 Features
-const Web3Features = () => {
-    return (
-        <div className="w-full bg-[#0d0d0d] pt-24 pb-32">
-            <div className="max-w-7xl mx-auto px-6">
-                
-                <h2 className="text-center font-aztec-body text-2xl md:text-4xl text-white/80 font-light tracking-tight mb-20">
-                    The Ultimate Sovereign Financial Intelligence
-                </h2>
-
-                <div className="grid grid-cols-1 gap-8">
-                    <TerminalWindow title="WHALE FLOW DETECTOR" className="min-h-[400px]">
-                        <div className="flex flex-col md:flex-row h-full">
-                            <div className="p-12 md:p-16 flex-1 flex flex-col justify-center">
-                                <h3 className="font-aztec-body text-3xl md:text-4xl text-white mb-6">
-                                    Real-Time Whale Flow (On-Chain)
-                                </h3>
-                                <p className="font-aztec-body text-lg text-white/50 leading-relaxed max-w-md">
-                                    Our system natively ingests Multi-Layer Capital Flows directly from EVM networks (Polygon, Ethereum, BSC, Base) and Hyperliquid L1. No simulations. Every block hash is verified.
-                                </p>
-                            </div>
-                            <div className="flex-1 bg-gradient-to-br from-[var(--aztec-orchid)]/30 to-[var(--aztec-ink)] relative overflow-hidden hidden md:block border-l border-white/10">
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] bg-[#050505] border border-white/10 shadow-2xl rounded-lg p-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-8 h-8 rounded-full bg-[var(--aztec-chartreuse)] flex-shrink-0" />
-                                        <div className="flex-1">
-                                            <div className="text-white text-sm mb-1">Live L1 Transactions</div>
-                                            <div className="text-white/40 text-xs mb-4">Capturing large algorithmic movements...</div>
-                                            <div className="space-y-3">
-                                                <div className="flex justify-between items-center bg-white/5 p-2 rounded text-xs text-white/70">
-                                                    <span>Tracing Hyperliquid Settlement...</span>
-                                                    <span>Verified</span>
-                                                </div>
+// ─── Web3 Features ────────────────────────────────────────────────────────────
+const Web3Features = () => (
+    <div className="w-full bg-[#0d0d0d] pt-24 pb-32" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
+        <div className="max-w-7xl mx-auto px-6">
+            <h2 className="text-center font-aztec-body text-2xl md:text-4xl text-white/80 font-light tracking-tight mb-20">
+                The Ultimate Sovereign Financial Intelligence
+            </h2>
+            <div className="grid grid-cols-1 gap-8">
+                <TerminalWindow title="WHALE FLOW DETECTOR" className="min-h-[400px]">
+                    <div className="flex flex-col md:flex-row h-full">
+                        <div className="p-12 md:p-16 flex-1 flex flex-col justify-center">
+                            <h3 className="font-aztec-body text-3xl md:text-4xl text-white mb-6">
+                                Real-Time Whale Flow (On-Chain)
+                            </h3>
+                            <p className="font-aztec-body text-lg text-white/50 leading-relaxed max-w-md">
+                                Our system natively ingests Multi-Layer Capital Flows directly from EVM networks (Polygon, Ethereum, BSC, Base) and Hyperliquid L1. No simulations. Every block hash is verified.
+                            </p>
+                        </div>
+                        <div className="flex-1 bg-gradient-to-br from-[var(--aztec-orchid)]/30 to-[var(--aztec-ink)] relative overflow-hidden hidden md:block border-l border-white/10">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] bg-[#050505] border border-white/10 shadow-2xl rounded-lg p-6">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-[var(--aztec-chartreuse)] flex-shrink-0" />
+                                    <div className="flex-1">
+                                        <div className="text-white text-sm mb-1">Live L1 Transactions</div>
+                                        <div className="text-white/40 text-xs mb-4">Capturing large algorithmic movements...</div>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center bg-white/5 p-2 rounded text-xs text-white/70">
+                                                <span>Tracing Hyperliquid Settlement...</span>
+                                                <span>Verified</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </TerminalWindow>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                         <TerminalWindow title="CLOB ORDERBOOK & DYNAMIC MARKETS" className="min-h-[300px]">
-                            <div className="flex flex-col h-full bg-[#0a0a0a]">
-                                <div className="p-8 pb-0">
-                                    <h3 className="font-aztec-body text-xl text-white mb-3">Live Order Book & Events</h3>
-                                    <p className="text-white/50 text-sm leading-relaxed mb-6">
-                                        Aggregating Polymarket Gamma API events seamlessly. Users interact with the active markets instantly via EIP-712 signatures.
-                                    </p>
-                                </div>
-                                <div className="p-8 mt-auto flex gap-4">
-                                     <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-[#00dda8]">CLOB L1 Tracker</div>
-                                     <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/40">100% Real Time</div>
-                                </div>
-                            </div>
-                         </TerminalWindow>
-                         
-                         <TerminalWindow title="HYPERLIQUID COPY TRADING & PORTFOLIO" className="min-h-[300px]">
-                            <div className="flex flex-col h-full bg-[#0a0a0a] p-8">
-                                <div className="flex-1 font-aztec-mono text-xs text-indigo-400 bg-black border border-white/5 p-4 rounded mb-6 overflow-hidden">
-                                     {`{ "intent": "COPY", "agent": "0xWhale",\n  "status": "AWAITING_ECDSA",\n  "capital": "$10,000 USDC" }`}
-                                </div>
-                                <div>
-                                    <h3 className="font-aztec-body text-xl text-white mb-3">Real Portfolio Management</h3>
-                                    <p className="text-white/50 text-sm leading-relaxed">
-                                        Experience genuine automated copy-trading flows routed through Hyperliquid's Layer 1 nodes instantly.
-                                    </p>
-                                </div>
-                            </div>
-                         </TerminalWindow>
                     </div>
+                </TerminalWindow>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <TerminalWindow title="CLOB ORDERBOOK & DYNAMIC MARKETS" className="min-h-[300px]">
+                        <div className="flex flex-col h-full bg-[#0a0a0a]">
+                            <div className="p-8 pb-0">
+                                <h3 className="font-aztec-body text-xl text-white mb-3">Live Order Book & Events</h3>
+                                <p className="text-white/50 text-sm leading-relaxed mb-6">
+                                    Aggregating Polymarket Gamma API events seamlessly. Users interact with the active markets instantly via EIP-712 signatures.
+                                </p>
+                            </div>
+                            <div className="p-8 mt-auto flex gap-4">
+                                 <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-[#00dda8]">CLOB L1 Tracker</div>
+                                 <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/40">100% Real Time</div>
+                            </div>
+                        </div>
+                     </TerminalWindow>
+                     
+                     <TerminalWindow title="HYPERLIQUID COPY TRADING & PORTFOLIO" className="min-h-[300px]">
+                        <div className="flex flex-col h-full bg-[#0a0a0a] p-8">
+                            <div className="flex-1 font-aztec-mono text-xs text-indigo-400 bg-black border border-white/5 p-4 rounded mb-6 overflow-hidden">
+                                 {`{ "intent": "COPY", "agent": "0xWhale",\n  "status": "AWAITING_ECDSA",\n  "capital": "$10,000 USDC" }`}
+                            </div>
+                            <div>
+                                <h3 className="font-aztec-body text-xl text-white mb-3">Real Portfolio Management</h3>
+                                <p className="text-white/50 text-sm leading-relaxed">
+                                    Experience genuine automated copy-trading flows routed through Hyperliquid's Layer 1 nodes instantly.
+                                </p>
+                            </div>
+                        </div>
+                     </TerminalWindow>
                 </div>
             </div>
         </div>
-    )
-}
+    </div>
+);
 
-// Letta's Light-Theme "Accessible Anywhere" Section
-const CrossPlatformAccess = () => {
-    return (
-        <div className="w-full bg-[#E8E8E8] py-32 px-6">
-            <div className="max-w-4xl mx-auto">
-                <h3 className="text-center font-aztec-body text-2xl text-[#111] mb-12">
-                    Your personalized agent, accessible from anywhere
-                </h3>
-                
-                <div className="flex flex-col bg-transparent rounded-xl border border-black/10 overflow-hidden shadow-sm">
-                    <div className="flex items-center justify-between p-6 bg-[#E8E8E8] border-b border-black/10 hover:bg-[#F2F2F2] transition-colors">
-                        <div className="flex items-center gap-6">
-                            <div className="flex -space-x-2">
-                                <div className="w-12 h-12 rounded bg-green-500 shadow-md flex items-center justify-center text-white"><Activity size={20} /></div>
-                                <div className="w-12 h-12 rounded bg-[#111] shadow-md flex items-center justify-center text-white"><ShieldCheck size={20} /></div>
-                                <div className="w-12 h-12 rounded bg-blue-500 shadow-md flex items-center justify-center text-white"><Lock size={20} /></div>
-                            </div>
-                            <span className="font-aztec-body text-lg text-black/80 font-medium">Install the desktop app</span>
+// ─── Cross Platform Section ───────────────────────────────────────────────────
+const CrossPlatformAccess = () => (
+    <div className="w-full bg-[#E8E8E8] py-32 px-6" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+        <div className="max-w-4xl mx-auto">
+            <h3 className="text-center font-aztec-body text-2xl text-[#111] mb-12">
+                Your personalized agent, accessible from anywhere
+            </h3>
+            <div className="flex flex-col bg-transparent rounded-xl border border-black/10 overflow-hidden shadow-sm">
+                <div className="flex items-center justify-between p-6 bg-[#E8E8E8] border-b border-black/10 hover:bg-[#F2F2F2] transition-colors">
+                    <div className="flex items-center gap-6">
+                        <div className="flex -space-x-2">
+                            <div className="w-12 h-12 rounded bg-green-500 shadow-md flex items-center justify-center text-white"><Activity size={20} /></div>
+                            <div className="w-12 h-12 rounded bg-[#111] shadow-md flex items-center justify-center text-white"><ShieldCheck size={20} /></div>
+                            <div className="w-12 h-12 rounded bg-blue-500 shadow-md flex items-center justify-center text-white"><Lock size={20} /></div>
                         </div>
-                        <button className="px-4 py-2 font-aztec-body text-xs text-black border border-black/20 rounded hover:bg-black hover:text-white transition-colors">
-                            Enter the Terminal
-                        </button>
+                        <span className="font-aztec-body text-lg text-black/80 font-medium">Install the desktop app</span>
                     </div>
-                    
-                    <div className="flex items-center justify-between p-6 bg-[#E8E8E8] border-b border-black/10 hover:bg-[#F2F2F2] transition-colors">
-                        <div className="flex items-center gap-6">
-                            <div className="w-24 h-16 rounded overflow-hidden shadow-md bg-black relative p-2 flex items-center">
-                                <span className="font-mono text-[8px] text-[var(--aztec-chartreuse)]">npm run start</span>
-                            </div>
-                            <span className="font-aztec-body text-lg text-black/80 font-medium">Use in the terminal</span>
+                    <button className="px-4 py-2 font-aztec-body text-xs text-black border border-black/20 rounded hover:bg-black hover:text-white transition-colors">
+                        Enter the Terminal
+                    </button>
+                </div>
+                <div className="flex items-center justify-between p-6 bg-[#E8E8E8] border-b border-black/10 hover:bg-[#F2F2F2] transition-colors">
+                    <div className="flex items-center gap-6">
+                        <div className="w-24 h-16 rounded overflow-hidden shadow-md bg-black relative p-2 flex items-center">
+                            <span className="font-mono text-[8px] text-[var(--aztec-chartreuse)]">npm run start</span>
                         </div>
-                        <button className="px-4 py-2 font-aztec-body text-xs text-black border border-black/20 rounded hover:bg-black hover:text-white transition-colors">
-                            Install with npm
-                        </button>
+                        <span className="font-aztec-body text-lg text-black/80 font-medium">Use in the terminal</span>
                     </div>
-
-                    <div className="flex items-center justify-between p-6 bg-[#E8E8E8] hover:bg-[#F2F2F2] transition-colors">
-                        <div className="flex items-center gap-6">
-                            <div className="w-24 h-16 rounded overflow-hidden shadow-md bg-gradient-to-r from-orange-600 to-red-600 relative p-2 flex items-center justify-center">
-                                <span className="font-mono text-[10px] text-white">SDK_CORE</span>
-                            </div>
-                            <span className="font-aztec-body text-lg text-black/80 font-medium">Build with the SDK</span>
+                    <button className="px-4 py-2 font-aztec-body text-xs text-black border border-black/20 rounded hover:bg-black hover:text-white transition-colors">
+                        Install with npm
+                    </button>
+                </div>
+                <div className="flex items-center justify-between p-6 bg-[#E8E8E8] hover:bg-[#F2F2F2] transition-colors">
+                    <div className="flex items-center gap-6">
+                        <div className="w-24 h-16 rounded overflow-hidden shadow-md bg-gradient-to-r from-orange-600 to-red-600 relative p-2 flex items-center justify-center">
+                            <span className="font-mono text-[10px] text-white">SDK_CORE</span>
                         </div>
-                        <button className="px-4 py-2 font-aztec-body text-xs text-black border border-black/20 rounded hover:bg-black hover:text-white transition-colors">
-                            Read the docs
-                        </button>
+                        <span className="font-aztec-body text-lg text-black/80 font-medium">Build with the SDK</span>
                     </div>
+                    <button className="px-4 py-2 font-aztec-body text-xs text-black border border-black/20 rounded hover:bg-black hover:text-white transition-colors">
+                        Read the docs
+                    </button>
                 </div>
             </div>
         </div>
-    )
-}
+    </div>
+);
 
-// Letta Downhead Hover Component
-const LettaHoverPixelLogo = () => {
-    return (
-        <div className="group flex items-center gap-4 cursor-pointer">
-            {/* The Icon: switches to alien on hover */}
-            <div className="w-16 h-16 relative bg-white/5 rounded-2xl shadow-xl border border-white/10 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:bg-[#111111] group-hover:border-[#4B55E5]/50 group-hover:shadow-[0_0_15px_rgba(75,85,229,0.3)]">
-                 <CorporateWhaleLogo className="w-10 h-10 transition-opacity duration-300 group-hover:opacity-0" />
-                 <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-3xl">
-                     👾
-                 </span>
-            </div>
-            {/* The Text: switches to blue pixel font on hover */}
-            <div className="font-aztec-h1 text-6xl text-white transition-all duration-300">
-                 <span className="inline-block group-hover:hidden">
-                    Whale Alert <span className="italic text-[var(--aztec-orchid)]">Network</span>
-                 </span>
-                 <span className="hidden group-hover:inline-block font-mono text-[#4B55E5] tracking-widest uppercase blur-[0.2px] scale-95" style={{ textShadow: "0px 0px 4px rgba(75,85,229,0.8)" }}>
-                    WHALE ALERT CODE
-                 </span>
-            </div>
-        </div>
-    );
-};
-
-const CustomCursor = () => {
-  return null; // Replaced by LegendaryCursor below
-};
-
+// ─── Main Landing ─────────────────────────────────────────────────────────────
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isConnected } = useSovereignAccount();
@@ -220,30 +183,28 @@ export function WhaleAlertLanding() {
     else openConnectModal();
   };
 
-  // Cursor tracking for backend/frontend magical hero glow
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // GPU-composited cursor glow — useRef avoids state re-renders on every move
+  const glowRef = useRef<HTMLDivElement>(null);
   const handleMouseMove = (e: React.MouseEvent) => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (rect) {
-          setMousePosition({
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
-          });
-      }
+    if (!glowRef.current) return;
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      glowRef.current.style.background = `radial-gradient(800px circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(147, 51, 234, 0.15), transparent 40%)`;
+    }
   };
 
   return (
-    <div 
-        ref={containerRef} 
+    <div
+        ref={containerRef}
         onMouseMove={handleMouseMove}
         className="relative w-full overflow-x-hidden bg-[#050505] selection:bg-[var(--aztec-orchid)]/30 cursor-auto"
     >
-      <LegendaryCursor />
-      <AntiPhishing />
+      <DynamicLegendaryCursor />
+      <DynamicAntiPhishing />
       
-      {/* ── PHASE 1: AZTEC HERO (Mandatory Preservation, Restored Space Background & Glow) ── */}
+      {/* ── PHASE 1: AZTEC HERO ── */}
       <section className="relative min-h-screen pt-32 px-6 overflow-hidden flex flex-col items-center justify-center">
-        {/* Restored Cosmic Logan Voss Background */}
+        {/* Background image — only desktop */}
         <div className="absolute inset-0 z-0 hidden md:block">
            <Image 
              src="/models/update/logan-voss-VTWMWadBMvM-unsplash.jpg" 
@@ -254,25 +215,21 @@ export function WhaleAlertLanding() {
            />
         </div>
 
-        {/* Letta Interactive Glow following Mouse */}
+        {/* Mouse glow — GPU layer, written imperatively to avoid re-renders */}
         <div 
-             className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300 opacity-60 mix-blend-screen"
-             style={{
-                 background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(147, 51, 234, 0.15), transparent 40%)`
-             }}
+             ref={glowRef}
+             className="absolute inset-0 z-0 pointer-events-none opacity-60 mix-blend-screen will-change-[background]"
         />
 
-        {/* Letta-style floating UI window super-imposed on the hero */}
+        {/* Letta-style floating UI window — desktop only */}
         <div className="absolute bottom-[-20%] md:bottom-[-40%] left-1/2 -translate-x-1/2 w-full max-w-5xl z-20 pointer-events-none opacity-50 blur-[2px] scale-105 hidden lg:block transition-transform duration-700 hover:scale-100 hover:blur-none">
-             <div className="w-full aspect-[16/9] rounded-t-3xl border-t border-x border-white/20 shadow-[0_0_100px_rgba(0,0,0,0.8)] bg-[#050505] overflow-hidden flex transform-gpu transition-all duration-300"
-                  style={{ transform: `perspective(1000px) rotateX(10deg) translateY(${mousePosition.y * 0.02}px)` }}>
+             <div className="w-full aspect-[16/9] rounded-t-3xl border-t border-x border-white/20 shadow-[0_0_100px_rgba(0,0,0,0.8)] bg-[#050505] overflow-hidden flex transform-gpu transition-all duration-300">
                  <div className="w-1/4 h-full border-r border-white/10 p-6 flex flex-col gap-4">
                      <div className="h-4 w-24 bg-white/20 rounded" />
                      <div className="h-4 w-32 bg-white/10 rounded" />
                      <div className="h-4 w-20 bg-white/10 rounded" />
                  </div>
                  <div className="flex-1 h-full p-12 relative overflow-hidden">
-                     {/* Floating console elements mimicking Letta's blurred terminal interface */}
                      <div className="w-3/4 h-32 bg-white/5 rounded-xl ml-auto mb-8 border border-white/5" />
                      <div className="w-1/2 h-20 bg-[var(--aztec-chartreuse)]/10 rounded-xl" />
                  </div>
@@ -283,9 +240,9 @@ export function WhaleAlertLanding() {
           initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
           transition={{ duration: 2, ease: [0.23, 1, 0.32, 1] }}
-          className="text-center relative z-10 max-w-7xl mx-auto will-change-transform"
+          className="text-center relative z-10 max-w-7xl mx-auto"
+          style={{ willChange: 'transform, opacity, filter' }}
         >
-          {/* Main Landing Whale Logo */}
           <div className="w-[min(90vw,700px)] h-[min(50vw,400px)] mx-auto mb-12 relative flex items-center justify-center group">
                <CorporateWhaleLogo className="w-64 h-64 md:w-80 md:h-80 group-hover:scale-110 transition-transform duration-[2s]" />
           </div>
@@ -294,7 +251,7 @@ export function WhaleAlertLanding() {
             Whale Alert Network
           </h1>
           
-          <p className="font-aztec-body text-xl md:text-3xl font-light text-white/70 max-w-4xl mx-auto leading-relaxed mb-12 px-4 shadow-black/50 text-shadow-sm">
+          <p className="font-aztec-body text-xl md:text-3xl font-light text-white/70 max-w-4xl mx-auto leading-relaxed mb-12 px-4">
              The ultimate sovereign financial intelligence platform.
           </p>
 
@@ -304,6 +261,7 @@ export function WhaleAlertLanding() {
               whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,255,255,0.1)" }}
               whileTap={{ scale: 0.98 }}
               className="px-8 py-4 bg-white text-black font-aztec-body font-medium text-sm rounded shadow-xl hover:bg-[#e0e0e0] transition-all"
+              style={{ willChange: 'transform' }}
             >
               Enter the Terminal
             </motion.button>
@@ -311,17 +269,16 @@ export function WhaleAlertLanding() {
         </motion.div>
       </section>
       
-      <DownheadSection />
+      <DynamicDownheadSection />
 
       <section className="relative z-10">
         <MarqueeBanner />
         <Web3Features />
         <CrossPlatformAccess />
         
-        {/* Deep Premium Checkout & Subs Footer */}
-        <CryptoCheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
+        <DynamicCryptoCheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
         
-        <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner">
+        <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
             <h2 className="font-aztec-body text-4xl font-light mb-4">Sovereign Protocol Matrix</h2>
             <p className="font-aztec-body text-white/50 text-sm mb-12 max-w-md mx-auto">
                Institutional-grade Web3 subscription algorithm (49 EUR) backed by smart contracts and absolute cryptographic neutrality. Connect your wallet to access the elite terminal.

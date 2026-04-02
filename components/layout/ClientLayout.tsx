@@ -6,17 +6,36 @@ import { useAccount, useAccountEffect } from 'wagmi';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { DropdownNav } from '@/components/site/DropdownNav';
 import { SiteNavigationPill } from '@/components/shared/SiteNavigationPill';
-import { HighHzWallpaper } from '@/components/landing/HighHzWallpaper';
 import { SystemsUtilityHeader } from '@/components/shared/SystemsUtilityHeader';
 import { ConnectWalletModal } from '@/components/shared/ConnectWalletModal';
 import { GlobalTokenTicker } from '@/components/shared/GlobalTokenTicker';
-import { UtilityPanels, BillionWhaleNotification } from '@/components/shared/UtilityPanels';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
 import { LinkedGate } from '@/components/shared/LinkedGate';
-import { UniversalEliteWallpaper } from '@/components/shared/UniversalEliteWallpaper';
+import dynamic from 'next/dynamic';
+
+// ─── Lazy GPU-heavy components ──────────────────────────────────────────
+// Canvas-based backgrounds run off the main thread on supporting browsers.
+// Dynamic-importing them prevents them from blocking initial hydration.
+const UniversalEliteWallpaper = dynamic(
+  () => import('@/components/shared/UniversalEliteWallpaper').then(m => m.UniversalEliteWallpaper),
+  { ssr: false }
+);
+const HighHzWallpaper = dynamic(
+  () => import('@/components/landing/HighHzWallpaper').then(m => m.HighHzWallpaper),
+  { ssr: false }
+);
+const UtilityPanels = dynamic(
+  () => import('@/components/shared/UtilityPanels').then(m => m.UtilityPanels),
+  { ssr: false }
+);
+const BillionWhaleNotification = dynamic(
+  () => import('@/components/shared/UtilityPanels').then(m => m.BillionWhaleNotification),
+  { ssr: false }
+);
+
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();

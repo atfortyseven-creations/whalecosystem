@@ -13,13 +13,19 @@ import { Toaster } from 'sonner'
 import { CookieProvider } from "@/components/privacy/CookieContext";
 import { CookieConsent } from "@/components/privacy/CookieConsent";
 import { GoogleTagManager } from "@/components/privacy/GoogleTagManager";
-import { OfflineDetector } from "@/components/ui/OfflineScreen";
-import { ClientFortress } from "@/components/ui/ClientFortress";
 import { initializeBackgroundServices } from "@/lib/services/init";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
-import { AztecNoise } from "@/components/ui/AztecNoise";
 import { ReactNode } from "react";
 import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
+import dynamic from 'next/dynamic';
+
+// ─── Dynamic (client-only) decoration/utility components ────────────────────
+// Loading them lazily removes them from the SSR critical path — zero
+// added latency, no hydration block on the main thread.
+const AztecNoise      = dynamic(() => import("@/components/ui/AztecNoise").then(m => m.AztecNoise),           { ssr: false });
+const ClientFortress  = dynamic(() => import("@/components/ui/ClientFortress").then(m => m.ClientFortress),   { ssr: false });
+const OfflineDetector = dynamic(() => import("@/components/ui/OfflineScreen").then(m => m.OfflineDetector),  { ssr: false });
+
 
 const inter = Inter({ subsets: ['latin'] })
 
