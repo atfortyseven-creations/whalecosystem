@@ -88,7 +88,8 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
         >
           <motion.div
             initial={{ scale: 0.98, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.98 }}
-            className="w-full max-w-[480px] bg-[#0A0A0A] text-[#E0E0E0] relative shadow-2xl border border-white/10"
+            className="w-full max-w-[480px] bg-[#0A0A0A] relative shadow-2xl border border-white/10"
+            style={{ color: '#E0E0E0' }}
           >
             {/* HEADER */}
             <div className="flex justify-between items-center bg-[#111] px-6 py-4 border-b border-white/10">
