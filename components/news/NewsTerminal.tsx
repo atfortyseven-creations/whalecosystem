@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Download, Mail, Moon, Sun, X, ChevronDown, ChevronUp, Calendar, Lock } from 'lucide-react';
+import { Download, Mail, Moon, Sun, X, ChevronDown, ChevronUp, Calendar, Lock, ChevronLeft } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import { useAccount } from 'wagmi';
 import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
@@ -193,26 +193,41 @@ export function NewsTerminal() {
   // ── Render principal ─────────────────────────────────────────────────────
   return (
     <>
-      {/* Root container — full bg override for dark/light fix */}
+      {/* Root container — GPU compositing layer to eliminate paint on scroll */}
       <div
-        style={{ background: BG, color: TEXT, minHeight: panelH }}
+        style={{
+          background: BG,
+          color: TEXT,
+          minHeight: panelH,
+          // Force Chromium/WebKit to promote to a GPU compositing layer
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+          // Disable elastic overscroll bounce inside container (iOS safe-area)
+          overscrollBehavior: 'none',
+        }}
         className="w-full relative"
       >
-        <div style={{ height: panelH, overflow: 'hidden' }} className="flex w-full">
+        <div
+          style={{ height: panelH, overflow: 'hidden' }}
+          className="flex w-full"
+        >
 
           {/* ═══════════════════════════════════════════════════════════════
               PANEL IZQUIERDO — Lista + Archivo
               ═══════════════════════════════════════════════════════════ */}
           <div
             style={{
-              width: '28%',
-              minWidth: 240,
               borderRight: `1px solid ${DIV}`,
               background: BG,
               overflowY: 'auto',
               height: '100%',
+              WebkitOverflowScrolling: 'touch',
+              willChange: 'transform',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden',
             }}
-            className="flex flex-col shrink-0"
+            className={`flex-col shrink-0 w-full md:w-[28%] md:min-w-[320px] lg:min-w-[360px] ${selected ? 'hidden md:flex' : 'flex'}`}
           >
             {/* Cabecera sticky */}
             <div
@@ -288,8 +303,21 @@ export function NewsTerminal() {
               {articles.slice(0, 50).map(art => {
                 const isActive = selected?.id === art.id;
                 return (
-                  <button key={art.id} onClick={() => setSelected(art)} className="text-left w-full px-6 py-5 border-b transition-all relative group"
-                    style={{ borderColor: DIV, background: isActive ? ACTIVE_BG : 'transparent', color: TEXT }}>
+                  <button
+                    key={art.id}
+                    onClick={() => setSelected(art)}
+                    className="text-left w-full px-6 py-5 border-b relative group"
+                    style={{
+                      borderColor: DIV,
+                      background: isActive ? ACTIVE_BG : 'transparent',
+                      color: TEXT,
+                      // GPU promote each row: eliminates scroll jank on 120/240Hz iOS
+                      WebkitTapHighlightColor: 'transparent',
+                      touchAction: 'manipulation',
+                      WebkitFontSmoothing: 'antialiased',
+                      transition: 'background 0.1s ease',
+                    }}
+                  >
                     {isActive && (
                       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: TEXT }} />
                     )}
@@ -310,7 +338,19 @@ export function NewsTerminal() {
           {/* ═══════════════════════════════════════════════════════════════
               PANEL DERECHO — Lectura institucional
               ═══════════════════════════════════════════════════════════ */}
-          <div ref={rightRef} style={{ flex: 1, height: '100%', overflowY: 'auto', background: BG }}>
+          <div 
+             ref={rightRef} 
+             style={{ 
+               flex: 1, 
+               height: '100%', 
+               overflowY: 'auto', 
+               background: BG,
+               WebkitOverflowScrolling: 'touch',
+               willChange: 'transform',
+               transform: 'translateZ(0)',
+             }}
+             className={`${selected ? 'flex' : 'hidden md:flex'} flex-col w-full md:w-auto relative`}
+          >
 
             <AnimatePresence mode="wait">
               {selected && (
@@ -319,11 +359,20 @@ export function NewsTerminal() {
                   transition={{ duration: 0.18 }}>
 
                   {/* ── Barra de controles ─────────────────────────────── */}
-                  <div className="flex items-center justify-between px-10 xl:px-16 py-5 border-b"
+                  <div className="flex items-center justify-between px-6 md:px-10 xl:px-16 py-5 border-b"
                        style={{ borderColor: DIV }}>
-                    <span className="font-mono text-[8px] uppercase tracking-[0.3em]" style={{ color: MUTED }}>
-                      {formatDate(selected.date)}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setSelected(null)}
+                        className="md:hidden flex items-center justify-center p-1 -ml-2 rounded-full border transition-all"
+                        style={{ borderColor: DIV, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}
+                      >
+                         <ChevronLeft size={16} color={MUTED} />
+                      </button>
+                      <span className="font-mono text-[8px] uppercase tracking-[0.3em] font-medium" style={{ color: MUTED }}>
+                        {formatDate(selected.date)}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-2">
                       {/* EUR conversion */}
                       {ethEur && (
@@ -353,27 +402,40 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* IMAGEN HERO — APARECE ARRIBA DEL TITULO EN FULL BLEED */}
+                  {/* IMAGEN HERO — GPU composited full-bleed hero */}
                   <div className="w-full pb-8">
                     <div
                       className="w-full overflow-hidden bg-[#080808]"
                       style={{
-                        height: `clamp(320px, ${Math.round(480 * fontSize)}px, 720px)`,
+                        // Mobile: smaller hero to preserve scroll perf on 6" screens
+                        height: `clamp(200px, 45vw, ${Math.round(480 * fontSize)}px)`,
+                        // Hard-composite to GPU layer — prevents texture upload stalls on A-series chips
+                        willChange: 'transform',
+                        transform: 'translateZ(0)',
+                        backfaceVisibility: 'hidden',
                       }}
                     >
                       <motion.img
-                        initial={{ opacity: 0, filter: 'blur(10px)' }}
-                        animate={{ opacity: 1, filter: 'blur(0px)' }}
-                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        key={selected.id}
+                        initial={{ opacity: 0, scale: 1.04 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
                         ref={imgRef}
                         src={getArticleImage(selected)}
                         alt={selected.title}
-                        className="w-full h-full object-cover grayscale transition-all duration-700"
+                        className="w-full h-full object-cover grayscale"
                         loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
+                        style={{
+                          // Tell engine this image will animate — pre-allocate VRAM tile
+                          willChange: 'opacity, transform',
+                          transform: 'translateZ(0)',
+                        }}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           if (target.dataset.errorHandled) return;
-                          target.dataset.errorHandled = "true";
+                          target.dataset.errorHandled = 'true';
                           let hash = 0;
                           for (let i = 0; i < selected.id.length; i++) {
                             hash = selected.id.charCodeAt(i) + ((hash << 5) - hash);
@@ -386,7 +448,7 @@ export function NewsTerminal() {
                   </div>
 
                   {/* ── Contenido del artículo: Fuente + Título ──────────────── */}
-                  <div className="px-10 xl:px-16 pt-10 pb-4">
+                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-4">
                     {/* FUENTE + ETIQUETA */}
                     <p className="font-mono text-[8px] uppercase tracking-[0.4em] mb-4" style={{ color: MUTED }}>
                       {selected.source} · Análisis Institucional
@@ -406,7 +468,7 @@ export function NewsTerminal() {
                   </div>
 
                   {/* ANÁLISIS PRINCIPAL */}
-                  <div className="px-10 xl:px-16 pt-10 pb-6 max-w-[900px]">
+                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-6 max-w-[900px]">
                       {!hasAccess ? (
                         <div className="relative">
                           {/* Pseudo-content blurred */}
