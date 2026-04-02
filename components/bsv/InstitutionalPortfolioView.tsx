@@ -379,7 +379,8 @@ function BuyView({ address, onBack }: any) {
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
     
     const encodedAddress = encodeURIComponent(address || '');
-    const onrampUrl = `https://global.transak.com?walletAddress=${encodedAddress}&fiatCurrency=USD&cryptoCurrencyCode=${networkInfo.currency}&network=${activeNetwork}&themeColor=000000&disableWalletAddressForm=true&isFeeCalculationHidden=true`;
+    // Using MoonPay for ultimate iframe robustness without API key origin blocks
+    const onrampUrl = `https://buy.moonpay.com/?currencyCode=${networkInfo.currency.toLowerCase()}&walletAddress=${encodedAddress}&colorCode=%230a0a0a`;
 
     return (
         <ModalView title="Buy Crypto" subtitle="Real Fiat Integration" icon={<CreditCard />} onBack={onBack}>
