@@ -176,25 +176,58 @@ export function InstitutionalHeader() {
                             boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
                         }}
                     >
-                        <div className="grid grid-cols-2 gap-2">
-                            {navLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="px-4 py-3 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.25em] transition-all border"
-                                    style={{
-                                        background: link.active ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.02)',
-                                        borderColor: link.active ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.06)',
-                                        color: link.active ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
-                                    }}
-                                >
-                                    {link.label}
-                                </Link>
-                            ))}
-                        </div>
-                        <div className="mt-5 pt-5 border-t flex justify-center" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                        {!isConnected && (
+                            <div className="grid grid-cols-2 gap-2 mb-5 pb-5 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="px-4 py-3 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.25em] transition-all border"
+                                        style={{
+                                            background: link.active ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.02)',
+                                            borderColor: link.active ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.06)',
+                                            color: link.active ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
+                                        }}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                        
+                        <div className="flex flex-col items-center w-full">
                             <SystemsUtilityHeader />
+                            
+                            {isConnected && (
+                                <Link
+                                    href="/news"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="w-full mt-6 block"
+                                >
+                                    <motion.div
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="relative flex items-center justify-center gap-3 w-full bg-[#0a0a0a] border border-[#222] rounded-2xl py-5 shadow-2xl overflow-hidden"
+                                    >
+                                        {/* Fluid Ray of Light Animation for 240Hz Effect */}
+                                        <motion.div
+                                            animate={{ x: ["-200%", "200%"] }}
+                                            transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
+                                            className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[30deg]"
+                                        />
+                                        
+                                        <span className="relative z-10 text-white font-mono font-black text-xs uppercase tracking-[0.4em] drop-shadow-md">
+                                            WHALE NEWS
+                                        </span>
+                                        <span className="relative z-10 w-2 h-2 rounded-full bg-[#00FFAA] animate-pulse shadow-[0_0_12px_#00FFAA]" />
+                                    </motion.div>
+                                    
+                                    <p className="mt-3 text-center w-full font-mono text-[8px] uppercase tracking-[0.3em] font-black text-black/30">
+                                        Terminal de Inteligencia Desbloqueada
+                                    </p>
+                                </Link>
+                            )}
                         </div>
                     </motion.div>
                 )}
