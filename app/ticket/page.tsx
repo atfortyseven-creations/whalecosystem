@@ -146,7 +146,7 @@ function QuantumVerificationPanel({ onVerified }: { onVerified: () => void }) {
     };
 
     const runSyntheticHeuristics = (points: {x:number, y:number, t:number}[], expectedShape: VerificationStep) => {
-        if (points.length < 10) return false;
+        if (points.length < 5) return false;
         
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         points.forEach(p => {
@@ -158,28 +158,29 @@ function QuantumVerificationPanel({ onVerified }: { onVerified: () => void }) {
 
         const width = maxX - minX;
         const height = maxY - minY;
-        const ratio = width / height;
+        const ratio = height > 0 ? width / height : 1;
         const duration = points[points.length - 1].t - points[0].t;
 
         // Bot fail condition: hyper-linear unnatural speed
-        if (duration < 150 && points.length > 20) return false;
+        if (duration < 50 && points.length > 20) return false;
 
         if (expectedShape === "CIRCLE") {
-            const isCircular = ratio > 0.5 && ratio < 2.0; // Human drawn circles aren't perfect
+            const isCircular = ratio > 0.2 && ratio < 5.0; // Very forgiving circularity
             const startNode = points[0];
             const endNode = points[points.length - 1];
             const closureDistance = Math.hypot(startNode.x - endNode.x, startNode.y - endNode.y);
-            const isClosed = closureDistance < (Math.max(width, height) * 0.4);
-            return isCircular && isClosed && width > 40;
+            const isClosed = closureDistance < (Math.max(width, height) * 0.85); // Allow open circles
+            return isCircular && isClosed && width > 20 && height > 20;
         }
 
         if (expectedShape === "SQUARE") {
-            // Check bounding box aspect ratio and sharp corners roughly
-            return ratio > 0.3 && ratio < 3.0 && width > 40 && duration > 200;
+            // Check basic aspect ratio and size roughly, tolerating single-stroke squares
+            return ratio > 0.2 && ratio < 5.0 && width > 20 && height > 20 && duration > 100;
         }
 
         if (expectedShape === "TRIANGLE") {
-            return width > 40 && duration > 200;
+            // Just ensure it has decent span on both axis
+            return width > 20 && height > 20 && duration > 100;
         }
 
         return false;
@@ -307,8 +308,8 @@ function QuantumVerificationPanel({ onVerified }: { onVerified: () => void }) {
     );
 }
 
-// --- 4. RAW CANVAS QUANTUM PARTICLES ---
-function QuantumParticleExplosion() {
+// --- 4. INSTITUTIONAL ATMOSPHERIC DUST ---
+function InstitutionalAtmosphere() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -316,53 +317,52 @@ function QuantumParticleExplosion() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
 
-        const particles: any[] = [];
-        for(let i = 0; i < 250; i++) {
+        const particles: {x:number, y:number, vx:number, vy:number, size:number, alpha:number, p:number}[] = [];
+        for(let i = 0; i < 150; i++) {
              particles.push({
-                 x: canvas.width / 2,
-                 y: canvas.height / 2,
-                 vx: (Math.random() - 0.5) * (Math.random() * 35 + 10),
-                 vy: (Math.random() - 0.5) * (Math.random() * 35 + 10),
-                 size: Math.random() * 8 + 2,
-                 life: 1,
-                 decay: Math.random() * 0.015 + 0.005,
-                 color: Math.random() > 0.4 ? '#FFD700' : '#FFF2AC'
+                 x: Math.random() * width,
+                 y: Math.random() * height,
+                 vx: (Math.random() - 0.5) * 0.15,
+                 vy: -Math.random() * 0.2 - 0.05, // Subtle drift upwards
+                 size: Math.random() * 1.5 + 0.5,
+                 alpha: Math.random() * 0.4 + 0.1,
+                 p: Math.random() * 0.01 + 0.005
              });
         }
 
         let frame: number;
         const render = () => {
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-            particles.forEach((p, i) => {
+            ctx.clearRect(0,0, width, height);
+            particles.forEach((p) => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.3; // Gravity pull
-                p.life -= p.decay;
-                if(p.life > 0) {
-                    ctx.globalAlpha = p.life;
-                    ctx.fillStyle = p.color;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = '#FFD700';
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                    ctx.fill();
-                } else {
-                    particles.splice(i, 1);
-                }
+                
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+
+                p.alpha += p.p;
+                if (p.alpha > 0.5 || p.alpha < 0.05) p.p *= -1;
+
+                ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
+                ctx.fillStyle = '#D4AF37'; // Elegant Gold
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fill();
             });
-            if (particles.length > 0) {
-                frame = requestAnimationFrame(render);
-            }
+            frame = requestAnimationFrame(render);
         };
         render();
 
         return () => cancelAnimationFrame(frame);
     }, []);
 
-    return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[100]" />;
+    return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[10] opacity-50" />;
 }
 
 
@@ -495,50 +495,53 @@ export default function GoldenTicketPage() {
             </div>
 
 
-            {/* --- CINEMATIC OVERLAY --- */}
+            {/* --- INSTITUTIONAL CINEMATIC OVERLAY --- */}
             <AnimatePresence>
                 {showCinematic && (
                     <motion.div 
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[9999] bg-[#050505] flex flex-col items-center justify-center overflow-hidden"
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }}
+                        className="fixed inset-0 z-[9999] bg-[#020202] flex flex-col items-center justify-center overflow-hidden"
                     >
-                        {/* Glow Ambiental Dorado */}
-                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,215,0,0.12)_0%,rgba(0,0,0,0)_70%)]" />
+                        {/* Elegant Minimalist Background Elements */}
+                        <div className="absolute inset-0 bg-transparent mix-blend-overlay opacity-30" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }}></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.06)_0%,transparent_60%)] pointer-events-none" />
 
-                        {/* Ticket Elevado y Escala Épica */}
+                        <InstitutionalAtmosphere />
+
+                        {/* Majestic Ticket Reveal */}
                         <motion.div 
-                            initial={{ scale: 0.5, y: 150, rotateX: 60, opacity: 0 }}
-                            animate={{ scale: 1.4, y: 0, rotateX: 0, opacity: 1 }}
-                            transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
-                            className="relative z-20 pointer-events-none"
+                            initial={{ scale: 0.85, y: 40, opacity: 0 }}
+                            animate={{ scale: 1.15, y: 0, opacity: 1 }}
+                            transition={{ duration: 2.5, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative z-20 pointer-events-none drop-shadow-2xl flex items-center justify-center"
                         >
-                            <EngineeredGoldenTicket isClaimed={true} />
-                            {/* Volumetric Rays Overlay */}
-                            <motion.div 
-                                initial={{ opacity: 0, rotate: 0 }}
-                                animate={{ opacity: 0.5, rotate: 360 }}
-                                transition={{ delay: 1, duration: 20, repeat: Infinity, ease: "linear" }}
-                                className="absolute top-1/2 left-1/2 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(from_0deg,transparent_0deg,rgba(255,215,0,0.15)_20deg,transparent_40deg,rgba(255,215,0,0.15)_60deg,transparent_80deg,rgba(255,215,0,0.15)_100deg,transparent_120deg)] pointer-events-none mix-blend-screen"
-                            />
+                            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}>
+                                <EngineeredGoldenTicket isClaimed={true} />
+                            </motion.div>
                         </motion.div>
 
-                        <QuantumParticleExplosion />
-
+                        {/* Serious Informative Panel */}
                         <motion.div 
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ delay: 2.8, duration: 1, ease: "backOut" }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1.5, duration: 1.2, ease: "easeOut" }}
                             className="absolute bottom-[10%] flex flex-col items-center text-center z-30 w-full"
                         >
-                            <h2 className="text-4xl md:text-5xl font-serif text-white tracking-widest drop-shadow-[0_0_25px_rgba(255,215,0,0.8)] font-black italic uppercase">¡FELICIDADES!</h2>
-                            <p className="text-[13px] md:text-[15px] font-sans tracking-[0.25em] font-medium text-white/90 mt-4 leading-relaxed max-w-sm border-b border-white/20 pb-4">
-                                Has reclamado tu<br/>Whale Node Ticket.
+                            <div className="flex items-center gap-3 mb-6">
+                               <div className="w-[6px] h-[6px] rounded-full bg-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.8)] animate-pulse" />
+                               <span className="text-[9px] font-mono tracking-[0.4em] uppercase text-[#D4AF37] font-bold">Autenticación Soberana</span>
+                            </div>
+                            
+                            <h2 className="text-xl md:text-3xl font-serif text-white/90 tracking-[0.2em] font-light uppercase">WHALE NODE TICKET EMITIDO</h2>
+                            
+                            <div className="w-px h-10 bg-gradient-to-b from-white/20 to-transparent my-6" />
+                            
+                            <p className="text-[9px] md:text-[10px] font-mono uppercase tracking-[0.2em] text-white/40 max-w-sm px-6 leading-loose">
+                                Operación validada en cadena.<br/>El portafolio tiene acceso vitalicio a la terminal institucional.
                             </p>
-                            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-black text-[#FFD700] mt-5 max-w-md px-6 leading-relaxed opacity-90">
-                                Acceso exclusivo desbloqueado a TODAS las implementaciones futuras del Whale Alert Network.
-                            </p>
-                            <button onClick={() => setShowCinematic(false)} className="mt-8 px-10 py-4 rounded-full text-[10px] font-black text-white/70 border border-white/20 uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white hover:border-white/50 active:scale-95 transition-all backdrop-blur-md">
-                                Ver mi ticket en la Vault
+
+                            <button onClick={() => setShowCinematic(false)} className="mt-10 px-8 py-3 bg-transparent text-[9px] font-mono text-white/50 border border-white/10 uppercase tracking-[0.3em] hover:bg-white/5 hover:text-white transition-colors duration-500">
+                                CONTINUAR A LA TERMINAL
                             </button>
                         </motion.div>
 

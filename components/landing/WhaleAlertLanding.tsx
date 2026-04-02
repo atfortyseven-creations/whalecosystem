@@ -251,9 +251,53 @@ export function WhaleAlertLanding() {
             Whale Alert Network
           </h1>
           
-          <p className="font-aztec-body text-xl md:text-3xl font-light text-white/70 max-w-4xl mx-auto leading-relaxed mb-12 px-4">
-             The ultimate sovereign financial intelligence platform.
-          </p>
+          <div className="font-aztec-body text-left text-sm md:text-base font-light text-white/50 max-w-4xl mx-auto leading-relaxed mb-12 px-6 md:px-10 space-y-8 max-h-[45vh] overflow-y-auto msv-hide-scrollbar border-y border-white/10 py-10 shadow-inner bg-black/20 backdrop-blur-sm rounded-xl">
+            <p>
+              En la dimensión macroeconómica contemporánea, la supremacía no se define únicamente por la acumulación transaccional, sino por la integridad matemática absoluta y un nivel de exposición regulatoria meticulosamente calibrado. Whale Alert Network nace como un ecosistema institucional de altísimo rendimiento, forjado desde sus cimientos bajo parámetros de seguridad de grado paramilitar y normativas de compliance globales innegociables. Lo que presentamos aquí no es una simple interfaz, sino una infraestructura algorítmica diseñada para quienes comprenden que en la red no existen segundas oportunidades frente a la vulnerabilidad o la latencia.
+            </p>
+
+            <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">1. Cinética de Tiempo Real</h3>
+            <p>
+              Rechazamos categóricamente la latencia intermitente, la dependencia de cachés obsoletos y cualquier forma de simulación de datos. Nuestro motor de ingesta procesa flujos de capitales masivos en tiempo real a través de canales asíncronos directos orientados hacia la memoria de la blockchain. Entendemos que en un entorno distribuido el fallo de un nodo distante es una certeza, no una posibilidad; por ello, para mitigar interrupciones sin degradar el rendimiento del clúster principal, hemos integrado robuztamente conectividad inquebrantable empleando algoritmos de Exponential Backoff.
+            </p>
+            <p>
+              Bajo esta rigurosa arquitectura, cada transferencia detectada atraviesa un filtro algorítmico microscópico. Evaluamos la desviación de mercado (Z-Score) en la escala de los microsegundos, aislando con precisión quirúrgica las anomalías macroestructurales —la auténtica huella de la "ballena"— y purgando despiadadamente el ruido transaccional. La precisión estadística dicta el acceso.
+            </p>
+
+            <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">2. Seguridad Soberana & E2EE</h3>
+            <p>
+              Arquitectamos toda nuestra infraestructura de conexión bajo la premisa inflexible de un Zero-Trust (Confianza Cero) absoluto. El puente enlazado entre la interfaz que usted opera y nuestro núcleo perimetral de datos prescinde por completo del almacenamiento obsoleto de contraseñas, bases de datos expuestas o validaciones orgánicas vulnerables a inyecciones.
+            </p>
+            <p>
+              La bóveda criptográfica encripta todo el espectro volumétrico de la información empleando End-to-End Encryption (E2EE) de grado bancario. La sincronización paralela de la identidad exige la demostración probatoria constante de la propiedad de su llave privada sin que el servidor central llegue a conocerla jamás en ningún punto del transporte.
+            </p>
+            <p>
+              Usted detenta una soberanía patrimonial invulnerable sobre su sesión; la totalidad de nuestra red operativa ha sido diseñada para matemáticamente impedir que exista alguna "llave maestra" capaz de vulnerar el enclave de su bóveda.
+            </p>
+
+            <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">3. Ingeniería Algorítmica Global</h3>
+            <p>
+              En el ecosistema institucional, intentar rastrear redes segmentadas de forma fragmentaria pulveriza la ventaja comercial. Hemos condensado un cruce multichain capaz de indexar flujos constantes de blockchains independientes al procesar enormes matrices probabilísticas en memoria RAM pura. Unificamos decibeles tarifarios y metadatos caóticos bajo un estándar de complejidad temporal logarítmica inmensamente eficiente.
+            </p>
+            <p>
+              Esta extrema eficiencia fractal de cálculos paralelos, escrita exhaustivamente y probada desde el origen en lenguaje Golang estructurado, constituye el cimiento inquebrantable que da fortaleza al sistema para digerir y devolver decenas de miles de request instantáneas, sin evidenciar ninguna fisura geométrica u operativa a simple vista.
+            </p>
+
+            <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">4. Normativas & Compliance</h3>
+            <p>
+              Para que el apalancamiento de los poderes institucionales transcurra limpiamente, es indispensable e inalterable conservar la total alienación del cumplimiento jurisdiccional. Hemos implantado barreras heurísticas auto-defensivas proyectadas sin reparos para sostener cualquier blindaje jurídico aun en el grado más riguroso y denso de escrutinio investigativo por autoridades financieras internacionales.
+            </p>
+            <ul className="list-disc pl-6 space-y-4">
+               <li><strong className="text-white uppercase">OFAC Sanctions & AML:</strong> Desplegamos motores audífugos que examinan la procedencia computacional de cada wallet entrante en tiempo real. Bloqueamos instantánea y atemporalmente a entidades conectadas a las prohibiciones globales, habilitando flujos de reconocimiento (KYC) integrados sin riesgo y blindados por la matemática de Zero Knowledge (ZK-Proofs).</li>
+               <li><strong className="text-white uppercase">CFTC & Geofencing WAF:</strong> Rutas de red constreñidas por barreras fronterizas automáticas con resoluciones de latencia inferiores a los 5 milisegundos. Ejecutamos un peritaje microscópico cortando y descartando simulaciones de mallas de VPNs impenetrables o alteración de enrutadores.</li>
+               <li><strong className="text-white uppercase">GDPR Universal:</strong> Conferimos una absoluta independencia soberana facilitando comandos directos de demolición integral del rastro de metadatos acoplados en cualquier fragmento de caché de memoria RAM con cumplimiento regido a ISO 27001 por libre solicitud del espectador.</li>
+            </ul>
+
+            <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">Resolución Universal</h3>
+            <p>
+              Whale Alert Network no comparece al mercado con la vocación superflua de adornar interfaces visuales interactivas en aplicaciones. Comparecemos únicamente para fragmentar y redefinir cada límite tecnológico para la vigilancia financiera implacable institucional. Absolutamente todo bit forjado en cada capa y modelo paramétrico transmutado por nuestros servidores centrales es verdaderamente un muro balístico erguido exclusivamente para soportar su completo y absoluto dominio soberano ante el entorno financiero más hostil en toda la red global en internet de capa intermedia de blockchains.
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.button
