@@ -39,6 +39,8 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
+const EMBEDDED_TABS = ['whale-portfolio', 'academy', 'support', 'gold-ticket'];
+
 export function InstitutionalProShell({ 
     children, 
     activeTab, 
@@ -50,6 +52,7 @@ export function InstitutionalProShell({
 }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const isEmbedded = EMBEDDED_TABS.includes(activeTab);
 
     return (
         <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#050505]/10">
@@ -195,10 +198,20 @@ export function InstitutionalProShell({
                 </header>
 
                 {/* ─── Table / View Area ─── */}
-                <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[#FFFFFF]">
-                    <div className="p-8 max-w-[1600px] mx-auto w-full h-full">
-                        {children}
-                    </div>
+                <main className="flex-1 relative bg-[#FFFFFF] overflow-hidden flex flex-col">
+                    {isEmbedded ? (
+                        // Full-height, zero-padding, zero-overflow for iframe embeds
+                        <div className="flex-1 overflow-hidden">
+                            {children}
+                        </div>
+                    ) : (
+                        // Standard padded container for internal panels
+                        <div className="flex-1 overflow-y-auto no-scrollbar">
+                            <div className="p-8 max-w-[1600px] mx-auto w-full">
+                                {children}
+                            </div>
+                        </div>
+                    )}
                 </main>
 
                 {/* ─── Pro Status Bar ─── */}
