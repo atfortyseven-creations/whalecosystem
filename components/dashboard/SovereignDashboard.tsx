@@ -8,6 +8,9 @@ import ActivityFeedPanel from '@/components/network/ActivityFeedPanel';
 import PolymarketPanel from '@/components/dashboard/PolymarketPanel';
 import { CopyTradingArena } from '@/components/premium/CopyTradingArena';
 import { LivePortfolio } from '@/components/premium/LivePortfolio';
+import { WatchlistTable } from '@/components/dashboard/WatchlistTable';
+import { NewPairsTable } from '@/components/dashboard/NewPairsTable';
+import { ApiTerminal } from '@/components/dashboard/ApiTerminal';
 import "@/app/dashboard/dashboard.css";
 
 type TabId = 'dashboard' | 'watchlist' | 'alerts' | 'multicharts' | 'new-pairs' | 'gainers' | 'api' | 'portfolio';
@@ -50,22 +53,19 @@ export default function SovereignDashboard() {
                         )}
 
                         {activeTab === 'watchlist' && (
-                            <div className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-[#E5E5E5] rounded-[3rem] bg-[#FAF9F6]">
-                                <span className="text-sm font-black text-[#050505] uppercase tracking-widest mb-2">Institutional Watchlist</span>
-                                <p className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Star any asset in the dashboard to track it here in high-fidelity.</p>
-                            </div>
+                            <WatchlistTable />
                         )}
 
                         {activeTab === 'portfolio' && (
                             <LivePortfolio />
                         )}
                         
-                        {/* Fallback for others */}
-                        {['new-pairs', 'api'].includes(activeTab) && (
-                            <div className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-[#E5E5E5] rounded-[3rem] bg-[#FAF9F6]">
-                                <span className="text-sm font-black text-[#050505] uppercase tracking-widest mb-2">{activeTab.replace('-', ' ').toUpperCase()} INTERFACE</span>
-                                <p className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Integrating on-chain Teranode endpoints for maximal precision...</p>
-                            </div>
+                        {activeTab === 'new-pairs' && (
+                            <NewPairsTable />
+                        )}
+
+                        {activeTab === 'api' && (
+                            <ApiTerminal />
                         )}
                     </motion.div>
                 </AnimatePresence>
