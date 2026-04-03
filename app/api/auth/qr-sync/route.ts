@@ -52,8 +52,20 @@ export async function POST(req: Request) {
         }), 'EX', 300);
 
         console.log(`[Handshake:Success] Sync verified for ${normalizedAddress} on token ${token}`);
-
-        return new NextResponse('Handshake Verified', { status: 200 });
+        
+        // [PERFECTION] Set cookie for the mobile user so they transition to the news shell
+        const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
+        return new NextResponse('Handshake Verified', { 
+            status: 200,
+            headers: {
+                'Set-Cookie': [
+                    `sovereign_handshake=${normalizedAddress}`,
+                    'Path=/',
+                    `Max-Age=${THIRTY_DAYS_S}`,
+                    'SameSite=Lax',
+                ].join('; '),
+            }
+        });
     } catch (e: any) {
         console.error('[QR_SYNC_FATAL]', e);
         return new NextResponse('Internal Server Error', { status: 500 });
