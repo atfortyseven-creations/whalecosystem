@@ -507,6 +507,7 @@ model User {
   contacts       Contact[]
   notifications  Notification[]
   watchedWallets WatchedWallet[]
+  watchedTokens  WatchedToken[]
   stats          UserStats? // Relation to UserStats
 
   // Referral Relations
@@ -988,6 +989,30 @@ model WatchedWallet {
   @@index([address])
 }
 
+model WatchedToken {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  // Token Info
+  address String
+  symbol  String
+  name    String
+  chain   String @default("ethereum")
+  
+  // Alerts
+  alertsEnabled Boolean @default(true)
+
+  // Snapshot details at time of starring/watching
+  entryPrice Float?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, address, chain])
+  @@index([userId])
+  @@index([address])
+}
+
 // ----------------------------------------------------------------------------
 // GLOBAL WHALE TRACKING (São Paulo Merge Persistence)
 // ----------------------------------------------------------------------------
@@ -1415,15 +1440,25 @@ model AlertRule {
   userId String
   user   User   @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
 
-  name       String
-  enabled    Boolean @default(true)
-  conditions Json
-  actions    Json
+  name            String
+  enabled         Boolean @default(true)
+  targetType      String  // 'WALLET', 'TOKEN', 'MARKET', 'GLOBAL'
+  targetAddress   String? // The wallet or token address
+  
+  // Specific Conditions
+  priceThreshold  Float?
+  volumeThreshold Float?
+  txSizeThreshold Float?
+  conditionLogic  String // 'GREATER_THAN', 'LESS_THAN', 'EQUALS', 'CUSTOM'
+
+  conditions Json? // Legacy/complex conditions fallback
+  actions    Json  // What to do when triggered (webhook, email, in-app push)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([targetAddress])
 }
 
 model Subscription {

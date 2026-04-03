@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         const userId = validation.userId!;
 
         const body = await req.json();
-        const { name, actions, conditions } = body;
+        const { name, actions, conditions, targetType, targetAddress, priceThreshold, volumeThreshold, txSizeThreshold, conditionLogic } = body;
 
         if (!name) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -43,7 +43,13 @@ export async function POST(req: NextRequest) {
                 userId,
                 name,
                 enabled: true,
-                conditions: conditions || { type: 'custom', value: 'all' },
+                targetType: targetType || 'TOKEN',
+                targetAddress: targetAddress || null,
+                priceThreshold: priceThreshold || null,
+                volumeThreshold: volumeThreshold || null,
+                txSizeThreshold: txSizeThreshold || null,
+                conditionLogic: conditionLogic || 'GREATER_THAN',
+                conditions: conditions || null,
                 actions: actions || { telegram: false, email: false, push: true, sms: false }
             }
         });
