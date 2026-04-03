@@ -72,7 +72,7 @@ export const SAAS_PLANS: Record<PlanTier, PlanConfig> = {
     [PlanTier.STARTER]: {
         name: 'Starter',
         tier: PlanTier.STARTER,
-        priceMetrics: { monthly: 49, annual: 470 },
+        priceMetrics: { monthly: 5, annual: 50 },
         limits: {
             requestsPerDay: 10000,
             maxApiKeys: 1,
@@ -110,9 +110,9 @@ export const SAAS_PLANS: Record<PlanTier, PlanConfig> = {
             csvExport: false,
         }
     },
-    [PlanTier.Elite]: {
+    [PlanTier.ELITE]: {
         name: 'Elite',
-        tier: PlanTier.Elite,
+        tier: PlanTier.ELITE,
         priceMetrics: { monthly: 1999, annual: 19190 },
         limits: {
             requestsPerDay: -1, // Unlimited

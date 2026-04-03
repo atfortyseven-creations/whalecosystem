@@ -83,22 +83,22 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
-          style={{ background: 'rgba(5,5,5,0.92)' }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          style={{ background: 'rgba(250,249,246,0.8)' }}
         >
           <motion.div
             initial={{ scale: 0.98, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.98 }}
-            className="w-full max-w-[480px] bg-[#0A0A0A] relative shadow-2xl border border-white/10"
-            style={{ color: '#E0E0E0' }}
+            className="w-full max-w-[480px] bg-[#FFFFFF] relative shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#E5E5E5]"
+            style={{ color: '#050505' }}
           >
             {/* HEADER */}
-            <div className="flex justify-between items-center bg-[#111] px-6 py-4 border-b border-white/10">
-              <div className="flex items-center gap-3 text-white/90">
+            <div className="flex justify-between items-center bg-[#FAF9F6] px-6 py-4 border-b border-[#E5E5E5]">
+              <div className="flex items-center gap-3 text-[#050505]/80">
                 <Terminal size={16} />
-                <span className="font-mono text-[10px] uppercase tracking-[0.3em] font-medium text-white/70">Clearance Ref. {Date.now().toString().slice(-6)}</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-[#050505]/60">Clearance Ref. {Date.now().toString().slice(-6)}</span>
               </div>
               {!isExecuting && (
-                <button onClick={onClose} className="opacity-40 hover:opacity-100 transition-opacity">
+                <button onClick={onClose} className="text-[#888888] hover:text-[#050505] transition-colors">
                   <X size={18} />
                 </button>
               )}
@@ -108,49 +108,49 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
             <div className="px-8 py-8 space-y-8">
               
               {/* INSTITUTIONAL INFO HEADER */}
-              <div className="flex justify-between items-start border-b border-white/10 pb-6">
+              <div className="flex justify-between items-start border-b border-[#E5E5E5] pb-6">
                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-white/50">
-                        <Clock size={12} className="text-[#D4AF37]/70" />
-                        <span className="font-mono text-[9px] uppercase tracking-[0.25em]">{formatDate(currentTime)} · {formatTime(currentTime)}</span>
+                    <div className="flex items-center gap-3 text-[#888888]">
+                        <Clock size={12} className="text-[#050505]/40" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold">{formatDate(currentTime)} · {formatTime(currentTime)}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-white/50">
-                        <User size={12} className="text-[#D4AF37]/70" />
-                        <span className="font-mono text-[9px] uppercase tracking-[0.25em]">
+                    <div className="flex items-center gap-3 text-[#888888]">
+                        <User size={12} className="text-[#050505]/40" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold">
                             {isConnected && address ? `ID: ${address.slice(0,8)}...${address.slice(-6)}` : "ENTIDAD NO DETECTADA"}
                         </span>
                     </div>
                  </div>
                  <div className="text-right space-y-2">
-                    <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-[#D4AF37]">NODO OPTIMISM L2</span>
-                    <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-white/30">PING: 14ms</span>
+                    <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-black">NODO OPTIMISM L2</span>
+                    <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-[#888888] font-bold text-opacity-40">PING: 14ms</span>
                  </div>
               </div>
 
               {/* MAIN METRICS */}
               <div className="text-center space-y-4">
-                <span className="block font-mono text-[9px] uppercase tracking-[0.4em] text-white/40 mb-5">Asignación Requerida</span>
+                <span className="block font-mono text-[9px] uppercase tracking-[0.4em] text-[#888888] mb-5 font-black">Asignación Requerida</span>
                 
                 <div className="flex items-end justify-center gap-4">
-                  <span className="font-sans text-5xl tracking-tighter leading-none text-white font-light">{PRICE_USD.toFixed(0)}</span>
+                  <span className="font-sans text-6xl tracking-tighter leading-none text-[#050505] font-black">{PRICE_USD.toFixed(0)}</span>
                   <div className="flex flex-col items-start pb-1">
-                    <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-white/80">USD</span>
-                    <span className="font-mono text-[8px] text-white/30 uppercase tracking-[0.3em] mt-1">Tarifa Plana</span>
+                    <span className="font-mono text-sm font-black uppercase tracking-[0.2em] text-[#050505]">USD</span>
+                    <span className="font-mono text-[8px] text-[#888888] uppercase tracking-[0.3em] font-bold mt-1">Tarifa Plana</span>
                   </div>
                 </div>
 
                 {/* EXACT EQUIVALENTS */}
                 <div className="flex items-center justify-center gap-8 pt-6">
                   <div className="text-center">
-                    <p className="font-mono text-sm font-medium tracking-[0.1em] text-white">{rates ? ethAmount : "—"} ETH</p>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-white/30 mt-1">Monto en Cadena</p>
+                    <p className="font-mono text-sm font-black tracking-[0.1em] text-[#050505]">{rates ? ethAmount : "—"} ETH</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-bold mt-1">Monto en Cadena</p>
                   </div>
-                  <div className="w-px h-8 bg-white/10" />
+                  <div className="w-px h-8 bg-[#E5E5E5]" />
                   <div className="text-center">
-                    <p className="font-mono text-sm font-medium tracking-[0.1em] text-white">
+                    <p className="font-mono text-sm font-black tracking-[0.1em] text-[#050505]">
                       {rates ? `${eurEquivalent} EUR` : '—'}
                     </p>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#D4AF37]/60 mt-1">
+                    <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-bold mt-1">
                       {rates ? `Ratio Oráculo Integrado` : 'Conectando...'}
                     </p>
                   </div>
@@ -158,19 +158,19 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
               </div>
 
               {/* TARGET RECP */}
-              <div className="bg-[#111] p-5 border border-white/5 rounded-sm text-left flex justify-between items-center">
+              <div className="bg-[#FAF9F6] p-5 border border-[#E5E5E5] rounded-xl text-left flex justify-between items-center shadow-inner">
                 <div className="space-y-1">
-                    <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-white/30">Destino Asegurado</span>
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-white/70">
+                    <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-black">Destino Asegurado</span>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-[#050505] font-black">
                     Tesorería Whale Alert
                     </p>
                 </div>
-                <span className="font-mono text-[9px] tracking-[0.2em] text-white/50">{TARGET_TREASURY.slice(0, 6)}...{TARGET_TREASURY.slice(-4)}</span>
+                <span className="font-mono text-[9px] tracking-[0.2em] text-[#888888] font-bold">{TARGET_TREASURY.slice(0, 6)}...{TARGET_TREASURY.slice(-4)}</span>
               </div>
 
               {/* ACTION BUTTON */}
               {isConfirmed ? (
-                <div className="bg-[#111] text-[#D4AF37] border border-[#D4AF37]/30 text-center py-5 font-mono text-[10px] font-bold uppercase tracking-[0.3em]">
+                <div className="bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/30 text-center py-5 font-mono text-[10px] font-black uppercase tracking-[0.3em] rounded-xl">
                   TRANSACCIÓN CONFIRMADA ✓
                 </div>
               ) : (
@@ -184,21 +184,21 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
                     <button
                       onClick={handleTransact}
                       disabled={isExecuting || !rates}
-                      className="w-full bg-[#E0E0E0] text-[#0A0A0A] font-mono text-[10px] font-extrabold uppercase py-6 tracking-[0.3em] hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 transition-colors duration-300"
+                      className="w-full bg-[#050505] text-[#FFFFFF] font-mono text-[11px] font-black uppercase py-6 tracking-[0.3em] hover:bg-[#050505]/90 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 transition-colors duration-300 rounded-xl shadow-lg"
                     >
                       {isWaiting ? (
-                        <><Activity size={14} className="animate-pulse" /> Confirmando Bloque L2...</>
+                        <><Activity size={14} className="animate-spin" /> Confirmando Bloque L2...</>
                       ) : isPending ? (
                         'Aprobación Requerida en Wallet...'
                       ) : isWrongNetwork ? (
                         'Forzar Red Optimism'
                       ) : (
-                        `AUTORIZAR PAGO DE ${ethAmount} ETH`
+                        `PAGAR ${ethAmount} ETH`
                       )}
                     </button>
                   )}
                   {writeError && (
-                    <p className="text-center text-[#FF5555] font-mono text-[8px] uppercase tracking-[0.2em]">
+                    <p className="text-center text-red-500 font-mono text-[8px] uppercase tracking-[0.2em] font-bold">
                       [ERROR] {writeError.message.split('.')[0]}
                     </p>
                   )}
@@ -207,8 +207,8 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
 
               {/* SECURITY BINDER */}
               <div className="flex justify-between items-center pt-2">
-                 <ShieldCheck size={14} className="text-white/10" />
-                 <p className="text-right font-mono text-[7px] uppercase tracking-[0.3em] text-white/20">
+                 <ShieldCheck size={14} className="text-[#050505]/20" />
+                 <p className="text-right font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-bold">
                     Protocolo Inmutable · Sin Reembolsos · Privacy by Void
                  </p>
               </div>
@@ -217,5 +217,6 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
         </motion.div>
       )}
     </AnimatePresence>
+
   );
 }

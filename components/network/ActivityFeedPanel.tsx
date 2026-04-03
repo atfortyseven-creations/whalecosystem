@@ -53,20 +53,18 @@ export default function ActivityFeedPanel() {
   return (
     <div className="w-full flex flex-col space-y-6">
       {/* ─── Stats ─── */}
-      <div className="border border-white/5 bg-white/[0.02]" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <div className="grid grid-cols-2 md:grid-cols-4">
-          {[
-            { label: "Txns (24h)", value: "41,820", color: "#111111" },
-            { label: "Volume (24h)", value: "$19.4B", color: "#00e699" },
-            { label: "Whale Alerts", value: "2,140", color: "#f43f5e" },
-            { label: "Avg Tx Size", value: "$462K", color: "#8b5cf6" },
-          ].map((s, i) => (
-            <div key={i} className="az-stat-card bg-[#FAF9F6] border border-[#E5E5E5] m-1 rounded-xl p-4 flex flex-col items-center justify-center">
-              <span className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">{s.label}</span>
-              <span className="text-xl font-black font-mono tracking-tighter" style={{ color: s.color }}>{s.value}</span>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {[
+          { label: "Txns (24h)", value: "41,820", color: "#050505" },
+          { label: "Volume (24h)", value: "$19.4B", color: "#00C076" },
+          { label: "Whale Alerts", value: "2,140", color: "#FF3B30" },
+          { label: "Avg Tx Size", value: "$462K", color: "#D4AF37" },
+        ].map((s, i) => (
+          <div key={i} className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 flex flex-col items-center justify-center shadow-sm">
+            <span className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] mb-1">{s.label}</span>
+            <span className="text-2xl font-black font-mono tracking-tighter" style={{ color: s.color }}>{s.value}</span>
+          </div>
+        ))}
       </div>
 
       {/* ─── Controls ─── */}
@@ -127,16 +125,16 @@ export default function ActivityFeedPanel() {
               </span>
               <span className="flex items-center gap-1.5">
                 {row.type === "IN" || row.type === "DEPOSIT" 
-                  ? <ArrowDownLeft size={16} className="text-[#00e699]" />
-                  : <ArrowUpRight size={16} className="text-[#f43f5e]" />}
-                <span className={`text-[10px] font-mono font-black uppercase tracking-widest ${row.type === "IN" || row.type === "DEPOSIT" ? "text-[#00e699]" : "text-[#f43f5e]"}`}>
+                  ? <ArrowDownLeft size={16} className="text-[#00C076]" />
+                  : <ArrowUpRight size={16} className="text-[#FF3B30]" />}
+                <span className={`text-[10px] font-mono font-black uppercase tracking-widest ${row.type === "IN" || row.type === "DEPOSIT" ? "text-[#00C076]" : "text-[#FF3B30]"}`}>
                   {row.type || 'TRANSFER'}
                 </span>
               </span>
-              <span className="text-sm font-mono font-black text-[#111111]">{formatAmount(row.usdValue || row.amount || 0)}</span>
+              <span className="text-sm font-mono font-black text-[#050505]">{formatAmount(row.usdValue || row.amount || 0)}</span>
               <span className="col-span-2 flex items-center justify-between">
-                <span className="text-xs font-bold text-[#111111]/70 truncate max-w-[200px]">{row.walletLabel || `${row.walletAddress?.slice(0,6)}...${row.walletAddress?.slice(-4)}`}</span>
-                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-black border ${row.type === "IN" || row.type === "DEPOSIT" ? "bg-[#00e699]/10 border-[#00e699]/20 text-[#00dda8]" : "bg-[#f43f5e]/10 border-[#f43f5e]/20 text-[#f43f5e]"}`}>
+                <span className="text-xs font-bold text-[#050505]/70 truncate max-w-[200px]">{row.walletLabel || `${row.walletAddress?.slice(0,6)}...${row.walletAddress?.slice(-4)}`}</span>
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-black border ${row.type === "IN" || row.type === "DEPOSIT" ? "bg-[#00C076]/10 border-[#00C076]/20 text-[#00C076]" : "bg-[#FF3B30]/10 border-[#FF3B30]/20 text-[#FF3B30]"}`}>
                   {row.token || 'USDC'}
                 </span>
               </span>

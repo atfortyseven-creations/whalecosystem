@@ -21,9 +21,9 @@ export function LivePortfolio() {
 
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8">
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8">
                 <Wallet size={48} className="text-[#888888] mb-4 opacity-50" />
-                <h3 className="text-xl font-black text-[#111111] uppercase tracking-tighter">WALLET DISCONNECTED</h3>
+                <h3 className="text-xl font-black text-[#050505] uppercase tracking-tighter">WALLET DISCONNECTED</h3>
                 <p className="text-sm font-bold text-[#888888] mt-2">Connect Web3 Wallet to view live on-chain balances</p>
             </div>
         );
@@ -43,24 +43,23 @@ export function LivePortfolio() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             
-            {/* Global PnL Header */}
-            <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-8 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4">
-                    <span className="flex items-center gap-1.5 text-[8px] font-black text-[#00FFAA] uppercase tracking-widest bg-[#00FFAA]/10 px-2 py-1 rounded">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-pulse" />
+            <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-6">
+                    <span className="flex items-center gap-1.5 text-[9px] font-black text-[#00C076] uppercase tracking-widest bg-[#00C076]/10 px-3 py-1.5 rounded-full border border-[#00C076]/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
                         LIVE SYNC • {new Date(liveTick).toLocaleTimeString()}
                     </span>
                 </div>
                 
-                <h2 className="text-[11px] font-bold text-[#888888] uppercase tracking-widest mb-2">Net Worth (USDC + Assets)</h2>
-                <div className="flex items-end gap-4">
-                    <h1 className="text-5xl font-black text-[#111111] font-mono tracking-tighter">
+                <h2 className="text-[11px] font-black text-[#888888] uppercase tracking-[0.2em] mb-3">Institutional Net Worth (USDC + Assets)</h2>
+                <div className="flex items-end gap-6">
+                    <h1 className="text-6xl font-black text-[#050505] font-mono tracking-tighter shadow-sm">
                         ${Number(totalPnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </h1>
-                    <div className={`flex items-center gap-1.5 mb-2 font-mono font-black ${isPositive ? 'text-[#00FFAA]' : 'text-[#f97316]'}`}>
-                        {isPositive ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-                        <span className="text-xl">{isPositive ? '+' : ''}{change24hUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        <span className="text-sm">({isPositive ? '+' : ''}{change24hPercent.toFixed(2)}%)</span>
+                    <div className={`flex items-center gap-2 mb-2 font-mono font-black ${isPositive ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                        {isPositive ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
+                        <span className="text-2xl">{isPositive ? '+' : ''}{change24hUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span className="text-sm opacity-60">({isPositive ? '+' : ''}{change24hPercent.toFixed(2)}%)</span>
                     </div>
                 </div>
             </div>
@@ -117,13 +116,13 @@ export function LivePortfolio() {
                                         </p>
                                         <div className="flex justify-between items-end">
                                             <div>
-                                                <span className={`text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${pos.outcome === "YES" ? 'bg-[#06b6d4]/10 text-[#06b6d4]' : 'bg-[#f97316]/10 text-[#f97316]'}`}>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${pos.outcome === "YES" ? 'bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20' : 'bg-[#FF3B30]/10 text-[#FF3B30] border border-[#FF3B30]/20'}`}>
                                                     {pos.outcome} <span className="opacity-50">({pos.shares.toFixed(2)} Shares)</span>
                                                 </span>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-sm font-black text-[#111111] font-mono">${pos.value.toFixed(2)}</div>
-                                                <div className={`text-[10px] font-black font-mono ${isPosPnL ? 'text-[#00FFAA]' : 'text-[#f97316]'}`}>
+                                                <div className="text-sm font-black text-[#050505] font-mono">${pos.value.toFixed(2)}</div>
+                                                <div className={`text-[10px] font-black font-mono ${isPosPnL ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
                                                     {isPosPnL ? '+' : ''}{pos.pnl.toFixed(2)} ({isPosPnL ? '+' : ''}{pos.pnlPercent.toFixed(1)}%)
                                                 </div>
                                             </div>

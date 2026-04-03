@@ -26,8 +26,8 @@ const fmtUsd = (n: number) => {
 };
 
 const SIGNAL_COLOR: Record<string, string> = {
-    OVERBOUGHT: '#f43f5e', OVERSOLD: '#00FFAA',
-    LEAN_YES: '#00e699', LEAN_NO: '#f59e0b', NEUTRAL: '#888888',
+    OVERBOUGHT: '#FF3B30', OVERSOLD: '#00C076',
+    LEAN_YES: '#00C076', LEAN_NO: '#FF3B30', NEUTRAL: '#888888',
 };
 
 function Skeleton({ count = 6 }) {
@@ -165,8 +165,8 @@ export default function PolymarketPanel() {
                     <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888]" />
                     <input 
                         value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder="Buscar mercados institucionales..." 
-                        className="w-full bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl pl-11 pr-4 py-3 text-sm text-[#111111] font-medium outline-none focus:border-[#111111] transition-colors shadow-sm"
+                        placeholder="Search institutional markets..." 
+                        className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-11 pr-4 py-3 text-xs font-bold text-[#050505] outline-none focus:border-[#050505] transition-all shadow-sm"
                     />
                 </div>
                 <div className="flex bg-[#E5E5E5]/40 p-1.5 rounded-xl border border-[#E5E5E5]">
@@ -246,17 +246,17 @@ export default function PolymarketPanel() {
                             <div className="flex items-center gap-3 shrink-0">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setSelected(m); }}
-                                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#00e699]/10 border border-[#00e699]/30 min-w-[70px] hover:bg-[#00e699]/20 transition-colors"
+                                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#00C076]/10 border border-[#00C076]/30 min-w-[75px] hover:bg-[#00C076]/20 transition-all font-mono"
                                 >
-                                    <span className="text-[10px] text-[#00dda8] font-black uppercase tracking-widest mb-1">BET YES</span>
-                                    <span className="text-sm font-mono font-black text-[#00dda8]">{Math.round(m.yesPrice * 100)}¢</span>
+                                    <span className="text-[10px] text-[#00C076] font-black uppercase tracking-widest mb-1">YES</span>
+                                    <span className="text-sm font-black text-[#00C076]">{Math.round(m.yesPrice * 100)}¢</span>
                                 </button>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setSelected(m); }}
-                                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/30 min-w-[70px] hover:bg-[#f43f5e]/20 transition-colors"
+                                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#FF3B30]/10 border border-[#FF3B30]/30 min-w-[75px] hover:bg-[#FF3B30]/20 transition-all font-mono"
                                 >
-                                    <span className="text-[10px] text-[#f43f5e] font-black uppercase tracking-widest mb-1">BET NO</span>
-                                    <span className="text-sm font-mono font-black text-[#f43f5e]">{Math.round((1 - m.yesPrice) * 100)}¢</span>
+                                    <span className="text-[10px] text-[#FF3B30] font-black uppercase tracking-widest mb-1">NO</span>
+                                    <span className="text-sm font-black text-[#FF3B30]">{Math.round((1 - m.yesPrice) * 100)}¢</span>
                                 </button>
                             </div>
                         </motion.div>
@@ -350,25 +350,23 @@ export default function PolymarketPanel() {
                                         <span className="text-[#f43f5e] font-black">{fmtUsd(Number(tradeAmount) / (1 - selected.yesPrice))}</span>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* BUY BUTTONS REPLICA */}
-                            <div className="p-6 border-t border-[#E5E5E5] bg-[#FFFFFF] flex gap-4">
+                                                {/* BUY BUTTONS REPLICA */}
+                            <div className="p-6 border-t border-[#E5E5E5] bg-white flex gap-4">
                                 <button 
                                     onClick={() => handleTrade('YES')}
                                     disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
-                                    className="flex-1 py-5 rounded-2xl bg-[#00e699]/10 border-2 border-[#00e699]/20 hover:bg-[#00e699]/20 text-[#00dda8] font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50"
+                                    className="flex-1 py-5 rounded-2xl bg-[#00C076] text-white font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 shadow-lg hover:shadow-[#00C076]/20"
                                 >
-                                    {isExecuting === 'YES' ? <Loader2 size={24} className="animate-spin text-[#00dda8]" /> : <>BUY YES <span className="text-[10px] font-black opacity-80 mt-0.5">@{Math.round(selected.yesPrice * 100)}¢</span></>}
+                                    {isExecuting === 'YES' ? <Loader2 size={24} className="animate-spin" /> : <>BUY YES <span className="text-[10px] font-bold opacity-80 mt-0.5">@{Math.round(selected.yesPrice * 100)}¢</span></>}
                                 </button>
                                 <button 
                                     onClick={() => handleTrade('NO')}
                                     disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
-                                    className="flex-1 py-5 rounded-2xl bg-[#f43f5e]/10 border-2 border-[#f43f5e]/20 hover:bg-[#f43f5e]/20 text-[#f43f5e] font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50"
+                                    className="flex-1 py-5 rounded-2xl bg-[#FF3B30] text-white font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 shadow-lg hover:shadow-[#FF3B30]/20"
                                 >
-                                    {isExecuting === 'NO' ? <Loader2 size={24} className="animate-spin text-[#f43f5e]" /> : <>BUY NO <span className="text-[10px] font-black opacity-80 mt-0.5">@{Math.round((1 - selected.yesPrice) * 100)}¢</span></>}
+                                    {isExecuting === 'NO' ? <Loader2 size={24} className="animate-spin" /> : <>BUY NO <span className="text-[10px] font-bold opacity-80 mt-0.5">@{Math.round((1 - selected.yesPrice) * 100)}¢</span></>}
                                 </button>
-                            </div>
+                            </div>             </div>
                             
                             {!isPolygon && isConnected && (
                                 <div className="px-6 pb-6 bg-[#FFFFFF]">

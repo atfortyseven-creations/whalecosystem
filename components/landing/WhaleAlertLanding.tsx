@@ -325,12 +325,12 @@ export function WhaleAlertLanding() {
         <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner">
             <h2 className="font-aztec-body text-4xl font-light mb-4">Sovereign Protocol Matrix</h2>
             <p className="font-aztec-body text-white/50 text-sm mb-12 max-w-md mx-auto">
-               Institutional-grade Web3 subscription algorithm (49 EUR) backed by smart contracts and absolute cryptographic neutrality. Connect your wallet to access the elite terminal.
+               Institutional-grade Web3 subscription algorithm (5 USD) backed by smart contracts and absolute cryptographic neutrality. Connect your wallet to access the elite terminal.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button onClick={handleEnterArchive} className="px-8 py-3 bg-white text-black text-xs font-medium rounded shadow-lg hover:bg-white/90 transition-all hover:scale-105">Connect Terminal</button>
               <button onClick={() => setShowCheckout(true)} className="px-8 py-3 bg-transparent border border-yellow-500/30 text-yellow-400 text-xs font-medium rounded hover:bg-yellow-500/10 transition-all hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
-                  Subscribe (49 EUR)
+                  Subscribe (5 USD)
               </button>
             </div>
         </div>

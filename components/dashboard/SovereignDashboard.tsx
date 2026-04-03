@@ -2,118 +2,74 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
+import { InstitutionalProShell } from '@/components/dashboard/InstitutionalProShell';
 import { PremiumMatrixStack } from "@/components/premium/PremiumMatrixStack";
 import ActivityFeedPanel from '@/components/network/ActivityFeedPanel';
 import PolymarketPanel from '@/components/dashboard/PolymarketPanel';
 import { CopyTradingArena } from '@/components/premium/CopyTradingArena';
 import { LivePortfolio } from '@/components/premium/LivePortfolio';
-import { Activity, LayoutGrid, Target, Wallet, BarChart2 } from 'lucide-react';
 import "@/app/dashboard/dashboard.css";
 
-type TabId = 'VIP_MATRIX' | 'ACTIVITY' | 'POLYMARKET' | 'DEFI_YIELD' | 'PORTFOLIO';
-
-interface TabDef {
-    id: TabId;
-    label: string;
-    icon: React.ReactNode;
-}
-
-const TABS: TabDef[] = [
-    { id: 'VIP_MATRIX', label: 'ORDER BOOK', icon: <Target size={14} /> },
-    { id: 'ACTIVITY', label: 'WHALE FLOW', icon: <Activity size={14} /> },
-    { id: 'POLYMARKET', label: 'MARKETS AVAILABLE', icon: <BarChart2 size={14} /> },
-    { id: 'DEFI_YIELD', label: 'COPY TRADING', icon: <LayoutGrid size={14} /> },
-    { id: 'PORTFOLIO', label: 'PORTFOLIO', icon: <Wallet size={14} /> },
-];
+type TabId = 'dashboard' | 'watchlist' | 'alerts' | 'multicharts' | 'new-pairs' | 'gainers' | 'api' | 'portfolio';
 
 export default function SovereignDashboard() {
-    const [activeTab, setActiveTab] = useState<TabId>('VIP_MATRIX');
+    const [activeTab, setActiveTab] = useState<TabId>('dashboard');
 
     return (
-        <InstitutionalShell 
-            title="SYSTEM HUB" 
-            subtitle="Sovereign Control Center" 
-            badge="LIVE" 
-            badgeVariant="orchid"
-            fullWidth={true}
+        <InstitutionalProShell 
+            activeTab={activeTab}
+            onTabChange={(id) => setActiveTab(id as TabId)}
         >
-            <div className="w-full flex flex-col bg-[#050505]">
-                {/* ─── Premium Horizontal Tab Bar ─── */}
-                <div className="border-b border-white/10 bg-[#0a0a0a] sticky top-[65px] z-40 px-6 pt-6">
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-[-1px]">
-                        {TABS.map((tab) => {
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`
-                                        relative px-6 py-3 flex items-center gap-2 text-[11px] font-mono tracking-[0.15em] uppercase transition-all whitespace-nowrap
-                                        ${isActive ? 'text-white' : 'text-white/40 hover:text-white/70'}
-                                    `}
-                                >
-                                    {isActive && (
-                                        <motion.div 
-                                            layoutId="system-active-tab"
-                                            className="absolute inset-0 bg-white/[0.05] border-t-2 border-[#a855f7] rounded-t-lg z-0"
-                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                        />
-                                    )}
-                                    <span className="relative z-10 flex items-center gap-2">
-                                        <span className={isActive ? 'text-[#a855f7]' : ''}>{tab.icon}</span>
-                                        <span className="font-bold">{tab.label}</span>
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+            <div className="w-full h-full">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-full h-full"
+                    >
+                        {activeTab === 'dashboard' && (
+                            <PremiumMatrixStack />
+                        )}
 
-                {/* ─── Main Content Area ─── */}
-                <div className="w-full relative">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="w-full min-h-full"
-                        >
-                            {activeTab === 'VIP_MATRIX' && (
-                                <div className="p-0">
-                                    <PremiumMatrixStack />
-                                </div>
-                            )}
+                        {activeTab === 'gainers' && (
+                            <ActivityFeedPanel />
+                        )}
 
-                            {activeTab === 'ACTIVITY' && (
-                                <div className="p-6 max-w-[1600px] mx-auto">
-                                    <ActivityFeedPanel />
-                                </div>
-                            )}
+                        {activeTab === 'multicharts' && (
+                            <PolymarketPanel />
+                        )}
 
-                            {activeTab === 'POLYMARKET' && (
-                                <div className="h-full">
-                                    <PolymarketPanel />
-                                </div>
-                            )}
+                        {activeTab === 'alerts' && (
+                            <div className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-[#E5E5E5] rounded-[3rem] bg-[#FAF9F6]">
+                                <span className="text-sm font-black text-[#050505] uppercase tracking-widest mb-2">Neural Alerts System</span>
+                                <p className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Connect your webhook in settings to activate real-time pulse notifications.</p>
+                            </div>
+                        )}
 
-                            {activeTab === 'DEFI_YIELD' && (
-                                <div className="h-full">
-                                    <CopyTradingArena />
-                                </div>
-                            )}
+                        {activeTab === 'watchlist' && (
+                            <div className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-[#E5E5E5] rounded-[3rem] bg-[#FAF9F6]">
+                                <span className="text-sm font-black text-[#050505] uppercase tracking-widest mb-2">Institutional Watchlist</span>
+                                <p className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Star any asset in the dashboard to track it here in high-fidelity.</p>
+                            </div>
+                        )}
 
-                            {activeTab === 'PORTFOLIO' && (
-                                <div className="h-full">
-                                    <LivePortfolio />
-                                </div>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
+                        {activeTab === 'portfolio' && (
+                            <LivePortfolio />
+                        )}
+                        
+                        {/* Fallback for others */}
+                        {['new-pairs', 'api'].includes(activeTab) && (
+                            <div className="flex flex-col items-center justify-center h-[60vh] text-center border-2 border-dashed border-[#E5E5E5] rounded-[3rem] bg-[#FAF9F6]">
+                                <span className="text-sm font-black text-[#050505] uppercase tracking-widest mb-2">{activeTab.replace('-', ' ').toUpperCase()} INTERFACE</span>
+                                <p className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Integrating on-chain Teranode endpoints for maximal precision...</p>
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
             </div>
-        </InstitutionalShell>
+        </InstitutionalProShell>
     );
 }
