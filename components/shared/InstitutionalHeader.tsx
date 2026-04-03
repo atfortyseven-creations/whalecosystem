@@ -176,29 +176,29 @@ export function InstitutionalHeader() {
                             boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
                         }}
                     >
-                        {!isConnected && (
-                            <div className="grid grid-cols-2 gap-2 mb-5 pb-5 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        onClick={() => setIsMenuOpen(false)}
-                                        className="px-4 py-3 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.25em] transition-all border"
-                                        style={{
-                                            background: link.active ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.02)',
-                                            borderColor: link.active ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.06)',
-                                            color: link.active ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
-                                        }}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+                        {/* ── ALL NAV TABS — always visible on PC (before & after login) ── */}
+                        <div className="grid grid-cols-2 gap-2 mb-5 pb-5 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                            {navLinks.map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="px-4 py-3 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.25em] transition-all border"
+                                    style={{
+                                        background: link.active ? 'rgba(0,0,0,0.07)' : 'rgba(0,0,0,0.02)',
+                                        borderColor: link.active ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.06)',
+                                        color: link.active ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
+                                    }}
+                                >
+                                    {link.label}
+                                </Link>
+                            ))}
+                        </div>
                         
                         <div className="flex flex-col items-center w-full">
                             <SystemsUtilityHeader />
                             
+                            {/* WHALE NEWS highlighted CTA — shown when connected on PC */}
                             {isConnected && (
                                 <Link
                                     href="/news"
