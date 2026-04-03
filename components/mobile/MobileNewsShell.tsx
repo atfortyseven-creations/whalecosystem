@@ -48,26 +48,6 @@ export function MobileNewsShell() {
             </span>
           </div>
         </div>
-
-        {/* Right: Whale News badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-          style={{
-            background: 'rgba(0,0,0,0.88)',
-            color: '#F7F2EA',
-          }}
-        >
-          <span
-            className="w-1.5 h-1.5 rounded-full animate-pulse"
-            style={{ background: '#00FFAA', boxShadow: '0 0 6px #00FFAA' }}
-          />
-          <span className="font-mono font-black text-[8px] uppercase tracking-[0.25em]">
-            WHALE NEWS
-          </span>
-        </motion.div>
       </header>
 
       {/* ─── News Terminal ─── */}

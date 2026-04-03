@@ -198,36 +198,6 @@ export function InstitutionalHeader() {
                         <div className="flex flex-col items-center w-full">
                             <SystemsUtilityHeader />
                             
-                            {/* WHALE NEWS highlighted CTA — shown when connected on PC */}
-                            {isConnected && (
-                                <Link
-                                    href="/news"
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="w-full mt-6 block"
-                                >
-                                    <motion.div
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="relative flex items-center justify-center gap-3 w-full bg-[#0a0a0a] border border-[#222] rounded-2xl py-5 shadow-2xl overflow-hidden"
-                                    >
-                                        {/* Fluid Ray of Light Animation for 240Hz Effect */}
-                                        <motion.div
-                                            animate={{ x: ["-200%", "200%"] }}
-                                            transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
-                                            className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[30deg]"
-                                        />
-                                        
-                                        <span className="relative z-10 text-white font-mono font-black text-xs uppercase tracking-[0.4em] drop-shadow-md">
-                                            WHALE NEWS
-                                        </span>
-                                        <span className="relative z-10 w-2 h-2 rounded-full bg-[#00FFAA] animate-pulse shadow-[0_0_12px_#00FFAA]" />
-                                    </motion.div>
-                                    
-                                    <p className="mt-3 text-center w-full font-mono text-[8px] uppercase tracking-[0.3em] font-black text-black/30">
-                                        Terminal de Inteligencia Desbloqueada
-                                    </p>
-                                </Link>
-                            )}
                         </div>
                     </motion.div>
                 )}
