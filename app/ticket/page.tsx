@@ -391,7 +391,7 @@ function InstitutionalAtmosphere() {
         return () => cancelAnimationFrame(frame);
     }, []);
 
-    return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[10] opacity-50" />;
+    return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[10] opacity-50 transform-gpu" style={{ willChange: 'transform' }} />;
 }
 
 
@@ -542,9 +542,13 @@ export default function GoldenTicketPage() {
                             initial={{ scale: 0.85, y: 40, opacity: 0 }}
                             animate={{ scale: 1.15, y: 0, opacity: 1 }}
                             transition={{ duration: 2.5, ease: [0.16, 1, 0.3, 1] }}
-                            className="relative z-20 pointer-events-none drop-shadow-2xl flex items-center justify-center"
+                            className="relative z-20 pointer-events-none drop-shadow-2xl flex items-center justify-center w-[90vw] max-w-[600px] aspect-[2/1] transform-gpu"
                         >
-                            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}>
+                            <motion.div 
+                                className="w-full h-full transform-gpu" 
+                                animate={{ y: [-10, 10, -10], rotateX: [0, 5, 0], rotateY: [0, 5, 0] }} 
+                                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                            >
                                 <EngineeredGoldenTicket isClaimed={true} />
                             </motion.div>
                         </motion.div>

@@ -50,7 +50,7 @@ const TerminalWindow = ({ title, children, rightIcon = ">>>", className = "" }: 
 
 // ─── Web3 Features ────────────────────────────────────────────────────────────
 const Web3Features = () => (
-    <div className="w-full bg-[#0d0d0d] pt-24 pb-32" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}>
+    <div className="w-full bg-[#0d0d0d] pt-24 pb-32">
         <div className="max-w-7xl mx-auto px-6">
             <h2 className="text-center font-aztec-body text-2xl md:text-4xl text-white/80 font-light tracking-tight mb-20">
                 The Ultimate Sovereign Financial Intelligence
@@ -123,7 +123,7 @@ const Web3Features = () => (
 
 // ─── Cross Platform Section ───────────────────────────────────────────────────
 const CrossPlatformAccess = () => (
-    <div className="w-full bg-[#E8E8E8] py-32 px-6" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}>
+    <div className="w-full bg-[#E8E8E8] py-32 px-6">
         <div className="max-w-4xl mx-auto">
             <h3 className="text-center font-aztec-body text-2xl text-[#111] mb-12">
                 Your personalized agent, accessible from anywhere
@@ -322,7 +322,7 @@ export function WhaleAlertLanding() {
         
         <DynamicCryptoCheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
         
-        <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner" style={{ contentVisibility: 'auto', containIntrinsicSize: '0 300px' }}>
+        <div className="bg-[#050505] py-32 text-center text-white relative border-b border-white/5 shadow-inner">
             <h2 className="font-aztec-body text-4xl font-light mb-4">Sovereign Protocol Matrix</h2>
             <p className="font-aztec-body text-white/50 text-sm mb-12 max-w-md mx-auto">
                Institutional-grade Web3 subscription algorithm (49 EUR) backed by smart contracts and absolute cryptographic neutrality. Connect your wallet to access the elite terminal.

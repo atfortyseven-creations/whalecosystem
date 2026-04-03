@@ -593,7 +593,7 @@ function PagePhilosophy3() {
 
 // ─── QR SCANNER ───────────────────────────────────────────────────────────────
 
-function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
+export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   const isProcessingRef = useRef(false);
   const addressRef = useRef<string>(address);
   const signRef = useRef<any>(signMessageAsync);
@@ -738,7 +738,7 @@ export function MobileSovereignLanding() {
   }
 
   return (
-    <div className="w-full h-[100dvh] bg-[#FAF9F6] overflow-hidden relative" style={{ contain: 'strict' }}>
+    <div className="w-full h-[100dvh] bg-[#FAF9F6] overflow-hidden relative">
       <AnimatedPattern />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 

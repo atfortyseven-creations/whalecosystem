@@ -12,12 +12,7 @@
 
 /* SYSTEM_REV_1.0.42_LEGENDARY_REFRESH */
 @layer base {
-  /* Rendering Optimization for long pages */
-  section {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 500px;
-    contain: paint layout;
-  }
+  /* Rendering Optimization for long pages (removed to fix iOS Safari blanks) */
 
   /* GPU Layer Acceleration for standard cards */
   .premium-card-gpu {

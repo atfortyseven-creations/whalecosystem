@@ -1,19 +1,27 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { NewsTerminal } from '@/components/news/NewsTerminal';
+import { QrCode } from 'lucide-react';
+import { MobileQRScanner } from '@/components/mobile/MobileSovereignLanding';
+import { useAccount, useSignMessage } from 'wagmi';
 
 // ─── MOBILE AUTHENTICATED SHELL ─────────────────────────────────────────────
 // Shown to mobile users who have completed the QR handshake.
 // Only Whale News is accessible — no other tabs.
 
 export function MobileNewsShell() {
+  const [showScanner, setShowScanner] = useState(false);
+  const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+
+  if (showScanner) {
+    return <MobileQRScanner onBack={() => setShowScanner(false)} address={address} signMessageAsync={signMessageAsync} />;
+  }
+
   return (
-    <div
-      className="w-full min-h-[100dvh] bg-[#FAF9F6] flex flex-col"
-      style={{ contain: 'strict' }}
-    >
+    <div className="w-full min-h-[100dvh] bg-[#FAF9F6] flex flex-col">
       {/* ─── Minimal Mobile Header ─── */}
       <header
         className="sticky top-0 z-50 flex items-center justify-between px-5 border-b"
@@ -48,6 +56,14 @@ export function MobileNewsShell() {
             </span>
           </div>
         </div>
+        
+        {/* QR Scanner Button */}
+        <button 
+          onClick={() => setShowScanner(true)}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white shadow-md active:scale-90 transition-transform"
+        >
+          <QrCode size={18} />
+        </button>
       </header>
 
       {/* ─── News Terminal ─── */}
