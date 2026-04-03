@@ -1,32 +1,42 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    LayoutDashboard, Star, Bell, BarChart2, Zap, 
-    TrendingUp, Code, Wallet, Settings, Menu, X,
-    ChevronLeft, ChevronRight, Search, Activity, 
-    Globe, Cpu, Shield
+import { motion } from 'framer-motion';
+import {
+    LayoutDashboard, Star, Bell, BarChart2, Zap,
+    TrendingUp, Code, Wallet, Settings,
+    ChevronLeft, ChevronRight, Search,
+    Globe, Cpu, Shield, Newspaper, LifeBuoy,
+    GraduationCap, Crown, PieChart
 } from 'lucide-react';
 import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
-import Link from 'next/link';
 
 interface NavItem {
     id: string;
     label: string;
     icon: React.ReactNode;
     badge?: string;
+    badgeColor?: string;
+    dividerBefore?: string;
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
-    { id: 'watchlist', label: 'Watchlist', icon: <Star size={18} />, badge: 'Pro' },
-    { id: 'alerts', label: 'Alerts', icon: <Bell size={18} /> },
-    { id: 'multicharts', label: 'Multicharts', icon: <BarChart2 size={18} /> },
-    { id: 'new-pairs', label: 'New Pairs', icon: <Zap size={18} />, badge: 'Live' },
-    { id: 'gainers', label: 'Gainers & Losers', icon: <TrendingUp size={18} /> },
-    { id: 'api', label: 'API Terminal', icon: <Code size={18} /> },
-    { id: 'portfolio', label: 'Portfolio', icon: <Wallet size={18} /> },
+    // ── Markets ──
+    { id: 'dashboard',       label: 'Dashboard',       icon: <LayoutDashboard size={17}/>, dividerBefore: 'Markets' },
+    { id: 'watchlist',       label: 'Watchlist',        icon: <Star size={17}/>,            badge: 'Pro' },
+    { id: 'alerts',          label: 'Alerts',           icon: <Bell size={17}/> },
+    { id: 'multicharts',     label: 'Multicharts',      icon: <BarChart2 size={17}/> },
+    { id: 'new-pairs',       label: 'New Pairs',        icon: <Zap size={17}/>,             badge: 'Live', badgeColor: '#00C076' },
+    { id: 'gainers',         label: 'Gainers & Losers', icon: <TrendingUp size={17}/> },
+    // ── Intelligence ──
+    { id: 'whale-portfolio', label: 'Whale Portfolio',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
+    { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
+    { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
+    { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
+    // ── Learn & Support ──
+    { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
+    { id: 'support',         label: 'Whale Support',    icon: <LifeBuoy size={17}/> },
+    { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
 export function InstitutionalProShell({ 
@@ -70,35 +80,57 @@ export function InstitutionalProShell({
                 </div>
 
                 {/* Sidebar Navigation */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-3 space-y-1 no-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 space-y-0.5 no-scrollbar">
                     {SIDEBAR_ITEMS.map((item) => {
                         const isActive = activeTab === item.id;
+                        const isGold   = item.id === 'gold-ticket';
                         return (
-                            <button
-                                key={item.id}
-                                onClick={() => onTabChange(item.id)}
-                                className={`
-                                    w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all relative
-                                    ${isActive 
-                                        ? 'bg-[#050505] text-white shadow-lg' 
-                                        : 'text-[#888888] hover:text-[#050505] hover:bg-[#E5E5E5]/30'}
-                                `}
-                            >
-                                <span className={isActive ? 'text-white' : ''}>{item.icon}</span>
-                                {!isCollapsed && (
-                                    <span className="text-xs font-bold uppercase tracking-widest flex-1 text-left">
-                                        {item.label}
-                                    </span>
+                            <div key={item.id}>
+                                {/* Section divider label */}
+                                {item.dividerBefore && !isCollapsed && (
+                                    <div className="px-4 pt-4 pb-1">
+                                        <span className="text-[8px] font-black text-[#CCCCCC] uppercase tracking-[0.2em]">
+                                            {item.dividerBefore}
+                                        </span>
+                                    </div>
                                 )}
-                                {!isCollapsed && item.badge && (
-                                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${isActive ? 'bg-white/20 text-white' : 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20'} uppercase`}>
-                                        {item.badge}
-                                    </span>
+                                {item.dividerBefore && isCollapsed && (
+                                    <div className="my-2 mx-3 h-px bg-[#E5E5E5]/60"/>
                                 )}
-                                {isActive && !isCollapsed && (
-                                    <motion.div layoutId="nav-glow" className="absolute left-0 w-1 h-6 bg-white rounded-r-full" />
-                                )}
-                            </button>
+                                <button
+                                    onClick={() => onTabChange(item.id)}
+                                    className={`
+                                        w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative
+                                        ${isGold && !isActive
+                                            ? 'text-[#D4AF37] hover:bg-[#D4AF37]/10 border border-[#D4AF37]/20'
+                                            : isActive
+                                                ? 'bg-[#050505] text-white shadow-md'
+                                                : 'text-[#888888] hover:text-[#050505] hover:bg-[#E5E5E5]/40'
+                                        }
+                                    `}
+                                >
+                                    <span className={isActive ? 'text-white' : isGold ? 'text-[#D4AF37]' : ''}>{item.icon}</span>
+                                    {!isCollapsed && (
+                                        <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none">
+                                            {item.label}
+                                        </span>
+                                    )}
+                                    {!isCollapsed && item.badge && (
+                                        <span
+                                            className="text-[7px] font-black px-1.5 py-0.5 rounded uppercase"
+                                            style={isActive
+                                                ? { background: 'rgba(255,255,255,0.2)', color: 'white' }
+                                                : { background: (item.badgeColor || '#D4AF37') + '18', color: item.badgeColor || '#D4AF37', border: `1px solid ${(item.badgeColor || '#D4AF37')}40` }
+                                            }
+                                        >
+                                            {item.badge}
+                                        </span>
+                                    )}
+                                    {isActive && (
+                                        <motion.div layoutId="nav-indicator" className="absolute left-0 w-1 h-5 bg-white rounded-r-full" />
+                                    )}
+                                </button>
+                            </div>
                         );
                     })}
                 </div>
