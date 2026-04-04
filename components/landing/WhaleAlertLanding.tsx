@@ -142,21 +142,21 @@ function DataTicker() {
   const content = [...tickerData, ...tickerData, ...tickerData];
 
   return (
-    <div className="relative w-full overflow-hidden border-y" style={{ borderColor: "rgba(5,5,5,0.04)" }}>
+    <div className="relative w-full overflow-hidden border-y" style={{ borderColor: "rgba(5,5,5,0.12)", background: "rgba(5,5,5,0.02)" }}>
       <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
         style={{ background: "linear-gradient(90deg,#FBC9C2,transparent)" }} />
       <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
         style={{ background: "linear-gradient(-90deg,#FBC9C2,transparent)" }} />
       <motion.div
-        className="flex gap-14 py-3 will-change-transform"
+        className="flex gap-14 py-3.5 will-change-transform"
         style={{ width: "max-content" }}
         animate={{ x: [0, -4000] }}
         transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
       >
         {content.map((item: string, i: number) => (
           <span key={i}
-            className="text-[8.5px] font-mono uppercase tracking-[0.28em] whitespace-nowrap"
-            style={{ color: item.startsWith("⚠") ? "#D4AF37" : "rgba(5,5,5,0.28)" }}>
+            className="text-[9px] font-mono uppercase tracking-[0.28em] whitespace-nowrap font-semibold"
+            style={{ color: item.startsWith("⚠") ? "#D4AF37" : "rgba(5,5,5,0.60)" }}>
             {item}
           </span>
         ))}
@@ -185,12 +185,12 @@ function GlowCard({
         className="relative rounded-2xl p-9 md:p-11 overflow-hidden cursor-default"
         style={{
           background: hovered
-            ? `radial-gradient(ellipse 80% 60% at 20% 20%, ${color}0a, rgba(5,5,5,0.015))`
-            : "rgba(5,5,5,0.018)",
-          border: `1px solid ${hovered ? color + "35" : "rgba(5,5,5,0.06)"}`,
+            ? `radial-gradient(ellipse 80% 60% at 20% 20%, ${color}18, rgba(5,5,5,0.05))`
+            : "rgba(5,5,5,0.05)",
+          border: `1px solid ${hovered ? color + "55" : "rgba(5,5,5,0.12)"}`,
           boxShadow: hovered
-            ? `0 0 80px ${color}18, 0 24px 72px rgba(0,0,0,0.5)`
-            : "0 8px 40px rgba(0,0,0,0.3)",
+            ? `0 0 80px ${color}25, 0 24px 72px rgba(0,0,0,0.15)`
+            : "0 4px 24px rgba(0,0,0,0.06)",
           transition: "border-color 0.5s, box-shadow 0.5s, background 0.5s",
         }}
       >
@@ -199,19 +199,19 @@ function GlowCard({
           className="absolute inset-0 pointer-events-none"
           animate={{ opacity: hovered ? 1 : 0 }}
           style={{
-            background: `linear-gradient(135deg, ${color}08, transparent 60%)`,
+            background: `linear-gradient(135deg, ${color}12, transparent 60%)`,
           }}
         />
 
         <div className="inline-flex p-3.5 rounded-xl mb-6"
-          style={{ background: `${color}10`, border: `1px solid ${color}1a` }}>
+          style={{ background: `${color}18`, border: `1px solid ${color}30` }}>
           <span style={{ color }}>{icon}</span>
         </div>
 
-        <h3 className="text-xl md:text-2xl font-light mb-4 leading-snug" style={{ color: "#050505" }}>
+        <h3 className="text-xl md:text-2xl font-semibold mb-4 leading-snug" style={{ color: "#050505" }}>
           {title}
         </h3>
-        <p className="text-sm font-light leading-relaxed" style={{ color: "rgba(5,5,5,0.35)" }}>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(5,5,5,0.65)" }}>
           {desc}
         </p>
 
@@ -282,10 +282,10 @@ function StatBlock({ value, label }: { value: string; label: string }) {
       initial={{ opacity: 0, y: 24 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ type: "spring", stiffness: 60, damping: 18 }}>
-      <span className="text-[9px] font-mono uppercase tracking-[0.4em] mb-1.5"
-        style={{ color: "rgba(5,5,5,0.28)" }}>{label}</span>
-      <span className="text-3xl md:text-4xl font-light tracking-tight"
-        style={{ color: "rgba(5,5,5,0.9)" }}>{value}</span>
+      <span className="text-[9px] font-mono uppercase tracking-[0.4em] mb-1.5 font-semibold"
+        style={{ color: "rgba(5,5,5,0.60)" }}>{label}</span>
+      <span className="text-3xl md:text-4xl font-semibold tracking-tight"
+        style={{ color: "rgba(5,5,5,0.95)" }}>{value}</span>
     </motion.div>
   );
 }
@@ -508,11 +508,11 @@ export function WhaleAlertLanding() {
       {/*  CAPABILITIES GRID                                              */}
       {/* ─────────────────────────────────────────────────────────────── */}
       <section className="relative z-10 py-28"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.03)" }}>
+        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
         <div className="max-w-6xl mx-auto px-6 md:px-12">
           <Reveal>
-            <p className="text-center text-[8.5px] font-mono uppercase tracking-[0.55em] mb-12"
-              style={{ color: "rgba(5,5,5,0.2)" }}>
+            <p className="text-center text-[9px] font-mono uppercase tracking-[0.55em] mb-12 font-semibold"
+              style={{ color: "rgba(5,5,5,0.55)" }}>
               — Capabilities
             </p>
           </Reveal>
@@ -521,13 +521,13 @@ export function WhaleAlertLanding() {
               <Reveal key={i} delay={i * 0.06} yOffset={24}>
                 <motion.div
                   whileHover={{ y: -5, scale: 1.04,
-                    boxShadow: `0 12px 40px ${f.color}18, 0 0 0 1px ${f.color}28` }}
+                    boxShadow: `0 12px 40px ${f.color}30, 0 0 0 1px ${f.color}45` }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   className="flex flex-col items-start gap-3 p-5 rounded-xl cursor-default"
-                  style={{ background: "rgba(5,5,5,0.018)", border: "1px solid rgba(5,5,5,0.05)" }}
+                  style={{ background: "rgba(5,5,5,0.04)", border: "1px solid rgba(5,5,5,0.10)" }}
                 >
                   <span style={{ color: f.color }}>{f.icon}</span>
-                  <span className="text-[11px] font-medium leading-snug" style={{ color: "rgba(5,5,5,0.55)" }}>
+                  <span className="text-[12px] font-semibold leading-snug" style={{ color: "rgba(5,5,5,0.80)" }}>
                     {f.label}
                   </span>
                 </motion.div>
@@ -541,13 +541,13 @@ export function WhaleAlertLanding() {
       {/*  ARCHITECTURE                                                    */}
       {/* ─────────────────────────────────────────────────────────────── */}
       <section className="relative z-10 py-40 px-6 md:px-12"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.04)" }}>
+        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="mb-24">
-              <p className="text-[8.5px] font-mono tracking-[0.55em] uppercase mb-5"
+              <p className="text-[9px] font-mono tracking-[0.55em] uppercase mb-5 font-bold"
                 style={{ color: "#1a6de0" }}>— Architecture</p>
-              <h2 className="text-3xl md:text-[3.5rem] font-light mb-6 leading-[1.1]"
+              <h2 className="text-3xl md:text-[3.5rem] font-semibold mb-6 leading-[1.1]"
                 style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
                 Principles of Structural{" "}
                 <span style={{
@@ -555,7 +555,7 @@ export function WhaleAlertLanding() {
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                 }}>Engineering.</span>
               </h2>
-              <p className="text-base font-light max-w-[580px]" style={{ color: "rgba(5,5,5,0.7)", lineHeight: 1.75 }}>
+              <p className="text-base max-w-[580px]" style={{ color: "rgba(5,5,5,0.72)", lineHeight: 1.75 }}>
                 The solidity of the system does not reside in superficial innovation, but in
                 the precise amalgamation of established computational paradigms.
               </p>
@@ -574,17 +574,17 @@ export function WhaleAlertLanding() {
       {/*  MODULES                                                         */}
       {/* ─────────────────────────────────────────────────────────────── */}
       <section className="relative z-10 py-40 px-6 md:px-12"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.04)" }}>
+        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="mb-24 text-center">
-              <p className="text-[8.5px] font-mono tracking-[0.55em] uppercase mb-5"
-                style={{ color: "#00d4ff" }}>— Implementation</p>
-              <h2 className="text-3xl md:text-[3.5rem] font-light mb-6"
+              <p className="text-[9px] font-mono tracking-[0.55em] uppercase mb-5 font-bold"
+                style={{ color: "#0095b3" }}>— Implementation</p>
+              <h2 className="text-3xl md:text-[3.5rem] font-semibold mb-6"
                 style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
                 Functional Modules
               </h2>
-              <p className="text-base font-light mx-auto" style={{ color: "rgba(5,5,5,0.7)", maxWidth: 520, lineHeight: 1.75 }}>
+              <p className="text-base mx-auto" style={{ color: "rgba(5,5,5,0.72)", maxWidth: 520, lineHeight: 1.75 }}>
                 The materialization concludes strictly in silent observation modules.
                 No simulations. Empirical data with profound rigor.
               </p>
@@ -595,32 +595,32 @@ export function WhaleAlertLanding() {
               <Reveal key={i} delay={i * 0.14} yOffset={50}>
                 <motion.div
                   whileHover={{ scale: 1.01,
-                    boxShadow: `0 24px 80px ${mod.color}10, 0 0 0 1px ${mod.color}22` }}
+                    boxShadow: `0 24px 80px ${mod.color}22, 0 0 0 1px ${mod.color}40` }}
                   transition={{ type: "spring", stiffness: 240, damping: 24 }}
                   className="rounded-2xl p-10 md:p-14 flex flex-col md:flex-row gap-10 md:gap-20 items-start"
                   style={{
-                    background: "rgba(5,5,5,0.016)",
-                    border: "1px solid rgba(5,5,5,0.05)",
-                    boxShadow: "0 16px 56px rgba(0,0,0,0.35)",
+                    background: "rgba(5,5,5,0.04)",
+                    border: "1px solid rgba(5,5,5,0.11)",
+                    boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
                   }}
                 >
                   <div className="md:w-1/3 shrink-0">
-                    <div className="text-[8px] font-mono tracking-[0.45em] uppercase mb-4 opacity-65"
+                    <div className="text-[9px] font-mono tracking-[0.45em] uppercase mb-4 font-bold"
                       style={{ color: mod.color }}>{mod.category}</div>
-                    <h3 className="text-2xl md:text-3xl font-light leading-snug"
-                      style={{ color: "rgba(5,5,5,0.92)" }}>{mod.title}</h3>
+                    <h3 className="text-2xl md:text-3xl font-semibold leading-snug"
+                      style={{ color: "rgba(5,5,5,0.95)" }}>{mod.title}</h3>
                     <div className="mt-5 h-[2px] w-10 rounded"
                       style={{ background: `linear-gradient(90deg,${mod.color},transparent)` }} />
                   </div>
                   <div className="md:w-2/3">
-                    <p className="text-base font-light leading-relaxed mb-8"
-                      style={{ color: "rgba(5,5,5,0.38)" }}>{mod.description}</p>
+                    <p className="text-base leading-relaxed mb-8"
+                      style={{ color: "rgba(5,5,5,0.68)" }}>{mod.description}</p>
                     <ul className="space-y-3">
                       {mod.points.map((pt, j) => (
                         <li key={j} className="flex items-center gap-4">
                           <div className="w-1.5 h-1.5 rounded-full shrink-0"
                             style={{ background: mod.color, boxShadow: `0 0 7px ${mod.color}` }} />
-                          <span className="text-sm font-light" style={{ color: "rgba(5,5,5,0.45)" }}>
+                          <span className="text-sm font-medium" style={{ color: "rgba(5,5,5,0.72)" }}>
                             {pt}
                           </span>
                         </li>
@@ -638,9 +638,9 @@ export function WhaleAlertLanding() {
       {/*  CONCLUSION CTA                                                  */}
       {/* ─────────────────────────────────────────────────────────────── */}
       <section className="relative z-10 py-52 px-6 text-center overflow-hidden"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.04)" }}>
+        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(26,109,224,0.065) 0%, transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(26,109,224,0.10) 0%, transparent 70%)" }} />
 
         <Reveal>
           <div className="relative max-w-3xl mx-auto">
@@ -651,7 +651,7 @@ export function WhaleAlertLanding() {
                 transition={{ duration: i === 0 ? 140 : 90, repeat: Infinity, ease: "linear" }}
                 className="absolute left-1/2 top-[-60px] -translate-x-1/2 rounded-full border pointer-events-none"
                 style={{ width: size, height: size,
-                  borderColor: i === 0 ? "rgba(26,109,224,0.07)" : "rgba(212,175,55,0.07)",
+                  borderColor: i === 0 ? "rgba(26,109,224,0.18)" : "rgba(212,175,55,0.18)",
                   borderStyle: i === 1 ? "dashed" : "solid",
                   marginTop: -(size / 2) + 60,
                   marginLeft: -(size / 2),
@@ -661,16 +661,16 @@ export function WhaleAlertLanding() {
                 }} />
             ))}
 
-            <p className="text-[8.5px] font-mono tracking-[0.55em] uppercase mb-9"
+            <p className="text-[9px] font-mono tracking-[0.55em] uppercase mb-9 font-bold"
               style={{ color: "#D4AF37" }}>— Terminal Access</p>
 
-            <h2 className="text-4xl md:text-6xl font-light mb-8 leading-tight"
+            <h2 className="text-4xl md:text-6xl font-semibold mb-8 leading-tight"
               style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
               Whale Alert Network Matrix
             </h2>
 
-            <p className="text-base font-light mb-16 leading-relaxed"
-              style={{ color: "rgba(5,5,5,0.7)", maxWidth: "520px", margin: "0 auto 4rem" }}>
+            <p className="text-base mb-16 leading-relaxed"
+              style={{ color: "rgba(5,5,5,0.72)", maxWidth: "520px", margin: "0 auto 4rem" }}>
               The terminal is available strictly for those who require this structural clarity.
               Access demands the verification of cryptographic signatures.
             </p>
