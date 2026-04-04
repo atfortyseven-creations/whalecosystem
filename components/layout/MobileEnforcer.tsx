@@ -64,7 +64,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     }
 
     // ── PC ZONE ──────────────────────────────────────────────────────────────
-    // Full app with ALL tabs (System, Whale Portfolio, News of Today,
-    // Whale Support, Whale Academy, Gold Ticket) — no restrictions.
+    // Only SYSTEM tab is publicly accessible. All other sections (Portfolio,
+    // News, Support, Academy, Gold Ticket) are hidden from the navigation.
     return <>{children}</>;
 }

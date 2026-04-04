@@ -1,8 +1,15 @@
 const isExtension = process.env.EXT_BUILD === 'true';
 
 /** @type {import('next').NextConfig} */
-// Force deployment trigger: 2026-02-09T11:55:00
+// Force deployment trigger: 2026-04-04T14:50:00
 const nextConfig = {
+    transpilePackages: [
+        'three',
+        '@react-three/fiber',
+        '@react-three/drei',
+        '@react-three/postprocessing',
+        'postprocessing',
+    ],
     webpack: (config, { isServer }) => {
         // [LEGENDARY BUILD FIX] Force bypass for missing third-party SDK dependencies
         config.resolve.alias = {
@@ -11,6 +18,14 @@ const nextConfig = {
             'porto': false,
             'porto/internal': false,
         };
+
+        // Three.js: prevent server-side import issues
+        if (isServer) {
+            config.externals = [...(config.externals || []),
+                'three', '@react-three/fiber', '@react-three/drei',
+                '@react-three/postprocessing', 'postprocessing'
+            ];
+        }
 
         if (!isServer) {
             config.resolve.fallback = {

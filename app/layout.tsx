@@ -40,7 +40,7 @@ export const metadata = {
     default: 'Whale Alert Network | Sovereign Institutional Interface',
     template: '%s | Whale Alert Network'
   },
-  description: 'The world\'s most advanced whale alert tool for real-time elite on-chain intelligence. Track massive capital flows across blockchains with institutional-grade forensic instrumentation, zero-knowledge proofs, and real-time AI signals.',
+  description: 'The world\'s most advanced whale alert tool for real-time elite on-chain intelligence. Track whales across 24 crypto assets with institutional-grade forensic instrumentation.',
   keywords: [
     'Whale Alert Network', 'Whale Alert', 'Whale Tracker', 'Elite Whale Intelligence', 
     'On-chain Forensic Analytics', 'Crypto Whale Detector', 'Institutional Flow Analysis',
@@ -74,7 +74,7 @@ export const metadata = {
   },
   openGraph: {
     title: 'Whale Alert Network | Sovereign Intelligence',
-    description: 'Track elite flows of millions in real time. The definitive whale alert tool with asymmetric institutional intelligence.',
+    description: 'The world\'s most advanced whale alert tool for real-time elite on-chain intelligence. Track whales across 24 crypto assets with institutional-grade forensic instrumentation.',
     url: 'https://humanidfi.com',
     siteName: 'Whale Alert Network',
     images: [

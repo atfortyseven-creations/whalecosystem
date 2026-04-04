@@ -93,10 +93,10 @@ export const Footer = () => {
                                 <span className="w-4 h-[1px] bg-[var(--aztec-orchid)]" /> Platform
                             </h4>
                             <div className="flex flex-col gap-5">
-                                <FooterLink href="/vip">VIP Archive</FooterLink>
-                                <FooterLink href="/network">Network Portal</FooterLink>
-                                <FooterLink href="/academy">Whale Academy</FooterLink>
-                                <FooterLink href="/support">Core Support</FooterLink>
+                                <FooterLink href="/dashboard" icon={<Globe size={15} />}>System Terminal</FooterLink>
+                                <FooterLink href="/docs" icon={<Code size={15} />}>Technical Docs</FooterLink>
+                                <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy Policy</FooterLink>
+                                <FooterLink href="/terms" icon={<Database size={15} />}>Terms of Service</FooterLink>
                             </div>
                         </div>
 
