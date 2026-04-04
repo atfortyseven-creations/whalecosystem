@@ -37,12 +37,8 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     useEffect(() => {
         setMounted(true);
-        // Force the institutional loading screen to show for 2.2 seconds before finishing hydration
-        const timer = setTimeout(() => {
-            setShowIntro(false);
-        }, 2200);
-        return () => clearTimeout(timer);
     }, []);
+
     useEffect(() => {
         const checkAccess = () => {
             if (!mounted) return;
@@ -74,9 +70,9 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         checkAccess();
     }, [isConnected, isPublicPage, router, mounted]);
 
-    // Loader — Show institutional loader during hydration and forced intro delay
-    if (!mounted || showIntro) {
-        return <WhaleAlertLoader bg="#FFFFFF" color="#000000" />;
+    // Loader — Only show during initial hydration to prevent flash
+    if (!mounted) {
+        return <div style={{ background: '#020202', minHeight: '100vh' }} />;
     }
 
     return (

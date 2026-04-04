@@ -17,10 +17,10 @@ const QrScanner = dynamic(
     { ssr: false, loading: () => <div className="w-64 h-64 rounded-3xl bg-white/5 animate-pulse mx-auto" /> }
 );
 
-// ─── CONFIGURACIÓN DE ANIMACIÓN ───────────────────────────────────────────────
+// ─── ANIMATION CONFIGURATION ───────────────────────────────────────────────
 const SPRING = { type: "spring" as const, stiffness: 60, damping: 20, mass: 1 };
 
-// ─── ETIQUETA ACADÉMICA ────────────────────────────────────────────────────────
+// ─── ACADEMIC TAG ────────────────────────────────────────────────────────
 function Tag({ children }: { children: React.ReactNode }) {
     return (
         <span style={{ color: "#D4AF37", border: "1px solid rgba(212, 175, 55, 0.15)", backgroundColor: "rgba(212, 175, 55, 0.05)" }} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-[0.25em]">
@@ -29,7 +29,7 @@ function Tag({ children }: { children: React.ReactNode }) {
     );
 }
 
-// ─── Sección ──────────────────────────────────────────────────────────────────
+// ─── Section ──────────────────────────────────────────────────────────────────
 function Section({ id, children, className = "" }: { id?: string; children: React.ReactNode; className?: string }) {
     return (
         <section id={id} className={`min-h-screen w-full relative flex flex-col px-6 py-20 ${className}`}>
@@ -38,7 +38,7 @@ function Section({ id, children, className = "" }: { id?: string; children: Reac
     );
 }
 
-// ─── Tarjeta Arquitectónica ──────────────────────────────────────────────────
+// ─── Architectural Card ──────────────────────────────────────────────────
 function ArchCard({ icon, title, subtitle, body }: {
     icon: React.ReactNode; title: string; subtitle: string; body: string;
 }) {
@@ -60,7 +60,7 @@ function ArchCard({ icon, title, subtitle, body }: {
     );
 }
 
-// ─── Paso Metodológico ────────────────────────────────────────────────────────
+// ─── Methodological Step ────────────────────────────────────────────────────────
 function Step({ n, title, body }: { n: number; title: string; body: string }) {
     return (
         <div className="flex gap-4">
@@ -96,22 +96,22 @@ export function MobileLanding() {
             style={{ backgroundColor: "#020202", color: "#E0E0E0" }}
             className="min-h-screen overflow-y-auto w-full selection:bg-[#D4AF37]/30 selection:text-white font-sans"
         >
-            {/* Atmósfera superior (Sutil) */}
+            {/* Upper Atmosphere (Subtle) */}
             <div className="fixed top-0 left-0 right-0 h-[40vh] bg-[radial-gradient(ellipse_at_50%_-20%,_rgba(212,175,55,0.05),_transparent_70%)] pointer-events-none z-0" />
 
-            {/* ── SECCIÓN 1: PRÓLOGO ── */}
+            {/* ── SECTION 1: PROLOGUE ── */}
             <section className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center border-b" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <motion.div
                     style={{ opacity: heroOpacity, y: heroY }}
                     className="relative z-10 flex flex-col items-center gap-7 pt-12"
                 >
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.2 }}>
-                        <Tag><Lock size={9} strokeWidth={1.5} /> Enlace Estructural</Tag>
+                        <Tag><Lock size={9} strokeWidth={1.5} /> Structural Link</Tag>
                     </motion.div>
 
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.3 }} className="space-y-4">
                         <h1 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-[40px] leading-[1.1] font-light tracking-tight">
-                            Sovereign
+                            Whale Alert
                             <br />
                             <span style={{ color: "#8A94A6" }}>Bridge Protocol</span>
                         </h1>
@@ -122,7 +122,7 @@ export function MobileLanding() {
                         style={{ color: "#A0AABF" }}
                         className="text-[15px] leading-[1.8] max-w-[280px] font-light"
                     >
-                        Interfaz móvil configurada exclusivamente para el establecimiento de sesiones criptográficas.
+                        Mobile interface configured exclusively for establishing cryptographic sessions.
                     </motion.p>
 
                     <motion.button
@@ -131,7 +131,7 @@ export function MobileLanding() {
                         style={{ backgroundColor: "#EAEAEA", color: "#0A0A0A" }}
                         className="flex items-center gap-2 px-6 py-3.5 rounded text-[13px] font-medium hover:bg-white transition-colors mt-2"
                     >
-                        Establecer Enlace Seguro <ArrowRight size={14} />
+                        Establish Secure Link <ArrowRight size={14} />
                     </motion.button>
                 </motion.div>
 
@@ -140,100 +140,100 @@ export function MobileLanding() {
                 </motion.div>
             </section>
 
-            {/* ── SECCIÓN 2: EPISTEMOLOGÍA Y LÍMITES ── */}
+            {/* ── SECTION 2: EPISTEMOLOGY AND BOUNDARIES ── */}
             <Section className="justify-start pt-24 pb-16 border-b" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <div className="space-y-10 max-w-sm mx-auto w-full">
                     <div className="space-y-5">
-                        <Tag><Monitor size={9} /> Restricción Computacional</Tag>
+                        <Tag><Monitor size={9} /> Computational Restriction</Tag>
                         <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-[28px] leading-[1.2] font-light">
-                            Topología de <br />
-                            <span style={{ color: "#8A94A6" }}>Alta Frecuencia.</span>
+                            High-Frequency <br />
+                            <span style={{ color: "#8A94A6" }}>Topology.</span>
                         </h2>
                         <p style={{ color: "#8A94A6" }} className="text-[14px] leading-[1.9] font-light">
-                            El análisis estocástico y la síntesis de flujos institucionales demandan capacidades de renderizado 
-                            constantes. Este dispositivo móvil carece de la optimización requerida para ejecutar el motor 
-                            visual sin comprometer la velocidad ni la veracidad de los eventos financieros.
+                            Stochastic analysis and institutional flow synthesis demand constant rendering capabilities. 
+                            This mobile device lacks the optimization required to execute the visual engine 
+                            without compromising the speed or veracity of financial events.
                         </p>
                     </div>
 
                     <div style={{ backgroundColor: "rgba(212, 175, 55, 0.03)", border: "1px solid rgba(212, 175, 55, 0.15)" }} className="rounded-xl p-5 space-y-3">
                         <div style={{ color: "#D4AF37" }} className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em]">
-                            <BookOpen size={12} /> Naturaleza del Enlace
+                            <BookOpen size={12} /> Nature of the Link
                         </div>
                         <p style={{ color: "#A0AABF" }} className="text-[13px] leading-[1.8] font-light">
-                            El dispositivo actual debe emplearse estrictamente como una capa de autenticación asimétrica (Zero-Knowledge). 
-                            Escanee el código de vinculación para delegar su sesión al entorno de escritorio.
+                            Current device must be used strictly as an asymmetric authentication layer (Zero-Knowledge). 
+                            Scan the pairing code to delegate your session to the desktop environment.
                         </p>
                     </div>
                 </div>
             </Section>
 
-            {/* ── SECCIÓN 3: ARQUITECTURA SINTÉTICA ── */}
+            {/* ── SECTION 3: SYNTHETIC ARCHITECTURE ── */}
             <Section className="justify-start pt-20 pb-16 border-b" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <div className="space-y-8 max-w-sm mx-auto w-full">
                     <div className="space-y-4">
-                        <Tag><Database size={9} /> Infraestructura</Tag>
+                        <Tag><Database size={9} /> Infrastructure</Tag>
                         <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-[28px] leading-[1.2] font-light">
-                            Constructo <br />
-                            <span style={{ color: "#8A94A6" }}>Algorítmico.</span>
+                            Algorithmic <br />
+                            <span style={{ color: "#8A94A6" }}>Construct.</span>
                         </h2>
                     </div>
 
                     <div className="space-y-4">
                         <ArchCard
                             icon={<Cpu size={18} strokeWidth={1.5} />}
-                            title="Ingesta Inmutable"
-                            subtitle="Sincronización EVM · WebSocket"
-                            body="Unificación de grafos dirigidos procedentes de estados de la blockchain sin intermediarios matemáticos que distorsionen la información."
+                            title="Immutable Ingestion"
+                            subtitle="EVM Sync · WebSocket"
+                            body="Unification of directed graphs coming from blockchain states without mathematical intermediaries that distort information."
                         />
                         <ArchCard
                             icon={<Shield size={18} strokeWidth={1.5} />}
-                            title="Capa de Soberanía"
-                            subtitle="Protocolos ZK · Mnemotécnicas"
-                            body="Implementamos mecanismos criptográficos para aislar los flujos generados, garantizando la inobservabilidad regulatoria de manera descentralizada."
+                            title="Sovereignty Layer"
+                            subtitle="ZK Protocols · Mnemonics"
+                            body="We implement cryptographic mechanisms to isolate generated flows, ensuring regulatory inobservability in a decentralized manner."
                         />
                         <ArchCard
                             icon={<Network size={18} strokeWidth={1.5} />}
-                            title="Modelado de Nodos"
-                            subtitle="Arquitectura Euclidiana"
-                            body="La plataforma interactúa generando mapeos directos sobre entidades de mercado (wallets, pools) permitiendo la vinculación semántica de datos puros."
+                            title="Node Modeling"
+                            subtitle="Euclidean Architecture"
+                            body="The platform interacts by generating direct mappings on market entities (wallets, pools) allowing for the semantic linking of raw data."
                         />
                     </div>
                 </div>
             </Section>
 
-            {/* ── SECCIÓN 4: INSTRUCCIONES DE ACCESO ── */}
+            {/* ── SECTION 4: ACCESS INSTRUCTIONS ── */}
             <Section className="justify-start pt-20 pb-12">
                 <div className="space-y-10 max-w-sm mx-auto w-full">
                     <div className="space-y-4">
-                        <Tag><Lock size={9} /> Metodología</Tag>
+                        <Tag><Lock size={9} /> Methodology</Tag>
                         <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-[28px] leading-[1.2] font-light">
-                            Protocolos de <br />
-                            <span style={{ color: "#8A94A6" }}>Autenticación.</span>
+                            Authentication <br />
+                            <span style={{ color: "#8A94A6" }}>Protocols.</span>
                         </h2>
                     </div>
 
                     <div className="space-y-4">
                         <Step
                             n={1}
-                            title="Despliegue Físico"
-                            body="Ubíquese en una estación de trabajo o computadora personal con un navegador con soporte nativo de aceleración web."
+                            title="Physical Deployment"
+                            body="Position yourself at a workstation or personal computer with a browser that natively supports web acceleration."
                         />
                         <Step
                             n={2}
-                            title="Apertura de la Red"
-                            body="Acceda a Sovereign Network y diríjase al panel de vinculación bajo la capa de preferencias ("Device Bridge")."
+                            title="Network Opening"
+                            body="Access Whale Alert Network and go to the link panel under the settings layer ('Device Bridge')."
                         />
                         <Step
                             n={3}
-                            title="Interpretación Criptográfica"
-                            body="Valide su acceso empleando la sección inferior de esta interfaz. El escáner decodificará el token efímero asignado a la sesión principal."
+                            title="Cryptographic Interpretation"
+                            body="Validate your access using the bottom section of this interface. The scanner will decode the ephemeral token assigned to the main session."
                         />
                     </div>
                 </div>
             </Section>
 
-            {/* ── SECCIÓN 5: MÓDULO DE CONEXIÓN E INGRESO (PRESERVADO INTACTO EN LÓGICA) ── */}
+            {/* ── SECTION 5: CONNECTION AND LOGIN MODULE ── */}
             <Section id="s-connect" className="justify-start pt-16 pb-24 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <div className="space-y-10 max-w-sm mx-auto w-full">
                     <div className="space-y-4 text-center">
@@ -241,14 +241,14 @@ export function MobileLanding() {
                             <QrCode size={28} strokeWidth={1} />
                         </div>
                         <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-[28px] leading-[1.2] font-light">
-                            Enlace de Observación
+                            Observation Link
                         </h2>
                         <p style={{ color: "#8A94A6" }} className="text-[13px] leading-[1.8] font-light">
-                            Identifique su entidad criptográfica y posteriormente enfoque la matriz de la terminal para formalizar el traspaso.
+                            Identify your cryptographic entity and then focus the terminal matrix to formalize the handover.
                         </p>
                     </div>
 
-                    {/* BLOQUE DE AUTENTICACION (Lógica preservada) */}
+                    {/* AUTH BLOCK */}
                     {isSignedIn ? (
                         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                                     style={{ backgroundColor: "rgba(212, 175, 55, 0.05)", border: "1px solid rgba(212, 175, 55, 0.2)" }}
@@ -256,10 +256,10 @@ export function MobileLanding() {
                             <CheckCircle size={22} style={{ color: "#D4AF37" }} className="shrink-0" />
                             <div>
                                 <p style={{ color: "#D4AF37" }} className="font-mono text-[9px] uppercase tracking-widest opacity-80">
-                                    Conexión Establecida
+                                    Connection Established
                                 </p>
                                 <p style={{ color: "#E0E0E0" }} className="text-[14px] font-medium mt-1">
-                                    {user?.primaryEmailAddress?.emailAddress ?? user?.username ?? 'Entidad Soberana'}
+                                    {user?.primaryEmailAddress?.emailAddress ?? user?.username ?? 'Sovereign Entity'}
                                 </p>
                             </div>
                         </motion.div>
@@ -276,7 +276,7 @@ export function MobileLanding() {
                                     <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
                                     <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
                                 </svg>
-                                Credencial Institucional (Clerk)
+                                Institutional Credential (Clerk)
                             </button>
                             <button
                                 onClick={() => openWallet()}
@@ -284,35 +284,34 @@ export function MobileLanding() {
                                 className="w-full py-4 rounded-lg font-medium text-[13px] flex items-center justify-center gap-3 transition-transform active:scale-[0.98] hover:bg-[rgba(255,255,255,0.05)]"
                             >
                                 <Wallet size={16} />
-                                Firma Criptográfica (Wallet)
+                                Cryptographic Signature (Wallet)
                             </button>
                         </div>
                     )}
 
-                    {/* Divisor Visual */}
+                    {/* Visual Divider */}
                     <div className="flex items-center gap-4 py-4">
                         <div className="flex-1 h-px" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }} />
-                        <span style={{ color: "#D4AF37" }} className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">Lector Óptico</span>
+                        <span style={{ color: "#D4AF37" }} className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">Optical Reader</span>
                         <div className="flex-1 h-px" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }} />
                     </div>
 
-                    {/* Escáner (Lógica conservada) */}
+                    {/* Scanner */}
                     <div className="space-y-6">
                         <div className="text-center space-y-1">
                             <p style={{ color: "#7B8699" }} className="font-mono text-[10px] uppercase tracking-[0.1em]">
-                                Visualice <span style={{ color: "#D4AF37" }}>Device Bridge</span> en el entorno PC
+                                Locate <span style={{ color: "#D4AF37" }}>Device Bridge</span> in PC environment
                             </p>
                         </div>
                         
-                        {/* Wrapper for the QrScanner to ensure it integrates seamlessly with dark theme */}
                         <div className="relative rounded-2xl overflow-hidden shadow-2xl isolate" style={{ border: "1px solid rgba(255, 255, 255, 0.08)" }}>
                              <QrScanner />
                         </div>
                     </div>
 
                     <p style={{ color: "#545F73" }} className="text-center text-[11px] leading-relaxed font-light mt-8">
-                        Su terminal móvil opera como un conducto de seguridad unidireccional. 
-                        La inmersión completa y análisis de la red requiere una estación de trabajo principal.
+                        Your mobile terminal operates as a one-way security conduit. 
+                        Full Network analysis and immersion requires a primary workstation.
                     </p>
                 </div>
             </Section>
