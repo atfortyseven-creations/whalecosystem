@@ -44,7 +44,7 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
                             transition={{ delay: 0.5, duration: 1 }}
                             className="text-white text-4xl md:text-6xl font-black tracking-tighter uppercase drop-shadow-2xl mix-blend-overlay"
                         >
-                            Whale Alert
+                            SOVEREIGN NETWORK
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0 }}

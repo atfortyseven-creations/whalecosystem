@@ -126,7 +126,7 @@ export function ConnectWalletModal() {
                                 <Shield size={15} className="text-white" />
                             </div>
                             <div>
-                                <div className="text-[10px] font-mono font-bold text-[#8B5CF6] uppercase tracking-[0.2em]">Whale Alert Network</div>
+                                <div className="text-[10px] font-mono font-bold text-[#8B5CF6] uppercase tracking-[0.2em]">Sovereign Network</div>
                                 <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Sovereign Terminal</div>
                             </div>
                         </div>
@@ -239,7 +239,7 @@ export function ConnectWalletModal() {
                                             </div>
                                         </button>
 
-                                        {/* QUATERNARY — Whale Alert Ledger (fully functional) */}
+                                        {/* QUATERNARY — Sovereign Ledger (fully functional) */}
                                         <button
                                             onClick={handleLedger}
                                             className="group w-full rounded-2xl border border-[#10B981]/20 bg-[#10B981]/[0.04] hover:bg-[#10B981]/[0.08] hover:border-[#10B981]/40 transition-all duration-200 active:scale-[0.99]"
@@ -251,7 +251,7 @@ export function ConnectWalletModal() {
                                                     </div>
                                                     <div className="text-left">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="text-[14px] font-black text-white tracking-tight">Whale Alert Ledger</div>
+                                                            <div className="text-[14px] font-black text-white tracking-tight">Sovereign Ledger</div>
                                                             <div className="text-[8px] font-mono font-bold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/25 rounded-full px-2 py-0.5 uppercase tracking-wider">Live</div>
                                                         </div>
                                                         <div className="text-[10px] font-mono text-white/30 tracking-wide mt-0.5">Institutional on-chain ledger access</div>

@@ -43,7 +43,7 @@ const COURSES: Course[] = [
             { id: 'w3', title: 'Setting Up Your Watchlist', duration: '12m', level: 'Beginner', completed: true,  locked: false, description: 'Adding tokens and wallets. Configuring entry prices and alert thresholds.' },
             { id: 'w4', title: 'Whale Accumulation Signals', duration: '22m', level: 'Intermediate', completed: true,  locked: false, description: 'Identifying stealth accumulation patterns using large OTC transfers and exchange withdrawals.' },
             { id: 'w5', title: 'Smart Money vs Dumb Money', duration: '18m', level: 'Intermediate', completed: false, locked: false, description: 'Scoring algorithms for wallet intelligence. Win rate calculation and alpha decay.' },
-            { id: 'w6', title: 'Building a Whale Alert System', duration: '25m', level: 'Advanced', completed: false, locked: true,  description: 'Multi-parameter alert rules. Webhook integration for real-time Telegram notifications.' },
+            { id: 'w6', title: 'Building a SOVEREIGN NETWORK SYSTEM', duration: '25m', level: 'Advanced', completed: false, locked: true,  description: 'Multi-parameter alert rules. Webhook integration for real-time Telegram notifications.' },
         ],
     },
     {

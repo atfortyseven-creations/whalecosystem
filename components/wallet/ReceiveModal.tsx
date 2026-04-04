@@ -76,7 +76,7 @@ export default function ReceiveModal({ isOpen, onClose, address: propAddress }: 
     };
 
     const handleNetworkChange = (chainId: number) => {
-        setStatusData({ status: 'LOADING', message: 'Cambiando de red en Whale Alert...' });
+        setStatusData({ status: 'LOADING', message: 'Cambiando de red en Sovereign Network...' });
         switchChain({ chainId }, {
             onSuccess: () => {
                 setSelectedChainId(chainId);

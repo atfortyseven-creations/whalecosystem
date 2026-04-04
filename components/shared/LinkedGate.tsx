@@ -311,7 +311,7 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
     try {
       const message = [
         '═══════════════════════════════',
-        '  WHALE ALERT NETWORK',
+        '  Sovereign Network',
         '  SOVEREIGN ACCESS PROTOCOL',
         '═══════════════════════════════',
         '',

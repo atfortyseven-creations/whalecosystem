@@ -80,28 +80,40 @@ const pctColor = (v: number) => v >= 0 ? 'text-[#00C076]' : 'text-[#FF3B30]';
 const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 
 export function GainersLosersPanel() {
-    const [data, setData]         = useState(generateData);
+    const [data, setData]         = useState(ASSETS.map(a => ({ ...a, price: 0, ch1h: 0, ch24h: 0, ch7d: 0, vol24h: 0, mcap: 0 })));
     const [search, setSearch]     = useState('');
     const [view, setView]         = useState<'gainers' | 'losers' | 'all'>('all');
     const [window, setWindow]     = useState<Window>('24h');
     const [lastUpdate, setLast]   = useState(new Date());
-    const [loading, setLoading]   = useState(false);
+    const [loading, setLoading]   = useState(true);
 
     const sortKey: SortKey = window === '1h' ? 'ch1h' : window === '7d' ? 'ch7d' : 'ch24h';
 
-    const refresh = useCallback(() => {
+    const refresh = useCallback(async () => {
         setLoading(true);
-        setTimeout(() => {
-            setData(generateData());
-            setLast(new Date());
-            setLoading(false);
-        }, 600);
+        try {
+            const res = await fetch('/api/markets');
+            if (res.ok) {
+                const { data: binanceData } = await res.json();
+                const bMap = new Map(binanceData.map((d: any) => [d.symbol, d]));
+
+                setData(prev => prev.map(a => {
+                    const tick = bMap.get(a.symbol + 'USDT') as any;
+                    if (tick) {
+                        const price = parseFloat(tick.lastPrice);
+                        const ch24h = parseFloat(tick.priceChangePercent);
+                        const vol24 = parseFloat(tick.quoteVolume);
+                        const mcap = a.mcapB * 1e9 * (price / (price * 0.9)); // rough approx for live update
+                        return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
+                    }
+                    return a;
+                }));
+                setLast(new Date());
+            }
+        } catch (e) {} finally { setLoading(false); }
     }, []);
 
-    useEffect(() => {
-        const interval = setInterval(refresh, 30000);
-        return () => clearInterval(interval);
-    }, [refresh]);
+    useEffect(() => { refresh(); const id = setInterval(refresh, 8000); return () => clearInterval(id); }, [refresh]);
 
     const filtered = data
         .filter(d => d.symbol.toLowerCase().includes(search.toLowerCase()) || d.name.toLowerCase().includes(search.toLowerCase()))

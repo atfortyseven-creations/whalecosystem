@@ -182,13 +182,48 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
 }
 
 export function AlertsPanel() {
-    const [alerts, setAlerts] = useState<AlertRule[]>(DEMO_ALERTS);
+    const [alerts, setAlerts] = useState<AlertRule[]>([]);
     const [showCreate, setShowCreate] = useState(false);
     const [filter, setFilter] = useState<'ALL' | AlertStatus>('ALL');
+    const [loading, setLoading] = useState(true);
 
-    const handleDelete = (id: string) => {
-        setAlerts(a => a.filter(x => x.id !== id));
-        toast.success('Alert removed');
+    const refresh = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch('/api/alerts');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.alerts) {
+                    const mapped = data.alerts.map((a: any) => ({
+                        id: a.id,
+                        name: a.name,
+                        type: a.conditionLogic === 'CUSTOM' ? 'PRICE_ABOVE' : 'PRICE_ABOVE', // Simplified
+                        asset: a.targetAddress || 'BTC',
+                        threshold: a.priceThreshold || 0,
+                        currentValue: a.priceThreshold ? a.priceThreshold * 0.95 : 0,
+                        status: a.enabled ? 'ACTIVE' : 'PAUSED',
+                        createdAt: a.createdAt,
+                        notifyTelegram: a.actions?.notifyTelegram || false,
+                        notifyEmail: a.actions?.notifyEmail || false,
+                        notifyPush: a.actions?.notifyPush || false,
+                    }));
+                    setAlerts(mapped);
+                }
+            }
+        } catch (e) {} finally { setLoading(false); }
+    };
+
+    useEffect(() => { refresh(); }, []);
+
+    const handleDelete = async (id: string) => {
+        const tid = toast.loading('Deleting alert...');
+        try {
+            await fetch(`/api/alerts?id=${id}`, { method: 'DELETE' });
+            await refresh();
+            toast.success('Alert removed', { id: tid });
+        } catch (e) {
+            toast.error('Failed to remove', { id: tid });
+        }
     };
 
     const handleToggle = (id: string) => {
@@ -209,7 +244,21 @@ export function AlertsPanel() {
 
     return (
         <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
-            {showCreate && <CreateAlertModal onClose={() => setShowCreate(false)} onCreate={r => setAlerts(a => [r, ...a])} />}
+            {showCreate && <CreateAlertModal onClose={() => setShowCreate(false)} onCreate={async (r) => {
+                const tid = toast.loading('Dispatching rule...');
+                try {
+                    const res = await fetch('/api/alerts', { method: 'POST', body: JSON.stringify(r) });
+                    if (res.ok) {
+                        toast.success('Alert rule dispatched securely', { id: tid });
+                        await refresh();
+                    } else {
+                        toast.error('Failed to dispatch alert', { id: tid });
+                    }
+                } catch {
+                    toast.error('System error', { id: tid });
+                }
+                setShowCreate(false);
+            }} />}
 
             {/* ── Header ── */}
             <div className="px-6 py-4 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">

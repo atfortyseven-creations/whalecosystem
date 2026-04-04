@@ -35,7 +35,7 @@ export default function WhaleSniperTerminal() {
         }
         break;
       case 'alert':
-        toast.success('Whale Alert configured for current viewport thresholds.');
+        toast.success('Sovereign Network configured for current viewport thresholds.');
         break;
       case 'ai':
         toast.promise(

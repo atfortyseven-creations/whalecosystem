@@ -164,7 +164,7 @@ export default function MetaMaskWalletView() {
                                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
                                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Polygon</span>
                             </div>
-                            <h2 className="text-sm font-black tracking-tight text-white leading-none mt-0.5">Whale Alert Wallet</h2>
+                            <h2 className="text-sm font-black tracking-tight text-white leading-none mt-0.5">Sovereign Network</h2>
                         </div>
                     </div>
                     

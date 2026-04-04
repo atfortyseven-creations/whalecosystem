@@ -73,13 +73,31 @@ export function WhaleSupport() {
     const [submitting, setSubmitting] = useState(false);
 
     const handleSubmit = async () => {
-        if (!subject || !message) { toast.error('Fill in subject and message'); return; }
+        if (!subject || !message) { toast.error('Please fill in subject and message'); return; }
         setSubmitting(true);
-        setTimeout(() => {
-            toast.success('Ticket submitted — we respond within 24h ✓');
-            setSubject(''); setMessage('');
+        try {
+            const res = await fetch('/api/support', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: 'Sovereign Whale',
+                    email: 'terminal@whalecosystem.com',
+                    category: 'Support Ticket',
+                    section: priority,
+                    message: `[SUBJECT: ${subject}]\n\n${message}`
+                })
+            });
+            if (res.ok) {
+                toast.success('Sovereign ticket dispatched securely to HQ ✓');
+                setSubject(''); setMessage('');
+            } else {
+                toast.error('Failed to dispatch ticket. Neural network busy.');
+            }
+        } catch (e) {
+            toast.error('Terminal connection error.');
+        } finally {
             setSubmitting(false);
-        }, 1000);
+        }
     };
 
     return (

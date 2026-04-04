@@ -108,7 +108,24 @@ export function NewsOfToday() {
             const res = await fetch('/api/news');
             if (res.ok) {
                 const data = await res.json();
-                if (data.news?.length > 0) setArticles(data.news);
+                if (data.articles?.length > 0) {
+                    const mappedArticles = data.articles.map((a: any, i: number) => ({
+                        id: a.id,
+                        title: a.title,
+                        summary: a.description || a.aiSummary || a.summary || '',
+                        url: a.url,
+                        source: a.source || 'WhaleTerminal',
+                        publishedAt: a.date || a.publishedAt || new Date().toISOString(),
+                        imageUrl: a.imageUrl,
+                        category: CATEGORIES[(i % (CATEGORIES.length - 1)) + 1],
+                        sentiment: ['bullish', 'bearish', 'neutral'][i % 3] as any,
+                        veracityScore: 70 + (i % 30),
+                        isFake: false,
+                        tokens: (a.title.includes('BTC') || a.title.includes('Bitcoin')) ? ['BTC'] :
+                                (a.title.includes('ETH') || a.title.includes('Ethereum')) ? ['ETH'] : []
+                    }));
+                    setArticles(mappedArticles);
+                }
             }
         } catch {}
         finally { setTimeout(() => setLoading(false), 600); }

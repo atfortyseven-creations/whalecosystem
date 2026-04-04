@@ -46,7 +46,7 @@ export function MobileNewsShell() {
           </div>
           <div className="flex flex-col leading-none">
             <span className="font-aztec-serif text-[14px] font-black text-black uppercase tracking-tighter leading-none">
-              Whale Alert
+              Sovereign Network
             </span>
             <span
               className="font-mono text-[6px] font-bold uppercase tracking-[0.4em] mt-0.5"

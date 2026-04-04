@@ -67,19 +67,19 @@ export function FeaturesSection() {
                     <FeatureCard
                         icon={ShieldCheck}
                         title="Biometric Privacy (ZK-Snarks)"
-                        description="Verify your Whale Alert Identity without ever revealing your actual biometric data. Your face generates a zero-knowledge mathematical proof; your data never leaves your device."
+                        description="Verify your Sovereign Identity without ever revealing your actual biometric data. Your face generates a zero-knowledge mathematical proof; your data never leaves your device."
                         delay={0}
                     />
                     <FeatureCard
                         icon={LockOpen}
                         title="Total Digital Sovereignty"
-                        description="Your identity credentials live in your wallet, not on our servers. You are the sole owner of your Whale Alert ID; you decide what you share, with whom, and when."
+                        description="Your identity credentials live in your wallet, not on our servers. You are the sole owner of your Sovereign ID; you decide what you share, with whom, and when."
                         delay={0.1}
                     />
                     <FeatureCard
                         icon={Blocks}
                         title="Universal Web3 Passport"
-                        description="A single login for the entire ecosystem. Access Whale Alert, Aave, DAOs, and metaverses without managing multiple accounts or passwords."
+                        description="A single login for the entire ecosystem. Access Sovereign Network, Aave, DAOs, and metaverses without managing multiple accounts or passwords."
                         delay={0.2}
                     />
                 </div>
