@@ -21,10 +21,10 @@ export function InstitutionalHeader() {
 
     const navLinks = [
         { href: '/dashboard',  label: 'System',          active: pathname === '/dashboard',  isSystem: true  },
-        { href: '/portfolio',  label: 'Whale Portfolio',  active: pathname === '/portfolio'                   },
+        { href: '/portfolio',  label: 'Sovereign Portfolio',  active: pathname === '/portfolio'                   },
         { href: '/news',       label: 'News of today',    active: pathname === '/news'                        },
-        { href: '/support',    label: 'Whale Support',    active: pathname === '/support'                     },
-        { href: '/academy',    label: 'Whale Academy',    active: pathname === '/academy'                     },
+        { href: '/support',    label: 'Sovereign Support',    active: pathname === '/support'                     },
+        { href: '/academy',    label: 'Sovereign Academy',    active: pathname === '/academy'                     },
         { href: '/ticket',     label: 'Gold Ticket',      active: pathname === '/ticket',     isTicket: true  },
     ];
 
@@ -67,10 +67,10 @@ export function InstitutionalHeader() {
                     </motion.div>
                     <div className="flex flex-col leading-none">
                         <span className="font-aztec-serif text-[18px] font-black text-black uppercase tracking-tighter leading-none">
-                            Whale Alert
+                            Sovereign Network
                         </span>
                         <span className="font-mono text-[7px] font-bold uppercase tracking-[0.4em] mt-0.5" style={{ color: 'rgba(0,0,0,0.35)' }}>
-                            Corporation
+                            Terminal
                         </span>
                     </div>
                 </Link>

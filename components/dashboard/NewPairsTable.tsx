@@ -275,7 +275,7 @@ export function NewPairsTable() {
             {/* ── Status Footer ── */}
             <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                 <span>{filtered.length} pairs shown · refreshes every 8s</span>
-                <span>Security powered by Whale Alert Neural Engine</span>
+                <span>Security powered by Sovereign Network Engine</span>
             </div>
         </div>
     );

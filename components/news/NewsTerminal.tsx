@@ -535,7 +535,7 @@ export function NewsTerminal() {
                     <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>
                       <div className="flex justify-between items-center font-mono text-[8px] uppercase tracking-[0.3em] mb-3"
                            style={{ color: MUTED }}>
-                        <span>Whale Alert Network — Intel Report</span>
+                        <span>Sovereign Network — Intel Report</span>
                         <span>No Reliance / Educational Only</span>
                       </div>
                       <p className="font-mono text-[8px] leading-relaxed uppercase tracking-wide" style={{ color: MUTED }}>

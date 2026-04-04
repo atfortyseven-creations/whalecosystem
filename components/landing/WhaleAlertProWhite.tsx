@@ -363,7 +363,7 @@ export function WhaleAlertProWhite() {
             <div className="w-10 h-10 bg-slate-950 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
               <Landmark size={20} className="text-white" />
             </div>
-            <span className="text-lg font-black tracking-tighter uppercase italic text-slate-950 underline decoration-cyan-400 decoration-4 underline-offset-4">Whale Alert Pro</span>
+            <span className="text-lg font-black tracking-tighter uppercase italic text-slate-950 underline decoration-cyan-400 decoration-4 underline-offset-4">Sovereign Network Pro</span>
           </Link>
 
           {/* Desktop Center Navigation */}
@@ -735,7 +735,7 @@ export function WhaleAlertProWhite() {
                  <div className="w-8 h-8 bg-slate-950 rounded-xl flex items-center justify-center">
                    <Landmark size={16} className="text-white" />
                  </div>
-                 <span className="text-xl font-black tracking-tighter uppercase italic text-slate-950">Whale Alert Pro</span>
+                 <span className="text-xl font-black tracking-tighter uppercase italic text-slate-950">Sovereign Network Pro</span>
                </div>
                <p className="text-sm font-medium text-slate-400 leading-relaxed uppercase tracking-wider">
                  Empowering institutional traders with sub-millisecond on-chain intelligence and sovereign forensic depth.
@@ -778,7 +778,7 @@ export function WhaleAlertProWhite() {
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-slate-50 text-[10px] font-black uppercase tracking-[0.5em] text-slate-300">
-            <div>© 2026 Whale Alert Pro — Sovereign Institutional Vanguard</div>
+            <div>© 2026 Sovereign Network Pro — Sovereign Institutional Vanguard</div>
             <div className="flex gap-10 mt-10 md:mt-0">
                <span>Optimal Performance (240Hz)</span>
                <span className="text-cyan-600">Lanzadera Submission Final</span>

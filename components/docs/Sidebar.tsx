@@ -27,7 +27,7 @@ export function Sidebar({ theme, currentPath }: SidebarProps) {
         { label: 'Whale Code ↗', href: 'https://whale.code', external: true },
         { label: 'Whale Code SDK ↗', href: 'https://whale.sdk', external: true },
         { label: 'Get started', href: '/docs/get-started' },
-        { label: 'Intro to Whale Alert', href: '/docs/intro' },
+        { label: 'Intro to Sovereign Network', href: '/docs/intro' },
         { label: 'Quickstart (API)', href: '/docs/quickstart' },
         { label: 'Models', href: '/docs/models' },
         { label: 'Pricing', href: '/docs/pricing' },

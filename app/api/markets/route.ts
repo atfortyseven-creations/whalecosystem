@@ -1,23 +1,14 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
-
-export const dynamic = 'force-dynamic'; // Ensure real-time data
+export const revalidate = 0;
 
 export async function GET() {
     try {
-        const markets = await prisma.market.findMany({
-            select: {
-                slug: true,  // This corresponds to the Market Address
-                riskLevel: true
-            }
-        });
-
-        return NextResponse.json(markets);
-    } catch (error) {
-        console.error("Error fetching market metadata:", error);
-        return NextResponse.json({ error: "Failed to fetch markets" }, { status: 500 });
-    }
+        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
+        if (res.ok) {
+            const data = await res.json();
+            return NextResponse.json({ success: true, data });
+        }
+    } catch {}
+    return NextResponse.json({ success: false }, { status: 500 });
 }
-

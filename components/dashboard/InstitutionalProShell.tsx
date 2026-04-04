@@ -9,7 +9,6 @@ import {
     Globe, Cpu, Shield, Newspaper, LifeBuoy,
     GraduationCap, Crown, PieChart
 } from 'lucide-react';
-import { CorporateWhaleLogo } from "@/components/bsv/CorporateWhaleLogo";
 
 interface NavItem {
     id: string;
@@ -29,13 +28,13 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'new-pairs',       label: 'New Pairs',        icon: <Zap size={17}/>,             badge: 'Live', badgeColor: '#00C076' },
     { id: 'gainers',         label: 'Gainers & Losers', icon: <TrendingUp size={17}/> },
     // ── Intelligence ──
-    { id: 'whale-portfolio', label: 'Whale Portfolio',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
+    { id: 'whale-portfolio', label: 'Sovereign Portfolio',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
     { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
     { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
     { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
     // ── Learn & Support ──
-    { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
-    { id: 'support',         label: 'Whale Support',    icon: <LifeBuoy size={17}/> },
+    { id: 'academy',         label: 'Sovereign Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
+    { id: 'support',         label: 'Sovereign Support',    icon: <LifeBuoy size={17}/> },
     { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
@@ -59,39 +58,20 @@ export function InstitutionalProShell({
             
             {/* ─── Persistent Pro Sidebar ─── */}
             <motion.aside 
-                animate={{ width: isCollapsed ? 80 : 280 }}
+                animate={{ width: isCollapsed ? 64 : 260 }}
                 className="h-full border-r border-[#E5E5E5] bg-[#FDFDFB] flex flex-col z-50 relative shadow-[10px_0_30px_rgba(0,0,0,0.02)]"
             >
-                {/* Sidebar Header */}
-                <div className="p-6 flex items-center justify-between border-b border-[#E5E5E5]/50">
-                    {!isCollapsed && (
-                        <div className="flex items-center gap-3">
-                            <div className="relative w-8 h-8">
-                                <CorporateWhaleLogo />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-black tracking-tighter uppercase leading-none">WHALE ALERT</span>
-                                <span className="text-[10px] font-bold text-[#888888] tracking-widest uppercase">SOVEREIGN NETWORK</span>
-                            </div>
-                        </div>
-                    )}
-                    {isCollapsed && (
-                        <div className="relative w-8 h-8 mx-auto">
-                            <CorporateWhaleLogo />
-                        </div>
-                    )}
-                </div>
 
-                {/* Sidebar Navigation */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 space-y-0.5 no-scrollbar">
-                    {SIDEBAR_ITEMS.map((item) => {
+                {/* Sidebar Navigation — tabs start at the very top */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pt-0 pb-4 px-3 space-y-0.5 no-scrollbar">
+                    {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
                         const isGold   = item.id === 'gold-ticket';
                         return (
                             <div key={item.id}>
                                 {/* Section divider label */}
                                 {item.dividerBefore && !isCollapsed && (
-                                    <div className="px-4 pt-4 pb-1">
+                                    <div className={`px-4 ${index === 0 ? 'pt-3' : 'pt-4'} pb-1`}>
                                         <span className="text-[8px] font-black text-[#CCCCCC] uppercase tracking-[0.2em]">
                                             {item.dividerBefore}
                                         </span>
@@ -138,13 +118,13 @@ export function InstitutionalProShell({
                     })}
                 </div>
 
-                {/* Sidebar Footer */}
-                <div className="p-4 border-t border-[#E5E5E5]/50">
+                {/* Collapse toggle — tiny footer */}
+                <div className="px-3 pb-3 pt-1">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="w-full flex items-center justify-center p-3 rounded-xl border border-[#E5E5E5] text-[#888888] hover:text-[#050505] hover:bg-[#E5E5E5]/30 transition-all"
+                        className="w-full flex items-center justify-center p-2 rounded-xl border border-[#E5E5E5] text-[#888888] hover:text-[#050505] hover:bg-[#E5E5E5]/30 transition-all"
                     >
-                        {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
                 </div>
             </motion.aside>

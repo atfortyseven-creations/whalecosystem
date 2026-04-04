@@ -1,7 +1,7 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════╗
  * ║   LIQUIDITY DYNAMICS — Capital Velocity Index                        ║
- * ║   Whale Alert Pro · Infrastructure Suite                             ║
+ * ║   Sovereign Network Pro · Infrastructure Suite                             ║
  * ╚══════════════════════════════════════════════════════════════════════╝
  */
 
