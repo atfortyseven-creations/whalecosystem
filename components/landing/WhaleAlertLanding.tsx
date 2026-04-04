@@ -335,9 +335,27 @@ export function WhaleAlertLanding() {
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      style={{ backgroundColor: "#020202", color: "#E0E0E0", minHeight: "100vh" }}
-      className="relative w-full overflow-x-hidden font-sans selection:bg-[#1a6de0]/25"
+      style={{ backgroundColor: "#010101", color: "#E0E0E0", minHeight: "100vh" }}
+      className="relative w-full overflow-x-hidden font-sans selection:bg-[#FBC9C2]/25"
     >
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes pc-subtle-breathe {
+          0%, 100% { transform: scale(1) translate(0, 0); }
+          50%      { transform: scale(1.05) translate(-1%, -1%); }
+        }
+        .bg-pc-living-pattern {
+          background-image: url('/fluid-pink-wallpaper.jpg');
+          background-size: cover;
+          background-position: center;
+          animation: pc-subtle-breathe 25s ease-in-out infinite;
+          will-change: transform;
+        }
+      ` }} />
+      {/* Animated Wallpaper Overlay — Majestic Rose Gold Blend */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-[-10%] bg-pc-living-pattern opacity-15 mix-blend-lighten filter saturate-150 contrast-125" />
+      </div>
+
       <DynamicLegendaryCursor />
 
       {/* ─────────────────────────────────────────────────────────────── */}

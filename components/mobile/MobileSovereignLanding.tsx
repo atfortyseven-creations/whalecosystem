@@ -108,10 +108,27 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
+        
+        @keyframes subtle-breathe {
+          0%, 100% { transform: scale(1) translate(0, 0); }
+          50%      { transform: scale(1.05) translate(-1%, -1%); }
+        }
+        .bg-living-pattern {
+          background-image: url('/fluid-pink-wallpaper.jpg');
+          background-size: cover;
+          background-position: center;
+          animation: subtle-breathe 25s ease-in-out infinite;
+          will-change: transform;
+        }
       ` }} />
+      {/* Living Pink Fluid Pattern Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden bg-[#FBC9C2]">
+        <div className="absolute inset-[-10%] bg-living-pattern opacity-95 mix-blend-multiply" />
+      </div>
+      {/* Optional subtle dot overlay for depth */}
       <motion.div
         aria-hidden="true"
-        className="fixed -inset-[32px] msv-dot-pattern pointer-events-none z-0"
+        className="fixed -inset-[32px] msv-dot-pattern pointer-events-none z-[1] opacity-20"
         animate={{ x: [0, -32], y: [0, -32] }}
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
         style={{ willChange: 'transform' }}
@@ -327,7 +344,7 @@ function PageHero({
   onEnterNews: () => void;
 }) {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
+    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
 
       {/* TOP BAR */}
       <header className="w-full flex items-center justify-end z-20 h-10">
@@ -359,7 +376,7 @@ function PageHero({
               duration: 1.5,
               ease: "easeInOut"
             }}
-            className="w-32 h-32 mx-auto mb-8 mt-4 flex items-center justify-center relative"
+            className="w-48 h-48 mx-auto mb-8 mt-4 flex items-center justify-center relative drop-shadow-xl"
             style={{ willChange: 'transform' }}
           >
             <img 
@@ -370,7 +387,7 @@ function PageHero({
           </motion.div>
 
           <h1 className="text-5xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic relative z-10 drop-shadow-md">
-            Whale Alert Network<br />Network
+            Whale Alert<br />Network
           </h1>
 
           <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
@@ -461,7 +478,7 @@ const formulaImgStyle = "h-8 mx-auto my-7 opacity-90 mix-blend-multiply drop-sha
 
 function PagePhilosophy1() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
+    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -469,22 +486,22 @@ function PagePhilosophy1() {
         className="mb-10 w-full flex flex-col items-center"
         style={{ willChange: 'transform, opacity' }}
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#050505]/40 mb-2">Documento de Arquitectura</span>
-        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505] text-center border-b-4 border-[#050505] pb-2 inline-block">
-          Manifiesto<br/>Técnico
+        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#050505]/40 mb-2">Architectural Vision</span>
+        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505] text-center border-b-4 border-[#050505] pb-2 inline-block drop-shadow-sm">
+          Technical<br/>Manifesto
         </h2>
       </motion.div>
 
       <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
         <p>
-          En la dimensión macroeconómica contemporánea, la supremacía no se define únicamente por la acumulación transaccional, sino por la integridad matemática absoluta y un nivel de exposición regulatoria meticulosamente calibrado. Whale Alert Network nace como un ecosistema institucional de altísimo rendimiento, forjado desde sus cimientos bajo parámetros de seguridad de grado paramilitar y normativas de compliance globales innegociables. Lo que presentamos aquí no es una simple interfaz, sino una infraestructura algorítmica diseñada para quienes comprenden que en la red no existen segundas oportunidades frente a la vulnerabilidad o la latencia.
+          In the contemporary macroeconomic landscape, true excellence is not defined by accumulation, but by absolute mathematical integrity, quiet resilience, and a profound respect for the delicate balance of global ecosystems. Whale Alert Network was born not out of ambition, but out of a humble dedication to illuminate the deepest currents of decentralized finance. We offer a sanctuary of precision—an institutional-grade infrastructure forged with reverence for uncompromising security and quiet observation.
         </p>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          1. Cinética de Tiempo Real
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
+          1. Real-Time Kinetic Harmony
         </h3>
         <p>
-          Rechazamos categóricamente la latencia intermitente, la dependencia de cachés obsoletos y cualquier forma de simulación de datos. Nuestro motor de ingesta procesa flujos de capitales masivos en tiempo real a través de canales asíncronos directos orientados hacia la memoria de la blockchain. Entendemos que en un entorno distribuido el fallo de un nodo distante es una certeza, no una posibilidad; por ello, para mitigar interrupciones sin degradar el rendimiento del clúster principal, hemos integrado robuztamente conectividad inquebrantable empleando algoritmos de Exponential Backoff:
+          We humbly reject the compromises of latency and simulation. Our ingestion engines gracefully process massive capital flows in true real-time, maintaining a silent, asynchronous dialogue with the blockchain’s memory. Recognizing that imperfections and node failures are inevitable in any distributed system, we implemented gentle yet mathematically rigorous Exponential Backoff algorithms to preserve harmony without disrupting the cluster:
         </p>
 
         <img 
@@ -494,7 +511,7 @@ function PagePhilosophy1() {
         />
 
         <p>
-          Bajo esta rigurosa arquitectura, cada transferencia detectada atraviesa un filtro algorítmico microscópico. Evaluamos la desviación de mercado (Z-Score) en la escala de los microsegundos, aislando con precisión quirúrgica las anomalías macroestructurales —la auténtica huella de la "ballena"— y purgando despiadadamente el ruido transaccional. La precisión estadística dicta el acceso:
+          Through this precise architecture, every detected transfer is treated with meticulous care. By evaluating market deviation (Z-Score) in microseconds, we elegantly isolate macrostructural anomalies—the quiet footprint of the whale—filtering out transient noise so that only the pure signal remains:
         </p>
 
         <img 
@@ -514,16 +531,16 @@ function PagePhilosophy1() {
 
 function PagePhilosophy2() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
+    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          2. Seguridad Soberana & E2EE
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
+          2. Sovereign Security & Trust
         </h3>
         <p>
-          Arquitectamos toda nuestra infraestructura de conexión bajo la premisa inflexible de un Zero-Trust (Confianza Cero) absoluto. El puente enlazado entre la interfaz que usted opera y nuestro núcleo perimetral de datos prescinde por completo del almacenamiento obsoleto de contraseñas, bases de datos expuestas o validaciones orgánicas vulnerables a inyecciones.
+          Our infrastructure is architected upon a foundation of absolute humility and Zero-Trust. We respectfully distance ourselves from your private data; the cryptographically secure bridge between your interface and our perimeter entirely eliminates the need for passwords or centralized organic validations.
         </p>
         <p>
-          La bóveda criptográfica encripta todo el espectro volumétrico de la información empleando End-to-End Encryption (E2EE) de grado bancario. La sincronización paralela de la identidad exige la demostración probatoria constante de la propiedad de su llave privada sin que el servidor central llegue a conocerla jamás en ningún punto del transporte. Esto se verifica calculando matemáticamente las firmas sobre nuestra curva elíptica:
+          The cryptographic vault protects your session using military-grade End-to-End Encryption (E2EE). Identity synchronization politely requests proof of private key ownership through elegant elliptical curve mathematics, ensuring that our servers remain blissfully ignorant of your most guarded secrets at all times:
         </p>
 
         <img 
@@ -533,14 +550,14 @@ function PagePhilosophy2() {
         />
 
         <p>
-          Usted detenta una soberanía patrimonial invulnerable sobre su sesión; la totalidad de nuestra red operativa ha sido diseñada para matemáticamente impedir que exista alguna "llave maestra" capaz de vulnerar el enclave de su bóveda.
+          You retain inviolable mastery over your wealth and digital footprint. Our network has been mathematically constrained specifically to ensure we hold no master key capable of breaching your sanctuary.
         </p>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          3. Ingeniería Algorítmica Global
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
+          3. Global Algorithmic Elegance
         </h3>
         <p>
-          En el ecosistema institucional, intentar rastrear redes segmentadas de forma fragmentaria pulveriza la ventaja comercial. Hemos condensado un cruce multichain capaz de indexar flujos constantes de blockchains independientes al procesar enormes matrices probabilísticas en memoria RAM pura. Unificamos decibeles tarifarios y metadatos caóticos bajo un estándar de complejidad temporal logarítmica inmensamente eficiente:
+          In an ecosystem characterized by fragmentation, simplicity becomes the ultimate sophistication. We have gently woven a multichain tapestry capable of indexing continuous streams across independent networks. By translating chaotic metadata into a harmonious standard of logarithmic time complexity, we achieve immense efficiency:
         </p>
 
         <img 
@@ -550,7 +567,7 @@ function PagePhilosophy2() {
         />
 
         <p>
-          Esta extrema eficiencia fractal de cálculos paralelos, escrita exhaustivamente y probada desde el origen en lenguaje Golang estructurado, constituye el cimiento inquebrantable que da fortaleza al sistema para digerir y devolver decenas de miles de request instantáneas, sin evidenciar ninguna fisura geométrica u operativa a simple vista.
+          This profound fractal efficiency, written with care in structured Golang, is the quiet heartbeat of our system. It seamlessly digests tens of thousands of instant requests while remaining as calm and unyielding as the deep ocean.
         </p>
       </div>
 
@@ -564,42 +581,42 @@ function PagePhilosophy2() {
 
 function PagePhilosophy3() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
+    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
       <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2">
-          4. Normativas & Compliance
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
+          4. Reverence for Compliance
         </h3>
         <p>
-          Para que el apalancamiento de los poderes institucionales transcurra limpiamente, es indispensable e inalterable conservar la total alienación del cumplimiento jurisdiccional. Hemos implantado barreras heurísticas auto-defensivas proyectadas sin reparos para sostener cualquier blindaje jurídico aun en el grado más riguroso y denso de escrutinio investigativo por autoridades financieras internacionales.
+          To empower institutional oversight with integrity, maintaining an unblemished alignment with global jurisdictions is fundamentally essential. We have carefully implemented self-defensive heuristic barriers, designed with absolute respect for international financial frameworks and rigorous regulatory scrutiny.
         </p>
         <ul className="list-disc list-inside space-y-4 font-semibold text-[#050505]/95 marker:text-indigo-600">
           <li className="leading-relaxed">
-            <span className="text-black font-black uppercase text-[12px] tracking-wider">OFAC Sanctions & AML:</span> Desplegamos motores audífugos que examinan la procedencia computacional de cada wallet entrante en tiempo real. Bloqueamos instantánea y atemporalmente a entidades conectadas a las prohibiciones globales, habilitando flujos de reconocimiento (KYC) integrados sin riesgo y blindados por la matemática de Zero Knowledge (ZK-Proofs).
+            <span className="text-black font-black uppercase text-[12px] tracking-wider">Sanctions & AML:</span> We orchestrate silent, real-time computational provenance checks. Entities associated with global prohibitions are gently but irreversibly denied access, while legitimate pathways are secured via respectful Zero-Knowledge Proofs (ZK-Proofs).
           </li>
           <li className="leading-relaxed">
-            <span className="text-black font-black uppercase text-[12px] tracking-wider">CFTC & Geofencing WAF:</span> Rutas de red constreñidas por barreras fronterizas automáticas con resoluciones de latencia inferiores a los 5 milisegundos. Ejecutamos un peritaje microscópico cortando y descartando simulaciones de mallas de VPNs impenetrables o alteración de enrutadores.
+            <span className="text-black font-black uppercase text-[12px] tracking-wider">Geofencing & WAF:</span> Our network pathways are guided by automated border resolutions operating under 5 milliseconds. We meticulously filter out artificial VPN routing with precision, preserving the structural integrity of localized compliance.
           </li>
           <li className="leading-relaxed">
-            <span className="text-black font-black uppercase text-[12px] tracking-wider">GDPR Universal:</span> Conferimos una absoluta independencia soberana facilitando comandos directos de demolición integral del rastro de metadatos acoplados en cualquier fragmento de caché de memoria RAM con cumplimiento regido a ISO 27001 por libre solicitud del espectador.
+            <span className="text-black font-black uppercase text-[12px] tracking-wider">Universal GDPR:</span> We bestow upon the observer the fundamental right to be forgotten, enabling instantaneous and total demolition of metadata footprints across any volatile memory segment, in strict adherence to ISO 27001 tenets.
           </li>
         </ul>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-5 text-[#050505] border-b border-black/10 pb-2">
-          Resolución Universal
+        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-5 text-[#050505] border-b border-black/10 pb-2 drop-shadow-sm">
+          A Quiet Resolution
         </h3>
         <p>
-          Whale Alert Network no comparece al mercado con la vocación superflua de adornar interfaces visuales interactivas en aplicaciones. Comparecemos únicamente para fragmentar y redefinir cada límite límite tecnológico para la vigilancia financiera implacable institucional. Absolutamente todo bit forjado en cada capa y modelo paramétrico transmutado por nuestros servidores centrales es verdaderamente un muro balístico erguido exclusivamente para soportar su completo y absoluto dominio soberano ante el entorno financiero más hostil en toda la red global en internet de capa intermedia de blockchains.
+          Whale Alert Network does not seek the superficial limelight of mere visual aesthetics. We arrive humbly to redefine the technological threshold of institutional awareness. Every byte forged within our architecture stands as a silent sentinel, built exclusively to support your absolute mastery in traversing the formidable depths of the global blockchain ecosystem.
         </p>
 
         {/* DOWNHEAD / PREMIUM FOOTER */}
         <div className="mt-16 pt-10 border-t border-black/5 flex flex-col items-center pb-24">
-          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-6 opacity-60 drop-shadow-xl" />
+          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-20 h-20 mb-6 opacity-60 drop-shadow-xl" />
           <div className="flex items-center gap-8">
-            <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors">
+            <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors drop-shadow-sm">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
               <span>@whalecosystem</span>
             </a>
-            <a href="https://github.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors">
+            <a href="https://github.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors drop-shadow-sm">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.45-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"></path></svg>
               <span>GitHub</span>
             </a>
@@ -765,7 +782,7 @@ export function MobileSovereignLanding() {
   }
 
   return (
-    <div className="w-full h-[100dvh] bg-[#FAF9F6] overflow-hidden relative">
+    <div className="w-full h-[100dvh] bg-transparent overflow-hidden relative">
       <AnimatedPattern />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
