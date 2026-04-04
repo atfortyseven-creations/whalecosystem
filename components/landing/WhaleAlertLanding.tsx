@@ -12,12 +12,9 @@ import dynamic from "next/dynamic";
 const DynamicCryptoCheckoutModal = dynamic(() => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal), { ssr: false });
 const DynamicLegendaryCursor = dynamic(() => import("@/components/landing/LegendaryCursor").then((m) => m.LegendaryCursor), { ssr: false });
 
-// ─── ANIMATION CONFIGURATION (240Hz) ──────────────────────────────────────
 const SPRING = { type: "spring" as const, stiffness: 60, damping: 20, mass: 1 };
 const SPRING_SMOOTH = { type: "spring" as const, stiffness: 40, damping: 25, mass: 1.5 };
 
-// ─── MATHEMATICAL CANVAS (Academic Elegance in Three.js) ─────────────────────
-// Represents a serene, structured environment for graph analysis.
 const AcademicCanvas = React.memo(() => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>();
@@ -38,7 +35,6 @@ const AcademicCanvas = React.memo(() => {
     resize();
     window.addEventListener("resize", resize);
 
-    // Serene grid and node system
     interface Node { x: number; y: number; vx: number; vy: number; connections: number[] }
     const GRID_SIZE = 120;
     const cols = Math.ceil(W / GRID_SIZE) + 1;
@@ -63,44 +59,39 @@ const AcademicCanvas = React.memo(() => {
       const delta = Math.min((now - lastTime) / 16.67, 3);
       lastTime = now;
 
-      // Base: Deep Absolute Black
       ctx.fillStyle = "#020202";
       ctx.fillRect(0, 0, W, H);
 
-      // Draw subtle grid
       ctx.strokeStyle = "rgba(255, 255, 255, 0.015)";
       ctx.lineWidth = 1;
-      
-      // Sustain nodes
+
       for (const node of nodes) {
         node.x += node.vx * delta;
         node.y += node.vy * delta;
-        
+
         if (node.x < 0 || node.x > W) node.vx *= -1;
         if (node.y < 0 || node.y > H) node.vy *= -1;
       }
 
-      // Draw proximity connections (Euclidean Architecture)
       const DISTANCE_THRESHOLD = 180;
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
           const distSq = dx * dx + dy * dy;
-          
+
           if (distSq < DISTANCE_THRESHOLD * DISTANCE_THRESHOLD) {
             const dist = Math.sqrt(distSq);
             const alpha = (1 - dist / DISTANCE_THRESHOLD) * 0.08;
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(212, 175, 55, ${alpha})`; // Academic Gold
+            ctx.strokeStyle = `rgba(212, 175, 55, ${alpha})`; 
             ctx.stroke();
           }
         }
       }
 
-      // Draw nodes (Mathematical points)
       ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
       for (const node of nodes) {
         ctx.beginPath();
@@ -128,7 +119,6 @@ const AcademicCanvas = React.memo(() => {
 });
 AcademicCanvas.displayName = "AcademicCanvas";
 
-// ─── REVEAL COMPONENT (Smooth Transitions) ────────────────────────
 interface RevealProps { children: React.ReactNode; delay?: number; className?: string; yOffset?: number }
 function Reveal({ children, delay = 0, className = "", yOffset = 40 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -146,47 +136,44 @@ function Reveal({ children, delay = 0, className = "", yOffset = 40 }: RevealPro
   );
 }
 
-// ─── ACADEMIC AND STRUCTURAL DATA ─────────────────────────────────────────
-
 const ARCHITECTURE_PILLARS = [
   {
     icon: <Cpu size={24} strokeWidth={1.5} />,
-    title: "In-Memory Ingestion Kinetics",
-    desc: "The system bypasses intermediate abstractions, processing base-layer events within RAM-resident matrices. This structuring allows for rigorous evaluation of stochastic deviations without altering the natural data flow."
+    title: "In-Memory Kinetic Ingestion",
+    desc: "The system bypasses intermediate abstractions, processing base-layer events directly in RAM matrices. This structure allows us to evaluate stochastic deviations with mathematical rigor without altering the natural flow of data."
   },
   {
     icon: <Lock size={24} strokeWidth={1.5} />,
-    title: "Conditional Cryptographic Frontier",
-    desc: "We ground the architecture on the non-negotiable principle of Zero-Trust. The protocol delegates cryptographic computation entirely to the client, encapsulating state vectors under E2EE (End-to-End Encryption) standards."
+    title: "Conditional Cryptographic Boundary",
+    desc: "We rest the architecture on the uncompromising principle of Zero-Trust. The protocol fully delegates cryptographic computation to the client, encapsulating state vectors under strictly end-to-end encrypted (E2EE) norms."
   },
   {
     icon: <Network size={24} strokeWidth={1.5} />,
-    title: "Multi-Layer Indexing",
-    desc: "Unification of directed graphs from independent instances. We formulate state trees that reduce algorithmic complexity when identifying and classifying capital convergences in real-time."
+    title: "Multi-layer Indexing",
+    desc: "Unification of directed computational graphs originating from independent instances. We formulate state trees that reduce algorithmic complexity by scanning and classifying real-time capital convergences."
   },
   {
     icon: <Shield size={24} strokeWidth={1.5} />,
-    title: "Integrity and Regulatory Compliance",
-    desc: "We incorporate underlying Zero-Knowledge validations to sustain adherence to international regulatory frameworks, ensuring auditing solvency without compromising the ontological sovereignty of the data."
+    title: "Integrity and Compliance",
+    desc: "We incorporate underlying Zero-Knowledge validation layers to maintain adherence to international regulatory frameworks, ensuring auditing solvency without compromising the ontological data sovereignty."
   }
 ];
 
 const MODULE_DEFINITIONS = [
   {
-    category: "Capture Layer",
+    category: "Ingestion Layer",
     title: "Institutional Flow Detector",
-    description: "A deterministic algorithm designed to monitor Ethereum Virtual Machine and Hyperliquid L1 subroutines. It analyzes absolute volumes and deciphers financial organization patterns through objective heuristics.",
-    points: ["Raw block analysis", "Z-Score applied to anomalies", "Non-blocking asynchronous filtering"]
+    description: "A deterministic algorithm structurally designed to monitor Ethereum Virtual Machine subroutines and Hyperliquid L1. It analyzes absolute volume and deciphers financial organization paradigms via objective heuristics.",
+    points: ["Raw block parsing", "Z-Score processing for anomalies", "Non-blocking asynchronous filters"]
   },
   {
     category: "Representation Layer",
     title: "Integrated Protocol Matrix",
-    description: "A structured terminal for visualizing the synthesis of extracted data. It presents the researcher with a sober interface, devoid of ornamental metrics, focused exclusively on the technical veracity of information.",
-    points: ["Dark pool liquidity (CLOB) junction", "EIP-712 signature aggregation", "Relational database persistence"]
+    description: "A rigidly structured terminal engineered to visualize the synthesis of extracted data. It presents an austere interface, intentionally devoid of ornamental metrics, strictly focusing on the technical veracity of the information.",
+    points: ["Dark liquidity intersection (CLOB)", "EIP-712 signature aggregation", "Relational database persistence"]
   }
 ];
 
-// ─── MAIN COMPONENT ────────────────────────────────────────
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -194,7 +181,6 @@ export function WhaleAlertLanding() {
   const { openConnectModal } = useUIStore();
   const [showCheckout, setShowCheckout] = useState(false);
 
-  // Parallax Controllers
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 0.2], [0, 100]);
@@ -243,10 +229,10 @@ export function WhaleAlertLanding() {
             style={{ color: "#A0AABF", maxWidth: "680px" }} 
             className="text-base md:text-lg font-light leading-relaxed mb-16"
           >
-            Our research into distributed network topology is formalized within this environment. 
-            We do not seek unfounded disruptions, but rather the objective, deterministic, and 
-            mathematically rigorous observation of institutional liquidity flows. A system built 
-            upon the immutable principles of cryptography and asynchronous analysis.
+            Our research in distributed network topology is formalized within this environment. 
+            We do not pursue unfounded disruption; rather, we aim for the objective, deterministic, 
+            and mathematically rigorous observation of institutional liquidity flows. A system built 
+            upon the immutable principles of cryptography and asynchronous macro-analysis.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 items-start">
@@ -256,30 +242,30 @@ export function WhaleAlertLanding() {
               className="px-8 py-3.5 rounded text-sm font-medium transition-transform hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(255,255,255,0.05)] flex items-center gap-3"
             >
               <BookOpen size={16} strokeWidth={1.5} />
-              Establish Connectivity
+              Access the Terminal
             </button>
             <button
               onClick={() => setShowCheckout(true)}
               style={{ border: "1px solid rgba(212, 175, 55, 0.4)", color: "#D4AF37" }}
               className="px-8 py-3.5 rounded text-sm font-medium transition-all hover:bg-[rgba(212,175,55,0.05)] hover:-translate-y-1"
             >
-              Acquire Academic license
+              Acquire Academic License
             </button>
           </div>
         </Reveal>
       </motion.section>
 
-      {/* ─── STRUCTURAL ENGINEERING PRINCIPLES (PILLARS) ─── */}
+      {/* ─── ARCHITECTURAL DEVELOPMENT ─── */}
       <section className="relative z-10 py-32 px-6 md:px-12 max-w-6xl mx-auto border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
         <Reveal>
           <div className="mb-20">
             <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-3xl md:text-4xl font-light mb-6">
-              Structural Engineering Principles
+              Principles of Structural Engineering
             </h2>
             <p style={{ color: "#8A94A6", maxWidth: "700px" }} className="text-base leading-relaxed font-light">
-              The robustness of the system does not lie in superficial innovation, but in the correct 
-              amalgamation of established computational paradigms. Below, we detail the logical 
-              anatomy that sustains our infrastructure.
+              The solidity of the system does not reside in superficial innovation, but rather in the precise 
+              amalgamation of established computational paradigms. Below we detail the logical anatomy 
+              that sustains our infrastructure.
             </p>
           </div>
         </Reveal>
@@ -306,7 +292,7 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ─── FUNCTIONAL IMPLEMENTATION MODULES ─── */}
+      {/* ─── PRACTICAL MODULES ─── */}
       <section className="relative z-10 py-32 px-6 md:px-12 max-w-6xl mx-auto border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
         <Reveal>
           <div className="mb-20 text-center">
@@ -314,8 +300,8 @@ export function WhaleAlertLanding() {
               Functional Implementation
             </h2>
             <p style={{ color: "#8A94A6", maxWidth: "600px" }} className="text-base leading-relaxed font-light mx-auto">
-              The materialization of the described architecture concludes in silent observation modules. 
-              No simulation, no artificial latency. Empirical data presented with rigor.
+              The materialization of the described architecture concludes strictly in silent observation modules. 
+              No simulations, no artificial latency. Empirical data presented with profound rigor.
             </p>
           </div>
         </Reveal>
@@ -357,18 +343,18 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ─── DATA MATRIX ACCESS ─── */}
+      {/* ─── CONCLUSION ─── */}
       <section className="relative z-10 py-40 px-6 max-w-4xl mx-auto text-center border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
         <Reveal>
           <div style={{ color: "#D4AF37", fill: "rgba(212, 175, 55, 0.1)" }} className="flex justify-center mb-8">
             <Database size={32} strokeWidth={1} />
           </div>
           <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-3xl font-light mb-6">
-            Access to the Whale Alert Network Matrix
+            Whale Alert Network Matrix
           </h2>
           <p style={{ color: "#8A94A6" }} className="text-base leading-relaxed font-light mb-12 max-w-2xl mx-auto">
-            The Whale Alert Network terminal is available for those who require this structural clarity. 
-            Access requires the verification of cryptographic signatures under strict session protocols.
+            The terminal is available strictly for those who require this structural clarity. 
+            Access demands the verification of cryptographic signatures under strict session protocols.
           </p>
           
           <button
@@ -376,7 +362,7 @@ export function WhaleAlertLanding() {
             style={{ border: "1px solid rgba(255, 255, 255, 0.2)", color: "#EAEAEA" }}
             className="px-8 py-3.5 rounded text-sm font-medium transition-colors hover:bg-white hover:text-black flex items-center justify-center gap-3 mx-auto"
           >
-            <span>Initialize Network Session</span>
+            <span>Access the Terminal</span>
             <ArrowRight size={16} strokeWidth={1.5} />
           </button>
         </Reveal>

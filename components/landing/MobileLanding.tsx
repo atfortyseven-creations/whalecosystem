@@ -29,7 +29,7 @@ function Tag({ children }: { children: React.ReactNode }) {
     );
 }
 
-// ─── Section ──────────────────────────────────────────────────────────────────
+// ─── SECTION ──────────────────────────────────────────────────────────────────
 function Section({ id, children, className = "" }: { id?: string; children: React.ReactNode; className?: string }) {
     return (
         <section id={id} className={`min-h-screen w-full relative flex flex-col px-6 py-20 ${className}`}>
@@ -38,7 +38,7 @@ function Section({ id, children, className = "" }: { id?: string; children: Reac
     );
 }
 
-// ─── Architectural Card ──────────────────────────────────────────────────
+// ─── ARCHITECTURAL CARD ──────────────────────────────────────────────────
 function ArchCard({ icon, title, subtitle, body }: {
     icon: React.ReactNode; title: string; subtitle: string; body: string;
 }) {
@@ -60,7 +60,7 @@ function ArchCard({ icon, title, subtitle, body }: {
     );
 }
 
-// ─── Methodological Step ────────────────────────────────────────────────────────
+// ─── METHODOLOGICAL STEP ────────────────────────────────────────────────────────
 function Step({ n, title, body }: { n: number; title: string; body: string }) {
     return (
         <div className="flex gap-4">
@@ -79,7 +79,7 @@ function Step({ n, title, body }: { n: number; title: string; body: string }) {
 }
 
 // ─────────────────────────────────────────
-// MAIN COMPONENT REWRITE (Academic / PC Zone Sync)
+// MAIN COMPONENT REWRITE
 // ─────────────────────────────────────────
 export function MobileLanding() {
     const { user, isSignedIn } = useUser();
@@ -96,7 +96,7 @@ export function MobileLanding() {
             style={{ backgroundColor: "#020202", color: "#E0E0E0" }}
             className="min-h-screen overflow-y-auto w-full selection:bg-[#D4AF37]/30 selection:text-white font-sans"
         >
-            {/* Upper Atmosphere (Subtle) */}
+            {/* Subtle atmospheric top light */}
             <div className="fixed top-0 left-0 right-0 h-[40vh] bg-[radial-gradient(ellipse_at_50%_-20%,_rgba(212,175,55,0.05),_transparent_70%)] pointer-events-none z-0" />
 
             {/* ── SECTION 1: PROLOGUE ── */}
@@ -122,7 +122,7 @@ export function MobileLanding() {
                         style={{ color: "#A0AABF" }}
                         className="text-[15px] leading-[1.8] max-w-[280px] font-light"
                     >
-                        Mobile interface configured exclusively for establishing cryptographic sessions.
+                        Mobile interface strictly configured for the establishment of cryptographic sessions.
                     </motion.p>
 
                     <motion.button
@@ -140,19 +140,19 @@ export function MobileLanding() {
                 </motion.div>
             </section>
 
-            {/* ── SECTION 2: EPISTEMOLOGY AND BOUNDARIES ── */}
+            {/* ── SECTION 2: EPISTEMOLOGY & LIMITATIONS ── */}
             <Section className="justify-start pt-24 pb-16 border-b" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <div className="space-y-10 max-w-sm mx-auto w-full">
                     <div className="space-y-5">
-                        <Tag><Monitor size={9} /> Computational Restriction</Tag>
+                        <Tag><Monitor size={9} /> Computational Constraint</Tag>
                         <h2 style={{ color: "#F5F5F5", fontFamily: "'Space Grotesk', sans-serif" }} className="text-[28px] leading-[1.2] font-light">
                             High-Frequency <br />
                             <span style={{ color: "#8A94A6" }}>Topology.</span>
                         </h2>
                         <p style={{ color: "#8A94A6" }} className="text-[14px] leading-[1.9] font-light">
-                            Stochastic analysis and institutional flow synthesis demand constant rendering capabilities. 
-                            This mobile device lacks the optimization required to execute the visual engine 
-                            without compromising the speed or veracity of financial events.
+                            The stochastic analysis and synthesis of institutional flows demand constant rendering capabilities. 
+                            This mobile device lacks the required optimization to execute the visual engine without compromising 
+                            the speed or the veracity of financial events.
                         </p>
                     </div>
 
@@ -161,8 +161,8 @@ export function MobileLanding() {
                             <BookOpen size={12} /> Nature of the Link
                         </div>
                         <p style={{ color: "#A0AABF" }} className="text-[13px] leading-[1.8] font-light">
-                            Current device must be used strictly as an asymmetric authentication layer (Zero-Knowledge). 
-                            Scan the pairing code to delegate your session to the desktop environment.
+                            The current device must be employed strictly as an asymmetric authentication layer (Zero-Knowledge). 
+                            Scan the linkage code to delegate your session to the desktop environment.
                         </p>
                     </div>
                 </div>
@@ -184,19 +184,19 @@ export function MobileLanding() {
                             icon={<Cpu size={18} strokeWidth={1.5} />}
                             title="Immutable Ingestion"
                             subtitle="EVM Sync · WebSocket"
-                            body="Unification of directed graphs coming from blockchain states without mathematical intermediaries that distort information."
+                            body="Unification of directed graphs sourced from blockchain states without intermediate mathematical abstractions that could distort the information."
                         />
                         <ArchCard
                             icon={<Shield size={18} strokeWidth={1.5} />}
                             title="Sovereignty Layer"
                             subtitle="ZK Protocols · Mnemonics"
-                            body="We implement cryptographic mechanisms to isolate generated flows, ensuring regulatory inobservability in a decentralized manner."
+                            body="We implement cryptographic mechanisms to isolate the generated flows, ensuring regulatory inobservability in a fully decentralized manner."
                         />
                         <ArchCard
                             icon={<Network size={18} strokeWidth={1.5} />}
                             title="Node Modeling"
                             subtitle="Euclidean Architecture"
-                            body="The platform interacts by generating direct mappings on market entities (wallets, pools) allowing for the semantic linking of raw data."
+                            body="The platform interacts by generating direct mappings onto market entities (wallets, pools) allowing the semantic linkage of pure data."
                         />
                     </div>
                 </div>
@@ -217,23 +217,23 @@ export function MobileLanding() {
                         <Step
                             n={1}
                             title="Physical Deployment"
-                            body="Position yourself at a workstation or personal computer with a browser that natively supports web acceleration."
+                            body="Locate yourself at a workstation or personal computer with a browser that natively supports web hardware acceleration."
                         />
                         <Step
                             n={2}
-                            title="Network Opening"
-                            body="Access Whale Alert Network and go to the link panel under the settings layer ('Device Bridge')."
+                            title="Network Initialization"
+                            body="Access the Whale Alert Network and navigate to the linkage panel under the preferences layer ('Device Bridge')."
                         />
                         <Step
                             n={3}
                             title="Cryptographic Interpretation"
-                            body="Validate your access using the bottom section of this interface. The scanner will decode the ephemeral token assigned to the main session."
+                            body="Validate your access employing the lower section of this interface. The scanner will decode the ephemeral token assigned to the main session."
                         />
                     </div>
                 </div>
             </Section>
 
-            {/* ── SECTION 5: CONNECTION AND LOGIN MODULE ── */}
+            {/* ── SECTION 5: CONNECTION MODULE (PRESERVED LOGIC) ── */}
             <Section id="s-connect" className="justify-start pt-16 pb-24 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <div className="space-y-10 max-w-sm mx-auto w-full">
                     <div className="space-y-4 text-center">
@@ -244,11 +244,11 @@ export function MobileLanding() {
                             Observation Link
                         </h2>
                         <p style={{ color: "#8A94A6" }} className="text-[13px] leading-[1.8] font-light">
-                            Identify your cryptographic entity and then focus the terminal matrix to formalize the handover.
+                            Identify your cryptographic entity and subsequently focus the terminal's matrix to formalize the transfer.
                         </p>
                     </div>
 
-                    {/* AUTH BLOCK */}
+                    {/* AUTHENTICATION BLOCK (Preserved Logic) */}
                     {isSignedIn ? (
                         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                                     style={{ backgroundColor: "rgba(212, 175, 55, 0.05)", border: "1px solid rgba(212, 175, 55, 0.2)" }}
@@ -292,7 +292,7 @@ export function MobileLanding() {
                     {/* Visual Divider */}
                     <div className="flex items-center gap-4 py-4">
                         <div className="flex-1 h-px" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }} />
-                        <span style={{ color: "#D4AF37" }} className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">Optical Reader</span>
+                        <span style={{ color: "#D4AF37" }} className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-50">Optical Scanner</span>
                         <div className="flex-1 h-px" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }} />
                     </div>
 
@@ -300,7 +300,7 @@ export function MobileLanding() {
                     <div className="space-y-6">
                         <div className="text-center space-y-1">
                             <p style={{ color: "#7B8699" }} className="font-mono text-[10px] uppercase tracking-[0.1em]">
-                                Locate <span style={{ color: "#D4AF37" }}>Device Bridge</span> in PC environment
+                                Visualize <span style={{ color: "#D4AF37" }}>Device Bridge</span> in the PC Environment
                             </p>
                         </div>
                         
@@ -310,8 +310,8 @@ export function MobileLanding() {
                     </div>
 
                     <p style={{ color: "#545F73" }} className="text-center text-[11px] leading-relaxed font-light mt-8">
-                        Your mobile terminal operates as a one-way security conduit. 
-                        Full Network analysis and immersion requires a primary workstation.
+                        Your mobile terminal operates as a unidirectional security conduit. 
+                        Full immersion and network analysis require a primary workstation.
                     </p>
                 </div>
             </Section>

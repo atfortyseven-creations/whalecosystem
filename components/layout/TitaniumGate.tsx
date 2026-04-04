@@ -26,7 +26,6 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     const { isConnected } = useAccount();
     const [state, setState] = useState<GateState>('AUTH');
     const [mounted, setMounted] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
     const pathname = usePathname();
     const router = useRouter();
     
@@ -38,7 +37,6 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     useEffect(() => {
         setMounted(true);
     }, []);
-
     useEffect(() => {
         const checkAccess = () => {
             if (!mounted) return;
@@ -70,9 +68,8 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         checkAccess();
     }, [isConnected, isPublicPage, router, mounted]);
 
-    // Loader — Only show during initial hydration to prevent flash
     if (!mounted) {
-        return <div style={{ background: '#020202', minHeight: '100vh' }} />;
+        return null;
     }
 
     return (
