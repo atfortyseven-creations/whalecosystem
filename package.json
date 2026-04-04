@@ -66,7 +66,7 @@
     "@rainbow-me/rainbowkit": "^2.0.5",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
-    "@react-three/postprocessing": "^2.19.1",
+    "@react-three/postprocessing": "^3.0.4",
     "@reown/appkit": "^1.8.17",
     "@reown/appkit-adapter-wagmi": "^1.8.17",
     "@scure/bip32": "^2.0.1",
