@@ -162,7 +162,7 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
                 <div className="space-y-1">
                     <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#888888] font-black">Destino Asegurado</span>
                     <p className="font-mono text-[10px] uppercase tracking-widest text-[#050505] font-black">
-                    Tesorería Sovereign Network
+                    Tesorería Whale Alert Network
                     </p>
                 </div>
                 <span className="font-mono text-[9px] tracking-[0.2em] text-[#888888] font-bold">{TARGET_TREASURY.slice(0, 6)}...{TARGET_TREASURY.slice(-4)}</span>

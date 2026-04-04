@@ -126,7 +126,7 @@ export function ConnectWalletModal() {
                                 <Shield size={15} className="text-white" />
                             </div>
                             <div>
-                                <div className="text-[10px] font-mono font-bold text-[#8B5CF6] uppercase tracking-[0.2em]">Sovereign Network</div>
+                                <div className="text-[10px] font-mono font-bold text-[#8B5CF6] uppercase tracking-[0.2em]">Whale Alert Network</div>
                                 <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest">Sovereign Terminal</div>
                             </div>
                         </div>

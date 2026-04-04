@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     // Simulate legendary-quality backend processing for the Institutional Menu
     switch (action) {
       case 'file_save':
-        return NextResponse.json({ success: true, message: 'Institutional state successfully encrypted and saved to Sovereign Network.' });
+        return NextResponse.json({ success: true, message: 'Institutional state successfully encrypted and saved to Whale Alert Network.' });
       case 'file_export':
         return NextResponse.json({ success: true, message: 'Data matrix exported with military-grade zk-SNARK proof.' });
       case 'edit_preferences':

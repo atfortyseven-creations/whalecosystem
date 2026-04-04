@@ -150,7 +150,7 @@ export const WorldGate = ({ children }: { children: React.ReactNode }) => {
                                         return;
                                     }}
                                     verification_level={VerificationLevel.Orb}
-                                    action_description="Identity Verification by Sovereign Network"
+                                    action_description="Identity Verification by Whale Alert Network"
                                 >
                                     {({ open }: { open: () => void }) => (
                                         <>

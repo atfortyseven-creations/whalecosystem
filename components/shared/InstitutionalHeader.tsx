@@ -67,7 +67,7 @@ export function InstitutionalHeader() {
                     </motion.div>
                     <div className="flex flex-col leading-none">
                         <span className="font-aztec-serif text-[18px] font-black text-black uppercase tracking-tighter leading-none">
-                            Sovereign Network
+                            Whale Alert Network
                         </span>
                         <span className="font-mono text-[7px] font-bold uppercase tracking-[0.4em] mt-0.5" style={{ color: 'rgba(0,0,0,0.35)' }}>
                             Terminal

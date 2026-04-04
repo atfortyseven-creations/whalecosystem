@@ -73,7 +73,7 @@ export default function WalletConnect() {
                                         const provider = (window as any).ethereum;
                                         const accounts = await provider.request({ method: 'eth_requestAccounts' });
                                         const account = accounts[0];
-                                        const message = `Welcome to Sovereign Network\n\nAuth Token: ${Math.floor(Math.random() * 1000000)}\nTimestamp: ${Date.now()}`;
+                                        const message = `Welcome to Whale Alert Network\n\nAuth Token: ${Math.floor(Math.random() * 1000000)}\nTimestamp: ${Date.now()}`;
                                         await provider.request({
                                             method: 'personal_sign',
                                             params: [message, account],

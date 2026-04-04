@@ -13,7 +13,7 @@ interface FAQItem {
 const FAQ_DATA: FAQItem[][] = [
     // PAGE 1: Core Architecture vs Standard Explorers
     [
-        { q: "How does Sovereign Network Pro exceed Etherscan's transaction tracking?", a: "While Etherscan provides raw ledger data, we provide forensic reconstruction of intents. Our engine decodes complex multichain sequences that explorers often mislabel as generic transfers.", tag: "ARCHITECTURE" },
+        { q: "How does Whale Alert Network Pro exceed Etherscan's transaction tracking?", a: "While Etherscan provides raw ledger data, we provide forensic reconstruction of intents. Our engine decodes complex multichain sequences that explorers often mislabel as generic transfers.", tag: "ARCHITECTURE" },
         { q: "What is the real-time latency difference compared to Infura?", a: "We operate on a proprietary mempool stream that precedes traditional RPC providers by 50-150ms, allowing users to identify whale move signatures before they are finalized.", tag: "PERFORMANCE" },
         { q: "Does the system support L2 native forensic analysis?", a: "Yes. Unlike generic systems, we analyze Arbitrum and Optimism sequencer batches directly to identify whale liquidity shifts at the rollup level.", tag: "NETWORKS" },
         { q: "How is deep liquidity tracking superior to Arkham?", a: "Our system identifies 'Ghost Wallets'—addresses that move funds without explicit entity labeling—using behavioral fingerprinting rather than simple public tags.", tag: "INTELLIGENCE" },
@@ -63,7 +63,7 @@ const FAQ_DATA: FAQItem[][] = [
         { q: "What is the 'Impermanent Loss' risk alert?", a: "A tool for LPs that signals when high whale volatility is likely to wipe out trading fee gains in a specific pair.", tag: "LIQUIDITY" },
         { q: "Can we identify 'Team Wallet' disposals?", a: "We track dev-related wallets identified during the genesis event to flag potential rug-pull or early exit behaviors.", tag: "SECURITY" },
         { q: "How do we monitor 'Curated Lists' on Curve?", a: "We index vote-escrowed (ve) token shifts to predict governance-driven incentive changes before they go live.", tag: "CURVE" },
-        { q: "What is the 'Yield Farmer' Sovereign Network?", a: "Identification of $1M+ capital entries into new yield optimizers, indicating high-risk high-reward institutional interest.", tag: "YIELD" }
+        { q: "What is the 'Yield Farmer' Whale Alert Network?", a: "Identification of $1M+ capital entries into new yield optimizers, indicating high-risk high-reward institutional interest.", tag: "YIELD" }
     ],
     // PAGE 5: Multi-Chain Logistics
     [
@@ -106,7 +106,7 @@ const FAQ_DATA: FAQItem[][] = [
     ],
     // PAGE 8: Privacy vs Forensics
     [
-        { q: "Is the Sovereign Network Pro system compliant with GDPR?", a: "Yes. We analyze public ledger data only and do not associate any PII (Personally Identifiable Information) with wallet addresses.", tag: "PRIVACY" },
+        { q: "Is the Whale Alert Network Pro system compliant with GDPR?", a: "Yes. We analyze public ledger data only and do not associate any PII (Personally Identifiable Information) with wallet addresses.", tag: "PRIVACY" },
         { q: "How can I keep my own whale movements private?", a: "We recommend using our 'Stealth Propagation' feature which uses mixers to avoid behavioral fingerprinting by other tools.", tag: "SOVEREIGNTY" },
         { q: "What is the 'Zero-Knowledge' alert verify?", a: "A feature allowing us to prove the existence of a whale move without revealing the destination address until it is settled.", tag: "ZK" },
         { q: "How do we manage 'Data Sovereignty'?", a: "Users own their alert filters; no data is shared with third-party advertising or surveillance firms.", tag: "ETHICS" },
@@ -119,14 +119,14 @@ const FAQ_DATA: FAQItem[][] = [
     ],
     // PAGE 9-15: Generating diverse institutional content
     [
-        { q: "Sovereign Network v8.4: What changed in this update?", a: "Major improvements to the stochastic engine and sub-15ms sync for cross-platform terminals.", tag: "UPDATE" },
+        { q: "Whale Alert Network v8.4: What changed in this update?", a: "Major improvements to the stochastic engine and sub-15ms sync for cross-platform terminals.", tag: "UPDATE" },
         { q: "Institutional Pipeline: How do we process 1M events?", a: "Using an event-driven Kafka architecture that ensures zero message loss even during peak network volatility.", tag: "PIPE" },
         { q: "Sovereign Intelligence: What is the Atlas of Networks?", a: "A specialized forensic map that visualizes the 'arteries' of value flow between primary and secondary blockchains.", tag: "ATLAS" },
         { q: "Web3 Integration: How do we compare with Glassnode?", a: "Glassnode is for macro analysis; we are for tactical, real-time capital execution alerts.", tag: "COMPARE" },
         { q: "Computational Power: What is the GPU advantage?", a: "We use CUDA-optimized kernels for fast pattern recognition of market-maker bot behavior.", tag: "COMPUTE" },
         { q: "API Performance: 99.99% Uptime SLA?", a: "Our globally redundant load balancers ensure institutional reliability during the highest stress periods.", tag: "API" },
         { q: "Whale Psychology: Can we predict market sentiment?", a: "By analyzing the 'hold duration' of high-tier tokens, we can estimate if whales are in accumulation or distribution phase.", tag: "ML" },
-        { q: "Atomic Execution: What is a flash-sync event?", a: "When the entire Sovereign Network synchronizes a high-impact move across all clients in under 100ms.", tag: "SYNC" },
+        { q: "Atomic Execution: What is a flash-sync event?", a: "When the entire Whale Alert Network synchronizes a high-impact move across all clients in under 100ms.", tag: "SYNC" },
         { q: "Security Armor: How do we prevent DDoS?", a: "Our infrastructure is protected by an Anycast network that disperses malicious traffic across 150 points of presence.", tag: "CYBER" },
         { q: "Financial Freedom: Why Sovereignty matters?", a: "Information is the ultimate weapon in the Web3 space. Our tools empower individuals with institutional-grade data.", tag: "MISSION" }
     ],
@@ -146,7 +146,7 @@ const FAQ_DATA: FAQItem[][] = [
         { q: "Latency Benchmarking: 15ms vs 500ms?", a: "Standard tools use public APIs. We use raw socket streams directly from our global node network for ultra-low latency.", tag: "LATENCY" },
         { q: "Security Auditing: Who verifies our code?", a: "Our forensic and security engines undergo quarterly audits by top-tier Web3 security firms like OpenZeppelin.", tag: "AUDITS" },
         { q: "Whale Watch: What is the 'Bubble' view?", a: "A physics-based visualizer where the size and velocity of bubbles represent the capital weight of transactions.", tag: "VIZ" },
-        { q: "Market Efficiency: Why use Sovereign Network Pro?", a: "Markets become more efficient when transparency is available to all. We provide that transparency with professional tools.", tag: "VALUE" },
+        { q: "Market Efficiency: Why use Whale Alert Network Pro?", a: "Markets become more efficient when transparency is available to all. We provide that transparency with professional tools.", tag: "VALUE" },
         { q: "Cross-Chain Sync: How do we handle timestamps?", a: "We use a NTP-synchronized reference clock across all nodes to ensure transactional ordering is perfect across different chains.", tag: "TIME" },
         { q: "Data Export: Can I get CSV data?", a: "Yes, users can export up to 100,000 whale events at a time for offline analysis in Excel or Python.", tag: "DATA" },
         { q: "Mobile Access: iOS and Android support?", a: "Our PWA (Progressive Web App) provides a native-like experience with push notifications on all modern mobile platforms.", tag: "MOBILE" },
@@ -160,7 +160,7 @@ const FAQ_DATA: FAQItem[][] = [
         { q: "How do we detect 'Market Manipulation'?", a: "We identify 'Spoofing' and 'Wash' patterns where whales use multiple addresses to create fake buy/sell walls.", tag: "SECURITY" },
         { q: "What is the 'Tactical Pulse' frequency?", a: "The pulse is updated every 3,000ms, providing a high-fidelity 'heartbeat' of the global crypto market.", tag: "MOMENTUM" },
         { q: "Does the system monitor whale social media?", a: "Complementary OSINT analysis correlates on-chain moves with high-profile tweets and Discord announcements.", tag: "OSINT" },
-        { q: "Why is the Sovereign Network Pro dashboard white?", a: "Institutional elegance. The Arctic Protocol theme provides maximum contrast for long-duration forensic focus sessions.", tag: "DESIGN" },
+        { q: "Why is the Whale Alert Network Pro dashboard white?", a: "Institutional elegance. The Arctic Protocol theme provides maximum contrast for long-duration forensic focus sessions.", tag: "DESIGN" },
         { q: "What is the 'Atomic Ledger' reconstruction?", a: "A bit-perfect simulation of a transaction's execution to verify the exact outcome before reporting.", tag: "TECH" },
         { q: "How many wallets are in our 'Whale Atlas'?", a: "Over 5.2 million filtered addresses with a cumulative AUM exceeding $3.5 Trillion USD.", tag: "DATA" },
         { q: "Can I receive alerts via SMS?", a: "Yes, global SMS delivery is supported for ultra-high-priority whale movements (>$100M).", tag: "ALERTS" },
@@ -187,16 +187,16 @@ const FAQ_DATA: FAQItem[][] = [
         { q: "UX Perfection: Why the fluid animations?", a: "Micro-interactions reduce the cognitive load when monitoring high-velocity transactional data streams.", tag: "AESTHETICS" },
         { q: "Security Sentinel: Protecting the 'Alpha'?", a: "We use isolated enclaves to process signals, ensuring that the 'Alpha' is never leaked before it reaches the user.", tag: "SECURITY" },
         { q: "Community Feedback: How can I contribute?", a: "Join our developer portal at humanidfi.com/developers to help build the next generation of forensic tools.", tag: "COMMUNITY" },
-        { q: "Sovereign Network Pro VIP: Is it worth the cost?", a: "For serious institutional participants, the alpha gain from a single alert can cover the cost of a 10-year subscription.", tag: "VALUE" },
+        { q: "Whale Alert Network Pro VIP: Is it worth the cost?", a: "For serious institutional participants, the alpha gain from a single alert can cover the cost of a 10-year subscription.", tag: "VALUE" },
         { q: "System Recovery: What happens during a crash?", a: "Our 'Hot-Standby' architecture ensures failover to a parallel region in under 2 seconds if a primary node fails.", tag: "RECOVERY" },
-        { q: "The End: Last sovereign query?", a: "Information is freedom. Sovereign Network Pro is the gateway to that freedom. Welcome to the Matrix.", tag: "END" }
+        { q: "The End: Last sovereign query?", a: "Information is freedom. Whale Alert Network Pro is the gateway to that freedom. Welcome to the Matrix.", tag: "END" }
     ],
     [
         { q: "Matrix Update 15.1: Final Sync?", a: "System reports 100% synchronization across all global nodes. Matrix status: PERFECT.", tag: "FINAL" },
         { q: "Legendary Whales: The Final Tier?", a: "Only wallets with sustained profitability over 36 months reach this tier. Truly the 'alpha of alphas'.", tag: "ALPHA" },
         { q: "Global Sentience: The future of AI?", a: "Our neural nets are evolving to identify not just what whales are doing, but WHY they are doing it.", tag: "FUTURE" },
         { q: "Sovereign Shield: Your privacy armor?", a: "In an age of total surveillance, we provide the ultimate shield for the sovereign individual.", tag: "PRIVACY" },
-        { q: "Sovereign Network 2026: Absolute Perfection?", a: "We don't settle for 'good enough'. We build for absolute, unshakeable perfection.", tag: "MISSION" },
+        { q: "Whale Alert Network 2026: Absolute Perfection?", a: "We don't settle for 'good enough'. We build for absolute, unshakeable perfection.", tag: "MISSION" },
         { q: "Institutional Onboarding: How to start?", a: "Connect your hardware wallet, verify your identity signature, and step into the inner sanctum of whale intelligence.", tag: "START" },
         { q: "The Arctic Vision: Why white-label?", a: "Whiteness represents clarity. Clarity represents truth. In the Arctic, truth is the only signal that matters.", tag: "TRUTH" },
         { q: "Delta Force: The response team?", a: "Our internal engineers monitor the matrix 24/7 to intervene if any signal deviation is detected.", tag: "FORCE" },

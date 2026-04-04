@@ -39,7 +39,7 @@ export function WhaleAlertFooter() {
 
     const sections = [
         {
-            title: "Sovereign Network",
+            title: "Whale Alert Network",
             links: [
                 { name: t('footer.get_wallet'), href: "/wallet" },
                 { name: t('footer.buy'), href: "#" },

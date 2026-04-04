@@ -26,7 +26,7 @@ const MarqueeBanner = () => (
       style={{ willChange: 'transform' }}
     >
       <span className="font-mono text-xl md:text-3xl text-white/30 tracking-[0.3em] font-bold uppercase">
-        Sovereign Network <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span> Sovereign Network <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span>
+        Whale Alert Network <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span> Whale Alert Network <span className="mx-8">◎</span> SOVEREIGN DATA <span className="mx-8">◎</span> ZK-COMPLIANCE <span className="mx-8">◎</span> INSTITUTIONAL <span className="mx-8">◎</span>
       </span>
     </motion.div>
   </div>
@@ -248,12 +248,12 @@ export function WhaleAlertLanding() {
           </div>
 
           <h1 className="font-aztec-body font-light tracking-tight text-[clamp(2.5rem,8vw,6rem)] leading-none text-white mb-6 drop-shadow-2xl">
-            Sovereign Network
+            Whale Alert Network
           </h1>
           
           <div className="font-aztec-body text-left text-sm md:text-base font-light text-white/50 max-w-4xl mx-auto leading-relaxed mb-12 px-6 md:px-10 space-y-8 max-h-[45vh] overflow-y-auto msv-hide-scrollbar border-y border-white/10 py-10 shadow-inner bg-black/20 backdrop-blur-sm rounded-xl">
             <p>
-              En la dimensión macroeconómica contemporánea, la supremacía no se define únicamente por la acumulación transaccional, sino por la integridad matemática absoluta y un nivel de exposición regulatoria meticulosamente calibrado. Sovereign Network nace como un ecosistema institucional de altísimo rendimiento, forjado desde sus cimientos bajo parámetros de seguridad de grado paramilitar y normativas de compliance globales innegociables. Lo que presentamos aquí no es una simple interfaz, sino una infraestructura algorítmica diseñada para quienes comprenden que en la red no existen segundas oportunidades frente a la vulnerabilidad o la latencia.
+              En la dimensión macroeconómica contemporánea, la supremacía no se define únicamente por la acumulación transaccional, sino por la integridad matemática absoluta y un nivel de exposición regulatoria meticulosamente calibrado. Whale Alert Network nace como un ecosistema institucional de altísimo rendimiento, forjado desde sus cimientos bajo parámetros de seguridad de grado paramilitar y normativas de compliance globales innegociables. Lo que presentamos aquí no es una simple interfaz, sino una infraestructura algorítmica diseñada para quienes comprenden que en la red no existen segundas oportunidades frente a la vulnerabilidad o la latencia.
             </p>
 
             <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">1. Cinética de Tiempo Real</h3>
@@ -295,7 +295,7 @@ export function WhaleAlertLanding() {
 
             <h3 className="text-white/90 text-lg font-bold uppercase tracking-widest border-b border-white/10 pb-2 mt-8">Resolución Universal</h3>
             <p>
-              Sovereign Network no comparece al mercado con la vocación superflua de adornar interfaces visuales interactivas en aplicaciones. Comparecemos únicamente para fragmentar y redefinir cada límite tecnológico para la vigilancia financiera implacable institucional. Absolutamente todo bit forjado en cada capa y modelo paramétrico transmutado por nuestros servidores centrales es verdaderamente un muro balístico erguido exclusivamente para soportar su completo y absoluto dominio soberano ante el entorno financiero más hostil en toda la red global en internet de capa intermedia de blockchains.
+              Whale Alert Network no comparece al mercado con la vocación superflua de adornar interfaces visuales interactivas en aplicaciones. Comparecemos únicamente para fragmentar y redefinir cada límite tecnológico para la vigilancia financiera implacable institucional. Absolutamente todo bit forjado en cada capa y modelo paramétrico transmutado por nuestros servidores centrales es verdaderamente un muro balístico erguido exclusivamente para soportar su completo y absoluto dominio soberano ante el entorno financiero más hostil en toda la red global en internet de capa intermedia de blockchains.
             </p>
           </div>
 

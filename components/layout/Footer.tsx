@@ -78,7 +78,7 @@ export const Footer = () => {
                     <div className="md:col-span-5 flex flex-col items-start">
                         <div className="flex items-center gap-3 mb-6 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-2xl">
                             <span className="text-xl">👾</span>
-                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Sovereign Network</span>
+                            <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Whale Alert Network</span>
                         </div>
                         <p className="text-[13px] font-sans text-white/40 leading-relaxed max-w-sm tracking-wide">
                             Advanced on-chain analytics and sovereign privacy infrastructure. Built exclusively for global financial institutions and elite market makers.
@@ -120,7 +120,7 @@ export const Footer = () => {
                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
                     <div className="text-[9px] font-aztec-mono font-black uppercase tracking-[0.4em] text-white/20 flex items-center justify-center gap-4 hover:text-white/40 transition-colors">
                         <Globe size={11} className="opacity-50" />
-                        <span>© 2026 Sovereign Network CORP — ALL RIGHTS RESERVED</span>
+                        <span>© 2026 Whale Alert Network CORP — ALL RIGHTS RESERVED</span>
                     </div>
                 </div>
             </div>

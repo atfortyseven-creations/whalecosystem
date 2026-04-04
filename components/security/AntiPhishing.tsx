@@ -51,7 +51,7 @@ export default function AntiPhishing() {
 
     // Check for suspicious domains
     if (domain && !isOfficialDomain(domain)) {
-      warnings.push('This may not be the official Sovereign Network domain');
+      warnings.push('This may not be the official Whale Alert Network domain');
     }
 
     // Check for homograph attacks (lookalike characters)
@@ -116,7 +116,7 @@ Chrome/Edge: Press Ctrl+D (Windows) or Cmd+D (Mac)
 Firefox: Press Ctrl+D (Windows) or Cmd+D (Mac)
 Safari: Press Cmd+D
 
-Always Access Sovereign Network through your bookmark to ensure you're on the official site.`);
+Always Access Whale Alert Network through your bookmark to ensure you're on the official site.`);
       
       localStorage.setItem('site-bookmarked', 'true');
       setHasBookmark(true);
@@ -188,7 +188,7 @@ Always Access Sovereign Network through your bookmark to ensure you're on the of
                         <div>
                           <h3 className="font-black text-green-600">Secure Connection</h3>
                           <p className="text-sm text-[#1F1F1F]/70">
-                            You are on the official Sovereign Network platform
+                            You are on the official Whale Alert Network platform
                           </p>
                         </div>
                       </>

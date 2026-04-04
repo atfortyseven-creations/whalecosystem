@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 // In-memory message buffer for the legendary demo
 // In production, this would use Redis (Upstash) or a direct BSV Overlay
 let messageBuffer: any[] = [
-    { id: '1', sender: 'SYSTEM', content: 'Sovereign Network Link Established.', timestamp: new Date(Date.now() - 50000).toISOString(), type: 'SYS' },
+    { id: '1', sender: 'SYSTEM', content: 'Whale Alert Network Link Established.', timestamp: new Date(Date.now() - 50000).toISOString(), type: 'SYS' },
     { id: '2', sender: 'WhaleHunter_7', content: 'Detected massive ETH movement to Coinbase. Anyone checking the BSV bridge?', timestamp: new Date(Date.now() - 20000).toISOString(), type: 'USER' }
 ];
 

@@ -180,7 +180,7 @@ export default function SettingsPanel() {
       </section>
 
       <div className="text-center text-xs text-[#1F1F1F]/30 pt-4">
-        Sovereign Network Terminal v1.0.0 (Phase 4 Build)
+        Whale Alert Network Terminal v1.0.0 (Phase 4 Build)
       </div>
     </div>
   );
@@ -190,7 +190,7 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
     const [input, setInput] = useState('');
     const [isHovering, setIsHovering] = useState(false);
     
-    const correctPhrase = "Sovereign Network";
+    const correctPhrase = "Whale Alert Network";
     const isMatched = input === correctPhrase;
 
     return (

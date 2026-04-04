@@ -99,7 +99,7 @@ export default function InstitutionalHeader() {
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-2">
             <span className="text-purple-600">✧</span>
-            <span className="font-serif text-xl font-black tracking-normal">SOVEREIGN NETWORK</span>
+            <span className="font-serif text-xl font-black tracking-normal">WHALE ALERT NETWORK</span>
           </div>
           <nav className="flex items-center gap-8 font-bold opacity-80">
             <button className="hover:text-black hover:opacity-100 transition-opacity text-pink-500">LIVE FEED</button>

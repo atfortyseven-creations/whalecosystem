@@ -30,7 +30,7 @@ export function WhaleAlertLoader({ bg = '#FFFFFF', color = '#000000' }: WhaleAle
             className="font-black text-4xl md:text-5xl uppercase tracking-tighter leading-none select-none"
             style={{ color }}
           >
-            Sovereign Network
+            Whale Alert Network
           </h1>
           <h2
             className="font-black text-4xl md:text-5xl uppercase tracking-tighter leading-none select-none"
