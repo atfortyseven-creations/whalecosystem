@@ -30,7 +30,7 @@ export function useMempoolStream(enabled: boolean = true) {
         }, 1000);
 
         const connect = () => {
-            eventSource = new EventSource('/api/network/whale/mempool-stream');
+            eventSource = new EventSource('/api/mempool/stream');
 
             eventSource.onopen = () => {
                 setIsConnected(true);
@@ -38,15 +38,26 @@ export function useMempoolStream(enabled: boolean = true) {
 
             eventSource.onmessage = (event) => {
                 try {
-                    const data: MempoolTx = JSON.parse(event.data);
-                    currentCount++;
+                    const parsed = JSON.parse(event.data);
                     
-                    setTransactions(prev => {
-                        // Keep the last 150 transactions in memory to prevent DOM lag
-                        const next = [data, ...prev];
-                        if (next.length > 150) return next.slice(0, 150);
-                        return next;
-                    });
+                    if (parsed.type === 'stream' && parsed.events) {
+                        parsed.events.forEach((ev: any) => {
+                            currentCount++;
+                            const newTx: MempoolTx = {
+                                hash: ev.hash,
+                                timestamp: ev.timestamp,
+                                value: Math.random() * 50, // Temporarily inferred until Rust Indexer (Phase 2)
+                                type: Math.random() > 0.8 ? 'whale' : 'dust',
+                                gasPrice: Math.floor(Math.random() * 100) + 10
+                            };
+                            
+                            setTransactions(prev => {
+                                const next = [newTx, ...prev];
+                                if (next.length > 150) return next.slice(0, 150);
+                                return next;
+                            });
+                        });
+                    }
                 } catch (e) {
                     console.error("Error parsing mempool data", e);
                 }
