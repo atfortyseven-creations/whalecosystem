@@ -61,11 +61,11 @@ const DEX_ROUTERS_BNB = new Set([
 
 const RPC_CONFIG = {
     ETH: [
-        process.env.ETH_RPC_URL || 'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff',
+        process.env.ETH_RPC_URL || 'https://go.getblock.io/31aef531b4e444f5bde76196502679da',
         process.env.ETH_RPC_URL_BACKUP || 'https://eth.getblock.io/d9f5f9207ac44e5d9faf8d3017ca9fff/mainnet/'
     ],
     BNB: [
-        process.env.BNB_RPC_URL || 'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517',
+        process.env.BNB_RPC_URL || 'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
         process.env.BNB_RPC_URL_BACKUP || 'https://bsc.getblock.io/3cdeadc7f4174c23b37daee85bc0d517/mainnet/'
     ]
 };

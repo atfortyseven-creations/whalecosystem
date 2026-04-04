@@ -30,29 +30,32 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
             const now = new Date();
             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
             
-            // Randomly select a node to simulate activity
             const activeNodes = nodes.filter(n => n.status !== 'error');
             if (activeNodes.length === 0) return;
-            const targetNode = activeNodes[Math.floor(Math.random() * activeNodes.length)];
+            
+            // Deterministic node selection
+            const nodeIndex = (now.getMinutes() + now.getSeconds()) % activeNodes.length;
+            const targetNode = activeNodes[nodeIndex];
 
+            // Deterministic log selection based on timestamp
+            const hash = (now.getMinutes() * 60 + now.getSeconds() + (targetNode.id || 0)) % 100;
             let newLog: LogEntry;
-            const rand = Math.random();
 
-            if (rand > 0.9 && targetNode.type === 'bot') {
+            if (hash > 90 && targetNode.type === 'bot') {
                 newLog = {
                     id: logCounter,
                     timestamp: timeStr,
                     type: 'success',
                     message: <span><span className="text-[var(--aztec-orchid)]">[{targetNode.title}]</span> ✅ Ejecución exitosa. Beneficio: <span className="text-[var(--aztec-chartreuse)]">+$4,500</span></span>
                 };
-            } else if (rand > 0.7) {
+            } else if (hash > 70) {
                 newLog = {
                     id: logCounter,
                     timestamp: timeStr,
                     type: 'info',
                     message: <span><span className="text-[var(--aztec-orchid)]">[{targetNode.title}]</span> ⚡ Tx iniciada...</span>
                 };
-            } else if (rand > 0.5) {
+            } else if (hash > 50) {
                 newLog = {
                     id: logCounter,
                     timestamp: timeStr,
@@ -153,3 +156,4 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
         </motion.div>
     );
 }
+

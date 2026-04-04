@@ -37,44 +37,12 @@ interface PortfolioToken {
     chain: string;
 }
 
-// ── Mock data generators ─────────────────────────────────────────────────────
+import useSWR from 'swr';
+
 const CHAIN_COLORS: Record<string, string> = {
     ethereum: '#627EEA', solana: '#9945FF', bsc: '#F0B90B',
     arbitrum: '#12AAFF', base: '#0052FF', polygon: '#8247E5',
 };
-
-const CATEGORIES = ['Exchange', 'Whale', 'DAO', 'MEV Bot', 'Smart Money', 'Institutional', 'Fund'];
-
-function generateWhale(rank: number): WhaleEntity {
-    const labels = [
-        'Vitalik Buterin', 'Binance Hot Wallet', 'Coinbase Prime', 'Jump Trading',
-        'Three Arrows Capital', 'a16z Crypto', 'Paradigm Capital', 'BlackRock DeFi',
-        'Cumberland DRW', 'Alameda Research', 'Wintermute Trading', 'GSR Markets',
-    ];
-    const chains = ['ethereum', 'solana', 'arbitrum', 'base', 'bsc', 'polygon'];
-    const tokens = ['BTC', 'ETH', 'SOL', 'ARB', 'BNB', 'USDC', 'USDT', 'LINK', 'UNI', 'AVAX'];
-    const nw = Math.random() * 2_000_000_000 + 10_000_000;
-    const ch = parseFloat(((Math.random() - 0.45) * 15).toFixed(2));
-    const wr = parseFloat((Math.random() * 35 + 55).toFixed(1));
-    const pnl = parseFloat(((Math.random() - 0.4) * 5_000_000).toFixed(0));
-    return {
-        rank,
-        label:  labels[rank - 1] || `Whale #${rank}`,
-        address: `0x${Math.random().toString(16).slice(2, 42)}`,
-        category: CATEGORIES[rank % CATEGORIES.length],
-        netWorthUSD: nw,
-        change24h: ch,
-        topHolding: tokens[rank % tokens.length],
-        topHoldingPct: parseFloat((Math.random() * 60 + 10).toFixed(1)),
-        winRate: wr,
-        pnl30d: pnl,
-        txCount30d: Math.floor(Math.random() * 3000 + 50),
-        chains: chains.slice(0, Math.floor(Math.random() * 4) + 1),
-        alphaScore: Math.floor(wr * 1.1 - 5 + Math.random() * 10),
-    };
-}
-
-const WHALES = Array.from({ length: 20 }, (_, i) => generateWhale(i + 1));
 
 const PORTFOLIO_TOKENS: PortfolioToken[] = [
     { symbol: 'BTC',  name: 'Bitcoin',         balance: 142.5,    priceUSD: 83241,  valueUSD: 11859244, change24h: 1.2,  allocation: 38.4, chain: 'ethereum'  },
@@ -99,19 +67,19 @@ const totalValue = PORTFOLIO_TOKENS.reduce((s, t) => s + t.valueUSD, 0);
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function WhalePortfolio() {
-    const [view, setView]     = useState<'leaderboard' | 'portfolio'>('leaderboard');
+    const [view, setView] = useState<'leaderboard' | 'portfolio'>('leaderboard');
     const [search, setSearch] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [whales, setWhales] = useState(WHALES);
     const [lastUpdated, setLastUpdated] = useState(new Date());
 
+    const { data, isLoading, mutate } = useSWR('/api/intelligence/whales', (url) => 
+        fetch(url).then(res => res.json()), { refreshInterval: 12000, suspense: false }
+    );
+
+    const whales: WhaleEntity[] = data?.entities || [];
+
     const refresh = () => {
-        setLoading(true);
-        setTimeout(() => {
-            setWhales(Array.from({ length: 20 }, (_, i) => generateWhale(i + 1)));
-            setLastUpdated(new Date());
-            setLoading(false);
-        }, 700);
+        mutate();
+        setLastUpdated(new Date());
     };
 
     const filteredWhales = whales.filter(w =>
@@ -158,9 +126,9 @@ export function WhalePortfolio() {
                             className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-8 pr-3 py-1.5 text-[10px] font-mono text-[#050505] outline-none focus:border-[#050505]"
                         />
                     </div>
-                    <button onClick={refresh} disabled={loading}
+                    <button onClick={refresh} disabled={isLoading}
                         className="ml-auto p-1.5 rounded-lg border border-[#E5E5E5] text-[#888888] hover:text-[#050505] disabled:opacity-50 transition-colors">
-                        <RefreshCw size={13} className={loading ? 'animate-spin' : ''}/>
+                        <RefreshCw size={13} className={isLoading ? 'animate-spin' : ''}/>
                     </button>
                     <span className="text-[9px] font-black text-[#888888] uppercase flex items-center gap-1">
                         <Clock size={9}/>{lastUpdated.toTimeString().slice(0, 8)}

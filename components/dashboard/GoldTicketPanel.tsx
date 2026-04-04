@@ -26,9 +26,12 @@ const STEPS = [
     { step: 4, title: 'Unlock Platform',   desc: 'All Sovereign features unlock immediately. No waiting. No KYC.',                     done: false },
 ];
 
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+
 type ClaimStep = 'eligibility' | 'payment' | 'claiming' | 'claimed';
 
 export function GoldTicketPanel() {
+    const { address, isConnected } = useSovereignAccount();
     const [step, setStep]             = useState<ClaimStep>('eligibility');
     const [walletConnected, setWallet] = useState(false);
     const [paymentDone, setPayment]   = useState(false);
@@ -74,7 +77,7 @@ export function GoldTicketPanel() {
                 <div className="text-center">
                     <h1 className="text-3xl font-black text-[#050505] uppercase tracking-tighter">Sovereign Active</h1>
                     <p className="text-sm text-[#888888] mt-2">Your Gold Ticket NFT has been minted to your wallet</p>
-                    <p className="text-[10px] font-mono text-[#888888] mt-1">Token ID: #WHALE-{Math.floor(Math.random()*10000).toString().padStart(4,'0')}</p>
+                    <p className="text-[10px] font-mono text-[#888888] mt-1">Token ID: #WHALE-{address ? address.slice(-4).toUpperCase() : '0000'}</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl w-full">
                     {BENEFITS.slice(0,4).map((b, i) => (

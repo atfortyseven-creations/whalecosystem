@@ -50,22 +50,7 @@ const CHAIN_COLORS: Record<string, string> = {
     celestia: '#7B2FBE', blur: '#FF6640', default: '#888888'
 };
 
-function generateData() {
-    return ASSETS.map(a => {
-        const ch1h  = parseFloat(((Math.random() - 0.48) * 8).toFixed(2));
-        const ch24h = parseFloat(((Math.random() - 0.45) * 30).toFixed(2));
-        const ch7d  = parseFloat(((Math.random() - 0.42) * 80).toFixed(2));
-        const price = a.mcapB * 1e9 * (Math.random() * 0.0000001 + 0.0000001) * (1 + ch24h / 200);
-        const vol24 = a.mcapB * 1e9 * (Math.random() * 0.08 + 0.02);
-        return {
-            ...a,
-            price,
-            ch1h, ch24h, ch7d,
-            vol24h: vol24,
-            mcap: a.mcapB * 1e9,
-        };
-    });
-}
+// Real data is strictly fetched from /api/markets in the component body.
 
 type SortKey = 'ch1h' | 'ch24h' | 'ch7d' | 'vol24h' | 'mcap';
 type Window = '1h' | '24h' | '7d';

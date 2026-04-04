@@ -107,7 +107,7 @@ const createOptimizedTransport = (primaryUrl: string, fallbackUrl?: string) => {
 export const mainnetClient = createPublicClient({
     chain: mainnet,
     transport: createOptimizedTransport(
-        'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff',
+        'https://go.getblock.io/31aef531b4e444f5bde76196502679da',
         `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
     )
 });
@@ -115,7 +115,7 @@ export const mainnetClient = createPublicClient({
 export const bscClient = createPublicClient({
     chain: bsc,
     transport: createOptimizedTransport(
-        'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517',
+        'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
         `https://bsc-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}` // Fallback if GetBlock has issues
     )
 });

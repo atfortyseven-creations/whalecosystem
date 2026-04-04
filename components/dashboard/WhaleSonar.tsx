@@ -1,38 +1,16 @@
-"use client";
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame } from 'lucide-react';
+import useSWR from 'swr';
 
 export function WhaleSonar() {
-    const [roi, setRoi] = useState(14.2);
-    const [burnRate, setBurnRate] = useState(0.042);
-    const [alerts, setAlerts] = useState<{id: number, text: string, type: 'threat'|'opportunity'}[]>([]);
+    const { data, isLoading } = useSWR('/api/intelligence/sonar', (url) => 
+        fetch(url).then(res => res.json()), { refreshInterval: 5000 }
+    );
 
-    useEffect(() => {
-        // Increment ROI slightly over time
-        const i1 = setInterval(() => setRoi(prev => prev + (Math.random() * 0.05)), 3000);
-        // Fluctuate Burn Rate
-        const i2 = setInterval(() => setBurnRate(prev => Math.max(0.01, prev + (Math.random() * 0.01 - 0.005))), 2000);
-        
-        // Random Threat/Opportunity generator
-        let c = 0;
-        const i3 = setInterval(() => {
-            if (Math.random() > 0.8) {
-                const isThreat = Math.random() > 0.5;
-                const texts = isThreat 
-                    ? ['Front-Running Bot Detected', 'High GWEI Spike', 'Liquidity Drain Alert'] 
-                    : ['Arbitrage Window Open', 'Low Gas Opportunity', 'Yield Spike Detected'];
-                
-                setAlerts(prev => [
-                    { id: ++c, text: texts[Math.floor(Math.random() * texts.length)], type: isThreat ? 'threat' : 'opportunity' },
-                    ...prev.slice(0, 3)
-                ]);
-            }
-        }, 4000);
-
-        return () => { clearInterval(i1); clearInterval(i2); clearInterval(i3); };
-    }, []);
+    const roi = data?.roi || 0;
+    const burnRate = data?.burnRate || 0;
+    const alerts: {id: number, text: string, type: 'threat'|'opportunity'}[] = data?.alerts || [];
 
     return (
         <motion.div 

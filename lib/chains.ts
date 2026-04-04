@@ -30,7 +30,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff',
+      'https://go.getblock.io/31aef531b4e444f5bde76196502679da',
     ].filter(Boolean),
     blockExplorerUrls: ['https://etherscan.io'],
     iconUrl: '/chains/ethereum.svg',
@@ -47,7 +47,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517',
+      'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
     ].filter(Boolean),
     blockExplorerUrls: ['https://bscscan.com'],
     iconUrl: '/chains/bsc.svg',

@@ -19,11 +19,17 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import useSWR from "swr";
+
 gsap.registerPlugin(ScrollTrigger);
 
 
 const DynamicCryptoCheckoutModal = dynamic(
   () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
+  { ssr: false }
+);
+const ClearanceHeroView = dynamic<any>(
+  () => import("./ClearanceView").then((m) => m.ClearanceView),
   { ssr: false }
 );
 const DynamicLegendaryCursor = dynamic(
@@ -127,7 +133,14 @@ const TICKER = [
 ];
 
 function DataTicker() {
-  const content = [...TICKER, ...TICKER, ...TICKER];
+  const { data } = useSWR("/api/network/live-ticker", (url) => fetch(url).then((res) => res.json()), {
+    refreshInterval: 10000, // 10s heartbeat
+    fallbackData: { ticker: TICKER }
+  });
+
+  const tickerData = data?.ticker || TICKER;
+  const content = [...tickerData, ...tickerData, ...tickerData];
+
   return (
     <div className="relative w-full overflow-hidden border-y" style={{ borderColor: "rgba(5,5,5,0.04)" }}>
       <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
@@ -137,10 +150,10 @@ function DataTicker() {
       <motion.div
         className="flex gap-14 py-3 will-change-transform"
         style={{ width: "max-content" }}
-        animate={{ x: [0, -3200] }}
-        transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
+        animate={{ x: [0, -4000] }}
+        transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
       >
-        {content.map((item, i) => (
+        {content.map((item: string, i: number) => (
           <span key={i}
             className="text-[8.5px] font-mono uppercase tracking-[0.28em] whitespace-nowrap"
             style={{ color: item.startsWith("⚠") ? "#D4AF37" : "rgba(5,5,5,0.28)" }}>
@@ -289,6 +302,7 @@ export function WhaleAlertLanding() {
   const { isConnected } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showClearance, setShowClearance] = useState(false);
   const [mouse, setMouse] = useState<[number, number]>([0, 0]);
 
   // Lenis smooth scroll
@@ -355,109 +369,119 @@ export function WhaleAlertLanding() {
             filter: useTransform(heroBlur, (v) => `blur(${v}px)`) }}
           className="relative w-full flex flex-col items-center px-6"
         >
-          {/* Status pill */}
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.9 }}
-            className="flex items-center gap-2.5 mb-9 px-4 py-1.5 rounded-full"
-            style={{ background: "rgba(5,5,5,0.04)", border: "1px solid rgba(5,5,5,0.08)" }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ background: "#00C076", boxShadow: "0 0 8px #00C076" }} />
-            <span className="text-[8.5px] font-mono tracking-[0.5em] uppercase text-black/50">
-              Institutional Intelligence — Live
-            </span>
-          </motion.div>
+          {/* HERO CONTENT TOGGLE */}
+          <AnimatePresence mode="wait">
+            {!showClearance ? (
+              <motion.div
+                key="standard-hero"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="flex flex-col items-center w-full"
+              >
+                {/* Headline */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 48 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 45, damping: 18 }}
+                  className="text-center mb-5 leading-[1.03]"
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: "clamp(2.8rem, 8vw, 7.5rem)",
+                    fontWeight: 300, letterSpacing: "-0.025em", color: "#050505",
+                    maxWidth: "900px",
+                  }}
+                >
+                  Track the world&rsquo;s{" "}
+                  <span style={{
+                    background: "linear-gradient(135deg, #1a6de0 20%, #00d4ff 55%, #D4AF37 90%)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  }}>
+                    largest whales.
+                  </span>
+                  <br />In real time.
+                </motion.h1>
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 48 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, type: "spring", stiffness: 45, damping: 18 }}
-            className="text-center mb-5 leading-[1.03]"
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: "clamp(2.8rem, 8vw, 7.5rem)",
-              fontWeight: 300, letterSpacing: "-0.025em", color: "#050505",
-              maxWidth: "900px",
-            }}
-          >
-            Track the world&rsquo;s{" "}
-            <span style={{
-              background: "linear-gradient(135deg, #1a6de0 20%, #00d4ff 55%, #D4AF37 90%)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            }}>
-              largest whales.
-            </span>
-            <br />In real time.
-          </motion.h1>
+                {/* Subtitle */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 1.1 }}
+                  className="text-center text-base md:text-lg font-light mb-11"
+                  style={{ color: "rgba(5,5,5,0.7)", maxWidth: "540px", lineHeight: 1.7 }}
+                >
+                  Financial observation architecture built on cryptography, asynchronous
+                  macro-analysis, and institutional-grade signal engineering.
+                </motion.p>
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.95, duration: 1.1 }}
-            className="text-center text-base md:text-lg font-light mb-11"
-            style={{ color: "rgba(5,5,5,0.7)", maxWidth: "540px", lineHeight: 1.7 }}
-          >
-            Financial observation architecture built on cryptography, asynchronous
-            macro-analysis, and institutional-grade signal engineering.
-          </motion.p>
+                {/* CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.8 }}
+                  className="flex flex-wrap gap-4 items-center justify-center mb-16"
+                >
+                  <motion.button
+                    onClick={handleEntry}
+                    whileHover={{ scale: 1.06, boxShadow: "0 0 60px rgba(26,109,224,0.45), 0 12px 40px rgba(0,0,0,0.5)" }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                    className="flex items-center gap-2.5 px-9 py-4 rounded-full text-sm font-semibold"
+                    style={{
+                      background: "linear-gradient(135deg,#1a6de0,#0047cc)",
+                      color: "#ffffff",
+                      boxShadow: "0 0 35px rgba(26,109,224,0.3), 0 8px 32px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    <BookOpen size={15} strokeWidth={2} />
+                    Access the Terminal
+                  </motion.button>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.15, duration: 0.8 }}
-            className="flex flex-wrap gap-4 items-center justify-center mb-16"
-          >
-            <motion.button
-              onClick={handleEntry}
-              whileHover={{ scale: 1.06, boxShadow: "0 0 60px rgba(26,109,224,0.45), 0 12px 40px rgba(0,0,0,0.5)" }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 320, damping: 22 }}
-              className="flex items-center gap-2.5 px-9 py-4 rounded-full text-sm font-semibold"
-              style={{
-                background: "linear-gradient(135deg,#1a6de0,#0047cc)",
-                color: "#ffffff",
-                boxShadow: "0 0 35px rgba(26,109,224,0.3), 0 8px 32px rgba(0,0,0,0.5)",
-              }}
-            >
-              <BookOpen size={15} strokeWidth={2} />
-              Access the Terminal
-            </motion.button>
+                  <motion.button
+                    onClick={() => setShowClearance(true)}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 px-9 py-4 rounded-full text-sm font-medium transition-all"
+                    style={{ border: "1px solid rgba(212,175,55,0.28)", color: "#D4AF37", background: "rgba(212,175,55,0.04)" }}
+                  >
+                    Acquire License
+                  </motion.button>
+                </motion.div>
 
-            <motion.button
-              onClick={() => setShowCheckout(true)}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-9 py-4 rounded-full text-sm font-medium transition-all"
-              style={{ border: "1px solid rgba(212,175,55,0.28)", color: "#D4AF37", background: "rgba(212,175,55,0.04)" }}
-            >
-              Acquire License
-            </motion.button>
-          </motion.div>
+                {/* Live stats */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7, duration: 0.9 }}
+                  className="flex flex-wrap justify-center items-center gap-x-14 gap-y-6 mt-14 px-4"
+                >
+                  {[
+                    { value: "$4.2B",  label: "24h Volume" },
+                    { value: "1,247",  label: "Whales Tracked" },
+                    { value: "24",     label: "Chains" },
+                    { value: "99.99%", label: "Uptime" },
+                  ].map((s, i) => (
+                    <React.Fragment key={i}>
+                      {i > 0 && <div className="hidden md:block w-px h-8 bg-black/10" />}
+                      <StatBlock value={s.value} label={s.label} />
+                    </React.Fragment>
+                  ))}
+                </motion.div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="clearance-view"
+                initial={{ opacity: 0, scale: 0.95, y: 30, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.7, ease: "circOut" }}
+                className="w-full flex justify-center"
+              >
+                <ClearanceHeroView onBack={() => setShowClearance(false)} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Live stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5, duration: 0.9 }}
-            className="flex flex-wrap justify-center items-center gap-x-14 gap-y-6 mt-14 px-4"
-          >
-            {[
-              { value: "$4.2B",  label: "24h Volume" },
-              { value: "1,247",  label: "Whales Tracked" },
-              { value: "24",     label: "Chains" },
-              { value: "99.99%", label: "Uptime" },
-            ].map((s, i) => (
-              <React.Fragment key={i}>
-                {i > 0 && <div className="hidden md:block w-px h-8 bg-black/10" />}
-                <StatBlock value={s.value} label={s.label} />
-              </React.Fragment>
-            ))}
-          </motion.div>
         </motion.div>
 
         {/* Scroll arrow */}
