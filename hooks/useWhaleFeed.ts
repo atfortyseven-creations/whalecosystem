@@ -220,12 +220,28 @@ export function useWhaleFeed() {
     const activityQuery = useQuery<WhaleActivity[]>({
         queryKey: ['network', 'whale', 'activity'],
         queryFn: async () => {
-            const res = await fetch('/api/network/whale/activity?limit=50');
-            if (!res.ok) throw new Error('Failed to fetch whale activity');
-            return res.json();
+            const res = await fetch('/api/whale-events?limit=70');
+            if (!res.ok) throw new Error('Failed to fetch indexed whale events');
+            const data = await res.json();
+            // Map Data Lake Events to expected WhaleActivity interface exactly
+            return (data.events || []).map((ev: any) => ({
+                id: ev.hash,
+                walletAddress: ev.wallet,
+                fromAddress: ev.wallet,
+                toAddress: ev.dex || 'Network',
+                type: ev.action,
+                token: ev.token,
+                amount: Number(ev.amount),
+                usdValue: Number(ev.usdValue),
+                transactionHash: ev.hash,
+                blockNumber: '0',
+                chain: 'ETHEREUM',
+                timestamp: new Date(ev.timestamp).toISOString(),
+                metadata: { method: ev.action }
+            }));
         },
-        refetchInterval: 10000,
-        staleTime: 5000,
+        refetchInterval: 5000,
+        staleTime: 3000,
     });
 
     const evmScanQuery = useQuery<any[]>({
