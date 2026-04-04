@@ -1,87 +1,28 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  DollarSign, Globe, Smartphone, Bell, Shield, Moon, 
-  ChevronRight, Key, ShieldCheck, Send, Mail 
-} from 'lucide-react';
+import { DollarSign, Globe, Smartphone, Bell, Shield, Moon, ChevronRight, Key, ShieldCheck } from 'lucide-react';
 import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions';
+import BiometricGuard from '@/components/wallet/BiometricGuard';
 import { startRegistration } from '@simplewebauthn/browser';
 import { toast } from 'sonner';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 export default function SettingsPanel() {
-  const { address } = useSovereignAccount();
-
-  // Basic Preferences
   const [currency, setCurrency] = useState('USD');
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('Light');
-  
-  // Security States
   const [showSecret, setShowSecret] = useState(false);
   const [isRegisteringPasskey, setIsRegisteringPasskey] = useState(false);
 
-  // Notification States
-  const [email, setEmail] = useState('');
-  const [telegramId, setTelegramId] = useState('');
-  const [tgEnabled, setTgEnabled] = useState(false);
-  const [emailEnabled, setEmailEnabled] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Fetch current settings on load
-  useEffect(() => {
-     if (!address) return;
-     fetch(`/api/user/settings?userId=${address}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.settings) {
-                setEmail(data.settings.user?.email || '');
-                setTelegramId(data.settings.telegramChatId || '');
-                setTgEnabled(data.settings.telegramEnabled);
-                setEmailEnabled(data.settings.emailNotifications);
-            }
-        })
-        .catch(err => console.error("Error fetching settings:", err));
-  }, [address]);
-
-  const saveSettings = async () => {
-    if (!address) {
-        toast.error('Wallet not connected');
-        return;
-    }
-    setIsSaving(true);
-    try {
-        const resp = await fetch('/api/user/settings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: address,
-                email,
-                telegramEnabled: tgEnabled,
-                telegramChatId: telegramId,
-                emailNotifications: emailEnabled
-            })
-        });
-        if (resp.ok) {
-            toast.success('Institutional settings synced.');
-        } else {
-            throw new Error('Failed to save');
-        }
-    } catch (err) {
-        toast.error('Sync failed. Check network.');
-    } finally {
-        setIsSaving(false);
-    }
-  };
+  // Hardcoded for now, real app should get from auth context
+  const authUserId = "cm6lcm2b600003b6m7k8j9l0n"; 
 
   const registerPasskey = async () => {
-    if (!address) return;
     setIsRegisteringPasskey(true);
     try {
       // 1. Get options from server
-      const resp = await fetch(`/api/auth/webauthn/register?userId=${address}`);
+      const resp = await fetch(`/api/auth/webauthn/register?userId=${authUserId}`);
       const options = await resp.json();
 
       if (options.error) throw new Error(options.error);
@@ -93,7 +34,7 @@ export default function SettingsPanel() {
       const verifyResp = await fetch('/api/auth/webauthn/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...attResp, userId: address }),
+        body: JSON.stringify({ ...attResp, userId: authUserId }),
       });
 
       const verification = await verifyResp.json();
@@ -191,75 +132,22 @@ export default function SettingsPanel() {
       </section>
 
       {/* Notifications */}
-      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10 space-y-4">
-        <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase tracking-wider">Notifications</h3>
-            {isSaving && <div className="animate-pulse text-[10px] font-black text-indigo-500 uppercase">Saving...</div>}
-        </div>
+      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+        <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Notifications</h3>
         
-        <div className="space-y-4">
-          {/* Telegram Channel */}
-          <div className="bg-white/40 p-4 rounded-2xl border border-[#1F1F1F]/5 space-y-3">
-             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#0088cc]/10 rounded-lg flex items-center justify-center text-[#0088cc]">
-                        <Send size={16} />
-                    </div>
-                    <span className="font-bold text-sm text-[#1F1F1F]">Telegram Bot</span>
-                </div>
-                <SettingsToggleRowShort 
-                    enabled={tgEnabled} 
-                    onToggle={() => setTgEnabled(!tgEnabled)} 
-                />
-             </div>
-             {tgEnabled && (
-                 <div className="space-y-2">
-                     <p className="text-[10px] text-[#1F1F1F]/40 font-medium">Link @SovereignWhaleBot then paste your Chat ID:</p>
-                     <input 
-                        type="text" 
-                        value={telegramId}
-                        onChange={(e) => setTelegramId(e.target.value)}
-                        placeholder="Telegram Chat ID..."
-                        className="w-full px-4 py-2 bg-white/60 border border-[#1F1F1F]/10 rounded-xl outline-none font-mono text-xs text-[#1F1F1F]"
-                     />
-                 </div>
-             )}
-          </div>
-
-          {/* Email Channel */}
-          <div className="bg-white/40 p-4 rounded-2xl border border-[#1F1F1F]/5 space-y-3">
-             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-500">
-                        <Mail size={16} />
-                    </div>
-                    <span className="font-bold text-sm text-[#1F1F1F]">Email Alerts</span>
-                </div>
-                <SettingsToggleRowShort 
-                    enabled={emailEnabled} 
-                    onToggle={() => setEmailEnabled(!emailEnabled)} 
-                />
-             </div>
-             {emailEnabled && (
-                 <div className="space-y-2">
-                     <input 
-                        type="email" 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Contact Email..."
-                        className="w-full px-4 py-2 bg-white/60 border border-[#1F1F1F]/10 rounded-xl outline-none font-bold text-xs text-[#1F1F1F]"
-                     />
-                 </div>
-             )}
-          </div>
-
-          <button 
-             onClick={saveSettings}
-             disabled={isSaving}
-             className="w-full py-4 bg-[#1F1F1F] text-[#EAEADF] font-black uppercase text-xs tracking-widest rounded-2xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 shadow-xl shadow-[#1F1F1F]/10"
-          >
-             {isSaving ? 'Syncing...' : 'Save Global Preferences'}
-          </button>
+        <div className="space-y-1">
+          <SettingsToggleRow 
+            icon={<Bell size={20} />} 
+            label="Transaction Alerts" 
+            enabled={true} 
+            onToggle={() => {}} 
+          />
+          <SettingsToggleRow 
+            icon={<DollarSign size={20} />} 
+            label="Price Alerts" 
+            enabled={false} 
+            onToggle={() => {}} 
+          />
         </div>
       </section>
 
@@ -272,7 +160,7 @@ export default function SettingsPanel() {
         {!showSecret ? (
              <DangerZoneReveal onSuccess={() => setShowSecret(true)} />
         ) : (
-            <div className="h-[200px]">
+            <div className="h-[300px]">
                 <div className="p-6 bg-white rounded-xl border border-[#1F1F1F]/10 text-center space-y-4">
                     <p className="font-mono text-lg font-bold text-[#1F1F1F]">
                         abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about
@@ -292,7 +180,7 @@ export default function SettingsPanel() {
       </section>
 
       <div className="text-center text-xs text-[#1F1F1F]/30 pt-4">
-        Sovereign Network Terminal v1.0.0 (Connectivity Phase)
+        Sovereign Network Terminal v1.0.0 (Phase 4 Build)
       </div>
     </div>
   );
@@ -307,6 +195,7 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
 
     return (
         <div className="relative group">
+            {/* Glassmorphism Container */}
             <div className="bg-red-500/5 backdrop-blur-xl border border-red-500/10 rounded-2xl p-6 space-y-4 transition-all hover:bg-red-500/10">
                 <div className="flex flex-col gap-2">
                     <label className="text-xs font-bold text-red-600 uppercase tracking-widest">
@@ -350,13 +239,14 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                 >
+                     {/* Hover Animation Overlay */}
                      {isMatched && (
-                          <motion.div 
+                         <motion.div 
                             initial={{ x: '-100%' }}
                             animate={{ x: isHovering ? '100%' : '-100%' }}
                             transition={{ duration: 0.5, ease: "easeInOut" }}
                             className="absolute inset-0 bg-white/30 skew-x-12"
-                          />
+                         />
                      )}
                      
                      <span className="relative z-10 flex items-center gap-2">
@@ -413,17 +303,5 @@ function SettingsToggleRow({ icon, label, sublabel, enabled, onToggle }: any) {
   );
 }
 
-function SettingsToggleRowShort({ enabled, onToggle }: any) {
-  return (
-    <button 
-      onClick={onToggle}
-      className={`w-10 h-6 rounded-full p-1 transition-all ${
-        enabled ? 'bg-[#1F1F1F]' : 'bg-[#1F1F1F]/20'
-      }`}
-    >
-      <div className={`w-4 h-4 bg-[#EAEADF] rounded-full shadow-sm transition-all ${
-        enabled ? 'translate-x-4' : 'translate-x-0'
-      }`} />
-    </button>
-  );
-}
+
+

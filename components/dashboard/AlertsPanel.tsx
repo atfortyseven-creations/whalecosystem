@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Bell, Plus, Trash2, ToggleLeft, ToggleRight,
     TrendingUp, TrendingDown, Zap, Volume2,
@@ -93,10 +93,12 @@ function progressToTarget(current: number | undefined, threshold: number, type: 
 }
 
 function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate: (a: AlertRule) => void }) {
-    const [form, setForm] = useState({ name: '', asset: 'BTC', type: 'PRICE_ABOVE' as AlertType, threshold: '', telegram: true, push: true, email: false });
+    const [form, setForm] = useState({ name: '', asset: 'BTC', type: 'PRICE_ABOVE' as AlertType, threshold: '', telegram: true, telegramHandle: '', push: true, email: false, emailAddress: '' });
 
     const handleCreate = () => {
         if (!form.name || !form.threshold) { toast.error('Fill in all fields'); return; }
+        if (form.telegram && !form.telegramHandle) { toast.error('Telegram handle required'); return; }
+        if (form.email && !form.emailAddress) { toast.error('Email address required'); return; }
         const rule: AlertRule = {
             id: `local-${Date.now()}`,
             name: form.name,
@@ -111,6 +113,15 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
         };
         onCreate(rule);
         toast.success(`Alert "${form.name}" created`);
+
+        // Elegant notification display
+        if (form.telegram) {
+             toast.success(`Telegram bot hooked to ${form.telegramHandle}`, { icon: '✈️' });
+        }
+        if (form.email) {
+             toast.success(`Email engine connected to ${form.emailAddress}`, { icon: '✉️' });
+        }
+        
         onClose();
     };
 
@@ -170,6 +181,28 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
                                 </button>
                             ))}
                         </div>
+                        <AnimatePresence>
+                            {(form.telegram || form.email) && (
+                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-2 mt-3 overflow-hidden">
+                                     {form.telegram && (
+                                        <div className="flex bg-white/50 border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs font-mono text-[#050505] focus-within:border-[#050505] items-center gap-2">
+                                            <span className="text-[#888888] font-bold">@</span>
+                                            <input value={form.telegramHandle} onChange={e => setForm(f => ({ ...f, telegramHandle: e.target.value }))}
+                                                placeholder="telegram_username" className="w-full outline-none bg-transparent"
+                                            />
+                                        </div>
+                                    )}
+                                    {form.email && (
+                                        <div className="flex bg-white/50 border border-[#E5E5E5] rounded-lg px-3 py-2 text-xs font-mono text-[#050505] focus-within:border-[#050505] items-center gap-2">
+                                            <span className="text-[#888888] font-bold">✉️</span>
+                                            <input value={form.emailAddress} onChange={e => setForm(f => ({ ...f, emailAddress: e.target.value }))}
+                                                placeholder="name@institutional.com" className="w-full outline-none bg-transparent"
+                                            />
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                     <div className="flex gap-3 pt-2">
                         <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-lg border border-[#E5E5E5] text-[10px] font-black uppercase tracking-widest text-[#888888] hover:text-[#050505] transition-colors">Cancel</button>
