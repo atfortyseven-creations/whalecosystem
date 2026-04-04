@@ -151,6 +151,9 @@ export function UniversalEliteWallpaper() {
         ? /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
         : false;
 
+    const [pathname, setPathname] = React.useState('');
+    React.useEffect(() => { setPathname(window.location.pathname); }, []);
+
     return (
         <>
             {/* GPU-composited canvas — will-change keeps it on its own layer */}
@@ -159,17 +162,19 @@ export function UniversalEliteWallpaper() {
                 className="fixed inset-0 w-full h-full pointer-events-none z-[-2] outline-none border-none m-0 p-0 block will-change-transform"
                 style={{ imageRendering: 'pixelated' }}
             />
-            {/* Static watermark — no animation, no willChange needed */}
-            <div
-                className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04]"
-                style={{
-                    backgroundImage: 'url(/official-whale-legendary.png)',
-                    backgroundRepeat: 'repeat',
-                    backgroundSize: isMobileSSR ? '50px' : '70px',
-                    filter: 'grayscale(1) brightness(1.2)',
-                    transform: 'translate3d(0,0,0)',
-                }}
-            />
+            {/* Static watermark — suppressed on landing page to avoid flash */}
+            {pathname !== '/' && (
+                <div
+                    className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.04]"
+                    style={{
+                        backgroundImage: 'url(/official-whale-legendary.png)',
+                        backgroundRepeat: 'repeat',
+                        backgroundSize: isMobileSSR ? '50px' : '70px',
+                        filter: 'grayscale(1) brightness(1.2)',
+                        transform: 'translate3d(0,0,0)',
+                    }}
+                />
+            )}
         </>
     );
 }

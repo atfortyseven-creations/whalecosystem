@@ -19,13 +19,13 @@ export function InstitutionalHeader() {
     const { openConnectModal } = useUIStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const navLinks = [
+    const navLinks: { href: string; label: string; active: boolean; isSystem?: boolean; isTicket?: boolean }[] = [
         { href: '/dashboard',  label: 'System',          active: pathname === '/dashboard',  isSystem: true  },
-        { href: '/portfolio',  label: 'Sovereign Portfolio',  active: pathname === '/portfolio'                   },
-        { href: '/news',       label: 'News of today',    active: pathname === '/news'                        },
-        { href: '/support',    label: 'Sovereign Support',    active: pathname === '/support'                     },
-        { href: '/academy',    label: 'Sovereign Academy',    active: pathname === '/academy'                     },
-        { href: '/ticket',     label: 'Gold Ticket',      active: pathname === '/ticket',     isTicket: true  },
+        // { href: '/portfolio',  label: 'Sovereign Portfolio',  active: pathname === '/portfolio'                   },
+        // { href: '/news',       label: 'News of today',    active: pathname === '/news'                        },
+        // { href: '/support',    label: 'Sovereign Support',    active: pathname === '/support'                     },
+        // { href: '/academy',    label: 'Sovereign Academy',    active: pathname === '/academy'                     },
+        // { href: '/ticket',     label: 'Gold Ticket',      active: pathname === '/ticket',     isTicket: true  },
     ];
 
     return (
@@ -49,18 +49,22 @@ export function InstitutionalHeader() {
             <div className="flex items-center gap-5 relative z-10 flex-shrink-0">
                 <Link href="/" className="flex items-center gap-3.5 group">
                     <motion.div
-                        whileHover={{ scale: 1.05, rotate: 3 }}
+                        whileHover={{ scale: 1.05 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                        className="relative w-11 h-11 flex items-center justify-center rounded-full border shadow-sm"
-                        style={{ background: 'rgba(0,0,0,0.04)', borderColor: 'rgba(0,0,0,0.08)' }}
+                        className="relative flex items-center justify-center rounded-xl border shadow-sm overflow-hidden"
+                        style={{
+                            width: '58px', height: '36px',
+                            background: 'rgba(0,0,0,0.04)',
+                            borderColor: 'rgba(0,0,0,0.08)'
+                        }}
                     >
                         <SplashContainer className="w-full h-full flex items-center justify-center">
                             <Image
                                 src="/official-whale-monochrome.png"
-                                alt="Whale Logo"
-                                width={28}
-                                height={28}
-                                className="object-contain"
+                                alt="Whale Alert Network Logo"
+                                width={52}
+                                height={32}
+                                className="object-contain w-full h-full p-1"
                                 unoptimized={true}
                             />
                         </SplashContainer>
