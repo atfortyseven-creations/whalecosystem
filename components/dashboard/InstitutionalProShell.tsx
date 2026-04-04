@@ -40,6 +40,64 @@ const SIDEBAR_ITEMS: NavItem[] = [
 
 const EMBEDDED_TABS = ['whale-portfolio', 'academy', 'support', 'gold-ticket'];
 
+function LiveMarketBand() {
+    const [stats, setStats] = useState([
+        { label: 'BTC',         value: 'Loading',   chg: null as string|null,  up: true  },
+        { label: 'ETH',         value: 'Loading',    chg: null as string|null,  up: false },
+        { label: 'Global MCap', value: '$2.84T',    chg: '+2.1%',  up: true  },
+        { label: 'DeFi TVL',    value: '$98.7B',    chg: '+0.4%',  up: true  },
+        { label: 'BTC.D',       value: '54.2%',     chg: '+0.3%',  up: true  },
+        { label: 'ETH Gas',     value: '14 Gwei',   chg: null,     up: true  },
+        { label: 'Fear/Greed',  value: '74',        chg: 'GREED',  up: true  },
+        { label: 'SOL TPS',     value: '4,218',     chg: null,     up: true  },
+    ]);
+
+    React.useEffect(() => {
+        const fetchBand = async () => {
+            try {
+                const res = await fetch('/api/markets');
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json?.data && Array.isArray(json.data)) {
+                        const bmap = new Map(json.data.map((d: any) => [d.symbol, d]));
+                        const btc = bmap.get('BTCUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
+                        const eth = bmap.get('ETHUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
+                        if (btc && eth) {
+                            setStats(prev => {
+                                const n = [...prev];
+                                n[0] = { label: 'BTC', value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(), chg: (parseFloat(btc.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(btc.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(btc.priceChangePercent || '0') >= 0 };
+                                n[1] = { label: 'ETH', value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(), chg: (parseFloat(eth.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(eth.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(eth.priceChangePercent || '0') >= 0 };
+                                return n;
+                            });
+                        }
+                    }
+                }
+            } catch (e) {}
+        };
+        fetchBand();
+        const t = setInterval(fetchBand, 10000);
+        return () => clearInterval(t);
+    }, []);
+
+    return (
+        <>
+            {stats.map((item, i) => (
+                <div key={i} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
+                    <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{item.label}</span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-[10px] font-black font-mono text-[#050505] truncate">{item.value}</span>
+                        {item.chg && (
+                            <span className={`text-[8px] font-black leading-none ${item.label === 'Fear/Greed' ? 'text-[#00C076]' : item.up ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                                {item.chg}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            ))}
+        </>
+    );
+}
+
 export function InstitutionalProShell({ 
     children, 
     activeTab, 
@@ -145,30 +203,9 @@ export function InstitutionalProShell({
                         />
                     </div>
 
-                    {/* Center: Dense Market Bar */}
+                    {/* Center: Live Dense Market Bar */}
                     <div className="hidden lg:flex items-center gap-0 divide-x divide-[#E5E5E5] flex-1 mx-6 overflow-hidden">
-                        {[
-                            { label: 'BTC',         value: '$83,241',   chg: '+1.2%',  up: true  },
-                            { label: 'ETH',         value: '$3,812',    chg: '-0.8%',  up: false },
-                            { label: 'Global MCap', value: '$2.84T',    chg: '+2.1%',  up: true  },
-                            { label: 'DeFi TVL',    value: '$98.7B',    chg: '+0.4%',  up: true  },
-                            { label: 'BTC.D',       value: '54.2%',     chg: '+0.3%',  up: true  },
-                            { label: 'ETH Gas',     value: '14 Gwei',   chg: null,     up: true  },
-                            { label: 'Fear/Greed',  value: '74',        chg: 'GREED',  up: true  },
-                            { label: 'SOL TPS',     value: '4,218',     chg: null,     up: true  },
-                        ].map((item, i) => (
-                            <div key={i} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
-                                <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{item.label}</span>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-[10px] font-black font-mono text-[#050505] truncate">{item.value}</span>
-                                    {item.chg && (
-                                        <span className={`text-[8px] font-black leading-none ${item.label === 'Fear/Greed' ? 'text-[#00C076]' : item.up ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
-                                            {item.chg}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                        <LiveMarketBand />
                     </div>
 
                     {/* Right: Settings */}

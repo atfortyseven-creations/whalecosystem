@@ -83,16 +83,16 @@ export function GainersLosersPanel() {
             const res = await fetch('/api/markets');
             if (res.ok) {
                 const json = await res.json();
-                if (json?.data && json.data.length > 0) {
-                    const bMap = new Map(json.data.map((d: any) => [d.symbol, d]));
+                if (json?.data && Array.isArray(json.data) && json.data.length > 0) {
+                    const bMap = new Map(json.data.map((d: any) => [d?.symbol, d]));
 
                     setData(prev => prev.map(a => {
                         const tick = bMap.get(a.symbol + 'USDT') as any;
-                        if (tick) {
-                            const price = parseFloat(tick.lastPrice);
-                            const ch24h = parseFloat(tick.priceChangePercent);
-                            const vol24 = parseFloat(tick.quoteVolume);
-                            const mcap = a.mcapB * 1e9 * (price / (price * 0.9)); // rough approx for live update
+                        if (tick && typeof tick === 'object' && tick.lastPrice) {
+                            const price = parseFloat(tick.lastPrice) || 0;
+                            const ch24h = parseFloat(tick.priceChangePercent) || 0;
+                            const vol24 = parseFloat(tick.quoteVolume) || 0;
+                            const mcap = a.mcapB * 1e9 * (price / (price * 0.9 || 1)); // rough approx for live update
                             return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
                         }
                         return a;
