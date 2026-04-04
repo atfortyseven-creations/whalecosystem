@@ -92,7 +92,9 @@ export function GainersLosersPanel() {
                             const price = parseFloat(tick.lastPrice) || 0;
                             const ch24h = parseFloat(tick.priceChangePercent) || 0;
                             const vol24 = parseFloat(tick.quoteVolume) || 0;
-                            const mcap = a.mcapB * 1e9 * (price / (price * 0.9 || 1)); // rough approx for live update
+                            // Safe mcap: avoid division by zero when price is 0
+                            const prev = price / (1 + ch24h / 100);
+                            const mcap = prev > 0 ? a.mcapB * 1e9 * (price / prev) : a.mcapB * 1e9;
                             return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
                         }
                         return a;
