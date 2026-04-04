@@ -94,13 +94,19 @@ export function ApiTerminal() {
         try {
             const start = performance.now();
             const res = await fetch(selected.path);
-            const elapsed = (performance.now() - start).toFixed(0);
-            const data = await res.json();
+            const elapsedStr = (performance.now() - start).toFixed(0);
+            
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                data = await res.text();
+            }
 
             // Capture headers
             const hdrs: Record<string, string> = {
                 'Content-Type':            res.headers.get('content-type') || 'application/json',
-                'X-Response-Time-ms':      elapsed,
+                'X-Response-Time-ms':      elapsedStr,
                 'X-Status':                String(res.status),
                 'X-RateLimit-Limit':       '1000',
                 'X-RateLimit-Remaining':   String(Math.floor(Math.random() * 900 + 50)),
@@ -114,7 +120,7 @@ export function ApiTerminal() {
                 _meta: {
                     status:     res.status,
                     ok:         res.ok,
-                    latency_ms: parseInt(elapsed),
+                    latency_ms: parseInt(elapsedStr),
                     timestamp:  new Date().toISOString(),
                     endpoint:   selected.path,
                     method:     selected.method,

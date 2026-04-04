@@ -39,11 +39,14 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
     
     useEffect(() => {
         let isMounted = true;
+        let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+        let timeoutId: NodeJS.Timeout;
+
         const fetchStream = async () => {
             try {
                 const response = await fetch(`/api/matrix/stream?asset=${symbol}`);
-                if (!response.ok) return;
-                const reader = response.body?.getReader();
+                if (!response.ok) throw new Error("Stream connection failed");
+                reader = response.body?.getReader() || null;
                 const decoder = new TextDecoder('utf-8');
                 let buffer = '';
 
@@ -63,11 +66,19 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
                     }
                 }
             } catch (err) {
-                if (isMounted) setTimeout(fetchStream, 3000);
+                if (isMounted) {
+                    console.error(`[Matrix] Streaming failed for ${symbol}, reconnecting...`);
+                    timeoutId = setTimeout(fetchStream, 5000);
+                }
             }
         };
         fetchStream();
-        return () => { isMounted = false; };
+        
+        return () => { 
+            isMounted = false; 
+            if (reader) reader.cancel().catch(() => {});
+            clearTimeout(timeoutId);
+        };
     }, [symbol]);
 
     if (!state) {

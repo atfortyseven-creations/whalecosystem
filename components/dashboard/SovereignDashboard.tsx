@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { InstitutionalProShell }  from '@/components/dashboard/InstitutionalProShell';
+import { InstitutionalProShell }   from '@/components/dashboard/InstitutionalProShell';
 import { ExternalEmbed }           from '@/components/dashboard/ExternalEmbed';
+import { SovereignContractModal }  from '@/components/dashboard/SovereignContractModal';
+import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 
 // ── Internal panels (no backend changes) ──────────────────────────────────────
 import { PremiumMatrixStack }      from '@/components/premium/PremiumMatrixStack';
@@ -82,36 +84,41 @@ export default function SovereignDashboard() {
     const externalPage = EXTERNAL_PAGES[activeTab];
 
     return (
-        <InstitutionalProShell
-            activeTab={activeTab}
-            onTabChange={(id) => setActiveTab(id as TabId)}
-        >
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="w-full h-full"
-                >
-                    {/* ── External pages rendered via ExternalEmbed ── */}
-                    {externalPage ? (
-                        <ExternalEmbed {...externalPage} />
+        <>
+            <SovereignContractModal />
+            <InstitutionalProShell
+                activeTab={activeTab}
+                onTabChange={(id) => setActiveTab(id as TabId)}
+            >
+                <DashboardErrorBoundary>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeTab}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.15, ease: 'easeOut' }}
+                            className="w-full h-full"
+                        >
+                            {/* ── External pages rendered via ExternalEmbed ── */}
+                            {externalPage ? (
+                                <ExternalEmbed {...externalPage} />
 
-                    /* ── Internal panels ── */
-                    ) : activeTab === 'dashboard'   ? <PremiumMatrixStack />
-                      : activeTab === 'watchlist'   ? <WatchlistTable />
-                      : activeTab === 'alerts'      ? <AlertsPanel />
-                      : activeTab === 'multicharts' ? <PolymarketPanel />
-                      : activeTab === 'new-pairs'   ? <NewPairsTable />
-                      : activeTab === 'gainers'     ? <GainersLosersPanel />
-                      : activeTab === 'api'         ? <ApiTerminal />
-                      : activeTab === 'portfolio'   ? <LivePortfolio />
-                      : activeTab === 'news'        ? <NewsOfToday />
-                      : null}
-                </motion.div>
-            </AnimatePresence>
-        </InstitutionalProShell>
+                            /* ── Internal panels ── */
+                            ) : activeTab === 'dashboard'   ? <PremiumMatrixStack />
+                              : activeTab === 'watchlist'   ? <WatchlistTable />
+                              : activeTab === 'alerts'      ? <AlertsPanel />
+                              : activeTab === 'multicharts' ? <PolymarketPanel />
+                              : activeTab === 'new-pairs'   ? <NewPairsTable />
+                              : activeTab === 'gainers'     ? <GainersLosersPanel />
+                              : activeTab === 'api'         ? <ApiTerminal />
+                              : activeTab === 'portfolio'   ? <LivePortfolio />
+                              : activeTab === 'news'        ? <NewsOfToday />
+                              : null}
+                        </motion.div>
+                    </AnimatePresence>
+                </DashboardErrorBoundary>
+            </InstitutionalProShell>
+        </>
     );
 }

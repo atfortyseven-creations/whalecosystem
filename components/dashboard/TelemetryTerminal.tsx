@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, ChevronsDown, Loader } from 'lucide-react';
+import { Terminal, ChevronsDown, Loader, Activity, RadioTower } from 'lucide-react';
 import { NodeData } from './CanvasEngine';
+import { io, Socket } from 'socket.io-client';
 
 interface TelemetryTerminalProps {
     nodes: NodeData[];
@@ -21,69 +22,71 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const endOfLogsRef = useRef<HTMLDivElement>(null);
 
-    // Simulate real-time RPC logs based on active nodes
+    // Reemplazar simulación con streams WebSockets reales del motor de Node.js
     useEffect(() => {
+        const socket = io();
         let logCounter = 0;
+
+        setLogs([
+            { id: -2, timestamp: 'System', type: 'info', message: 'Initializing Institutional WebSocket Topology...' },
+            { id: -1, timestamp: 'System', type: 'info', message: <span className="text-[#888888]">Connecting to background daemon...</span> }
+        ]);
+
+        socket.on('connect', () => {
+            setLogs(prev => [...prev.slice(-49), {
+                id: ++logCounter,
+                timestamp: 'System',
+                type: 'success',
+                message: <span className="text-[#00C076] font-black">WS ENGINE ONLINE // CONNECTION ESTABLISHED</span>
+            }]);
+        });
         
-        const generateLog = () => {
-            logCounter++;
+        socket.on('whale_tx', (data) => {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+            
+            setLogs(prev => [...prev.slice(-49), {
+                id: ++logCounter,
+                timestamp: timeStr,
+                type: 'warning',
+                message: <span><span className="text-[#E5E5E5]">[{data.chain.toUpperCase()}]</span> ⚡ ALERTA INSTITUCIONAL: {data.type} detectado por <span className="text-[#FF9500] font-black">${(data.amountUsd).toLocaleString()}</span> USD.</span>
+            }]);
+        });
+
+        socket.on('engine_status', (status) => {
             const now = new Date();
             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
             
-            const activeNodes = nodes.filter(n => n.status !== 'error');
-            if (activeNodes.length === 0) return;
-            
-            // Deterministic node selection
-            const nodeIndex = (now.getMinutes() + now.getSeconds()) % activeNodes.length;
-            const targetNode = activeNodes[nodeIndex];
-
-            // Deterministic log selection based on timestamp
-            const hash = (now.getMinutes() * 60 + now.getSeconds() + (targetNode.id || 0)) % 100;
-            let newLog: LogEntry;
-
-            if (hash > 90 && targetNode.type === 'bot') {
-                newLog = {
-                    id: logCounter,
-                    timestamp: timeStr,
-                    type: 'success',
-                    message: <span><span className="text-[var(--aztec-orchid)]">[{targetNode.title}]</span> ✅ Ejecución exitosa. Beneficio: <span className="text-[var(--aztec-chartreuse)]">+$4,500</span></span>
-                };
-            } else if (hash > 70) {
-                newLog = {
-                    id: logCounter,
+            // Limit status print to prevent flooding if it updates every second, maybe print every 10th
+            if (status.processedTxs % 10 === 0) {
+                 setLogs(prev => [...prev.slice(-49), {
+                    id: ++logCounter,
                     timestamp: timeStr,
                     type: 'info',
-                    message: <span><span className="text-[var(--aztec-orchid)]">[{targetNode.title}]</span> ⚡ Tx iniciada...</span>
-                };
-            } else if (hash > 50) {
-                newLog = {
-                    id: logCounter,
-                    timestamp: timeStr,
-                    type: 'warning',
-                    message: <span><span className="text-[var(--aztec-orchid)]">[{targetNode.title}]</span> ⏳ Esperando confirmación de bloque. Latencia: {targetNode.latency}ms.</span>
-                };
-            } else {
-                newLog = {
-                    id: logCounter,
-                    timestamp: timeStr,
-                    type: 'info',
-                    message: <span><span className="text-[var(--aztec-orchid)]">[{targetNode.title}]</span> Pooling RPC via WSS matrix.</span>
-                };
+                    message: <span className="text-[#888888]"><Activity size={10} className="inline mr-1"/> Motor Mempool: {status.tps} TPS | Tx Totales: {status.processedTxs.toLocaleString()} | Uptime: {Math.floor(status.uptime)}s</span>
+                }]);
             }
+        });
 
-            setLogs(prev => [...prev.slice(-49), newLog]); // Keep last 50 logs
+        socket.on('mempool_tick', (data) => {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            // Only capture 5% of normal ticks to not overflow the dom terminal visually (simulate extreme volume)
+            if (Math.random() < 0.05) {
+                setLogs(prev => [...prev.slice(-49), {
+                    id: ++logCounter,
+                    timestamp: timeStr,
+                    type: 'info',
+                    message: <span><span className="text-[#888888]">[{data.chain}]</span> Pool Trace: {data.id}</span>
+                }]);
+            }
+        });
+
+        return () => {
+            socket.disconnect();
         };
-
-        const interval = setInterval(generateLog, 2500); // New log every 2.5s
-        
-        // Initial setup logs
-        setLogs([
-            { id: -2, timestamp: 'System', type: 'info', message: 'Initializing UltraFluid WebSocket Topology...' },
-            { id: -1, timestamp: 'System', type: 'success', message: 'Docker nodes mounted. Matrix synchronized.' },
-        ]);
-
-        return () => clearInterval(interval);
-    }, [nodes]);
+    }, []);
 
     // Auto-scroll to bottom
     useEffect(() => {

@@ -7,6 +7,9 @@ import {
     ArrowUpRight, ArrowDownRight, Flame, Skull,
     BarChart2, Clock
 } from 'lucide-react';
+import { List as RWList } from 'react-window';
+const List = RWList as any;
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 const ASSETS = [
     { symbol: 'BTC',    name: 'Bitcoin',         chain: 'multi',     mcapB: 1640  },
@@ -79,23 +82,28 @@ export function GainersLosersPanel() {
         try {
             const res = await fetch('/api/markets');
             if (res.ok) {
-                const { data: binanceData } = await res.json();
-                const bMap = new Map(binanceData.map((d: any) => [d.symbol, d]));
+                const json = await res.json();
+                if (json?.data && json.data.length > 0) {
+                    const bMap = new Map(json.data.map((d: any) => [d.symbol, d]));
 
-                setData(prev => prev.map(a => {
-                    const tick = bMap.get(a.symbol + 'USDT') as any;
-                    if (tick) {
-                        const price = parseFloat(tick.lastPrice);
-                        const ch24h = parseFloat(tick.priceChangePercent);
-                        const vol24 = parseFloat(tick.quoteVolume);
-                        const mcap = a.mcapB * 1e9 * (price / (price * 0.9)); // rough approx for live update
-                        return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
-                    }
-                    return a;
-                }));
-                setLast(new Date());
+                    setData(prev => prev.map(a => {
+                        const tick = bMap.get(a.symbol + 'USDT') as any;
+                        if (tick) {
+                            const price = parseFloat(tick.lastPrice);
+                            const ch24h = parseFloat(tick.priceChangePercent);
+                            const vol24 = parseFloat(tick.quoteVolume);
+                            const mcap = a.mcapB * 1e9 * (price / (price * 0.9)); // rough approx for live update
+                            return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
+                        }
+                        return a;
+                    }));
+                    setLast(new Date());
+                    return;
+                }
             }
-        } catch (e) {} finally { setLoading(false); }
+        } catch (e) {
+            console.error("Failed to fetch markets endpoint", e);
+        } finally { setLoading(false); }
     }, []);
 
     useEffect(() => { refresh(); const id = setInterval(refresh, 8000); return () => clearInterval(id); }, [refresh]);
@@ -221,58 +229,73 @@ export function GainersLosersPanel() {
                     ))}
                 </div>
 
-                {/* Rows */}
-                <div className="divide-y divide-[#F0F0F0]">
-                    {filtered.map((d, i) => (
-                        <motion.div key={d.symbol}
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.015 }}
-                            className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer"
-                            style={{ gridTemplateColumns: '2.5fr 1.5fr 0.9fr 0.9fr 0.9fr 1.2fr 1.2fr' }}
-                        >
-                            {/* Asset */}
-                            <div className="px-4 py-3 flex items-center gap-2.5">
-                                <span className="text-[8px] font-black text-[#888888] w-4">{i + 1}</span>
-                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                    style={{ background: CHAIN_COLORS[d.chain] || CHAIN_COLORS.default }}>
-                                    {d.symbol[0]}
-                                </div>
-                                <div>
-                                    <div className="text-[11px] font-black text-[#050505]">{d.symbol}</div>
-                                    <div className="text-[8px] text-[#888888]">{d.name}</div>
-                                </div>
-                            </div>
+                {/* Rows (Virtualized) */}
+                <div className="flex-1 w-full h-[500px]">
+                    <AutoSizer>
+                        {({ height, width }) => (
+                            <List
+                                height={height}
+                                itemCount={filtered.length}
+                                itemSize={56}
+                                width={width}
+                                itemData={{ filtered }}
+                            >
+                                {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
+                                    const d = data.filtered[index];
+                                    return (
+                                        <div style={style} className="border-b border-[#F0F0F0]">
+                                            <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
+                                                style={{ gridTemplateColumns: '2.5fr 1.5fr 0.9fr 0.9fr 0.9fr 1.2fr 1.2fr' }}
+                                            >
+                                                {/* Asset */}
+                                                <div className="px-4 flex items-center gap-2.5">
+                                                    <span className="text-[8px] font-black text-[#888888] w-4">{index + 1}</span>
+                                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                                                        style={{ background: CHAIN_COLORS[d.chain] || CHAIN_COLORS.default }}>
+                                                        {d.symbol[0]}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[11px] font-black text-[#050505]">{d.symbol}</div>
+                                                        <div className="text-[8px] text-[#888888]">{d.name}</div>
+                                                    </div>
+                                                </div>
 
-                            {/* Price */}
-                            <div className="px-4 py-3 text-[10px] font-black font-mono text-[#050505]">
-                                {d.price >= 1 ? `$${d.price.toFixed(2)}` : `$${d.price.toFixed(6)}`}
-                            </div>
+                                                {/* Price */}
+                                                <div className="px-4 text-[10px] font-black font-mono text-[#050505]">
+                                                    {d.price >= 1 ? `$${d.price.toFixed(2)}` : `$${d.price.toFixed(6)}`}
+                                                </div>
 
-                            {/* 1h */}
-                            <div className={`px-4 py-3 text-right text-[10px] font-black font-mono ${pctColor(d.ch1h)}`}>
-                                {pctFmt(d.ch1h)}
-                            </div>
+                                                {/* 1h */}
+                                                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch1h)}`}>
+                                                    {pctFmt(d.ch1h)}
+                                                </div>
 
-                            {/* 24h */}
-                            <div className={`px-4 py-3 text-right text-[10px] font-black font-mono ${pctColor(d.ch24h)}`}>
-                                {pctFmt(d.ch24h)}
-                            </div>
+                                                {/* 24h */}
+                                                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch24h)}`}>
+                                                    {pctFmt(d.ch24h)}
+                                                </div>
 
-                            {/* 7d */}
-                            <div className={`px-4 py-3 text-right text-[10px] font-black font-mono ${pctColor(d.ch7d)}`}>
-                                {pctFmt(d.ch7d)}
-                            </div>
+                                                {/* 7d */}
+                                                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch7d)}`}>
+                                                    {pctFmt(d.ch7d)}
+                                                </div>
 
-                            {/* Vol */}
-                            <div className="px-4 py-3 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                {fmt(d.vol24h)}
-                            </div>
+                                                {/* Vol */}
+                                                <div className="px-4 text-right text-[10px] font-bold font-mono text-[#050505]">
+                                                    {fmt(d.vol24h)}
+                                                </div>
 
-                            {/* MCap */}
-                            <div className="px-4 py-3 text-right text-[10px] font-bold font-mono text-[#888888]">
-                                {fmt(d.mcap)}
-                            </div>
-                        </motion.div>
-                    ))}
+                                                {/* MCap */}
+                                                <div className="px-4 text-right text-[10px] font-bold font-mono text-[#888888]">
+                                                    {fmt(d.mcap)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }}
+                            </List>
+                        )}
+                    </AutoSizer>
                 </div>
 
                 {/* Footer */}

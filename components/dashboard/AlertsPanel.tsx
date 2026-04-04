@@ -8,6 +8,7 @@ import {
     Activity, Target, Clock, CheckCircle, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { io } from 'socket.io-client';
 
 type AlertType = 'PRICE_ABOVE' | 'PRICE_BELOW' | 'VOLUME_SPIKE' | 'WHALE_MOVE' | 'PERCENT_CHANGE';
 type AlertStatus = 'ACTIVE' | 'TRIGGERED' | 'PAUSED';
@@ -27,41 +28,7 @@ interface AlertRule {
     notifyPush: boolean;
 }
 
-// ── Simulated local alert engine ─────────────────────────────────────────────
-const DEMO_ALERTS: AlertRule[] = [
-    {
-        id: 'a1', name: 'BTC Breakout Alert', type: 'PRICE_ABOVE', asset: 'BTC',
-        threshold: 90000, currentValue: 83241, status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-        notifyTelegram: true, notifyEmail: false, notifyPush: true
-    },
-    {
-        id: 'a2', name: 'ETH Support Break', type: 'PRICE_BELOW', asset: 'ETH',
-        threshold: 3000, currentValue: 3812, status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-        notifyTelegram: false, notifyEmail: true, notifyPush: true
-    },
-    {
-        id: 'a3', name: 'SOL Volume Spike', type: 'VOLUME_SPIKE', asset: 'SOL',
-        threshold: 5000000, currentValue: 3200000, status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        notifyTelegram: true, notifyEmail: false, notifyPush: false
-    },
-    {
-        id: 'a4', name: 'PEPE Whale Move', type: 'WHALE_MOVE', asset: 'PEPE',
-        threshold: 1000000, currentValue: 2500000, status: 'TRIGGERED',
-        triggeredAt: new Date(Date.now() - 1800000).toISOString(),
-        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        notifyTelegram: true, notifyEmail: true, notifyPush: true
-    },
-    {
-        id: 'a5', name: 'ARB -10% Crash', type: 'PERCENT_CHANGE', asset: 'ARB',
-        threshold: -10, currentValue: -4.2, status: 'PAUSED',
-        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-        notifyTelegram: false, notifyEmail: false, notifyPush: true
-    },
-];
-
+// ── Real Alert Engine ─────────────────────────────────────────────
 const TYPE_CONFIG: Record<AlertType, { label: string; icon: React.ReactNode; color: string }> = {
     PRICE_ABOVE:    { label: 'Price Above',     icon: <TrendingUp size={12}/>,   color: '#00C076' },
     PRICE_BELOW:    { label: 'Price Below',     icon: <TrendingDown size={12}/>, color: '#FF3B30' },
@@ -226,7 +193,7 @@ export function AlertsPanel() {
             const res = await fetch('/api/alerts');
             if (res.ok) {
                 const data = await res.json();
-                if (data.alerts) {
+                if (data.alerts && data.alerts.length > 0) {
                     const mapped = data.alerts.map((a: any) => ({
                         id: a.id,
                         name: a.name,
@@ -241,12 +208,44 @@ export function AlertsPanel() {
                         notifyPush: a.actions?.notifyPush || false,
                     }));
                     setAlerts(mapped);
+                    return;
                 }
             }
-        } catch (e) {} finally { setLoading(false); }
+            throw new Error("Missing real alert data");
+        } catch (e) {
+            console.error('Error fetching alerts', e);
+        } finally { setLoading(false); }
     };
 
     useEffect(() => { refresh(); }, []);
+
+    // ── WebSocket live feed from background daemon ─────────────────────────
+    useEffect(() => {
+        const socket = io();
+        socket.on('whale_tx', (data: any) => {
+            if (data.amountUsd < 2_000_000) return; // Only institutional-grade moves
+            const newAlert: AlertRule = {
+                id: `ws-${data.id}`,
+                name: `🐋 Live Whale ${data.type} · ${data.chain.toUpperCase()}`,
+                type: 'WHALE_MOVE',
+                asset: data.chain.toUpperCase(),
+                threshold: data.amountUsd,
+                currentValue: data.amountUsd,
+                status: 'TRIGGERED',
+                triggeredAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                notifyTelegram: false,
+                notifyEmail: false,
+                notifyPush: true,
+            };
+            setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
+            toast(`🐋 Whale detected — $${(data.amountUsd / 1e6).toFixed(2)}M on ${data.chain.toUpperCase()}`, {
+                duration: 6000,
+                style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' }
+            });
+        });
+        return () => { socket.disconnect(); };
+    }, []);
 
     const handleDelete = async (id: string) => {
         const tid = toast.loading('Deleting alert...');

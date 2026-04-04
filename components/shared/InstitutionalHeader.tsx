@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Menu, X, Ticket } from 'lucide-react';
+import { Globe, Menu, X, Ticket, RadioTower } from 'lucide-react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useUIStore } from '@/lib/store/ui-store';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 import Image from 'next/image';
 import { SplashContainer } from '@/components/shared/SplashContainer';
+import { io } from 'socket.io-client';
 
 // ─── IVORY INSTITUTIONAL HEADER ───
 // Crema/Ivory premium palette — 100% visible, senior Web3 grade
@@ -18,6 +19,16 @@ export function InstitutionalHeader() {
     const { address: eoaAddress, isConnected } = useSovereignAccount();
     const { openConnectModal } = useUIStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [engineOnline, setEngineOnline] = useState(false);
+    const [tps, setTps] = useState(0);
+
+    useEffect(() => {
+        const socket = io();
+        socket.on('connect', () => setEngineOnline(true));
+        socket.on('disconnect', () => setEngineOnline(false));
+        socket.on('engine_status', (s: any) => setTps(s.tps));
+        return () => { socket.disconnect(); };
+    }, []);
 
     const navLinks: { href: string; label: string; active: boolean; isSystem?: boolean; isTicket?: boolean }[] = [
         { href: '/dashboard',  label: 'System',          active: pathname === '/dashboard',  isSystem: true  },
@@ -32,7 +43,7 @@ export function InstitutionalHeader() {
         <>
         {/* ─── MAIN IVORY HEADER ─── */}
         <header
-            className="relative flex items-center justify-between px-6 lg:px-10 border-b sticky top-0 z-[100] transition-all duration-300"
+            className="relative flex items-center justify-between px-6 lg:px-10 w-full border-b sticky top-0 z-[100] transition-all duration-300"
             style={{
                 background: 'linear-gradient(135deg, #FDFAF5 0%, #F7F2EA 50%, #FDFAF5 100%)',
                 borderColor: 'rgba(0,0,0,0.07)',
@@ -46,7 +57,7 @@ export function InstitutionalHeader() {
             <div className="absolute top-0 inset-x-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.9) 70%, transparent)' }} />
 
             {/* LEFT: Brand Identity */}
-            <div className="flex items-center gap-5 relative z-10 flex-shrink-0">
+            <div className="flex items-center gap-5 relative z-10 flex-shrink-0 mr-auto">
                 <Link href="/" className="flex items-center gap-3.5 group">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
@@ -150,6 +161,19 @@ export function InstitutionalHeader() {
 
             {/* RIGHT: Utility area */}
             <div className="flex items-center gap-3 relative z-10 flex-shrink-0">
+
+                {/* Live Engine Status Badge */}
+                <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[8px] font-mono font-black uppercase tracking-widest"
+                    style={{
+                        borderColor: engineOnline ? 'rgba(0,192,118,0.25)' : 'rgba(0,0,0,0.1)',
+                        color: engineOnline ? '#00C076' : '#888888',
+                        background: engineOnline ? 'rgba(0,192,118,0.06)' : 'transparent',
+                    }}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${engineOnline ? 'bg-[#00C076] animate-pulse' : 'bg-[#888888]'}`} />
+                    <RadioTower size={9} />
+                    {engineOnline ? `LIVE · ${tps} TPS` : 'OFFLINE'}
+                </div>
+
                 <div className="hidden lg:block">
                     <SystemsUtilityHeader />
                 </div>
