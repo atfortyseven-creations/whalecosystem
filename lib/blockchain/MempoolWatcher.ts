@@ -1,6 +1,7 @@
 import { ethClient, polClient } from './rpcClient';
 import { formatEther } from 'viem';
 import prisma from '@/lib/db';
+import { dispatchAlert } from '@/lib/notifications/notificationService';
 
 // Absolute Perfection: The Engine that listens to Web3 without sleeping.
 // Integrates Phase 2 Stochastic Filtering and Data Lake Indexation.
@@ -108,7 +109,10 @@ class SovereignMempoolStreamer {
           this.recentTiers.push(eventData);
           if (this.recentTiers.length > 50) this.recentTiers.shift();
 
-          // 2. Index to Core DB Data Lake if it's considered Deep Liquidity
+          // 2. Dispatch External Notifications (Telegram/Email)
+          await dispatchAlert(eventData);
+
+          // 3. Index to Core DB Data Lake if it's considered Deep Liquidity
           if (baseValue > 250000) {
               await prisma.globalWhaleEvent.upsert({
                   where: { hash_logIndex: { hash: hash, logIndex: 0 } },
