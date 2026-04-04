@@ -28,14 +28,14 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'new-pairs',       label: 'New Pairs',        icon: <Zap size={17}/>,             badge: 'Live', badgeColor: '#00C076' },
     { id: 'gainers',         label: 'Gainers & Losers', icon: <TrendingUp size={17}/> },
     // ── Intelligence ──
-    // { id: 'whale-portfolio', label: 'Sovereign Portfolio',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
-    // { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
-    { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/>, dividerBefore: 'Intelligence' },
+    { id: 'whale-portfolio', label: 'Whale Intelligence',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
+    { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
+    { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
     { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
     // ── Learn & Support ──
-    // { id: 'academy',         label: 'Sovereign Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
-    // { id: 'support',         label: 'Sovereign Support',    icon: <LifeBuoy size={17}/> },
-    // { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
+    { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
+    { id: 'support',         label: 'Whale Support',    icon: <LifeBuoy size={17}/> },
+    { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
 const EMBEDDED_TABS = ['whale-portfolio', 'academy', 'support', 'gold-ticket'];
