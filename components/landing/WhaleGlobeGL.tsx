@@ -338,7 +338,7 @@ export function WhaleGlobeGL({
       <ParticleMesh explode={explode} mouse={mouse} />
 
       {/* ── POST PROCESSING ── */}
-      <EffectComposer multisampling={0}>
+      <EffectComposer>
         <Bloom
           intensity={1.6}
           luminanceThreshold={0.05}
