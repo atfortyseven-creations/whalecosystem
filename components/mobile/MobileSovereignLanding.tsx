@@ -317,12 +317,14 @@ function PageHero({
   onConnect,
   onScan,
   onDisconnect,
+  onEnterNews,
 }: {
   isConnected: boolean;
   address?: string;
   onConnect: () => void;
   onScan: () => void;
   onDisconnect: () => void;
+  onEnterNews: () => void;
 }) {
   return (
     <div className="msv-snap-page min-h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
@@ -386,20 +388,39 @@ function PageHero({
                 CONNECT WALLET
               </button>
             ) : (
-              <button
-                onClick={onScan}
-                className="w-full h-[88px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-[12px] flex items-center justify-between px-10 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
-                style={{ willChange: 'transform' }}
-              >
-                <div className="grid grid-cols-[auto_1fr] gap-6 items-center">
-                  <QrCode size={22} className="text-[#050505]" />
-                  <div className="text-left leading-tight">
-                    <p className="tracking-[0.3em]">SYNC LENS</p>
-                    <p className="text-[9px] opacity-40 mt-1 font-bold">READY: OPEN SCANNER</p>
+              <div className="flex flex-col gap-3">
+                {/* Opcion 1: Escanear QR para el PC */}
+                <button
+                  onClick={onScan}
+                  className="w-full h-[72px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
+                  style={{ willChange: 'transform' }}
+                >
+                  <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
+                    <QrCode size={20} className="text-[#050505]" />
+                    <div className="text-left leading-tight">
+                      <p className="tracking-[0.3em]">SCAN PC QR</p>
+                      <p className="text-[8px] opacity-40 mt-1 font-bold">LINK DESKTOP SESSION</p>
+                    </div>
                   </div>
-                </div>
-                <ChevronRight size={18} className="opacity-20 group-hover:translate-x-1 transition-transform" />
-              </button>
+                  <ChevronRight size={16} className="opacity-20 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                {/* Opcion 2: Entrar a Noticias Movil */}
+                <button
+                  onClick={onEnterNews}
+                  className="w-full h-[72px] bg-[#050505] border-2 border-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/20 active:scale-[0.98] group"
+                  style={{ willChange: 'transform' }}
+                >
+                  <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
+                    <Activity size={20} className="text-white" />
+                    <div className="text-left leading-tight">
+                      <p className="tracking-[0.3em]">ENTER TERMINAL</p>
+                      <p className="text-[8px] opacity-60 mt-1 font-bold">VIEW MOBILE DASHBOARD</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
             )}
           </div>
 
@@ -733,6 +754,12 @@ export function MobileSovereignLanding() {
     }
   }, [connect, connectors, walletBrowser]);
 
+  const handleEnterNews = useCallback(() => {
+    // Force the sovereign handshake explicitly for mobile
+    document.cookie = "sovereign_handshake=0x_bypass; path=/; max-age=31536000";
+    window.location.reload();
+  }, []);
+
   if (view === 'scanner') {
     return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
   }
@@ -752,6 +779,7 @@ export function MobileSovereignLanding() {
           onConnect={handleConnectTrigger}
           onScan={() => setView('scanner')}
           onDisconnect={() => disconnect()}
+          onEnterNews={handleEnterNews}
         />
 
         {/* PHILOSOPHY PAGES */}
