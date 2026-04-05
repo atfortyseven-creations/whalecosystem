@@ -146,9 +146,41 @@ const STORE_LINKS: Record<string, { ios: string; android: string }> = {
   rainbow:  { ios: 'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021', android: 'https://play.google.com/store/apps/details?id=me.rainbow' },
 };
 
+// ─── WORLD FINANCIAL CLOCKS ───────────────────────────────────────────────────
+function WorldFinancialClocks() {
+  const [time, setTime] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  if (!mounted) return <div className="h-8 mb-6 mt-2" />;
+  const hubs = [
+    { name: 'NY', tz: 'America/New_York' },
+    { name: 'LDN', tz: 'Europe/London' },
+    { name: 'TYO', tz: 'Asia/Tokyo' },
+    { name: 'DXB', tz: 'Asia/Dubai' },
+  ];
+  return (
+    <div className="flex justify-center items-center gap-6 w-full max-w-[320px] mx-auto opacity-70 mb-4 mt-2">
+      {hubs.map(hub => {
+        const localTime = new Date(time.toLocaleString('en-US', { timeZone: hub.tz }));
+        return (
+          <div key={hub.name} className="flex flex-col items-center min-w-[40px]">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] mb-0.5">{hub.name}</span>
+            <span className="font-mono text-[9px] tracking-widest font-bold text-[#050505]/80">
+              {localTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const WALLET_OPTIONS = [
   { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
-  { id: 'walletConnect', name: 'WALLETCONNECT', desc: 'MODAL / QR CODE', iconType: 'walletconnect' },
   { id: 'trust',    name: 'TRUST WALLET', desc: 'MOBILE APP', iconType: 'trust' },
   { id: 'coinbase', name: 'COINBASE WALLET',desc: 'SMART WALLET / APP', iconType: 'coinbase' },
   { id: 'rainbow',  name: 'RAINBOW WALLET',      desc: 'MOBILE APP', iconType: 'rainbow' },
@@ -368,15 +400,18 @@ function PageHero({
           className="flex flex-col items-center"
           style={{ willChange: 'transform, opacity' }}
         >
+          <WorldFinancialClocks />
+
           {/* Animated Whale Logo bounded nicely */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
-            animate={{ y: [0, -15, 0], opacity: 1 }}
+            animate={{ y: [0, -20, 0], opacity: 1 }}
             transition={{
-              duration: 1.5,
+              duration: 3,
+              repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="w-48 h-48 mx-auto mb-8 mt-4 flex items-center justify-center relative drop-shadow-xl"
+            className="w-[280px] h-[280px] mx-auto mb-4 mt-2 flex items-center justify-center relative drop-shadow-2xl"
             style={{ willChange: 'transform' }}
           >
             <img 
@@ -386,7 +421,7 @@ function PageHero({
             />
           </motion.div>
 
-          <h1 className="text-5xl font-black tracking-tighter leading-[0.9] mb-8 uppercase italic relative z-10 drop-shadow-md">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-[0.9] mb-6 uppercase italic relative z-10 drop-shadow-md">
             Whale Alert<br />Network
           </h1>
 
