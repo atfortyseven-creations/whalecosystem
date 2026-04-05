@@ -101,8 +101,15 @@ export function NewsOfToday() {
     const [search, setSearch]     = useState('');
     const [category, setCategory] = useState('All');
     const [sentiment, setSentiment] = useState<'all' | 'bullish' | 'bearish' | 'neutral'>('all');
+    // Prevent setState after unmount (stale closure guard)
+    const mountedRef = React.useRef(true);
+    React.useEffect(() => {
+        mountedRef.current = true;
+        return () => { mountedRef.current = false; };
+    }, []);
 
-    const refresh = async () => {
+    const refresh = React.useCallback(async () => {
+        if (!mountedRef.current) return;
         setLoading(true);
         try {
             const res = await fetch('/api/news');
@@ -110,7 +117,7 @@ export function NewsOfToday() {
                 const data = await res.json();
                 if (data.articles?.length > 0) {
                     const mappedArticles = data.articles.map((a: any, i: number) => ({
-                        id: a.id,
+                        id: a.id ?? String(i),
                         title: a.title,
                         summary: a.description || a.aiSummary || a.summary || '',
                         url: a.url,
@@ -124,14 +131,16 @@ export function NewsOfToday() {
                         tokens: (a.title.includes('BTC') || a.title.includes('Bitcoin')) ? ['BTC'] :
                                 (a.title.includes('ETH') || a.title.includes('Ethereum')) ? ['ETH'] : []
                     }));
-                    setArticles(mappedArticles);
+                    if (mountedRef.current) setArticles(mappedArticles);
                 }
             }
-        } catch {}
-        finally { setTimeout(() => setLoading(false), 600); }
-    };
+        } catch { /* keep DEMO_NEWS */ }
+        finally {
+            setTimeout(() => { if (mountedRef.current) setLoading(false); }, 600);
+        }
+    }, []);
 
-    useEffect(() => { refresh(); }, []);
+    useEffect(() => { refresh(); }, [refresh]);
 
     const filtered = articles.filter(a =>
         (category === 'All' || a.category === category) &&

@@ -70,16 +70,18 @@ export function NewPairsTable() {
     };
 
     const filtered = pairs
+        .filter(p => p != null && typeof p === 'object')
         .filter(p => chainFilter === 'all' || p.chain === chainFilter)
         .filter(p => {
-            if (rugFilter === 'verified') return p.security.score >= 65;
-            if (rugFilter === 'risky')    return p.security.score < 65;
+            const score = p.security?.score ?? 50;
+            if (rugFilter === 'verified') return score >= 65;
+            if (rugFilter === 'risky')    return score < 65;
             return true;
         })
         .filter(p =>
-            p.baseToken.symbol.toLowerCase().includes(search.toLowerCase()) ||
-            p.baseToken.name.toLowerCase().includes(search.toLowerCase()) ||
-            p.chain.toLowerCase().includes(search.toLowerCase())
+            (p.baseToken?.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (p.baseToken?.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (p.chain ?? '').toLowerCase().includes(search.toLowerCase())
         );
 
     const chains: Chain[] = ['all', 'solana', 'base', 'ethereum', 'arbitrum', 'bsc'];
@@ -139,11 +141,13 @@ export function NewPairsTable() {
             </div>
 
             {/* ── Table ── */}
-            <div className="flex-1 overflow-auto relative">
-                <div className="min-w-[1400px]">
+            {/* outer scroll: horizontal only — height is explicit so AutoSizer works */}
+            <div className="flex-1 overflow-x-auto overflow-y-hidden relative" style={{ minHeight: 0 }}>
+                {/* min-width wrapper — must NOT constrain height */}
+                <div style={{ minWidth: 1400, height: '100%', display: 'flex', flexDirection: 'column' }}>
 
                     {/* Column Headers */}
-                    <div className="sticky top-0 z-10 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
+                    <div className="sticky top-0 z-10 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0"
                         style={{ gridTemplateColumns: '2.4fr 1.4fr 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 1fr 1fr 1.4fr' }}
                     >
                         {['Token / Dex', 'Price USD', 'Age', '5m %', '1h %', '6h %', '24h %', 'Liquidity', 'MCap', 'FDV', 'Makers', 'Security'].map((h, idx) => (
@@ -151,28 +155,31 @@ export function NewPairsTable() {
                         ))}
                     </div>
 
-                    {/* Rows */}
-                    <div className="flex-1 w-full h-[600px]">
+                    {/* Rows — AutoSizer now lives in a genuinely flex-1 container */}
+                    <div className="flex-1" style={{ minHeight: 0 }}>
                         {loading && pairs.length === 0 ? (
-                            <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center">
+                            <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center h-full justify-center">
                                 <Loader2 className="animate-spin mb-3" size={22} /> Scanning mempool streams…
                             </div>
                         ) : filtered.length === 0 ? (
-                            <div className="p-12 text-center text-[#888888] text-[10px] font-mono">NO PAIRS MATCH FILTERS</div>
+                            <div className="p-12 text-center text-[#888888] text-[10px] font-mono h-full flex items-center justify-center">NO PAIRS MATCH FILTERS</div>
                         ) : (
                             <AutoSizer>
                                 {({ height, width }) => (
                                     <List
-                                        height={height}
+                                        height={height || 560}
                                         itemCount={filtered.length}
                                         itemSize={78}
-                                        width={width}
+                                        width={width || 1400}
                                         itemData={{ filtered }}
                                     >
                                         {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
-                                            const p = data.filtered[index];
-                                            const isRug = p.security.score < 65;
-                                            const score = p.security.score;
+                                            const p = data?.filtered?.[index];
+                                            if (!p || !p.security || !p.priceChange || !p.baseToken) {
+                                                return <div style={style} />;
+                                            }
+                                            const isRug = (p.security.score ?? 50) < 65;
+                                            const score = p.security.score ?? 50;
                                             return (
                                                 <div style={style} className="border-b border-[#F0F0F0]">
                                                     <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"

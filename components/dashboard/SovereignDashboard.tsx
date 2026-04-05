@@ -83,36 +83,37 @@ export default function SovereignDashboard() {
             <InstitutionalProShell
                 activeTab={activeTab}
                 onTabChange={(id) => setActiveTab(id as TabId)}
+                isExternalEmbed={!!externalPage}
             >
-                <DashboardErrorBoundary>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            transition={{ duration: 0.15, ease: 'easeOut' }}
-                            className="w-full h-full"
-                        >
-                            {/* ── External pages rendered via ExternalEmbed ── */}
-                            {externalPage ? (
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        className="w-full h-full flex flex-col"
+                    >
+                        {/* ── External pages rendered via ExternalEmbed ── */}
+                        {externalPage ? (
+                            <DashboardErrorBoundary key={activeTab}>
                                 <ExternalEmbed {...externalPage} />
+                            </DashboardErrorBoundary>
 
-                            /* ── Internal panels ── */
-                            ) : activeTab === 'dashboard'       ? <PremiumMatrixStack />
-                              : activeTab === 'watchlist'        ? <WatchlistTable />
-                              : activeTab === 'alerts'           ? <AlertsPanel />
-                              : activeTab === 'multicharts'      ? <PolymarketPanel />
-                              : activeTab === 'new-pairs'        ? <NewPairsTable />
-                              : activeTab === 'gainers'          ? <GainersLosersPanel />
-                              : activeTab === 'api'              ? <ApiTerminal />
-                              : activeTab === 'portfolio'        ? <LivePortfolio />
-                              : activeTab === 'news'             ? <NewsOfToday />
-                              : activeTab === 'whale-portfolio'  ? <WhalePortfolio />
-                              : null}
-                        </motion.div>
-                    </AnimatePresence>
-                </DashboardErrorBoundary>
+                        /* ── Internal panels — each with its own isolated error boundary ── */
+                        ) : activeTab === 'dashboard'       ? <DashboardErrorBoundary key="dashboard">      <PremiumMatrixStack />  </DashboardErrorBoundary>
+                          : activeTab === 'watchlist'        ? <DashboardErrorBoundary key="watchlist">      <WatchlistTable />       </DashboardErrorBoundary>
+                          : activeTab === 'alerts'           ? <DashboardErrorBoundary key="alerts">         <AlertsPanel />          </DashboardErrorBoundary>
+                          : activeTab === 'multicharts'      ? <DashboardErrorBoundary key="multicharts">    <PolymarketPanel />       </DashboardErrorBoundary>
+                          : activeTab === 'new-pairs'        ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />         </DashboardErrorBoundary>
+                          : activeTab === 'gainers'          ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
+                          : activeTab === 'api'              ? <DashboardErrorBoundary key="api">            <ApiTerminal />           </DashboardErrorBoundary>
+                          : activeTab === 'portfolio'        ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />         </DashboardErrorBoundary>
+                          : activeTab === 'news'             ? <DashboardErrorBoundary key="news">           <NewsOfToday />           </DashboardErrorBoundary>
+                          : activeTab === 'whale-portfolio'  ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />         </DashboardErrorBoundary>
+                          : null}
+                    </motion.div>
+                </AnimatePresence>
             </InstitutionalProShell>
         </>
     );

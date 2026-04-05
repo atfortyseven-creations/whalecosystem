@@ -9,6 +9,7 @@ import {
     Globe, Cpu, Shield, Newspaper, LifeBuoy,
     GraduationCap, Crown, PieChart
 } from 'lucide-react';
+import { useSettingsStore } from '@/lib/store/settings-store';
 
 interface NavItem {
     id: string;
@@ -60,7 +61,8 @@ function LiveMarketBand() {
                 if (res.ok) {
                     const json = await res.json();
                     if (isMounted && json?.data && Array.isArray(json.data)) {
-                        const bmap = new Map(json.data.map((d: any) => [d.symbol, d]));
+                        const validData = json.data.filter((d: any) => d != null && typeof d === 'object' && typeof d.symbol === 'string');
+                        const bmap = new Map(validData.map((d: any) => [d.symbol, d]));
                         const btc = bmap.get('BTCUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
                         const eth = bmap.get('ETHUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
                         if (btc && eth) {
@@ -102,14 +104,17 @@ function LiveMarketBand() {
 export function InstitutionalProShell({ 
     children, 
     activeTab, 
-    onTabChange 
+    onTabChange,
+    isExternalEmbed = false,
 }: { 
     children: React.ReactNode;
     activeTab: string;
     onTabChange: (id: string) => void;
+    isExternalEmbed?: boolean;
 }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const { setSettingsOpen } = useSettingsStore();
 
     return (
         <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#050505]/10">
@@ -140,6 +145,7 @@ export function InstitutionalProShell({
                                 )}
                                 <button
                                     onClick={() => onTabChange(item.id)}
+                                    title={item.label}
                                     className={`
                                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative
                                         ${isGold && !isActive
@@ -209,19 +215,30 @@ export function InstitutionalProShell({
                     </div>
 
                     {/* Right: Settings */}
-                    <button className="shrink-0 p-2 rounded-xl border border-[#E5E5E5] hover:bg-[#E5E5E5]/30 text-[#888888] hover:text-[#050505] transition-all">
+                    <button
+                        onClick={() => setSettingsOpen(true)}
+                        title="Open Settings"
+                        className="shrink-0 p-2 rounded-xl border border-[#E5E5E5] hover:bg-[#E5E5E5]/30 text-[#888888] hover:text-[#050505] transition-all active:scale-95"
+                    >
                         <Settings size={16} />
                     </button>
                 </header>
 
                 {/* ─── Table / View Area ─── */}
                 <main className="flex-1 relative bg-[#FFFFFF] overflow-hidden flex flex-col">
-                    {/* Standard padded container for all internal panels */}
-                    <div className="flex-1 overflow-y-auto no-scrollbar">
-                        <div className="p-8 max-w-[1600px] mx-auto w-full">
+                    {isExternalEmbed ? (
+                        /* External embed: fill entire space, no padding */
+                        <div className="flex-1 flex flex-col overflow-hidden">
                             {children}
                         </div>
-                    </div>
+                    ) : (
+                        /* Native panel: standard padded container */
+                        <div className="flex-1 overflow-y-auto no-scrollbar">
+                            <div className="p-8 max-w-[1600px] mx-auto w-full">
+                                {children}
+                            </div>
+                        </div>
+                    )}
                 </main>
 
                 {/* ─── Pro Status Bar ─── */}
