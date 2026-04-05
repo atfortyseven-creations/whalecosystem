@@ -41,7 +41,7 @@ export default function ClearanceTab() {
               key={desk.id}
               role="button"
               onClick={() => setSelectedDesk(desk.id)}
-              className={\`flex items-center justify-between p-6 rounded-2xl border transition-all \${selectedDesk === desk.id ? 'border-red-500/50 bg-white/5' : 'border-white/10 bg-[#050505] hover:border-white/30'}\`}
+              className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${selectedDesk === desk.id ? 'border-red-500/50 bg-white/5' : 'border-white/10 bg-[#050505] hover:border-white/30'}`}
             >
               <div className="flex items-center gap-6">
                 <div className="w-2 h-12 rounded-full" style={{ backgroundColor: desk.color }} />
@@ -92,7 +92,7 @@ export default function ClearanceTab() {
                 </div>
 
                 <a 
-                  href={\`https://bridge.sovereign.network/otc/\${selectedDesk}\`}
+                  href={`https://bridge.sovereign.network/otc/${selectedDesk}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-white text-black py-4 rounded-xl flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest hover:bg-gray-200 transition-colors"

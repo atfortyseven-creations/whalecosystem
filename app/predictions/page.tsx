@@ -29,7 +29,7 @@ export default function PredictionMatrixTab() {
              <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={\`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors \${activeFilter === filter ? 'bg-black text-white' : 'bg-black/5 text-black/50 hover:bg-black/10'}\`}
+                className={`px-5 py-2 text-[10px] font-black uppercase tracking-widest rounded-full transition-colors ${activeFilter === filter ? 'bg-black text-white' : 'bg-black/5 text-black/50 hover:bg-black/10'}`}
              >
                {filter}
              </button>
@@ -65,8 +65,8 @@ export default function PredictionMatrixTab() {
               <div>
                 {/* Bar */}
                 <div className="w-full h-2 rounded-full overflow-hidden flex mb-4">
-                  <div className="h-full bg-[#00C076] transition-all" style={{ width: \`\${market.yesPct}%\` }} />
-                  <div className="h-full bg-red-500 transition-all" style={{ width: \`\${market.noPct}%\` }} />
+                  <div className="h-full bg-[#00C076] transition-all" style={{ width: `${market.yesPct}%` }} />
+                  <div className="h-full bg-red-500 transition-all" style={{ width: `${market.noPct}%` }} />
                 </div>
                 
                 <div className="flex justify-between items-center mb-6">
@@ -75,7 +75,7 @@ export default function PredictionMatrixTab() {
                 </div>
 
                 <a 
-                  href={\`https://bridge.sovereign.network/predict/\${market.id}\`}
+                  href={`https://bridge.sovereign.network/predict/${market.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-[#FAF9F6] text-[#050505] p-3 rounded-xl flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest hover:bg-[#F0F0F0] transition-colors border border-black/5"

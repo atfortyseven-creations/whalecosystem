@@ -62,7 +62,7 @@ export function EcosystemWarRoom() {
       <div className="relative z-10 flex flex-wrap gap-3 mb-8">
         <button 
           onClick={() => setActiveFilter(null)}
-          className={\`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all \${activeFilter === null ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}\`}
+          className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === null ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
         >
           GLOBAL MESH
         </button>
@@ -70,7 +70,7 @@ export function EcosystemWarRoom() {
           <button 
             key={chain.chainName}
             onClick={() => setActiveFilter(chain.chainSymbol)}
-            className={\`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all \${activeFilter === chain.chainSymbol ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}\`}
+            className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === chain.chainSymbol ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
           >
             Only {chain.chainName} Flow
           </button>
@@ -90,7 +90,7 @@ export function EcosystemWarRoom() {
             className="flex items-center justify-between p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-colors group cursor-crosshair"
           >
             <div className="flex items-center gap-6">
-               <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-80" style={{ backgroundColor: \`\${chain.color}15\` }}>
+               <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-80" style={{ backgroundColor: `${chain.color}15` }}>
                   <ShieldCheck size={20} color={chain.color} />
                </div>
                <div>

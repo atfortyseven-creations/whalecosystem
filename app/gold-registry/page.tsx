@@ -42,7 +42,7 @@ export default function GoldRegistryPage() {
            const isSimulating = verifying === node.id;
 
            return (
-             <div key={node.id} className={\`bg-white p-6 border rounded-[2rem] shadow-lg transition-all \${isVerified ? 'border-green-500/30 shadow-green-500/5' : 'border-black/5 hover:border-black/10'}\`}>
+             <div key={node.id} className={`bg-white p-6 border rounded-[2rem] shadow-lg transition-all ${isVerified ? 'border-green-500/30 shadow-green-500/5' : 'border-black/5 hover:border-black/10'}`}>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                    
                    {/* Info Block */}
@@ -107,7 +107,7 @@ export default function GoldRegistryPage() {
                        className="mt-6 pt-6 border-t border-black/5"
                      >
                         <a 
-                          href={\`https://bridge.sovereign.network/go/\${node.id}\`} 
+                          href={`https://bridge.sovereign.network/go/${node.id}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="block w-full text-center py-4 bg-[#FAF9F6] hover:bg-[#F0F0F0] border border-black/5 text-[#050505] font-black uppercase text-[11px] tracking-[0.3em] rounded-xl transition-colors"
