@@ -1,4 +1,10 @@
-import { PlanTier } from '@prisma/client';
+export enum PlanTier {
+  FREE = "FREE",
+  STANDARD = "STANDARD",
+  STARTER = "STARTER",
+  PRO = "PRO",
+  ELITE = "ELITE"
+}
 
 export interface PlanConfig {
     name: string;
