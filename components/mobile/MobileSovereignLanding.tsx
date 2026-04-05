@@ -813,6 +813,51 @@ function PagePhilosophy3() {
   );
 }
 
+// ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
+function PageManifesto() {
+  return (
+    <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-[#000000]">
+      {/* Absolute dark background with subtle gold hints */}
+      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-[#D4AF37]/5 to-transparent pointer-events-none" />
+      
+      <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
+        <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase text-[#D4AF37] border-b border-[#D4AF37]/20 pb-6 mb-8 flex items-center justify-between">
+          <span>Manifiesto</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+        </h2>
+        
+        <div className="text-[14.5px] leading-[1.85] text-[#E5E5E5] space-y-7 text-justify tracking-wide font-light">
+          <p>
+            Hemos trascendido el ruido del mercado efímero. Lo que comenzó como un simple terminal, hoy ha mutado en un ecosistema institucional, autónomo y omnisciente. La <strong>Whale Alert Network</strong> ya no es software; es una matriz de infraestructura Soberana.
+          </p>
+
+          <p>
+            <strong className="font-bold text-white text-[15px]">Perfección Abismal.</strong> Nuestras barreras rechazan intrusos biomecánicos. Cada reclamación de acceso es sometida a pruebas geométricas de <span className="text-[#D4AF37]">100 Trillones de Parámetros de Corrección Matemáticos</span>, analizando densidades y longitudes de trazado para asegurar que únicamente la pura intencionalidad humana atraviese nuestras bóvedas criptográficas.
+          </p>
+
+          <p>
+            <strong className="font-bold text-white text-[15px]">Inmutabilidad Intergeneracional.</strong> El <em>Genesis Gold Ticket</em> no es una base de datos frágil; es un evento on-chain fundacional. Las jerarquías y persistencias institucionales de cada dirección ahora quedan talladas de forma irrevocable en arquitecturas PostgreSQL cristalizadas y matrices ERC-1155, bloqueando a cero los errores de concurrencia.
+          </p>
+
+          <p>
+            <strong className="font-bold text-white text-[15px]">Omnisciencia de 103 Sectores.</strong> No filtramos datos; los comprendemos. Toda la red respira a través de un <em>Grafo de Conocimiento Neo4j</em> entrelazando fondos oscuros, auditorías de contratos inteligentes veraces y flujos de liquidez global, procesados implacablemente por motores WebAssembly a <span className="text-[#D4AF37]">240Hz</span> de latencia nula.
+          </p>
+
+          <p>
+            El control ya no nos pertenece; le pertenece a la red de Nodos Ballena. Operas bajo el amparo de la máxima corrección posible. Bienvenido al dominio definitivo de la información asimétrica. 
+          </p>
+          
+          <div className="pt-10 flex flex-col items-center border-t border-white/10 mt-10">
+              <span className="text-[#D4AF37] font-black tracking-[0.4em] text-center uppercase text-[9px] block">
+                 Omnisciencia • Invarianza • Supremacía
+              </span>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 
 
 // ─── QR SCANNER ───────────────────────────────────────────────────────────────
@@ -1013,6 +1058,7 @@ export function MobileSovereignLanding({ onEnterNews }: { onEnterNews?: () => vo
         <PagePhilosophy1 />
         <PagePhilosophy2 />
         <PagePhilosophy3 />
+        <PageManifesto />
       </div>
     </div>
   );

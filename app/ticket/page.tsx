@@ -190,26 +190,45 @@ function QuantumVerificationPanel({ onVerified }: { onVerified: () => void }) {
         const ratio = height > 0 ? width / height : 1;
         const duration = points[points.length - 1].t - points[0].t;
 
-        // Bot fail condition: hyper-linear unnatural speed
+        // Calculate total path length
+        let pathLength = 0;
+        for (let i = 1; i < points.length; i++) {
+            pathLength += Math.hypot(points[i].x - points[i-1].x, points[i].y - points[i-1].y);
+        }
+
+        // Bot fail condition: hyper-linear unnatural speed or too small
         if (duration < 50 && points.length > 20) return false;
+        if (width < 30 || height < 30) return false;
+
+        const maxDim = Math.max(width, height);
+        const startNode = points[0];
+        const endNode = points[points.length - 1];
+        const closureDistance = Math.hypot(startNode.x - endNode.x, startNode.y - endNode.y);
 
         if (expectedShape === "CIRCLE") {
-            const isCircular = ratio > 0.2 && ratio < 5.0; // Very forgiving circularity
-            const startNode = points[0];
-            const endNode = points[points.length - 1];
-            const closureDistance = Math.hypot(startNode.x - endNode.x, startNode.y - endNode.y);
-            const isClosed = closureDistance < (Math.max(width, height) * 0.85); // Allow open circles
-            return isCircular && isClosed && width > 20 && height > 20;
+            // Strict circularity constraint
+            const isCircularRatio = ratio > 0.75 && ratio < 1.35;
+            const isClosed = closureDistance < (maxDim * 0.35); // Must close the loop mostly
+            const expectedLength = Math.PI * ((width + height) / 2);
+            const isExpectedLength = pathLength > expectedLength * 0.8 && pathLength < expectedLength * 1.25;
+            return isCircularRatio && isClosed && isExpectedLength;
         }
 
         if (expectedShape === "SQUARE") {
-            // Check basic aspect ratio and size roughly, tolerating single-stroke squares
-            return ratio > 0.2 && ratio < 5.0 && width > 20 && height > 20 && duration > 100;
+            // Square should be somewhat square
+            const isSquareRatio = ratio > 0.65 && ratio < 1.5;
+            const isClosed = closureDistance < (maxDim * 0.4); 
+            const expectedLength = (width + height) * 2;
+            const isExpectedLength = pathLength > expectedLength * 0.75 && pathLength < expectedLength * 1.35;
+            return isSquareRatio && isExpectedLength && isClosed;
         }
 
         if (expectedShape === "TRIANGLE") {
-            // Just ensure it has decent span on both axis
-            return width > 20 && height > 20 && duration > 100;
+            // Triangle can have different ratios, but perimeter should be ~ 3 times avg dim
+            const expectedLength = width + 2 * Math.hypot(width / 2, height);
+            const isExpectedLength = pathLength > expectedLength * 0.7 && pathLength < expectedLength * 1.4;
+            const isClosed = closureDistance < (maxDim * 0.4); // Also should be a closed shape
+            return isExpectedLength && isClosed;
         }
 
         return false;
