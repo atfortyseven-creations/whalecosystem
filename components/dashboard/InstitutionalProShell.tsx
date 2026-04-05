@@ -7,7 +7,7 @@ import {
     TrendingUp, Code, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, Newspaper, LifeBuoy,
-    GraduationCap, Crown, PieChart
+    GraduationCap, Crown, PieChart, Briefcase
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 
@@ -36,6 +36,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     // ── Learn & Support ──
     { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
     { id: 'support',         label: 'Whale Support',    icon: <LifeBuoy size={17}/> },
+    { id: 'humanidfi-portfolio', label: 'Whale Portfolio', icon: <Briefcase size={17}/> },
     { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 

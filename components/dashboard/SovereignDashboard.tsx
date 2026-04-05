@@ -21,7 +21,7 @@ import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
 
 // ── Icons for external-embed pages ────────────────────────────────────────────
-import { Crown, GraduationCap, LifeBuoy, PieChart } from 'lucide-react';
+import { Crown, GraduationCap, LifeBuoy, PieChart, Briefcase } from 'lucide-react';
 
 import "@/app/dashboard/dashboard.css";
 
@@ -37,6 +37,7 @@ type TabId =
     | 'whale-portfolio'
     | 'news'
     | 'support'
+    | 'humanidfi-portfolio'
     | 'academy'
     | 'gold-ticket';
 
@@ -61,6 +62,13 @@ const EXTERNAL_PAGES: Partial<Record<TabId, {
         icon:        <LifeBuoy size={16}/>,
         accentColor: '#0052FF',
         description: 'Open tickets, browse the FAQ, and reach the support team directly.',
+    },
+    'humanidfi-portfolio': {
+        url:         'https://www.humanidfi.com/portfolio',
+        title:       'Whale Portfolio',
+        icon:        <Briefcase size={16}/>,
+        accentColor: '#00C076',
+        description: 'Manage and connect your premium portfolio directly via HumanIDFi.',
     },
     'gold-ticket': {
         url:         'https://www.humanidfi.com/ticket',

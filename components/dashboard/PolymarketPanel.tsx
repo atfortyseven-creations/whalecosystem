@@ -350,23 +350,24 @@ export default function PolymarketPanel() {
                                         <span className="text-[#f43f5e] font-black">{fmtUsd(Number(tradeAmount) / (1 - selected.yesPrice))}</span>
                                     </div>
                                 </div>
-                                                {/* BUY BUTTONS REPLICA */}
-                            <div className="p-6 border-t border-[#E5E5E5] bg-white flex gap-4">
-                                <button 
-                                    onClick={() => handleTrade('YES')}
-                                    disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
-                                    className="flex-1 py-5 rounded-2xl bg-[#00C076] text-white font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 shadow-lg hover:shadow-[#00C076]/20"
-                                >
-                                    {isExecuting === 'YES' ? <Loader2 size={24} className="animate-spin" /> : <>BUY YES <span className="text-[10px] font-bold opacity-80 mt-0.5">@{Math.round(selected.yesPrice * 100)}¢</span></>}
-                                </button>
-                                <button 
-                                    onClick={() => handleTrade('NO')}
-                                    disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
-                                    className="flex-1 py-5 rounded-2xl bg-[#FF3B30] text-white font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 shadow-lg hover:shadow-[#FF3B30]/20"
-                                >
-                                    {isExecuting === 'NO' ? <Loader2 size={24} className="animate-spin" /> : <>BUY NO <span className="text-[10px] font-bold opacity-80 mt-0.5">@{Math.round((1 - selected.yesPrice) * 100)}¢</span></>}
-                                </button>
-                            </div>             </div>
+                                {/* BUY BUTTONS REPLICA */}
+                                <div className="p-6 border-t border-[#E5E5E5] bg-white flex gap-4">
+                                    <button 
+                                        onClick={() => handleTrade('YES')}
+                                        disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
+                                        className="flex-1 py-5 rounded-2xl bg-[#00C076] text-white font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 shadow-lg hover:shadow-[#00C076]/20"
+                                    >
+                                        {isExecuting === 'YES' ? <Loader2 size={24} className="animate-spin" /> : <>BUY YES <span className="text-[10px] font-bold opacity-80 mt-0.5">@{Math.round(selected.yesPrice * 100)}¢</span></>}
+                                    </button>
+                                    <button 
+                                        onClick={() => handleTrade('NO')}
+                                        disabled={isExecuting !== null || !tradeAmount || parseFloat(tradeAmount) <= 0}
+                                        className="flex-1 py-5 rounded-2xl bg-[#FF3B30] text-white font-black uppercase tracking-widest text-sm flex flex-col items-center justify-center gap-1 transition-all disabled:opacity-50 shadow-lg hover:shadow-[#FF3B30]/20"
+                                    >
+                                        {isExecuting === 'NO' ? <Loader2 size={24} className="animate-spin" /> : <>BUY NO <span className="text-[10px] font-bold opacity-80 mt-0.5">@{Math.round((1 - selected.yesPrice) * 100)}¢</span></>}
+                                    </button>
+                                </div>
+                            </div>
                             
                             {!isPolygon && isConnected && (
                                 <div className="px-6 pb-6 bg-[#FFFFFF]">
