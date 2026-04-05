@@ -45,9 +45,9 @@ export function LivePortfolio() {
             
             <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-6">
-                    <span className="flex items-center gap-1.5 text-[9px] font-black text-[#00C076] uppercase tracking-widest bg-[#00C076]/10 px-3 py-1.5 rounded-full border border-[#00C076]/20">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-                        LIVE SYNC • {new Date(liveTick).toLocaleTimeString()}
+                    <span className="flex items-center gap-1.5 text-[8.5px] font-mono font-black text-[#888888] uppercase tracking-[0.2em]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#050505] animate-pulse opacity-70" />
+                        SYSTEM TELEMETRY SYNCHRONIZED
                     </span>
                 </div>
                 

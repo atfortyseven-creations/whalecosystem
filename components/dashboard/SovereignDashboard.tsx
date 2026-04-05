@@ -19,6 +19,12 @@ import { AlertsPanel }             from '@/components/dashboard/AlertsPanel';
 import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPanel';
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 
+// New natively wired institutional components
+import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
+import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
+import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
+import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
+
 // ── Icons for embedded pages ──────────────────────────────────────────────────
 import { Crown, GraduationCap, LifeBuoy, PieChart } from 'lucide-react';
 
@@ -39,49 +45,9 @@ type TabId =
     | 'academy'
     | 'gold-ticket';
 
-// ── External page definitions ─────────────────────────────────────────────────
-const EXTERNAL_PAGES: Partial<Record<TabId, {
-    url:         string;
-    title:       string;
-    icon:        React.ReactNode;
-    accentColor: string;
-    description: string;
-}>> = {
-    'whale-portfolio': {
-        url:         'https://www.humanidfi.com/portfolio',
-        title:       'Whale Portfolio',
-        icon:        <PieChart  size={16}/>,
-        accentColor: '#050505',
-        description: 'Institutional whale portfolio tracker — real-time on-chain positions, PnL, and allocation.',
-    },
-    'academy': {
-        url:         'https://www.humanidfi.com/academy',
-        title:       'Whale Academy',
-        icon:        <GraduationCap size={16}/>,
-        accentColor: '#627EEA',
-        description: 'Professional-grade crypto education: whale intelligence, DeFi, API tools, and portfolio management.',
-    },
-    'support': {
-        url:         'https://www.humanidfi.com/support',
-        title:       'Whale Support',
-        icon:        <LifeBuoy size={16}/>,
-        accentColor: '#0052FF',
-        description: 'Open tickets, browse the FAQ, and reach the support team directly.',
-    },
-    'gold-ticket': {
-        url:         'https://www.humanidfi.com/ticket',
-        title:       'Gold Ticket',
-        icon:        <Crown size={16}/>,
-        accentColor: '#D4AF37',
-        description: 'Claim your one-time $5 NFT pass granting lifetime Sovereign access to the entire platform.',
-    },
-};
-
 // ── Main router ───────────────────────────────────────────────────────────────
 export default function SovereignDashboard() {
     const [activeTab, setActiveTab] = useState<TabId>('dashboard');
-
-    const externalPage = EXTERNAL_PAGES[activeTab];
 
     return (
         <>
@@ -100,12 +66,7 @@ export default function SovereignDashboard() {
                             transition={{ duration: 0.15, ease: 'easeOut' }}
                             className="w-full h-full"
                         >
-                            {/* ── External pages rendered via ExternalEmbed ── */}
-                            {externalPage ? (
-                                <ExternalEmbed {...externalPage} />
-
-                            /* ── Internal panels ── */
-                            ) : activeTab === 'dashboard'   ? <PremiumMatrixStack />
+                            { activeTab === 'dashboard'   ? <PremiumMatrixStack />
                               : activeTab === 'watchlist'   ? <WatchlistTable />
                               : activeTab === 'alerts'      ? <AlertsPanel />
                               : activeTab === 'multicharts' ? <PolymarketPanel />
@@ -114,6 +75,10 @@ export default function SovereignDashboard() {
                               : activeTab === 'api'         ? <ApiTerminal />
                               : activeTab === 'portfolio'   ? <LivePortfolio />
                               : activeTab === 'news'        ? <NewsOfToday />
+                              : activeTab === 'whale-portfolio' ? <WhalePortfolio />
+                              : activeTab === 'academy'     ? <WhaleAcademy />
+                              : activeTab === 'support'     ? <WhaleSupport />
+                              : activeTab === 'gold-ticket' ? <GoldTicketPanel />
                               : null}
                         </motion.div>
                     </AnimatePresence>

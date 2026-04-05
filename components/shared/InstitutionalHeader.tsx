@@ -162,17 +162,7 @@ export function InstitutionalHeader() {
             {/* RIGHT: Utility area */}
             <div className="flex items-center gap-3 relative z-10 flex-shrink-0">
 
-                {/* Live Engine Status Badge */}
-                <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[8px] font-mono font-black uppercase tracking-widest"
-                    style={{
-                        borderColor: engineOnline ? 'rgba(0,192,118,0.25)' : 'rgba(0,0,0,0.1)',
-                        color: engineOnline ? '#00C076' : '#888888',
-                        background: engineOnline ? 'rgba(0,192,118,0.06)' : 'transparent',
-                    }}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${engineOnline ? 'bg-[#00C076] animate-pulse' : 'bg-[#888888]'}`} />
-                    <RadioTower size={9} />
-                    {engineOnline ? `LIVE · ${tps} TPS` : 'OFFLINE'}
-                </div>
+                {/* Engine Status Badge Removed from Navigation per request */}
 
                 <div className="hidden lg:block">
                     <SystemsUtilityHeader />

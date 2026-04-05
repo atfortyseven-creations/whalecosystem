@@ -233,71 +233,80 @@ export function GainersLosersPanel() {
 
                 {/* Rows (Virtualized) */}
                 <div className="flex-1 w-full h-[500px]">
-                    <AutoSizer>
-                        {({ height, width }) => (
-                            <List
-                                height={height}
-                                itemCount={filtered.length}
-                                itemSize={56}
-                                width={width}
-                                itemData={{ filtered }}
-                            >
-                                {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
-                                    const d = data.filtered[index];
-                                    return (
-                                        <div style={style} className="border-b border-[#F0F0F0]">
-                                            <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
-                                                style={{ gridTemplateColumns: '2.5fr 1.5fr 0.9fr 0.9fr 0.9fr 1.2fr 1.2fr' }}
-                                            >
-                                                {/* Asset */}
-                                                <div className="px-4 flex items-center gap-2.5">
-                                                    <span className="text-[8px] font-black text-[#888888] w-4">{index + 1}</span>
-                                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                                        style={{ background: CHAIN_COLORS[d.chain] || CHAIN_COLORS.default }}>
-                                                        {d.symbol[0]}
+                    {filtered.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full text-center p-8 text-[#888888]">
+                            <Search size={32} className="mb-4 opacity-50" />
+                            <h3 className="text-xs font-black text-[#111111] uppercase tracking-widest mb-1">NO MARKETS FOUND</h3>
+                            <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Adjust filters or search criteria</p>
+                        </div>
+                    ) : (
+                        <AutoSizer>
+                            {({ height, width }) => (
+                                <List
+                                    height={height || 500}
+                                    itemCount={filtered.length}
+                                    itemSize={56}
+                                    width={width || '100%'}
+                                    itemData={{ filtered }}
+                                >
+                                    {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
+                                        const d = data?.filtered?.[index];
+                                        if (!d) return <div style={style} className="bg-red-500/10" />; // Absolute failsafe
+                                        return (
+                                            <div style={style} className="border-b border-[#F0F0F0]">
+                                                <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
+                                                    style={{ gridTemplateColumns: '2.5fr 1.5fr 0.9fr 0.9fr 0.9fr 1.2fr 1.2fr' }}
+                                                >
+                                                    {/* Asset */}
+                                                    <div className="px-4 flex items-center gap-2.5">
+                                                        <span className="text-[8px] font-black text-[#888888] w-4">{index + 1}</span>
+                                                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                                                            style={{ background: CHAIN_COLORS[d.chain] || CHAIN_COLORS.default }}>
+                                                            {d.symbol?.[0] || '?'}
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[11px] font-black text-[#050505]">{d.symbol}</div>
+                                                            <div className="text-[8px] text-[#888888]">{d.name}</div>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <div className="text-[11px] font-black text-[#050505]">{d.symbol}</div>
-                                                        <div className="text-[8px] text-[#888888]">{d.name}</div>
+
+                                                    {/* Price */}
+                                                    <div className="px-4 text-[10px] font-black font-mono text-[#050505]">
+                                                        {d.price >= 1 ? `$${(d.price || 0).toFixed(2)}` : `$${(d.price || 0).toFixed(6)}`}
                                                     </div>
-                                                </div>
 
-                                                {/* Price */}
-                                                <div className="px-4 text-[10px] font-black font-mono text-[#050505]">
-                                                    {d.price >= 1 ? `$${d.price.toFixed(2)}` : `$${d.price.toFixed(6)}`}
-                                                </div>
+                                                    {/* 1h */}
+                                                    <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch1h)}`}>
+                                                        {pctFmt(d.ch1h || 0)}
+                                                    </div>
 
-                                                {/* 1h */}
-                                                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch1h)}`}>
-                                                    {pctFmt(d.ch1h)}
-                                                </div>
+                                                    {/* 24h */}
+                                                    <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch24h)}`}>
+                                                        {pctFmt(d.ch24h || 0)}
+                                                    </div>
 
-                                                {/* 24h */}
-                                                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch24h)}`}>
-                                                    {pctFmt(d.ch24h)}
-                                                </div>
+                                                    {/* 7d */}
+                                                    <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch7d)}`}>
+                                                        {pctFmt(d.ch7d || 0)}
+                                                    </div>
 
-                                                {/* 7d */}
-                                                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch7d)}`}>
-                                                    {pctFmt(d.ch7d)}
-                                                </div>
+                                                    {/* Vol */}
+                                                    <div className="px-4 text-right text-[10px] font-bold font-mono text-[#050505]">
+                                                        {fmt(d.vol24h || 0)}
+                                                    </div>
 
-                                                {/* Vol */}
-                                                <div className="px-4 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                    {fmt(d.vol24h)}
-                                                </div>
-
-                                                {/* MCap */}
-                                                <div className="px-4 text-right text-[10px] font-bold font-mono text-[#888888]">
-                                                    {fmt(d.mcap)}
+                                                    {/* MCap */}
+                                                    <div className="px-4 text-right text-[10px] font-bold font-mono text-[#888888]">
+                                                        {fmt(d.mcap || 0)}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    );
-                                }}
-                            </List>
-                        )}
-                    </AutoSizer>
+                                        );
+                                    }}
+                                </List>
+                            )}
+                        </AutoSizer>
+                    )}
                 </div>
 
                 {/* Footer */}

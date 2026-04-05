@@ -77,7 +77,7 @@ export const Footer = () => {
                     {/* Brand Identity */}
                     <div className="md:col-span-5 flex flex-col items-start">
                         <div className="flex items-center gap-3 mb-6 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full backdrop-blur-md shadow-2xl">
-                            <span className="text-xl">👾</span>
+                            <span className="text-xl pb-1">🐋</span>
                             <span className="text-[12px] font-aztec-mono font-black tracking-[0.25em] uppercase text-white">Whale Alert Network</span>
                         </div>
                         <p className="text-[13px] font-sans text-white/40 leading-relaxed max-w-sm tracking-wide">

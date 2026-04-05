@@ -489,9 +489,6 @@ export function WhaleAlertLanding() {
           className="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 1 }}
         >
-          <span className="text-[7.5px] font-mono tracking-[0.5em] uppercase text-black/40">
-            Scroll to Explore
-          </span>
           <motion.div
             className="w-[1px] h-12"
             style={{ background: "linear-gradient(180deg, rgba(26,109,224,0.8), transparent)" }}
@@ -510,12 +507,6 @@ export function WhaleAlertLanding() {
       <section className="relative z-10 py-28"
         style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
         <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <Reveal>
-            <p className="text-center text-[9px] font-mono uppercase tracking-[0.55em] mb-12 font-semibold"
-              style={{ color: "rgba(5,5,5,0.55)" }}>
-              — Capabilities
-            </p>
-          </Reveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {FEATURES.map((f, i) => (
               <Reveal key={i} delay={i * 0.06} yOffset={24}>
@@ -545,8 +536,6 @@ export function WhaleAlertLanding() {
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="mb-24">
-              <p className="text-[9px] font-mono tracking-[0.55em] uppercase mb-5 font-bold"
-                style={{ color: "#1a6de0" }}>— Architecture</p>
               <h2 className="text-3xl md:text-[3.5rem] font-semibold mb-6 leading-[1.1]"
                 style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
                 Principles of Structural{" "}
@@ -578,8 +567,6 @@ export function WhaleAlertLanding() {
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="mb-24 text-center">
-              <p className="text-[9px] font-mono tracking-[0.55em] uppercase mb-5 font-bold"
-                style={{ color: "#0095b3" }}>— Implementation</p>
               <h2 className="text-3xl md:text-[3.5rem] font-semibold mb-6"
                 style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
                 Functional Modules
@@ -605,8 +592,6 @@ export function WhaleAlertLanding() {
                   }}
                 >
                   <div className="md:w-1/3 shrink-0">
-                    <div className="text-[9px] font-mono tracking-[0.45em] uppercase mb-4 font-bold"
-                      style={{ color: mod.color }}>{mod.category}</div>
                     <h3 className="text-2xl md:text-3xl font-semibold leading-snug"
                       style={{ color: "rgba(5,5,5,0.95)" }}>{mod.title}</h3>
                     <div className="mt-5 h-[2px] w-10 rounded"
@@ -660,9 +645,6 @@ export function WhaleAlertLanding() {
                   left: "50%",
                 }} />
             ))}
-
-            <p className="text-[9px] font-mono tracking-[0.55em] uppercase mb-9 font-bold"
-              style={{ color: "#D4AF37" }}>— Terminal Access</p>
 
             <h2 className="text-4xl md:text-6xl font-semibold mb-8 leading-tight"
               style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>

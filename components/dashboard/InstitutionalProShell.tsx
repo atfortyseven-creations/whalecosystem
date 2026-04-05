@@ -38,12 +38,12 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
-const EMBEDDED_TABS = ['whale-portfolio', 'academy', 'support', 'gold-ticket'];
+// Removed EMBEDDED_TABS since all content is now inherently native and perfectly padded.
 
 function LiveMarketBand() {
     const [stats, setStats] = useState([
-        { label: 'BTC',         value: 'Loading',   chg: null as string|null,  up: true  },
-        { label: 'ETH',         value: 'Loading',    chg: null as string|null,  up: false },
+        { label: 'BTC',         value: '---',       chg: null as string|null,  up: true  },
+        { label: 'ETH',         value: '---',       chg: null as string|null,  up: false },
         { label: 'Global MCap', value: '$2.84T',    chg: '+2.1%',  up: true  },
         { label: 'DeFi TVL',    value: '$98.7B',    chg: '+0.4%',  up: true  },
         { label: 'BTC.D',       value: '54.2%',     chg: '+0.3%',  up: true  },
@@ -53,12 +53,13 @@ function LiveMarketBand() {
     ]);
 
     React.useEffect(() => {
+        let isMounted = true;
         const fetchBand = async () => {
             try {
                 const res = await fetch('/api/markets');
                 if (res.ok) {
                     const json = await res.json();
-                    if (json?.data && Array.isArray(json.data)) {
+                    if (isMounted && json?.data && Array.isArray(json.data)) {
                         const bmap = new Map(json.data.map((d: any) => [d.symbol, d]));
                         const btc = bmap.get('BTCUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
                         const eth = bmap.get('ETHUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
@@ -76,7 +77,7 @@ function LiveMarketBand() {
         };
         fetchBand();
         const t = setInterval(fetchBand, 10000);
-        return () => clearInterval(t);
+        return () => { isMounted = false; clearInterval(t); };
     }, []);
 
     return (
@@ -109,7 +110,6 @@ export function InstitutionalProShell({
 }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const isEmbedded = EMBEDDED_TABS.includes(activeTab);
 
     return (
         <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#050505]/10">
@@ -216,19 +216,12 @@ export function InstitutionalProShell({
 
                 {/* ─── Table / View Area ─── */}
                 <main className="flex-1 relative bg-[#FFFFFF] overflow-hidden flex flex-col">
-                    {isEmbedded ? (
-                        // Full-height, zero-padding, zero-overflow for iframe embeds
-                        <div className="flex-1 overflow-hidden">
+                    {/* Standard padded container for all internal panels */}
+                    <div className="flex-1 overflow-y-auto no-scrollbar">
+                        <div className="p-8 max-w-[1600px] mx-auto w-full">
                             {children}
                         </div>
-                    ) : (
-                        // Standard padded container for internal panels
-                        <div className="flex-1 overflow-y-auto no-scrollbar">
-                            <div className="p-8 max-w-[1600px] mx-auto w-full">
-                                {children}
-                            </div>
-                        </div>
-                    )}
+                    </div>
                 </main>
 
                 {/* ─── Pro Status Bar ─── */}
