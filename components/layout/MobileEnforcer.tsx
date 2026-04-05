@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { MobileSovereignLanding } from '@/components/mobile/MobileSovereignLanding';
 import dynamic from 'next/dynamic';
 
+
 // Lazy-load the authenticated mobile news shell
 const MobileNewsShell = dynamic(
     () => import('@/components/mobile/MobileNewsShell').then(m => m.MobileNewsShell),
@@ -12,8 +13,7 @@ const MobileNewsShell = dynamic(
 
 // ─── MOBILE AUTH STATE DETECTION ─────────────────────────────────────────────
 // Checks for the sovereign_handshake cookie that is set after a successful
-// QR scan + wallet signature on mobile. This determines whether the user
-// should see the landing/onboarding flow or the authenticated Whale News view.
+// QR scan + wallet signature on mobile.
 function hasSovereignHandshake(): boolean {
     if (typeof document === 'undefined') return false;
     return document.cookie
@@ -24,22 +24,16 @@ function hasSovereignHandshake(): boolean {
 export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [isMobileAuthenticated, setIsMobileAuthenticated] = useState(false);
+    const [isHandshaked, setIsHandshaked] = useState(false);
+    const [showNews, setShowNews] = useState(false);
 
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
             const isMobileDevice = /android|mobi|iphone|ipod|ipad/i.test(userAgent.toLowerCase());
-
-            // ONLY enforce mobile view on actual mobile devices (phones/tablets).
-            // PC users with touch screens or resized windows should NEVER see the mobile flow.
             const mobile = isMobileDevice && window.innerWidth < 1024;
             setIsMobile(mobile);
-
-            // If this is a mobile device, check QR handshake authentication state
-            if (mobile) {
-                setIsMobileAuthenticated(hasSovereignHandshake());
-            }
+            setIsHandshaked(hasSovereignHandshake());
         };
 
         checkMobile();
@@ -55,16 +49,27 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
     if (isMobile) {
-        // Authenticated mobile users → ONLY Whale News
-        if (isMobileAuthenticated) {
+        // 1. Not connected: Show landing (connect wallet)
+        // 2. Connected but not handshaked: Show landing (confirmation + buttons)
+        // 3. Handshaked + user clicked enter: Show news
+        // User already clicked "Go to News" or cookie was set from previous QR scan
+        if (showNews || isHandshaked) {
             return <MobileNewsShell />;
         }
-        // Unauthenticated mobile users → Landing + QR onboarding flow
-        return <MobileSovereignLanding />;
+
+        // Show landing page: connects wallet AND shows post-login confirmation
+        // with "Go to News" and "Scan QR" buttons
+        return (
+            <MobileSovereignLanding
+                onEnterNews={() => {
+                    // Persist across reloads so user stays in news on refresh
+                    document.cookie = "sovereign_handshake=0x_bypass; path=/; max-age=31536000";
+                    setShowNews(true);
+                }}
+            />
+        );
     }
 
     // ── PC ZONE ──────────────────────────────────────────────────────────────
-    // Only SYSTEM tab is publicly accessible. All other sections (Portfolio,
-    // News, Support, Academy, Gold Ticket) are hidden from the navigation.
     return <>{children}</>;
 }
