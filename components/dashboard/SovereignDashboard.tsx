@@ -8,7 +8,7 @@ import { ExternalEmbed }           from '@/components/dashboard/ExternalEmbed';
 import { SovereignContractModal }  from '@/components/dashboard/SovereignContractModal';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 
-// ── Internal panels (no backend changes) ──────────────────────────────────────
+// ── Internal panels ───────────────────────────────────────────────────────────
 import { PremiumMatrixStack }      from '@/components/premium/PremiumMatrixStack';
 import PolymarketPanel             from '@/components/dashboard/PolymarketPanel';
 import { LivePortfolio }           from '@/components/premium/LivePortfolio';
@@ -18,14 +18,9 @@ import { ApiTerminal }             from '@/components/dashboard/ApiTerminal';
 import { AlertsPanel }             from '@/components/dashboard/AlertsPanel';
 import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPanel';
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
-
-// New natively wired institutional components
 import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
-import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
-import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
-import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
 
-// ── Icons for embedded pages ──────────────────────────────────────────────────
+// ── Icons for external-embed pages ────────────────────────────────────────────
 import { Crown, GraduationCap, LifeBuoy, PieChart } from 'lucide-react';
 
 import "@/app/dashboard/dashboard.css";
@@ -45,9 +40,42 @@ type TabId =
     | 'academy'
     | 'gold-ticket';
 
+// ── External page definitions ─────────────────────────────────────────────────
+const EXTERNAL_PAGES: Partial<Record<TabId, {
+    url:         string;
+    title:       string;
+    icon:        React.ReactNode;
+    accentColor: string;
+    description: string;
+}>> = {
+    'academy': {
+        url:         'https://www.humanidfi.com/academy',
+        title:       'Whale Academy',
+        icon:        <GraduationCap size={16}/>,
+        accentColor: '#627EEA',
+        description: 'Professional-grade crypto education: whale intelligence, DeFi, API tools, and portfolio management.',
+    },
+    'support': {
+        url:         'https://www.humanidfi.com/support',
+        title:       'Whale Support',
+        icon:        <LifeBuoy size={16}/>,
+        accentColor: '#0052FF',
+        description: 'Open tickets, browse the FAQ, and reach the support team directly.',
+    },
+    'gold-ticket': {
+        url:         'https://www.humanidfi.com/ticket',
+        title:       'Gold Ticket',
+        icon:        <Crown size={16}/>,
+        accentColor: '#D4AF37',
+        description: 'Claim your one-time $5 NFT pass granting lifetime Sovereign access to the entire platform.',
+    },
+};
+
 // ── Main router ───────────────────────────────────────────────────────────────
 export default function SovereignDashboard() {
     const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+
+    const externalPage = EXTERNAL_PAGES[activeTab];
 
     return (
         <>
@@ -66,19 +94,21 @@ export default function SovereignDashboard() {
                             transition={{ duration: 0.15, ease: 'easeOut' }}
                             className="w-full h-full"
                         >
-                            { activeTab === 'dashboard'   ? <PremiumMatrixStack />
-                              : activeTab === 'watchlist'   ? <WatchlistTable />
-                              : activeTab === 'alerts'      ? <AlertsPanel />
-                              : activeTab === 'multicharts' ? <PolymarketPanel />
-                              : activeTab === 'new-pairs'   ? <NewPairsTable />
-                              : activeTab === 'gainers'     ? <GainersLosersPanel />
-                              : activeTab === 'api'         ? <ApiTerminal />
-                              : activeTab === 'portfolio'   ? <LivePortfolio />
-                              : activeTab === 'news'        ? <NewsOfToday />
-                              : activeTab === 'whale-portfolio' ? <WhalePortfolio />
-                              : activeTab === 'academy'     ? <WhaleAcademy />
-                              : activeTab === 'support'     ? <WhaleSupport />
-                              : activeTab === 'gold-ticket' ? <GoldTicketPanel />
+                            {/* ── External pages rendered via ExternalEmbed ── */}
+                            {externalPage ? (
+                                <ExternalEmbed {...externalPage} />
+
+                            /* ── Internal panels ── */
+                            ) : activeTab === 'dashboard'       ? <PremiumMatrixStack />
+                              : activeTab === 'watchlist'        ? <WatchlistTable />
+                              : activeTab === 'alerts'           ? <AlertsPanel />
+                              : activeTab === 'multicharts'      ? <PolymarketPanel />
+                              : activeTab === 'new-pairs'        ? <NewPairsTable />
+                              : activeTab === 'gainers'          ? <GainersLosersPanel />
+                              : activeTab === 'api'              ? <ApiTerminal />
+                              : activeTab === 'portfolio'        ? <LivePortfolio />
+                              : activeTab === 'news'             ? <NewsOfToday />
+                              : activeTab === 'whale-portfolio'  ? <WhalePortfolio />
                               : null}
                         </motion.div>
                     </AnimatePresence>

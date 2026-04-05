@@ -84,17 +84,18 @@ export function GainersLosersPanel() {
             if (res.ok) {
                 const json = await res.json();
                 if (json?.data && Array.isArray(json.data) && json.data.length > 0) {
-                    const bMap = new Map(json.data.map((d: any) => [d?.symbol, d]));
+                    // Filter out any null/undefined entries before building the Map
+                    const validEntries = json.data.filter((d: any) => d != null && typeof d === 'object' && d.symbol);
+                    const bMap = new Map<string, any>(validEntries.map((d: any) => [d.symbol, d]));
 
                     setData(prev => prev.map(a => {
-                        const tick = bMap.get(a.symbol + 'USDT') as any;
-                        if (tick && typeof tick === 'object' && tick.lastPrice) {
+                        const tick = bMap.get(a.symbol + 'USDT');
+                        if (tick && typeof tick === 'object' && tick.lastPrice != null) {
                             const price = parseFloat(tick.lastPrice) || 0;
                             const ch24h = parseFloat(tick.priceChangePercent) || 0;
                             const vol24 = parseFloat(tick.quoteVolume) || 0;
-                            // Safe mcap: avoid division by zero when price is 0
-                            const prev = price / (1 + ch24h / 100);
-                            const mcap = prev > 0 ? a.mcapB * 1e9 * (price / prev) : a.mcapB * 1e9;
+                            const prevPrice = price / (1 + ch24h / 100);
+                            const mcap = prevPrice > 0 ? a.mcapB * 1e9 * (price / prevPrice) : a.mcapB * 1e9;
                             return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
                         }
                         return a;
