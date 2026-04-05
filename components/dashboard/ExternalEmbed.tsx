@@ -27,6 +27,13 @@ export function ExternalEmbed({
     const iframeRef             = useRef<HTMLIFrameElement>(null);
     const timeoutRef            = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    /* ── Start load timer on mount ──────────────────────────────────────── */
+    React.useEffect(() => {
+        // Start the 12s cross-origin fallback timer immediately on mount
+        timeoutRef.current = setTimeout(() => setStatus('ready'), 12000);
+        return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+    }, [url]);
+
     /* ── Attempt to detect X-Frame-Options block ───────────────────────── */
     const handleLoad = useCallback(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);

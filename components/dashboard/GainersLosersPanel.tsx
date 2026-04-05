@@ -71,11 +71,11 @@ export function GainersLosersPanel() {
     const [data, setData]         = useState(ASSETS.map(a => ({ ...a, price: 0, ch1h: 0, ch24h: 0, ch7d: 0, vol24h: 0, mcap: 0 })));
     const [search, setSearch]     = useState('');
     const [view, setView]         = useState<'gainers' | 'losers' | 'all'>('all');
-    const [window, setWindow]     = useState<Window>('24h');
+    const [timeWindow, setTimeWindow] = useState<Window>('24h');
     const [lastUpdate, setLast]   = useState(new Date());
     const [loading, setLoading]   = useState(true);
 
-    const sortKey: SortKey = window === '1h' ? 'ch1h' : window === '7d' ? 'ch7d' : 'ch24h';
+    const sortKey: SortKey = timeWindow === '1h' ? 'ch1h' : timeWindow === '7d' ? 'ch7d' : 'ch24h';
 
     const refresh = useCallback(async () => {
         setLoading(true);
@@ -83,9 +83,12 @@ export function GainersLosersPanel() {
             const res = await fetch('/api/markets');
             if (res.ok) {
                 const json = await res.json();
-                if (json?.data && Array.isArray(json.data) && json.data.length > 0) {
-                    // Filter out any null/undefined entries before building the Map
-                    const validEntries = json.data.filter((d: any) => d != null && typeof d === 'object' && d.symbol);
+                // Strictly filter out any null/undefined entries before building the Map
+                const rawData = Array.isArray(json?.data) ? json.data : [];
+                const validEntries = rawData.filter(
+                    (d: any) => d != null && typeof d === 'object' && typeof d.symbol === 'string'
+                );
+                if (validEntries.length > 0) {
                     const bMap = new Map<string, any>(validEntries.map((d: any) => [d.symbol, d]));
 
                     setData(prev => prev.map(a => {
@@ -101,7 +104,6 @@ export function GainersLosersPanel() {
                         return a;
                     }));
                     setLast(new Date());
-                    return;
                 }
             }
         } catch (e) {
@@ -127,7 +129,7 @@ export function GainersLosersPanel() {
                 <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                         <Flame size={15} className="text-[#00C076]"/>
-                        <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest">Top Gainers ({window})</span>
+                        <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest">Top Gainers ({timeWindow})</span>
                     </div>
                     <div className="space-y-3">
                         {topGainers.map((d, i) => (
@@ -156,7 +158,7 @@ export function GainersLosersPanel() {
                 <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                         <Skull size={15} className="text-[#FF3B30]"/>
-                        <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest">Top Losers ({window})</span>
+                        <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest">Top Losers ({timeWindow})</span>
                     </div>
                     <div className="space-y-3">
                         {topLosers.map((d, i) => (
@@ -199,8 +201,8 @@ export function GainersLosersPanel() {
                     {/* Time window */}
                     <div className="flex gap-1">
                         {(['1h', '24h', '7d'] as const).map(w => (
-                            <button key={w} onClick={() => setWindow(w)}
-                                className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all ${window === w ? 'bg-[#050505] text-white border-[#050505]' : 'text-[#888888] border-[#E5E5E5] hover:border-[#050505]'}`}>
+                            <button key={w} onClick={() => setTimeWindow(w)}
+                                className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all ${timeWindow === w ? 'bg-[#050505] text-white border-[#050505]' : 'text-[#888888] border-[#E5E5E5] hover:border-[#050505]'}`}>
                                 {w}
                             </button>
                         ))}
@@ -233,7 +235,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Rows (Virtualized) */}
-                <div className="flex-1 w-full h-[500px]">
+                <div className="w-full" style={{ height: 500 }}>
                     {filtered.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-center p-8 text-[#888888]">
                             <Search size={32} className="mb-4 opacity-50" />
@@ -312,7 +314,7 @@ export function GainersLosersPanel() {
 
                 {/* Footer */}
                 <div className="px-5 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                    <span>{filtered.length} assets · {window} window</span>
+                    <span>{filtered.length} assets · {timeWindow} window</span>
                     <span>Updates every 30s</span>
                 </div>
             </div>
