@@ -415,10 +415,17 @@ export default function GoldenTicketPage() {
         }).catch(()=>{});
 
         if (walletAddress) {
+             const localClaim = localStorage.getItem(`hasClaimed_${walletAddress}`);
+             if (localClaim) {
+                 setHasClaimed(true);
+                 setIsHumanVerified(true);
+             }
+
              fetch(`/api/golden-ticket/claim?address=${walletAddress}`).then(res => res.json()).then(data => {
                  if (data.hasClaimed) {
                      setHasClaimed(true);
                      setIsHumanVerified(true);
+                     localStorage.setItem(`hasClaimed_${walletAddress}`, 'true');
                  }
              }).catch(()=>{});
         }
@@ -451,6 +458,7 @@ export default function GoldenTicketPage() {
              setTimeout(() => {
                  setHasClaimed(true);
                  setIsClaiming(false);
+                 localStorage.setItem(`hasClaimed_${walletAddress}`, 'true');
                  // We keep showCinematic true so they can close it manually
                  // It auto-closes slightly later to match the 8 seconds of absolute immersion.
              }, 4500);
@@ -512,13 +520,24 @@ export default function GoldenTicketPage() {
                              )}
                          </>
                      ) : (
-                         <div className="mt-8 px-10 py-5 bg-[#050505]/5 rounded-3xl border border-[#050505]/5 flex items-center gap-4">
-                             <ShieldCheck size={28} className="text-[#050505]/40" />
-                             <div className="flex flex-col">
-                                 <span className="font-bold text-[13px] tracking-[0.15em] text-[#050505]/80 font-mono uppercase">TICKET APROBADO</span>
-                                 <span className="text-[10px] uppercase font-bold text-[#050505]/40 tracking-[0.2em]">{walletAddress?.slice(0,6)}...{walletAddress?.slice(-4)}</span>
+                         <motion.div 
+                             initial={{ scale: 0.9, opacity: 0 }}
+                             animate={{ scale: 1, opacity: 1 }}
+                             className="mt-8 px-10 py-6 bg-gradient-to-r from-[#D4AF37]/10 to-[#F5E17A]/10 rounded-[2rem] border border-[#D4AF37]/30 shadow-[0_0_40px_rgba(212,175,55,0.15)] flex flex-col items-center gap-4 w-full max-w-[340px]"
+                         >
+                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#F5E17A] flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+                                 <ShieldCheck size={32} className="text-[#050505]" />
                              </div>
-                         </div>
+                             <div className="flex flex-col items-center text-center">
+                                 <span className="font-black text-[15px] tracking-[0.2em] text-[#050505] font-mono uppercase bg-clip-text">TICKET CLAIMED INMUTABLE</span>
+                                 <span className="text-[11px] uppercase font-bold text-[#050505]/50 tracking-[0.2em] mt-2 bg-[#050505]/5 px-4 py-1.5 rounded-full">
+                                     {walletAddress?.slice(0,6)}...{walletAddress?.slice(-4)}
+                                 </span>
+                             </div>
+                             <p className="text-[10px] uppercase font-bold text-[#00C076] tracking-widest mt-2 flex items-center gap-1.5">
+                                 <Zap size={12} fill="#00C076" /> VINCULADO PARA SIEMPRE
+                             </p>
+                         </motion.div>
                      )}
                 </div>
             </div>
@@ -573,8 +592,8 @@ export default function GoldenTicketPage() {
                                 Operación validada en cadena.<br/>El portafolio tiene acceso vitalicio a la terminal institucional.
                             </p>
 
-                            <button onClick={() => setShowCinematic(false)} className="mt-10 px-8 py-3 bg-transparent text-[9px] font-mono text-white/50 border border-white/10 uppercase tracking-[0.3em] hover:bg-white/5 hover:text-white transition-colors duration-500">
-                                CONTINUAR A LA TERMINAL
+                            <button onClick={() => setShowCinematic(false)} className="mt-10 px-10 py-5 bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#E6B800] text-[#050505] text-[12px] font-black uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(255,215,0,0.6)] hover:shadow-[0_0_80px_rgba(255,215,0,0.8)] hover:scale-[1.05] active:scale-[0.98] transition-all duration-300 rounded-full flex items-center justify-center gap-3 w-full max-w-[360px]">
+                                VER MI TICKET CLAIMEADO
                             </button>
                         </motion.div>
 

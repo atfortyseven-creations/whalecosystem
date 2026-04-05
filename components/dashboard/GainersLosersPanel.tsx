@@ -7,8 +7,7 @@ import {
     ArrowUpRight, ArrowDownRight, Flame, Skull,
     BarChart2, Clock, Wifi, WifiOff
 } from 'lucide-react';
-import { List as RWList } from 'react-window';
-const List = RWList as any;
+import { List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useMarketStream } from '@/context/MarketStreamContext';
 
@@ -96,13 +95,17 @@ export function GainersLosersPanel() {
         }
     }, [markets]);
 
-    const filtered = data
+    const filtered = (data || [])
+        .filter(d => d && d.symbol && d.name)
         .filter(d => d.symbol.toLowerCase().includes(search.toLowerCase()) || d.name.toLowerCase().includes(search.toLowerCase()))
-        .filter(d => view === 'gainers' ? (d as any)[sortKey] >= 0 : view === 'losers' ? (d as any)[sortKey] < 0 : true)
-        .sort((a, b) => (b as any)[sortKey] - (a as any)[sortKey]);
+        .filter(d => {
+            const val = (d as any)[sortKey] || 0;
+            return view === 'gainers' ? val >= 0 : view === 'losers' ? val < 0 : true;
+        })
+        .sort((a, b) => ((b as any)[sortKey] || 0) - ((a as any)[sortKey] || 0));
 
-    const topGainers = [...data].sort((a, b) => (b as any)[sortKey] - (a as any)[sortKey]).slice(0, 3);
-    const topLosers  = [...data].sort((a, b) => (a as any)[sortKey] - (b as any)[sortKey]).slice(0, 3);
+    const topGainers = [...(data || [])].sort((a, b) => ((b as any)[sortKey] || 0) - ((a as any)[sortKey] || 0)).slice(0, 3);
+    const topLosers  = [...(data || [])].sort((a, b) => ((a as any)[sortKey] || 0) - ((b as any)[sortKey] || 0)).slice(0, 3);
 
     return (
         <div className="flex flex-col space-y-5">
@@ -130,7 +133,7 @@ export function GainersLosersPanel() {
                                 </div>
                                 <div className="flex items-center gap-1 text-[#00C076]">
                                     <ArrowUpRight size={12}/>
-                                    <span className="text-[10px] font-black">{pctFmt((d as any)[sortKey])}</span>
+                                    <span className="text-[10px] font-black">{pctFmt(((d as any)[sortKey]) || 0)}</span>
                                 </div>
                             </div>
                         ))}
@@ -159,7 +162,7 @@ export function GainersLosersPanel() {
                                 </div>
                                 <div className="flex items-center gap-1 text-[#FF3B30]">
                                     <ArrowDownRight size={12}/>
-                                    <span className="text-[10px] font-black">{pctFmt((d as any)[sortKey])}</span>
+                                    <span className="text-[10px] font-black">{pctFmt(((d as any)[sortKey]) || 0)}</span>
                                 </div>
                             </div>
                         ))}
@@ -199,16 +202,12 @@ export function GainersLosersPanel() {
                         />
                     </div>
 
-                    {/* Connection Status */}
                     <div className="flex items-center gap-2 ml-auto">
                         {isConnected ? <Wifi size={13} className="text-[#00C076]" /> : <WifiOff size={13} className="text-[#FF3B30] animate-pulse" />}
                         <span className="flex items-center gap-1 text-[9px] font-black text-[#888888] uppercase">
-                            <Clock size={9}/>{lastUpdate.toTimeString().slice(0, 8)}
+                            <Clock size={9}/>{lastUpdate && typeof lastUpdate.toTimeString === 'function' ? lastUpdate.toTimeString().slice(0, 8) : '00:00:00'}
                         </span>
                     </div>
-                    <span className="flex items-center gap-1 text-[9px] font-black text-[#888888] uppercase">
-                        <Clock size={9}/>{lastUpdate.toTimeString().slice(0, 8)}
-                    </span>
                 </div>
 
                 {/* Headers */}
@@ -229,17 +228,19 @@ export function GainersLosersPanel() {
                         </div>
                     ) : (
                         <AutoSizer>
-                            {({ height, width }) => (
-                                <List
-                                    height={height || 500}
-                                    itemCount={filtered.length}
-                                    itemSize={56}
-                                    width={width || '100%'}
-                                    itemData={{ filtered }}
-                                >
+                            {({ height, width }) => {
+                                if (!height || !width) return <div style={{ height: 500, width: '100%' }} />;
+                                return (
+                                    <List
+                                        height={height || 500}
+                                        itemCount={filtered.length}
+                                        itemSize={56}
+                                        width={width || '100%'}
+                                        itemData={{ filtered }}
+                                    >
                                     {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
                                         const d = data?.filtered?.[index];
-                                        if (!d) return <div style={style} className="bg-red-500/10" />; // Absolute failsafe
+                                        if (!d) return <div style={style} className="bg-red-500/10" />;
                                         return (
                                             <div style={style} className="border-b border-[#F0F0F0]">
                                                 <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
@@ -249,7 +250,7 @@ export function GainersLosersPanel() {
                                                     <div className="px-4 flex items-center gap-2.5">
                                                         <span className="text-[8px] font-black text-[#888888] w-4">{index + 1}</span>
                                                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                                            style={{ background: CHAIN_COLORS[d.chain] || CHAIN_COLORS.default }}>
+                                                            style={{ background: CHAIN_COLORS?.[d.chain] || CHAIN_COLORS?.default }}>
                                                             {d.symbol?.[0] || '?'}
                                                         </div>
                                                         <div>
@@ -260,7 +261,7 @@ export function GainersLosersPanel() {
 
                                                     {/* Price */}
                                                     <div className="px-4 text-[10px] font-black font-mono text-[#050505]">
-                                                        {d.price >= 1 ? `$${(d.price || 0).toFixed(2)}` : `$${(d.price || 0).toFixed(6)}`}
+                                                        {(d.price || 0) >= 1 ? `$${(d.price || 0).toFixed(2)}` : `$${(d.price || 0).toFixed(6)}`}
                                                     </div>
 
                                                     {/* 1h */}
@@ -292,14 +293,15 @@ export function GainersLosersPanel() {
                                         );
                                     }}
                                 </List>
-                            )}
+                            );
+                        }}
                         </AutoSizer>
                     )}
                 </div>
 
                 {/* Footer */}
                 <div className="px-5 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                    <span>{filtered.length} assets · {timeWindow} window</span>
+                    <span>{filtered?.length || 0} assets · {timeWindow} window</span>
                     <span>Updates every 30s</span>
                 </div>
             </div>
