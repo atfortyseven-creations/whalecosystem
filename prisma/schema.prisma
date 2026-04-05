@@ -166,3 +166,20 @@ model UserProgress {
   
   @@unique([userId, lessonId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GOLDEN TICKET CLAIM
+// ─────────────────────────────────────────────────────────────────────────────
+
+model GoldenTicket {
+  id                    String   @id @default(uuid())
+  userAddress           String   @unique
+  serialCode            String   @unique
+  tier                  String   @default("GENESIS")
+  badgeColor            String   @default("GOLD")
+  networkLaunchEligible Boolean  @default(true)
+  ticketNumber          Int      @default(autoincrement())
+  twitterHandle         String?
+  isActive              Boolean  @default(true)
+  claimedAt             DateTime @default(now())
+}
