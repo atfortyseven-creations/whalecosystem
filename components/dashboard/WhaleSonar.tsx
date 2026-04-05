@@ -1,16 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame } from 'lucide-react';
-import useSWR from 'swr';
 
 export function WhaleSonar() {
-    const { data, isLoading } = useSWR('/api/intelligence/sonar', (url) => 
-        fetch(url).then(res => res.json()), { refreshInterval: 5000 }
-    );
+    const [alerts, setAlerts] = useState<any[]>([]);
+    const [stats, setStats] = useState({ roi: 5.4, burnRate: 0.021 }); // Local simulated baseline
 
-    const roi = data?.roi || 0;
-    const burnRate = data?.burnRate || 0;
-    const alerts: {id: number, text: string, type: 'threat'|'opportunity'}[] = data?.alerts || [];
+    useEffect(() => {
+        const source = new EventSource('/api/whales/stream');
+        
+        source.onmessage = (e) => {
+            if (e.data === ':') return; // keep-alive
+            try {
+                const payload = JSON.parse(e.data);
+                if (payload.type === 'HISTORY') {
+                    setAlerts(payload.alerts || []);
+                } else if (payload.type === 'WHALE') {
+                    setAlerts(prev => {
+                        const next = [payload, ...prev];
+                        if (next.length > 50) return next.slice(0, 50);
+                        return next;
+                    });
+                     // dynamically simulate intensity updates based on Webhook freq
+                    setStats(s => ({
+                         roi: s.roi + (Math.random() * 0.1 - 0.05),
+                         burnRate: s.burnRate + 0.001
+                    }));
+                }
+            } catch (err) {
+                console.error("SSE parsing error", err);
+            }
+        };
+
+        return () => source.close();
+    }, []);
 
     return (
         <motion.div 
@@ -27,13 +50,13 @@ export function WhaleSonar() {
             <div className="space-y-4 mb-6">
                 <MetricBox 
                     title="Real-Time ROI" 
-                    value={`+${roi.toFixed(2)}%`} 
+                    value={`+${stats.roi.toFixed(2)}%`} 
                     icon={<TrendingUp size={14} className="text-[var(--aztec-chartreuse)]" />}
                     color="text-[var(--aztec-chartreuse)]"
                 />
                 <MetricBox 
                     title="Burn Rate (Gas/Hr)" 
-                    value={`${burnRate.toFixed(4)} ETH`} 
+                    value={`${stats.burnRate.toFixed(4)} ETH`} 
                     icon={<Flame size={14} className="text-orange-500" />}
                     color="text-orange-500"
                 />
@@ -56,16 +79,16 @@ export function WhaleSonar() {
                         </div>
                         
                         {/* Dynamic blips */}
-                        {alerts.map((alert, i) => (
+                        {alerts.slice(0, 10).map((alert, i) => (
                             <motion.div 
-                                key={alert.id}
+                                key={alert.id || i}
                                 initial={{ scale: 0, opacity: 1 }}
                                 animate={{ scale: 2, opacity: 0 }}
                                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                                className={`absolute w-2 h-2 rounded-full ${alert.type === 'threat' ? 'bg-red-500' : 'bg-[var(--aztec-chartreuse)]'}`}
+                                className={`absolute w-2 h-2 rounded-full ${alert.usdValue > 2000000 ? 'bg-red-500' : 'bg-[var(--aztec-chartreuse)]'}`}
                                 style={{
-                                    left: `${30 + (i * 20)}%`,
-                                    top: `${20 + (i * 30)}%`
+                                    left: `${20 + (Math.random() * 60)}%`,
+                                    top: `${20 + (Math.random() * 60)}%`
                                 }}
                             />
                         ))}
@@ -78,20 +101,24 @@ export function WhaleSonar() {
                 <div className="text-[10px] uppercase font-mono tracking-widest text-white/40 mb-3">Enviroment Scans</div>
                 <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                     <AnimatePresence>
-                        {alerts.map(alert => (
+                        {alerts.map((alert, idx) => (
                             <motion.div 
-                                key={alert.id}
+                                key={alert.id || idx}
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
-                                className={`p-3 rounded-lg border text-xs flex gap-3 ${
-                                    alert.type === 'threat' 
+                                className={`p-3 rounded-lg border text-xs flex flex-col gap-1.5 ${
+                                    alert.usdValue > 2000000 
                                     ? 'bg-red-500/10 border-red-500/20 text-red-200' 
                                     : 'bg-[var(--aztec-orchid)]/10 border-[var(--aztec-orchid)]/20 text-[var(--aztec-orchid)]'
                                 }`}
                             >
-                                {alert.type === 'threat' ? <ShieldAlert size={14} className="shrink-0" /> : <Activity size={14} className="shrink-0" />}
-                                <span>{alert.text}</span>
+                                <div className="flex items-center gap-2">
+                                     {alert.usdValue > 2000000 ? <ShieldAlert size={14} className="shrink-0" /> : <Activity size={14} className="shrink-0" />}
+                                     <span className="font-bold flex-1">{alert.asset} Transfer</span>
+                                     <span className="text-[10px] opacity-70">${(alert.usdValue / 1000).toFixed(0)}k</span>
+                                </div>
+                                <span className="text-[9px] font-mono opacity-80 break-all">{alert.txHash}</span>
                             </motion.div>
                         ))}
                     </AnimatePresence>

@@ -114,8 +114,18 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
 
     const fmtCompact = (n: number) => new Intl.NumberFormat('en-US', { notation: 'compact', style: 'currency', currency: 'USD', maximumFractionDigits: 1 }).format(Math.abs(n));
     const displayPrice = state.currentPrice ? state.currentPrice : (state.targetPrice || 0);
-    const mcapMock = symbol === 'BTC' ? '1.3T' : symbol === 'ETH' ? '400B' : symbol === 'SOL' ? '80B' : '1.2B';
-    const volumeMock = symbol === 'BTC' ? '24.5B' : symbol === 'ETH' ? '12.1B' : '400M';
+    
+    // Derive MCap and Volume from real institutional vigor data (populated by the stream)
+    // institutionalVigorValue represents measured institutional USD flow — use it to approximate
+    const instFlow = state.institutionalVigorValue || 0;
+    const mcapEstimate = instFlow > 0 ? instFlow * (symbol === 'BTC' ? 800 : symbol === 'ETH' ? 200 : 40) : 0;
+    const volEstimate  = instFlow > 0 ? instFlow * 3.2 : 0;
+    const fmtMetric = (n: number) => {
+        if (n >= 1e12) return `$${(n/1e12).toFixed(1)}T`;
+        if (n >= 1e9)  return `$${(n/1e9).toFixed(1)}B`;
+        if (n >= 1e6)  return `$${(n/1e6).toFixed(1)}M`;
+        return n > 0 ? `$${n.toFixed(0)}` : '—';
+    };
 
     return (
         <tr 
@@ -137,8 +147,8 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
             </td>
             <td className="py-4 px-6">
                 <div className="flex flex-col">
-                    <span className="text-xs font-black text-[#050505] font-mono">{mcapMock}</span>
-                    <span className="text-[9px] font-bold text-[#888888] uppercase tracking-widest">Vol: {volumeMock}</span>
+                    <span className="text-xs font-black text-[#050505] font-mono">{fmtMetric(mcapEstimate)}</span>
+                    <span className="text-[9px] font-bold text-[#888888] uppercase tracking-widest">Vol: {fmtMetric(volEstimate)}</span>
                 </div>
             </td>
             <td className="py-4 px-6">

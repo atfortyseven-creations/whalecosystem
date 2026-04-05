@@ -26,37 +26,58 @@ const STEPS = [
     { step: 4, title: 'Unlock Platform',   desc: 'All Sovereign features unlock immediately. No waiting. No KYC.',                     done: false },
 ];
 
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { injected } from 'wagmi/connectors';
+import { parseEther } from 'viem';
+
+const SOVEREIGN_PASS_ADDRESS = '0x1234567890123456789012345678901234567890'; // Pending deployment actual address
+const SOVEREIGN_PASS_ABI = [
+  { "inputs": [], "name": "mint", "outputs": [], "stateMutability": "payable", "type": "function" }
+];
 
 type ClaimStep = 'eligibility' | 'payment' | 'claiming' | 'claimed';
 
 export function GoldTicketPanel() {
-    const { address, isConnected } = useSovereignAccount();
-    const [step, setStep]             = useState<ClaimStep>('eligibility');
-    const [walletConnected, setWallet] = useState(false);
-    const [paymentDone, setPayment]   = useState(false);
-    const [claiming, setClaiming]     = useState(false);
+    const { address, isConnected } = useAccount();
+    const { connect } = useConnect();
+    const { data: hash, writeContract, isPending } = useWriteContract();
+    
+    const { isLoading: isConfirming, isSuccess: isConfirmed } = 
+        useWaitForTransactionReceipt({ hash });
+
+    const [step, setStep] = useState<ClaimStep>('eligibility');
+    const [paymentDone, setPayment] = useState(false);
+
+    // Dynamic states derived from on-chain logic
+    const walletConnected = isConnected;
 
     const handleConnect = () => {
-        setWallet(true);
-        toast.success('Wallet connected — eligibility verified ✓');
+        connect({ connector: injected() });
+        toast.success('Awaiting wallet confirmation…');
     };
 
     const handlePayment = () => {
-        setPayment(true);
-        setStep('payment');
-        toast.success('Payment confirmed · $5 USDC received ✓');
+        writeContract({
+            address: SOVEREIGN_PASS_ADDRESS as `0x${string}`,
+            abi: SOVEREIGN_PASS_ABI,
+            functionName: 'mint',
+            value: parseEther('0.001') // Approximate $3-5 on Base/Eth
+        }, {
+            onSuccess: () => {
+                setPayment(true);
+                setStep('claiming');
+            },
+            onError: (err) => {
+                toast.error('Transaction rejected or failed: ' + err.message);
+            }
+        });
     };
 
-    const handleClaim = async () => {
-        setClaiming(true);
-        setStep('claiming');
-        setTimeout(() => {
-            setStep('claimed');
-            setClaiming(false);
-            toast.success('🎉 Gold Ticket claimed! Sovereign access activated.');
-        }, 3000);
-    };
+    // Auto-advance once confirmed on the blockchain
+    if (isConfirmed && step === 'claiming') {
+        setStep('claimed');
+        toast.success('🎉 Gold Ticket minted on-chain! Sovereign access activated.');
+    }
 
     if (step === 'claimed') {
         return (
@@ -91,14 +112,18 @@ export function GoldTicketPanel() {
         );
     }
 
-    if (step === 'claiming') {
+    if (step === 'claiming' || isPending || isConfirming) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
                 <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
                     className="w-20 h-20 rounded-full border-4 border-[#D4AF37] border-t-transparent"/>
                 <div className="text-center">
-                    <h2 className="text-xl font-black text-[#050505] uppercase tracking-tighter">Minting Your Gold Ticket</h2>
-                    <p className="text-[10px] text-[#888888] mt-2 font-mono">Broadcasting NFT to blockchain…</p>
+                    <h2 className="text-xl font-black text-[#050505] uppercase tracking-tighter">
+                        {isConfirming ? 'Waiting for block confirmation' : 'Minting Your Gold Ticket'}
+                    </h2>
+                    <p className="text-[10px] text-[#888888] mt-2 font-mono">
+                        {hash ? `TxHash: ${hash.slice(0, 10)}...${hash.slice(-8)}` : 'Approve transaction in your wallet…'}
+                    </p>
                 </div>
             </div>
         );
@@ -202,16 +227,10 @@ export function GoldTicketPanel() {
                                     {paymentDone ? '3' : '3'}
                                 </div>
                                 <div>
-                                    <div className="text-[11px] font-black text-[#050505]">Claim Gold Ticket NFT</div>
-                                    <div className="text-[9px] text-[#888888]">NFT minted to your wallet — instant Sovereign access</div>
+                                    <div className="text-[11px] font-black text-[#050505]">Gold Ticket Processing</div>
+                                    <div className="text-[9px] text-[#888888]">Verification and execution happening on-chain</div>
                                 </div>
                             </div>
-                            {paymentDone && (
-                                <button onClick={handleClaim}
-                                    className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-[#D4AF37] to-[#F5E17A] text-[#050505] rounded-lg text-[9px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] transition-all">
-                                    <Crown size={13}/> Claim Now
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>

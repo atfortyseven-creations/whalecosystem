@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
+import Redis from 'ioredis';
 
 export const revalidate = 0;
+
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 // ── DexScreener "latest" pairs endpoint ────────────────────────────────────
 // Returns the freshest pairs across chains with full metadata
@@ -57,6 +60,14 @@ function mapDexPair(p: any, idx: number) {
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '25', 10);
+    
+    let nativeWeb3Pairs: any[] = [];
+    try {
+        const raw = await redis.get('latest_defi_pairs');
+        if (raw) nativeWeb3Pairs = JSON.parse(raw);
+    } catch (e) {
+        console.warn("[NEW-PAIRS] Secondary Web3 cache unreachable");
+    }
 
     try {
         // ── Primary: DexScreener latest pairs across all chains ──
@@ -75,7 +86,11 @@ export async function GET(req: Request) {
                     .slice(0, limit);
 
                 const pairs = sorted.map((p, i) => mapDexPair(p, i));
-                return NextResponse.json({ pairs, source: 'dexscreener' });
+                
+                // Merge True Web3 Scanned Pairs + Aggregated Pairs
+                const combined = [...nativeWeb3Pairs, ...pairs].slice(0, limit);
+                
+                return NextResponse.json({ pairs: combined, source: 'hybrid_web3_dexscreener' });
             }
         }
     } catch (e) {

@@ -10,6 +10,7 @@ import {
     GraduationCap, Crown, PieChart, Briefcase
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
+import { useMarketStream } from '@/context/MarketStreamContext';
 
 interface NavItem {
     id: string;
@@ -43,6 +44,8 @@ const SIDEBAR_ITEMS: NavItem[] = [
 // Removed EMBEDDED_TABS since all content is now inherently native and perfectly padded.
 
 function LiveMarketBand() {
+    const { markets } = useMarketStream();
+    
     const [stats, setStats] = useState([
         { label: 'BTC',         value: '---',       chg: null as string|null,  up: true  },
         { label: 'ETH',         value: '---',       chg: null as string|null,  up: false },
@@ -55,33 +58,19 @@ function LiveMarketBand() {
     ]);
 
     React.useEffect(() => {
-        let isMounted = true;
-        const fetchBand = async () => {
-            try {
-                const res = await fetch('/api/markets');
-                if (res.ok) {
-                    const json = await res.json();
-                    if (isMounted && json?.data && Array.isArray(json.data)) {
-                        const validData = json.data.filter((d: any) => d != null && typeof d === 'object' && typeof d.symbol === 'string');
-                        const bmap = new Map(validData.map((d: any) => [d.symbol, d]));
-                        const btc = bmap.get('BTCUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
-                        const eth = bmap.get('ETHUSDT') as {lastPrice: string, priceChangePercent: string} | undefined;
-                        if (btc && eth) {
-                            setStats(prev => {
-                                const n = [...prev];
-                                n[0] = { label: 'BTC', value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(), chg: (parseFloat(btc.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(btc.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(btc.priceChangePercent || '0') >= 0 };
-                                n[1] = { label: 'ETH', value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(), chg: (parseFloat(eth.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(eth.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(eth.priceChangePercent || '0') >= 0 };
-                                return n;
-                            });
-                        }
-                    }
-                }
-            } catch (e) {}
-        };
-        fetchBand();
-        const t = setInterval(fetchBand, 10000);
-        return () => { isMounted = false; clearInterval(t); };
-    }, []);
+        if (markets.size > 0) {
+            const btc = markets.get('BTCUSDT');
+            const eth = markets.get('ETHUSDT');
+            if (btc && eth) {
+                setStats(prev => {
+                    const n = [...prev];
+                    n[0] = { label: 'BTC', value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(), chg: (parseFloat(btc.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(btc.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(btc.priceChangePercent || '0') >= 0 };
+                    n[1] = { label: 'ETH', value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(), chg: (parseFloat(eth.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(eth.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(eth.priceChangePercent || '0') >= 0 };
+                    return n;
+                });
+            }
+        }
+    }, [markets]);
 
     return (
         <>

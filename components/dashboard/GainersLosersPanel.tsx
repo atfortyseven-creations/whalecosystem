@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import {
     TrendingUp, TrendingDown, RefreshCw, Search,
     ArrowUpRight, ArrowDownRight, Flame, Skull,
-    BarChart2, Clock
+    BarChart2, Clock, Wifi, WifiOff
 } from 'lucide-react';
 import { List as RWList } from 'react-window';
 const List = RWList as any;
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { useMarketStream } from '@/context/MarketStreamContext';
 
 const ASSETS = [
     { symbol: 'BTC',    name: 'Bitcoin',         chain: 'multi',     mcapB: 1640  },
@@ -68,50 +69,32 @@ const pctColor = (v: number) => v >= 0 ? 'text-[#00C076]' : 'text-[#FF3B30]';
 const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 
 export function GainersLosersPanel() {
+    const { markets, isConnected, lastUpdate } = useMarketStream();
+    
     const [data, setData]         = useState(ASSETS.map(a => ({ ...a, price: 0, ch1h: 0, ch24h: 0, ch7d: 0, vol24h: 0, mcap: 0 })));
     const [search, setSearch]     = useState('');
     const [view, setView]         = useState<'gainers' | 'losers' | 'all'>('all');
     const [timeWindow, setTimeWindow] = useState<Window>('24h');
-    const [lastUpdate, setLast]   = useState(new Date());
-    const [loading, setLoading]   = useState(true);
 
     const sortKey: SortKey = timeWindow === '1h' ? 'ch1h' : timeWindow === '7d' ? 'ch7d' : 'ch24h';
 
-    const refresh = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await fetch('/api/markets');
-            if (res.ok) {
-                const json = await res.json();
-                // Strictly filter out any null/undefined entries before building the Map
-                const rawData = Array.isArray(json?.data) ? json.data : [];
-                const validEntries = rawData.filter(
-                    (d: any) => d != null && typeof d === 'object' && typeof d.symbol === 'string'
-                );
-                if (validEntries.length > 0) {
-                    const bMap = new Map<string, any>(validEntries.map((d: any) => [d.symbol, d]));
-
-                    setData(prev => prev.map(a => {
-                        const tick = bMap.get(a.symbol + 'USDT');
-                        if (tick && typeof tick === 'object' && tick.lastPrice != null) {
-                            const price = parseFloat(tick.lastPrice) || 0;
-                            const ch24h = parseFloat(tick.priceChangePercent) || 0;
-                            const vol24 = parseFloat(tick.quoteVolume) || 0;
-                            const prevPrice = price / (1 + ch24h / 100);
-                            const mcap = prevPrice > 0 ? a.mcapB * 1e9 * (price / prevPrice) : a.mcapB * 1e9;
-                            return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
-                        }
-                        return a;
-                    }));
-                    setLast(new Date());
+    // The stream provides instantaneous context changes.
+    useEffect(() => {
+        if (markets.size > 0) {
+            setData(prev => prev.map(a => {
+                const tick = markets.get(a.symbol + 'USDT');
+                if (tick && tick.lastPrice != null) {
+                    const price = parseFloat(tick.lastPrice) || 0;
+                    const ch24h = parseFloat(tick.priceChangePercent) || 0;
+                    const vol24 = parseFloat(tick.quoteVolume) || 0;
+                    const prevPrice = price / (1 + ch24h / 100);
+                    const mcap = prevPrice > 0 ? a.mcapB * 1e9 * (price / prevPrice) : a.mcapB * 1e9;
+                    return { ...a, price, ch1h: ch24h / 24, ch24h, ch7d: ch24h * 5, vol24h: vol24, mcap };
                 }
-            }
-        } catch (e) {
-            console.error("Failed to fetch markets endpoint", e);
-        } finally { setLoading(false); }
-    }, []);
-
-    useEffect(() => { refresh(); const id = setInterval(refresh, 8000); return () => clearInterval(id); }, [refresh]);
+                return a;
+            }));
+        }
+    }, [markets]);
 
     const filtered = data
         .filter(d => d.symbol.toLowerCase().includes(search.toLowerCase()) || d.name.toLowerCase().includes(search.toLowerCase()))
@@ -216,11 +199,13 @@ export function GainersLosersPanel() {
                         />
                     </div>
 
-                    {/* Refresh */}
-                    <button onClick={refresh} disabled={loading}
-                        className="ml-auto p-1.5 rounded-lg border border-[#E5E5E5] text-[#888888] hover:text-[#050505] disabled:opacity-50 transition-colors">
-                        <RefreshCw size={13} className={loading ? 'animate-spin' : ''}/>
-                    </button>
+                    {/* Connection Status */}
+                    <div className="flex items-center gap-2 ml-auto">
+                        {isConnected ? <Wifi size={13} className="text-[#00C076]" /> : <WifiOff size={13} className="text-[#FF3B30] animate-pulse" />}
+                        <span className="flex items-center gap-1 text-[9px] font-black text-[#888888] uppercase">
+                            <Clock size={9}/>{lastUpdate.toTimeString().slice(0, 8)}
+                        </span>
+                    </div>
                     <span className="flex items-center gap-1 text-[9px] font-black text-[#888888] uppercase">
                         <Clock size={9}/>{lastUpdate.toTimeString().slice(0, 8)}
                     </span>

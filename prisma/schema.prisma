@@ -72,5 +72,97 @@ model EcosystemWarRoomData {
   totalEntities Int    @default(0)
   tvl         Float    @default(0.0)
   volume24h   Float    @default(0.0)
-  lastUpdated DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOVEREIGN USER PROFILES & WATCHLISTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String      @id @default(uuid())
+  walletAddress String      @unique
+  isPro         Boolean     @default(false)
+  goldTicketTokenId String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  watchlists    Watchlist[]
+  alerts        Alert[]
+  progress      UserProgress[]
+}
+
+model Watchlist {
+  id          String   @id @default(uuid())
+  userId      String
+  symbol      String   // E.g., "BTCUSDT" or a contract address
+  chain       String   @default("multi")
+  addedAt     DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, symbol, chain])
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  userId      String
+  targetType  String   // "PRICE", "GAS", "WHALE_TX", "LIQUIDATION"
+  condition   String   // "ABOVE", "BELOW", "EQUALS"
+  threshold   Float
+  metric      String   // e.g., "BTC", "ETH_GAS"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SIWE AUTHENTICATION NONCES
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SiweNonce {
+  id        String   @id @default(uuid())
+  nonce     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ON-CHAIN ACADEMY PROGRESSION
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Course {
+  id            String   @id @default(uuid())
+  slug          String   @unique
+  title         String
+  description   String   @db.Text
+  totalDuration String
+  badge         String?
+  level         String   @default("Beginner")
+  lessons       Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(uuid())
+  courseId    String
+  title       String
+  duration    String
+  level       String
+  description String   @db.Text
+  orderIndex  Int
+  isLocked    Boolean  @default(false)
+  
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  lessonId  String
+  completed Boolean  @default(true)
+  timestamp DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, lessonId])
 }

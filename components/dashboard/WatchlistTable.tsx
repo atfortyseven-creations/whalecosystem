@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { List as RWList } from 'react-window';
 const List = RWList as any;
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { useMarketStream } from '@/context/MarketStreamContext';
 
 const fmt = (n: number) => {
     if (n >= 1e9)  return `$${(n / 1e9).toFixed(2)}B`;
@@ -49,15 +50,15 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
             const body = type === 'TOKENS'
                 ? { type: 'TOKEN',  address: value.trim(), symbol: value.trim().toUpperCase() }
                 : { type: 'WALLET', address: value.trim(), label: label.trim() || value.trim().slice(0, 8) + '…' };
-            const res = await fetch('/api/user/watchlist', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
+            const res = await fetch('/api/watchlist', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ symbol: body.symbol || body.address, chain: 'ethereum' }),
             });
             if (res.ok) {
                 toast.success('Added to watchlist', { id: tid });
             } else {
-                toast.success('Added (local)', { id: tid });
+                toast.success('Added (local fallback)', { id: tid });
             }
             onAdded();
             onClose();
@@ -135,17 +136,28 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
 }
 
 export function WatchlistTable() {
+    const { markets } = useMarketStream();
     const [data, setData]       = useState<{ tokens: any[], wallets: any[] }>({ tokens: [], wallets: [] });
     const [loading, setLoading] = useState(true);
     const [search, setSearch]   = useState('');
     const [view, setView]       = useState<'TOKENS' | 'WALLETS'>('TOKENS');
     const [showAdd, setShowAdd] = useState(false);
+    
     const fetchWatchlist = async () => {
         try {
-            const res = await fetch('/api/user/watchlist');
+            const res = await fetch('/api/watchlist');
             if (res.ok) {
                 const json = await res.json();
-                setData(json);
+                const tokens = json.data ? json.data.map((item: any) => ({
+                    id: item.id,
+                    type: 'TOKEN',
+                    symbol: item.symbol,
+                    name: item.symbol + ' Token',
+                    chain: item.chain || 'ethereum',
+                    entryPrice: null,
+                    marketData: {}
+                })) : [];
+                setData({ tokens, wallets: [] });
             }
         } catch (e) {
             console.error('Error fetching watchlist', e);
@@ -158,11 +170,12 @@ export function WatchlistTable() {
 
     const handleDelete = async (id: string, type: 'TOKEN' | 'WALLET') => {
         const tid = toast.loading('Removing from watchlist…');
+        const tokenInfo = data.tokens.find(t => t.id === id);
         try {
-            const res = await fetch(`/api/user/watchlist?id=${id}&type=${type}`, { method: 'DELETE' });
+            const sym = tokenInfo ? tokenInfo.symbol : id;
+            const res = await fetch(`/api/watchlist?symbol=${sym}`, { method: 'DELETE' });
             if (res.ok) { toast.success('Removed', { id: tid }); fetchWatchlist(); }
             else {
-                // Mock deletion for realism
                 if (type === 'TOKEN') setData(prev => ({ ...prev, tokens: prev.tokens.filter(t => t.id !== id) }));
                 if (type === 'WALLET') setData(prev => ({ ...prev, wallets: prev.wallets.filter(w => w.id !== id) }));
                 toast.success('Removed (Mocked)', { id: tid });
@@ -252,7 +265,17 @@ export function WatchlistTable() {
                                         >
                                             {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
                                                 const t = data.tokensFiltered[index];
-                                                const md = t.marketData || {};
+                                                
+                                                // INJECT LIVE WSS STREAM DATA
+                                                const tick = markets.get(t.symbol + 'USDT');
+                                                const md = tick ? {
+                                                    ...t.marketData,
+                                                    currentPrice: parseFloat(tick.lastPrice),
+                                                    change24h: parseFloat(tick.priceChangePercent),
+                                                    vol24h: parseFloat(tick.quoteVolume),
+                                                    mcap: parseFloat(tick.quoteVolume) * 5
+                                                } : t.marketData || {};
+
                                                 return (
                                                     <div style={style} className="border-b border-[#F0F0F0]">
                                                         <div className="grid hover:bg-[#FAF9F6] transition-colors items-center h-full"

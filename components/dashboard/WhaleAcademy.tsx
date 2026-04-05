@@ -30,72 +30,56 @@ interface Course {
     badge?: string;
 }
 
-const COURSES: Course[] = [
-    {
-        id: 'whale-basics',
-        title: 'Whale Intelligence Fundamentals',
-        description: 'Learn how to identify and track institutional whale wallets, interpret on-chain signals, and build your first watchlist.',
-        icon: <Globe size={24}/>, color: '#627EEA',
-        totalDuration: '2h 30m', progress: 80, badge: 'Popular',
-        lessons: [
-            { id: 'w1', title: 'What is a Whale?', duration: '8m', level: 'Beginner', completed: true,  locked: false, description: 'Defining institutional wallets vs retail. Size thresholds and behavioral patterns.' },
-            { id: 'w2', title: 'Reading On-Chain Data', duration: '15m', level: 'Beginner', completed: true,  locked: false, description: 'Understanding Etherscan, Solscan, block explorers. Interpreting transaction flows.' },
-            { id: 'w3', title: 'Setting Up Your Watchlist', duration: '12m', level: 'Beginner', completed: true,  locked: false, description: 'Adding tokens and wallets. Configuring entry prices and alert thresholds.' },
-            { id: 'w4', title: 'Whale Accumulation Signals', duration: '22m', level: 'Intermediate', completed: true,  locked: false, description: 'Identifying stealth accumulation patterns using large OTC transfers and exchange withdrawals.' },
-            { id: 'w5', title: 'Smart Money vs Dumb Money', duration: '18m', level: 'Intermediate', completed: false, locked: false, description: 'Scoring algorithms for wallet intelligence. Win rate calculation and alpha decay.' },
-            { id: 'w6', title: 'Building a WHALE ALERT NETWORK SYSTEM', duration: '25m', level: 'Advanced', completed: false, locked: true,  description: 'Multi-parameter alert rules. Webhook integration for real-time Telegram notifications.' },
-        ],
-    },
-    {
-        id: 'defi-mastery',
-        title: 'DeFi & New Pairs Mastery',
-        description: 'Master the art of detecting new liquidity pools, evaluating rug-pull risk, and timing entries with precision.',
-        icon: <TrendingUp size={24}/>, color: '#00C076',
-        totalDuration: '3h 15m', progress: 33, badge: 'New',
-        lessons: [
-            { id: 'd1', title: 'How DEXes Create New Pairs', duration: '10m', level: 'Beginner', completed: true,  locked: false, description: 'AMM mechanics, Uniswap V3, Raydium. Understanding liquidity pool creation events.' },
-            { id: 'd2', title: 'Reading New Pairs Metrics', duration: '20m', level: 'Beginner', completed: true,  locked: false, description: 'MCap, Vol, Liquidity, Holder count, Sniper count — what each metric tells you.' },
-            { id: 'd3', title: 'Rug Pull Detection', duration: '18m', level: 'Intermediate', completed: false, locked: false, description: 'Security score interpretation, honeypot checks, LP lock verification.' },
-            { id: 'd4', title: 'Sniper & Insider Detection', duration: '22m', level: 'Intermediate', completed: false, locked: true,  description: 'Identifying coordinated buys in the first 30 seconds. Bot wallets vs genuine demand.' },
-            { id: 'd5', title: 'Entry Timing Strategies', duration: '30m', level: 'Advanced', completed: false, locked: true,  description: 'Volume precursor analysis. Optimal entry windows after LP deployment.' },
-            { id: 'd6', title: 'Portfolio Risk Management', duration: '25m', level: 'Advanced', completed: false, locked: true,  description: 'Position sizing for high-risk new pairs. Stop-loss mechanics in volatile DEX markets.' },
-        ],
-    },
-    {
-        id: 'api-terminal',
-        title: 'API Terminal & Quant Tools',
-        description: 'Access the full power of the Whalecosystem API to build custom bots, dashboards and trading strategies.',
-        icon: <Code size={24}/>, color: '#9945FF',
-        totalDuration: '4h 00m', progress: 0, badge: undefined,
-        lessons: [
-            { id: 'a1', title: 'API Authentication & Keys', duration: '8m', level: 'Beginner', completed: false, locked: false, description: 'Generating API keys, setting permissions. Rate-limit tiers explained.' },
-            { id: 'a2', title: 'Market & New Pairs Endpoints', duration: '20m', level: 'Beginner', completed: false, locked: false, description: 'Querying new pairs feed, filtering by chain, security score, and volume.' },
-            { id: 'a3', title: 'Watchlist & Alert Automation', duration: '22m', level: 'Intermediate', completed: false, locked: true,  description: 'POST/DELETE watchlist entries programmatically. Building automated alert triggers.' },
-            { id: 'a4', title: 'Webhook & Telegram Integration', duration: '28m', level: 'Intermediate', completed: false, locked: true,  description: 'Configuring push notifications. Building a live monitoring Telegram bot in Node.js.' },
-            { id: 'a5', title: 'Backtesting Whale Signals', duration: '40m', level: 'Advanced', completed: false, locked: true,  description: 'Using historical signals API to backtest entry strategies. Walk-forward optimization.' },
-            { id: 'a6', title: 'Building a Trading Bot', duration: '45m', level: 'Advanced', completed: false, locked: true,  description: 'End-to-end: signal detection → position sizing → DEX execution with wagmi.' },
-        ],
-    },
-    {
-        id: 'portfolio-mgmt',
-        title: 'Institutional Portfolio Management',
-        description: 'Learn professional portfolio construction, risk analysis, and performance attribution used by crypto funds.',
-        icon: <BarChart2 size={24}/>, color: '#D4AF37',
-        totalDuration: '2h 45m', progress: 0, badge: 'Pro',
-        lessons: [
-            { id: 'p1', title: 'Portfolio Construction Basics', duration: '15m', level: 'Beginner', completed: false, locked: false, description: 'Asset allocation frameworks. Diversification across chains, sectors, and market caps.' },
-            { id: 'p2', title: 'Risk Metrics Deep Dive', duration: '20m', level: 'Intermediate', completed: false, locked: false, description: 'Sharpe ratio, max drawdown, volatility-adjusted returns. Whale concentration risk.' },
-            { id: 'p3', title: 'On-Chain Portfolio Tracking', duration: '18m', level: 'Intermediate', completed: false, locked: true,  description: 'Syncing live positions. Unrealized/realized PnL. Cost-basis tracking across wallets.' },
-            { id: 'p4', title: 'Institutional Reporting', duration: '22m', level: 'Advanced', completed: false, locked: true,  description: 'Generating tax reports, performance attribution. Fund-grade accounting standards.' },
-        ],
-    },
-];
+const LEVEL_COLORS: Record<string, string> = { Beginner: '#00C076', Intermediate: '#FF9500', Advanced: '#FF3B30' };
 
-const LEVEL_COLORS = { Beginner: '#00C076', Intermediate: '#FF9500', Advanced: '#FF3B30' };
+import useSWR from 'swr';
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function WhaleAcademy() {
+    const { data: rawData, mutate } = useSWR('/api/academy', fetcher);
+    
+    // Inject the Lucide icons dynamically mapped by name/theme later in mapping
+    const MAPPED_ICONS: Record<string, React.ReactNode> = {
+        'whale-basics': <Globe size={24}/>,
+        'defi-mastery': <TrendingUp size={24}/>,
+        'api-terminal': <Code size={24}/>,
+        'portfolio-mgmt': <BarChart2 size={24}/>
+    };
+    const MAPPED_COLORS: Record<string, string> = {
+        'whale-basics': '#627EEA',
+        'defi-mastery': '#00C076',
+        'api-terminal': '#9945FF',
+        'portfolio-mgmt': '#D4AF37'
+    };
+
+    const COURSES: Course[] = rawData?.data?.map((co: any) => ({
+        ...co,
+        icon: MAPPED_ICONS[co.id] || <BookOpen size={24}/>,
+        color: MAPPED_COLORS[co.id] || '#050505'
+    })) || [];
+
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+
+    const markLessonComplete = async () => {
+        if (!selectedLesson) return;
+        try {
+            await fetch('/api/academy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lessonId: selectedLesson.id })
+            });
+            mutate(); // Rehydrate from Prisma Database
+            // Optimistically update selection
+            setSelectedLesson({ ...selectedLesson, completed: true });
+            if (selectedCourse) setSelectedCourse({
+                 ...selectedCourse,
+                 lessons: selectedCourse.lessons.map(l => l.id === selectedLesson.id ? { ...l, completed: true } : l)
+            });
+        } catch (e) {
+            console.error("Failure updating lesson", e);
+        }
+    };
 
     if (selectedLesson && selectedCourse) {
         return (
@@ -136,8 +120,8 @@ export function WhaleAcademy() {
                             className="px-6 py-3 border border-[#E5E5E5] rounded-xl text-[10px] font-black uppercase tracking-widest text-[#888888] hover:text-[#050505] transition-colors">
                             ← Back to Course
                         </button>
-                        <button className="flex-1 py-3 bg-[#050505] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/85 transition-colors flex items-center justify-center gap-2">
-                            <CheckCircle size={14}/> Mark Complete
+                        <button onClick={markLessonComplete} className="flex-1 py-3 bg-[#050505] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/85 transition-colors flex items-center justify-center gap-2">
+                            <CheckCircle size={14}/> {selectedLesson.completed ? 'Completed' : 'Mark Complete'}
                         </button>
                     </div>
                 </div>

@@ -61,6 +61,15 @@ const ENDPOINT_GROUPS: { label: string; icon: React.ReactNode; endpoints: Endpoi
             { id: 'pnl',             group: 'portfolio', method: 'GET', path: '/api/user/pnl',                 description: 'Profit & loss breakdown over configurable time windows.',             category: 'PORTFOLIO' },
         ]
     },
+    {
+        label: 'Knowledge Graph',
+        icon: <Database size={13}/>,
+        endpoints: [
+            { id: 'graph-search',    group: 'graph', method: 'GET',  path: '/api/graph?q=vitalik',            description: 'Search Neo4j graph for Person/Token/Wallet/Company entities.', category: 'GRAPH', params: 'q (string), type (person|token|wallet|company|all)' },
+            { id: 'graph-query',     group: 'graph', method: 'POST', path: '/api/graph',                      description: 'Execute a safe read-only Cypher query on the sovereign knowledge graph.', category: 'GRAPH', params: '{ cypher: string, params?: object }' },
+            { id: 'whale-intel',     group: 'graph', method: 'GET',  path: '/api/intelligence/whales',        description: 'On-chain whale leaderboard with real movement analytics and alpha scores.', category: 'GRAPH' },
+        ]
+    },
 ];
 
 const METHOD_COLORS: Record<HttpMethod, string> = {

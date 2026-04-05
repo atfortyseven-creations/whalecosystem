@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme, getDefaultConfig, RainbowKitAuthenticationProvider, createAuthenticationAdapter } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { SiweMessage } from 'siwe';
+import { MarketStreamProvider } from '@/context/MarketStreamContext';
 
 const queryClient = new QueryClient();
 
@@ -74,7 +75,9 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
               overlayBlur: 'small',
             })}
           >
-            {children}
+            <MarketStreamProvider>
+              {children}
+            </MarketStreamProvider>
           </RainbowKitProvider>
         </RainbowKitAuthenticationProvider>
       </QueryClientProvider>
