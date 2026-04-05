@@ -21,6 +21,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
 import { CinematicWhaleLogo } from './CinematicWhaleLogo';
 import { LiveTerminalWidgets } from './LiveTerminalWidgets';
+import { WhaleOfflineGame } from './WhaleOfflineGame';
 
 // ─── DEEP LINK HELPERS ───────────────────────────────────────────────────────
 
@@ -425,12 +426,12 @@ function PageHero({
             Whale Alert<br />Network
           </h1>
 
-          <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
-            Connect with<br />PC session.
-          </p>
+          {!isConnected ? (
+            <div className="w-full space-y-4">
+              <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
+                Connect with<br />PC session.
+              </p>
 
-          <div className="w-full space-y-4">
-            {!isConnected ? (
               <button
                 onClick={onConnect}
                 className="w-full h-[88px] bg-[#050505] text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] group"
@@ -439,25 +440,21 @@ function PageHero({
                 <Wallet size={20} className="text-white/40 group-active:translate-x-1 transition-transform" />
                 CONNECT WALLET
               </button>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {/* Opcion 1: Escanear QR para el PC */}
-                <button
-                  onClick={onScan}
-                  className="w-full h-[72px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
-                  style={{ willChange: 'transform' }}
-                >
-                  <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
-                    <QrCode size={20} className="text-[#050505]" />
-                    <div className="text-left leading-tight">
-                      <p className="tracking-[0.3em]">SCAN PC QR</p>
-                      <p className="text-[8px] opacity-40 mt-1 font-bold">LINK DESKTOP SESSION</p>
-                    </div>
-                  </div>
-                  <ChevronRight size={16} className="opacity-20 group-hover:translate-x-1 transition-transform" />
-                </button>
+            </div>
+          ) : (
+            <div className="w-full space-y-4">
+              <div className="w-full bg-[#FAF9F6] border border-black/10 rounded-[2rem] p-5 mb-4 text-center shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                   <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.2em]">BÓVEDA ACTIVA</span>
+                </div>
+                <span className="text-[10px] font-bold text-[#050505]/60 uppercase tracking-[0.08em] leading-relaxed block">
+                  La cartera está conectada correctamente
+                </span>
+              </div>
 
-                {/* Opcion 2: Entrar a Noticias Movil */}
+              <div className="flex flex-col gap-3">
+                {/* Opcion 1: Ir a las noticias */}
                 <button
                   onClick={onEnterNews}
                   className="w-full h-[72px] bg-[#050505] border-2 border-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/20 active:scale-[0.98] group"
@@ -466,15 +463,31 @@ function PageHero({
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
                     <Activity size={20} className="text-white" />
                     <div className="text-left leading-tight">
-                      <p className="tracking-[0.3em]">ENTER TERMINAL</p>
-                      <p className="text-[8px] opacity-60 mt-1 font-bold">VIEW MOBILE DASHBOARD</p>
+                      <p className="tracking-[0.3em] font-black">VER NOTICIAS</p>
+                      <p className="text-[8px] opacity-60 mt-1 font-bold">TERMINAL DE NOTICIAS MÓVIL</p>
                     </div>
                   </div>
                   <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform" />
                 </button>
+
+                {/* Opcion 2: Escanear PC */}
+                <button
+                  onClick={onScan}
+                  className="w-full h-[72px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
+                  style={{ willChange: 'transform' }}
+                >
+                  <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
+                    <QrCode size={20} className="text-[#050505]" />
+                    <div className="text-left leading-tight">
+                      <p className="tracking-[0.3em] font-black">ENLAZAR PC</p>
+                      <p className="text-[8px] opacity-40 mt-1 font-bold">ESCANEAR CÓDIGO DE ESCRITORIO</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="opacity-20 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {isConnected && address && (
             <div className="mt-10 opacity-20">
@@ -507,153 +520,291 @@ function PageHero({
   );
 }
 
-// ─── PAGE 2 · INSTITUTIONAL MANIFESTO ────────────────────────────────────────
+// ─── LIVE METRICS ─────────────────────────────────────────────────────────────
+function LiveFPS() {
+  const [fps, setFps] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  const timesRef = useRef<number[]>([]);
+  useEffect(() => {
+    setMounted(true);
+    let last = performance.now();
+    let raf: number;
+    const loop = (now: number) => {
+      const dt = now - last; last = now;
+      timesRef.current.push(dt);
+      if (timesRef.current.length > 30) timesRef.current.shift();
+      const avg = timesRef.current.reduce((a,b)=>a+b,0)/timesRef.current.length;
+      setFps(Math.round(1000/avg));
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  if (!mounted) return null;
+  const color = fps >= 55 ? '#34D399' : fps >= 30 ? '#FBBF24' : '#F87171';
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: color }} />
+      <span className="font-mono text-[10px] font-black" style={{ color }}>{fps}<span className="opacity-50">fps</span></span>
+    </div>
+  );
+}
 
-const formulaImgStyle = "h-8 mx-auto my-7 opacity-90 mix-blend-multiply drop-shadow-md";
+function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: number; duration?: number; suffix?: string }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      obs.disconnect();
+      const start = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min((now-start)/duration, 1);
+        const ease = 1 - Math.pow(1-p, 3);
+        setVal(Math.round(target * ease));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [target, duration]);
+  return <div ref={ref}>{val.toLocaleString()}{suffix}</div>;
+}
 
+// ─── PAGE 2 · 240Hz SOVEREIGN RENDERING ENGINE ────────────────────────────────
 function PagePhilosophy1() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
+    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-6 pt-14 pb-12 overflow-y-auto msv-hide-scrollbar relative bg-[#050508]">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes slide-right { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes glow-pulse { 0%,100% { box-shadow: 0 0 12px #7C3AED44; } 50% { box-shadow: 0 0 28px #7C3AEDaa; } }
+        @keyframes flow { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+        .pipe-flow { background: linear-gradient(90deg, #7C3AED, #3B82F6, #06B6D4, #7C3AED); background-size: 200%; animation: flow 3s linear infinite; }
+        @keyframes shimmer-hz { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+      ` }} />
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-10 w-full flex flex-col items-center"
-        style={{ willChange: 'transform, opacity' }}
+        initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }}
+        transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}
+        className="mb-8"
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#050505]/40 mb-2">Architectural Vision</span>
-        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.95] uppercase italic text-[#050505] text-center border-b-4 border-[#050505] pb-2 inline-block drop-shadow-sm">
-          Technical<br/>Manifesto
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[8px] font-black uppercase tracking-[0.45em] text-white/25">Rendering Engine</span>
+          <LiveFPS />
+        </div>
+        <h2 className="text-[2.4rem] font-black tracking-tighter leading-[0.88] uppercase text-white">
+          240<span className="text-[#7C3AED]">Hz</span><br/>Sovereign<br/>Renderer
         </h2>
+        <div className="h-[3px] w-24 pipe-flow rounded-full mt-3" />
       </motion.div>
 
-      <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
-        <p>
-          In the contemporary macroeconomic landscape, true excellence is not defined by accumulation, but by absolute mathematical integrity, quiet resilience, and a profound respect for the delicate balance of global ecosystems. Whale Alert Network was born not out of ambition, but out of a humble dedication to illuminate the deepest currents of decentralized finance. We offer a sanctuary of precision—an institutional-grade infrastructure forged with reverence for uncompromising security and quiet observation.
+      <div className="flex flex-col gap-5">
+        {/* Metric cards */}
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: 'Frame Budget', val: '4.17', unit: 'ms', color: '#7C3AED' },
+            { label: 'GPU Layers',   val: '48',   unit: '+',  color: '#3B82F6' },
+            { label: 'Compositors', val: '16',   unit: 'x',  color: '#06B6D4' },
+          ].map(m => (
+            <div key={m.label} className="bg-white/[0.04] border border-white/[0.07] rounded-2xl p-3 flex flex-col" style={{ boxShadow:`0 0 16px ${m.color}18` }}>
+              <span className="font-mono text-[18px] font-black" style={{ color: m.color }}>
+                {m.val}<span className="text-[11px] opacity-60">{m.unit}</span>
+              </span>
+              <span className="text-[7.5px] font-black uppercase tracking-[0.2em] text-white/30 mt-0.5 leading-none">{m.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Pipeline diagram */}
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-3">GPU Compositing Pipeline</p>
+          <div className="flex items-center gap-1">
+            {['JS','Style','Layout','Paint','Composite','Display'].map((s,i) => (
+              <React.Fragment key={s}>
+                <motion.div
+                  initial={{ opacity:0, scale:0.8 }} whileInView={{ opacity:1, scale:1 }}
+                  transition={{ delay: i*0.1, duration:0.4 }}
+                  className="flex-1 h-7 rounded-lg flex items-center justify-center"
+                  style={{ background: `hsl(${210+i*18},80%,${30+i*5}%)`, border:`1px solid hsl(${210+i*18},80%,${45+i*5}%)30` }}
+                >
+                  <span className="text-[6px] font-black uppercase tracking-wider text-white/80">{s}</span>
+                </motion.div>
+                {i < 5 && <div className="w-1.5 h-[1px] bg-white/15 flex-shrink-0" />}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Frame budget bar */}
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-[8px] font-black uppercase tracking-[0.35em] text-white/25">Frame Budget @ 240Hz</p>
+            <span className="font-mono text-[9px] font-black text-[#7C3AED]">4.17ms total</span>
+          </div>
+          <div className="space-y-1.5">
+            {[
+              { name:'Script',      pct:18, color:'#7C3AED' },
+              { name:'Render',      pct:22, color:'#3B82F6' },
+              { name:'GPU Comp.',   pct:35, color:'#06B6D4' },
+              { name:'Display Sync',pct:25, color:'#10B981' },
+            ].map(b => (
+              <div key={b.name} className="flex items-center gap-2">
+                <span className="text-[7px] font-black uppercase tracking-wider text-white/25 w-16 flex-shrink-0">{b.name}</span>
+                <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }} whileInView={{ width: `${b.pct}%` }}
+                    transition={{ duration:1, ease:[0.16,1,0.3,1], delay:0.2 }}
+                    className="h-full rounded-full" style={{ background: b.color }}
+                  />
+                </div>
+                <span className="text-[7px] font-mono font-black text-white/30 w-6 flex-shrink-0">{b.pct}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-[11.5px] leading-[1.9] font-medium text-white/50">
+          Every pixel is orchestrated through a <span className="text-white/80 font-black">GPU-composited layer tree</span>, bypassing the main thread entirely. CSS <code className="font-mono text-[#7C3AED] text-[10px]">will-change: transform</code> elevates 48 independent compositor layers — ensuring <span className="text-white/80 font-black">zero layout thrash</span> and true 240Hz synchronization with the device VSYNC signal.
         </p>
-
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
-          1. Real-Time Kinetic Harmony
-        </h3>
-        <p>
-          We humbly reject the compromises of latency and simulation. Our ingestion engines gracefully process massive capital flows in true real-time, maintaining a silent, asynchronous dialogue with the blockchain’s memory. Recognizing that imperfections and node failures are inevitable in any distributed system, we implemented gentle yet mathematically rigorous Exponential Backoff algorithms to preserve harmony without disrupting the cluster:
-        </p>
-
-        <img 
-          src="/f_backoff.svg" 
-          alt="Exponential Backoff Formula" 
-          className={formulaImgStyle}
-        />
-
-        <p>
-          Through this precise architecture, every detected transfer is treated with meticulous care. By evaluating market deviation (Z-Score) in microseconds, we elegantly isolate macrostructural anomalies—the quiet footprint of the whale—filtering out transient noise so that only the pure signal remains:
-        </p>
-
-        <img 
-          src="/f_zscore.svg" 
-          alt="Z-Score Formula" 
-          className={formulaImgStyle}
-        />
       </div>
 
-      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={{ willChange: 'transform' }}>
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">SIGUIENTE CAPÍTULO</span>
-        <ChevronDown size={14} className="text-[#050505]" />
+      <motion.div className="flex flex-col items-center gap-1 mt-8 opacity-20" animate={{ y:[0,4,0] }} transition={{ duration:2, repeat:Infinity }}>        <span className="text-[8px] font-black uppercase tracking-[0.35em] text-white">SIGUIENTE</span>
+        <ChevronDown size={13} className="text-white" />
       </motion.div>
     </div>
   );
 }
 
+// ─── PAGE 3 · ZERO-LATENCY PIPELINE ──────────────────────────────────────────
 function PagePhilosophy2() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
-      <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
-          2. Sovereign Security & Trust
-        </h3>
-        <p>
-          Our infrastructure is architected upon a foundation of absolute humility and Zero-Trust. We respectfully distance ourselves from your private data; the cryptographically secure bridge between your interface and our perimeter entirely eliminates the need for passwords or centralized organic validations.
-        </p>
-        <p>
-          The cryptographic vault protects your session using military-grade End-to-End Encryption (E2EE). Identity synchronization politely requests proof of private key ownership through elegant elliptical curve mathematics, ensuring that our servers remain blissfully ignorant of your most guarded secrets at all times:
-        </p>
+    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-6 pt-14 pb-12 overflow-y-auto msv-hide-scrollbar relative bg-[#03050A]">
+      <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:0.7 }} className="mb-8">
+        <span className="text-[8px] font-black uppercase tracking-[0.45em] text-white/20 block mb-3">Neural Pipeline</span>
+        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.9] uppercase text-white">
+          Zero<span className="text-[#3B82F6]">-μs</span><br/>Intelligence
+        </h2>
+        <div className="h-[3px] w-20 bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] rounded-full mt-3" />
+      </motion.div>
 
-        <img 
-          src="/f_ecdsa.svg" 
-          alt="ECDSA Verification Formula" 
-          className={formulaImgStyle}
-        />
+      <div className="flex flex-col gap-4">
+        {/* Live latency display */}
+        <div className="bg-[#3B82F6]/[0.06] border border-[#3B82F6]/20 rounded-2xl p-4">
+          <div className="flex items-end gap-3 mb-3">
+            <div className="font-mono text-[2.8rem] font-black text-[#3B82F6] leading-none">
+              <AnimatedCounter target={240} suffix="" />
+            </div>
+            <div className="mb-1">
+              <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25">Hz Display</p>
+              <p className="text-[8px] font-black uppercase tracking-[0.25em] text-[#3B82F6]/60">Sync Rate</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[['< 0.8ms','Input Lag'],['< 2.1ms','Render'],['< 1.3ms','Commit']].map(([v,l])=>(
+              <div key={l} className="flex flex-col">
+                <span className="font-mono text-[11px] font-black text-[#06B6D4]">{v}</span>
+                <span className="text-[7px] font-black uppercase tracking-wider text-white/25">{l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <p>
-          You retain inviolable mastery over your wealth and digital footprint. Our network has been mathematically constrained specifically to ensure we hold no master key capable of breaching your sanctuary.
-        </p>
+        {/* WebAssembly stack */}
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-3">WebAssembly SIMD Stack</p>
+          {[['SIMD128','Price oracle vectorisation','#7C3AED'],
+            ['SharedArrayBuffer','Lock-free worker sync','#3B82F6'],
+            ['OffscreenCanvas','Off-main-thread GPU paint','#06B6D4'],
+            ['Atomics.waitAsync','Non-blocking IPC','#10B981']
+          ].map(([tech, desc, color], i) => (
+            <motion.div
+              key={tech}
+              initial={{ opacity:0, x:-12 }} whileInView={{ opacity:1, x:0 }}
+              transition={{ delay:i*0.08, duration:0.45 }}
+              className="flex items-start gap-3 py-2 border-b border-white/[0.04] last:border-0"
+            >
+              <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background:color }} />
+              <div>
+                <span className="font-mono text-[10px] font-black" style={{ color }}>{tech}</span>
+                <p className="text-[9px] text-white/30 leading-snug mt-0.5">{desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-3 text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
-          3. Global Algorithmic Elegance
-        </h3>
-        <p>
-          In an ecosystem characterized by fragmentation, simplicity becomes the ultimate sophistication. We have gently woven a multichain tapestry capable of indexing continuous streams across independent networks. By translating chaotic metadata into a harmonious standard of logarithmic time complexity, we achieve immense efficiency:
-        </p>
-
-        <img 
-          src="/f_log.svg" 
-          alt="Logarithmic Time Complexity Formula" 
-          className={formulaImgStyle}
-        />
-
-        <p>
-          This profound fractal efficiency, written with care in structured Golang, is the quiet heartbeat of our system. It seamlessly digests tens of thousands of instant requests while remaining as calm and unyielding as the deep ocean.
+        <p className="text-[11.5px] leading-[1.9] font-medium text-white/50">
+          Market entropy is processed through a <span className="text-white/80 font-black">WASM SIMD128 engine</span> operating in a dedicated Worker thread. The main thread remains perpetually unblocked — delivering deterministic 240Hz frame delivery with <span className="text-[#3B82F6] font-black">&lt; 0.8ms input latency</span> even under peak whale alert load.
         </p>
       </div>
 
-      <motion.div className="flex flex-col items-center gap-1 mt-10 opacity-30" animate={{ y: [0, 4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} style={{ willChange: 'transform' }}>
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">SIGUIENTE CAPÍTULO</span>
-        <ChevronDown size={14} className="text-[#050505]" />
+      <motion.div className="flex flex-col items-center gap-1 mt-8 opacity-20" animate={{ y:[0,4,0] }} transition={{ duration:2, repeat:Infinity }}>
+        <span className="text-[8px] font-black uppercase tracking-[0.35em] text-white">SIGUIENTE</span>
+        <ChevronDown size={13} className="text-white" />
       </motion.div>
     </div>
   );
 }
 
+// ─── PAGE 4 · CRYPTOGRAPHIC SOVEREIGNTY ──────────────────────────────────────
 function PagePhilosophy3() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col px-8 pt-16 pb-12 overflow-y-auto msv-hide-scrollbar relative">
-      <div className="flex-1 flex flex-col gap-5 text-[12.5px] leading-[1.85] font-medium text-[#050505]/85">
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] text-[#050505] border-b border-black/10 pb-2 flex items-center gap-2 drop-shadow-sm">
-          4. Reverence for Compliance
-        </h3>
-        <p>
-          To empower institutional oversight with integrity, maintaining an unblemished alignment with global jurisdictions is fundamentally essential. We have carefully implemented self-defensive heuristic barriers, designed with absolute respect for international financial frameworks and rigorous regulatory scrutiny.
-        </p>
-        <ul className="list-disc list-inside space-y-4 font-semibold text-[#050505]/95 marker:text-indigo-600">
-          <li className="leading-relaxed">
-            <span className="text-black font-black uppercase text-[12px] tracking-wider">Sanctions & AML:</span> We orchestrate silent, real-time computational provenance checks. Entities associated with global prohibitions are gently but irreversibly denied access, while legitimate pathways are secured via respectful Zero-Knowledge Proofs (ZK-Proofs).
-          </li>
-          <li className="leading-relaxed">
-            <span className="text-black font-black uppercase text-[12px] tracking-wider">Geofencing & WAF:</span> Our network pathways are guided by automated border resolutions operating under 5 milliseconds. We meticulously filter out artificial VPN routing with precision, preserving the structural integrity of localized compliance.
-          </li>
-          <li className="leading-relaxed">
-            <span className="text-black font-black uppercase text-[12px] tracking-wider">Universal GDPR:</span> We bestow upon the observer the fundamental right to be forgotten, enabling instantaneous and total demolition of metadata footprints across any volatile memory segment, in strict adherence to ISO 27001 tenets.
-          </li>
-        </ul>
+    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-6 pt-14 pb-12 overflow-y-auto msv-hide-scrollbar relative bg-[#020408]">
+      <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:0.7 }} className="mb-8">
+        <span className="text-[8px] font-black uppercase tracking-[0.45em] text-white/20 block mb-3">Cryptographic Vault</span>
+        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.9] uppercase text-white">
+          Sovereign<span className="text-[#10B981]">Vault</span><br/>Identity
+        </h2>
+        <div className="h-[3px] w-20 bg-gradient-to-r from-[#10B981] to-[#06B6D4] rounded-full mt-3" />
+      </motion.div>
 
-        <h3 className="text-[13px] font-black uppercase tracking-[0.18em] mt-5 text-[#050505] border-b border-black/10 pb-2 drop-shadow-sm">
-          A Quiet Resolution
-        </h3>
-        <p>
-          Whale Alert Network does not seek the superficial limelight of mere visual aesthetics. We arrive humbly to redefine the technological threshold of institutional awareness. Every byte forged within our architecture stands as a silent sentinel, built exclusively to support your absolute mastery in traversing the formidable depths of the global blockchain ecosystem.
-        </p>
+      <div className="flex flex-col gap-4">
+        {/* ECDSA card */}
+        <div className="bg-[#10B981]/[0.06] border border-[#10B981]/20 rounded-2xl p-4">
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#10B981]/60 mb-2">ECDSA secp256k1 · EIP-191</p>
+          <div className="font-mono text-[10px] text-[#10B981]/80 leading-relaxed bg-black/30 rounded-xl p-3 border border-[#10B981]/10">
+            <p className="text-white/20 text-[8px] mb-1"># Zero-knowledge handshake</p>
+            <p>Q = dG <span className="text-white/25">(private key × generator)</span></p>
+            <p className="mt-1">σ = Sign<sub>d</sub>(H(m)) → (r, s)</p>
+            <p className="mt-1">Verify: sG = H(m)Q + rG<span className="text-[#10B981]">✓</span></p>
+          </div>
+        </div>
 
-        {/* DOWNHEAD / PREMIUM FOOTER */}
-        <div className="mt-16 pt-10 border-t border-black/5 flex flex-col items-center pb-24">
-          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-20 h-20 mb-6 opacity-60 drop-shadow-xl" />
-          <div className="flex items-center gap-8">
-            <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors drop-shadow-sm">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-              <span>@whalecosystem</span>
+        {/* Security tier list */}
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-3">Security Stack</p>
+          {[
+            ['E2E Encryption',   'AES-256-GCM · ChaCha20-Poly1305', '#10B981'],
+            ['ZK Proofs',        'Groth16 SNARK — O(1) verify',     '#7C3AED'],
+            ['HSM Key Guard',    'secp256k1 · Hardware boundary',   '#3B82F6'],
+            ['Merkle Integrity', 'SHA-3 proof of inclusion',        '#F59E0B'],
+            ['Geofence WAF',     'eBPF · < 0.3ms border pass',      '#06B6D4'],
+          ].map(([t,d,c],i) => (
+            <motion.div key={t}
+              initial={{ opacity:0, x:-10 }} whileInView={{ opacity:1, x:0 }}
+              transition={{ delay:i*.07, duration:0.4 }}
+              className="flex items-center gap-3 py-2 border-b border-white/[0.04] last:border-0"
+            >
+              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background:c, boxShadow:`0 0 6px ${c}80` }} />
+              <div className="flex-1">
+                <span className="text-[10px] font-black text-white/70">{t}</span>
+                <p className="text-[8px] font-mono text-white/25 mt-0.5 leading-none">{d}</p>
+              </div>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" style={{ boxShadow:'0 0 6px #10B98180' }} />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 pt-8 border-t border-white/[0.05] flex flex-col items-center pb-16">
+          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-4 opacity-40 drop-shadow-xl" style={{ filter:'invert(1)' }} />
+          <div className="flex items-center gap-6">
+            <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white/50 transition-colors">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              @whalecosystem
             </a>
-            <a href="https://github.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors drop-shadow-sm">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.45-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"></path></svg>
-              <span>GitHub</span>
+            <a href="https://github.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white/50 transition-colors">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.45-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+              GitHub
             </a>
           </div>
         </div>
@@ -782,7 +933,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-export function MobileSovereignLanding() {
+export function MobileSovereignLanding({ onEnterNews }: { onEnterNews?: () => void } = {}) {
   const { isConnected, address } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
@@ -791,6 +942,21 @@ export function MobileSovereignLanding() {
   const [view, setView] = useState<'landing' | 'scanner'>('landing');
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [walletBrowser, setWalletBrowser] = useState<string | null>(null);
+  const [showGame, setShowGame] = useState(false);
+
+  // Offline detection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const goOffline = () => setShowGame(true);
+    const goOnline  = () => {}; // keep game open until user dismisses
+    if (!navigator.onLine) setShowGame(true);
+    window.addEventListener('offline', goOffline);
+    window.addEventListener('online', goOnline);
+    return () => {
+      window.removeEventListener('offline', goOffline);
+      window.removeEventListener('online', goOnline);
+    };
+  }, []);
 
   useEffect(() => {
     setWalletBrowser(detectWalletBrowser());
@@ -807,10 +973,15 @@ export function MobileSovereignLanding() {
   }, [connect, connectors, walletBrowser]);
 
   const handleEnterNews = useCallback(() => {
-    // Force the sovereign handshake explicitly for mobile
-    document.cookie = "sovereign_handshake=0x_bypass; path=/; max-age=31536000";
-    window.location.reload();
-  }, []);
+    if (onEnterNews) {
+      // Use parent-provided callback (MobileEnforcer will switch to MobileNewsShell without reload)
+      onEnterNews();
+    } else {
+      // Fallback: set cookie + reload (legacy path)
+      document.cookie = "sovereign_handshake=0x_bypass; path=/; max-age=31536000";
+      window.location.reload();
+    }
+  }, [onEnterNews]);
 
   if (view === 'scanner') {
     return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
@@ -818,6 +989,10 @@ export function MobileSovereignLanding() {
 
   return (
     <div className="w-full h-[100dvh] bg-transparent overflow-hidden relative">
+      {/* Offline Whale Game Overlay */}
+      <AnimatePresence>
+        {showGame && <WhaleOfflineGame visible={showGame} onBack={() => setShowGame(false)} />}
+      </AnimatePresence>
       <AnimatedPattern />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
