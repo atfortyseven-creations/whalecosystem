@@ -221,30 +221,43 @@ export function AlertsPanel() {
 
     // ── WebSocket live feed from background daemon ─────────────────────────
     useEffect(() => {
-        const socket = io();
-        socket.on('whale_tx', (data: any) => {
-            if (data.amountUsd < 2_000_000) return; // Only institutional-grade moves
-            const newAlert: AlertRule = {
-                id: `ws-${data.id}`,
-                name: `🐋 Live Whale ${data.type} · ${data.chain.toUpperCase()}`,
-                type: 'WHALE_MOVE',
-                asset: data.chain.toUpperCase(),
-                threshold: data.amountUsd,
-                currentValue: data.amountUsd,
-                status: 'TRIGGERED',
-                triggeredAt: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                notifyTelegram: false,
-                notifyEmail: false,
-                notifyPush: true,
-            };
-            setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
-            toast(`🐋 Whale detected — $${(data.amountUsd / 1e6).toFixed(2)}M on ${data.chain.toUpperCase()}`, {
-                duration: 6000,
-                style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' }
+        // Connect to the same origin as the app — avoids connecting to undefined
+        const socketUrl = typeof window !== 'undefined' ? window.location.origin : '';
+        if (!socketUrl) return;
+        let socket: ReturnType<typeof io> | null = null;
+        try {
+            socket = io(socketUrl, {
+                path: '/api/socketio',
+                reconnectionAttempts: 3,
+                timeout: 5000,
             });
-        });
-        return () => { socket.disconnect(); };
+            socket.on('connect_error', () => { /* silent — server may not have socket.io */ });
+            socket.on('whale_tx', (data: any) => {
+                if (!data || data.amountUsd < 2_000_000) return; // Only institutional-grade moves
+                const newAlert: AlertRule = {
+                    id: `ws-${data.id ?? Date.now()}`,
+                    name: `🐋 Live Whale ${data.type} · ${(data.chain ?? 'ETH').toUpperCase()}`,
+                    type: 'WHALE_MOVE',
+                    asset: (data.chain ?? 'ETH').toUpperCase(),
+                    threshold: data.amountUsd,
+                    currentValue: data.amountUsd,
+                    status: 'TRIGGERED',
+                    triggeredAt: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                    notifyTelegram: false,
+                    notifyEmail: false,
+                    notifyPush: true,
+                };
+                setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
+                toast(`🐋 Whale detected — $${(data.amountUsd / 1e6).toFixed(2)}M on ${(data.chain ?? 'ETH').toUpperCase()}`, {
+                    duration: 6000,
+                    style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' }
+                });
+            });
+        } catch { /* socket.io not available */ }
+        return () => {
+            if (socket) { try { socket.disconnect(); } catch {} }
+        };
     }, []);
 
     const handleDelete = async (id: string) => {

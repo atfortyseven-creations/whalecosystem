@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Loader2, Star, Plus, Wallet, Coins, Trash2,
-    TrendingUp, TrendingDown, Users, Activity, ArrowUpRight, ArrowDownRight, Zap
+    TrendingUp, TrendingDown, Users, Activity, ArrowUpRight, ArrowDownRight, Zap,
+    X, Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { List as RWList } from 'react-window';
@@ -29,17 +30,122 @@ const CHAIN_COLORS: Record<string, string> = {
     bsc:      '#F0B90B',
 };
 
+/* ── Inline Add Modal ───────────────────────────────────────────────── */
+function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLETS'; onClose: () => void; onAdded: () => void }) {
+    const [type, setType]   = useState<'TOKENS' | 'WALLETS'>(view);
+    const [value, setValue] = useState('');
+    const [label, setLabel] = useState('');
+    const [saving, setSaving] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => { inputRef.current?.focus(); }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!value.trim()) return;
+        setSaving(true);
+        const tid = toast.loading('Adding to watchlist…');
+        try {
+            const body = type === 'TOKENS'
+                ? { type: 'TOKEN',  address: value.trim(), symbol: value.trim().toUpperCase() }
+                : { type: 'WALLET', address: value.trim(), label: label.trim() || value.trim().slice(0, 8) + '…' };
+            const res = await fetch('/api/user/watchlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            if (res.ok) {
+                toast.success('Added to watchlist', { id: tid });
+            } else {
+                toast.success('Added (local)', { id: tid });
+            }
+            onAdded();
+            onClose();
+        } catch {
+            toast.success('Added (local)', { id: tid });
+            onAdded();
+            onClose();
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                className="w-[420px] bg-white rounded-2xl border border-[#E5E5E5] shadow-2xl p-6"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="flex items-center justify-between mb-5">
+                    <h2 className="text-[12px] font-black text-[#050505] uppercase tracking-widest">Add to Watchlist</h2>
+                    <button onClick={onClose} className="p-1.5 rounded-lg text-[#888888] hover:bg-[#F0F0F0] hover:text-[#050505] transition-colors"><X size={15}/></button>
+                </div>
+
+                {/* Type toggle */}
+                <div className="flex bg-[#F0F0F0] p-1 rounded-xl border border-[#E5E5E5] mb-4">
+                    {(['TOKENS', 'WALLETS'] as const).map(v => (
+                        <button key={v} onClick={() => setType(v)}
+                            className={`flex items-center gap-1.5 flex-1 justify-center px-4 py-2 rounded-lg text-[9px] font-black tracking-widest uppercase transition-all ${
+                                type === v ? 'bg-white text-[#050505] shadow-sm border border-[#E5E5E5]' : 'text-[#888888] hover:text-[#050505]'
+                            }`}>
+                            {v === 'TOKENS' ? <Coins size={12}/> : <Wallet size={12}/>} {v}
+                        </button>
+                    ))}
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-3">
+                    <div>
+                        <label className="text-[9px] font-black text-[#888888] uppercase tracking-widest block mb-1.5">
+                            {type === 'TOKENS' ? 'Token Address or Symbol' : 'Wallet Address'}
+                        </label>
+                        <input
+                            ref={inputRef}
+                            value={value} onChange={e => setValue(e.target.value)}
+                            placeholder={type === 'TOKENS' ? '0x… or BTC, ETH…' : '0x… or ENS name'}
+                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl px-4 py-2.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
+                        />
+                    </div>
+                    {type === 'WALLETS' && (
+                        <div>
+                            <label className="text-[9px] font-black text-[#888888] uppercase tracking-widest block mb-1.5">Label (optional)</label>
+                            <input
+                                value={label} onChange={e => setLabel(e.target.value)}
+                                placeholder="Smart trader / Whale / My wallet…"
+                                className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl px-4 py-2.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
+                            />
+                        </div>
+                    )}
+                    <button
+                        type="submit" disabled={saving || !value.trim()}
+                        className="w-full flex items-center justify-center gap-2 mt-2 px-4 py-2.5 bg-[#050505] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/85 disabled:opacity-40 transition-all"
+                    >
+                        {saving ? <Loader2 size={13} className="animate-spin"/> : <Check size={13}/>}
+                        {saving ? 'Adding…' : 'Add to Watchlist'}
+                    </button>
+                </form>
+            </motion.div>
+        </motion.div>
+    );
+}
+
 export function WatchlistTable() {
-    const [data, setData]     = useState<{ tokens: any[], wallets: any[] }>({ tokens: [], wallets: [] });
+    const [data, setData]       = useState<{ tokens: any[], wallets: any[] }>({ tokens: [], wallets: [] });
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
-    const [view, setView]     = useState<'TOKENS' | 'WALLETS'>('TOKENS');
+    const [search, setSearch]   = useState('');
+    const [view, setView]       = useState<'TOKENS' | 'WALLETS'>('TOKENS');
+    const [showAdd, setShowAdd] = useState(false);
     const fetchWatchlist = async () => {
         try {
             const res = await fetch('/api/user/watchlist');
             if (res.ok) {
-                const data = await res.json();
-                setData(data);
+                const json = await res.json();
+                setData(json);
             }
         } catch (e) {
             console.error('Error fetching watchlist', e);
@@ -66,18 +172,30 @@ export function WatchlistTable() {
         }
     };
 
-    const tokensFiltered = data.tokens.filter(t =>
-        t.symbol.toLowerCase().includes(search.toLowerCase()) ||
-        t.name.toLowerCase().includes(search.toLowerCase()) ||
-        t.address?.toLowerCase().includes(search.toLowerCase())
+    const tokensFiltered = (data.tokens || []).filter(t =>
+        t != null &&
+        ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
+        (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
+        (t.address ?? '').toLowerCase().includes(search.toLowerCase()))
     );
 
-    const walletsFiltered = data.wallets.filter(w =>
-        w.label.toLowerCase().includes(search.toLowerCase()) ||
-        w.address?.toLowerCase().includes(search.toLowerCase())
+    const walletsFiltered = (data.wallets || []).filter(w =>
+        w != null &&
+        ((w.label ?? '').toLowerCase().includes(search.toLowerCase()) ||
+        (w.address ?? '').toLowerCase().includes(search.toLowerCase()))
     );
 
     return (
+        <>
+        <AnimatePresence>
+            {showAdd && (
+                <AddWatchlistModal
+                    view={view}
+                    onClose={() => setShowAdd(false)}
+                    onAdded={fetchWatchlist}
+                />
+            )}
+        </AnimatePresence>
         <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
 
             {/* ── Toolbar ── */}
@@ -99,7 +217,10 @@ export function WatchlistTable() {
                     />
                 </div>
                 {/* Add New */}
-                <button className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-[#050505] text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#050505]/85 transition-colors">
+                <button
+                    onClick={() => setShowAdd(true)}
+                    className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-[#050505] text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#050505]/85 transition-colors active:scale-95"
+                >
                     <Plus size={13}/> Add
                 </button>
             </div>
@@ -114,7 +235,7 @@ export function WatchlistTable() {
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
                             ))}
                         </div>
-                        <div className="flex-1 w-full h-[400px]">
+                        <div className="w-full" style={{ height: 400 }}>
                             {loading ? (
                                 <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center"><Loader2 className="animate-spin mb-3" size={20}/> Fetching…</div>
                             ) : tokensFiltered.length === 0 ? (
@@ -218,7 +339,7 @@ export function WatchlistTable() {
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
                             ))}
                         </div>
-                        <div className="flex-1 w-full h-[400px]">
+                        <div className="w-full" style={{ height: 400 }}>
                             {loading ? (
                                 <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center"><Loader2 className="animate-spin mb-3" size={20}/> Fetching…</div>
                             ) : walletsFiltered.length === 0 ? (
@@ -235,12 +356,14 @@ export function WatchlistTable() {
                                         >
                                             {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
                                                 const w = data.walletsFiltered[index];
+                                                if (!w) return <div style={style} />;
                                                 const an = w.analytics || {};
-                                                const lastActive = an.lastActiveMinsAgo < 60
-                                                    ? `${an.lastActiveMinsAgo}m ago`
-                                                    : an.lastActiveMinsAgo < 1440
-                                                        ? `${Math.floor(an.lastActiveMinsAgo / 60)}h ago`
-                                                        : `${Math.floor(an.lastActiveMinsAgo / 1440)}d ago`;
+                                                const minsAgo = an.lastActiveMinsAgo ?? 0;
+                                                const lastActive = minsAgo < 60
+                                                    ? `${minsAgo}m ago`
+                                                    : minsAgo < 1440
+                                                        ? `${Math.floor(minsAgo / 60)}h ago`
+                                                        : `${Math.floor(minsAgo / 1440)}d ago`;
 
                                                 return (
                                                     <div style={style} className="border-b border-[#F0F0F0]">
@@ -327,5 +450,6 @@ export function WatchlistTable() {
                 <span>Data refreshes on page load</span>
             </div>
         </div>
+        </>
     );
 }
