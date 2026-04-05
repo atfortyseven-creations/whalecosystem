@@ -89,6 +89,9 @@ export async function GET(req: Request) {
                     isRunning = false;
                 }
             };
+            
+            // Defeat Nginx/cloud reverse proxies buffering the connection
+            controller.enqueue(new TextEncoder().encode(': ' + 'x'.repeat(2048) + '\n\n'));
 
             while (isRunning) {
                 try {
