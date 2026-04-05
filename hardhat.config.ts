@@ -6,7 +6,13 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.20",
+  solidity: {
+    compilers: [
+      { version: "0.8.20" },
+      { version: "0.8.22" },
+      { version: "0.8.24" }
+    ]
+  },
   networks: {
     arbitrum: {
       url: process.env.ARBITRUM_RPC_URL || "https://arb1.arbitrum.io/rpc",

@@ -4,6 +4,7 @@ import { Inter, Martel, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 import './smooth-scroll.css'
 import Providers from "@/components/Providers";
+import { Web3SovereignProvider } from "@/app/providers";
 import "@fontsource/space-grotesk/700.css";
 import "@fontsource/space-grotesk/400.css";
 import "@fontsource/roboto-mono/700.css";
@@ -170,9 +171,11 @@ export default async function RootLayout({
              <GoogleTagManager gtmId="GTM-52B9SCRM" />
               <Providers cookies={cookies}>
                 <MobileEnforcer>
-                  <ClientLayout>
-                    {children}
-                  </ClientLayout>
+                  <Web3SovereignProvider>
+                    <ClientLayout>
+                      {children}
+                    </ClientLayout>
+                  </Web3SovereignProvider>
                 </MobileEnforcer>
                 <Toaster richColors position="top-right" />
                 <CookieConsent />
