@@ -392,11 +392,18 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
         if (Math.abs(cross) > 50) angleChanges++;
       }
 
-      const meetsLengthReq = totalLength > 80;
-      const meetsCoverageReq = coverageX > 0.25 || coverageY > 0.25;
-      const meetsComplexityReq = angleChanges > 3;
+      // Check if it's a closed organic loop (circle/polygon)
+      const firstPt = pts[0];
+      const lastPt = pts[pts.length - 1];
+      const distanceStartEnd = Math.sqrt(
+         Math.pow(firstPt.x - lastPt.x, 2) + Math.pow(firstPt.y - lastPt.y, 2)
+      );
+      const isClosedLoop = distanceStartEnd < 45; // Must close the shape
 
-      if (meetsLengthReq && meetsCoverageReq && meetsComplexityReq) {
+      const meetsLengthReq = totalLength > 120;
+      const meetsCoverageReq = coverageX > 0.3 || coverageY > 0.3;
+
+      if (meetsLengthReq && meetsCoverageReq && isClosedLoop && angleChanges > 2) {
         setStatus("ok");
         setTimeout(() => onVerified(), 800);
       } else {
@@ -412,11 +419,11 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
   }, [points, onVerified]);
 
   const statusMessages = {
-    idle: "Draw any shape to verify humanity",
+    idle: "Draw a closed circle to verify humanity",
     drawing: "Keep drawing...",
     analyzing: "Analyzing trace geometry...",
     ok: "Human confirmed ✓",
-    fail: "Too simple — try a more complex shape",
+    fail: "Shape must be closed — connect start and end",
   };
 
   const statusColors = {
@@ -510,7 +517,7 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
 
         {/* Instructions */}
         <p className="text-center mt-2 text-[9px] font-mono text-black/40 tracking-wider">
-          Draw a loop, zigzag, or any organic shape
+          Draw a continuous circle / closed loop
         </p>
       </div>
     </motion.div>
@@ -611,9 +618,9 @@ function PostClaimMenu({ walletAddress, serial }: { walletAddress: string | null
     },
     {
       icon: <Trophy size={18} />,
-      label: "Alpha Intel Desk",
+      label: "Sovereign Alpha Terminal",
       desc: "Exclusive insights for Genesis holders",
-      href: "/alpha-intel",
+      href: "/sovereign-intel",
       primary: false,
     },
     {

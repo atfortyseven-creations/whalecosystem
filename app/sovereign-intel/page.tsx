@@ -13,7 +13,7 @@ interface AlphaInsight {
   marketSentiment: any;
 }
 
-export default function AlphaIntelPage() {
+export default function SovereignIntelPage() {
   const { address: eoaAddress } = useSovereignAccount();
   const { address: sovereignAddress } = useWalletStore();
   const walletAddress = eoaAddress || sovereignAddress;
@@ -30,17 +30,18 @@ export default function AlphaIntelPage() {
     }
 
     const checkClaimStatus = async () => {
+      const localClaim = localStorage.getItem(`hasClaimed_${walletAddress}`);
       try {
         const claimRes = await fetch(`/api/golden-ticket/claim?address=${walletAddress}`);
         const claimData = await claimRes.json();
         
-        if (!claimData.hasClaimed) {
+        if (!claimData.hasClaimed && !localClaim) {
           setAuthFailed(true);
           setLoading(false);
           return;
         }
 
-        const intelRes = await fetch(`/api/premium/alpha-intel?address=${walletAddress}`);
+        const intelRes = await fetch(`/api/premium/sovereign-intel?address=${walletAddress}`);
         const intelData = await intelRes.json();
 
         if (intelData.success) {
@@ -76,7 +77,7 @@ export default function AlphaIntelPage() {
           <Lock size={32} className="text-red-500/80 mb-6" />
           <h2 className="text-red-500 font-bold uppercase tracking-widest text-sm mb-3">Clearance Denied</h2>
           <p className="text-white/40 text-xs leading-relaxed mb-8">
-            Access to the Alpha Intel Desk requires a verified Sovereign Wallet and an active Genesis ticket.
+            Access to the Sovereign Alpha Terminal requires a verified Sovereign Wallet and an active Genesis ticket.
           </p>
           <a href="/" className="px-6 py-3 border border-red-500/30 text-red-500/80 rounded-full text-xs uppercase tracking-widest hover:bg-red-500/10 transition-colors">
             Return to Matrix
@@ -97,7 +98,7 @@ export default function AlphaIntelPage() {
       <nav className="fixed top-0 left-0 right-0 p-6 z-50 flex justify-between items-center bg-gradient-to-b from-[#050505] to-transparent">
         <div className="flex items-center gap-3">
           <ShieldAlert className="text-[#D4AF37]" size={20} />
-          <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#D4AF37]">Alpha Node Active</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#D4AF37]">Sovereign Node Active</span>
         </div>
         <div className="font-mono text-[10px] text-white/30 tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
           ID: {walletAddress?.slice(0,6)}...{walletAddress?.slice(-4)}
@@ -113,7 +114,7 @@ export default function AlphaIntelPage() {
             className="text-4xl md:text-5xl font-serif font-light tracking-wide text-[#F0E0A0]"
             style={{ textShadow: "0 0 40px rgba(212,175,55,0.2)" }}
           >
-            Alpha Intel Desk
+            Sovereign Alpha Terminal
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 1 }}
