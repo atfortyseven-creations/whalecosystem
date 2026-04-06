@@ -15,9 +15,9 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 
 
-// Configuration
-const BTC_RPC_URL = process.env.BITCOIN_RPC_URL;
-const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000; // 50k default — Elite threshold
+// Configuration — GetBlock BTC primary endpoint takes priority over legacy BITCOIN_RPC_URL
+const BTC_RPC_URL = process.env.GETBLOCK_BTC_RPC || process.env.BITCOIN_RPC_URL;
+const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
 
 
 const prisma = new PrismaClient();
@@ -309,9 +309,10 @@ async function startEvmWorker(resilient: ResilientProvider, chainLabel: string) 
   }
 }
 
-// Bitcoin Configuration (BTC Worker uses BTC_RPC_URL constant defined at top)
+// Bitcoin Configuration — BTC_RPC_URL already prioritizes GETBLOCK_BTC_RPC (set above)
 async function btcRpcCall(method: string, params: any[] = []) {
-    const urls = [BTC_RPC_URL, process.env.GETBLOCK_BTC_RPC].filter(Boolean);
+    // Deduplicate: BTC_RPC_URL === GETBLOCK_BTC_RPC (already prioritized above)
+    const urls = [...new Set([BTC_RPC_URL, process.env.GETBLOCK_BTC_RPC].filter(Boolean))] as string[];
     if (urls.length === 0) throw new Error("Bitcoin RPC URL not configured");
     
     for (const url of urls) {

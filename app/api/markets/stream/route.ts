@@ -1,77 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Redis } from 'ioredis';
 
 export const dynamic = 'force-dynamic';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-// We use a singleton loosely to avoid hitting max connections in dev
-let redis: Redis | null = null;
-try {
-   redis = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, lazyConnect: true });
-   redis.on('error', (err) => {
-       console.warn("Redis stream cache connection error:", err.message);
-   });
-} catch (e) {
-   console.warn("Could not connect to Redis for WSS streaming");
-}
+// ── In-memory cache (15s TTL) — no Redis dependency ──────────────────────────
+let _cachedMarkets: any[] | null = null;
+let _cacheTs = 0;
+const CACHE_TTL_MS = 15_000;
 
-// ── Synthetic Fallback Generator (Impervious to API Bans) ──
+// ── Synthetic Fallback Generator (Impervious to API Bans) ────────────────────
 function getBulletproofSyntheticMarkets() {
     const ASSETS = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'AVAX', 'LINK', 'DOT', 'UNI', 'MATIC'];
     const basePrices: Record<string, number> = {
-        'BTC': 67450 + Math.random() * 500,
-        'ETH': 3450 + Math.random() * 50,
-        'BNB': 580 + Math.random() * 10,
-        'SOL': 148 + Math.random() * 5,
-        'XRP': 0.52 + Math.random() * 0.02,
-        'ADA': 0.45 + Math.random() * 0.02,
-        'DOGE': 0.16 + Math.random() * 0.01,
-        'AVAX': 45 + Math.random() * 2,
+        'BTC':  83000  + Math.random() * 1000,
+        'ETH':  1600   + Math.random() * 50,
+        'BNB':  580    + Math.random() * 10,
+        'SOL':  120    + Math.random() * 5,
+        'XRP':  0.52   + Math.random() * 0.02,
+        'ADA':  0.45   + Math.random() * 0.02,
+        'DOGE': 0.16   + Math.random() * 0.01,
+        'AVAX': 20     + Math.random() * 2,
     };
-    
+
     return ASSETS.map(symbol => {
         const p = basePrices[symbol] || (Math.random() * 100);
         return {
             symbol: `${symbol}USDT`,
             lastPrice: p.toFixed(symbol === 'BTC' || symbol === 'ETH' ? 2 : 4),
             priceChangePercent: ((Math.random() * 10) - 5).toFixed(2),
-            quoteVolume: (p * 1000000 * Math.random()).toFixed(2),
+            quoteVolume: (p * 1_000_000 * Math.random()).toFixed(2),
         };
     });
 }
 
-export async function GET(req: NextRequest) {
-    let marketData;
-    
+export async function GET(_req: NextRequest) {
+    // ── Serve from in-memory cache if fresh ───────────────────────────────────
+    if (_cachedMarkets && Date.now() - _cacheTs < CACHE_TTL_MS) {
+        return NextResponse.json(
+            { success: true, timestamp: _cacheTs, data: _cachedMarkets },
+            { headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+        );
+    }
+
+    let marketData: any[] | null = null;
+
     try {
-        if (redis && redis.status === 'ready') {
-            const raw = await redis.get('institutional_markets_cache');
-            if (raw) marketData = JSON.parse(raw);
-        }
-        
-        if (!marketData) {
-            const binanceRes = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
-            if (binanceRes.ok) {
-                marketData = await binanceRes.json();
-            } else {
-                marketData = getBulletproofSyntheticMarkets();
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 5000);
+        const binanceRes = await fetch('https://api.binance.com/api/v3/ticker/24hr', {
+            cache: 'no-store',
+            signal: controller.signal,
+        });
+        clearTimeout(id);
+        if (binanceRes.ok) {
+            const raw = await binanceRes.json();
+            if (Array.isArray(raw) && raw.length > 0) {
+                marketData = raw;
             }
         }
-    } catch (e) {
+    } catch {
+        // Silently fall through to synthetic
+    }
+
+    if (!marketData || !Array.isArray(marketData) || marketData.length === 0) {
         marketData = getBulletproofSyntheticMarkets();
     }
 
-    if (!marketData || !Array.isArray(marketData)) {
-        marketData = getBulletproofSyntheticMarkets();
-    }
+    // Update in-memory cache
+    _cachedMarkets = marketData;
+    _cacheTs = Date.now();
 
-    return NextResponse.json({
-        success: true,
-        timestamp: Date.now(),
-        data: marketData
-    }, {
-        headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-        }
-    });
+    return NextResponse.json(
+        { success: true, timestamp: _cacheTs, data: marketData },
+        { headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
+    );
 }
