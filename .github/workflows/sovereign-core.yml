@@ -1,0 +1,49 @@
+name: Sovereign Core CI/CD
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  backend-compilation:
+    name: Backend Build & Integrity
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.11.0'
+          cache: 'npm'
+
+      - name: Install Pure Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Compile ZK Circuits & Contracts
+        run: npx hardhat compile
+
+      - name: Execute Strict Typing Validation
+        run: npx tsc --noEmit
+
+      - name: Dry Build Next.js
+        run: cross-env NODE_OPTIONS="--max-old-space-size=4096" next build
+        env:
+          NEXT_PUBLIC_IGNORE_WARNINGS: "true"
+
+  security-audit:
+    name: Slither Smart Contract Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Slither
+        run: pip3 install slither-analyzer
+      - name: Run Audit
+        run: slither . --print human-summary || true

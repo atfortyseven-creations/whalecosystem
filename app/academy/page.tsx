@@ -1,69 +1,62 @@
-"use client";
+import React from "react";
+import { Metadata } from "next";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { AcademyViewer } from '@/components/academy/AcademyViewer';
-import { Shield, Cpu, TrendingUp, Lock, BookOpen, AlertTriangle } from 'lucide-react';
-import { InstitutionalShell } from "@/components/shared/InstitutionalShell";
-import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
-import "@/app/dashboard/dashboard.css";
+export const metadata: Metadata = {
+  title: "Sovereign Academy | EVM Thermodynamics & ZK Logic",
+  description: "Educational matrix for the Sovereign Protocol. Master EVM trace monitoring, Zero-Knowledge proofs under Aztec L2, and transient state manipulation.",
+};
 
-
-
-// ─── WHALE HERO ───
-function WhaleAcademyHero() {
+export default function AcademyPage() {
   return (
-    <div className="relative flex-shrink-0 flex flex-col items-center justify-center pt-20 pb-8 px-6 text-center bg-[#FAF9F6] border-b border-[#E5E5E5]">
-      
-      {/* ── DISCLAIMER BANNER ── */}
-      <div className="w-full bg-[#f59e0b] shadow-md border-b-2 border-black/10 py-3 px-4 flex items-center justify-center gap-3 relative z-[60] mb-8">
-        <AlertTriangle size={18} className="text-[#111111]" strokeWidth={2.5} />
-        <span className="text-xs sm:text-sm font-black font-mono tracking-widest uppercase text-[#111111]" style={{ fontWeight: 900 }}>
-          NO RELIANCE / EDUCATIONAL PURPOSES ONLY DISCLAIMER: Information provided is NOT financial advice.
-        </span>
-      </div>
-      
-      {/* Subtle grid backdrop for institutional feel */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg,#111111 0,#111111 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#111111 0,#111111 1px,transparent 1px,transparent 40px)' }} />
-
-      {/* Corporate Whale Logo */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative mb-6"
-      >
-        <div className="w-[80px] h-[80px] bg-white rounded-2xl flex items-center justify-center shadow-xl p-2 mx-auto border border-black/5">
-          <CorporateWhaleLogo className="w-full h-full" />
+    <div className="min-h-screen bg-[#050505] text-white/80 selection:bg-[var(--aztec-orchid)]/30 font-sans pb-32 pt-28 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-16">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/10 text-[10px] font-mono uppercase tracking-[0.2em] font-semibold text-white/60 mb-8 bg-white/5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--aztec-orchid)]" /> 
+            The Sovereign Academy
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+            EVM Thermodynamics & <br />
+            <span className="text-[var(--aztec-orchid)]">Cryptographic Intelligence</span>
+          </h1>
+          <p className="text-lg text-white/50 max-w-2xl leading-relaxed">
+            Theoretical mastery is the prerequisite for deterministic execution. The modules below dictate the base physical limitations of decentralized protocols.
+          </p>
         </div>
-      </motion.div>
 
-      {/* Title block */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-        className="relative z-10"
-      >
-        <h1 className="font-sans font-black text-5xl md:text-6xl text-[#111111] tracking-tighter leading-none mb-4 mt-3">
-          Whale Academy
-        </h1>
-        <p className="font-sans text-sm text-[#888888] font-bold max-w-md mx-auto leading-relaxed">
-          Institutional-grade education for the sovereign on-chain operator. From ZK fundamentals to deep protocol analysis.
-        </p>
-      </motion.div>
-
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AcademyModule 
+                title="1. Aztec L2 Zero-Knowledge Circuits" 
+                desc="Mastering fractional rollups and the circomlibjs boundary. Understanding how to prove authority without linking root addresses to the Terminal session."
+            />
+            <AcademyModule 
+                title="2. EVM Mempool Thermodynamics" 
+                desc="Execution traces based on EIP-2929. Tracking SLOAD and SSTORE geometrical gas costs to evaluate incoming institutional logic execution."
+            />
+             <AcademyModule 
+                title="3. Transient State Analysis (EIP-1153)" 
+                desc="Reentrancy architectures mapped via TSTORE memory. Decoding volatile variables used by top-tier Dark Pool smart contracts."
+            />
+            <AcademyModule 
+                title="4. Neo4j Institutional Graph" 
+                desc="Navigating deep-nested cross-chain associations. Tracing multi-step liquidity bridging directly from cold-storage into Hyperliquid margins."
+            />
+        </div>
+      </div>
     </div>
   );
 }
 
-export default function AcademyPage() {
-  return (
-    <InstitutionalShell title="Whale Academy" fullWidth>
-      <WhaleAcademyHero />
-      <AcademyViewer />
-    </InstitutionalShell>
-  );
+function AcademyModule({ title, desc }: { title: string, desc: string }) {
+    return (
+        <div className="border border-white/10 p-8 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors">
+            <h3 className="text-xl font-semibold text-white mb-4">{title}</h3>
+            <p className="text-[14px] text-white/50 leading-relaxed font-mono">
+                {desc}
+            </p>
+            <div className="mt-8 flex justify-end">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--aztec-orchid)]">Initialize Module &rarr;</span>
+            </div>
+        </div>
+    );
 }

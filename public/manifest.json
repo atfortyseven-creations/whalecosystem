@@ -6,7 +6,9 @@
   "display": "standalone",
   "background_color": "#FAF9F6",
   "theme_color": "#FAF9F6",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "id": "/?source=pwa",
   "icons": [
     {
       "src": "/official-whale-monochrome.png",

@@ -8,6 +8,48 @@ This document serves as the absolute blueprint and master photograph of the Whal
 ## 🏛️ 1. MACRO-ARCHITECTURE OVERVIEW
 The Whale Alert Portal is not merely a wallet; it is a **High-Frequency On-Chain Intelligence Terminal**. It fuses Zero-Knowledge identity verification (WorldID), real-time Ethereum/Base mempool telemetry, predictive markets (Polymarket), and elite-grade portfolio analytics into a single seamless interface.
 
+### Topology Matrix
+```mermaid
+graph TD
+    subgraph EVM Base Layer
+        Mem[Mempool Streams]
+        Blk[Confirmed Blocks]
+    end
+
+    subgraph Sovereign Desktop Vault
+        Daemon[SovereignVault_RUN.bat]
+        Wrk[Whale Worker Nodes]
+        Prisma[(PostgreSQL State)]
+        Neo[(Neo4j Graph)]
+        Redis[(Upstash PubSub)]
+    end
+
+    subgraph ZK Security Layer
+        Cir[circomlibjs Circuits]
+        Hnd[QR Handshake Protocol]
+    end
+
+    subgraph User Devices
+        Nxt[Next.js 15 Web/Desktop]
+        Pwa[iOS/Android PWA Offline]
+    end
+
+    Mem -->|Alchemy gRPC| Wrk
+    Blk -->|Alchemy gRPC| Wrk
+    Wrk -->|Z-Score Eval| Neo
+    Wrk --> Prisma
+    Wrk -->|vitals.tx.new| Redis
+    
+    Redis --> Daemon
+    Prisma --> Daemon
+    Neo --> Daemon
+
+    Daemon -->|Locally Hosted Hub| Cir
+    Cir -->|Zero Knowledge Verified| Nxt
+    Daemon -->|E2EE Tunnel| Hnd
+    Hnd --> Pwa
+```
+
 ### 🧠 State & Persistence Layer
 - **PostgreSQL - Prisma ORM**: Primary relational store for user profiles, identity mappings, and transaction metadata.
 - **MongoDB - Mongoose**: Dynamic storage for Polymarket event data and complex market indices.
