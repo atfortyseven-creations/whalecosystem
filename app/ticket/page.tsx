@@ -415,13 +415,16 @@ function InstitutionalAtmosphere() {
 
 
 // --- 5. IMMERSIVE GROSS 1 CINEMATIC ROOT ---
+import useSWR from "swr";
 
 export default function GoldenTicketPage() {
     const { address: eoaAddress } = useSovereignAccount();
     const { address: sovereignAddress } = useWalletStore();
     const walletAddress = eoaAddress || sovereignAddress;
 
-    const [globalCount, setGlobalCount] = useState<number>(10);
+    const { data: countData, mutate: mutateCount } = useSWR('/api/golden-ticket/count', url => fetch(url).then(res => res.json()), { refreshInterval: 2500 });
+    const globalCount = countData?.count !== undefined ? countData.count : 10;
+
     const [isHumanVerified, setIsHumanVerified] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
     const [hasClaimed, setHasClaimed] = useState(false);
@@ -429,10 +432,6 @@ export default function GoldenTicketPage() {
 
     // Initial DB Poll & Setup
     useEffect(() => {
-        fetch('/api/golden-ticket/claim?address=0x0000').then(res => res.json()).then(data => {
-            if(data.totalClaimed !== undefined) setGlobalCount(data.totalClaimed);
-        }).catch(()=>{});
-
         if (walletAddress) {
              const localClaim = localStorage.getItem(`hasClaimed_${walletAddress}`);
              if (localClaim) {
@@ -471,7 +470,7 @@ export default function GoldenTicketPage() {
              
              // Advance Sequence
              setTimeout(() => {
-                 setGlobalCount(prev => prev + 1);
+                 mutateCount();
              }, 3000);
 
              setTimeout(() => {

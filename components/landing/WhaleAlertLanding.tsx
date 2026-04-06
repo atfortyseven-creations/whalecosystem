@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 import {
   BookOpen, Network, Shield, Database,
-  Cpu, ArrowRight, Lock, Zap, Eye, Globe, Activity
+  Cpu, ArrowRight, Lock, Zap, Eye, Globe, Activity, Check
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
@@ -303,6 +303,7 @@ export function WhaleAlertLanding() {
   const { openConnectModal } = useUIStore();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showClearance, setShowClearance] = useState(false);
+  const [showDocumentGate, setShowDocumentGate] = useState(false);
   const [mouse, setMouse] = useState<[number, number]>([0, 0]);
 
   // Lenis smooth scroll
@@ -336,6 +337,19 @@ export function WhaleAlertLanding() {
   }, []);
 
   const handleEntry = useCallback(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("hasReadDocs") === "true") {
+        if (isConnected) router.push("/vip");
+        else openConnectModal();
+    } else {
+        setShowDocumentGate(true);
+    }
+  }, [isConnected, router, openConnectModal]);
+
+  const executeSystemEntry = useCallback(() => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem("hasReadDocs", "true");
+    }
+    setShowDocumentGate(false);
     if (isConnected) router.push("/vip");
     else openConnectModal();
   }, [isConnected, router, openConnectModal]);
@@ -681,6 +695,38 @@ export function WhaleAlertLanding() {
       <div className="relative z-10"><Footer /></div>
 
       <DynamicCryptoCheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
+
+      {/* DOCUMENT GATE MODAL */}
+      <AnimatePresence>
+        {showDocumentGate && (
+          <div className="fixed inset-0 z-[9999] bg-[#FAF9F6]/80 backdrop-blur-xl flex items-center justify-center p-4">
+            <motion.div initial={{opacity:0, y:20, scale:0.95}} animate={{opacity:1, y:0, scale:1}} exit={{opacity:0, scale:0.95, y:20}} className="bg-white border border-[#E5E5E5] p-8 md:p-10 rounded-[2rem] max-w-2xl w-full shadow-2xl flex flex-col max-h-[85vh]">
+              <div className="flex items-center gap-3 mb-2">
+                 <Shield className="text-[#050505]" size={24} />
+                 <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-[#050505] leading-none">Sovereign Integrity Gate</h2>
+              </div>
+              <p className="text-[10px] text-black/50 mb-6 font-mono uppercase tracking-widest pl-9">Authorization Required before proceeding</p>
+              
+              <div className="flex-1 overflow-y-auto mb-8 p-6 bg-[#F5F5F5]/60 border border-black/5 rounded-2xl text-[13px] font-medium leading-[1.8] custom-scrollbar" style={{ color: "rgba(5,5,5,0.7)" }}>
+                 <p className="mb-4">You are about to initiate execution protocols within the <strong className="text-black font-bold">Whale Alert Network Matrix</strong>. By accessing this terminal, you explicitly acknowledge that all stochastic tracking metrics, on-chain intelligence flows, and synthetic neural estimations are presented as pure informational entropy and do not constitute financial advice.</p>
+                 <p className="mb-4">The Sovereign Node architecture strictly enforces absolute Zero-Trust parameters. All cryptographic and heuristic keys are maintained exclusively on your native client. The central database operates as a blind relay and never retains identifiable behavioral markers beyond aggregated cryptographic hashes.</p>
+                 <p className="mb-4">By accepting these postulates, you mathematically verify your intent to utilize these mechanisms solely according to deterministic institutional observation frameworks.</p>
+                 <div className="h-10" />
+                 <p className="font-black text-black uppercase tracking-widest text-[10px] border-t border-black/10 pt-4 flex items-center gap-2">
+                    <Check size={12} /> END OF MANUSCRIPT.
+                 </p>
+              </div>
+
+              <div className="flex gap-4">
+                <button onClick={() => setShowDocumentGate(false)} className="px-6 py-4 border border-[#E5E5E5] text-black font-semibold uppercase tracking-widest text-[10px] rounded-2xl hover:bg-[#F5F5F5] transition-colors">DECLINE</button>
+                <button onClick={executeSystemEntry} className="flex-1 py-4 bg-[#050505] text-white font-semibold uppercase tracking-widest text-[10px] rounded-2xl shadow-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+                   ACCEPT & ENTER SYSTEM <ArrowRight size={14} />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

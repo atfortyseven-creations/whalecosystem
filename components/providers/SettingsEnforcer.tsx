@@ -1,12 +1,18 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '@/lib/store/settings-store';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useWalletStore } from '@/lib/store/wallet-store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network } from 'lucide-react';
 
 export function SettingsEnforcer() {
-    const { theme, testnetMode } = useSettingsStore();
+    const { address: eoaAddress } = useSovereignAccount();
+    const { address: sovereignAddress } = useWalletStore();
+    const walletAddress = eoaAddress || sovereignAddress;
+
+    const { theme, currency, language, showBalances, allowAnalytics, testnetMode } = useSettingsStore();
 
     // Enforce Theme (Dark mode classes on HTML)
     useEffect(() => {
@@ -24,6 +30,46 @@ export function SettingsEnforcer() {
             }
         }
     }, [theme]);
+
+    const initialSyncDone = useRef(false);
+
+    // 1. PULL settings on connect
+    useEffect(() => {
+        if (walletAddress && !initialSyncDone.current) {
+            fetch(`/api/settings?address=${walletAddress}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && !data.error) {
+                        useSettingsStore.setState({
+                            theme: data.theme,
+                            currency: data.currency,
+                            language: data.language,
+                            showBalances: data.showBalances,
+                            allowAnalytics: data.allowAnalytics,
+                            testnetMode: data.testnetMode
+                        });
+                        initialSyncDone.current = true;
+                    }
+                }).catch(console.error);
+        }
+    }, [walletAddress]);
+
+    // 2. PUSH settings on change
+    useEffect(() => {
+        if (walletAddress && initialSyncDone.current) {
+            const timeout = setTimeout(() => {
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        walletAddress, theme, currency, language, showBalances, allowAnalytics, testnetMode
+                    })
+                }).catch(console.error);
+            }, 1000); // 1s sync debounce
+            return () => clearTimeout(timeout);
+        }
+    }, [walletAddress, theme, currency, language, showBalances, allowAnalytics, testnetMode]);
+
 
     return (
         <AnimatePresence>

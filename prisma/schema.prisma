@@ -79,16 +79,24 @@ model EcosystemWarRoomData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model User {
-  id            String      @id @default(uuid())
-  walletAddress String      @unique
-  isPro         Boolean     @default(false)
+  id              String      @id @default(uuid())
+  walletAddress   String      @unique
+  isPro           Boolean     @default(false)
   goldTicketTokenId String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   
-  watchlists    Watchlist[]
-  alerts        Alert[]
-  progress      UserProgress[]
+  // Environment Variables (Unique Per User)
+  theme           String      @default("light")
+  currency        String      @default("USD")
+  language        String      @default("es-ES")
+  showBalances    Boolean     @default(true)
+  allowAnalytics  Boolean     @default(true)
+  testnetMode     Boolean     @default(false)
+  
+  watchlists      Watchlist[]
+  alerts          Alert[]
+  progress        UserProgress[]
 }
 
 model Watchlist {

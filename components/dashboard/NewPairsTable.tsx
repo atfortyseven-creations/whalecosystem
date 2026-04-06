@@ -30,14 +30,29 @@ export function NewPairsTable() {
     const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
     const fetchPairs = useCallback(async () => {
         try {
-            const res = await fetch('/api/market/new-pairs?limit=25');
+            // Parallel: DexScreener (existing) + EP3 GetBlock WebSocket buffer
+            const [res, liveRes] = await Promise.all([
+                fetch('/api/market/new-pairs?limit=25'),
+                fetch('/api/market/new-pairs/live'),
+            ]);
+
+            const liveData = liveRes.ok ? await liveRes.json() : { pairs: [] };
+            const livePairs: any[] = liveData.pairs || [];
+
             if (res.ok) {
                 const data = await res.json();
                 if (data.pairs && data.pairs.length > 0) {
-                    setPairs(data.pairs);
+                    // EP3 live pairs prepended — they are the genuinely newest
+                    const merged = [...livePairs, ...data.pairs].slice(0, 50);
+                    setPairs(merged);
                     setLastRefresh(new Date());
                     return;
                 }
+            }
+            // Fallback: at least show live EP3 pairs
+            if (livePairs.length > 0) {
+                setPairs(livePairs);
+                setLastRefresh(new Date());
             }
         } catch (e) {
             console.error('Error fetching pairs', e);
@@ -48,9 +63,74 @@ export function NewPairsTable() {
 
     useEffect(() => {
         fetchPairs();
-        const interval = setInterval(fetchPairs, 8000);
+        const interval = setInterval(fetchPairs, 15000); // Reduced polling — SSE handles live updates
         return () => clearInterval(interval);
     }, [fetchPairs]);
+
+    // ── EP3 SSE: real-time UniswapV3 PoolCreated events ──────────────────────
+    useEffect(() => {
+        let es: EventSource | null = null;
+        try {
+            es = new EventSource('/api/market/new-pairs/sse');
+
+            es.addEventListener('message', (e) => {
+                try {
+                    const msg = JSON.parse(e.data);
+                    if (msg.type === 'NEW_PAIR') {
+                        // Convert EP3 raw event to table shape
+                        const newPair = {
+                            id:          msg.pool,
+                            chain:       'ethereum',
+                            dex:         `Uniswap V3 (${(msg.fee / 10000).toFixed(2)}% fee)`,
+                            baseToken: {
+                                symbol: `${msg.token0.slice(2, 6).toUpperCase()}`,
+                                name:   `Token ${msg.token0.slice(2, 8)}`,
+                            },
+                            quoteToken: { symbol: 'ETH' },
+                            priceUsd:    '0.0000',
+                            pairCreatedAt: msg.timestamp,
+                            priceChange:   { m5: 0, h1: 0, h6: 0, h24: 0 },
+                            liquidity:     { usd: 0 },
+                            mcap:          0, fdv: 0,
+                            txns:          { m5: { buys: 0, sells: 0 } },
+                            traders:       { makers: 1, snipers: 0 },
+                            feeTier:       msg.fee,
+                            security: { score: 88, honeypotRisk: false, lpBurned: false, mintRevoked: false },
+                            taxes: { buy: 0, sell: 0 },
+                        };
+                        setPairs(prev => [newPair, ...prev].slice(0, 100));
+                        setLastRefresh(new Date());
+                    } else if (msg.type === 'HISTORY' && Array.isArray(msg.pairs)) {
+                        // Initial buffer from EP3 engine
+                        const histPairs = msg.pairs.map((ev: any, i: number) => ({
+                            id:          ev.pool,
+                            chain:       'ethereum',
+                            dex:         `Uniswap V3`,
+                            baseToken: { symbol: ev.token0.slice(2, 6).toUpperCase(), name: `Token ${ev.token0.slice(2, 8)}` },
+                            quoteToken:  { symbol: 'ETH' },
+                            priceUsd:    '0.0000',
+                            pairCreatedAt: ev.timestamp,
+                            priceChange:   { m5: 0, h1: 0, h6: 0, h24: 0 },
+                            liquidity:     { usd: 0 },
+                            mcap: 0, fdv: 0,
+                            txns: { m5: { buys: 0, sells: 0 } },
+                            traders: { makers: 1, snipers: 0 },
+                            feeTier: ev.fee,
+                            security: { score: 88, honeypotRisk: false, lpBurned: false, mintRevoked: false },
+                            taxes: { buy: 0, sell: 0 },
+                        }));
+                        setPairs(prev => [...histPairs, ...prev].slice(0, 100));
+                    }
+                } catch {}
+            });
+
+            es.onerror = () => {
+                // SSE will auto-reconnect; silently ignore errors
+            };
+        } catch {}
+
+        return () => { es?.close(); };
+    }, []);
 
     const fmt = (n: number) => {
         if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;

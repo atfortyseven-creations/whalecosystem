@@ -103,12 +103,24 @@ const createOptimizedTransport = (primaryUrl: string, fallbackUrl?: string) => {
 
 // ─── HYPER-OPTIMIZED VIEM CLIENTS ─────────────────────────────────────────────
 
-// GetBlock INSANE CU Optimization (Primary) + Alchemy (Fallback)
+// GetBlock EP1 JSON-RPC (User Portfolio / primary reads) + EP4 (Market Intel) + Alchemy (Fallback)
+const GETBLOCK_EP1 = process.env.GETBLOCK_ETH_RPC_1 || 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8';
+const GETBLOCK_EP4 = process.env.GETBLOCK_ETH_RPC_4 || 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c';
+
 export const mainnetClient = createPublicClient({
     chain: mainnet,
     transport: createOptimizedTransport(
-        'https://go.getblock.io/31aef531b4e444f5bde76196502679da',
+        GETBLOCK_EP1,
         `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
+    )
+});
+
+// Dedicated market-intel client using EP4 (slot0/getReserves calls)
+export const marketIntelClient = createPublicClient({
+    chain: mainnet,
+    transport: createOptimizedTransport(
+        GETBLOCK_EP4,
+        GETBLOCK_EP1  // Fallback to EP1 if EP4 is rate-limited
     )
 });
 

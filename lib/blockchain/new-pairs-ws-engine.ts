@@ -1,0 +1,123 @@
+/**
+ * GetBlock WebSocket New Pairs Engine — EP3
+ * Subscribes to UniswapV3 PoolCreated events in real time.
+ * Factory: 0x1F98431c8aD98523631AE4a59f267346ea31F984
+ * Event:   PoolCreated(address,address,uint24,int24,address)
+ * Uses: wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a
+ */
+
+import WebSocket from 'ws';
+
+const WS_URL = process.env.GETBLOCK_ETH_WS_3!;
+
+// UniswapV3 Factory
+const UNISWAP_V3_FACTORY  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'.toLowerCase();
+const POOL_CREATED_TOPIC   = '0x783cca1c0412dd0d695e784568c96da2e9c22ff989357a2e8b1d9b2b4e6b7118';
+
+export interface NewPairEvent {
+    pool:        string;
+    token0:      string;
+    token1:      string;
+    fee:         number;       // 500 = 0.05%, 3000 = 0.3%, 10000 = 1%
+    blockNumber: number;
+    txHash:      string;
+    timestamp:   number;
+}
+
+type PairListener = (event: NewPairEvent) => void;
+
+class NewPairsWebSocketEngine {
+    private ws:       WebSocket | null = null;
+    private listeners: Set<PairListener> = new Set();
+    private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    // In-memory buffer of latest new pairs (last 50)
+    public  buffer:   NewPairEvent[] = [];
+
+    connect() {
+        if (this.ws?.readyState === WebSocket.OPEN) return;
+
+        this.ws = new WebSocket(WS_URL);
+
+        this.ws.on('open', () => {
+            console.info('[NewPairsEngine] GetBlock WS connected (EP3)');
+            this.ws!.send(JSON.stringify({
+                jsonrpc: '2.0', id: 1,
+                method:  'eth_subscribe',
+                params:  [
+                    'logs',
+                    {
+                        address: UNISWAP_V3_FACTORY,
+                        topics:  [POOL_CREATED_TOPIC],
+                    }
+                ],
+            }));
+        });
+
+        this.ws.on('message', (raw: Buffer) => {
+            try {
+                const msg = JSON.parse(raw.toString());
+                if (msg.method === 'eth_subscription' && msg.params?.result) {
+                    this.handleLog(msg.params.result);
+                }
+            } catch { /* ignore */ }
+        });
+
+        this.ws.on('close', () => {
+            console.warn('[NewPairsEngine] WS closed — reconnecting in 5s');
+            this.scheduleReconnect();
+        });
+
+        this.ws.on('error', (err) => {
+            console.error('[NewPairsEngine] WS error:', err.message);
+        });
+    }
+
+    private handleLog(log: any) {
+        const topics = log.topics || [];
+        if (topics.length < 3) return;
+
+        // PoolCreated non-indexed args are ABI-encoded in data:
+        // data = fee (uint24, 32 bytes) | tickSpacing (int24, 32 bytes) | pool (address, 32 bytes)
+        const data = log.data || '0x';
+        const fee        = parseInt(data.slice(2, 66), 16);
+        const pool       = '0x' + data.slice(154, 194);    // last 20 bytes of third word
+
+        const token0 = '0x' + topics[1].slice(26);
+        const token1 = '0x' + topics[2].slice(26);
+
+        const event: NewPairEvent = {
+            pool,
+            token0,
+            token1,
+            fee,
+            blockNumber: parseInt(log.blockNumber, 16),
+            txHash:      log.transactionHash,
+            timestamp:   Date.now(),
+        };
+
+        // Push to buffer, cap at 50
+        this.buffer = [event, ...this.buffer].slice(0, 50);
+        this.listeners.forEach(fn => fn(event));
+    }
+
+    private scheduleReconnect() {
+        if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = setTimeout(() => this.connect(), 5000);
+    }
+
+    subscribe(fn: PairListener) {
+        this.listeners.add(fn);
+        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            this.connect();
+        }
+        return () => this.listeners.delete(fn);
+    }
+
+    disconnect() {
+        if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        this.ws?.close();
+        this.ws = null;
+    }
+}
+
+export const newPairsEngine = new NewPairsWebSocketEngine();

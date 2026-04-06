@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     Wallet, TrendingUp, ArrowUpRight, ArrowDownRight, RefreshCw,
@@ -58,6 +58,7 @@ export function WhalePortfolio() {
     const [view, setView] = useState<'leaderboard' | 'portfolio'>('leaderboard');
     const [search, setSearch] = useState('');
     const [lastUpdated, setLastUpdated] = useState(new Date());
+    const [liveWhaleCount, setLiveWhaleCount] = useState(0); // EP2 live counter
 
     // Real wallet address from wagmi
     const { address, isConnected } = useAccount();
@@ -67,28 +68,65 @@ export function WhalePortfolio() {
         { refreshInterval: 12000, suspense: false }
     );
 
-    // Real on-chain portfolio — only fetches when wallet is connected
+    // Real on-chain portfolio — EP1 — only fetches when wallet is connected
     const { data: portfolioData, isLoading: portfolioLoading, mutate: mutatePortfolio } = useSWR(
         isConnected && address ? `/api/user/portfolio?address=${address}` : null,
         fetcher,
         { refreshInterval: 30000, suspense: false }
     );
 
+    // EP4: Real on-chain prices from UniswapV3 slot0()
+    const { data: priceData } = useSWR(
+        '/api/market/prices', fetcher,
+        { refreshInterval: 60000, suspense: false }
+    );
+
+    // Enrich portfolio tokens with EP4 on-chain prices where available
+    const ep4Prices: Record<string, number> = priceData?.prices || {};
+
     const whales: WhaleEntity[] = whaleData?.entities || [];
 
-    // Map real portfolio tokens from on-chain response
-    const PORTFOLIO_TOKENS: PortfolioToken[] = (portfolioData?.tokens || []).map((t: any) => ({
-        symbol: t.symbol || '?',
-        name: t.name || t.symbol,
-        balance: parseFloat(t.balance || '0'),
-        priceUSD: t.usdPrice || 0,
-        valueUSD: t.usdValue || 0,
-        change24h: t.change24h || 0,
-        allocation: t.portfolioPct || 0,
-        chain: (t.chain || 'ethereum').toLowerCase(),
-    }));
+    // Map real portfolio tokens from on-chain response (EP1), enriched with EP4 prices
+    const PORTFOLIO_TOKENS: PortfolioToken[] = (portfolioData?.tokens || []).map((t: any) => {
+        const onChainPrice = ep4Prices[t.symbol];
+        const priceUSD = onChainPrice || t.usdPrice || 0;
+        const valueUSD = t.balance * priceUSD;
+        return {
+            symbol: t.symbol || '?',
+            name: t.name || t.symbol,
+            balance: parseFloat(t.balance || '0'),
+            priceUSD,
+            valueUSD,
+            change24h: t.change24h || 0,
+            allocation: t.portfolioPct || 0,
+            chain: (t.chain || 'ethereum').toLowerCase(),
+        };
+    });
 
     const totalValue = PORTFOLIO_TOKENS.reduce((s, t) => s + t.valueUSD, 0);
+
+    // Recalculate allocation after EP4 price enrichment
+    if (totalValue > 0) {
+        PORTFOLIO_TOKENS.forEach(t => { t.allocation = (t.valueUSD / totalValue) * 100; });
+    }
+
+    // ── EP2 SSE: count live whale transfers in real time ───────────────────────
+    useEffect(() => {
+        let es: EventSource | null = null;
+        try {
+            es = new EventSource('/api/whales/sse');
+            es.addEventListener('message', (e) => {
+                try {
+                    const msg = JSON.parse(e.data);
+                    if (msg.type === 'WHALE_TX') {
+                        setLiveWhaleCount(c => c + 1);
+                        setLastUpdated(new Date());
+                    }
+                } catch {}
+            });
+        } catch {}
+        return () => { es?.close(); };
+    }, []);
 
     // Derive dynamic stats from real whale data
     const totalAUM    = whales.reduce((s, w) => s + (w.netWorthUSD || 0), 0);
@@ -146,6 +184,13 @@ export function WhalePortfolio() {
                             </button>
                         ))}
                     </div>
+                    {/* EP2 Live whale counter badge */}
+                    {liveWhaleCount > 0 && (
+                        <span className="flex items-center gap-1.5 px-2.5 py-1 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-lg text-[9px] font-black text-[#D4AF37] uppercase tracking-widest">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"/>
+                            {liveWhaleCount} live · EP2
+                        </span>
+                    )}
                     <div className="relative flex-1 min-w-[160px] max-w-xs">
                         <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]"/>
                         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search whale or entity…"

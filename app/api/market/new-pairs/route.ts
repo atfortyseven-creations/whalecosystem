@@ -97,54 +97,5 @@ export async function GET(req: Request) {
         console.error('[NEW-PAIRS] DexScreener fetch failed:', e);
     }
 
-    // ── Fallback: Binance 24h ticker → emulate as "new pairs" ──
-    try {
-        const binRes = await fetch(
-            'https://api.binance.com/api/v3/ticker/24hr',
-            { cache: 'no-store', signal: AbortSignal.timeout(6000) }
-        );
-        if (binRes.ok) {
-            const data = await binRes.json();
-            const usdtPairs = (data as any[])
-                .filter(d => d.symbol.endsWith('USDT') && parseFloat(d.quoteVolume) > 100000)
-                .slice(0, limit);
-
-            const pairs = usdtPairs.map((d: any, i: number) => ({
-                id: d.symbol + '_BIN',
-                chain: i % 3 === 0 ? 'ethereum' : i % 3 === 1 ? 'bsc' : 'solana',
-                dex: i % 3 === 0 ? 'Uniswap V3' : i % 3 === 1 ? 'PancakeSwap' : 'Raydium',
-                baseToken: {
-                    symbol: d.symbol.replace('USDT', ''),
-                    name: d.symbol.replace('USDT', '') + ' Token',
-                },
-                quoteToken: { symbol: 'USDT' },
-                priceUsd: parseFloat(d.lastPrice).toFixed(parseFloat(d.lastPrice) < 0.001 ? 8 : 4),
-                pairCreatedAt: Date.now() - (i * 720000),
-                priceChange: {
-                    m5:  0,
-                    h1:  parseFloat(d.priceChangePercent) / 24,
-                    h6:  parseFloat(d.priceChangePercent) / 4,
-                    h24: parseFloat(d.priceChangePercent),
-                },
-                liquidity: { usd: parseFloat(d.quoteVolume) * 0.08 },
-                mcap: parseFloat(d.quoteVolume) * 0.4,
-                fdv:  parseFloat(d.quoteVolume) * 0.5,
-                txns: {
-                    m5: {
-                        buys:  Math.floor(parseInt(d.count || '0') / 1440),
-                        sells: Math.floor(parseInt(d.count || '0') / 1600),
-                    },
-                },
-                traders: { makers: Math.floor(parseInt(d.count || '0') / 100) || 1, snipers: 0 },
-                security: { score: 85, honeypotRisk: false, lpBurned: true, mintRevoked: true },
-                taxes: { buy: 0, sell: 0 },
-            }));
-
-            return NextResponse.json({ pairs, source: 'binance_fallback' });
-        }
-    } catch (e) {
-        console.error('[NEW-PAIRS] Binance fallback failed:', e);
-    }
-
-    return NextResponse.json({ pairs: [] }, { status: 503 });
+    return NextResponse.json({ pairs: [], fallback: 'none' }, { status: 503 });
 }

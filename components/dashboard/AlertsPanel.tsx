@@ -8,7 +8,6 @@ import {
     Activity, Target, Clock, CheckCircle, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { io } from 'socket.io-client';
 
 type AlertType = 'PRICE_ABOVE' | 'PRICE_BELOW' | 'VOLUME_SPIKE' | 'WHALE_MOVE' | 'PERCENT_CHANGE';
 type AlertStatus = 'ACTIVE' | 'TRIGGERED' | 'PAUSED';
@@ -180,8 +179,12 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
         </div>
     );
 }
+import { useAccount } from 'wagmi';
+
+// ... other imports
 
 export function AlertsPanel() {
+    const { address } = useAccount();
     const [alerts, setAlerts] = useState<AlertRule[]>([]);
     const [showCreate, setShowCreate] = useState(false);
     const [filter, setFilter] = useState<'ALL' | AlertStatus>('ALL');
@@ -190,7 +193,11 @@ export function AlertsPanel() {
     const refresh = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/alerts');
+            if (!address) {
+                setAlerts([]);
+                return;
+            }
+            const res = await fetch(`/api/alerts?address=${address}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data.alerts && data.alerts.length > 0) {
@@ -211,59 +218,63 @@ export function AlertsPanel() {
                     return;
                 }
             }
-            throw new Error("Missing real alert data");
+            setAlerts([]); // If no alerts, empty list is fine
         } catch (e) {
             console.error('Error fetching alerts', e);
         } finally { setLoading(false); }
     };
 
-    useEffect(() => { refresh(); }, []);
+    useEffect(() => { refresh(); }, [address]);
 
-    // ── WebSocket live feed from background daemon ─────────────────────────
+    // ── EP2 SSE: real-time whale transfers from GetBlock WebSocket ─────────────
     useEffect(() => {
-        // Connect to the same origin as the app — avoids connecting to undefined
-        const socketUrl = typeof window !== 'undefined' ? window.location.origin : '';
-        if (!socketUrl) return;
-        let socket: ReturnType<typeof io> | null = null;
+        let es: EventSource | null = null;
         try {
-            socket = io(socketUrl, {
-                path: '/api/socketio',
-                reconnectionAttempts: 3,
-                timeout: 5000,
+            es = new EventSource('/api/whales/sse');
+
+            es.addEventListener('message', (e) => {
+                try {
+                    const msg = JSON.parse(e.data);
+                    if (msg.type !== 'WHALE_TX') return;
+
+                    if ((msg.usdValue || 0) < 50_000) return;
+
+                    const newAlert: AlertRule = {
+                        id:      `ep2-${msg.txHash}-${Date.now()}`,
+                        name:    `🐋 On-Chain Whale · ${msg.symbol} Transfer`,
+                        type:    'WHALE_MOVE',
+                        asset:   msg.symbol || 'ETH',
+                        threshold:    msg.usdValue,
+                        currentValue: msg.usdValue,
+                        status:       'TRIGGERED',
+                        triggeredAt:  new Date(msg.timestamp).toISOString(),
+                        createdAt:    new Date(msg.timestamp).toISOString(),
+                        notifyTelegram: false,
+                        notifyEmail:    false,
+                        notifyPush:     true,
+                    };
+
+                    setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
+
+                    const usdM = (msg.usdValue / 1e6).toFixed(2);
+                    const from  = `${msg.from?.slice(0, 6)}…${msg.from?.slice(-4)}`;
+                    const to    = `${msg.to?.slice(0, 6)}…${msg.to?.slice(-4)}`;
+                    toast(`🐋 $${usdM}M ${msg.symbol} — ${from} → ${to}`, {
+                        duration: 8000,
+                        style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' },
+                    });
+                } catch {}
             });
-            socket.on('connect_error', () => { /* silent — server may not have socket.io */ });
-            socket.on('whale_tx', (data: any) => {
-                if (!data || data.amountUsd < 2_000_000) return; // Only institutional-grade moves
-                const newAlert: AlertRule = {
-                    id: `ws-${data.id ?? Date.now()}`,
-                    name: `🐋 Live Whale ${data.type} · ${(data.chain ?? 'ETH').toUpperCase()}`,
-                    type: 'WHALE_MOVE',
-                    asset: (data.chain ?? 'ETH').toUpperCase(),
-                    threshold: data.amountUsd,
-                    currentValue: data.amountUsd,
-                    status: 'TRIGGERED',
-                    triggeredAt: new Date().toISOString(),
-                    createdAt: new Date().toISOString(),
-                    notifyTelegram: false,
-                    notifyEmail: false,
-                    notifyPush: true,
-                };
-                setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
-                toast(`🐋 Whale detected — $${(data.amountUsd / 1e6).toFixed(2)}M on ${(data.chain ?? 'ETH').toUpperCase()}`, {
-                    duration: 6000,
-                    style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' }
-                });
-            });
-        } catch { /* socket.io not available */ }
-        return () => {
-            if (socket) { try { socket.disconnect(); } catch {} }
-        };
+            es.onerror = () => {};
+        } catch {}
+        return () => { es?.close(); };
     }, []);
 
     const handleDelete = async (id: string) => {
+        if (!address) return;
         const tid = toast.loading('Deleting alert...');
         try {
-            await fetch(`/api/alerts?id=${id}`, { method: 'DELETE' });
+            await fetch(`/api/alerts?id=${id}&address=${address}`, { method: 'DELETE' });
             await refresh();
             toast.success('Alert removed', { id: tid });
         } catch (e) {
@@ -290,9 +301,10 @@ export function AlertsPanel() {
     return (
         <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
             {showCreate && <CreateAlertModal onClose={() => setShowCreate(false)} onCreate={async (r) => {
+                if (!address) return toast.error('Wallet not connected');
                 const tid = toast.loading('Dispatching rule...');
                 try {
-                    const res = await fetch('/api/alerts', { method: 'POST', body: JSON.stringify(r) });
+                    const res = await fetch('/api/alerts', { method: 'POST', body: JSON.stringify({ ...r, address }) });
                     if (res.ok) {
                         toast.success('Alert rule dispatched securely', { id: tid });
                         await refresh();

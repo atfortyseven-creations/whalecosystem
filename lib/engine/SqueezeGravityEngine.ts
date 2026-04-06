@@ -108,59 +108,54 @@ export class VIPMatrixEngine {
         
         try {
             // Promise.all to fetch both endpoints concurrently for minimal latency (<150ms total)
-            // Use standard Spot Ticker to get the exact real price flawlessly
-            const [priceRes, premiumRes, globalRatioRes] = await Promise.all([
+            const [priceRes, premiumRes, globalRatioRes, oiRes] = await Promise.all([
                 fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`, { next: { revalidate: 0 } }).catch(() => null),
                 fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`, { next: { revalidate: 0 } }).catch(() => null),
-                fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=5m&limit=1`, { next: { revalidate: 0 } }).catch(() => null)
+                fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${symbol}&period=5m&limit=1`, { next: { revalidate: 0 } }).catch(() => null),
+                fetch(`https://fapi.binance.com/fapi/v1/openInterest?symbol=${symbol}`, { next: { revalidate: 0 } }).catch(() => null)
             ]);
 
             const priceData = priceRes ? await priceRes.json().catch(() => ({})) : {};
             const premiumData = premiumRes ? await premiumRes.json().catch(() => ({})) : {};
             const ratioData = globalRatioRes ? await globalRatioRes.json().catch(() => ({})) : [];
+            const oiData = oiRes ? await oiRes.json().catch(() => ({})) : {};
 
-            // If spot price fails (e.g. invalid symbol on Binance), fallback to simple random mock relative to asset, BUT NEVER mock BTC/ETH/SOL/BNB
             let markPrice = Number(priceData.price || premiumData.markPrice || 0);
             
             if (markPrice === 0) {
-               // Absolute fallback if asset doesn't exist on Binance, attempt MEXC
+               // Absolute fallback if asset doesn't exist on Binance, attempt MEXC (Real On-Chain/CEX fallback)
                const mexcRes = await fetch(`https://api.mexc.com/api/v3/ticker/price?symbol=${symbol}`, { next: { revalidate: 0 } }).catch(() => null);
                const mexcData = mexcRes ? await mexcRes.json().catch(() => ({})) : {};
                markPrice = Number(mexcData.price || 0);
-
+               
                if (markPrice === 0) {
-                   console.warn(`[Matrix Engine] Asset ${asset} not found on Binance or MEXC, using approximate price.`);
-                   markPrice = asset === 'BTC' ? 66500 : asset === 'ETH' ? 3450 : asset === 'SOL' ? 148 : asset === 'BNB' ? 580 : 1.0;
+                   throw new Error(`[Matrix Engine] Asset ${asset} pricing unavailable from primary and secondary oracles.`);
                }
             }
 
             // Ratio API outputs an array of periods: [{ longAccount: "0.55", shortAccount: "0.45", longShortRatio: "1.2" }]
             let latestRatio = ratioData && ratioData.length > 0 ? ratioData[0] : null;
-            let apiFunding = Number(premiumData.lastFundingRate !== undefined ? premiumData.lastFundingRate : 0.0001);
+            let apiFunding = Number(premiumData.lastFundingRate !== undefined ? premiumData.lastFundingRate : 0.0000);
 
             if (!latestRatio || !latestRatio.longAccount) {
-                // IF Binance Futures is Geo-Blocked (e.g., US servers), synthesize a realistic, dynamic ratio
-                const t = Date.now() / 150000; // Oscillates every ~2.5 mins
-                const seed = asset.charCodeAt(0) + (asset.charCodeAt(1) || 0) + (asset.charCodeAt(2) || 0);
-                const shift = Math.sin(t + seed) * 0.35; // Creates dynamic tension curve
-                latestRatio = {
-                    longAccount: (0.5 + shift).toString(),
-                    shortAccount: (0.5 - shift).toString()
-                };
-                apiFunding = 0.0000 + (Math.cos(t + seed) * 0.0002);
+                // If API is blocked, do not synthesize mock data. Use explicitly neutral data.
+                latestRatio = { longAccount: "0.50", shortAccount: "0.50" };
             }
 
             const longPercent = Number(latestRatio.longAccount);
             const shortPercent = Number(latestRatio.shortAccount);
             const avgFundingRate = apiFunding;
             
-            // To approximate total Open Interest in USD, we query /fapi/v1/openInterest but here we generate a realistic synthetic volume representation based on the real % ratio.
-            const simulatedTotalOI = markPrice * (asset === 'BTC' ? 85000 : asset === 'ETH' ? 450000 : 15000000);
-            const aggregatedLongOI = simulatedTotalOI * longPercent;
-            const aggregatedShortOI = simulatedTotalOI * shortPercent;
+            // True Open Interest in USD
+            const openInterestAmount = Number(oiData.openInterest || 0);
+            const actualTotalOIUsd = openInterestAmount > 0 ? (openInterestAmount * markPrice) : 0;
+            
+            const aggregatedLongOI = actualTotalOIUsd * longPercent;
+            const aggregatedShortOI = actualTotalOIUsd * shortPercent;
 
             // Nearest Squeeze Target (Wall)
-            const nearestSqueezeTarget = markPrice * (shortPercent > longPercent ? 1.025 : 0.975); // 2.5% up/down where 50x levers die
+            const nearestSqueezeTarget = markPrice * (shortPercent > longPercent ? 1.025 : 0.975); // 2.5% up/down target
+
 
             // Phase 2: On-Chain Whale Radar Integration
             const whaleState = await WhaleRadarEngine.getInstitutionalVigor(asset, markPrice);

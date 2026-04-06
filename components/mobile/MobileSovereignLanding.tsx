@@ -572,283 +572,39 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
   return <div ref={ref}>{val.toLocaleString()}{suffix}</div>;
 }
 
-// ─── PAGE 2 · 240Hz SOVEREIGN RENDERING ENGINE ────────────────────────────────
-function PagePhilosophy1() {
-  return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-6 pt-14 pb-12 overflow-y-auto msv-hide-scrollbar relative bg-[#050508]">
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes slide-right { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-        @keyframes glow-pulse { 0%,100% { box-shadow: 0 0 12px #7C3AED44; } 50% { box-shadow: 0 0 28px #7C3AEDaa; } }
-        @keyframes flow { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
-        .pipe-flow { background: linear-gradient(90deg, #7C3AED, #3B82F6, #06B6D4, #7C3AED); background-size: 200%; animation: flow 3s linear infinite; }
-        @keyframes shimmer-hz { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
-      ` }} />
-      <motion.div
-        initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }}
-        transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}
-        className="mb-8"
-      >
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[8px] font-black uppercase tracking-[0.45em] text-white/25">Rendering Engine</span>
-          <LiveFPS />
-        </div>
-        <h2 className="text-[2.4rem] font-black tracking-tighter leading-[0.88] uppercase text-white">
-          240<span className="text-[#7C3AED]">Hz</span><br/>Sovereign<br/>Renderer
-        </h2>
-        <div className="h-[3px] w-24 pipe-flow rounded-full mt-3" />
-      </motion.div>
-
-      <div className="flex flex-col gap-5">
-        {/* Metric cards */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: 'Frame Budget', val: '4.17', unit: 'ms', color: '#7C3AED' },
-            { label: 'GPU Layers',   val: '48',   unit: '+',  color: '#3B82F6' },
-            { label: 'Compositors', val: '16',   unit: 'x',  color: '#06B6D4' },
-          ].map(m => (
-            <div key={m.label} className="bg-white/[0.04] border border-white/[0.07] rounded-2xl p-3 flex flex-col" style={{ boxShadow:`0 0 16px ${m.color}18` }}>
-              <span className="font-mono text-[18px] font-black" style={{ color: m.color }}>
-                {m.val}<span className="text-[11px] opacity-60">{m.unit}</span>
-              </span>
-              <span className="text-[7.5px] font-black uppercase tracking-[0.2em] text-white/30 mt-0.5 leading-none">{m.label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Pipeline diagram */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-3">GPU Compositing Pipeline</p>
-          <div className="flex items-center gap-1">
-            {['JS','Style','Layout','Paint','Composite','Display'].map((s,i) => (
-              <React.Fragment key={s}>
-                <motion.div
-                  initial={{ opacity:0, scale:0.8 }} whileInView={{ opacity:1, scale:1 }}
-                  transition={{ delay: i*0.1, duration:0.4 }}
-                  className="flex-1 h-7 rounded-lg flex items-center justify-center"
-                  style={{ background: `hsl(${210+i*18},80%,${30+i*5}%)`, border:`1px solid hsl(${210+i*18},80%,${45+i*5}%)30` }}
-                >
-                  <span className="text-[6px] font-black uppercase tracking-wider text-white/80">{s}</span>
-                </motion.div>
-                {i < 5 && <div className="w-1.5 h-[1px] bg-white/15 flex-shrink-0" />}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        {/* Frame budget bar */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-[8px] font-black uppercase tracking-[0.35em] text-white/25">Frame Budget @ 240Hz</p>
-            <span className="font-mono text-[9px] font-black text-[#7C3AED]">4.17ms total</span>
-          </div>
-          <div className="space-y-1.5">
-            {[
-              { name:'Script',      pct:18, color:'#7C3AED' },
-              { name:'Render',      pct:22, color:'#3B82F6' },
-              { name:'GPU Comp.',   pct:35, color:'#06B6D4' },
-              { name:'Display Sync',pct:25, color:'#10B981' },
-            ].map(b => (
-              <div key={b.name} className="flex items-center gap-2">
-                <span className="text-[7px] font-black uppercase tracking-wider text-white/25 w-16 flex-shrink-0">{b.name}</span>
-                <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }} whileInView={{ width: `${b.pct}%` }}
-                    transition={{ duration:1, ease:[0.16,1,0.3,1], delay:0.2 }}
-                    className="h-full rounded-full" style={{ background: b.color }}
-                  />
-                </div>
-                <span className="text-[7px] font-mono font-black text-white/30 w-6 flex-shrink-0">{b.pct}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <p className="text-[11.5px] leading-[1.9] font-medium text-white/50">
-          Every pixel is orchestrated through a <span className="text-white/80 font-black">GPU-composited layer tree</span>, bypassing the main thread entirely. CSS <code className="font-mono text-[#7C3AED] text-[10px]">will-change: transform</code> elevates 48 independent compositor layers — ensuring <span className="text-white/80 font-black">zero layout thrash</span> and true 240Hz synchronization with the device VSYNC signal.
-        </p>
-      </div>
-
-      <motion.div className="flex flex-col items-center gap-1 mt-8 opacity-20" animate={{ y:[0,4,0] }} transition={{ duration:2, repeat:Infinity }}>        <span className="text-[8px] font-black uppercase tracking-[0.35em] text-white">SIGUIENTE</span>
-        <ChevronDown size={13} className="text-white" />
-      </motion.div>
-    </div>
-  );
-}
-
-// ─── PAGE 3 · ZERO-LATENCY PIPELINE ──────────────────────────────────────────
-function PagePhilosophy2() {
-  return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-6 pt-14 pb-12 overflow-y-auto msv-hide-scrollbar relative bg-[#03050A]">
-      <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:0.7 }} className="mb-8">
-        <span className="text-[8px] font-black uppercase tracking-[0.45em] text-white/20 block mb-3">Neural Pipeline</span>
-        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.9] uppercase text-white">
-          Zero<span className="text-[#3B82F6]">-μs</span><br/>Intelligence
-        </h2>
-        <div className="h-[3px] w-20 bg-gradient-to-r from-[#3B82F6] to-[#06B6D4] rounded-full mt-3" />
-      </motion.div>
-
-      <div className="flex flex-col gap-4">
-        {/* Live latency display */}
-        <div className="bg-[#3B82F6]/[0.06] border border-[#3B82F6]/20 rounded-2xl p-4">
-          <div className="flex items-end gap-3 mb-3">
-            <div className="font-mono text-[2.8rem] font-black text-[#3B82F6] leading-none">
-              <AnimatedCounter target={240} suffix="" />
-            </div>
-            <div className="mb-1">
-              <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25">Hz Display</p>
-              <p className="text-[8px] font-black uppercase tracking-[0.25em] text-[#3B82F6]/60">Sync Rate</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {[['< 0.8ms','Input Lag'],['< 2.1ms','Render'],['< 1.3ms','Commit']].map(([v,l])=>(
-              <div key={l} className="flex flex-col">
-                <span className="font-mono text-[11px] font-black text-[#06B6D4]">{v}</span>
-                <span className="text-[7px] font-black uppercase tracking-wider text-white/25">{l}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* WebAssembly stack */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-3">WebAssembly SIMD Stack</p>
-          {[['SIMD128','Price oracle vectorisation','#7C3AED'],
-            ['SharedArrayBuffer','Lock-free worker sync','#3B82F6'],
-            ['OffscreenCanvas','Off-main-thread GPU paint','#06B6D4'],
-            ['Atomics.waitAsync','Non-blocking IPC','#10B981']
-          ].map(([tech, desc, color], i) => (
-            <motion.div
-              key={tech}
-              initial={{ opacity:0, x:-12 }} whileInView={{ opacity:1, x:0 }}
-              transition={{ delay:i*0.08, duration:0.45 }}
-              className="flex items-start gap-3 py-2 border-b border-white/[0.04] last:border-0"
-            >
-              <div className="w-1 h-1 rounded-full mt-1.5 flex-shrink-0" style={{ background:color }} />
-              <div>
-                <span className="font-mono text-[10px] font-black" style={{ color }}>{tech}</span>
-                <p className="text-[9px] text-white/30 leading-snug mt-0.5">{desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <p className="text-[11.5px] leading-[1.9] font-medium text-white/50">
-          Market entropy is processed through a <span className="text-white/80 font-black">WASM SIMD128 engine</span> operating in a dedicated Worker thread. The main thread remains perpetually unblocked — delivering deterministic 240Hz frame delivery with <span className="text-[#3B82F6] font-black">&lt; 0.8ms input latency</span> even under peak whale alert load.
-        </p>
-      </div>
-
-      <motion.div className="flex flex-col items-center gap-1 mt-8 opacity-20" animate={{ y:[0,4,0] }} transition={{ duration:2, repeat:Infinity }}>
-        <span className="text-[8px] font-black uppercase tracking-[0.35em] text-white">SIGUIENTE</span>
-        <ChevronDown size={13} className="text-white" />
-      </motion.div>
-    </div>
-  );
-}
-
-// ─── PAGE 4 · CRYPTOGRAPHIC SOVEREIGNTY ──────────────────────────────────────
-function PagePhilosophy3() {
-  return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-6 pt-14 pb-12 overflow-y-auto msv-hide-scrollbar relative bg-[#020408]">
-      <motion.div initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:0.7 }} className="mb-8">
-        <span className="text-[8px] font-black uppercase tracking-[0.45em] text-white/20 block mb-3">Cryptographic Vault</span>
-        <h2 className="text-[2.2rem] font-black tracking-tighter leading-[0.9] uppercase text-white">
-          Sovereign<span className="text-[#10B981]">Vault</span><br/>Identity
-        </h2>
-        <div className="h-[3px] w-20 bg-gradient-to-r from-[#10B981] to-[#06B6D4] rounded-full mt-3" />
-      </motion.div>
-
-      <div className="flex flex-col gap-4">
-        {/* ECDSA card */}
-        <div className="bg-[#10B981]/[0.06] border border-[#10B981]/20 rounded-2xl p-4">
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-[#10B981]/60 mb-2">ECDSA secp256k1 · EIP-191</p>
-          <div className="font-mono text-[10px] text-[#10B981]/80 leading-relaxed bg-black/30 rounded-xl p-3 border border-[#10B981]/10">
-            <p className="text-white/20 text-[8px] mb-1"># Zero-knowledge handshake</p>
-            <p>Q = dG <span className="text-white/25">(private key × generator)</span></p>
-            <p className="mt-1">σ = Sign<sub>d</sub>(H(m)) → (r, s)</p>
-            <p className="mt-1">Verify: sG = H(m)Q + rG<span className="text-[#10B981]">✓</span></p>
-          </div>
-        </div>
-
-        {/* Security tier list */}
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
-          <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/25 mb-3">Security Stack</p>
-          {[
-            ['E2E Encryption',   'AES-256-GCM · ChaCha20-Poly1305', '#10B981'],
-            ['ZK Proofs',        'Groth16 SNARK — O(1) verify',     '#7C3AED'],
-            ['HSM Key Guard',    'secp256k1 · Hardware boundary',   '#3B82F6'],
-            ['Merkle Integrity', 'SHA-3 proof of inclusion',        '#F59E0B'],
-            ['Geofence WAF',     'eBPF · < 0.3ms border pass',      '#06B6D4'],
-          ].map(([t,d,c],i) => (
-            <motion.div key={t}
-              initial={{ opacity:0, x:-10 }} whileInView={{ opacity:1, x:0 }}
-              transition={{ delay:i*.07, duration:0.4 }}
-              className="flex items-center gap-3 py-2 border-b border-white/[0.04] last:border-0"
-            >
-              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background:c, boxShadow:`0 0 6px ${c}80` }} />
-              <div className="flex-1">
-                <span className="text-[10px] font-black text-white/70">{t}</span>
-                <p className="text-[8px] font-mono text-white/25 mt-0.5 leading-none">{d}</p>
-              </div>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" style={{ boxShadow:'0 0 6px #10B98180' }} />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 pt-8 border-t border-white/[0.05] flex flex-col items-center pb-16">
-          <CinematicWhaleLogo src="/official-whale-monochrome.png" className="w-16 h-16 mb-4 opacity-40 drop-shadow-xl" style={{ filter:'invert(1)' }} />
-          <div className="flex items-center gap-6">
-            <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white/50 transition-colors">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              @whalecosystem
-            </a>
-            <a href="https://github.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/20 hover:text-white/50 transition-colors">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3"><path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.45-1.15-1.11-1.46-1.11-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
-              GitHub
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-[#000000]">
-      {/* Absolute dark background with subtle gold hints */}
-      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-[#D4AF37]/5 to-transparent pointer-events-none" />
-      
+    <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent">
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
-        <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase text-[#D4AF37] border-b border-[#D4AF37]/20 pb-6 mb-8 flex items-center justify-between">
-          <span>Manifiesto</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+        <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase text-[#050505] border-b border-black/10 pb-6 mb-8 flex items-center justify-between">
+          <span>Manifiesto Sovereign</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
         </h2>
         
-        <div className="text-[14.5px] leading-[1.85] text-[#E5E5E5] space-y-7 text-justify tracking-wide font-light">
+        <div className="text-[14.5px] leading-[1.85] text-[#050505]/80 space-y-7 text-justify tracking-wide font-medium">
           <p>
-            Hemos trascendido el ruido del mercado efímero. Lo que comenzó como un simple terminal, hoy ha mutado en un ecosistema institucional, autónomo y omnisciente. La <strong>Whale Alert Network</strong> ya no es software; es una matriz de infraestructura Soberana.
+            Hemos trascendido el ruido del mercado efímero. Lo que comenzó como un simple terminal, hoy ha mutado en un ecosistema institucional, autónomo y omnisciente. La <strong className="text-[#050505] font-black">Whale Alert Network</strong> ya no es software; es una matriz de infraestructura Soberana.
           </p>
 
           <p>
-            <strong className="font-bold text-white text-[15px]">Perfección Abismal.</strong> Nuestras barreras rechazan intrusos biomecánicos. Cada reclamación de acceso es sometida a pruebas geométricas de <span className="text-[#D4AF37]">100 Trillones de Parámetros de Corrección Matemáticos</span>, analizando densidades y longitudes de trazado para asegurar que únicamente la pura intencionalidad humana atraviese nuestras bóvedas criptográficas.
+            <strong className="font-black text-[#050505] text-[15px]">Perfección Abismal.</strong> Nuestras barreras rechazan intrusos biomecánicos. Cada reclamación de acceso es sometida a pruebas geométricas de <span className="text-black font-black">100 Trillones de Parámetros de Corrección Matemáticos</span>, analizando densidades y longitudes de trazado para asegurar que únicamente la pura intencionalidad humana atraviese nuestras bóvedas criptográficas.
           </p>
 
           <p>
-            <strong className="font-bold text-white text-[15px]">Inmutabilidad Intergeneracional.</strong> El <em>Genesis Gold Ticket</em> no es una base de datos frágil; es un evento on-chain fundacional. Las jerarquías y persistencias institucionales de cada dirección ahora quedan talladas de forma irrevocable en arquitecturas PostgreSQL cristalizadas y matrices ERC-1155, bloqueando a cero los errores de concurrencia.
+            <strong className="font-black text-[#050505] text-[15px]">Inmutabilidad Intergeneracional.</strong> El <em className="italic text-black font-black">Genesis Gold Ticket</em> no es una base de datos frágil; es un evento on-chain fundacional. Las jerarquías y persistencias institucionales de cada dirección ahora quedan talladas de forma irrevocable en arquitecturas PostgreSQL cristalizadas y matrices ERC-1155, bloqueando a cero los errores de concurrencia.
           </p>
 
           <p>
-            <strong className="font-bold text-white text-[15px]">Omnisciencia de 103 Sectores.</strong> No filtramos datos; los comprendemos. Toda la red respira a través de un <em>Grafo de Conocimiento Neo4j</em> entrelazando fondos oscuros, auditorías de contratos inteligentes veraces y flujos de liquidez global, procesados implacablemente por motores WebAssembly a <span className="text-[#D4AF37]">240Hz</span> de latencia nula.
+            <strong className="font-black text-[#050505] text-[15px]">Omnisciencia de 103 Sectores.</strong> No filtramos datos; los comprendemos. Toda la red respira a través de un <em className="text-black font-black italic">Grafo de Conocimiento Neo4j</em> entrelazando fondos oscuros, auditorías de contratos inteligentes veraces y flujos de liquidez global, procesados implacablemente por motores WebAssembly a <span className="text-black font-black">240Hz</span> de latencia nula.
           </p>
 
-          <p>
+          <p className="font-bold text-[#050505] pt-2">
             El control ya no nos pertenece; le pertenece a la red de Nodos Ballena. Operas bajo el amparo de la máxima corrección posible. Bienvenido al dominio definitivo de la información asimétrica. 
           </p>
           
-          <div className="pt-10 flex flex-col items-center border-t border-white/10 mt-10">
-              <span className="text-[#D4AF37] font-black tracking-[0.4em] text-center uppercase text-[9px] block">
+          <div className="pt-10 flex flex-col items-center border-t border-black/10 mt-10">
+              <span className="text-[#050505]/60 font-black tracking-[0.4em] text-center uppercase text-[9px] block">
                  Omnisciencia • Invarianza • Supremacía
               </span>
           </div>
@@ -1054,10 +810,7 @@ export function MobileSovereignLanding({ onEnterNews }: { onEnterNews?: () => vo
           onEnterNews={handleEnterNews}
         />
 
-        {/* PHILOSOPHY PAGES */}
-        <PagePhilosophy1 />
-        <PagePhilosophy2 />
-        <PagePhilosophy3 />
+        {/* MANIFESTO PAGE */}
         <PageManifesto />
       </div>
     </div>

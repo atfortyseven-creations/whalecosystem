@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { MobileSovereignLanding } from '@/components/mobile/MobileSovereignLanding';
 import dynamic from 'next/dynamic';
-
+import { useAccount } from 'wagmi';
 
 // Lazy-load the authenticated mobile news shell
 const MobileNewsShell = dynamic(
@@ -11,21 +11,11 @@ const MobileNewsShell = dynamic(
     { ssr: false }
 );
 
-// ─── MOBILE AUTH STATE DETECTION ─────────────────────────────────────────────
-// Checks for the sovereign_handshake cookie that is set after a successful
-// QR scan + wallet signature on mobile.
-function hasSovereignHandshake(): boolean {
-    if (typeof document === 'undefined') return false;
-    return document.cookie
-        .split('; ')
-        .some(row => row.startsWith('sovereign_handshake=0x'));
-}
-
 export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [isHandshaked, setIsHandshaked] = useState(false);
     const [showNews, setShowNews] = useState(false);
+    const { isConnected } = useAccount();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -33,12 +23,16 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             const isMobileDevice = /android|mobi|iphone|ipod|ipad/i.test(userAgent.toLowerCase());
             const mobile = isMobileDevice && window.innerWidth < 1024;
             setIsMobile(mobile);
-            setIsHandshaked(hasSovereignHandshake());
         };
 
         checkMobile();
         setMounted(true);
         window.addEventListener('resize', checkMobile);
+        
+        if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('mobile_news_bypass') === 'true') {
+            setShowNews(true);
+        }
+
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
@@ -49,11 +43,8 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
     if (isMobile) {
-        // 1. Not connected: Show landing (connect wallet)
-        // 2. Connected but not handshaked: Show landing (confirmation + buttons)
-        // 3. Handshaked + user clicked enter: Show news
-        // User already clicked "Go to News" or cookie was set from previous QR scan
-        if (showNews || isHandshaked) {
+        // User clicked "Go to News" or from session storage, AND wallet is connected
+        if (showNews && isConnected) {
             return <MobileNewsShell />;
         }
 
@@ -62,8 +53,9 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         return (
             <MobileSovereignLanding
                 onEnterNews={() => {
-                    // Persist across reloads so user stays in news on refresh
-                    document.cookie = "sovereign_handshake=0x_bypass; path=/; max-age=31536000";
+                    if (typeof sessionStorage !== 'undefined') {
+                        sessionStorage.setItem('mobile_news_bypass', 'true');
+                    }
                     setShowNews(true);
                 }}
             />
