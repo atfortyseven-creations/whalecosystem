@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 
 export const revalidate = 30; // 30 seconds
@@ -70,3 +71,4 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ status: "error", message: error.message }, { status: 500 });
     }
 }
+

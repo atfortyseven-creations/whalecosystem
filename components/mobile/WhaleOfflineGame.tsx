@@ -238,21 +238,18 @@ export function WhaleOfflineGame({ visible, onBack }: { visible: boolean; onBack
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-12 pb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black/45">Sin Conexión · Modo Offline</span>
-        </div>
+        <div />
         <button
-          className="px-4 py-1.5 bg-black/10 backdrop-blur-sm rounded-full text-[9px] font-black uppercase tracking-wider text-black/55 pointer-events-auto active:scale-90 transition-transform border border-black/10"
+          className="px-4 py-1.5 bg-transparent rounded-full text-[9px] font-black uppercase tracking-widest text-black/40 pointer-events-auto active:scale-90 transition-all"
           onClick={e => { e.stopPropagation(); onBack?.(); }}
-        >← Atrás</button>
+        >Esc</button>
       </div>
 
       {/* Canvas */}
       <div className="flex-1 flex items-center justify-center px-4">
         <canvas
           ref={canvasRef} width={CW} height={CH}
-          className="w-full max-w-sm rounded-3xl shadow-2xl border border-white/40"
+          className="w-full max-w-sm rounded-[1.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border-[6px] border-white/50"
           style={{ touchAction: 'none' }}
         />
       </div>

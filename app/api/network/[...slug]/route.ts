@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE = 'https://mempool.space/api';
@@ -46,3 +47,4 @@ export async function GET(
         );
     }
 }
+

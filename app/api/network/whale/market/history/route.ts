@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { moralisService } from '@/lib/blockchain/MoralisService';
 
@@ -35,3 +36,4 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch market history', result: [] }, { status: 502 });
     }
 }
+

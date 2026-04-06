@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Known major exchange cold wallet addresses (subset)
@@ -79,4 +80,5 @@ export async function GET() {
     return NextResponse.json({ error: 'Data unavailable', netFlowScore: 0, direction: 'NEUTRAL', sentiment: 'neutral' });
   }
 }
+
 

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { mainnetClient } from '@/lib/blockchain/rpc-engine';
 
@@ -69,4 +70,5 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 

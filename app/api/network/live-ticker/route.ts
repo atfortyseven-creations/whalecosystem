@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { mainnetClient, bscClient } from '@/lib/blockchain/rpc-engine';
 import { formatUnits } from 'viem';
@@ -75,3 +76,4 @@ export async function GET() {
         });
     }
 }
+

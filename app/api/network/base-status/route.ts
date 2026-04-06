@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
@@ -28,4 +29,5 @@ export async function GET() {
         });
     }
 }
+
 

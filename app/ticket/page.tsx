@@ -226,7 +226,7 @@ function CinematicVoid() {
       animate={{ opacity: 1 }}
       transition={{ duration: 2 }}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ background: "#000000" }}
+      style={{ background: "#FFFFFF" }}
     >
       {/* Soft gold nebula */}
       <motion.div
@@ -238,7 +238,7 @@ function CinematicVoid() {
           width: "70vw",
           height: "70vw",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 65%)",
+          background: "radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 65%)",
         }}
       />
       {/* Particle shimmer */}
@@ -251,8 +251,8 @@ function CinematicVoid() {
             height: Math.random() * 3 + 1,
             top: `${20 + Math.random() * 60}%`,
             left: `${10 + Math.random() * 80}%`,
-            background: "rgba(212,175,55,0.6)",
-            boxShadow: "0 0 8px rgba(212,175,55,0.8)",
+            background: "rgba(212,175,55,0.8)",
+            boxShadow: "0 0 8px rgba(212,175,55,0.4)",
           }}
           animate={{ opacity: [0, 1, 0], y: [0, -30, 0] }}
           transition={{
@@ -420,9 +420,9 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
   };
 
   const statusColors = {
-    idle: "rgba(212,175,55,0.4)",
+    idle: "rgba(0,0,0,0.3)",
     drawing: "#D4AF37",
-    analyzing: "#a78bfa",
+    analyzing: "#8b5cf6",
     ok: "#10b981",
     fail: "#ef4444",
   };
@@ -437,7 +437,7 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
       <div className="w-full max-w-[420px]">
         {/* Label */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/30">
+          <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-black/40">
             Human Verification
           </span>
           {attempts > 0 && (
@@ -450,7 +450,7 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
         {/* Canvas */}
         <div
           className="relative rounded-[1.5rem] overflow-hidden"
-          style={{ border: "1px solid rgba(212,175,55,0.15)", background: "rgba(0,0,0,0.6)" }}
+          style={{ border: "1px solid rgba(0,0,0,0.1)", background: "rgba(0,0,0,0.02)" }}
         >
           <canvas
             ref={canvasRef}
@@ -509,7 +509,7 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
         </motion.p>
 
         {/* Instructions */}
-        <p className="text-center mt-2 text-[9px] font-mono text-white/15 tracking-wider">
+        <p className="text-center mt-2 text-[9px] font-mono text-black/40 tracking-wider">
           Draw a loop, zigzag, or any organic shape
         </p>
       </div>
@@ -554,7 +554,7 @@ function HoldToClaim({ onClaim, walletAddress }: { onClaim: () => void; walletAd
     <div className="w-full flex flex-col items-center select-none touch-none">
       <span
         className="text-[9px] font-mono tracking-[0.5em] uppercase mb-6 transition-colors duration-500"
-        style={{ color: isPressing ? "rgba(212,175,55,0.8)" : "rgba(255,255,255,0.25)" }}
+        style={{ color: isPressing ? "rgba(212,175,55,0.8)" : "rgba(0,0,0,0.4)" }}
       >
         {isPressing ? `Claiming… ${Math.round(progress)}%` : "Hold to Claim"}
       </span>
@@ -569,10 +569,10 @@ function HoldToClaim({ onClaim, walletAddress }: { onClaim: () => void; walletAd
         whileHover={{ scale: 1.02 }}
         className="relative w-[280px] h-[60px] rounded-full overflow-hidden cursor-pointer"
         style={{
-          background: "rgba(255,255,255,0.03)",
+          background: "rgba(0,0,0,0.02)",
           border: isPressing
             ? "1px solid rgba(212,175,55,0.5)"
-            : "1px solid rgba(255,255,255,0.08)",
+            : "1px solid rgba(0,0,0,0.1)",
           transition: "border-color 0.3s",
         }}
       >
@@ -589,7 +589,7 @@ function HoldToClaim({ onClaim, walletAddress }: { onClaim: () => void; walletAd
 
         <span
           className="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.4em] z-10"
-          style={{ color: progress > 40 ? "#000" : "rgba(255,255,255,0.4)" }}
+          style={{ color: progress > 40 ? "#FFFFFF" : "rgba(0,0,0,0.4)" }}
         >
           {isComplete ? "CLAIMED" : "HOLD"}
         </span>
@@ -604,16 +604,16 @@ function PostClaimMenu({ walletAddress, serial }: { walletAddress: string | null
   const menuItems = [
     {
       icon: <Activity size={18} />,
-      label: "Enter Sovereign Terminal",
+      label: "News",
       desc: "Access the live market intelligence feed",
       href: "/news",
       primary: true,
     },
     {
       icon: <Trophy size={18} />,
-      label: "Gold Registry",
-      desc: "View all Genesis ticket holders",
-      href: "/gold-registry",
+      label: "Alpha Intel Desk",
+      desc: "Exclusive insights for Genesis holders",
+      href: "/alpha-intel",
       primary: false,
     },
     {
@@ -632,7 +632,7 @@ function PostClaimMenu({ walletAddress, serial }: { walletAddress: string | null
       transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-[480px] mx-auto flex flex-col gap-3"
     >
-      <span className="text-[9px] font-mono tracking-[0.5em] uppercase text-white/20 text-center mb-2">
+      <span className="text-[9px] font-mono tracking-[0.5em] uppercase text-black/40 text-center mb-2">
         Choose your next action
       </span>
 
@@ -643,26 +643,26 @@ function PostClaimMenu({ walletAddress, serial }: { walletAddress: string | null
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.6 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-4 px-6 py-5 rounded-[1.5rem] transition-all group cursor-pointer"
+          className="flex items-center gap-4 px-6 py-5 rounded-[1.5rem] transition-all group cursor-pointer shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]"
           style={{
             background: item.primary
-              ? "linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.05))"
-              : "rgba(255,255,255,0.03)",
+              ? "linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.02))"
+              : "rgba(0,0,0,0.02)",
             border: item.primary
               ? "1px solid rgba(212,175,55,0.3)"
-              : "1px solid rgba(255,255,255,0.07)",
+              : "1px solid rgba(0,0,0,0.06)",
           }}
-          whileHover={{ scale: 1.02, x: 4 }}
+          whileHover={{ scale: 1.02, x: 4, background: "rgba(0,0,0,0.04)" }}
           whileTap={{ scale: 0.98 }}
         >
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm"
             style={{
-              background: item.primary ? "rgba(212,175,55,0.15)" : "rgba(255,255,255,0.05)",
-              border: item.primary ? "1px solid rgba(212,175,55,0.25)" : "1px solid rgba(255,255,255,0.08)",
+              background: item.primary ? "rgba(212,175,55,0.15)" : "#FFFFFF",
+              border: item.primary ? "1px solid rgba(212,175,55,0.25)" : "1px solid rgba(0,0,0,0.08)",
             }}
           >
-            <span style={{ color: item.primary ? "#D4AF37" : "rgba(255,255,255,0.4)" }}>
+            <span style={{ color: item.primary ? "#B8962E" : "#555555" }}>
               {item.icon}
             </span>
           </div>
@@ -670,24 +670,24 @@ function PostClaimMenu({ walletAddress, serial }: { walletAddress: string | null
           <div className="flex-1 min-w-0">
             <p
               className="text-[12px] font-black uppercase tracking-widest"
-              style={{ color: item.primary ? "#D4AF37" : "rgba(255,255,255,0.75)" }}
+              style={{ color: item.primary ? "#B8962E" : "#111111" }}
             >
               {item.label}
             </p>
-            <p className="text-[9px] font-mono text-white/25 mt-0.5">{item.desc}</p>
+            <p className="text-[9px] font-mono text-black/50 mt-0.5">{item.desc}</p>
           </div>
 
           <ChevronRight
             size={14}
             className="shrink-0 transition-transform group-hover:translate-x-1"
-            style={{ color: item.primary ? "rgba(212,175,55,0.5)" : "rgba(255,255,255,0.15)" }}
+            style={{ color: item.primary ? "rgba(212,175,55,0.8)" : "rgba(0,0,0,0.25)" }}
           />
         </motion.a>
       ))}
 
       {/* Ticket number info */}
       <div className="text-center mt-4">
-        <span className="text-[8px] font-mono text-white/15 tracking-widest uppercase">
+        <span className="text-[8px] font-mono text-black/30 tracking-widest uppercase font-bold">
           Genesis Ticket #{String(serial).padStart(4, "0")} · {walletAddress?.slice(0, 10)}...
         </span>
       </div>
@@ -780,7 +780,7 @@ export default function GoldenTicketPage() {
   return (
     <div
       className="min-h-[100dvh] flex flex-col font-sans relative overflow-hidden transition-colors duration-[2000ms]"
-      style={{ background: isConfirming || isDone ? "#000000" : "#050505" }}
+      style={{ background: isConfirming || isDone ? "#FFFFFF" : "#FAFAFA" }}
     >
       {(isConfirming || isDone) && <CinematicVoid />}
 
@@ -792,12 +792,12 @@ export default function GoldenTicketPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer"
-            style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
+            className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer shadow-sm"
+            style={{ border: "1px solid rgba(0,0,0,0.08)", background: "#FFFFFF" }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <RotateCcw size={12} className="text-white/30" />
+            <RotateCcw size={12} className="text-black/50" />
             <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/30">Back</span>
           </motion.a>
         )}

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { searchAnalyticsService } from '@/lib/services/SearchAnalyticsService';
 
@@ -26,3 +27,4 @@ export async function GET(req: NextRequest) {
         }, { status: 500 });
     }
 }
+

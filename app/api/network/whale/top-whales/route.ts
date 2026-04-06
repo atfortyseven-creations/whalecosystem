@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { redisClient as redis } from '@/lib/redis/client';
@@ -87,3 +88,4 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch whale snapshots' }, { status: 500 });
     }
 }
+

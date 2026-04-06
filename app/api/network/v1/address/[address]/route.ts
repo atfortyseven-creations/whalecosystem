@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 import { walletIntelligenceService } from '@/lib/wallet/WalletIntelligenceService';
@@ -92,3 +93,4 @@ export async function GET(
         return NextResponse.json({ error: 'Upstream error' }, { status: 502 });
     }
 }
+

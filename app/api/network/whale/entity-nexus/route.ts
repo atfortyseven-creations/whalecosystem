@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { walletIntelligenceService } from '@/lib/wallet/WalletIntelligenceService';
@@ -191,4 +192,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to build entity graph', nodes: [], links: [] }, { status: 200 });
   }
 }
+
 

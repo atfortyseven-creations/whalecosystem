@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Known historical "sleeping giant" BTC wallets for demonstration + real monitoring
@@ -84,4 +85,5 @@ async function analyzeAddress(address: string) {
               : 'NORMAL',
   };
 }
+
 

@@ -160,17 +160,19 @@ function WorldFinancialClocks() {
   const hubs = [
     { name: 'NY', tz: 'America/New_York' },
     { name: 'LDN', tz: 'Europe/London' },
-    { name: 'TYO', tz: 'Asia/Tokyo' },
+    { name: 'FRA', tz: 'Europe/Berlin' },
     { name: 'DXB', tz: 'Asia/Dubai' },
+    { name: 'HKG', tz: 'Asia/Hong_Kong' },
+    { name: 'TYO', tz: 'Asia/Tokyo' },
   ];
   return (
-    <div className="flex justify-center items-center gap-6 w-full max-w-[320px] mx-auto opacity-70 mb-4 mt-2">
+    <div className="flex justify-center items-center gap-3 w-full flex-wrap mx-auto opacity-70 mb-4 mt-2 px-2">
       {hubs.map(hub => {
         const localTime = new Date(time.toLocaleString('en-US', { timeZone: hub.tz }));
         return (
-          <div key={hub.name} className="flex flex-col items-center min-w-[40px]">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] mb-0.5">{hub.name}</span>
-            <span className="font-mono text-[9px] tracking-widest font-bold text-[#050505]/80">
+          <div key={hub.name} className="flex flex-col items-center min-w-[36px]">
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] mb-0.5">{hub.name}</span>
+            <span className="font-mono text-[8px] tracking-widest font-bold text-[#050505]/80">
               {localTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
           </div>
@@ -578,45 +580,41 @@ function PageManifesto() {
     <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent">
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
         <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase text-[#050505] border-b border-black/10 pb-6 mb-8 flex items-center justify-between">
-          <span>Manifiesto Sovereign</span>
+          <span>Technical Manifesto</span>
           <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
         </h2>
         
         <div className="text-[14.5px] leading-[1.85] text-[#050505]/80 space-y-7 text-justify tracking-wide font-medium">
           <p>
-            Hemos trascendido el ruido del mercado efímero. Lo que comenzó como un simple terminal, hoy ha mutado en un ecosistema institucional, autónomo y omnisciente. La <strong className="text-[#050505] font-black">Whale Alert Network</strong> ya no es software; es una matriz de infraestructura Soberana.
+            The fundamental architecture of the Sovereign Terminal transcends conventional heuristic data aggregation. It is formulated as an institutional-grade, deterministic macro-analysis system. The network does not merely process data; it ingests raw on-chain entropy through low-level RPC websocket streams at 240Hz, bypassing superficial middle-tier abstractions.
           </p>
 
           <p>
-            <strong className="font-black text-[#050505] text-[15px]">Perfección Abismal.</strong> Nuestras barreras rechazan intrusos biomecánicos. Cada reclamación de acceso es sometida a pruebas geométricas de <span className="text-black font-black">100 Trillones de Parámetros de Corrección Matemáticos</span>, analizando densidades y longitudes de trazado para asegurar que únicamente la pura intencionalidad humana atraviese nuestras bóvedas criptográficas.
+            <strong className="font-black text-[#050505] text-[15px]">Zero-Knowledge Determinism.</strong> Our perimeter enforces stringent cryptographic isolation. Every entry verification undergoes computationally exhaustive geometric tracing, utilizing one hundred trillion multi-variate parameter corrections. This algorithmic scrutiny evaluates trajectory densities and kinematic pressure with uncompromising mathematical rigor to guarantee absolute human agency, decisively blocking all synthetic biomechanical automation.
           </p>
 
           <p>
-            <strong className="font-black text-[#050505] text-[15px]">Inmutabilidad Intergeneracional.</strong> El <em className="italic text-black font-black">Genesis Gold Ticket</em> no es una base de datos frágil; es un evento on-chain fundacional. Las jerarquías y persistencias institucionales de cada dirección ahora quedan talladas de forma irrevocable en arquitecturas PostgreSQL cristalizadas y matrices ERC-1155, bloqueando a cero los errores de concurrencia.
+            <strong className="font-black text-[#050505] text-[15px]">Immutable Ontological State.</strong> The <em className="italic text-black font-black">Genesis Gold Ticket</em> functions not as a mutable database entry, but as a foundational on-chain primitive. Institutional hierarchies and access credentials are irrevocably persisted within high-availability PostgreSQL relational architectures and anchored to ERC-1155 token matrices, thereby reducing concurrency anomalies to absolute zero.
           </p>
 
           <p>
-            <strong className="font-black text-[#050505] text-[15px]">Omnisciencia de 103 Sectores.</strong> No filtramos datos; los comprendemos. Toda la red respira a través de un <em className="text-black font-black italic">Grafo de Conocimiento Neo4j</em> entrelazando fondos oscuros, auditorías de contratos inteligentes veraces y flujos de liquidez global, procesados implacablemente por motores WebAssembly a <span className="text-black font-black">240Hz</span> de latencia nula.
+            <strong className="font-black text-[#050505] text-[15px]">Distributed Knowledge Graph.</strong> The system leverages a horizontally scaled Neo4j Knowledge Graph topology. This graph-theoretic engine cross-references dark pool liquidity intersections, rigorously audited semantic smart contracts, and cross-chain financial vectors independently, orchestrated entirely by WebAssembly engines executing at zero-latency thresholds.
           </p>
 
           <p className="font-bold text-[#050505] pt-2">
-            El control ya no nos pertenece; le pertenece a la red de Nodos Ballena. Operas bajo el amparo de la máxima corrección posible. Bienvenido al dominio definitivo de la información asimétrica. 
+            The infrastructure establishes the paradigm for asymmetric information retrieval. You are now operating within an environment of absolute cryptographic certainty and empirical infrastructural truth.
           </p>
           
           <div className="pt-10 flex flex-col items-center border-t border-black/10 mt-10">
               <span className="text-[#050505]/60 font-black tracking-[0.4em] text-center uppercase text-[9px] block">
-                 Omnisciencia • Invarianza • Supremacía
+                 Omniscience • Invariance • Supremacy
               </span>
           </div>
         </div>
       </motion.div>
     </div>
   );
-}
-
-
-
-// ─── QR SCANNER ───────────────────────────────────────────────────────────────
+}// ─── QR SCANNER ───────────────────────────────────────────────────────────────
 
 export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   const isProcessingRef = useRef(false);
@@ -788,12 +786,16 @@ export function MobileSovereignLanding({ onEnterNews }: { onEnterNews?: () => vo
     return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
   }
 
+  if (showGame) {
+    return (
+      <div className="w-full h-[100dvh] bg-transparent overflow-hidden relative">
+        <WhaleOfflineGame visible={showGame} onBack={() => setShowGame(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-[100dvh] bg-transparent overflow-hidden relative">
-      {/* Offline Whale Game Overlay */}
-      <AnimatePresence>
-        {showGame && <WhaleOfflineGame visible={showGame} onBack={() => setShowGame(false)} />}
-      </AnimatePresence>
       <AnimatedPattern />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 

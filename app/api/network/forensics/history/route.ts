@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { ethereumResilientProvider, baseResilientProvider } from '@/lib/blockchain/ResilientProvider';
 import { ethers } from 'ethers';
@@ -60,3 +61,4 @@ export async function GET() {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+

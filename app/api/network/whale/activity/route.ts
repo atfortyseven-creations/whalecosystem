@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -33,3 +34,4 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: err.message }, { status: 502 });
     }
 }
+

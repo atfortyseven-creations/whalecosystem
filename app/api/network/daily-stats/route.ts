@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { startOfDay, endOfDay, addDays } from 'date-fns';
@@ -65,4 +66,5 @@ export async function GET(req: NextRequest) {
         }, { status: 500 });
     }
 }
+
 

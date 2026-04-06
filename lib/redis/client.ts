@@ -36,29 +36,22 @@ function createMockRedis(name?: string) {
 
 // Sanitize and reconstruct REDIS_URL
 function getSanitizedRedisUrl(): string {
-    const rawUrl = (process.env.REDIS_URL || '').toString();
+    const rawUrl = (process.env.REDIS_URL || '').toString().trim().replace(/^["']|["']$/g, '');
     
-    let sanitized = rawUrl.trim().replace(/^["']|["']$/g, '');
-
     // If properly formatted, return it
-    if (sanitized.startsWith('redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@` : '';
+    if (rawUrl.startsWith('redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@` : '';
         return `${protocol}://${auth}${host}:${port}`;
     }
 
-    // If we have a password but still no host, try one final Railway default
+    // Attempt Railway Proxy if we ONLY have a password
     if (isLikelyPassword && !host) {
         const fallBackHost = 'roundhouse.proxy.rlwy.net'; 
-        const protocol = 'redis';
-        const auth = `default:${sanitized}@`;
-        
-        // [RESILIENCE] Only warn if we are NOT in production, to keep logs cleaner
-        if (process.env.NODE_ENV !== 'production') {
-            console.warn(`[Redis:Setup] ⚠️ REDIS_URL detected as possible password. Attempting Railway Proxy: ${fallBackHost}`);
-        }
-        return `${protocol}://${auth}${fallBackHost}:${port}`;
+        return `redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@${fallBackHost}:${port}`;
     }
 
-    return sanitized;
+    // [CRITICAL FIX] If it's not a valid URL by this point, DO NOT return just a random string
+    // as ioredis will interpret it as a domain name and cause endless ENOTFOUND loops!
+    return '';
 }
 
 const REDIS_URL = getSanitizedRedisUrl();
