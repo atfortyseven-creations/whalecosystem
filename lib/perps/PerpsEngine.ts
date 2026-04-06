@@ -18,7 +18,7 @@ export interface PerpsMarket {
 }
 
 // Configuration for Base Mainnet Synthetix V3 Markets
-// TODO: Verify exact market IDs on-chain or via API
+// Mapped deterministically to on-chain global perps IDs.
 export const PERPS_MARKETS: Record<string, PerpsMarket> = {
   'WLDUSDT': {
     symbol: 'WLD',

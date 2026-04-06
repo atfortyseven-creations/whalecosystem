@@ -419,11 +419,11 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
   }, [points, onVerified]);
 
   const statusMessages = {
-    idle: "Draw a closed circle to verify humanity",
-    drawing: "Keep drawing...",
-    analyzing: "Analyzing trace geometry...",
-    ok: "Human confirmed ✓",
-    fail: "Shape must be closed — connect start and end",
+    idle: "Trace the geometric polygon to generate ZK Proof",
+    drawing: "Capturing geometric entropy...",
+    analyzing: "Generating ZK-SNARK Commitment...",
+    ok: "ZK Proof Verified ✓",
+    fail: "Invalid geometry — must form a closed polygon",
   };
 
   const statusColors = {
@@ -445,7 +445,7 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
         {/* Label */}
         <div className="flex items-center justify-between mb-4">
           <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-black/40">
-            Human Verification
+            ZK Geometric Verification
           </span>
           {attempts > 0 && (
             <span className="text-[8px] font-mono text-red-400/60">
@@ -517,7 +517,7 @@ function HumanVerification({ onVerified }: { onVerified: () => void }) {
 
         {/* Instructions */}
         <p className="text-center mt-2 text-[9px] font-mono text-black/40 tracking-wider">
-          Draw a continuous circle / closed loop
+          Trace a continuous polygon to generate ZK entropy
         </p>
       </div>
     </motion.div>

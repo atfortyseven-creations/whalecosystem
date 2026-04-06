@@ -191,3 +191,86 @@ model GoldenTicket {
   isActive              Boolean  @default(true)
   claimedAt             DateTime @default(now())
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOVEREIGN INTELLIGENCE CORPUS (ARKHAM/NANSEN KILLER)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model OnChainEntity {
+  id              String   @id @default(uuid())
+  address         String   @unique
+  label           String?  // The identity of the entity
+  category        String?  // Exchange, Whale, MEV, Fund
+  isZkShielded    Boolean  @default(false)
+  neo4jNodeId     String?  @unique // Reference to local graph DB node
+  totalVolumeUSD  Float    @default(0.0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  labels          EntityLabel[]
+}
+
+model EntityLabel {
+  id              String   @id @default(uuid())
+  entityId        String
+  labelName       String
+  confidenceScore Float    @default(1.0)
+  source          String   // "NeuralAgent", "UserDefined", "TeranodeStream"
+  createdAt       DateTime @default(now())
+  
+  entity          OnChainEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+}
+
+model NeuralAgentConfig {
+  id                  String   @id @default(uuid())
+  agentId             String   @unique
+  mode                String   @default("OBSERVER") // OBSERVER, EXECUTION, HFT
+  maxSlippage         Float    @default(0.5)
+  targetChains        String[] // E.g., ["Ethereum", "Solana", "EVM"]
+  isActive            Boolean  @default(true)
+  autoTradeThreshold  Float?
+  lastPingAt          DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOBERANIA DE CUSTODIA (ON-CHAIN CONTRACT STATES)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TimeLockVault {
+  id          String   @id @default(uuid())
+  userAddress String   @unique
+  amount      Float
+  unlockDate  DateTime
+  txHash      String?
+  status      String   @default("LOCKED") // "LOCKED", "WITHDRAWN"
+  createdAt   DateTime @default(now())
+}
+
+model DeadMansSwitch {
+  id               String   @id @default(uuid())
+  userAddress      String   @unique
+  beneficiary      String
+  inactivityPeriod Int      // En segundos
+  lastPing         DateTime @default(now())
+  active           Boolean  @default(true)
+  txHash           String?
+}
+
+model Guardian {
+  id              String   @id @default(uuid())
+  userEmail       String
+  guardianAddress String
+  threshold       Int      @default(3) // Firmas requeridas
+  isActive        Boolean  @default(true)
+  
+  @@unique([userEmail, guardianAddress])
+}
+
+model PrivacyDonation {
+  id          String   @id @default(uuid())
+  amount      Float
+  nullifier   String   @unique
+  commitment  String   @unique
+  timestamp   DateTime @default(now())
+}
+
