@@ -7,19 +7,21 @@ import {
     ArrowUpRight, ArrowDownRight, Clock, Filter,
     Users, Zap, AlertTriangle, RefreshCw
 } from 'lucide-react';
-import { List as RWList } from 'react-window';
-const List = RWList as any;
-import AutoSizer from 'react-virtualized-auto-sizer';
 
-type Chain = 'all' | 'solana' | 'base' | 'ethereum' | 'arbitrum' | 'bsc';
+
+type Chain = 'all' | 'solana' | 'base' | 'ethereum' | 'arbitrum' | 'bsc' | 'polygon' | 'avalanche';
 
 const CHAIN_COLORS: Record<string, string> = {
-    solana:   '#9945FF',
-    base:     '#0052FF',
-    ethereum: '#627EEA',
-    arbitrum: '#12AAFF',
-    bsc:      '#F0B90B',
+    solana:    '#9945FF',
+    base:      '#0052FF',
+    ethereum:  '#627EEA',
+    arbitrum:  '#12AAFF',
+    bsc:       '#F0B90B',
+    polygon:   '#8247E5',
+    avalanche: '#E84142',
 };
+
+const NETWORKS: Chain[] = ['all', 'ethereum', 'solana', 'base', 'bsc', 'arbitrum', 'polygon', 'avalanche'];
 
 export function NewPairsTable() {
     const [pairs, setPairs]       = useState<any[]>([]);
@@ -164,7 +166,7 @@ export function NewPairsTable() {
             (p.chain ?? '').toLowerCase().includes(search.toLowerCase())
         );
 
-    const chains: Chain[] = ['all', 'solana', 'base', 'ethereum', 'arbitrum', 'bsc'];
+    const chains: Chain[] = NETWORKS;
 
     return (
         <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
@@ -179,18 +181,6 @@ export function NewPairsTable() {
                         placeholder="Symbol, chain…"
                         className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-8 pr-3 py-1.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
                     />
-                </div>
-
-                {/* Chain filter pills */}
-                <div className="flex gap-1 flex-wrap">
-                    {chains.map(c => (
-                        <button key={c}
-                            onClick={() => setChainFilter(c)}
-                            className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all ${chainFilter === c ? 'bg-[#050505] text-white border-[#050505]' : 'text-[#888888] border-[#E5E5E5] hover:border-[#050505] hover:text-[#050505]'}`}
-                        >
-                            {c === 'all' ? 'ALL' : c.toUpperCase()}
-                        </button>
-                    ))}
                 </div>
 
                 {/* Rug filter */}
@@ -209,15 +199,29 @@ export function NewPairsTable() {
                     ))}
                 </div>
 
-                {/* Refresh + status */}
                 <div className="ml-auto flex items-center gap-3">
                     <button onClick={fetchPairs} className="p-1.5 rounded-lg border border-[#E5E5E5] text-[#888888] hover:text-[#050505] transition-colors">
                         <RefreshCw size={13} />
                     </button>
-                    <span className="flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase text-[#00C076]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" /> LIVE · {lastRefresh.toTimeString().slice(0,8)}
+                    <span className="flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase" style={{ color: '#00C076' }}>
+                        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00C076' }} /> LIVE · {lastRefresh.toTimeString().slice(0,8)}
                     </span>
                 </div>
+            </div>
+
+            {/* ── Network Filter Row (Fix B) ── */}
+            <div className="px-4 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
+                <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest mr-1">Network:</span>
+                {chains.map(c => (
+                    <button key={c}
+                        onClick={() => setChainFilter(c)}
+                        className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all ${chainFilter === c
+                            ? 'text-white border-transparent'
+                            : 'text-[#888888] border-[#E5E5E5] hover:border-[#050505] bg-transparent'}`}
+                        style={chainFilter === c ? { background: c === 'all' ? '#050505' : CHAIN_COLORS[c] || '#050505' } : {}}>
+                        {c === 'all' ? 'All Networks' : c.charAt(0).toUpperCase() + c.slice(1)}
+                    </button>
+                ))}
             </div>
 
             {/* ── Table ── */}
@@ -235,143 +239,132 @@ export function NewPairsTable() {
                         ))}
                     </div>
 
-                    {/* Rows — AutoSizer now lives in a genuinely flex-1 container */}
+                    {/* Rows — explicit height prevents AutoSizer collapse bug */}
                     <div className="flex-1" style={{ minHeight: 0 }}>
                         {loading && pairs.length === 0 ? (
-                            <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center h-full justify-center">
+                            <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center justify-center" style={{ height: 520 }}>
                                 <Loader2 className="animate-spin mb-3" size={22} /> Scanning mempool streams…
                             </div>
                         ) : filtered.length === 0 ? (
-                            <div className="p-12 text-center text-[#888888] text-[10px] font-mono h-full flex items-center justify-center">NO PAIRS MATCH FILTERS</div>
+                            <div className="p-12 text-center text-[#888888] text-[10px] font-mono flex items-center justify-center" style={{ height: 520 }}>NO PAIRS MATCH FILTERS</div>
                         ) : (
-                            <AutoSizer>
-                                {({ height, width }) => (
-                                    <List
-                                        height={height || 560}
-                                        itemCount={filtered.length}
-                                        itemSize={78}
-                                        width={width || 1400}
-                                        itemData={{ filtered }}
-                                    >
-                                        {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
-                                            const p = data?.filtered?.[index];
-                                            if (!p || !p.security || !p.priceChange || !p.baseToken) {
-                                                return <div style={style} />;
-                                            }
-                                            const isRug = (p.security.score ?? 50) < 65;
-                                            const score = p.security.score ?? 50;
-                                            return (
-                                                <div style={style} className="border-b border-[#F0F0F0]">
-                                                    <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
-                                                        style={{ gridTemplateColumns: '2.4fr 1.4fr 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 1fr 1fr 1.4fr' }}
-                                                    >
-                                                        {/* Token / Dex */}
-                                                        <div className="px-3 flex items-center gap-2.5 overflow-hidden">
-                                                            <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                                                style={{ background: CHAIN_COLORS[p.chain] || '#888' }}>
-                                                                {p.baseToken.symbol[0]}
-                                                            </div>
-                                                            <div className="flex flex-col min-w-0">
-                                                                <div className="flex items-center gap-1.5">
-                                                                    <span className="text-[11px] font-black text-[#050505] truncate">{p.baseToken.symbol}</span>
-                                                                    <span className="text-[8px] font-mono text-[#888888]">/ {p.quoteToken.symbol}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-1.5 mt-0.5">
-                                                                    <span className="text-[8px] font-bold text-[#888888] truncate">{p.baseToken.name}</span>
-                                                                    <span className="text-[7px] px-1.5 py-0.5 rounded border border-[#E5E5E5] text-[#888888]" style={{ borderColor: CHAIN_COLORS[p.chain] + '55', color: CHAIN_COLORS[p.chain] }}>{p.chain}</span>
-                                                                    <span className="text-[7px] text-[#888888]">{p.dex}</span>
-                                                                </div>
-                                                            </div>
+                            <div className="flex flex-col w-full overflow-y-auto overflow-x-hidden" style={{ height: 520 }}>
+                                {filtered.map((p: any, index: number) => {
+                                    if (!p || !p.security || !p.priceChange || !p.baseToken) {
+                                        return null;
+                                    }
+                                    const isRug = (p.security.score ?? 50) < 65;
+                                    const score = p.security.score ?? 50;
+                                    return (
+                                        <div key={p.id || index} className="border-b border-[#F0F0F0]">
+                                            <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer min-h-[78px]"
+                                                style={{ gridTemplateColumns: '2.4fr 1.4fr 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 1fr 1fr 1.4fr' }}
+                                            >
+                                                {/* Token / Dex */}
+                                                <div className="px-3 flex items-center gap-2.5 overflow-hidden">
+                                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                                                        style={{ background: CHAIN_COLORS[p.chain] || '#888' }}>
+                                                        {p.baseToken.symbol[0]}
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="text-[11px] font-black text-[#050505] truncate">{p.baseToken.symbol}</span>
+                                                            <span className="text-[8px] font-mono text-[#888888]">/ {p.quoteToken.symbol}</span>
                                                         </div>
-
-                                                        {/* Price */}
-                                                        <div className="px-3">
-                                                            <div className="text-[11px] font-black font-mono text-[#050505]">${p.priceUsd}</div>
-                                                            <div className="flex gap-2 mt-0.5 text-[9px] font-mono">
-                                                                <span className="text-[#00C076] flex items-center gap-0.5"><ArrowUpRight size={9}/>{p.txns.m5.buys}B</span>
-                                                                <span className="text-[#FF3B30] flex items-center gap-0.5"><ArrowDownRight size={9}/>{p.txns.m5.sells}S</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Age */}
-                                                        <div className="px-3 text-right text-[10px] font-mono font-bold text-[#050505] flex items-center justify-end gap-1">
-                                                            <Clock size={10} className="text-[#888888]" />{getAge(p.pairCreatedAt)}
-                                                        </div>
-
-                                                        {/* 5m % */}
-                                                        <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.m5)}`}>
-                                                            {pctFmt(p.priceChange.m5)}
-                                                        </div>
-
-                                                        {/* 1h % */}
-                                                        <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h1)}`}>
-                                                            {pctFmt(p.priceChange.h1)}
-                                                        </div>
-
-                                                        {/* 6h % */}
-                                                        <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h6)}`}>
-                                                            {pctFmt(p.priceChange.h6)}
-                                                        </div>
-
-                                                        {/* 24h % */}
-                                                        <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h24)}`}>
-                                                            {pctFmt(p.priceChange.h24)}
-                                                        </div>
-
-                                                        {/* Liquidity */}
-                                                        <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                            {fmt(p.liquidity.usd)}
-                                                        </div>
-
-                                                        {/* MCap */}
-                                                        <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                            {fmt(p.mcap)}
-                                                        </div>
-
-                                                        {/* FDV */}
-                                                        <div className="px-3 text-right text-[10px] font-bold font-mono text-[#888888]">
-                                                            {fmt(p.fdv)}
-                                                        </div>
-
-                                                        {/* Makers */}
-                                                        <div className="px-3 text-right">
-                                                            <div className="flex flex-col items-end gap-0.5">
-                                                                <span className="text-[10px] font-black font-mono text-[#050505] flex items-center gap-1">
-                                                                    <Users size={9} className="text-[#888888]" />{p.traders.makers}
-                                                                </span>
-                                                                {p.traders.snipers > 0 && (
-                                                                    <span className="text-[8px] font-bold text-[#FF3B30] flex items-center gap-0.5">
-                                                                        <Zap size={8}/>{p.traders.snipers} snipers
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Security Score */}
-                                                        <div className="px-3">
-                                                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-[8px] font-black uppercase tracking-wider border w-fit ml-auto ${
-                                                                isRug
-                                                                    ? 'bg-[#FF3B30]/10 border-[#FF3B30]/30 text-[#FF3B30]'
-                                                                    : 'bg-[#00C076]/10 border-[#00C076]/30 text-[#00C076]'
-                                                            }`}>
-                                                                {isRug ? <ShieldAlert size={10}/> : <ShieldCheck size={10}/>}
-                                                                <span>{score}/100</span>
-                                                                {p.security.honeypotRisk && <AlertTriangle size={9} className="text-[#FF9500]" />}
-                                                            </div>
-                                                            <div className="flex gap-1.5 justify-end mt-1">
-                                                                {p.security.lpBurned     && <span className="text-[7px] font-black text-[#00C076]">LP✓</span>}
-                                                                {p.security.mintRevoked  && <span className="text-[7px] font-black text-[#00C076]">MINT✓</span>}
-                                                                {p.taxes.buy  > 0 && <span className="text-[7px] font-bold text-[#888888]">B:{p.taxes.buy}%</span>}
-                                                                {p.taxes.sell > 0 && <span className="text-[7px] font-bold text-[#888888]">S:{p.taxes.sell}%</span>}
-                                                            </div>
+                                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                                            <span className="text-[8px] font-bold text-[#888888] truncate">{p.baseToken.name}</span>
+                                                            <span className="text-[7px] px-1.5 py-0.5 rounded border border-[#E5E5E5] text-[#888888]" style={{ borderColor: CHAIN_COLORS[p.chain] + '55', color: CHAIN_COLORS[p.chain] }}>{p.chain}</span>
+                                                            <span className="text-[7px] text-[#888888]">{p.dex}</span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            );
-                                        }}
-                                    </List>
-                                )}
-                            </AutoSizer>
+
+                                                {/* Price */}
+                                                <div className="px-3">
+                                                    <div className="text-[11px] font-black font-mono text-[#050505]">${p.priceUsd}</div>
+                                                    <div className="flex gap-2 mt-0.5 text-[9px] font-mono">
+                                                        <span className="text-[#00C076] flex items-center gap-0.5"><ArrowUpRight size={9}/>{p.txns.m5.buys}B</span>
+                                                        <span className="text-[#FF3B30] flex items-center gap-0.5"><ArrowDownRight size={9}/>{p.txns.m5.sells}S</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Age */}
+                                                <div className="px-3 text-right text-[10px] font-mono font-bold text-[#050505] flex items-center justify-end gap-1">
+                                                    <Clock size={10} className="text-[#888888]" />{getAge(p.pairCreatedAt)}
+                                                </div>
+
+                                                {/* 5m % */}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.m5)}`}>
+                                                    {pctFmt(p.priceChange.m5)}
+                                                </div>
+
+                                                {/* 1h % */}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h1)}`}>
+                                                    {pctFmt(p.priceChange.h1)}
+                                                </div>
+
+                                                {/* 6h % */}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h6)}`}>
+                                                    {pctFmt(p.priceChange.h6)}
+                                                </div>
+
+                                                {/* 24h % */}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h24)}`}>
+                                                    {pctFmt(p.priceChange.h24)}
+                                                </div>
+
+                                                {/* Liquidity */}
+                                                <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
+                                                    {fmt(p.liquidity.usd)}
+                                                </div>
+
+                                                {/* MCap */}
+                                                <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
+                                                    {fmt(p.mcap)}
+                                                </div>
+
+                                                {/* FDV */}
+                                                <div className="px-3 text-right text-[10px] font-bold font-mono text-[#888888]">
+                                                    {fmt(p.fdv)}
+                                                </div>
+
+                                                {/* Makers */}
+                                                <div className="px-3 text-right">
+                                                    <div className="flex flex-col items-end gap-0.5">
+                                                        <span className="text-[10px] font-black font-mono text-[#050505] flex items-center gap-1">
+                                                            <Users size={9} className="text-[#888888]" />{p.traders.makers}
+                                                        </span>
+                                                        {p.traders.snipers > 0 && (
+                                                            <span className="text-[8px] font-bold text-[#FF3B30] flex items-center gap-0.5">
+                                                                <Zap size={8}/>{p.traders.snipers} snipers
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Security Score */}
+                                                <div className="px-3">
+                                                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-[8px] font-black uppercase tracking-wider border w-fit ml-auto ${
+                                                        isRug
+                                                            ? 'bg-[#FF3B30]/10 border-[#FF3B30]/30 text-[#FF3B30]'
+                                                            : 'bg-[#00C076]/10 border-[#00C076]/30 text-[#00C076]'
+                                                    }`}>
+                                                        {isRug ? <ShieldAlert size={10}/> : <ShieldCheck size={10}/>}
+                                                        <span>{score}/100</span>
+                                                        {p.security.honeypotRisk && <AlertTriangle size={9} className="text-[#FF9500]" />}
+                                                    </div>
+                                                    <div className="flex gap-1.5 justify-end mt-1">
+                                                        {p.security.lpBurned     && <span className="text-[7px] font-black text-[#00C076]">LP✓</span>}
+                                                        {p.security.mintRevoked  && <span className="text-[7px] font-black text-[#00C076]">MINT✓</span>}
+                                                        {p.taxes.buy  > 0 && <span className="text-[7px] font-bold text-[#888888]">B:{p.taxes.buy}%</span>}
+                                                        {p.taxes.sell > 0 && <span className="text-[7px] font-bold text-[#888888]">S:{p.taxes.sell}%</span>}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         )}
                     </div>
                 </div>
