@@ -20,44 +20,49 @@ export function MegalodonWhalePulse() {
     // Connect to the REAL on-chain mempool stream — only whale events ($500k+) arrive here
     useEffect(() => {
         if (!isMonitoring) return;
-        let es: EventSource | null = null;
+        let isMounted = true;
+        let timeoutId: NodeJS.Timeout;
 
-        try {
-            es = new EventSource('/api/network/whale/mempool-stream');
-            
-            es.onmessage = (event) => {
-                try {
-                    const tx = JSON.parse(event.data);
-                    // Only show whale transactions, not dust
-                    if (tx.type !== 'whale') return;
-                    
-                    const ethValue = typeof tx.value === 'number' ? tx.value : 0;
-                    const usdEstimate = ethValue * 3000; // rough ETH price; replace with live price if available
-                    const formatted = usdEstimate >= 1_000_000
-                        ? `$${(usdEstimate / 1_000_000).toFixed(1)}M`
-                        : `$${(usdEstimate / 1_000).toFixed(0)}K`;
-                    
-                    const alert: UIStoreAlert = {
-                        id: tx.hash?.slice(0, 10) || Date.now().toString(36),
-                        type: 'WHALE_TX',
-                        chain: 'ETH',
-                        amount: formatted,
-                        severity: usdEstimate > 5_000_000 ? 'ASTRONOMICAL' : 'CRITICAL',
-                        timestamp: new Date(tx.timestamp || Date.now()).toLocaleTimeString(),
-                    };
-                    
-                    setAlerts(prev => [alert, ...prev].slice(0, 5));
-                } catch { /* malformed frame */ }
-            };
+        const fetchPulse = async () => {
+            if (!isMounted) return;
+            try {
+                const res = await fetch('/api/network/whale/mempool-stream');
+                if (res.ok) {
+                    const tx = await res.json();
+                    if (tx && tx.type === 'whale') {
+                        const ethValue = typeof tx.value === 'number' ? tx.value : 0;
+                        const usdEstimate = ethValue * 3000;
+                        const formatted = usdEstimate >= 1_000_000
+                            ? `$${(usdEstimate / 1_000_000).toFixed(1)}M`
+                            : `$${(usdEstimate / 1_000).toFixed(0)}K`;
+                        
+                        const alert: UIStoreAlert = {
+                            id: tx.hash?.slice(0, 10) || Date.now().toString(36),
+                            type: 'WHALE_TX',
+                            chain: 'ETH',
+                            amount: formatted,
+                            severity: usdEstimate > 5_000_000 ? 'ASTRONOMICAL' : 'CRITICAL',
+                            timestamp: new Date(tx.timestamp || Date.now()).toLocaleTimeString(),
+                        };
+                        
+                        setAlerts(prev => [alert, ...prev].slice(0, 5));
+                    }
+                }
+            } catch (e) {
+                // Silently retry
+            } finally {
+                if (isMounted) {
+                    timeoutId = setTimeout(fetchPulse, 2500); // 2.5s polling
+                }
+            }
+        };
 
-            es.onerror = () => {
-                // SSE disconnected — silently retry after 5s
-                es?.close();
-                setTimeout(() => setIsMonitoring(m => { if (m) { setIsMonitoring(false); setIsMonitoring(true); } return m; }), 5000);
-            };
-        } catch { /* EventSource not supported */ }
+        fetchPulse();
 
-        return () => es?.close();
+        return () => {
+            isMounted = false;
+            clearTimeout(timeoutId);
+        };
     }, [isMonitoring]);
 
     const [alertStats, setAlertStats] = useState<{ eth24h: number; btc24h: number; sol24h: number; base24h: number } | null>(null);

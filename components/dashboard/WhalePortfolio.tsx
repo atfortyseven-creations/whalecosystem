@@ -110,22 +110,34 @@ export function WhalePortfolio() {
         PORTFOLIO_TOKENS.forEach(t => { t.allocation = (t.valueUSD / totalValue) * 100; });
     }
 
-    // ── EP2 SSE: count live whale transfers in real time ───────────────────────
+    // EP2 Polling: count live whale transfers in real time
     useEffect(() => {
-        let es: EventSource | null = null;
-        try {
-            es = new EventSource('/api/whales/sse');
-            es.addEventListener('message', (e) => {
-                try {
-                    const msg = JSON.parse(e.data);
-                    if (msg.type === 'WHALE_TX') {
+        let isMounted = true;
+        let timeoutId: NodeJS.Timeout;
+        
+        const fetchWhaleTx = async () => {
+            if (!isMounted) return;
+            try {
+                const res = await fetch('/api/whales/sse');
+                if (res.ok) {
+                    const parsed = await res.json();
+                    if (parsed && parsed.type === 'WHALE_TX') {
                         setLiveWhaleCount(c => c + 1);
                         setLastUpdated(new Date());
                     }
-                } catch {}
-            });
-        } catch {}
-        return () => { es?.close(); };
+                }
+            } catch {}
+            finally {
+                if (isMounted) {
+                    timeoutId = setTimeout(fetchWhaleTx, 4000); // 4s poll
+                }
+            }
+        };
+        fetchWhaleTx();
+        return () => { 
+            isMounted = false;
+            clearTimeout(timeoutId);
+        };
     }, []);
 
     // Derive dynamic stats from real whale data

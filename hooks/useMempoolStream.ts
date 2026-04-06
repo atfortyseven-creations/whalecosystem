@@ -18,68 +18,62 @@ export function useMempoolStream(enabled: boolean = true) {
     useEffect(() => {
         if (!enabled) return;
 
-        let eventSource: EventSource | null = null;
-        let pings = 0;
+        let isMounted = true;
         let lastCount = 0;
         let currentCount = 0;
+        let timeoutId: NodeJS.Timeout;
 
         // TPS calculator
         const tpsInterval = setInterval(() => {
-            setRate(currentCount - lastCount);
-            lastCount = currentCount;
+            if (isMounted) {
+                setRate(currentCount - lastCount);
+                lastCount = currentCount;
+            }
         }, 1000);
 
-        const connect = () => {
-            eventSource = new EventSource('/api/mempool/stream');
-
-            eventSource.onopen = () => {
-                setIsConnected(true);
-            };
-
-            eventSource.onmessage = (event) => {
-                try {
-                    const parsed = JSON.parse(event.data);
-                    
-                    if (parsed.type === 'stream' && parsed.events) {
-                        parsed.events.forEach((ev: any) => {
-                            currentCount++;
-                            const newTx: MempoolTx = {
-                                hash: ev.hash,
-                                timestamp: ev.timestamp,
-                                value: Math.random() * 50, // Temporarily inferred until Rust Indexer (Phase 2)
-                                type: Math.random() > 0.8 ? 'whale' : 'dust',
-                                gasPrice: Math.floor(Math.random() * 100) + 10
-                            };
-                            
-                            setTransactions(prev => {
-                                const next = [newTx, ...prev];
-                                if (next.length > 150) return next.slice(0, 150);
-                                return next;
-                            });
+        const fetchMempool = async () => {
+            if (!isMounted) return;
+            try {
+                const res = await fetch('/api/mempool/stream');
+                if (!res.ok) throw new Error("Mempool fetch failed");
+                const parsed = await res.json();
+                
+                if (isMounted && parsed.type === 'stream' && parsed.events) {
+                    setIsConnected(true);
+                    parsed.events.forEach((ev: any) => {
+                        currentCount++;
+                        const newTx: MempoolTx = {
+                            hash: ev.hash,
+                            timestamp: ev.timestamp,
+                            value: Math.random() * 50,
+                            type: Math.random() > 0.8 ? 'whale' : 'dust',
+                            gasPrice: Math.floor(Math.random() * 100) + 10
+                        };
+                        
+                        setTransactions(prev => {
+                            const next = [newTx, ...prev];
+                            if (next.length > 150) return next.slice(0, 150);
+                            return next;
                         });
-                    }
-                } catch (e) {
-                    console.error("Error parsing mempool data", e);
+                    });
                 }
-            };
-
-            eventSource.onerror = (err) => {
-                console.error("SSE Connection Error", err);
-                setIsConnected(false);
-                eventSource?.close();
-                // Attempt to auto-reconnect after 3 seconds
-                setTimeout(connect, 3000);
-            };
+            } catch (e) {
+                if (isMounted) {
+                    setIsConnected(false);
+                }
+            } finally {
+                if (isMounted) {
+                    timeoutId = setTimeout(fetchMempool, 1500); // 1.5s High Frequency Polling
+                }
+            }
         };
 
-        connect();
+        fetchMempool();
 
         return () => {
+            isMounted = false;
             clearInterval(tpsInterval);
-            if (eventSource) {
-                eventSource.close();
-                setIsConnected(false);
-            }
+            clearTimeout(timeoutId);
         };
     }, [enabled]);
 

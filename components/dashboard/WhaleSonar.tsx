@@ -7,32 +7,44 @@ export function WhaleSonar() {
     const [stats, setStats] = useState({ roi: 5.4, burnRate: 0.021 }); // Local simulated baseline
 
     useEffect(() => {
-        const source = new EventSource('/api/whales/stream');
-        
-        source.onmessage = (e) => {
-            if (e.data === ':') return; // keep-alive
+        let isMounted = true;
+        let timeoutId: NodeJS.Timeout;
+
+        const fetchAlerts = async () => {
+            if (!isMounted) return;
             try {
-                const payload = JSON.parse(e.data);
-                if (payload.type === 'HISTORY') {
-                    setAlerts(payload.alerts || []);
-                } else if (payload.type === 'WHALE') {
-                    setAlerts(prev => {
-                        const next = [payload, ...prev];
-                        if (next.length > 50) return next.slice(0, 50);
-                        return next;
-                    });
-                     // dynamically simulate intensity updates based on Webhook freq
-                    setStats(s => ({
-                         roi: s.roi + (Math.random() * 0.1 - 0.05),
-                         burnRate: s.burnRate + 0.001
-                    }));
+                const res = await fetch('/api/whales/stream');
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.type === 'HISTORY') {
+                        setAlerts(payload.alerts || []);
+                    } else if (payload.type === 'WHALE') {
+                        setAlerts(prev => {
+                            const next = [payload, ...prev];
+                            if (next.length > 50) return next.slice(0, 50);
+                            return next;
+                        });
+                        setStats(s => ({
+                             roi: s.roi + (Math.random() * 0.1 - 0.05),
+                             burnRate: s.burnRate + 0.001
+                        }));
+                    }
                 }
             } catch (err) {
-                console.error("SSE parsing error", err);
+                // Silently retry
+            } finally {
+                if (isMounted) {
+                    timeoutId = setTimeout(fetchAlerts, 3000);
+                }
             }
         };
 
-        return () => source.close();
+        fetchAlerts();
+
+        return () => {
+            isMounted = false;
+            clearTimeout(timeoutId);
+        };
     }, []);
 
     return (

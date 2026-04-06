@@ -24,7 +24,9 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
 
     // Reemplazar simulación con streams WebSockets reales del motor de Node.js
     useEffect(() => {
-        const socket = io();
+        // Connect to the external standalone WebSocket Gateway
+        const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+        const socket = io(GATEWAY_URL, { path: '/api/socket/io' });
         let logCounter = 0;
 
         setLogs([
@@ -41,7 +43,8 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
             }]);
         });
         
-        socket.on('whale_tx', (data) => {
+        // Listen to REAL events emitted by services/gateway/server.ts
+        socket.on('new-whale-alert', (data) => {
             const now = new Date();
             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
             
@@ -49,38 +52,37 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
                 id: ++logCounter,
                 timestamp: timeStr,
                 type: 'warning',
-                message: <span><span className="text-[#E5E5E5]">[{data.chain.toUpperCase()}]</span> ⚡ ALERTA INSTITUCIONAL: {data.type} detectado por <span className="text-[#FF9500] font-black">${(data.amountUsd).toLocaleString()}</span> USD.</span>
+                message: <span><span className="text-[#E5E5E5]">[{data.chain?.toUpperCase() || 'ETH'}]</span> ⚡ ALERTA INSTITUCIONAL: {data.type || 'Transfer'} detectado por <span className="text-[#FF9500] font-black">${(data.usdValue || data.amountUsd || 0).toLocaleString()}</span> USD.</span>
             }]);
         });
 
-        socket.on('engine_status', (status) => {
+        socket.on('vitals.tx.new', (data) => {
             const now = new Date();
             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
             
-            // Limit status print to prevent flooding if it updates every second, maybe print every 10th
-            if (status.processedTxs % 10 === 0) {
-                 setLogs(prev => [...prev.slice(-49), {
-                    id: ++logCounter,
-                    timestamp: timeStr,
-                    type: 'info',
-                    message: <span className="text-[#888888]"><Activity size={10} className="inline mr-1"/> Motor Mempool: {status.tps} TPS | Tx Totales: {status.processedTxs.toLocaleString()} | Uptime: {Math.floor(status.uptime)}s</span>
-                }]);
-            }
-        });
-
-        socket.on('mempool_tick', (data) => {
-            const now = new Date();
-            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            
-            // Only capture 5% of normal ticks to not overflow the dom terminal visually (simulate extreme volume)
+            // Limit verbose prints to prevent DOM overflow
             if (Math.random() < 0.05) {
                 setLogs(prev => [...prev.slice(-49), {
                     id: ++logCounter,
                     timestamp: timeStr,
                     type: 'info',
-                    message: <span><span className="text-[#888888]">[{data.chain}]</span> Pool Trace: {data.id}</span>
+                    message: <span><span className="text-[#888888]">[{data.chain || 'ETH'}]</span> Mempool Hash: {data.hash?.slice(0, 16) || '0x...'}...</span>
                 }]);
             }
+        });
+
+        socket.on('connect_error', () => {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            setLogs(prev => {
+                if (prev[prev.length-1]?.type === 'error') return prev; // prevent flood
+                return [...prev.slice(-49), {
+                    id: ++logCounter,
+                    timestamp: timeStr,
+                    type: 'error',
+                    message: <span className="text-[#FF3B30]">CONNECTION FAILED — Is the Gateway running on {GATEWAY_URL}?</span>
+                }];
+            });
         });
 
         return () => {

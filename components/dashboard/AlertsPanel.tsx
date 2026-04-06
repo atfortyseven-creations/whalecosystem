@@ -226,48 +226,59 @@ export function AlertsPanel() {
 
     useEffect(() => { refresh(); }, [address]);
 
-    // ── EP2 SSE: real-time whale transfers from GetBlock WebSocket ─────────────
+    // EP2 Polling: real-time whale transfers from GetBlock/Backend
     useEffect(() => {
-        let es: EventSource | null = null;
-        try {
-            es = new EventSource('/api/whales/sse');
+        let isMounted = true;
+        let timeoutId: NodeJS.Timeout;
 
-            es.addEventListener('message', (e) => {
-                try {
-                    const msg = JSON.parse(e.data);
-                    if (msg.type !== 'WHALE_TX') return;
+        const fetchPulse = async () => {
+            if (!isMounted) return;
+            try {
+                const res = await fetch('/api/whales/sse');
+                if (res.ok) {
+                    const msg = await res.json();
+                    if (msg && msg.type === 'WHALE_TX' && (msg.usdValue || 0) >= 50_000) {
+                        const newAlert: AlertRule = {
+                            id:      `ep2-${msg.txHash}-${Date.now()}`,
+                            name:    `🐋 On-Chain Whale · ${msg.symbol} Transfer`,
+                            type:    'WHALE_MOVE',
+                            asset:   msg.symbol || 'ETH',
+                            threshold:    msg.usdValue,
+                            currentValue: msg.usdValue,
+                            status:       'TRIGGERED',
+                            triggeredAt:  new Date(msg.timestamp).toISOString(),
+                            createdAt:    new Date(msg.timestamp).toISOString(),
+                            notifyTelegram: false,
+                            notifyEmail:    false,
+                            notifyPush:     true,
+                        };
 
-                    if ((msg.usdValue || 0) < 50_000) return;
+                        setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
 
-                    const newAlert: AlertRule = {
-                        id:      `ep2-${msg.txHash}-${Date.now()}`,
-                        name:    `🐋 On-Chain Whale · ${msg.symbol} Transfer`,
-                        type:    'WHALE_MOVE',
-                        asset:   msg.symbol || 'ETH',
-                        threshold:    msg.usdValue,
-                        currentValue: msg.usdValue,
-                        status:       'TRIGGERED',
-                        triggeredAt:  new Date(msg.timestamp).toISOString(),
-                        createdAt:    new Date(msg.timestamp).toISOString(),
-                        notifyTelegram: false,
-                        notifyEmail:    false,
-                        notifyPush:     true,
-                    };
+                        const usdM = (msg.usdValue / 1e6).toFixed(2);
+                        const from  = `${msg.from?.slice(0, 6)}…${msg.from?.slice(-4)}`;
+                        const to    = `${msg.to?.slice(0, 6)}…${msg.to?.slice(-4)}`;
+                        toast(`🐋 $${usdM}M ${msg.symbol} — ${from} → ${to}`, {
+                            duration: 8000,
+                            style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' },
+                        });
+                    }
+                }
+            } catch (e) {
+                // Silently omit error on poll
+            } finally {
+                if (isMounted) {
+                    timeoutId = setTimeout(fetchPulse, 3500); // 3.5s polling
+                }
+            }
+        };
 
-                    setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
+        fetchPulse();
 
-                    const usdM = (msg.usdValue / 1e6).toFixed(2);
-                    const from  = `${msg.from?.slice(0, 6)}…${msg.from?.slice(-4)}`;
-                    const to    = `${msg.to?.slice(0, 6)}…${msg.to?.slice(-4)}`;
-                    toast(`🐋 $${usdM}M ${msg.symbol} — ${from} → ${to}`, {
-                        duration: 8000,
-                        style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' },
-                    });
-                } catch {}
-            });
-            es.onerror = () => {};
-        } catch {}
-        return () => { es?.close(); };
+        return () => {
+            isMounted = false;
+            clearTimeout(timeoutId);
+        };
     }, []);
 
     const handleDelete = async (id: string) => {

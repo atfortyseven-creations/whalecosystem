@@ -72,48 +72,11 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const asset = url.searchParams.get('asset') || 'BTC';
 
-    const stream = new ReadableStream({
-        async start(controller) {
-            let isRunning = true;
-
-            req.signal.addEventListener('abort', () => {
-                isRunning = false;
-                try { controller.close(); } catch (_) {}
-            });
-
-            const sendEvent = (data: unknown) => {
-                try {
-                    const message = `data: ${JSON.stringify(data)}\n\n`;
-                    controller.enqueue(new TextEncoder().encode(message));
-                } catch (_) {
-                    isRunning = false;
-                }
-            };
-            
-            // Defeat Nginx/cloud reverse proxies buffering the connection
-            controller.enqueue(new TextEncoder().encode(': ' + 'x'.repeat(2048) + '\n\n'));
-
-            while (isRunning) {
-                try {
-                    const output = await VIPMatrixEngine.calculatePrecognitiveState(asset);
-                    // Always send real data over the Matrix Stream
-                    sendEvent(output);
-                } catch (err) {
-                    console.error("[Matrix Stream] Engine tick failed for", asset, err);
-                    // Total engine failure — send rich demo fallback so UI doesn't crash
-                    sendEvent(getDemoState(asset));
-                }
-                await new Promise(resolve => setTimeout(resolve, 5000));
-            }
-        }
-    });
-
-    return new Response(stream, {
+    const output = await VIPMatrixEngine.calculatePrecognitiveState(asset);
+    return new Response(JSON.stringify(output), {
         headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache, no-transform',
-            'Connection': 'keep-alive',
-            'X-Accel-Buffering': 'no',
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Access-Control-Allow-Origin': '*'
         }
     });

@@ -67,37 +67,23 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
             try {
                 const response = await fetch(`/api/matrix/stream?asset=${symbol}`);
                 if (!response.ok) throw new Error("Stream connection failed");
-                reader = response.body?.getReader() || null;
-                const decoder = new TextDecoder('utf-8');
-                let buffer = '';
-
-                while (isMounted && reader) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n\n');
-                    buffer = lines.pop() || '';
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const parsed = JSON.parse(line.slice(6));
-                                if (isMounted) setState(parsed as PrecognitiveState);
-                            } catch (_) {}
-                        }
-                    }
-                }
+                const parsed = await response.json();
+                if (isMounted && parsed) setState(parsed as PrecognitiveState);
             } catch (err) {
                 if (isMounted) {
-                    console.error(`[Matrix] Streaming failed for ${symbol}, reconnecting...`);
+                    console.error(`[Matrix] Streaming failed for ${symbol}, retrying...`);
+                }
+            } finally {
+                if (isMounted) {
                     timeoutId = setTimeout(fetchStream, 5000);
                 }
             }
         };
+
         fetchStream();
         
         return () => { 
             isMounted = false; 
-            if (reader) reader.cancel().catch(() => {});
             clearTimeout(timeoutId);
             clearTimeout(fallbackTimer);
         };

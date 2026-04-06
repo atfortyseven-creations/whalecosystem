@@ -41,72 +41,37 @@ function getBulletproofSyntheticMarkets() {
 }
 
 export async function GET(req: NextRequest) {
-    const encoder = new TextEncoder();
+    let marketData;
     
-    // Server-Sent Events (SSE) setup
-    const stream = new ReadableStream({
-        async start(controller) {
-            // Function to send data
-            const sendEvent = async () => {
-                let marketData;
-                
-                try {
-                    if (redis && redis.status === 'ready') {
-                        // Attempt to fetch from high-performance Redis cache populated by our WebSocket Daemon
-                        const raw = await redis.get('institutional_markets_cache');
-                        if (raw) marketData = JSON.parse(raw);
-                    }
-                    
-                    // Fallback to active REST fetch if no Redis daemon is running
-                    if (!marketData) {
-                        const binanceRes = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
-                        if (binanceRes.ok) {
-                            marketData = await binanceRes.json();
-                        } else {
-                            // Binance blocked us (403/429) -> Inject bulletproof stream
-                            marketData = getBulletproofSyntheticMarkets();
-                        }
-                    }
-                } catch (e) {
-                    console.error("Stream Fetch Error", e);
-                    marketData = getBulletproofSyntheticMarkets();
-                }
-
-                if (marketData && Array.isArray(marketData)) {
-                    // Send an immediate trailing newline packet so Railway's proxy flush actually trips
-                    const payload = `data: ${JSON.stringify({ success: true, timestamp: Date.now(), data: marketData })}\n\n`;
-                    controller.enqueue(encoder.encode(payload));
-                } else {
-                    // Absolute failsafe fallback if data is utterly corrupted
-                    const failsafe = `data: ${JSON.stringify({ success: true, timestamp: Date.now(), data: getBulletproofSyntheticMarkets() })}\n\n`;
-                    controller.enqueue(encoder.encode(failsafe));
-                }
-            };
-
-            // Defeat Nginx/cloud reverse proxies buffering the connection
-            controller.enqueue(new TextEncoder().encode(': ' + 'x'.repeat(2048) + '\n\n'));
-
-            // Send immediate burst
-            await sendEvent();
-
-            // Set up interval for every 2 seconds (High Frequency)
-            const intervalId = setInterval(async () => {
-                await sendEvent();
-            }, 2000);
-
-            // Clean up upon client disconnect
-            req.signal.addEventListener('abort', () => {
-                clearInterval(intervalId);
-                controller.close();
-            });
+    try {
+        if (redis && redis.status === 'ready') {
+            const raw = await redis.get('institutional_markets_cache');
+            if (raw) marketData = JSON.parse(raw);
         }
-    });
+        
+        if (!marketData) {
+            const binanceRes = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
+            if (binanceRes.ok) {
+                marketData = await binanceRes.json();
+            } else {
+                marketData = getBulletproofSyntheticMarkets();
+            }
+        }
+    } catch (e) {
+        marketData = getBulletproofSyntheticMarkets();
+    }
 
-    return new NextResponse(stream, {
+    if (!marketData || !Array.isArray(marketData)) {
+        marketData = getBulletproofSyntheticMarkets();
+    }
+
+    return NextResponse.json({
+        success: true,
+        timestamp: Date.now(),
+        data: marketData
+    }, {
         headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache, no-transform',
-            'Connection': 'keep-alive',
-        },
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+        }
     });
 }

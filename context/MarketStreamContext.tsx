@@ -30,49 +30,41 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
     const [lastUpdate, setLastUpdate] = useState(new Date());
 
     useEffect(() => {
-        let eventSource: EventSource | null = null;
         let isMounted = true;
+        let timeoutId: NodeJS.Timeout;
 
-        const connectStream = () => {
-            eventSource = new EventSource('/api/markets/stream');
-
-            eventSource.onopen = () => {
-                if (isMounted) setIsConnected(true);
-            };
-
-            eventSource.onmessage = (event) => {
-                try {
-                    const parsed = JSON.parse(event.data);
-                    if (parsed && parsed.success && Array.isArray(parsed.data)) {
-                        if (isMounted) {
-                            const newMap = new Map<string, MarketData>();
-                            parsed.data.forEach((d: MarketData) => {
-                                if (d?.symbol) newMap.set(d.symbol, d);
-                            });
-                            setMarkets(newMap);
-                            setLastUpdate(new Date(parsed.timestamp || Date.now()));
-                        }
+        const fetchStream = async () => {
+            try {
+                const res = await fetch('/api/markets/stream');
+                if (!res.ok) throw new Error("Stream fetch failed");
+                const parsed = await res.json();
+                
+                if (parsed && parsed.success && Array.isArray(parsed.data)) {
+                    if (isMounted) {
+                        const newMap = new Map<string, MarketData>();
+                        parsed.data.forEach((d: MarketData) => {
+                            if (d?.symbol) newMap.set(d.symbol, d);
+                        });
+                        setMarkets(newMap);
+                        setLastUpdate(new Date(parsed.timestamp || Date.now()));
+                        setIsConnected(true);
                     }
-                } catch (e) {
-                    console.error("MarketStream parse error", e);
                 }
-            };
-
-            eventSource.onerror = () => {
+            } catch (e) {
+                console.warn("MarketStream fetch error, retrying...", e);
                 if (isMounted) setIsConnected(false);
-                eventSource?.close();
-                // Attempt to reconnect after 5 seconds if connection fails
-                setTimeout(connectStream, 5000);
-            };
+            } finally {
+                if (isMounted) {
+                    timeoutId = setTimeout(fetchStream, 2500);
+                }
+            }
         };
 
-        connectStream();
+        fetchStream();
 
         return () => {
             isMounted = false;
-            if (eventSource) {
-                eventSource.close();
-            }
+            clearTimeout(timeoutId);
         };
     }, []);
 
