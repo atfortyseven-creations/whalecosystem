@@ -108,6 +108,27 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
         console.warn('⚠️ [WebSocket] Redis not configured. Pub/Sub disabled in this instance.');
     }
 
+    // ─── NATIVE MEMPOOL TELEMETRY (REAL WEBSOCKET, NO POLLING) ──────────────
+    if (process.env.ALCHEMY_WEB3_WSS) {
+        try {
+            const { WebSocketProvider } = require('ethers');
+            const wsProvider = new WebSocketProvider(process.env.ALCHEMY_WEB3_WSS);
+            console.log('📡 [Mempool WS] Connected directly to Alchemy PendingTransactions');
+            
+            // Ultra-fast global stream (throttle or sample for UI rendering)
+            let tickCount = 0;
+            wsProvider.on('pending', (txHash: string) => {
+                if (!io) return;
+                tickCount++;
+                if (tickCount % 5 === 0) { // Throttle for frontend performance
+                    io.emit('mempool.heartbeat', { hash: txHash, _t: Date.now() });
+                }
+            });
+        } catch (err) {
+            console.error('❌ [Mempool WS] Failed to listen to native mempool:', err);
+        }
+    }
+
     // ─── SOCKET CONNECTION HANDLING ─────────────────────────────────────────
     io.on('connection', async (socket) => {
         // Track active clients for CU Optimization (Sleep Mode)

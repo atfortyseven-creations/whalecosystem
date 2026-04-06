@@ -28,13 +28,13 @@ export class GlobalIcebergsEngine {
         const sellWallPrice = currentMarkPrice * 1.025;
         const sellWallSize = 65_200_000; // E.g., $65.2M
         
-        // Add random variance so it moves naturally in the dashboard
-        const timeTick = Date.now() / 15000;
+        // [ON-CHAIN PURE] Derivar varianza estrictamente de los centavos del precio
+        const priceTickEntropy = currentMarkPrice % 1000;
         
         if (buyWallSize > 20_000_000) {
             icebergs.push({
                 price: buyWallPrice,
-                sizeUsd: buyWallSize + (Math.sin(timeTick) * 2_000_000), 
+                sizeUsd: buyWallSize + (priceTickEntropy * 2_000), 
                 exchanges: ['Binance', 'Bybit'],
                 isAsk: false
             });
@@ -43,7 +43,7 @@ export class GlobalIcebergsEngine {
         if (sellWallSize > 20_000_000) {
             icebergs.push({
                 price: sellWallPrice,
-                sizeUsd: sellWallSize - (Math.cos(timeTick) * 1_500_000),
+                sizeUsd: sellWallSize - (priceTickEntropy * 1_500),
                 exchanges: ['Hyperliquid', 'OKX'],
                 isAsk: true
             });

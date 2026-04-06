@@ -110,16 +110,18 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
 
     const Redis = require('ioredis');
     return new Redis(REDIS_URL, {
+        family: 0, // [DNS-FIX] Dual-stack resolution
+        keepAlive: 10000, // [STABILITY] Keep-Alive to prevent proxy timeout
         maxRetriesPerRequest: 1, // FAST FAIL: Don't queue requests if Redis is down
         enableReadyCheck: false,
-        connectTimeout: 1000, // AGGRESSIVE: 1s or fail
+        connectTimeout: 2000, // AGGRESSIVE: 2s or fail
         retryStrategy(times: number) {
             // [LEGENDARY-RESILIENCE] Skip retries if infrastructure is failing
             if (times > 3) return null; // STOP retrying after 3 attempts
             return Math.min(times * 100, 1000);
         },
         reconnectOnError(err: any) {
-            const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND'];
+            const targetErrors = ['READONLY', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'EAI_AGAIN'];
             const shouldReconnect = targetErrors.some(e => err.message.includes(e));
             if (shouldReconnect) {
                 console.warn(`[Redis:${config.name || 'Client'}] 🔄 Reconnecting on critical error: ${err.message}`);
