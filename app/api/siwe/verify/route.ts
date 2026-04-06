@@ -1,57 +1,115 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SiweMessage } from 'siwe';
 import { prisma } from '@/lib/prisma';
-import crypto from 'crypto';
+import { SignJWT } from 'jose';
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'VOID_SECRET_99_POLY'
+);
 
 export async function POST(req: NextRequest) {
-    try {
-        const { message, signature } = await req.json();
-        const nonce = req.cookies.get('siwe-nonce')?.value;
+  try {
+    const { message, signature } = await req.json();
+    const nonce = req.cookies.get('siwe-nonce')?.value;
 
-        if (!nonce) {
-            return NextResponse.json({ ok: false, error: 'No nonce in cookies' }, { status: 400 });
-        }
-
-        const siweMessage = new SiweMessage(message);
-        const { data: fields } = await siweMessage.verify({ signature, nonce });
-
-        if (fields.nonce !== nonce) {
-             return NextResponse.json({ ok: false, error: 'Invalid nonce' }, { status: 400 });
-        }
-
-        // Upsert User in Database
-        let user = await prisma.user.findUnique({
-             where: { walletAddress: fields.address }
-        });
-
-        if (!user) {
-             user = await prisma.user.create({
-                 data: { walletAddress: fields.address }
-             });
-        }
-
-        const res = NextResponse.json({ ok: true, address: fields.address });
-        
-        // We set a custom session cookie for Wagmi/Rainbowkit
-        // In a true NextAuth integration, this would call signIn('credentials') 
-        // to mint a JWT, but since the frontend uses generic RainbowKit SIWE:
-        res.cookies.set('human.session-token', crypto.randomUUID(), {
-             httpOnly: true,
-             secure: process.env.NODE_ENV === 'production',
-             sameSite: 'strict',
-             path: '/'
-        });
-        
-        // Mark user as logged in via wallet
-        res.cookies.set('wallet-auth', fields.address, {
-             httpOnly: false, // Accessible to frontend to know who is logged in without SWR
-             secure: process.env.NODE_ENV === 'production',
-             path: '/'
-        });
-
-        return res;
-    } catch (e) {
-        console.error("SIWE Verify Error:", e);
-        return NextResponse.json({ ok: false, error: 'Verification failed' }, { status: 400 });
+    if (!nonce) {
+      return NextResponse.json({ ok: false, error: 'No nonce in session. Request a new nonce.' }, { status: 400 });
     }
+
+    // ── Cryptographic signature verification ─────────────────────────────────
+    const siweMessage = new SiweMessage(message);
+    const { data: fields, error: siweErr } = await siweMessage.verify({
+      signature,
+      nonce,
+    });
+
+    if (siweErr || !fields) {
+      console.error('[SIWE] Verification failed:', siweErr);
+      return NextResponse.json({ ok: false, error: 'Invalid signature or nonce mismatch.' }, { status: 401 });
+    }
+
+    if (fields.nonce !== nonce) {
+      return NextResponse.json({ ok: false, error: 'Nonce mismatch — replay attack rejected.' }, { status: 401 });
+    }
+
+    // ── Upsert Sovereign User ─────────────────────────────────────────────────
+    let user;
+    try {
+      user = await prisma.user.upsert({
+        where: { walletAddress: fields.address.toLowerCase() },
+        update: {
+          lastSeenAt: new Date(),
+          siweNonce: fields.nonce,
+        },
+        create: {
+          walletAddress: fields.address.toLowerCase(),
+          siweNonce: fields.nonce,
+          lastSeenAt: new Date(),
+        },
+      });
+    } catch (dbErr) {
+      // Degraded mode: proceed without DB if Prisma schema mismatch
+      console.warn('[SIWE] DB upsert failed (degraded mode):', dbErr);
+    }
+
+    // ── Mint Sovereign JWT ────────────────────────────────────────────────────
+    const jwtPayload = {
+      sub: fields.address.toLowerCase(),
+      address: fields.address.toLowerCase(),
+      chainId: fields.chainId,
+      domain: fields.domain,
+      issuedAt: fields.issuedAt,
+      clearance: 'SOVEREIGN', // Institutional-grade access level
+    };
+
+    const sessionToken = await new SignJWT(jwtPayload)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('7d')
+      .sign(JWT_SECRET);
+
+    // ── Build response with all session cookies ───────────────────────────────
+    const res = NextResponse.json({
+      ok: true,
+      address: fields.address,
+      chainId: fields.chainId,
+      clearance: 'SOVEREIGN',
+    });
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    };
+
+    // Primary SIWE session token (JWT)
+    res.cookies.set('human_session', sessionToken, cookieOptions);
+
+    // Sovereign handshake marker (read by middleware)
+    res.cookies.set('sovereign_handshake', fields.address.toLowerCase(), {
+      ...cookieOptions,
+      httpOnly: false, // Frontend-readable to show wallet address
+    });
+
+    // Wallet-auth for fast frontend reads
+    res.cookies.set('wallet-auth', fields.address.toLowerCase(), {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    // Clear consumed nonce
+    res.cookies.delete('siwe-nonce');
+
+    console.info(`[SIWE] ✅ Sovereign session issued for: ${fields.address}`);
+    return res;
+
+  } catch (e) {
+    console.error('[SIWE] Verify error:', e);
+    return NextResponse.json({ ok: false, error: 'Verification failed. Signature may be invalid.' }, { status: 400 });
+  }
 }

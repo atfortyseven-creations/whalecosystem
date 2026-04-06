@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { MobileSovereignLanding } from '@/components/mobile/MobileSovereignLanding';
 import dynamic from 'next/dynamic';
 import { useAccount } from 'wagmi';
@@ -17,6 +17,9 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [showNews, setShowNews] = useState(false);
     const { isConnected } = useAccount();
 
+    // Track previous connection state to detect NEW wallet connections
+    const prevConnected = useRef<boolean>(false);
+
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
@@ -28,28 +31,58 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         checkMobile();
         setMounted(true);
         window.addEventListener('resize', checkMobile);
-        
-        if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('mobile_news_bypass') === 'true') {
+
+        // Only restore news bypass if wallet is already connected AND
+        // the session was explicitly set by the user (not auto on fresh load).
+        const bypassActive = typeof sessionStorage !== 'undefined'
+            && sessionStorage.getItem('mobile_news_bypass') === 'true';
+        const hasSovereignCookie = typeof document !== 'undefined'
+            && (document.cookie.includes('sovereign_handshake=') || document.cookie.includes('wallet-auth='));
+
+        if (bypassActive && hasSovereignCookie) {
             setShowNews(true);
         }
 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Prevent hydration mismatch flash
+    // When wallet NEWLY connects → reset to landing so user sees the manifesto + options
+    useEffect(() => {
+        if (!mounted) return;
+
+        if (isConnected && !prevConnected.current) {
+            // New connection — always show landing, never auto-enter news
+            if (typeof sessionStorage !== 'undefined') {
+                sessionStorage.removeItem('mobile_news_bypass');
+            }
+            setShowNews(false);
+        }
+
+        if (!isConnected && prevConnected.current) {
+            // Disconnected — also reset to landing
+            setShowNews(false);
+            if (typeof sessionStorage !== 'undefined') {
+                sessionStorage.removeItem('mobile_news_bypass');
+            }
+        }
+
+        prevConnected.current = isConnected;
+    }, [isConnected, mounted]);
+
     if (!mounted) {
         return <div className="min-h-screen bg-[#FAF9F6]" />;
     }
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
     if (isMobile) {
-        // User clicked "Go to News" or from session storage, AND wallet is connected
+        // User EXPLICITLY chose to go to news via the landing page button
         if (showNews && isConnected) {
             return <MobileNewsShell />;
         }
 
-        // Show landing page: connects wallet AND shows post-login confirmation
-        // with "Go to News" and "Scan QR" buttons
+        // Always show the Sovereign Landing:
+        // Pre-connection → wallet connect buttons
+        // Post-connection → manifesto + "VER NOTICIAS" + "ENLAZAR PC"
         return (
             <MobileSovereignLanding
                 onEnterNews={() => {

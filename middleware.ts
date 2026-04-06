@@ -108,12 +108,26 @@ export default clerkMiddleware(async (auth, request) => {
 
     // 3. Identity & Protection
     const clerkAuth = await auth();
-    const humanSession = request.cookies.get('human_session');
     const nextAuthToken = request.cookies.get('next-auth.session-token');
     const sovereignHandshake = request.cookies.get('sovereign_handshake');
     const kycStatusCookie = request.cookies.get('kyc_status');
-    
-    const isAuthenticated = !!clerkAuth?.userId || !!humanSession || !!nextAuthToken || !!sovereignHandshake;
+
+    // Validate SIWE JWT from human_session cookie
+    let siweSessionValid = false;
+    const humanSessionCookie = request.cookies.get('human_session')?.value;
+    if (humanSessionCookie) {
+      try {
+        const { jwtVerify } = await import('jose');
+        const JWT_KEY = new TextEncoder().encode(process.env.JWT_SECRET || 'VOID_SECRET_99_POLY');
+        await jwtVerify(humanSessionCookie, JWT_KEY);
+        siweSessionValid = true;
+      } catch {
+        // Invalid or expired SIWE JWT — treat as unauthenticated
+        siweSessionValid = false;
+      }
+    }
+
+    const isAuthenticated = !!clerkAuth?.userId || siweSessionValid || !!nextAuthToken || !!sovereignHandshake;
 
     if (isProtectedRoute(request)) {
       if (!isAuthenticated) {
@@ -188,7 +202,7 @@ export default clerkMiddleware(async (auth, request) => {
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://*.clerk.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://www.humanidfi.com https://*.googleusercontent.com",
         "font-src 'self' https://fonts.gstatic.com data:",
-        "connect-src 'self' https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us",
+        "connect-src 'self' https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io",
         "frame-src 'self' https://*.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com",
         "object-src 'none'",
         "base-uri 'self'",

@@ -1,12 +1,27 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-    const res = NextResponse.json({ ok: true });
-    
-    // Clear cookies securely
-    res.cookies.delete('siwe-nonce');
-    res.cookies.delete('human.session-token');
-    res.cookies.delete('wallet-auth');
-    
-    return res;
+  const res = NextResponse.json({ ok: true, message: 'Sovereign session terminated.' });
+
+  // Clear all SIWE/session cookies
+  const cookiesToClear = [
+    'siwe-nonce',
+    'human_session',
+    'human.session-token',
+    'wallet-auth',
+    'sovereign_handshake',
+    'wallet-auth',
+  ];
+
+  for (const name of cookiesToClear) {
+    res.cookies.set(name, '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0, // Immediate expiry
+    });
+  }
+
+  return res;
 }
