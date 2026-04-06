@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore } from '@/lib/store/settings-store';
+import { useTheme } from 'next-themes';
+import { signOut } from 'next-auth/react';
 import { 
     X, Moon, Sun, DollarSign, Globe2, Eye, EyeOff, Shield, 
-    Activity, Trash2, Network, ChevronRight, Settings2, Laptop
+    Activity, Trash2, Network, ChevronRight, Settings2, Laptop, LogOut
 } from 'lucide-react';
 
 export function GlobalSettingsModal() {
@@ -15,10 +17,27 @@ export function GlobalSettingsModal() {
         setSettingsOpen, clearAppData
     } = useSettingsStore();
 
+    const { setTheme: setNextTheme } = useTheme();
+
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
+    // Sync Zustand theme with next-themes DOM
+    useEffect(() => {
+        if (mounted) {
+            setNextTheme(theme);
+        }
+    }, [theme, mounted, setNextTheme]);
+
     if (!mounted) return null;
+
+    const handleDisconnect = async () => {
+        if (confirm("¿Estás seguro de que deseas desconectar tu cuenta e iniciar sesión de nuevo?")) {
+            localStorage.clear();
+            sessionStorage.clear();
+            await signOut({ callbackUrl: '/' });
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -177,7 +196,7 @@ export function GlobalSettingsModal() {
                                             <Toggle enabled={testnetMode} setEnabled={setTestnetMode} emergency />
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-[#FAF9F6]">
+                                        <div className="flex items-center justify-between p-4 border-b border-[#F0F0F0] bg-[#FAF9F6]">
                                             <div className="flex items-center gap-3 opacity-80">
                                                 <div className="w-7 h-7 rounded-md border border-[#E5E5E5] flex items-center justify-center">
                                                     <Trash2 size={14} className="text-[#050505]" />
@@ -198,6 +217,25 @@ export function GlobalSettingsModal() {
                                                 Borrar Datos
                                             </button>
                                         </div>
+                                        
+                                        {/* Disconnect Account Button */}
+                                        <div className="flex items-center justify-between p-4 bg-[#FFF5F5] transition-colors border-t border-[#FF3B30]/10">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-7 h-7 rounded-md border border-[#FF3B30]/30 bg-white flex items-center justify-center">
+                                                    <LogOut size={14} className="text-[#FF3B30]" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider">Desconectar Cuenta</span>
+                                                    <span className="text-[9px] text-[#FF3B30]/80">Cerrar sesión cifrada</span>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={handleDisconnect}
+                                                className="px-4 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white shadow-sm hover:bg-[#D32F2F] transition-all active:scale-95"
+                                            >
+                                                Desconectar
+                                            </button>
+                                        </div>
                                     </div>
                                 </section>
                             </div>
@@ -205,7 +243,7 @@ export function GlobalSettingsModal() {
                             {/* Footer Note */}
                             <div className="p-6 bg-[#050505] text-[#FAF9F6] flex flex-col items-center justify-center text-center">
                                 <span className="text-[10px] font-black uppercase tracking-widest mb-1">Whale Alert Network Matrix</span>
-                                <span className="text-[8px] text-[#888888] font-mono">SOVEREIGN_NODE_V8.4.1 — INSTITUTIONAL</span>
+                                <span className="text-[8px] text-[#888888] font-mono">SOVEREIGN_NODE_V8.5.0 — INSTITUTIONAL</span>
                             </div>
                         </div>
                     </motion.div>

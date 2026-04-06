@@ -20,6 +20,10 @@ import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPan
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
 
+import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
+import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
+import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
+
 // ── Icons for external-embed pages ────────────────────────────────────────────
 import { Crown, GraduationCap, LifeBuoy, PieChart, Briefcase } from 'lucide-react';
 
@@ -79,11 +83,8 @@ const EXTERNAL_PAGES: Partial<Record<TabId, {
     },
 };
 
-// ── Main router ───────────────────────────────────────────────────────────────
 export default function SovereignDashboard() {
     const [activeTab, setActiveTab] = useState<TabId>('dashboard');
-
-    const externalPage = EXTERNAL_PAGES[activeTab];
 
     return (
         <>
@@ -91,7 +92,7 @@ export default function SovereignDashboard() {
             <InstitutionalProShell
                 activeTab={activeTab}
                 onTabChange={(id) => setActiveTab(id as TabId)}
-                isExternalEmbed={!!externalPage}
+                isExternalEmbed={false}
             >
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -102,24 +103,23 @@ export default function SovereignDashboard() {
                         transition={{ duration: 0.15, ease: 'easeOut' }}
                         className="w-full h-full flex flex-col"
                     >
-                        {/* ── External pages rendered via ExternalEmbed ── */}
-                        {externalPage ? (
-                            <DashboardErrorBoundary key={activeTab}>
-                                <ExternalEmbed {...externalPage} />
-                            </DashboardErrorBoundary>
-
-                        /* ── Internal panels — each with its own isolated error boundary ── */
-                        ) : activeTab === 'dashboard'       ? <DashboardErrorBoundary key="dashboard">      <PremiumMatrixStack />  </DashboardErrorBoundary>
-                          : activeTab === 'watchlist'        ? <DashboardErrorBoundary key="watchlist">      <WatchlistTable />       </DashboardErrorBoundary>
-                          : activeTab === 'alerts'           ? <DashboardErrorBoundary key="alerts">         <AlertsPanel />          </DashboardErrorBoundary>
-                          : activeTab === 'multicharts'      ? <DashboardErrorBoundary key="multicharts">    <PolymarketPanel />       </DashboardErrorBoundary>
-                          : activeTab === 'new-pairs'        ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />         </DashboardErrorBoundary>
-                          : activeTab === 'gainers'          ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
-                          : activeTab === 'api'              ? <DashboardErrorBoundary key="api">            <ApiTerminal />           </DashboardErrorBoundary>
-                          : activeTab === 'portfolio'        ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />         </DashboardErrorBoundary>
-                          : activeTab === 'news'             ? <DashboardErrorBoundary key="news">           <NewsOfToday />           </DashboardErrorBoundary>
-                          : activeTab === 'whale-portfolio'  ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />         </DashboardErrorBoundary>
-                          : null}
+                        {
+                            activeTab === 'dashboard'            ? <DashboardErrorBoundary key="dashboard">      <PremiumMatrixStack />   </DashboardErrorBoundary>
+                          : activeTab === 'watchlist'            ? <DashboardErrorBoundary key="watchlist">      <WatchlistTable />       </DashboardErrorBoundary>
+                          : activeTab === 'alerts'               ? <DashboardErrorBoundary key="alerts">         <AlertsPanel />          </DashboardErrorBoundary>
+                          : activeTab === 'multicharts'          ? <DashboardErrorBoundary key="multicharts">    <PolymarketPanel />      </DashboardErrorBoundary>
+                          : activeTab === 'new-pairs'            ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />        </DashboardErrorBoundary>
+                          : activeTab === 'gainers'              ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
+                          : activeTab === 'whale-portfolio'      ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />       </DashboardErrorBoundary>
+                          : activeTab === 'news'                 ? <DashboardErrorBoundary key="news">           <NewsOfToday />          </DashboardErrorBoundary>
+                          : activeTab === 'api'                  ? <DashboardErrorBoundary key="api">            <ApiTerminal />          </DashboardErrorBoundary>
+                          : activeTab === 'portfolio'            ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />        </DashboardErrorBoundary>
+                          : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
+                          : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
+                          : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <WhalePortfolio />       </DashboardErrorBoundary>
+                          : activeTab === 'gold-ticket'          ? <DashboardErrorBoundary key="gold">           <GoldTicketPanel />      </DashboardErrorBoundary>
+                          : null
+                        }
                     </motion.div>
                 </AnimatePresence>
             </InstitutionalProShell>
