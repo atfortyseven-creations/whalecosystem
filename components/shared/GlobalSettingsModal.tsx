@@ -10,6 +10,8 @@ import {
     Activity, Trash2, Network, ChevronRight, Settings2, Laptop, LogOut
 } from 'lucide-react';
 
+import { useDisconnect } from 'wagmi';
+
 export function GlobalSettingsModal() {
     const { 
         theme, currency, language, showBalances, allowAnalytics, testnetMode, isSettingsOpen,
@@ -18,6 +20,7 @@ export function GlobalSettingsModal() {
     } = useSettingsStore();
 
     const { setTheme: setNextTheme } = useTheme();
+    const { disconnectAsync } = useDisconnect();
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
@@ -33,9 +36,13 @@ export function GlobalSettingsModal() {
 
     const handleDisconnect = async () => {
         if (confirm("¿Estás seguro de que deseas desconectar tu cuenta e iniciar sesión de nuevo?")) {
+            try {
+                if (disconnectAsync) await disconnectAsync();
+            } catch(e) {}
             localStorage.clear();
             sessionStorage.clear();
-            await signOut({ callbackUrl: '/' });
+            await signOut({ redirect: false });
+            window.location.href = '/';
         }
     };
 
@@ -68,8 +75,8 @@ export function GlobalSettingsModal() {
                                         <Settings2 size={16} className="text-white" />
                                     </div>
                                     <div>
-                                        <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest">Configuración</h2>
-                                        <p className="text-[10px] text-[#888888] font-mono">Sovereign Environment Variables</p>
+                                        <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest">Settings</h2>
+                                        <p className="text-[10px] text-[#888888] font-mono">Terminal Environment Variables</p>
                                     </div>
                                 </div>
                                 <button 
@@ -83,7 +90,7 @@ export function GlobalSettingsModal() {
                             <div className="p-6 space-y-8 flex-1">
                                 {/* 1. Preferencias */}
                                 <section className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Preferencias</h3>
+                                    <h3 className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Preferences</h3>
                                     
                                     {/* Tema */}
                                     <div className="bg-white rounded-xl border border-[#E5E5E5] p-1 shadow-sm">
@@ -92,14 +99,14 @@ export function GlobalSettingsModal() {
                                                 <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center">
                                                     <Sun size={14} className="text-[#050505]" />
                                                 </div>
-                                                <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Tema</span>
+                                                <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Theme</span>
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-3 gap-1 p-2">
                                             {[
-                                                { id: 'light', label: 'Claro', icon: <Sun size={12}/> },
-                                                { id: 'dark', label: 'Oscuro', icon: <Moon size={12}/> },
-                                                { id: 'system', label: 'Sistema', icon: <Laptop size={12}/> }
+                                                { id: 'light', label: 'Light', icon: <Sun size={12}/> },
+                                                { id: 'dark', label: 'Dark', icon: <Moon size={12}/> },
+                                                { id: 'system', label: 'System', icon: <Laptop size={12}/> }
                                             ].map((t) => (
                                                 <button
                                                     key={t.id}
@@ -121,7 +128,7 @@ export function GlobalSettingsModal() {
                                                     <DollarSign size={14} className="text-[#050505]" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Moneda local</span>
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Local Currency</span>
                                                     <span className="text-[9px] text-[#888888] font-mono">{currency}</span>
                                                 </div>
                                             </div>
@@ -134,7 +141,7 @@ export function GlobalSettingsModal() {
                                                     <Globe2 size={14} className="text-[#050505]" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Idioma</span>
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Language</span>
                                                     <span className="text-[9px] text-[#888888] font-mono">{language === 'es-ES' ? 'Español (España)' : 'English (US)'}</span>
                                                 </div>
                                             </div>
@@ -145,7 +152,7 @@ export function GlobalSettingsModal() {
 
                                 {/* 2. Saldos y Privacidad */}
                                 <section className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Privacidad y seguridad</h3>
+                                    <h3 className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Privacy & Security</h3>
                                     
                                     <div className="bg-white rounded-xl border border-[#E5E5E5] shadow-sm divide-y divide-[#F0F0F0]">
                                         <div className="flex items-center justify-between p-4 bg-white rounded-t-xl">
@@ -154,8 +161,8 @@ export function GlobalSettingsModal() {
                                                     {showBalances ? <Eye size={14} className="text-[#050505]" /> : <EyeOff size={14} className="text-[#050505]" />}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Saldos y actividad</span>
-                                                    <span className="text-[9px] text-[#888888]">Ocultar montos a la vista</span>
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Balances & Activity</span>
+                                                    <span className="text-[9px] text-[#888888]">Hide amounts from view</span>
                                                 </div>
                                             </div>
                                             <Toggle enabled={showBalances} setEnabled={setShowBalances} />
@@ -167,8 +174,8 @@ export function GlobalSettingsModal() {
                                                     <Activity size={14} className="text-[#050505]" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Permitir análisis</span>
-                                                    <span className="text-[9px] text-[#888888]">Metadatos anónimos</span>
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Allow Analytics</span>
+                                                    <span className="text-[9px] text-[#888888]">Anonymous metadata only</span>
                                                 </div>
                                             </div>
                                             <Toggle enabled={allowAnalytics} setEnabled={setAllowAnalytics} />
@@ -179,7 +186,7 @@ export function GlobalSettingsModal() {
                                 {/* 3. Avanzado */}
                                 <section className="space-y-4">
                                     <h3 className="text-[10px] font-black text-[#FF3B30] uppercase tracking-[0.2em] flex items-center gap-2">
-                                        <Shield size={10} /> Avanzado
+                                        <Shield size={10} /> Advanced
                                     </h3>
                                     
                                     <div className="bg-white rounded-xl border border-[#FF3B30]/20 shadow-sm overflow-hidden">
@@ -189,8 +196,8 @@ export function GlobalSettingsModal() {
                                                     <Network size={14} className="text-[#FF3B30]" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Modo de red de prueba</span>
-                                                    <span className="text-[9px] text-[#888888]">Activar Testnets (Sepolia, Goerli)</span>
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Testnet Mode</span>
+                                                    <span className="text-[9px] text-[#888888]">Enable Testnets (Sepolia, Goerli)</span>
                                                 </div>
                                             </div>
                                             <Toggle enabled={testnetMode} setEnabled={setTestnetMode} emergency />
@@ -202,8 +209,8 @@ export function GlobalSettingsModal() {
                                                     <Trash2 size={14} className="text-[#050505]" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Datos de la app</span>
-                                                    <span className="text-[9px] text-[#888888]">Purgar caché y cookies</span>
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">App Data</span>
+                                                    <span className="text-[9px] text-[#888888]">Purge cache and cookies</span>
                                                 </div>
                                             </div>
                                             <button 
@@ -214,7 +221,7 @@ export function GlobalSettingsModal() {
                                                 }}
                                                 className="px-3 py-1.5 rounded-lg border border-[#FF3B30] text-[9px] font-black uppercase text-[#FF3B30] hover:bg-[#FF3B30] hover:text-white transition-colors"
                                             >
-                                                Borrar Datos
+                                                Clear Data
                                             </button>
                                         </div>
                                         
@@ -225,15 +232,15 @@ export function GlobalSettingsModal() {
                                                     <LogOut size={14} className="text-[#FF3B30]" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider">Desconectar Cuenta</span>
-                                                    <span className="text-[9px] text-[#FF3B30]/80">Cerrar sesión cifrada</span>
+                                                    <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider">Disconnect Account</span>
+                                                    <span className="text-[9px] text-[#FF3B30]/80">End encrypted session</span>
                                                 </div>
                                             </div>
                                             <button 
                                                 onClick={handleDisconnect}
                                                 className="px-4 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white shadow-sm hover:bg-[#D32F2F] transition-all active:scale-95"
                                             >
-                                                Desconectar
+                                                Disconnect
                                             </button>
                                         </div>
                                     </div>
@@ -243,7 +250,7 @@ export function GlobalSettingsModal() {
                             {/* Footer Note */}
                             <div className="p-6 bg-[#050505] text-[#FAF9F6] flex flex-col items-center justify-center text-center">
                                 <span className="text-[10px] font-black uppercase tracking-widest mb-1">Whale Alert Network Matrix</span>
-                                <span className="text-[8px] text-[#888888] font-mono">SOVEREIGN_NODE_V8.5.0 — INSTITUTIONAL</span>
+                                <span className="text-[8px] text-[#888888] font-mono">TERMINAL_NODE_V8.5.0 — INSTITUTIONAL</span>
                             </div>
                         </div>
                     </motion.div>
