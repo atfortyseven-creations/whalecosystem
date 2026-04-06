@@ -1,11 +1,20 @@
 /**
  * GetBlock Ethereum Engine
  * EP1: JSON-RPC → User Portfolio  (eth_getBalance + eth_call)
- * EP4: JSON-RPC → Market Intel    (slot0 / getReserves)
+ * EP2: JSON-RPC → Market Intel    (slot0 / getReserves)
+ * EP3: JSON-RPC → Backup reads
+ * EP4: JSON-RPC → Secondary backup
  */
 
-const RPC_1 = process.env.GETBLOCK_ETH_RPC_1!;
-const RPC_4 = process.env.GETBLOCK_ETH_RPC_4!;
+// ── All GetBlock endpoints — hardcoded as requested ────────────────────────
+const RPC_ENDPOINTS = [
+    'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8', // EP1 — primary portfolio
+    'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c', // EP2 — market intel
+    'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', // EP3 — backup
+    'https://go.getblock.io/31aef531b4e444f5bde76196502679da', // EP4 — backup 2
+];
+const RPC_1 = RPC_ENDPOINTS[0]; // Primary for portfolio reads
+const RPC_4 = RPC_ENDPOINTS[1]; // Primary for market intel (slot0 / getReserves)
 
 // ERC-20 ABI selectors (4-byte keccak)
 const SIG_BALANCE_OF   = '0x70a08231'; // balanceOf(address)

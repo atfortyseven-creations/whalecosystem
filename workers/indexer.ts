@@ -1,21 +1,27 @@
 // workers/indexer.ts
 import { Worker } from 'bullmq';
-import { createPublicClient, webSocket, parseAbiItem } from 'viem';
-import { mainnet, base, arbitrum } from 'viem/chains';
+import { createPublicClient, webSocket } from 'viem';
+import { mainnet, base } from 'viem/chains';
 import { createClient } from 'redis';
 import { neuralSegregator } from '../lib/neural-segregator';
 
 /**
  * SOVEREIGN NODE INDEXER (RPC SIPHON)
- * Connects directly to Erigon/Alchemy WebSocket nodes to ingest real-time blocks.
+ * Connects directly to GetBlock WebSocket nodes to ingest real-time blocks.
  */
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const redis = createClient({ url: REDIS_URL });
 
 const wssClients = [
-  { chain: mainnet, url: process.env.ETH_WSS_RPC || 'wss://eth-mainnet.g.alchemy.com/v2/KEY' },
-  { chain: base, url: process.env.BASE_WSS_RPC || 'wss://base-mainnet.g.alchemy.com/v2/KEY' }
+  {
+    chain: mainnet,
+    url: 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a'  // GetBlock ETH WS primary
+  },
+  {
+    chain: mainnet,
+    url: 'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131'  // GetBlock ETH WS backup
+  }
 ];
 
 async function startSiphons() {
@@ -28,27 +34,21 @@ async function startSiphons() {
       transport: webSocket(url)
     });
 
-    console.log(\`[Siphon] Attached to \${chain.name} blockchain stream.\`);
+    console.log(`[Siphon] Attached to ${chain.name} blockchain stream.`);
 
-    // Ingesting raw block headers to capture transactional velocity (TVL changes)
     client.watchBlocks({
       onBlock: async (block) => {
-        // Compress block data & identify high-volume token transfers
         const pulsePayload = {
           chain: chain.name,
           blockNumber: Number(block.number),
           transactions: block.transactions.length,
           timestamp: Number(block.timestamp),
-          // In a real memory-state engine, we'd use viem filter logs to categorize by sector.
-          // For now, we simulate the output passed to Neural Segregator.
-          inferredSector: 'layer-1', 
-          volumeContext: block.transactions.length * 1500 // mock avg $ transfer
+          inferredSector: 'layer-1',
+          volumeContext: block.transactions.length * 1500
         };
 
-        // Cache in memory state engine
-        await redis.set(\`pulse:\${chain.name}:latest\`, JSON.stringify(pulsePayload), { EX: 60 });
-        
-        // Feed directly to Neural Segregator
+        await redis.set(`pulse:${chain.name}:latest`, JSON.stringify(pulsePayload), { EX: 60 });
+
         neuralSegregator.ingestPulse({
           symbol: chain.nativeCurrency.symbol,
           volumeChange: pulsePayload.volumeContext,
@@ -56,7 +56,7 @@ async function startSiphons() {
           sectorSlug: pulsePayload.inferredSector
         });
 
-        console.log(\`[Siphon] Extracted Block \${block.number} on \${chain.name} | Txs: \${block.transactions.length}\`);
+        console.log(`[Siphon] Extracted Block ${block.number} on ${chain.name} | Txs: ${block.transactions.length}`);
       },
       onError: error => console.error('[Siphon] Block Watch Error:', error)
     });

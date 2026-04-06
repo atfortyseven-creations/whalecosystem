@@ -103,25 +103,32 @@ const createOptimizedTransport = (primaryUrl: string, fallbackUrl?: string) => {
 
 // ─── HYPER-OPTIMIZED VIEM CLIENTS ─────────────────────────────────────────────
 
-// GetBlock EP1 JSON-RPC (User Portfolio / primary reads) + EP4 (Market Intel) + Alchemy (Fallback)
-const GETBLOCK_EP1 = process.env.GETBLOCK_ETH_RPC_1 || 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8';
-const GETBLOCK_EP4 = process.env.GETBLOCK_ETH_RPC_4 || 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c';
+// Primary GetBlock endpoints as requested
+const GETBLOCK_ETH_RPC_1 = 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8';
+const GETBLOCK_ETH_RPC_2 = 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c';
+const GETBLOCK_ETH_RPC_3 = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234';
+const GETBLOCK_ETH_RPC_4 = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da';
+
+// Polygon GetBlock endpoint
+const GETBLOCK_POLYGON_RPC = 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d';
 
 export const mainnetClient = createPublicClient({
     chain: mainnet,
-    transport: createOptimizedTransport(
-        GETBLOCK_EP1,
-        `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
-    )
+    transport: fallback([
+        http(GETBLOCK_ETH_RPC_1, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_1) }),
+        http(GETBLOCK_ETH_RPC_2, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_2) }),
+        http(GETBLOCK_ETH_RPC_3, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_3) }),
+        http(`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`, { fetchOptions: { cache: 'no-store' } })
+    ], { rank: false })
 });
 
-// Dedicated market-intel client using EP4 (slot0/getReserves calls)
+// Dedicated market-intel client
 export const marketIntelClient = createPublicClient({
     chain: mainnet,
-    transport: createOptimizedTransport(
-        GETBLOCK_EP4,
-        GETBLOCK_EP1  // Fallback to EP1 if EP4 is rate-limited
-    )
+    transport: fallback([
+        http(GETBLOCK_ETH_RPC_4, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_4) }),
+        http(GETBLOCK_ETH_RPC_2, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_2) })
+    ], { rank: false })
 });
 
 export const bscClient = createPublicClient({
@@ -144,7 +151,10 @@ export const baseClient = createPublicClient({
 
 export const polygonClient = createPublicClient({
     chain: polygon,
-    transport: createOptimizedTransport(`https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`)
+    transport: createOptimizedTransport(
+        GETBLOCK_POLYGON_RPC, 
+        `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
+    )
 });
 
 export const arbitrumClient = createPublicClient({

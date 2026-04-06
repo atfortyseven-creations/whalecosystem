@@ -3,9 +3,9 @@ import { Worker, Job } from 'bullmq';
 import { neuralSegregator } from '../lib/neural-segregator';
 
 /**
- * Sovereign Node Syndicate Daemon
- * Listens to anomalous Z-Scores from the Neural Segregator globally and pushes them 
- * to Substack, X, Telegram, and RSS to maintain automated Omnichannel SEO Dominance.
+ * Whale Alert Syndicate Daemon
+ * Listens to anomalous Z-Scores from the Neural Segregator and pushes them
+ * to Substack, X, Telegram, and RSS for automated Omnichannel SEO Dominance.
  */
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
@@ -24,35 +24,32 @@ export const syndicateWorker = new Worker('SyndicationQueue', async (job: Job<An
      return { status: 'IGNORED', reason: 'Threshold not met for global alerting' };
   }
 
-  console.log(\`[Sovereign Daemon] Initiating Cross-Pollination for \${sector.toUpperCase()} (\${signal})\`);
+  console.log(`[Syndicate Daemon] Initiating Cross-Pollination for ${sector.toUpperCase()} (${signal})`);
 
   try {
-    // 1. Post to Substack (Generates SEO-backed Micro-Article)
+    const title = `Whale Alert Oracle: Anomalous ${zScore > 0 ? 'Inflow' : 'Outflow'} detected in ${sector}`;
+    const moneyStr = (volumeContext / 1000000).toFixed(2);
+    const body = `The Whale Alert Neural Segregator has detected extreme capital rotation. \n\nSignal: ${signal}\n24h Volume Deviation Context: $${moneyStr}M`;
     await publishToSubstack({
-      title: \`Sovereign Oracle: Anomalous \${zScore > 0 ? 'Inflow' : 'Outflow'} detected in \${sector}\`,
-      body: \`The Sovereign Neural Segregator has detected extreme capital rotation. \n\nSignal: \${signal}\n24h Volume Deviation Context: $\${(volumeContext / 1000000).toFixed(2)}M\`,
+      title,
+      body,
       tags: [sector, 'Macro', 'Whale Alert']
     });
 
-    // 2. Broadcast to Telegram & X
     await publishToSocials(
-      \`🚨 #WhaleEcosystem Oracle Alert 🚨\n\n\${signal}\nSector: \${sector.toUpperCase()}\nZ-Score: \${zScore.toFixed(3)}\n\nIntercept this flow at bridge.sovereign.network\`
+      `🚨 #WhaleAlertNetwork Oracle Alert 🚨\n\n${signal}\nSector: ${sector.toUpperCase()}\nZ-Score: ${zScore.toFixed(3)}\n\nIntercept this flow at Whale Alert Network`
     );
 
-    // 3. Inject back into local Prisma Database for 'Kinetic' News Layer
-    // prisma.article.create({ ... })
-
-    console.log(\`[Sovereign Daemon] Syndication Complete.\`);
+    console.log(`[Syndicate Daemon] Syndication Complete.`);
     return { status: 'SYNDICATED', sector };
 
   } catch (err) {
-    console.error('[Sovereign Daemon] Matrix Cross-Pollination Failed:', err);
+    console.error('[Syndicate Daemon] Cross-Pollination Failed:', err);
     throw err;
   }
 
 }, { connection: { url: REDIS_URL } });
 
-// Hooking the daemon to our Segregator natively (or this would run via Redis events in a real cluster)
 neuralSegregator.on('sector_update', (data: any) => {
   const { sector, metrics, latestPacket } = data;
   if (Math.abs(metrics.zScore) >= 2.5) {
@@ -68,6 +65,6 @@ neuralSegregator.on('sector_update', (data: any) => {
   }
 });
 
-// Mock APIs
+// Stub APIs
 async function publishToSubstack(payload: any) { return Promise.resolve(true); }
 async function publishToSocials(message: string) { return Promise.resolve(true); }

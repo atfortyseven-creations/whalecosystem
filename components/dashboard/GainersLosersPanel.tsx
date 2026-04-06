@@ -7,9 +7,59 @@ import {
     ArrowUpRight, ArrowDownRight, Flame, Skull,
     BarChart2, Clock, Wifi, WifiOff
 } from 'lucide-react';
-import { List } from 'react-window';
+import { List as RWList } from 'react-window';
+const VList = RWList as any;
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useMarketStream } from '@/context/MarketStreamContext';
+
+// ── Row renderer for react-window (must be a named component, not inline)
+const GainersRow = ({ index, style, data }: { index: number; style: React.CSSProperties; data: { filtered: any[] } }) => {
+    const d = data?.filtered?.[index];
+    if (!d) return <div style={style} />;
+    const pctColor = (v: number) => v >= 0 ? 'text-[#00C076]' : 'text-[#FF3B30]';
+    const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
+    const fmt = (n: number) => {
+        if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
+        if (Math.abs(n) >= 1e9)  return `$${(n / 1e9).toFixed(2)}B`;
+        if (Math.abs(n) >= 1e6)  return `$${(n / 1e6).toFixed(2)}M`;
+        return `$${n.toFixed(2)}`;
+    };
+    const CHAIN_COLORS: Record<string, string> = {
+        ethereum: '#627EEA', solana: '#9945FF', bsc: '#F0B90B',
+        polygon: '#8247E5', arbitrum: '#12AAFF', optimism: '#FF0420',
+        multi: '#050505', xrp: '#00AAE4', cardano: '#0033AD',
+        avalanche: '#E84142', polkadot: '#E6007A', aptos: '#00C3A0',
+        injective: '#00F2FE', near: '#00C08B', starknet: '#FF875B',
+        celestia: '#7B2FBE', blur: '#FF6640', default: '#888888'
+    };
+    return (
+        <div style={style} className="border-b border-[#F0F0F0]">
+            <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
+                style={{ gridTemplateColumns: '2.5fr 1.5fr 0.9fr 0.9fr 0.9fr 1.2fr 1.2fr' }}
+            >
+                <div className="px-4 flex items-center gap-2.5">
+                    <span className="text-[8px] font-black text-[#888888] w-4">{index + 1}</span>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                        style={{ background: CHAIN_COLORS[d.chain] || CHAIN_COLORS.default }}>
+                        {d.symbol?.[0] || '?'}
+                    </div>
+                    <div>
+                        <div className="text-[11px] font-black text-[#050505]">{d.symbol}</div>
+                        <div className="text-[8px] text-[#888888]">{d.name}</div>
+                    </div>
+                </div>
+                <div className="px-4 text-[10px] font-black font-mono text-[#050505]">
+                    {(d.price || 0) >= 1 ? `$${(d.price || 0).toFixed(2)}` : `$${(d.price || 0).toFixed(6)}`}
+                </div>
+                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch1h || 0)}`}>{pctFmt(d.ch1h || 0)}</div>
+                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch24h || 0)}`}>{pctFmt(d.ch24h || 0)}</div>
+                <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch7d || 0)}`}>{pctFmt(d.ch7d || 0)}</div>
+                <div className="px-4 text-right text-[10px] font-bold font-mono text-[#050505]">{fmt(d.vol24h || 0)}</div>
+                <div className="px-4 text-right text-[10px] font-bold font-mono text-[#888888]">{fmt(d.mcap || 0)}</div>
+            </div>
+        </div>
+    );
+};
 
 const ASSETS = [
     { symbol: 'BTC',    name: 'Bitcoin',         chain: 'multi',     mcapB: 1640  },
@@ -96,16 +146,16 @@ export function GainersLosersPanel() {
     }, [markets]);
 
     const filtered = (data || [])
-        .filter(d => d && d.symbol && d.name)
-        .filter(d => d.symbol.toLowerCase().includes(search.toLowerCase()) || d.name.toLowerCase().includes(search.toLowerCase()))
+        .filter(d => Boolean(d && d.symbol && d.name))
+        .filter(d => (d.symbol || '').toLowerCase().includes((search || '').toLowerCase()) || (d.name || '').toLowerCase().includes((search || '').toLowerCase()))
         .filter(d => {
-            const val = (d as any)[sortKey] || 0;
+            const val = ((d as any)[sortKey] !== undefined ? (d as any)[sortKey] : 0) || 0;
             return view === 'gainers' ? val >= 0 : view === 'losers' ? val < 0 : true;
         })
-        .sort((a, b) => ((b as any)[sortKey] || 0) - ((a as any)[sortKey] || 0));
+        .sort((a, b) => (((b as any)[sortKey] !== undefined ? (b as any)[sortKey] : 0) || 0) - (((a as any)[sortKey] !== undefined ? (a as any)[sortKey] : 0) || 0));
 
-    const topGainers = [...(data || [])].sort((a, b) => ((b as any)[sortKey] || 0) - ((a as any)[sortKey] || 0)).slice(0, 3);
-    const topLosers  = [...(data || [])].sort((a, b) => ((a as any)[sortKey] || 0) - ((b as any)[sortKey] || 0)).slice(0, 3);
+    const topGainers = [...(data || [])].filter(d => Boolean(d && d.symbol)).sort((a, b) => (((b as any)[sortKey] !== undefined ? (b as any)[sortKey] : 0) || 0) - (((a as any)[sortKey] !== undefined ? (a as any)[sortKey] : 0) || 0)).slice(0, 3);
+    const topLosers  = [...(data || [])].filter(d => Boolean(d && d.symbol)).sort((a, b) => (((a as any)[sortKey] !== undefined ? (a as any)[sortKey] : 0) || 0) - (((b as any)[sortKey] !== undefined ? (b as any)[sortKey] : 0) || 0)).slice(0, 3);
 
     return (
         <div className="flex flex-col space-y-5">
@@ -231,70 +281,17 @@ export function GainersLosersPanel() {
                             {({ height, width }) => {
                                 if (!height || !width) return <div style={{ height: 500, width: '100%' }} />;
                                 return (
-                                    <List
+                                    <VList
                                         height={height || 500}
                                         itemCount={filtered.length}
                                         itemSize={56}
                                         width={width || '100%'}
                                         itemData={{ filtered }}
                                     >
-                                    {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
-                                        const d = data?.filtered?.[index];
-                                        if (!d) return <div style={style} className="bg-red-500/10" />;
-                                        return (
-                                            <div style={style} className="border-b border-[#F0F0F0]">
-                                                <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer h-full"
-                                                    style={{ gridTemplateColumns: '2.5fr 1.5fr 0.9fr 0.9fr 0.9fr 1.2fr 1.2fr' }}
-                                                >
-                                                    {/* Asset */}
-                                                    <div className="px-4 flex items-center gap-2.5">
-                                                        <span className="text-[8px] font-black text-[#888888] w-4">{index + 1}</span>
-                                                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                                            style={{ background: CHAIN_COLORS?.[d.chain] || CHAIN_COLORS?.default }}>
-                                                            {d.symbol?.[0] || '?'}
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-[11px] font-black text-[#050505]">{d.symbol}</div>
-                                                            <div className="text-[8px] text-[#888888]">{d.name}</div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Price */}
-                                                    <div className="px-4 text-[10px] font-black font-mono text-[#050505]">
-                                                        {(d.price || 0) >= 1 ? `$${(d.price || 0).toFixed(2)}` : `$${(d.price || 0).toFixed(6)}`}
-                                                    </div>
-
-                                                    {/* 1h */}
-                                                    <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch1h)}`}>
-                                                        {pctFmt(d.ch1h || 0)}
-                                                    </div>
-
-                                                    {/* 24h */}
-                                                    <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch24h)}`}>
-                                                        {pctFmt(d.ch24h || 0)}
-                                                    </div>
-
-                                                    {/* 7d */}
-                                                    <div className={`px-4 text-right text-[10px] font-black font-mono ${pctColor(d.ch7d)}`}>
-                                                        {pctFmt(d.ch7d || 0)}
-                                                    </div>
-
-                                                    {/* Vol */}
-                                                    <div className="px-4 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                        {fmt(d.vol24h || 0)}
-                                                    </div>
-
-                                                    {/* MCap */}
-                                                    <div className="px-4 text-right text-[10px] font-bold font-mono text-[#888888]">
-                                                        {fmt(d.mcap || 0)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    }}
-                                </List>
-                            );
-                        }}
+                                        {GainersRow as any}
+                                    </VList>
+                                );
+                            }}
                         </AutoSizer>
                     )}
                 </div>

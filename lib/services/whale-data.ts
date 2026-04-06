@@ -61,12 +61,14 @@ const DEX_ROUTERS_BNB = new Set([
 
 const RPC_CONFIG = {
     ETH: [
-        process.env.GETBLOCK_ETH_RPC_1 || 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8',
-        process.env.ETH_RPC_URL_BACKUP  || 'https://go.getblock.us/69668586f4a84e3597c5dd658514121a',
+        'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8', // EP1 — primary
+        'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c', // EP2 — market intel
+        'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', // EP3 — backup
+        'https://go.getblock.io/31aef531b4e444f5bde76196502679da', // EP4 — backup 2
     ],
     BNB: [
-        process.env.BNB_RPC_URL || 'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
-        process.env.BNB_RPC_URL_BACKUP || 'https://bsc.getblock.io/3cdeadc7f4174c23b37daee85bc0d517/mainnet/'
+        'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
+        'https://bsc-dataseed1.binance.org',
     ]
 };
 

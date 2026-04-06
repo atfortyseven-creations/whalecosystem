@@ -8,7 +8,12 @@
 
 import WebSocket from 'ws';
 
-const WS_URL = process.env.GETBLOCK_ETH_WS_3!;
+const WS_ENDPOINTS = [
+    'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a',
+    'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
+    'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131'
+];
+let currentWsIndex = 0;
 
 // UniswapV3 Factory
 const UNISWAP_V3_FACTORY  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'.toLowerCase();
@@ -36,7 +41,8 @@ class NewPairsWebSocketEngine {
     connect() {
         if (this.ws?.readyState === WebSocket.OPEN) return;
 
-        this.ws = new WebSocket(WS_URL);
+        const currentUrl = WS_ENDPOINTS[currentWsIndex];
+        this.ws = new WebSocket(currentUrl);
 
         this.ws.on('open', () => {
             console.info('[NewPairsEngine] GetBlock WS connected (EP3)');
@@ -102,6 +108,7 @@ class NewPairsWebSocketEngine {
 
     private scheduleReconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        currentWsIndex = (currentWsIndex + 1) % WS_ENDPOINTS.length;
         this.reconnectTimer = setTimeout(() => this.connect(), 5000);
     }
 
