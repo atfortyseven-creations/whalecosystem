@@ -66,7 +66,7 @@ const ENDPOINT_GROUPS: { label: string; icon: React.ReactNode; endpoints: Endpoi
         icon: <Database size={13}/>,
         endpoints: [
             { id: 'graph-search',    group: 'graph', method: 'GET',  path: '/api/graph?q=vitalik',            description: 'Search Neo4j graph for Person/Token/Wallet/Company entities.', category: 'GRAPH', params: 'q (string), type (person|token|wallet|company|all)' },
-            { id: 'graph-query',     group: 'graph', method: 'POST', path: '/api/graph',                      description: 'Execute a safe read-only Cypher query on the sovereign knowledge graph.', category: 'GRAPH', params: '{ cypher: string, params?: object }' },
+            { id: 'graph-query',     group: 'graph', method: 'POST', path: '/api/graph',                      description: 'Execute a safe read-only Cypher query on the network knowledge graph.', category: 'GRAPH', params: '{ cypher: string, params?: object }' },
             { id: 'whale-intel',     group: 'graph', method: 'GET',  path: '/api/intelligence/whales',        description: 'On-chain whale leaderboard with real movement analytics and alpha scores.', category: 'GRAPH' },
         ]
     },
@@ -244,7 +244,7 @@ export function ApiTerminal() {
                         <button key={t} onClick={() => setActiveTab(t)}
                             className={`px-4 py-2 text-[9px] font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === t ? 'border-[#00C076] text-[#00C076]' : 'border-transparent text-white/30 hover:text-white/60'}`}>
                             {t}
-                            {t === 'headers' && Object.keys(responseHeaders).length > 0 && (
+                            {activeTab === 'headers' && responseHeaders && Object.keys(responseHeaders).length > 0 && (
                                 <span className="ml-1.5 px-1.5 py-0.5 bg-[#00C076]/20 text-[#00C076] rounded text-[7px]">{Object.keys(responseHeaders).length}</span>
                             )}
                         </button>
@@ -277,7 +277,7 @@ export function ApiTerminal() {
                             {response}
                         </motion.pre>
                     )}
-                    {activeTab === 'headers' && Object.keys(responseHeaders).length > 0 && (
+                    {activeTab === 'headers' && responseHeaders && Object.keys(responseHeaders).length > 0 && (
                         <table className="w-full text-[10px] font-mono">
                             <thead>
                                 <tr className="text-[8px] text-white/30 uppercase tracking-widest border-b border-white/10">
@@ -295,7 +295,7 @@ export function ApiTerminal() {
                             </tbody>
                         </table>
                     )}
-                    {activeTab === 'headers' && Object.keys(responseHeaders).length === 0 && (
+                    {activeTab === 'headers' && (!responseHeaders || Object.keys(responseHeaders).length === 0) && (
                         <div className="text-center text-white/20 text-[10px] font-mono mt-8">Execute a request to see response headers</div>
                     )}
                 </div>

@@ -47,10 +47,10 @@ export function SovereignContractModal() {
             </div>
             <div>
               <h1 className="text-xl font-black text-[#050505] tracking-tight uppercase mb-1">
-                Institutional Access Agreement
+                Whale Network Agreement
               </h1>
               <p className="text-[10px] font-bold text-[#888888] uppercase tracking-widest leading-relaxed">
-                Terminal connection established. Cryptographic and legal verification required.
+                Terminal connection established. Network verification required.
               </p>
             </div>
           </div>
@@ -58,9 +58,9 @@ export function SovereignContractModal() {
           {/* Body */}
           <div className="p-10 flex-col gap-6 flex">
             <p className="text-xs font-bold text-[#444444] leading-relaxed">
-              By accessing the Sovereign Network Terminal, you operate under a state of elevated financial clearance. 
-              The infrastructure processes real-time on-chain data, deep mempool mechanics, and accelerated polymarket analytics. 
-              You must fully understand the operational guidelines and the legal framework preserving data integrity and privacy.
+              By accessing the Whale Alert Network, you operate under an elevated state of market intelligence. 
+              The infrastructure processes real-time on-chain data, deep mempool mechanics, and accelerated market analytics. 
+              You must fully understand the operational guidelines preserving data integrity and privacy.
             </p>
 
             <div className="flex flex-col gap-3">
@@ -77,9 +77,9 @@ export function SovereignContractModal() {
                 <div className="flex items-center gap-4">
                   <BookOpen size={20} />
                   <div>
-                    <h3 className="text-sm font-black tracking-tight">Sovereign Documentation</h3>
+                    <h3 className="text-sm font-black tracking-tight">Whale Documentation</h3>
                     <p className={`text-[9px] font-bold uppercase tracking-widest mt-0.5 ${isReadingDocs ? "text-[#00C076]/70" : "text-[#888888]"}`}>
-                      System Mechanics & Endpoints
+                      System Mechanics & Protocols
                     </p>
                   </div>
                 </div>

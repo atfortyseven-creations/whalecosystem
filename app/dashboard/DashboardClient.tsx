@@ -1,7 +1,5 @@
-"use client";
-
-import SovereignDashboard from '@/components/dashboard/SovereignDashboard';
+import WhaleDashboard from '@/components/dashboard/WhaleDashboard';
 
 export default function DashboardClient() {
-  return <SovereignDashboard />;
+  return <WhaleDashboard />;
 }

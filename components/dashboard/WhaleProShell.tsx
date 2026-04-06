@@ -41,8 +41,6 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
-// Removed EMBEDDED_TABS since all content is now inherently native and perfectly padded.
-
 function LiveMarketBand() {
     const { markets } = useMarketStream();
     
@@ -91,7 +89,7 @@ function LiveMarketBand() {
     );
 }
 
-export function InstitutionalProShell({ 
+export function WhaleProShell({ 
     children, 
     activeTab, 
     onTabChange,
@@ -115,14 +113,13 @@ export function InstitutionalProShell({
                 className="h-full border-r border-[#E5E5E5] bg-[#FDFDFB] flex flex-col z-50 relative shadow-[10px_0_30px_rgba(0,0,0,0.02)]"
             >
 
-                {/* Sidebar Navigation — tabs start at the very top */}
+                {/* Sidebar Navigation */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden pt-0 pb-4 px-3 space-y-0.5 no-scrollbar">
                     {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
                         const isGold   = item.id === 'gold-ticket';
                         return (
                             <div key={item.id}>
-                                {/* Section divider label */}
                                 {item.dividerBefore && !isCollapsed && (
                                     <div className={`px-4 ${index === 0 ? 'pt-3' : 'pt-4'} pb-1`}>
                                         <span className="text-[8px] font-black text-[#CCCCCC] uppercase tracking-[0.2em]">
@@ -172,7 +169,6 @@ export function InstitutionalProShell({
                     })}
                 </div>
 
-                {/* Collapse toggle — tiny footer */}
                 <div className="px-3 pb-3 pt-1">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -188,7 +184,6 @@ export function InstitutionalProShell({
                 
                 {/* ─── Top Master Bar ─── */}
                 <header className="h-[56px] border-b border-[#E5E5E5] bg-white flex items-center justify-between px-6 z-40 shrink-0 shadow-sm">
-                    {/* Left: Search */}
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
@@ -199,12 +194,10 @@ export function InstitutionalProShell({
                         />
                     </div>
 
-                    {/* Center: Live Dense Market Bar */}
                     <div className="hidden lg:flex items-center gap-0 divide-x divide-[#E5E5E5] flex-1 mx-6 overflow-hidden">
                         <LiveMarketBand />
                     </div>
 
-                    {/* Right: Settings */}
                     <button
                         onClick={() => setSettingsOpen(true)}
                         title="Open Settings"
@@ -214,28 +207,19 @@ export function InstitutionalProShell({
                     </button>
                 </header>
 
-                {/* ─── Table / View Area ─── */}
                 <main className="flex-1 relative bg-[#FFFFFF] overflow-hidden flex flex-col">
-                    {isExternalEmbed ? (
-                        /* External embed: fill entire space, no padding */
-                        <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="flex-1 overflow-y-auto no-scrollbar">
+                        <div className="p-8 max-w-[1600px] mx-auto w-full">
                             {children}
                         </div>
-                    ) : (
-                        /* Native panel: standard padded container */
-                        <div className="flex-1 overflow-y-auto no-scrollbar">
-                            <div className="p-8 max-w-[1600px] mx-auto w-full">
-                                {children}
-                            </div>
-                        </div>
-                    )}
+                    </div>
                 </main>
 
-                {/* ─── Pro Status Bar ─── */}
+                {/* ─── Status Bar ─── */}
                 <footer className="h-8 border-t border-[#E5E5E5] bg-[#FDFDFB] flex items-center justify-between px-6 shrink-0">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Globe size={11} /> Global Latency: 12ms</span>
-                        <span className="flex items-center gap-1.5"><Cpu size={11} /> BSV Teranode: ACTIVE</span>
+                        <span className="flex items-center gap-1.5"><Cpu size={11} /> Network Nodes: ACTIVE</span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Shield size={11} /> SSL: SECURE</span>

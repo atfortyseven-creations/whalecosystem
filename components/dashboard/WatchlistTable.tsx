@@ -265,6 +265,7 @@ export function WatchlistTable() {
                                         >
                                             {({ index, style, data }: { index: number, style: React.CSSProperties, data: any }) => {
                                                 const t = data.tokensFiltered[index];
+                                                if (!t) return <div style={style} />;
                                                 
                                                 // INJECT LIVE WSS STREAM DATA
                                                 const tick = markets.get(t.symbol + 'USDT');

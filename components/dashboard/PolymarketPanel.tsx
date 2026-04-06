@@ -88,32 +88,32 @@ export default function PolymarketPanel() {
 
     const handleTrade = async (direction: 'YES' | 'NO') => {
         if (!isConnected) {
-            toast.error('Wallet no conectada', { description: 'Conecta tu wallet para operar en Polymarket.' });
+            toast.error('Wallet Not Connected', { description: 'Please connect your wallet to trade on Polymarket.' });
             return;
         }
         if (!selected) return;
         if (!selected.fpmmAddress) {
-            toast.error('Mercado sin FPMM', { description: 'Este mercado no tiene un contrato FPMM disponible aún. Prueba otro mercado.' });
+            toast.error('No FPMM Available', { description: 'This market does not have an FPMM contract deployed yet. Please try another market.' });
             return;
         }
 
         setIsExecuting(direction);
-        const toastId = toast.loading(`Preparando ejecución [${direction}]...`);
+        const toastId = toast.loading(`Preparing execution [${direction}]...`);
 
         try {
             // Step A: Switch to Polygon if needed
             if (!isPolygon && switchChainAsync) {
-                toast.loading('Cambiando red a Polygon...', { id: toastId });
+                toast.loading('Switching network to Polygon...', { id: toastId });
                 try {
                     await switchChainAsync({ chainId: 137 });
                     await new Promise(r => setTimeout(r, 1200));
                 } catch {
-                    throw new Error('El cambio a Polygon fue rechazado. Polymarket opera en Polygon Mainnet.');
+                    throw new Error('Polygon switch rejected. Polymarket operates on Polygon Mainnet.');
                 }
             }
 
             // Step 1 of 2: Approve USDC to the FPMM contract
-            toast.loading('Paso 1/2: Autorizando USDC al contrato FPMM...', { id: toastId });
+            toast.loading('Step 1/2: Authorizing USDC for FPMM...', { id: toastId });
             const approvalPayload = polymarketRouterService.buildApprovalTransaction(
                 selected.fpmmAddress,
                 tradeAmount
@@ -123,13 +123,13 @@ export default function PolymarketPanel() {
                 data: approvalPayload.tx.data as `0x${string}`,
                 value: BigInt(0),
             });
-            toast.loading(`Paso 1/2 confirmado. Hash: ${approvalHash.slice(0, 10)}... Paso 2/2 en progreso...`, { id: toastId });
+            toast.loading(`Step 1/2 confirmed. Hash: ${approvalHash.slice(0, 10)}... Step 2/2 in progress...`, { id: toastId });
 
             // Wait a beat for the approval to propagate
             await new Promise(r => setTimeout(r, 2000));
 
             // Step 2 of 2: Execute the real FPMM buy()
-            toast.loading('Paso 2/2: Comprando acciones en el FPMM...', { id: toastId });
+            toast.loading('Step 2/2: Buying shares on FPMM...', { id: toastId });
             const tradePayload = await polymarketRouterService.buildTradeTransaction(
                 selected.fpmmAddress,
                 direction,
@@ -141,16 +141,16 @@ export default function PolymarketPanel() {
                 value: BigInt(0),
             });
 
-            toast.success('Trade ejecutado on-chain en Polymarket', {
+            toast.success('Trade Executed On-Chain', {
                 id: toastId,
-                description: `Has comprado ${tradeAmount} USDC en acciones ${direction}. Tx: ${tradeHash.slice(0, 18)}...`,
+                description: `Successfully purchased ${tradeAmount} USDC in ${direction} shares. Tx: ${tradeHash.slice(0, 18)}...`,
             });
 
             setSelected(null);
         } catch (e: any) {
-            toast.error('Error en la ejecución', {
+            toast.error('Execution Error', {
                 id: toastId,
-                description: e.message || 'El usuario rechazó la transacción.',
+                description: e.message || 'Transaction rejected by user.',
             });
         } finally {
             setIsExecuting(null);
@@ -299,7 +299,7 @@ export default function PolymarketPanel() {
                                 {/* ODDS IMPLICADAS REPLICA */}
                                 <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] p-6 text-center shadow-sm">
                                     <div className="flex items-center justify-center gap-2 text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] mb-6">
-                                        ODDS IMPLICADAS
+                                        IMPLIED ODDS
                                     </div>
                                     <div className="flex justify-between items-center px-4">
                                         <div className="flex-1 text-center">
@@ -317,7 +317,7 @@ export default function PolymarketPanel() {
                                 {/* INPUT REPLICA */}
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] uppercase">TAMAÑO DE LA POSICIÓN (USDC)</label>
+                                        <label className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#888888] uppercase">POSITION SIZE (USDC)</label>
                                     </div>
                                     <div className="relative">
                                         <input 
@@ -342,11 +342,11 @@ export default function PolymarketPanel() {
                                 {/* PAYOUT REPLICA */}
                                 <div className="space-y-3 pt-2">
                                     <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888]">
-                                        <span>Payout Potencial (YES):</span>
+                                        <span>Potential Payout (YES):</span>
                                         <span className="text-[#00e699] font-black">{fmtUsd(Number(tradeAmount) / selected.yesPrice)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-[12px] font-mono font-bold text-[#888888]">
-                                        <span>Payout Potencial (NO):</span>
+                                        <span>Potential Payout (NO):</span>
                                         <span className="text-[#f43f5e] font-black">{fmtUsd(Number(tradeAmount) / (1 - selected.yesPrice))}</span>
                                     </div>
                                 </div>

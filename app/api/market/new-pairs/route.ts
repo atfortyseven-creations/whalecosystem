@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
 
-// ── DexScreener endpoints (priority order) ────────────────────────────────────
-const DS_LATEST   = 'https://api.dexscreener.com/token-profiles/latest/v1';
-const DS_BOOSTED  = 'https://api.dexscreener.com/token-boosts/latest/v1';
-const DS_FALLBACK = 'https://api.dexscreener.com/latest/dex/search?q=ETH%2FUSDT&order=createdAt';
+// ── DexScreener endpoints ─────────────────────────────────────────────────────
+// Discovery: Latest token profiles (often very new/hype)
+const DS_PROFILES = 'https://api.dexscreener.com/token-profiles/latest/v1';
+// Recovery: Search for recent pairs across all chains
+const DS_SEARCH   = 'https://api.dexscreener.com/latest/dex/search?q=ETH%2FUSDT';
 
-// ── Map any DexScreener shape to the standard pair object ─────────────────────
-function mapDexPair(p: any, idx: number) {
+// ── Map DexScreener pair to standard table shape ───────────────────────────────
+function mapDexPair(p: any) {
     const chainRaw = (p.chainId || p.chain || 'ethereum').toLowerCase();
     const chain =
         chainRaw.includes('solana') ? 'solana' :
@@ -18,37 +19,40 @@ function mapDexPair(p: any, idx: number) {
         chainRaw.includes('polygon') ? 'polygon' :
         chainRaw.includes('avalanche') || chainRaw.includes('avax') ? 'avalanche' : 'ethereum';
 
-    const ca  = p.priceChange || {};
-    const txn = p.txns        || {};
-    const m5  = txn.m5        || {};
-    const liq = p.liquidity   || {};
+    const priceChange = p.priceChange || {};
+    const txn = p.txns         || {};
+    const m5  = txn.m5         || {};
+    const liq = p.liquidity    || {};
 
-    const hasliq = (liq.usd || 0) > 1000;
-    const score  = hasliq ? Math.min(100, 60 + Math.floor((liq.usd || 0) / 50_000)) : 30;
+    // Calculate a security score based on liquidity/age
+    const liqUsd = liq.usd || 0;
+    let score = 50;
+    if (liqUsd > 100000) score = 92;
+    else if (liqUsd > 20000) score = 75;
+    else if (liqUsd > 1000)  score = 60;
+    else score = 33; // Risky
 
     return {
-        id:            p.pairAddress || p.tokenAddress || `pair_${idx}`,
+        id:           p.pairAddress || p.tokenAddress || `pair_${Math.random()}`,
         chain,
-        dex:           p.dexId ? p.dexId.charAt(0).toUpperCase() + p.dexId.slice(1) : 'DEX',
+        dex:          p.dexId ? p.dexId.charAt(0).toUpperCase() + p.dexId.slice(1) : 'DEX',
         baseToken: {
-            symbol: (p.baseToken?.symbol || p.symbol || '???').toString(),
+            symbol: (p.baseToken?.symbol || p.symbol || '???').toString().toUpperCase(),
             name:   (p.baseToken?.name   || p.name   || 'Unknown Asset').toString(),
         },
-        quoteToken:    { symbol: (p.quoteToken?.symbol || 'USDT').toString() },
-        priceUsd:      p.priceUsd
-            ? parseFloat(p.priceUsd).toFixed(parseFloat(p.priceUsd) < 0.001 ? 8 : 4)
-            : '0.00',
-        pairCreatedAt: p.pairCreatedAt || p.createdAt || (Date.now() - idx * 900_000),
+        quoteToken:   { symbol: (p.quoteToken?.symbol || 'USDT').toString() },
+        priceUsd:     p.priceUsd ? parseFloat(p.priceUsd).toFixed(parseFloat(p.priceUsd) < 0.0001 ? 8 : 4) : '0.00',
+        pairCreatedAt: p.pairCreatedAt || p.createdAt || (Date.now() - 3600000),
         priceChange: {
-            m5:  parseFloat(ca.m5  || '0') || 0,
-            h1:  parseFloat(ca.h1  || '0') || 0,
-            h6:  parseFloat(ca.h6  || '0') || 0,
-            h24: parseFloat(ca.h24 || '0') || 0,
+            m5:  parseFloat(priceChange.m5  || '0') || 0,
+            h1:  parseFloat(priceChange.h1  || '0') || 0,
+            h6:  parseFloat(priceChange.h6  || '0') || 0,
+            h24: parseFloat(priceChange.h24 || '0') || 0,
         },
-        liquidity: { usd: liq.usd || 0 },
-        mcap:   p.marketCap || 0,
-        fdv:    p.fdv       || 0,
-        txns:   { m5: { buys: m5.buys || 0, sells: m5.sells || 0 } },
+        liquidity: { usd: liqUsd },
+        mcap:  p.marketCap || 0,
+        fdv:   p.fdv || 0,
+        txns:  { m5: { buys: m5.buys || 0, sells: m5.sells || 0 } },
         traders: { makers: p.makers || 1, snipers: 0 },
         security: {
             score,
@@ -60,95 +64,66 @@ function mapDexPair(p: any, idx: number) {
     };
 }
 
-// ── Synthetic fallback (always works) ────────────────────────────────────────
-function getDemoPairs(limit: number) {
-    const chains = ['solana', 'ethereum', 'base', 'bsc', 'arbitrum'];
-    const dexes  = ['Raydium', 'Uniswap V3', 'Aerodrome', 'PancakeSwap', 'SushiSwap'];
-    const names  = ['AIX', 'NEURO', 'ZETA', 'ALPHA', 'OMEGA', 'PEPE2', 'DOGX', 'CATS', 'BULL', 'BEAR'];
-
-    return Array.from({ length: Math.min(limit, 15) }).map((_, i) => {
-        const chain = chains[i % chains.length];
-        const dex   = dexes[i % dexes.length];
-        const sym   = names[i % names.length];
-        return {
-            id:            `pair_demo_${i}`,
-            chain, dex,
-            baseToken:     { symbol: sym, name: `${sym} Protocol` },
-            quoteToken:    { symbol: chain === 'solana' ? 'SOL' : 'WETH' },
-            priceUsd:      (Math.random() * 0.05).toFixed(4),
-            pairCreatedAt: Date.now() - i * 900_000,
-            priceChange: {
-                m5:  parseFloat(((Math.random() * 20)  - 5).toFixed(2)),
-                h1:  parseFloat(((Math.random() * 50)  - 10).toFixed(2)),
-                h6:  parseFloat(((Math.random() * 100) - 20).toFixed(2)),
-                h24: parseFloat(((Math.random() * 200) - 30).toFixed(2)),
-            },
-            liquidity: { usd: 10_000 + Math.random() * 500_000 },
-            mcap:     50_000 + Math.random() * 2_000_000,
-            fdv:      50_000 + Math.random() * 2_000_000,
-            txns:     { m5: { buys: Math.floor(Math.random() * 100), sells: Math.floor(Math.random() * 50) } },
-            traders:  { makers: Math.floor(Math.random() * 500) + 10, snipers: Math.floor(Math.random() * 5) },
-            security: {
-                score:        50 + Math.floor(Math.random() * 45),
-                honeypotRisk: Math.random() > 0.9,
-                lpBurned:     Math.random() > 0.5,
-                mintRevoked:  Math.random() > 0.5,
-            },
-            taxes: { buy: 0, sell: 0 },
-        };
-    });
-}
-
-// ── Try one DexScreener URL, return mapped pair array or null ─────────────────
-async function tryEndpoint(url: string, limit: number): Promise<any[] | null> {
+// ── Fetch metadata for an array of addresses found in profiles ─────────────────
+async function fetchEnrichedPairs(addresses: string[]): Promise<any[]> {
+    if (addresses.length === 0) return [];
     try {
-        const res = await fetch(url, {
-            cache:   'no-store',
-            headers: { 'Accept': 'application/json' },
-            signal:  AbortSignal.timeout(8_000),
+        // Fetch up to 30 addresses at once via /tokens endpoint
+        const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${addresses.join(',')}`, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(5000),
         });
-        if (!res.ok) return null;
-        const ds = await res.json();
-
-        // token-profiles/latest returns a top-level array
-        if (Array.isArray(ds)) {
-            const mapped = ds
-                .filter((p: any) => p != null && (p.tokenAddress || p.pairAddress))
-                .slice(0, limit)
-                .map((p: any, i: number) => mapDexPair(p, i));
-            return mapped.length > 0 ? mapped : null;
-        }
-
-        // Standard search returns { pairs: [...] }
-        if (Array.isArray(ds?.pairs)) {
-            const sorted = ds.pairs
-                .filter((p: any) => p != null && p.baseToken?.symbol)
-                .sort((a: any, b: any) => (b.pairCreatedAt || 0) - (a.pairCreatedAt || 0))
-                .slice(0, limit);
-            const mapped = sorted.map((p: any, i: number) => mapDexPair(p, i));
-            return mapped.length > 0 ? mapped : null;
-        }
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (!data.pairs) return [];
+        
+        // Return unique pairs (one per token address)
+        const seen = new Set();
+        return data.pairs
+            .filter((p: any) => {
+                const addr = (p.baseToken?.address || '').toLowerCase();
+                if (seen.has(addr)) return false;
+                seen.add(addr);
+                return true;
+            })
+            .map(mapDexPair);
     } catch (e) {
-        console.warn('[NEW-PAIRS] Endpoint failed:', url, (e as any)?.message);
+        console.warn('[NEW-PAIRS] Enrichment failed:', e);
+        return [];
     }
-    return null;
 }
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '25', 10), 50);
 
-    // Try endpoints in priority order: latest profiles ► boosted ► search
-    for (const url of [DS_LATEST, DS_BOOSTED, DS_FALLBACK]) {
-        const pairs = await tryEndpoint(url, limit);
-        if (pairs && pairs.length > 0) {
-            const source = url.includes('token-profiles') ? 'dexscreener_latest'
-                : url.includes('token-boosts') ? 'dexscreener_boosted'
-                : 'dexscreener_search';
-            return NextResponse.json({ pairs, source });
-        }
-    }
+    try {
+        // Step 1: Get latest profiles (high discovery value)
+        const profileRes = await fetch(DS_PROFILES, { cache: 'no-store' });
+        const profiles = profileRes.ok ? await profileRes.json() : [];
+        const addresses = Array.isArray(profiles) 
+            ? profiles.map((p: any) => p.tokenAddress).filter(Boolean).slice(0, 15)
+            : [];
 
-    // ── Unbreakable Fallback ──────────────────────────────────────────────────
-    return NextResponse.json({ pairs: getDemoPairs(limit), source: 'synthetic' });
+        // Step 2: Enrich profile addresses with real-time pair telemetry
+        const enrichedProfiles = await fetchEnrichedPairs(addresses);
+
+        // Step 3: Fetch search results for recent liquid pairs as filler
+        const searchRes = await fetch(DS_SEARCH, { cache: 'no-store' });
+        const searchData = searchRes.ok ? await searchRes.json() : { pairs: [] };
+        const searchPairs = (searchData.pairs || []).map(mapDexPair);
+
+        // Step 4: Merge (Enriched Profiles first, then Search)
+        const merged = [...enrichedProfiles, ...searchPairs]
+            .filter((p, i, self) => i === self.findIndex(t => t.id === p.id))
+            .slice(0, limit);
+
+        return NextResponse.json({
+            pairs: merged,
+            source: enrichedProfiles.length > 0 ? 'dexscreener_enriched' : 'dexscreener_search',
+        });
+    } catch (e: any) {
+        console.error('[NEW-PAIRS] System Failure:', e.message);
+        return NextResponse.json({ pairs: [], source: 'error' });
+    }
 }

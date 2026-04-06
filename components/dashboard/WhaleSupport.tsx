@@ -32,7 +32,7 @@ const FAQ = [
     },
     {
         q: 'What is the Gold Ticket and how do I claim it?',
-        a: 'The Gold Ticket is a one-time NFT-based access pass that grants lifetime Sovereign tier access. Navigate to the "Gold Ticket" section in the sidebar to check eligibility and claim. A $5/month subscription is required to maintain API access.',
+        a: 'The Gold Ticket is a one-time NFT-based access pass that grants lifetime Whale Network access. Navigate to the "Gold Ticket" section in the sidebar to check eligibility and claim. A $5/month subscription is required to maintain API access.',
     },
     {
         q: 'Why is my Watchlist not showing market data?',
@@ -80,7 +80,7 @@ export function WhaleSupport() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: 'Sovereign Whale',
+                    name: 'Whale Network User',
                     email: 'terminal@whalecosystem.com',
                     category: 'Support Ticket',
                     section: priority,
@@ -88,7 +88,7 @@ export function WhaleSupport() {
                 })
             });
             if (res.ok) {
-                toast.success('Sovereign ticket dispatched securely to HQ ✓');
+                toast.success('Professional ticket dispatched securely to HQ ✓');
                 setSubject(''); setMessage('');
             } else {
                 toast.error('Failed to dispatch ticket. Neural network busy.');

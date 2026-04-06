@@ -87,13 +87,13 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
         // Anti-latency precision check
         const activeTokenIdToTrade = side === "YES" ? activeTokenIdYes : activeTokenIdNo;
         if (!activeTokenIdToTrade) {
-             toast.error("Error criptográfico: Token ID irreconocible para este mercado.");
+             toast.error("Cryptographic Error: Unrecognized Token ID for this market.");
              return;
         }
 
         const bestPrice = side === "YES"
             ? (orderBook.asks[0]?.price || 0.5)
-            : (1 - (orderBook.bids[0]?.price || 0.5)); // Derivado aritméticamente inmutable
+            : (1 - (orderBook.bids[0]?.price || 0.5));
 
         trade("BUY", amount, bestPrice, activeTokenIdToTrade);
     };
@@ -122,7 +122,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                             <div className="hidden md:flex items-center space-x-2 bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/20">
                                 <ActivityIcon size={14} className={isPolygon ? 'text-emerald-500 animate-pulse' : 'text-gray-500'} />
                                 <span className="text-xs font-black tracking-widest text-[#00dda8] uppercase">
-                                    {isPolygon ? "L1 Connectivity: Native" : "Cross-Chain Relojed"}
+                                    {isPolygon ? "L1 Connectivity: Native" : "Cross-Chain Relayed"}
                                 </span>
                             </div>
                         </div>
@@ -148,7 +148,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                             <Globe className="w-32 h-32 text-indigo-500" />
                         </div>
 
-                        <h2 className="text-xs uppercase tracking-[0.3em] text-white/50 font-black mb-2">Valor Total del Portafolio</h2>
+                        <h2 className="text-xs uppercase tracking-[0.3em] text-white/50 font-black mb-2">Total Portfolio Value</h2>
                         <div className="flex items-baseline space-x-2">
                             <span className="text-6xl md:text-7xl font-black font-mono tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
                                 ${portfolioValue}
@@ -157,7 +157,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
 
                         <div className="mt-8 flex space-x-8 items-end relative z-10">
                             <div className="flex-1">
-                                <p className="text-[10px] text-emerald-500/50 uppercase tracking-[0.2em] mb-1 font-black">Capital Líquido L1 (USDC)</p>
+                                <p className="text-[10px] text-emerald-500/50 uppercase tracking-[0.2em] mb-1 font-black">L1 Liquid Capital (USDC)</p>
                                 <p className="text-2xl font-black font-mono text-emerald-400 shadow-sm">${usdcBalance}</p>
                             </div>
 
@@ -183,11 +183,11 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xs font-black text-white/50 uppercase tracking-[0.25em] flex items-center gap-2">
                                 <Globe size={14} className="text-white/30" />
-                                Terminal de Mercados L1
+                                L1 Market Terminal
                             </h3>
                             {isMarketsLoading && (
                                 <div className="flex items-center gap-2 text-[#00dda8] text-[9px] uppercase tracking-widest font-black animate-pulse">
-                                    <Loader2 size={12} className="animate-spin" /> Sincronizando Nodos CLOB...
+                                    <Loader2 size={12} className="animate-spin" /> Syncing CLOB Nodes...
                                 </div>
                             )}
                             {marketsError && (
@@ -232,7 +232,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                             })}
                             {!isMarketsLoading && markets.length === 0 && !marketsError && (
                                 <div className="col-span-full py-12 text-center text-[#555555] font-black uppercase tracking-widest text-xs">
-                                    No hay mercados activos sincronizados en el nodo local actualmente.
+                                    No active markets synchronized in the local node currently.
                                 </div>
                             )}
                         </div>
@@ -247,9 +247,9 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                             <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
                                 <ActivityIcon className="w-8 h-8 text-rose-500" />
                             </div>
-                            <h3 className="text-xl font-black uppercase text-white tracking-widest">Falla Jurisdiccional</h3>
+                            <h3 className="text-xl font-black uppercase text-white tracking-widest">Jurisdictional Halt</h3>
                             <p className="text-[#888888] font-bold text-xs max-w-[220px] uppercase tracking-wider">
-                                Orderbook enrutamiento restringido. Sincronice cadena Polygon.
+                                Orderbook routing restricted. Please switch to Polygon network.
                             </p>
                         </div>
                     ) : (
@@ -259,13 +259,13 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                 <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 backdrop-blur-md flex items-start space-x-4">
                                     <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
                                     <div>
-                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-amber-500 mb-1">Handshake Requerido</h3>
-                                        <p className="text-[10px] text-white/50 mb-3 font-medium">Bóveda asimétrica desactiva inyecciones sin Proxy EIP-712.</p>
+                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-amber-500 mb-1">Handshake Required</h3>
+                                        <p className="text-[10px] text-white/50 mb-3 font-medium">Asymmetric vault disables injections without EIP-712 Proxy.</p>
                                         <button
                                             onClick={login}
                                             className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-[#050505] text-[10px] font-black uppercase tracking-widest rounded transition-colors"
                                         >
-                                            Autorizar Canal
+                                            Authorize Channel
                                         </button>
                                     </div>
                                 </div>
@@ -275,18 +275,18 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                 <div className="mb-6 border-b border-[#222] pb-6">
                                     <h3 className="text-[10px] font-black text-[#555] uppercase tracking-[0.2em] mb-2 flex items-center space-x-2">
                                         <TrendingUp className="w-4 h-4 text-[#00dda8]" />
-                                        <span>Orderbook en Vivo — CLOB L1</span>
+                                        <span>Live Orderbook — CLOB L1</span>
                                     </h3>
                                     <p className="text-sm font-black text-white leading-tight">
-                                        {selectedMarket ? selectedMarket.question : "Seleccione mercado para rastrear liquidez"}
+                                        {selectedMarket ? selectedMarket.question : "Select market to track liquidity"}
                                     </p>
                                 </div>
 
-                                {/* VISUAL ORDERBOOK MULTIMETRICO */}
+                                {/* VISUAL ORDERBOOK MULTIMETRIC */}
                                 <div className="space-y-1 mb-8 font-mono text-[11px] font-bold tracking-tight">
                                     {(isBookLoading && orderBook.asks.length === 0) && (
                                         <div className="text-center py-6 text-[#555] uppercase tracking-widest flex items-center justify-center gap-2">
-                                            <Loader2 size={12} className="animate-spin text-[#00dda8]" /> Analizando bloque...
+                                            <Loader2 size={12} className="animate-spin text-[#00dda8]" /> Analyzing block...
                                         </div>
                                     )}
 
@@ -302,10 +302,10 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                                 />
                                             </div>
                                         ))}
-                                        {orderBook.asks.length === 0 && !isBookLoading && <div className="text-[#333] text-center italic py-2">Vacío</div>}
+                                        {orderBook.asks.length === 0 && !isBookLoading && <div className="text-[#333] text-center italic py-2">Empty</div>}
                                     </div>
 
-                                    <div className="py-2 text-center text-[9px] text-[#444] font-black tracking-[0.3em] uppercase">Spread Central</div>
+                                    <div className="py-2 text-center text-[9px] text-[#444] font-black tracking-[0.3em] uppercase">Mid Spread</div>
 
                                     {/* BIDS (BUYERS) - GREEN */}
                                     <div className="space-y-1 p-2 rounded-xl bg-[#111] border border-[#222]">
@@ -319,7 +319,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                                 />
                                             </div>
                                         ))}
-                                        {orderBook.bids.length === 0 && !isBookLoading && <div className="text-[#333] text-center italic py-2">Vacío</div>}
+                                        {orderBook.bids.length === 0 && !isBookLoading && <div className="text-[#333] text-center italic py-2">Empty</div>}
                                     </div>
                                 </div>
 
@@ -330,19 +330,19 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                             onClick={() => setSide("YES")}
                                             className={`flex-1 py-3.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "YES" ? "bg-[#00dda8] text-[#050505] shadow-[0_4px_20px_rgba(0,221,168,0.2)]" : "text-[#555] hover:text-white"}`}
                                         >
-                                            COMPRAR YES
+                                            BUY YES
                                         </button>
                                         <button
                                             onClick={() => setSide("NO")}
                                             className={`flex-1 py-3.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "NO" ? "bg-[#ff4d4d] text-white shadow-[0_4px_20px_rgba(255,77,77,0.2)]" : "text-[#555] hover:text-white"}`}
                                         >
-                                            COMPRAR NO
+                                            BUY NO
                                         </button>
                                     </div>
 
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-[10px] text-[#555] uppercase font-black tracking-widest">Asignación L1 (USDC)</label>
+                                            <label className="text-[10px] text-[#555] uppercase font-black tracking-widest">L1 Allocation (USDC)</label>
                                             <div className="relative mt-2">
                                                 <input
                                                     type="number"
@@ -358,7 +358,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                         </div>
 
                                         <div className="flex justify-between text-[11px] py-1 border-t border-[#222] pt-4 font-bold uppercase tracking-widest">
-                                            <span className="text-[#555]">Shares Proyectadas</span>
+                                            <span className="text-[#555]">Projected Shares</span>
                                             <span className="text-white font-mono">{amount ? (parseFloat(amount) / 0.65).toFixed(2) : "0.00"}</span>
                                         </div>
 
@@ -367,11 +367,11 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                             disabled={tradeStatus === "APPROVING" || tradeStatus === "SIGNING" || tradeStatus === "POSTING" || !amount || !selectedMarket}
                                             className="w-full py-4 rounded-xl bg-white text-[#050505] font-black uppercase tracking-widest text-[11px] transition-all hover:bg-[#eee] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-2"
                                         >
-                                            {tradeStatus === "APPROVING" && <><Loader2 className="animate-spin w-4 h-4" /> Firma EIP-2612...</>}
+                                            {tradeStatus === "APPROVING" && <><Loader2 className="animate-spin w-4 h-4" /> EIP-2612 Signature...</>}
                                             {tradeStatus === "SIGNING" && <><Loader2 className="animate-spin w-4 h-4" /> ECDSA Handshake...</>}
-                                            {tradeStatus === "POSTING" && <><Loader2 className="animate-spin w-4 h-4" /> Enrutando L1...</>}
-                                            {tradeStatus === "SUCCESS" && "Operación Liquidada"}
-                                            {tradeStatus === "IDLE" && "FIRMAR Y ENVIAR ORDEN L1"}
+                                            {tradeStatus === "POSTING" && <><Loader2 className="animate-spin w-4 h-4" /> Routing L1...</>}
+                                            {tradeStatus === "SUCCESS" && "Trade Settled"}
+                                            {tradeStatus === "IDLE" && "SIGN & SUBMIT L1 ORDER"}
                                         </button>
                                     </div>
                                 </div>
@@ -383,4 +383,3 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
         </motion.div>
     );
 }
-
