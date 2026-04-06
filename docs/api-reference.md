@@ -278,7 +278,7 @@ Completes a mobile-to-desktop QR synchronization handshake. Called from the mobi
 }
 ```
 
-**Response `200`:** Sets `sovereign_handshake` cookie and returns:
+**Response `200`:** Sets `whale_handshake` cookie and returns:
 ```json
 { "success": true, "sessionEstablished": true }
 ```

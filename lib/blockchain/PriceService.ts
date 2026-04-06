@@ -10,7 +10,7 @@ import { LRUCache } from 'lru-cache';
 export class PriceService {
   private static cache = new LRUCache<string, any>({
     max: 2000,
-    ttl: 1000 * 30, // 30 seconds — real-time institutional requirement
+    ttl: 1000 * 30, // 30 seconds — real-time professional requirement
   });
 
   private static MAJORS = ['ETH', 'BTC', 'USDC', 'USDT', 'SOL', 'BNB', 'AVAX', 'MATIC', 'POL', 'ARB', 'OP'];

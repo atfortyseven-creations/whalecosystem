@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║          SOVEREIGN HANDSHAKE — DEADMAN'S SWITCH v1.0.0                      ║
+ * ║          WHALE HANDSHAKE — DEADMAN'S SWITCH v1.0.0                       ║
  * ║          Non-Custodial Inheritance Protocol (Polygon PoS / Amoy)             ║
  * ║                                                                              ║
  * ║  Architecture: Owner never cedes custody. Contract holds zero funds.         ║
@@ -28,7 +28,7 @@ import {IERC20Metadata}          from "@openzeppelin/contracts/token/ERC20/exten
 import {SafeERC20}               from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC721}                 from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-contract SovereignDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
+contract WhaleDeadmanSwitch is Ownable2Step, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     // ─────────────────────────────────────────────────────────────────────────────

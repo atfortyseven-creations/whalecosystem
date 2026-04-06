@@ -35,10 +35,10 @@ startProcess('WEB-UI', 'node', ['--max-old-space-size=512', '--import', 'tsx', '
 console.log("🐋 [Worker] Starting Whale Tracking Indexer...");
 startProcess('INDEXER', 'node', ['--max-old-space-size=512', '--import', 'tsx', 'scripts/whale-worker.ts']);
 
-// 3. Start the Scheduled Sync Manager (Sovereign Vault - Every 24h)
-console.log("📡 [Sync] Sovereign Vault Scheduler Active.");
+// 3. Start the Scheduled Sync Manager (Whale Vault - Every 24h)
+console.log("📡 [Sync] Whale Vault Scheduler Active.");
 setInterval(async () => {
-    console.log("🔄 [Sync] Triggering Sovereign Vault Garbage Collection...");
+    console.log("🔄 [Sync] Triggering Whale Vault Garbage Collection...");
     const payloadTypes = ['security_events', 'intel_items'];
     
     for (const payload_type of payloadTypes) {

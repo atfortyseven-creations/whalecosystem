@@ -17,13 +17,13 @@ export async function POST(req: Request) {
             try {
                 const isValid = await verifyMessage({
                     address: address as `0x${string}`,
-                    message: `SOVEREIGN_HANDSHAKE:${token}`,
+                    message: `WHALE_HANDSHAKE:${token}`,
                     signature: signature as `0x${string}`,
                 });
 
                 if (!isValid) {
                     console.error(`[Handshake:Denied] Invalid signature for ${address} on token ${token}`);
-                    return new NextResponse('Verification Failed: Invalid Sovereign Handshake', { status: 401 });
+                    return new NextResponse('Verification Failed: Invalid Whale Handshake', { status: 401 });
                 }
             } catch (verifError) {
                 console.error('[Handshake:VerifError]', verifError);
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
             status: 200,
             headers: {
                 'Set-Cookie': [
-                    `sovereign_handshake=${normalizedAddress}`,
+                    `whale_handshake=${normalizedAddress}`,
                     'Path=/',
                     `Max-Age=${THIRTY_DAYS_S}`,
                     'SameSite=Lax',

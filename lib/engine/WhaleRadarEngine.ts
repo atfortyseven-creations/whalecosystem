@@ -23,11 +23,11 @@ export class WhaleRadarEngine {
     private static rollingWhaleInflowUSD = 0;
     private static lastResetTime = Date.now();
 
-    // Sovereign GetBlock RPC Endpoints (550k CU Allocation)
+    // Professional GetBlock RPC Endpoints (550k CU Allocation)
     private static RPC_ENDPOINTS = {
         ETH: 'https://go.getblock.io/b50acf08a4cd403390c246637034cfac',   // Ethereum Mainnet (Core CEX Deposits)
         ARB: 'https://go.getblock.io/0cd4475a0d354fb6bf8f5588c9b1456b',   // Arbitrum One (Hyperliquid Core)
-        OP: 'https://go.getblock.io/1eed0f18f4de463c80e5430ffdf278aa',    // Optimism (Institutional routing)
+        OP: 'https://go.getblock.io/1eed0f18f4de463c80e5430ffdf278aa',    // Optimism (Whale-Grade routing)
         MATIC: 'https://go.getblock.io/38ee170f06334b3cacf5a07f0c1f05b6'  // Polygon POS (Retail Taker Noise)
     };
 
@@ -66,7 +66,7 @@ export class WhaleRadarEngine {
         console.log('[Whale Radar] Active. Listening for 7-figure Txns to Hot Wallets.');
     }
 
-    public static async getInstitutionalVigor(asset: string, currentMarkPrice: number): Promise<VigorState> {
+    public static async getWhaleVigor(asset: string, currentMarkPrice: number): Promise<VigorState> {
         // Reset rolling window every 1 hour
         if (Date.now() - this.lastResetTime > 3600 * 1000) {
             this.rollingWhaleInflowUSD = 0;
@@ -107,7 +107,7 @@ export class WhaleRadarEngine {
         // [ON-CHAIN PURE] Use absolute rolling inflow. ZERO MOCKS.
         const whaleInflow = this.rollingWhaleInflowUSD;
 
-        // Institutional Vigor USD Delta
+        // Whale Vigor USD Delta
         const usdDelta = whaleInflow - retailTakerVolume;
         
         // Vigor Percentage (0-100% Scale of Accumulation dominance)

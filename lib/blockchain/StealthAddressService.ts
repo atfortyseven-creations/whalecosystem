@@ -4,7 +4,7 @@ import { type Address, type Hex, keccak256, encodePacked } from 'viem';
 
 /**
  * StealthAddressService (ERC-5564)
- * Implements non-custodial, unlinkable payment addresses for institutional privacy.
+ * Implements non-custodial, unlinkable payment addresses for professional privacy.
  * Enables the "Stealth Mode" of the Arctic Protocol.
  */
 export class StealthAddressService {

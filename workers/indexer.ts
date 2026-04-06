@@ -6,7 +6,7 @@ import { createClient } from 'redis';
 import { neuralSegregator } from '../lib/neural-segregator';
 
 /**
- * SOVEREIGN NODE INDEXER (RPC SIPHON)
+ * WHALE NODE INDEXER (RPC SIPHON)
  * Connects directly to GetBlock WebSocket nodes to ingest real-time blocks.
  */
 

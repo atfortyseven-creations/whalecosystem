@@ -274,3 +274,23 @@ model PrivacyDonation {
   timestamp   DateTime @default(now())
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WHALE TELEMETRY & ACTIVITY
+// ─────────────────────────────────────────────────────────────────────────────
+
+model WhaleActivity {
+  id              String   @id @default(uuid())
+  walletAddress   String
+  type            String   // 'TRANSFER', 'SWAP', 'MINT', 'BURN'
+  token           String
+  amount          String
+  usdValue        String
+  fromAddress     String
+  toAddress       String
+  transactionHash String   @unique
+  blockNumber     BigInt
+  chain           String
+  metadata        Json?
+  timestamp       DateTime @default(now())
+}

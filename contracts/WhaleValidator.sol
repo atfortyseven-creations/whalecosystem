@@ -2,12 +2,12 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title SovereignValidator
+ * @title WhaleValidator
  * @dev Cryptographic validation layer for the Whale Ecosystem's Gold Registry.
  * Audits the solvency of Exchanges, Casinos, and Wallets.
  */
-contract SovereignValidator {
-    address public immutable sovereignAuthority;
+contract WhaleValidator {
+    address public immutable whaleAuthority;
 
     struct AuditRecord {
         bytes32 platformHash;
@@ -31,12 +31,12 @@ contract SovereignValidator {
     event AuthorityTransferred(address indexed previousAuthority, address indexed newAuthority);
 
     modifier onlyAuthority() {
-        require(msg.sender == sovereignAuthority, "Unauthorized Ping");
+        require(msg.sender == whaleAuthority, "Unauthorized Ping");
         _;
     }
 
     constructor() {
-        sovereignAuthority = msg.sender;
+        whaleAuthority = msg.sender;
         emit AuthorityTransferred(address(0), msg.sender);
     }
 

@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 /**
  * @title DeadMansSwitch
- * @notice Mecanismo de herencia Sovereign-grade. Si el titular no ejecuta un ping en X tiempo, el beneficiario designado puede drenar los fondos.
+ * @notice Mecanismo de herencia Whale-grade. Si el titular no ejecuta un ping en X tiempo, el beneficiario designado puede drenar los fondos.
  */
 contract DeadMansSwitch {
     struct Switch {

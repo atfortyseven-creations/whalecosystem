@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 /**
- * SOVEREIGN VAULT DAEMON (V1.0)
+ * WHALE VAULT DAEMON (V1.0)
  * ----------------------------
  * This is the local receptor for the Whale Alert "Garbage Collector" system.
  * It listens for encrypted payloads from the Railway-Production cloud
@@ -12,7 +12,7 @@ const crypto = require('crypto');
  */
 
 const PORT = process.env.VAULT_PORT || 7007;
-const SECRET_KEY = process.env.SOVEREIGN_VAULT_SECRET || 'SOVEREIGN_QUANTUM_KEY_777';
+const SECRET_KEY = process.env.WHALE_VAULT_SECRET || 'WHALE_QUANTUM_KEY_777';
 const STORAGE_DIR = path.join(__dirname, '..', 'vault-storage');
 
 // Ensure storage directory exists
@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => {
         if (!authHeader || authHeader !== `Bearer ${SECRET_KEY}`) {
             console.warn(`[Vault] ❌ Unauthorized ingress attempt from ${req.socket.remoteAddress}`);
             res.writeHead(401, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Sovereign Key Invalid' }));
+            res.end(JSON.stringify({ error: 'Whale Key Invalid' }));
             return;
         }
 
@@ -79,7 +79,7 @@ const server = http.createServer((req, res) => {
                     uhrp_metadata: {
                         hash: uhrp_hash,
                         algorithm: 'sha256',
-                        protocol: 'Sovereign-Vault-V1.1'
+                        protocol: 'Whale-Vault-V1.1'
                     }
                 };
 
@@ -129,12 +129,12 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`\n=================================================`);
-    console.log(`🏛️  SOVEREIGN VAULT DAEMON - ONLINE`);
+    console.log(`🏛️  WHALE VAULT DAEMON - ONLINE`);
     console.log(`=================================================`);
     console.log(`📡 STATUS: ACTIVE & LISTENING`);
     console.log(`📍 ADDRESS: http://localhost:${PORT}`);
     console.log(`📁 STORAGE: ${STORAGE_DIR}`);
-    console.log(`🔐 ACCESS: RESTRICTED VIA QUANTUM SECRET`);
+    console.log(`🔐 ACCESS: RESTRICTED VIA WHALE SECRET`);
     console.log(`-------------------------------------------------\n`);
     console.log(`Waiting for Railway production to teleport data...`);
 });

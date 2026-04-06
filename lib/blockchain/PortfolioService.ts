@@ -544,7 +544,7 @@ export class PortfolioService {
         address: rawAddress,
         isBitcoin: true,
         legendaryScore: 100,
-        strategicInsight: "Bitcoin sovereignty detected. Maximum security profile active."
+        strategicInsight: "Professional Whale-Grade Bitcoin security detected. Maximum security profile active."
       };
       await safeRedisSet(cacheKey, JSON.stringify(btcResult), 'EX', 3600); // 1h TTL for Bitcoin
       return btcResult;

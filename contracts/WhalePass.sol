@@ -7,15 +7,15 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-/// @title SovereignPass: Institutional Gold Ticket Membership
+/// @title WhalePass: Professional Gold Ticket Membership
 /// @notice ERC-1155 implementation for exclusive Whale Alert Network terminal access
-contract SovereignPass is ERC1155, Ownable, ERC1155Supply {
+contract WhalePass is ERC1155, Ownable, ERC1155Supply {
     using Strings for uint256;
 
     // Token IDs
     uint256 public constant GOLD_TICKET = 1;
     uint256 public constant VANGUARD_TIER = 2;
-    uint256 public constant INSTITUTIONAL_TIER = 3;
+    uint256 public constant WHALE_TIER = 3;
 
     // Pricing & Supply
     uint256 public mintPrice = 0.5 ether;
@@ -44,7 +44,7 @@ contract SovereignPass is ERC1155, Ownable, ERC1155Supply {
         _royaltyRecipient = initialOwner;
     }
 
-    /// @notice Mints a Gold Ticket for Whitelisted wallets (Institutional Partners)
+    /// @notice Mints a Gold Ticket for Whitelisted wallets (Governance Partners)
     /// @param proof Merkle proof confirming the sender's inclusion
     function whitelistMint(bytes32[] calldata proof) external payable {
         if (!isWhitelistSaleActive) revert SaleNotActive();

@@ -1,9 +1,9 @@
 /**
- * 🥞 SOVEREIGN WHALE MONITORING: PANCAKESWAP V3 (BSC)
+ * 🥞 WHALE ALERT MONITORING: PANCAKESWAP V3 (BSC)
  * Core Engine for Real-Time Elite Settlement Observation
  * 
  * Mastered by: Antigravity Systems
- * Version: 2.1.0 (Elite Sovereign Edition)
+ * Version: 2.1.0 (Whale Elite Edition)
  */
 
 import { ethers } from "ethers";
@@ -37,7 +37,7 @@ const tokenCache = new Map<string, { symbol: string, decimals: number }>();
  * CORE MONITORING ENGINE
  */
 async function startPancakeWorker() {
-    console.log("\n[SYSTEM] 🚀 INITIATING SOVEREIGN PANCAKESWAP MONITOR");
+    console.log("\n[SYSTEM] 🚀 INITIATING WHALE PANCAKESWAP MONITOR");
     console.log(`[SYSTEM] Threshold: $${WHALE_THRESHOLD_USD.toLocaleString()} USD`);
     
     let lastProcessedBlock: number;
@@ -114,7 +114,7 @@ async function handleV3Swap(log: ethers.Log) {
     const amount0 = BigInt(decoded.amount0.toString());
     const amount1 = BigInt(decoded.amount1.toString());
 
-    // Sovereign Token Resolution
+    // Whale Token Resolution
     const [t0, t1] = await Promise.all([
         resolveToken(t0Addr, provider),
         resolveToken(t1Addr, provider)
@@ -228,6 +228,6 @@ async function processWhaleSwap(data: any) {
 
 // --- BOOTSTRAP ---
 startPancakeWorker().catch(err => {
-    console.error("[FATAL] Sovereign Engine failure:", err);
+    console.error("[FATAL] Whale Engine failure:", err);
     process.exit(1);
 });

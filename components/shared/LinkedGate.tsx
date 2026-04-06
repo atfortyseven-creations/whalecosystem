@@ -646,7 +646,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                             className="relative p-4 bg-white rounded-2xl shadow-inner w-full h-full flex items-center justify-center"
                           >
                             <QRCodeSVG
-                              value={`SOVEREIGN_HANDSHAKE:${qrSession}`}
+                              value={`WHALE_HANDSHAKE:${qrSession}`}
                               style={{ width: '100%', height: '100%' }}
                               level="H"
                               bgColor="transparent"

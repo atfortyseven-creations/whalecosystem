@@ -1,5 +1,5 @@
-const CACHE_NAME = 'sovereign-vault-v1';
-const DYNAMIC_CACHE = 'sovereign-dynamic-v1';
+const CACHE_NAME = 'whale-vault-v1';
+const DYNAMIC_CACHE = 'whale-dynamic-v1';
 
 const STATIC_ASSETS = [
   '/',

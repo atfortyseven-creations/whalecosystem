@@ -73,7 +73,7 @@ export async function encryptVault(
     data: unknown,
     signer: ethers.Signer
 ): Promise<EncryptedVault> {
-    const message = 'Allow Access to Sovereign Vault';
+    const message = 'Allow Access to Whale Vault';
 
     // Step 1 — Prove ownership: request an EIP-191 signature from the wallet.
     const signature = await signer.signMessage(message);
@@ -126,7 +126,7 @@ export async function decryptVault(
         );
     } catch {
         throw new Error(
-            'Sovereign Vault: decryption failed. The wallet signature, salt, or ciphertext is invalid.'
+            'Whale Vault: decryption failed. The wallet signature, salt, or ciphertext is invalid.'
         );
     }
 

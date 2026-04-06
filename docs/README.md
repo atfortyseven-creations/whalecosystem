@@ -22,7 +22,7 @@
 | Document | Description |
 |---|---|
 | [Stateful Agents](./stateful-agents.md) | Autonomous intelligence units with persistent memory |
-| [Sovereign Identity](./sovereign-identity.md) | EIP-191 auth, KYC JWT, AES-GCM vault encryption |
+| [Whale Identity](./whale-identity.md) | EIP-191 auth, KYC JWT, AES-GCM vault encryption |
 | [Neural Intelligence](./neural-intelligence.md) | Z-score engine, whale classification, signal generation |
 
 ---

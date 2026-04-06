@@ -1,6 +1,6 @@
-# Sovereign Identity
+# Whale Identity Protocol
 
-Whale Alert Network does not store passwords, email addresses, or any personally identifiable information linked to on-chain identities. Authentication is entirely cryptographic, built on three interlocking layers.
+Whale Alert Network does not store passwords, email addresses, or any personally identifiable information linked to on-chain identities. Authentication is entirely cryptographic, built on three interlocking layers of the **Whale Security Mesh**.
 
 ---
 
@@ -51,14 +51,14 @@ Session state written to cookie-based wagmi storage (SSR-safe)
 
 ---
 
-## Layer 2 — Sovereign Handshake (EIP-191)
+## Layer 2 — Whale Handshake (EIP-191)
 
-After connecting a wallet, sensitive actions (vault access, QR synchronization, trading route entry) require a **wallet signature** — not a transaction. This proves ownership of the address without any gas cost and without broadcasting anything to the blockchain.
+After connecting a wallet, sensitive actions (vault access, QR synchronization, trading route entry) require a **Whale signature** — not a transaction. This proves ownership of the address without any gas cost and without broadcasting anything to the blockchain.
 
 ### Message Signed
 
 ```
-Allow Access to Sovereign Vault
+Allow Access to Whale Vault
 ```
 
 This is a static, human-readable message. No dynamic nonces are included in this message — the uniqueness guarantee is provided by the encryption salt (see Layer 3).
@@ -78,19 +78,19 @@ Where:
 
 In code, this is performed by `ethers.verifyMessage(message, signature)` which returns the recovered address. If it matches the connected wallet address, authentication succeeds.
 
-### QR Synchronization
+### QR Synchronization (Desktop-to-Mobile)
 
 For the desktop-to-mobile QR sync flow (connecting a mobile wallet to a desktop terminal session):
 
-1. Desktop generates a UUID session token and encodes it as `SOVEREIGN_HANDSHAKE:{token}` in a QR code
+1. Desktop generates a UUID session token and encodes it as `WHALE_HANDSHAKE:{token}` in a QR code
 2. Mobile scans the QR via the built-in camera scanner (`Html5Qrcode`)
 3. Mobile POSTs `{ token, address }` to `/api/auth/qr-sync`
-4. Server validates the token against Redis and sets the `sovereign_handshake` session cookie
+4. Server validates the token against Redis and sets the `whale_handshake` session cookie
 5. Desktop terminal detects the cookie and elevates the session
 
 ---
 
-## Layer 3 — Vault Encryption (AES-GCM-256 + PBKDF2)
+## Layer 3 — Whale Vault Encryption (AES-GCM-256 + PBKDF2)
 
 Sensitive user data (portfolio snapshots, private notes, trading configurations) is encrypted client-side before leaving the browser. The server never receives the plaintext.
 
@@ -106,7 +106,7 @@ key = PBKDF2(
 )
 ```
 
-The **210,000 iterations** mean that brute-forcing the key requires approximately 210,000 SHA-256 operations per guess. With a GPU cluster capable of 10 billion SHA-256/sec, exhausting a 256-bit key space would require more computation than exists in the observable universe.
+The **210,000 iterations** mean that brute-forcing the key requires approximately 210,000 SHA-256 operations per guess.
 
 ### Encryption
 
@@ -118,7 +118,7 @@ encryptedData = AES-GCM-256(
 )
 ```
 
-AES-GCM provides both **confidentiality** (encryption) and **authenticity** (GHASH authentication tag). Any tampering with the ciphertext causes decryption to fail with a hard error — there is no silent corruption.
+AES-GCM provides both **confidentiality** (encryption) and **authenticity** (GHASH authentication tag).
 
 ### Storage Format
 
@@ -151,21 +151,14 @@ Access to trading routes (`/trade/*`) requires a KYC approval token in addition 
     "status": "APPROVED",
     "verifiedAt": "2026-03-30T18:00:00Z",
     "expiresAt": "2026-06-30T18:00:00Z",
-    "tier": "PRO"
+    "tier": "WHALE_PRO"
   }
 }
 ```
 
 ### Verification
 
-All KYC tokens are verified in the Edge middleware using `jose.jwtVerify()` with the deployment's `KYC_SECRET` environment variable. If the environment variable is not configured, all access to KYC-protected routes is denied automatically — there is no fallback.
-
-```typescript
-const { payload } = await jwtVerify(kycToken, KYC_SECRET_bytes);
-if (payload.status !== 'APPROVED') {
-  return redirect('/');
-}
-```
+All KYC tokens are verified in the Edge middleware using `jose.jwtVerify()` with the deployment's `KYC_SECRET`.
 
 ---
 
@@ -176,8 +169,8 @@ The platform supports four concurrent authentication signals, any one of which e
 | Signal | Cookie Name | Source |
 |---|---|---|
 | Clerk managed session | `__session` | Clerk Auth |
-| Sovereign handshake | `sovereign_handshake` | QR sync flow |
+| Whale handshake | `whale_handshake` | QR sync flow |
 | NextAuth session | `next-auth.session-token` | NextAuth.js |
-| Human session | `human_session` | Custom identity flow |
+| Whale session | `whale_session` | Custom identity flow |
 
-All cookies are `HttpOnly`, `Secure`, and `SameSite=Strict`. They are never accessible to JavaScript running on the page.
+All cookies are `HttpOnly`, `Secure`, and `SameSite=Strict`.

@@ -16,7 +16,7 @@ The platform then applies a statistical anomaly engine to the raw event stream, 
 
 ## Core Philosophy
 
-### 1. Sovereign Data Ownership
+### 1. Whale Data Ownership
 No user account stores personal identifiers. Authentication is cryptographic: your Ethereum wallet address is your identity. A wallet signature (EIP-191) proves you are the account holder without revealing who you are. We never accumulate usernames, passwords, or email addresses linked to on-chain identities.
 
 ### 2. Institutional Transparency
@@ -47,7 +47,7 @@ Whale Alert Network operates in compliance with CFTC and OFAC guidelines. Jurisd
 ## Key Capabilities
 
 - **Real-time whale detection** — Z-score anomaly filtering on raw transaction streams
-- **Sovereign identity** — EIP-191 wallet signature authentication with AES-GCM-256 encrypted session vault
+- **Whale identity** — EIP-191 wallet signature authentication with AES-GCM-256 encrypted session vault
 - **Polymarket intelligence** — Order book depth, position tracking, and market sentiment derived from Polymarket's CLOB API
 - **Institutional API** — Rate-tiered REST and WebSocket API with per-plan SLA guarantees
 - **Governance participation** — On-chain proposal creation and voting via gasless execution (EIP-712 meta-transactions)

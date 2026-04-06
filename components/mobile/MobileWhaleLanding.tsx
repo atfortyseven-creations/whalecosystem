@@ -631,7 +631,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
   const handleScan = useCallback(async (text: string) => {
     if (isProcessingRef.current) return;
-    if (!text.startsWith('SOVEREIGN_HANDSHAKE:')) return;
+    if (!text.startsWith('WHALE_HANDSHAKE:')) return;
     const currentAddress = addressRef.current;
     if (!currentAddress) {
       toast.error('WALLET NO CONECTADA', { description: 'Conecta tu wallet antes de escanear.' });
@@ -640,7 +640,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
     isProcessingRef.current = true;
     setIsProcessing(true);
     try {
-      const token = text.slice('SOVEREIGN_HANDSHAKE:'.length);
+      const token = text.slice('WHALE_HANDSHAKE:'.length);
       const res = await fetch('/api/auth/qr-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -734,7 +734,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-export function MobileSovereignLanding({ onEnterNews }: { onEnterNews?: () => void } = {}) {
+export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void } = {}) {
   const { isConnected, address } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
