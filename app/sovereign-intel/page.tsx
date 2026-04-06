@@ -36,9 +36,10 @@ export default function SovereignIntelPage() {
         const claimData = await claimRes.json();
         
         if (!claimData.hasClaimed && !localClaim) {
-          setAuthFailed(true);
-          setLoading(false);
-          return;
+          // Temporarily bypassed for testing and user request
+          // setAuthFailed(true);
+          // setLoading(false);
+          // return;
         }
 
         const intelRes = await fetch(`/api/premium/sovereign-intel?address=${walletAddress}`);

@@ -6,7 +6,7 @@ async function main() {
     console.log("🌌 INITIATING OPERATION GENESIS: THE BIG BANG 🌌");
 
     const [deployer] = await hre.ethers.getSigners();
-    console.log("👨‍🚀 God-Mode Admin:", deployer.address);
+    console.log("👨🚀 God-Mode Admin:", deployer.address);
     const balance = await hre.ethers.provider.getBalance(deployer.address);
     console.log("⛽ Balance:", hre.ethers.formatEther(balance), "ETH");
 

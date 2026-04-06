@@ -16,15 +16,21 @@ interface RPCEndpoint {
  * EP4: GETBLOCK_ETH_RPC_4  → Market Intel (slot0 / getReserves top-20 pools)
  */
 
-// ── 4 dedicated GetBlock endpoints (from .env) ────────────────────────────────
-const EP1_HTTP = process.env.GETBLOCK_ETH_RPC_1 || 'https://eth.llamarpc.com';
-const EP2_WSS  = process.env.GETBLOCK_ETH_WS_2  || '';
-const EP3_WSS  = process.env.GETBLOCK_ETH_WS_3  || '';
-const EP4_HTTP = process.env.GETBLOCK_ETH_RPC_4 || 'https://eth.llamarpc.com';
-
-// ── Legacy / BSC / Base fallbacks ────────────────────────────────────────────
-const GETBLOCK_BSC_HTTPS  = process.env.GETBLOCK_BSC_RPC   || 'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517';
-const GETBLOCK_BASE_HTTPS = process.env.GETBLOCK_BASE_RPC  || 'https://go.getblock.us/69668586f4a84e3597c5dd658514121a';
+// ── GetBlock endpoints — hardcoded as requested ──────────────────────────────
+// Primary ETH HTTP endpoints
+const EP1_HTTP = 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8'; // ETH JSON-RPC (portfolio)
+const EP2_HTTP = 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c'; // ETH JSON-RPC (market intel)
+const EP3_HTTP = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234'; // ETH JSON-RPC (backup 1)
+const EP4_HTTP = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da'; // ETH JSON-RPC (backup 2)
+// Primary ETH WebSocket endpoints
+const EP_WSS_1 = 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a'; // ETH WS primary
+const EP_WSS_2 = 'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343'; // ETH WS secondary
+const EP_WSS_3 = 'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131'; // ETH WS backup
+// Polygon
+const POLYGON_HTTP = 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d'; // Polygon JSON-RPC
+// Legacy BSC/Base endpoints
+const GETBLOCK_BSC_HTTPS  = 'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe';
+const GETBLOCK_BASE_HTTPS = process.env.GETBLOCK_BASE_RPC || 'https://mainnet.base.org';
 
 export class ResilientProvider {
   private primaryProvider: ethers.JsonRpcProvider;
@@ -153,21 +159,27 @@ export class ResilientProvider {
   }
 }
 
-// ── Ethereum: EP1 (HTTP portfolio) + EP4 (HTTP market intel) + EP2 WS (whale detection) ──
+// ── Ethereum: all HTTP RPCs + primary WS ──────────────────────────────────────
 export const ethereumResilientProvider = new ResilientProvider(
-  [EP1_HTTP, EP4_HTTP, 'https://eth.llamarpc.com'].filter(Boolean),
+  [EP1_HTTP, EP2_HTTP, EP3_HTTP, EP4_HTTP].filter(Boolean),
   1,
-  EP2_WSS || undefined
+  EP_WSS_1
 );
 
-// ── BSC: legacy endpoint ───────────────────────────────────────────────────────
+// ── BSC ───────────────────────────────────────────────────────────────────────
 export const bscResilientProvider = new ResilientProvider(
   [GETBLOCK_BSC_HTTPS, 'https://binance.llamarpc.com'].filter(Boolean),
   56
 );
 
-// ── Base: legacy GetBlock Base endpoint ───────────────────────────────────────
+// ── Base ──────────────────────────────────────────────────────────────────────
 export const baseResilientProvider = new ResilientProvider(
   [GETBLOCK_BASE_HTTPS, 'https://mainnet.base.org'].filter(Boolean),
   8453
+);
+
+// ── Polygon ───────────────────────────────────────────────────────────────────
+export const polygonResilientProvider = new ResilientProvider(
+  [POLYGON_HTTP, 'https://polygon.llamarpc.com'].filter(Boolean),
+  137
 );

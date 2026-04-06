@@ -311,7 +311,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
 
             <div className="flex flex-col items-center mb-9">
               <div className="w-[60px] h-[60px] bg-white border border-black/[0.04] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)] rounded-full flex items-center justify-center mb-5">
-                <img src="/official-whale-monochrome.png" className="w-[30px] h-[30px]" alt="Whale" />
+                <img src="/logo-landingpage.png" className="w-[30px] h-[30px]" alt="Whale" />
               </div>
               <h3 className="text-[20px] font-black text-[#050505] tracking-tight mb-1">Bóveda Criptográfica</h3>
               <p className="text-[9px] text-[#050505]/40 font-black uppercase tracking-[0.16em]">Sincronización de Identidad</p>
@@ -406,23 +406,25 @@ function PageHero({
           <WorldFinancialClocks />
 
           {/* Animated Whale Logo bounded nicely */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: [0, -20, 0], opacity: 1 }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="w-[280px] h-[280px] mx-auto mb-4 mt-2 flex items-center justify-center relative drop-shadow-2xl"
-            style={{ willChange: 'transform' }}
-          >
-            <img 
-              src="/official-whale-monochrome.png" 
-              className="w-full h-full object-contain" 
-              alt="Whale Logo" 
-            />
-          </motion.div>
+          {!isConnected && (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: [0, -20, 0], opacity: 1 }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-[280px] h-[280px] mx-auto mb-4 mt-2 flex items-center justify-center relative drop-shadow-2xl"
+              style={{ willChange: 'transform' }}
+            >
+              <img 
+                src="/logo-landingpage.png" 
+                className="w-full h-full object-contain" 
+                alt="Whale Logo" 
+              />
+            </motion.div>
+          )}
 
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-[0.9] mb-6 uppercase italic relative z-10 drop-shadow-md">
             Whale Alert<br />Network

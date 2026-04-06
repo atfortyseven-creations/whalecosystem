@@ -38,18 +38,16 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Whale Alert Network | Sovereign Institutional Interface',
+    default: 'HOME | Whale Alert Network',
     template: '%s | Whale Alert Network'
   },
-  description: 'The world\'s most advanced whale alert tool for real-time elite on-chain intelligence. Track whales across 24 crypto assets with institutional-grade forensic instrumentation.',
+  description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
   keywords: [
-    'Whale Alert Network', 'Whale Alert', 'Whale Tracker', 'Elite Whale Intelligence', 
-    'On-chain Forensic Analytics', 'Crypto Whale Detector', 'Institutional Flow Analysis',
-    'Dark Pool Heatmap', 'Bitcoin Mempool', 'Sovereign Infrastructure'
+    'Whale Alert Network', 'Whale Alert', 'Whale Tracker', 'Crypto Whale Detector', 'On-chain Analytics', 'Crypto Community'
   ],
-  authors: [{ name: 'Sovereign Institutional Team' }],
-  creator: 'Sovereign Institutional Team',
-  publisher: 'Sovereign Institutional Team',
+  authors: [{ name: 'Whale Alert Network Team' }],
+  creator: 'Whale Alert Network Team',
+  publisher: 'Whale Alert Network Team',
   metadataBase: new URL('https://humanidfi.com'),
   alternates: {
     canonical: '/',
@@ -74,16 +72,16 @@ export const metadata = {
     title: 'Whale Alert',
   },
   openGraph: {
-    title: 'Whale Alert Network | Sovereign Intelligence',
-    description: 'The world\'s most advanced whale alert tool for real-time elite on-chain intelligence. Track whales across 24 crypto assets with institutional-grade forensic instrumentation.',
+    title: 'HOME | Whale Alert Network',
+    description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
     url: 'https://humanidfi.com',
     siteName: 'Whale Alert Network',
     images: [
       {
-        url: '/official-whale-monochrome.png',
+        url: '/logo-landingpage.png',
         width: 1200,
         height: 1200,
-        alt: 'Whale Alert Network Elite Matrix',
+        alt: 'Whale Alert Network',
       },
     ],
     locale: 'en_US',
@@ -91,9 +89,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Whale Alert Network | Elite Tracker',
-    description: 'Sovereign On-chain Analytics. Real-time institutional detection algorithms.',
-    images: ['/official-whale-monochrome.png'],
+    title: 'HOME | Whale Alert Network',
+    description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
+    images: ['/logo-landingpage.png'],
   },
 }
 
@@ -126,7 +124,7 @@ export default async function RootLayout({
         "@type": "WebSite",
         "url": "https://humanidfi.com/",
         "name": "Whale Alert Network",
-        "description": "Cryptographic shield and on-chain intelligence protocol. Mastering EVM thermodynamics, ZK-Circuits, and Real-Time Algorithmic Forensics.",
+        "description": "La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.",
         "publisher": {
           "@id": "https://humanidfi.com/#organization"
         }
@@ -134,9 +132,9 @@ export default async function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://humanidfi.com/#organization",
-        "name": "Sovereign Institutional Team",
+        "name": "Whale Alert Network Team",
         "url": "https://humanidfi.com",
-        "logo": "https://humanidfi.com/official-whale-monochrome.png",
+        "logo": "https://humanidfi.com/logo-landingpage.png",
         "sameAs": [
           "https://github.com/atfortyseven-creations/whalecosystem"
         ]
@@ -149,7 +147,7 @@ export default async function RootLayout({
         "creator": {
           "@id": "https://humanidfi.com/#organization"
         },
-        "description": "The definitive sovereign terminal for real-time elite on-chain intelligence. Integrating Zero-Knowledge rollups, local Sovereign Vault daemons, Neo4j Graph Indexers, and deterministic AI signals.",
+        "description": "Whale Alert Network terminal for real-time elite on-chain intelligence.",
         "url": "https://humanidfi.com/network",
         "featureList": [
           "Sovereign PC Vault (Local Daemon Zero-Trust)",
@@ -160,10 +158,10 @@ export default async function RootLayout({
       },
       {
         "@type": "SoftwareSourceCode",
-        "name": "Sovereign Vault Base Architecture",
+        "name": "Whale Alert Base Architecture",
         "codeRepository": "https://github.com/atfortyseven-creations/whalecosystem",
         "programmingLanguage": ["TypeScript", "Solidity", "PostgreSQL", "Neo4j", "React", "Next.js"],
-        "description": "Dual-hybrid architecture running Next.js 15 App router over a Zero-Latency 240Hz Letta-style Bento UI, with an offline SovereignVault_RUN.bat local daemon for absolute privacy. Uses Worldcoin IDKit + Sumsub on-chain KYC."
+        "description": "Dual-hybrid architecture running Next.js 15 App router over a Zero-Latency Bento UI."
       },
       {
         "@type": "DataFeed",

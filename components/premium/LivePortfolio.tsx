@@ -5,9 +5,15 @@ import { motion } from 'framer-motion';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { Wallet, TrendingUp, TrendingDown, RefreshCcw, LayoutGrid } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 export function LivePortfolio() {
-    const { isConnected } = useAccount();
+    const { isConnected: isWagmiConnected } = useAccount();
+    const { address: eoaAddress } = useSovereignAccount();
+    const { address: sovereignAddress } = useWalletStore();
+    
+    const isConnected = isWagmiConnected || !!eoaAddress || !!sovereignAddress;
     const { 
         usdcBalance, 
         totalPnl, 
