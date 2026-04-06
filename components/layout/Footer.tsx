@@ -93,10 +93,11 @@ export const Footer = () => {
                                 <span className="w-4 h-[1px] bg-[var(--aztec-orchid)]" /> Platform
                             </h4>
                             <div className="flex flex-col gap-5">
-                                <FooterLink href="/dashboard" icon={<Globe size={15} />}>System Terminal</FooterLink>
+                                <FooterLink href="/network" icon={<Globe size={15} />}>System Terminal</FooterLink>
+                                <FooterLink href="/academy" icon={<Database size={15} />}>Sovereign Academy</FooterLink>
+                                <FooterLink href="/api-marketplace" icon={<Code size={15} />}>API Marketplace</FooterLink>
+                                <FooterLink href="/docs/whitepaper" icon={<Lock size={15} />}>Institutional Whitepaper</FooterLink>
                                 <FooterLink href="/docs" icon={<Code size={15} />}>Technical Docs</FooterLink>
-                                <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy Policy</FooterLink>
-                                <FooterLink href="/terms" icon={<Database size={15} />}>Terms of Service</FooterLink>
                             </div>
                         </div>
 
@@ -107,8 +108,8 @@ export const Footer = () => {
                             </h4>
                             <div className="flex flex-col gap-5">
                                 <FooterLink href="https://twitter.com/whalecosystem" external icon={<Twitter size={15} />}>Twitter / X</FooterLink>
-                                <FooterLink href="https://github.com/atfortyseven/M47-Terminal" external icon={<Github size={15} />}>Github Repository</FooterLink>
-                                <FooterLink href="/docs" icon={<Code size={15} />}>Technical Docs</FooterLink>
+                                <FooterLink href="https://github.com/atfortyseven-creations/whalecosystem" external icon={<Github size={15} />}>Github Repository</FooterLink>
+                                <FooterLink href="/llms.txt" external icon={<Code size={15} />}>LLM / AI Instructions</FooterLink>
                                 <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy Policy</FooterLink>
                             </div>
                         </div>

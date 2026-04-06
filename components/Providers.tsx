@@ -12,8 +12,15 @@ import { MarketWebsocketProvider } from "@/src/context/MarketWebsocketProvider";
 import { SessionProvider } from "next-auth/react";
 import { ReactLenis } from 'lenis/react';
 import { CWIProvider } from "@/lib/bsv/CWIContext";
+import { useEffect } from "react";
 
 export default function Providers({ children, initialState, cookies }: { children: React.ReactNode, initialState?: State, cookies?: string | null }) {
+    useEffect(() => {
+        if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").catch(console.error);
+        }
+    }, []);
+
     return (
         <ReactLenis root options={{ lerp: 0.08, duration: 1.5, smoothWheel: true }}>
         <SessionProvider>

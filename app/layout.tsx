@@ -149,8 +149,30 @@ export default async function RootLayout({
         "creator": {
           "@id": "https://humanidfi.com/#organization"
         },
-        "description": "The definitive sovereign terminal for real-time elite on-chain intelligence. Integrating Zero-Knowledge rollups, EVM thermodynamic analytics, and deterministic AI signals.",
-        "url": "https://humanidfi.com/network"
+        "description": "The definitive sovereign terminal for real-time elite on-chain intelligence. Integrating Zero-Knowledge rollups, local Sovereign Vault daemons, Neo4j Graph Indexers, and deterministic AI signals.",
+        "url": "https://humanidfi.com/network",
+        "featureList": [
+          "Sovereign PC Vault (Local Daemon Zero-Trust)",
+          "Next.js Hybrid Safari iOS Webview + QR State Sync",
+          "Hardhat L2 Aztec Network ZK Integrations",
+          "Whale Worker (Prisma + Neo4j + BullMQ)"
+        ]
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "Sovereign Vault Base Architecture",
+        "codeRepository": "https://github.com/atfortyseven-creations/whalecosystem",
+        "programmingLanguage": ["TypeScript", "Solidity", "PostgreSQL", "Neo4j", "React", "Next.js"],
+        "description": "Dual-hybrid architecture running Next.js 15 App router over a Zero-Latency 240Hz Letta-style Bento UI, with an offline SovereignVault_RUN.bat local daemon for absolute privacy. Uses Worldcoin IDKit + Sumsub on-chain KYC."
+      },
+      {
+        "@type": "DataFeed",
+        "name": "Live Institutional Flow Feed",
+        "dataFeedElement": {
+          "@type": "DataFeedItem",
+          "name": "EVM Thermodynamic Matrix",
+          "description": "Live stochastic tracing of accumulated gas signatures natively via local Node daemon connected to Ethereum."
+        }
       }
     ]
   };
