@@ -18,6 +18,7 @@ import { AlertsPanel }             from '@/components/dashboard/AlertsPanel';
 import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPanel';
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
+import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
 
 import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
 import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
@@ -39,6 +40,7 @@ type TabId =
     | 'portfolio'
     | 'whale-portfolio'
     | 'news'
+    | 'omni-explorer'
     | 'support'
     | 'humanidfi-portfolio'
     | 'academy'
@@ -109,6 +111,7 @@ export default function WhaleDashboard() {
                       : activeTab === 'gainers'              ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
                       : activeTab === 'whale-portfolio'      ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />       </DashboardErrorBoundary>
                       : activeTab === 'news'                 ? <DashboardErrorBoundary key="news">           <NewsOfToday />          </DashboardErrorBoundary>
+                      : activeTab === 'omni-explorer'        ? <DashboardErrorBoundary key="omni-explorer">  <OmniExplorer />         </DashboardErrorBoundary>
                       : activeTab === 'api'                  ? <DashboardErrorBoundary key="api">            <ApiTerminal />          </DashboardErrorBoundary>
                       : activeTab === 'portfolio'            ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />        </DashboardErrorBoundary>
                       : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>

@@ -1,16 +1,8 @@
 "use client";
 
-import React, {
-  useRef, useEffect, useState, useCallback, useMemo
-} from "react";
-import {
-  motion, useScroll, useTransform, useSpring,
-  useInView, AnimatePresence, useMotionValue, useVelocity
-} from "framer-motion";
-import {
-  BookOpen, Network, Shield, Database,
-  Cpu, ArrowRight, Lock, Zap, Eye, Globe, Activity, Check
-} from "lucide-react";
+import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
+import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from "framer-motion";
+import { Terminal, Database, Shield, Zap, Globe, Cpu, ArrowRight, Binary } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useUIStore } from "@/lib/store/ui-store";
@@ -18,11 +10,9 @@ import { Footer } from "@/components/layout/Footer";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
 import useSWR from "swr";
 
 gsap.registerPlugin(ScrollTrigger);
-
 
 const DynamicCryptoCheckoutModal = dynamic(
   () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
@@ -32,131 +22,56 @@ const ClearanceHeroView = dynamic<any>(
   () => import("./ClearanceView").then((m) => m.ClearanceView),
   { ssr: false }
 );
-const DynamicLegendaryCursor = dynamic(
-  () => import("@/components/landing/LegendaryCursor").then((m) => m.LegendaryCursor),
-  { ssr: false }
-);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LENIS SMOOTH SCROLL — 240hz capability with spring physics
-// ─────────────────────────────────────────────────────────────────────────────
 function useLenis() {
   useEffect(() => {
     let lenis: any = null;
     let raf: number;
-
     (async () => {
       try {
         const { default: Lenis } = await import("lenis");
-        lenis = new Lenis({
-          duration: 1.4,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          touchMultiplier: 2.2,
-          infinite: false,
-        });
-
-        const animate = (time: number) => {
-          lenis?.raf(time);
-          raf = requestAnimationFrame(animate);
-        };
+        lenis = new Lenis({ duration: 1.2, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        const animate = (time: number) => { lenis?.raf(time); raf = requestAnimationFrame(animate); };
         raf = requestAnimationFrame(animate);
-
-        // Connect Lenis ↔ GSAP ScrollTrigger
         lenis.on("scroll", ScrollTrigger.update);
         gsap.ticker.add((time: number) => { lenis?.raf(time * 1000); });
         gsap.ticker.lagSmoothing(0);
-      } catch {
-        // Lenis unavailable — degrade gracefully
-      }
+      } catch {}
     })();
-
-    return () => {
-      cancelAnimationFrame(raf);
-      lenis?.destroy();
-    };
+    return () => { cancelAnimationFrame(raf); lenis?.destroy(); };
   }, []);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SECTION REVEAL — GSAP-powered cinematic entrance
-// ─────────────────────────────────────────────────────────────────────────────
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-  yOffset = 70,
-  direction = "up",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  yOffset?: number;
-  direction?: "up" | "left" | "right";
-}) {
+function Reveal({ children, delay = 0, className = "", yOffset = 40 }: { children: React.ReactNode; delay?: number; className?: string; yOffset?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-6%" });
-
-  const initial =
-    direction === "left"  ? { opacity: 0, x: -yOffset, y: 0, filter: "blur(12px)" }
-    : direction === "right" ? { opacity: 0, x: yOffset,  y: 0, filter: "blur(12px)" }
-    : { opacity: 0, x: 0, y: yOffset, filter: "blur(10px)" };
-
   return (
-    <motion.div
-      ref={ref}
-      initial={initial}
-      animate={isInView
-        ? { opacity: 1, x: 0, y: 0, filter: "blur(0px)" }
-        : initial
-      }
-      transition={{
-        type: "spring", stiffness: 50, damping: 20, mass: 1.2,
-        delay, opacity: { duration: 0.8 },
-        filter: { duration: 0.9 },
-      }}
-      className={className}
-    >
+    <motion.div ref={ref} initial={{ opacity: 0, y: yOffset }} animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }} className={className}>
       {children}
     </motion.div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LIVE TICKER
-// ─────────────────────────────────────────────────────────────────────────────
 const TICKER = [
-  "BTC: $83,241 ▲1.2%", "ETH: $3,812 ▼0.8%",
-  "⚠ WHALE: 14,200 ETH DETECTED", "SOL: $182 ▲3.1%",
-  "DARK POOL: $280M BTC", "99.99% Uptime",
-  "Whales Tracked: 1,247", "24h Volume: $4.2B",
-  "⚠ WHALE: 8,900 BTC DETECTED", "Fear/Greed: 74 GREED",
+  "BLOCK: 19284711", "TX_HASH: 0x9fA2...3b1C",
+  "⚠ WHALE: 14_200 ETH", "[ZK_PROOF_VERIFIED]",
+  "TARGET: DARK_POOL_A", "NET_STATE: SECURE",
+  "0x882A...F019 SWAP", "NODE_LATENCY: 12ms",
 ];
 
 function DataTicker() {
   const { data } = useSWR("/api/network/live-ticker", (url) => fetch(url).then((res) => res.json()), {
-    refreshInterval: 10000, // 10s heartbeat
-    fallbackData: { ticker: TICKER }
+    fallbackData: { ticker: TICKER }, refreshInterval: 5000
   });
-
-  const tickerData = data?.ticker || TICKER;
-  const content = [...tickerData, ...tickerData, ...tickerData];
+  const tData = data?.ticker || TICKER;
+  const content = [...tData, ...tData, ...tData];
 
   return (
-    <div className="relative w-full overflow-hidden border-y" style={{ borderColor: "rgba(5,5,5,0.12)", background: "rgba(5,5,5,0.02)" }}>
-      <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-        style={{ background: "linear-gradient(90deg,#FBC9C2,transparent)" }} />
-      <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-        style={{ background: "linear-gradient(-90deg,#FBC9C2,transparent)" }} />
-      <motion.div
-        className="flex gap-14 py-3.5 will-change-transform"
-        style={{ width: "max-content" }}
-        animate={{ x: [0, -4000] }}
-        transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-      >
+    <div className="relative w-full border-y border-[#00FF55]/20 bg-[#000000] overflow-hidden py-2" style={{ boxShadow: "inset 0 0 20px rgba(0,255,85,0.05)" }}>
+      <motion.div className="flex gap-16 will-change-transform w-max" animate={{ x: [0, -2000] }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
         {content.map((item: string, i: number) => (
-          <span key={i}
-            className="text-[9px] font-mono uppercase tracking-[0.28em] whitespace-nowrap font-semibold"
-            style={{ color: item.startsWith("⚠") ? "#D4AF37" : "rgba(5,5,5,0.60)" }}>
+          <span key={i} className="text-[10px] font-mono uppercase tracking-[0.3em] font-black" style={{ color: item.includes("⚠") ? "#FF0055" : "#00FF55" }}>
             {item}
           </span>
         ))}
@@ -165,176 +80,38 @@ function DataTicker() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GLOW CARD
-// ─────────────────────────────────────────────────────────────────────────────
-function GlowCard({
-  icon, title, desc, delay = 0, direction = "up", color = "#1a6de0",
-}: {
-  icon: React.ReactNode; title: string; desc: string;
-  delay?: number; direction?: "up" | "left" | "right"; color?: string;
-}) {
+function ZKCard({ icon, title, desc, delay = 0 }: { icon: React.ReactNode; title: string; desc: string; delay?: number }) {
   const [hovered, setHov] = useState(false);
   return (
-    <Reveal delay={delay} direction={direction}>
-      <motion.div
-        onHoverStart={() => setHov(true)}
-        onHoverEnd={() => setHov(false)}
-        animate={{ y: hovered ? -6 : 0, scale: hovered ? 1.02 : 1 }}
-        transition={{ type: "spring", stiffness: 280, damping: 22 }}
-        className="relative rounded-2xl p-9 md:p-11 overflow-hidden cursor-default"
-        style={{
-          background: hovered
-            ? `radial-gradient(ellipse 80% 60% at 20% 20%, ${color}18, rgba(5,5,5,0.05))`
-            : "rgba(5,5,5,0.05)",
-          border: `1px solid ${hovered ? color + "55" : "rgba(5,5,5,0.12)"}`,
-          boxShadow: hovered
-            ? `0 0 80px ${color}25, 0 24px 72px rgba(0,0,0,0.15)`
-            : "0 4px 24px rgba(0,0,0,0.06)",
-          transition: "border-color 0.5s, box-shadow 0.5s, background 0.5s",
-        }}
+    <Reveal delay={delay}>
+      <div 
+        onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+        className="relative p-8 border border-[#333333] transition-colors duration-200 bg-[#000000]"
+        style={{ borderColor: hovered ? "#00FF55" : "#222222" }}
       >
-        {/* Animated sweep light */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          animate={{ opacity: hovered ? 1 : 0 }}
-          style={{
-            background: `linear-gradient(135deg, ${color}12, transparent 60%)`,
-          }}
-        />
-
-        <div className="inline-flex p-3.5 rounded-xl mb-6"
-          style={{ background: `${color}18`, border: `1px solid ${color}30` }}>
-          <span style={{ color }}>{icon}</span>
+        <div className="absolute top-0 right-0 p-2 opacity-30 font-mono text-[8px] text-[#00FF55]">[{title.slice(0,3).toUpperCase()}_MOD]</div>
+        <div className="mb-6 inline-flex p-3 border border-[#00FF55]/30 text-[#00FF55] bg-[#00FF55]/5">
+            {icon}
         </div>
-
-        <h3 className="text-xl md:text-2xl font-semibold mb-4 leading-snug" style={{ color: "#050505" }}>
-          {title}
-        </h3>
-        <p className="text-sm leading-relaxed" style={{ color: "rgba(5,5,5,0.65)" }}>
-          {desc}
-        </p>
-
-        {/* Bottom glimmer */}
-        <motion.div
-          className="absolute bottom-0 left-0 h-[1px] w-full"
-          style={{ background: `linear-gradient(90deg,transparent,${color},transparent)` }}
-          animate={{ opacity: hovered ? 1 : 0, scaleX: hovered ? 1 : 0 }}
-          transition={{ duration: 0.45 }}
-        />
-      </motion.div>
+        <h3 className="font-mono text-xl font-bold mb-3 text-white uppercase tracking-tight">::{title}</h3>
+        <p className="font-mono text-xs text-[#888888] leading-relaxed uppercase tracking-wider">{desc}</p>
+        
+        <motion.div className="absolute bottom-0 left-0 h-[2px] bg-[#00FF55]"
+          initial={{ width: 0 }} animate={{ width: hovered ? "100%" : 0 }} />
+      </div>
     </Reveal>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ARCHITECTURE & MODULES DATA
-// ─────────────────────────────────────────────────────────────────────────────
-const PILLARS = [
-  { icon: <Cpu size={20} strokeWidth={1.5} />, color: "#1a6de0",
-    title: "In-Memory Kinetic Ingestion",
-    desc: "The system bypasses intermediate abstractions, processing base-layer events directly in RAM matrices. This structure allows evaluating stochastic deviations with mathematical rigor." },
-  { icon: <Lock size={20} strokeWidth={1.5} />, color: "#D4AF37",
-    title: "Conditional Cryptographic Boundary",
-    desc: "We rest the architecture on the uncompromising principle of Zero-Trust. The protocol fully delegates cryptographic computation to the client under strictly E2EE norms." },
-  { icon: <Network size={20} strokeWidth={1.5} />, color: "#00d4ff",
-    title: "Multi-layer Graph Indexing",
-    desc: "Unification of directed computational graphs originating from independent instances. We formulate state trees that reduce algorithmic complexity in real-time." },
-  { icon: <Shield size={20} strokeWidth={1.5} />, color: "#9333ea",
-    title: "Integrity & Compliance",
-    desc: "We incorporate Zero-Knowledge validation layers to maintain adherence to international regulatory frameworks without compromising ontological data sovereignty." },
-];
-
-const MODULES = [
-  {
-    category: "Ingestion Layer", color: "#1a6de0",
-    title: "Institutional Flow Detector",
-    description: "A deterministic algorithm structurally designed to monitor Ethereum Virtual Machine subroutines and Hyperliquid L1. It analyzes absolute volume and deciphers financial organization paradigms via objective heuristics.",
-    points: ["Raw block parsing", "Z-Score processing for anomalies", "Non-blocking asynchronous filters"],
-  },
-  {
-    category: "Representation Layer", color: "#00d4ff",
-    title: "Integrated Protocol Matrix",
-    description: "A rigidly structured terminal engineered to visualize the synthesis of extracted data. It presents an austere interface, intentionally devoid of ornamental metrics, focusing on technical veracity.",
-    points: ["Dark liquidity intersection (CLOB)", "EIP-712 signature aggregation", "Relational database persistence"],
-  },
-];
-
-const FEATURES = [
-  { icon: <Eye size={18} />,      label: "Real-time Whale Detection", color: "#1a6de0" },
-  { icon: <Zap size={18} />,      label: "Dark Pool Signals",         color: "#D4AF37" },
-  { icon: <Globe size={18} />,    label: "24 Chain Coverage",         color: "#00d4ff" },
-  { icon: <Shield size={18} />,   label: "ZK-Proof Privacy",          color: "#9333ea" },
-  { icon: <Activity size={18} />, label: "AI Flow Analysis",          color: "#00C076" },
-  { icon: <Network size={18} />,  label: "Mempool Intelligence",      color: "#f97316" },
-  { icon: <Database size={18} />, label: "Sovereign Data Layer",      color: "#ec4899" },
-  { icon: <Cpu size={18} />,      label: "EVM Thermodynamics",        color: "#1a6de0" },
-];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// STAT COUNTER
-// ─────────────────────────────────────────────────────────────────────────────
-function StatBlock({ value, label }: { value: string; label: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
-  return (
-    <motion.div ref={ref} className="flex flex-col items-center md:items-start"
-      initial={{ opacity: 0, y: 24 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ type: "spring", stiffness: 60, damping: 18 }}>
-      <span className="text-[9px] font-mono uppercase tracking-[0.4em] mb-1.5 font-semibold"
-        style={{ color: "rgba(5,5,5,0.60)" }}>{label}</span>
-      <span className="text-3xl md:text-4xl font-semibold tracking-tight"
-        style={{ color: "rgba(5,5,5,0.95)" }}>{value}</span>
-    </motion.div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN EXPORT
-// ─────────────────────────────────────────────────────────────────────────────
 export function WhaleAlertLanding() {
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const heroRef       = useRef<HTMLDivElement>(null);
-  const globeWrapRef  = useRef<HTMLDivElement>(null);
-
+  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { isConnected } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
-  const [showCheckout, setShowCheckout] = useState(false);
   const [showClearance, setShowClearance] = useState(false);
   const [showDocumentGate, setShowDocumentGate] = useState(false);
-  const [mouse, setMouse] = useState<[number, number]>([0, 0]);
 
-  // Lenis smooth scroll
   useLenis();
-
-  // Scroll progress for globe explosion
-  const { scrollYProgress: heroScrollProg } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const explodeSpring = useSpring(heroScrollProg, { stiffness: 80, damping: 30 });
-  const [explodeVal, setExplodeVal] = useState(0);
-
-  useEffect(() => {
-    const unsub = explodeSpring.on("change", (v) => setExplodeVal(Math.min(1, Math.max(0, v * 2.2))));
-    return unsub;
-  }, [explodeSpring]);
-
-  // Cinematic hero parallax
-  const heroOpacity = useTransform(heroScrollProg, [0, 0.7], [1, 0]);
-  const heroY       = useTransform(heroScrollProg, [0, 0.7], [0, 100]);
-  const heroBlur    = useTransform(heroScrollProg, [0, 0.5], [0, 16]);
-  const heroScale   = useTransform(heroScrollProg, [0, 0.7], [1, 0.9]);
-
-  // Mouse parallax
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    setMouse([
-      (e.clientX / window.innerWidth - 0.5) * 2,
-      -(e.clientY / window.innerHeight - 0.5) * 2,
-    ]);
-  }, []);
 
   const handleEntry = useCallback(() => {
     if (typeof window !== "undefined" && localStorage.getItem("hasReadDocs") === "true") {
@@ -346,381 +123,106 @@ export function WhaleAlertLanding() {
   }, [isConnected, router, openConnectModal]);
 
   const executeSystemEntry = useCallback(() => {
-    if (typeof window !== "undefined") {
-        localStorage.setItem("hasReadDocs", "true");
-    }
+    if (typeof window !== "undefined") localStorage.setItem("hasReadDocs", "true");
     setShowDocumentGate(false);
     if (isConnected) router.push("/vip");
     else openConnectModal();
   }, [isConnected, router, openConnectModal]);
 
   return (
-    <div
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      style={{ backgroundColor: "transparent", color: "#050505", minHeight: "100vh" }}
-      className="relative w-full overflow-x-hidden font-sans selection:bg-[#FBC9C2]/25"
-    >
+    <div ref={containerRef} className="relative w-full overflow-x-hidden bg-black text-white font-sans selection:bg-[#00FF55] selection:text-black">
+      
+      {/* ── HERO ── */}
+      <section className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black">
+        {/* CRT GRID */}
+        <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: `linear-gradient(#00FF55 1px, transparent 1px), linear-gradient(90deg, #00FF55 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
 
-
-      <DynamicLegendaryCursor />
-
-      {/* ─────────────────────────────────────────────────────────────── */}
-      {/*  HERO                                                           */}
-      {/* ─────────────────────────────────────────────────────────────── */}
-      <section
-        ref={heroRef}
-        className="relative flex flex-col items-center justify-center overflow-hidden"
-        style={{ minHeight: "100vh", zIndex: 10 }}
-      >
-        {/* Subtle radial nebula */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(10,40,100,0.18) 0%, transparent 70%)",
-        }} />
-
-        <motion.div
-          style={{ opacity: heroOpacity, y: heroY, scale: heroScale,
-            filter: useTransform(heroBlur, (v) => `blur(${v}px)`) }}
-          className="relative w-full flex flex-col items-center px-6"
-        >
-          {/* HERO CONTENT TOGGLE */}
-          <AnimatePresence mode="wait">
-            {!showClearance ? (
-              <motion.div
-                key="standard-hero"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="flex flex-col items-center w-full"
-              >
-                {/* Headline */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 48 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, type: "spring", stiffness: 45, damping: 18 }}
-                  className="text-center mb-5 leading-[1.03]"
-                  style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "clamp(2.8rem, 8vw, 7.5rem)",
-                    fontWeight: 300, letterSpacing: "-0.025em", color: "#050505",
-                    maxWidth: "900px",
-                  }}
-                >
-                  Track the world&rsquo;s{" "}
-                  <span style={{
-                    background: "linear-gradient(135deg, #1a6de0 20%, #00d4ff 55%, #D4AF37 90%)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                  }}>
-                    largest whales.
-                  </span>
-                  <br />In real time.
-                </motion.h1>
-
-                {/* Subtitle */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 1.1 }}
-                  className="text-center text-base md:text-lg font-light mb-11"
-                  style={{ color: "rgba(5,5,5,0.7)", maxWidth: "540px", lineHeight: 1.7 }}
-                >
-                  Financial observation architecture built on cryptography, asynchronous
-                  macro-analysis, and institutional-grade signal engineering.
-                </motion.p>
-
-                {/* CTA */}
-                <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                  className="flex flex-wrap gap-4 items-center justify-center mb-16"
-                >
-                  <motion.button
-                    onClick={handleEntry}
-                    whileHover={{ scale: 1.06, boxShadow: "0 0 60px rgba(26,109,224,0.45), 0 12px 40px rgba(0,0,0,0.5)" }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="flex items-center gap-2.5 px-9 py-4 rounded-full text-sm font-semibold"
-                    style={{
-                      background: "linear-gradient(135deg,#1a6de0,#0047cc)",
-                      color: "#ffffff",
-                      boxShadow: "0 0 35px rgba(26,109,224,0.3), 0 8px 32px rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    <BookOpen size={15} strokeWidth={2} />
-                    Access the Terminal
-                  </motion.button>
-
-                  <motion.button
-                    onClick={() => setShowClearance(true)}
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-2 px-9 py-4 rounded-full text-sm font-medium transition-all"
-                    style={{ border: "1px solid rgba(212,175,55,0.28)", color: "#D4AF37", background: "rgba(212,175,55,0.04)" }}
-                  >
-                    Acquire License
-                  </motion.button>
-                </motion.div>
-
-                {/* Live stats */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7, duration: 0.9 }}
-                  className="flex flex-wrap justify-center items-center gap-x-14 gap-y-6 mt-14 px-4"
-                >
-                  {[
-                    { value: "$4.2B",  label: "24h Volume" },
-                    { value: "1,247",  label: "Whales Tracked" },
-                    { value: "24",     label: "Chains" },
-                    { value: "99.99%", label: "Uptime" },
-                  ].map((s, i) => (
-                    <React.Fragment key={i}>
-                      {i > 0 && <div className="hidden md:block w-px h-8 bg-black/10" />}
-                      <StatBlock value={s.value} label={s.label} />
-                    </React.Fragment>
-                  ))}
-                </motion.div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="clearance-view"
-                initial={{ opacity: 0, scale: 0.95, y: 30, filter: "blur(10px)" }}
-                animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.7, ease: "circOut" }}
-                className="w-full flex justify-center"
-              >
-                <ClearanceHeroView onBack={() => setShowClearance(false)} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-        </motion.div>
-
-        {/* Scroll arrow */}
-        <motion.div
-          className="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2, duration: 1 }}
-        >
-          <motion.div
-            className="w-[1px] h-12"
-            style={{ background: "linear-gradient(180deg, rgba(26,109,224,0.8), transparent)" }}
-            animate={{ scaleY: [0.4, 1, 0.4], opacity: [0.3, 0.9, 0.3] }}
-            transition={{ duration: 2.2, repeat: Infinity }}
-          />
-        </motion.div>
-      </section>
-
-      {/* TICKER */}
-      <div className="relative z-10"><DataTicker /></div>
-
-      {/* ─────────────────────────────────────────────────────────────── */}
-      {/*  CAPABILITIES GRID                                              */}
-      {/* ─────────────────────────────────────────────────────────────── */}
-      <section className="relative z-10 py-28"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {FEATURES.map((f, i) => (
-              <Reveal key={i} delay={i * 0.06} yOffset={24}>
-                <motion.div
-                  whileHover={{ y: -5, scale: 1.04,
-                    boxShadow: `0 12px 40px ${f.color}30, 0 0 0 1px ${f.color}45` }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="flex flex-col items-start gap-3 p-5 rounded-xl cursor-default"
-                  style={{ background: "rgba(5,5,5,0.04)", border: "1px solid rgba(5,5,5,0.10)" }}
-                >
-                  <span style={{ color: f.color }}>{f.icon}</span>
-                  <span className="text-[12px] font-semibold leading-snug" style={{ color: "rgba(5,5,5,0.80)" }}>
-                    {f.label}
-                  </span>
-                </motion.div>
-              </Reveal>
-            ))}
-          </div>
+        <div className="relative z-10 w-full flex flex-col items-center px-6 text-center">
+            <AnimatePresence mode="wait">
+                {!showClearance ? (
+                    <motion.div key="core" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
+                        <div className="px-4 py-1 mb-8 border border-[#00FF55] text-[#00FF55] font-mono text-[9px] font-black uppercase tracking-[0.4em]">
+                            SECURE CONNECTION ESTABLISHED
+                        </div>
+                        <h1 className="font-mono text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase whitespace-nowrap">
+                            <span className="text-white">WHALE</span><span className="text-[#00FF55]">ALERT</span>
+                        </h1>
+                        <p className="font-mono text-sm md:text-base text-[#888888] max-w-2xl leading-relaxed uppercase tracking-widest mb-12">
+                            Zero-Knowledge architecture tracking global liquidity flow.
+                        </p>
+                        <div className="flex gap-4">
+                            <button onClick={handleEntry} className="group relative px-8 py-4 bg-[#00FF55] text-black font-mono text-sm font-black uppercase tracking-[0.2em] transition-all hover:bg-white">
+                                CONNECT WALLET
+                            </button>
+                            <button onClick={() => setShowClearance(true)} className="px-8 py-4 border border-[#333333] text-white font-mono text-sm font-black uppercase tracking-[0.2em] hover:border-[#00FF55] hover:text-[#00FF55] transition-colors">
+                                GET ACCESS PASS
+                            </button>
+                        </div>
+                        
+                        <div className="mt-20 flex gap-12 font-mono text-[10px] uppercase tracking-[0.3em] font-black text-[#888888]">
+                            <div><span className="text-white block mb-1">0x89A...FF80</span>NODE_ID</div>
+                            <div><span className="text-[#00FF55] block mb-1">ZERO</span>LATENCY</div>
+                            <div><span className="text-white block mb-1">E2E</span>ENCRYPTED</div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div key="clearance" initial={{ opacity: 0, filter: "blur(10px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} className="w-full">
+                        <ClearanceHeroView onBack={() => setShowClearance(false)} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────── */}
-      {/*  ARCHITECTURE                                                    */}
-      {/* ─────────────────────────────────────────────────────────────── */}
-      <section className="relative z-10 py-40 px-6 md:px-12"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
-        <div className="max-w-6xl mx-auto">
-          <Reveal>
-            <div className="mb-24">
-              <h2 className="text-3xl md:text-[3.5rem] font-semibold mb-6 leading-[1.1]"
-                style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
-                Principles of Structural{" "}
-                <span style={{
-                  background: "linear-gradient(135deg,#1a6de0,#00d4ff)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                }}>Engineering.</span>
-              </h2>
-              <p className="text-base max-w-[580px]" style={{ color: "rgba(5,5,5,0.72)", lineHeight: 1.75 }}>
-                The solidity of the system does not reside in superficial innovation, but in
-                the precise amalgamation of established computational paradigms.
-              </p>
-            </div>
-          </Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {PILLARS.map((p, i) => (
-              <GlowCard key={i} icon={p.icon} title={p.title} desc={p.desc}
-                delay={i * 0.09} direction={i % 2 === 0 ? "left" : "right"} color={p.color} />
-            ))}
+      <DataTicker />
+
+      {/* ── MODULES ── */}
+      <section className="py-32 px-6 max-w-6xl mx-auto border-t border-[#222222]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <ZKCard icon={<Terminal size={24}/>} title="Direct Ingestion" desc="Bypassing visual abstractions. Raw RPC feeds merged into local matrix states." delay={0}/>
+              <ZKCard icon={<Shield size={24}/>} title="Zero-Knowledge Base" desc="You are mathematically isolated from the host server. Cryptographic E2E logic." delay={0.1}/>
+              <ZKCard icon={<Database size={24}/>} title="Graph Indexing" desc="Stochastic evaluation of mempool flows. Unprecedented memory mapping." delay={0.2}/>
+              <ZKCard icon={<Binary size={24}/>} title="Institutional Triggers" desc="Real-time alerts over geometric threshold breaches." delay={0.3}/>
           </div>
-        </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────── */}
-      {/*  MODULES                                                         */}
-      {/* ─────────────────────────────────────────────────────────────── */}
-      <section className="relative z-10 py-40 px-6 md:px-12"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
-        <div className="max-w-6xl mx-auto">
-          <Reveal>
-            <div className="mb-24 text-center">
-              <h2 className="text-3xl md:text-[3.5rem] font-semibold mb-6"
-                style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
-                Functional Modules
-              </h2>
-              <p className="text-base mx-auto" style={{ color: "rgba(5,5,5,0.72)", maxWidth: 520, lineHeight: 1.75 }}>
-                The materialization concludes strictly in silent observation modules.
-                No simulations. Empirical data with profound rigor.
-              </p>
-            </div>
-          </Reveal>
-          <div className="space-y-5">
-            {MODULES.map((mod, i) => (
-              <Reveal key={i} delay={i * 0.14} yOffset={50}>
-                <motion.div
-                  whileHover={{ scale: 1.01,
-                    boxShadow: `0 24px 80px ${mod.color}22, 0 0 0 1px ${mod.color}40` }}
-                  transition={{ type: "spring", stiffness: 240, damping: 24 }}
-                  className="rounded-2xl p-10 md:p-14 flex flex-col md:flex-row gap-10 md:gap-20 items-start"
-                  style={{
-                    background: "rgba(5,5,5,0.04)",
-                    border: "1px solid rgba(5,5,5,0.11)",
-                    boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
-                  }}
-                >
-                  <div className="md:w-1/3 shrink-0">
-                    <h3 className="text-2xl md:text-3xl font-semibold leading-snug"
-                      style={{ color: "rgba(5,5,5,0.95)" }}>{mod.title}</h3>
-                    <div className="mt-5 h-[2px] w-10 rounded"
-                      style={{ background: `linear-gradient(90deg,${mod.color},transparent)` }} />
-                  </div>
-                  <div className="md:w-2/3">
-                    <p className="text-base leading-relaxed mb-8"
-                      style={{ color: "rgba(5,5,5,0.68)" }}>{mod.description}</p>
-                    <ul className="space-y-3">
-                      {mod.points.map((pt, j) => (
-                        <li key={j} className="flex items-center gap-4">
-                          <div className="w-1.5 h-1.5 rounded-full shrink-0"
-                            style={{ background: mod.color, boxShadow: `0 0 7px ${mod.color}` }} />
-                          <span className="text-sm font-medium" style={{ color: "rgba(5,5,5,0.72)" }}>
-                            {pt}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
+      {/* ── CTA ── */}
+      <section className="py-40 border-y border-[#333333] bg-[#050505] text-center">
+          <h2 className="font-mono text-3xl font-black uppercase tracking-tight text-white mb-6">CONNECT TO PLATFORM</h2>
+          <p className="font-mono text-xs text-[#888888] mb-12 uppercase tracking-[0.2em]">Live real-time intelligence data.</p>
+          <button onClick={handleEntry} className="px-10 py-5 bg-white text-black font-mono text-sm font-black uppercase tracking-[0.3em] hover:bg-[#00FF55]">
+              CONNECT
+          </button>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────── */}
-      {/*  CONCLUSION CTA                                                  */}
-      {/* ─────────────────────────────────────────────────────────────── */}
-      <section className="relative z-10 py-52 px-6 text-center overflow-hidden"
-        style={{ borderTop: "1px solid rgba(5,5,5,0.12)" }}>
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(26,109,224,0.10) 0%, transparent 70%)" }} />
+      <Footer />
 
-        <Reveal>
-          <div className="relative max-w-3xl mx-auto">
-            {/* Orbital rings */}
-            {[300, 200].map((size, i) => (
-              <motion.div key={i}
-                animate={{ rotate: i % 2 === 0 ? [0, 360] : [360, 0] }}
-                transition={{ duration: i === 0 ? 140 : 90, repeat: Infinity, ease: "linear" }}
-                className="absolute left-1/2 top-[-60px] -translate-x-1/2 rounded-full border pointer-events-none"
-                style={{ width: size, height: size,
-                  borderColor: i === 0 ? "rgba(26,109,224,0.18)" : "rgba(212,175,55,0.18)",
-                  borderStyle: i === 1 ? "dashed" : "solid",
-                  marginTop: -(size / 2) + 60,
-                  marginLeft: -(size / 2),
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                }} />
-            ))}
+      <DynamicCryptoCheckoutModal isOpen={false} onClose={() => {}} />
 
-            <h2 className="text-4xl md:text-6xl font-semibold mb-8 leading-tight"
-              style={{ fontFamily: "'Space Grotesk',sans-serif", color: "#050505" }}>
-              Whale Alert Network Matrix
-            </h2>
-
-            <p className="text-base mb-16 leading-relaxed"
-              style={{ color: "rgba(5,5,5,0.72)", maxWidth: "520px", margin: "0 auto 4rem" }}>
-              The terminal is available strictly for those who require this structural clarity.
-              Access demands the verification of cryptographic signatures.
-            </p>
-
-            <motion.button
-              onClick={handleEntry}
-              whileHover={{ scale: 1.07,
-                boxShadow: "0 0 80px rgba(26,109,224,0.45), 0 24px 60px rgba(0,0,0,0.6)" }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="inline-flex items-center gap-3 px-12 py-5 rounded-full text-base font-semibold"
-              style={{
-                background: "linear-gradient(135deg,#1a6de0,#0047cc)",
-                color: "#ffffff",
-                boxShadow: "0 0 40px rgba(26,109,224,0.28), 0 12px 48px rgba(0,0,0,0.5)",
-              }}
-            >
-              Access the Terminal
-              <ArrowRight size={18} strokeWidth={2} />
-            </motion.button>
-          </div>
-        </Reveal>
-      </section>
-
-      {/* FOOTER */}
-      <div className="relative z-10"><Footer /></div>
-
-      <DynamicCryptoCheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
-
-      {/* DOCUMENT GATE MODAL */}
+      {/* ── ZK HANDSHAKE MODAL ── */}
       <AnimatePresence>
         {showDocumentGate && (
-          <div className="fixed inset-0 z-[9999] bg-[#FAF9F6]/80 backdrop-blur-xl flex items-center justify-center p-4">
-            <motion.div initial={{opacity:0, y:20, scale:0.95}} animate={{opacity:1, y:0, scale:1}} exit={{opacity:0, scale:0.95, y:20}} className="bg-white border border-[#E5E5E5] p-8 md:p-10 rounded-[2rem] max-w-2xl w-full shadow-2xl flex flex-col max-h-[85vh]">
-              <div className="flex items-center gap-3 mb-2">
-                 <Shield className="text-[#050505]" size={24} />
-                 <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-[#050505] leading-none">Sovereign Integrity Gate</h2>
+          <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} 
+                className="bg-black border border-[#00FF55]/50 p-8 max-w-2xl w-full flex flex-col font-mono shadow-[0_0_50px_rgba(0,255,85,0.1)]">
+              <div className="flex items-center gap-3 mb-6 border-b border-[#333333] pb-4">
+                 <Terminal className="text-[#00FF55]" size={20} />
+                 <h2 className="text-xl font-black uppercase tracking-tight text-[#00FF55]">CONNECT PROTOCOL</h2>
               </div>
-              <p className="text-[10px] text-black/50 mb-6 font-mono uppercase tracking-widest pl-9">Authorization Required before proceeding</p>
               
-              <div className="flex-1 overflow-y-auto mb-8 p-6 bg-[#F5F5F5]/60 border border-black/5 rounded-2xl text-[13px] font-medium leading-[1.8] custom-scrollbar" style={{ color: "rgba(5,5,5,0.7)" }}>
-                 <p className="mb-4">You are about to initiate execution protocols within the <strong className="text-black font-bold">Whale Alert Network Matrix</strong>. By accessing this terminal, you explicitly acknowledge that all stochastic tracking metrics, on-chain intelligence flows, and synthetic neural estimations are presented as pure informational entropy and do not constitute financial advice.</p>
-                 <p className="mb-4">The Sovereign Node architecture strictly enforces absolute Zero-Trust parameters. All cryptographic and heuristic keys are maintained exclusively on your native client. The central database operates as a blind relay and never retains identifiable behavioral markers beyond aggregated cryptographic hashes.</p>
-                 <p className="mb-4">By accepting these postulates, you mathematically verify your intent to utilize these mechanisms solely according to deterministic institutional observation frameworks.</p>
-                 <div className="h-10" />
-                 <p className="font-black text-black uppercase tracking-widest text-[10px] border-t border-black/10 pt-4 flex items-center gap-2">
-                    <Check size={12} /> END OF MANUSCRIPT.
-                 </p>
+              <div className="flex-1 mb-8 p-6 bg-[#050505] border border-[#222222] text-[11px] font-bold text-[#888888] leading-[2] uppercase tracking-wider">
+                 <p className="mb-4 text-white">CONNECTING...</p>
+                 <p className="mb-4">By bypassing this gateway, you enter an absolute Zero-Trust environment. The intelligence matrix offers raw telemetry without financial advice.</p>
+                 <p className="mb-4">All cryptographic validations and signatures occur strictly client-side. The node acts purely as a relay.</p>
+                 <p className="mt-8 text-[#00FF55]">WAITING FOR SIGNATURE</p>
               </div>
 
               <div className="flex gap-4">
-                <button onClick={() => setShowDocumentGate(false)} className="px-6 py-4 border border-[#E5E5E5] text-black font-semibold uppercase tracking-widest text-[10px] rounded-2xl hover:bg-[#F5F5F5] transition-colors">DECLINE</button>
-                <button onClick={executeSystemEntry} className="flex-1 py-4 bg-[#050505] text-white font-semibold uppercase tracking-widest text-[10px] rounded-2xl shadow-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex justify-center items-center gap-2">
-                   ACCEPT & ENTER SYSTEM <ArrowRight size={14} />
+                <button onClick={() => setShowDocumentGate(false)} className="px-6 py-4 border border-[#333333] text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#222222] transition-colors">
+                    CANCEL
+                </button>
+                <button onClick={executeSystemEntry} className="flex-1 py-4 bg-[#00FF55] text-black font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-colors">
+                   SIGN MESSAGE
                 </button>
               </div>
             </motion.div>

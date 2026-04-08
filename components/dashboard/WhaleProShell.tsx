@@ -33,6 +33,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'whale-portfolio', label: 'Whale Intelligence',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
     { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
     { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
+    { id: 'omni-explorer',   label: 'Aztec Explorer',   icon: <Search size={17}/>,          badge: 'ZK', badgeColor: '#00FF55' },
     { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
     // ── Learn & Support ──
     { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
