@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { NewsTerminal } from '@/components/news/NewsTerminal';
 import { QrCode } from 'lucide-react';
-import { MobileQRScanner } from '@/components/mobile/MobileSovereignLanding';
+import { MobileQRScanner } from '@/components/mobile/MobileWhaleLanding';
 import { useAccount, useSignMessage } from 'wagmi';
 
 // ─── MOBILE AUTHENTICATED SHELL ─────────────────────────────────────────────
