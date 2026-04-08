@@ -14,27 +14,57 @@ interface EcosystemData {
   color: string;
 }
 
-const mockEcosystems: EcosystemData[] = [
-  { chainName: 'Ethereum', chainSymbol: 'ETH', totalEntities: 4231, tvl: 45000000000, volume24h: 1200000000, color: '#627EEA' },
-  { chainName: 'Binance Chain', chainSymbol: 'BSC', totalEntities: 995, tvl: 5000000000, volume24h: 400000000, color: '#F3BA2F' },
-  { chainName: 'Solana', chainSymbol: 'SOL', totalEntities: 303, tvl: 2500000000, volume24h: 800000000, color: '#14F195' },
-  { chainName: 'Arbitrum', chainSymbol: 'ARB', totalEntities: 138, tvl: 3000000000, volume24h: 300000000, color: '#28A0F0' },
-  { chainName: 'Base', chainSymbol: 'BASE', totalEntities: 60, tvl: 600000000, volume24h: 150000000, color: '#0052FF' },
-];
+// ── Static chain config (non-price info) ──────────────────────────────────────
+const CHAIN_CONFIG: Record<string, { color: string; symbol: string }> = {
+  Ethereum:  { color: '#627EEA', symbol: 'ETH'  },
+  'BSC':     { color: '#F3BA2F', symbol: 'BSC'  },
+  Solana:    { color: '#14F195', symbol: 'SOL'  },
+  Arbitrum:  { color: '#28A0F0', symbol: 'ARB'  },
+  Base:      { color: '#0052FF', symbol: 'BASE' },
+  Polygon:   { color: '#8247E5', symbol: 'MATIC'},
+  Avalanche: { color: '#E84142', symbol: 'AVAX' },
+};
 
 export function EcosystemWarRoom() {
-  const [data, setData] = useState<EcosystemData[]>(mockEcosystems);
+  const [data, setData] = useState<EcosystemData[]>([]);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  // In production, this hooks to `neuralSegregator` via WebSockets
   useEffect(() => {
-    const timer = setInterval(() => {
-      setData(prev => prev.map(chain => ({
-        ...chain,
-        volume24h: chain.volume24h + (Math.random() * 1000000 - 500000)
-      })));
-    }, 2000);
-    return () => clearInterval(timer);
+    const fetchChainTvl = async () => {
+      try {
+        // Real: DeFiLlama public markets endpoint — no API key required
+        const res = await fetch('https://api.llama.fi/v2/chains', { cache: 'no-store' });
+        if (!res.ok) return;
+        const chains: any[] = await res.json();
+        
+        const TARGET_CHAINS = Object.keys(CHAIN_CONFIG);
+        const filtered = chains
+          .filter(c => TARGET_CHAINS.includes(c.name))
+          .map(c => ({
+            chainName:     c.name,
+            chainSymbol:   CHAIN_CONFIG[c.name]?.symbol ?? c.name,
+            totalEntities: c.protocols ?? 0,
+            tvl:           c.tvl ?? 0,
+            volume24h:     c.volume24h ?? 0,
+            color:         CHAIN_CONFIG[c.name]?.color ?? '#888888',
+          }))
+          .sort((a, b) => b.tvl - a.tvl);
+
+        if (filtered.length > 0) {
+          setData(filtered);
+          setLastUpdated(new Date().toLocaleTimeString());
+        }
+      } catch (e) {
+        // If DeFiLlama is unreachable, display nothing rather than fake data
+        console.error('[EcosystemWarRoom] DeFi Llama fetch failed', e);
+      }
+    };
+
+    fetchChainTvl();
+    // Refresh every 60s — DeFiLlama data updates every minute
+    const interval = setInterval(fetchChainTvl, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   const totalTvlGlobal = data.reduce((acc, curr) => acc + curr.tvl, 0);
@@ -48,13 +78,14 @@ export function EcosystemWarRoom() {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <Server size={18} className="text-indigo-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">Live Ecosystem War-Room</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">Live Chain TVL Board</span>
           </div>
-          <h2 className="text-3xl font-black uppercase tracking-tighter">Global Structural Dominance</h2>
+          <h2 className="text-3xl font-black uppercase tracking-tighter">Ecosystem TVL Rankings</h2>
         </div>
         <div className="text-right">
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">Global Monopolized TVL</p>
-          <p className="font-mono text-2xl">${(totalTvlGlobal / 1000000000).toFixed(2)}B</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">Global TVL · Source: DeFiLlama</p>
+          <p className="font-mono text-2xl">${(totalTvlGlobal / 1_000_000_000).toFixed(2)}B</p>
+          {lastUpdated && <p className="text-[9px] font-mono opacity-30 mt-1">Updated {lastUpdated}</p>}
         </div>
       </header>
 
@@ -64,7 +95,7 @@ export function EcosystemWarRoom() {
           onClick={() => setActiveFilter(null)}
           className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === null ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
         >
-          GLOBAL MESH
+          ALL CHAINS
         </button>
         {data.map(chain => (
           <button 
@@ -72,7 +103,7 @@ export function EcosystemWarRoom() {
             onClick={() => setActiveFilter(chain.chainSymbol)}
             className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === chain.chainSymbol ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
           >
-            Only {chain.chainName} Flow
+            {chain.chainName}
           </button>
         ))}
       </div>

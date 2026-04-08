@@ -4,7 +4,7 @@ import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame } from 'lucide-re
 
 export function WhaleSonar() {
     const [alerts, setAlerts] = useState<any[]>([]);
-    const [stats, setStats] = useState({ roi: 5.4, burnRate: 0.021 }); // Local simulated baseline
+    const [stats, setStats] = useState({ alertCount: 0, totalUsd: 0 });
 
     useEffect(() => {
         let isMounted = true;
@@ -25,8 +25,8 @@ export function WhaleSonar() {
                             return next;
                         });
                         setStats(s => ({
-                             roi: s.roi + (Math.random() * 0.1 - 0.05),
-                             burnRate: s.burnRate + 0.001
+                            alertCount: s.alertCount + 1,
+                            totalUsd: s.totalUsd + (payload.usdValue || 0)
                         }));
                     }
                 }
@@ -61,14 +61,14 @@ export function WhaleSonar() {
             {/* Financial Health Metrics */}
             <div className="space-y-4 mb-6">
                 <MetricBox 
-                    title="Real-Time ROI" 
-                    value={`+${stats.roi.toFixed(2)}%`} 
+                    title="Alerts Detected" 
+                    value={`${stats.alertCount}`} 
                     icon={<TrendingUp size={14} className="text-[var(--aztec-chartreuse)]" />}
                     color="text-[var(--aztec-chartreuse)]"
                 />
                 <MetricBox 
-                    title="Burn Rate (Gas/Hr)" 
-                    value={`${stats.burnRate.toFixed(4)} ETH`} 
+                    title="Total USD Volume" 
+                    value={stats.totalUsd > 0 ? `$${(stats.totalUsd / 1e6).toFixed(2)}M` : `---`} 
                     icon={<Flame size={14} className="text-orange-500" />}
                     color="text-orange-500"
                 />
@@ -91,19 +91,22 @@ export function WhaleSonar() {
                         </div>
                         
                         {/* Dynamic blips */}
-                        {alerts.slice(0, 10).map((alert, i) => (
+                        {alerts.slice(0, 10).map((alert, i) => {
+                            // Deterministic position derived from the tx hash
+                            const hashCode = (alert.txHash || 'default').split('').reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0);
+                            const leftPct = 20 + (hashCode % 60);
+                            const topPct  = 20 + ((hashCode * 31) % 60);
+                            return (
                             <motion.div 
                                 key={alert.id || i}
                                 initial={{ scale: 0, opacity: 1 }}
                                 animate={{ scale: 2, opacity: 0 }}
                                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                                className={`absolute w-2 h-2 rounded-full ${alert.usdValue > 2000000 ? 'bg-red-500' : 'bg-[var(--aztec-chartreuse)]'}`}
-                                style={{
-                                    left: `${20 + (Math.random() * 60)}%`,
-                                    top: `${20 + (Math.random() * 60)}%`
-                                }}
+                                className={`absolute w-2 h-2 rounded-full ${(alert.usdValue || 0) > 2000000 ? 'bg-red-500' : 'bg-[var(--aztec-chartreuse)]'}`}
+                                style={{ left: `${leftPct}%`, top: `${topPct}%` }}
                             />
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
