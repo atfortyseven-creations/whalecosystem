@@ -97,10 +97,12 @@ export function NewsOfToday() {
                         url: a.url,
                         source: a.source || 'Intel Desk',
                         publishedAt: a.date || a.publishedAt || new Date().toISOString(),
-                        sentiment: ['bullish', 'bearish', 'neutral'][i % 3] as any,
-                        veracityScore: 70 + (i % 30),
-                        isFake: false,
-                        tokens: []
+                        // Use real sentiment from API, or 'neutral' as a safe fallback
+                        sentiment: (['bullish', 'bearish', 'neutral'].includes(a.sentiment) ? a.sentiment : 'neutral') as any,
+                        // Use real veracity score from API, or null — never fabricate
+                        veracityScore: typeof a.veracityScore === 'number' ? a.veracityScore : null,
+                        isFake: a.isFake ?? false,
+                        tokens: a.tokens ?? []
                     }));
                     if (mountedRef.current) setArticles(mappedArticles);
                 }
@@ -214,16 +216,20 @@ export function NewsOfToday() {
                                                         ) : (
                                                             <div className="flex items-center gap-1.5 text-[#00C076]">
                                                                 <ShieldCheck size={14}/>
-                                                                <span className="text-[10px] font-black uppercase tracking-widest">Verified Intelligence</span>
+                                                                <span className="text-[10px] font-black uppercase tracking-widest">Verified Source</span>
                                                             </div>
                                                         )}
-                                                        <div className="w-px h-4 bg-[#E5E5E5]"/>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[10px] uppercase font-bold text-[#888888] tracking-widest">Signal Integrity:</span>
-                                                            <span className={`text-[12px] font-mono font-black ${a.veracityScore > 80 ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
-                                                                {a.veracityScore}%
-                                                            </span>
-                                                        </div>
+                                                        {a.veracityScore !== null && (
+                                                            <>
+                                                            <div className="w-px h-4 bg-[#E5E5E5]"/>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] uppercase font-bold text-[#888888] tracking-widest">Signal Integrity:</span>
+                                                                <span className={`text-[12px] font-mono font-black ${a.veracityScore > 80 ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                                                                    {a.veracityScore}%
+                                                                </span>
+                                                            </div>
+                                                            </>
+                                                        )}
                                                     </div>
 
                                                     <a 
