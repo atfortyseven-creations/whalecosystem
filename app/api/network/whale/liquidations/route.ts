@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { redisClient } from '@/lib/redis/client';
 
-export const revalidate = 5; // Revalidate every 5s
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {

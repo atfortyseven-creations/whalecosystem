@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { verifySession } from '@/lib/session';
+import { getSession } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await verifySession();
+        const session = await getSession();
         if (!session || !session.user) {
             return NextResponse.json({ error: 'Unauthorized Sovereign Access' }, { status: 401 });
         }
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
-        const session = await verifySession();
+        const session = await getSession();
         if (!session || !session.user) {
             return NextResponse.json({ error: 'Unauthorized Sovereign Access' }, { status: 401 });
         }

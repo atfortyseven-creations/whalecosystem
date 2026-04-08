@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { graphMiner } from '@/services/intelligence/entity-graph-miner';
-import { verifySession } from '@/lib/session';
+import { getSession } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const session = await verifySession();
+        const session = await getSession();
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized to view matrix geometry' }, { status: 401 });
         }

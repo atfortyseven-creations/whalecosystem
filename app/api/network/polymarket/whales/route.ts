@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 30; // 30 seconds
+export const dynamic = 'force-dynamic';
 
 // Polymarket Polygon Subgraph
 const SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/tokenunion/polymarket-matic';

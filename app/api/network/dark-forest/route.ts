@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 
-export const revalidate = 15; // Cache for 15 seconds to avoid RPC spam
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
     try {
