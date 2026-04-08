@@ -20,7 +20,7 @@ export function GlobalSettingsModal() {
     } = useSettingsStore();
 
     const { setTheme: setNextTheme } = useTheme();
-    const { disconnectAsync } = useDisconnect();
+    const { disconnect } = useDisconnect();
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
@@ -35,9 +35,9 @@ export function GlobalSettingsModal() {
     if (!mounted) return null;
 
     const handleDisconnect = async () => {
-        if (confirm("¿Estás seguro de que deseas desconectar tu cuenta e iniciar sesión de nuevo?")) {
+        if (confirm("Disconnect your wallet and return to the home page?")) {
             try {
-                if (disconnectAsync) await disconnectAsync();
+                disconnect(); // wagmi v2: synchronous, no await needed
             } catch(e) {}
             localStorage.clear();
             sessionStorage.clear();

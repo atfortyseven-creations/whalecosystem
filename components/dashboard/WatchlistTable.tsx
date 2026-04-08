@@ -274,7 +274,8 @@ export function WatchlistTable() {
                                                     currentPrice: parseFloat(tick.lastPrice),
                                                     change24h: parseFloat(tick.priceChangePercent),
                                                     vol24h: parseFloat(tick.quoteVolume),
-                                                    mcap: parseFloat(tick.quoteVolume) * 5
+                                                    // MCap not available from Binance ticker — show '—' not a fake number
+                                                    mcap: t.marketData?.mcap ?? null
                                                 } : t.marketData || {};
 
                                                 return (
