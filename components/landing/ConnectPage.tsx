@@ -228,27 +228,56 @@ export default function ConnectPage() {
                 </div>
 
                 {/* Connection options */}
-                <div className="space-y-3">
+                <div className="space-y-6">
+                  
+                  {/* BRANDED GRID (The Vault) */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { id: 'metamask', name: 'MetaMask', logo: '/wallets/metamask.svg', handler: handleInjected, badge: 'Native' },
+                      { id: 'coinbase', name: 'Coinbase', logo: '/wallets/coinbase.png', handler: handleQR, badge: 'Smart' },
+                      { id: 'rainbow', name: 'Rainbow', logo: '/wallets/rainbow.png', handler: handleQR, badge: 'Mobile' },
+                      { id: 'rabby', name: 'Rabby', logo: '/wallets/rabby.svg', handler: handleInjected, badge: 'Pro' },
+                    ].map((w, i) => (
+                      <motion.button
+                        key={w.id}
+                        onClick={w.handler}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.25 + i * 0.05 }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="group relative flex flex-col items-center justify-center p-8 bg-white dark:bg-white/5 border border-[#E0E0E0] dark:border-white/10 rounded-3xl hover:border-[#D4AF37] hover:shadow-2xl hover:shadow-black/5 transition-all"
+                      >
+                        <div className="absolute top-3 right-3 text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-[#F5F5F5] dark:bg-white/10 text-[#888888] dark:text-white/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {w.badge}
+                        </div>
+                        <div className="w-14 h-14 mb-4 flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
+                          <img 
+                            src={w.logo} 
+                            alt={w.name} 
+                            className="max-w-full max-h-full object-contain filter drop-shadow-xl"
+                          />
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-[#050505] dark:text-white group-hover:text-[#D4AF37] transition-colors">
+                          {w.name}
+                        </span>
+                      </motion.button>
+                    ))}
+                  </div>
 
-                  {/* Browser Extension (Desktop primary) */}
-                  <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}>
-                    <ConnectCard
-                      icon={<Monitor size={20} />}
-                      label="Browser Extension"
-                      sublabel="MetaMask, Rabby, Coinbase Wallet or any injected provider"
-                      badge="Desktop"
-                      onClick={handleInjected}
-                      loading={connectingMethod === "injected" && isPending}
-                    />
-                  </motion.div>
+                  <div className="flex items-center gap-4 py-2">
+                    <div className="flex-1 h-px bg-[#E5E5E5] dark:bg-white/10" />
+                    <span className="text-[9px] font-black text-[#CCCCCC] uppercase tracking-[0.3em]">Universal Access</span>
+                    <div className="flex-1 h-px bg-[#E5E5E5] dark:bg-white/10" />
+                  </div>
 
-                  {/* QR / WalletConnect (Mobile primary) */}
-                  <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.32 }}>
+                  {/* WalletConnect Overlay Trigger */}
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                     <ConnectCard
-                      icon={<Smartphone size={20} />}
-                      label="QR Code / WalletConnect"
-                      sublabel="Scan with MetaMask, Trust Wallet, Zerion, Rainbow or any WC app"
-                      badge="Mobile & Desktop"
+                      icon={<Smartphone size={18} />}
+                      label="Any Other Wallet"
+                      sublabel="Connect via WalletConnect / QR Protocol"
+                      badge="Global Sync"
                       onClick={handleQR}
                       loading={connectingMethod === "qr" && isPending}
                     />
