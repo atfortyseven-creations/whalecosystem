@@ -140,14 +140,14 @@ export function GoldTicketPanel() {
   const { switchChain }  = useSwitchChain();
 
   // ── DB-level counter (polling every 8s) ─────────────────────────────────────
-  const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number } | null>(null);
+  const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any } | null>(null);
   const fetchDbStats = useCallback(async () => {
     try {
       const q = address ? `?address=${address}` : '';
       const res = await fetch(`/api/golden-ticket/claim${q}`);
       if (res.ok) {
         const json = await res.json();
-        setDbStats({ totalClaimed: json.totalClaimed, remaining: json.remaining });
+        setDbStats({ totalClaimed: json.totalClaimed, remaining: json.remaining, ticket: json.ticket });
       }
     } catch { /* silent — on-chain fallback shown */ }
   }, [address]);
@@ -271,10 +271,10 @@ export function GoldTicketPanel() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatChip label="Your Ticket" value="GENESIS" accent />
-          <StatChip label="Network" value="Optimism L2" />
-          <StatChip label="Total Minted" value={`${displayMinted} / ${displayMax}`} />
-          <StatChip label="Remaining" value={String(displayRemain)} />
+          <StatChip label="Serial Code" value={dbStats?.ticket?.serialCode || "GENESIS-0000"} accent />
+          <StatChip label="Mint Sequence" value={`#${dbStats?.ticket?.ticketNumber || '...'}`} />
+          <StatChip label="Verification Date" value={dbStats?.ticket?.claimedAt ? new Date(dbStats.ticket.claimedAt).toLocaleDateString() : "Live"} />
+          <StatChip label="Network Layer" value="Optimism L2" />
         </div>
 
         {/* Supply Bar */}

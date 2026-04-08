@@ -31,18 +31,7 @@ const CHAIN_COLORS: Record<string, string> = {
     bsc:      '#F0B90B',
 };
 
-const DEMO_TOKENS = [
-    { id: '1', type: 'TOKEN', symbol: 'BTC', name: 'Bitcoin', chain: 'ethereum', entryPrice: null, marketData: { change24h: 2.3, vol24h: 42000000000, mcap: 1200000000000, currentPrice: 65400 } },
-    { id: '2', type: 'TOKEN', symbol: 'ETH', name: 'Ethereum', chain: 'ethereum', entryPrice: null, marketData: { change24h: 4.1, vol24h: 12000000000, mcap: 400000000000, currentPrice: 3450 } },
-    { id: '3', type: 'TOKEN', symbol: 'SOL', name: 'Solana', chain: 'solana', entryPrice: null, marketData: { change24h: -1.2, vol24h: 2500000000, mcap: 60000000000, currentPrice: 142 } },
-    { id: '4', type: 'TOKEN', symbol: 'ARB', name: 'Arbitrum', chain: 'arbitrum', entryPrice: null, marketData: { change24h: 8.5, vol24h: 850000000, mcap: 3200000000, currentPrice: 2.1 } },
-];
 
-const DEMO_WALLETS = [
-    { id: 'w1', type: 'WALLET', address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e', label: 'Wintermute Temp', isWhale: true, isSmart: true, alertsEnabled: true, analytics: { netWorthUSD: 14500000, pnl30d: 420000, winRate: 68, dexCexRatio: 0.85, topProtocol: 'Uniswap V3', alphaScore: 92, lastActiveMinsAgo: 12 } },
-    { id: 'w2', type: 'WALLET', address: '0x881D40237659C251811CEC9c364ef91dC08D300C', label: 'Smart DEX Accumulator', isWhale: false, isSmart: true, alertsEnabled: false, analytics: { netWorthUSD: 2400000, pnl30d: 110000, winRate: 74, dexCexRatio: 0.95, topProtocol: 'Aerodrome', alphaScore: 88, lastActiveMinsAgo: 45 } },
-    { id: 'w3', type: 'WALLET', address: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', label: 'Vitalik.eth', isWhale: true, isSmart: false, alertsEnabled: false, analytics: { netWorthUSD: 310000000, pnl30d: -1500000, winRate: 50, dexCexRatio: 0.1, topProtocol: 'Lido', alphaScore: 40, lastActiveMinsAgo: 8400 } },
-];
 
 /* ── Inline Add Modal ───────────────────────────────────────────────── */
 function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLETS'; onClose: () => void; onAdded: () => void }) {
@@ -223,16 +212,17 @@ export function WatchlistTable() {
                 })) : [];
                 
                 if (tokens.length === 0) {
-                    setData({ tokens: DEMO_TOKENS, wallets: DEMO_WALLETS });
+                    setData({ tokens: [], wallets: [] });
                 } else {
-                    setData({ tokens, wallets: DEMO_WALLETS });
+                    // Wallets fetching to be implemented if endpoint supports it, for now we leave empty
+                    setData({ tokens, wallets: [] }); 
                 }
             } else {
-                setData({ tokens: DEMO_TOKENS, wallets: DEMO_WALLETS });
+                setData({ tokens: [], wallets: [] });
             }
         } catch (e) {
             console.error('Error fetching watchlist', e);
-            setData({ tokens: DEMO_TOKENS, wallets: DEMO_WALLETS });
+            setData({ tokens: [], wallets: [] });
         } finally {
             setLoading(false);
         }
