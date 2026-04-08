@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mainnetClient } from '@/lib/blockchain/rpc-engine';
 
-export const revalidate = 5; // Aggressive 5-second revalidation
+export const dynamic = 'force-dynamic';
 
 // Omega Directive: Deep Failover Strategy
 // If the primary node fails, Viem will automatically rotate to the next one via rpc-engine.

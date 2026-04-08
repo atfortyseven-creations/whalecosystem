@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 60; // 1 min cache
+export const dynamic = 'force-dynamic';
 
 // Across Protocol V2 Subgraph (Mainnet)
 const ACROSS_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/across-protocol/across-v2';

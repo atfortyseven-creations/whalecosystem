@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { mevAgent } from '@/services/execution/hft-mev-agent';
-import { verifySession } from '@/lib/session';
+import { getSession } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const session = await verifySession();
+        const session = await getSession();
         if (!session) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

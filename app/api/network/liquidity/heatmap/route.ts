@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = 60; // 1 minute cache for heavy subgraph queries
+export const dynamic = 'force-dynamic';
 
 // Uniswap V3 Mainnet Subgraph
 const UNISWAP_V3_SUBGRAPH_URL = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3';
