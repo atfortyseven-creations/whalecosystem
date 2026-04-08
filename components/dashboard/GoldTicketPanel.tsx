@@ -4,11 +4,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  useAccount, useConnect, useSendTransaction,
+  useAccount, useConnect, useWriteContract,
   useWaitForTransactionReceipt, useReadContract, useSwitchChain,
 } from 'wagmi';
 import { injected } from 'wagmi/connectors';
-import { encodeFunctionData } from 'viem';
 import {
   ShieldCheck, Zap, Users, Lock, ExternalLink,
   Clock, Star, CheckCircle2, Flame,
@@ -120,17 +119,9 @@ function StatChip({ label, value, accent }: { label: string; value: string; acce
   );
 }
 
+// Replaced LivePulse empty component to satisfy any references
 function LivePulse() {
-  return (
-    <div className="flex items-center gap-2">
-      <motion.div
-        className="w-2 h-2 rounded-full bg-[#00C076]"
-        animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
-        transition={{ duration: 1.8, repeat: Infinity }}
-      />
-      <span className="text-[9px] font-black uppercase tracking-widest text-[#00C076]">Live On-Chain</span>
-    </div>
-  );
+  return null;
 }
 
 // ── MAIN PANEL ────────────────────────────────────────────────────────────────
@@ -203,9 +194,9 @@ export function GoldTicketPanel() {
 
   // ── On-chain write ───────────────────────────────────────────────────────────
   const {
-    sendTransaction, data: txHash,
+    writeContract, data: txHash,
     isPending: isTxPending, isError: isTxError, error: txError, reset: resetTx,
-  } = useSendTransaction();
+  } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -232,9 +223,10 @@ export function GoldTicketPanel() {
     if (isWrongNetwork && switchChain) { switchChain({ chainId: OPTIMISM_CHAIN_ID }); return; }
     if (hasTicket) { toast.info('This wallet already holds a Whale Gold Ticket.'); return; }
     try {
-      sendTransaction({
-        to: CONTRACT,
-        data: encodeFunctionData({ abi: ABI, functionName: 'mint', args: [] }),
+      writeContract({
+        address: CONTRACT,
+        abi: ABI,
+        functionName: 'mint',
         value: mintPrice > 0n ? mintPrice : 0n,
       });
     } catch (e: any) {
@@ -355,9 +347,8 @@ export function GoldTicketPanel() {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 65%)' }} />
 
-        {/* Live badge */}
-        <div className="flex items-center justify-between mb-8">
-          <LivePulse />
+        {/* Live badge spacing placeholder */}
+        <div className="flex justify-end mb-8">
           <a
             href={`https://optimistic.etherscan.io/address/${CONTRACT}`}
             target="_blank" rel="noopener noreferrer"
@@ -379,18 +370,11 @@ export function GoldTicketPanel() {
               Genesis collection limited to <span className="text-[#D4AF37] font-bold">200 units</span> total.
             </p>
 
-            {mintPrice > 0n ? (
+            {mintPrice > 0n && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/5">
                 <Zap size={12} className="text-[#D4AF37]" />
                 <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest">
                   Mint Price: {fmtEth(mintPrice)} ETH
-                </span>
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#00C076]/30 bg-[#00C076]/5">
-                <Zap size={12} className="text-[#00C076]" />
-                <span className="text-[10px] font-black text-[#00C076] uppercase tracking-widest">
-                  Free Mint · Pay Gas Only
                 </span>
               </div>
             )}
@@ -398,12 +382,6 @@ export function GoldTicketPanel() {
 
           {/* Right: live supply counter */}
           <div className="bg-white/5 border border-white/8 rounded-2xl p-8 space-y-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Users size={14} className="text-white/30" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/30">
-                Genesis Supply · Real-Time
-              </span>
-            </div>
 
             {/* Counter */}
             <div className="text-center space-y-1">
