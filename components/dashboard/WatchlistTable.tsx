@@ -156,6 +156,57 @@ export function WatchlistTable() {
     const [view, setView]       = useState<'TOKENS' | 'WALLETS'>('TOKENS');
     const [showAdd, setShowAdd] = useState(false);
     
+    // DexScreener Global Search
+    const [globalSearchTokens, setGlobalSearchTokens] = useState<any[]>([]);
+    const [isSearchingGlobal, setIsSearchingGlobal] = useState(false);
+
+    useEffect(() => {
+        if (search.length < 2 || view !== 'TOKENS') {
+            setGlobalSearchTokens([]);
+            return;
+        }
+        const delayDebounceFn = setTimeout(async () => {
+            setIsSearchingGlobal(true);
+            try {
+                const res = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${search}`);
+                const json = await res.json();
+                if (json.pairs) {
+                    const uniquePairs = new Map();
+                    // Deduplicate by baseToken address taking the highest liquidity pair
+                    json.pairs.forEach((p: any) => {
+                        const addr = p.baseToken.address;
+                        if (!uniquePairs.has(addr) || (p.liquidity?.usd || 0) > (uniquePairs.get(addr).liquidity?.usd || 0)) {
+                            uniquePairs.set(addr, p);
+                        }
+                    });
+                    
+                    const mapped = Array.from(uniquePairs.values()).slice(0, 30).map((p: any) => ({
+                        id: p.pairAddress,
+                        type: 'TOKEN',
+                        symbol: p.baseToken.symbol,
+                        name: p.baseToken.name,
+                        chain: p.chainId,
+                        entryPrice: null,
+                        marketData: {
+                            currentPrice: parseFloat(p.priceUsd || '0'),
+                            change24h: p.priceChange?.h24 || 0,
+                            vol24h: p.volume?.h24 || 0,
+                            mcap: p.fdv || p.liquidity?.usd || 0,
+                            roi: null,
+                            whaleConcentration: null
+                        }
+                    }));
+                    setGlobalSearchTokens(mapped);
+                }
+            } catch (e) {
+                console.error("Global search failed:", e);
+            } finally {
+                setIsSearchingGlobal(false);
+            }
+        }, 500);
+        return () => clearTimeout(delayDebounceFn);
+    }, [search, view]);
+    
     const fetchWatchlist = async () => {
         try {
             const res = await fetch('/api/watchlist');
@@ -206,12 +257,15 @@ export function WatchlistTable() {
         }
     };
 
-    const tokensFiltered = (data.tokens || []).filter(t =>
-        t != null &&
-        ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (t.address ?? '').toLowerCase().includes(search.toLowerCase()))
-    );
+    // If user is searching globally, override the token list completely
+    const tokensFiltered = search.length >= 2 
+        ? globalSearchTokens 
+        : (data.tokens || []).filter(t =>
+            t != null &&
+            ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (t.address ?? '').toLowerCase().includes(search.toLowerCase()))
+          );
 
     const walletsFiltered = (data.wallets || []).filter(w =>
         w != null &&
@@ -270,8 +324,8 @@ export function WatchlistTable() {
                             ))}
                         </div>
                         <div className="w-full" style={{ height: 400 }}>
-                            {loading ? (
-                                <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center"><Loader2 className="animate-spin mb-3" size={20}/> Fetching…</div>
+                            {loading || isSearchingGlobal ? (
+                                <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center"><Loader2 className="animate-spin mb-3" size={20}/> {isSearchingGlobal ? 'Searching Global DEX Database…' : 'Fetching…'}</div>
                             ) : tokensFiltered.length === 0 ? (
                                 <div className="p-12 text-center text-[#888888] text-[10px] font-mono">NO TOKENS WATCHED · Click Add to begin</div>
                             ) : (
@@ -355,12 +409,22 @@ export function WatchlistTable() {
                                                                 {md.whaleConcentration ? `${md.whaleConcentration}%` : '—'}
                                                             </div>
 
-                                                            {/* Delete */}
+                                                            {/* Delete / Save */}
                                                             <div className="px-3 flex justify-end">
-                                                                <button onClick={() => data.handleDelete(t.id, 'TOKEN')}
-                                                                    className="p-1.5 text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-lg transition-colors">
-                                                                    <Trash2 size={14}/>
-                                                                </button>
+                                                                {search.length >= 2 ? (
+                                                                    <button onClick={() => {
+                                                                        setData(prev => ({ ...prev, tokens: [...prev.tokens, t] }));
+                                                                        setSearch('');
+                                                                        toast.success(`${t.symbol} saved to watchlist`);
+                                                                    }} className="p-1.5 text-[#00C076] hover:bg-[#00C076]/10 rounded-lg transition-colors font-bold text-[9px] uppercase tracking-widest border border-transparent hover:border-[#00C076]/30">
+                                                                        ADD
+                                                                    </button>
+                                                                ) : (
+                                                                    <button onClick={() => data.handleDelete(t.id, 'TOKEN')}
+                                                                        className="p-1.5 text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-lg transition-colors">
+                                                                        <Trash2 size={14}/>
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
