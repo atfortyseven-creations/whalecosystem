@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BarChart2, Crown, Globe, Fingerprint, Terminal, Heart, Settings } from 'lucide-react';
+import { Home, LineChart, Globe, Target, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -10,68 +10,64 @@ export function MobileNavBar() {
     const pathname = usePathname();
 
     const navItems = [
-        { href: '/vip', label: 'VIP', icon: Crown },
-        { href: '/network', label: 'Network', icon: Globe },
+        { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/network', label: 'Intelligence', icon: Globe },
         { href: '/', label: 'Home', icon: Home },
-        { href: '/portfolio', label: 'Portfolio', icon: BarChart2 },
-        { href: '/settings', label: 'Settings', icon: Settings },
+        { href: '/portfolio', label: 'Portfolio', icon: LineChart },
+        { href: '/support', label: 'Support', icon: Target },
     ];
 
     return (
         <motion.nav 
             initial={{ y: 100 }}
             animate={{ y: 0 }}
-            className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-[var(--aztec-parchment)]/95 backdrop-blur-2xl border-t border-[var(--aztec-ink)]/10 pb-[env(safe-area-inset-bottom)] transform-gpu"
-            style={{ position: 'fixed', bottom: 0 }}
+            className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-white dark:bg-[#050505] backdrop-blur-3xl border-t border-black/5 dark:border-white/5 pb-[env(safe-area-inset-bottom)] transform-gpu"
         >
-            <div className="flex items-center justify-around px-2 py-3">
+            <div className="flex justify-evenly items-center px-2 py-2">
                 {navItems.map((item, index) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
+                    const isCenter = index === 2;
                     
                     return (
                         <Link 
                             key={item.href} 
                             href={item.href}
-                            className="relative flex flex-col items-center gap-1 flex-1 group"
+                            className="relative flex flex-col items-center justify-center w-full h-14 group"
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
                         >
-                            {/* Active indicator */}
-                            {isActive && (
+                            {/* Active top line */}
+                            {isActive && !isCenter && (
                                 <motion.div
-                                    layoutId="activeTab"
-                                    className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-[var(--aztec-orchid)] rounded-full transform-gpu"
-                                    transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
+                                    layoutId="activeTabMobile"
+                                    className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-black dark:bg-white rounded-b-full"
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                             )}
                             
-                            {/* Icon */}
                             <div className={cn(
-                                "relative flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-200",
-                                isActive 
-                                    ? "bg-[var(--aztec-ink)]/5 border border-[var(--aztec-orchid)]/30 scale-105" 
-                                    : "bg-[var(--aztec-ink)]/5 border border-transparent group-hover:bg-[var(--aztec-ink)]/10 group-hover:scale-105"
+                                "flex items-center justify-center transition-all duration-300",
+                                isCenter ? "w-12 h-12 bg-black dark:bg-white rounded-full shadow-lg -translate-y-4" : "w-10 h-10 rounded-2xl",
+                                isActive && !isCenter ? "text-black dark:text-white" : "text-black/40 dark:text-white/40"
                             )}>
                                 <Icon 
-                                    size={20} 
+                                    size={isCenter ? 22 : 20} 
+                                    strokeWidth={isActive || isCenter ? 2.5 : 2}
                                     className={cn(
-                                        "transition-colors duration-200",
-                                        isActive ? "text-[var(--aztec-orchid)]" : "text-[var(--aztec-ink)]/60 group-hover:text-[var(--aztec-ink)]"
+                                        "transition-colors duration-300",
+                                        isCenter ? "text-white dark:text-black" : "group-hover:text-black dark:group-hover:text-white"
                                     )}
                                 />
-                                
-                                {/* Glow effect for VIP */}
-                                {item.href === '/vip' && isActive && (
-                                    <div className="absolute inset-0 bg-[var(--aztec-orchid)]/10 rounded-2xl blur-lg -z-10" />
-                                )}
                             </div>
                             
-                            {/* Label */}
-                            <span className={cn(
-                                "text-[10px] font-bold transition-colors duration-200 uppercase tracking-wider",
-                                isActive ? "text-[var(--aztec-ink)]" : "text-[var(--aztec-ink)]/40 group-hover:text-[var(--aztec-ink)]/70"
-                            )}>
-                                {item.label}
-                            </span>
+                            {!isCenter && (
+                                <span className={cn(
+                                    "text-[9px] font-mono tracking-widest uppercase transition-colors duration-300 mt-0.5",
+                                    isActive ? "text-black dark:text-white font-bold" : "text-black/40 dark:text-white/40 font-medium group-hover:text-black/70 dark:group-hover:text-white/70"
+                                )}>
+                                    {item.label}
+                                </span>
+                            )}
                         </Link>
                     );
                 })}
