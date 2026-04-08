@@ -134,7 +134,7 @@ export function WhaleAlertLanding() {
       
       {/* ── HEADER WITH TOGGLE ── */}
       <header className="absolute top-0 w-full flex items-center justify-between p-6 z-50">
-          <div className="font-black text-xl font-aztec-serif uppercase tracking-tight">WAN</div>
+          <div className="font-black text-xl font-aztec-serif uppercase tracking-tight"></div>
           <ThemeToggle />
       </header>
 
@@ -147,9 +147,6 @@ export function WhaleAlertLanding() {
             <AnimatePresence mode="wait">
                 {!showClearance ? (
                     <motion.div key="core" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
-                        <div className="px-4 py-1 mb-8 border border-black/10 dark:border-white/10 text-black dark:text-white font-mono text-[9px] font-black uppercase tracking-[0.4em] bg-black/5 dark:bg-white/5">
-                            SECURE CONNECTION ESTABLISHED
-                        </div>
                         <h1 className="font-mono text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase whitespace-nowrap text-black dark:text-white">
                             WHALE<br />ALERT
                         </h1>
@@ -157,18 +154,9 @@ export function WhaleAlertLanding() {
                             Democratizing Intelligence. Uncovering dark liquidity to protect retail flow.
                         </p>
                         <div className="flex gap-4">
-                            <button onClick={handleEntry} className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-mono text-sm font-black uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-xl">
-                                CONNECT WALLET
-                            </button>
                             <button onClick={() => setShowClearance(true)} className="px-8 py-4 border border-black/20 dark:border-white/20 text-black dark:text-white font-mono text-sm font-black uppercase tracking-[0.2em] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                 GET ACCESS PASS
                             </button>
-                        </div>
-                        
-                        <div className="mt-20 flex gap-12 font-mono text-[10px] uppercase tracking-[0.3em] font-black text-black/50 dark:text-white/50">
-                            <div><span className="text-black dark:text-white block mb-1">0x89A...FF80</span>NODE_ID</div>
-                            <div><span className="text-black dark:text-white block mb-1">ZERO</span>LATENCY</div>
-                            <div><span className="text-black dark:text-white block mb-1">E2E</span>ENCRYPTED</div>
                         </div>
                     </motion.div>
                 ) : (

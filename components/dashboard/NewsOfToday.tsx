@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ExternalLink, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { RefreshCw, ExternalLink, ShieldCheck, ShieldAlert, Clock } from 'lucide-react';
 
 interface NewsArticle {
     id: string;
@@ -19,46 +19,88 @@ interface NewsArticle {
 
 const DEMO_NEWS: NewsArticle[] = [
     {
-        id: '1', title: 'Bitcoin Eyes $90K Resistance as Institutional Buying Intensifies',
-        summary: 'On-chain data reveals whales accumulated 42,000 BTC in the last 72 hours ahead of key macro catalyst. BlackRock ETF inflows hit all-time high of $1.2B in a single day, signaling unprecedented institutional appetite.',
-        url: 'https://coindesk.com', source: 'The Block', publishedAt: new Date(Date.now() - 1200000).toISOString(),
-        sentiment: 'bullish', veracityScore: 92, isFake: false, tokens: ['BTC'],
+        id: '1', 
+        title: 'Institutional Grade Dark Pools Shift Strategy Ahead of Upcoming Expirations',
+        summary: 'Major institutional clearing houses have initiated an unprecedented accumulation phase observed through unmapped liquidity vectors. Proprietary tracing algorithms indicate a direct correlation between these stealth acquisitions and anticipated macro environment policy shifts, effectively cornering retail slippage assumptions.',
+        url: 'https://bloomberg.com', 
+        source: 'Whale Core Metrics', 
+        publishedAt: new Date(Date.now() - 1200000).toISOString(),
+        sentiment: 'bullish', 
+        veracityScore: 98, 
+        isFake: false, 
+        tokens: ['BTC', 'ETH'],
     },
     {
-        id: '2', title: 'Ethereum Pectra Upgrade Scheduled — Staking Limit to 2048 ETH',
-        summary: 'The Prague/Electra hard fork finally ships a critical change raising validator balance caps. Up to 10x reduction in validator load expected, paving way for mass institutional staking with fewer nodes overhead.',
-        url: 'https://ethresear.ch', source: 'ETH Research', publishedAt: new Date(Date.now() - 3600000).toISOString(),
-        sentiment: 'bullish', veracityScore: 97, isFake: false, tokens: ['ETH'],
+        id: '2', 
+        title: 'Zero-Knowledge Cryptographic Paradigms Restructure Layer-2 Fee Geometries',
+        summary: 'A consortium of primary Ethereum rollup solutions has finalized the deployment of synchronized ZK-SNARK verifiers. This infrastructural update functionally eliminates state-bloat on the L1 sequencer, reducing computational cross-chain overhead by an estimated 92% and accelerating bridging finality for enterprise-scale capital.',
+        url: 'https://ethresear.ch', 
+        source: 'L2 Architecture Review', 
+        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+        sentiment: 'bullish', 
+        veracityScore: 95, 
+        isFake: false, 
+        tokens: ['ETH', 'STRK', 'ZKS'],
     },
     {
-        id: '3', title: 'Solana DeFi Reaches $12B TVL — Surpasses Counterparts',
-        summary: 'Top decentralized exchanges on the network pull unprecedented liquidity. Institutional players now eye the architecture as a tier-1 settlement layer due to high throughput and low fee characteristics.',
-        url: 'https://defillama.com', source: 'Crypto Insights', publishedAt: new Date(Date.now() - 7200000).toISOString(),
-        sentiment: 'neutral', veracityScore: 88, isFake: false, tokens: ['SOL'],
+        id: '3', 
+        title: 'Geopolitical Tensions Drive Unprecedented Stablecoin Outflows to Self-Custody',
+        summary: 'In response to sudden sovereign fiscal policies across European theaters, on-chain telemetry registered over $4.2 Billion in USDC and USDT exiting centralized custodial platforms. This kinetic shift underscores the rising dominance of decentralized bearer-asset philosophy among high net-worth family offices.',
+        url: 'https://wsj.com', 
+        source: 'Sovereign Intel Desk', 
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        sentiment: 'neutral', 
+        veracityScore: 91, 
+        isFake: false, 
+        tokens: ['USDC', 'USDT'],
     },
     {
-        id: '4', title: 'Major Exchange Allegedly Insolvent — Anonymous Source Claims',
-        summary: 'Unverified rumors of liquidity issues at mid-tier exchange circulate on social media. No official statement has been released. Historical data suggests a pattern resembling organized disinformation campaigns.',
-        url: 'https://cryptopanic.com', source: 'Market Rumors', publishedAt: new Date(Date.now() - 10800000).toISOString(),
-        sentiment: 'bearish', veracityScore: 23, isFake: true, tokens: [],
+        id: '4', 
+        title: 'Unverified Report Suggests Imminent Liquidation Cascade in Mid-Tier Exchanges',
+        summary: 'Anomalous trading patterns identified across subsidiary digital exchanges indicate severe margin exposure. Analysts note that these systemic fractures bear distinct similarities to previous highly leveraged unravellings, warning retail participants to secure cold storage vectors immediately.',
+        url: 'https://cryptopanic.com', 
+        source: 'Anomaly Detection Radar', 
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        sentiment: 'bearish', 
+        veracityScore: 42, 
+        isFake: true, 
+        tokens: [],
     },
     {
-        id: '5', title: 'On-Chain Governance Passes Strategic Fee Reduction Proposal',
-        summary: 'A major DAO votes overwhelmingly in favor of reducing transaction costs by 40%. The proposal, sponsored by leading DeFi protocols, argues that current fee structures limit mass retail adoption.',
-        url: 'https://arbiscan.io', source: 'Governance Daily', publishedAt: new Date(Date.now() - 14400000).toISOString(),
-        sentiment: 'bullish', veracityScore: 91, isFake: false, tokens: ['ARB'],
+        id: '5', 
+        title: 'Asymmetric Yield Harvesting Frameworks Exploit Inefficient AMM Routing',
+        summary: 'Advanced maximal extractable value (MEV) searchers have operationalized a novel geometric routing protocol. By triangulating volatile asset corridors on decentralized exchanges, these bots are successfully siphoning yield from mispriced limit orders without suffering traditional impermanent loss.',
+        url: 'https://flashbots.net', 
+        source: 'MEV Insights', 
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        sentiment: 'bearish', 
+        veracityScore: 89, 
+        isFake: false, 
+        tokens: ['UNI', 'CRV'],
     },
     {
-        id: '6', title: 'SEC Clears Path for Spot Ethereum ETF Options Trading',
-        summary: 'Regulators approve options contracts on spot ETFs — a major milestone that analysts project could unlock significant institutional capital within the next 90 days of trading.',
-        url: 'https://sec.gov', source: 'Regulatory Watch', publishedAt: new Date(Date.now() - 21600000).toISOString(),
-        sentiment: 'bullish', veracityScore: 96, isFake: false, tokens: ['ETH'],
+        id: '6', 
+        title: 'Federal Reserve Monetary Policy Indicates Continued Neutral Stance on Risk Assets',
+        summary: 'Following the latest macroeconomic address, central banking authorities have signaled a deliberate maintenance of current interest rate thresholds. Analysts project that this stagnation creates a highly fertile consolidation period for decentralized commodities, allowing native networks to mature without severe capital flight pressure.',
+        url: 'https://reuters.com', 
+        source: 'Global Macro View', 
+        publishedAt: new Date(Date.now() - 21600000).toISOString(),
+        sentiment: 'neutral', 
+        veracityScore: 94, 
+        isFake: false, 
+        tokens: [],
     },
     {
-        id: '7', title: 'Global Market Cap Recovers After Federal Reserve Pause Signal',
-        summary: 'The central bank hints at holding rates steady through the second quarter, triggering a broad-market relief rally. Risk assets across the board experience a surge in relative valuation.',
-        url: 'https://wsj.com', source: 'Macro Desk', publishedAt: new Date(Date.now() - 28800000).toISOString(),
-        sentiment: 'bullish', veracityScore: 90, isFake: false, tokens: ['BTC', 'ETH'],
+        id: '7', 
+        title: 'Regulatory Clarity Catalyst Initiates Tier-1 Capital Influx into Real World Assets',
+        summary: 'The formal standardization of tokenized traditional securities by primary global economic jurisdictions has unlocked a massive collateral pipeline. Real World Asset (RWA) protocols are witnessing institutional minting scales that structurally bridge legacy debt markets directly onto permissionless ledgers.',
+        url: 'https://ft.com', 
+        source: 'Regulatory Alpha', 
+        publishedAt: new Date(Date.now() - 28800000).toISOString(),
+        sentiment: 'bullish', 
+        veracityScore: 97, 
+        isFake: false, 
+        tokens: ['ONDO', 'MKR'],
     },
 ];
 
@@ -70,16 +112,45 @@ function timeAgo(iso: string) {
     return `${Math.floor(diff / 86400)} days ago`;
 }
 
+// Helper to determine the current state of a global exchange based on UTC time
+function getExchangeStatus() {
+    const now = new Date();
+    const utcHour = now.getUTCHours();
+    const isWeekend = now.getUTCDay() === 0 || now.getUTCDay() === 6;
+
+    // Simplified UTC logic for demonstration purposes
+    const nyseOpen = !isWeekend && (utcHour >= 13 && utcHour < 20); // 9:30 AM - 4:00 PM EST (approx)
+    const lseOpen = !isWeekend && (utcHour >= 8 && utcHour < 16);   // 8:00 AM - 4:30 PM GMT
+    const tseOpen = !isWeekend && (utcHour >= 0 && utcHour < 6);    // 9:00 AM - 3:00 PM JST (UTC+9)
+    const hkexOpen = !isWeekend && (utcHour >= 1 && utcHour < 8);   // 9:30 AM - 4:00 PM HKT (UTC+8)
+
+    return [
+        { name: 'NYSE (New York)', open: nyseOpen },
+        { name: 'LSE (London)', open: lseOpen },
+        { name: 'TSE (Tokyo)', open: tseOpen },
+        { name: 'HKEX (Hong Kong)', open: hkexOpen },
+    ];
+}
+
 export function NewsOfToday() {
     const [articles, setArticles] = useState<NewsArticle[]>(DEMO_NEWS);
     const [loading, setLoading]   = useState(false);
     const [search, setSearch]     = useState('');
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [exchanges, setExchanges] = useState(getExchangeStatus());
     
     const mountedRef = React.useRef(true);
+    
     React.useEffect(() => {
         mountedRef.current = true;
-        return () => { mountedRef.current = false; };
+        // Update exchange statuses periodically
+        const interval = setInterval(() => {
+            setExchanges(getExchangeStatus());
+        }, 60000);
+        return () => { 
+            mountedRef.current = false; 
+            clearInterval(interval);
+        };
     }, []);
 
     const refresh = React.useCallback(async () => {
@@ -97,9 +168,7 @@ export function NewsOfToday() {
                         url: a.url,
                         source: a.source || 'Intel Desk',
                         publishedAt: a.date || a.publishedAt || new Date().toISOString(),
-                        // Use real sentiment from API, or 'neutral' as a safe fallback
                         sentiment: (['bullish', 'bearish', 'neutral'].includes(a.sentiment) ? a.sentiment : 'neutral') as any,
-                        // Use real veracity score from API, or null — never fabricate
                         veracityScore: typeof a.veracityScore === 'number' ? a.veracityScore : null,
                         isFake: a.isFake ?? false,
                         tokens: a.tokens ?? []
@@ -121,15 +190,30 @@ export function NewsOfToday() {
     );
 
     return (
-        <div className="w-full flex justify-center py-4 text-[#050505] font-sans">
-            <div className="w-full bg-white border-y sm:border sm:rounded-[2px] border-[#050505] shadow-[4px_4px_0_0_#050505] overflow-hidden">
+        <div className="w-full flex justify-center py-4 text-black dark:text-white font-sans transition-colors duration-300">
+            <div className="w-full bg-white dark:bg-[#0A0A0A] border-y sm:border sm:rounded-[2px] border-black/10 dark:border-white/10 shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.05)] overflow-hidden">
                 
+                {/* ── EXCHANGE STATUS TICKER ── */}
+                <div className="w-full border-b border-black/5 dark:border-white/5 bg-[#F9F9F9] dark:bg-[#050505] flex items-center px-6 overflow-x-auto whitespace-nowrap msv-hide-scrollbar py-2 gap-8">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 shrink-0">
+                        <Clock size={12} />
+                        Global Markets
+                    </div>
+                    {exchanges.map((ex) => (
+                        <div key={ex.name} className="flex items-center gap-2 shrink-0">
+                            <div className={`w-1.5 h-1.5 rounded-full ${ex.open ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30]/50'}`} />
+                            <span className="text-[10px] uppercase font-mono font-bold tracking-wider opacity-80">
+                                {ex.name} <span className="opacity-40 font-normal">[{ex.open ? 'OPEN' : 'CLOSED'}]</span>
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
                 {/* ── THE POST HEADER ── */}
-                <div className="px-6 md:px-10 py-8 border-b-4 border-[#050505] flex flex-col md:flex-row md:items-end justify-between gap-6 bg-[#FAF9F6]">
+                <div className="px-6 md:px-10 py-8 border-b-4 border-black dark:border-white flex flex-col md:flex-row md:items-end justify-between gap-6 bg-[#FAF9F6] dark:bg-[#080808]">
                     <div className="flex flex-col">
-                        <p className="font-serif italic text-sm text-[#888888] mb-1">Vol. 42 — Final Edition</p>
-                        <h1 className="font-serif text-5xl md:text-7xl font-black tracking-tighter uppercase leading-[0.85] text-[#050505]">
-                            The <br/>Terminal Post
+                        <h1 className="font-aztec-serif text-5xl md:text-7xl font-black tracking-tighter uppercase leading-[0.85] text-black dark:text-white">
+                            The <br/>Whale Post
                         </h1>
                     </div>
                     
@@ -139,18 +223,18 @@ export function NewsOfToday() {
                                 value={search} 
                                 onChange={e => setSearch(e.target.value)} 
                                 placeholder="Search publications…"
-                                className="w-full md:w-64 bg-transparent border-b border-[#E5E5E5] text-[#050505] placeholder:text-[#888888] pb-1 font-serif italic outline-none focus:border-[#050505] transition-all"
+                                className="w-full md:w-64 bg-transparent border-b border-black/10 dark:border-white/20 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 pb-1 font-serif italic outline-none focus:border-black dark:focus:border-white transition-all"
                             />
-                            <button onClick={refresh} disabled={loading} className="p-2 border border-[#E5E5E5] rounded-full hover:bg-[#050505] hover:text-white transition-all disabled:opacity-50 group">
+                            <button onClick={refresh} disabled={loading} className="p-2 border border-black/10 dark:border-white/20 rounded-full hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 group">
                                 <RefreshCw size={14} className={`${loading ? 'animate-spin' : ''}`} />
                             </button>
                         </div>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#888888]">Institutional Intelligence Desk</p>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-50">Institutional Intelligence Desk</p>
                     </div>
                 </div>
 
                 {/* ── INBOX STACK / NEWSPAPER LIST ── */}
-                <div className="flex flex-col divide-y divide-[#E5E5E5]">
+                <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
                     {filtered.map((a) => {
                         const isExpanded = expandedId === a.id;
                         
@@ -159,30 +243,30 @@ export function NewsOfToday() {
                                 {/* ROW (Clickable) */}
                                 <div 
                                     onClick={() => setExpandedId(isExpanded ? null : a.id)}
-                                    className={`flex flex-col md:flex-row md:items-center px-6 md:px-10 py-5 gap-4 md:gap-8 cursor-pointer transition-colors ${isExpanded ? 'bg-[#050505] text-white' : 'hover:bg-[#f2f2f2] text-[#050505]'}`}
+                                    className={`flex flex-col md:flex-row md:items-center px-6 md:px-10 py-5 gap-4 md:gap-8 cursor-pointer transition-colors ${isExpanded ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
                                 >
                                     {/* Source & Time Column */}
                                     <div className="w-full md:w-40 shrink-0 flex flex-row md:flex-col justify-between md:justify-start items-center md:items-start gap-1">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${isExpanded ? 'text-white' : 'text-[#050505]'}`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${isExpanded ? '' : 'opacity-80'}`}>
                                             {a.source}
                                         </span>
-                                        <span className={`text-[11px] font-serif italic ${isExpanded ? 'text-white/60' : 'text-[#888888]'}`}>
+                                        <span className={`text-[11px] font-serif italic ${isExpanded ? 'opacity-60' : 'opacity-40'}`}>
                                             {timeAgo(a.publishedAt)}
                                         </span>
                                     </div>
 
                                     {/* Headline Column */}
                                     <div className="flex-1 overflow-hidden">
-                                        <h2 className={`font-serif text-xl md:text-2xl font-bold leading-snug tracking-tight ${isExpanded ? 'text-white' : 'text-[#050505] group-hover:text-black'}`}>
+                                        <h2 className={`font-serif text-xl md:text-2xl font-bold leading-snug tracking-tight ${isExpanded ? '' : 'group-hover:opacity-80'}`}>
                                             {a.title}
                                         </h2>
                                     </div>
 
                                     {/* Minimal Indicator */}
                                     <div className="hidden md:flex shrink-0 w-8 justify-end">
-                                        {a.sentiment === 'bullish' && <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-[#00C076]' : 'bg-[#00C076]/80'}`} title="Bullish"/>}
-                                        {a.sentiment === 'bearish' && <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-[#FF3B30]' : 'bg-[#FF3B30]/80'}`} title="Bearish"/>}
-                                        {a.sentiment === 'neutral' && <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-white/30' : 'bg-[#E5E5E5]'}`} title="Neutral"/>}
+                                        {a.sentiment === 'bullish' && <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-[#00C076]' : 'bg-[#00C076] opacity-30 group-hover:opacity-100'}`} title="Bullish"/>}
+                                        {a.sentiment === 'bearish' && <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-[#FF3B30]' : 'bg-[#FF3B30] opacity-30 group-hover:opacity-100'}`} title="Bearish"/>}
+                                        {a.sentiment === 'neutral' && <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-current opacity-30' : 'bg-current opacity-10'}`} title="Neutral"/>}
                                     </div>
                                 </div>
 
@@ -194,19 +278,19 @@ export function NewsOfToday() {
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
                                             transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                            className="overflow-hidden bg-[#FAF9F6] border-t border-[#050505]"
+                                            className="overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A] border-t border-black dark:border-white"
                                         >
                                             <div className="px-6 md:px-10 py-8 md:pl-[224px] pr-6 md:pr-16 flex flex-col space-y-6">
                                                 
                                                 {/* Article Body */}
                                                 <div>
-                                                    <p className="font-serif text-lg md:text-xl leading-relaxed text-[#333333] first-letter:text-6xl first-letter:font-black first-letter:float-left first-letter:mr-3 first-letter:mt-1">
+                                                    <p className="font-serif text-lg md:text-xl leading-relaxed text-black/80 dark:text-white/80 first-letter:text-6xl first-letter:font-black first-letter:float-left first-letter:mr-3 first-letter:mt-1">
                                                         {a.summary}
                                                     </p>
                                                 </div>
 
                                                 {/* Meta Info & Actions */}
-                                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-6 mt-2 border-t border-[#E5E5E5]">
+                                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-6 mt-2 border-t border-black/10 dark:border-white/10">
                                                     <div className="flex items-center gap-4">
                                                         {a.isFake ? (
                                                             <div className="flex items-center gap-1.5 text-[#FF3B30]">
@@ -221,9 +305,9 @@ export function NewsOfToday() {
                                                         )}
                                                         {a.veracityScore !== null && (
                                                             <>
-                                                            <div className="w-px h-4 bg-[#E5E5E5]"/>
+                                                            <div className="w-px h-4 bg-black/10 dark:bg-white/10"/>
                                                             <div className="flex items-center gap-2">
-                                                                <span className="text-[10px] uppercase font-bold text-[#888888] tracking-widest">Signal Integrity:</span>
+                                                                <span className="text-[10px] uppercase font-bold opacity-40 tracking-widest">Signal Integrity:</span>
                                                                 <span className={`text-[12px] font-mono font-black ${a.veracityScore > 80 ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
                                                                     {a.veracityScore}%
                                                                 </span>
@@ -236,7 +320,7 @@ export function NewsOfToday() {
                                                         href={a.url} 
                                                         target="_blank" 
                                                         rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 px-4 py-2 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#222] transition-colors"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity"
                                                     >
                                                         Read Full Report <ExternalLink size={12}/>
                                                     </a>
@@ -253,14 +337,14 @@ export function NewsOfToday() {
                 {/* Empty State */}
                 {filtered.length === 0 && (
                     <div className="py-24 text-center">
-                        <p className="font-serif italic text-[#888888] text-lg">"No publications met the criteria."</p>
+                        <p className="font-serif italic opacity-50 text-lg">"No publications met the criteria."</p>
                     </div>
                 )}
                 
                 {/* Footer Strip */}
-                <div className="bg-[#050505] px-6 py-2 flex justify-between items-center text-white">
+                <div className="bg-black px-6 py-2 flex justify-between items-center text-white">
                     <span className="text-[8px] font-mono opacity-50">END OF FEED</span>
-                    <span className="text-[8px] font-mono opacity-50">THE TERMINAL POST © {new Date().getFullYear()}</span>
+                    <span className="text-[8px] font-mono opacity-50">THE WHALE POST © {new Date().getFullYear()}</span>
                 </div>
                 
             </div>

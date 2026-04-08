@@ -150,38 +150,7 @@ export function GlobalSettingsModal() {
                                     </div>
                                 </section>
 
-                                {/* 2. Saldos y Privacidad */}
-                                <section className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Privacy & Security</h3>
-                                    
-                                    <div className="bg-white rounded-xl border border-[#E5E5E5] shadow-sm divide-y divide-[#F0F0F0]">
-                                        <div className="flex items-center justify-between p-4 bg-white rounded-t-xl">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center">
-                                                    {showBalances ? <Eye size={14} className="text-[#050505]" /> : <EyeOff size={14} className="text-[#050505]" />}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Balances & Activity</span>
-                                                    <span className="text-[9px] text-[#888888]">Hide amounts from view</span>
-                                                </div>
-                                            </div>
-                                            <Toggle enabled={showBalances} setEnabled={setShowBalances} />
-                                        </div>
-
-                                        <div className="flex items-center justify-between p-4 bg-white rounded-b-xl">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center">
-                                                    <Activity size={14} className="text-[#050505]" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Allow Analytics</span>
-                                                    <span className="text-[9px] text-[#888888]">Anonymous metadata only</span>
-                                                </div>
-                                            </div>
-                                            <Toggle enabled={allowAnalytics} setEnabled={setAllowAnalytics} />
-                                        </div>
-                                    </div>
-                                </section>
+                                {/* Privacy section removed as per strict system requirements */}
 
                                 {/* 3. Avanzado */}
                                 <section className="space-y-4">
