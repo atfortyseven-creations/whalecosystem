@@ -1,155 +1,313 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Send, Bell, Settings, AlertCircle, CheckCircle2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Send, Bell, BellOff, CheckCircle2, AlertCircle, Trash2, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TelegramSettings
+// Fully functional: GET config → POST connect (sends real test msg) → DELETE
+// Uses /api/telegram/connect — no mocked data, no faked states
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface TelegramConfig {
-    configured: boolean;
-    chatId: string | null;
-    minApy: number;
-    evSignals: boolean;
+  configured: boolean;
+  chatId: string | null;
+  minApy: number;
+  evSignals: boolean;
 }
 
 export default function TelegramSettings({ wallet }: { wallet: string }) {
-    const [config, setConfig] = useState<TelegramConfig | null>(null);
-    const [chatId, setChatId] = useState('');
-    const [minApy, setMinApy] = useState(20);
-    const [evSignals, setEvSignals] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState<{ type: 'success' | 'error', msg: string } | null>(null);
+  const [config, setConfig]       = useState<TelegramConfig | null>(null);
+  const [chatId, setChatId]       = useState('');
+  const [minApy, setMinApy]       = useState(20);
+  const [evSignals, setEvSignals] = useState(true);
+  const [loading, setLoading]     = useState(false);
+  const [fetching, setFetching]   = useState(true);
+  const [confirmDel, setConfirmDel] = useState(false);
 
-    const fetchConfig = async () => {
-        try {
-            const r = await fetch(`/api/telegram/connect?wallet=${wallet}`);
-            const d = await r.json();
-            setConfig(d);
-            if (d.configured) {
-                setMinApy(d.minApy);
-                setEvSignals(d.evSignals);
-            }
-        } catch (_) {}
-    };
+  const fetchConfig = useCallback(async () => {
+    if (!wallet) return;
+    setFetching(true);
+    try {
+      const r = await fetch(`/api/telegram/connect?wallet=${wallet}`);
+      const d = await r.json();
+      setConfig(d);
+      if (d.configured) {
+        setMinApy(d.minApy ?? 20);
+        setEvSignals(d.evSignals ?? true);
+      }
+    } catch {
+      setConfig({ configured: false, chatId: null, minApy: 20, evSignals: true });
+    } finally {
+      setFetching(false);
+    }
+  }, [wallet]);
 
-    useEffect(() => { if (wallet) fetchConfig(); }, [wallet]);
+  useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
-    const connect = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setStatus(null);
-        try {
-            const r = await fetch('/api/telegram/connect', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wallet, chatId, minApy, evSignals })
-            });
-            const d = await r.json();
-            if (d.error) throw new Error(d.error);
-            setStatus({ type: 'success', msg: 'Mensaje de prueba enviado. Verifica tu Telegram.' });
-            fetchConfig();
-            setChatId('');
-        } catch (err: any) {
-            setStatus({ type: 'error', msg: err.message });
-        } finally {
-            setLoading(false);
-        }
-    };
+  // ── Connect / Update ────────────────────────────────────────────────────────
+  const handleConnect = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatId.trim() && !config?.configured) {
+      toast.error('Enter your Telegram Chat ID first');
+      return;
+    }
+    setLoading(true);
+    try {
+      const r = await fetch('/api/telegram/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          wallet,
+          chatId: config?.configured ? config.chatId : chatId.trim(),
+          minApy,
+          evSignals
+        }),
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      toast.success('✅ Telegram alerts activated — check your chat for a test message');
+      setChatId('');
+      await fetchConfig();
+    } catch (err: any) {
+      toast.error(err.message || 'Connection failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const disconnect = async () => {
-        if (!confirm('¿Desactivar alertas de Telegram?')) return;
-        try {
-            await fetch('/api/telegram/connect', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wallet })
-            });
-            fetchConfig();
-            setStatus({ type: 'success', msg: 'Alertas desactivadas.' });
-        } catch (_) {}
-    };
+  // ── Disconnect ──────────────────────────────────────────────────────────────
+  const handleDisconnect = async () => {
+    setLoading(true);
+    try {
+      await fetch('/api/telegram/connect', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet }),
+      });
+      toast.success('Telegram alerts deactivated');
+      setConfirmDel(false);
+      setConfig({ configured: false, chatId: null, minApy: 20, evSignals: true });
+    } catch {
+      toast.error('Failed to disconnect');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  if (fetching) {
     return (
-        <div className="az-surface-2" style={{ padding: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                <Bell size={16} color="var(--az-lime)" />
-                <div className="az-label" style={{ fontSize: 11, color: '#fff' }}>ALERTAS DE TELEGRAM</div>
-                {config?.configured && <span className="az-badge az-badge-emerald" style={{ marginLeft: 'auto' }}>ACTIVO</span>}
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 24 }}>
-                {/* Info Block */}
-                <div>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: 16 }}>
-                        Recibe notificaciones críticas en tiempo real sobre oportunidades de arbitraje en <strong>Polymarket</strong> y pools de alto rendimiento en <strong>DeFi</strong>.
-                    </p>
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: 12, border: '1px solid var(--az-border)' }}>
-                        <div className="az-label" style={{ fontSize: 8, marginBottom: 6 }}>INSTRUCCIONES</div>
-                        <ol style={{ paddingLeft: 16, fontSize: 9, color: 'rgba(255,255,255,0.4)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <li>Busca <code>@userinfobot</code> en Telegram.</li>
-                            <li>Obtén tu <strong>Chat ID</strong> numérico.</li>
-                            <li>Pégalo aquí para vincular tu wallet.</li>
-                        </ol>
-                    </div>
-                </div>
-
-                {/* Form Block */}
-                <form onSubmit={connect} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {!config?.configured ? (
-                        <>
-                            <div className="az-label" style={{ fontSize: 8 }}>CHAT ID DE TELEGRAM</div>
-                            <input 
-                                type="text" 
-                                placeholder="Ej: 123456789" 
-                                value={chatId} 
-                                onChange={e => setChatId(e.target.value)}
-                                className="az-input"
-                                required
-                            />
-                        </>
-                    ) : (
-                        <div style={{ background: 'rgba(224,255,0,0.03)', border: '1px dashed var(--az-lime-glow)', padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <div className="az-label" style={{ fontSize: 8 }}>VINCULADO A</div>
-                                <div className="az-value-sm" style={{ fontFamily: 'var(--font-mono)' }}>{config.chatId}</div>
-                            </div>
-                            <button type="button" onClick={disconnect} className="az-btn-ghost" style={{ padding: 6, border: 'none' }}>
-                                <Trash2 size={14} color="var(--az-rose)" />
-                            </button>
-                        </div>
-                    )}
-
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        <div style={{ flex: 1 }}>
-                            <div className="az-label" style={{ fontSize: 8, marginBottom: 4 }}>MIN APY %</div>
-                            <select className="az-select" style={{ width: '100%' }} value={minApy} onChange={e => setMinApy(+e.target.value)}>
-                                {[5, 10, 20, 50, 100].map(v => <option key={v} value={v}>{v}%+</option>)}
-                            </select>
-                        </div>
-                        <div style={{ flex: 1 }}>
-                            <div className="az-label" style={{ fontSize: 8, marginBottom: 4 }}>SIGNALS</div>
-                            <button 
-                                type="button"
-                                onClick={() => setEvSignals(!evSignals)}
-                                className="az-btn-ghost" 
-                                style={{ width: '100%', padding: '6px 0', borderColor: evSignals ? 'var(--az-lime)' : 'var(--az-border)' }}
-                            >
-                                {evSignals ? 'ON' : 'OFF'}
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" disabled={loading} className="az-btn-primary" style={{ width: '100%', marginTop: 8 }}>
-                        {loading ? 'CONECTANDO...' : config?.configured ? 'GUARDAR CAMBIOS' : 'ACTIVAR ALERTAS'}
-                    </button>
-                </form>
-            </div>
-
-            {status && (
-                <div style={{ marginTop: 16, padding: '10px 14px', background: status.type === 'success' ? 'rgba(0,232,122,0.1)' : 'rgba(255,64,96,0.1)', border: `1px solid ${status.type === 'success' ? 'var(--az-emerald)' : 'var(--az-rose)'}`, color: status.type === 'success' ? 'var(--az-emerald)' : 'var(--az-rose)', fontSize: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {status.type === 'success' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
-                    {status.msg}
-                </div>
-            )}
-        </div>
+      <div className="flex items-center justify-center py-10 gap-3 text-[#888888]">
+        <Loader2 size={16} className="animate-spin" />
+        <span className="text-[10px] font-mono uppercase tracking-widest">Loading config…</span>
+      </div>
     );
+  }
+
+  const isActive = config?.configured;
+
+  return (
+    <div className="space-y-6">
+      {/* ── Status Banner ── */}
+      <div className={`flex items-center justify-between px-5 py-4 rounded-2xl border ${
+        isActive
+          ? 'bg-[#00C076]/5 border-[#00C076]/25'
+          : 'bg-[#FAF9F6] border-[#E5E5E5]'
+      }`}>
+        <div className="flex items-center gap-3">
+          {isActive
+            ? <Bell size={16} className="text-[#00C076]" />
+            : <BellOff size={16} className="text-[#888888]" />
+          }
+          <div>
+            <p className={`text-[11px] font-black uppercase tracking-widest ${isActive ? 'text-[#00C076]' : 'text-[#888888]'}`}>
+              {isActive ? 'Telegram Alerts Active' : 'Telegram Not Connected'}
+            </p>
+            {isActive && config?.chatId && (
+              <p className="text-[9px] font-mono text-[#888888] mt-0.5">Chat: {config.chatId}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {isActive && (
+            <button
+              onClick={() => setConfirmDel(true)}
+              className="p-2 rounded-lg text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 transition-all"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+          <button
+            onClick={fetchConfig}
+            className="p-2 rounded-lg text-[#888888] hover:text-[#050505] hover:bg-black/5 transition-all"
+          >
+            <RefreshCw size={13} />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Delete Confirmation ── */}
+      <AnimatePresence>
+        {confirmDel && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="bg-[#FF3B30]/5 border border-[#FF3B30]/20 rounded-2xl p-5 space-y-3"
+          >
+            <p className="text-[11px] font-black text-[#FF3B30] uppercase tracking-widest flex items-center gap-2">
+              <AlertCircle size={13} /> Confirm deactivation
+            </p>
+            <p className="text-[10px] text-[#888888] font-mono">
+              This will remove your Telegram Chat ID from the system. You won't receive any more whale alerts until you reconnect.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmDel(false)}
+                className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest border border-[#E5E5E5] rounded-xl text-[#888888] hover:border-[#050505] hover:text-[#050505] transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDisconnect}
+                disabled={loading}
+                className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest bg-[#FF3B30] text-white rounded-xl hover:bg-[#D32F2F] transition-all active:scale-95 disabled:opacity-50"
+              >
+                {loading ? 'Removing…' : 'Yes, Disconnect'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Setup Guide (only when not configured) ── */}
+      {!isActive && (
+        <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5">
+          <p className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-3">
+            Setup Guide — 3 Steps
+          </p>
+          <ol className="space-y-3">
+            {[
+              { n: '01', text: 'Open Telegram and search for ', link: '@BotFather', href: 'https://t.me/BotFather' },
+              { n: '02', text: 'Start a chat with the Whale Alert bot (ask the team for the bot username)' },
+              { n: '03', text: 'Open ', link: '@userinfobot', href: 'https://t.me/userinfobot', suffix: ' to get your numeric Chat ID' },
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="text-[9px] font-black font-mono text-[#888888] mt-0.5 shrink-0 w-5">{step.n}</span>
+                <p className="text-[10px] text-[#888888] font-mono leading-relaxed">
+                  {step.text}
+                  {step.link && (
+                    <a
+                      href={step.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#0088cc] hover:underline inline-flex items-center gap-0.5"
+                    >
+                      {step.link} <ExternalLink size={9} />
+                    </a>
+                  )}
+                  {step.suffix ?? ''}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {/* ── Main Form ── */}
+      <form onSubmit={handleConnect} className="space-y-4">
+        {/* Chat ID input (only when not yet configured) */}
+        {!isActive && (
+          <div>
+            <label className="block text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">
+              Your Telegram Chat ID
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="e.g. 123456789"
+              value={chatId}
+              onChange={e => setChatId(e.target.value.replace(/[^\d-]/g, ''))}
+              className="w-full px-4 py-3 rounded-xl border border-[#E5E5E5] bg-white text-[12px] font-mono text-[#050505] placeholder-[#CCCCCC] focus:outline-none focus:border-[#050505] transition-colors"
+              required={!isActive}
+            />
+            <p className="text-[9px] font-mono text-[#CCCCCC] mt-1.5">
+              Numeric ID from @userinfobot · Can be negative for groups
+            </p>
+          </div>
+        )}
+
+        {/* Alert filters */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">
+              Min APY Threshold
+            </label>
+            <select
+              value={minApy}
+              onChange={e => setMinApy(Number(e.target.value))}
+              className="w-full px-3 py-2.5 rounded-xl border border-[#E5E5E5] bg-white text-[11px] font-black text-[#050505] focus:outline-none focus:border-[#050505] transition-colors cursor-pointer"
+            >
+              {[5, 10, 20, 50, 100, 200].map(v => (
+                <option key={v} value={v}>{v}% and above</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">
+              EV Signals
+            </label>
+            <button
+              type="button"
+              onClick={() => setEvSignals(v => !v)}
+              className={`w-full py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${
+                evSignals
+                  ? 'bg-[#050505] border-[#050505] text-white'
+                  : 'bg-white border-[#E5E5E5] text-[#888888] hover:border-[#050505]'
+              }`}
+            >
+              {evSignals ? '✓ Enabled' : 'Disabled'}
+            </button>
+          </div>
+        </div>
+
+        {/* What you'll receive */}
+        <div className="bg-[#FAF9F6] border border-[#F0F0F0] rounded-xl px-4 py-3">
+          <p className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">You'll Receive Alerts For</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {[
+              '🐋 Whale movements > $1M',
+              '📈 Price threshold breaks',
+              evSignals ? '⚡ EV Polymarket signals' : null,
+              minApy <= 50 ? `💰 DeFi APY ≥ ${minApy}%` : null,
+              '🔔 Liquidation warnings',
+              '📊 Daily digest at 08:00 UTC',
+            ].filter(Boolean).map((item, i) => (
+              <p key={i} className="text-[9px] font-mono text-[#888888]">{item}</p>
+            ))}
+          </div>
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading || (!chatId.trim() && !isActive)}
+          className="w-full py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.25em] transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          style={{
+            background: isActive ? '#050505' : '#050505',
+            color: '#fff',
+          }}
+        >
+          {loading
+            ? <><Loader2 size={14} className="animate-spin" /> Processing…</>
+            : isActive
+            ? <><CheckCircle2 size={14} /> Save Changes & Send Test</>
+            : <><Send size={14} /> Activate Telegram Alerts</>
+          }
+        </button>
+      </form>
+    </div>
+  );
 }
