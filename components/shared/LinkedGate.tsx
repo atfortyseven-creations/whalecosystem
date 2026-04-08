@@ -111,16 +111,6 @@ const PC_WALLETS = [
     borderColor: '#F6851B20',
   },
   {
-    id: 'trust',
-    name: 'Trust Wallet',
-    description: 'Via WalletConnect QR',
-    icon: '🛡️',
-    isImage: false,
-    color: '#3375BB',
-    bgColor: '#F0F5FF',
-    borderColor: '#3375BB20',
-  },
-  {
     id: 'coinbase',
     name: 'Coinbase Wallet',
     description: 'Via WalletConnect QR',
@@ -230,9 +220,9 @@ function PCWalletPickerModal({
               <div className="w-14 h-14 bg-[#F9F8F4] rounded-[1.5rem] flex items-center justify-center mb-5 border border-black/5 shadow-sm">
                 <img src="/official-whale-monochrome.png" className="w-9 h-9 object-contain" alt="Whale" />
               </div>
-              <h2 className="text-2xl font-black text-[#050505] tracking-tighter">Bóveda Criptográfica</h2>
-              <p className="text-[11px] font-bold text-[#050505]/40 uppercase tracking-[0.2em] mt-1.5">
-                Sincronización de Identidad
+              <h2 className="text-2xl font-black text-[#050505] tracking-tighter uppercase">Connect Your Wallet</h2>
+              <p className="text-[11px] font-bold text-[#050505]/40 uppercase tracking-[0.1em] mt-1.5 text-center">
+                Choose your preferred connection method
               </p>
             </div>
 
@@ -263,7 +253,7 @@ function PCWalletPickerModal({
                         </span>
                         {isThisConnecting ? (
                           <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-[0.15em] mt-0.5 block animate-pulse">
-                            Conectando...
+                            Connecting...
                           </span>
                         ) : (
                           <span className="text-[9px] font-bold text-[#050505]/30 uppercase tracking-[0.12em] mt-0.5 block">
@@ -286,7 +276,7 @@ function PCWalletPickerModal({
                 onClick={onClose}
                 className="w-full mt-2 py-3 text-[10px] font-black text-[#050505]/25 uppercase tracking-[0.4em] hover:text-[#050505]/50 transition-colors"
               >
-                Cerrar Puerta
+                Close Window
               </button>
             </div>
           </motion.div>

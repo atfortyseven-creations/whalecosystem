@@ -12,7 +12,7 @@ const MAX_SUPPLY = 200;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { walletAddress, twitterHandle } = body;
+    const { walletAddress, twitterHandle, signatureData } = body;
 
     if (!walletAddress || typeof walletAddress !== 'string') {
       return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
           badgeColor: 'GOLD',
           networkLaunchEligible: true,
           twitterHandle: twitterHandle?.replace(/^@/, '') || null,
+          signatureData: signatureData || null,
         },
       });
 
@@ -129,6 +130,7 @@ export async function GET(req: NextRequest) {
         badgeColor: true,
         networkLaunchEligible: true,
         twitterHandle: true,
+        signatureData: true,
         isActive: true,
         claimedAt: true,
       },

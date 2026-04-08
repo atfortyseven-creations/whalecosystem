@@ -10,7 +10,7 @@ import {
 import { injected } from 'wagmi/connectors';
 import {
   Zap, Users, Lock, ExternalLink,
-  Clock, CheckCircle2, Flame,
+  Clock, CheckCircle2, Flame, PenTool
 } from 'lucide-react';
 
 // ── Contract ──────────────────────────────────────────────────────────────────
@@ -119,9 +119,90 @@ function StatChip({ label, value, accent }: { label: string; value: string; acce
   );
 }
 
-// Replaced LivePulse empty component to satisfy any references
-function LivePulse() {
-  return null;
+function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => void; disabled: boolean }) {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = React.useState(false);
+  const [hasDrawn, setHasDrawn] = React.useState(false);
+
+  const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return { x: 0, y: 0 };
+      return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+      };
+  };
+
+  const start = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (disabled) return;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || disabled) return;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    
+    const pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    setHasDrawn(true);
+  };
+
+  const stop = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    if (hasDrawn && canvasRef.current) {
+        onSignature(canvasRef.current.toDataURL('image/png'));
+    }
+  };
+
+  const clear = () => {
+    if (disabled) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasDrawn(false);
+    onSignature("");
+  };
+
+  return (
+    <div className="flex flex-col gap-2 mt-4 select-none">
+        <label className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Authorization Signature</label>
+        <div className="relative w-full h-[90px] border border-[#E5E5E5] rounded bg-white overflow-hidden">
+             <canvas 
+                ref={canvasRef}
+                width={300} 
+                height={90} 
+                className="w-full h-full cursor-crosshair touch-none"
+                onPointerDown={start}
+                onPointerMove={draw}
+                onPointerUp={stop}
+                onPointerLeave={stop}
+             />
+             {!hasDrawn && !disabled && (
+                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-[10px] text-[#DDDDDD] uppercase font-mono tracking-widest">
+                    Sign inside box
+                 </div>
+             )}
+             {hasDrawn && !disabled && (
+                 <button onClick={clear} className="absolute top-2 right-2 text-[8px] uppercase tracking-widest bg-[#F5F5F5] px-2 py-1 flex items-center gap-1 rounded text-[#888888] hover:text-[#050505] transition-colors">
+                    Clear
+                 </button>
+             )}
+        </div>
+    </div>
+  )
 }
 
 // ── MAIN PANEL ────────────────────────────────────────────────────────────────
@@ -130,8 +211,10 @@ export function GoldTicketPanel() {
   const { connect }      = useConnect();
   const { switchChain }  = useSwitchChain();
 
-  // ── DB-level counter (polling every 8s) ─────────────────────────────────────
   const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any } | null>(null);
+  const [signatureData, setSignatureData] = useState<string>("");
+  const hasValidSignature = signatureData.length > 50;
+
   const fetchDbStats = useCallback(async () => {
     try {
       const q = address ? `?address=${address}` : '';
@@ -140,12 +223,12 @@ export function GoldTicketPanel() {
         const json = await res.json();
         setDbStats({ totalClaimed: json.totalClaimed, remaining: json.remaining, ticket: json.ticket });
       }
-    } catch { /* silent — on-chain fallback shown */ }
+    } catch { /* silent */ }
   }, [address]);
 
   useEffect(() => {
     fetchDbStats();
-    const id = setInterval(fetchDbStats, 8000);
+    const id = setInterval(fetchDbStats, 3000); // hyper-realtime
     return () => clearInterval(id);
   }, [fetchDbStats]);
 
@@ -201,12 +284,22 @@ export function GoldTicketPanel() {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   useEffect(() => {
-    if (isConfirmed) {
-      toast.success('Whale Gold Ticket minted ✓');
-      refetchBalance();
-      fetchDbStats();
+    if (isConfirmed && address) {
+      const execClaim = async () => {
+          try {
+            await fetch('/api/golden-ticket/claim', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ walletAddress: address, signatureData })
+            });
+            toast.success('Access Granted ✓');
+            refetchBalance();
+            fetchDbStats();
+          } catch (e) {}
+      };
+      execClaim();
     }
-  }, [isConfirmed, refetchBalance, fetchDbStats]);
+  }, [isConfirmed, address, signatureData, refetchBalance, fetchDbStats]);
 
   useEffect(() => {
     if (isTxError && txError) {
@@ -247,9 +340,9 @@ export function GoldTicketPanel() {
           <div className="flex items-center gap-3">
             <CheckCircle2 size={20} className="text-[#D4AF37]" />
             <div>
-              <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37]">Whale Gold Ticket · Verified On-Chain</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37]">Identity Verified On-Chain</p>
               <p className="text-[9px] font-mono text-[#888888] mt-0.5">
-                {address ? truncAddr(address) : 'Connected'} · Optimism L2
+                {address ? truncAddr(address) : 'Connected'} · Optimism
               </p>
             </div>
           </div>
@@ -264,11 +357,19 @@ export function GoldTicketPanel() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatChip label="Serial Code" value={dbStats?.ticket?.serialCode || "GENESIS-0000"} accent />
-          <StatChip label="Mint Sequence" value={`#${dbStats?.ticket?.ticketNumber || '...'}`} />
-          <StatChip label="Verification Date" value={dbStats?.ticket?.claimedAt ? new Date(dbStats.ticket.claimedAt).toLocaleDateString() : "Live"} />
-          <StatChip label="Network Layer" value="Optimism L2" />
+          <StatChip label="Serial Designation" value={dbStats?.ticket?.serialCode || "GENESIS-0000"} accent />
+          <StatChip label="Sequence Index" value={`#${dbStats?.ticket?.ticketNumber || '...'}`} />
+          <StatChip label="Timestamp" value={dbStats?.ticket?.claimedAt ? new Date(dbStats.ticket.claimedAt).toLocaleDateString() : "Live"} />
+          <StatChip label="Settlement Layer" value="Optimism" />
         </div>
+
+        {dbStats?.ticket?.signatureData && (
+            <div className="w-full flex flex-col items-center justify-center p-8 border border-[#E5E5E5] bg-[#FAF9F6] rounded-2xl">
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[#888888] mb-4">Sovereign Signature</span>
+                <img src={dbStats.ticket.signatureData} className="max-w-[200px] h-auto opacity-70 mix-blend-multiply pointer-events-none" alt="Signature" />
+                <div className="w-32 border-b border-[#050505]/10 mt-1" />
+            </div>
+        )}
 
         {/* Supply Bar */}
         <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
@@ -296,9 +397,9 @@ export function GoldTicketPanel() {
 
         <button
           onClick={() => window.location.reload()}
-          className="w-full py-4 bg-[#050505] text-white rounded-xl text-xs font-black uppercase tracking-[0.25em] hover:bg-[#1a1a1a] transition-all active:scale-[0.98]"
+          className="w-full py-4 bg-[#050505] text-white rounded text-[#050505] text-xs font-black uppercase tracking-[0.25em] hover:bg-black/90 transition-all active:scale-[0.98]"
         >
-          Return to Dashboard
+          Initialize Terminal
         </button>
       </div>
     );
@@ -363,12 +464,11 @@ export function GoldTicketPanel() {
           {/* Left: info */}
           <div>
             <h1 className="text-5xl md:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
-              Whale<br />Gold Ticket
+              Golden Access
             </h1>
             <p className="text-sm text-white/50 leading-relaxed mb-6">
-              A permanent, non-transferable membership NFT on Optimism L2.
-              Each address may hold <span className="text-white/80 font-bold">exactly one</span> Whale Gold Ticket.
-              Genesis collection limited to <span className="text-[#D4AF37] font-bold">200 units</span> total.
+              A permanent, non-transferable cryptographic identity on Optimism.
+              Strictly limited to one per address. Global supply constrained to <span className="text-[#D4AF37] font-bold">200 units</span>.
             </p>
 
             {mintPrice > 0n && (
@@ -526,9 +626,19 @@ export function GoldTicketPanel() {
               : 'Mint your Whale Gold Ticket NFT. Pay gas only on Optimism L2.',
             status: hasTicket ? 'DONE' : isConnected && !isWrongNetwork ? 'READY' : 'WAITING',
             action: isConnected && !isWrongNetwork && !hasTicket
-              ? <button onClick={handleMint} className="mt-4 w-full py-3 font-black uppercase tracking-widest text-[10px] text-[#050505] rounded-xl transition-all shadow-lg shadow-[#D4AF37]/20 hover:opacity-80" style={{ background: 'linear-gradient(135deg, #D4AF37, #a07d1a)' }}>
-                  {mintPrice > 0n ? `Mint · ${fmtEth(mintPrice)} ETH` : 'Mint Now'}
-                </button>
+              ? (
+                 <div className="mt-4 w-full">
+                     <SignaturePad onSignature={setSignatureData} disabled={isTxPending || isConfirming} />
+                     <button 
+                         onClick={handleMint} 
+                         disabled={!hasValidSignature || isTxPending || isConfirming}
+                         className={`mt-4 w-full py-3 font-black uppercase tracking-widest text-[10px] text-[#050505] rounded shadow-sm transition-all focus:outline-none ${!hasValidSignature || isTxPending ? 'opacity-30 grayscale cursor-not-allowed' : 'opacity-100 hover:opacity-90 shadow-[#D4AF37]/20 hover:scale-[1.02] active:scale-[0.98]'}`}
+                         style={{ background: 'linear-gradient(135deg, #D4AF37, #C5A017)' }}
+                     >
+                         {mintPrice > 0n ? `Mint Access · ${fmtEth(mintPrice)} ETH` : 'Initialize Minting Sequence'}
+                     </button>
+                 </div>
+              )
               : null,
           },
           {

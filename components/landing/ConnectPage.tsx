@@ -145,12 +145,7 @@ export default function ConnectPage() {
       {/* ── Header ── */}
       <header className="relative z-10 flex items-center justify-between px-6 py-5 border-b border-black/[0.06] dark:border-white/[0.06]">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-[#050505] dark:bg-white rounded-lg flex items-center justify-center">
-            <Zap size={14} className="text-[#D4AF37]" />
-          </div>
-          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#050505] dark:text-white">
-            Whale Alert Network
-          </span>
+          <span className="text-2xl">🐳</span>
         </div>
         <span className="text-[9px] font-mono text-[#CCCCCC] uppercase tracking-widest">
           Secure Connection
@@ -207,7 +202,6 @@ export default function ConnectPage() {
                     transition={{ delay: 0.1 }}
                     className="text-[9px] font-black uppercase tracking-[0.5em] text-[#D4AF37]"
                   >
-                    Institutional Access
                   </motion.p>
                   <motion.h1
                     initial={{ opacity: 0, y: 8 }}
@@ -236,7 +230,6 @@ export default function ConnectPage() {
                       { id: 'metamask', name: 'MetaMask', logo: '/wallets/metamask.svg', handler: handleInjected, badge: 'Native' },
                       { id: 'coinbase', name: 'Coinbase', logo: '/wallets/coinbase.png', handler: handleQR, badge: 'Smart' },
                       { id: 'rainbow', name: 'Rainbow', logo: '/wallets/rainbow.png', handler: handleQR, badge: 'Mobile' },
-                      { id: 'rabby', name: 'Rabby', logo: '/wallets/rabby.svg', handler: handleInjected, badge: 'Pro' },
                     ].map((w, i) => (
                       <motion.button
                         key={w.id}
@@ -285,32 +278,7 @@ export default function ConnectPage() {
 
                 </div>
 
-                {/* Divider */}
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 h-px bg-[#E5E5E5] dark:bg-white/10" />
-                  <span className="text-[9px] font-mono text-[#CCCCCC] uppercase tracking-widest">Security</span>
-                  <div className="flex-1 h-px bg-[#E5E5E5] dark:bg-white/10" />
-                </div>
 
-                {/* Security guarantees */}
-                <div className="space-y-2.5">
-                  {[
-                    { icon: <Shield size={11} />, text: "Non-custodial — your keys never leave your device" },
-                    { icon: <Zap size={11} />,    text: "Read-only access requested until you approve on-chain actions" },
-                    { icon: <Wallet size={11} />, text: "Signatures are verified on Optimism L2 only" },
-                  ].map((item, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 + i * 0.08 }}
-                      className="flex items-start gap-2.5"
-                    >
-                      <span className="mt-0.5 text-[#D4AF37] shrink-0">{item.icon}</span>
-                      <p className="text-[10px] text-[#888888] dark:text-white/30 font-mono leading-relaxed">{item.text}</p>
-                    </motion.div>
-                  ))}
-                </div>
 
                 {/* Supported wallets row */}
                 <motion.div
