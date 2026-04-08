@@ -1,26 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Activity, Box, ArrowRight, ArrowLeftRight, Clock, ShieldCheck, AlignLeft } from "lucide-react";
-
-const OMNI_BLOCKS = [
-    { height: 19823485, age: "12 secs ago", txs: 142, size: "1.2 MB", validator: "0xWhale...4A" },
-    { height: 19823484, age: "24 secs ago", txs: 210, size: "1.4 MB", validator: "0xDarkP...9B" },
-    { height: 19823483, age: "36 secs ago", txs: 94,  size: "0.8 MB", validator: "0xG5...A12" },
-    { height: 19823482, age: "48 secs ago", txs: 312, size: "2.1 MB", validator: "0xSystem...0" },
-    { height: 19823481, age: "1 min ago",   txs: 156, size: "1.1 MB", validator: "0xNull...44" },
-];
-
-const MASSIVE_TXS = [
-    { hash: "0x98A...F12C", age: "14 secs ago", from: "0xUnkn...88Z", to: "0xExch...1A", value: "24,500 ETH", type: "TRANSFER" },
-    { hash: "0x33B...090A", age: "29 secs ago", from: "0xPool...A11", to: "0xSmart...5", value: "12.4M USDC", type: "CONTRACT_CALL" },
-    { hash: "0x111...FFFF", age: "45 secs ago", from: "0xWhal...981", to: "0xBurn...00", value: "500 WBTC",  type: "BURN" },
-    { hash: "0x77C...AA12", age: "52 secs ago", from: "0xDark...P99", to: "0xMev...B0",  value: "4,200 ETH", type: "SWAP" },
-    { hash: "0x999...7777", age: "1 min ago",   from: "0xExch...02",  to: "0xWhal...54", value: "85M USDT",  type: "TRANSFER" },
-];
+import { usePublicClient, useBlockNumber } from 'wagmi';
+import { formatEther } from 'viem';
 
 export function OmniExplorer() {
     const [searchQuery, setSearchQuery] = useState("");
+    const publicClient = usePublicClient();
+    const { data: blockNumber } = useBlockNumber({ watch: true });
+    
+    const [blocks, setBlocks] = useState<any[]>([]);
+    const [massiveTxs, setMassiveTxs] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!publicClient || !blockNumber) return;
+
+        const fetchBlock = async () => {
+            try {
+                const block = await publicClient.getBlock({
+                    blockNumber: blockNumber,
+                    includeTransactions: true
+                });
+
+                const targetBlock = {
+                    height: Number(block.number),
+                    age: '0 secs ago',
+                    txs: block.transactions.length,
+                    size: (Number(block.size) / 1000000).toFixed(2) + ' MB',
+                    validator: block.miner ? (block.miner.substring(0,6) + '...' + block.miner.substring(38)) : '0xSync...'
+                };
+
+                setBlocks(prev => {
+                    const exists = prev.find(p => p.height === targetBlock.height);
+                    if (exists) return prev;
+                    return [targetBlock, ...prev].slice(0, 5);
+                });
+
+                const txs = block.transactions as any[];
+                // Filter large transactions
+                const valTxs = txs
+                    .filter((t: any) => t.value && t.value > 0n)
+                    .sort((a,b) => (a.value < b.value ? 1 : -1))
+                    .slice(0, 5);
+                
+                if (valTxs.length > 0) {
+                    const newMassive = valTxs.map(t => ({
+                        hash: t.hash.substring(0,6) + '...' + t.hash.substring(60),
+                        age: 'New Block',
+                        from: t.from.substring(0,6) + '...' + t.from.substring(38),
+                        to: t.to ? (t.to.substring(0,6) + '...' + t.to.substring(38)) : 'Contract',
+                        value: Number(formatEther(t.value)).toFixed(2) + ' ETH',
+                        type: 'TRANSFER'
+                    }));
+                    setMassiveTxs(prev => {
+                        const combined = [...newMassive, ...prev];
+                        return combined.slice(0, 5); // Keep top 5 latest large txs
+                    });
+                }
+
+            } catch (e) {
+                console.error('Failed to fetch block', e);
+            }
+        };
+
+        fetchBlock();
+    }, [blockNumber, publicClient]);
 
     return (
         <div className="min-h-full w-full bg-[#000000] text-[#FFFFFF] font-mono p-4 md:p-8 flex flex-col gap-12 selection:bg-[#00FF55] selection:text-black overflow-y-auto">
@@ -72,7 +117,10 @@ export function OmniExplorer() {
                     </div>
 
                     <div className="flex flex-col">
-                        {OMNI_BLOCKS.map((block, i) => (
+                        {blocks.length === 0 && (
+                            <div className="p-8 text-center text-[10px] text-[#555555] uppercase tracking-widest animate-pulse">Syncing Cryptographic Data...</div>
+                        )}
+                        {blocks.map((block, i) => (
                             <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b border-[#111111] hover:bg-[#050505] transition-colors gap-4 sm:gap-0">
                                 
                                 {/* Block ID & Time */}
@@ -115,7 +163,10 @@ export function OmniExplorer() {
                     </div>
 
                     <div className="flex flex-col">
-                        {MASSIVE_TXS.map((tx, i) => (
+                        {massiveTxs.length === 0 && (
+                            <div className="p-8 text-center text-[10px] text-[#555555] uppercase tracking-widest animate-pulse">Scanning Mempool...</div>
+                        )}
+                        {massiveTxs.map((tx, i) => (
                             <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b border-[#111111] hover:bg-[#050505] transition-colors gap-4 sm:gap-0">
                                 
                                 {/* TX Info */}

@@ -9,57 +9,37 @@ const PERFECTION_TOKENS = [
     "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "AVAX", "DOGE", "DOT", "LINK"
 ];
 
-interface PrecognitiveState {
-    gravityScore: number;
+interface LiveMarketState {
+    momentumScore: number;
     direction: 'BEARISH' | 'BULLISH' | 'NEUTRAL';
     targetPrice: number;
     currentPrice?: number;
-    institutionalVigorValue: number;
-    institutionalVigorPercent: number;
-    institutionalIsAccumulation: boolean;
-    polyConfluenceValue: number;
-    polyHasData: boolean;
+    volumeValue: number;
+    vigorPercent: number;
+    isAccumulation: boolean;
+    confluenceValue: number;
+    hasData: boolean;
     icebergs: any[];
     probabilityOfReversal: number;
     expectedMove: number;
 }
 
 function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
-    const [state, setState] = useState<PrecognitiveState | null>(null);
+    const [state, setState] = useState<LiveMarketState | null>(null);
     const [isHovered, setIsHovered] = useState(false);
     
     useEffect(() => {
         let isMounted = true;
         let timeoutId: NodeJS.Timeout;
 
-        const SEED = symbol.charCodeAt(0) + (symbol.charCodeAt(1) ?? 0);
-        const fallbackTimer = setTimeout(() => {
-            if (isMounted && !state) {
-                setState({
-                    gravityScore: 40 + (SEED % 50),
-                    direction: SEED % 2 === 0 ? 'BULLISH' : 'BEARISH',
-                    targetPrice: SEED * 412,
-                    currentPrice: SEED * 400 + (SEED % 100) + (Math.random() * 10),
-                    institutionalVigorValue: SEED * 1e6,
-                    institutionalVigorPercent: 30 + (SEED % 60),
-                    institutionalIsAccumulation: SEED % 3 !== 0,
-                    polyConfluenceValue: 0.5 + ((SEED % 40) / 100),
-                    polyHasData: false,
-                    icebergs: [],
-                    probabilityOfReversal: 15 + (SEED % 40),
-                    expectedMove: ((SEED % 20) - 10) / 2,
-                });
-            }
-        }, 3000);
-
         const fetchStream = async () => {
             try {
                 const response = await fetch(`/api/matrix/stream?asset=${symbol}`);
                 if (!response.ok) throw new Error("Stream connection failed");
                 const parsed = await response.json();
-                if (isMounted && parsed) setState(parsed as PrecognitiveState);
+                if (isMounted && parsed && !parsed.error) setState(parsed as LiveMarketState);
             } catch (err) {
-                // fall back to mock gracefully if stream is 404 to ensure visual perfection
+                // If it fails, we strictly do NOT fallback to fake data. Null state forces the UI to show 'Syncing...'
             } finally {
                 if (isMounted) {
                     timeoutId = setTimeout(fetchStream, 6000);
@@ -72,7 +52,6 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
         return () => { 
             isMounted = false; 
             clearTimeout(timeoutId);
-            clearTimeout(fallbackTimer);
         };
     }, [symbol]);
 
@@ -112,17 +91,17 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
             </td>
             <td className="py-5 px-6">
                 <div className="flex flex-col">
-                    <span className="text-xs text-[#050505] font-mono">${(state.institutionalVigorValue / 1e6).toFixed(1)}M</span>
+                    <span className="text-xs text-[#050505] font-mono">${(state.volumeValue / 1e6).toFixed(1)}M</span>
                     <span className="text-[9px] text-[#888888] uppercase tracking-[0.2em] mt-0.5">24h Vol</span>
                 </div>
             </td>
             <td className="py-5 px-6">
                 <div className="flex items-center gap-2">
-                    <span className={`text-xs font-mono ${state.institutionalIsAccumulation ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
-                        {state.institutionalVigorPercent.toFixed(0)}%
+                    <span className={`text-xs font-mono ${state.isAccumulation ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                        {state.vigorPercent.toFixed(0)}%
                     </span>
                     <span className="text-[9px] text-[#888888] uppercase tracking-[0.2em]">
-                        {state.institutionalIsAccumulation ? 'Accumulation' : 'Distribution'}
+                        {state.isAccumulation ? 'Buyers' : 'Sellers'}
                     </span>
                 </div>
             </td>
@@ -131,12 +110,12 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
                     <div className="flex-1 h-1 bg-[#E5E5E5] overflow-hidden w-24">
                         <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: `${Math.min(100, Math.max(0, state.gravityScore))}%` }}
+                            animate={{ width: `${Math.min(100, Math.max(0, state.momentumScore))}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
                             className={`h-full ${state.direction === 'BULLISH' ? 'bg-[#00C076]' : 'bg-[#FF3B30]'}`}
                         />
                     </div>
-                    <span className="text-[10px] font-mono text-[#050505] w-8">{(state.gravityScore / 10).toFixed(1)}G</span>
+                    <span className="text-[10px] font-mono text-[#050505] w-8">{state.momentumScore.toFixed(0)}</span>
                 </div>
             </td>
             <td className="py-5 px-6 text-right">
@@ -249,11 +228,11 @@ export function PremiumMatrixStack() {
                     <thead className="bg-[#FAF9F6] border-b-2 border-[#050505]">
                         <tr>
                             <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Asset Index</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Oracle Price</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Predicted Move</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Institutional Vol</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Whale Vector</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Gravity Score</th>
+                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Last Market Price</th>
+                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Realized 24h Move</th>
+                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Total 24h Vol</th>
+                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Spread Edge</th>
+                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Momentum RSI</th>
                             <th className="py-4 px-6 text-right text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Ops</th>
                         </tr>
                     </thead>

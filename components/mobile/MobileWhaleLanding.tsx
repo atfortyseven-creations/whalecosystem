@@ -85,7 +85,7 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
         .msv-hide-scrollbar::-webkit-scrollbar { display: none; }
         .msv-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .msv-dot-pattern {
-          background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+          background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
           background-size: 32px 32px;
           will-change: transform;
           transform: translateZ(0);
@@ -109,23 +109,9 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
-        
-        @keyframes subtle-breathe {
-          0%, 100% { transform: scale(1) translate(0, 0); }
-          50%      { transform: scale(1.05) translate(-1%, -1%); }
-        }
-        .bg-living-pattern {
-          background-image: url('/fluid-pink-wallpaper.jpg');
-          background-size: cover;
-          background-position: center;
-          animation: subtle-breathe 25s ease-in-out infinite;
-          will-change: transform;
-        }
       ` }} />
-      {/* Living Pink Fluid Pattern Background */}
-      <div className="fixed inset-0 z-0 overflow-hidden bg-[#FBC9C2]">
-        <div className="absolute inset-[-10%] bg-living-pattern opacity-95 mix-blend-multiply" />
-      </div>
+      {/* Zero-Trust Black Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden bg-[#000000]" />
       {/* Optional subtle dot overlay for depth */}
       <motion.div
         aria-hidden="true"

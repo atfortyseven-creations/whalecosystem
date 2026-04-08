@@ -77,9 +77,9 @@ function LiveMarketBand() {
                 <div key={i} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
                     <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{item.label}</span>
                     <div className="flex items-baseline gap-1">
-                        <span className="text-[10px] font-black font-mono text-[#050505] truncate">{item.value}</span>
+                        <span className="text-[10px] font-black font-mono text-white truncate">{item.value}</span>
                         {item.chg && (
-                            <span className={`text-[8px] font-black leading-none ${item.label === 'Fear/Greed' ? 'text-[#00C076]' : item.up ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                            <span className={`text-[8px] font-black leading-none ${item.label === 'Fear/Greed' ? 'text-[#00FF55]' : item.up ? 'text-[#00FF55]' : 'text-[#FF3B30]'}`}>
                                 {item.chg}
                             </span>
                         )}
@@ -106,12 +106,12 @@ export function WhaleProShell({
     const { setSettingsOpen } = useSettingsStore();
 
     return (
-        <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#050505]/10">
+        <div className="flex h-screen bg-[#000000] text-white overflow-hidden font-sans selection:bg-[#00FF55]/20">
             
             {/* ─── Persistent Pro Sidebar ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="h-full border-r border-[#E5E5E5] bg-[#FDFDFB] flex flex-col z-50 relative shadow-[10px_0_30px_rgba(0,0,0,0.02)]"
+                className="h-full border-r border-white/10 bg-[#000000] flex flex-col z-50 relative shadow-none"
             >
 
                 {/* Sidebar Navigation */}
@@ -129,7 +129,7 @@ export function WhaleProShell({
                                     </div>
                                 )}
                                 {item.dividerBefore && isCollapsed && (
-                                    <div className="my-2 mx-3 h-px bg-[#E5E5E5]/60"/>
+                                    <div className="my-2 mx-3 h-px bg-white/10"/>
                                 )}
                                 <button
                                     onClick={() => onTabChange(item.id)}
@@ -139,8 +139,8 @@ export function WhaleProShell({
                                         ${isGold && !isActive
                                             ? 'text-[#D4AF37] hover:bg-[#D4AF37]/10 border border-[#D4AF37]/20'
                                             : isActive
-                                                ? 'bg-[#050505] text-white shadow-md'
-                                                : 'text-[#888888] hover:text-[#050505] hover:bg-[#E5E5E5]/40'
+                                                ? 'bg-white/10 text-white shadow-md border border-white/20'
+                                                : 'text-[#888888] hover:text-white hover:bg-white/5'
                                         }
                                     `}
                                 >
@@ -173,7 +173,7 @@ export function WhaleProShell({
                 <div className="px-3 pb-3 pt-1">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="w-full flex items-center justify-center p-2 rounded-xl border border-[#E5E5E5] text-[#888888] hover:text-[#050505] hover:bg-[#E5E5E5]/30 transition-all"
+                        className="w-full flex items-center justify-center p-2 rounded-xl border border-white/10 text-[#888888] hover:text-white hover:bg-white/5 transition-all"
                     >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
@@ -184,31 +184,31 @@ export function WhaleProShell({
             <div className="flex-1 flex flex-col min-w-0 relative">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="h-[56px] border-b border-[#E5E5E5] bg-white flex items-center justify-between px-6 z-40 shrink-0 shadow-sm">
+                <header className="h-[56px] border-b border-white/10 bg-[#000000] flex items-center justify-between px-6 z-40 shrink-0 shadow-none">
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
                             type="text" value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                             placeholder="Search markets or addresses…"
-                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#050505] transition-all"
+                            className="w-full bg-[#000000] border border-white/10 text-white rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#00FF55] transition-all"
                         />
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-0 divide-x divide-[#E5E5E5] flex-1 mx-6 overflow-hidden">
+                    <div className="hidden lg:flex items-center gap-0 divide-x divide-white/10 flex-1 mx-6 overflow-hidden">
                         <LiveMarketBand />
                     </div>
 
                     <button
                         onClick={() => setSettingsOpen(true)}
                         title="Open Settings"
-                        className="shrink-0 p-2 rounded-xl border border-[#E5E5E5] hover:bg-[#E5E5E5]/30 text-[#888888] hover:text-[#050505] transition-all active:scale-95"
+                        className="shrink-0 p-2 rounded-xl border border-white/10 hover:bg-white/5 text-[#888888] hover:text-white transition-all active:scale-95"
                     >
                         <Settings size={16} />
                     </button>
                 </header>
 
-                <main className="flex-1 relative bg-[#FFFFFF] overflow-hidden flex flex-col">
+                <main className="flex-1 relative bg-[#000000] overflow-hidden flex flex-col">
                     <div className="flex-1 overflow-y-auto no-scrollbar">
                         <div className="p-8 max-w-[1600px] mx-auto w-full">
                             {children}
@@ -217,14 +217,14 @@ export function WhaleProShell({
                 </main>
 
                 {/* ─── Status Bar ─── */}
-                <footer className="h-8 border-t border-[#E5E5E5] bg-[#FDFDFB] flex items-center justify-between px-6 shrink-0">
+                <footer className="h-8 border-t border-white/10 bg-[#000000] flex items-center justify-between px-6 shrink-0">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Globe size={11} /> Global Latency: 12ms</span>
                         <span className="flex items-center gap-1.5"><Cpu size={11} /> Network Nodes: ACTIVE</span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Shield size={11} /> SSL: SECURE</span>
-                        <span className="text-[#050505]">© 2026 WHALECOSYSTEM CORP.</span>
+                        <span className="text-[#888888]">© 2026 WHALECOSYSTEM CORP.</span>
                     </div>
                 </footer>
             </div>
