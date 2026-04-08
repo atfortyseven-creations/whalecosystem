@@ -6,11 +6,11 @@ import { useSettingsStore } from '@/lib/store/settings-store';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { 
-    X, Moon, Sun, DollarSign, Globe2, Eye, EyeOff, Shield, 
-    Activity, Trash2, Network, ChevronRight, Settings2, Laptop, LogOut
+    X, Moon, Sun, DollarSign, Globe2, Shield, 
+    Network, ChevronRight, Settings2, Laptop, LogOut, Trash2, AlertTriangle
 } from 'lucide-react';
-
 import { useDisconnect } from 'wagmi';
+import { useUIStore } from '@/lib/store/ui-store';
 
 export function GlobalSettingsModal() {
     const { 
@@ -21,8 +21,10 @@ export function GlobalSettingsModal() {
 
     const { setTheme: setNextTheme } = useTheme();
     const { disconnect } = useDisconnect();
+    const { openConnectModal } = useUIStore();
 
     const [mounted, setMounted] = useState(false);
+    const [confirmDisconnect, setConfirmDisconnect] = useState(false);
     useEffect(() => setMounted(true), []);
 
     // Sync Zustand theme with next-themes DOM
@@ -35,15 +37,15 @@ export function GlobalSettingsModal() {
     if (!mounted) return null;
 
     const handleDisconnect = async () => {
-        if (confirm("Disconnect your wallet and return to the home page?")) {
-            try {
-                disconnect(); // wagmi v2: synchronous, no await needed
-            } catch(e) {}
-            localStorage.clear();
-            sessionStorage.clear();
-            await signOut({ redirect: false });
-            window.location.href = '/';
-        }
+        // Step 1: disconnect wagmi + clear storage
+        try { disconnect(); } catch {}
+        localStorage.clear();
+        sessionStorage.clear();
+        try { await signOut({ redirect: false }); } catch {}
+        setConfirmDisconnect(false);
+        setSettingsOpen(false);
+        // Step 2: open the connect wallet modal (with QR) so the user can reconnect
+        setTimeout(() => openConnectModal(), 300);
     };
 
     return (
@@ -195,23 +197,59 @@ export function GlobalSettingsModal() {
                                         </div>
                                         
                                         {/* Disconnect Account Button */}
-                                        <div className="flex items-center justify-between p-4 bg-[#FFF5F5] transition-colors border-t border-[#FF3B30]/10">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md border border-[#FF3B30]/30 bg-white flex items-center justify-center">
-                                                    <LogOut size={14} className="text-[#FF3B30]" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider">Disconnect Account</span>
-                                                    <span className="text-[9px] text-[#FF3B30]/80">End encrypted session</span>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={handleDisconnect}
-                                                className="px-4 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white shadow-sm hover:bg-[#D32F2F] transition-all active:scale-95"
+                                        <AnimatePresence mode="wait">
+                                        {!confirmDisconnect ? (
+                                            <motion.div
+                                                key="disconnect-idle"
+                                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                                className="flex items-center justify-between p-4 bg-[#FFF5F5] transition-colors border-t border-[#FF3B30]/10"
                                             >
-                                                Disconnect
-                                            </button>
-                                        </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-7 h-7 rounded-md border border-[#FF3B30]/30 bg-white flex items-center justify-center">
+                                                        <LogOut size={14} className="text-[#FF3B30]" />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider">Disconnect Account</span>
+                                                        <span className="text-[9px] text-[#FF3B30]/60">End session · Returns to wallet selector</span>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    onClick={() => setConfirmDisconnect(true)}
+                                                    className="px-4 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white shadow-sm hover:bg-[#D32F2F] transition-all active:scale-95"
+                                                >
+                                                    Disconnect
+                                                </button>
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="disconnect-confirm"
+                                                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                                                className="flex flex-col gap-3 p-4 bg-[#FF3B30]/5 border-t border-[#FF3B30]/20"
+                                            >
+                                                <div className="flex items-center gap-2 text-[10px] font-black text-[#FF3B30] uppercase tracking-widest">
+                                                    <AlertTriangle size={13} />
+                                                    Confirm Disconnect
+                                                </div>
+                                                <p className="text-[9px] text-[#888888] font-mono leading-relaxed">
+                                                    Your wallet will be disconnected. You'll be shown the wallet selector to reconnect via QR or extension.
+                                                </p>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setConfirmDisconnect(false)}
+                                                        className="flex-1 py-2 rounded-lg border border-[#E5E5E5] text-[9px] font-black uppercase text-[#888888] hover:border-[#050505] hover:text-[#050505] transition-all"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={handleDisconnect}
+                                                        className="flex-1 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white hover:bg-[#D32F2F] transition-all active:scale-95"
+                                                    >
+                                                        Yes, Disconnect
+                                                    </button>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                        </AnimatePresence>
                                     </div>
                                 </section>
                             </div>

@@ -11,8 +11,6 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useSWR from "swr";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-
 gsap.registerPlugin(ScrollTrigger);
 
 const DynamicCryptoCheckoutModal = dynamic(
@@ -132,12 +130,6 @@ export function WhaleAlertLanding() {
   return (
     <div ref={containerRef} className="relative w-full overflow-x-hidden bg-white dark:bg-black text-black dark:text-white font-sans transition-colors duration-300">
       
-      {/* ── HEADER WITH TOGGLE ── */}
-      <header className="absolute top-0 w-full flex items-center justify-between p-6 z-50">
-          <div className="font-black text-xl font-aztec-serif uppercase tracking-tight"></div>
-          <ThemeToggle />
-      </header>
-
       {/* ── HERO ── */}
       <section className="relative flex flex-col items-center justify-center min-h-[90vh]">
         {/* CRT GRID */}

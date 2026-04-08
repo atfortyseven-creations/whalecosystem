@@ -3,47 +3,62 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { motion } from "framer-motion";
 
+// GPU-accelerated theme toggle — zero Framer overhead, CSS transform only
+// will-change + transform3d forces compositing layer for 60fps flicker-free swap
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
-  // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
+  // Placeholder: same size, no layout shift while mounting
   if (!mounted) {
-    return (
-      <div className="w-10 h-10 border border-black/10 dark:border-white/10 rounded-full bg-white/5" />
-    );
+    return <div className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 bg-transparent shrink-0" aria-hidden />;
   }
 
-  const isDark = theme === "dark";
-
   return (
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+    <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative flex items-center justify-center w-10 h-10 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-black text-black dark:text-white transition-colors duration-300 shadow-sm"
-      aria-label="Toggle Theme"
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className="
+        relative flex items-center justify-center
+        w-10 h-10 rounded-full shrink-0
+        border border-black/10 dark:border-white/10
+        bg-white dark:bg-black
+        text-black dark:text-white
+        shadow-sm
+        [transition:background-color_250ms_ease,border-color_250ms_ease,transform_120ms_ease]
+        hover:scale-105 active:scale-95
+        will-change-transform
+      "
+      style={{ WebkitFontSmoothing: 'antialiased' }}
     >
-      <div className="relative w-5 h-5 flex items-center justify-center">
-        <Sun
-          className={`absolute transition-all duration-500 ease-in-out ${
-            isDark ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
-          }`}
-          size={18}
-        />
-        <Moon
-          className={`absolute transition-all duration-500 ease-in-out ${
-            isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
-          }`}
-          size={18}
-        />
-      </div>
-    </motion.button>
+      {/* Sun icon */}
+      <Sun
+        size={17}
+        strokeWidth={2}
+        aria-hidden
+        className="absolute [transition:opacity_220ms_ease,transform_220ms_ease]"
+        style={{
+          opacity: isDark ? 0 : 1,
+          transform: isDark ? 'rotate(90deg) scale(0.5)' : 'rotate(0deg) scale(1)',
+          willChange: 'transform, opacity',
+        }}
+      />
+      {/* Moon icon */}
+      <Moon
+        size={17}
+        strokeWidth={2}
+        aria-hidden
+        className="absolute [transition:opacity_220ms_ease,transform_220ms_ease]"
+        style={{
+          opacity: isDark ? 1 : 0,
+          transform: isDark ? 'rotate(0deg) scale(1)' : 'rotate(-90deg) scale(0.5)',
+          willChange: 'transform, opacity',
+        }}
+      />
+    </button>
   );
 }
