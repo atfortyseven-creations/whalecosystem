@@ -11,6 +11,7 @@ import { ConnectWalletModal } from '@/components/shared/ConnectWalletModal';
 import { GlobalTokenTicker } from '@/components/shared/GlobalTokenTicker';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
+import { MobileNavBar } from '@/components/layout/MobileNavBar';
 import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
 import { LinkedGate } from '@/components/shared/LinkedGate';
@@ -104,6 +105,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         pathname.startsWith('/ticket') ||
                         pathname.startsWith('/news')
                     ) && <Downhead />}
+                    
+                    <MobileNavBar />
                 </div>
             </TitaniumGate>
         </>

@@ -137,31 +137,26 @@
 
   body {
     background-color: var(--bg-page);
-    color: var(--text-primary);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* Sane minimum width: never go below 320px (smallest iPhone SE) */
     min-width: 320px;
     overflow-x: hidden;
     overflow-y: auto;
 
-    /* iOS safe-area support (notch / home bar) */
     padding-left:   env(safe-area-inset-left);
     padding-right:  env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
 
-    /* iOS momentum scroll */
     -webkit-overflow-scrolling: touch;
-
-    /* Prevent accidental pinch-zoom while allowing pan — handled by viewport meta */
     touch-action: pan-x pan-y;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     user-select: text;
 
-    @apply antialiased bg-[var(--bg-page)] text-[var(--aztec-ink)] cursor-default transition-colors duration-300;
+    @apply antialiased transition-colors duration-300;
+    @apply bg-white dark:bg-[#000000] text-black dark:text-white;
   }
 
   ::selection {
@@ -588,6 +583,32 @@
   left: -30vw !important;
   top: -30vh !important;
   filter: blur(80px) saturate(2) brightness(1.1) !important;
+}
+
+/* =============================================
+   AZTEC PATTERN & PIXEL DEFORMATION
+   ============================================= */
+
+.bg-aztec-pattern {
+  background-image: 
+    linear-gradient(45deg, currentcolor 25%, transparent 25%, transparent 75%, currentcolor 75%, currentcolor),
+    linear-gradient(45deg, currentcolor 25%, transparent 25%, transparent 75%, currentcolor 75%, currentcolor);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  opacity: 0.05;
+}
+
+@keyframes pixel-deform {
+  0%   { filter: hue-rotate(0deg) saturate(1.5) contrast(1.2) drop-shadow(4px 4px 0 rgba(255,0,255,0.2)); transform: scale(1.0) skewX(0deg); }
+  25%  { filter: hue-rotate(90deg) saturate(2.5) contrast(1.4) drop-shadow(-4px -4px 0 rgba(0,255,255,0.2)); transform: scale(1.02) skewX(1deg); }
+  50%  { filter: hue-rotate(180deg) saturate(1) contrast(1.8) drop-shadow(4px -4px 0 rgba(255,255,0,0.2)); transform: scale(0.98) skewX(-1deg); }
+  75%  { filter: hue-rotate(270deg) saturate(2) contrast(1) drop-shadow(-4px 4px 0 rgba(255,0,0,0.2)); transform: scale(1.03) skewX(0.5deg); }
+  100% { filter: hue-rotate(360deg) saturate(1.5) contrast(1.2) drop-shadow(4px 4px 0 rgba(255,0,255,0.2)); transform: scale(1.0) skewX(0deg); }
+}
+
+.animate-pixel-deform {
+  animation: pixel-deform 8s steps(5) infinite !important;
+  will-change: filter, transform !important;
 }
 
 /* ============================================================

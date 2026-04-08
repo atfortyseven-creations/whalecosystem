@@ -115,7 +115,7 @@ export function GoldTicketPanel() {
             address: ACCESS_PASS_ADDRESS as `0x${string}`,
             abi: ACCESS_PASS_ABI,
             functionName: 'mint',
-            value: mintPrice,
+            ...(mintPrice > 0n ? { value: mintPrice } : {})
         });
     };
 
