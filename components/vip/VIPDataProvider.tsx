@@ -23,7 +23,7 @@ const INTERVALS = {
     mempool:      10_000,  // 10s — mempool.space
     funding:      6_000,   // 6s  — Binance+Bybit
     liquidations: 5_000,   // 5s  — Binance Futures
-    liveNetwork:  8_000,   // 8s  — Live On-Chain (ETH Block, Gas, Chainlink)
+    liveNetwork:  8_000,   // 8s  — Network Oracle (ETH Block, Gas, Chainlink)
     topWhales:    60_000,  // 60s — blockchain.info (heavy)
     satoshi:      120_000, // 120s — Batch mode
     volume:       20_000,  // 20s — Inflow/Outflow
@@ -123,7 +123,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         } catch {}
     };
 
-    // ── 6. LIVE ON-CHAIN METRICS (ETH Block, Gas, Chainlink) ──
+    // ── 6. NETWORK ORACLE METRICS (ETH Block, Gas, Chainlink) ──
     const pollLiveNetwork = async () => {
         try {
             const res = await fetch('/api/network/live');
