@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
-import { ExternalEmbed }           from '@/components/dashboard/ExternalEmbed';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 
 // ── Internal panels ───────────────────────────────────────────────────────────
@@ -26,9 +25,8 @@ import { BRCExplorerShell }        from '@/components/bsv/BRCExplorerShell';
 import { ZKShieldStation }         from '@/components/dashboard/ZKShieldStation';
 import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
 import { SovereignVault }          from '@/components/dashboard/SovereignVault';
-
-// ── Icons for external-embed pages ────────────────────────────────────────────
-import { Crown, GraduationCap, LifeBuoy, PieChart, Briefcase } from 'lucide-react';
+import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
+import PortfolioDashboard          from '@/components/dashboard/PortfolioDashboard';
 
 import "@/app/dashboard/dashboard.css";
 
@@ -52,44 +50,6 @@ type TabId =
     | 'zk-shield'
     | 'neural-graph'
     | 'sovereign-vault';
-
-// ── External page definitions ─────────────────────────────────────────────────
-const EXTERNAL_PAGES: Partial<Record<TabId, {
-    url:         string;
-    title:       string;
-    icon:        React.ReactNode;
-    accentColor: string;
-    description: string;
-}>> = {
-    'academy': {
-        url:         'https://www.humanidfi.com/academy',
-        title:       'Whale Academy',
-        icon:        <GraduationCap size={16}/>,
-        accentColor: '#627EEA',
-        description: 'Professional-grade crypto education: whale intelligence, DeFi, API tools, and portfolio management.',
-    },
-    'support': {
-        url:         'https://www.humanidfi.com/support',
-        title:       'Whale Support',
-        icon:        <LifeBuoy size={16}/>,
-        accentColor: '#0052FF',
-        description: 'Open tickets, browse the FAQ, and reach the support team directly.',
-    },
-    'humanidfi-portfolio': {
-        url:         'https://www.humanidfi.com/portfolio',
-        title:       'Whale Portfolio',
-        icon:        <Briefcase size={16}/>,
-        accentColor: '#00C076',
-        description: 'Manage and connect your premium portfolio directly via HumanIDFi.',
-    },
-    'gold-ticket': {
-        url:         'https://www.humanidfi.com/ticket',
-        title:       'Whale Access Ticket',
-        icon:        <Crown size={16}/>,
-        accentColor: '#D4AF37',
-        description: 'Claim your one-time permanent pass granting lifetime access to the entire platform.',
-    },
-};
 
 export default function WhaleDashboard() {
     const [activeTab, setActiveTab] = useState<TabId>('dashboard');
@@ -124,7 +84,7 @@ export default function WhaleDashboard() {
                       : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
                       : activeTab === 'brc-explorer'         ? <DashboardErrorBoundary key="brc">            <BRCExplorerShell />     </DashboardErrorBoundary>
                       : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
-                      : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <WhalePortfolio />       </DashboardErrorBoundary>
+                      : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <PortfolioDashboard />   </DashboardErrorBoundary>
                       : activeTab === 'gold-ticket'          ? <DashboardErrorBoundary key="gold">           <GoldTicketPanel />      </DashboardErrorBoundary>
                       : activeTab === 'zk-shield'            ? <DashboardErrorBoundary key="zk-shield">      <ZKShieldStation />      </DashboardErrorBoundary>
                       : activeTab === 'neural-graph'         ? <DashboardErrorBoundary key="neural-graph">   <EntityGraphVis />       </DashboardErrorBoundary>

@@ -39,6 +39,9 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
 
     const [previousAssets, setPreviousAssets] = useState<string[]>([]);
     const [newAssetIds, setNewAssetIds] = useState<Set<string>>(new Set());
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
 
     // 1. SYNC DATA
     useEffect(() => {
@@ -65,7 +68,9 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
 
     const isProfit = totalChange24h >= 0;
 
-    // 3. DISCONNECTED STATE
+    // 3. MOUNT & DISCONNECTED STATE
+    if (!mounted) return null;
+    
     if (!isConnected) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 relative">

@@ -157,6 +157,10 @@ export default function PolymarketPanel() {
         }
     };
 
+    if (!mounted) {
+        return <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FFFFFF] items-center justify-center"><Loader2 size={32} className="animate-spin text-[#E5E5E5]" /></div>;
+    }
+
     return (
         <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FFFFFF] text-[#111111] font-sans">
             {/* Controls */}

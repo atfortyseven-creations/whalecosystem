@@ -12,6 +12,8 @@ export function LivePortfolio() {
     const { isConnected: isWagmiConnected } = useAccount();
     const { address: eoaAddress } = useSovereignAccount();
     const { address: sovereignAddress } = useWalletStore();
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
     
     const isConnected = isWagmiConnected || !!eoaAddress || !!sovereignAddress;
     const { 
@@ -24,6 +26,15 @@ export function LivePortfolio() {
         isLoading,
         liveTick 
     } = useLivePortfolio();
+
+    if (!mounted) {
+        return (
+            <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] shadow-sm max-w-4xl mx-auto mt-8 animate-pulse text-center">
+                <RefreshCcw size={32} className="text-[#888888] animate-spin mb-4 mx-auto" />
+                <span className="text-sm font-black uppercase text-[#888888] tracking-widest">INITIALIZING SECURE VAULT...</span>
+            </div>
+        );
+    }
 
     if (!isConnected) {
         return (

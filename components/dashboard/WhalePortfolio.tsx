@@ -59,9 +59,12 @@ export function WhalePortfolio() {
     const [search, setSearch] = useState('');
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [liveWhaleCount, setLiveWhaleCount] = useState(0); // EP2 live counter
+    const [mounted, setMounted] = useState(false);
 
     // Real wallet address from wagmi
     const { address, isConnected } = useAccount();
+
+    useEffect(() => { setMounted(true); }, []);
 
     const { data: whaleData, isLoading: whaleLoading, mutate: mutateWhales } = useSWR(
         '/api/intelligence/whales', fetcher,
@@ -157,6 +160,8 @@ export function WhalePortfolio() {
         w.category.toLowerCase().includes(search.toLowerCase()) ||
         w.address.toLowerCase().includes(search.toLowerCase())
     );
+
+    if (!mounted) return null;
 
     return (
         <div className="flex flex-col space-y-5">
