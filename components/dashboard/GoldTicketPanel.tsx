@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useAccount, useConnect, useSendTransaction, useWaitForTransactionReceipt, useReadContract, useSwitchChain } from 'wagmi';
 import { injected } from 'wagmi/connectors';
-import { parseEther } from 'viem';
+import { parseEther, encodeFunctionData } from 'viem';
 
 // ── Contract config ───────────────────────────────────────────────────────────
 const ACCESS_PASS_ADDRESS = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a';
@@ -34,8 +34,9 @@ const ACCESS_PASS_ABI = [
 ] as const;
 
 export function GoldTicketPanel() {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected, chainId } = useAccount();
     const { connect } = useConnect();
+    const { switchChain } = useSwitchChain();
 
     // ── On-chain reads ────────────────────────────────────────────────────────
     const { data: balanceData, refetch: refetchBalance } = useReadContract({
@@ -76,13 +77,13 @@ export function GoldTicketPanel() {
 
     // ── On-chain write: real mint() call ─────────────────────────────────────
     const {
-        writeContract,
+        sendTransaction,
         data: txHash,
         isPending: isTxPending,
         isError: isTxError,
         error: txError,
         reset: resetTx
-    } = useWriteContract();
+    } = useSendTransaction();
 
     const {
         isLoading: isConfirming,
@@ -110,13 +111,27 @@ export function GoldTicketPanel() {
 
     const handleMint = () => {
         if (!isConnected) { toast.error('Connect your wallet first'); return; }
+        if (chainId !== 10 && switchChain) { 
+            switchChain({ chainId: 10 }); 
+            return; 
+        }
         if (hasTicket)    { toast.info('This wallet already holds a Gold Ticket.'); return; }
-        writeContract({
-            address: ACCESS_PASS_ADDRESS as `0x${string}`,
-            abi: ACCESS_PASS_ABI,
-            functionName: 'mint',
-            ...(mintPrice > 0n ? { value: mintPrice } : {})
-        });
+        
+        try {
+            const dataPayload = encodeFunctionData({
+                abi: ACCESS_PASS_ABI,
+                functionName: 'mint',
+                args: []
+            });
+
+            sendTransaction({
+                to: ACCESS_PASS_ADDRESS as `0x${string}`,
+                data: dataPayload,
+                value: mintPrice > 0n ? mintPrice : 0n,
+            });
+        } catch (e: any) {
+            toast.error(e?.message || 'Failed to encode transaction');
+        }
     };
 
     // ── STATE: ALREADY HAS TICKET ─────────────────────────────────────────────
