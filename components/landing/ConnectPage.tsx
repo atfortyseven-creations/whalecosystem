@@ -370,11 +370,6 @@ export default function ConnectPage() {
                       loading={connectingMethod === "qr" && isPending}
                     />
                   </motion.div>
-
-                </div>
-
-
-
                 {/* Supported wallets row */}
                 <motion.div
                   initial={{ opacity: 0 }}

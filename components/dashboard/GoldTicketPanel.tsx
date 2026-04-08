@@ -323,7 +323,7 @@ export function GoldTicketPanel() {
         abi: ABI,
         functionName: 'mint',
         args: [],
-        value: mintPrice > 0n ? mintPrice : undefined,
+        ...(mintPrice > 0n ? { value: mintPrice } : {})
       });
     } catch (e: any) {
       toast.error(e?.message ?? 'Failed to build transaction');

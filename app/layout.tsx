@@ -186,9 +186,9 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body className={`${inter.className} ${martel.variable} ${robotoMono.variable} perf-ultra`}>
+        <body className="bg-[#FAF9F6] text-[#050505] antialiased selection:bg-[#D4AF37] selection:text-white" suppressHydrationWarning>
           <CookieProvider>
-             <GoogleTagManager gtmId="GTM-52B9SCRM" />
+             <ErrorSuppressor />    <GoogleTagManager gtmId="GTM-52B9SCRM" />
               <Providers cookies={cookies}>
                 <MobileEnforcer>
                   <Web3SovereignProvider>

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST() {
     const sessionId = crypto.randomUUID();
     // Valid for 5 minutes
