@@ -181,33 +181,37 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
 
     // ── BOOT ENGINE ────────────────────────────────────────────
     useEffect(() => {
-        // Initial load — all in parallel
-        pollWhaleEvents();
-        pollWhaleActivities();
-        pollMempool();
-        pollFunding();
-        pollLiquidations();
-        pollLiveNetwork();
-        pollTopWhales();
-        pollLeaderboard();
-        pollSatoshi();
-        pollVolume();
+        let isMounted = true;
+        
+        // Use a recursive setTimeout instead of setInterval.
+        // This guarantees that if the server takes 12s to respond to an 8s interval request,
+        // we don't stack up pending requests and DDoS the backend (Connection Pool Exhaustion).
+        const runPoll = async (pollFn: () => Promise<void>, intervalMs: number) => {
+            if (!isMounted) return;
+            await pollFn();
+            if (isMounted) {
+                const timerId = setTimeout(() => runPoll(pollFn, intervalMs), intervalMs);
+                timers.current.push(timerId);
+            }
+        };
 
-        // Register intervals
-        timers.current = [
-            setInterval(pollWhaleEvents, INTERVALS.whaleEvents),
-            setInterval(pollWhaleActivities, INTERVALS.activities),
-            setInterval(pollMempool, INTERVALS.mempool),
-            setInterval(pollFunding, INTERVALS.funding),
-            setInterval(pollLiquidations, INTERVALS.liquidations),
-            setInterval(pollLiveNetwork, INTERVALS.liveNetwork),
-            setInterval(pollTopWhales, INTERVALS.topWhales),
-            setInterval(pollLeaderboard, INTERVALS.leaderboard),
-            setInterval(pollSatoshi, INTERVALS.satoshi),
-            setInterval(pollVolume, INTERVALS.volume),
-        ];
+        // Boot independent async loops
+        runPoll(pollWhaleEvents, INTERVALS.whaleEvents);
+        runPoll(pollWhaleActivities, INTERVALS.activities);
+        runPoll(pollMempool, INTERVALS.mempool);
+        runPoll(pollFunding, INTERVALS.funding);
+        runPoll(pollLiquidations, INTERVALS.liquidations);
+        runPoll(pollLiveNetwork, INTERVALS.liveNetwork);
+        runPoll(pollTopWhales, INTERVALS.topWhales);
+        runPoll(pollLeaderboard, INTERVALS.leaderboard);
+        runPoll(pollSatoshi, INTERVALS.satoshi);
+        runPoll(pollVolume, INTERVALS.volume);
 
-        return () => timers.current.forEach(clearInterval);
+        return () => {
+            isMounted = false;
+            timers.current.forEach(clearTimeout);
+            timers.current = [];
+        };
     }, []);
 
     return <>{children}</>;

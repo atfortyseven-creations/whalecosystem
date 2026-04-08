@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
     try {
@@ -20,7 +18,7 @@ export async function GET(request: Request) {
         });
 
         // Ensure we fix BigInt serialization and include status
-        const serialized = activities.map(a => ({
+        const serialized = activities.map((a: any) => ({
             ...a,
             blockNumber: a.blockNumber.toString(),
             amount: Number(a.amount),
@@ -34,4 +32,3 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: err.message }, { status: 502 });
     }
 }
-

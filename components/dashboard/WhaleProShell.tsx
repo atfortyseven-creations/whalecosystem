@@ -6,8 +6,8 @@ import {
     LayoutDashboard, Star, Bell, BarChart2, Zap,
     TrendingUp, Code, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
-    Globe, Cpu, Shield, Newspaper, LifeBuoy,
-    GraduationCap, Crown, PieChart, Briefcase
+    Globe, Cpu, Shield, ShieldAlert, Newspaper, LifeBuoy,
+    GraduationCap, Crown, PieChart, Briefcase, Network
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -33,53 +33,71 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'whale-portfolio', label: 'Whale Intelligence',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
     { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
     { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
+    { id: 'zk-shield',       label: 'ZK Shield Station',icon: <Shield size={17}/>,          badge: 'ZKP', badgeColor: '#00FF55' },
+    { id: 'neural-graph',    label: 'Neural Graph',     icon: <Network size={17}/>,         badge: 'LIVE', badgeColor: '#0052FF' },
+    { id: 'sovereign-vault', label: 'Sovereign Vault',  icon: <ShieldAlert size={17}/>,     badge: 'VAULT', badgeColor: '#FF3B30' },
     { id: 'omni-explorer',   label: 'Aztec Explorer',   icon: <Search size={17}/>,          badge: 'ZK', badgeColor: '#00FF55' },
     { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
     // ── Learn & Support ──
     { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
+    { id: 'brc-explorer',    label: 'BRC Standards',    icon: <Code size={17}/>,            badge: 'BSV', badgeColor: '#E2B33D' },
     { id: 'support',         label: 'Whale Support',    icon: <LifeBuoy size={17}/> },
     { id: 'humanidfi-portfolio', label: 'Whale Portfolio', icon: <Briefcase size={17}/> },
     { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
 function LiveMarketBand() {
-    const { markets } = useMarketStream();
-    
-    const [stats, setStats] = useState([
-        { label: 'BTC',         value: '---',       chg: null as string|null,  up: true  },
-        { label: 'ETH',         value: '---',       chg: null as string|null,  up: false },
-        { label: 'Global MCap', value: '$2.84T',    chg: '+2.1%',  up: true  },
-        { label: 'DeFi TVL',    value: '$98.7B',    chg: '+0.4%',  up: true  },
-        { label: 'BTC.D',       value: '54.2%',     chg: '+0.3%',  up: true  },
-        { label: 'ETH Gas',     value: '14 Gwei',   chg: null,     up: true  },
-        { label: 'Fear/Greed',  value: '74',        chg: 'GREED',  up: true  },
-        { label: 'SOL TPS',     value: '4,218',     chg: null,     up: true  },
-    ]);
+    const { markets, isConnected: streamConnected } = useMarketStream();
 
-    React.useEffect(() => {
-        if (markets.size > 0) {
-            const btc = markets.get('BTCUSDT');
-            const eth = markets.get('ETHUSDT');
-            if (btc && eth) {
-                setStats(prev => {
-                    const n = [...prev];
-                    n[0] = { label: 'BTC', value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(), chg: (parseFloat(btc.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(btc.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(btc.priceChangePercent || '0') >= 0 };
-                    n[1] = { label: 'ETH', value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(), chg: (parseFloat(eth.priceChangePercent || '0') >= 0 ? '+' : '') + parseFloat(eth.priceChangePercent || '0').toFixed(1) + '%', up: parseFloat(eth.priceChangePercent || '0') >= 0 };
-                    return n;
-                });
-            }
-        }
-    }, [markets]);
+    const btc = markets.get('BTCUSDT');
+    const eth = markets.get('ETHUSDT');
+
+    interface StatItem { label: string; value: string; chg: string | null; up: boolean; }
+
+    const items: StatItem[] = [];
+
+    if (btc) {
+        const chgPct = parseFloat(btc.priceChangePercent || '0');
+        items.push({
+            label: 'BTC',
+            value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(),
+            chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(1) + '%',
+            up: chgPct >= 0,
+        });
+    }
+    if (eth) {
+        const chgPct = parseFloat(eth.priceChangePercent || '0');
+        items.push({
+            label: 'ETH',
+            value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(),
+            chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(1) + '%',
+            up: chgPct >= 0,
+        });
+    }
+
+    // Loading skeleton while stream connects
+    if (items.length === 0) {
+        return (
+            <>
+                {['BTC', 'ETH'].map(label => (
+                    <div key={label} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
+                        <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{label}</span>
+                        <div className="h-3 w-14 bg-white/10 rounded animate-pulse" />
+                    </div>
+                ))}
+            </>
+        );
+    }
 
     return (
         <>
-            {stats.map((item, i) => (
+            {items.map((item, i) => (
                 <div key={i} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
                     <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{item.label}</span>
                     <div className="flex items-baseline gap-1">
                         <span className="text-[10px] font-black font-mono text-white truncate">{item.value}</span>
                         {item.chg && (
-                            <span className={`text-[8px] font-black leading-none ${item.label === 'Fear/Greed' ? 'text-[#00FF55]' : item.up ? 'text-[#00FF55]' : 'text-[#FF3B30]'}`}>
+                            <span className={`text-[8px] font-black leading-none ${item.up ? 'text-[#00FF55]' : 'text-[#FF3B30]'}`}>
                                 {item.chg}
                             </span>
                         )}

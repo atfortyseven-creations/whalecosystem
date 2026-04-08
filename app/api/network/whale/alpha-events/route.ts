@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { whaleService } from '../../../../../lib/services/whale-data';
 
-export const dynamic = 'force-dynamic';
+
 export const revalidate = 0;
 
 // Hard API timeout: 8 seconds maximum. Never blocks for 300s.

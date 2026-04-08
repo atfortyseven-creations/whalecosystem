@@ -1,12 +1,5 @@
 // workers/sentimentEngine.ts
-import { PrismaClient } from '@prisma/client';
-
-/**
- * WHALE ALERT AI SENTIMENT ENGINE
- * Polls RSS/X, feeds content to Grok API, and writes categorized JSON to Prisma.
- */
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 const GROK_API_KEY = process.env.GROK_API_KEY;
 
 const GROK_SYSTEM_PROMPT = `

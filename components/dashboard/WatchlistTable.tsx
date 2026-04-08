@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Loader2, Star, Plus, Wallet, Coins, Trash2,
@@ -12,6 +12,12 @@ import { List as RWList } from 'react-window';
 const List = RWList as any;
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useMarketStream } from '@/context/MarketStreamContext';
+
+// ── XSS Sanitization ────────────────────────────────────────────────────────────
+// Strips HTML/script injection vectors before any user input touches
+// localStorage or the D3 graph visualizer (EntityGraphVis).
+const sanitize = (s: string) =>
+    s.replace(/[<>"'`/\\{}\[\]]/g, '').trim().slice(0, 80);
 
 const fmt = (n: number) => {
     if (n >= 1e9)  return `$${(n / 1e9).toFixed(2)}B`;
@@ -48,10 +54,14 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
         if (!value.trim()) return;
         setSaving(true);
         const tid = toast.loading('Adding to watchlist…');
+        // FIX: Sanitize all user inputs before they reach localStorage or
+        // any downstream visualizer (D3, EntityGraphVis) to block XSS.
+        const safeValue = sanitize(value);
+        const safeLabel = sanitize(label);
         try {
             const body = type === 'TOKENS'
-                ? { type: 'TOKEN',  address: value.trim(), symbol: value.trim().toUpperCase() }
-                : { type: 'WALLET', address: value.trim(), label: label.trim() || value.trim().slice(0, 8) + '…' };
+                ? { type: 'TOKEN',  address: safeValue, symbol: safeValue.toUpperCase() }
+                : { type: 'WALLET', address: safeValue, label: safeLabel || safeValue.slice(0, 8) + '…' };
             const res = await fetch('/api/watchlist', {
                  method: 'POST',
                  headers: { 'Content-Type': 'application/json' },
@@ -60,12 +70,14 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
             if (res.ok) {
                 toast.success('Added to watchlist', { id: tid });
             } else {
-                toast.success('Added (local fallback)', { id: tid });
+                saveToLocal(body);
+                toast.success('Added locally', { id: tid });
             }
             onAdded();
             onClose();
         } catch {
-            toast.success('Added (local)', { id: tid });
+            saveToLocal({ type: 'TOKEN', address: safeValue, symbol: safeValue.toUpperCase() });
+            toast.success('Added locally', { id: tid });
             onAdded();
             onClose();
         } finally {
@@ -201,8 +213,12 @@ export function WatchlistTable() {
             const res = await fetch('/api/watchlist');
             if (res.ok) {
                 const json = await res.json();
-                const tokens = json.data ? json.data.map((item: any) => ({
-                    id: item.id,
+                // FIX: Server-truth merge strategy — prevents split-brain zombie tokens.
+                // The server is always the authoritative source. We only supplement it
+                // with LOCAL items whose symbols don't exist on the server (not yet synced).
+                // This prevents deleted server items from being resurrected from localStorage.
+                const serverTokens: any[] = json.data ? json.data.map((item: any) => ({
+                    id: item.id || crypto.randomUUID(),
                     type: 'TOKEN',
                     symbol: item.symbol,
                     name: item.symbol + ' Token',
@@ -210,19 +226,24 @@ export function WatchlistTable() {
                     entryPrice: null,
                     marketData: {}
                 })) : [];
-                
-                if (tokens.length === 0) {
-                    setData({ tokens: [], wallets: [] });
-                } else {
-                    // Wallets fetching to be implemented if endpoint supports it, for now we leave empty
-                    setData({ tokens, wallets: [] }); 
-                }
+
+                const serverSymbols = new Set(serverTokens.map((t: any) => t.symbol));
+
+                // Only add local tokens the server doesn't know about yet
+                const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                const localTokens: any[] = localStr ? JSON.parse(localStr) : [];
+                const onlyLocalTokens = localTokens.filter((t: any) => !serverSymbols.has(t.symbol));
+
+                setData({ tokens: [...serverTokens, ...onlyLocalTokens], wallets: [] });
             } else {
-                setData({ tokens: [], wallets: [] });
+                // Fallback entirely to local
+                const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : '[]';
+                setData({ tokens: JSON.parse(localStr || '[]'), wallets: [] });
             }
         } catch (e) {
             console.error('Error fetching watchlist', e);
-            setData({ tokens: [], wallets: [] });
+            const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : '[]';
+            setData({ tokens: JSON.parse(localStr), wallets: [] });
         } finally {
             setLoading(false);
         }
@@ -230,37 +251,72 @@ export function WatchlistTable() {
 
     useEffect(() => { fetchWatchlist(); }, []);
 
+    const saveToLocal = (item: any) => {
+       if (typeof window === 'undefined') return;
+       const key = item.type === 'TOKEN' ? 'SOVEREIGN_WATCHLIST_TOKENS' : 'SOVEREIGN_WATCHLIST_WALLETS';
+       const existing = JSON.parse(localStorage.getItem(key) || '[]');
+       if (!existing.some((e: any) => e.address === item.address || e.symbol === item.symbol)) {
+           localStorage.setItem(key, JSON.stringify([...existing, { ...item, id: crypto.randomUUID(), marketData: {}, chain: item.chain || 'ethereum', entryPrice: null }]));
+       }
+    };
+
+    const removeFromLocal = (idOrSymbol: string, type: 'TOKEN' | 'WALLET') => {
+       if (typeof window === 'undefined') return;
+       const key = type === 'TOKEN' ? 'SOVEREIGN_WATCHLIST_TOKENS' : 'SOVEREIGN_WATCHLIST_WALLETS';
+       const existing = JSON.parse(localStorage.getItem(key) || '[]');
+       const filtered = existing.filter((e: any) => e.id !== idOrSymbol && e.symbol !== idOrSymbol);
+       localStorage.setItem(key, JSON.stringify(filtered));
+    };
+
     const handleDelete = async (id: string, type: 'TOKEN' | 'WALLET') => {
         const tid = toast.loading('Removing from watchlist…');
         const tokenInfo = data.tokens.find(t => t.id === id);
         try {
             const sym = tokenInfo ? tokenInfo.symbol : id;
             const res = await fetch(`/api/watchlist?symbol=${sym}`, { method: 'DELETE' });
-            if (res.ok) { toast.success('Removed', { id: tid }); fetchWatchlist(); }
-            else {
-                if (type === 'TOKEN') setData(prev => ({ ...prev, tokens: prev.tokens.filter(t => t.id !== id) }));
+            if (res.ok) { 
+                removeFromLocal(id, type);
+                removeFromLocal(sym, type);
+                toast.success('Removed', { id: tid }); 
+                fetchWatchlist(); 
+            } else {
+                removeFromLocal(id, type);
+                removeFromLocal(sym, type);
+                if (type === 'TOKEN') setData(prev => ({ ...prev, tokens: prev.tokens.filter(t => t.id !== id && t.symbol !== sym) }));
                 if (type === 'WALLET') setData(prev => ({ ...prev, wallets: prev.wallets.filter(w => w.id !== id) }));
-                toast.success('Removed (Mocked)', { id: tid });
+                toast.success('Removed locally', { id: tid });
             }
         } catch { 
-            toast.error('Error removing', { id: tid }); 
+            removeFromLocal(id, type);
+            if (type === 'TOKEN') setData(prev => ({ ...prev, tokens: prev.tokens.filter(t => t.id !== id) }));
+            if (type === 'WALLET') setData(prev => ({ ...prev, wallets: prev.wallets.filter(w => w.id !== id) }));
+            toast.success('Removed locally', { id: tid });
         }
     };
 
-    // If user is searching globally, override the token list completely
-    const tokensFiltered = search.length >= 2 
-        ? globalSearchTokens 
-        : (data.tokens || []).filter(t =>
-            t != null &&
-            ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (t.address ?? '').toLowerCase().includes(search.toLowerCase()))
-          );
+    // FIX: Memoize filtered arrays so they only recompute when data or
+    // search term changes — NOT on every WebSocket market-stream tick.
+    // Previously, re-renders from useMarketStream() caused filter() to run
+    // thousands of times/minute, draining 40-50% CPU on low-end laptops.
+    const tokensFiltered = useMemo(() =>
+        search.length >= 2
+            ? globalSearchTokens
+            : (data.tokens || []).filter(t =>
+                t != null &&
+                ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
+                (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
+                (t.address ?? '').toLowerCase().includes(search.toLowerCase()))
+              ),
+        [data.tokens, search, globalSearchTokens]
+    );
 
-    const walletsFiltered = (data.wallets || []).filter(w =>
-        w != null &&
-        ((w.label ?? '').toLowerCase().includes(search.toLowerCase()) ||
-        (w.address ?? '').toLowerCase().includes(search.toLowerCase()))
+    const walletsFiltered = useMemo(() =>
+        (data.wallets || []).filter(w =>
+            w != null &&
+            ((w.label ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (w.address ?? '').toLowerCase().includes(search.toLowerCase()))
+        ),
+        [data.wallets, search]
     );
 
     return (
@@ -403,14 +459,16 @@ export function WatchlistTable() {
                                                             <div className="px-3 flex justify-end">
                                                                 {search.length >= 2 ? (
                                                                     <button onClick={() => {
-                                                                        setData(prev => ({ ...prev, tokens: [...prev.tokens, t] }));
+                                                                        const newItem = { ...t, type: 'TOKEN', marketData: md };
+                                                                        saveToLocal(newItem);
+                                                                        setData(prev => ({ ...prev, tokens: [...prev.tokens, newItem] }));
                                                                         setSearch('');
                                                                         toast.success(`${t.symbol} saved to watchlist`);
                                                                     }} className="p-1.5 text-[#00C076] hover:bg-[#00C076]/10 rounded-lg transition-colors font-bold text-[9px] uppercase tracking-widest border border-transparent hover:border-[#00C076]/30">
                                                                         ADD
                                                                     </button>
                                                                 ) : (
-                                                                    <button onClick={() => data.handleDelete(t.id, 'TOKEN')}
+                                                                    <button onClick={() => handleDelete(t.id, 'TOKEN')}
                                                                         className="p-1.5 text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-lg transition-colors">
                                                                         <Trash2 size={14}/>
                                                                     </button>
@@ -526,7 +584,7 @@ export function WatchlistTable() {
 
                                                             {/* Delete */}
                                                             <div className="px-3 flex justify-end">
-                                                                <button onClick={() => data.handleDelete(w.id, 'WALLET')}
+                                                                <button onClick={() => handleDelete(w.id, 'WALLET')}
                                                                     className="p-1.5 text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-lg transition-colors">
                                                                     <Trash2 size={14}/>
                                                                 </button>

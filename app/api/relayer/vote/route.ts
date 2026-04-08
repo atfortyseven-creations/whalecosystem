@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { ethers } from "ethers";
 // TODO: Uncomment after deploying contracts
 // import PolymarketGovernanceGaslessABI from "../../../../artifacts/contracts/PolymarketGovernanceGasless.sol/PolymarketGovernanceGasless.json";
-
-const prisma = new PrismaClient();
 
 // ENV Checks
 const RELAYER_PRIVATE_KEY = process.env.RELAYER_PRIVATE_KEY || "";

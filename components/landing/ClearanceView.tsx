@@ -8,7 +8,13 @@ import { injected } from "wagmi/connectors";
 import { parseEther } from "viem";
 import { useNewsStore } from "@/lib/store/news-store";
 
-const TARGET_TREASURY = "0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a" as const;
+// FIX Bug 15a: Treasury address sourced from env var so it can be rotated
+// without a code redeployment if the address is ever compromised.
+// Falls back to the known address only when not set.
+const TARGET_TREASURY = (
+    process.env.NEXT_PUBLIC_TREASURY_ADDRESS ||
+    '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a'
+) as `0x${string}`;
 const TARGET_CHAIN = 10; // Optimism Mainnet
 const PRICE_USD = 5.0;
 
@@ -63,9 +69,14 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
 
   const handleTransact = () => {
     if (!isConnected) return;
-    if (chainId !== TARGET_CHAIN && switchChain) {
-      switchChain({ chainId: TARGET_CHAIN });
-      return;
+    // FIX Bug 15b: Chain-switch guard.
+    // switchChain() is async — if the user's wallet is on the wrong network,
+    // initiate the switch and return immediately. Do NOT call sendTransaction
+    // in the same click because chainId may not have updated yet.
+    // The user will click again after the wallet confirms the network switch.
+    if (chainId !== TARGET_CHAIN) {
+        if (switchChain) switchChain({ chainId: TARGET_CHAIN });
+        return; // hard stop — never fall through to sendTransaction on wrong chain
     }
     sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
   };
@@ -111,8 +122,8 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-black/40">
                 <Clock size={12} />
-                <span className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold">
-                  {formatDate(currentTime)} · {formatTime(currentTime)}
+                <span className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold min-w-[200px]">
+                  {mounted ? `${formatDate(currentTime)} · ${formatTime(currentTime)}` : 'Sincronizando reloj L2...'}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-black/40">

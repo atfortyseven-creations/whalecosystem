@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
  *  - Bybit OI per day (when available)
  * No Math.random() — only real API data.
  */
-export const dynamic = 'force-dynamic';
+
 export const revalidate = 0;
 
 interface OIPoint {

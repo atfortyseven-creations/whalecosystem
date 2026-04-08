@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { hashPassword, createJWT, isValidPassword } from '@/lib/auth';
+import { hashPassword, isValidPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
@@ -83,19 +83,9 @@ export async function POST(request: NextRequest) {
     // Set secure httpOnly cookies
     await setSessionCookies(accessToken, refreshToken);
 
-    // Also set legacy auth_token for backward compatibility (will be removed later)
-    const token = createJWT(user.id, user.email);
-    const cookieStore = await cookies();
-    cookieStore.set('auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 // 7 days
-    });
-
     return NextResponse.json({
       success: true,
-      token,
+      token: accessToken,
       user: {
         id: user.id,
         email: user.email,

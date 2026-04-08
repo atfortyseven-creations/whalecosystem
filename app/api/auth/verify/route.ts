@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { createJWT } from '@/lib/auth';
-import { cookies } from 'next/headers';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,21 +47,22 @@ export async function POST(request: NextRequest) {
       data: { verified: true }
     });
 
-    // Generate JWT
-   const token = createJWT(verificationCode.user.id, verificationCode.user.email);
+    // Generate access and refresh tokens
+    const userAgent = request.headers.get('user-agent') || '';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    
+    const { createAccessToken, createRefreshToken, setSessionCookies, generateFingerprint } = await import('@/lib/session');
+    const fingerprint = generateFingerprint(userAgent, ip);
+    
+    const accessToken = await createAccessToken(verificationCode.user.id, verificationCode.user.email, fingerprint);
+    const refreshToken = await createRefreshToken(verificationCode.user.id, verificationCode.user.email, fingerprint);
 
-    // Set HTTP-only cookie
-    const cookieStore = await cookies();
-    cookieStore.set('auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 // 7 days
-    });
+    // Set secure httpOnly cookies
+    await setSessionCookies(accessToken, refreshToken);
 
     return NextResponse.json({
       success: true,
-      token,
+      token: accessToken,
       user: {
         id: verificationCode.user.id,
         email: verificationCode.user.email,

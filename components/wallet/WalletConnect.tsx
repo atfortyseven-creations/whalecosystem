@@ -71,13 +71,11 @@ export default function WalletConnect() {
                                 if (!isMobile && typeof window !== 'undefined' && (window as any).ethereum) {
                                     try {
                                         const provider = (window as any).ethereum;
-                                        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                                        const account = accounts[0];
-                                        const message = `Welcome to Whale Alert Network\n\nAuth Token: ${Math.floor(Math.random() * 1000000)}\nTimestamp: ${Date.now()}`;
-                                        await provider.request({
-                                            method: 'personal_sign',
-                                            params: [message, account],
-                                        });
+                                        // FIX: Removed dummy personal_sign request here.
+                                        // Previously it injected a Math.random() token and forced the user to sign
+                                        // a fake message before triggering Wagmi connect, resulting in double-signing
+                                        // because AppKit/SIWE handles the real EIP-4361 signature downstream.
+                                        await provider.request({ method: 'eth_requestAccounts' });
                                         const connector = connectors.find(c => c.id === 'io.metamask' || c.id === 'metaMask' || c.id.includes('metamask'));
                                         if (connector) connect({ connector });
                                         return;

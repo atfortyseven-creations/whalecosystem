@@ -118,9 +118,19 @@ export default clerkMiddleware(async (auth, request) => {
     if (humanSessionCookie) {
       try {
         const { jwtVerify } = await import('jose');
-        const JWT_KEY = new TextEncoder().encode(process.env.JWT_SECRET || 'VOID_SECRET_99_POLY');
-        await jwtVerify(humanSessionCookie, JWT_KEY);
-        siweSessionValid = true;
+        // FIX: Same VOID_SECRET_99_POLY vulnerability fixed here.
+        // The middleware is the gatekeeper — a forged human_session cookie
+        // using the leaked secret bypasses ALL protected route authentication.
+        // Guard: if JWT_SECRET not set, treat all sessions as invalid (secure default).
+        const rawSecret = process.env.JWT_SECRET;
+        if (!rawSecret) {
+            console.error('[WhaleFortress:CRITICAL] JWT_SECRET not set. All session cookies treated as invalid.');
+            siweSessionValid = false;
+        } else {
+            const JWT_KEY = new TextEncoder().encode(rawSecret);
+            await jwtVerify(humanSessionCookie, JWT_KEY);
+            siweSessionValid = true;
+        }
       } catch {
         // Invalid or expired SIWE JWT — treat as unauthenticated
         siweSessionValid = false;

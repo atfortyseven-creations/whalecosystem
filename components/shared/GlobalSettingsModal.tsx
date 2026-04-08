@@ -10,7 +10,7 @@ import {
     Network, ChevronRight, Settings2, Laptop, LogOut, Trash2, AlertTriangle
 } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
-import { useUIStore } from '@/lib/store/ui-store';
+
 
 export function GlobalSettingsModal() {
     const { 
@@ -21,7 +21,6 @@ export function GlobalSettingsModal() {
 
     const { setTheme: setNextTheme } = useTheme();
     const { disconnect } = useDisconnect();
-    const { openConnectModal } = useUIStore();
 
     const [mounted, setMounted] = useState(false);
     const [confirmDisconnect, setConfirmDisconnect] = useState(false);
@@ -37,15 +36,48 @@ export function GlobalSettingsModal() {
     if (!mounted) return null;
 
     const handleDisconnect = async () => {
-        // Step 1: disconnect wagmi + clear storage
+        // Step 1: Mark disconnect intent BEFORE clearing storage
+        // ConnectPage reads this to skip auto-redirect back to dashboard
+        try { sessionStorage.setItem('__disconnected__', '1'); } catch {}
+
+        // Step 2: Wagmi disconnect
         try { disconnect(); } catch {}
-        localStorage.clear();
-        sessionStorage.clear();
+
+        // Step 3: Clear only AUTH-related state.
+        // FIX Bug 19: localStorage.clear() was previously wiping ALL keys including
+        // SOVEREIGN_WATCHLIST_TOKENS/WALLETS — permanently destroying weeks of
+        // curated watchlist data in a single click.
+        // Now we surgically remove only session/auth keys, preserving user data.
+        const AUTH_KEYS_TO_REMOVE = [
+            'wagmi.store',
+            'wagmi.cache',
+            'WCM_VERSION',
+            '__WC_MODAL_WEB3MODAL__',
+            'nextauth.message',
+            'hasReadDocs',
+        ];
+        try {
+            AUTH_KEYS_TO_REMOVE.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+        } catch {}
+
+        // Step 4: Clear auth cookies only (not all cookies)
+        try {
+            const authCookiePattern = /^(next-auth|session|__Secure|__Host)/;
+            document.cookie.split(';').forEach(c => {
+                const name = c.split('=')[0].trim();
+                if (authCookiePattern.test(name)) {
+                    document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/`;
+                }
+            });
+        } catch {}
+
         try { await signOut({ redirect: false }); } catch {}
+
         setConfirmDisconnect(false);
         setSettingsOpen(false);
-        // Step 2: open the connect wallet modal (with QR) so the user can reconnect
-        setTimeout(() => openConnectModal(), 300);
+
+        // Step 5: Hard navigate to /connect — do NOT use router.push (wagmi may re-trigger)
+        window.location.replace('/connect');
     };
 
     return (
@@ -231,8 +263,8 @@ export function GlobalSettingsModal() {
                                                     Confirm Disconnect
                                                 </div>
                                                 <p className="text-[9px] text-[#888888] font-mono leading-relaxed">
-                                                    Your wallet will be disconnected. You'll be shown the wallet selector to reconnect via QR or extension.
-                                                </p>
+                                    Your wallet will be fully disconnected. You will be taken to the connection screen — no automatic reconnect.
+                                </p>
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setConfirmDisconnect(false)}

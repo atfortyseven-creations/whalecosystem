@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { mainnetClient, bscClient } from '@/lib/blockchain/rpc-engine';
 import { formatUnits } from 'viem';
@@ -48,30 +48,30 @@ export async function GET() {
                 ethBlock: Number(ethBlock),
                 bscBlock: Number(bscBlock),
                 whaleCount: whaleMovements.length,
-                uptime: '99.99%',
-                volume24h: '$4.2B'
+                // FIX Bug 12: Removed hardcoded fake uptime and volume metrics.
+                // These are KPIs that must come from real monitoring, not constants.
+                uptime: null,
+                volume24h: null,
             }
         });
     } catch (e) {
-        console.error('[TICKER ERROR/RATE LIMIT] Engaging bulletproof synthetic protocol', e);
-        // Never return 500 — keep the UI flowing with simulated marquee data
+        // FIX Bug 12: Removed all Math.random() fake block numbers and fake prices.
+        // Returning a clearly-marked degraded state instead of fabricated data.
+        // The UI can detect success:false and render a degraded-mode banner.
+        console.error('[TICKER ERROR] RPC or data source failed:', e);
         return NextResponse.json({ 
-            success: true, 
+            success: false,
+            degraded: true,
             ticker: [
-                `ETH BLOCK: ${19000000 + Math.floor(Math.random() * 1000)}`,
-                `BSC BLOCK: ${36000000 + Math.floor(Math.random() * 1000)}`,
-                `ETH GAS: ${15 + Math.floor(Math.random() * 10)} GWEI`,
-                `BSC GAS: 3.00 GWEI`,
-                `⚠ WHALE: 1500 ETH ON ETHEREUM detected`,
-                `BTC: $${(90000 + Math.random() * 2000).toLocaleString(undefined, { maximumFractionDigits: 0 })} ▲2.10%`,
-                `ETH: $${(3200 + Math.random() * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })} ▼0.40%`
+                'NETWORK STATUS: DEGRADED — RECONNECTING...',
+                'DATA FEEDS TEMPORARILY UNAVAILABLE',
             ],
             stats: {
-                ethBlock: 19000000,
-                bscBlock: 36000000,
-                whaleCount: 1,
-                uptime: '99.99%',
-                volume24h: '$3.8B'
+                ethBlock: null,
+                bscBlock: null,
+                whaleCount: 0,
+                uptime: null,
+                volume24h: null,
             }
         });
     }

@@ -11,12 +11,15 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Wallet address required' }, { status: 400 });
         }
 
+        // FIX: Validate address format to prevent DB injection via crafted query strings
+        const normalised = address.toLowerCase();
+        if (!/^0x[a-f0-9]{40}$/.test(normalised)) {
+            return NextResponse.json({ error: 'Invalid wallet address format' }, { status: 400 });
+        }
+
         const user = await prisma.user.findUnique({
-            where: { walletAddress: address.toLowerCase() },
-            select: {
-                tier: true,
-                worldIdNullifierHash: true
-            }
+            where:  { walletAddress: normalised },
+            select: { tier: true, worldIdNullifierHash: true }
         });
 
         // Verification Logic
@@ -29,7 +32,7 @@ export async function GET(req: NextRequest) {
             nullifierHash: user?.worldIdNullifierHash || null
         });
 
-        // 3. Auto-Hydrate Security Cookies for Middleware if record exists
+        // Auto-Hydrate Security Cookies for Middleware if record exists
         if (isVerified) {
             const cookieOptions = {
                 path: '/',
@@ -38,16 +41,24 @@ export async function GET(req: NextRequest) {
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax' as const
             };
-            
-            const JWT_SECRET = new TextEncoder().encode(process.env.KYC_SECRET || 'WhaleAlert_KYC_MasterKey_2026_Secure');
+
+            // CRITICAL SECURITY FIX: Same hardcoded secret removed as in verify-human.
+            const rawSecret = process.env.KYC_SECRET;
+            if (!rawSecret) {
+                console.error('[UserStatus] ❌ CRITICAL: KYC_SECRET not set. Cannot issue kyc_token.');
+                // Still return user status — just don't issue the cookie
+                return response;
+            }
+
+            const JWT_SECRET = new TextEncoder().encode(rawSecret);
             const token = await new SignJWT({ address: address.toLowerCase(), status: 'APPROVED' })
                 .setProtectedHeader({ alg: 'HS256' })
                 .setIssuedAt()
                 .setExpirationTime('7d')
                 .sign(JWT_SECRET);
 
-            response.cookies.set('kyc_token', token, cookieOptions); // Cryptographically secure token
-            response.cookies.set('kyc_status', 'APPROVED', { ...cookieOptions, httpOnly: false }); // Only for UI checks
+            response.cookies.set('kyc_token', token, cookieOptions);
+            response.cookies.set('kyc_status', 'APPROVED', { ...cookieOptions, httpOnly: false });
             response.cookies.set('human_session', 'true', cookieOptions);
         }
 

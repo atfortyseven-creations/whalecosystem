@@ -20,11 +20,16 @@ export async function POST(req: NextRequest) {
         }
 
         // 🛡️ [SECURITY] Hard-bind to the authenticated Clerk user
+        const existingUser = await prisma.user.findFirst({
+            where: { clerkId, walletAddress: walletAddress.toLowerCase() }
+        });
+
+        if (!existingUser) {
+            return NextResponse.json({ error: 'Wallet not associated with this user' }, { status: 403 });
+        }
+
         const user = await prisma.user.update({
-            where: { 
-                clerkId: clerkId,
-                walletAddress: walletAddress.toLowerCase() 
-            },
+            where: { clerkId: clerkId },
             data: { 
                 snxAccountId: snxAccountId.toString(),
                 lastActive: new Date()

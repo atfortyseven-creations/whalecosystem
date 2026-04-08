@@ -79,7 +79,10 @@ const PRIORITY_SYMBOLS = new Set([
     'GMXUSDT','SUIUSDT','SEIUSDT','TONUSDT',
 ]);
 
-// ── Hardened Synthetic Fallback (only when both sources fail) ─────────────────
+// ── Hardened Synthetic Fallback (only when BOTH Binance AND on-chain fail) ────
+// FIX Bug 11: All Math.random() removed. Fake price deltas are gone.
+// Static last-known prices are displayed with source='synthetic' so the
+// UI can render a clear warning banner instead of showing junk as live data.
 function getSyntheticMarkets(): any[] {
     const BASE: Record<string, [number, string]> = {
         'BTC': [83500, 'BTCUSDT'], 'ETH': [1610, 'ETHUSDT'],
@@ -91,12 +94,14 @@ function getSyntheticMarkets(): any[] {
     return Object.entries(BASE).map(([tok, [p, sym]]) => ({
         symbol: sym,
         lastPrice: p.toFixed(tok === 'BTC' || tok === 'ETH' ? 2 : 4),
-        priceChangePercent: ((Math.random() * 6) - 3).toFixed(2),
-        quoteVolume: (p * 500_000 + Math.random() * p * 200_000).toFixed(2),
-        openPrice: (p * (1 - Math.random() * 0.03)).toFixed(2),
-        highPrice: (p * (1 + Math.random() * 0.03)).toFixed(2),
-        lowPrice:  (p * (1 - Math.random() * 0.03)).toFixed(2),
-        source: 'synthetic',
+        // All delta/volume fields are explicitly zero — no fake fluctuations.
+        // The frontend checks source === 'synthetic' to display a stale-data banner.
+        priceChangePercent: '0.00',
+        quoteVolume: '0.00',
+        openPrice:  p.toFixed(2),
+        highPrice:  p.toFixed(2),
+        lowPrice:   p.toFixed(2),
+        source: 'synthetic', // triggers warning UI
     }));
 }
 

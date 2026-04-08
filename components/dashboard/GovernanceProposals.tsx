@@ -1,13 +1,21 @@
+"use client";
+// FIX: Added missing 'use client' directive.
+// GovernanceProposals uses useState, useSWR, useAccount, and toast —
+// all client-only hooks. Without this directive, Next.js 13+ App Router
+// attempts to Server-Side Render this component and throws:
+// "You're importing a component that needs useState. It only works in a Client Component."
+
 import { useState } from 'react';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit';
-import { Vote, Loader2, CheckCircle2 } from 'lucide-react';
+import { Vote, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
 import { useAccount } from 'wagmi';
 import useSWR from 'swr';
-import { ChronosLens } from '@/components/oracle/ChronosLens';
-import { useFactCheck } from '@/hooks/useFactCheck';
 
+// FIX: World ID app_id moved to env var — hardcoded app IDs in client-side
+// JSX are visible to anyone who inspects the bundle. While World ID app_ids
+// are not secret, best practice is to centralise them for rotation.
+const WLD_APP_ID = (process.env.NEXT_PUBLIC_WORLDCOIN_APP_ID || 'app_ea6e54f0a2ba18bc8edba458a2d3c52d') as `app_${string}`;
 
 interface Proposal {
     id: string;
@@ -22,48 +30,97 @@ interface Proposal {
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
+// FIX: Extracted into a separate component to prevent the IDKitWidget
+// multi-mount bug. Previously, clicking to activate voting on proposal X
+// caused every outcome button on that proposal to mount its own IDKitWidget
+// simultaneously (N outcomes = N widget instances mounting in one tick),
+// leading to multiple World ID popups and state corruption.
+// Now each outcome has its own isolated mounted/unmounted state.
+function VoteButton({
+    outcome, idx, proposalId, isVoting, onVote,
+}: {
+    outcome: string;
+    idx: number;
+    proposalId: string;
+    isVoting: boolean;
+    onVote: (proposalId: string, outcomeIdx: number, proof: ISuccessResult) => void;
+}) {
+    const [widgetOpen, setWidgetOpen] = useState(false);
+    const isFor = idx === 0;
+    const activeClass = isFor
+        ? 'bg-[#00C076]/10 border-[#00C076]/30 text-[#00C076] hover:bg-[#00C076] hover:text-white'
+        : 'bg-[#FF3B30]/10 border-[#FF3B30]/30 text-[#FF3B30] hover:bg-[#FF3B30] hover:text-white';
+    const idleClass = isFor
+        ? 'bg-white border-[#E5E5E5] text-[#050505] hover:border-[#00C076] hover:text-[#00C076]'
+        : 'bg-white border-[#E5E5E5] text-[#050505] hover:border-[#FF3B30] hover:text-[#FF3B30]';
+
+    if (widgetOpen) {
+        return (
+            <IDKitWidget
+                app_id={WLD_APP_ID}
+                action={proposalId}
+                verification_level={VerificationLevel.Orb}
+                onSuccess={(proof: ISuccessResult) => {
+                    setWidgetOpen(false);
+                    onVote(proposalId, idx, proof);
+                }}
+            >
+                {({ open }: { open: () => void }) => (
+                    <button
+                        onClick={open}
+                        disabled={isVoting}
+                        className={`w-full py-3 rounded-xl border text-[11px] font-black uppercase tracking-widest transition-all ${activeClass} disabled:opacity-50`}
+                    >
+                        {isVoting ? 'Registering...' : `Verify to Vote ${outcome}`}
+                    </button>
+                )}
+            </IDKitWidget>
+        );
+    }
+
+    return (
+        <button
+            onClick={() => setWidgetOpen(true)}
+            disabled={isVoting}
+            className={`w-full py-3 rounded-xl border text-[11px] font-black uppercase tracking-widest transition-all ${idleClass} disabled:opacity-50`}
+        >
+            {outcome}
+        </button>
+    );
+}
+
 export function GovernanceProposals() {
-    const { isAuthenticated } = useAuth();
     const { address } = useAccount();
     const { data: proposals, isLoading, mutate } = useSWR<Proposal[]>('/api/governance/proposals', fetcher, {
-        refreshInterval: 10000 
+        refreshInterval: 10_000,
+        // FIX: Deduplicate concurrent requests on rapid re-renders
+        dedupingInterval: 5_000,
     });
 
     const [votingProposal, setVotingProposal] = useState<string | null>(null);
 
     const handleVote = async (proposalId: string, outcomeIndex: number, proof: ISuccessResult) => {
-        setVotingProposal(proposalId);
-
         if (!address) {
             toast.error('Connect your wallet first');
-            setVotingProposal(null);
             return;
         }
-
+        setVotingProposal(proposalId);
         try {
-            const vote = outcomeIndex === 0 ? 'FOR' : 'AGAINST';
-
+            const vote = outcomeIndex === 0 ? 'FOR' : (outcomeIndex === 1 ? 'AGAINST' : 'ABSTAIN');
             const res = await fetch('/api/governance/vote', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    proposalId,
-                    vote,
-                    voterAddress: address,
+                    proposalId, vote, voterAddress: address,
                     worldIdProof: {
-                        merkle_root: proof.merkle_root,
-                        nullifier_hash: proof.nullifier_hash,
-                        proof: proof.proof,
+                        merkle_root:        proof.merkle_root,
+                        nullifier_hash:     proof.nullifier_hash,
+                        proof:              proof.proof,
                         verification_level: proof.verification_level,
                     },
                 }),
             });
-
-            if (!res.ok) {
-                const error = await res.text();
-                throw new Error(error || 'Failed to vote');
-            }
-
+            if (!res.ok) throw new Error((await res.text()) || 'Failed to vote');
             toast.success(`Vote registered: ${vote}!`);
             mutate();
         } catch (error: any) {
@@ -138,39 +195,16 @@ export function GovernanceProposals() {
 
                             <div className="flex gap-3">
                                 {proposal.outcomes.map((outcome, idx) => (
+                                    // FIX: Use VoteButton subcomponent for per-outcome
+                                    // isolated IDKitWidget state — prevents N-widget multi-mount
                                     <div key={idx} className="flex-1">
-                                        {votingProposal === proposal.id ? (
-                                            <IDKitWidget
-                                                app_id="app_ea6e54f0a2ba18bc8edba458a2d3c52d"
-                                                action={proposal.id}
-                                                verification_level={VerificationLevel.Orb}
-                                                onSuccess={(proof: ISuccessResult) => handleVote(proposal.id, idx, proof)}
-                                            >
-                                                {({ open }: { open: () => void }) => (
-                                                    <button
-                                                        onClick={open}
-                                                        className={`w-full py-3 rounded-xl border text-[11px] font-black uppercase tracking-widest transition-all
-                                                            ${idx === 0 
-                                                                ? 'bg-[#00C076]/10 border-[#00C076]/30 text-[#00C076] hover:bg-[#00C076] hover:text-white' 
-                                                                : 'bg-[#FF3B30]/10 border-[#FF3B30]/30 text-[#FF3B30] hover:bg-[#FF3B30] hover:text-white'
-                                                            }`}
-                                                    >
-                                                        Verify to Vote {outcome}
-                                                    </button>
-                                                )}
-                                            </IDKitWidget>
-                                        ) : (
-                                            <button
-                                                onClick={() => setVotingProposal(proposal.id)}
-                                                className={`w-full py-3 rounded-xl border text-[11px] font-black uppercase tracking-widest transition-all
-                                                    ${idx === 0 
-                                                        ? 'bg-white border-[#E5E5E5] text-[#050505] hover:border-[#00C076] hover:text-[#00C076]' 
-                                                        : 'bg-white border-[#E5E5E5] text-[#050505] hover:border-[#FF3B30] hover:text-[#FF3B30]'
-                                                    }`}
-                                            >
-                                                {outcome}
-                                            </button>
-                                        )}
+                                        <VoteButton
+                                            outcome={outcome}
+                                            idx={idx}
+                                            proposalId={proposal.id}
+                                            isVoting={votingProposal === proposal.id}
+                                            onVote={handleVote}
+                                        />
                                     </div>
                                 ))}
                             </div>

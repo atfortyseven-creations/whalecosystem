@@ -6,10 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { verifyWorldIDProof } from '@/lib/worldid';
-
-const prisma = new PrismaClient();
 
 interface VoteRequest {
     proposalId: string;

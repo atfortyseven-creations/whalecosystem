@@ -2,8 +2,14 @@ import { NextResponse } from 'next/server';
 
 /**
  * SOVEREIGN IDENTITY - PAYMAIL RESOLUTION ENGINE
- * ---------------------------------------------
+ * -----------------------------------------------
  * Translates human-readable handles into Bitcoin SV addresses and PKI metadata.
+ * 
+ * FIX Bug 14: Removed ALL Math.random() fake address/PKI generation.
+ * Previously, fallback responses contained invented Bitcoin addresses and
+ * cryptographic public keys — these could cause users to verify signatures
+ * against non-existent keys, resulting in fund loss.
+ * Now: unresolvable handles return a clear 404 error instead of fabricated data.
  */
 export async function GET(request: Request) {
     try {
@@ -17,36 +23,58 @@ export async function GET(request: Request) {
         const [user, domain] = handle.split('@');
         console.log(`📡 [Identity] Resolving Paymail Identity: ${handle}...`);
 
-        // Standard Paymail Resolution Protocol (SRV Lookup Simulation)
+        // ── Step 1: Fetch the BSVALIAS capability document ─────────────────────
         const wellKnownUrl = `https://${domain}/.well-known/bsvalias`;
-        
-        try {
-            const configRes = await fetch(wellKnownUrl);
-            const config = await configRes.json();
-            
-            // If the domain supports paymail, it should have an address resolution endpoint
-            const resolveUrl = config.addressResolution || `https://${domain}/api/v1/paymail/address/${handle}`;
-            
-            // For now, if the resolve fails (simulation), we provide a deterministic address 
-            // to show the UI working flawlessly for the legendary demo.
-            return NextResponse.json({
-                handle,
-                address: '1SirDeggen' + Math.random().toString(16).slice(2, 10) + '...xyz',
-                pki: '03' + Math.random().toString(16).slice(2, 64),
-                human_id: user.toUpperCase(),
-                status: 'VERIFIED_SOVEREIGN',
-                protocol: 'SRV/BSV-ALIAS'
-            });
+        let resolveEndpoint: string | null = null;
 
-        } catch (e) {
-            // Fallback for demo: Deterministic resolution
-            return NextResponse.json({
-                handle,
-                address: '1L' + Math.random().toString(16).slice(2, 12),
-                status: 'GENERIC_MAPPING',
-                message: 'SRV lookup failed. Falling back to deterministic mapping.'
+        try {
+            const configRes = await fetch(wellKnownUrl, {
+                signal: AbortSignal.timeout(5000),
             });
+            if (configRes.ok) {
+                const config = await configRes.json();
+                resolveEndpoint = config?.capabilities?.['759684b1']
+                    || config?.addressResolution
+                    || null;
+            }
+        } catch {
+            // Domain doesn't support Paymail or is offline
         }
+
+        // ── Step 2: Attempt live address resolution ─────────────────────────────
+        if (resolveEndpoint) {
+            try {
+                const resolveUrl = resolveEndpoint.replace('{alias}', user).replace('{domain.tld}', domain);
+                const resolveRes = await fetch(resolveUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ senderHandle: 'inquiry@whalealert.network', dt: new Date().toISOString(), amount: 0 }),
+                    signal: AbortSignal.timeout(5000),
+                });
+                if (resolveRes.ok) {
+                    const resolved = await resolveRes.json();
+                    return NextResponse.json({
+                        handle,
+                        address:    resolved.output || resolved.address,
+                        human_id:   user.toUpperCase(),
+                        status:     'VERIFIED_LIVE',
+                        protocol:   'BSV-ALIAS/P2PKH',
+                        source:     'live',
+                    });
+                }
+            } catch {
+                // Resolution endpoint failed
+            }
+        }
+
+        // ── Step 3: Honest failure — no data is better than fake data ───────────
+        // FIX: Previously returned Math.random() fake address + fake PKI key here.
+        // We now return 404 so the caller knows the identity is unresolvable.
+        return NextResponse.json({
+            error: 'Paymail handle could not be resolved.',
+            handle,
+            hint: `The domain '${domain}' does not expose a BSVALIAS capability document or the address endpoint is offline.`,
+        }, { status: 404 });
 
     } catch (error: any) {
         console.error('[Identity] Resolution Error:', error);

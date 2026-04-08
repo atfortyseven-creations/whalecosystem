@@ -57,9 +57,19 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
 
     if (!state) {
         return (
-            <tr className="border-b border-[#E5E5E5] bg-white">
-                <td className="py-5 px-6 font-mono text-sm text-[#888888] animate-pulse">{symbol}</td>
-                <td colSpan={6} className="py-5 px-6 text-[10px] text-[#888888] uppercase tracking-[0.2em] animate-pulse">Syncing Cryptographic Data...</td>
+            <tr className="border-b border-[#E5E5E5] bg-white opacity-60">
+                <td className="py-5 px-6">
+                    <div className="flex items-center gap-3">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#E5E5E5] animate-pulse" />
+                        <span className="text-sm font-black text-[#888888] tracking-tight animate-pulse">{symbol}</span>
+                    </div>
+                </td>
+                <td className="py-5 px-6 font-mono text-sm text-[#888888] animate-pulse">Syncing...</td>
+                <td className="py-5 px-6 font-mono text-xs text-[#888888] animate-pulse">--</td>
+                <td className="py-5 px-6 font-mono text-xs text-[#888888] animate-pulse">--</td>
+                <td className="py-5 px-6 font-mono text-xs text-[#888888] animate-pulse">--</td>
+                <td className="py-5 px-6 font-mono text-xs text-[#888888] animate-pulse">--</td>
+                <td className="py-5 px-6 text-right">--</td>
             </tr>
         );
     }
