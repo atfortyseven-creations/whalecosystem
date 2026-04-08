@@ -173,7 +173,6 @@ function WorldFinancialClocks() {
 
 const WALLET_OPTIONS = [
   { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
-  { id: 'trust',    name: 'TRUST WALLET', desc: 'MOBILE APP', iconType: 'trust' },
   { id: 'coinbase', name: 'COINBASE WALLET',desc: 'SMART WALLET / APP', iconType: 'coinbase' },
   { id: 'rainbow',  name: 'RAINBOW WALLET',      desc: 'MOBILE APP', iconType: 'rainbow' },
 ];
@@ -302,13 +301,13 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
               <div className="w-[60px] h-[60px] bg-white border border-black/[0.04] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)] rounded-full flex items-center justify-center mb-5">
                 <img src="/logo-landingpage.png" className="w-[30px] h-[30px]" alt="Whale" />
               </div>
-              <h3 className="text-[20px] font-black text-[#050505] tracking-tight mb-1">Bóveda Criptográfica</h3>
-              <p className="text-[9px] text-[#050505]/40 font-black uppercase tracking-[0.16em]">Sincronización de Identidad</p>
+              <h3 className="text-[20px] font-black text-[#050505] tracking-tight mb-1 uppercase">Connect Your Wallet</h3>
+              <p className="text-[9px] text-[#050505]/40 font-black uppercase tracking-[0.12em] text-center px-4">Choose your preferred connection method</p>
               
               {error && (
                 <div className="mt-4 px-3 py-2 bg-rose-50 text-rose-500 rounded-lg text-[9px] font-bold tracking-widest uppercase border border-rose-100 flex gap-2 w-full text-center items-center justify-center">
                     <Zap size={10} className="shrink-0" />
-                    <span>Conexión Fallida o Cancelada</span>
+                    <span>Connection Failed or Canceled</span>
                 </div>
               )}
             </div>
@@ -331,7 +330,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                       <div className="text-left flex flex-col justify-center">
                         <span className="font-black text-[12.5px] text-[#050505] tracking-widest">{wallet.name}</span>
                         <span className={`text-[8px] font-black uppercase tracking-[0.12em] mt-[1px] ${busy ? 'text-indigo-500 animate-pulse' : 'text-[#050505]/30'}`}>
-                          {busy ? 'CONECTANDO...' : wallet.desc}
+                          {busy ? 'CONNECTING...' : wallet.desc}
                         </span>
                       </div>
                     </div>
@@ -341,7 +340,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             </div>
 
             <button onClick={onClose} className="w-full mt-7 py-3 mb-1 text-[9.5px] font-black text-[#050505]/25 uppercase tracking-[0.35em] active:opacity-50 transition-opacity">
-              Cerrar Puerta
+              Close Window
             </button>
           </motion.div>
         </div>
@@ -408,25 +407,21 @@ function PageHero({
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="w-[280px] h-[280px] mx-auto mb-4 mt-2 flex items-center justify-center relative drop-shadow-2xl"
+              className="w-[280px] h-[280px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-2xl"
               style={{ willChange: 'transform' }}
             >
               <img 
-                src="/logo-landingpage.png" 
+                src="/official-whale-monochrome.png" 
                 className="w-full h-full object-contain" 
                 alt="Whale Logo" 
               />
             </motion.div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-[0.9] mb-6 uppercase italic relative z-10 drop-shadow-md text-black dark:text-white">
-            Whale Alert<br />Network
-          </h1>
-
           {!isConnected ? (
             <div className="w-full space-y-4">
               <p className="text-[12px] font-bold text-black/40 dark:text-white/40 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
-                Connect with<br />PC session.
+                Sync across devices<br />seamlessly.
               </p>
 
               <button
@@ -443,15 +438,15 @@ function PageHero({
               <div className="w-full bg-[#FAF9F6] border border-black/10 rounded-[2rem] p-5 mb-4 text-center shadow-sm">
                 <div className="flex items-center justify-center gap-2 mb-2">
                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.2em]">BÓVEDA ACTIVA</span>
+                   <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.2em]">IDENTITY VERIFIED</span>
                 </div>
                 <span className="text-[10px] font-bold text-[#050505]/60 uppercase tracking-[0.08em] leading-relaxed block">
-                  La cartera está conectada correctamente
+                  Wallet successfully connected to the terminal
                 </span>
               </div>
 
               <div className="flex flex-col gap-3">
-                {/* Opcion 1: Ir a las noticias */}
+                {/* Option 1: View Intelligence */}
                 <button
                   onClick={onEnterNews}
                   className="w-full h-[72px] bg-[#050505] border-2 border-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/20 active:scale-[0.98] group"
@@ -460,14 +455,14 @@ function PageHero({
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
                     <Activity size={20} className="text-white" />
                     <div className="text-left leading-tight">
-                      <p className="tracking-[0.3em] font-black">VER NOTICIAS</p>
-                      <p className="text-[8px] opacity-60 mt-1 font-bold">TERMINAL DE NOTICIAS MÓVIL</p>
+                      <p className="tracking-[0.3em] font-black">ENTER TERMINAL</p>
+                      <p className="text-[8px] opacity-60 mt-1 font-bold">MOBILE INTELLIGENCE HUB</p>
                     </div>
                   </div>
                   <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                {/* Opcion 2: Escanear PC */}
+                {/* Option 2: Sync PC */}
                 <button
                   onClick={onScan}
                   className="w-full h-[72px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
@@ -476,8 +471,8 @@ function PageHero({
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
                     <QrCode size={20} className="text-[#050505]" />
                     <div className="text-left leading-tight">
-                      <p className="tracking-[0.3em] font-black">ENLAZAR PC</p>
-                      <p className="text-[8px] opacity-40 mt-1 font-bold">ESCANEAR CÓDIGO DE ESCRITORIO</p>
+                      <p className="tracking-[0.3em] font-black">SYNC DESKTOP</p>
+                      <p className="text-[8px] opacity-40 mt-1 font-bold">SCAN HANDSHAKE QR CODE</p>
                     </div>
                   </div>
                   <ChevronRight size={16} className="opacity-20 group-hover:translate-x-1 transition-transform" />
@@ -503,7 +498,7 @@ function PageHero({
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         style={{ willChange: 'transform' }}
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">EXPLORAR</span>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">EXPLORE</span>
         <ChevronDown size={14} className="text-[#050505]" />
       </motion.div>
 
@@ -572,43 +567,30 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
 // ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
+    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
-        <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase border-b border-black/10 dark:border-white/10 pb-6 mb-8 flex items-center justify-between">
-          <span>Technical Manifesto</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white animate-pulse" />
-        </h2>
-        
-        <div className="text-[14.5px] leading-[1.85] opacity-80 space-y-7 text-justify tracking-wide font-medium">
+        <div className="text-[14px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
           <p>
-            The fundamental architecture of the Whale Alert Network transcends conventional heuristic data aggregation. It is formulated as an institutional-grade, deterministic macro-analysis system dedicated to transparency.
+            The architectural nexus of our backend is fundamentally predicated upon a robust integration with the Aztec Network. By synthesizing a deterministic PostgreSQL ontology with Aztec’s privacy-preserving zero-knowledge rollup (zkRollup) infrastructure, the system enforces programmable confidentiality and cryptographic finality across all critical data vectors.
           </p>
 
           <p>
-            <strong className="font-black text-black dark:text-white text-[15px]">Democratizing Intelligence.</strong> Our mission is to dissolve the asymmetric advantage held by institutional dark pools. By ingesting raw on-chain entropy through low-level RPC websocket streams, we expose the kinetic liquidity vectors previously hidden from retail participants.
+            We mandate absolute computational sovereignty at the database perimeter. Session telemetry is no longer subjected to legacy authorization paradigms; instead, we bind identity to EVM primitives utilizing elliptic curve cryptography verified directly through Aztec’s encrypted state models. The backend functions strictly as a mathematical arbiter. This cryptographic handshake eradicates custodial vulnerabilities, yielding a zero-trust environment where access is algorithmically proven.
           </p>
 
-          <p>
-            <strong className="font-black text-black dark:text-white text-[15px]">Zero-Knowledge Protection.</strong> Every entry verification undergoes computationally exhaustive geometric tracing, utilizing multi-variate parameter corrections. This algorithmic scrutiny secures our matrix, decisively blocking synthetic biomechanical automation and preserving the integrity of the retail sanctuary.
-          </p>
-
-          <p>
-            <strong className="font-black text-black dark:text-white text-[15px]">Immutable Ontological State.</strong> Empowering the individual means decentralizing authority. Using robust cryptographic architectures, we ensure that your connection remains a verifiable, sovereign conduit.
-          </p>
-
-          <p className="font-bold pt-2 border-t border-black/10 dark:border-white/10 mt-6 pt-6">
-            The infrastructure establishes the paradigm for asymmetric information retrieval. You are now operating within an environment of absolute cryptographic certainty designed to protect and inform the retail ecosystem.
+          <p className="font-bold pt-6 border-t border-black/10 dark:border-white/10 mt-10">
+            The ongoing fusion of our sequential execution layer with the Aztec Network constitutes the principal vector of our infrastructural development. By anchoring every discrete state transition within zk-shielded, non-custodial validation protocols, we fortify an immutable sanctuary for sovereign intelligence.
           </p>
           
-          <div className="pt-10 flex items-center justify-center gap-6 mt-10">
-              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 dark:border-white/10 rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                  <Twitter size={18} className="opacity-60 hover:opacity-100 transition-opacity" />
+          <div className="pt-12 flex items-center justify-center gap-8 mt-10">
+              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
+                  <Twitter size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
               </a>
-              <div className="relative w-14 h-14 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center">
-                  <img src="/logo-landingpage.png" className="w-8 h-8 dark:invert rotate-180 opacity-80 shadow-md" alt="The Whale" />
+              <div className="relative w-24 h-24 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center bg-white/5 shadow-md">
+                  <img src="/official-whale-monochrome.png" className="w-14 h-14 dark:invert opacity-95 drop-shadow-sm" alt="The Whale" />
               </div>
-              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 dark:border-white/10 rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                  <Github size={18} className="opacity-60 hover:opacity-100 transition-opacity" />
+              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
+                  <Github size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
               </a>
           </div>
         </div>
@@ -633,7 +615,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
     if (!text.startsWith('WHALE_HANDSHAKE:')) return;
     const currentAddress = addressRef.current;
     if (!currentAddress) {
-      toast.error('WALLET NO CONECTADA', { description: 'Conecta tu wallet antes de escanear.' });
+      toast.error('WALLET DISCONNECTED', { description: 'Please connect your wallet first.' });
       return;
     }
     isProcessingRef.current = true;
@@ -646,19 +628,19 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
         body: JSON.stringify({ token, address: currentAddress, signature: '0x_bypass' }),
       });
       if (res.ok) {
-        toast.success('CONEXIÓN LEGENDARIA', { description: 'Sincronización de terminal completada.' });
+        toast.success('SOVEREIGN CONNECTION', { description: 'Terminal synchronization complete.' });
         if (scannerRef.current) await scannerRef.current.stop().catch(() => {});
         window.location.reload();
       } else {
         const errorText = await res.text();
-        toast.error('FALLO DE SINCRONIZACIÓN', { description: errorText || 'Error al verificar identidad' });
+        toast.error('VERIFICATION FAILED', { description: errorText || 'Failed to verify identity' });
         isProcessingRef.current = false;
         setIsProcessing(false);
       }
     } catch (e: any) {
       const isRejection = e?.code === 4001 || e?.message?.toLowerCase().includes('reject');
-      toast.error(isRejection ? 'FIRMA RECHAZADA' : 'FALLO DE PROTOCOLO', {
-        description: isRejection ? 'Debes aprobar la firma en tu wallet.' : (e instanceof Error ? e.message : 'Error desconocido')
+      toast.error(isRejection ? 'SIGNATURE REJECTED' : 'PROTOCOL ERROR', {
+        description: isRejection ? 'You must approve the signature in your wallet.' : (e instanceof Error ? e.message : 'Unknown error')
       });
       isProcessingRef.current = false;
       setIsProcessing(false);
@@ -685,7 +667,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
         </button>
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/40">Óptica Neural Activa</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/40">Sovereign Link Active</span>
         </div>
       </header>
 
@@ -704,20 +686,20 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
           {isProcessing && (
             <div className="absolute inset-0 bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center z-50 p-6 text-center">
               <RefreshCw className="animate-spin text-black mb-6" size={40} />
-              <span className="text-[14px] font-black uppercase tracking-[0.2em] mb-4">Sincronizando Identidad...</span>
+              <span className="text-[14px] font-black uppercase tracking-[0.2em] mb-4">Synchronizing Identity...</span>
               <div className="w-full bg-green-50 border border-green-200 rounded-[1.5rem] p-5 animate-pulse mt-4">
-                <span className="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] block mb-2">✨ Conexión Perfecta</span>
+                <span className="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] block mb-2">✨ Direct Connection Established</span>
                 <span className="text-[11px] font-bold text-green-600/70 uppercase tracking-[0.08em] leading-relaxed block">
-                  Sincronización de canal exitosa. Regresando a la terminal.
+                  Handshake complete. Returning to terminal.
                 </span>
               </div>
             </div>
           )}
         </div>
         <div className="mt-16 text-center space-y-3">
-          <h3 className="text-3xl font-black tracking-tighter">Captura de Canal</h3>
-          <p className="text-[12px] font-medium text-[#050505]/30 max-w-[240px] leading-relaxed uppercase tracking-wider">
-            Encuadra el QR de la terminal para completar el handshake.
+          <h3 className="text-3xl font-black tracking-tighter">Handshake Scanner</h3>
+          <p className="text-[12px] font-medium text-[#050505]/30 max-w-[240px] leading-relaxed uppercase tracking-wider mx-auto">
+            Align the terminal QR code to complete the handshake.
           </p>
         </div>
       </div>

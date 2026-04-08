@@ -214,6 +214,7 @@ model GoldenTicket {
   networkLaunchEligible Boolean  @default(true)
   ticketNumber          Int      @default(autoincrement())
   twitterHandle         String?
+  signatureData         String?  @db.Text
   isActive              Boolean  @default(true)
   claimedAt             DateTime @default(now())
 }
