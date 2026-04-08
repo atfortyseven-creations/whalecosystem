@@ -209,10 +209,12 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
 export function GoldTicketPanel() {
   const { address, isConnected, chainId } = useAccount();
   const { connect }      = useConnect();
-  const { switchChain }  = useSwitchChain();
-
   const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any } | null>(null);
   const [signatureData, setSignatureData] = useState<string>("");
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => setIsMounted(true), []);
+
   const hasValidSignature = signatureData.length > 50;
 
   const fetchDbStats = useCallback(async () => {
@@ -327,6 +329,15 @@ export function GoldTicketPanel() {
       toast.error(e?.message ?? 'Failed to build transaction');
     }
   };
+
+  // ── PRE-HYDRATION FALLBACK ───────────────────────────────────────────────────
+  if (!isMounted) {
+    return (
+      <div className="w-full flex justify-center items-center py-20 min-h-[400px]">
+         <div className="w-10 h-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // ── ALREADY HOLDS TICKET ─────────────────────────────────────────────────────
   if (hasTicket || isConfirmed) {

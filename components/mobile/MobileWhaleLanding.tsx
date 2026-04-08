@@ -725,6 +725,11 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [walletBrowser, setWalletBrowser] = useState<string | null>(null);
   const [showGame, setShowGame] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Offline detection
   useEffect(() => {
@@ -764,6 +769,10 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
       window.location.reload();
     }
   }, [onEnterNews]);
+
+  if (!isMounted) {
+    return <div className="w-full h-[100dvh] bg-transparent" />;
+  }
 
   if (view === 'scanner') {
     return <MobileQRScanner onBack={() => setView('landing')} address={address} signMessageAsync={signMessageAsync} />;
