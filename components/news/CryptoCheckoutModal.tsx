@@ -65,10 +65,27 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
 
   const handleTransact = () => {
     if (!isConnected) return;
-    if (chainId !== TARGET_CHAIN && switchChain) {
-      switchChain({ chainId: TARGET_CHAIN });
+    
+    if (chainId !== TARGET_CHAIN) {
+      if (switchChain) {
+        switchChain(
+          { chainId: TARGET_CHAIN },
+          {
+            onSuccess: () => {
+              // Wait a bit for the chain to fully register in wagmi state before sending TX
+              setTimeout(() => {
+                sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
+              }, 1500);
+            },
+            onError: (err) => {
+              console.error(err);
+            }
+          }
+        );
+      }
       return;
     }
+    
     sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
   };
 
@@ -198,8 +215,8 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
                     </button>
                   )}
                   {writeError && (
-                    <p className="text-center text-red-500 font-mono text-[8px] uppercase tracking-[0.2em] font-bold">
-                      [ERROR] {writeError.message.split('.')[0]}
+                    <p className="text-center text-red-500 font-mono text-[9px] uppercase tracking-[0.1em] font-bold mt-2">
+                       ❌ FONDOS INSUFICIENTES EN OPTIMISM O TRANSACCIÓN RECHAZADA.
                     </p>
                   )}
                 </div>
