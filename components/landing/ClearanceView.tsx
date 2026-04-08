@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Clock, User, Terminal, Activity, ChevronLeft } from "lucide-react";
-import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt } from "wagmi";
+import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt, useConnect } from "wagmi";
+import { injected } from "wagmi/connectors";
 import { parseEther } from "viem";
 import { useNewsStore } from "@/lib/store/news-store";
 
@@ -41,8 +42,11 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
 
   const [rates, setRates] = useState<{ eur: number; usd: number } | null>(null);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [mounted, setMounted] = useState(false);
+  const { connect } = useConnect();
 
   useEffect(() => {
+    setMounted(true);
     fetchCryptoRates().then(setRates);
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
@@ -114,7 +118,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
               <div className="flex items-center gap-3 text-black/40">
                 <User size={12} />
                 <span className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold">
-                  {isConnected && address
+                  {mounted && isConnected && address
                     ? `ID: ${address.slice(0, 10)}...${address.slice(-6)}`
                     : "ENTIDAD NO DETECTADA"}
                 </span>
@@ -199,11 +203,19 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
               </motion.div>
             ) : (
               <div className="space-y-6">
-                {!isConnected ? (
-                  <div className="flex justify-center scale-110">
-                    {/* @ts-ignore */}
-                    <appkit-button />
+                {!mounted ? (
+                  <div className="py-7 text-center font-mono text-xs uppercase tracking-widest text-[#888888]">
+                    Iniciando Sistema...
                   </div>
+                ) : !isConnected ? (
+                  <motion.button
+                    onClick={() => connect({ connector: injected() })}
+                    whileHover={{ scale: 1.02, backgroundColor: "#111" }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-[#050505] text-white font-mono text-xs font-black uppercase py-7 tracking-[0.4em] flex justify-center items-center gap-4 transition-all duration-300 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
+                  >
+                    CONECTAR WALLET // L2
+                  </motion.button>
                 ) : (
                   <motion.button
                     onClick={handleTransact}
