@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     LifeBuoy, MessageCircle, Mail, ExternalLink,
@@ -18,12 +18,7 @@ interface Ticket {
     lastReply: string;
 }
 
-const DEMO_TICKETS: Ticket[] = [
-    { id: 'WHK-1042', subject: 'API key rate limit exceeded — need enterprise tier',    status: 'In Progress', priority: 'High',     createdAt: '2026-04-01', lastReply: '2026-04-03' },
-    { id: 'WHK-1038', subject: 'Watchlist not saving across sessions',                  status: 'Resolved',    priority: 'Medium',   createdAt: '2026-03-28', lastReply: '2026-03-30' },
-    { id: 'WHK-1031', subject: 'Request: Telegram bot integration for alerts',          status: 'Open',        priority: 'Low',      createdAt: '2026-03-22', lastReply: '2026-03-22' },
-    { id: 'WHK-1019', subject: 'Gold Ticket claim not processing — payment stuck',      status: 'Resolved',    priority: 'Critical', createdAt: '2026-03-15', lastReply: '2026-03-16' },
-];
+// No hardcoded demo tickets — real data only from API
 
 const FAQ = [
     {
@@ -71,6 +66,25 @@ export function WhaleSupport() {
     const [message, setMessage]     = useState('');
     const [priority, setPriority]   = useState<'Low' | 'Medium' | 'High'>('Medium');
     const [submitting, setSubmitting] = useState(false);
+    const [tickets, setTickets]     = useState<Ticket[]>([]);
+    const [ticketsLoading, setTicketsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTickets = async () => {
+            try {
+                const res = await fetch('/api/support/tickets');
+                if (res.ok) {
+                    const data = await res.json();
+                    setTickets(data.tickets || []);
+                }
+            } catch {
+                // API not available — show empty state, not fake data
+            } finally {
+                setTicketsLoading(false);
+            }
+        };
+        fetchTickets();
+    }, []);
 
     const handleSubmit = async () => {
         if (!subject || !message) { toast.error('Please fill in subject and message'); return; }
@@ -109,13 +123,9 @@ export function WhaleSupport() {
                         <LifeBuoy size={22} className="text-white"/>
                     </div>
                     <div>
-                        <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest">Whale Support Center</h2>
-                        <p className="text-[10px] text-[#888888]">Average response time: under 4 hours · 24/7 for critical issues</p>
+                        <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest">Support Center</h2>
+                        <p className="text-[10px] text-[#888888]">Average response: under 4 hours · 24h for critical issues</p>
                     </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse"/>
-                    <span className="text-[9px] font-black text-[#00C076] uppercase">Support Online</span>
                 </div>
             </div>
 
@@ -186,10 +196,14 @@ export function WhaleSupport() {
                     <div className="bg-white border border-[#E5E5E5] rounded-2xl overflow-hidden shadow-sm">
                         <div className="px-6 py-4 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
                             <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest">My Tickets</span>
-                            <span className="text-[8px] text-[#888888]">{DEMO_TICKETS.length} total</span>
+                            <span className="text-[8px] text-[#888888]">{tickets.length} total</span>
                         </div>
                         <div className="divide-y divide-[#F0F0F0]">
-                            {DEMO_TICKETS.map((t, i) => (
+                            {ticketsLoading ? (
+                                <div className="py-8 text-center text-[9px] font-mono text-[#888888]">Loading tickets…</div>
+                            ) : tickets.length === 0 ? (
+                                <div className="py-8 text-center text-[9px] font-mono text-[#888888]">No tickets yet. Submit one below.</div>
+                            ) : tickets.map((t, i) => (
                                 <motion.div key={t.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.06 }}
                                     className="px-5 py-4 hover:bg-[#FAF9F6] transition-colors">
                                     <div className="flex items-start justify-between gap-2">

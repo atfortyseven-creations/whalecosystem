@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from "framer-motion";
-import { Terminal, Database, Shield, Zap, Globe, Cpu, ArrowRight, Binary } from "lucide-react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { Terminal, Database, Shield, Binary } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useUIStore } from "@/lib/store/ui-store";
@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useSWR from "swr";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,10 +69,10 @@ function DataTicker() {
   const content = [...tData, ...tData, ...tData];
 
   return (
-    <div className="relative w-full border-y border-[#00FF55]/20 bg-[#000000] overflow-hidden py-2" style={{ boxShadow: "inset 0 0 20px rgba(0,255,85,0.05)" }}>
+    <div className="relative w-full border-y border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 overflow-hidden py-2" style={{ boxShadow: "inset 0 0 20px rgba(0,0,0,0.02)" }}>
       <motion.div className="flex gap-16 will-change-transform w-max" animate={{ x: [0, -2000] }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
         {content.map((item: string, i: number) => (
-          <span key={i} className="text-[10px] font-mono uppercase tracking-[0.3em] font-black" style={{ color: item.includes("⚠") ? "#FF0055" : "#00FF55" }}>
+          <span key={i} className={`text-[10px] font-mono uppercase tracking-[0.3em] font-black ${item.includes("⚠") ? "text-red-500" : "text-black dark:text-white"}`}>
             {item}
           </span>
         ))}
@@ -86,17 +87,16 @@ function ZKCard({ icon, title, desc, delay = 0 }: { icon: React.ReactNode; title
     <Reveal delay={delay}>
       <div 
         onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-        className="relative p-8 border border-[#333333] transition-colors duration-200 bg-[#000000]"
-        style={{ borderColor: hovered ? "#00FF55" : "#222222" }}
+        className="relative p-8 border border-black/10 dark:border-white/10 transition-colors duration-200 bg-white dark:bg-black hover:border-black/30 dark:hover:border-white/30"
       >
-        <div className="absolute top-0 right-0 p-2 opacity-30 font-mono text-[8px] text-[#00FF55]">[{title.slice(0,3).toUpperCase()}_MOD]</div>
-        <div className="mb-6 inline-flex p-3 border border-[#00FF55]/30 text-[#00FF55] bg-[#00FF55]/5">
+        <div className="absolute top-0 right-0 p-2 opacity-30 font-mono text-[8px] text-black dark:text-white">[{title.slice(0,3).toUpperCase()}_MOD]</div>
+        <div className="mb-6 inline-flex p-3 border border-black/10 dark:border-white/10 text-black dark:text-white bg-black/5 dark:bg-white/5">
             {icon}
         </div>
-        <h3 className="font-mono text-xl font-bold mb-3 text-white uppercase tracking-tight">::{title}</h3>
-        <p className="font-mono text-xs text-[#888888] leading-relaxed uppercase tracking-wider">{desc}</p>
+        <h3 className="font-mono text-xl font-bold mb-3 text-black dark:text-white uppercase tracking-tight">::{title}</h3>
+        <p className="font-mono text-xs text-black/50 dark:text-white/50 leading-relaxed uppercase tracking-wider">{desc}</p>
         
-        <motion.div className="absolute bottom-0 left-0 h-[2px] bg-[#00FF55]"
+        <motion.div className="absolute bottom-0 left-0 h-[2px] bg-black dark:bg-white"
           initial={{ width: 0 }} animate={{ width: hovered ? "100%" : 0 }} />
       </div>
     </Reveal>
@@ -130,39 +130,45 @@ export function WhaleAlertLanding() {
   }, [isConnected, router, openConnectModal]);
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-x-hidden bg-black text-white font-sans selection:bg-[#00FF55] selection:text-black">
+    <div ref={containerRef} className="relative w-full overflow-x-hidden bg-white dark:bg-black text-black dark:text-white font-sans transition-colors duration-300">
       
-      {/* ── HERO ── */}
-      <section className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black">
-        {/* CRT GRID */}
-        <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: `linear-gradient(#00FF55 1px, transparent 1px), linear-gradient(90deg, #00FF55 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
+      {/* ── HEADER WITH TOGGLE ── */}
+      <header className="absolute top-0 w-full flex items-center justify-between p-6 z-50">
+          <div className="font-black text-xl font-aztec-serif uppercase tracking-tight">WAN</div>
+          <ThemeToggle />
+      </header>
 
-        <div className="relative z-10 w-full flex flex-col items-center px-6 text-center">
+      {/* ── HERO ── */}
+      <section className="relative flex flex-col items-center justify-center min-h-[90vh]">
+        {/* CRT GRID */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-20" style={{ backgroundImage: `linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
+
+        <div className="relative z-10 w-full flex flex-col items-center px-6 text-center mt-10">
             <AnimatePresence mode="wait">
                 {!showClearance ? (
                     <motion.div key="core" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
-                        <div className="px-4 py-1 mb-8 border border-[#00FF55] text-[#00FF55] font-mono text-[9px] font-black uppercase tracking-[0.4em]">
+                        <div className="px-4 py-1 mb-8 border border-black/10 dark:border-white/10 text-black dark:text-white font-mono text-[9px] font-black uppercase tracking-[0.4em] bg-black/5 dark:bg-white/5">
                             SECURE CONNECTION ESTABLISHED
                         </div>
-                        <h1 className="font-mono text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase whitespace-nowrap">
-                            <span className="text-white">WHALE</span><span className="text-[#00FF55]">ALERT</span>
+                        <h1 className="font-mono text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase whitespace-nowrap text-black dark:text-white">
+                            WHALE<br />ALERT
                         </h1>
-                        <p className="font-mono text-sm md:text-base text-[#888888] max-w-2xl leading-relaxed uppercase tracking-widest mb-12">
-                            Zero-Knowledge architecture tracking global liquidity flow.
+                        <p className="font-mono text-sm md:text-base text-black/60 dark:text-white/60 max-w-2xl leading-relaxed uppercase tracking-widest mb-12 font-medium">
+                            Democratizing Intelligence. Uncovering dark liquidity to protect retail flow.
                         </p>
                         <div className="flex gap-4">
-                            <button onClick={handleEntry} className="group relative px-8 py-4 bg-[#00FF55] text-black font-mono text-sm font-black uppercase tracking-[0.2em] transition-all hover:bg-white">
+                            <button onClick={handleEntry} className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-mono text-sm font-black uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-xl">
                                 CONNECT WALLET
                             </button>
-                            <button onClick={() => setShowClearance(true)} className="px-8 py-4 border border-[#333333] text-white font-mono text-sm font-black uppercase tracking-[0.2em] hover:border-[#00FF55] hover:text-[#00FF55] transition-colors">
+                            <button onClick={() => setShowClearance(true)} className="px-8 py-4 border border-black/20 dark:border-white/20 text-black dark:text-white font-mono text-sm font-black uppercase tracking-[0.2em] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                 GET ACCESS PASS
                             </button>
                         </div>
                         
-                        <div className="mt-20 flex gap-12 font-mono text-[10px] uppercase tracking-[0.3em] font-black text-[#888888]">
-                            <div><span className="text-white block mb-1">0x89A...FF80</span>NODE_ID</div>
-                            <div><span className="text-[#00FF55] block mb-1">ZERO</span>LATENCY</div>
-                            <div><span className="text-white block mb-1">E2E</span>ENCRYPTED</div>
+                        <div className="mt-20 flex gap-12 font-mono text-[10px] uppercase tracking-[0.3em] font-black text-black/50 dark:text-white/50">
+                            <div><span className="text-black dark:text-white block mb-1">0x89A...FF80</span>NODE_ID</div>
+                            <div><span className="text-black dark:text-white block mb-1">ZERO</span>LATENCY</div>
+                            <div><span className="text-black dark:text-white block mb-1">E2E</span>ENCRYPTED</div>
                         </div>
                     </motion.div>
                 ) : (
@@ -177,7 +183,7 @@ export function WhaleAlertLanding() {
       <DataTicker />
 
       {/* ── MODULES ── */}
-      <section className="py-32 px-6 max-w-6xl mx-auto border-t border-[#222222]">
+      <section className="py-32 px-6 max-w-6xl mx-auto border-t border-black/5 dark:border-white/5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <ZKCard icon={<Terminal size={24}/>} title="Direct Ingestion" desc="Bypassing visual abstractions. Raw RPC feeds merged into local matrix states." delay={0}/>
               <ZKCard icon={<Shield size={24}/>} title="Zero-Knowledge Base" desc="You are mathematically isolated from the host server. Cryptographic E2E logic." delay={0.1}/>
@@ -187,10 +193,10 @@ export function WhaleAlertLanding() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-40 border-y border-[#333333] bg-[#050505] text-center">
-          <h2 className="font-mono text-3xl font-black uppercase tracking-tight text-white mb-6">CONNECT TO PLATFORM</h2>
-          <p className="font-mono text-xs text-[#888888] mb-12 uppercase tracking-[0.2em]">Live real-time intelligence data.</p>
-          <button onClick={handleEntry} className="px-10 py-5 bg-white text-black font-mono text-sm font-black uppercase tracking-[0.3em] hover:bg-[#00FF55]">
+      <section className="py-40 border-y border-black/5 dark:border-white/5 bg-black/5 dark:bg-[#0A0A0A] text-center">
+          <h2 className="font-mono text-3xl font-black uppercase tracking-tight text-black dark:text-white mb-6">CONNECT TO PLATFORM</h2>
+          <p className="font-mono text-xs text-black/50 dark:text-white/50 mb-12 uppercase tracking-[0.2em]">Live real-time intelligence data.</p>
+          <button onClick={handleEntry} className="px-10 py-5 bg-black dark:bg-white text-white dark:text-black font-mono text-sm font-black uppercase tracking-[0.3em] hover:scale-105 transition-transform shadow-lg">
               CONNECT
           </button>
       </section>
@@ -202,26 +208,26 @@ export function WhaleAlertLanding() {
       {/* ── ZK HANDSHAKE MODAL ── */}
       <AnimatePresence>
         {showDocumentGate && (
-          <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] bg-white/90 dark:bg-black/90 backdrop-blur-md flex items-center justify-center p-4 transition-colors">
             <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} 
-                className="bg-black border border-[#00FF55]/50 p-8 max-w-2xl w-full flex flex-col font-mono shadow-[0_0_50px_rgba(0,255,85,0.1)]">
-              <div className="flex items-center gap-3 mb-6 border-b border-[#333333] pb-4">
-                 <Terminal className="text-[#00FF55]" size={20} />
-                 <h2 className="text-xl font-black uppercase tracking-tight text-[#00FF55]">CONNECT PROTOCOL</h2>
+                className="bg-white dark:bg-black border border-black/10 dark:border-white/20 p-8 max-w-2xl w-full flex flex-col font-mono shadow-2xl">
+              <div className="flex items-center gap-3 mb-6 border-b border-black/10 dark:border-white/10 pb-4">
+                 <Terminal className="text-black dark:text-white" size={20} />
+                 <h2 className="text-xl font-black uppercase tracking-tight text-black dark:text-white">CONNECT PROTOCOL</h2>
               </div>
               
-              <div className="flex-1 mb-8 p-6 bg-[#050505] border border-[#222222] text-[11px] font-bold text-[#888888] leading-[2] uppercase tracking-wider">
-                 <p className="mb-4 text-white">CONNECTING...</p>
+              <div className="flex-1 mb-8 p-6 bg-black/5 dark:bg-[#050505] border border-black/10 dark:border-white/10 text-[11px] font-bold text-black/60 dark:text-white/60 leading-[2] uppercase tracking-wider">
+                 <p className="mb-4 text-black dark:text-white">CONNECTING...</p>
                  <p className="mb-4">By bypassing this gateway, you enter an absolute Zero-Trust environment. The intelligence matrix offers raw telemetry without financial advice.</p>
                  <p className="mb-4">All cryptographic validations and signatures occur strictly client-side. The node acts purely as a relay.</p>
-                 <p className="mt-8 text-[#00FF55]">WAITING FOR SIGNATURE</p>
+                 <p className="mt-8 text-black dark:text-white decoration-solid underline underline-offset-4">WAITING FOR SIGNATURE</p>
               </div>
 
               <div className="flex gap-4">
-                <button onClick={() => setShowDocumentGate(false)} className="px-6 py-4 border border-[#333333] text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#222222] transition-colors">
+                <button onClick={() => setShowDocumentGate(false)} className="px-6 py-4 border border-black/20 dark:border-white/20 text-black dark:text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     CANCEL
                 </button>
-                <button onClick={executeSystemEntry} className="flex-1 py-4 bg-[#00FF55] text-black font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white transition-colors">
+                <button onClick={executeSystemEntry} className="flex-1 py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-[10px] hover:scale-[1.02] transition-transform">
                    SIGN MESSAGE
                 </button>
               </div>

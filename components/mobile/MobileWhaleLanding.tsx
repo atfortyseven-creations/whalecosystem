@@ -14,7 +14,10 @@ import {
   Eye,
   Zap,
   Shield,
+  Twitter,
+  Github
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -110,12 +113,12 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
         }
         .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
       ` }} />
-      {/* Zero-Trust Black Background */}
-      <div className="fixed inset-0 z-0 overflow-hidden bg-[#000000]" />
+      {/* Zero-Trust Background adhering to light/dark system */}
+      <div className="fixed inset-0 z-0 overflow-hidden bg-[#FDFBF7] dark:bg-[#000000]" />
       {/* Optional subtle dot overlay for depth */}
       <motion.div
         aria-hidden="true"
-        className="fixed -inset-[32px] msv-dot-pattern pointer-events-none z-[1] opacity-20"
+        className="fixed -inset-[32px] msv-dot-pattern pointer-events-none z-[1] opacity-20 dark:opacity-10"
         animate={{ x: [0, -32], y: [0, -32] }}
         transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
         style={{ willChange: 'transform' }}
@@ -368,16 +371,20 @@ function PageHero({
     <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
 
       {/* TOP BAR */}
-      <header className="w-full flex items-center justify-end z-20 h-10">
-        {isConnected && (
-          <button
-            onClick={onDisconnect}
-            className="w-10 h-10 bg-white border border-black/5 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
-            style={{ willChange: 'transform' }}
-          >
-            <RefreshCw size={14} className="text-[#050505]/40" />
-          </button>
-        )}
+      <header className="w-full flex items-center justify-between z-20 h-10 px-4">
+        <div className="flex-1" />
+        <div className="flex items-center gap-3">
+            <ThemeToggle />
+            {isConnected && (
+              <button
+                onClick={onDisconnect}
+                className="w-10 h-10 bg-black/5 dark:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform text-black border border-black/10 dark:text-white dark:border-white/10"
+                style={{ willChange: 'transform' }}
+              >
+                <RefreshCw size={14} className="opacity-60" />
+              </button>
+            )}
+        </div>
       </header>
 
       {/* HERO */}
@@ -412,22 +419,22 @@ function PageHero({
             </motion.div>
           )}
 
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-[0.9] mb-6 uppercase italic relative z-10 drop-shadow-md">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-[0.9] mb-6 uppercase italic relative z-10 drop-shadow-md text-black dark:text-white">
             Whale Alert<br />Network
           </h1>
 
           {!isConnected ? (
             <div className="w-full space-y-4">
-              <p className="text-[12px] font-bold text-[#050505]/30 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
+              <p className="text-[12px] font-bold text-black/40 dark:text-white/40 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
                 Connect with<br />PC session.
               </p>
 
               <button
                 onClick={onConnect}
-                className="w-full h-[88px] bg-[#050505] text-white rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] group"
+                className="w-full h-[88px] bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_40px_-15px_rgba(255,255,255,0.2)] group border border-black/5 dark:border-white/5"
                 style={{ willChange: 'transform' }}
               >
-                <Wallet size={20} className="text-white/40 group-active:translate-x-1 transition-transform" />
+                <Wallet size={20} className="text-white/40 dark:text-black/40 group-active:translate-x-1 transition-transform" />
                 CONNECT WALLET
               </button>
             </div>
@@ -565,38 +572,44 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
 // ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent">
+    <div className="msv-snap-page min-h-[100dvh] w-full font-serif flex flex-col px-8 pt-20 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
-        <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase text-[#050505] border-b border-black/10 pb-6 mb-8 flex items-center justify-between">
+        <h2 className="text-[11px] font-mono font-black tracking-[0.4em] uppercase border-b border-black/10 dark:border-white/10 pb-6 mb-8 flex items-center justify-between">
           <span>Technical Manifesto</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white animate-pulse" />
         </h2>
         
-        <div className="text-[14.5px] leading-[1.85] text-[#050505]/80 space-y-7 text-justify tracking-wide font-medium">
+        <div className="text-[14.5px] leading-[1.85] opacity-80 space-y-7 text-justify tracking-wide font-medium">
           <p>
-            The fundamental architecture of the Sovereign Terminal transcends conventional heuristic data aggregation. It is formulated as an institutional-grade, deterministic macro-analysis system. The network does not merely process data; it ingests raw on-chain entropy through low-level RPC websocket streams at 240Hz, bypassing superficial middle-tier abstractions.
+            The fundamental architecture of the Whale Alert Network transcends conventional heuristic data aggregation. It is formulated as an institutional-grade, deterministic macro-analysis system dedicated to transparency.
           </p>
 
           <p>
-            <strong className="font-black text-[#050505] text-[15px]">Zero-Knowledge Determinism.</strong> Our perimeter enforces stringent cryptographic isolation. Every entry verification undergoes computationally exhaustive geometric tracing, utilizing one hundred trillion multi-variate parameter corrections. This algorithmic scrutiny evaluates trajectory densities and kinematic pressure with uncompromising mathematical rigor to guarantee absolute human agency, decisively blocking all synthetic biomechanical automation.
+            <strong className="font-black text-black dark:text-white text-[15px]">Democratizing Intelligence.</strong> Our mission is to dissolve the asymmetric advantage held by institutional dark pools. By ingesting raw on-chain entropy through low-level RPC websocket streams, we expose the kinetic liquidity vectors previously hidden from retail participants.
           </p>
 
           <p>
-            <strong className="font-black text-[#050505] text-[15px]">Immutable Ontological State.</strong> The <em className="italic text-black font-black">Genesis Gold Ticket</em> functions not as a mutable database entry, but as a foundational on-chain primitive. Institutional hierarchies and access credentials are irrevocably persisted within high-availability PostgreSQL relational architectures and anchored to ERC-1155 token matrices, thereby reducing concurrency anomalies to absolute zero.
+            <strong className="font-black text-black dark:text-white text-[15px]">Zero-Knowledge Protection.</strong> Every entry verification undergoes computationally exhaustive geometric tracing, utilizing multi-variate parameter corrections. This algorithmic scrutiny secures our matrix, decisively blocking synthetic biomechanical automation and preserving the integrity of the retail sanctuary.
           </p>
 
           <p>
-            <strong className="font-black text-[#050505] text-[15px]">Distributed Knowledge Graph.</strong> The system leverages a horizontally scaled Neo4j Knowledge Graph topology. This graph-theoretic engine cross-references dark pool liquidity intersections, rigorously audited semantic smart contracts, and cross-chain financial vectors independently, orchestrated entirely by WebAssembly engines executing at zero-latency thresholds.
+            <strong className="font-black text-black dark:text-white text-[15px]">Immutable Ontological State.</strong> Empowering the individual means decentralizing authority. Using robust cryptographic architectures, we ensure that your connection remains a verifiable, sovereign conduit.
           </p>
 
-          <p className="font-bold text-[#050505] pt-2">
-            The infrastructure establishes the paradigm for asymmetric information retrieval. You are now operating within an environment of absolute cryptographic certainty and empirical infrastructural truth.
+          <p className="font-bold pt-2 border-t border-black/10 dark:border-white/10 mt-6 pt-6">
+            The infrastructure establishes the paradigm for asymmetric information retrieval. You are now operating within an environment of absolute cryptographic certainty designed to protect and inform the retail ecosystem.
           </p>
           
-          <div className="pt-10 flex flex-col items-center border-t border-black/10 mt-10">
-              <span className="text-[#050505]/60 font-black tracking-[0.4em] text-center uppercase text-[9px] block">
-                 Omniscience • Invariance • Supremacy
-              </span>
+          <div className="pt-10 flex items-center justify-center gap-6 mt-10">
+              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 dark:border-white/10 rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                  <Twitter size={18} className="opacity-60 hover:opacity-100 transition-opacity" />
+              </a>
+              <div className="relative w-14 h-14 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center">
+                  <img src="/logo-landingpage.png" className="w-8 h-8 dark:invert rotate-180 opacity-80 shadow-md" alt="The Whale" />
+              </div>
+              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 dark:border-white/10 rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                  <Github size={18} className="opacity-60 hover:opacity-100 transition-opacity" />
+              </a>
           </div>
         </div>
       </motion.div>
