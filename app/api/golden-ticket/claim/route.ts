@@ -18,68 +18,84 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
     }
 
+    // Validate hex address — accept both lower and checksummed
     const address = walletAddress.toLowerCase();
-
-    if (!/^0x[a-f0-9]{40}$/i.test(address)) {
+    if (!/^0x[a-f0-9]{40}$/.test(address)) {
       return NextResponse.json({ error: 'Malformed wallet address' }, { status: 400 });
     }
 
-    // Guard: max supply
-    const totalClaimed = await prisma.goldenTicket.count();
-    if (totalClaimed >= MAX_SUPPLY) {
-      return NextResponse.json({ error: 'Max supply reached. All 200 Whale Gold Tickets have been minted.' }, { status: 410 });
-    }
-
-    // Upsert user (only fields that exist in schema)
-    await prisma.user.upsert({
-      where: { walletAddress: address },
-      update: {},
-      create: { walletAddress: address },
+    // Check for existing claim BEFORE opening a transaction (fast path)
+    const existing = await prisma.goldenTicket.findUnique({
+      where: { userAddress: address },
+      select: { id: true, ticketNumber: true, serialCode: true, tier: true, badgeColor: true,
+                networkLaunchEligible: true, twitterHandle: true, isActive: true, claimedAt: true }
     });
-
-    // Check existing
-    const existing = await prisma.goldenTicket.findUnique({ where: { userAddress: address } });
     if (existing) {
       return NextResponse.json({
-        success: false,
-        alreadyClaimed: true,
-        ticket: existing,
+        success: false, alreadyClaimed: true, ticket: existing,
         serial: existing.ticketNumber,
         message: 'This wallet has already claimed its Genesis Ticket.',
       }, { status: 409 });
     }
 
-    // Create with temp serialCode to avoid race P2002
-    const ticket = await prisma.goldenTicket.create({
-      data: {
-        userAddress: address,
-        serialCode: `PENDING-${address}-${Date.now()}`,
-        tier: 'GENESIS',
-        badgeColor: 'GOLD',
-        networkLaunchEligible: true,
-        twitterHandle: twitterHandle?.replace(/^@/, '') || null,
-      },
-    });
+    // FIX: TOCTOU race condition.
+    // Previously: count check + create were 2 separate operations. Under concurrent
+    // load, two requests could both pass the count check and both mint, exceeding
+    // the MAX_SUPPLY of 200 golden tickets permanently.
+    // Fix: wrap count check + upsert user + create ticket in a single serializable
+    // Prisma interactive transaction, making the supply guard atomic.
+    const result = await prisma.$transaction(async (tx) => {
+      const totalClaimed = await tx.goldenTicket.count();
+      if (totalClaimed >= MAX_SUPPLY) {
+        throw new Error('MAX_SUPPLY_REACHED');
+      }
 
-    const serialNumber = String(ticket.ticketNumber).padStart(4, '0');
-    const finalTicket = await prisma.goldenTicket.update({
-      where: { id: ticket.id },
-      data: { serialCode: `WGT-GENESIS-${serialNumber}` },
-    });
+      // Ensure the User row exists (required FK for other relations)
+      await tx.user.upsert({
+        where:  { walletAddress: address },
+        update: {},
+        create: { walletAddress: address },
+      });
+
+      // Create with a temp serialCode to avoid duplicate race on the unique column
+      const ticket = await tx.goldenTicket.create({
+        data: {
+          userAddress: address,
+          serialCode: `PENDING-${address}-${Date.now()}`,
+          tier: 'GENESIS',
+          badgeColor: 'GOLD',
+          networkLaunchEligible: true,
+          twitterHandle: twitterHandle?.replace(/^@/, '') || null,
+        },
+      });
+
+      // Finalise the human-readable serial code
+      const serialNumber = String(ticket.ticketNumber).padStart(4, '0');
+      const finalTicket = await tx.goldenTicket.update({
+        where: { id: ticket.id },
+        data:  { serialCode: `WGT-GENESIS-${serialNumber}` },
+      });
+
+      return { finalTicket, totalClaimed };
+    }, { timeout: 10_000 });
 
     return NextResponse.json({
       success: true,
-      ticket: finalTicket,
-      serial: finalTicket.ticketNumber,
-      totalClaimed: totalClaimed + 1,
+      ticket: result.finalTicket,
+      serial: result.finalTicket.ticketNumber,
+      totalClaimed: result.totalClaimed + 1,
       message: 'Whale Gold Ticket claimed successfully.',
     }, { status: 201 });
 
   } catch (error: any) {
+    if (error?.message === 'MAX_SUPPLY_REACHED') {
+      return NextResponse.json({
+        error: 'Max supply reached. All 200 Whale Gold Tickets have been minted.',
+      }, { status: 410 });
+    }
     if (error?.code === 'P2002') {
       return NextResponse.json({
-        success: false,
-        alreadyClaimed: true,
+        success: false, alreadyClaimed: true,
         message: 'This wallet has already claimed its Genesis Ticket.',
       }, { status: 409 });
     }

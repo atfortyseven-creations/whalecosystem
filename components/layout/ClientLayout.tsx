@@ -20,12 +20,13 @@ import dynamic from 'next/dynamic';
 // ─── Lazy GPU-heavy components ──────────────────────────────────────────
 // Canvas-based backgrounds run off the main thread on supporting browsers.
 // Dynamic-importing them prevents them from blocking initial hydration.
+// FIX Bug 17: HighHzWallpaper removed — rendering both UniversalEliteWallpaper
+// AND HighHzWallpaper simultaneously caused a GPU compositing storm:
+// two fixed inset-0 layers doubled VRAM usage and created blend-mode
+// artifacts on integrated GPUs (Intel HD, Apple M1 base). One wallpaper
+// system is sufficient for the entire Aztec Brutalist aesthetic.
 const UniversalEliteWallpaper = dynamic(
   () => import('@/components/shared/UniversalEliteWallpaper').then(m => m.UniversalEliteWallpaper),
-  { ssr: false }
-);
-const HighHzWallpaper = dynamic(
-  () => import('@/components/landing/HighHzWallpaper').then(m => m.HighHzWallpaper),
   { ssr: false }
 );
 const UtilityPanels = dynamic(
@@ -58,11 +59,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <ConnectWalletModal />
             
             <TitaniumGate>
-                {/* Wallpaper global: suprimido en /news para fondo blanco puro */}
+                {/* Single unified wallpaper layer — the HighHzWallpaper was removed
+                    (Bug 17) to prevent the dual-layer GPU compositing storm */}
                 {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
                 <div className="flex flex-col min-h-screen relative z-0">
                     <div className="flex-1 flex flex-col relative w-full">
-                        {(!pathname.startsWith('/developers') && !pathname.startsWith('/news')) && <HighHzWallpaper />}
 
                         {/* Reignited Institutional Header */}
                         {(

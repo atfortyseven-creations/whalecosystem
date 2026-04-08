@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from "next/server";
 
 export const revalidate = 60; // 1 minute cache for heavy subgraph queries

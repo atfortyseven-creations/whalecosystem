@@ -1,22 +1,27 @@
 import { http, createConfig } from 'wagmi'
-import { optimism, baseSepolia } from 'wagmi/chains'
-import { walletConnect } from 'wagmi/connectors'
+import { mainnet, base, bsc, optimism } from 'wagmi/chains'
+import { injected, walletConnect } from 'wagmi/connectors'
 
-// 1. Usamos el Project ID que ya tienes en Railway
-// 1. Usamos el Project ID que ya tienes en Railway
+// Project ID for WalletConnect
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WC_PROJECT_ID || '0ce6bdc0b433d45ab19d32f130dd4f18';
 
-// Token address provided by user (Ensure this matches the one in env or use one of them)
-// Using value from user env vars: NEXT_PUBLIC_WLD_TOKEN_ADDRESS
 export const WLD_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_WLD_TOKEN_ADDRESS || '0xdc6f18f83959cd25095c2453192f16d08b496666') as `0x${string}`;
 
+// ── INSTITUTIONAL CHAIN SET ────────────────────────────────────────────────────
+// These chains MUST match what the EVM workers actually monitor (evm-worker.ts):
+// ETHEREUM Mainnet, BASE Mainnet, BSC Mainnet.
+// Using testnets here would cause SovereignVault to lock funds on testnets
+// while the intelligence layer watches Mainnet — a catastrophic mismatch.
 export const config = createConfig({
-    chains: [optimism, baseSepolia],
+    chains: [mainnet, base, bsc, optimism],
     connectors: [
+        // CRITICAL: injected must be listed FIRST so MetaMask/Rabby are
+        // the default connector and contract writes get proper RPC params.
+        injected({ target: 'metaMask' }),
+        injected(),
         walletConnect({
             projectId,
             showQrModal: true,
-            // CORE PIECE: Without this, the QR will fail in World App
             metadata: {
                 name: 'WhaleAlert ID.fi',
                 description: 'The Sovereign Identity & Prediction Market Suite',
@@ -26,9 +31,11 @@ export const config = createConfig({
         }),
     ],
     transports: {
-        // Usamos tu RPC de Alchemy para Optimism
-        [optimism.id]: http(process.env.NEXT_PUBLIC_OPTIMISM_RPC || "https://mainnet.optimism.io"),
-        [baseSepolia.id]: http(process.env.BASE_SEPOLIA_RPC || "https://sepolia.base.org"),
+        [mainnet.id]:  http(process.env.NEXT_PUBLIC_ETHEREUM_RPC  || 'https://eth.llamarpc.com'),
+        [base.id]:     http(process.env.NEXT_PUBLIC_BASE_RPC       || 'https://mainnet.base.org'),
+        [bsc.id]:      http(process.env.NEXT_PUBLIC_BSC_RPC        || 'https://bsc-dataseed.binance.org'),
+        [optimism.id]: http(process.env.NEXT_PUBLIC_OPTIMISM_RPC   || 'https://mainnet.optimism.io'),
     },
 })
+
 

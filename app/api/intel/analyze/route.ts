@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-// In production, instantiate prisma in a singleton file to avoid connection limits
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 // Configuration
 const CONFIDENCE_THRESHOLD = 85;

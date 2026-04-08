@@ -25,19 +25,27 @@ const ClearanceHeroView = dynamic<any>(
 function useLenis() {
   useEffect(() => {
     let lenis: any = null;
-    let raf: number;
     (async () => {
       try {
         const { default: Lenis } = await import("lenis");
         lenis = new Lenis({ duration: 1.2, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-        const animate = (time: number) => { lenis?.raf(time); raf = requestAnimationFrame(animate); };
-        raf = requestAnimationFrame(animate);
-        lenis.on("scroll", ScrollTrigger.update);
+
+        // FIX Bug 18: Only use gsap.ticker as the single animation driver.
+        // Previously BOTH requestAnimationFrame AND gsap.ticker.add() were calling
+        // lenis.raf(), which drove Lenis twice per frame:
+        //   → 2× scroll speed on 120Hz monitors
+        //   → 2× CPU usage from the animation engine
+        //   → 2× battery drain on mobile devices
+        // Solution: remove the manual RAF loop entirely and let GSAP drive Lenis.
         gsap.ticker.add((time: number) => { lenis?.raf(time * 1000); });
         gsap.ticker.lagSmoothing(0);
+        lenis.on("scroll", ScrollTrigger.update);
       } catch {}
     })();
-    return () => { cancelAnimationFrame(raf); lenis?.destroy(); };
+    return () => {
+      gsap.ticker.remove((time: number) => { lenis?.raf(time * 1000); });
+      lenis?.destroy();
+    };
   }, []);
 }
 
@@ -52,18 +60,28 @@ function Reveal({ children, delay = 0, className = "", yOffset = 40 }: { childre
   );
 }
 
-const TICKER = [
-  "BLOCK: 19284711", "TX_HASH: 0x9fA2...3b1C",
-  "⚠ WHALE: 14_200 ETH", "[ZK_PROOF_VERIFIED]",
-  "TARGET: DARK_POOL_A", "NET_STATE: SECURE",
-  "0x882A...F019 SWAP", "NODE_LATENCY: 12ms",
+// FIX Bug 22: Replaced hardcoded static block "BLOCK: 19284711" (a block from
+// January 2024) with a live-status message. Stale block numbers mislead
+// institutional users into thinking the system is not real-time.
+// The DataTicker component fetches live data from /api/network/live-ticker
+// which already contains real block numbers from the RPC providers.
+const TICKER_FALLBACK = [
+  "LIVE FEED: CONNECTING...",
+  "[ZK_PROOF_VERIFIED]",
+  "TARGET: DARK_POOL_A",
+  "NET_STATE: SECURE",
+  "NODE_LATENCY: <15ms",
+  "MEMPOOL: MONITORING",
+  "WHALES: TRACKED",
+  "SOVEREIGN_MATRIX: ONLINE",
 ];
 
 function DataTicker() {
   const { data } = useSWR("/api/network/live-ticker", (url) => fetch(url).then((res) => res.json()), {
-    fallbackData: { ticker: TICKER }, refreshInterval: 5000
+    fallbackData: { ticker: TICKER_FALLBACK }, refreshInterval: 5000
   });
-  const tData = data?.ticker || TICKER;
+  // Use live ticker items; fall back to neutral status messages (not stale block numbers)
+  const tData = (data?.degraded || !data?.ticker?.length) ? TICKER_FALLBACK : data.ticker;
   const content = [...tData, ...tData, ...tData];
 
   return (

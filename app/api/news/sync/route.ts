@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-export const dynamic = 'force-dynamic';
+
 export const revalidate = 0;
 import { NewsProcessor } from '@/lib/news-processor';
 import { fetchNewsByCategory } from '@/lib/news-service';

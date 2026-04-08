@@ -213,42 +213,5 @@ export function isValidPassword(password: string): { valid: boolean; error?: str
   return { valid: true };
 }
 
-/**
- * Create a legacy JWT token (for backward compatibility)
- * @deprecated Use createAccessToken and createRefreshToken from lib/session instead
- * This is a temporary compatibility shim until we migrate all endpoints to the new session system
- */
-export function createJWT(userId: string, email: string): string {
-  // Simple base64-encoded token for legacy compatibility
-  // This is NOT secure for production use long-term, but prevents immediate signup failures
-  const payload = {
-    userId,
-    email,
-    iat: Date.now(),
-    exp: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
-  };
-  return Buffer.from(JSON.stringify(payload)).toString('base64');
-}
 
-
-/**
- * Verify a legacy JWT token (decodes base64)
- * @deprecated Use verifySession from lib/session instead
- */
-export async function verifyJWT(token: string): Promise<any> {
-  try {
-    const decoded = Buffer.from(token, 'base64').toString('utf-8');
-    const payload = JSON.parse(decoded);
-    
-    // Check expiration
-    if (payload.exp && Date.now() > payload.exp) {
-      return null;
-    }
-    
-    return payload;
-  } catch (error) {
-    console.error("Error verifying JWT:", error);
-    return null;
-  }
-}
 

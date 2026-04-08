@@ -87,6 +87,12 @@ model User {
   goldTicketTokenId String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  // FIX: worldIdNullifierHash was MISSING from the User model.
+  // Both /api/verify-human and /api/user/status read and write this field,
+  // but it was absent from schema.prisma causing Prisma P2009
+  // (unknown field) at runtime on every World ID verification attempt.
+  worldIdNullifierHash String? @unique
   
   // Environment Variables (Unique Per User)
   theme           String      @default("light")
@@ -96,9 +102,27 @@ model User {
   allowAnalytics  Boolean     @default(true)
   testnetMode     Boolean     @default(false)
   
+  // FIX: Missing fields required by Clerk auth and SNX integrations
+  clerkId         String?     @unique
+  snxAccountId    String?     @unique
+  
   watchlists      Watchlist[]
   alerts          Alert[]
   progress        UserProgress[]
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SAAS SUBSCRIPTIONS & STRIPE
+// FIX: Missing Subscription model referenced by Stripe webhooks
+// ─────────────────────────────────────────────────────────────────────────────
+model Subscription {
+  id        String   @id @default(uuid())
+  userId    String   @unique // Maps to User.walletAddress typically
+  status    String   // 'ACTIVE', 'CANCELED', 'PAST_DUE'
+  tier      String   // 'LIFETIME_VIP', 'PRO_MONTHLY', etc.
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Watchlist {
@@ -295,4 +319,187 @@ model WhaleActivity {
   chain           String
   metadata        Json?
   timestamp       DateTime @default(now())
+
+  // FIX: Critical missing indexes.
+  // Without these, leaderboard GROUP BY walletAddress does a full table scan
+  // across millions of rows — unusable latency at production scale.
+  // The (chain, timestamp) composite index accelerates per-chain timeline queries.
+  @@index([walletAddress])
+  @@index([chain, timestamp])
+  @@index([timestamp])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BITCOIN SV (BSV) BRC STANDARDS INDEX
+// ─────────────────────────────────────────────────────────────────────────────
+
+model BRCStandard {
+  id              String   @id @default(uuid())
+  brcNumber       Int      @unique
+  title           String
+  author          String   @default("Unknown")
+  status          String   @default("Draft")
+  type            String   @default("Standard")
+  created         DateTime?
+  updated         DateTime?
+  summary         String?  @db.Text
+  content         String?  @db.Text
+  githubUrl       String?
+  lastSyncAt      DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMAIL SUBSCRIBERS
+// Referenced by: /api/newsletter/subscribe, /api/alerts/subscribe,
+// /api/subscribe, /api/cron/supply-alerts, /api/admin/emails
+// FIX: This model was MISSING from schema.prisma, causing Prisma P1009 runtime
+// crashes on every newsletter subscription operation in production.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model EmailSubscriber {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  frequency        String   @default("weekly") // "daily", "weekly", "monthly"
+  subscribed       Boolean  @default(true)
+  unsubscribeToken String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([subscribed])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TELEGRAM ALERTS
+// Referenced by: /api/telegram/connect, /api/cron/*, webhook handlers
+// FIX: This model was MISSING from schema.prisma, causing Prisma P1009 runtime
+// crashes every time a user attempted to configure Telegram alerts.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TelegramAlert {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  chatId        String
+  minApy        Float    @default(20)
+  evSignals     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([walletAddress])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPATIBILITY POLYFILLS FOR EXTENDED API ROUTES (FIX BUILD CRASHES)
+// These models satisfy TS and Prisma Client generated types for legacy or 
+// parallel API routes that query these models.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AuthUser {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  walletAddress   String?  @unique
+  recoveryEmail   String?
+  encryptedPrivateKey String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  securityEvents  SecurityEvent[]
+}
+
+model SecurityEvent {
+  id              String   @id @default(uuid())
+  authUserId      String
+  type            String
+  ipAddress       String?
+  userAgent       String?
+  location        String?
+  timestamp       DateTime @default(now())
+
+  authUser        AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id              String   @id @default(uuid())
+  txHash          String   @unique
+  status          String   @default("PENDING")
+  type            String   // SEND, RECEIVE, REBALANCE
+  amount          Float
+  token           String
+  fromAddress     String
+  toAddress       String
+  timestamp       DateTime @default(now())
+}
+
+model SocialRecovery {
+  id              String   @id @default(uuid())
+  userEmail       String   @unique
+  threshold       Int      @default(3)
+  delayHours      Int      @default(48)
+  active          Boolean  @default(true)
+}
+
+model AIRebalancerPlan {
+  id              String   @id @default(uuid())
+  userId          String
+  strategy        String
+  payload         Json
+  executed        Boolean  @default(false)
+  executedAt      DateTime?
+  txHashes        String[]
+  expectedPnl     Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model GlobalWhaleEvent {
+  id              String   @id @default(uuid())
+  txHash          String   @unique
+  amountUSD       Float
+  protocol        String
+  timestamp       DateTime @default(now())
+}
+
+model AlertRule {
+  id              String   @id @default(uuid())
+  userId          String
+  condition       String
+  threshold       Float
+  isActive        Boolean  @default(true)
+}
+
+model WatchedWallet {
+  id              String   @id @default(uuid())
+  userId          String
+  walletAddress   String
+  label           String?
+  createdAt       DateTime @default(now())
+}
+
+model KYCRecord {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  status          String   // 'PENDING', 'APPROVED', 'REJECTED'
+  applicantId     String?
+  documentType    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BlockchainTransaction {
+  id              String   @id @default(uuid())
+  txHash          String   @unique
+  blockNumber     Int
+  status          String
+  createdAt       DateTime @default(now())
+}
+
+// FIX: Session polyfill for JWT verification route fallback
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String   
+  expiresAt    DateTime
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+}
+

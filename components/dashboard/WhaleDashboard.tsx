@@ -21,8 +21,11 @@ import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
 import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
 
 import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
-import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
 import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
+import { BRCExplorerShell }        from '@/components/bsv/BRCExplorerShell';
+import { ZKShieldStation }         from '@/components/dashboard/ZKShieldStation';
+import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
+import { SovereignVault }          from '@/components/dashboard/SovereignVault';
 
 // ── Icons for external-embed pages ────────────────────────────────────────────
 import { Crown, GraduationCap, LifeBuoy, PieChart, Briefcase } from 'lucide-react';
@@ -44,7 +47,11 @@ type TabId =
     | 'support'
     | 'humanidfi-portfolio'
     | 'academy'
-    | 'gold-ticket';
+    | 'brc-explorer'
+    | 'gold-ticket'
+    | 'zk-shield'
+    | 'neural-graph'
+    | 'sovereign-vault';
 
 // ── External page definitions ─────────────────────────────────────────────────
 const EXTERNAL_PAGES: Partial<Record<TabId, {
@@ -115,9 +122,13 @@ export default function WhaleDashboard() {
                       : activeTab === 'api'                  ? <DashboardErrorBoundary key="api">            <ApiTerminal />          </DashboardErrorBoundary>
                       : activeTab === 'portfolio'            ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />        </DashboardErrorBoundary>
                       : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
+                      : activeTab === 'brc-explorer'         ? <DashboardErrorBoundary key="brc">            <BRCExplorerShell />     </DashboardErrorBoundary>
                       : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
                       : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <WhalePortfolio />       </DashboardErrorBoundary>
                       : activeTab === 'gold-ticket'          ? <DashboardErrorBoundary key="gold">           <GoldTicketPanel />      </DashboardErrorBoundary>
+                      : activeTab === 'zk-shield'            ? <DashboardErrorBoundary key="zk-shield">      <ZKShieldStation />      </DashboardErrorBoundary>
+                      : activeTab === 'neural-graph'         ? <DashboardErrorBoundary key="neural-graph">   <EntityGraphVis />       </DashboardErrorBoundary>
+                      : activeTab === 'sovereign-vault'      ? <DashboardErrorBoundary key="sov-vault">      <SovereignVault />       </DashboardErrorBoundary>
                       : null
                     }
                 </motion.div>

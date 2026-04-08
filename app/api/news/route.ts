@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+
 
 interface CryptoPanicArticle {
   id: number; domain: string; title: string; published_at: string;

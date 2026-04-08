@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { redisClient as redis } from '@/lib/redis/client';
 
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { redisClient as redis } from '@/lib/redis/client';
 
 export const revalidate = 3600;
 
@@ -45,7 +43,7 @@ export async function GET() {
 
         // JOIN with WalletAnalytics for real PNL/Metadata (Phase 6)
         const analytics = await prisma.walletAnalytics.findMany({
-            where: { address: { in: latestSnapshots.map(s => s.address) } }
+            where: { address: { in: latestSnapshots.map((s: any) => s.address) } }
         });
 
         if (latestSnapshots.length === 0) {
@@ -56,8 +54,8 @@ export async function GET() {
             });
         }
 
-        const whales = latestSnapshots.map((s, index) => {
-            const analytic = analytics.find(a => a.address.toLowerCase() === s.address.toLowerCase());
+        const whales = latestSnapshots.map((s: any, index: number) => {
+            const analytic = analytics.find((a: any) => a.address.toLowerCase() === s.address.toLowerCase());
             const metadata = analytic?.metadata as any;
             const pnlData = metadata?.profitLossBreakdown || { totalPnlUsd: 0 };
 
@@ -88,4 +86,3 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch whale snapshots' }, { status: 500 });
     }
 }
-

@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { redisClient as redis } from '@/lib/redis/client';
 
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { redisClient as redis } from '@/lib/redis/client';
 
 export const revalidate = 60; // Refresh every minute
 
@@ -43,7 +41,7 @@ export async function GET() {
         });
 
         // Fetch labels and tiers from WhaleSnapshot if available
-        const addresses = result.map(r => r.walletAddress);
+        const addresses = result.map((r: any) => r.walletAddress);
         const snapshots = await prisma.whaleSnapshot.findMany({
             where: {
                 address: {
@@ -56,15 +54,15 @@ export async function GET() {
             distinct: ['address'],
         });
 
-        const snapshotMap = new Map(snapshots.map(s => [s.address, s]));
+        const snapshotMap = new Map(snapshots.map((s: any) => [s.address, s]));
 
         // JOIN with WalletAnalytics for real PNL/Metadata (Phase 6)
         const analytics = await prisma.walletAnalytics.findMany({
             where: { address: { in: addresses } }
         });
-        const analyticsMap = new Map(analytics.map(a => [a.address.toLowerCase(), a]));
+        const analyticsMap = new Map(analytics.map((a: any) => [a.address.toLowerCase(), a]));
 
-        const leaderboard = result.map((r, index) => {
+        const leaderboard = result.map((r: any, index: number) => {
             const snap = snapshotMap.get(r.walletAddress);
             const analytic = analyticsMap.get(r.walletAddress.toLowerCase());
             const metadata = analytic?.metadata as any;
@@ -93,4 +91,3 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to generate whale leaderboard' }, { status: 500 });
     }
 }
-

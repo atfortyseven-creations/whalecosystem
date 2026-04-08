@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, X, Activity, Clock, User, Terminal } from 'lucide-react';
 import { useNewsStore } from '@/lib/store/news-store';
@@ -12,7 +12,12 @@ interface CheckoutProps {
   onClose: () => void;
 }
 
-const TARGET_TREASURY = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
+// FIX: Treasury sourced from env var — same correction as ClearanceView.tsx.
+// Hardcoded treasury cannot be rotated without redeployment if compromised.
+const TARGET_TREASURY = (
+    process.env.NEXT_PUBLIC_TREASURY_ADDRESS ||
+    '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a'
+) as `0x${string}`;
 const TARGET_CHAIN    = 10;    // Optimism Mainnet
 const PRICE_USD       = 5.00;
 
@@ -41,8 +46,17 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
   const { sendTransaction, data: txHash, isPending, error: writeError } = useSendTransaction();
   const { isLoading: isWaiting, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
+  // FIX: useId() generates a stable, SSR-safe identifier that matches
+  // between server and client render — eliminates the React hydration mismatch
+  // caused by Date.now() which produces different values on server vs client.
+  const stableRef = useId().replace(/:/g, '').slice(0, 6).toUpperCase();
+
   const [rates, setRates] = useState<{ eur: number, usd: number } | null>(null);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  // FIX: Wrap onClose in useCallback so the setTimeout captures the latest
+  // version of onClose, not the stale closure from the initial render.
+  const handleClose = useCallback(() => { onClose(); }, [onClose]);
 
   useEffect(() => {
     if (isOpen) {
@@ -55,9 +69,9 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
   useEffect(() => {
     if (isConfirmed) {
       setNewsSubscribed(true);
-      setTimeout(onClose, 2000);
+      setTimeout(handleClose, 2000);
     }
-  }, [isConfirmed, setNewsSubscribed, onClose]);
+  }, [isConfirmed, setNewsSubscribed, handleClose]);
 
   // Cálculos perfectos de conversión
   const ethAmount = rates ? (PRICE_USD / rates.usd).toFixed(5) : "0.00149";
@@ -112,7 +126,10 @@ export function CryptoCheckoutModal({ isOpen, onClose }: CheckoutProps) {
             <div className="flex justify-between items-center bg-[#FAF9F6] px-6 py-4 border-b border-[#E5E5E5]">
               <div className="flex items-center gap-3 text-[#050505]/80">
                 <Terminal size={16} />
-                <span className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-[#050505]/60">Clearance Ref. {Date.now().toString().slice(-6)}</span>
+                {/* FIX: Replaced Date.now().toString().slice(-6) with stable useId()
+                    Date.now() on server != Date.now() on client — causes React hydration
+                    mismatch and console errors in Next.js 13+. useId() is SSR-safe. */}
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] font-black text-[#050505]/60">Clearance Ref. {stableRef}</span>
               </div>
               {!isExecuting && (
                 <button onClick={onClose} className="text-[#888888] hover:text-[#050505] transition-colors">

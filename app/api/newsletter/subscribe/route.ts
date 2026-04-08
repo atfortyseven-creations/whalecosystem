@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { randomBytes } from 'crypto';
 
 // Schema de validación
 const SubscribeSchema = z.object({
@@ -34,8 +35,11 @@ export async function POST(request: NextRequest) {
         email,
         frequency,
         subscribed: true,
-        // Generar un token simple para desuscribirse
-        unsubscribeToken: Math.random().toString(36).substring(2, 15), 
+        // FIX Bug 20: Math.random() is a non-cryptographic PRNG.
+        // An attacker can statistically predict the token and unsubscribe
+        // arbitrary users from whale alerts without their consent.
+        // crypto.randomBytes(32) generates 256-bit CSPRNG entropy.
+        unsubscribeToken: randomBytes(32).toString('hex'),
       },
     });
 

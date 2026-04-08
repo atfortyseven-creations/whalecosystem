@@ -9,8 +9,8 @@ import {
 } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import {
-  ShieldCheck, Zap, Users, Lock, ExternalLink,
-  Clock, Star, CheckCircle2, Flame,
+  Zap, Users, Lock, ExternalLink,
+  Clock, CheckCircle2, Flame,
 } from 'lucide-react';
 
 // ── Contract ──────────────────────────────────────────────────────────────────
@@ -227,7 +227,8 @@ export function GoldTicketPanel() {
         address: CONTRACT,
         abi: ABI,
         functionName: 'mint',
-        value: mintPrice > 0n ? mintPrice : 0n,
+        args: [],
+        value: mintPrice > 0n ? mintPrice : undefined,
       });
     } catch (e: any) {
       toast.error(e?.message ?? 'Failed to build transaction');
@@ -431,20 +432,41 @@ export function GoldTicketPanel() {
         {/* What you get */}
         <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
           <p className="text-[10px] font-black uppercase tracking-widest text-[#888888] mb-6">What This Ticket Grants</p>
-          <ul className="space-y-4">
+          <ul className="space-y-5">
             {[
-              { icon: <ShieldCheck size={14} />, title: 'Permanent On-Chain Access', desc: 'Your membership is encoded in the Optimism L2 blockchain. No subscription, no renewal.' },
-              { icon: <Zap size={14} />, title: 'Whale Intelligence Suite', desc: 'Full access to real-time whale movement tracking, alpha signals, and institutional data feeds.' },
-              { icon: <Star size={14} />, title: 'Genesis Badge', desc: 'Exclusive Genesis holder status — distinguishes early members from future tiers.' },
-              { icon: <Lock size={14} />, title: 'One Ticket Per Wallet', desc: 'Smart contract enforces strict 1-per-address. Non-transferable genesis identity.' },
+              {
+                n: '01',
+                title: 'Permanent On-Chain Access',
+                desc: 'Your membership is permanently encoded in the Optimism L2 blockchain. Unlike traditional subscriptions, this access never expires, cannot be revoked, and requires no renewal fees — ever.',
+                tag: 'Non-Expiring',
+              },
+              {
+                n: '02',
+                title: 'Whale Intelligence Suite',
+                desc: 'Unlock real-time tracking of on-chain whale movements across BTC, ETH, BASE, and BSC. Includes institutional alpha signals, large-cap flow data, and cross-chain activity feeds.',
+                tag: 'Full Access',
+              },
+              {
+                n: '03',
+                title: 'Genesis Badge',
+                desc: 'Holders of this Genesis ticket carry a verifiable on-chain identity that distinguishes them from all future membership tiers. Genesis status is immutable once minted.',
+                tag: 'Exclusive',
+              },
+              {
+                n: '04',
+                title: 'One Ticket Per Wallet',
+                desc: 'The smart contract enforces a strict one-ticket-per-address rule. This NFT is soulbound to your wallet — it cannot be transferred, resold, or duplicated, making your genesis identity unique.',
+                tag: 'Soulbound',
+              },
             ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <div className="mt-0.5 w-7 h-7 rounded-lg bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center shrink-0 text-[#D4AF37]">
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="text-[11px] font-black text-[#050505] uppercase tracking-wide">{item.title}</p>
-                  <p className="text-[10px] text-[#888888] mt-0.5 leading-relaxed">{item.desc}</p>
+              <li key={i} className="flex items-start gap-4 pb-5 border-b border-[#F5F5F5] last:border-0 last:pb-0">
+                <span className="text-[9px] font-black font-mono text-[#CCCCCC] mt-0.5 shrink-0 w-5">{item.n}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-[11px] font-black text-[#050505] uppercase tracking-wide">{item.title}</p>
+                    <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-[#D4AF37]/10 text-[#B8962E] border border-[#D4AF37]/20 shrink-0">{item.tag}</span>
+                  </div>
+                  <p className="text-[10px] text-[#888888] leading-relaxed">{item.desc}</p>
                 </div>
               </li>
             ))}

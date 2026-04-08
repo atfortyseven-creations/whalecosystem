@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { ethereumResilientProvider, baseResilientProvider } from '@/lib/blockchain/ResilientProvider';
 import { ethers } from 'ethers';

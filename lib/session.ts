@@ -2,9 +2,30 @@ import { SignJWT, jwtVerify, JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 
-const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || 'VOID_SECRET_99_POLY'
-);
+// ── CRITICAL SECURITY GUARD ────────────────────────────────────────────────
+// FIX: 'VOID_SECRET_99_POLY' was the hardcoded fallback. This secret is now
+// publicly visible in source code, making every SIWE+session JWT forgeable.
+// An attacker could craft:
+//   { alg:'HS256' }.{ sub:'0x<any_address>', clearance:'SOVEREIGN', exp:... }
+// sign it with the known secret and bypass ALL middleware authentication checks.
+// We now fail loud at module load — an unconfigured secret must halt the server.
+const _rawJwtSecret = process.env.JWT_SECRET;
+if (!_rawJwtSecret && process.env.NODE_ENV === 'production') {
+    // In production: crash immediately — serving with no secret is catastrophic
+    throw new Error(
+        '[SECURITY FATAL] JWT_SECRET environment variable is not set. '
+        + 'The server cannot start safely without a cryptographically random secret. '
+        + 'Set JWT_SECRET to at least 32 random bytes in your deployment environment variables.'
+    );
+}
+// In development: warn loudly but allow operation with a deterministic dev secret
+if (!_rawJwtSecret) {
+    console.warn(
+        '\x1b[33m[WARNING] JWT_SECRET not set. Using a temporary development secret.\n'
+        + 'This is INSECURE. Set JWT_SECRET before deploying to production.\x1b[0m'
+    );
+}
+const JWT_SECRET = new TextEncoder().encode(_rawJwtSecret || 'dev-only-not-for-production-jwt-secret-change-me');
 
 // Session configuration
 export const SESSION_CONFIG = {

@@ -1,5 +1,7 @@
 import { ethers } from "ethers";
-import { PrismaClient } from "@prisma/client";
+// FIX: Use the global Prisma singleton from lib/prisma to prevent
+// connection pool exhaustion when multiple workers run simultaneously.
+import { prisma } from "../../lib/prisma";
 import dotenv from "dotenv";
 import { getRealTimePrice } from "../../lib/priceHelper";
 import { addWhaleToQueue } from "../../lib/queues/whaleQueue";
@@ -8,7 +10,6 @@ import { baseResilientProvider, ethereumResilientProvider, bscResilientProvider,
 dotenv.config();
 
 const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
-const prisma = new PrismaClient();
 
 const TOKEN_CONFIG: Record<string, { symbol: string, decimals: number }> = {
   // --- BASE ---
@@ -56,56 +57,87 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
     try {
         const config = TOKEN_CONFIG[log.address.toLowerCase()];
         if (!config) return;
+
+        // FIX: Guard against non-standard Transfer events where topics[1] or topics[2]
+        // may be missing (e.g. scam contracts that omit 'indexed' on address params).
+        // Previously this would crash the entire worker with a null-reference error.
+        if (!log.topics || log.topics.length < 3 || !log.data || log.data === '0x') return;
+
+        let from: string, to: string, tokenAmount: number;
+        try {
+            const parsedLog = ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data);
+            tokenAmount = parseFloat(ethers.formatUnits(parsedLog[0], config.decimals));
+            from = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[1])[0] as string;
+            to   = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[2])[0] as string;
+        } catch {
+            return; // Malformed log — skip silently, do NOT crash the daemon
+        }
+
         const price = await getRealTimePrice(config.symbol) || 1;
-        const parsedLog = ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data);
-        const tokenAmount = parseFloat(ethers.formatUnits(parsedLog[0], config.decimals));
         const usdValue = tokenAmount * price;
 
         if (usdValue >= WHALE_THRESHOLD_USD) {
-            const from = (ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[1])[0] as string);
-            const to = (ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[2])[0] as string);
             await processWhaleTx(log.transactionHash, from, to, config.symbol, tokenAmount, usdValue, log.blockNumber, chainLabel, { method: "ERC20" });
         }
-    } catch (e) {}
+    } catch (e) {/* outer safety net — daemon must never crash */}
   });
 }
 
 async function startPollingWorker(resilient: ResilientProvider, chainLabel: string) {
     let lastProcessedBlock = await resilient.call<number>(p => p.getBlockNumber());
+    // FIX: Cap the block range queried per polling cycle.
+    // Without this, if the worker is offline for 1 hour it attempts getLogs for
+    // ~300 Ethereum blocks in a single request, hitting the GetBlock/Alchemy
+    // 2000-event limit and silently truncating the response — whales are missed.
+    // MAX_BLOCK_CHUNK=50 guarantees complete ingestion even after long downtime.
+    const MAX_BLOCK_CHUNK = 50;
+    let consecutiveErrors = 0;
+    const MAX_BACKOFF_MS  = 5 * 60_000;
+
     while (true) {
         try {
             const currentBlock = await resilient.call<number>(p => p.getBlockNumber());
             if (currentBlock > lastProcessedBlock) {
+                const toBlock = Math.min(currentBlock, lastProcessedBlock + MAX_BLOCK_CHUNK);
                 const logs = await resilient.call<any[]>(p => p.getLogs({
                     fromBlock: lastProcessedBlock + 1,
-                    toBlock: currentBlock,
+                    toBlock,
                     topics: [TRANSFER_TOPIC]
                 }));
                 for (const log of logs) {
                     const config = TOKEN_CONFIG[log.address.toLowerCase()];
                     if (config) {
                         const price = await getRealTimePrice(config.symbol) || 1;
-                        const tokenAmount = parseFloat(ethers.formatUnits(ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data)[0], config.decimals));
+                        let tokenAmount = 0;
+                        try {
+                            tokenAmount = parseFloat(ethers.formatUnits(
+                                ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data)[0],
+                                config.decimals
+                            ));
+                        } catch { continue; } // Malformed data — skip
+
                         if (tokenAmount * price >= WHALE_THRESHOLD_USD) {
                             let fromAddr = "Unknown";
-                            let toAddr = "Unknown";
-                            try {
-                                if (log.topics && log.topics.length >= 3) {
-                                    fromAddr = (ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[1])[0] as string);
-                                    toAddr = (ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[2])[0] as string);
-                                }
-                            } catch (e) {
-                                // Fallback only if totally unparseable, but do not emit 0x...
+                            let toAddr   = "Unknown";
+                            if (log.topics && log.topics.length >= 3) {
+                                try {
+                                    fromAddr = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[1])[0] as string;
+                                    toAddr   = ethers.AbiCoder.defaultAbiCoder().decode(["address"], log.topics[2])[0] as string;
+                                } catch { /* non-standard log — keep Unknown addresses */ }
                             }
                             await processWhaleTx(log.transactionHash, fromAddr, toAddr, config.symbol, tokenAmount, tokenAmount * price, log.blockNumber, chainLabel, { method: "Polling" });
                         }
                     }
                 }
-                lastProcessedBlock = currentBlock;
+                lastProcessedBlock = toBlock; // Advance only to processed toBlock, not currentBlock
             }
-            await new Promise(r => setTimeout(r, 12000));
-        } catch (e) {
-            await new Promise(r => setTimeout(r, 30000));
+            consecutiveErrors = 0;
+            await new Promise(r => setTimeout(r, 12_000));
+        } catch (e: any) {
+            consecutiveErrors++;
+            const backoff = Math.min(30_000 * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
+            console.error(`❌ [${chainLabel}] Polling error #${consecutiveErrors}. Backoff ${backoff / 1000}s:`, e.message);
+            await new Promise(r => setTimeout(r, backoff));
         }
     }
 }
@@ -121,8 +153,8 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
             walletAddress: from,
             type: metadata.method || "TRANSFER",
             token: asset,
-            amount,
-            usdValue,
+            amount: amount.toString(),
+            usdValue: usdValue.toString(),
             fromAddress: from,
             toAddress: to,
             transactionHash: hash,

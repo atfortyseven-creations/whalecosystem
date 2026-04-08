@@ -5,12 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { MerkleTree } from 'merkletreejs';
 import keccak256 from 'keccak256';
 import { AbiCoder } from 'ethers';
-
-const prisma = new PrismaClient();
 
 // POST: Generate Merkle proof for claiming
 export async function POST(request: NextRequest) {

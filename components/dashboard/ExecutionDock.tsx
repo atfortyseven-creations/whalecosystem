@@ -7,6 +7,9 @@ import { ShieldAlert, Zap, Lock, Crosshair, AlertTriangle, Fingerprint, Activity
 import { useSniperStore } from '@/store/useSniperStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // Optional: Add default native ETH address and target token (e.g. USDC on ETH Mainnet)
 const NATIVE_ETH = "0xEeeeeEeeeEeEeeEeEqEeeEEEeeeeEeeeeeeeEEeE";
@@ -29,6 +32,9 @@ export default function ExecutionDock() {
       addExecutedTrade(hash, 0, currentPrice); // Recording 0 amount as it's a test tx, but recording the exact price tick it fired at
     }
   }, [isConfirmed, hash, addExecutedTrade]);
+
+  // HFT Anomalies polling
+  const { data: mevData, isLoading: mevLoading } = useSWR('/api/execution/mev', fetcher, { refreshInterval: 5000 });
 
   const [isQuoting, setIsQuoting] = useState(false);
 
@@ -95,8 +101,27 @@ export default function ExecutionDock() {
 
       <div className="flex-1" />
 
-      {/* ── EXECUTION STATS ── */}
+      {/* ── EXECUTION STATS & MEV FEED ── */}
       <div className="space-y-3 bg-[#0a0a0a] border border-white/5 p-4 rounded-sm z-10 relative overflow-hidden">
+         {/* HFT MEV Anomaly Stream */}
+         <div className="border border-emerald-500/20 bg-emerald-500/5 p-2 rounded-sm mb-4">
+             <div className="text-[9px] font-black uppercase text-emerald-400 mb-2 flex items-center gap-2">
+                 <Activity size={10} className="animate-pulse" /> FLASHBOTS RELAY (HFT MEMPOOL)
+             </div>
+             {mevLoading ? (
+                 <div className="text-[8px] text-emerald-400/50 uppercase font-mono">Listening to dark pool...</div>
+             ) : (
+                <div className="flex flex-col gap-1.5 max-h-24 overflow-y-auto custom-scrollbar pr-1">
+                    {(mevData?.anomalies || []).slice(0, 3).map((anomaly: any, i: number) => (
+                        <div key={i} className="flex justify-between items-center text-[8px] font-mono border-b border-emerald-500/10 pb-1">
+                            <span className="text-emerald-400/80">{anomaly.pair} ({anomaly.route.split(' ')[0]})</span>
+                            <span className="text-emerald-400 font-bold">+${anomaly.profitUsd}</span>
+                        </div>
+                    ))}
+                </div>
+             )}
+         </div>
+
          {isQuoting || isPending || isConfirming ? (
              <div className="absolute inset-0 bg-[#e0ff00]/10 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
                  <div className="flex items-center gap-3 text-[#e0ff00] font-black uppercase tracking-widest text-xs">

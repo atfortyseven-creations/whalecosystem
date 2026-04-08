@@ -3,9 +3,7 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { PrismaClient } from "@prisma/client";
 import { clearSessionCookies } from "@/lib/session";
-
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-jwt-key-change-in-prod";
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
     const cookieStore = await cookies();

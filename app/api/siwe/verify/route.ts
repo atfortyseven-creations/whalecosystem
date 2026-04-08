@@ -3,9 +3,13 @@ import { SiweMessage } from 'siwe';
 import { prisma } from '@/lib/prisma';
 import { SignJWT } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'VOID_SECRET_99_POLY'
-);
+// FIX: Same VOID_SECRET_99_POLY vulnerability as lib/session.ts.
+// Removed hardcoded fallback. Guard instead of silently using a known secret.
+const _rawJwtSecret = process.env.JWT_SECRET;
+if (!_rawJwtSecret && process.env.NODE_ENV === 'production') {
+    throw new Error('[SECURITY FATAL] JWT_SECRET not set. Cannot mint SIWE session tokens safely.');
+}
+const JWT_SECRET = new TextEncoder().encode(_rawJwtSecret || 'dev-only-not-for-production-jwt-secret-change-me');
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,20 +40,18 @@ export async function POST(req: NextRequest) {
     let user;
     try {
       user = await prisma.user.upsert({
-        where: { walletAddress: fields.address.toLowerCase() },
-        update: {
-          lastSeenAt: new Date(),
-          siweNonce: fields.nonce,
-        },
-        create: {
-          walletAddress: fields.address.toLowerCase(),
-          siweNonce: fields.nonce,
-          lastSeenAt: new Date(),
-        },
+        where:  { walletAddress: fields.address.toLowerCase() },
+        // FIX: Changed 'lastSeenAt' → 'lastActive' (actual schema field name).
+        // Removed 'siweNonce': field does not exist in User model — every SIWE
+        // login was hitting the catch-block silently and skipping DB persistence
+        // entirely, meaning no authenticated user was ever recorded in the DB.
+        update:  { lastActive: new Date() },
+        create:  { walletAddress: fields.address.toLowerCase(), lastActive: new Date() },
       });
     } catch (dbErr) {
       // Degraded mode: proceed without DB if Prisma schema mismatch
       console.warn('[SIWE] DB upsert failed (degraded mode):', dbErr);
+
     }
 
     // ── Mint Sovereign JWT ────────────────────────────────────────────────────

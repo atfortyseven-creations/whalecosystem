@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { usePathname } from 'next/navigation';
+
+// FIX Bug 16: Replaced window.location.pathname + useState race condition with
+// usePathname() from Next.js which is available synchronously during SSR/hydration.
+// Previously: component mounted with pathname='' → isLanding=false (wrong) →
+// watermark flashed for one frame on the landing page before disappearing.
+// Now: pathname is correct from the very first render, no flash.
 
 export function UniversalEliteWallpaper() {
-    const [pathname, setPathname] = useState('');
-    
-    useEffect(() => {
-        setPathname(window.location.pathname);
-    }, []);
+    const pathname = usePathname();
 
-    // We suppress the watermark on the landing page to keep it clean
+    // Suppress the watermark on the landing page to keep it clean
     const isLanding = pathname === '/';
 
     return (
@@ -29,9 +32,9 @@ export function UniversalEliteWallpaper() {
             {/* High-Fidelity Noise Layer for "Professor Emeritus" Aesthetic */}
             <div className="absolute inset-0 noise-overlay" />
             
-            {/* Subtle Vignette for Institutional Focus */}
+            {/* Subtle Vignette for Institutional Focus (Elite Gold) */}
             <div className="absolute inset-0 pointer-events-none" 
-                 style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(251, 201, 194, 0.2) 100%)" }} />
+                 style={{ background: "radial-gradient(circle at center, transparent 30%, rgba(212, 175, 55, 0.07) 100%)" }} />
 
             {/* Global Watermark (Suppressed on Landing) */}
             {!isLanding && (
