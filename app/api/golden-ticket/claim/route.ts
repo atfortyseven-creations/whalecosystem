@@ -3,8 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+const MAX_SUPPLY = 200;
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/golden-ticket/claim
-// Claims a Golden Ticket for the authenticated user. One per wallet address.
+// One ticket per wallet address, enforced at DB + logic level.
+// ─────────────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -15,34 +19,37 @@ export async function POST(req: NextRequest) {
     }
 
     const address = walletAddress.toLowerCase();
-    
-    // Validate address format
+
     if (!/^0x[a-f0-9]{40}$/i.test(address)) {
       return NextResponse.json({ error: 'Malformed wallet address' }, { status: 400 });
     }
 
-    // [SAFETY] Upsert user so foreign key constraint is satisfied even for new wallets
+    // Guard: max supply
+    const totalClaimed = await prisma.goldenTicket.count();
+    if (totalClaimed >= MAX_SUPPLY) {
+      return NextResponse.json({ error: 'Max supply reached. All 200 Whale Gold Tickets have been minted.' }, { status: 410 });
+    }
+
+    // Upsert user (only fields that exist in schema)
     await prisma.user.upsert({
       where: { walletAddress: address },
-      update: { lastActive: new Date() },
-      create: { walletAddress: address, tier: 'GHOST' },
+      update: {},
+      create: { walletAddress: address },
     });
 
-    // Check if user already has a ticket (DB-level unique enforces this too)
-    const existing = await prisma.goldenTicket.findUnique({
-      where: { userAddress: address },
-    });
-
+    // Check existing
+    const existing = await prisma.goldenTicket.findUnique({ where: { userAddress: address } });
     if (existing) {
       return NextResponse.json({
         success: false,
         alreadyClaimed: true,
         ticket: existing,
-        message: 'This wallet has already claimed its Genesis Ticket.'
+        serial: existing.ticketNumber,
+        message: 'This wallet has already claimed its Genesis Ticket.',
       }, { status: 409 });
     }
 
-    // Create ticket with a temporary unique serialCode to avoid P2002 Race Condition on concurrent claims
+    // Create with temp serialCode to avoid race P2002
     const ticket = await prisma.goldenTicket.create({
       data: {
         userAddress: address,
@@ -54,41 +61,46 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Update with final sequential serialCode based on actual ticketNumber assigned by DB
-    const serialNumber = String(ticket.ticketNumber).padStart(6, '0');
+    const serialNumber = String(ticket.ticketNumber).padStart(4, '0');
     const finalTicket = await prisma.goldenTicket.update({
       where: { id: ticket.id },
-      data: { serialCode: `WHALE-GEN-${serialNumber}` }
+      data: { serialCode: `WGT-GENESIS-${serialNumber}` },
     });
 
     return NextResponse.json({
       success: true,
       ticket: finalTicket,
-      message: 'Genesis Ticket claimed successfully. Your golden badge is reserved.'
+      serial: finalTicket.ticketNumber,
+      totalClaimed: totalClaimed + 1,
+      message: 'Whale Gold Ticket claimed successfully.',
     }, { status: 201 });
 
   } catch (error: any) {
-    // Handle unique constraint violation (race condition)
     if (error?.code === 'P2002') {
       return NextResponse.json({
         success: false,
         alreadyClaimed: true,
-        message: 'This wallet has already claimed its Genesis Ticket.'
+        message: 'This wallet has already claimed its Genesis Ticket.',
       }, { status: 409 });
     }
-    console.error('[Golden Ticket Claim Error]', error);
+    console.error('[Golden Ticket POST Error]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// GET /api/golden-ticket/claim?address=0x...
-// Returns the ticket status for a given address
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/golden-ticket/claim
+// ?address=0x...  → per-wallet status + global supply
+// (no address)    → global supply stats only (for public counter)
+// ─────────────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   try {
     const address = req.nextUrl.searchParams.get('address')?.toLowerCase();
+    const totalClaimed = await prisma.goldenTicket.count();
+    const remaining = Math.max(0, MAX_SUPPLY - totalClaimed);
 
     if (!address) {
-      return NextResponse.json({ error: 'Address required' }, { status: 400 });
+      return NextResponse.json({ hasClaimed: false, ticket: null, totalClaimed, remaining, maxSupply: MAX_SUPPLY });
     }
 
     const ticket = await prisma.goldenTicket.findUnique({
@@ -103,16 +115,16 @@ export async function GET(req: NextRequest) {
         twitterHandle: true,
         isActive: true,
         claimedAt: true,
-      }
+      },
     });
-
-    // Also return total claimed for social proof
-    const totalClaimed = await prisma.goldenTicket.count();
 
     return NextResponse.json({
       hasClaimed: !!ticket,
       ticket: ticket || null,
+      serial: ticket?.ticketNumber ?? null,
       totalClaimed,
+      remaining,
+      maxSupply: MAX_SUPPLY,
     });
 
   } catch (error) {
