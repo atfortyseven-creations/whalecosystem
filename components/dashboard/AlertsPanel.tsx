@@ -204,10 +204,11 @@ export function AlertsPanel() {
                     const mapped = data.alerts.map((a: any) => ({
                         id: a.id,
                         name: a.name,
-                        type: a.conditionLogic === 'CUSTOM' ? 'PRICE_ABOVE' : 'PRICE_ABOVE', // Simplified
-                        asset: a.targetAddress || 'BTC',
+                        type: (a.conditionLogic || 'PRICE_ABOVE') as AlertType,
+                        asset: a.targetAddress || a.asset || 'BTC',
                         threshold: a.priceThreshold || 0,
-                        currentValue: a.priceThreshold ? a.priceThreshold * 0.95 : 0,
+                        // currentValue is NOT fabricated — only set if explicitly provided by backend
+                        currentValue: typeof a.currentValue === 'number' ? a.currentValue : undefined,
                         status: a.enabled ? 'ACTIVE' : 'PAUSED',
                         createdAt: a.createdAt,
                         notifyTelegram: a.actions?.notifyTelegram || false,
@@ -332,7 +333,7 @@ export function AlertsPanel() {
             <div className="px-6 py-4 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <Bell size={16} className="text-[#050505]"/>
-                    <span className="text-xs font-black text-[#050505] uppercase tracking-widest">Neural Alerts</span>
+                    <span className="text-xs font-black text-[#050505] uppercase tracking-widest">Alert Rules</span>
                     <span className="text-[9px] px-2 py-0.5 bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20 rounded font-black uppercase">{counts.ACTIVE} Active</span>
                 </div>
                 <button onClick={() => setShowCreate(true)}

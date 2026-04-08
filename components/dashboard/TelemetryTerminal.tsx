@@ -60,10 +60,11 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
             const now = new Date();
             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
             
-            // Limit verbose prints to prevent DOM overflow
-            if (Math.random() < 0.05) {
+            // Throttle: log 1 in every 20 mempool txs to prevent DOM overflow
+            logCounter++;
+            if (logCounter % 20 === 0) {
                 setLogs(prev => [...prev.slice(-49), {
-                    id: ++logCounter,
+                    id: logCounter,
                     timestamp: timeStr,
                     type: 'info',
                     message: <span><span className="text-[#888888]">[{data.chain || 'ETH'}]</span> Mempool Hash: {data.hash?.slice(0, 16) || '0x...'}...</span>
