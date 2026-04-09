@@ -349,6 +349,17 @@
     text-wrap: balance;
   }
 
+  /* Safe Area / Fallback VP utilities for iOS 15 */
+  .min-h-safe {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .h-safe {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+
   /* Utilitarios de brillo sutil */
   .glow-text {
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);

@@ -315,9 +315,12 @@ export function MarketHeatmap24h() {
       // Binance tickers — direct call (may be blocked by CORS in browser)
       let tickers: any[] = [];
       try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 6000);
         const binRes = await fetch("https://fapi.binance.com/fapi/v1/ticker/24hr", {
-          signal: AbortSignal.timeout(6000),
+          signal: ctrl.signal,
         });
+        clearTimeout(tid);
         if (binRes.ok) tickers = await binRes.json();
       } catch {}
 

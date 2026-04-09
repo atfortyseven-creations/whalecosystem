@@ -24,10 +24,13 @@ const PRICE_USD       = 5.00;
 // Oráculo de tipo de cambio ETH → EUR y USD
 async function fetchCryptoRates(): Promise<{ eur: number, usd: number } | null> {
   try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 4000);
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur,usd',
-      { cache: 'no-store', signal: AbortSignal.timeout(4000) }
+      { cache: 'no-store', signal: ctrl.signal }
     );
+    clearTimeout(tid);
     if (!res.ok) return { eur: 3100.25, usd: 3350.50 }; // Fallback de máxima seriedad
     const data = await res.json();
     return { 

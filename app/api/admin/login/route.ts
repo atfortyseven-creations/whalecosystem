@@ -5,8 +5,10 @@ import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 
 const JWT_SECRET_STR = process.env.JWT_SECRET;
-if (!JWT_SECRET_STR && process.env.SKIP_ENV_VALIDATION !== 'true') {
-    throw new Error("CRITICAL: JWT_SECRET environment variable is not defined");
+if (!JWT_SECRET_STR) {
+    if (process.env.NODE_ENV === 'production') {
+        console.error("[Admin Login] ⚠️ JWT_SECRET not defined. Admin logins disabled.");
+    }
 }
 const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'build-fallback-secret');
 

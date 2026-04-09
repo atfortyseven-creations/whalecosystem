@@ -16,8 +16,8 @@ import { newPairsEngine } from '@/lib/blockchain/new-pairs-ws-engine';
 export const dynamic = 'force-dynamic';
 
 // ── GetBlock EP4 HTTP — market intel reads (slot0) ─────────────────────────
-const EP4_HTTP = 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c';
-const EP1_HTTP = 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8';
+const EP4_HTTP = 'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f'; // EP2 — primary (.us)
+const EP1_HTTP = 'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d'; // EP1 — primary (.io)
 
 // Uniswap V3 slot0 selector
 const SIG_SLOT0 = '0x3850c7bd';

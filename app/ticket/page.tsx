@@ -786,7 +786,7 @@ export default function GoldenTicketPage() {
 
   return (
     <div
-      className="min-h-[100dvh] flex flex-col font-sans relative overflow-hidden transition-colors duration-[2000ms]"
+      className="min-h-safe min-h-screen flex flex-col font-sans relative overflow-hidden transition-colors duration-[2000ms]"
       style={{ background: isConfirming || isDone ? "#FFFFFF" : "#FAFAFA" }}
     >
       {(isConfirming || isDone) && <CinematicVoid />}
@@ -810,7 +810,7 @@ export default function GoldenTicketPage() {
         )}
       </AnimatePresence>
 
-      <div className="flex-1 w-full max-w-4xl mx-auto flex flex-col items-center justify-center px-4 relative z-10 min-h-[100dvh] py-16 gap-12">
+      <div className="flex-1 w-full max-w-4xl mx-auto flex flex-col items-center justify-center px-4 relative z-10 min-h-safe min-h-screen py-16 gap-12">
 
         {/* Card — always visible */}
         <WhaleGoldCard

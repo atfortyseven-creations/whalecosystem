@@ -75,10 +75,13 @@ export function ExchangeBTCOpenInterest() {
   const fetchData = useCallback(async () => {
     setError(null);
     try {
-      // Use our new server-side API — real BTC price per day + Bybit OI
+      // Use standard AbortController for iOS 15 compatibility
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 15000);
       const res = await fetch("/api/vip/oi-history", {
-        signal: AbortSignal.timeout(15000),
+        signal: ctrl.signal,
       });
+      clearTimeout(tid);
 
       if (!res.ok) {
         setError("OI history data unavailable. Retrying...");

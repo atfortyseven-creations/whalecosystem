@@ -103,11 +103,12 @@ const createOptimizedTransport = (primaryUrl: string, fallbackUrl?: string) => {
 
 // ─── HYPER-OPTIMIZED VIEM CLIENTS ─────────────────────────────────────────────
 
-// Primary GetBlock endpoints as requested
-const GETBLOCK_ETH_RPC_1 = 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8';
-const GETBLOCK_ETH_RPC_2 = 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c';
-const GETBLOCK_ETH_RPC_3 = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234';
-const GETBLOCK_ETH_RPC_4 = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da';
+// ── USER-PROVIDED PRIMARY ENDPOINTS (GetBlock Dashboard) ─────────────────────
+const GETBLOCK_NEW_PRIMARY   = 'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d'; // EP1 — primary (.io)
+const GETBLOCK_NEW_SECONDARY = 'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f'; // EP2 — primary (.us)
+// ── LEGACY FALLBACK ENDPOINTS ──────────────────────────────────────────────────
+const GETBLOCK_ETH_RPC_3 = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234'; // EP3 — backup 1
+const GETBLOCK_ETH_RPC_4 = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da'; // EP4 — backup 2
 
 // Polygon GetBlock endpoint
 const GETBLOCK_POLYGON_RPC = 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d';
@@ -115,9 +116,9 @@ const GETBLOCK_POLYGON_RPC = 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9
 export const mainnetClient = createPublicClient({
     chain: mainnet,
     transport: fallback([
-        http(GETBLOCK_ETH_RPC_1, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_1) }),
-        http(GETBLOCK_ETH_RPC_2, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_2) }),
-        http(GETBLOCK_ETH_RPC_3, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_3) }),
+        http(GETBLOCK_NEW_PRIMARY,   { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_PRIMARY) }),
+        http(GETBLOCK_NEW_SECONDARY, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_SECONDARY) }),
+        http(GETBLOCK_ETH_RPC_3,     { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_3) }),
         http(`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`, { fetchOptions: { cache: 'no-store' } })
     ], { rank: false })
 });
@@ -126,8 +127,9 @@ export const mainnetClient = createPublicClient({
 export const marketIntelClient = createPublicClient({
     chain: mainnet,
     transport: fallback([
-        http(GETBLOCK_ETH_RPC_4, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_4) }),
-        http(GETBLOCK_ETH_RPC_2, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_2) })
+        http(GETBLOCK_NEW_SECONDARY, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_SECONDARY) }),
+        http(GETBLOCK_NEW_PRIMARY,   { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_PRIMARY) }),
+        http(GETBLOCK_ETH_RPC_4,     { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_4) })
     ], { rank: false })
 });
 

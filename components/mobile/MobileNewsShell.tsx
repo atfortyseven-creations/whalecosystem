@@ -21,7 +21,7 @@ export function MobileNewsShell() {
   }
 
   return (
-    <div className="w-full min-h-[100dvh] bg-[#FAF9F6] flex flex-col">
+    <div className="w-full min-h-safe min-h-screen bg-[#FAF9F6] flex flex-col">
       {/* ─── Minimal Mobile Header ─── */}
       <header
         className="sticky top-0 z-50 flex items-center justify-between px-5 border-b"

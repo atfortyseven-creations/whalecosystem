@@ -57,6 +57,12 @@ export default function PolymarketPanel() {
     const [tradeAmount, setTradeAmount] = useState('100');
     const [isExecuting, setIsExecuting] = useState<'YES' | 'NO' | null>(null);
 
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const { isConnected, address } = useAccount();
     const chainId = useChainId();
     const { switchChain, switchChainAsync } = useSwitchChain();

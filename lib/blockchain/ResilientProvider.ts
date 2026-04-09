@@ -16,12 +16,12 @@ interface RPCEndpoint {
  * EP4: GETBLOCK_ETH_RPC_4  → Market Intel (slot0 / getReserves top-20 pools)
  */
 
-// ── GetBlock endpoints — hardcoded as requested ──────────────────────────────
-// Primary ETH HTTP endpoints
-const EP1_HTTP = 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8'; // ETH JSON-RPC (portfolio)
-const EP2_HTTP = 'https://go.getblock.io/28362d2830a5473a840edab3fda9fc3c'; // ETH JSON-RPC (market intel)
-const EP3_HTTP = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234'; // ETH JSON-RPC (backup 1)
-const EP4_HTTP = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da'; // ETH JSON-RPC (backup 2)
+// ── GetBlock endpoints — user-provided primaries ─────────────────────────────
+// Primary ETH HTTP endpoints (new dashboard keys)
+const EP1_HTTP = 'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d'; // ETH JSON-RPC — primary (.io)
+const EP2_HTTP = 'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f'; // ETH JSON-RPC — primary (.us)
+const EP3_HTTP = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234'; // ETH JSON-RPC — backup 1
+const EP4_HTTP = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da'; // ETH JSON-RPC — backup 2
 // Primary ETH WebSocket endpoints
 const EP_WSS_1 = 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a'; // ETH WS primary
 const EP_WSS_2 = 'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343'; // ETH WS secondary
