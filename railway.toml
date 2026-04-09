@@ -4,6 +4,6 @@ buildCommand = "npm run build:railway"
 
 [deploy]
 # prisma db push runs at RUNTIME (has DATABASE_URL). next build runs at BUILD TIME (no DATABASE_URL).
-startCommand = "npx prisma db push --accept-data-loss && npm start"
+startCommand = "npm run start:prod"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 100
