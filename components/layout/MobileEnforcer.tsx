@@ -24,7 +24,12 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
             const isMobileDevice = /android|mobi|iphone|ipod|ipad/i.test(userAgent.toLowerCase());
-            const mobile = isMobileDevice && window.innerWidth < 1024;
+            // Threshold is 768px (not 1024px).
+            // Rationale: Safari/Chrome "Desktop Mode" on iPhone/iPad reports a viewport of ~980px.
+            // At 1024px threshold, desktop-mode mobile users were incorrectly flagged as mobile.
+            // Real mobile screens in portrait are max 430px CSS width (iPhone Pro Max).
+            // 768px is the lowest breakpoint where a tablet/desktop-mode layout is unambiguous.
+            const mobile = isMobileDevice && window.innerWidth < 768;
             setIsMobile(mobile);
         };
 
