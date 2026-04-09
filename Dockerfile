@@ -26,9 +26,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
   CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
 
-# Copy and ensure the boot script is executable
-COPY start.sh ./
-RUN chmod +x start.sh
-
-# The simplified, bulletproof launch command
-CMD ["./start.sh"]
+# The simplified, bulletproof launch command via NPM to evade Windows CRLF shell script corruption
+CMD ["npm", "run", "start:prod"]
