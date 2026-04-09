@@ -248,19 +248,24 @@ export function WhaleProShell({
                         `,
                     }}
                 >
-                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]"
-                        style={{
-                            backgroundColor: '#050810', /* Base robusta anti-FOUC (Flash of Unstyled Content) */
-                            backgroundImage: `url('/dashboard-bg.jpg')`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center 80%',
-                            backgroundAttachment: 'fixed',
-                            backgroundRepeat: 'no-repeat',
-                            imageRendering: 'crisp-edges', /* Cross-browser standard sin riesgos de que Firefox crashee por webkits ignorados */
-                        }}
-                    >
+                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
+                        
+                        {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (Dashboard Parallax Purity) */}
+                        <div 
+                            className="fixed inset-0 pointer-events-none -z-10 bg-[#050810] transition-colors duration-300"
+                            style={{
+                                backgroundImage: `url('/dashboard-bg.jpg')`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center 80%',
+                                backgroundRepeat: 'no-repeat',
+                                imageRendering: 'crisp-edges',
+                                transform: 'translateZ(0)',
+                                willChange: 'transform'
+                            }}
+                        />
+
                         {/* Immersive glassmorphism / darkening overlay for perfect readability while scrolling */}
-                        <div className="absolute inset-0 pointer-events-none bg-white/40 dark:bg-black/70 backdrop-blur-[2px]" />
+                        <div className="fixed inset-0 pointer-events-none -z-[5] bg-white/40 dark:bg-black/70 backdrop-blur-[2px] transition-colors duration-300" />
                         
                         <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10">
                             <AnimatePresence mode="wait">

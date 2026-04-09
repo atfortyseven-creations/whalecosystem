@@ -53,6 +53,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV NODE_OPTIONS="--max-old-space-size=350"
 
 # Next.js standalone bundles its own minimal node_modules internally.
 # We only need to copy three artifacts from the builder — nothing else.

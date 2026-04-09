@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
 // live mempool activity from mempool.space
 // ════════════════════════════════════════════════════════════════════
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
