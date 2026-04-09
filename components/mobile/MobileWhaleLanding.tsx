@@ -157,12 +157,11 @@ function WorldFinancialClocks() {
   return (
     <div className="flex justify-center items-center gap-3 w-full flex-wrap mx-auto opacity-70 mb-4 mt-2 px-2">
       {hubs.map(hub => {
-        const localTime = new Date(time.toLocaleString('en-US', { timeZone: hub.tz }));
         return (
           <div key={hub.name} className="flex flex-col items-center min-w-[36px]">
             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] mb-0.5">{hub.name}</span>
             <span className="font-mono text-[8px] tracking-widest font-bold text-[#050505]/80">
-              {localTime.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              {time.toLocaleTimeString('en-US', { timeZone: hub.tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
           </div>
         );
@@ -571,15 +570,13 @@ function PageManifesto() {
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
         <div className="text-[14px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
           <p>
-            The architectural nexus of our backend is fundamentally predicated upon a robust integration with the Aztec Network. By synthesizing a deterministic PostgreSQL ontology with Aztec’s privacy-preserving zero-knowledge rollup (zkRollup) infrastructure, the system enforces programmable confidentiality and cryptographic finality across all critical data vectors.
+            The architectural nexus of the backend operations is fundamentally predicated upon an unconditional integration with the Aztec zkRollup Network. By synthesizing a deterministic PostgreSQL ontology with Aztec paradigm of privacy-preserving Zero-Knowledge proofs, the resultant ecosystem autonomously enforces programmable cryptographic finality and data obfuscation across all active execution vectors.
           </p>
-
           <p>
-            We mandate absolute computational sovereignty at the database perimeter. Session telemetry is no longer subjected to legacy authorization paradigms; instead, we bind identity to EVM primitives utilizing elliptic curve cryptography verified directly through Aztec’s encrypted state models. The backend functions strictly as a mathematical arbiter. This cryptographic handshake eradicates custodial vulnerabilities, yielding a zero-trust environment where access is algorithmically proven.
+            It is imperative to maintain computational sovereignty at the deepest perimeter of node operations. Conventional telemetry propagation and session management methodologies have been permanently superseded. In their place, operational identity is bound sequentially to Ethereum Virtual Machine native primitives utilizing homomorphic elliptic curve cryptography. This mathematical arbitration guarantees that custodial dependencies are eradicated natively. The verification of institutional signatures dictates system state deterministically, establishing a hermetic, zero-trust cryptographic conduit.
           </p>
-
           <p className="font-bold pt-6 border-t border-black/10 dark:border-white/10 mt-10">
-            The ongoing fusion of our sequential execution layer with the Aztec Network constitutes the principal vector of our infrastructural development. By anchoring every discrete state transition within zk-shielded, non-custodial validation protocols, we fortify an immutable sanctuary for sovereign intelligence.
+            The contiguous synthesis of our asynchronous execution arrays with the decentralized Aztec infrastructural mesh constitutes the apex vector of institutional intelligence. Through anchoring all discrete state transitions within mathematically shielded validation matrices, the Whale Alert Network establishes an immutable citadel for uncompromised financial monitoring.
           </p>
           
           <div className="pt-12 flex items-center justify-center gap-8 mt-10">
