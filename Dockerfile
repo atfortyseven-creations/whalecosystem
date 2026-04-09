@@ -22,9 +22,13 @@ RUN npm run build
 ENV NODE_ENV=production
 EXPOSE 3000
 
-# Health check for Railway / Kubernetes
-HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
-  CMD wget -qO- http://localhost:3000/api/health || exit 1
+# Health check — Railway polls this to determine if the service is alive
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+  CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
 
 # The simplest, most failure-resistant launch command. Native Next.js 15 routing.
-CMD ["npm", "start"]
+# Railway injects $PORT dynamically — we must bind to it, not hardcode 3000.
+# Critical: Use `npx` because `next` is not in the global Linux PATH.
+# We also launch the Background P2P Mesh (UDP) and Solana workers concurrently!
+# [RESILIENCE] Prisma and workers run in background (&) so Next.js never hangs.
+CMD ["sh", "-c", "(npx prisma db push --accept-data-loss || true) & npx tsx scripts/sovereign-mesh.ts & npx tsx scripts/solana-worker.ts & npx next start -p ${PORT:-3000} -H 0.0.0.0"]

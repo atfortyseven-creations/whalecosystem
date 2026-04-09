@@ -12,18 +12,20 @@
  */
 
 import { Connection, PublicKey, LogsFilter } from '@solana/web3.js';
-import Redis from 'ioredis';
+// import Redis from 'ioredis';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.production' });
 
 const COMPUTE_BUDGET_PROGRAM = new PublicKey('ComputeBudget111111111111111111111111111111');
 const SOLANA_RPC_WSS = process.env.SOLANA_RPC_WSS || 'wss://api.mainnet-beta.solana.com';
 
+import { createRedisClient } from '../lib/redis/client';
+
 // Standard execution fee is ~1-10 microlamports. 
 // A 15,000+ fee indicates structural urgency (Whale/Institutional algorithm)
 const ANOMALY_PRIORITY_THRESHOLD = 15000;
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = createRedisClient({ name: 'Solana-Worker' });
 
 async function interceptThermodynamicAnomalies() {
     console.log(`[SOLANA] 🖧 Connecting to ${SOLANA_RPC_WSS} (SIMD-0109 Engine)`);
