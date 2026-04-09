@@ -352,7 +352,7 @@ export function WhaleAlertProWhite() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative bg-white text-slate-900 selection:bg-cyan-100 selection:text-cyan-900 overflow-x-hidden">
+    <div ref={containerRef} className="relative bg-white text-slate-900 selection:bg-cyan-100 selection:text-cyan-900 overflow-x-hidden wave-surface wave-surface-strong">
       <InmersiveConstellations />
       {/* ─────────────────────────────────────────────────────────────
           HEADER
@@ -575,7 +575,7 @@ export function WhaleAlertProWhite() {
       {/* ─────────────────────────────────────────────────────────────
           WHALE EVENTS PREVIEW (MARKET)
           ───────────────────────────────────────────────────────────── */}
-      <section id="market" className="py-56 px-12 bg-slate-50 relative overflow-hidden">
+      <section id="market" className="py-56 px-12 bg-slate-50 relative overflow-hidden wave-surface">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         <div className="max-w-7xl mx-auto space-y-32">
           <div className="text-center space-y-10">
@@ -589,7 +589,7 @@ export function WhaleAlertProWhite() {
             </p>
           </div>
 
-          <div className="bg-white rounded-[4rem] border border-slate-200 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.08)] overflow-hidden">
+          <div className="bg-white rounded-[4rem] border border-slate-200 shadow-[0_80px_150px_-30px_rgba(0,0,0,0.08)] overflow-hidden wave-surface wave-surface-light">
             <div className="flex items-center justify-between px-16 py-10 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-6">
                 <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
@@ -701,7 +701,7 @@ export function WhaleAlertProWhite() {
       {/* ─────────────────────────────────────────────────────────────
           FINAL ACTION
           ───────────────────────────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center justify-center relative bg-white overflow-hidden py-32">
+      <section className="min-h-screen flex items-center justify-center relative bg-white overflow-hidden py-32 wave-surface wave-surface-strong">
         <div className="absolute inset-0 opacity-20 transition-all duration-1000">
           <Image src={LANDING_ASSETS.intelligence} alt="Intelligence" fill className="object-cover saturate-0 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-b from-white via-white/40 to-white" />
@@ -727,7 +727,7 @@ export function WhaleAlertProWhite() {
       {/* ─────────────────────────────────────────────────────────────
           FOOTER
           ───────────────────────────────────────────────────────────── */}
-      <footer className="relative py-32 px-12 border-t border-slate-100 bg-white overflow-hidden">
+      <footer className="relative py-32 px-12 border-t border-slate-100 bg-white overflow-hidden wave-surface">
         <div className="max-w-7xl mx-auto space-y-24 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-start gap-20">
             <div className="space-y-8 max-w-sm">
