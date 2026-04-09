@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 
 interface NavItem {
     id: string;
@@ -121,15 +123,22 @@ export function WhaleProShell({
 }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const { setSettingsOpen } = useSettingsStore();
 
     return (
-        <div className="flex h-screen bg-[#000000] text-white overflow-hidden font-sans selection:bg-[#00FF55]/20">
+        <>
+        <GlobalCommandPalette
+            isOpen={isPaletteOpen}
+            setIsOpen={setIsPaletteOpen}
+            onTabChange={onTabChange}
+        />
+        <div className="flex h-screen bg-white dark:bg-[#000000] text-black dark:text-white overflow-hidden font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
             
             {/* ─── Persistent Pro Sidebar ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="h-full border-r border-white/10 bg-[#000000] flex flex-col z-50 relative shadow-none"
+                className="h-full border-r border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex flex-col z-50 relative shadow-none transition-colors duration-300"
             >
 
                 {/* Sidebar Navigation */}
@@ -147,7 +156,7 @@ export function WhaleProShell({
                                     </div>
                                 )}
                                 {item.dividerBefore && isCollapsed && (
-                                    <div className="my-2 mx-3 h-px bg-white/10"/>
+                                    <div className="my-2 mx-3 h-px bg-black/10 dark:bg-white/10"/>
                                 )}
                                 <button
                                     onClick={() => onTabChange(item.id)}
@@ -157,12 +166,12 @@ export function WhaleProShell({
                                         ${isGold && !isActive
                                             ? 'text-[#D4AF37] hover:bg-[#D4AF37]/10 border border-[#D4AF37]/20'
                                             : isActive
-                                                ? 'bg-white/10 text-white shadow-md border border-white/20'
-                                                : 'text-[#888888] hover:text-white hover:bg-white/5'
+                                                ? 'bg-black/5 dark:bg-white/10 text-black dark:text-white shadow-md border border-black/10 dark:border-white/20'
+                                                : 'text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                                         }
                                     `}
                                 >
-                                    <span className={isActive ? 'text-white' : isGold ? 'text-[#D4AF37]' : ''}>{item.icon}</span>
+                                    <span className={isActive ? 'text-black dark:text-white' : isGold ? 'text-[#D4AF37]' : ''}>{item.icon}</span>
                                     {!isCollapsed && (
                                         <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none">
                                             {item.label}
@@ -180,7 +189,7 @@ export function WhaleProShell({
                                         </span>
                                     )}
                                     {isActive && (
-                                        <motion.div layoutId="nav-indicator" className="absolute left-0 w-1 h-5 bg-white rounded-r-full" />
+                                        <motion.div layoutId="nav-indicator" className="absolute left-0 w-1 h-5 bg-black dark:bg-white rounded-r-full" />
                                     )}
                                 </button>
                             </div>
@@ -191,7 +200,7 @@ export function WhaleProShell({
                 <div className="px-3 pb-3 pt-1">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="w-full flex items-center justify-center p-2 rounded-xl border border-white/10 text-[#888888] hover:text-white hover:bg-white/5 transition-all"
+                        className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10 dark:border-white/10 text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                     >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
@@ -202,31 +211,36 @@ export function WhaleProShell({
             <div className="flex-1 flex flex-col min-w-0 relative">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="h-[56px] border-b border-white/10 bg-[#000000] flex items-center justify-between px-6 z-40 shrink-0 shadow-none">
+                <header className="h-[56px] border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
-                            type="text" value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            placeholder="Search markets or addresses…"
-                            className="w-full bg-[#000000] border border-white/10 text-white rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#00FF55] transition-all"
+                            type="text"
+                            readOnly
+                            onFocus={() => setIsPaletteOpen(true)}
+                            onClick={() => setIsPaletteOpen(true)}
+                            placeholder="Press ⌘K to search..."
+                            className="w-full bg-transparent border border-black/10 dark:border-white/10 text-black dark:text-white rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#00FF55] transition-all cursor-pointer"
                         />
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-0 divide-x divide-white/10 flex-1 mx-6 overflow-hidden">
+                    <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 dark:divide-white/10 flex-1 mx-6 overflow-hidden">
                         <LiveMarketBand />
                     </div>
 
-                    <button
-                        onClick={() => setSettingsOpen(true)}
-                        title="Open Settings"
-                        className="shrink-0 p-2 rounded-xl border border-white/10 hover:bg-white/5 text-[#888888] hover:text-white transition-all active:scale-95"
-                    >
-                        <Settings size={16} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                        <button
+                            onClick={() => setSettingsOpen(true)}
+                            title="Open Settings"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 text-[#888888] hover:text-black dark:hover:text-white transition-all flex items-center justify-center w-10 h-10"
+                        >
+                            <Settings size={18} />
+                        </button>
+                    </div>
                 </header>
 
-                <main className="flex-1 relative bg-[#000000] overflow-hidden flex flex-col">
+                <main className="flex-1 relative bg-[#FAF9F6] dark:bg-[#000000] overflow-hidden flex flex-col transition-colors duration-300">
                     <div className="flex-1 overflow-y-auto no-scrollbar">
                         <div className="p-8 max-w-[1600px] mx-auto w-full">
                             {children}
@@ -235,7 +249,7 @@ export function WhaleProShell({
                 </main>
 
                 {/* ─── Status Bar ─── */}
-                <footer className="h-8 border-t border-white/10 bg-[#000000] flex items-center justify-between px-6 shrink-0">
+                <footer className="h-8 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Globe size={11} /> Global Latency: 12ms</span>
                         <span className="flex items-center gap-1.5"><Cpu size={11} /> Network Nodes: ACTIVE</span>
@@ -247,5 +261,6 @@ export function WhaleProShell({
                 </footer>
             </div>
         </div>
+        </>
     );
 }

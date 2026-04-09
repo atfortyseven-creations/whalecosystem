@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { useAccount, useBalance } from 'wagmi';
-import { Activity, Clock, Zap, ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
+import { Activity, Clock, Zap, ArrowUpRight, ArrowDownRight, TrendingUp, GripVertical } from 'lucide-react';
+import { useDragOrder } from '@/hooks/useDragOrder';
 
 const PERFECTION_TOKENS = [
     "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "AVAX", "DOGE", "DOT", "LINK"
@@ -159,10 +160,19 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
     );
 }
 
+// ─── Draggable stat card definitions ─────────────────────────────────────────
+const INITIAL_CARDS = [
+    { id: 'live-portfolio' },
+    { id: 'macro-metrics' },
+    { id: 'system-status' },
+];
+
 export function PremiumMatrixStack() {
     const { address, isConnected } = useAccount();
     const { data: balance } = useBalance({ address });
     const [selectedCategory, setSelectedCategory] = useState<'MAJOR' | 'ALT'>('MAJOR');
+    const [isRearranging, setIsRearranging] = useState(false);
+    const [cards, setCards, resetCards] = useDragOrder(INITIAL_CARDS, 'dashboard-widget-order');
 
     const displayTokens = selectedCategory === 'MAJOR' 
         ? PERFECTION_TOKENS.slice(0, 5) 
@@ -170,64 +180,95 @@ export function PremiumMatrixStack() {
 
     return (
         <div className="w-full h-full flex flex-col space-y-8 animate-in fade-in duration-700 font-sans pb-16">
-            
-            {/* ─── WALLET OVERVIEW (REAL BACKEND) ─── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                {/* Balance Card */}
-                <div className="bg-white dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 p-6 shadow-[4px_4px_0_0_#050505] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.1)] hover:dark:shadow-[4px_4px_0_0_rgba(212,175,55,0.3)] hover:dark:border-[#D4AF37]/30 transition-all rounded-sm relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/[0.02] dark:from-white/[0.02] to-transparent pointer-events-none" />
-                    <div className="flex justify-between items-start mb-4 relative z-10">
-                        <p className="text-[9px] font-black text-[#888888] dark:text-[#D4AF37] uppercase tracking-[0.2em]">Live Portfolio</p>
-                        {isConnected ? (
-                            <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_rgba(0,192,118,0.6)]" title="Connected to Native Wallet"/>
-                        ) : (
-                            <div className="w-2 h-2 rounded-full bg-[#FF3B30]" title="Disconnected"/>
+
+            {/* ─── DRAGGABLE STAT CARDS ─── */}
+            <Reorder.Group
+                axis="x"
+                values={cards}
+                onReorder={setCards}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                style={{ listStyle: 'none', padding: 0, margin: 0 }}
+                as="div"
+            >
+                {cards.map((card) => (
+                    <Reorder.Item
+                        key={card.id}
+                        value={card}
+                        drag={isRearranging}
+                        dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+                        whileDrag={{ scale: 1.03, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.4)', zIndex: 50 }}
+                        style={{ position: 'relative', cursor: isRearranging ? 'grab' : 'default' }}
+                        as="div"
+                        className="relative"
+                    >
+                        {/* Drag handle overlay */}
+                        {isRearranging && (
+                            <div className="absolute top-2 right-2 z-10 text-[#D4AF37] opacity-60">
+                                <GripVertical size={14} />
+                            </div>
                         )}
-                    </div>
-                    <div className="relative z-10">
-                        <h2 className="text-4xl font-mono text-[#050505] dark:text-white tracking-tighter drop-shadow-md">
-                            {isConnected && balance ? `${Number(balance.formatted).toFixed(4)} ${balance.symbol}` : '---'}
-                        </h2>
-                        <p className="text-[10px] font-mono text-[#888888] dark:text-white/40 uppercase tracking-widest mt-2 flex items-center gap-2">
-                            Wallet: <span className="text-[#050505] dark:text-[#D4AF37] bg-[#F5F5F5] dark:bg-[#D4AF37]/10 px-2 py-0.5 rounded font-black">{isConnected && address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
-                        </p>
-                    </div>
-                </div>
 
-                {/* Macro Metrics Card */}
-                <div className="bg-[#050505] dark:bg-[#0A0A0A] text-white p-6 shadow-[4px_4px_0_0_#E5E5E5] dark:shadow-[4px_4px_0_0_rgba(0,192,118,0.3)] dark:border border-white/5 rounded-sm relative overflow-hidden group hover:dark:shadow-[4px_4px_0_0_rgba(0,192,118,0.5)] transition-all">
-                    <div className="absolute -inset-2 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/10 via-transparent to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
-                    <p className="text-[9px] font-black text-white/50 dark:text-green-500/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
-                        <Activity size={12}/> Global Liquidity Matrix
-                    </p>
-                    <h2 className="text-4xl font-mono text-[#00C076] tracking-tighter drop-shadow-[0_0_15px_rgba(0,192,118,0.4)] relative z-10">
-                        +14.2%
-                    </h2>
-                    <p className="text-[10px] font-mono text-white/50 uppercase tracking-widest mt-2 relative z-10">
-                        Institutional Net Flow (24H)
-                    </p>
-                </div>
+                        {/* ─── Card: Live Portfolio ─── */}
+                        {card.id === 'live-portfolio' && (
+                            <div className="bg-white dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 p-6 shadow-[4px_4px_0_0_#050505] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.1)] hover:dark:shadow-[4px_4px_0_0_rgba(212,175,55,0.3)] hover:dark:border-[#D4AF37]/30 transition-all rounded-sm relative overflow-hidden group h-full">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-black/[0.02] dark:from-white/[0.02] to-transparent pointer-events-none" />
+                                <div className="flex justify-between items-start mb-4 relative z-10">
+                                    <p className="text-[9px] font-black text-[#888888] dark:text-[#D4AF37] uppercase tracking-[0.2em]">Live Portfolio</p>
+                                    {isConnected ? (
+                                        <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_rgba(0,192,118,0.6)]" title="Connected to Native Wallet"/>
+                                    ) : (
+                                        <div className="w-2 h-2 rounded-full bg-[#FF3B30]" title="Disconnected"/>
+                                    )}
+                                </div>
+                                <div className="relative z-10">
+                                    <h2 className="text-4xl font-mono text-[#050505] dark:text-white tracking-tighter drop-shadow-md">
+                                        {isConnected && balance ? `${Number(balance.formatted).toFixed(4)} ${balance.symbol}` : '---'}
+                                    </h2>
+                                    <p className="text-[10px] font-mono text-[#888888] dark:text-white/40 uppercase tracking-widest mt-2 flex items-center gap-2">
+                                        Wallet: <span className="text-[#050505] dark:text-[#D4AF37] bg-[#F5F5F5] dark:bg-[#D4AF37]/10 px-2 py-0.5 rounded font-black">{isConnected && address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
-                {/* Status Card */}
-                <div className="bg-[#FAF9F6] dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 p-6 flex flex-col justify-center rounded-sm shadow-sm hover:shadow-md dark:shadow-none transition-shadow">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center border-b border-[#E5E5E5] dark:border-white/10 pb-2">
-                            <span className="text-[10px] font-black text-[#888888] dark:text-white/40 uppercase tracking-[0.2em]">Node Sync</span>
-                            <span className="text-[10px] font-mono font-black text-[#00C076] flex items-center gap-1.5"><Clock size={11} className="animate-spin-slow"/> 12ms</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-[#E5E5E5] dark:border-white/10 pb-2">
-                            <span className="text-[10px] font-black text-[#888888] dark:text-white/40 uppercase tracking-[0.2em]">AI Predictors</span>
-                            <span className="text-[10px] text-[#050505] dark:text-indigo-400 font-black uppercase tracking-[0.2em]">Online</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-black text-[#888888] dark:text-white/40 uppercase tracking-[0.2em]">Execution</span>
-                            <span className="text-[10px] text-[#050505] dark:text-white font-black uppercase tracking-[0.2em]">Neural Routing</span>
-                        </div>
-                    </div>
-                </div>
+                        {/* ─── Card: Macro Metrics ─── */}
+                        {card.id === 'macro-metrics' && (
+                            <div className="bg-[#050505] dark:bg-[#0A0A0A] text-white p-6 shadow-[4px_4px_0_0_#E5E5E5] dark:shadow-[4px_4px_0_0_rgba(0,192,118,0.3)] dark:border border-white/5 rounded-sm relative overflow-hidden group hover:dark:shadow-[4px_4px_0_0_rgba(0,192,118,0.5)] transition-all h-full">
+                                <div className="absolute -inset-2 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/10 via-transparent to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
+                                <p className="text-[9px] font-black text-white/50 dark:text-green-500/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
+                                    <Activity size={12}/> Global Liquidity Matrix
+                                </p>
+                                <h2 className="text-4xl font-mono text-[#00C076] tracking-tighter drop-shadow-[0_0_15px_rgba(0,192,118,0.4)] relative z-10">
+                                    +14.2%
+                                </h2>
+                                <p className="text-[10px] font-mono text-white/50 uppercase tracking-widest mt-2 relative z-10">
+                                    Institutional Net Flow (24H)
+                                </p>
+                            </div>
+                        )}
 
-            </div>
+                        {/* ─── Card: System Status ─── */}
+                        {card.id === 'system-status' && (
+                            <div className="bg-[#FAF9F6] dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 p-6 flex flex-col justify-center rounded-sm shadow-sm hover:shadow-md dark:shadow-none transition-shadow h-full">
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center border-b border-[#E5E5E5] dark:border-white/10 pb-2">
+                                        <span className="text-[10px] font-black text-[#888888] dark:text-white/40 uppercase tracking-[0.2em]">Node Sync</span>
+                                        <span className="text-[10px] font-mono font-black text-[#00C076] flex items-center gap-1.5"><Clock size={11} className="animate-spin-slow"/> 12ms</span>
+                                    </div>
+                                    <div className="flex justify-between items-center border-b border-[#E5E5E5] dark:border-white/10 pb-2">
+                                        <span className="text-[10px] font-black text-[#888888] dark:text-white/40 uppercase tracking-[0.2em]">AI Predictors</span>
+                                        <span className="text-[10px] text-[#050505] dark:text-indigo-400 font-black uppercase tracking-[0.2em]">Online</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[10px] font-black text-[#888888] dark:text-white/40 uppercase tracking-[0.2em]">Execution</span>
+                                        <span className="text-[10px] text-[#050505] dark:text-white font-black uppercase tracking-[0.2em]">Neural Routing</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </Reorder.Item>
+                ))}
+            </Reorder.Group>
 
             {/* ─── TERMINAL CONTROLS ─── */}
             <div className="mt-8 flex items-center justify-between border-b-2 border-[#050505] dark:border-white/20 pb-4">
@@ -250,9 +291,33 @@ export function PremiumMatrixStack() {
                         </button>
                     </div>
                 </div>
-                <div className="hidden lg:flex items-center gap-3 bg-[#FAF9F6] dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 px-4 py-2 rounded-full shadow-inner">
-                    <span className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_rgba(0,192,118,0.8)]"/>
-                    <span className="text-[9px] font-black text-[#888888] dark:text-[#00C076] uppercase tracking-[0.2em]">Live Orderbook Connected</span>
+                <div className="flex items-center gap-3">
+                    {/* Rearrange toggle */}
+                    <button
+                        onClick={() => {
+                            if (isRearranging) setIsRearranging(false);
+                            else setIsRearranging(true);
+                        }}
+                        className={`px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-sm border transition-all flex items-center gap-1.5 ${
+                            isRearranging
+                                ? 'bg-[#D4AF37] border-[#D4AF37] text-black'
+                                : 'border-[#E5E5E5] dark:border-white/10 text-[#888888] dark:text-white/40 hover:border-[#D4AF37] hover:text-[#D4AF37]'
+                        }`}
+                    >
+                        <GripVertical size={11} /> {isRearranging ? 'Done' : 'Rearrange'}
+                    </button>
+                    {isRearranging && (
+                        <button
+                            onClick={resetCards}
+                            className="px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-sm border border-[#E5E5E5] dark:border-white/10 text-[#888888] hover:text-[#FF3B30] hover:border-[#FF3B30] transition-all"
+                        >
+                            Reset
+                        </button>
+                    )}
+                    <div className="hidden lg:flex items-center gap-3 bg-[#FAF9F6] dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 px-4 py-2 rounded-full shadow-inner">
+                        <span className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_rgba(0,192,118,0.8)]"/>
+                        <span className="text-[9px] font-black text-[#888888] dark:text-[#00C076] uppercase tracking-[0.2em]">Live Orderbook Connected</span>
+                    </div>
                 </div>
             </div>
 

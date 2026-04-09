@@ -1,9 +1,11 @@
 "use client";
 
-import React from 'react';
-import { BookOpen, Terminal, Database, ShieldCheck, Cpu, Globe } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, Terminal, Database, ShieldCheck, Cpu, Globe, Search } from 'lucide-react';
 
 export default function DocsPage() {
+    const [searchQuery, setSearchQuery] = useState("");
+    
     return (
         <div 
             style={{ backgroundColor: "#020202", color: "#E0E0E0", minHeight: "100vh" }} 
@@ -23,9 +25,36 @@ export default function DocsPage() {
                     Technical Specifications.
                 </h1>
                 
-                <p style={{ color: "#545F73" }} className="font-mono text-sm mb-24 uppercase tracking-widest">
-                    Version: Alpha Release 1.5.0
-                </p>
+                <div className="flex items-center gap-6 mb-12">
+                    <p style={{ color: "#545F73" }} className="font-mono text-sm uppercase tracking-widest m-0">
+                        Version: Alpha Release 1.5.0
+                    </p>
+                    <a 
+                        href="/SOVEREIGN_WHITEPAPER.md" 
+                        download="Whale_Alert_Whitepaper.md"
+                        className="bg-[#D4AF37] text-black font-mono text-xs font-bold uppercase tracking-wider py-2 px-6 rounded-md hover:bg-[#F2d36d] transition-colors"
+                    >
+                        Download PDF/MD Variant
+                    </a>
+                </div>
+
+                {/* ── SEARCH BAR ── */}
+                <div className="w-full max-w-2xl mb-24 relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A94A6]" size={20} />
+                    <input 
+                        type="text" 
+                        placeholder="Search the sovereign archives..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-[#0A0C0F] border border-[#ffffff10] rounded-xl py-4 pl-12 pr-4 text-[#F5F5F5] font-mono text-sm focus:outline-none focus:border-[#D4AF37] transition-colors"
+                        style={{ outline: "none", boxShadow: "none" }}
+                    />
+                    {searchQuery && (
+                        <div className="absolute top-full mt-2 w-full bg-[#0A0C0F] border border-[#ffffff10] rounded-xl p-4 z-10 text-sm text-[#8A94A6] font-mono">
+                            Press Enter to search for &quot;{searchQuery}&quot;...
+                        </div>
+                    )}
+                </div>
 
                 {/* ── MODULE CARDS ── */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-24">

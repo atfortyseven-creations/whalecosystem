@@ -1,17 +1,163 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import useSWR from 'swr';
-import { Shield, Fingerprint, Lock, ShieldAlert, Activity, CheckCircle2, Clock, UserPlus, Trash2, Users } from 'lucide-react';
-import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { Shield, Fingerprint, Lock, ShieldAlert, Activity, CheckCircle2, Clock, UserPlus, Trash2, Users, Zap, AlertTriangle, RefreshCw, ExternalLink } from 'lucide-react';
+import { useAccount, useSendTransaction } from 'wagmi';
 import { parseEther } from 'viem';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // XSS sanitize for guardian addresses
 const sanitizeAddr = (s: string) => s.replace(/[^a-zA-Z0-9._-]/g, '').trim().slice(0, 100);
+
+// ─── On-Chain Status Panel ────────────────────────────────────────────────────
+// Reads live blockchain state from /api/contracts/status
+function OnChainStatusPanel({ address }: { address?: string }) {
+    const { data, isLoading, mutate } = useSWR(
+        `/api/contracts/status?address=${address ?? ''}&chain=base`,
+        fetcher,
+        { refreshInterval: 30_000 }
+    );
+
+    const dm = data?.deadmanSwitch;
+    const tl = data?.timeLock;
+
+    const statusColor = (s?: string) => {
+        if (s === 'ACTIVE')    return 'text-[#00C076]';
+        if (s === 'TRIGGERED') return 'text-[#FF3B30]';
+        if (s === 'PAUSED')    return 'text-[#FF9500]';
+        if (s === 'EXPIRED')   return 'text-[#FF3B30]';
+        if (s === 'LOCKED')    return 'text-[#0052FF]';
+        if (s === 'UNLOCKED')  return 'text-[#00C076]';
+        return 'text-[#888888]';
+    };
+
+    return (
+        <div className="w-full border border-[#D4AF37]/20 bg-[#050505] p-6 relative overflow-hidden">
+            {/* Gold accent line */}
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent" />
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <Zap size={16} className="text-[#D4AF37]" />
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Live On-Chain Status</h3>
+                    <span className="text-[7px] border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] px-2 py-0.5 font-black uppercase tracking-widest">BASE</span>
+                </div>
+                <button
+                    onClick={() => mutate()}
+                    className="text-[#888888] hover:text-[#D4AF37] transition-colors p-1"
+                    title="Refresh on-chain state"
+                >
+                    <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+                </button>
+            </div>
+
+            {isLoading && !data && (
+                <div className="text-[9px] text-[#888888] uppercase tracking-widest animate-pulse">Reading blockchain state...</div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* DeadMan Switch on-chain */}
+                <div className="bg-[#0A0A0A] border border-[#222222] p-4">
+                    <div className="text-[9px] text-[#888888] uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <Activity size={10} /> WhaleDeadmanSwitch
+                    </div>
+                    {!dm ? (
+                        <div className="text-[9px] text-[#444444] uppercase">No contract address configured</div>
+                    ) : dm.error ? (
+                        <div className="text-[9px] text-[#FF3B30] flex items-center gap-1.5">
+                            <AlertTriangle size={10} /> {dm.error}
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[9px] text-[#888888] uppercase">Status</span>
+                                <span className={`text-[9px] font-black uppercase ${statusColor(dm.status)}`}>{dm.status}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[9px] text-[#888888] uppercase">Last Ping</span>
+                                <span className="text-[9px] font-mono text-white">{new Date(dm.lastPing * 1000).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[9px] text-[#888888] uppercase">Expires</span>
+                                <span className="text-[9px] font-mono text-white">{dm.expiresAtIso?.slice(0,10)}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[9px] text-[#888888] uppercase">Days Remaining</span>
+                                <span className={`text-[9px] font-black ${dm.daysRemaining < 14 ? 'text-[#FF9500]' : 'text-[#00C076]'}`}>{dm.daysRemaining}d</span>
+                            </div>
+                            <div className="mt-3 h-1 bg-[#111111] rounded-full overflow-hidden">
+                                <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                        width: `${Math.min(100, (dm.daysRemaining / dm.timeoutPeriodDays) * 100)}%`,
+                                        background: dm.daysRemaining < 14 ? '#FF9500' : '#00C076'
+                                    }}
+                                />
+                            </div>
+                            {dm.contractAddress && (
+                                <a
+                                    href={`https://basescan.org/address/${dm.contractAddress}`}
+                                    target="_blank" rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-[8px] text-[#888888] hover:text-[#D4AF37] transition-colors mt-1"
+                                >
+                                    <ExternalLink size={8} /> {dm.contractAddress.slice(0,10)}...{dm.contractAddress.slice(-6)}
+                                </a>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* HumanTimeLock on-chain */}
+                <div className="bg-[#0A0A0A] border border-[#222222] p-4">
+                    <div className="text-[9px] text-[#888888] uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <Lock size={10} /> HumanTimeLock
+                    </div>
+                    {!tl ? (
+                        <div className="text-[9px] text-[#444444] uppercase">Connect wallet to check lock</div>
+                    ) : tl.error ? (
+                        <div className="text-[9px] text-[#FF3B30] flex items-center gap-1.5">
+                            <AlertTriangle size={10} /> {tl.error}
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[9px] text-[#888888] uppercase">Status</span>
+                                <span className={`text-[9px] font-black uppercase ${statusColor(tl.status)}`}>{tl.status}</span>
+                            </div>
+                            {tl.hasLock ? (
+                                <>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[9px] text-[#888888] uppercase">Locked</span>
+                                        <span className="text-[9px] font-mono font-black text-[#0052FF]">{parseFloat(tl.amountEth).toFixed(4)} ETH</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[9px] text-[#888888] uppercase">Unlocks</span>
+                                        <span className="text-[9px] font-mono text-white">{tl.unlockTimeIso?.slice(0,10)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[9px] text-[#888888] uppercase">Days Left</span>
+                                        <span className="text-[9px] font-black text-[#0052FF]">{tl.daysRemaining}d</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-[9px] text-[#555555] uppercase">No active lock for this wallet</div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {data?.blockNumber && (
+                <div className="mt-4 text-[8px] text-[#444444] font-mono">
+                    Block #{data.blockNumber.toLocaleString()} · {data.timestamp?.slice(0,19).replace('T',' ')} UTC
+                </div>
+            )}
+        </div>
+    );
+}
 
 export function SovereignVault() {
     const { isConnected, address } = useAccount();
@@ -217,9 +363,10 @@ export function SovereignVault() {
 
                 </div>
 
+                {/* ── ON-CHAIN LIVE STATUS ─────────────────────────────────────────── */}
+                <OnChainStatusPanel address={address} />
+
                 {/* ── GUARDIAN MULTI-SIG ───────────────────────────────────────────── */}
-                {/* FIX: Added multi-sig guardian section to eliminate single-point-of-failure.
-                    A stolen wallet alone cannot bypass vault protections when guardians are set. */}
                 <div className="w-full border border-[#222222] bg-[#020202] p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <Users size={20} className="text-[#D4AF37]" />

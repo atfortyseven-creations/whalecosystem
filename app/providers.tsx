@@ -8,6 +8,7 @@ import { RainbowKitProvider, darkTheme, getDefaultConfig, RainbowKitAuthenticati
 import '@rainbow-me/rainbowkit/styles.css';
 import { SiweMessage } from 'siwe';
 import { MarketStreamProvider } from '@/context/MarketStreamContext';
+import { WhaleStreamProvider } from '@/context/WhaleStreamContext';
 
 const queryClient = new QueryClient();
 
@@ -76,7 +77,9 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
             })}
           >
             <MarketStreamProvider>
-              {children}
+              <WhaleStreamProvider>
+                {children}
+              </WhaleStreamProvider>
             </MarketStreamProvider>
           </RainbowKitProvider>
         </RainbowKitAuthenticationProvider>

@@ -1,0 +1,37 @@
+# Whale Alert Network — Helm Chart
+# Institutional one-command deployment
+#
+# Usage:
+#   helm repo add whale-alert https://charts.whalealert.network
+#   helm install whale-alert whale-alert/whale-alert \
+#     --namespace whale-alert --create-namespace \
+#     --set secrets.databaseUrl="postgresql://..." \
+#     --set secrets.redisUrl="redis://..." \
+#     --set secrets.alchemyApiKey="..." \
+#     --set secrets.telegramBotToken="..." \
+#     --set image.tag="3.0.0"
+#
+# Upgrade:
+#   helm upgrade whale-alert whale-alert/whale-alert --reuse-values --set image.tag="3.1.0"
+#
+# Uninstall:
+#   helm uninstall whale-alert --namespace whale-alert
+
+apiVersion: v2
+name: whale-alert
+description: Sovereign On-Chain Intelligence Network — Institutional Grade Deployment
+type: application
+version: 3.0.0
+appVersion: "3.0.0"
+keywords:
+  - crypto
+  - blockchain
+  - whale-tracking
+  - defi
+  - intelligence
+home: https://whalealert.network
+sources:
+  - https://github.com/atfortyseven-creations/whalecosystem
+maintainers:
+  - name: Whale Alert Core Team
+    email: core@whalealert.network

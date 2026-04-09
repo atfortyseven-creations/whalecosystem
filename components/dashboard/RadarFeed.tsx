@@ -4,26 +4,25 @@ import React, { useEffect } from 'react';
 import { useWhaleFeed } from '@/hooks/useWhaleFeed';
 import { useSniperStore } from '@/store/useSniperStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useWhaleStream } from '@/context/WhaleStreamContext';
 
 export default function RadarFeed() {
   const { unifiedWhaleFeed } = useWhaleFeed();
   const pushAlert = useSniperStore((state) => state.pushAlert);
-  
-  // Use a fine-grained selector to ONLY re-render when alerts array changes
   const alerts = useSniperStore((state) => state.alerts);
   const filters = useSniperStore((state) => state.filters);
 
-  // Hydrate Store with Real-time Feed
-  // In a real HFT environment, this would be a direct WebSocket, but we use the existing unified feed 
-  // and push it to our zero-render Zustand store.
+  // ─── Secondary Real-Time Source: SSE Stream ──────────────────────────────
+  // The SSE context delivers events pushed directly from the EVM/BTC/SOL workers
+  // via Redis queue → /api/whale-stream → EventSource.
+  // These events are piped into the same Zustand store for unified rendering.
+  const { events: sseEvents, isConnected: sseConnected } = useWhaleStream();
+
+  // ─── Primary Source: Unified Whale Feed (WebSocket / Polling) ────────────
   useEffect(() => {
     if (!unifiedWhaleFeed.length) return;
-    
-    // Take the latest event
     const latest = unifiedWhaleFeed[0];
-    
-    // Parse into our strict interface
-    const newAlert = {
+    pushAlert({
       id: latest.id || latest.hash,
       txHash: latest.hash,
       asset: latest.asset || 'UNKNOWN',
@@ -34,16 +33,34 @@ export default function RadarFeed() {
       chain: latest.chain || 'UNKNOWN',
       action: (latest.action === 'COMPRA' || latest.action === 'BUY') ? 'BUY' : latest.action === 'SELL' ? 'SELL' : 'TRANSFER',
       timestamp: latest.timestamp,
-    };
-
-    // Store handles the mathematical filtering (minVolumeUsd, etc) and circular buffering
-    pushAlert(newAlert as any);
+    } as any);
   }, [unifiedWhaleFeed, pushAlert]);
+
+  // ─── Secondary Source: SSE Stream (WhaleStreamContext) ─────────────────
+  useEffect(() => {
+    if (!sseEvents.length) return;
+    const latest = sseEvents[0];
+    pushAlert({
+      id: latest.id,
+      txHash: latest.hash,
+      asset: latest.asset,
+      amount: Number(latest.amount || 0),
+      usdValue: Number(latest.usdValue || 0),
+      from: latest.from,
+      to: latest.to,
+      chain: latest.chain,
+      action: 'TRANSFER',
+      timestamp: latest.timestamp,
+    } as any);
+  }, [sseEvents, pushAlert]);
 
   return (
     <div className="flex flex-col absolute inset-0 bg-[#050505] p-2">
-      <div className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white/30 border-b border-white/5 mb-2 shrink-0">
-        <span>TIME</span>
+      <div className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white/30 border-b border-white/5 mb-2 shrink-0 items-center">
+        <span className="flex items-center gap-1.5">
+          <span className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-[#00C076] shadow-[0_0_6px_rgba(0,192,118,0.7)]' : 'bg-white/20'} animate-pulse`} />
+          TIME
+        </span>
         <span>SIGNATURE // ROUTE</span>
         <span className="text-right">VOLUME (USD)</span>
         <span className="text-right">ASSET</span>
