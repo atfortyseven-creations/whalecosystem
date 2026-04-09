@@ -52,6 +52,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 # Next.js standalone bundles its own minimal node_modules internally.
 # We only need to copy three artifacts from the builder — nothing else.
@@ -59,7 +60,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static     ./.next/static
 COPY --from=builder /app/public           ./public
 
-# Prisma: schema + generated client needed at runtime for db push
+# Prisma: schema + generated client needed at runtime for db access
 COPY --from=builder /app/prisma           ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
@@ -67,8 +68,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 EXPOSE 3000
 
 # Liveness probe — Railway polls this every 30 s
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
-    CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+    CMD wget -qO- http://127.0.0.1:${PORT:-3000}/api/health || exit 1
 
-# Sync schema to live DB, then boot the Next.js standalone server
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node server.js"]
+# Boot the Next.js standalone server
+CMD ["node", "server.js"]
