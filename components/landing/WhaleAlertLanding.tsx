@@ -385,14 +385,17 @@ export function WhaleAlertLanding() {
         {/* Radial fade */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, rgba(250,249,246,0.95) 100%)" }} />
 
-        {/* ── LEFT PANEL: News of Today — screens ≥ 1400px ——————————— */}
-        <div className="absolute z-20 hidden [@media(min-width:1400px)]:block"
+        {/* ── LEFT PANEL: News of Today — screens ≥ 1280px (xl) ——————————— */}
+        {/* NOTE: Using Tailwind xl (1280px) instead of custom 1400px media query.
+             This ensures the panel shows in desktop-mode browsers on tablets/mobile
+             where viewport CSS width is reported correctly regardless of User-Agent. */}
+        <div className="absolute z-20 hidden xl:block"
              style={{ left: 20, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
           <NewsOfTodayPanel />
         </div>
 
-        {/* ── RIGHT PANEL: Whale Post iframe ———————————————————— */}
-        <div className="absolute z-20 hidden [@media(min-width:1400px)]:block"
+        {/* ── RIGHT PANEL: Whale Post iframe — screens ≥ 1280px (xl) ————————————————————— */}
+        <div className="absolute z-20 hidden xl:block"
              style={{ right: 20, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
           <WhalePostIframePanel />
         </div>
