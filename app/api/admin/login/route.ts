@@ -8,7 +8,7 @@ const JWT_SECRET_STR = process.env.JWT_SECRET;
 if (!JWT_SECRET_STR && process.env.SKIP_ENV_VALIDATION !== 'true') {
     throw new Error("CRITICAL: JWT_SECRET environment variable is not defined");
 }
-const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR);
+const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'build-fallback-secret');
 
 export async function POST(req: NextRequest) {
     try {

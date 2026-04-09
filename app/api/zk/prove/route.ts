@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { zkWorker } from '@/services/crypto/zk-shield-worker';
-import { verifySession } from '@/lib/session';
+import { getSession } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await verifySession();
+        const session = await getSession();
         if (!session || !session.user) {
             return NextResponse.json({ error: 'Unauthorized via Sovereign Handshake' }, { status: 401 });
         }

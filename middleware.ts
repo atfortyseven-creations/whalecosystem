@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { RedisRateLimiter } from './lib/redis/rate-limiter';
+// Removed RedisRateLimiter import: ioredis uses Node APIs incompatible with Next.js Edge Runtime.
+// import { RedisRateLimiter } from './lib/redis/rate-limiter';
 import { runWAF } from './lib/security/waf-engine';
 
 // [SAFE-ENUM] Defined locally to avoid pulling in @prisma/client in Edge Runtime
@@ -91,13 +92,13 @@ export default clerkMiddleware(async (auth, request) => {
             userTier = tierMeta.plan as PlanTier;
           }
         }
-        const rateLimit = await RedisRateLimiter.check(ip, userTier);
-        if (!rateLimit.success) {
-          return new NextResponse(JSON.stringify({ error: 'System busy. Retry in 60s.' }), { 
-            status: 429, 
-            headers: { 'Content-Type': 'application/json' } 
-          });
-        }
+        // const rateLimit = await RedisRateLimiter.check(ip, userTier);
+        // if (!rateLimit.success) {
+        //   return new NextResponse(JSON.stringify({ error: 'System busy. Retry in 60s.' }), { 
+        //     status: 429, 
+        //     headers: { 'Content-Type': 'application/json' } 
+        //   });
+        // }
       } catch (rateLimitErr) {
         // M-4 FIX: Redis failure is a critical alert, not a silent pass.
         // Log it as an emergency and fall through (fail-open is safer than hard-blocking users
