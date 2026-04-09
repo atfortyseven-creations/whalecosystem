@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         }
 
         const token = authHeader.split(' ')[1];
-        let payload;
+        let payload: any;
         
         try {
             const verified = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
