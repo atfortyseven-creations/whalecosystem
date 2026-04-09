@@ -144,7 +144,5 @@ export const mempoolWatcher = globalForSovereign.sovereignMempool || SovereignMe
 
 if (process.env.NODE_ENV !== 'production') globalForSovereign.sovereignMempool = mempoolWatcher;
 
-// Auto-start in production immediately 
-if (process.env.NODE_ENV === 'production') {
-    mempoolWatcher.startListening();
-}
+// REMOVED: Auto-start removed from global scope to prevent SSR crashing on WebSocket connection drops (402 Payment Required). 
+// The mesh or worker layers will manually call startListening() when running outside the web server boundary!
