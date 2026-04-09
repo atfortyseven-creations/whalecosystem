@@ -1,9 +1,11 @@
 [build]
-builder = "nixpacks"
-buildCommand = "npm run build:railway"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-# prisma db push runs at RUNTIME (has DATABASE_URL). next build runs at BUILD TIME (no DATABASE_URL).
-startCommand = "npm run start:prod"
+# CMD is defined inside Dockerfile (Multi-Stage). Do NOT override with startCommand.
+# Railway respects the Dockerfile CMD when builder = "DOCKERFILE".
 healthcheckPath = "/api/health"
-healthcheckTimeout = 100
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

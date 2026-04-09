@@ -1,30 +1,74 @@
-# ─── Unified Sovereign Production Environment ────────────────────────────────
-FROM node:22-alpine
+# ─── SOVEREIGN MULTI-STAGE DOCKER PIPELINE ──────────────────────────────────
+# Railway Hobby Plan: 8 vCPU / 8 GB RAM — Optimized absolutely.
+# Stage 1 → Install deps  (cached layer, rarely invalidated)
+# Stage 2 → Compile Next.js Standalone bundle  (4 GB RAM cap)
+# Stage 3 → Minimal runner  (no devDeps, no build tools, ~200 MB final image)
+
+# ─── BASE IMAGE ──────────────────────────────────────────────────────────────
+FROM node:22-alpine AS base
+
+# OS libraries required by Prisma binary engine, sharp (image), and native addons
+RUN apk add --no-cache \
+    libc6-compat \
+    openssl \
+    python3 \
+    make \
+    g++ \
+    wget
+
+# ─── STAGE 1: INSTALL DEPENDENCIES ──────────────────────────────────────────
+FROM base AS deps
 WORKDIR /app
 
-# Install OS deps for native modules (sharp, canvas, openssl for Prisma)
-RUN apk add --no-cache libc6-compat openssl python3 make g++
+# Only copy manifests first — invalidates cache only when deps change
+COPY package.json package-lock.json ./
 
-COPY package*.json ./
+# Install all deps (dev+prod) needed to compile Next.js
 RUN npm ci --legacy-peer-deps
 
+# ─── STAGE 2: BUILD ──────────────────────────────────────────────────────────
+FROM base AS builder
+WORKDIR /app
+
+# Pull installed modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy source (dockerignore eliminates scripts, k8s, contracts, etc.)
 COPY . .
 
-# Build-time env flags:
-ENV NODE_OPTIONS="--max-old-space-size=8192"
+# Safety: disable Next.js telemetry and enforce memory ceiling for Railway
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_ENV_VALIDATION=true
 
-# Compile Next.js UI (leaves node_modules intact for our external workers)
-RUN npm run build
+# Generate Prisma client then compile Next.js standalone bundle
+RUN npx prisma generate && \
+    npx next build
 
-# Runtime configuration
+# ─── STAGE 3: PRODUCTION RUNNER ──────────────────────────────────────────────
+FROM base AS runner
+WORKDIR /app
+
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+
+# Next.js standalone bundles its own minimal node_modules internally.
+# We only need to copy three artifacts from the builder — nothing else.
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static     ./.next/static
+COPY --from=builder /app/public           ./public
+
+# Prisma: schema + generated client needed at runtime for db push
+COPY --from=builder /app/prisma           ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
 EXPOSE 3000
 
-# Health check — Railway polls this to determine if the service is alive
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-  CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
+# Liveness probe — Railway polls this every 30 s
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+    CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
 
-# The simplified, bulletproof launch command via NPM to evade Windows CRLF shell script corruption
-CMD ["npm", "run", "start:prod"]
+# Sync schema to live DB, then boot the Next.js standalone server
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node server.js"]

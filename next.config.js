@@ -52,9 +52,9 @@ const nextConfig = {
         ]
     },
 
-    // NOTE: 'standalone' output removed. The Dockerfile is single-stage and retains
-    // full node_modules, so 'next start' works natively without standalone server.
-    // Standalone mode generates its own server.js that conflicts with 'next start'.
+    output: 'standalone',
+    // NOTE: 'standalone' output ACTIVATED. We are now running a Multi-Stage Docker Build
+    // for absolute resource efficiency on Railway 8GB Hobby Plan.
 
     compress: true,
     poweredByHeader: false,

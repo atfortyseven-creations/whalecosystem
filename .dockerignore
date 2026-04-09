@@ -1,17 +1,62 @@
+# ─── DOCKER CONTEXT EXCLUSIONS ──────────────────────────────────────────────
+# Dev build artifacts
 node_modules
 .next
 out
 build
+.turbo
+
+# Git & editor
 .git
-.ds_store
+.gitignore
+.github
+.DS_Store
+*.lnk
+
+# Environment secrets
 .env*
-npm-debug.log*
-yarn-debug.log*
+!.env.example
+
+# Heavy dev-only directories (not needed at runtime)
+scripts
+k8s
+contracts
+typechain-types
 artifacts
 cache
-typechain-types
 subgraph
 test
+ignition
+graphql
+neo4j
 docs
-scripts/test*
-tsconfig.tsbuildinfo
+examples
+
+# Misc junk accumulated during dev
+*.bat
+*.ps1
+*.sh
+*.patch
+*.log
+*.tsbuildinfo
+*.py
+Extractor.*
+diff.patch
+tmp_diff.txt
+tsc_output.txt
+build.log
+debug_intel.js
+refactor.js
+fix_trade_page.py
+extract.html
+extract_color.js
+get_color.js
+light_theme.js
+gtm_container_export.json
+theme_logic_prompt.md
+system_capabilities.md
+
+# Docker itself
+docker
+docker-compose.yml
+.dockerignore
