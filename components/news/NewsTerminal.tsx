@@ -474,10 +474,10 @@ export function NewsTerminal() {
                   <div className="px-6 md:px-10 xl:px-16 pt-8 pb-6 max-w-[900px]">
                       {/* ── Full content — access is open to all users ── */}
                       <div
-                        className="font-sans font-light tracking-wide leading-[2.2] space-y-7 opacity-80"
+                        className="font-sans font-light tracking-wide leading-[1.9] space-y-5 opacity-85"
                         style={{
-                          fontSize: `${1.18 * fontSize}rem`,
-                          color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
+                          fontSize: `${0.82 * fontSize}rem`,
+                          color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.80)',
                         }}
                       >
                         {selected.description

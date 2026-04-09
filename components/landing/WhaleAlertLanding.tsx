@@ -161,23 +161,20 @@ function NewsOfTodayPanel() {
     <div
       className="flex flex-col overflow-hidden"
       style={{
-        width: 232,
-        maxHeight: 'calc(100vh - 140px)',
-        background: 'rgba(250,249,246,0.94)',
-        border: '1px solid rgba(0,0,0,0.10)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        width: 272,
+        maxHeight: 'calc(100vh - 120px)',
+        background: 'rgba(250,249,246,0.96)',
+        border: '1px solid rgba(0,0,0,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
       }}
     >
       {/* Header */}
-      <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-           className="flex items-center justify-between px-4 py-3 shrink-0">
-        <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-white">
+      <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+           className="flex items-center px-4 py-3.5 shrink-0">
+        <span className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-white">
           News of Today
-        </span>
-        <span className="px-1.5 py-0.5 text-[7px] font-black uppercase tracking-widest text-white"
-              style={{ background: '#00C076', borderRadius: 2 }}>
-          LIVE
         </span>
       </div>
 
@@ -194,19 +191,19 @@ function NewsOfTodayPanel() {
             href={art.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block px-4 py-3 group"
+            className="block px-4 py-3.5 group"
             style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-[7px] font-black uppercase tracking-widest"
-                    style={{ color: 'rgba(0,0,0,0.32)' }}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="font-mono text-[8px] font-black uppercase tracking-widest"
+                    style={{ color: 'rgba(0,0,0,0.35)' }}>
                 {art.source}
               </span>
-              <span className="font-mono text-[7px]" style={{ color: 'rgba(0,0,0,0.20)' }}>
+              <span className="font-mono text-[8px]" style={{ color: 'rgba(0,0,0,0.22)' }}>
                 {timeAgo(art.date)}
               </span>
             </div>
-            <p className="text-[10px] font-bold text-black leading-tight line-clamp-2
+            <p className="text-[11px] font-bold text-black leading-snug line-clamp-2
                           group-hover:opacity-60 transition-opacity">
               {art.title}
             </p>
@@ -239,27 +236,28 @@ function WhalePostIframePanel() {
   const [loaded, setLoaded] = React.useState(false);
   // iframe is 1000px wide, scaled to 232px → scale = 0.232
   // container height is 500px, iframe height = 500/0.232 ≈ 2155px
-  const SCALE = 0.232;
+  const SCALE = 0.272;                         // 272px panel / 1000px iframe = 0.272
   const IFRAME_W = 1000;
-  const PANEL_H = 500;
-  const IFRAME_H = Math.round(PANEL_H / SCALE);
+  const PANEL_H = 560;                          // fixed height — fills most of viewport
+  const IFRAME_H = Math.round(PANEL_H / SCALE); // unscaled iframe height
 
   return (
     <div
       className="flex flex-col overflow-hidden"
       style={{
-        width: 232,
-        maxHeight: 'calc(100vh - 140px)',
-        background: 'rgba(250,249,246,0.94)',
-        border: '1px solid rgba(0,0,0,0.10)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        width: 272,
+        maxHeight: 'calc(100vh - 120px)',
+        background: 'rgba(250,249,246,0.96)',
+        border: '1px solid rgba(0,0,0,0.12)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
       }}
     >
       {/* Header */}
       <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
            className="flex items-center justify-between px-4 py-3 shrink-0">
-        <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-white">
+        <span className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-white">
           Whale Post
         </span>
         <a
@@ -387,15 +385,15 @@ export function WhaleAlertLanding() {
         {/* Radial fade */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, rgba(250,249,246,0.95) 100%)" }} />
 
-        {/* ── LEFT PANEL: News of Today — pantalles ≥ 1600 px ——————————— */}
-        <div className="absolute z-20 hidden [@media(min-width:1600px)]:block"
-             style={{ left: 16, top: '50%', transform: 'translateY(-50%) translateY(24px)' }}>
+        {/* ── LEFT PANEL: News of Today — screens ≥ 1400px ——————————— */}
+        <div className="absolute z-20 hidden [@media(min-width:1400px)]:block"
+             style={{ left: 20, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
           <NewsOfTodayPanel />
         </div>
 
         {/* ── RIGHT PANEL: Whale Post iframe ———————————————————— */}
-        <div className="absolute z-20 hidden [@media(min-width:1600px)]:block"
-             style={{ right: 16, top: '50%', transform: 'translateY(-50%) translateY(24px)' }}>
+        <div className="absolute z-20 hidden [@media(min-width:1400px)]:block"
+             style={{ right: 20, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
           <WhalePostIframePanel />
         </div>
 

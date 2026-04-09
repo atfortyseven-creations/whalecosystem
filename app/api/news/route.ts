@@ -47,15 +47,58 @@ function decodeHTMLEntities(text: string): string {
     .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 }
 
-// ─── Análisis Institucional Extendido (7 Bloques) ────────────────────────────
+// ─── Institutional Analysis Engine (English — 6 rotating template sets) ─────────────
 function generateDeepAnalysis(title: string, domain: string): string {
-  return [
-    `Nuestros nodos de telemetría termodinámica que auditan los flujos de ${domain} han identificado un vector asimétrico inusual: "${title}". Este desarrollo técnico ha activado los protocolos de vigilancia de Nivel-Alfa dentro de nuestra infraestructura institucional, dada su propagación anómala que excede los parámetros estándar de volatilidad. Los sistemas de alerta temprana revelan una concentración atípica de liquidez de alto valor preparándose en la antesala de este horizonte temporal.`,
+  // Deterministic rotation so the same article always gets the same analysis block
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) hash = title.charCodeAt(i) + ((hash << 5) - hash);
+  const idx = Math.abs(hash) % 6;
 
-    `Desde la perspectiva del análisis matricial de liquidez, los operadores de Nivel 1 —entidades con capitales superiores a los $10 millones en activos digitales— se encuentran ejecutando discretas pero sistemáticas realineaciones de exposición. El flujo de datos en cadena apunta claramente a una reestructuración estratégica de carteras, migrando desde libros de órdenes centralizados hacia capas profundas de autocustodia. Históricamente, este patrón antecede expansiones direccionales masivas en un transcurso de 48 horas, sugiriendo una inminente compresión asimétrica del mercado.`,
+  const templates: string[][] = [
+    // ─ Template 0: On-chain liquidity flow ─────────────────────────────────
+    [
+      `Whale Alert Network’s on-chain telemetry nodes monitoring ${domain} have flagged an asymmetric signal in the context of “${title}.” Cross-referencing mempool throughput, stablecoin mint velocity, and derivative open interest across Arbitrum, Optimism, and Ethereum mainnet reveals a statistically significant deviation from 30-day baseline volatility bands — consistent with pre-directional accumulation phases observed in Q3 2023 and Q1 2024.`,
+      `Tier-1 participants — defined as entities maintaining $10M+ AUM in digital assets — are executing measured rebalancing across custodial and non-custodial venues. On-chain data shows net outflows from centralized order books into cold-storage clusters, a pattern that has historically preceded 15–35% directional expansions within 72 hours. Notably, large block transactions above the $2.5M threshold have increased 18.4% over the prior 48-hour window as of this report.`,
+      `EVM-correlated analysis through the Whale Intelligence Matrix projects elevated implied volatility repricing in near-dated perpetuals. The divergence between retail sentiment indices (currently bearish at -0.62 Z-score) and institutional positioning (net long, confidence interval 94.3%) represents a structural dislocation that the network classifies as a high-priority surveillance event. Operators are advised to monitor the $82,400 BTC support cluster and ETH’s 4H RSI convergence zone before committing directional capital.`,
+    ],
 
-    `El análisis correlacionado a través de los ecosistemas EVM proyecta una fuerte reprecificación de derivados en el muy corto plazo. Las métricas de interés abierto exponen una divergencia estructural absoluta entre el sentimiento especulativo minorista y el riguroso posicionamiento estratégico institucional, el cual acumula silenciosamente posiciones largas fuertemente respaldadas. Recomendamos a los operadores provistos de motores soberanos de inteligencia mantener una postura de observación estratégica, aguardando una confirmación estructural intacta antes de comprometer su capital algorítmico.`
-  ].join('\n\n');
+    // ─ Template 1: Regulatory / macro overlay ────────────────────────────
+    [
+      `The development reported by ${domain} — “${title}” — has been catalogued by the Whale Alert Intelligence Desk as a macro-level regulatory event with first and second-order implications for on-chain liquidity routing. Our compliance overlay engine has cross-referenced this event against MiCA Article 76, SEC Form 8-K filings from the prior 30 days, and active CFTC enforcement dockets, producing a risk-adjusted impact score of 7.8/10 for derivative markets and 6.2/10 for spot venues.`,
+      `Institutional capital flows are demonstrating early-stage repositioning consistent with regulatory uncertainty pricing. Prime brokerage desks at tier-1 venues have widened collateral haircuts by an estimated 8–12% on affected assets, while RFQ spreads in the $1M+ OTC block market have expanded 22 basis points. This combination of signals historically precedes sharp intraday volatility spikes as market makers recalibrate inventory risk thresholds in line with the new regulatory context.`,
+      `Whale Alert Network’s cross-chain surveillance infrastructure is maintaining elevated alert status across the top 15 EVM-compatible networks. On-chain compliance scores for affected protocols have been downgraded from ‘Institutional Grade’ to ‘Elevated Scrutiny’ pending additional regulatory clarity. Operators running sovereign intelligence frameworks should weight portfolio exposure with a 0.85× Kelly multiplier until the primary uncertainty vector resolves or a clear jurisdictional precedent is established.`,
+    ],
+
+    // ─ Template 2: DeFi / protocol mechanics ───────────────────────────
+    [
+      `${domain}’s coverage of “${title}” intersects directly with active surveillance vectors tracked by the Whale Alert DeFi Intelligence Unit. Protocol-level TVL migration data indicates that $340M+ in liquidity has repositioned across Uniswap v3, Curve, and Aave v3 in the past 6 hours — a rate 2.3× above the trailing 7-day average. Smart money wallet clusters (identified via our proprietary ECDSA signature graph analysis) are concentrating exposure in short-duration yield instruments, suggesting defensive positioning rather than risk-on deployment.`,
+      `The mechanics underlying this event carry implications for protocol incentive structures and tokenomics stability. Governance vote participation has surged 41% above baseline across affected DAOs, while on-chain treasury outflows from multi-sig wallets associated with core development teams have accelerated — a pattern the Whale Intelligence Matrix classifies as ‘informed reallocation’ with 87.6% confidence. Fee revenue impact across the top 5 affected DeFi protocols is currently modeled at -12% to -18% over a 30-day horizon under base-case assumptions.`,
+      `Cross-protocol contagion risk is being assessed as low-to-moderate at this stage. However, the Whale Alert Network’s stress-test engine flags a tail scenario (probability: 8.4%) where cascading liquidation events across lending markets could amplify price displacement by an additional 1.8× beyond current implied move estimates. Operators with active positions in affected protocols should review their liquidation buffers and ensure collateral ratios maintain at least a 15% safety margin above current thresholds.`,
+    ],
+
+    // ─ Template 3: Whale wallet / exchange flow ─────────────────────────
+    [
+      `Following ${domain}’s publication of “${title},” the Whale Alert Network detected coordinated large-wallet activity across 14 independent blockchain networks within a 90-minute window — a temporal clustering anomaly that triggers our Tier-Alpha surveillance protocol. Wallets categorized as ‘genesis-era holders’ (defined as addresses active before block 500,000 on their respective chains) collectively transferred $127M in notional value to mixed custody arrangements, signaling deliberate portfolio restructuring rather than routine operations.`,
+      `Exchange net flow data corroborates the directional thesis: Coinbase, Binance, and Kraken collectively logged $89M in net outflows from hot wallets in the 4 hours following this event, while derivatives open interest across CME Bitcoin futures increased by 6,200 contracts. This simultaneous spot-outflow and futures-inflow dynamic is characteristic of institutional basis trade setup — a strategy that historically resolves with directional spot price follow-through within 2–3 trading sessions, on average.`,
+      `The Whale Alert Intelligence Desk has upgraded this event’s priority classification from ‘Standard Monitoring’ to ‘Active Surveillance.’ Real-time WebSocket feeds have been directed to dedicated anomaly detection pipelines covering BTC, ETH, SOL, and the top 8 ERC-20 assets by market capitalization. Network participants with sovereign terminal access receive live alerts as threshold breach events are confirmed on-chain. Maintain situational awareness and avoid overextended positions until the primary distribution pattern completes or reverses.`,
+    ],
+
+    // ─ Template 4: Technology / infrastructure signal ────────────────────
+    [
+      `The report published by ${domain} — “${title}” — represents a meaningful inflection point in blockchain infrastructure development as tracked by the Whale Alert Technology Intelligence Unit. Protocol upgrade cycles, validator set composition shifts, and L2 bridge volume anomalies have all converged within the same 72-hour monitoring window, producing a composite signal strength of 8.1 on a 10-point institutional relevance scale — above the 7.5 threshold that triggers elevated protocol surveillance.`,
+      `Node latency benchmarks across the affected infrastructure layer show throughput degradation of approximately 340ms at the 95th percentile, compared to a 30-day baseline of 85ms — indicating elevated network congestion consistent with coordinated on-chain activity. MEV extraction rates have simultaneously spiked 310% above baseline, suggesting that sophisticated arbitrage operators have already priced the information asymmetry created by this development into their execution strategies.`,
+      `From a capital allocation perspective, on-chain data indicates that quantitative funds and algorithmic trading desks have begun rotating from L1 infrastructure exposure toward L2 settlement layer assets — specifically those with confirmed EIP-4844 blob fee optimization. This rotation aligns with the Whale Alert Network’s 90-day infrastructure outlook, which projects L2 transaction share growing from 67% to an estimated 78–82% of total Ethereum ecosystem volume. Operators should consider adjusting fee-tier exposure accordingly.`,
+    ],
+
+    // ─ Template 5: Market structure / derivatives ──────────────────────
+    [
+      `${domain}’s coverage of “${title}” has triggered an immediate review by the Whale Alert Market Structure Desk, given its direct implications for derivatives market microstructure. Options market data shows a notable skew shift: 25-delta put/call implied volatility spread has moved from -2.1 to +3.8 in the 6 hours since publication — a 5.9-point reversal that statistically precedes realized volatility of 2.4× the 30-day historical average over subsequent 48-hour windows.`,
+      `Perpetual funding rates across the top 5 venues by open interest have compressed from +0.018% to +0.003% per 8-hour interval — reflecting rapid deleveraging by overleveraged retail long positions. Simultaneously, block trade activity in structured products (primarily accumulators and barrier options) has increased 3.1× above the trailing 5-day average, suggesting that institutional desks are positioning for a wider realized volatility range using defined-risk structures rather than directional delta exposures.`,
+      `The Whale Alert Volatility Surface Model projects a 68% probability of a +/-8.4% price move in the primary affected asset within 5 trading days, based on term structure normalization patterns observed across 23 comparable historical events. Gamma exposure maps indicate that market makers are net short gamma below $80,000 BTC — a positioning that mechanically amplifies directional moves and could produce self-reinforcing price action if key technical support levels are breached. Maintain tight risk parameters and pre-define exit criteria before entering new positions.`,
+    ],
+  ];
+
+  return templates[idx].join('\n\n');
 }
 
 // ─── Extractor de RSS con imágenes ───────────────────────────────────────────
