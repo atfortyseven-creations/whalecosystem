@@ -10,10 +10,11 @@ RUN npm ci --legacy-peer-deps
 
 COPY . .
 
-# Generate Prisma client before build
-RUN npx prisma generate
-
-# Production Next.js build with max memory for large bundles
+# Build-time env flags:
+#   NEXT_TELEMETRY_DISABLED=1 — no telemetry pings
+#   SKIP_ENV_VALIDATION=true  — skip runtime-only env validation (DATABASE_URL etc.)
+#   NODE_OPTIONS               — allow large bundle memory
+# prisma generate is called INSIDE npm run build — no separate step needed.
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_ENV_VALIDATION=true
