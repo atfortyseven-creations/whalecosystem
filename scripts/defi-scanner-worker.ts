@@ -1,8 +1,8 @@
 import { createPublicClient, http, parseAbiItem } from 'viem';
 import { mainnet, base, arbitrum } from 'viem/chains';
-import Redis from 'ioredis';
+import { createRedisClient } from '../lib/redis/client';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = createRedisClient({ name: 'DeFi-Scanner' });
 
 // Common Uniswap V2 / V3 ABI for PairCreated / PoolCreated
 const V2_FACTORY = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f';
