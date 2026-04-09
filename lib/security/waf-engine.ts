@@ -122,11 +122,26 @@ function maybeGC() {
 
 // ─── MAIN WAF FUNCTION ────────────────────────────────────────────────────────
 
+// ─── WAF BYPASS WHITELIST ─────────────────────────────────────────────────────
+// These paths are ALWAYS allowed through with zero anomaly scoring.
+// Railway/K8s healthchecks use wget/curl with minimal UAs — WAF must never block these.
+const WAF_BYPASS_PATHS = [
+  '/api/health',
+  '/api/health-check',
+  '/_next/',
+  '/favicon.ico',
+];
+
 export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
   const ip       = getIP(req);
   const pathname = req.nextUrl.pathname;
   const ua       = req.headers.get('user-agent') ?? '';
   const method   = req.method;
+
+  // ── BYPASS: Infra / Healthcheck paths (Railway wget, K8s probe, Next.js static) ────
+  if (WAF_BYPASS_PATHS.some(p => pathname.startsWith(p))) {
+    return null; // unconditional pass-through — no scoring applied
+  }
 
   let anomalyScore = 0;
   const reasons: string[] = [];

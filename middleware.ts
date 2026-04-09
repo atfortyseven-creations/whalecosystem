@@ -47,6 +47,14 @@ const RESTRICTED_COUNTRIES = ['US', 'CU', 'IR', 'KP', 'SY'];
 export default clerkMiddleware(async (auth, request) => {
   try {
     const { pathname } = request.nextUrl;
+
+    // ── LAYER -1: ABSOLUTE BYPASS — Healthcheck & Infra paths ───────────────────
+    // Railway/K8s/Docker polls /api/health using wget with no User-Agent.
+    // This MUST bypass WAF, auth, rate-limiting and ALL middleware logic.
+    if (pathname === '/api/health' || pathname === '/api/health-check') {
+      return NextResponse.next();
+    }
+
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
                request.headers.get('x-real-ip') || 
                '127.0.0.1';

@@ -52,6 +52,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
+# CRITICAL: Next.js standalone server binds to HOSTNAME — must be 0.0.0.0 for Railway
 ENV HOSTNAME="0.0.0.0"
 ENV NODE_OPTIONS="--max-old-space-size=350"
 
@@ -68,9 +69,12 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 EXPOSE 3000
 
-# Liveness probe — Railway polls this every 30 s
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+# Liveness probe — Railway polls this every 30s
+# start-period: 90s grace period before Railway starts counting failures.
+# This handles cold-start with 2372 packages + Prisma + Next.js standalone init.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
     CMD wget -qO- http://127.0.0.1:${PORT:-3000}/api/health || exit 1
 
 # Boot the Next.js standalone server
+# HOSTNAME=0.0.0.0 ensures the server listens on all interfaces (Railway requirement)
 CMD ["node", "server.js"]

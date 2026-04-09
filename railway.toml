@@ -6,6 +6,6 @@ dockerfilePath = "Dockerfile"
 # CMD is defined inside Dockerfile (Multi-Stage). Do NOT override with startCommand.
 # Railway respects the Dockerfile CMD when builder = "DOCKERFILE".
 healthcheckPath = "/api/health"
-healthcheckTimeout = 120
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
