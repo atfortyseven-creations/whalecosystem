@@ -116,8 +116,21 @@ export async function GET(req: NextRequest) {
     const totalClaimed = await prisma.goldenTicket.count();
     const remaining = Math.max(0, MAX_SUPPLY - totalClaimed);
 
+    const feedRaw = await prisma.goldenTicket.findMany({
+      where: { isActive: true },
+      select: {
+        userAddress: true,
+        claimedAt: true,
+        signatureData: true,
+      },
+      orderBy: { claimedAt: 'desc' },
+      take: 30, // Top 30 recent mints for the Ledger
+    });
+
     if (!address) {
-      return NextResponse.json({ hasClaimed: false, ticket: null, totalClaimed, remaining, maxSupply: MAX_SUPPLY });
+      return NextResponse.json({ 
+        hasClaimed: false, ticket: null, totalClaimed, remaining, maxSupply: MAX_SUPPLY, feed: feedRaw
+      });
     }
 
     const ticket = await prisma.goldenTicket.findUnique({
@@ -143,6 +156,7 @@ export async function GET(req: NextRequest) {
       totalClaimed,
       remaining,
       maxSupply: MAX_SUPPLY,
+      feed: feedRaw,
     });
 
   } catch (error) {

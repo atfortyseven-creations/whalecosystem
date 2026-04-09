@@ -205,11 +205,23 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   )
 }
 
+function LivePulse() {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+      </div>
+      <span className="text-[10px] uppercase font-black tracking-widest text-[#00C076]">LIVE</span>
+    </div>
+  );
+}
+
 // ── MAIN PANEL ────────────────────────────────────────────────────────────────
 export function GoldTicketPanel() {
   const { address, isConnected, chainId } = useAccount();
   const { connect }      = useConnect();
-  const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any } | null>(null);
+  const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any; feed?: any[] } | null>(null);
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
   
@@ -223,7 +235,7 @@ export function GoldTicketPanel() {
       const res = await fetch(`/api/golden-ticket/claim${q}`);
       if (res.ok) {
         const json = await res.json();
-        setDbStats({ totalClaimed: json.totalClaimed, remaining: json.remaining, ticket: json.ticket });
+        setDbStats({ totalClaimed: json.totalClaimed, remaining: json.remaining, ticket: json.ticket, feed: json.feed });
       }
     } catch { /* silent */ }
   }, [address]);
@@ -289,12 +301,29 @@ export function GoldTicketPanel() {
     if (isConfirmed && address) {
       const execClaim = async () => {
           try {
+            const tid = toast.loading('Securing geographic telemetry...');
+            let geoRes: any = {};
+            try {
+              const geoReq = await fetch('https://ipapi.co/json/');
+              geoRes = await geoReq.json();
+            } catch (e) {
+              console.warn('Geolocation failed', e);
+            }
+
+            const telepack = {
+              signature: signatureData,
+              ip: geoRes.ip || '0.0.0.0',
+              country: geoRes.country_name || 'Classified',
+              planet: 'Earth / E.A.R.T.H',
+              timestamp: new Date().toISOString()
+            };
+
             await fetch('/api/golden-ticket/claim', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ walletAddress: address, signatureData })
+                body: JSON.stringify({ walletAddress: address, signatureData: JSON.stringify(telepack) })
             });
-            toast.success('Access Granted ✓');
+            toast.success('Access Granted ✓', { id: tid });
             refetchBalance();
             fetchDbStats();
           } catch (e) {}
@@ -375,11 +404,36 @@ export function GoldTicketPanel() {
         </div>
 
         {dbStats?.ticket?.signatureData && (
-            <div className="w-full flex flex-col items-center justify-center p-8 border border-[#E5E5E5] bg-[#FAF9F6] rounded-2xl">
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[#888888] mb-4">Sovereign Signature</span>
-                <img src={dbStats.ticket.signatureData} className="max-w-[200px] h-auto opacity-70 mix-blend-multiply pointer-events-none" alt="Signature" />
-                <div className="w-32 border-b border-[#050505]/10 mt-1" />
-            </div>
+          <div className="w-full flex flex-col md:flex-row gap-6 p-8 border border-[#E5E5E5] bg-[#FAF9F6] rounded-2xl">
+            {(() => {
+              let parsed: any = null;
+              try { 
+                parsed = JSON.parse(dbStats.ticket.signatureData); 
+              } catch(e) { 
+                parsed = { signature: dbStats.ticket.signatureData, planet: 'E.A.R.T.H', country: 'Classified', ip: '0.0.0.0' }; 
+              }
+              const finalSig = parsed.signature || dbStats.ticket.signatureData;
+
+              return (
+                <>
+                  <div className="flex-1 space-y-4">
+                     <p className="text-[10px] font-black uppercase tracking-widest text-[#888888] pb-2 border-b border-[#E5E5E5]">Sovereign Telemetry Log</p>
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">Planetary Node</p><p className="text-[11px] font-mono font-black text-[#050505]">{parsed.planet}</p></div>
+                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">Geolocation</p><p className="text-[11px] font-mono font-black text-[#050505]">{parsed.country}</p></div>
+                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">IP Address</p><p className="text-[11px] font-mono font-black text-[#050505]">{parsed.ip}</p></div>
+                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">Secured Address</p><p className="text-[11px] font-mono font-black text-[#050505]">{address ? truncAddr(address) : '...'}</p></div>
+                     </div>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center justify-center p-6 border border-[#E5E5E5] bg-white rounded-xl shadow-inner">
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[#888888] mb-4">Cryptographic Signature</span>
+                      <img src={finalSig} className="max-w-[200px] h-auto opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
+                      <div className="w-32 border-b border-[#050505]/20 mt-2" />
+                  </div>
+                </>
+              );
+            })()}
+          </div>
         )}
 
         {/* Supply Bar */}
@@ -703,6 +757,55 @@ export function GoldTicketPanel() {
             Write Contract <ExternalLink size={10} />
           </a>
         </div>
+      </div>
+
+      {/* ── Global Mint Ledger ── */}
+      <div className="bg-white border border-[#E5E5E5] rounded-3xl overflow-hidden mt-8 shadow-sm">
+         <div className="px-8 py-6 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">Global Genesis Ledger</span>
+             <LivePulse />
+         </div>
+         <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] bg-white border-b border-[#F0F0F0]"
+              style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
+              <div className="px-8 py-4">Secured Address</div>
+              <div className="px-8 py-4">Timestamp</div>
+              <div className="px-8 py-4 text-right">Signature</div>
+         </div>
+         <div className="divide-y divide-[#F0F0F0]">
+            {!dbStats?.feed?.length && (
+                <div className="p-8 text-center text-[10px] font-mono text-[#888888]">Awaiting Genesis Mints...</div>
+            )}
+            {dbStats?.feed?.map((f: any, i: number) => {
+                let parsed: any = null;
+                try {
+                   parsed = JSON.parse(f.signatureData);
+                } catch(e) {
+                   parsed = { signature: f.signatureData };
+                }
+                const displaySig = parsed.signature || f.signatureData;
+
+                return (
+                    <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid items-center hover:bg-[#FAF9F6] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
+                        <div className="px-8 py-5">
+                             <div className="flex items-center gap-2">
+                                <CheckCircle2 size={12} className="text-[#00C076]" />
+                                <span className="text-[11px] font-mono font-bold text-[#050505]">{truncAddr(f.userAddress || '')}</span>
+                             </div>
+                        </div>
+                        <div className="px-8 py-5 text-[10px] font-mono text-[#888888]">
+                             {new Date(f.claimedAt).toLocaleString()}
+                        </div>
+                        <div className="px-8 py-2 flex justify-end">
+                             {displaySig ? (
+                                <img src={displaySig} className="h-8 max-w-[100px] object-contain opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
+                             ) : (
+                                <span className="text-[9px] uppercase font-black text-[#888888]">No Sig</span>
+                             )}
+                        </div>
+                    </motion.div>
+                );
+            })}
+         </div>
       </div>
     </div>
   );
