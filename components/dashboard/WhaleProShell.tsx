@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard, Star, Bell, BarChart2, Zap,
     TrendingUp, Code, Wallet, Settings,
@@ -37,7 +37,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
     { id: 'zk-shield',       label: 'ZK Shield Station',icon: <Shield size={17}/>,          badge: 'ZKP', badgeColor: '#00FF55' },
     { id: 'neural-graph',    label: 'Neural Graph',     icon: <Network size={17}/>,         badge: 'LIVE', badgeColor: '#0052FF' },
-    { id: 'sovereign-vault', label: 'Sovereign Vault',  icon: <ShieldAlert size={17}/>,     badge: 'VAULT', badgeColor: '#FF3B30' },
+    { id: 'sovereign-vault', label: 'User',            icon: <ShieldAlert size={17}/>,     badge: 'USER', badgeColor: '#0052FF' },
     { id: 'omni-explorer',   label: 'Aztec Explorer',   icon: <Search size={17}/>,          badge: 'ZK', badgeColor: '#00FF55' },
     { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
     // ── Learn & Support ──
@@ -240,10 +240,47 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative bg-[#FAF9F6] dark:bg-[#000000] overflow-hidden flex flex-col transition-colors duration-300">
-                    <div className="flex-1 overflow-y-auto no-scrollbar">
-                        <div className="p-8 max-w-[1600px] mx-auto w-full">
-                            {children}
+                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300"
+                    style={{
+                        background: `
+                            radial-gradient(ellipse at 50% 0%, rgba(0,150,255,0.08) 0%, transparent 60%),
+                            #050810
+                        `,
+                    }}
+                >
+                    {/* Isometric cube SVG background pattern */}
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cdefs%3E%3ClinearGradient id='top' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300BFFF' stop-opacity='0.18'/%3E%3Cstop offset='100%25' stop-color='%230052FF' stop-opacity='0.10'/%3E%3C/linearGradient%3E%3ClinearGradient id='left' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230052FF' stop-opacity='0.12'/%3E%3Cstop offset='100%25' stop-color='%23003080' stop-opacity='0.06'/%3E%3C/linearGradient%3E%3ClinearGradient id='right' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300BFFF' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%23003080' stop-opacity='0.04'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(60,8)'%3E%3Cpolygon points='0,-16 28,0 0,16 -28,0' fill='url(%23top)' stroke='%2300BFFF' stroke-width='0.4' stroke-opacity='0.25'/%3E%3Cpolygon points='-28,0 0,16 0,48 -28,32' fill='url(%23left)' stroke='%230066CC' stroke-width='0.4' stroke-opacity='0.2'/%3E%3Cpolygon points='28,0 0,16 0,48 28,32' fill='url(%23right)' stroke='%2300BFFF' stroke-width='0.4' stroke-opacity='0.15'/%3E%3C/g%3E%3C/svg%3E")`,
+                            backgroundSize: '120px 104px',
+                            opacity: 0.7,
+                        }}
+                    />
+                    {/* Dark vignette overlay to guarantee text readability */}
+                    <div className="absolute inset-0 pointer-events-none"
+                        style={{ background: 'radial-gradient(ellipse at center, transparent 20%, rgba(5,8,16,0.5) 100%)' }}
+                    />
+                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
+                        <div className="p-8 max-w-[1600px] mx-auto w-full h-full">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeTab}
+                                    initial={{ opacity: 0, y: 30, scale: 0.98, filter: 'blur(10px)', rotateX: 5 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', rotateX: 0 }}
+                                    exit={{ opacity: 0, y: -30, scale: 0.98, filter: 'blur(10px)', rotateX: -5 }}
+                                    transition={{ 
+                                        type: "spring", 
+                                        stiffness: 400, 
+                                        damping: 30, 
+                                        mass: 0.8,
+                                    }}
+                                    style={{ willChange: 'transform, opacity, filter', transformOrigin: 'top center' }}
+                                    className="w-full h-full"
+                                >
+                                    {children}
+                                </motion.div>
+                            </AnimatePresence>
                         </div>
                     </div>
                 </main>
