@@ -67,18 +67,12 @@ const nextConfig = {
         ignoreDuringBuilds: true
     },
 
-    // External packages
+    // External packages: Only specify packages with native bindings (Rust/C++/WASM).
+    // Pure JS packages (ethers, stripe, bcryptjs, snarkjs) will be automatically traced
+    // and optimally bundled inside the .next/standalone/node_modules output.
     serverExternalPackages: [
         '@prisma/client',
-        'prisma',
-        'bcryptjs',
-        '@xmtp/browser-sdk',
-        'ethers',
-        'web3',
-        '@walletconnect/ethereum-provider',
-        'socket.io',
-        'stripe',
-        'snarkjs'
+        'prisma'
     ],
 
     env: {
