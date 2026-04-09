@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import Redis from 'ioredis';
+import { createRedisClient, createSubClient } from '@/lib/redis/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,8 +8,8 @@ export async function GET(req: Request) {
         const encoder = new TextEncoder();
         const stream = new ReadableStream({
             async start(controller) {
-                const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-                const pSubscriber = new Redis(process.env.REDIS_URL || 'redis://localhost:6379'); // need dedicated sub
+                const redis = createRedisClient({ name: 'Whale-Stream' });
+                const pSubscriber = createSubClient('Whale-Stream-Sub');
 
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'CONNECTED' })}\n\n`));
 
