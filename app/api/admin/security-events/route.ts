@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
+if (!JWT_SECRET && process.env.SKIP_ENV_VALIDATION !== 'true') {
     throw new Error("CRITICAL: JWT_SECRET environment variable is missing");
 }
 
