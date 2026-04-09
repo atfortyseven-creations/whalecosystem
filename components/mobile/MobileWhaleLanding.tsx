@@ -398,23 +398,23 @@ function PageHero({
 
           {/* Animated Whale Logo bounded nicely */}
           {!isConnected && (
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: [0, -20, 0], opacity: 1 }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="w-[280px] h-[280px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-2xl"
-              style={{ willChange: 'transform' }}
-            >
-              <img 
-                src="/official-whale-monochrome.png" 
-                className="w-full h-full object-contain" 
-                alt="Whale Logo" 
-              />
-            </motion.div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: [0, -20, 0], opacity: 1 }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="w-[340px] h-[340px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-2xl"
+                style={{ willChange: 'transform' }}
+              >
+                <img 
+                  src="/official-whale-monochrome.png" 
+                  className="w-full h-full object-contain" 
+                  alt="Whale Logo" 
+                />
+              </motion.div>
           )}
 
           {!isConnected ? (
@@ -569,14 +569,44 @@ function PageManifesto() {
     <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
         <div className="text-[14px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">00</span>
+            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ABSTRACT</span>
+          </div>
           <p>
-            The architectural nexus of the backend operations is fundamentally predicated upon an unconditional integration with the Aztec zkRollup Network. By synthesizing a deterministic PostgreSQL ontology with Aztec paradigm of privacy-preserving Zero-Knowledge proofs, the resultant ecosystem autonomously enforces programmable cryptographic finality and data obfuscation across all active execution vectors.
+            The Whale Alert Network represents a paradigm shift in decentralized financial intelligence and blockchain analytics. This repository encapsulates the foundational logic, distributed mesh networking interfaces, cryptography-enforced endpoints, and proprietary user-interaction frameworks constituting the Whale Alert Node. Engineered with strict adherence to Zero-Trust principles and immutable non-custodial methodologies, the system aggregates, verifies, and disseminates institutional-grade on-chain telemetry.
           </p>
+          
+          <div className="flex items-center gap-3 mb-4 mt-8">
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">01</span>
+            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">INFRASTRUCTURE</span>
+          </div>
           <p>
-            It is imperative to maintain computational sovereignty at the deepest perimeter of node operations. Conventional telemetry propagation and session management methodologies have been permanently superseded. In their place, operational identity is bound sequentially to Ethereum Virtual Machine native primitives utilizing homomorphic elliptic curve cryptography. This mathematical arbitration guarantees that custodial dependencies are eradicated natively. The verification of institutional signatures dictates system state deterministically, establishing a hermetic, zero-trust cryptographic conduit.
+            The backend relies on an unconditionally deterministic environment structured around Next.js App Router topologies, integrating directly with high-frequency PostgreSQL atomic transactions. Legacy session authentication paradigms have been entirely deprecated. The network operates strictly utilizing cryptographic identity verifications. Users authenticate by signing deterministic cryptographic challenges directly with their hierarchical deterministic wallets.
           </p>
-          <p className="font-bold pt-6 border-t border-black/10 dark:border-white/10 mt-10">
-            The contiguous synthesis of our asynchronous execution arrays with the decentralized Aztec infrastructural mesh constitutes the apex vector of institutional intelligence. Through anchoring all discrete state transitions within mathematically shielded validation matrices, the Whale Alert Network establishes an immutable citadel for uncompromised financial monitoring.
+
+          <div className="flex items-center gap-3 mb-4 mt-8">
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">02</span>
+            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ZK-SHIELD</span>
+          </div>
+          <p>
+            At the apex of our asynchronous operation array lies the Zero-Knowledge processing unit, interfaced through conceptual alignment with the Aztec Network. This computational bastion ensures that all executed state transitions regarding user identity and priority access maintain programmable cryptographic finality. By synthesizing deterministic database routing with homomorphic encryption validation, the node operates as an impartial, cryptographic arbiter.
+          </p>
+
+          <div className="flex items-center gap-3 mb-4 mt-8">
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">03</span>
+            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">GENESIS TELEMETRY</span>
+          </div>
+          <p>
+            The Genesis access tier mandates absolute non-repudiation. Utilizing an integrated HTML5 diagnostic canvas array, the user's manual signature is captured digitally and compressed alongside environmental telemetry logs. This telemetry is verified asynchronously alongside the L2 block confirmation. The result is an indelible, real-time cryptographic receipt of the individual's admission into the intelligence terminal.
+          </p>
+
+          <p className="font-bold pt-8 border-t border-black/10 dark:border-white/10 mt-12 text-[11px] uppercase tracking-widest text-center opacity-40">
+            Immutable Data. Zero-Trust Verification. Extreme Precision.
           </p>
           
           <div className="pt-12 flex items-center justify-center gap-8 mt-10">

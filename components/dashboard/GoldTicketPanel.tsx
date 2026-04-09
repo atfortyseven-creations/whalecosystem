@@ -262,6 +262,7 @@ function LivePulse() {
 export function GoldTicketPanel() {
   const { address, isConnected, chainId } = useAccount();
   const { connect }      = useConnect();
+  const { switchChain }  = useSwitchChain();
   const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any; feed?: any[] } | null>(null);
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
