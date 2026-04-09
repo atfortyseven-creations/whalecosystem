@@ -1,9 +1,9 @@
-builder = "docker"
-# buildCommand is ignored when using builder = "docker" as the Dockerfile defines it.
+[build]
+builder = "nixpacks"
+buildCommand = "npm run build:railway"
 
 [deploy]
 # prisma db push runs at RUNTIME (has DATABASE_URL). next build runs at BUILD TIME (no DATABASE_URL).
 startCommand = "npx prisma db push --accept-data-loss && npm start"
 healthcheckPath = "/api/health"
-healthcheckTimeout = 120
-restartPolicy = "always"
+healthcheckTimeout = 100
