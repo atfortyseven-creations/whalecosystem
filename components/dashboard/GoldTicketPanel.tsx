@@ -389,13 +389,15 @@ export function GoldTicketPanel() {
     if (isWrongNetwork && switchChain) { switchChain({ chainId: OPTIMISM_CHAIN_ID }); return; }
     if (hasTicket) { toast.info('This wallet already holds a Whale Gold Ticket.'); return; }
     try {
-      writeContract({
+      const txParams: any = {
         address: CONTRACT,
         abi: ABI,
         functionName: 'mint',
-        args: [],
-        ...(mintPrice > 0n ? { value: mintPrice } : {})
-      });
+      };
+      if (mintPrice > 0n) {
+        txParams.value = mintPrice;
+      }
+      writeContract(txParams);
     } catch (e: any) {
       toast.error(e?.message ?? 'Failed to build transaction');
     }

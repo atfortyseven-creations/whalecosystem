@@ -352,11 +352,12 @@
   /* Safe Area / Fallback VP utilities for iOS 15 */
   .min-h-safe {
     min-height: 100vh;
-    min-height: 100dvh;
+    /* iOS fallback using webkit */
+    min-height: -webkit-fill-available;
   }
   .h-safe {
     height: 100vh;
-    height: 100dvh;
+    height: -webkit-fill-available;
   }
 
 

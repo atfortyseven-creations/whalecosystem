@@ -109,6 +109,14 @@ function SecurityBadge({ text }: { text: string }) {
 }
 
 export default function ApiMarketplacePage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white font-mono text-xs uppercase tracking-widest">Loading Marketplace...</div>}>
+      <ApiMarketplacePageContent />
+    </React.Suspense>
+  );
+}
+
+function ApiMarketplacePageContent() {
   const { isSignedIn, isLoaded, user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
