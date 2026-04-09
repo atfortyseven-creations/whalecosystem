@@ -535,6 +535,7 @@ export function GoldTicketPanel() {
               ? 'Approve the signature in your wallet. Do not close this tab.'
               : 'Signature verified. Awaiting backend synchronization.'}
           </p>
+        </div>
       </div>
     );
   }

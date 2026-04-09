@@ -18,32 +18,37 @@ git status --short
 
 echo.
 echo [3/4] Committing...
-git commit -m "fix: scroll, Optimism switch, ledger UI + open news access + landing panels
+echo fix: scroll, Optimism switch, ledger UI + open news access + landing panels > commit_msg.txt
+echo. >> commit_msg.txt
+echo SCROLL SYSTEM >> commit_msg.txt
+echo - SmoothScroll.tsx: Singleton RAF loop, proper cleanup, modal scroll passthrough >> commit_msg.txt
+echo - ZoomWrapper.tsx: Replace CSS zoom:1.2 with transform:scale (Lenis-compatible) >> commit_msg.txt
+echo - globals.css: Remove scroll-behavior:smooth (Lenis owns it), fix touch-action >> commit_msg.txt
+echo - smooth-scroll.css: Remove conflicting scroll-behavior:smooth >> commit_msg.txt
+echo. >> commit_msg.txt
+echo WEB3 / OPTIMISM >> commit_msg.txt
+echo - providers.tsx: Add Optimism chain to wagmi config (chains + transports) >> commit_msg.txt
+echo - GoldTicketPanel.tsx: useSwitchChain with onError handler + isSwitching state >> commit_msg.txt
+echo - Switch to Optimism button: loading state feedback, disabled during switch >> commit_msg.txt
+echo. >> commit_msg.txt
+echo LEDGER TICKETS UI >> commit_msg.txt
+echo - GoldTicketPanel.tsx: Rename 'Global Genesis Ledger' -^> 'Ledger Tickets' >> commit_msg.txt
+echo - Remove LivePulse green dot from ledger header >> commit_msg.txt
+echo - Signature column: always render visual (real PNG or placeholder SVG) >> commit_msg.txt
+echo. >> commit_msg.txt
+echo NEWS — OPEN ACCESS >> commit_msg.txt
+echo - NewsTerminal.tsx: hasAccess = true for all users, paywall fully disabled >> commit_msg.txt
+echo - Paywall overlay and blurred content replaced with direct content render >> commit_msg.txt
+echo. >> commit_msg.txt
+echo LANDING PAGE PANELS (^>=1600px screens) >> commit_msg.txt
+echo - WhaleAlertLanding.tsx: NewsOfTodayPanel (left) - live /api/news feed >> commit_msg.txt
+echo - WhaleAlertLanding.tsx: WhalePostIframePanel (right) - scaled /news iframe >> commit_msg.txt
+echo - Both panels: glassmorphism border, dark header, footer CTA, responsive >> commit_msg.txt
+echo. >> commit_msg.txt
+echo - Fix missing closing div tag in GoldTicketPanel component >> commit_msg.txt
 
-SCROLL SYSTEM
-- SmoothScroll.tsx: Singleton RAF loop, proper cleanup, modal scroll passthrough
-- ZoomWrapper.tsx: Replace CSS zoom:1.2 with transform:scale (Lenis-compatible)
-- globals.css: Remove scroll-behavior:smooth (Lenis owns it), fix touch-action
-- smooth-scroll.css: Remove conflicting scroll-behavior:smooth
-
-WEB3 / OPTIMISM
-- providers.tsx: Add Optimism chain to wagmi config (chains + transports)
-- GoldTicketPanel.tsx: useSwitchChain with onError handler + isSwitching state
-- Switch to Optimism button: loading state feedback, disabled during switch
-
-LEDGER TICKETS UI
-- GoldTicketPanel.tsx: Rename 'Global Genesis Ledger' -> 'Ledger Tickets'
-- Remove LivePulse green dot from ledger header
-- Signature column: always render visual (real PNG or placeholder SVG)
-
-NEWS — OPEN ACCESS
-- NewsTerminal.tsx: hasAccess = true for all users, paywall fully disabled
-- Paywall overlay and blurred content replaced with direct content render
-
-LANDING PAGE PANELS (>=1600px screens)
-- WhaleAlertLanding.tsx: NewsOfTodayPanel (left) - live /api/news feed
-- WhaleAlertLanding.tsx: WhalePostIframePanel (right) - scaled /news iframe
-- Both panels: glassmorphism border, dark header, footer CTA, responsive"
+git commit -F commit_msg.txt
+del commit_msg.txt
 
 if %errorlevel% neq 0 ( echo ERROR: git commit failed & pause & exit /b 1 )
 
