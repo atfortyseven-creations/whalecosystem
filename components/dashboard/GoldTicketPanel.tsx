@@ -262,7 +262,11 @@ function LivePulse() {
 export function GoldTicketPanel() {
   const { address, isConnected, chainId } = useAccount();
   const { connect }      = useConnect();
-  const { switchChain }  = useSwitchChain();
+  const { switchChain, isPending: isSwitching }  = useSwitchChain({
+    mutation: {
+      onError: (error) => toast.error(`Failed to switch network: ${error.message}`)
+    }
+  });
   const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any; feed?: any[] } | null>(null);
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
@@ -729,7 +733,7 @@ export function GoldTicketPanel() {
             action: !isConnected
               ? <button onClick={handleConnect} className="mt-4 w-full py-3 bg-[#050505] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1a1a1a] transition-all">Connect Wallet</button>
               : isWrongNetwork
-              ? <button onClick={() => switchChain?.({ chainId: OPTIMISM_CHAIN_ID })} className="mt-4 w-full py-3 bg-[#FF9500] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-all">Switch to Optimism</button>
+              ? <button disabled={isSwitching} onClick={() => switchChain?.({ chainId: OPTIMISM_CHAIN_ID })} className={`mt-4 w-full py-3 ${isSwitching ? 'bg-[#FF9500]/70 cursor-wait' : 'bg-[#FF9500] hover:opacity-80 active:scale-[0.98]'} text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all`}>{isSwitching ? 'Switching Network...' : 'Switch to Optimism'}</button>
               : null,
           },
           {
@@ -809,9 +813,8 @@ export function GoldTicketPanel() {
 
       {/* ── Global Mint Ledger ── */}
       <div className="bg-white border border-[#E5E5E5] rounded-3xl overflow-hidden mt-8 shadow-sm">
-         <div className="px-8 py-6 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">Global Genesis Ledger</span>
-             <LivePulse />
+         <div className="px-8 py-6 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center">
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">Ledger Tickets</span>
          </div>
          <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] bg-white border-b border-[#F0F0F0]"
               style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
@@ -845,13 +848,17 @@ export function GoldTicketPanel() {
                         <div className="px-8 py-5 text-[10px] font-mono text-[#888888]">
                              {f.claimedAt ? new Date(f.claimedAt).toLocaleString() : '—'}
                         </div>
-                        <div className="px-8 py-2 flex justify-end">
-                             {displaySig ? (
-                                <img src={displaySig} className="h-8 max-w-[100px] object-contain opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
-                             ) : (
-                                <span className="text-[9px] uppercase font-black text-[#888888]">No Sig</span>
-                             )}
-                        </div>
+                         <div className="px-8 py-2 flex justify-end">
+                              {displaySig && displaySig.startsWith('data:image') ? (
+                                 <img src={displaySig} className="h-8 max-w-[100px] object-contain opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
+                              ) : (
+                                 <div className="border border-[#E5E5E5] bg-white rounded" style={{ width: 100, height: 32 }}>
+                                   <svg width="100%" height="100%" viewBox="0 0 100 32" fill="none">
+                                     <path d="M8,20 C18,8 28,24 38,14 C48,4 58,26 68,16 C78,8 88,20 92,14" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                   </svg>
+                                 </div>
+                              )}
+                         </div>
                     </motion.div>
                 );
             })}

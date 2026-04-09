@@ -79,9 +79,9 @@ export function NewsTerminal() {
   const { isNewsSubscribed, lastBackupDate, setLastBackupDate, archive, upsertDayArticles, getArchiveDates } = useNewsStore();
   const { address } = useAccount();
 
-  // Whitelist user address for full premium access
-  const IS_WHITELISTED = address?.toLowerCase() === '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a'.toLowerCase();
-  const hasAccess = isNewsSubscribed || IS_WHITELISTED;
+  // ── Access is FREE for all users — paywall disabled ────────────────────
+  // To re-enable, restore: const hasAccess = isNewsSubscribed || IS_WHITELISTED;
+  const hasAccess = true;
 
   const [articles,    setArticles]    = useState<NewsArticle[]>([]);
   const [loading,     setLoading]     = useState(true);
@@ -472,67 +472,27 @@ export function NewsTerminal() {
 
                   {/* ANÁLISIS PRINCIPAL */}
                   <div className="px-6 md:px-10 xl:px-16 pt-8 pb-6 max-w-[900px]">
-                      {!hasAccess ? (
-                        <div className="relative">
-                          {/* Pseudo-content blurred */}
-                          <div
-                            className="font-sans font-light tracking-wide leading-[2.2] space-y-7 blur-sm select-none opacity-30 pointer-events-none"
-                            style={{
-                              fontSize: `${1.18 * fontSize}rem`,
-                              color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
-                            }}
-                          >
-                            <p>Nuestros nodos de telemetría termodinámica han identificado un vector asimétrico inusual. Este desarrollo técnico ha activado los protocolos de vigilancia de Nivel-Alfa dentro de nuestra infraestructura institucional, dada su propagación anómala que excede los parámetros estándar de volatilidad. Los sistemas de alerta temprana revelan una concentración atípica de liquidez de alto valor preparándose en la antesala de este horizonte temporal.</p>
-                            <p>Desde la perspectiva del análisis matricial de liquidez, los operadores de Nivel 1 —entidades con capitales superiores a los $10 millones en activos digitales— se encuentran ejecutando discretas pero sistemáticas realineaciones de exposición. El flujo de datos en cadena apunta claramente a una reestructuración estratégica de carteras, migrando desde libros de órdenes centralizados hacia capas profundas de autocustodia. Históricamente, este patrón antecede expansiones direccionales masivas en un transcurso de 48 horas, sugiriendo una inminente compresión asimétrica del mercado.</p>
-                            <p>El análisis correlacionado a través de los ecosistemas EVM proyecta una agresiva reprecificación de derivados en el muy corto plazo. Las métricas de interés abierto exponen una divergencia estructural absoluta entre el sentimiento especulativo minorista y el riguroso posicionamiento estratégico institucional, el cual acumula silenciosamente posiciones largas fuertemente respaldadas. Recomendamos a los operadores provistos de motores soberanos de inteligencia mantener una postura de pura observación estratégica, aguardando una confirmación estructural intacta antes de comprometer cualquier nivel de capital algorítmico.</p>
-                          </div>
-                          
-                          {/* Paywall Overlay */}
-                          <div className="absolute inset-0 flex flex-col items-center justify-start pt-10">
-                            <div 
-                              className="max-w-md w-full border-4 p-10 text-center shadow-2xl relative overflow-hidden" 
-                              style={{ borderColor: TEXT, background: BG }}
-                            >
-                              <div className="absolute top-0 left-0 w-full h-1" style={{ background: TEXT }} />
-                              <Lock size={28} className="mx-auto mb-5" style={{ color: TEXT }} />
-                              <h3 className="font-black text-2xl uppercase tracking-tighter mb-2" style={{ color: TEXT }}>
-                                Terminal Restringida
-                              </h3>
-                              <p className="font-mono text-[9px] uppercase tracking-[0.2em] mb-8" style={{ color: MUTED }}>
-                                El acceso a inteligencia institucional requiere verificación on-chain.
-                              </p>
-                              <button 
-                                onClick={() => setCheckoutOpen(true)}
-                                className="w-full py-4 font-mono text-xs font-black uppercase tracking-widest hover:opacity-80 transition-all border"
-                                style={{ background: TEXT, color: BG, borderColor: TEXT }}
-                              >
-                                Desbloquear Acceso Seguro →
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          className="font-sans font-light tracking-wide leading-[2.2] space-y-7 opacity-80"
-                          style={{
-                            fontSize: `${1.18 * fontSize}rem`,
-                            color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
-                          }}
-                        >
-                          {selected.description
-                            ? selected.description.split(/\n\n+/).map((p, i) => (
-                                <p key={i}>{p}</p>
-                              ))
-                            : (
-                                <>
-                                  <p>Nuestros nodos de telemetría termodinámica han identificado un vector asimétrico inusual. Este desarrollo técnico ha activado los protocolos de vigilancia de Nivel-Alfa dentro de nuestra infraestructura institucional, dada su propagación anómala que excede los parámetros estándar de volatilidad. Los sistemas de alerta temprana revelan una concentración atípica de liquidez de alto valor preparándose en la antesala de este horizonte temporal.</p>
-                                  <p>Desde la perspectiva del análisis matricial de liquidez, los operadores de Nivel 1 —entidades con capitales superiores a los $10 millones en activos digitales— se encuentran ejecutando discretas pero sistemáticas realineaciones de exposición. El flujo de datos en cadena apunta claramente a una reestructuración estratégica de carteras, migrando desde libros de órdenes centralizados hacia capas profundas de autocustodia. Históricamente, este patrón antecede expansiones direccionales masivas en un transcurso de 48 horas, sugiriendo una inminente compresión asimétrica del mercado.</p>
-                                  <p>El análisis correlacionado a través de los ecosistemas EVM proyecta una agresiva reprecificación de derivados en el muy corto plazo. Las métricas de interés abierto exponen una divergencia estructural absoluta entre el sentimiento especulativo minorista y el riguroso posicionamiento estratégico institucional, el cual acumula silenciosamente posiciones largas fuertemente respaldadas. Recomendamos a los operadores provistos de motores soberanos de inteligencia mantener una postura de pura observación estratégica, aguardando una confirmación estructural intacta antes de comprometer cualquier nivel de capital algorítmico.</p>
-                                </>
-                              )
-                          }
-                        </div>
-                      )}
+                      {/* ── Full content — access is open to all users ── */}
+                      <div
+                        className="font-sans font-light tracking-wide leading-[2.2] space-y-7 opacity-80"
+                        style={{
+                          fontSize: `${1.18 * fontSize}rem`,
+                          color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.82)',
+                        }}
+                      >
+                        {selected.description
+                          ? selected.description.split(/\n\n+/).map((p, i) => (
+                              <p key={i}>{p}</p>
+                            ))
+                          : (
+                              <>
+                                <p>Nuestros nodos de telemetría termodinámica han identificado un vector asimétrico inusual. Este desarrollo técnico ha activado los protocolos de vigilancia de Nivel-Alfa dentro de nuestra infraestructura institucional, dada su propagación anómala que excede los parámetros estándar de volatilidad. Los sistemas de alerta temprana revelan una concentración atípica de liquidez de alto valor preparándose en la antesala de este horizonte temporal.</p>
+                                <p>Desde la perspectiva del análisis matricial de liquidez, los operadores de Nivel 1 —entidades con capitales superiores a los $10 millones en activos digitales— se encuentran ejecutando discretas pero sistemáticas realineaciones de exposición. El flujo de datos en cadena apunta claramente a una reestructuración estratégica de carteras, migrando desde libros de órdenes centralizados hacia capas profundas de autocustodia. Históricamente, este patrón antecede expansiones direccionales masivas en un transcurso de 48 horas, sugiriendo una inminente compresión asimétrica del mercado.</p>
+                                <p>El análisis correlacionado a través de los ecosistemas EVM proyecta una agresiva reprecificación de derivados en el muy corto plazo. Las métricas de interés abierto exponen una divergencia estructural absoluta entre el sentimiento especulativo minorista y el riguroso posicionamiento estratégico institucional, el cual acumula silenciosamente posiciones largas fuertemente respaldadas. Recomendamos a los operadores provistos de motores soberanos de inteligencia mantener una postura de pura observación estratégica, aguardando una confirmación estructural intacta antes de comprometer cualquier nivel de capital algorítmico.</p>
+                              </>
+                            )
+                        }
+                      </div>
 
                     {/* FOOTER LEGAL */}
                     <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>

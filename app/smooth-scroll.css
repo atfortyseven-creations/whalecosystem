@@ -1,6 +1,6 @@
-html {
-  scroll-behavior: smooth;
-}
+/* scroll-behavior: smooth is managed exclusively by Lenis (SmoothScroll.tsx).
+   Setting it here too causes native-browser smooth scroll to fight with Lenis,
+   producing stuttery double-animation. */
 
 @supports (scrollbar-width: thin) {
   * {
@@ -28,13 +28,17 @@ html {
   background: rgba(139, 92, 246, 0.8);
 }
 
+/* scroll-margin-top for anchor links (Lenis-compatible) */
 @media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-  
   * {
     scroll-margin-top: 100px;
   }
 }
 
+/* When user prefers reduced motion — disable Lenis easing via data attribute
+   that can be set by JS, and fall back to instant native scroll */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+}

@@ -137,6 +137,182 @@ function PillarCard({ icon, title, desc, delay = 0 }: { icon: React.ReactNode; t
   );
 }
 
+// ── timeAgo helper ───────────────────────────────────────────────────────────
+function timeAgo(isoDate: string): string {
+  const diff = Date.now() - new Date(isoDate).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1)  return 'just now';
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+// ── Left Panel: News of Today ─────────────────────────────────────────────────
+function NewsOfTodayPanel() {
+  const { data, isLoading } = useSWR(
+    '/api/news',
+    (url: string) => fetch(url).then(r => r.json()),
+    { refreshInterval: 60_000, revalidateOnFocus: false }
+  );
+  const articles: any[] = (data?.articles ?? []).slice(0, 12);
+
+  return (
+    <div
+      className="flex flex-col overflow-hidden"
+      style={{
+        width: 232,
+        maxHeight: 'calc(100vh - 140px)',
+        background: 'rgba(250,249,246,0.94)',
+        border: '1px solid rgba(0,0,0,0.10)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
+    >
+      {/* Header */}
+      <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+           className="flex items-center justify-between px-4 py-3 shrink-0">
+        <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-white">
+          News of Today
+        </span>
+        <span className="px-1.5 py-0.5 text-[7px] font-black uppercase tracking-widest text-white"
+              style={{ background: '#00C076', borderRadius: 2 }}>
+          LIVE
+        </span>
+      </div>
+
+      {/* Article list */}
+      <div className="overflow-y-auto flex-1" style={{ scrollbarWidth: 'none' }}>
+        {isLoading && (
+          <div className="flex items-center justify-center py-10">
+            <div className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+          </div>
+        )}
+        {articles.map((art: any) => (
+          <a
+            key={art.id}
+            href={art.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-4 py-3 group"
+            style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-[7px] font-black uppercase tracking-widest"
+                    style={{ color: 'rgba(0,0,0,0.32)' }}>
+                {art.source}
+              </span>
+              <span className="font-mono text-[7px]" style={{ color: 'rgba(0,0,0,0.20)' }}>
+                {timeAgo(art.date)}
+              </span>
+            </div>
+            <p className="text-[10px] font-bold text-black leading-tight line-clamp-2
+                          group-hover:opacity-60 transition-opacity">
+              {art.title}
+            </p>
+          </a>
+        ))}
+        {!isLoading && articles.length === 0 && (
+          <p className="px-4 py-6 font-mono text-[9px] uppercase tracking-widest"
+             style={{ color: 'rgba(0,0,0,0.25)' }}>
+            Cargando fuentes...
+          </p>
+        )}
+      </div>
+
+      {/* Footer CTA */}
+      <div className="shrink-0 px-4 py-2.5"
+           style={{ borderTop: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)' }}>
+        <a href="/news"
+           className="font-mono text-[8px] font-black uppercase tracking-widest"
+           style={{ color: 'rgba(0,0,0,0.35)' }}
+        >
+          Ver todas las noticias →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ── Right Panel: Whale Post iframe ────────────────────────────────────────────
+function WhalePostIframePanel() {
+  const [loaded, setLoaded] = React.useState(false);
+  // iframe is 1000px wide, scaled to 232px → scale = 0.232
+  // container height is 500px, iframe height = 500/0.232 ≈ 2155px
+  const SCALE = 0.232;
+  const IFRAME_W = 1000;
+  const PANEL_H = 500;
+  const IFRAME_H = Math.round(PANEL_H / SCALE);
+
+  return (
+    <div
+      className="flex flex-col overflow-hidden"
+      style={{
+        width: 232,
+        maxHeight: 'calc(100vh - 140px)',
+        background: 'rgba(250,249,246,0.94)',
+        border: '1px solid rgba(0,0,0,0.10)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
+    >
+      {/* Header */}
+      <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+           className="flex items-center justify-between px-4 py-3 shrink-0">
+        <span className="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-white">
+          Whale Post
+        </span>
+        <a
+          href="https://www.humanidfi.com/news"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-[7px] uppercase tracking-widest"
+          style={{ color: 'rgba(255,255,255,0.40)' }}
+        >
+          Open ↗
+        </a>
+      </div>
+
+      {/* Scaled iframe container */}
+      <div className="relative flex-1 overflow-hidden" style={{ height: PANEL_H }}>
+        {!loaded && (
+          <div className="absolute inset-0 flex items-center justify-center"
+               style={{ background: '#FAF9F6' }}>
+            <div className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
+          </div>
+        )}
+        <iframe
+          src="/news"
+          title="Whale Post"
+          scrolling="no"
+          onLoad={() => setLoaded(true)}
+          style={{
+            width: IFRAME_W,
+            height: IFRAME_H,
+            border: 'none',
+            transform: `scale(${SCALE})`,
+            transformOrigin: 'top left',
+            pointerEvents: 'none',
+            opacity: loaded ? 1 : 0,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+      </div>
+
+      {/* Footer */}
+      <div className="shrink-0 px-4 py-2.5"
+           style={{ borderTop: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)' }}>
+        <a href="/news"
+           className="font-mono text-[8px] font-black uppercase tracking-widest"
+           style={{ color: 'rgba(0,0,0,0.35)' }}
+        >
+          Ir a noticias completas →
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ───────────────────────────────────────────────────────────────
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -210,6 +386,18 @@ export function WhaleAlertLanding() {
           style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)`, backgroundSize: '48px 48px' }} />
         {/* Radial fade */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, rgba(250,249,246,0.95) 100%)" }} />
+
+        {/* ── LEFT PANEL: News of Today — pantalles ≥ 1600 px ——————————— */}
+        <div className="absolute z-20 hidden [@media(min-width:1600px)]:block"
+             style={{ left: 16, top: '50%', transform: 'translateY(-50%) translateY(24px)' }}>
+          <NewsOfTodayPanel />
+        </div>
+
+        {/* ── RIGHT PANEL: Whale Post iframe ———————————————————— */}
+        <div className="absolute z-20 hidden [@media(min-width:1600px)]:block"
+             style={{ right: 16, top: '50%', transform: 'translateY(-50%) translateY(24px)' }}>
+          <WhalePostIframePanel />
+        </div>
 
         <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center">
           <AnimatePresence mode="wait">

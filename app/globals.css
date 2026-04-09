@@ -107,9 +107,14 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth is intentionally REMOVED — Lenis (SmoothScroll.tsx)
+       manages smooth scrolling. Having both active causes double-animation jank
+       and breaks Lenis scroll position sync. */
     -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    /* pan-x pan-y explicitly allows the browser to pass wheel/touch scroll
+       events through to Lenis. 'manipulation' only prevents double-tap zoom
+       but can silently eat scroll on some engines. */
+    touch-action: pan-x pan-y;
 
     /* === STRATOSPHERIC GPU RENDERING === */
     text-rendering: optimizeLegibility;
@@ -188,8 +193,10 @@
      -webkit-font-smoothing: antialiased;
      -moz-osx-font-smoothing: grayscale;
      text-rendering: optimizeLegibility;
-     /* Prevent each element from overriding the global pan-only touch action */
-     touch-action: inherit;
+     /* NOTE: touch-action: inherit is intentionally REMOVED.
+        It caused all child elements to silently inherit 'manipulation' from <html>,
+        which blocked wheel scroll events on nested containers.
+        Elements that need custom touch-action must opt-in explicitly. */
      box-sizing: border-box;
    }
   /* Senior absolute layout correction */
