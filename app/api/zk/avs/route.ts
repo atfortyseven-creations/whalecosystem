@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
         // 2. Mark the record as mathematically verified in the DB
         const activity = await prisma.whaleActivity.update({
-            where: { txHash },
+            where: { transactionHash: txHash },
             data: { isZkVerified: true }
         });
 

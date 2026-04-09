@@ -320,6 +320,7 @@ model WhaleActivity {
   chain           String
   metadata        Json?
   timestamp       DateTime @default(now())
+  isZkVerified    Boolean  @default(false)
 
   // FIX: Critical missing indexes.
   // Without these, leaderboard GROUP BY walletAddress does a full table scan
@@ -409,14 +410,16 @@ model AuthUser {
 
 model SecurityEvent {
   id              String   @id @default(uuid())
-  authUserId      String
+  authUserId      String?
   type            String
+  severity        String   @default("INFO")
+  details         String?  @db.Text
   ipAddress       String?
   userAgent       String?
   location        String?
   timestamp       DateTime @default(now())
 
-  authUser        AuthUser @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+  authUser        AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {

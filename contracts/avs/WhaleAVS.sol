@@ -99,6 +99,7 @@ contract WhaleAVS is Ownable2Step, ReentrancyGuard, Pausable {
         require(!task.hasVoted[msg.sender], "Already attested");
 
         task.hasVoted[msg.sender] = true;
+        op.successfulVerifications += 1; // Track for Sovereign Hall of Fame
 
         if (isValid) {
             task.approvals += 1;

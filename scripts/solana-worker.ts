@@ -42,10 +42,10 @@ async function interceptThermodynamicAnomalies() {
     console.log(`[SOLANA] 🔊 Subscribing to ComputeBudget logs (Processed Commitment)...`);
 
     connection.onLogs(filter, async (logs, ctx) => {
-        if (logs.err) return;
+        if (logs.err || !logs.logs || !Array.isArray(logs.logs)) return;
 
         // Fast regex parse to find the exact SetComputeUnitPrice instruction
-        const priceLog = logs.logs.find(l => l.includes('SetComputeUnitPrice'));
+        const priceLog = logs.logs.find(l => typeof l === 'string' && l.includes('SetComputeUnitPrice'));
         if (!priceLog) return;
 
         // Extract the price paid: e.g. "Program log: SetComputeUnitPrice { micro_lamports: 25000 }"

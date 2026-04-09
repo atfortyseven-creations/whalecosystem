@@ -65,7 +65,13 @@ socket.on('error', (err) => {
     socket.close();
 });
 
-socket.bind(MESH_PORT);
+// Only bind to the receiving port if this file is executed as a standalone daemon.
+// If it is simply imported by Next.js to use `broadcastToMesh`, it remains a dynamic sending client.
+const isMainModule = process.argv[1] && process.argv[1].includes('sovereign-mesh');
+
+if (isMainModule) {
+    socket.bind(MESH_PORT);
+}
 
 /**
  * Mocks the cryptographic validation of another node's signal
@@ -120,12 +126,14 @@ export function broadcastToMesh(eventType: string, data: any) {
     });
 }
 
-// Memory Cleanup loop (prevent Map endless growth)
-setInterval(() => {
-    const now = Date.now();
-    for (const [id, time] of processMemory.entries()) {
-        if (now - time > 60000) { // Keep memory for 60 seconds
-            processMemory.delete(id);
+// Memory Cleanup loop (prevent Map endless growth) - only if running as Daemon
+if (isMainModule) {
+    setInterval(() => {
+        const now = Date.now();
+        for (const [id, time] of processMemory.entries()) {
+            if (now - time > 60000) { // Keep memory for 60 seconds
+                processMemory.delete(id);
+            }
         }
-    }
-}, 10000);
+    }, 10000);
+}
