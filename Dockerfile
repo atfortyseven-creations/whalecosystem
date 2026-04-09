@@ -26,9 +26,9 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
   CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
 
-# The simplest, most failure-resistant launch command. Native Next.js 15 routing.
-# Railway injects $PORT dynamically — we must bind to it, not hardcode 3000.
-# Critical: Use `npx` because `next` is not in the global Linux PATH.
-# We also launch the Background P2P Mesh (UDP) and Solana workers concurrently!
-# [RESILIENCE] Prisma and workers run in background (&) so Next.js never hangs.
-CMD ["sh", "-c", "(npx prisma db push --accept-data-loss || true) & npx tsx scripts/sovereign-mesh.ts & npx tsx scripts/solana-worker.ts & npx next start -p ${PORT:-3000} -H 0.0.0.0"]
+# Copy and ensure the boot script is executable
+COPY start.sh ./
+RUN chmod +x start.sh
+
+# The simplified, bulletproof launch command
+CMD ["./start.sh"]
