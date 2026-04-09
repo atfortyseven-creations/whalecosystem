@@ -366,7 +366,7 @@ function PageHero({
   onEnterNews: () => void;
 }) {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
+    <div className="msv-snap-page min-h-safe min-h-screen w-full text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
 
       {/* TOP BAR */}
       <header className="w-full flex items-center justify-between z-20 h-10 px-4">
@@ -566,7 +566,7 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
 // ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-[100dvh] w-full font-sans flex flex-col px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
+    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
         <div className="text-[14px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
           <p>
@@ -768,7 +768,7 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
   }, [onEnterNews]);
 
   if (!isMounted) {
-    return <div className="w-full h-[100dvh] bg-transparent" />;
+    return <div className="w-full h-safe min-h-screen bg-transparent" />;
   }
 
   if (view === 'scanner') {

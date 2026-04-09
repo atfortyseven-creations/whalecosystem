@@ -124,20 +124,31 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   const [isDrawing, setIsDrawing] = React.useState(false);
   const [hasDrawn, setHasDrawn] = React.useState(false);
 
+  // Scale canvas buffer to match its displayed size (prevents blurry strokes on HiDPI)
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.scale(dpr, dpr);
+  }, []);
+
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return { x: 0, y: 0 };
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      return {
-          x: (e.clientX - rect.left) * scaleX,
-          y: (e.clientY - rect.top) * scaleY
-      };
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
   };
 
   const start = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (disabled) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
     const pos = getPos(e);
@@ -150,11 +161,10 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
     if (!isDrawing || disabled) return;
     const ctx = canvasRef.current?.getContext('2d');
     if (!ctx) return;
-    
     const pos = getPos(e);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.stroke();
@@ -165,7 +175,7 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
     if (!isDrawing) return;
     setIsDrawing(false);
     if (hasDrawn && canvasRef.current) {
-        onSignature(canvasRef.current.toDataURL('image/png'));
+      onSignature(canvasRef.current.toDataURL('image/png'));
     }
   };
 
@@ -180,33 +190,61 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   };
 
   return (
-    <div className="flex flex-col gap-2 mt-4 select-none">
-        <label className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Authorization Signature</label>
-        <div className="relative w-full h-[90px] border border-[#E5E5E5] rounded bg-white overflow-hidden">
-             <canvas 
-                ref={canvasRef}
-                width={300} 
-                height={90} 
-                className="w-full h-full cursor-crosshair touch-none"
-                onPointerDown={start}
-                onPointerMove={draw}
-                onPointerUp={stop}
-                onPointerLeave={stop}
-             />
-             {!hasDrawn && !disabled && (
-                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-[10px] text-[#DDDDDD] uppercase font-mono tracking-widest">
-                    Sign inside box
-                 </div>
-             )}
-             {hasDrawn && !disabled && (
-                 <button onClick={clear} className="absolute top-2 right-2 text-[8px] uppercase tracking-widest bg-[#F5F5F5] px-2 py-1 flex items-center gap-1 rounded text-[#888888] hover:text-[#050505] transition-colors">
-                    Clear
-                 </button>
-             )}
-        </div>
+    <div className="flex flex-col gap-3 mt-6 select-none">
+      <div className="flex items-center justify-between">
+        <label className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Draw Your Signature</label>
+        {hasDrawn && !disabled && (
+          <button onClick={clear} className="text-[9px] font-black uppercase tracking-widest text-[#888888] hover:text-[#FF3B30] transition-colors">
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Canvas surface */}
+      <div
+        className={`relative w-full rounded-xl overflow-hidden transition-all duration-200 ${
+          hasDrawn
+            ? 'border-2 border-[#D4AF37]/50 bg-[#FFFEF9] shadow-[0_0_0_4px_rgba(212,175,55,0.08)]'
+            : 'border-2 border-dashed border-[#DDDDDD] bg-white'
+        }`}
+        style={{ height: 160 }}
+      >
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full cursor-crosshair touch-none"
+          style={{ touchAction: 'none' }}
+          onPointerDown={start}
+          onPointerMove={draw}
+          onPointerUp={stop}
+          onPointerLeave={stop}
+        />
+
+        {/* Instruction overlay — only shown before drawing */}
+        {!hasDrawn && !disabled && (
+          <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center gap-2">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+            </svg>
+            <p className="text-[11px] font-black uppercase tracking-widest text-[#CCCCCC]">Draw your signature here</p>
+            <p className="text-[9px] font-mono text-[#DDDDDD]">Use your mouse, trackpad or finger</p>
+            <div className="absolute bottom-8 left-8 right-8 border-b border-[#F0F0F0]" />
+          </div>
+        )}
+
+        {/* Disabled overlay */}
+        {disabled && <div className="absolute inset-0 bg-white/60 pointer-events-none" />}
+      </div>
+
+      {/* Status */}
+      <p className={`text-[9px] font-mono uppercase tracking-widest transition-colors ${
+        hasDrawn ? 'text-[#D4AF37] font-black' : 'text-[#CCCCCC]'
+      }`}>
+        {hasDrawn ? '✓ Signature captured — ready to mint' : 'Your signature will be saved with your mint forever'}
+      </p>
     </div>
-  )
+  );
 }
+
 
 function LivePulse() {
   return (
