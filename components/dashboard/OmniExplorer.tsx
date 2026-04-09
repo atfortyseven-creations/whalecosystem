@@ -1,18 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Activity, Box, ArrowRight, ArrowLeftRight, Clock, ShieldCheck, AlignLeft } from "lucide-react";
+import { Search, Activity, Box, ArrowRight, Clock, ShieldCheck, AlignLeft, Loader2, AlertCircle } from "lucide-react";
 import { usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
 
 export function OmniExplorer() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState<any[] | null>(null);
+    const [searchError, setSearchError] = useState<string | null>(null);
+
     const publicClient = usePublicClient();
     const { data: blockNumber } = useBlockNumber({ watch: true });
     
     const [blocks, setBlocks] = useState<any[]>([]);
     const [massiveTxs, setMassiveTxs] = useState<any[]>([]);
 
+    // ── On-chain block feed ─────────────────────────────────────────────────
     useEffect(() => {
         if (!publicClient || !blockNumber) return;
 
@@ -38,7 +43,6 @@ export function OmniExplorer() {
                 });
 
                 const txs = block.transactions as any[];
-                // Filter large transactions
                 const valTxs = txs
                     .filter((t: any) => t.value && t.value > 0n)
                     .sort((a,b) => (a.value < b.value ? 1 : -1))
@@ -50,15 +54,11 @@ export function OmniExplorer() {
                         age: 'New Block',
                         from: t.from.substring(0,6) + '...' + t.from.substring(38),
                         to: t.to ? (t.to.substring(0,6) + '...' + t.to.substring(38)) : 'Contract',
-                        value: Number(formatEther(t.value)).toFixed(2) + ' ETH',
+                        value: Number(formatEther(t.value)).toFixed(4) + ' ETH',
                         type: 'TRANSFER'
                     }));
-                    setMassiveTxs(prev => {
-                        const combined = [...newMassive, ...prev];
-                        return combined.slice(0, 5); // Keep top 5 latest large txs
-                    });
+                    setMassiveTxs(prev => [...newMassive, ...prev].slice(0, 5));
                 }
-
             } catch (e) {
                 console.error('Failed to fetch block', e);
             }
@@ -66,6 +66,28 @@ export function OmniExplorer() {
 
         fetchBlock();
     }, [blockNumber, publicClient]);
+
+    // ── Search handler ──────────────────────────────────────────────────────
+    const handleSearch = async () => {
+        const q = searchQuery.trim();
+        if (!q || q.length < 2) return;
+        setIsSearching(true);
+        setSearchResults(null);
+        setSearchError(null);
+        try {
+            const res = await fetch(`/api/graph?q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            if (data.ok) {
+                setSearchResults(data.data ?? []);
+            } else {
+                setSearchError(data.error || 'No results found');
+            }
+        } catch {
+            setSearchError('Network error — could not reach the graph index.');
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
     return (
         <div className="min-h-full w-full bg-[#000000] text-[#FFFFFF] font-mono p-4 md:p-8 flex flex-col gap-12 selection:bg-[#00FF55] selection:text-black overflow-y-auto">
@@ -83,22 +105,75 @@ export function OmniExplorer() {
 
                 <div className="w-full relative">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                        <Search size={20} className="text-[#00FF55]" />
+                        {isSearching
+                            ? <Loader2 size={20} className="text-[#00FF55] animate-spin" />
+                            : <Search size={20} className="text-[#00FF55]" />}
                     </div>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         className="w-full bg-[#050505] border-2 border-[#333333] focus:border-[#00FF55] text-white p-6 pl-14 outline-none transition-colors text-sm uppercase tracking-widest placeholder:text-[#555555]"
-                        placeholder="SEARCH BY ADDRESS / TX HASH / BLOCK / ENS"
+                        placeholder="SEARCH BY ADDRESS / TX HASH / TOKEN / ENS"
                     />
-                    <button className="absolute inset-y-2 right-2 bg-[#00FF55] text-black px-6 font-black text-xs uppercase tracking-widest hover:bg-white transition-colors">
-                        SCAN
+                    <button
+                        onClick={handleSearch}
+                        disabled={isSearching}
+                        className="absolute inset-y-2 right-2 bg-[#00FF55] text-black px-6 font-black text-xs uppercase tracking-widest hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSearching ? 'SCANNING...' : 'SCAN'}
                     </button>
-                    {/* Corner aesthetic markers */}
                     <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-[#00FF55]" />
                     <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-[#00FF55]" />
                 </div>
+
+                {/* Search Results Panel */}
+                {searchError && (
+                    <div className="w-full border border-[#FF3B30]/40 bg-[#FF3B30]/5 p-4 flex items-center gap-3">
+                        <AlertCircle size={16} className="text-[#FF3B30] shrink-0" />
+                        <span className="text-[11px] text-[#FF3B30] uppercase tracking-widest">{searchError}</span>
+                    </div>
+                )}
+                {searchResults !== null && (
+                    <div className="w-full border border-[#222222] bg-[#020202]">
+                        <div className="flex items-center justify-between p-4 border-b border-[#222222] bg-[#050505]">
+                            <div className="flex items-center gap-3">
+                                <Search size={14} className="text-[#00FF55]" />
+                                <h2 className="text-[12px] font-black uppercase tracking-widest">
+                                    SEARCH RESULTS
+                                </h2>
+                            </div>
+                            <span className="text-[9px] text-[#00FF55] uppercase tracking-widest font-bold">
+                                {searchResults.length} ENTITIES FOUND
+                            </span>
+                        </div>
+                        {searchResults.length === 0 ? (
+                            <div className="p-8 text-center text-[10px] text-[#555555] uppercase tracking-widest">
+                                No entities found in the graph index for &quot;{searchQuery}&quot;
+                            </div>
+                        ) : (
+                            <div className="flex flex-col divide-y divide-[#111111]">
+                                {searchResults.map((result: any, i: number) => {
+                                    const entity = result.node || result.n || result;
+                                    const label = result.label || entity._labels?.[0] || 'Entity';
+                                    const name = entity.name || entity.address || entity.symbol || entity.id || 'Unknown';
+                                    return (
+                                        <div key={i} className="flex items-center justify-between p-4 hover:bg-[#050505] transition-colors">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-[12px] text-[#00FF55] font-black tracking-widest">{name}</span>
+                                                {entity.description && (
+                                                    <span className="text-[9px] text-[#555555] uppercase tracking-widest">{entity.description}</span>
+                                                )}
+                                            </div>
+                                            <span className="px-2 py-1 border border-[#333] text-[8px] text-[#888888] uppercase tracking-widest shrink-0">{label}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Matrix Data Grids */}

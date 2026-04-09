@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import * as d3 from 'd3';
-import { Network, Search, Zap, Loader2 } from 'lucide-react';
+import { Network, Zap, Loader2, WifiOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
@@ -16,6 +16,8 @@ export function EntityGraphVis() {
         refreshInterval: 60000, 
         revalidateOnFocus: false 
     });
+
+    const isDegraded = matrixData?.degraded || (!matrixData?.graph?.nodes?.length && matrixData?.success);
 
     useEffect(() => {
         if (!matrixData?.graph || !svgRef.current) return;
@@ -137,9 +139,20 @@ export function EntityGraphVis() {
                         <Loader2 className="animate-spin text-[#00FF55]" size={32} />
                         <span className="text-[10px] font-mono text-[#888888] tracking-widest">MINING NEURAL VECTORS...</span>
                     </div>
+                ) : isDegraded ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                        <WifiOff size={32} className="text-[#333333]" />
+                        <span className="text-[10px] font-mono text-[#555555] tracking-widest uppercase">
+                            Graph database offline
+                        </span>
+                        <span className="text-[9px] font-mono text-[#444444] tracking-widest uppercase max-w-xs text-center">
+                            {matrixData?.reason || 'Neo4j connection not configured. Add NEO4J_URI to your environment variables to enable neural graph mining.'}
+                        </span>
+                    </div>
                 ) : (
                     <svg ref={svgRef} className="w-full h-full cursor-crosshair" />
                 )}
+
                 
                 {/* Overlay Panel */}
                 {selectedNode && (

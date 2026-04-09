@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { zkWorker } from '@/services/crypto/zk-shield-worker';
-import { getSession } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await getSession();
-        if (!session || !session.user) {
-            return NextResponse.json({ error: 'Unauthorized via Sovereign Handshake' }, { status: 401 });
-        }
-
         const body = await req.json();
         const { address, amount, nonce } = body;
 
-        if (!address) {
-            return NextResponse.json({ error: 'Address required for ZK payload' }, { status: 400 });
+        if (!address || typeof address !== 'string' || address.length < 42) {
+            return NextResponse.json({ error: 'Valid Ethereum address required' }, { status: 400 });
         }
 
         // Generate the SNARK proof
