@@ -397,6 +397,9 @@ export function GoldTicketPanel() {
         address: CONTRACT,
         abi: ABI,
         functionName: 'mint',
+        args: [],
+        account: address,
+        chainId: OPTIMISM_CHAIN_ID,
       };
       if (mintPrice > 0n) {
         txParams.value = mintPrice;
