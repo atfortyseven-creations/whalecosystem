@@ -18,7 +18,7 @@ build
 !.env.example
 
 # Heavy dev-only directories (not needed at runtime)
-scripts
+# 'scripts' is required for production background workers (sovereign-mesh.ts etc)
 k8s
 contracts
 typechain-types
@@ -35,7 +35,7 @@ examples
 # Misc junk accumulated during dev
 *.bat
 *.ps1
-*.sh
+# Allow .sh files so start.sh can be copied to the runner
 *.patch
 *.log
 *.tsbuildinfo
