@@ -11,10 +11,16 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-// Configuration
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8400528150:AAGtzfSpSvD6HgauHwg7Nw3sGElQx1Ug4rg";
-const TARGET_CHAT_ID = "@HumanidFi"; 
-const TOPIC_ID = 1367;
+// ─── Security: NEVER hardcode the bot token. Fail fast if missing. ──────────
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+if (!BOT_TOKEN) {
+    console.error("💀 [Telegram Worker] TELEGRAM_BOT_TOKEN env var is not set. Worker cannot start.");
+    process.exit(1);
+}
+
+const TARGET_CHAT_ID = process.env.TELEGRAM_CHAT_ID ?? "@HumanidFi";
+const TOPIC_ID = Number(process.env.TELEGRAM_TOPIC_ID ?? "1367");
+
 
 async function sendTelegram(text: string, chatId: string = TARGET_CHAT_ID, threadId: number | null = TOPIC_ID) {
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;

@@ -6,6 +6,16 @@ This node maintains absolute accountability for deployed systems iterations alon
 **Codename**: "Leviathan Submersion"
 **Date**: Currently in Deployment Window
 
+### Visual Version History
+```mermaid
+timeline
+    title Sovereign Terminal Evolution
+    2026-Q1 : Pre-Genesis : Next.js 15 Bootstrap : Hardhat ZK tests
+    2026-Q2 : 0.1.0-Genesis : SovereignVault_RUN.bat : Mempool Workers : Dual UI 240Hz
+    2026-Q3 : v0.2.0 (Target) : Dark Pool OTC Mapping : AI Intent Predictor
+    2026-Q4 : v1.0.0 (Target) : ZK SNARK Circuits Audit : Mainnet Institutional Launch
+```
+
 ### Baseline Integrity Signatures
 - **Frontend Core**: Next.js App Router (v15+)
 - **Sovereign Engine**: Local `SovereignVault` execution pipeline

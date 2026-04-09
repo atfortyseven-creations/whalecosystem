@@ -1,6 +1,6 @@
 {
   "name": "whale-alert-pro",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run worker:scanner\"",
@@ -28,8 +28,29 @@
     "whale:stop": "pm2 stop whale-monitor",
     "whale:restart": "pm2 restart whale-monitor",
     "whale:logs": "pm2 logs whale-monitor",
-    "whale:status": "pm2 status whale-monitor",
-    "whale:keepalive": "bash scripts/keep-whale-alive.sh"
+    "whale:status":       "pm2 status whale-monitor",
+    "whale:keepalive":    "bash scripts/keep-whale-alive.sh",
+
+    "worker:scanner":     "npx tsx scripts/whale-worker.ts",
+    "worker:telegram":    "npx tsx scripts/telegram-worker.ts",
+    "worker:alerts":      "npx tsx scripts/alert-worker.ts",
+    "workers:start":      "concurrently \"npm run worker:scanner\" \"npm run worker:telegram\" \"npm run worker:alerts\"",
+
+    "deploy:sovereign":          "npx hardhat run scripts/deploy-sovereign.ts --network base",
+    "deploy:sovereign:testnet":   "npx hardhat run scripts/deploy-sovereign.ts --network baseGoerli",
+    "deploy:sovereign:local":     "npx hardhat run scripts/deploy-sovereign.ts --network localhost",
+
+    "test:contracts":     "npx hardhat test --network hardhat",
+    "test:deadman":       "npx hardhat test test/WhaleDeadmanSwitch.test.ts --network hardhat",
+    "test:timelock":      "npx hardhat test test/HumanTimeLock.test.ts --network hardhat",
+    "test:gas":           "REPORT_GAS=true npx hardhat test --network hardhat",
+
+    "k8s:apply":          "kubectl apply -f k8s/",
+    "k8s:delete":         "kubectl delete -f k8s/",
+    "k8s:status":         "kubectl get all -n whale-alert",
+    "helm:install":       "helm install whale-alert k8s/helm --namespace whale-alert --create-namespace",
+    "helm:upgrade":       "helm upgrade whale-alert k8s/helm --namespace whale-alert --reuse-values",
+    "helm:uninstall":     "helm uninstall whale-alert --namespace whale-alert"
   },
   "engines": {
     "node": ">=22.11.0"

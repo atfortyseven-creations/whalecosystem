@@ -60,41 +60,25 @@ npx hardhat run scripts/deploy-zap-gasless.ts --network baseSepolia
 
 ---
 
-### Step 5: Configure Railway (5 min)
+### Step 5: Configure Railway (Step-by-Step Tutorial)
 
-1. Go to Railway Dashboard
-2. Select your project
-3. Click "Variables"
-4. Add all variables from `.env.production.template`
-5. Click "Deploy"
+1. **Prepare your Repository**: Ensure your GitHub repository contains the `railway.json` and `Dockerfile` (or `docker-compose.yml` if using full stack).
+2. **Login to Railway**: Go to the Railway Dashboard (https://railway.app/).
+3. **Create New Project**: Click on `New Project` -> `Deploy from GitHub repo`.
+4. **Select Repository**: Search for `atfortyseven-creations/whalecosystem` and select it.
+5. **Add Environment Variables**: Go to the `Variables` tab of your new service and paste all variables from your local `.env`. Ensure to use production RPCs and keys.
+6. **Set Continuous Deployment**: Ensure "Automatic Deployments" is on so that pushing to `main` updates the app automatically.
+7. **Generate Domain**: Go to `Settings` -> `Networking` and click `Generate Domain` to get your public URL.
+8. **Check Prisma (If using PostgreSQL)**: If you are not using MongoDB/Supabase, make sure to add a Database Service in Railway, and link its `DATABASE_URL` to your app service.
 
-**Required Variables:**
+**Required Variables for Sovereign Terminal:**
 ```bash
-NEXT_PUBLIC_POLYMARKET_API_URL="https://clob.polymarket.com"
-NEXT_PUBLIC_ALCHEMY_API_KEY="your_alchemy_key_here"
-NEXT_PUBLIC_WALLET_CONNECT_ID="your_wallet_connect_id"
-BASE_MAINNET_RPC_URL="https://mainnet.base.org"
-BASE_SEPOLIA_RPC_URL="https://sepolia.base.org"
+NEXT_PUBLIC_SITE_URL="https://your-domain.up.railway.app"
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_wallet_connect_id"
 DATABASE_URL="postgresql://..." 
-JWT_SECRET="your_jwt_secret_here"
 MONGODB_URI="mongodb+srv://..."
-NEXT_PUBLIC_APP_URL="https://polymarketwallet.up.railway.app"
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID="your_project_id"
-NEXT_PUBLIC_WLD_ACTION_LOGIN="login"
-NIXPACKS_NODE_VERSION="22.13.0"
-OPENAI_API_KEY="sk-..."
-PM_CONFIG_PRODUCTION="false"
-PRIVATE_KEY="0x..."
-RELAYER_PRIVATE_KEY="your_relayer_private_key"
-WORLD_ID_ROUTER="id.worldcoin.eth"
-NEXT_PUBLIC_WLD_APP_ID="app_..."
-NEWS_API_KEY="your_news_api_key"
-NEXT_PUBLIC_HUMANFI_CONTRACT="0x42eEf0899F733Ff812d937DB04ec45C00324c2c4"
-NEXT_PUBLIC_NEWS_API_KEY="pub_..."
-NEXT_PUBLIC_OPTIMISM_RPC="https://opt-mainnet.g.alchemy.com/v2/your_key"
-NEXT_PUBLIC_WC_PROJECT_ID="your_wc_project_id"
-NEXT_PUBLIC_WLD_TOKEN="0x9dBfa9F29F86e4D197Dd1abD69A96DF59ffDD0bb"
-NEXT_PUBLIC_WLD_TOKEN_ADDRESS="0xdc6f18f83959cd25095c2453192f16d08b496666"
+JWT_SECRET="your_jwt_secret_here"
+PRISMA_GENERATE_DATAPROXY="true"
 ```
 
 ---
@@ -102,25 +86,33 @@ NEXT_PUBLIC_WLD_TOKEN_ADDRESS="0xdc6f18f83959cd25095c2453192f16d08b496666"
 ### Step 6: Verify Deployment (3 min)
 
 1. Visit your Railway URL
-2. Connect wallet
-3. Try a small zap (1 WLD)
-4. Check transaction on Basescan
+2. Open Network Tab (F12) to ensure WebSockets connect without 502 errors.
+3. Connect your wallet using the Sovereign QR Handshake.
+4. Verify market telemetry is streaming in.
 
 ---
 
-## Troubleshooting
+## Troubleshooting (Common Issues)
 
-### Issue: "Unknown Network"
-**Solution:** Add `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`
+### 1. Issue: "Unknown Network"
+**Symptoms:** The terminal connects but cannot fetch blockchain data or complains about unsupported chain.
+**Solution:** Ensure `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set and you are connected to a supported network (Ethereum Mainnet or Base).
 
-### Issue: "Relayer out of funds"
-**Solution:** Fund relayer wallet with more ETH
+### 2. Issue: "Relayer out of funds"
+**Symptoms:** Unable to broadcast internal transactions for execution/minting.
+**Solution:** Fund relayer wallet with more ETH on the respective chain.
 
-### Issue: "Contract not found"
-**Solution:** Verify contract addresses are correct
+### 3. Issue: "Contract not found" / "Invalid parameters"
+**Symptoms:** Deploying or interacting throws RPC parameter errors (e.g., passing a float instead of a string to `ethers`).
+**Solution:** Verify contract addresses and ensure you are passing stringified integers to EVM methods.
 
-### Issue: "Signature verification failed"
-**Solution:** Check chainId matches (84532 for Base Sepolia)
+### 4. Issue: "Signature verification failed"
+**Symptoms:** WalletConnect signs but the backend rejects the transaction.
+**Solution:** Check `chainId` matches exactly. Restart the Railway app to flush the Next.js cache.
+
+### 5. Issue: "WebSocket 502 Bad Gateway"
+**Symptoms:** Live alerts do not appear. Terminal shows "Reconnecting...".
+**Solution:** Railway might be routing to the wrong internal port. Ensure your worker exposes the correct WebSocket port and the Railway firewall allows it.
 
 ---
 

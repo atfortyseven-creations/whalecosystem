@@ -52,6 +52,10 @@ const nextConfig = {
         ]
     },
 
+    // Standalone output required for Docker multi-stage build (Dockerfile COPY .next/standalone)
+    // Skipped in extension builds which use 'out' distDir instead.
+    output: isExtension ? undefined : 'standalone',
+
     compress: true,
     poweredByHeader: false,
     productionBrowserSourceMaps: false,

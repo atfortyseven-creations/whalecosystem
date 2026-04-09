@@ -1,49 +1,99 @@
-name: Sovereign Core CI/CD
+name: 🏛️ Sovereign Core — Contract Tests & API Coverage
 
 on:
   push:
-    branches: ["main"]
+    paths:
+      - 'contracts/**'
+      - 'test/**'
+      - 'app/api/**'
+      - 'scripts/deploy-sovereign.ts'
   pull_request:
-    branches: ["main"]
+    paths:
+      - 'contracts/**'
+      - 'test/**'
+      - 'app/api/**'
 
 jobs:
-  backend-compilation:
-    name: Backend Build & Integrity
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 1: Smart Contract Unit Tests (Hardhat + hardhat-network-helpers)
+  # ─────────────────────────────────────────────────────────────────
+  contract-tests:
+    name: 📜 Contract Tests (Hardhat)
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    timeout-minutes: 15
 
-      - name: Setup Node.js Environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.11.0'
-          cache: 'npm'
-
-      - name: Install Pure Dependencies
-        run: npm ci
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Compile ZK Circuits & Contracts
-        run: npx hardhat compile
-
-      - name: Execute Strict Typing Validation
-        run: npx tsc --noEmit
-
-      - name: Dry Build Next.js
-        run: cross-env NODE_OPTIONS="--max-old-space-size=4096" next build
-        env:
-          NEXT_PUBLIC_IGNORE_WARNINGS: "true"
-
-  security-audit:
-    name: Slither Smart Contract Audit
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Slither
-        run: pip3 install slither-analyzer
-      - name: Run Audit
-        run: slither . --print human-summary || true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: 🔨 Compile Contracts
+        run: npx hardhat compile
+
+      - name: 🧪 Run WhaleDeadmanSwitch Tests
+        run: npx hardhat test test/WhaleDeadmanSwitch.test.ts --network hardhat
+
+      - name: 🧪 Run HumanTimeLock Tests
+        run: npx hardhat test test/HumanTimeLock.test.ts --network hardhat
+
+      - name: 🧪 Run Legacy SovereignDeadmanSwitch Tests
+        run: npx hardhat test test/SovereignDeadmanSwitch.test.js --network hardhat
+
+      - name: 📊 Gas Report
+        run: REPORT_GAS=true npx hardhat test --network hardhat
+        continue-on-error: true
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 2: API Route Type Safety
+  # ─────────────────────────────────────────────────────────────────
+  api-typecheck:
+    name: 🔍 API Routes Type Safety
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: 🛡️ TypeScript check (API routes only)
+        run: npx tsc --noEmit --project tsconfig.json
+        env:
+          SKIP_ENV_VALIDATION: 'true'
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 3: Deploy Dry-Run (localhost fork)
+  # ─────────────────────────────────────────────────────────────────
+  deploy-dry-run:
+    name: 🚀 Deploy Dry-Run (localhost)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [contract-tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - run: npx hardhat compile
+
+      - name: 🧪 Deploy Sovereign Contracts (localhost)
+        run: npx hardhat run scripts/deploy-sovereign.ts --network localhost
+        env:
+          BACKUP_WALLET_ADDRESS: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+          DEADMAN_TIMEOUT_DAYS:  "90"

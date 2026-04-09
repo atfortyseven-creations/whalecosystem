@@ -180,8 +180,7 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
     );
 }
 import { useAccount } from 'wagmi';
-
-// ... other imports
+import { useWhaleStream } from '@/context/WhaleStreamContext';
 
 export function AlertsPanel() {
     const { address } = useAccount();
@@ -189,6 +188,9 @@ export function AlertsPanel() {
     const [showCreate, setShowCreate] = useState(false);
     const [filter, setFilter] = useState<'ALL' | AlertStatus>('ALL');
     const [loading, setLoading] = useState(true);
+
+    // ─── Real-time SSE whale event subscription ──────────────────────
+    const { events: sseEvents, isConnected: sseConnected } = useWhaleStream();
 
     const refresh = async () => {
         setLoading(true);
@@ -227,60 +229,46 @@ export function AlertsPanel() {
 
     useEffect(() => { refresh(); }, [address]);
 
-    // EP2 Polling: real-time whale transfers from GetBlock/Backend
+    // ─── Inject high-value SSE whale events as auto-alert rules ──────────
+    // Threshold: $500K USD — matches institutional-grade monitoring standard.
+    // These appear as TRIGGERED WHALE_MOVE rules in real time.
+    const SSE_THRESHOLD_USD = 500_000;
+    const seenSSEIds = React.useRef<Set<string>>(new Set());
+
     useEffect(() => {
-        let isMounted = true;
-        let timeoutId: NodeJS.Timeout;
+        if (!sseEvents.length) return;
+        const latest = sseEvents[0];
+        if (seenSSEIds.current.has(latest.id)) return;
+        seenSSEIds.current.add(latest.id);
 
-        const fetchPulse = async () => {
-            if (!isMounted) return;
-            try {
-                const res = await fetch('/api/whales/sse');
-                if (res.ok) {
-                    const msg = await res.json();
-                    if (msg && msg.type === 'WHALE_TX' && (msg.usdValue || 0) >= 50_000) {
-                        const newAlert: AlertRule = {
-                            id:      `ep2-${msg.txHash}-${Date.now()}`,
-                            name:    `🐋 On-Chain Whale · ${msg.symbol} Transfer`,
-                            type:    'WHALE_MOVE',
-                            asset:   msg.symbol || 'ETH',
-                            threshold:    msg.usdValue,
-                            currentValue: msg.usdValue,
-                            status:       'TRIGGERED',
-                            triggeredAt:  new Date(msg.timestamp).toISOString(),
-                            createdAt:    new Date(msg.timestamp).toISOString(),
-                            notifyTelegram: false,
-                            notifyEmail:    false,
-                            notifyPush:     true,
-                        };
+        const usdValue = Number(latest.usdValue) || 0;
+        if (usdValue < SSE_THRESHOLD_USD) return;
 
-                        setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
-
-                        const usdM = (msg.usdValue / 1e6).toFixed(2);
-                        const from  = `${msg.from?.slice(0, 6)}…${msg.from?.slice(-4)}`;
-                        const to    = `${msg.to?.slice(0, 6)}…${msg.to?.slice(-4)}`;
-                        toast(`🐋 $${usdM}M ${msg.symbol} — ${from} → ${to}`, {
-                            duration: 8000,
-                            style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' },
-                        });
-                    }
-                }
-            } catch (e) {
-                // Silently omit error on poll
-            } finally {
-                if (isMounted) {
-                    timeoutId = setTimeout(fetchPulse, 3500); // 3.5s polling
-                }
-            }
+        const newAlert: AlertRule = {
+            id:      latest.id,
+            name:    `🐋 Whale · ${latest.asset} ${Number(latest.amount || 0).toFixed(2)}`,
+            type:    'WHALE_MOVE',
+            asset:   latest.asset,
+            threshold:    usdValue,
+            currentValue: usdValue,
+            status:       'TRIGGERED',
+            triggeredAt:  latest.timestamp,
+            createdAt:    latest.timestamp,
+            notifyTelegram: false,
+            notifyEmail:    false,
+            notifyPush:     true,
         };
 
-        fetchPulse();
+        setAlerts(prev => [newAlert, ...prev.slice(0, 49)]);
 
-        return () => {
-            isMounted = false;
-            clearTimeout(timeoutId);
-        };
-    }, []);
+        const usdM  = (usdValue / 1e6).toFixed(2);
+        const from  = `${latest.from?.slice(0, 6)}…${latest.from?.slice(-4)}`;
+        const to    = `${latest.to?.slice(0,  6)}…${latest.to?.slice(-4)}`;
+        toast(`🐋 $${usdM}M ${latest.asset} · ${latest.chain} · ${from} → ${to}`, {
+            duration: 9000,
+            style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' },
+        });
+    }, [sseEvents]);
 
     const handleDelete = async (id: string) => {
         if (!address) return;
@@ -463,7 +451,10 @@ export function AlertsPanel() {
             {/* ── Footer ── */}
             <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                 <span>{alerts.length} total rules · Neural Engine monitoring 24/7</span>
-                <span className="flex items-center gap-1 text-[#00C076]"><div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse"/>Engine Online</span>
+                <span className={`flex items-center gap-1 ${sseConnected ? 'text-[#00C076]' : 'text-[#888888]'}`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-[#00C076] animate-pulse' : 'bg-[#888888]'}`}/>
+                    {sseConnected ? 'Stream Active' : 'Reconnecting...'}
+                </span>
             </div>
         </div>
     );

@@ -19,6 +19,7 @@ import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { ReactNode } from "react";
 import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
 import { ClientOverlays } from "@/components/layout/ClientOverlays";
+import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -186,23 +187,26 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body className="bg-[#FAF9F6] text-[#050505] antialiased selection:bg-[#D4AF37] selection:text-white" suppressHydrationWarning>
-          <CookieProvider>
-             <ErrorSuppressor />    <GoogleTagManager gtmId="GTM-52B9SCRM" />
-              <Providers cookies={cookies}>
-                <MobileEnforcer>
-                  <Web3SovereignProvider>
-                    <ClientLayout>
-                      {children}
-                    </ClientLayout>
-                  </Web3SovereignProvider>
-                </MobileEnforcer>
-                <Toaster richColors position="top-right" />
-                <CookieConsent />
-                <ClientOverlays />
-                <ErrorSuppressor />
-              </Providers>
-          </CookieProvider>
+        <body className="bg-[#FAF9F6] text-[#050505] dark:bg-[#000000] dark:text-[#E0E0E0] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" suppressHydrationWarning>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            <CookieProvider>
+               <ErrorSuppressor />
+               <GoogleTagManager gtmId="GTM-52B9SCRM" />
+                <Providers cookies={cookies}>
+                  <MobileEnforcer>
+                    <Web3SovereignProvider>
+                      <ClientLayout>
+                        {children}
+                      </ClientLayout>
+                    </Web3SovereignProvider>
+                  </MobileEnforcer>
+                  <Toaster richColors position="top-right" />
+                  <CookieConsent />
+                  <ClientOverlays />
+                  <ErrorSuppressor />
+                </Providers>
+            </CookieProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
