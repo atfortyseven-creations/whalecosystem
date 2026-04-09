@@ -7,7 +7,7 @@ echo 1. Guardando archivos (git add .)
 git add .
 echo.
 echo 2. Empaquetando cambios (git commit)
-git commit -m "chore(deploy): institutional hardening, prisma global singleton & green deploy optimization"
+git commit -m "fix(build): remove prisma db push from build time — Railway green deploy"
 echo.
 echo 3. Enviando a los servidores de Railway/Github (git push)
 git push origin main || git push
