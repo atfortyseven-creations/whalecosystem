@@ -528,23 +528,13 @@ export function GoldTicketPanel() {
         </div>
         <div className="text-center space-y-2 max-w-sm">
           <h3 className="text-lg font-black uppercase tracking-tight text-[#050505]">
-            {isTxPending ? 'Confirm in Wallet' : 'Broadcasting to Optimism…'}
+            {isTxPending ? 'Confirm in Wallet' : 'Securing Telemetry…'}
           </h3>
           <p className="text-[11px] text-[#888888]">
             {isTxPending
-              ? 'Approve the transaction in your wallet. Do not close this tab.'
-              : 'Transaction submitted. Awaiting L2 block confirmation.'}
+              ? 'Approve the signature in your wallet. Do not close this tab.'
+              : 'Signature verified. Awaiting backend synchronization.'}
           </p>
-          {txHash && (
-            <a
-              href={`https://optimistic.etherscan.io/tx/${txHash}`}
-              target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 text-[10px] font-mono text-[#D4AF37] hover:underline mt-2"
-            >
-              {truncAddr(String(txHash))} <ExternalLink size={10} />
-            </a>
-          )}
-        </div>
       </div>
     );
   }
