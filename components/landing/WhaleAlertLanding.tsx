@@ -223,13 +223,8 @@ export function WhaleAlertLanding() {
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                   className="mb-10"
                 >
-                  <img src="/official-whale-monochrome.png" className="w-24 h-24 md:w-32 md:h-32 dark:invert drop-shadow-2xl" alt="Whale Alert Network" />
+                  <img src="/official-whale-monochrome.png" className="w-56 h-56 md:w-80 md:h-80 dark:invert drop-shadow-2xl" alt="Whale Alert Network" />
                 </motion.div>
-
-                {/* Eyebrow */}
-                <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/30 dark:text-white/30 font-black mb-6">
-                  Real-Time On-Chain Intelligence
-                </p>
 
                 {/* Title */}
                 <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-black text-black dark:text-white leading-[0.92] tracking-tighter mb-8 max-w-3xl">
@@ -372,7 +367,7 @@ export function WhaleAlertLanding() {
                   </p>
                 </div>
                 <div className="shrink-0">
-                  <button onClick={() => setShowClearance(true)}
+                  <button onClick={() => router.push('/ticket')}
                     className="px-8 py-4 bg-white dark:bg-black text-black dark:text-white font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-opacity whitespace-nowrap">
                     Claim Ticket
                   </button>
@@ -465,6 +460,94 @@ export function WhaleAlertLanding() {
             </div>
           </Reveal>
 
+        </div>
+      </section>
+
+      {/* ── THE SOVEREIGN MANIFESTO (FROM README) ──────────────────────────── */}
+      <section className="py-32 px-6 bg-white dark:bg-[#0A0A0A] border-t border-black/[0.05] dark:border-white/[0.05]">
+        <div className="max-w-4xl mx-auto font-sans">
+          <Reveal>
+            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-8 text-center">Protocol Manifesto</p>
+            <h2 className="text-3xl md:text-5xl font-black text-black dark:text-white tracking-tighter mb-16 text-center leading-tight">
+              WHALE ALERT NETWORK:<br/>THE SOVEREIGN INTELLIGENCE PROTOCOL
+            </h2>
+          </Reveal>
+
+          <div className="space-y-16 text-[14px] text-black/60 dark:text-white/60 leading-[2.2] font-medium tracking-wide">
+            
+            <Reveal delay={0.1}>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">00</span>
+                <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">ABSTRACT</span>
+              </div>
+              <p>
+                The Whale Alert Network represents a paradigm shift in decentralized financial intelligence and blockchain analytics. This repository encapsulates the foundational logic, distributed mesh networking interfaces, cryptography-enforced endpoints, and proprietary user-interaction frameworks constituting the Whale Alert Node. Engineered with strict adherence to Zero-Trust principles and immutable non-custodial methodologies, the system aggregates, verifies, and disseminates institutional-grade on-chain telemetry. It bypasses conventional visualization abstraction layers by operating synchronously with Ethereum Virtual Machine (EVM) mempool execution environments and scalable Rollup architectures.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">01</span>
+                <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">ARCHITECTURAL ONTOLOGY AND CORE INFRASTRUCTURE</span>
+              </div>
+              <p className="mb-6">
+                The backend relies on an unconditionally deterministic environment structured around Next.js App Router topologies, integrating directly with high-frequency PostgreSQL atomic transactions. This infrastructure departs from traditional web service dependencies by acting specifically as an immutable relay for zero-knowledge data.
+              </p>
+              <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-2">A. Non-Custodial Session Handshakes</h4>
+              <p className="mb-6">
+                Legacy session authentication paradigms have been entirely deprecated. The network operates strictly utilizing cryptographic identity verifications. Elliptic curve digital signature algorithms (ECDSA) manage all authorization matrices. Users authenticate by signing deterministic cryptographic challenges directly with their hierarchical deterministic wallets, generating verifiable payloads that the backend mathematically validates without ever assuming custodial control or storing sensitive authentication vectors.
+              </p>
+              <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-2">B. The Sovereign Aztec Rollup Integration (ZK-Shield)</h4>
+              <p>
+                At the apex of our asynchronous operation array lies the Zero-Knowledge processing unit, interfaced through conceptual alignment with the Aztec Network. This computational bastion ensures that all executed state transitions regarding user identity and priority access maintain programmable cryptographic finality. By synthesizing deterministic database routing with homomorphic encryption validation, the node operates as an impartial, cryptographic arbiter.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.3}>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">02</span>
+                <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">THE SEVEN-PHASE MATHEMATICAL INTERFACE (TERMINAL ARCHITECTURE)</span>
+              </div>
+              <p className="mb-6">
+                The frontend execution layer is constructed adopting an "Aztec Brutalist" aesthetic framework—a rigorous, strictly monochromatic design system prioritizing low-latency rendering and maximum data density. It eliminates superfluous animations in favor of high-fidelity institutional terminal metrics. The Terminal is segmented into seven core operational phases:
+              </p>
+              <ul className="space-y-4 text-[13px] border-l border-black/10 dark:border-white/10 pl-6">
+                <li><strong className="text-black dark:text-white font-black">Phase I (Core Dashboard):</strong> Real-time assimilation of global liquidity events, dark pool transactions, and whale capitalization matrices.</li>
+                <li><strong className="text-black dark:text-white font-black">Phase II (Global Market):</strong> A decentralized tracking mechanism mapping directly to Polymarket and synthetic frameworks.</li>
+                <li><strong className="text-black dark:text-white font-black">Phase III (Institutional Watchlist):</strong> Aggressively guarded entity-tracking table allowing users to monitor designated EVM addresses.</li>
+                <li><strong className="text-black dark:text-white font-black">Phase IV (Pro Matrix Analytics):</strong> A restricted operational layer offering granular, sub-second volume delta computations.</li>
+                <li><strong className="text-black dark:text-white font-black">Phase V (Advanced Alert Telemetry):</strong> Programmable event-listeners executing immediate callbacks upon critical chain-state alterations.</li>
+                <li><strong className="text-black dark:text-white font-black">Phase VI (Multichart Overlay):</strong> High-precision algorithmic integrations running multi-layered temporal charts synchronously.</li>
+                <li><strong className="text-black dark:text-white font-black">Phase VII (Sovereign Genesis Node):</strong> The definitive authentication tier. Users mint the Sovereign Golden Ticket to cement identity, requiring geographic telemetry and a raw cryptographic signature broadcast to the Global Genesis Ledger.</li>
+              </ul>
+            </Reveal>
+
+            <Reveal delay={0.4}>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">03</span>
+                <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">CRYPTOGRAPHIC SIGNATURE AND TELEMETRY LOGGING</span>
+              </div>
+              <p>
+                The Genesis access tier mandates absolute non-repudiation. Utilizing an integrated HTML5 diagnostic canvas array, the user's manual signature is captured digitally and compressed alongside environmental telemetry logs (Timestamp, Address Sequence, Geographic Code, and Planetary Node). This telemetry is verified asynchronously alongside the L2 block confirmation. Once finality is achieved on Optimism, the payload is securely packaged to the PostgreSQL database, resulting in an indelible, real-time cryptographic receipt of the individual's admission into the intelligence terminal.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.5}>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">04</span>
+                <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">DEPLOYMENT AND REPLICATION (PRIVACY BY VOID)</span>
+              </div>
+              <p>
+                In parallel to robust desktop computation, the terminal deploys a rigorous Mobile Enforcer topology. Utilizing highly optimized client hydration barriers, the system guarantees perfect rendering across diverse mobile processor constraints (mitigating legacy WebKit engine errors natively). The network operates flawlessly across edge-delivery mechanisms and scalable cloud environments via automated rigorous deployment hooks. The entire framework encapsulates a relentless pursuit of transparency, real-time accuracy, and unyielding privacy. It adheres permanently to the doctrine of "Privacy by Void”—where the most secure data is the data the system fundamentally refuses to harbor.
+              </p>
+            </Reveal>
+
+          </div>
         </div>
       </section>
 
