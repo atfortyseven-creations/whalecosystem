@@ -639,7 +639,22 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
   const handleScan = useCallback(async (text: string) => {
     if (isProcessingRef.current) return;
-    if (!text.startsWith('WHALE_HANDSHAKE:')) return;
+    
+    let token = '';
+    if (text.startsWith('WHALE_HANDSHAKE:')) {
+      token = text.slice('WHALE_HANDSHAKE:'.length);
+    } else if (text.includes('session=')) {
+      try {
+        const url = new URL(text);
+        token = url.searchParams.get('session') || '';
+      } catch {
+        const parts = text.split('session=');
+        token = parts.length > 1 ? parts[1].split('&')[0] : '';
+      }
+    }
+    
+    if (!token) return;
+
     const currentAddress = addressRef.current;
     if (!currentAddress) {
       toast.error('WALLET DISCONNECTED', { description: 'Please connect your wallet first.' });
@@ -648,11 +663,11 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
     isProcessingRef.current = true;
     setIsProcessing(true);
     try {
-      const token = text.slice('WHALE_HANDSHAKE:'.length);
       const res = await fetch('/api/auth/qr-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, address: currentAddress, signature: '0x_bypass' }),
+
       });
       if (res.ok) {
         toast.success('SOVEREIGN CONNECTION', { description: 'Terminal synchronization complete.' });
@@ -807,14 +822,14 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
 
   if (showGame) {
     return (
-      <div className="w-full h-[100dvh] bg-transparent overflow-hidden relative">
+      <div className="w-full h-screen min-h-screen bg-transparent overflow-hidden relative">
         <WhaleOfflineGame visible={showGame} onBack={() => setShowGame(false)} />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-[100dvh] bg-transparent overflow-hidden relative">
+    <div className="w-full h-screen min-h-screen bg-transparent overflow-hidden relative">
       <AnimatedPattern />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
