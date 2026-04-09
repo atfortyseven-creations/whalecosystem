@@ -183,10 +183,10 @@ export function WhaleAlertLanding() {
       {/* ── MODULES ── */}
       <section className="py-32 px-6 max-w-6xl mx-auto border-t border-black/5 dark:border-white/5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <ZKCard icon={<Terminal size={24}/>} title="Direct Ingestion" desc="Bypassing visual abstractions. Raw RPC feeds merged into local matrix states." delay={0}/>
-              <ZKCard icon={<Shield size={24}/>} title="Zero-Knowledge Base" desc="You are mathematically isolated from the host server. Cryptographic E2E logic." delay={0.1}/>
-              <ZKCard icon={<Database size={24}/>} title="Graph Indexing" desc="Stochastic evaluation of mempool flows. Unprecedented memory mapping." delay={0.2}/>
-              <ZKCard icon={<Binary size={24}/>} title="Institutional Triggers" desc="Real-time alerts over geometric threshold breaches." delay={0.3}/>
+              <ZKCard icon={<Terminal size={24}/>} title="Direct Ingestion" desc="Bypassing visual abstractions. Raw Solana SIMD-0109 and EVM Mempool feeds merged into local matrix states." delay={0}/>
+              <ZKCard icon={<Shield size={24}/>} title="Zero-Knowledge AVS" desc="Eigenlayer restaking engine. Mathematical verification of thermodynamic variables via ZK-SNARK nodes." delay={0.1}/>
+              <ZKCard icon={<Database size={24}/>} title="Sovereign Mesh P2P" desc="Distributed intelligence array. 10,000 UDP multicast nodes broadcasting via Zero-Trust DHT gossiping." delay={0.2}/>
+              <ZKCard icon={<Binary size={24}/>} title="European MiCA Layer" desc="Institutional-grade privacy structures. Real-time alerts with enterprise GDPR-compliant Right to Be Forgotten architecture." delay={0.3}/>
           </div>
       </section>
 
