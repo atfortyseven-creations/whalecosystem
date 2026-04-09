@@ -60,9 +60,8 @@ export class ResilientProvider {
       );
     }
 
-    if (wssUrl && (wssUrl.startsWith('wss://') || wssUrl.startsWith('ws://'))) {
-      this.initWebSocket(wssUrl);
-    }
+    // WebSocket is NO LONGER initialized in the constructor!
+    // It will be loaded lazily to prevent Next.js SSR from crashing due to 402 errors on global scope.
   }
 
   private initWebSocket(url: string) {
@@ -155,6 +154,13 @@ export class ResilientProvider {
   }
 
   getWsProvider(): ethers.WebSocketProvider | undefined {
+    if (!this.wssUrl) return undefined;
+    
+    // Lazy Initialization: Only create the WebSocket when actually requested by a daemon/worker.
+    if (!this.wsProvider) {
+        this.initWebSocket(this.wssUrl);
+    }
+    
     return this.wsProvider;
   }
 }

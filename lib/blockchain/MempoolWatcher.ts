@@ -1,4 +1,4 @@
-import { ethClient, polClient } from './rpcClient';
+import { getEthWsClient, getPolWsClient } from './rpcClient';
 import { formatEther } from 'viem';
 import prisma from '@/lib/db';
 
@@ -31,17 +31,17 @@ class SovereignMempoolStreamer {
     console.log("🟢 [Sovereign Engine] Opening Dark Forest WebSockets...");
 
     // Watch Ethereum Blocks (Macro Tracking)
-    const unwatchBlocks = ethClient.watchBlocks({
-      onBlock: (block) => {
+    const unwatchBlocks = getEthWsClient().watchBlocks({
+      onBlock: (block: any) => {
         console.log(`[ETH L1] New Block Minted: ${block.number} | Transactions: ${block.transactions.length}`);
         // Here we could map through block.transactions, fetch receipts, and push to SSE.
       },
-      onError: error => console.error("Block Watch Error", error)
+      onError: (error: any) => console.error("Block Watch Error", error)
     });
 
     // Watch Pending Transactions (Sniper / Front-running tracking)
     // NOTE: Requires Alchemy/QuickNode specific WS plans. Using block listener as stable fallback above.
-    const unwatchPending = ethClient.watchPendingTransactions({
+    const unwatchPending = getEthWsClient().watchPendingTransactions({
       onTransactions: async (txHashes: any[]) => {
         // High-frequency data. 
         // Stochastic Filter applied to isolate institutional volume.
