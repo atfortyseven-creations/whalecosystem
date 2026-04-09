@@ -213,11 +213,8 @@ export function WatchlistTable() {
             const res = await fetch('/api/watchlist');
             if (res.ok) {
                 const json = await res.json();
-                // FIX: Server-truth merge strategy — prevents split-brain zombie tokens.
-                // The server is always the authoritative source. We only supplement it
-                // with LOCAL items whose symbols don't exist on the server (not yet synced).
-                // This prevents deleted server items from being resurrected from localStorage.
-                const serverTokens: any[] = json.data ? json.data.map((item: any) => ({
+                const serverData = Array.isArray(json.data) ? json.data : [];
+                const serverTokens: any[] = serverData.map((item: any) => ({
                     id: item.id || crypto.randomUUID(),
                     type: 'TOKEN',
                     symbol: item.symbol,
@@ -225,25 +222,45 @@ export function WatchlistTable() {
                     chain: item.chain || 'ethereum',
                     entryPrice: null,
                     marketData: {}
-                })) : [];
+                }));
 
                 const serverSymbols = new Set(serverTokens.map((t: any) => t.symbol));
 
                 // Only add local tokens the server doesn't know about yet
-                const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
-                const localTokens: any[] = localStr ? JSON.parse(localStr) : [];
-                const onlyLocalTokens = localTokens.filter((t: any) => !serverSymbols.has(t.symbol));
+                let localTokens: any[] = [];
+                try {
+                    const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                    if (localStr) {
+                         const parsed = JSON.parse(localStr);
+                         if (Array.isArray(parsed)) localTokens = parsed;
+                    }
+                } catch(e) {}
+                const onlyLocalTokens = localTokens.filter((t: any) => t && !serverSymbols.has(t.symbol));
 
                 setData({ tokens: [...serverTokens, ...onlyLocalTokens], wallets: [] });
             } else {
                 // Fallback entirely to local
-                const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : '[]';
-                setData({ tokens: JSON.parse(localStr || '[]'), wallets: [] });
+                let localTokens: any[] = [];
+                try {
+                    const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                    if (localStr) {
+                         const parsed = JSON.parse(localStr);
+                         if (Array.isArray(parsed)) localTokens = parsed;
+                    }
+                } catch(e) {}
+                setData({ tokens: localTokens, wallets: [] });
             }
         } catch (e) {
             console.error('Error fetching watchlist', e);
-            const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : '[]';
-            setData({ tokens: JSON.parse(localStr), wallets: [] });
+            let localTokens: any[] = [];
+            try {
+                const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                if (localStr) {
+                     const parsed = JSON.parse(localStr);
+                     if (Array.isArray(parsed)) localTokens = parsed;
+                }
+            } catch(e) {}
+            setData({ tokens: localTokens, wallets: [] });
         } finally {
             setLoading(false);
         }
@@ -254,16 +271,18 @@ export function WatchlistTable() {
     const saveToLocal = (item: any) => {
        if (typeof window === 'undefined') return;
        const key = item.type === 'TOKEN' ? 'SOVEREIGN_WATCHLIST_TOKENS' : 'SOVEREIGN_WATCHLIST_WALLETS';
-       const existing = JSON.parse(localStorage.getItem(key) || '[]');
+       let existing: any[] = [];
+       try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
        if (!existing.some((e: any) => e.address === item.address || e.symbol === item.symbol)) {
-           localStorage.setItem(key, JSON.stringify([...existing, { ...item, id: crypto.randomUUID(), marketData: {}, chain: item.chain || 'ethereum', entryPrice: null }]));
+           localStorage.setItem(key, JSON.stringify([...existing, { ...item, id: crypto.randomUUID?.() ?? Date.now().toString(36), marketData: {}, chain: item.chain || 'ethereum', entryPrice: null }]));
        }
     };
 
     const removeFromLocal = (idOrSymbol: string, type: 'TOKEN' | 'WALLET') => {
        if (typeof window === 'undefined') return;
        const key = type === 'TOKEN' ? 'SOVEREIGN_WATCHLIST_TOKENS' : 'SOVEREIGN_WATCHLIST_WALLETS';
-       const existing = JSON.parse(localStorage.getItem(key) || '[]');
+       let existing: any[] = [];
+       try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
        const filtered = existing.filter((e: any) => e.id !== idOrSymbol && e.symbol !== idOrSymbol);
        localStorage.setItem(key, JSON.stringify(filtered));
     };
@@ -391,13 +410,13 @@ export function WatchlistTable() {
                                                 // INJECT LIVE WSS STREAM DATA
                                                 const tick = markets.get(t.symbol + 'USDT');
                                                 const md = tick ? {
-                                                    ...t.marketData,
-                                                    currentPrice: parseFloat(tick.lastPrice),
-                                                    change24h: parseFloat(tick.priceChangePercent),
-                                                    vol24h: parseFloat(tick.quoteVolume),
+                                                    ...(t.marketData || {}),
+                                                    currentPrice: tick.lastPrice ? parseFloat(tick.lastPrice) : null,
+                                                    change24h: tick.priceChangePercent ? parseFloat(tick.priceChangePercent) : null,
+                                                    vol24h: tick.quoteVolume ? parseFloat(tick.quoteVolume) : null,
                                                     // MCap not available from Binance ticker — show '—' not a fake number
                                                     mcap: t.marketData?.mcap ?? null
-                                                } : t.marketData || {};
+                                                } : (t.marketData || {});
 
                                                 return (
                                                     <div style={style} className="border-b border-[#F0F0F0]">

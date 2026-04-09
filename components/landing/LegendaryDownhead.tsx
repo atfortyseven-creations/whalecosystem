@@ -14,9 +14,11 @@ export function LegendaryDownhead() {
     
     const measureLatency = async () => {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
         const start = performance.now();
-        // Fire a lightweight request to the fastest available endpoint
-        await fetch("/api/network/live", { method: "HEAD", cache: "no-store", signal: AbortSignal.timeout(2000) });
+        await fetch("/api/network/live", { method: "HEAD", cache: "no-store", signal: controller.signal });
+        clearTimeout(timeoutId);
         const end = performance.now();
         if (isMounted) setLatency(Math.round(end - start));
       } catch {

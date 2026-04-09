@@ -125,11 +125,14 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   const [hasDrawn, setHasDrawn] = React.useState(false);
 
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return { x: 0, y: 0 };
+      const canvas = canvasRef.current;
+      if (!canvas) return { x: 0, y: 0 };
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
       return {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top) * scaleY
       };
   };
 
@@ -408,9 +411,13 @@ export function GoldTicketPanel() {
             {(() => {
               let parsed: any = null;
               try { 
-                parsed = JSON.parse(dbStats.ticket.signatureData); 
-              } catch(e) { 
-                parsed = { signature: dbStats.ticket.signatureData, planet: 'E.A.R.T.H', country: 'Classified', ip: '0.0.0.0' }; 
+                const raw = JSON.parse(dbStats.ticket.signatureData);
+                // JSON.parse('null') returns null — guard explicitly
+                if (raw && typeof raw === 'object') parsed = raw;
+              } catch(e) { /* not json */ }
+              // Fallback: treat the whole string as a raw PNG dataURL
+              if (!parsed) {
+                parsed = { signature: dbStats.ticket.signatureData, planet: 'E.A.R.T.H', country: 'Classified', ip: '0.0.0.0' };
               }
               const finalSig = parsed.signature || dbStats.ticket.signatureData;
 
@@ -776,13 +783,15 @@ export function GoldTicketPanel() {
                 <div className="p-8 text-center text-[10px] font-mono text-[#888888]">Awaiting Genesis Mints...</div>
             )}
             {dbStats?.feed?.map((f: any, i: number) => {
+                if (!f) return null;
                 let parsed: any = null;
                 try {
-                   parsed = JSON.parse(f.signatureData);
-                } catch(e) {
-                   parsed = { signature: f.signatureData };
-                }
-                const displaySig = parsed.signature || f.signatureData;
+                   const raw = JSON.parse(f.signatureData);
+                   // JSON.parse('null') returns null — guard explicitly
+                   if (raw && typeof raw === 'object') parsed = raw;
+                } catch(e) { /* not json, treat as raw dataurl */ }
+                if (!parsed) parsed = { signature: f.signatureData ?? '' };
+                const displaySig: string = parsed.signature || f.signatureData || '';
 
                 return (
                     <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid items-center hover:bg-[#FAF9F6] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
@@ -793,7 +802,7 @@ export function GoldTicketPanel() {
                              </div>
                         </div>
                         <div className="px-8 py-5 text-[10px] font-mono text-[#888888]">
-                             {new Date(f.claimedAt).toLocaleString()}
+                             {f.claimedAt ? new Date(f.claimedAt).toLocaleString() : '—'}
                         </div>
                         <div className="px-8 py-2 flex justify-end">
                              {displaySig ? (

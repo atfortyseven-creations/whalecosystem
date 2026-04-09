@@ -59,10 +59,13 @@ function todayKey(): string {
 // Fetches EUR equivalent for 0.015 ETH
 async function fetchEthEur(): Promise<number | null> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur',
-      { cache: 'no-store', signal: AbortSignal.timeout(4000) }
+      { cache: 'no-store', signal: controller.signal }
     );
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     const data = await res.json();
     return data?.ethereum?.eur ?? null;
