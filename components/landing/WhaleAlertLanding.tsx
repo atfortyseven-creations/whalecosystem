@@ -346,8 +346,22 @@ export function WhaleAlertLanding() {
   }, [isConnected, router, openConnectModal]);
 
   return (
-    <div ref={containerRef} className="relative w-full overflow-x-hidden bg-[#FAF9F6] dark:bg-[#080808] text-black dark:text-white font-sans transition-colors duration-300">
-
+    <div ref={containerRef} className="relative w-full overflow-x-hidden text-black dark:text-white font-sans transition-colors duration-300"
+      style={{
+        backgroundColor: '#FAF9F6', /* Fallback light mode base for instant load */
+        backgroundImage: "url('/landing-bg.jpg')",
+        backgroundSize: "clamp(600px, 40vw, 1000px)",
+        backgroundPosition: "center top",
+        backgroundAttachment: "fixed",
+        backgroundRepeat: "repeat",
+        imageRendering: "crisp-edges",
+      }}
+    >
+        {/* Subtle overlay to guarantee text readability in light and dark mode */}
+        <div className="absolute inset-0 pointer-events-none bg-white/60 dark:bg-black/80 backdrop-blur-[1px]" />
+        
+        {/* Wrap content in a relative z-10 index to stay above the backdrop overlay */}
+        <div className="relative z-10 w-full h-full">
       {/* ── NAV ─────────────────────────────────────────────────────────────── */}
       <motion.nav
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 transition-all duration-300"
@@ -817,6 +831,7 @@ export function WhaleAlertLanding() {
           </div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }

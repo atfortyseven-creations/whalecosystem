@@ -248,21 +248,21 @@ export function WhaleProShell({
                         `,
                     }}
                 >
-                    {/* Isometric cube SVG background pattern */}
-                    <div
-                        className="absolute inset-0 pointer-events-none"
+                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]"
                         style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cdefs%3E%3ClinearGradient id='top' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300BFFF' stop-opacity='0.18'/%3E%3Cstop offset='100%25' stop-color='%230052FF' stop-opacity='0.10'/%3E%3C/linearGradient%3E%3ClinearGradient id='left' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230052FF' stop-opacity='0.12'/%3E%3Cstop offset='100%25' stop-color='%23003080' stop-opacity='0.06'/%3E%3C/linearGradient%3E%3ClinearGradient id='right' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300BFFF' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%23003080' stop-opacity='0.04'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(60,8)'%3E%3Cpolygon points='0,-16 28,0 0,16 -28,0' fill='url(%23top)' stroke='%2300BFFF' stroke-width='0.4' stroke-opacity='0.25'/%3E%3Cpolygon points='-28,0 0,16 0,48 -28,32' fill='url(%23left)' stroke='%230066CC' stroke-width='0.4' stroke-opacity='0.2'/%3E%3Cpolygon points='28,0 0,16 0,48 28,32' fill='url(%23right)' stroke='%2300BFFF' stroke-width='0.4' stroke-opacity='0.15'/%3E%3C/g%3E%3C/svg%3E")`,
-                            backgroundSize: '120px 104px',
-                            opacity: 0.7,
+                            backgroundColor: '#050810', /* Base robusta anti-FOUC (Flash of Unstyled Content) */
+                            backgroundImage: `url('/dashboard-bg.jpg')`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center 80%',
+                            backgroundAttachment: 'fixed',
+                            backgroundRepeat: 'no-repeat',
+                            imageRendering: 'crisp-edges', /* Cross-browser standard sin riesgos de que Firefox crashee por webkits ignorados */
                         }}
-                    />
-                    {/* Dark vignette overlay to guarantee text readability */}
-                    <div className="absolute inset-0 pointer-events-none"
-                        style={{ background: 'radial-gradient(ellipse at center, transparent 20%, rgba(5,8,16,0.5) 100%)' }}
-                    />
-                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
-                        <div className="p-8 max-w-[1600px] mx-auto w-full h-full">
+                    >
+                        {/* Immersive glassmorphism / darkening overlay for perfect readability while scrolling */}
+                        <div className="absolute inset-0 pointer-events-none bg-white/40 dark:bg-black/70 backdrop-blur-[2px]" />
+                        
+                        <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -283,6 +283,7 @@ export function WhaleProShell({
                             </AnimatePresence>
                         </div>
                     </div>
+
                 </main>
 
                 {/* ─── Status Bar ─── */}
