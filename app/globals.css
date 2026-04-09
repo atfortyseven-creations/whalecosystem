@@ -61,12 +61,12 @@
 
     /* ═══════════════════════════════════════════════════════
        JAPANESE OCEAN WAVE PATTERN (ukiyo-e style)
-       Inline SVG tile — scales naturally at any DPI.
-       Applied opacity: 0.045 — barely perceptible, unmistakable.
-       Size: 320px × 200px tile — NOT zoomed, full repeat.
+       Inline SVG tile — crisp at ANY DPI, never zoomed.
+       Tile: 320×200px — exact pixel repeat, no interpolation.
+       opacity: 0.05 — clean and unmistakable on cream.
        ═══════════════════════════════════════════════════════ */
-    --wave-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200' viewBox='0 0 320 200'%3E%3Cg fill='none' stroke='%231A1400' stroke-width='0.8' stroke-linecap='round'%3E%3C!-- Wave 1: large left spiral --%3E%3Cpath d='M-10,140 C10,100 30,60 60,50 C90,40 100,60 100,80 C100,100 85,115 70,110 C55,105 50,90 58,82 C66,74 78,78 75,88'/%3E%3Cpath d='M-10,150 C12,108 35,65 65,54 C95,43 107,65 107,86 C107,107 91,123 75,118 C59,113 53,97 62,88 C71,79 84,83 81,94'/%3E%3Cpath d='M-10,160 C14,116 40,70 70,58 C100,46 114,70 114,92 C114,114 97,131 80,126 C63,121 56,104 66,94 C76,84 90,88 87,100'/%3E%3C!-- Wave 1 foam caps --%3E%3Cpath d='M95,65 C100,58 108,55 112,60'/%3E%3Cpath d='M78,110 C82,105 90,103 93,108'/%3E%3C!-- Wave 2: center large spiral --%3E%3Cpath d='M130,120 C145,85 165,50 190,42 C215,34 228,55 228,75 C228,95 215,108 202,104 C189,100 185,87 192,80 C199,73 210,76 207,86'/%3E%3Cpath d='M130,132 C147,94 169,57 195,48 C221,39 236,62 236,83 C236,104 222,118 208,114 C194,110 189,96 197,88 C205,80 217,83 214,94'/%3E%3Cpath d='M130,144 C149,103 173,64 200,54 C227,44 244,69 244,91 C244,113 229,128 214,124 C199,120 193,105 202,96 C211,87 224,90 221,102'/%3E%3C!-- Wave 2 foam --%3E%3Cpath d='M222,58 C228,51 236,48 240,53'/%3E%3Cpath d='M206,104 C211,99 219,97 222,102'/%3E%3C!-- Wave 3: right spiral --%3E%3Cpath d='M270,100 C280,70 295,40 315,35 C335,30 344,48 342,65 C340,82 329,92 319,89 C309,86 306,75 312,69 C318,63 327,66 324,75'/%3E%3Cpath d='M270,112 C282,80 298,48 319,42 C340,36 351,56 349,74 C347,92 335,103 324,100 C313,97 310,85 317,78 C324,71 334,74 331,84'/%3E%3Cpath d='M270,124 C284,90 301,56 323,49 C345,42 358,64 356,83 C354,102 341,114 329,111 C317,108 314,95 322,87 C330,79 341,82 338,93'/%3E%3C!-- Wave 3 foam --%3E%3Cpath d='M338,50 C343,44 350,41 354,46'/%3E%3C!-- Bottom connecting waves --%3E%3Cpath d='M-10,175 C30,160 70,155 110,165 C130,170 140,178 160,175 C180,172 200,160 230,158 C260,156 290,162 320,170'/%3E%3Cpath d='M-10,185 C30,170 75,164 115,175 C136,181 147,189 168,186 C189,183 210,170 241,168 C272,166 296,173 320,182'/%3E%3C!-- Swirl connectors between waves --%3E%3Cpath d='M105,95 C115,88 122,95 118,105 C114,115 105,118 100,112 C95,106 98,98 105,95Z'/%3E%3Cpath d='M245,80 C253,74 260,80 257,89 C254,98 246,101 241,96 C236,91 238,83 245,80Z'/%3E%3C!-- Fine detail lines inside spirals --%3E%3Cpath d='M62,78 C67,73 73,74 71,82'/%3E%3Cpath d='M192,65 C197,60 203,61 201,69'/%3E%3Cpath d='M315,62 C319,57 325,58 323,65'/%3E%3C/g%3E%3C/svg%3E");
-    --wave-pattern-opacity: 0.045;
+    --wave-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='200' viewBox='0 0 320 200' shape-rendering='crispEdges'%3E%3Cg fill='none' stroke='%231A1400' stroke-width='0.75' stroke-linecap='round' stroke-linejoin='round' vector-effect='non-scaling-stroke'%3E%3Cpath d='M-10,140 C10,100 30,60 60,50 C90,40 100,60 100,80 C100,100 85,115 70,110 C55,105 50,90 58,82 C66,74 78,78 75,88'/%3E%3Cpath d='M-10,150 C12,108 35,65 65,54 C95,43 107,65 107,86 C107,107 91,123 75,118 C59,113 53,97 62,88 C71,79 84,83 81,94'/%3E%3Cpath d='M-10,160 C14,116 40,70 70,58 C100,46 114,70 114,92 C114,114 97,131 80,126 C63,121 56,104 66,94 C76,84 90,88 87,100'/%3E%3Cpath d='M95,65 C100,58 108,55 112,60'/%3E%3Cpath d='M78,110 C82,105 90,103 93,108'/%3E%3Cpath d='M130,120 C145,85 165,50 190,42 C215,34 228,55 228,75 C228,95 215,108 202,104 C189,100 185,87 192,80 C199,73 210,76 207,86'/%3E%3Cpath d='M130,132 C147,94 169,57 195,48 C221,39 236,62 236,83 C236,104 222,118 208,114 C194,110 189,96 197,88 C205,80 217,83 214,94'/%3E%3Cpath d='M130,144 C149,103 173,64 200,54 C227,44 244,69 244,91 C244,113 229,128 214,124 C199,120 193,105 202,96 C211,87 224,90 221,102'/%3E%3Cpath d='M222,58 C228,51 236,48 240,53'/%3E%3Cpath d='M206,104 C211,99 219,97 222,102'/%3E%3Cpath d='M270,100 C280,70 295,40 315,35 C335,30 344,48 342,65 C340,82 329,92 319,89 C309,86 306,75 312,69 C318,63 327,66 324,75'/%3E%3Cpath d='M270,112 C282,80 298,48 319,42 C340,36 351,56 349,74 C347,92 335,103 324,100 C313,97 310,85 317,78 C324,71 334,74 331,84'/%3E%3Cpath d='M270,124 C284,90 301,56 323,49 C345,42 358,64 356,83 C354,102 341,114 329,111 C317,108 314,95 322,87 C330,79 341,82 338,93'/%3E%3Cpath d='M338,50 C343,44 350,41 354,46'/%3E%3Cpath d='M-10,175 C30,160 70,155 110,165 C130,170 140,178 160,175 C180,172 200,160 230,158 C260,156 290,162 320,170'/%3E%3Cpath d='M-10,185 C30,170 75,164 115,175 C136,181 147,189 168,186 C189,183 210,170 241,168 C272,166 296,173 320,182'/%3E%3Cpath d='M105,95 C115,88 122,95 118,105 C114,115 105,118 100,112 C95,106 98,98 105,95Z'/%3E%3Cpath d='M245,80 C253,74 260,80 257,89 C254,98 246,101 241,96 C236,91 238,83 245,80Z'/%3E%3Cpath d='M62,78 C67,73 73,74 71,82'/%3E%3Cpath d='M192,65 C197,60 203,61 201,69'/%3E%3Cpath d='M315,62 C319,57 325,58 323,65'/%3E%3C/g%3E%3C/svg%3E");
+    --wave-pattern-opacity: 0.05;
   }
 
 
@@ -175,9 +175,20 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     JAPANESE WAVE PATTERN — Light mode universal application
-     Applies to body in light mode (bg-white) as a pseudo-element
-     so it never interferes with content stacking contexts.
+     JAPANESE WAVE PATTERN — Desktop CSS pseudo-element fallback
+     ─────────────────────────────────────────────────────────
+     WHY pseudo-element + React component both exist:
+     • body::before renders instantly on SSR before JS hydrates
+       → prevents flash of no-pattern on first paint on desktop
+     • WavePatternOverlay (React) takes over on ALL platforms
+       and is the authoritative source of truth after hydration
+     
+     MOBILE OVERRIDE:
+     iOS Safari & Android WebView do NOT correctly handle
+     `position: fixed` on `body::before` pseudo-elements.
+     The pattern disappears/jumps during scroll.
+     We suppress it on touch devices with the media query below —
+     WavePatternOverlay (DOM element) handles mobile correctly.
      ═══════════════════════════════════════════════════════════ */
   body:not(.dark)::before,
   html:not(.dark) body::before {
@@ -186,11 +197,31 @@
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background-image: var(--wave-pattern);
+
+    /* === IMAGE PATTERN RENDERING ===
+       - translateZ(0): forces own GPU compositor layer → no re-interpolation on tab switch
+       - background-size: auto ensures 1:1 native image size mapping (no zoom, no quality loss)
+    */
+    transform: translateZ(0);
+    will-change: auto;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    background-image: url('/wave-pattern-bg.jpg');
     background-repeat: repeat;
-    background-size: 320px 200px;
-    opacity: var(--wave-pattern-opacity);
+    background-size: auto;
+    background-attachment: scroll;
+
+    opacity: 0.15;
     mix-blend-mode: multiply;
+  }
+
+  /* Disable CSS pseudo-element on touch screens — React component handles it */
+  @media (hover: none) and (pointer: coarse) {
+    body:not(.dark)::before,
+    html:not(.dark) body::before {
+      display: none;
+    }
   }
 
   /* All direct children of body must stack ABOVE the wave pattern overlay */
@@ -569,9 +600,15 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  transform: translateZ(0);
+  will-change: auto;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   background-image: var(--wave-pattern);
   background-repeat: repeat;
   background-size: 320px 200px;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
   opacity: var(--wave-pattern-opacity);
   mix-blend-mode: multiply;
   border-radius: inherit;

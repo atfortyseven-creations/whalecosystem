@@ -20,6 +20,7 @@ import { ReactNode } from "react";
 import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
 import { ClientOverlays } from "@/components/layout/ClientOverlays";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -189,6 +190,8 @@ export default async function RootLayout({
         </head>
         <body className="bg-[#FAF9F6] text-[#050505] dark:bg-[#000000] dark:text-[#E0E0E0] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" suppressHydrationWarning>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
+            <WavePatternOverlay />
             <CookieProvider>
                <ErrorSuppressor />
                <GoogleTagManager gtmId="GTM-52B9SCRM" />

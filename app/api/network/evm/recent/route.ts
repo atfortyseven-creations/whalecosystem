@@ -44,14 +44,25 @@ interface ChainConfig {
   priceKey: string;
 }
 
+// ─── POOL DE 6 GETBLOCK ENDPOINTS (rotación automática por failover) ─────────
+const GETBLOCK_POOL = [
+  'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f',
+  'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d',
+  'https://go.getblock.us/88747de304e04365ac4c85789ba4fe54',
+  'https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24',
+  'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234',
+  'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d',
+];
+
 const CHAINS: ChainConfig[] = [
   {
     label: 'ETHEREUM',
     chainId: 1,
     rpcUrls: [
-      'https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff',
+      ...GETBLOCK_POOL,
       process.env.ETH_RPC_URL || '',
       'https://eth.llamarpc.com',
+      'https://cloudflare-eth.com',
     ].filter(Boolean),
     nativeSymbol: 'ETH',
     priceKey: 'ETH',
@@ -60,7 +71,7 @@ const CHAINS: ChainConfig[] = [
     label: 'BASE',
     chainId: 8453,
     rpcUrls: [
-      process.env.GETBLOCK_BASE_RPC || '',
+      ...GETBLOCK_POOL,
       process.env.BASE_MAINNET_RPC_URL || '',
       'https://mainnet.base.org',
       'https://base.llamarpc.com',
@@ -72,11 +83,12 @@ const CHAINS: ChainConfig[] = [
     label: 'BSC',
     chainId: 56,
     rpcUrls: [
-      'https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517', // User Dedicated BSC Node
+      ...GETBLOCK_POOL,
       process.env.BSC_RPC_URL || '',
-      'https://binance.llamarpc.com',
-      'https://bsc-dataseed.binance.org',
+      'https://bsc-dataseed1.binance.org',
+      'https://bsc-dataseed2.binance.org',
       'https://bsc-dataseed1.defibit.io',
+      'https://bsc-rpc.publicnode.com',
     ].filter(Boolean),
     nativeSymbol: 'BNB',
     priceKey: 'BNB',

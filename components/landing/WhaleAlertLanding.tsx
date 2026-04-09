@@ -762,20 +762,31 @@ export function WhaleAlertLanding() {
 
       {/* ── FINAL CTA (DOWNHEAD) ───────────────────────────────────────────────────────── */}
       <section className="relative py-40 px-6 border-t border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
-        {/* Absolute Perfection: Blue Waves Background */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <Image 
-            src="/downhead-hq.jpg" 
-            alt="Whale Downhead Wave" 
-            fill 
-            className="object-cover object-center dark:brightness-75" 
-            quality={100} 
-          />
-          {/* Subtle gradient to ensure the text and icons remain flawlessly visible */}
-          <div className="absolute inset-0 bg-white/60 dark:bg-black/70 backdrop-blur-sm" />
-        </div>
+        {/* ── MAX-PPI HOKUSAI WAVE BACKGROUND ────────────────────────────────────
+           Uses the user-provided Hokusai wave image.
+           background-size: cover & background-position: bottom center ensures
+           it scales up without breaking aspect ratio, keeping the waves at the bottom.
+           ────────────────────────────────────────────────────────────────────── */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            transform: "translateZ(0)",
+            willChange: "auto",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden" as any,
+            backgroundImage: "url('/hokusai-downhead.jpg')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "bottom center",
+            opacity: 0.9,     // Slight opacity if text needs it, but image center is white
+            backgroundColor: "#FAF9F6",
+          }}
+        />
+        {/* Dark mode overlay: Since this is a light-themed Hokusai wave, dark mode strips it or blends it */}
+        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.95 }} />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <div className="relative z-20 max-w-3xl mx-auto text-center">
           <Reveal>
             <div className="relative w-20 h-20 mx-auto mb-10 group">
                 <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:bg-blue-400/40 transition-colors" />

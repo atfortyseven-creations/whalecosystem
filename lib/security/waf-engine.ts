@@ -58,7 +58,6 @@ const INJECTION_PATTERNS = [
 
 // ─── SUSPICIOUS HEADERS ───────────────────────────────────────────────────────
 const SUSPICIOUS_HEADERS = [
-  'x-forwarded-host',
   'x-original-url',
   'x-rewrite-url',
   'x-custom-ip-authorization',

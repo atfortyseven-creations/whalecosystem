@@ -15,177 +15,186 @@ const worldchain = {
 };
 
 // ─── ADVANCED RPC CACHE INTERCEPTOR ───────────────────────────────────────────
-// This caching layer memorizes identical JSON-RPC reads (e.g. eth_call, eth_chainId)
-// for a few seconds to dramatically crush CU usage when multiple components request the same data.
-
+// Deduplication de requests identicos en ventana de 2.5s para ahorrar CUs
 const rpcCache = new Map<string, { data: any; expiry: number }>();
-const CACHE_TTL_MS = 2500; // 2.5 seconds cache deduplication for extreme CU savings
-
-const crypto = globalThis.crypto;
+const CACHE_TTL_MS = 2500;
 
 async function hashRequest(body: string): Promise<string> {
-    // A quick hash of the RPC body to serve as cache key
-    // Using simple hashing for speed rather than full SHA-256
-    let hash = 0;
-    for (let i = 0; i < body.length; i++) {
-        const char = body.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash.toString(16);
+  let hash = 0;
+  for (let i = 0; i < body.length; i++) {
+    const char = body.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return hash.toString(16);
 }
 
 const memoizedFetch = (url: string) => {
-    return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        // Only intercept POST JSON-RPC requests
-        if (init?.method === 'POST' && typeof init.body === 'string') {
-            try {
-                const bodyObj = JSON.parse(init.body);
-                // Only cache safe read methods
-                const isReadMethod = Array.isArray(bodyObj) 
-                    ? bodyObj.every(b => ['eth_call', 'eth_chainId', 'eth_blockNumber', 'eth_gasPrice'].includes(b.method))
-                    : ['eth_call', 'eth_chainId', 'eth_blockNumber', 'eth_gasPrice'].includes(bodyObj.method);
+  return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    if (init?.method === 'POST' && typeof init.body === 'string') {
+      try {
+        const bodyObj = JSON.parse(init.body);
+        const isReadMethod = Array.isArray(bodyObj)
+          ? bodyObj.every(b => ['eth_call', 'eth_chainId', 'eth_blockNumber', 'eth_gasPrice'].includes(b.method))
+          : ['eth_call', 'eth_chainId', 'eth_blockNumber', 'eth_gasPrice'].includes(bodyObj.method);
 
-                if (isReadMethod) {
-                    const cacheKey = `${url}_${await hashRequest(init.body)}`;
-                    const cached = rpcCache.get(cacheKey);
-                    
-                    if (cached && cached.expiry > Date.now()) {
-                        // console.log(`[RPC-ENGINE] CU SAVED! 🛡️ Cache hit for ${url}`);
-                        return new Response(JSON.stringify(cached.data), {
-                            status: 200,
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-                    }
-
-                    // Execute real network request
-                    const response = await fetch(input, init);
-                    if (response.ok) {
-                        const clone = response.clone();
-                        const data = await clone.json();
-                        rpcCache.set(cacheKey, { data, expiry: Date.now() + CACHE_TTL_MS });
-                    }
-                    return response;
-                }
-            } catch (e) {
-                // Fallback to normal fetch if parsing fails
-            }
+        if (isReadMethod) {
+          const cacheKey = `${url}_${await hashRequest(init.body)}`;
+          const cached = rpcCache.get(cacheKey);
+          if (cached && cached.expiry > Date.now()) {
+            return new Response(JSON.stringify(cached.data), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' },
+            });
+          }
+          const response = await fetch(input, init);
+          if (response.ok) {
+            const clone = response.clone();
+            const data = await clone.json();
+            rpcCache.set(cacheKey, { data, expiry: Date.now() + CACHE_TTL_MS });
+          }
+          return response;
         }
-        return fetch(input, init);
+      } catch (e) {
+        // Fallback a fetch normal si falla el parse
+      }
     }
-}
-
-// Helper to create hyper-optimized HTTP transports
-const createOptimizedTransport = (primaryUrl: string, fallbackUrl?: string) => {
-    const transports = [
-        http(primaryUrl, {
-            fetchOptions: { cache: 'no-store' },
-            batch: {
-                batchSize: 4096,
-                wait: 100 // 100ms multicall gathering
-            },
-            fetchFn: memoizedFetch(primaryUrl)
-        })
-    ];
-
-    if (fallbackUrl) {
-        transports.push(
-            http(fallbackUrl, {
-                fetchOptions: { cache: 'no-store' },
-                batch: { batchSize: 4096, wait: 100 },
-                fetchFn: memoizedFetch(fallbackUrl)
-            })
-        );
-    }
-
-    return fallback(transports, { rank: false });
+    return fetch(input, init);
+  };
 };
 
-// ─── HYPER-OPTIMIZED VIEM CLIENTS ─────────────────────────────────────────────
+// ─── TODOS LOS ENDPOINTS GETBLOCK ─────────────────────────────────────────────
+// 6 endpoints en rotación — viem los usa en orden, pasando al siguiente
+// cuando recibe error HTTP (401, 429, 5xx, timeout)
+const GB_EP1 = 'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f';
+const GB_EP2 = 'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d';
+const GB_EP3 = 'https://go.getblock.us/88747de304e04365ac4c85789ba4fe54';
+const GB_EP4 = 'https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24';
+const GB_EP5 = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234';
+const GB_EP6 = 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d';
 
-// ── USER-PROVIDED PRIMARY ENDPOINTS (GetBlock Dashboard) ─────────────────────
-const GETBLOCK_NEW_PRIMARY   = 'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d'; // EP1 — primary (.io)
-const GETBLOCK_NEW_SECONDARY = 'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f'; // EP2 — primary (.us)
-// ── LEGACY FALLBACK ENDPOINTS ──────────────────────────────────────────────────
-const GETBLOCK_ETH_RPC_3 = 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234'; // EP3 — backup 1
-const GETBLOCK_ETH_RPC_4 = 'https://go.getblock.io/31aef531b4e444f5bde76196502679da'; // EP4 — backup 2
+// ─── Helper: construye transport con TODOS los endpoints en orden ─────────────
+// rank: false → usa el primero disponible en orden, no el más rápido
+// retryCount: 3 → reintenta 3 veces antes de pasar al siguiente transport
+const makeTransport = (urls: string[]) =>
+  fallback(
+    urls.map(url =>
+      http(url, {
+        fetchOptions: { cache: 'no-store' },
+        batch: { batchSize: 512, wait: 50 },
+        fetchFn: memoizedFetch(url),
+        retryCount: 2,
+        retryDelay: 500,
+        timeout: 8_000,
+      })
+    ),
+    { rank: false }
+  );
 
-// Polygon GetBlock endpoint
-const GETBLOCK_POLYGON_RPC = 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d';
+// ─── CLIENTES VIEM ─────────────────────────────────────────────────────────────
 
+// Ethereum Mainnet — todos los GetBlock EPs + Alchemy como último recurso
 export const mainnetClient = createPublicClient({
-    chain: mainnet,
-    transport: fallback([
-        http(GETBLOCK_NEW_PRIMARY,   { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_PRIMARY) }),
-        http(GETBLOCK_NEW_SECONDARY, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_SECONDARY) }),
-        http(GETBLOCK_ETH_RPC_3,     { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_3) }),
-        http(`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`, { fetchOptions: { cache: 'no-store' } })
-    ], { rank: false })
+  chain: mainnet,
+  transport: makeTransport([
+    GB_EP1, GB_EP2, GB_EP3, GB_EP4, GB_EP5, GB_EP6,
+    `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://eth.llamarpc.com',
+  ]),
 });
 
-// Dedicated market-intel client
+// Market Intel client — mismo pool, orden diferente para distribución de carga
 export const marketIntelClient = createPublicClient({
-    chain: mainnet,
-    transport: fallback([
-        http(GETBLOCK_NEW_SECONDARY, { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_SECONDARY) }),
-        http(GETBLOCK_NEW_PRIMARY,   { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_NEW_PRIMARY) }),
-        http(GETBLOCK_ETH_RPC_4,     { fetchOptions: { cache: 'no-store' }, fetchFn: memoizedFetch(GETBLOCK_ETH_RPC_4) })
-    ], { rank: false })
+  chain: mainnet,
+  transport: makeTransport([
+    GB_EP3, GB_EP4, GB_EP5, GB_EP6, GB_EP1, GB_EP2,
+    `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+  ]),
 });
 
+// BSC — GetBlock EPs + fallbacks públicos
 export const bscClient = createPublicClient({
-    chain: bsc,
-    transport: createOptimizedTransport(
-        'https://go.getblock.us/bfb53e7124d44e55beaab2f172b43cfe',
-        `https://bsc-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}` // Fallback if GetBlock has issues
-    )
+  chain: bsc,
+  transport: makeTransport([
+    GB_EP1, GB_EP2, GB_EP3, GB_EP4, GB_EP5, GB_EP6,
+    'https://bsc-dataseed1.binance.org',
+    'https://bsc-dataseed2.binance.org',
+    'https://bsc-dataseed1.defibit.io',
+    `https://bnb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+  ]),
 });
 
+// Optimism
 export const optimismClient = createPublicClient({
-    chain: optimism,
-    transport: createOptimizedTransport(`https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`)
+  chain: optimism,
+  transport: makeTransport([
+    GB_EP2, GB_EP4, GB_EP6,
+    `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://mainnet.optimism.io',
+  ]),
 });
 
+// Base
 export const baseClient = createPublicClient({
-    chain: base,
-    transport: createOptimizedTransport(`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`)
+  chain: base,
+  transport: makeTransport([
+    GB_EP1, GB_EP3, GB_EP5,
+    `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://mainnet.base.org',
+  ]),
 });
 
+// Polygon
 export const polygonClient = createPublicClient({
-    chain: polygon,
-    transport: createOptimizedTransport(
-        GETBLOCK_POLYGON_RPC, 
-        `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`
-    )
+  chain: polygon,
+  transport: makeTransport([
+    GB_EP6, GB_EP4, GB_EP2,
+    `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://polygon.llamarpc.com',
+  ]),
 });
 
+// Arbitrum
 export const arbitrumClient = createPublicClient({
-    chain: arbitrum,
-    transport: createOptimizedTransport(`https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`)
+  chain: arbitrum,
+  transport: makeTransport([
+    GB_EP5, GB_EP3, GB_EP1,
+    `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://arb1.arbitrum.io/rpc',
+  ]),
 });
 
+// Avalanche
 export const avalancheClient = createPublicClient({
-    chain: avalanche,
-    transport: createOptimizedTransport(`https://avalanche-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`)
+  chain: avalanche,
+  transport: makeTransport([
+    GB_EP2, GB_EP4,
+    `https://avalanche-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://api.avax.network/ext/bc/C/rpc',
+  ]),
 });
 
+// WorldChain
 export const worldchainClient = createPublicClient({
-    //@ts-ignore Custom chain def
-    chain: worldchain,
-    transport: createOptimizedTransport(`https://worldchain-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`)
+  //@ts-ignore Custom chain def
+  chain: worldchain,
+  transport: makeTransport([
+    `https://worldchain-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
+    'https://worldchain-mainnet.g.alchemy.com/public',
+  ]),
 });
 
-// Helper for dynamic chain selection
+// ─── Helper de selección dinámica de chain ─────────────────────────────────
 export const getClientForChain = (chainId: number): PublicClient => {
-    switch (chainId) {
-        case 1: return mainnetClient as any;
-        case 56: return bscClient as any;
-        case 10: return optimismClient as any;
-        case 8453: return baseClient as any;
-        case 137: return polygonClient as any;
-        case 42161: return arbitrumClient as any;
-        case 43114: return avalancheClient as any;
-        case 480: return worldchainClient as any;
-        default: return mainnetClient as any; // Fallback to mainnet
-    }
+  switch (chainId) {
+    case 1:     return mainnetClient as any;
+    case 56:    return bscClient as any;
+    case 10:    return optimismClient as any;
+    case 8453:  return baseClient as any;
+    case 137:   return polygonClient as any;
+    case 42161: return arbitrumClient as any;
+    case 43114: return avalancheClient as any;
+    case 480:   return worldchainClient as any;
+    default:    return mainnetClient as any;
+  }
 };

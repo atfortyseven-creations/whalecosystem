@@ -93,8 +93,24 @@ export function MobileLanding() {
             </Section>
 
             {/* ── BRIDGE MODULE ── */}
-            <Section id="s-connect" className="justify-start pt-16 pb-24">
-                <div className="space-y-10 max-w-sm mx-auto w-full">
+            <Section id="s-connect" className="justify-start pt-16 pb-24 overflow-hidden relative">
+                {/* MAX-PPI HOKUSAI WAVE BACKGROUND */}
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0 z-0 pointer-events-none"
+                    style={{
+                        transform: "translateZ(0)",
+                        willChange: "auto",
+                        backgroundImage: "url('/hokusai-downhead.jpg')",
+                        backgroundRepeat: "no-repeat",
+                        backgroundSize: "cover",
+                        backgroundPosition: "bottom center",
+                        opacity: 0.25, // Lower opacity to keep neon green text highly legible on mobile black theme
+                        mixBlendMode: "luminosity" // Blends beautifully into the black background
+                    }}
+                />
+                
+                <div className="relative z-10 space-y-10 max-w-sm mx-auto w-full">
                     <div className="space-y-4 text-center">
                         <div className="flex justify-center mb-6">
                             <div className="p-4 border border-[#00FF55] bg-[#00FF55]/5 text-[#00FF55]">
