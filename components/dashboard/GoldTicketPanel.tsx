@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  useAccount, useConnect, useWriteContract,
-  useWaitForTransactionReceipt, useReadContract, useSwitchChain,
+  useAccount, useConnect, useSignMessage,
+  useReadContract, useSwitchChain,
 } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import {
@@ -335,13 +335,13 @@ export function GoldTicketPanel() {
   const displayRemain   = displayMax - displayMinted;
   const isWrongNetwork  = isConnected && chainId !== OPTIMISM_CHAIN_ID;
 
-  // ── On-chain write ───────────────────────────────────────────────────────────
+  // ── Off-chain write ──────────────────────────────────────────────────────────
   const {
-    writeContract, data: txHash,
-    isPending: isTxPending, isError: isTxError, error: txError, reset: resetTx,
-  } = useWriteContract();
+    signMessage, data: cryptoSignature,
+    isPending: isTxPending, isError: isTxError, error: txError, reset: resetTx, isSuccess: isConfirmed
+  } = useSignMessage();
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const isConfirming = false; // Kept for backwards UI compat
 
   useEffect(() => {
     if (isConfirmed && address) {
@@ -367,7 +367,7 @@ export function GoldTicketPanel() {
             await fetch('/api/golden-ticket/claim', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ walletAddress: address, signatureData: JSON.stringify(telepack) })
+                body: JSON.stringify({ walletAddress: address, signatureData: JSON.stringify(telepack), cryptoSignature })
             });
             toast.success('Access Granted ✓', { id: tid });
             refetchBalance();
@@ -376,7 +376,7 @@ export function GoldTicketPanel() {
       };
       execClaim();
     }
-  }, [isConfirmed, address, signatureData, refetchBalance, fetchDbStats]);
+  }, [isConfirmed, address, cryptoSignature, signatureData, refetchBalance, fetchDbStats]);
 
   useEffect(() => {
     if (isTxError && txError) {
@@ -390,23 +390,13 @@ export function GoldTicketPanel() {
 
   const handleMint = () => {
     if (!isConnected) { toast.error('Connect your wallet first'); return; }
-    if (isWrongNetwork && switchChain) { switchChain({ chainId: OPTIMISM_CHAIN_ID }); return; }
     if (hasTicket) { toast.info('This wallet already holds a Whale Gold Ticket.'); return; }
     try {
-      const txParams: any = {
-        address: CONTRACT,
-        abi: ABI,
-        functionName: 'mint',
-        args: [],
-        account: address,
-        chainId: OPTIMISM_CHAIN_ID,
-      };
-      if (mintPrice > 0n) {
-        txParams.value = mintPrice;
-      }
-      writeContract(txParams);
+      signMessage({
+        message: `I am claiming my Genesis identity for ${address?.toLowerCase()} on Whale Alert Network. Gasless.`
+      });
     } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to build transaction');
+      toast.error(e?.message ?? 'Failed to build signature request');
     }
   };
 

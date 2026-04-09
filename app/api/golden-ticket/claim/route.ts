@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyMessage } from 'viem';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ const MAX_SUPPLY = 200;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { walletAddress, twitterHandle, signatureData } = body;
+    const { walletAddress, twitterHandle, signatureData, cryptoSignature } = body;
 
     if (!walletAddress || typeof walletAddress !== 'string') {
       return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
@@ -22,6 +23,24 @@ export async function POST(req: NextRequest) {
     const address = walletAddress.toLowerCase();
     if (!/^0x[a-f0-9]{40}$/.test(address)) {
       return NextResponse.json({ error: 'Malformed wallet address' }, { status: 400 });
+    }
+
+    if (!cryptoSignature) {
+      return NextResponse.json({ error: 'Missing cryptographic signature' }, { status: 400 });
+    }
+
+    // Verify mathematical signature ownership
+    try {
+      const isValidSig = await verifyMessage({
+        address: address as `0x${string}`,
+        message: `I am claiming my Genesis identity for ${address} on Whale Alert Network. Gasless.`,
+        signature: cryptoSignature as `0x${string}`,
+      });
+      if (!isValidSig) {
+         return NextResponse.json({ error: 'Cryptographic signature is invalid or forged' }, { status: 401 });
+      }
+    } catch (e) {
+      return NextResponse.json({ error: 'Failed to verify cryptographic signature' }, { status: 401 });
     }
 
     // Check for existing claim BEFORE opening a transaction (fast path)
