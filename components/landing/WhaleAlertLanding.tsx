@@ -131,7 +131,7 @@ export function WhaleAlertLanding() {
 
   const handleEntry = useCallback(() => {
     if (typeof window !== "undefined" && localStorage.getItem("hasReadDocs") === "true") {
-        if (isConnected) router.push("/vip");
+        if (isConnected) router.push("/dashboard");
         else openConnectModal();
     } else {
         setShowDocumentGate(true);
@@ -141,7 +141,7 @@ export function WhaleAlertLanding() {
   const executeSystemEntry = useCallback(() => {
     if (typeof window !== "undefined") localStorage.setItem("hasReadDocs", "true");
     setShowDocumentGate(false);
-    if (isConnected) router.push("/vip");
+    if (isConnected) router.push("/dashboard");
     else openConnectModal();
   }, [isConnected, router, openConnectModal]);
 
