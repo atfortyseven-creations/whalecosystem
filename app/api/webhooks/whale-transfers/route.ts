@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import Redis from 'ioredis';
+import { createRedisClient } from '@/lib/redis/client';
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = createRedisClient({ name: 'Whale-Webhook' });
 
 // This endpoint receives HTTP POST requests from an on-chain indexing service like Alchemy Custom Webhooks or QuickNode Destinatioms.
 export async function POST(req: Request) {
