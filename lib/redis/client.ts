@@ -93,8 +93,11 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
             });
         }
     } else {
+        // [RESILIENCE] Never throw — a missing REDIS_URL must not kill the server process.
+        // Features requiring Redis (rate-limiting, caching) will degrade gracefully.
         if (process.env.NODE_ENV === 'production') {
-            throw new Error('[Redis:Initialization] 💀 CRITICAL: REDIS_URL missing in PRODUCTION.');
+            console.error('[Redis:Initialization] 🚨 REDIS_URL missing in PRODUCTION. Running in DEGRADED MODE.');
+            console.error('[Redis:Initialization] ⚠️  Set REDIS_URL in Railway dashboard to enable caching & rate-limiting.');
         }
         redisClient = createMockRedis('FinalFallback');
     }

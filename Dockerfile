@@ -26,5 +26,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
   CMD wget -qO- http://localhost:3000/api/health || exit 1
 
-# Launch Sequence: Sync Database (soft fail) -> Start Web UI & P2P Mesh & Solana Workers
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss || true; npm start"]
+# The simplest, most failure-resistant launch command. Native Next.js 15 routing.
+CMD ["npm", "start"]

@@ -10,7 +10,7 @@
     "deploy:deadman": "npx hardhat run scripts/deploy-deadman-switch.js --network polygonAmoy",
     "deploy:deadman:mainnet": "npx hardhat run scripts/deploy-deadman-switch.js --network polygon",
     "build:extension": "node scripts/extension-build.js",
-    "start": "npx tsx scripts/production-cluster.ts",
+    "start": "next start",
     "start:gateway": "npx tsx services/gateway/server.ts",
     "start:scanner": "npx tsx services/scanner/index.ts",
     "start:alerts": "npx tsx scripts/alert-worker.ts",

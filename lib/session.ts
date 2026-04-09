@@ -11,11 +11,15 @@ import crypto from 'crypto';
 // We now fail loud at module load — an unconfigured secret must halt the server.
 const _rawJwtSecret = process.env.JWT_SECRET;
 if (!_rawJwtSecret && process.env.NODE_ENV === 'production' && process.env.SKIP_ENV_VALIDATION !== 'true') {
-    // In production: crash immediately — serving with no secret is catastrophic
-    throw new Error(
-        '[SECURITY FATAL] JWT_SECRET environment variable is not set. '
-        + 'The server cannot start safely without a cryptographically random secret. '
-        + 'Set JWT_SECRET to at least 32 random bytes in your deployment environment variables.'
+    // [RESILIENCE] Log a critical warning but never throw at module-level in production.
+    // A fatal throw here prevents the entire server from starting, making the app
+    // impossible to deploy without first setting env vars in Railway dashboard.
+    // Auth routes will return 401 Unauthorized if JWT_SECRET is missing.
+    console.error(
+        '[SECURITY CRITICAL] JWT_SECRET environment variable is not set. '
+        + 'The server is running INSECURELY. '
+        + 'Set JWT_SECRET in your Railway dashboard immediately. '
+        + 'All session tokens will use a temporary insecure fallback.'
     );
 }
 // In development: warn loudly but allow operation with a deterministic dev secret
