@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
             ok: true,
             message: `Proof cryptographically accepted for ${txHash}`,
             avsConsensusReached: true,
-            assetAmount: activity.tokenAmount
+            assetAmount: activity.amount
         });
 
     } catch (error: any) {
