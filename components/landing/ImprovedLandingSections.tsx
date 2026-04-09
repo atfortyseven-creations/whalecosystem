@@ -181,8 +181,14 @@ function NotificationItem({ type, title, subtitle, time }: {
 
 export function DownloadCTASection() {
     return (
-        <section className="relative w-full py-32">
-            <div className="max-w-4xl mx-auto px-6 text-center">
+        <section className="relative w-full py-32 overflow-hidden">
+            {/* Ultra High Quality Lines Background for Download Zone */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <Image src="/ios-android-hq.jpg" alt="Waves Pattern" fill className="object-cover object-center opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-screen" quality={100} priority />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-[#FAF9F6] dark:from-[#050505] dark:via-transparent dark:to-[#050505]" />
+            </div>
+            
+            <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}

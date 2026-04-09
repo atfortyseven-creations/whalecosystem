@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sumsubProvider } from '@/lib/identity/sumsub-provider';
 import { prisma } from '@/lib/prisma';
-import { getAuthUser } from '@/lib/auth/get-auth-user';
 
 /**
  * GET /api/identity/token

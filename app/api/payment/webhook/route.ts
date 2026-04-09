@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
         maxApiKeys: limits.maxKeys,
         purchaseIp: stripeSub.metadata?.purchase_ip || '',
         purchaseCountry: stripeSub.metadata?.purchase_country || '',
-        currentPeriodEnd: new Date(stripeSub.current_period_end * 1000),
+        currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
       },
     });
 
@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
 
   // 2. Subscription renewed — extend access
   else if (event.type === 'invoice.paid') {
-    const invoice = event.data.object as Stripe.Invoice;
+    const invoice = event.data.object as any;
     if (!invoice.subscription) return NextResponse.json({ ok: true });
 
     const stripeSub = await stripe.subscriptions.retrieve(invoice.subscription as string);
@@ -187,7 +187,7 @@ export async function POST(req: NextRequest) {
       where: { stripeSubscriptionId: invoice.subscription as string },
       data: {
         status: 'active',
-        currentPeriodEnd: new Date(stripeSub.current_period_end * 1000),
+        currentPeriodEnd: new Date((stripeSub as any).current_period_end * 1000),
         updatedAt: new Date(),
       },
     });
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
 
   // 3. Payment failed — suspend after 72h grace
   else if (event.type === 'invoice.payment_failed') {
-    const invoice = event.data.object as Stripe.Invoice;
+    const invoice = event.data.object as any;
     if (!invoice.subscription) return NextResponse.json({ ok: true });
 
     const gracePeriodEnd = new Date(Date.now() + 72 * 60 * 60 * 1000);

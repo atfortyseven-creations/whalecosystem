@@ -386,16 +386,16 @@ export class SignalEngine {
 
     // RSI reasoning
     if (data.rsi.signal === 'OVERSOLD') {
-      reasons.push(`RSI at ${data.rsi.safeToFixed(value, 0)} indicates oversold conditions (bullish)`);
+      reasons.push(`RSI at ${safeToFixed(data.rsi.value, 0)} indicates oversold conditions (bullish)`);
     } else if (data.rsi.signal === 'OVERBOUGHT') {
-      reasons.push(`RSI at ${data.rsi.safeToFixed(value, 0)} indicates overbought conditions (bearish)`);
+      reasons.push(`RSI at ${safeToFixed(data.rsi.value, 0)} indicates overbought conditions (bearish)`);
     }
 
     // MACD reasoning
     if (data.macd.trend === 'BULLISH') {
-      reasons.push(`MACD shows bullish momentum (histogram: ${data.macd.histogram > 0 ? '+' : ''}${data.macd.safeToFixed(histogram, 4)})`);
+      reasons.push(`MACD shows bullish momentum (histogram: ${data.macd.histogram > 0 ? '+' : ''}${safeToFixed(data.macd.histogram, 4)})`);
     } else if (data.macd.trend === 'BEARISH') {
-      reasons.push(`MACD shows bearish momentum (histogram: ${data.macd.safeToFixed(histogram, 4)})`);
+      reasons.push(`MACD shows bearish momentum (histogram: ${safeToFixed(data.macd.histogram, 4)})`);
     }
 
     // BB reasoning
@@ -406,17 +406,19 @@ export class SignalEngine {
     }
 
     // Volume reasoning
-    if (data.volume.ratio > 1.5) {
+    if (data.volume.volumeRatio > 1.5) {
       const pressure = data.volume.buyPressure > 0.6 ? 'strong buying' : 'strong selling';
-      reasons.push(`${pressure.charAt(0).toUpperCase() + pressure.slice(1)} pressure with ${safeToFixed(data.volume.ratio * 100, 0)}% above average volume`);
+      reasons.push(`${pressure.charAt(0).toUpperCase() + pressure.slice(1)} pressure with ${safeToFixed(data.volume.volumeRatio * 100, 0)}% above average volume`);
     }
 
     // S/R reasoning
     if (data.sr.distanceToSupport < 2) {
-      reasons.push(`Near support level at $${data.sr.safeToFixed(nearestSupport, 2)} (${data.sr.safeToFixed(distanceToSupport, 1)}% away)`);
+      const nearestSupport = data.sr.support[0] || 0;
+      reasons.push(`Near support level at $${safeToFixed(nearestSupport, 2)} (${safeToFixed(data.sr.distanceToSupport, 1)}% away)`);
     }
     if (data.sr.distanceToResistance < 2) {
-      reasons.push(`Near resistance level at $${data.sr.safeToFixed(nearestResistance, 2)} (${data.sr.safeToFixed(distanceToResistance, 1)}% away)`);
+      const nearestResistance = data.sr.resistance[0] || 0;
+      reasons.push(`Near resistance level at $${safeToFixed(nearestResistance, 2)} (${safeToFixed(data.sr.distanceToResistance, 1)}% away)`);
     }
 
     return reasons;
@@ -430,12 +432,12 @@ export class SignalEngine {
 
     // Poor risk/reward
     if (data.riskReward < 1.5) {
-      warnings.push(`Low risk/reward ratio (1:${data.safeToFixed(riskReward, 1)}). Consider waiting for better entry.`);
+      warnings.push(`Low risk/reward ratio (1:${safeToFixed(data.riskReward, 1)}). Consider waiting for better entry.`);
     }
 
     // Low volume
-    if (data.volume.ratio < 0.7) {
-      warnings.push(`Volume is ${((1 - data.volume.ratio) * 100).toFixed(0)}% below average. Signal may be unreliable.`);
+    if (data.volume.volumeRatio < 0.7) {
+      warnings.push(`Volume is ${((1 - data.volume.volumeRatio) * 100).toFixed(0)}% below average. Signal may be unreliable.`);
     }
 
     // High volatility

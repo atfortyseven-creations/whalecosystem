@@ -52,9 +52,8 @@ const nextConfig = {
         ]
     },
 
-    output: 'standalone',
-    // NOTE: 'standalone' output ACTIVATED. We are now running a Multi-Stage Docker Build
-    // for absolute resource efficiency on Railway 8GB Hobby Plan.
+    // output: 'standalone', // DISABLING STANDALONE: We need full node_modules and TSX to run background workers.
+    // NOTE: 'standalone' output DEACTIVATED. We reverted to standard build to run background workers via start.sh.
 
     compress: true,
     poweredByHeader: false,

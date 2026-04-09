@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useSWR from "swr";
+import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
 
 const DynamicCryptoCheckoutModal = dynamic(
@@ -351,19 +352,19 @@ export function WhaleAlertLanding() {
         {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (iOS/Android/PC Parity) */}
         <div 
           className="fixed inset-0 pointer-events-none -z-10 bg-[#FAF9F6] dark:bg-[#050810] transition-colors duration-300"
-          style={{
-            backgroundImage: "url('/landing-bg.jpg')",
-            backgroundSize: "clamp(600px, 40vw, 1000px)",
-            backgroundPosition: "center top",
-            backgroundRepeat: "repeat",
-            imageRendering: "crisp-edges",
-            transform: "translateZ(0)",
-            willChange: "transform"
-          }}
-        />
+        >
+          <Image 
+            src="/ios-android-hq.jpg" 
+            alt="Landing Background Waves" 
+            fill 
+            className="object-cover object-center opacity-40 dark:opacity-20" 
+            quality={100} 
+            priority
+          />
+        </div>
 
         {/* Subtle overlay to guarantee text readability in light and dark mode */}
-        <div className="fixed inset-0 pointer-events-none -z-[5] bg-white/60 dark:bg-black/80 backdrop-blur-[1px] transition-colors duration-300" />
+        <div className="fixed inset-0 pointer-events-none -z-[5] bg-white/60 dark:bg-black/80 backdrop-blur-[2px] transition-colors duration-300" />
         
         {/* Wrap content in a relative z-10 index to stay above the backdrop overlay */}
         <div className="relative z-10 w-full">
@@ -759,33 +760,48 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ───────────────────────────────────────────────────────── */}
-      <section className="py-40 px-6 border-t border-black/[0.05] dark:border-white/[0.05]">
-        <div className="max-w-3xl mx-auto text-center">
+      {/* ── FINAL CTA (DOWNHEAD) ───────────────────────────────────────────────────────── */}
+      <section className="relative py-40 px-6 border-t border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
+        {/* Absolute Perfection: Blue Waves Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <Image 
+            src="/downhead-hq.jpg" 
+            alt="Whale Downhead Wave" 
+            fill 
+            className="object-cover object-center dark:brightness-75" 
+            quality={100} 
+          />
+          {/* Subtle gradient to ensure the text and icons remain flawlessly visible */}
+          <div className="absolute inset-0 bg-white/60 dark:bg-black/70 backdrop-blur-sm" />
+        </div>
+
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <Reveal>
-            <img src="/official-whale-monochrome.png" className="w-14 h-14 dark:invert mx-auto mb-10 opacity-40" alt="" />
-            <h2 className="font-sans text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">
+            <div className="relative w-20 h-20 mx-auto mb-10 group">
+                <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:bg-blue-400/40 transition-colors" />
+                <img src="/official-whale-monochrome.png" className="relative w-20 h-20 dark:invert opacity-90 drop-shadow-xl group-hover:scale-105 transition-transform" alt="Whale Logo" />
+            </div>
+            
+            <h2 className="font-sans text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight drop-shadow-sm">
               The network is live.<br />Connect now.
             </h2>
-            <p className="text-[14px] text-black/40 dark:text-white/40 leading-relaxed mb-12 max-w-lg mx-auto">
+            <p className="text-[14px] font-medium text-black/60 dark:text-white/60 leading-relaxed mb-12 max-w-lg mx-auto">
               Real data. No placeholders. Every transaction you see on the terminal is sourced directly from the blockchain in real time.
             </p>
             <button onClick={handleEntry}
-              className="px-12 py-5 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.3em] text-sm hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-black/20 flex items-center gap-4 mx-auto">
+              className="px-12 py-5 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.3em] text-sm hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-blue-500/20 flex items-center gap-4 mx-auto border border-white/10">
               <ArrowRight size={16} />
               Connect to Terminal
             </button>
-            <div className="mt-8 flex items-center justify-center gap-6">
+            <div className="mt-12 flex items-center justify-center gap-8 bg-white/10 dark:bg-black/10 w-max mx-auto px-8 py-3 rounded-full backdrop-blur-md border border-black/5 dark:border-white/5 shadow-inner">
               <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer"
-                 className="flex items-center gap-2 text-black/30 dark:text-white/30 hover:text-black dark:hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                View on GitHub
+                 className="flex items-center gap-2 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-all hover:scale-105">
+                <Github size={18} />
               </a>
               <span className="text-black/10 dark:text-white/10">|</span>
               <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer"
-                 className="flex items-center gap-2 text-black/30 dark:text-white/30 hover:text-black dark:hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.261 5.632 5.9-5.632Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>
-                Follow on X
+                 className="flex items-center gap-2 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-all hover:scale-105">
+                <Twitter size={18} />
               </a>
             </div>
           </Reveal>
@@ -793,7 +809,7 @@ export function WhaleAlertLanding() {
       </section>
 
       {/* ── FOOTER BAND ─────────────────────────────────────────────────────── */}
-      <div className="border-t border-black/[0.06] dark:border-white/[0.06] px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="relative border-t border-black/[0.06] dark:border-white/[0.06] px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-20">
         <div className="flex items-center gap-3">
           <img src="/official-whale-monochrome.png" className="w-5 h-5 dark:invert opacity-40" alt="" />
           <span className="font-mono text-[9px] uppercase tracking-widest text-black/25 dark:text-white/25 font-black">

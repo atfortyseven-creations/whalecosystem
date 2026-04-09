@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emailValidation = isValidEmail(email);
-    if (!emailValidation.valid) {
+    const isEmailValid = isValidEmail(email);
+    if (!isEmailValid) {
       return NextResponse.json(
-        { error: emailValidation.error },
+        { error: 'Invalid email format' },
         { status: 400 }
       );
     }

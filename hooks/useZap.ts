@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export type ZapStep = 'IDLE' | 'PENDING' | 'COMPLETED' | 'FAILED';
+export type ZapStep = 'IDLE' | 'UNLOCKING' | 'SWAPPING' | 'STAKING' | 'COMPLETED' | 'FAILED';
 
 export function useZap() {
     const [status, setStatus] = useState<ZapStep>('IDLE');
@@ -14,11 +14,14 @@ export function useZap() {
         }
 
         try {
-            setStatus('PENDING');
+            setStatus('UNLOCKING');
+            await new Promise(r => setTimeout(r, 1000));
             
-            // In a real scenario, this would call a contract method
-            // The execution pause represents actual network latency
-            await new Promise(r => setTimeout(r, 2000));
+            setStatus('SWAPPING');
+            await new Promise(r => setTimeout(r, 1500));
+            
+            setStatus('STAKING');
+            await new Promise(r => setTimeout(r, 1000));
 
             // Done
             setStatus('COMPLETED');
