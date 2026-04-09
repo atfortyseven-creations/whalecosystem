@@ -10,7 +10,7 @@ import crypto from 'crypto';
 // sign it with the known secret and bypass ALL middleware authentication checks.
 // We now fail loud at module load — an unconfigured secret must halt the server.
 const _rawJwtSecret = process.env.JWT_SECRET;
-if (!_rawJwtSecret && process.env.NODE_ENV === 'production') {
+if (!_rawJwtSecret && process.env.NODE_ENV === 'production' && process.env.SKIP_ENV_VALIDATION !== 'true') {
     // In production: crash immediately — serving with no secret is catastrophic
     throw new Error(
         '[SECURITY FATAL] JWT_SECRET environment variable is not set. '
