@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 // Sovereign AppKit Configuration
 const config = getDefaultConfig({
   appName: 'Sovereign Terminal Omniverse',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'sovereign_terminal_0x',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
   chains: [mainnet, base, arbitrum],
   transports: {
     [mainnet.id]: http(),

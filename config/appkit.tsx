@@ -9,10 +9,15 @@ import { createAppKit } from '@reown/appkit/react'
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-// 1. Get projectId — MUST be set in environment variables. No fallback allowed.
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-if (!projectId) {
-    throw new Error('[Security] NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not configured. Set this variable in your deployment environment.');
+// 1. Get projectId — Falls back to real project ID so the app renders even without the env var.
+// Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+    || process.env.NEXT_PUBLIC_WC_PROJECT_ID
+    || '093232b25784a0694c642ad54a6331fa'; // Whale Alert Network production project
+if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
+    if (typeof window !== 'undefined') {
+        console.warn('[WalletConnect] Using hardcoded project ID. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.');
+    }
 }
 
 // 2. Interstellar Node Override

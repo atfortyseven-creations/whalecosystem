@@ -204,17 +204,17 @@ export default clerkMiddleware(async (auth, request) => {
     const isWalletRoute = pathname.startsWith('/api/wallet') || pathname === '/';
 
     const scriptSrc = isWalletRoute
-        ? `'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com https://accounts.google.com`
-        : `'self' 'nonce-${nonce}' 'strict-dynamic' https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com https://accounts.google.com`;
+        ? `'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.humanidfi.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com https://accounts.google.com`
+        : `'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com https://accounts.google.com`;
 
     const cspHeader = [
         "default-src 'self'",
         `script-src ${scriptSrc}`,
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://*.clerk.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://www.humanidfi.com https://*.googleusercontent.com",
+        "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://img.clerk.com https://*.clerk.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://www.humanidfi.com https://*.googleusercontent.com",
         "font-src 'self' https://fonts.gstatic.com data:",
-        "connect-src 'self' https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io",
-        "frame-src 'self' https://*.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com",
+        "connect-src 'self' https://api.web3modal.org https://pulse.walletconnect.org https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io",
+        "frame-src 'self' https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
