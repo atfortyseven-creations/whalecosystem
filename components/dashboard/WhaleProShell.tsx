@@ -28,25 +28,25 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'dashboard',       label: 'Genesis Terminal',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Global Consensus' },
     { id: 'watchlist',       label: 'Observed UTXOs',          icon: <Eye size={17}/> },
     { id: 'alerts',          label: 'Network Triggers',        icon: <Bell size={17}/> },
-    { id: 'whale-events',    label: 'Raw Mempool Stream',      icon: <TrendingUp size={17}/>,       badge: 'LIVE', badgeColor: '#D4AF37' },
-    { id: 'multicharts',     label: 'Heuristic Visuals',       icon: <BarChart2 size={17}/>,       badge: 'NEW', badgeColor: '#00FF55' },
-    { id: 'new-pairs',       label: 'Genesis Contracts',       icon: <Zap size={17}/>,              badge: 'Live', badgeColor: '#00C076' },
+    { id: 'whale-events',    label: 'Raw Mempool Stream',      icon: <TrendingUp size={17}/> },
+    { id: 'multicharts',     label: 'Heuristic Visuals',       icon: <BarChart2 size={17}/> },
+    { id: 'new-pairs',       label: 'Genesis Contracts',       icon: <Zap size={17}/> },
     { id: 'gainers',         label: 'Entropy Deltas',          icon: <TrendingUp size={17}/> },
     // ── Cryptographic Espionage ──
     { id: 'whale-portfolio', label: 'Entity Heuristics',       icon: <PieChart size={17}/>,        dividerBefore: 'Crypto Espionage' },
-    { id: 'news',            label: 'Chronological Cipher',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
+    { id: 'news',            label: 'Chronological Cipher',    icon: <Newspaper size={17}/> },
     { id: 'api',             label: 'Direct RPC Terminal',     icon: <Code size={17}/> },
-    { id: 'zk-shield',       label: 'ZK Cloak Protocol',       icon: <Shield size={17}/>,          badge: 'ZKP', badgeColor: '#00FF55' },
-    { id: 'neural-graph',    label: 'Association Graph',       icon: <Network size={17}/>,         badge: 'LIVE', badgeColor: '#0052FF' },
-    { id: 'sovereign-vault', label: 'Cryptographic ID',        icon: <ShieldAlert size={17}/>,     badge: 'USER', badgeColor: '#0052FF' },
-    { id: 'omni-explorer',   label: 'Aztec Layer-2 Node',      icon: <Search size={17}/>,          badge: 'ZK', badgeColor: '#00FF55' },
+    { id: 'zk-shield',       label: 'ZK Cloak Protocol',       icon: <Shield size={17}/> },
+    { id: 'neural-graph',    label: 'Association Graph',       icon: <Network size={17}/> },
+    { id: 'sovereign-vault', label: 'Cryptographic ID',        icon: <ShieldAlert size={17}/> },
+    { id: 'omni-explorer',   label: 'Aztec Layer-2 Node',      icon: <Search size={17}/> },
     { id: 'portfolio',       label: 'Sovereign Capital State', icon: <Wallet size={17}/> },
     // ── Protocol Doctrine ──
     { id: 'academy',         label: 'The Whitepaper Academy',  icon: <GraduationCap size={17}/>,   dividerBefore: 'Protocol Doctrine' },
-    { id: 'brc-explorer',    label: 'Bitcoin Primitives',      icon: <Code size={17}/>,            badge: 'BSV', badgeColor: '#E2B33D' },
+    { id: 'brc-explorer',    label: 'Bitcoin Primitives',      icon: <Code size={17}/> },
     { id: 'support',         label: 'Operator Assist',         icon: <LifeBuoy size={17}/> },
     { id: 'humanidfi-portfolio', label: 'Cold Storage Vault',  icon: <Briefcase size={17}/> },
-    { id: 'gold-ticket',     label: 'Genesis Clearance',       icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
+    { id: 'gold-ticket',     label: 'Genesis Clearance',       icon: <Crown size={17}/> },
 ];
 
 function LiveMarketBand() {
@@ -146,7 +146,6 @@ export function WhaleProShell({
                 <div className="flex-1 overflow-y-auto overflow-x-hidden pt-0 pb-4 px-3 space-y-0.5 no-scrollbar">
                     {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
-                        const isGold   = item.id === 'gold-ticket';
                         return (
                             <div key={item.id}>
                                 {item.dividerBefore && !isCollapsed && (
@@ -164,29 +163,16 @@ export function WhaleProShell({
                                     title={item.label}
                                     className={`
                                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative
-                                        ${isGold && !isActive
-                                            ? 'text-[#D4AF37] hover:bg-[#D4AF37]/10 border border-[#D4AF37]/20'
-                                            : isActive
-                                                ? 'bg-black/5 dark:bg-white/10 text-black dark:text-white shadow-md border border-black/10 dark:border-white/20'
+                                        ${isActive
+                                                ? 'bg-black/5 dark:bg-white/10 text-black dark:text-white shadow-none border border-black/10 dark:border-white/20'
                                                 : 'text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
                                         }
                                     `}
                                 >
-                                    <span className={isActive ? 'text-[#050505]' : isGold ? 'text-[#D4AF37]' : 'text-[#888888]'}>{item.icon}</span>
+                                    <span className={isActive ? 'text-[#050505]' : 'text-[#888888]'}>{item.icon}</span>
                                     {!isCollapsed && (
                                         <span className={`text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none ${isActive ? 'text-[#050505]' : 'text-[#555555]'}`}>
                                             {item.label}
-                                        </span>
-                                    )}
-                                    {!isCollapsed && item.badge && (
-                                        <span
-                                            className="text-[7px] font-black px-1.5 py-0.5 rounded uppercase"
-                                            style={isActive
-                                                ? { background: 'rgba(5,5,5,0.1)', color: '#050505' }
-                                                : { background: (item.badgeColor || '#D4AF37') + '18', color: item.badgeColor || '#D4AF37', border: `1px solid ${(item.badgeColor || '#D4AF37')}40` }
-                                            }
-                                        >
-                                            {item.badge}
                                         </span>
                                     )}
                                     {isActive && (

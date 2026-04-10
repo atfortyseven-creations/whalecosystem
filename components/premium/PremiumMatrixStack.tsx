@@ -5,6 +5,7 @@ import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { useAccount, useBalance } from 'wagmi';
 import { Activity, Clock, Zap, ArrowUpRight, ArrowDownRight, TrendingUp, GripVertical } from 'lucide-react';
 import { useDragOrder } from '@/hooks/useDragOrder';
+import { useMarketStream } from '@/context/MarketStreamContext';
 
 const PERFECTION_TOKENS = [
     "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "AVAX", "DOGE", "DOT", "LINK"
@@ -26,59 +27,13 @@ interface LiveMarketState {
 }
 
 function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
-    const [state, setState] = useState<LiveMarketState | null>(null);
+    const { markets } = useMarketStream();
     const [isHovered, setIsHovered] = useState(false);
     
-    useEffect(() => {
-        let isMounted = true;
-        let timeoutId: NodeJS.Timeout;
+    // Consume from the global internal stream (bypasses ALL client rate limits)
+    const marketData = markets.get(`${symbol}USDT`);
 
-        const fetchStream = async () => {
-            try {
-                const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}USDT`);
-                if (!response.ok) throw new Error("Stream connection failed");
-                const data = await response.json();
-
-                const currentPrice = parseFloat(data.lastPrice);
-                const priceChange24h = parseFloat(data.priceChangePercent);
-                const volume24h = parseFloat(data.volume) * currentPrice;
-
-                const momentumScore = Math.min(100, Math.max(0, 50 + (priceChange24h * 5)));
-                const isAccumulation = priceChange24h >= 0;
-                const vigorPercent = 50 + Math.min(50, Math.max(-50, priceChange24h * 3));
-
-                if (isMounted) setState({
-                    momentumScore,
-                    direction: isAccumulation ? 'BULLISH' : 'BEARISH',
-                    targetPrice: currentPrice * (1 + (priceChange24h / 100)),
-                    currentPrice,
-                    volumeValue: volume24h,
-                    vigorPercent,
-                    isAccumulation,
-                    confluenceValue: Math.abs(priceChange24h) / 10,
-                    hasData: true,
-                    icebergs: [], 
-                    probabilityOfReversal: 20 + Math.abs(priceChange24h * 2),
-                    expectedMove: priceChange24h
-                });
-            } catch (err) {
-                // Keep visually syncing if it fails
-            } finally {
-                if (isMounted) {
-                    timeoutId = setTimeout(fetchStream, 6000);
-                }
-            }
-        };
-
-        fetchStream();
-        
-        return () => { 
-            isMounted = false; 
-            clearTimeout(timeoutId);
-        };
-    }, [symbol]);
-
-    if (!state) {
+    if (!marketData) {
         return (
             <tr className="border-b border-[#E5E5E5] bg-white opacity-60">
                 <td className="py-5 px-6">
@@ -97,8 +52,14 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
         );
     }
 
-    const displayPrice = state.currentPrice ? state.currentPrice : (state.targetPrice || 0);
-    const isBull = state.expectedMove >= 0;
+    const currentPrice = parseFloat(marketData.lastPrice || '0');
+    const priceChange24h = parseFloat(marketData.priceChangePercent || '0');
+    const volumeValue = parseFloat(marketData.quoteVolume || '0');
+    
+    const isBull = priceChange24h >= 0;
+    const vigorPercent = 50 + Math.min(50, Math.max(-50, priceChange24h * 3));
+    const momentumScore = Math.min(100, Math.max(0, 50 + (priceChange24h * 5)));
+    const direction = isBull ? 'BULLISH' : 'BEARISH';
 
     return (
         <tr 
@@ -108,33 +69,33 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
         >
             <td className="py-5 px-6">
                 <div className="flex items-center gap-3">
-                    <span className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(0,192,118,0.6)]" style={{ background: isBull ? '#00C076' : '#FF3B30', boxShadow: isBull ? '0 0 10px rgba(0,192,118,0.4)' : '0 0 10px rgba(255,59,48,0.4)' }} />
-                    <span className="text-sm font-black text-[#050505] tracking-tight group-hover:text-[#D4AF37] transition-colors">{symbol}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] text-[#888888] font-bold uppercase tracking-[0.2em] shadow-sm">PERP</span>
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: isBull ? '#00C076' : '#FF3B30' }} />
+                    <span className="text-sm font-black text-[#050505] tracking-tight group-hover:text-[#888888] transition-colors">{symbol}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] text-[#888888] font-bold uppercase tracking-[0.2em]">PERP</span>
                 </div>
             </td>
-            <td className="py-5 px-6 font-mono text-sm text-[#050505] font-bold drop-shadow-sm">
-                ${displayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+            <td className="py-5 px-6 font-mono text-sm text-[#050505] font-bold">
+                ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
             </td>
-            <td className={`py-5 px-6 font-mono text-xs font-bold ${isBull ? 'text-[#00C076] drop-shadow-[0_0_8px_rgba(0,192,118,0.2)]' : 'text-[#FF3B30] drop-shadow-[0_0_8px_rgba(255,59,48,0.2)]'}`}>
+            <td className={`py-5 px-6 font-mono text-xs font-bold ${isBull ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
                 <div className="flex items-center gap-1">
                     {isBull ? <ArrowUpRight size={13} strokeWidth={3}/> : <ArrowDownRight size={13} strokeWidth={3}/>}
-                    {Math.abs(state.expectedMove).toFixed(2)}%
+                    {Math.abs(priceChange24h).toFixed(2)}%
                 </div>
             </td>
             <td className="py-5 px-6">
                 <div className="flex flex-col">
-                    <span className="text-xs text-[#050505] font-mono">${(state.volumeValue / 1e6).toFixed(1)}M</span>
+                    <span className="text-xs text-[#050505] font-mono">${(volumeValue / 1e6).toFixed(1)}M</span>
                     <span className="text-[9px] text-[#888888] uppercase tracking-[0.2em] mt-0.5">24h Vol</span>
                 </div>
             </td>
             <td className="py-5 px-6">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] ${state.isAccumulation ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
-                        {state.vigorPercent.toFixed(0)}%
+                    <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] ${isBull ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
+                        {vigorPercent.toFixed(0)}%
                     </span>
                     <span className="text-[9px] text-[#888888] uppercase tracking-[0.2em]">
-                        {state.isAccumulation ? 'Buyers' : 'Sellers'}
+                        {isBull ? 'Buyers' : 'Sellers'}
                     </span>
                 </div>
             </td>
@@ -143,16 +104,16 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
                     <div className="flex-1 h-1 bg-[#E5E5E5] overflow-hidden w-24 rounded-full">
                         <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: `${Math.min(100, Math.max(0, state.momentumScore))}%` }}
+                            animate={{ width: `${Math.min(100, Math.max(0, momentumScore))}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
-                            className={`h-full ${state.direction === 'BULLISH' ? 'bg-[#00C076] shadow-[0_0_12px_rgba(0,192,118,0.8)]' : 'bg-[#FF3B30] shadow-[0_0_12px_rgba(255,59,48,0.8)]'}`}
+                            className={`h-full ${direction === 'BULLISH' ? 'bg-[#00C076]' : 'bg-[#FF3B30]'}`}
                         />
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-[#050505] w-8">{state.momentumScore.toFixed(0)}</span>
+                    <span className="text-[10px] font-mono font-bold text-[#050505] w-8">{momentumScore.toFixed(0)}</span>
                 </div>
             </td>
             <td className="py-5 px-6 text-right">
-                <button className="opacity-0 group-hover:opacity-100 px-5 py-2 rounded-lg bg-[#050505] text-[#FAF9F6] text-[9px] font-black uppercase tracking-[0.2em] shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)] hover:scale-105 transition-all active:scale-95">
+                <button className="opacity-0 group-hover:opacity-100 px-5 py-2 rounded-lg bg-[#050505] text-[#FAF9F6] text-[9px] font-black uppercase tracking-[0.2em] transition-all">
                     Execute
                 </button>
             </td>
@@ -215,7 +176,7 @@ export function PremiumMatrixStack() {
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <p className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Live Portfolio</p>
                                     {isConnected ? (
-                                        <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_rgba(0,192,118,0.6)]" title="Connected to Native Wallet"/>
+                                        <div className="w-2 h-2 rounded-full bg-[#00C076]" title="Connected to Native Wallet"/>
                                     ) : (
                                         <div className="w-2 h-2 rounded-full bg-[#FF3B30]" title="Disconnected"/>
                                     )}
@@ -253,11 +214,11 @@ export function PremiumMatrixStack() {
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center border-b border-[#E5E5E5] pb-2">
                                         <span className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Node Sync</span>
-                                        <span className="text-[10px] font-mono font-black text-[#00C076] flex items-center gap-1.5"><Clock size={11} className="animate-spin-slow"/> 12ms</span>
+                                        <span className="text-[10px] font-mono font-black text-[#00C076] flex items-center gap-1.5"><Clock size={11}/> 12ms</span>
                                     </div>
                                     <div className="flex justify-between items-center border-b border-[#E5E5E5] pb-2">
                                         <span className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">AI Predictors</span>
-                                        <span className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.2em]">Online</span>
+                                        <span className="text-[10px] text-[#050505] font-black uppercase tracking-[0.2em]">Online</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Execution</span>
@@ -315,7 +276,7 @@ export function PremiumMatrixStack() {
                         </button>
                     )}
                     <div className="hidden lg:flex items-center gap-3 bg-white border border-[#E5E5E5] px-4 py-2 rounded-full shadow-sm">
-                        <span className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse shadow-[0_0_8px_rgba(0,192,118,0.8)]"/>
+                        <span className="w-2 h-2 rounded-full bg-[#00C076]"/>
                         <span className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Live Orderbook Connected</span>
                     </div>
                 </div>
