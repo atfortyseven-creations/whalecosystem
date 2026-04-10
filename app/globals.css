@@ -65,7 +65,7 @@
        Tile: 250px base — exact repetition, no interpolation.
        opacity: 0.06 — clear watermark without obstructing data.
        ═══════════════════════════════════════════════════════ */
-    --wave-pattern: url("/CHECKPOINT/nuevo-patron-cosmico.jpg");
+    --wave-pattern: url("/api/checkpoint-image?name=nuevo-patron-cosmico.jpg");
     --wave-pattern-opacity: 0.06;
   }
 

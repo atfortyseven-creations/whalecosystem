@@ -248,7 +248,7 @@ export function WhaleProShell({
                         <div 
                             className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 hidden dark:block"
                             style={{
-                                backgroundImage: `url('/CHECKPOINT/nuevo-patron-cosmico.jpg')`,
+                                backgroundImage: `url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')`,
                                 backgroundSize: '250px auto',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'repeat',
@@ -261,7 +261,7 @@ export function WhaleProShell({
                         <div 
                             className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 block dark:hidden"
                             style={{
-                                backgroundImage: `url('/CHECKPOINT/nuevo-patron-cosmico.jpg')`,
+                                backgroundImage: `url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')`,
                                 backgroundSize: '250px auto',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'repeat',

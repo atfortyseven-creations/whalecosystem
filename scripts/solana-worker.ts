@@ -53,7 +53,7 @@ async function interceptThermodynamicAnomalies() {
 
     // Subscribe ONLY to transactions touching the ComputeBudget program
     const filter: LogsFilter = {
-        mentions: [COMPUTE_BUDGET_PROGRAM]
+        mentions: [COMPUTE_BUDGET_PROGRAM.toBase58() as any]
     };
 
     console.log(`[SOLANA] 🔊 Subscribing to ComputeBudget logs (Processed Commitment)...`);
