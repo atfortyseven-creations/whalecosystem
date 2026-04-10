@@ -309,6 +309,114 @@ function WhalePostIframePanel() {
   );
 }
 
+// ── PILAR I: EL REGISTRO AKÁSICO ────────────────────────────────────────────────
+function AkashicRegistryPanel() {
+  const { data } = useSWR('/api/akashic', (url: string) => fetch(url).then(r => r.json()));
+  const records = data?.records?.slice(0, 3) || [];
+
+  return (
+    <div className="bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-[2rem] overflow-hidden shadow-xl flex flex-col">
+      <div className="bg-black dark:bg-white text-white dark:text-black px-8 py-5 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <Database size={16} />
+          <span className="font-mono text-[11px] font-black uppercase tracking-[0.3em]">The Akashic Registry</span>
+        </div>
+        <span className="font-mono text-[9px] uppercase tracking-widest opacity-60">Permanent Historian</span>
+      </div>
+      <div className="p-8 md:p-10 space-y-8 flex-1 flex flex-col justify-between">
+        <p className="text-[13px] text-black/60 dark:text-white/60 leading-relaxed font-medium">
+          The official source of record for the crypto era. No dashboards that expire. Every movement exceeding $50M is captured, assigned an immutable identifier, and cryptographically hashed on-chain.
+        </p>
+        
+        <div className="space-y-3">
+          {records.length === 0 && <div className="animate-pulse h-24 bg-black/5 dark:bg-white/5 rounded-xl border border-black/10 dark:border-white/10" />}
+          {records.map((rec: any) => (
+            <div key={rec.id} className="p-5 bg-[#FAF9F6] dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-xl flex flex-col gap-2 relative group overflow-hidden transition-all hover:border-black/20 dark:hover:border-white/20">
+              <div className="flex justify-between items-start">
+                <span className="font-mono text-[10px] font-black text-black/40 dark:text-white/40 uppercase tracking-widest">Entry #{rec.id}</span>
+                <span className="font-mono text-[9px] text-black/30 dark:text-white/30">{new Date(rec.timestamp).toLocaleString()}</span>
+              </div>
+              <p className="font-sans font-bold text-[14px] text-black dark:text-white">{rec.amount} <span className="text-black/40 dark:text-white/40 font-mono text-[11px] ml-1">on {rec.chain}</span></p>
+              <p className="text-[11px] text-black/60 dark:text-white/60 leading-relaxed mt-1">"{rec.editorial}"</p>
+              
+              {/* Hash overlay on hover */}
+              <div className="absolute inset-0 bg-black/95 dark:bg-white/95 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity p-4 backdrop-blur-sm">
+                <span className="font-mono text-[8px] uppercase tracking-widest text-white/50 dark:text-black/50 mb-2">On-Chain SHA-256 Record</span>
+                <span className="font-mono text-[10px] text-white dark:text-black break-all text-center leading-relaxed max-w-[90%]">{rec.hash}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PILAR II: EL PROTOCOLO BALLENA MUERTA ─────────────────────────────────────────
+function DeadWhaleProtocolPanel() {
+  return (
+    <div className="bg-[#050505] border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl relative p-8 md:p-10 flex flex-col">
+      <div className="absolute top-0 right-0 p-6">
+        <span className="flex h-2.5 w-2.5 relative">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+        </span>
+      </div>
+      
+      <div className="flex flex-col h-full justify-between gap-12">
+        <div>
+          <span className="inline-flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.3em] text-red-500 mb-6 bg-red-500/10 px-3 py-1.5 rounded-full border border-red-500/20">
+            <Activity size={12} /> Sentinel Active
+          </span>
+          <h3 className="font-sans text-3xl font-black text-white tracking-tight mb-4">Dead Whale Protocol</h3>
+          <p className="text-[13px] text-white/50 leading-[1.9] font-medium">
+            Monitoring the sacred wallets. The 1.1M BTC mined by Satoshi Nakamoto. The 2009 genesis miners. The DAO hacker. 
+            Wallets that haven't moved in a decade. If they breathe, we document it instantly.
+          </p>
+        </div>
+        
+        <div className="pt-6 border-t border-white/10 grid grid-cols-2 gap-6">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2 font-black">Target Wallets</p>
+            <p className="font-mono text-lg font-black text-white">41,892</p>
+          </div>
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2 font-black">Last Awakening</p>
+            <p className="font-mono text-[11px] font-bold text-white uppercase tracking-widest mt-1">July 2023 <span className="opacity-40 ml-1">(11y dormant)</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PILAR III: LA CONSTELACIÓN ──────────────────────────────────────────────────
+function SovereignConstellationPanel() {
+  return (
+    <div className="bg-[#FAF9F6] dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-[2rem] p-10 md:p-14 text-center relative overflow-hidden group col-span-1 md:col-span-2 lg:col-span-1 flex flex-col justify-center items-center">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/[0.04] dark:from-white/[0.05] via-transparent to-transparent opacity-50" />
+      
+      <div className="relative z-10">
+        <div className="w-20 h-20 mx-auto mb-8 bg-black dark:bg-white rounded-full flex items-center justify-center shadow-2xl">
+          <Lock className="text-white dark:text-black" size={28} />
+        </div>
+        
+        <p className="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-black/40 dark:text-white/40 mb-4">The Master Key</p>
+        <h3 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">200 Sovereign<br/>Witnesses</h3>
+        <p className="text-[14px] text-black/60 dark:text-white/60 leading-[1.9] max-w-sm mx-auto mb-10 font-medium">
+          There will only ever be 200 genesis nodes. When the 200th human signs the registry with their geographic coordinates and cryptographic hand-drawn signature, their combined hashes will mathematically generate the <strong>Master Key</strong>. No one knows what it unlocks.
+        </p>
+        
+        <div className="inline-flex items-center gap-6 bg-white dark:bg-[#0A0A0A] py-4 px-8 rounded-full border border-black/10 dark:border-white/10 shadow-lg">
+          <span className="font-mono text-[13px] font-black text-black dark:text-white">74 / 200</span>
+          <span className="w-1.5 h-1.5 bg-black/20 dark:bg-white/20 rounded-full" />
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/50 dark:text-white/50">Witnesses Sealed</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ───────────────────────────────────────────────────────────────
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -611,52 +719,40 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ── GENESIS LEDGER PREVIEW ───────────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02]">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* ── SOVEREIGN MYSTERY DOCTRINE (THE 3 PILLARS) ───────────────────────── */}
+      <section className="py-32 px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02]">
+        <div className="max-w-[1400px] mx-auto">
           <Reveal>
-            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-2xl mx-auto">
-
-              <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
-                The Global Genesis Ledger.
+            <div className="text-center mb-16 max-w-3xl mx-auto">
+              <h2 className="font-sans text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">
+                Not a product.<br/>An event.
               </h2>
-              <p className="text-[14px] text-black/60 dark:text-white/60 mx-auto leading-relaxed font-medium">
-                Every Gold Ticket mint is recorded permanently. Address, timestamp, geolocation, and the user's hand-drawn signature — all stored on-chain and visible to every participant in real time.
+              <p className="text-[14px] text-black/50 dark:text-white/50 leading-[2] font-medium">
+                The market is not something you merely observe; it is something you cryptographically seal. We are building the permanent historical layer of institutional capital movement.
               </p>
             </div>
           </Reveal>
-          <Reveal delay={0.1}>
-            <div className="border border-black/10 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0A0A0A]">
-              <div className="px-6 py-3 border-b border-black/[0.04] dark:border-white/[0.04] grid grid-cols-3 text-[8px] font-mono font-black uppercase tracking-widest text-black/25 dark:text-white/25">
-                <span>Wallet Address</span>
-                <span className="text-center">Timestamp</span>
-                <span className="text-right">Hand-drawn Signature</span>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-fr">
+            {/* Left Column: Akashic Registry */}
+            <Reveal delay={0.1}>
+              <div className="h-full">
+                <AkashicRegistryPanel />
               </div>
+            </Reveal>
 
-              {/* Row — signature shown as drawn PNG thumbnail */}
-              {[
-                { addr: "0x3f91...8D2a", time: "2025-04-08 · 14:22", sig: "M10,45 C20,20 35,15 45,30 C55,45 65,50 80,35 C90,25 100,40 115,30" },
-                { addr: "0xAb12...C33e", time: "2025-04-08 · 11:07", sig: "M10,50 C25,15 40,60 55,30 C70,5 85,55 110,40 C120,35 125,45 135,38" },
-                { addr: "0x77f0...09b1", time: "2025-04-07 · 23:54", sig: "M8,40 Q30,10 55,42 Q78,70 100,35 Q115,18 130,42" },
-              ].map(({ addr, time, sig }, i) => (
-                <div key={i} className="px-6 py-4 border-b border-black/[0.04] dark:border-white/[0.04] grid grid-cols-3 items-center gap-4">
-                  <span className="font-mono text-[11px] font-bold text-black dark:text-white">{addr}</span>
-                  <span className="font-mono text-[10px] text-black/40 dark:text-white/40 text-center">{time}</span>
-                  <div className="flex justify-end">
-                    {/* Simulated hand-drawn signature as SVG path */}
-                    <div className="border border-black/8 dark:border-white/8 bg-white dark:bg-black/40 rounded px-2 py-1" style={{ width: 110, height: 38 }}>
-                      <svg width="100%" height="100%" viewBox="0 0 140 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d={sig} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-black/50 dark:text-white/50" />
-                      </svg>
-                    </div>
-                  </div>
+            {/* Middle Column: Dead Whale Protocol & Master Key */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 lg:col-span-2 gap-6">
+              <Reveal delay={0.15}>
+                <div className="h-full">
+                  <DeadWhaleProtocolPanel />
                 </div>
-              ))}
-
-
+              </Reveal>
+              <Reveal delay={0.2} className="h-full">
+                <SovereignConstellationPanel />
+              </Reveal>
             </div>
-          </Reveal>
-
+          </div>
         </div>
       </section>
 
