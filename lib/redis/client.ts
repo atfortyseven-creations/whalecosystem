@@ -106,7 +106,7 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
     console.log(`[Redis:${config.name || 'Factory'}] 🚀 Initializing legendary connection...`);
 
     const Redis = require('ioredis');
-    return new Redis(REDIS_URL, {
+    const client = new Redis(REDIS_URL, {
         family: 0, // [DNS-FIX] Dual-stack resolution
         keepAlive: 10000, // [STABILITY] Keep-Alive to prevent proxy timeout
         maxRetriesPerRequest: 3, // Relaxed proxy failover queue
@@ -124,6 +124,7 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
                 console.warn(`[Redis:${config.name || 'Client'}] 🔄 Reconnecting on critical error: ${err.message}`);
             }
             return shouldReconnect;
+        }
     });
 
     // [FATAL ERROR SUPPRESSION]
