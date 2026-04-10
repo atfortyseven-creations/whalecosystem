@@ -18,6 +18,7 @@ import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPan
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
 import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
+import { TopWhaleEvents24h }       from '@/components/dashboard/TopWhaleEvents24h';
 
 import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
 import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
@@ -34,6 +35,7 @@ type TabId =
     | 'dashboard'
     | 'watchlist'
     | 'alerts'
+    | 'whale-events'
     | 'multicharts'
     | 'new-pairs'
     | 'gainers'
@@ -73,6 +75,7 @@ export default function WhaleDashboard() {
                         activeTab === 'dashboard'            ? <DashboardErrorBoundary key="dashboard">      <PremiumMatrixStack />   </DashboardErrorBoundary>
                       : activeTab === 'watchlist'            ? <DashboardErrorBoundary key="watchlist">      <WatchlistTable />       </DashboardErrorBoundary>
                       : activeTab === 'alerts'               ? <DashboardErrorBoundary key="alerts">         <AlertsPanel />          </DashboardErrorBoundary>
+                      : activeTab === 'whale-events'         ? <DashboardErrorBoundary key="whale-events">    <TopWhaleEvents24h />    </DashboardErrorBoundary>
                       : activeTab === 'multicharts'          ? <DashboardErrorBoundary key="multicharts">    <PolymarketPanel />      </DashboardErrorBoundary>
                       : activeTab === 'new-pairs'            ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />        </DashboardErrorBoundary>
                       : activeTab === 'gainers'              ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>

@@ -1,14 +1,15 @@
 // schema.prisma
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  // Habilitamos extensiones PostgreSQL nativas para indexación de texto y vectores
-  extensions = [pg_trgm, btree_gin, unaccent]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // NOTE: pg_trgm/btree_gin/unaccent extensions omitted —
+  // Railway PostgreSQL does not guarantee superuser extension access.
+  // Full-text search is handled at the application layer via Prisma fullTextSearchPostgres.
 }
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions", "fullTextSearch", "fullTextIndex"]
+  previewFeatures = ["postgresqlExtensions", "fullTextSearchPostgres"]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

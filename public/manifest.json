@@ -1,24 +1,100 @@
 {
-  "name": "Whale Alert Network - Sovereign AVS",
-  "short_name": "Whale Alert",
-  "description": "The definitive decentralized Sovereign Intelligence Protocol.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#FAF9F6",
-  "theme_color": "#FAF9F6",
-  "orientation": "portrait-primary",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "name": "Whale Alert Network — Sovereign Intelligence Protocol",
+  "short_name": "WhaleAlert",
+  "description": "Institutional-grade on-chain intelligence. Real-time whale telemetry, ZK-verified signals, multi-chain analytics, and decentralized sovereign mesh networking across EVM, Solana, and beyond.",
+  "version": "3.0.0",
   "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+
+  "background_color": "#0a0a0a",
+  "theme_color": "#c8a96e",
+
+  "categories": ["finance", "productivity", "utilities"],
+  "keywords": ["blockchain", "whale", "crypto", "defi", "analytics", "solana", "ethereum", "trading"],
+
   "icons": [
+    { "src": "/icons/icon-48.png",   "sizes": "48x48",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-256.png",  "sizes": "256x256", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/official-whale-monochrome.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+
+  "screenshots": [
     {
-      "src": "/official-whale-monochrome.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/screenshots/desktop-dashboard.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Macro Intelligence Dashboard — Desktop"
     },
     {
-      "src": "/official-whale-monochrome.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/screenshots/mobile-feed.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Real-Time Whale Feed — Mobile"
     }
-  ]
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Live Whale Feed",
+      "short_name": "Feed",
+      "description": "Jump directly to the real-time whale alert stream",
+      "url": "/dashboard?tab=alerts&source=pwa_shortcut",
+      "icons": [{ "src": "/icons/shortcut-feed.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Macro Dashboard",
+      "short_name": "Macro",
+      "description": "Full institutional analytics overview",
+      "url": "/dashboard?source=pwa_shortcut",
+      "icons": [{ "src": "/icons/shortcut-macro.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Leaderboard",
+      "short_name": "Ranking",
+      "description": "Top whale wallets by on-chain volume",
+      "url": "/dashboard?tab=leaderboard&source=pwa_shortcut",
+      "icons": [{ "src": "/icons/shortcut-leaderboard.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Gold Ticket",
+      "short_name": "VIP",
+      "description": "Genesis VIP claim and sovereign identity",
+      "url": "/dashboard?tab=gold-ticket&source=pwa_shortcut",
+      "icons": [{ "src": "/icons/shortcut-gold.png", "sizes": "96x96" }]
+    }
+  ],
+
+  "share_target": {
+    "action": "/api/shared",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+
+  "related_applications": [],
+  "prefer_related_applications": false
 }

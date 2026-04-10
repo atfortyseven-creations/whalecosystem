@@ -134,11 +134,7 @@ try {
     if (IS_EDGE) {
         redisClient = createMockRedis('EdgeRuntime');
     } else if (REDIS_URL || IS_BUILDING) {
-        if (process.env.NODE_ENV === 'production' && !IS_BUILDING) {
-            // [TEMPORARY-FIX] Force mock mode if infrastructure is flaky
-            console.warn('[Redis:Main] ⚠️ Forcing DEGRADED MODE (Mock) for production stability.');
-            redisClient = createMockRedis('ProductionMock');
-        } else if (IS_BUILDING) {
+            if (IS_BUILDING) {
             // Build Phase: provide a safe dummy to satisfy static analysis
             redisClient = {
                 on: () => {},
@@ -150,9 +146,9 @@ try {
                 __isBuildMock: true,
             };
         } else {
-            // Dev: share instance across HMR reloads in Next.js
+            // Dev + Production: share a real ioredis instance across HMR reloads in Next.js
             if (!(global as any).__redisClient) {
-                (global as any).__redisClient = createRedisClient({ name: 'LegendaryDev' });
+                (global as any).__redisClient = createRedisClient({ name: 'Legendary' });
             }
             redisClient = (global as any).__redisClient;
         }
