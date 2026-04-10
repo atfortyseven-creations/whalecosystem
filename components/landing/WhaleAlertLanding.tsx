@@ -160,21 +160,20 @@ function NewsOfTodayPanel() {
 
   return (
     <div
-      className="flex flex-col overflow-hidden"
+      className="flex flex-col overflow-hidden shadow-2xl rounded-2xl"
       style={{
-        width: 272,
+        width: 340,
         maxHeight: 'calc(100vh - 120px)',
         background: 'rgba(250,249,246,0.96)',
         border: '1px solid rgba(0,0,0,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
       }}
     >
       {/* Header */}
       <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
-           className="flex items-center px-4 py-3.5 shrink-0">
-        <span className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-white">
+           className="flex items-center px-5 py-4 shrink-0">
+        <span className="font-mono text-[12px] font-black uppercase tracking-[0.28em] text-white">
           News of Today
         </span>
       </div>
@@ -195,16 +194,16 @@ function NewsOfTodayPanel() {
             className="block px-4 py-3.5 group"
             style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}
           >
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="font-mono text-[8px] font-black uppercase tracking-widest"
+            <div className="flex items-center gap-2 mb-2 w-full">
+              <span className="font-mono text-[10px] font-black uppercase tracking-widest line-clamp-1"
                     style={{ color: 'rgba(0,0,0,0.35)' }}>
                 {art.source}
               </span>
-              <span className="font-mono text-[8px]" style={{ color: 'rgba(0,0,0,0.22)' }}>
+              <span className="font-mono text-[10px] shrink-0" style={{ color: 'rgba(0,0,0,0.22)' }}>
                 {timeAgo(art.date)}
               </span>
             </div>
-            <p className="text-[11px] font-bold text-black leading-snug line-clamp-2
+            <p className="text-[13px] font-bold text-black leading-snug line-clamp-3
                           group-hover:opacity-60 transition-opacity">
               {art.title}
             </p>
@@ -219,10 +218,10 @@ function NewsOfTodayPanel() {
       </div>
 
       {/* Footer CTA */}
-      <div className="shrink-0 px-4 py-2.5"
+      <div className="shrink-0 px-5 py-3"
            style={{ borderTop: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)' }}>
         <a href="/news"
-           className="font-mono text-[8px] font-black uppercase tracking-widest"
+           className="font-mono text-[9px] font-black uppercase tracking-widest"
            style={{ color: 'rgba(0,0,0,0.35)' }}
         >
           Ver todas las noticias →
@@ -235,37 +234,35 @@ function NewsOfTodayPanel() {
 // ── Right Panel: Whale Post iframe ────────────────────────────────────────────
 function WhalePostIframePanel() {
   const [loaded, setLoaded] = React.useState(false);
-  // iframe is 1000px wide, scaled to 232px → scale = 0.232
-  // container height is 500px, iframe height = 500/0.232 ≈ 2155px
-  const SCALE = 0.272;                         // 272px panel / 1000px iframe = 0.272
+  // iframe is 1000px wide, scaled to 340px → scale = 0.34
+  const SCALE = 0.34;
   const IFRAME_W = 1000;
-  const PANEL_H = 560;                          // fixed height — fills most of viewport
+  const PANEL_H = 640;                          // fixed height
   const IFRAME_H = Math.round(PANEL_H / SCALE); // unscaled iframe height
 
   return (
     <div
-      className="flex flex-col overflow-hidden"
+      className="flex flex-col overflow-hidden shadow-2xl rounded-2xl"
       style={{
-        width: 272,
+        width: 340,
         maxHeight: 'calc(100vh - 120px)',
         background: 'rgba(250,249,246,0.96)',
         border: '1px solid rgba(0,0,0,0.12)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
       }}
     >
       {/* Header */}
       <div style={{ background: '#050505', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-           className="flex items-center justify-between px-4 py-3 shrink-0">
-        <span className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-white">
+           className="flex items-center justify-between px-5 py-4 shrink-0">
+        <span className="font-mono text-[12px] font-black uppercase tracking-[0.28em] text-white">
           Whale Post
         </span>
         <a
           href="https://www.humanidfi.com/news"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-[7px] uppercase tracking-widest"
+          className="font-mono text-[9px] uppercase tracking-widest"
           style={{ color: 'rgba(255,255,255,0.40)' }}
         >
           Open ↗
@@ -299,10 +296,10 @@ function WhalePostIframePanel() {
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 px-4 py-2.5"
+      <div className="shrink-0 px-5 py-3"
            style={{ borderTop: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)' }}>
         <a href="/news"
-           className="font-mono text-[8px] font-black uppercase tracking-widest"
+           className="font-mono text-[9px] font-black uppercase tracking-widest"
            style={{ color: 'rgba(0,0,0,0.35)' }}
         >
           Ir a noticias completas →
@@ -351,12 +348,8 @@ export function WhaleAlertLanding() {
         
         {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER — 4K ukiyo-e pattern */}
         <div 
-          className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
+          className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-[length:180px] md:bg-[length:400px] bg-left-top"
           style={{
-             backgroundImage: "url('/patron-cosmico-4k.png')",
-             backgroundRepeat: "repeat",
-             backgroundSize: "auto",
-             backgroundPosition: "top left",
              transform: "translateZ(0)",
              willChange: "transform",
              opacity: 0.72,
@@ -403,17 +396,14 @@ export function WhaleAlertLanding() {
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 40%, rgba(250,249,246,0.3) 100%)" }} />
 
         {/* ── LEFT PANEL: News of Today — screens ≥ 1280px (xl) ——————————— */}
-        {/* NOTE: Using Tailwind xl (1280px) instead of custom 1400px media query.
-             This ensures the panel shows in desktop-mode browsers on tablets/mobile
-             where viewport CSS width is reported correctly regardless of User-Agent. */}
         <div className="absolute z-20 hidden xl:block"
-             style={{ left: 20, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
+             style={{ left: 24, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
           <NewsOfTodayPanel />
         </div>
 
         {/* ── RIGHT PANEL: Whale Post iframe — screens ≥ 1280px (xl) ————————————————————— */}
         <div className="absolute z-20 hidden xl:block"
-             style={{ right: 20, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
+             style={{ right: 24, top: '50%', transform: 'translateY(-50%) translateY(28px)' }}>
           <WhalePostIframePanel />
         </div>
 
@@ -486,24 +476,24 @@ export function WhaleAlertLanding() {
       <DataTicker />
 
       {/* ── ABSTRACT ────────────────────────────────────────────────────────── */}
-      <section className="py-24 px-6">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-24 px-6 relative z-10">
+        <div className="max-w-4xl mx-auto bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-16 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm">
           <Reveal>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-6">The Platform</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-6">The Platform</p>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="font-sans text-3xl md:text-5xl font-black text-black dark:text-white leading-tight tracking-tighter mb-8 max-w-3xl">
               A new standard for blockchain intelligence.
             </h2>
           </Reveal>
-          <div className="grid md:grid-cols-2 gap-8 mt-12">
+          <div className="grid md:grid-cols-2 gap-8 mt-6">
             <Reveal delay={0.1}>
-              <p className="text-[14px] text-black/50 dark:text-white/50 leading-[1.9]">
+              <p className="text-[14px] text-black/60 dark:text-white/60 leading-[1.9] font-medium">
                 Whale Alert Network aggregates real-time on-chain data from every major blockchain — Ethereum, Solana, Bitcoin, and their L2 ecosystems — into a single, unified intelligence terminal. No synthetic data. No delays. Everything is sourced directly from the chain.
               </p>
             </Reveal>
             <Reveal delay={0.15}>
-              <p className="text-[14px] text-black/50 dark:text-white/50 leading-[1.9]">
+              <p className="text-[14px] text-black/60 dark:text-white/60 leading-[1.9] font-medium">
                 Authentication is non-custodial by design. Your wallet signs a cryptographic challenge client-side. The backend verifies it mathematically and never stores your private data. Access is proven, not granted.
               </p>
             </Reveal>
@@ -515,16 +505,18 @@ export function WhaleAlertLanding() {
       <section className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02]">
         <div className="max-w-6xl mx-auto">
           <Reveal>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-3">Terminal Architecture</p>
-            <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
-              Seven operational phases.
-            </h2>
-            <p className="text-[13px] text-black/40 dark:text-white/40 max-w-xl mb-16 leading-relaxed">
-              The terminal is structured into distinct, independent modules. Each phase targets a specific layer of market intelligence.
-            </p>
+            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-3xl mx-auto text-center">
+              <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-3">Terminal Architecture</p>
+              <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
+                Seven operational phases.
+              </h2>
+              <p className="text-[13px] text-black/60 dark:text-white/60 mx-auto max-w-xl leading-relaxed font-medium">
+                The terminal is structured into distinct, independent modules. Each phase targets a specific layer of market intelligence.
+              </p>
+            </div>
           </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.06] dark:bg-white/[0.06]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.06] dark:bg-white/[0.06] shadow-2xl rounded-[2rem] overflow-hidden border border-black/5 dark:border-white/5">
             <div className="bg-[#FAF9F6] dark:bg-[#080808]">
               <PhaseCard number="I" icon={<Activity size={18} />} title="Core Intelligence Dashboard"
                 desc="Real-time whale transactions, dark pool activity, and liquidity events across all major chains. Everything updates via WebSocket — no page refresh needed."
@@ -587,16 +579,18 @@ export function WhaleAlertLanding() {
       {/* ── INFRASTRUCTURE PILLARS ────────────────────────────────────────────── */}
       <section className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05]">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-16">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <Reveal>
-                <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-3">Infrastructure</p>
-                <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-6">
-                  Built to last.<br/>Built to scale.
-                </h2>
-                <p className="text-[13px] text-black/40 dark:text-white/40 leading-relaxed">
-                  The backend is a deterministic system. Every result is reproducible, every transaction verifiable. Nothing relies on a centralized authority.
-                </p>
+                <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-4">Infrastructure</p>
+                  <h2 className="font-sans text-3xl md:text-5xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">
+                    Built to last.<br/>Built to scale.
+                  </h2>
+                  <p className="text-[13px] text-black/60 dark:text-white/60 leading-relaxed font-medium">
+                    The backend is a deterministic system. Every result is reproducible, every transaction verifiable. Nothing relies on a centralized authority.
+                  </p>
+                </div>
               </Reveal>
             </div>
             <div className="space-y-px">
@@ -621,13 +615,15 @@ export function WhaleAlertLanding() {
       <section className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02]">
         <div className="max-w-4xl mx-auto text-center">
           <Reveal>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-4">Cryptographic Signature Log</p>
-            <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-6">
-              The Global Genesis Ledger.
-            </h2>
-            <p className="text-[14px] text-black/45 dark:text-white/45 max-w-xl mx-auto leading-relaxed mb-12">
-              Every Gold Ticket mint is recorded permanently. Address, timestamp, geolocation, and the user's hand-drawn signature — all stored on-chain and visible to every participant in real time.
-            </p>
+            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-2xl mx-auto">
+              <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-4">Cryptographic Signature Log</p>
+              <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
+                The Global Genesis Ledger.
+              </h2>
+              <p className="text-[14px] text-black/60 dark:text-white/60 mx-auto leading-relaxed font-medium">
+                Every Gold Ticket mint is recorded permanently. Address, timestamp, geolocation, and the user's hand-drawn signature — all stored on-chain and visible to every participant in real time.
+              </p>
+            </div>
           </Reveal>
           <Reveal delay={0.1}>
             <div className="border border-black/10 dark:border-white/10 overflow-hidden bg-white dark:bg-[#0A0A0A]">
@@ -835,37 +831,22 @@ export function WhaleAlertLanding() {
         </div>
       </section>
 
-      {/* ── FINAL CTA (DOWNHEAD) ───────────────────────────────────────────────────────── */}
-      <section className="relative py-40 px-6 border-t border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
-        {/* ── MAX-PPI HOKUSAI WAVE BACKGROUND ────────────────────────────────────
-           Uses the user-provided Hokusai wave image.
-           background-size: cover & background-position: bottom center ensures
-           it scales up without breaking aspect ratio, keeping the waves at the bottom.
-           ────────────────────────────────────────────────────────────────────── */}
-        {/* ── 4K DOWNHEAD BACKGROUND: repating ukiyo-e pattern + Hokusai wave bottom layer ── */}
-
+      {/* ── FINAL CTA & FOOTER (DOWNHEAD) ───────────────────────────────────────────────────────── */}
+      <section className="relative pt-40 min-h-[80vh] flex flex-col border-t border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
         {/* Layer 1: Repeating wave pattern at 72% opacity */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-0 pointer-events-none"
+          className="absolute inset-0 z-0 pointer-events-none bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-[length:180px] md:bg-[length:400px] bg-left-top"
           style={{
             transform: "translateZ(0)",
             willChange: "transform",
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden" as any,
-            backgroundImage: "url('/patron-cosmico-4k.png')",
-            backgroundRepeat: "repeat",
-            backgroundSize: "auto",
-            backgroundPosition: "top left",
             opacity: 0.72,
           }}
         />
 
-        {/* Layer 2: Hokusai blue waves perfectly scaled via native img logic */}
-        <img
-          src="/olas-hokusai-4k.png"
-          alt="Hokusai Waves"
-          className="absolute bottom-0 left-0 w-full h-auto z-[2] pointer-events-none select-none"
+        {/* Layer 2: Hokusai blue waves perfectly scaled - replacing cover with 120%_auto to prevent huge zoom on mobile portrait */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-[length:140%_auto] md:bg-[length:100%_auto] bg-no-repeat"
           style={{
             transform: "translateZ(0)",
             willChange: "transform",
@@ -873,54 +854,60 @@ export function WhaleAlertLanding() {
           }}
         />
 
-        {/* Dark mode overlay: hides the light-mode olas in dark mode, keeps pattern */}
-        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.82 }} />
+        {/* Dark mode overlay */}
+        <div className="absolute inset-0 z-[2] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.82 }} />
 
-        <div className="relative z-20 max-w-3xl mx-auto text-center">
-          <Reveal>
-            <div className="relative w-20 h-20 mx-auto mb-10 group">
-                <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:bg-blue-400/40 transition-colors" />
-                <img src="/official-whale-monochrome.png" className="relative w-20 h-20 dark:invert opacity-90 drop-shadow-xl group-hover:scale-105 transition-transform" alt="Whale Logo" />
-            </div>
-            
-            <h2 className="font-sans text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight drop-shadow-sm">
-              The network is live.<br />Connect now.
-            </h2>
-            <p className="text-[14px] font-medium text-black/60 dark:text-white/60 leading-relaxed mb-12 max-w-lg mx-auto">
-              Real data. No placeholders. Every transaction you see on the terminal is sourced directly from the blockchain in real time.
-            </p>
-            <button onClick={handleEntry}
-              className="px-12 py-5 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.3em] text-sm hover:scale-105 active:scale-95 transition-transform shadow-2xl shadow-blue-500/20 flex items-center gap-4 mx-auto border border-white/10">
-              <ArrowRight size={16} />
-              Connect to Terminal
-            </button>
-            <div className="mt-12 flex items-center justify-center gap-8 bg-white/10 dark:bg-black/10 w-max mx-auto px-8 py-3 rounded-full backdrop-blur-md border border-black/5 dark:border-white/5 shadow-inner">
-              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer"
-                 className="flex items-center gap-2 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-all hover:scale-105">
-                <Github size={18} />
-              </a>
-              <span className="text-black/10 dark:text-white/10">|</span>
-              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer"
-                 className="flex items-center gap-2 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-all hover:scale-105">
-                <Twitter size={18} />
-              </a>
+        <div className="relative z-20 flex-grow flex items-center justify-center pb-32 px-4 md:px-6">
+          <Reveal className="w-full flex justify-center mt-10">
+            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md border border-black/10 dark:border-white/10 p-8 md:p-14 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative w-full max-w-3xl text-center">
+              
+              {/* BIG WHALE ON WHITE BUTTON */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-36 md:h-36 bg-white dark:bg-[#111] rounded-full shadow-2xl flex items-center justify-center border border-black/10 dark:border-white/10 z-30 group hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] transition-all">
+                  <img src="/official-whale-monochrome.png" className="w-16 h-16 md:w-20 md:h-20 dark:invert opacity-95 group-hover:scale-110 transition-transform" alt="Whale Logo" />
+              </div>
+
+              <div className="mt-8 md:mt-12">
+                <h2 className="font-sans text-3xl md:text-5xl lg:text-6xl font-black text-black dark:text-white tracking-tighter mb-4 leading-tight drop-shadow-sm">
+                  The network is live.<br />Connect now.
+                </h2>
+                <p className="text-[13px] md:text-[14px] font-medium text-black/60 dark:text-white/60 leading-relaxed mb-10 mx-auto max-w-lg">
+                  Real data. No placeholders. Every transaction you see on the terminal is sourced directly from the blockchain in real time.
+                </p>
+                <button onClick={handleEntry}
+                  className="px-10 md:px-12 py-5 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.25em] text-[11px] md:text-xs hover:scale-105 active:scale-95 transition-transform shadow-2xl flex items-center justify-center gap-4 mx-auto w-full sm:w-auto">
+                  <ArrowRight size={16} />
+                  Connect to Terminal
+                </button>
+              </div>
+
+              <div className="mt-12 flex items-center justify-center gap-6 bg-black/[0.03] dark:bg-white/[0.03] w-max mx-auto px-8 py-3 rounded-full border border-black/5 dark:border-white/5">
+                <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer"
+                   className="text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-all hover:scale-110">
+                  <Github size={16} />
+                </a>
+                <span className="text-black/10 dark:text-white/10">|</span>
+                <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer"
+                   className="text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-all hover:scale-110">
+                  <Twitter size={16} />
+                </a>
+              </div>
             </div>
           </Reveal>
         </div>
-      </section>
 
-      {/* ── FOOTER BAND ─────────────────────────────────────────────────────── */}
-      <div className="relative border-t border-black/[0.06] dark:border-white/[0.06] px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-20">
-        <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-5 h-5 dark:invert opacity-40" alt="" />
-          <span className="font-mono text-[9px] uppercase tracking-widest text-black/25 dark:text-white/25 font-black">
-            Whale Alert Network · Immutable Data · Zero-Trust Verification
+        {/* ── FOOTER BAND INTEGRATED OVER THE WAVES ───────────────────────────────── */}
+        <div className="relative z-20 border-t border-black/10 dark:border-white/10 px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/70 dark:bg-black/70 backdrop-blur-xl mt-auto">
+          <div className="flex items-center gap-3">
+            <img src="/official-whale-monochrome.png" className="w-5 h-5 dark:invert opacity-60" alt="" />
+            <span className="font-mono text-[9px] uppercase tracking-widest text-black/80 dark:text-white/80 font-black drop-shadow-sm">
+              Immutable Data · Zero-Trust Verification · Extreme Precision
+            </span>
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-widest text-black/50 dark:text-white/50 font-bold text-center md:text-right">
+            Privacy by Void. No data stored. All communication is end-to-end verified.
           </span>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-widest text-black/15 dark:text-white/15 font-bold">
-          Privacy by Void. No data stored. All communication is end-to-end verified.
-        </span>
-      </div>
+      </section>
 
       <DynamicCryptoCheckoutModal isOpen={false} onClose={() => {}} />
 
