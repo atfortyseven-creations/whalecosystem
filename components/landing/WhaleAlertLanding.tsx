@@ -353,11 +353,11 @@ export function WhaleAlertLanding() {
         <div 
           className="fixed inset-0 pointer-events-none -z-10 transition-colors duration-300"
           style={{
-             backgroundImage: "url('/wave-pattern-bg.jpg')",
+             backgroundImage: "url('/api/checkpoint-image?name=image%20(2).jpg')",
              backgroundRepeat: "repeat",
-             backgroundSize: "320px 200px",
+             backgroundSize: "600px auto",
              backgroundPosition: "top left",
-             opacity: 0.15
+             opacity: 0.25
           }}
         >
         </div>
@@ -774,11 +774,11 @@ export function WhaleAlertLanding() {
             willChange: "auto",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
-            backgroundImage: "url('/wave-pattern-bg.jpg')",
-            backgroundRepeat: "repeat",
-            backgroundSize: "320px 200px",
+            backgroundImage: "url('/api/checkpoint-image?name=image%20(3).jpg')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "100% auto",
             backgroundPosition: "bottom center",
-            opacity: 0.15,     // Slight opacity if text needs it, but image center is white
+            opacity: 0.6,     // Increased opacity to ensure the downhead wave is clearly visible
             backgroundColor: "#FAF9F6",
           }}
         />
