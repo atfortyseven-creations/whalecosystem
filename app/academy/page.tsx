@@ -44,18 +44,33 @@ export default function AcademyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#020202] text-white/80 font-sans pb-32 pt-28 px-6">
+        <div className="min-h-screen text-black/80 font-sans pb-0 pt-28 relative overflow-x-hidden">
+
+            {/* ── Cosmic background — matches all InstitutionalShell pages ── */}
+            <div
+                className="fixed inset-0 pointer-events-none -z-20 bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
+                style={{
+                    backgroundSize: 'clamp(100px, 25vw, 400px)',
+                    opacity: 0.60,
+                    transform: 'translateZ(0)',
+                    willChange: 'transform',
+                }}
+            />
+            <div className="fixed inset-0 pointer-events-none -z-10 bg-[#FAF9F4]/68" />
+
+            {/* ── Content ── */}
+            <div className="relative z-10 px-6 pb-0">
             <div className="max-w-4xl mx-auto">
                 <div className="mb-16 text-center md:text-left">
-                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-emerald-500/20 text-[10px] font-mono uppercase tracking-[0.2em] font-semibold text-emerald-400 mb-8 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                    <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-black/15 text-[10px] font-mono uppercase tracking-[0.2em] font-semibold text-black/50 mb-8 bg-white/70 shadow-sm backdrop-blur-sm">
                         <GraduationCap size={14} />
                         Whale Academy
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white mb-6 uppercase">
+                    <h1 className="text-4xl md:text-6xl font-black tracking-tight text-black mb-6 uppercase">
                         Sovereign <br className="hidden md:block" />
-                        <span className="text-emerald-500">Intelligence</span> Matrix
+                        <span className="text-black/30">Intelligence</span> Matrix
                     </h1>
-                    <p className="text-lg text-white/50 max-w-2xl leading-relaxed md:border-l-2 md:border-emerald-500/20 md:pl-6">
+                    <p className="text-lg text-black/50 max-w-2xl leading-relaxed md:border-l-2 md:border-black/20 md:pl-6">
                         Theoretical mastery is the prerequisite for deterministic execution. Choose a module below to unlock advanced concepts on decentralized analysis.
                     </p>
                 </div>
@@ -64,20 +79,20 @@ export default function AcademyPage() {
                     {ACADEMY_MODULES.map((mod) => {
                         const isExpanded = expandedId === mod.id;
                         return (
-                            <div key={mod.id} className={`rounded-3xl border transition-all duration-500 overflow-hidden ${isExpanded ? 'border-emerald-500/40 bg-[#0A0A0A]' : 'border-white/5 bg-[#050505] hover:bg-[#080808] hover:border-emerald-500/20'}`}>
+                            <div key={mod.id} className={`rounded-3xl border transition-all duration-500 overflow-hidden ${isExpanded ? 'border-black/20 bg-white/95 shadow-xl' : 'border-black/[0.07] bg-white/70 hover:bg-white/90 hover:border-black/15 shadow-sm'}`}>
                                 <button
                                     onClick={() => toggleModule(mod.id)}
                                     className="w-full text-left p-6 md:p-8 flex items-center justify-between outline-none"
                                 >
                                     <div className="flex-1 pr-6">
-                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tight mb-3 transition-colors ${isExpanded ? 'text-emerald-400' : 'text-white'}`}>
+                                        <h3 className={`text-xl md:text-2xl font-black uppercase tracking-tight mb-3 transition-colors ${isExpanded ? 'text-black' : 'text-black/70'}`}>
                                             {mod.title}
                                         </h3>
-                                        <p className="text-sm font-mono text-white/40 leading-relaxed">
+                                        <p className="text-sm font-mono text-black/40 leading-relaxed">
                                             {mod.desc}
                                         </p>
                                     </div>
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${isExpanded ? 'bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.4)] rotate-180' : 'bg-white/5 text-white/40'}`}>
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${isExpanded ? 'bg-black text-white shadow-lg rotate-180' : 'bg-black/5 text-black/40 border border-black/10'}`}>
                                         <ChevronDown size={20} />
                                     </div>
                                 </button>
@@ -90,29 +105,29 @@ export default function AcademyPage() {
                                             exit={{ height: 0, opacity: 0 }}
                                             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                                         >
-                                            <div className="p-6 md:p-8 pt-0 border-t border-white/5 bg-[#080808]">
+                                            <div className="p-6 md:p-8 pt-0 border-t border-black/[0.06] bg-white/80">
                                                 <div className="mt-8 flex flex-col md:flex-row gap-8">
                                                     <div className="flex-1 space-y-6">
-                                                        <h4 className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                        <h4 className="text-[10px] font-mono text-black/30 uppercase tracking-[0.2em] flex items-center gap-2">
                                                             <BookOpen size={12} /> Class Syllabus Content
                                                         </h4>
-                                                        <p className="text-base text-white/70 leading-relaxed">
+                                                        <p className="text-base text-black/60 leading-relaxed">
                                                             {mod.content}
                                                         </p>
                                                     </div>
                                                     
-                                                    <div className="md:w-72 bg-[#020202] rounded-2xl p-5 border border-white/5 space-y-4">
-                                                        <div className="w-full aspect-video bg-emerald-900/20 rounded-xl border border-emerald-500/20 flex items-center justify-center relative overflow-hidden group cursor-pointer">
-                                                            <div className="absolute inset-0 bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors" />
-                                                            <div className="w-10 h-10 rounded-full bg-emerald-500 text-black flex items-center justify-center z-10 shadow-[0_0_20px_rgba(16,185,129,0.5)] group-hover:scale-110 transition-transform">
+                                                    <div className="md:w-72 bg-white/90 rounded-2xl p-5 border border-black/[0.08] space-y-4 shadow-sm">
+                                                        <div className="w-full aspect-video bg-black/5 rounded-xl border border-black/10 flex items-center justify-center relative overflow-hidden group cursor-pointer">
+                                                            <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors" />
+                                                            <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center z-10 shadow-lg group-hover:scale-110 transition-transform">
                                                                 <Video size={16} className="ml-1" />
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center justify-between text-xs font-mono">
-                                                            <span className="text-white/40 flex items-center gap-1.5"><ChevronRight size={12} /> Duration</span>
-                                                            <span className="text-emerald-400 font-bold">{mod.time}</span>
+                                                            <span className="text-black/40 flex items-center gap-1.5"><ChevronRight size={12} /> Duration</span>
+                                                            <span className="text-black font-bold">{mod.time}</span>
                                                         </div>
-                                                        <button className="w-full py-3 bg-white/5 hover:bg-emerald-500/10 hover:text-emerald-400 text-white/70 font-black text-[10px] tracking-[0.2em] uppercase rounded-xl transition-all border border-transparent hover:border-emerald-500/20">
+                                                        <button className="w-full py-3 bg-black hover:bg-black/80 text-white font-black text-[10px] tracking-[0.2em] uppercase rounded-xl transition-all shadow-sm hover:shadow-md">
                                                             Start Execution
                                                         </button>
                                                     </div>
@@ -126,6 +141,32 @@ export default function AcademyPage() {
                     })}
                 </div>
             </div>
+            </div>
+
+            {/* ── DOWNPAGE: Hokusai wave footer ── */}
+            <div className="relative pt-24 pb-0 overflow-hidden border-t border-black/[0.05] z-10 mt-20">
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0 z-0 pointer-events-none bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
+                    style={{ backgroundSize: 'clamp(100px, 25vw, 400px)', opacity: 0.72, transform: 'translateZ(0)' }}
+                />
+                <div
+                    className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-no-repeat"
+                    style={{ backgroundSize: 'clamp(140%, 60vw + 100%, 100%)', opacity: 0.90, transform: 'translateZ(0)' }}
+                />
+                <div className="relative z-20 border-t border-black/10 px-6 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/65 backdrop-blur-xl mt-48 md:mt-64">
+                    <div className="flex items-center gap-3">
+                        <img src="/official-whale-monochrome.png" className="w-5 h-5 opacity-50" alt="" />
+                        <span className="font-mono text-[9px] uppercase tracking-widest text-black/60 font-black">
+                            Immutable Data · Zero-Trust Verification · Extreme Precision
+                        </span>
+                    </div>
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 font-bold text-center md:text-right">
+                        Privacy by Void · No data stored · All communication is end-to-end verified
+                    </span>
+                </div>
+            </div>
         </div>
     );
+
 }

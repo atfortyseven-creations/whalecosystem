@@ -260,6 +260,45 @@ npm run test:gas
 - [ ] **Protocolo Propio L2**: Chain optimizada para telemetría on-chain de alta frecuencia.
 - [ ] **Integración MiCA**: Plena conformidad con el reglamento europeo de activos digitales.
 - [ ] **Institutional API SLA 99.99%**: Acuerdos de nivel de servicio institucionales con garantías on-chain.
+---
+
+## 🧠 Perfil Requerido: Arquitecto de Sistemas Core (Búsqueda Abierta)
+
+Dada la colosal envergadura técnica, criptográfica y matemática del **Whale Alert Network**, estamos en la búsqueda de un Ingeniero/Arquitecto de Software de élite. El candidato ideal debe poseer la erudición técnica absoluta para construir, depurar y escalar sistemas distribuidos de grado institucional **desde cero y sin la asistencia de modelos de Inteligencia Artificial (LLMs)**. 
+
+Este rol exige un profundo dominio de los fundamentos de las Ciencias de la Computación, requiriendo un perfil que trascienda el desarrollo web tradicional y se adentre en la ingeniería estructural de sistemas asíncronos distribuidos en tiempo real.
+
+### 🔬 Competencias Técnicas Indispensables
+
+1. **Ingeniería de Sistemas Distribuidos y Alta Concurrencia:**
+   - Dominio absoluto del modelo de red puro (Handshakes TCP/IP, WebSockets, SSE). Experiencia sólida arquitectando y consumiendo colas de mensajería persistentes con delivery guarantees (*Redis Streams, Apache Kafka*).
+   - Capacidad matemática para gestionar arquitecturas stateful vs stateless, evadir *race conditions*, y resolver *deadlocks* en memorias compartidas distribuidas a través de clústeres de Nodos (Ej. *Replica Scaling con PgBouncer*).
+
+2. **Criptografía Aplicada y Zero-Trust:**
+   - Comprensión fundacional de Curvas Elípticas (*ECDSA secp256k1*) implementadas a bajo nivel (Node.js/C++). 
+   - Diseño de atestaciones e identidades asimétricas (*Sign-In with Ethereum - SIWE, Nonces, Time-Locks*).
+   - Implementación y diseño pre-compilatorio de Pruebas de Conocimiento Cero (*Zero-Knowledge Proofs*). Dominio académico de zk-SNARKs (Groth16/Plonk) y arquitecturas AVS (Ej: EigenLayer/SnarkJS).
+
+3. **Arquitectura de Base de Datos y Optimización HFT (Terabytes):**
+   - Análisis forense de cuellos de botella mediante *Query Profiling* (*PostgreSQL*).
+   - Diseño geométrico de agrupaciones en disco y memoria (*14+ índices compuestos, B-Tree, particiones GIN*). Capacidad para mantener latencias <5ms en *tablescans* y *joins* mutantes sobre 1TB+ de datos transaccionales.
+
+4. **Infraestructura Blockchain de Baja Latencia (RPC & Mempools):**
+   - Anatomía interna de la *EVM Mempool*, gas limit mechanics, e intercepción de liquidaciones MEV.
+   - Ingeniería de bajo nivel en Solana (RPC): Capacidad para abrir flujos de logs binarios WebSocket y descodificar campos abstractos como *ComputeBudget* (SIMD-0109) en crudo (sub-500ms) evadiendo envolturas high-level ineficientes.
+
+5. **Renderizado Frontend Gráfico de Hardware (Capa de Presentación):**
+   - Mecánica extrema del *Event Loop* del navegador (V8 / SpiderMonkey) y optimización de jerarquías del DOM de React (Next.js 15 SSR/RSC) para evitar los *Garbage Collector stalls*.
+   - Ingeniería visual directa sobre la caché del Compositor de GPU (Zero-Paint Pipelines, *will-change* matrices). Experiencia inmersiva uniendo WebGL (*Three.js, R3F*) con matemáticas vectoriales atadas al scroll del usuario (*GSAP, Lenis*).
+
+6. **DevOps Determinista e Infraestructura Inmutable:**
+   - Gobierno puro contiguo de la red a través de Bash Scripting, Webhooks asíncronos, despliegues dockerizados en nube privada de lata densidad (*Railway Pro, AWS*), y protocolos estables de Fallover-RPC.
+
+### 💡 Perfil Cognitivo Excluyente
+
+Buscamos una mente de ingeniería purista y matemática. Un profesional al que le fascine diseccionar la fluctuación de un latido milisegundo a milisegundo por red óptica global. Alguien capaz de leer fallos abstractos (*stacktraces* anónimos fragmentados) de memoria; alguien cuya extrema resiliencia investigativa, lectura intensa de documentación cruda (RFCs), y lógica constructiva inherente superen por completo cualquier dependencia a la I.A. actual. 
+
+Si operativamente usted es el núcleo de certidumbre en sistemas donde equivocarse es catastrófico, usted es la mente arquitectónica que buscamos.
 
 ---
 

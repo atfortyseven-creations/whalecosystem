@@ -75,10 +75,10 @@ function CanvasNode({
             onPointerDown={onPointerDown}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             style={{ transform: `translate(${node.x}px, ${node.y}px)`, position: 'absolute', top: 0, left: 0 }}
-            className={`w-44 cursor-grab active:cursor-grabbing select-none rounded-xl border bg-[#111] shadow-lg transition-colors z-10 ${
+            className={`w-44 cursor-grab active:cursor-grabbing select-none rounded-xl border shadow-lg transition-all z-10 ${
                 selected
-                    ? 'border-[#a855f7]/70 shadow-[0_0_16px_rgba(168,85,247,0.3)]'
-                    : 'border-white/[0.07] hover:border-white/20'
+                    ? 'border-black/20 shadow-[0_4px_20px_rgba(0,0,0,0.15)] bg-white'
+                    : 'border-black/[0.08] hover:border-black/20 bg-white/90'
             }`}
         >
             {/* Input Anchor (Left) */}
@@ -87,11 +87,11 @@ function CanvasNode({
                 onPointerDown={(e) => onAnchorDragStart(e, node.id, false)}
             />
 
-            <div className="px-3 py-2.5 flex items-center gap-2 border-b border-white/[0.06] pointer-events-none">
-                <div className="text-white/50">
+            <div className="px-3 py-2.5 flex items-center gap-2 pointer-events-none" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                <div className="text-black/40">
                     <NodeIcon type={node.type} size={13} />
                 </div>
-                <span className={`text-xs font-semibold truncate flex-1 ${selected ? 'text-white' : 'text-white/90'}`}>
+                <span className={`text-xs font-semibold truncate flex-1 ${selected ? 'text-black' : 'text-black/80'}`}>
                     {node.title}
                 </span>
                 <Circle
@@ -102,8 +102,8 @@ function CanvasNode({
                 />
             </div>
             <div className="px-3 py-2 flex items-center justify-between pointer-events-none">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-white/30">{node.type}</span>
-                <span className="text-[10px] font-mono text-white/30">{node.latency}ms</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-black/30">{node.type}</span>
+                <span className="text-[10px] font-mono text-black/30">{node.latency}ms</span>
             </div>
 
             {/* Output Anchor (Right) */}
@@ -131,7 +131,7 @@ function ContextMenu({
             <div className="fixed inset-0 z-40" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }} />
             <div
                 style={{ top: y, left: x }}
-                className="fixed z-50 w-52 rounded-xl border border-white/10 bg-[#111]/95 backdrop-blur-xl shadow-2xl overflow-hidden py-1"
+                className="fixed z-50 w-52 rounded-xl border border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-2xl overflow-hidden py-1"
                 onContextMenu={(e) => e.preventDefault()}
             >
                 {!nodeId ? (
@@ -157,7 +157,7 @@ function ContextMenu({
 }
 
 function MenuLabel({ children }: { children: React.ReactNode }) {
-    return <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/30 font-mono">{children}</div>;
+    return <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-black/30 font-mono">{children}</div>;
 }
 
 function MenuItem({ children, onClick, icon, danger }: {
@@ -168,10 +168,10 @@ function MenuItem({ children, onClick, icon, danger }: {
         <button
             onClick={onClick}
             className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors ${
-                danger ? 'text-red-400 hover:bg-red-500/10' : 'text-white/70 hover:bg-white/5 hover:text-white'
+                danger ? 'text-red-500 hover:bg-red-500/10' : 'text-black/70 hover:bg-black/5 hover:text-black'
             }`}
         >
-            <span className="opacity-60">{icon}</span>
+            <span className="opacity-50">{icon}</span>
             {children}
         </button>
     );
@@ -391,22 +391,22 @@ function OperationsCanvas({
 
     if (isLoading) {
         return (
-            <div className="flex-1 flex items-center justify-center bg-[#050505]">
+            <div className="flex-1 flex items-center justify-center" style={{ background: 'transparent' }}>
                 <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 rounded-full border-2 border-[#a855f7] border-t-transparent animate-spin" />
-                    <p className="text-[11px] font-mono text-white/30 uppercase tracking-widest">Loading canvas…</p>
+                    <div className="w-8 h-8 rounded-full border-2 border-black/30 border-t-black animate-spin" />
+                    <p className="text-[11px] font-mono text-black/30 uppercase tracking-widest">Loading canvas…</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="flex-1 relative overflow-hidden bg-[#050505]">
-            {/* Grid background */}
+        <div className="flex-1 relative overflow-hidden" style={{ background: 'transparent' }}>
+            {/* Dot grid — black dots on light background */}
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 0)',
+                    backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 0)',
                     backgroundSize: '32px 32px',
                     backgroundPosition: `${pan.x % 32}px ${pan.y % 32}px`,
                 }}
@@ -414,13 +414,13 @@ function OperationsCanvas({
 
             {/* Top toolbar */}
             <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#111] border border-white/[0.07] text-[10px] font-mono text-white/30">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/90 border border-black/[0.08] text-[10px] font-mono text-black/40 shadow-sm backdrop-blur-sm">
                     <Circle size={5} fill="#4ade80" strokeWidth={0} className="text-[#4ade80]" />
                     {lastSaved ? `Saved ${lastSaved}` : 'Canvas ready'}
                 </div>
                 <button
                     onClick={() => { setPan({ x: 0, y: 0 }); }}
-                    className="px-2.5 py-1.5 rounded-lg bg-[#111] border border-white/[0.07] text-[10px] font-mono text-white/30 hover:text-white/60 hover:border-white/20 transition-colors flex items-center gap-1.5"
+                    className="px-2.5 py-1.5 rounded-lg bg-white/90 border border-black/[0.08] text-[10px] font-mono text-black/40 hover:text-black/70 hover:border-black/20 transition-colors flex items-center gap-1.5 shadow-sm backdrop-blur-sm"
                 >
                     <RefreshCw size={10} /> Reset view
                 </button>
@@ -429,8 +429,8 @@ function OperationsCanvas({
             {/* Empty state */}
             {nodes.length === 0 && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-                    <Plus size={32} className="text-white/10 mb-4" />
-                    <p className="text-[11px] font-mono text-white/20 uppercase tracking-widest">Right-click to add your first node</p>
+                    <Plus size={32} className="text-black/10 mb-4" />
+                    <p className="text-[11px] font-mono text-black/20 uppercase tracking-widest">Right-click to add your first node</p>
                 </div>
             )}
 
@@ -559,13 +559,21 @@ function NodeConfigPanel({ node, onClose, onUpdate }: { node: NodeData; onClose:
     };
 
     return (
-        <aside className="w-80 shrink-0 border-l border-white/[0.06] bg-[#0a0a0a] flex flex-col absolute right-0 top-0 bottom-0 z-30 shadow-2xl">
-            <div className="px-4 py-4 border-b border-white/[0.06] flex items-center justify-between">
+        <aside
+            className="w-80 shrink-0 flex flex-col absolute right-0 top-0 bottom-0 z-30 shadow-2xl"
+            style={{
+                background: 'rgba(250,249,246,0.97)',
+                borderLeft: '1px solid rgba(0,0,0,0.08)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+            }}
+        >
+            <div className="px-4 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                 <div className="flex items-center gap-2">
                     <NodeIcon type={node.type} size={16} />
-                    <span className="font-semibold text-sm text-white/90">Node Config</span>
+                    <span className="font-semibold text-sm text-black/80">Node Config</span>
                 </div>
-                <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-white/80 transition-colors">
+                <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-black/5 text-black/30 hover:text-black/70 transition-colors">
                     <X size={15} />
                 </button>
             </div>
@@ -573,54 +581,53 @@ function NodeConfigPanel({ node, onClose, onUpdate }: { node: NodeData; onClose:
             <div className="flex-1 p-5 overflow-y-auto space-y-6">
                 {/* General Settings */}
                 <div className="space-y-3">
-                    <label className="text-[10px] font-mono uppercase tracking-widest text-white/40">Node Title</label>
-                    <input 
-                        type="text" 
+                    <label className="text-[10px] font-mono uppercase tracking-widest text-black/40">Node Title</label>
+                    <input
+                        type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full bg-[#111] border border-white/[0.07] rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#a855f7]/50" 
+                        className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm text-black outline-none focus:border-black/30 shadow-sm"
                     />
                 </div>
 
                 {/* Specific Settings */}
                 {node.type === 'wallet' && (
                     <div className="space-y-3">
-                        <label className="text-[10px] font-mono uppercase tracking-widest text-white/40">Tracked Address</label>
-                        <input 
-                            type="text" 
+                        <label className="text-[10px] font-mono uppercase tracking-widest text-black/40">Tracked Address</label>
+                        <input
+                            type="text"
                             placeholder="0x..."
                             value={addr}
                             onChange={(e) => setAddr(e.target.value)}
-                            className="w-full bg-[#111] border border-white/[0.07] rounded-lg px-3 py-2.5 text-sm text-white font-mono outline-none focus:border-[#a855f7]/50" 
+                            className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm text-black font-mono outline-none focus:border-black/30 shadow-sm"
                         />
                     </div>
                 )}
 
                 {node.type === 'bot' && (
                     <div className="space-y-3">
-                        <label className="text-[10px] font-mono uppercase tracking-widest text-white/40">Strategy Webhook</label>
-                        <input 
-                            type="text" 
+                        <label className="text-[10px] font-mono uppercase tracking-widest text-black/40">Strategy Webhook</label>
+                        <input
+                            type="text"
                             placeholder="https://api..."
                             value={webhook}
                             onChange={(e) => setWebhook(e.target.value)}
-                            className="w-full border border-white/[0.07] rounded-lg px-3 py-2.5 text-sm text-white font-mono outline-none focus:border-[#a855f7]/50" 
-                            style={{ backgroundColor: '#111' }}
+                            className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm text-black font-mono outline-none focus:border-black/30 shadow-sm"
                         />
                     </div>
                 )}
-                
+
                 {(node.type === 'contract' || node.type === 'api') && (
-                    <div className="p-3 bg-[#a855f7]/10 border border-[#a855f7]/20 rounded-lg">
-                        <p className="text-[11px] text-[#a855f7] leading-relaxed">Advanced config requires institutional tier subscription.</p>
+                    <div className="p-3 bg-black/5 border border-black/10 rounded-lg">
+                        <p className="text-[11px] text-black/60 leading-relaxed">Advanced config requires institutional tier subscription.</p>
                     </div>
                 )}
             </div>
 
-            <div className="p-4 border-t border-white/[0.06]">
+            <div className="p-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
                 <button
                     onClick={handleSave}
-                    className="w-full py-2.5 rounded-lg bg-[#a855f7] text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#b06cf7] transition-colors"
+                    className="w-full py-2.5 rounded-lg bg-black text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
                 >
                     <Save size={15} /> Save Configuration
                 </button>
@@ -679,19 +686,19 @@ function ActivityTab() {
         <div className="flex-1 p-6 overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                    <h2 className="text-sm font-semibold text-white/80">System Activity</h2>
+                    <h2 className="text-sm font-semibold text-black/70">System Activity</h2>
                     {!loading && <span className="flex h-2 w-2 rounded-full bg-[#4ade80] animate-pulse" title="Core Engine Connected"></span>}
                 </div>
-                <button onClick={clearLogs} className="text-[10px] font-mono text-white/30 hover:text-white/60 uppercase tracking-widest px-2 py-1 rounded bg-white/5">
+                <button onClick={clearLogs} className="text-[10px] font-mono text-black/30 hover:text-black/60 uppercase tracking-widest px-2 py-1 rounded bg-black/5">
                     Clear UI Logs
                 </button>
             </div>
             
             {unifiedLogs.length === 0 ? (
-                <div className="text-center text-white/20 text-xs font-mono py-10 border border-dashed border-white/10 rounded-xl flex flex-col items-center gap-2">
+                <div className="text-center text-black/20 text-xs font-mono py-10 border border-dashed border-black/10 rounded-xl flex flex-col items-center gap-2 bg-white/60">
                     {loading ? (
                         <>
-                            <div className="w-4 h-4 border-2 border-[#a855f7] border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
                             Connecting to Engine Database...
                         </>
                     ) : (
@@ -701,16 +708,16 @@ function ActivityTab() {
             ) : (
                 <div className="space-y-1 font-mono text-xs">
                     {unifiedLogs.map(log => {
-                        let colorClass = 'text-white/50';
-                        if (log.type === 'success') colorClass = 'text-[#4ade80]';
-                        if (log.type === 'warning') colorClass = 'text-[#f59e0b]';
-                        if (log.type === 'error') colorClass = 'text-red-400';
-                        if (log.type === 'info') colorClass = 'text-[#38bdf8]';
+                        let colorClass = 'text-black/50';
+                        if (log.type === 'success') colorClass = 'text-emerald-600';
+                        if (log.type === 'warning') colorClass = 'text-amber-600';
+                        if (log.type === 'error') colorClass = 'text-red-500';
+                        if (log.type === 'info') colorClass = 'text-sky-600';
                         
                         return (
-                            <div key={log.id} className="flex items-start gap-3 py-2 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] px-2 rounded transition-colors -mx-2">
-                                <span className="text-white/20 shrink-0 w-16 align-top">{log.time}</span>
-                                <span className={`shrink-0 w-20 text-[9px] uppercase tracking-widest bg-white/[0.03] px-1 py-0.5 rounded text-center ${log.source === 'UI' ? 'text-white/30' : 'text-[#a855f7] border border-[#a855f7]/30'}`}>
+                            <div key={log.id} className="flex items-start gap-3 py-2 border-b border-black/[0.05] last:border-0 hover:bg-black/[0.02] px-2 rounded transition-colors -mx-2">
+                                <span className="text-black/20 shrink-0 w-16 align-top">{log.time}</span>
+                                <span className={`shrink-0 w-20 text-[9px] uppercase tracking-widest bg-black/[0.03] px-1 py-0.5 rounded text-center ${log.source === 'UI' ? 'text-black/30' : 'text-black/60 border border-black/20'}`}>
                                     [{log.source}]
                                 </span>
                                 <span className={`${colorClass} leading-[1.4]`}>{log.msg}</span>
@@ -720,8 +727,7 @@ function ActivityTab() {
                 </div>
             )}
         </div>
-    );
-}
+    );}
 
 // ─────────────────────────────────────────
 // Settings Tab
@@ -831,13 +837,13 @@ function NavItem({ icon, label, active, onClick }: {
             onClick={onClick}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 active
-                    ? 'bg-white/[0.07] text-white'
-                    : 'text-white/40 hover:text-white/70 hover:bg-white/[0.04]'
+                    ? 'bg-black/8 text-black border border-black/10'
+                    : 'text-black/40 hover:text-black/70 hover:bg-black/5'
             }`}
         >
-            <span className={active ? 'text-[#a855f7]' : 'text-current'}>{icon}</span>
+            <span className={active ? 'text-black/70' : 'text-current'}>{icon}</span>
             <span className="font-medium">{label}</span>
-            {active && <ChevronRight size={12} className="ml-auto text-white/20" />}
+            {active && <ChevronRight size={12} className="ml-auto text-black/20" />}
         </button>
     );
 }
@@ -869,13 +875,43 @@ export function DashboardShell() {
     ];
 
     return (
-        <div data-dashboard="true" className="flex text-white" style={{ position: 'fixed', inset: 0, zIndex: 100, width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#080808', color: '#ffffff' }}>
+        <div
+            data-dashboard="true"
+            className="flex text-black"
+            style={{
+                position: 'fixed', inset: 0, zIndex: 100,
+                width: '100vw', height: '100vh', overflow: 'hidden',
+            }}
+        >
+            {/* ── COSMIC PATTERN BACKGROUND ── exact same layer as landing page */}
+            <div
+                className="absolute inset-0 pointer-events-none bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
+                style={{
+                    backgroundSize: 'clamp(100px, 18vw, 320px)',
+                    opacity: 0.55,
+                    zIndex: 0,
+                    transform: 'translateZ(0)',
+                    willChange: 'transform',
+                }}
+            />
+            {/* Light wash so text stays readable */}
+            <div className="absolute inset-0 bg-[#FAF9F4]/70 pointer-events-none" style={{ zIndex: 1 }} />
+            {/* All children above the background */}
+            <div className="relative z-10 flex w-full h-full overflow-hidden" style={{ color: '#0A0A0A' }}>
 
-            {/* ── LEFT SIDEBAR ── */}
-            <aside className="dashboard-shell-aside w-52 shrink-0 flex flex-col">
+            {/* ── LEFT SIDEBAR ── cream glass panel */}
+            <aside
+                className="dashboard-shell-aside w-52 shrink-0 flex flex-col"
+                style={{
+                    background: 'rgba(250,249,246,0.92)',
+                    borderRight: '1px solid rgba(0,0,0,0.08)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                }}
+            >
                 {/* Wordmark */}
-                <div className="px-4 py-4 border-b border-white/[0.06]">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/30">Operations V2</span>
+                <div className="px-4 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-black/40">Operations V2</span>
                 </div>
 
                 {/* Nav */}
@@ -892,11 +928,13 @@ export function DashboardShell() {
                 </nav>
 
                 {/* Bottom Tools */}
-                <div className="p-2 border-t border-white/[0.06] space-y-1">
+                <div className="p-2 space-y-1" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
                     <button
                         onClick={() => setBridgeOpen(v => !v)}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                            bridgeOpen ? 'bg-[#a855f7]/10 text-[#a855f7] border border-[#a855f7]/20' : 'text-white/30 hover:text-white/60 hover:bg-white/[0.04]'
+                            bridgeOpen
+                                ? 'bg-black/10 text-black border border-black/15'
+                                : 'text-black/40 hover:text-black/70 hover:bg-black/5'
                         }`}
                     >
                         <QrCode size={14} />
@@ -905,7 +943,7 @@ export function DashboardShell() {
                     
                     <Link
                         href="/"
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-black/40 hover:text-black/70 hover:bg-black/5 transition-colors"
                     >
                         <Home size={14} />
                         <span className="font-medium text-sm">Terminal Hub</span>
@@ -917,12 +955,20 @@ export function DashboardShell() {
             <div className="flex-1 flex flex-col min-w-0 relative">
 
                 {/* Top bar */}
-                <header className="dashboard-shell-header h-12 shrink-0 flex items-center px-4 gap-3 z-20">
-                    <span className="text-sm font-medium text-white/60">
+                <header
+                    className="dashboard-shell-header h-12 shrink-0 flex items-center px-4 gap-3 z-20"
+                    style={{
+                        background: 'rgba(250,249,246,0.80)',
+                        borderBottom: '1px solid rgba(0,0,0,0.07)',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                    }}
+                >
+                    <span className="text-sm font-medium text-black/50">
                         {navItems.find(n => n.id === tab)?.label}
                     </span>
                     <div className="ml-auto flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">humanidfi.com/dashboard</span>
+                        <span className="text-[10px] font-mono text-black/25 uppercase tracking-widest">humanidfi.com/dashboard</span>
                     </div>
                 </header>
 
@@ -931,9 +977,9 @@ export function DashboardShell() {
                     {tab === 'canvas' && (
                         <>
                             <div className={`flex-1 transition-all duration-300 ${selectedNode ? 'mr-80' : ''}`}>
-                                <OperationsCanvas 
-                                    selectedId={selectedId} 
-                                    setSelectedId={setSelectedId} 
+                                <OperationsCanvas
+                                    selectedId={selectedId}
+                                    setSelectedId={setSelectedId}
                                     nodes={nodes}
                                     setNodes={setNodes}
                                 />
@@ -941,9 +987,9 @@ export function DashboardShell() {
                             
                             {/* Node property slide-over */}
                             {selectedNode && (
-                                <NodeConfigPanel 
-                                    node={selectedNode} 
-                                    onClose={() => setSelectedId(null)} 
+                                <NodeConfigPanel
+                                    node={selectedNode}
+                                    onClose={() => setSelectedId(null)}
                                     onUpdate={handleNodeUpdate}
                                 />
                             )}
@@ -957,13 +1003,21 @@ export function DashboardShell() {
 
             {/* ── DEVICE BRIDGE DRAWER ── */}
             {bridgeOpen && (
-                <aside className="w-72 shrink-0 border-l border-white/[0.06] bg-[#0a0a0a] flex flex-col z-30 shadow-2xl">
-                    <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+                <aside
+                    className="w-72 shrink-0 flex flex-col z-30 shadow-2xl"
+                    style={{
+                        background: 'rgba(250,249,246,0.96)',
+                        borderLeft: '1px solid rgba(0,0,0,0.08)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                    }}
+                >
+                    <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
                         <div>
-                            <p className="text-xs font-semibold text-white/70">Device Bridge</p>
-                            <p className="text-[10px] font-mono text-white/30 mt-0.5">Generate QR on PC → scan on mobile</p>
+                            <p className="text-xs font-semibold text-black/70">Device Bridge</p>
+                            <p className="text-[10px] font-mono text-black/30 mt-0.5">Generate QR on PC → scan on mobile</p>
                         </div>
-                        <button onClick={() => setBridgeOpen(false)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/30 hover:text-white/60 transition-colors">
+                        <button onClick={() => setBridgeOpen(false)} className="p-1.5 rounded-lg hover:bg-black/5 text-black/30 hover:text-black/60 transition-colors">
                             <X size={14} />
                         </button>
                     </div>
@@ -972,6 +1026,7 @@ export function DashboardShell() {
                     </div>
                 </aside>
             )}
+            </div>
         </div>
     );
 }

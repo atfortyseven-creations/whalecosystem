@@ -4,13 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Menu, X, ChevronDown } from 'lucide-react';
-import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { useUIStore } from '@/lib/store/ui-store';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { SystemsUtilityHeader } from './SystemsUtilityHeader';
 import Image from 'next/image';
 import { SplashContainer } from '@/components/shared/SplashContainer';
-import { io } from 'socket.io-client';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 type NavGroup = {
@@ -20,37 +17,19 @@ type NavGroup = {
 
 export function InstitutionalHeader() {
     const pathname = usePathname();
-    const { address: eoaAddress, isConnected } = useSovereignAccount();
-    const { openConnectModal } = useUIStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [engineOnline, setEngineOnline] = useState(false);
-    const [tps, setTps] = useState(0);
-
-    useEffect(() => {
-        const socket = io();
-        socket.on('connect', () => setEngineOnline(true));
-        socket.on('disconnect', () => setEngineOnline(false));
-        socket.on('engine_status', (s: any) => setTps(s.tps));
-        return () => { socket.disconnect(); };
-    }, []);
 
     const navGroups: NavGroup[] = [
         {
             label: "Markets",
             links: [
-                { href: '/dashboard', label: 'Macro Dashboard' },
-                { href: '/multicharts', label: 'Liquidity Multicharts' },
-                { href: '/watchlist', label: 'Institutional Watchlist' },
-                { href: '/volatility', label: 'Volatility Matrix' }
+                { href: '/dashboard', label: 'Macro Dashboard' }
             ]
         },
         {
             label: "Intelligence",
             links: [
-                { href: '/network', label: 'Sovereign Intelligence' },
-                { href: '/news', label: 'Global Market Feeds' },
-                { href: '/zk-explorer', label: 'Aztec ZK Explorer' },
-                { href: '/api-terminal', label: 'Terminal API' }
+                { href: '/news', label: 'Global Market Feeds' }
             ]
         },
         {

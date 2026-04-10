@@ -347,12 +347,14 @@ export function WhaleAlertLanding() {
     <div ref={containerRef} className="relative w-full overflow-x-hidden text-black dark:text-white font-sans transition-colors duration-300">
         
         {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER — 4K ukiyo-e pattern */}
+        {/* Mobile: 120px tile — tight enough to feel like texture, not zoom. Desktop: 400px wide for full artwork fidelity */}
         <div 
-          className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-[length:180px] md:bg-[length:400px] bg-left-top"
+          className="fixed inset-0 pointer-events-none -z-20 bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
           style={{
-             transform: "translateZ(0)",
-             willChange: "transform",
-             opacity: 0.72,
+            backgroundSize: 'clamp(100px, 25vw, 400px)',
+            transform: "translateZ(0)",
+            willChange: "transform",
+            opacity: 0.72,
           }}
         />
 
@@ -678,29 +680,35 @@ export function WhaleAlertLanding() {
           <div className="space-y-16 text-[14px] text-black/60 dark:text-white/60 leading-[2.2] font-medium tracking-wide">
             
             <Reveal delay={0.1}>
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4 mb-6">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">00</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">PROTOCOL ABSTRACT</span>
               </div>
               <p>
-                <strong>Whale Alert Network</strong> es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red soberana (Sovereign Mesh) para proporcionar una capa de conocimiento sin precedentes sobre los movimientos de capital cripto a gran escala.
+                <strong className="text-black dark:text-white">Whale Alert Network</strong> is an institutional-grade on-chain intelligence platform that synthesizes real-time telemetry, multi-chain analysis, and a decentralized sovereign peer-to-peer network protocol — the Sovereign Mesh — to provide an unprecedented layer of knowledge over large-scale cryptographic capital movements. The platform does not aggregate data from secondary providers. Every signal originates from direct blockchain state observation: from raw RPC streams, mempool intercepts, and log subscription feeds maintained by a globally distributed set of sovereign sentinel nodes.
               </p>
               <p className="mt-4">
-                El sistema procesa y analiza transacciones de alto valor (ballenas) a través de múltiples redes blockchain simultáneamente, aplicando filtros criptográficos ZK, correlaciones temporales de señales y algoritmos de puntuación Z-score propietarios, todo con latencias de sub-500ms.
+                The system processes and analyzes high-value transactions across Solana, Ethereum, BNB Chain, Arbitrum, Base, Polygon, and Optimism simultaneously — applying proprietary Zero-Knowledge cryptographic filters, temporal signal cross-correlations, and Z-score deviation algorithms, all at sub-500ms end-to-end latency from transaction broadcast to terminal display. No intermediary. No API aggregator. No delayed data feed. The network is the sensor.
               </p>
-              <blockquote className="mt-6 border-l-2 border-black/20 dark:border-white/20 pl-6 italic opacity-80">
-                "El conocimiento del mercado más poderoso no es el que puedes comprar. Es el que el mercado emite y nadie más puede leer."
+              <p className="mt-4">
+                The architecture is built on a foundational axiom: <strong className="text-black dark:text-white">market intelligence is not a product — it is a consequence of direct observation at the protocol level.</strong> Centralized intelligence platforms rely on third-party data providers, introducing latency, selection bias, and censorship vectors. Whale Alert Network eliminates all three by positioning sovereign sentinel nodes at the earliest measurable point in the transaction lifecycle: the mempool, at the moment of broadcast, before any block confirmation.
+              </p>
+              <blockquote className="mt-8 border-l-2 border-black/20 dark:border-white/20 pl-6 italic opacity-80 text-[15px]">
+                "The most powerful market knowledge is not what you can buy. It is what the market itself emits — and what no one else can read."
               </blockquote>
             </Reveal>
 
-            <Reveal delay={0.2}>
-              <div className="flex items-center gap-4 mb-4">
+            <Reveal delay={0.15}>
+              <div className="flex items-center gap-4 mb-6">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">01</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">ARQUITECTURA DEL SISTEMA</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">SYSTEM ARCHITECTURE</span>
               </div>
-              <pre className="bg-black/5 dark:bg-white/5 p-6 rounded-xl font-mono text-[10px] md:text-[11px] overflow-x-auto whitespace-pre text-black/80 dark:text-white/80">
+              <p>
+                The Whale Alert Network architecture is organized into four sovereign layers: the Presentation Layer (Next.js 15 rendering engine with Server Components), the Intelligence Core (real-time signal processing and 6-aggregator pre-computation), the Data Infrastructure (Redis Streams, PostgreSQL 1TB, PgBouncer pooling), and the Cryptographic Validation Layer (ECDSA Mesh signatures, Groth16 ZK Proofs, EigenLayer AVS registration). Each layer operates with strict interface contracts and is independently scalable and replaceable without affecting system uptime.
+              </p>
+              <pre className="bg-black/5 dark:bg-white/5 p-6 rounded-xl font-mono text-[10px] md:text-[11px] overflow-x-auto whitespace-pre text-black/80 dark:text-white/80 mt-6">
 {`┌─────────────────────────────────────────────────────────────────┐
 │                    WHALE ALERT NETWORK v3.0                     │
 ├─────────────────┬───────────────────┬───────────────────────────┤
@@ -715,29 +723,21 @@ export function WhaleAlertLanding() {
 ├─────────────────┴───────────────────┴───────────────────────────┤
 │                    INFRASTRUCTURE LAYER                         │
 │                                                                 │
-│  Railway Pro (42 réplicas · 1TB Storage · 1000 vCPU)            │
+│  Railway Pro (42 réplicas · 1TB Storage · 1000 vCPU)           │
 │  Docker Compose (web + worker-solana + worker-mesh)             │
 │  GitHub Actions CI → Railway Auto-Deploy                        │
-│  Global RPC Router (6 endpoints · Auto-Failover)                │
+│  Global RPC Router (6 endpoints · Auto-Failover)               │
 └─────────────────────────────────────────────────────────────────┘`}
               </pre>
+              <p className="mt-6">
+                The system is deployed on Railway Pro across 42 simultaneous stateless replicas, all connected through a PgBouncer connection pool capped at 5 concurrent connections per replica — protecting the PostgreSQL 1TB instance from pool exhaustion under full horizontal load. Any replica can be destroyed and respawned at any moment without data loss or session interruption. All persistent state is externalized to the PostgreSQL and Redis layers; no replica stores anything locally beyond its ephemeral in-memory ECDSA node key.
+              </p>
             </Reveal>
 
-            <Reveal delay={0.3}>
-              <div className="flex items-center gap-4 mb-4">
+            <Reveal delay={0.2}>
+              <div className="flex items-center gap-4 mb-6">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">02</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">STACK TÉCNICO COMPLETO</span>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-8 mt-6">
-                <div>
-                  <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-4">Frontend</h4>
-                  <ul className="space-y-3 text-[13px]">
-                    <li><strong className="text-black dark:text-white">Next.js 15</strong> (App Router) - SSR/SSG/Streaming</li>
-                    <li><strong className="text-black dark:text-white">TypeScript 5.7</strong> - Tipado estricto</li>
-                    <li><strong className="text-black dark:text-white">Three.js + R3F</strong> - Renderizado 3D</li>
-                    <li><strong className="text-black dark:text-white">GSAP 3 + Framer Motion</strong> - Animaciones alta performance</li>
                     <li><strong className="text-black dark:text-white">Wagmi + Viem</strong> - Conexión Web3</li>
                   </ul>
                 </div>
@@ -833,21 +833,24 @@ export function WhaleAlertLanding() {
 
       {/* ── FINAL CTA & FOOTER (DOWNHEAD) ───────────────────────────────────────────────────────── */}
       <section className="relative pt-40 min-h-[80vh] flex flex-col border-t border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
-        {/* Layer 1: Repeating wave pattern at 72% opacity */}
+        {/* ── Layer 1: Same cosmic ukiyo-e pattern as the landing hero — mobile gets clamp-based tile size */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-0 pointer-events-none bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-[length:180px] md:bg-[length:400px] bg-left-top"
+          className="absolute inset-0 z-0 pointer-events-none bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
           style={{
+            backgroundSize: 'clamp(100px, 25vw, 400px)',
             transform: "translateZ(0)",
             willChange: "transform",
             opacity: 0.72,
           }}
         />
 
-        {/* Layer 2: Hokusai blue waves perfectly scaled - replacing cover with 120%_auto to prevent huge zoom on mobile portrait */}
+        {/* ── Layer 2: Hokusai blue waves — progressively scaled per viewport so mobile portrait never zooms grotesquely */}
+        {/* 200% on xs → 160% on sm → 140% on md → 100% on lg+ */}
         <div
-          className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-[length:140%_auto] md:bg-[length:100%_auto] bg-no-repeat"
+          className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-no-repeat"
           style={{
+            backgroundSize: 'clamp(140%, 60vw + 100%, 100%)',
             transform: "translateZ(0)",
             willChange: "transform",
             opacity: 0.92,
