@@ -59,11 +59,13 @@ const nextConfig = {
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
     reactStrictMode: true,
-    swcMinify: true,
+    // swcMinify: REMOVED — always enabled by default in Next.js 15
+
+    // Moved from experimental in Next.js 15
+    serverExternalPackages: ['@prisma/client', 'prisma', 'ioredis', 'neo4j-driver', 'snarkjs'],
 
     experimental: {
         optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber'],
-        serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
     },
 
     typescript: {

@@ -3,22 +3,22 @@ import { PrismaClient } from '@prisma/client';
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
 // [ESTABILIDAD CÓSMICA] Prisma Singleton for Massive Multi-Replica Deployments
-// Extracts standard DATABASE_URL to inject pgBouncer params preventing connection exhaustion.
+// PgBouncer injection at runtime only — never at build time.
+// During `next build`, DATABASE_URL is not injected by Railway, so we must
+// fall back to the default env-based resolution to avoid PrismaClientConstructorValidationError.
 
-function getPooledDatabaseUrl() {
+function getProductionUrl(): string | undefined {
     const rawUrl = process.env.DATABASE_URL;
+    // If not set (build time), return undefined — Prisma will use its own env detection
     if (!rawUrl) return undefined;
-    
-    // Si ya trae poolers, retornarla tal cual
+    // If already pooled, use as-is
     if (rawUrl.includes('pgbouncer=true')) return rawUrl;
 
     try {
         const urlObj = new URL(rawUrl);
-        // Si no estamos en Supabase o un protocolo extraño (solo psql estándar), inyectamos límites de seguridad.
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
             urlObj.searchParams.set('pgbouncer', 'true');
             if (!urlObj.searchParams.has('connection_limit')) {
-                // Al escalar a 42-100 réplicas, limitar cada contenedor a 5 conexiones para no colapsar pgBouncer.
                 urlObj.searchParams.set('connection_limit', '5');
             }
         }
@@ -28,15 +28,23 @@ function getPooledDatabaseUrl() {
     }
 }
 
-export const prisma =
-    globalForPrisma.prisma ??
-    new PrismaClient({
-        datasources: {
-            db: {
-                url: process.env.NODE_ENV === 'production' ? getPooledDatabaseUrl() : process.env.DATABASE_URL,
-            },
-        },
+function createPrismaClient(): PrismaClient {
+    // Only inject custom datasource URL when we actually have one at runtime.
+    // At build time, let Prisma handle env resolution itself.
+    const url = process.env.NODE_ENV === 'production' ? getProductionUrl() : undefined;
+
+    if (url) {
+        return new PrismaClient({
+            datasources: { db: { url } },
+            log: ['error'],
+        });
+    }
+
+    return new PrismaClient({
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
     });
+}
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 globalForPrisma.prisma = prisma;
