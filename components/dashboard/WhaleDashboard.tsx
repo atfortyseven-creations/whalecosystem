@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 
 // ── Internal panels ───────────────────────────────────────────────────────────
 import { PremiumMatrixStack }      from '@/components/premium/PremiumMatrixStack';
-import PolymarketPanel             from '@/components/dashboard/PolymarketPanel';
+import { InstitutionalQuantChart }   from '@/components/premium/InstitutionalQuantChart';
 import { LivePortfolio }           from '@/components/premium/LivePortfolio';
 import { WatchlistTable }          from '@/components/dashboard/WatchlistTable';
 import { NewPairsTable }           from '@/components/dashboard/NewPairsTable';
@@ -18,7 +17,6 @@ import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPan
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
 import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
 import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
-import { TopWhaleEvents24h }       from '@/components/dashboard/TopWhaleEvents24h';
 
 import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
 import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
@@ -28,6 +26,7 @@ import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
 import { SovereignVault }          from '@/components/dashboard/SovereignVault';
 import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
 import PortfolioDashboard          from '@/components/dashboard/PortfolioDashboard';
+import { VirtualizedFirehose }     from '@/components/premium/VirtualizedFirehose';
 
 import "@/app/dashboard/dashboard.css";
 
@@ -62,40 +61,30 @@ export default function WhaleDashboard() {
             onTabChange={(id: string) => setActiveTab(id as TabId)}
             isExternalEmbed={false}
         >
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="w-full h-full flex flex-col"
-                >
-                    {
-                        activeTab === 'dashboard'            ? <DashboardErrorBoundary key="dashboard">      <PremiumMatrixStack />   </DashboardErrorBoundary>
-                      : activeTab === 'watchlist'            ? <DashboardErrorBoundary key="watchlist">      <WatchlistTable />       </DashboardErrorBoundary>
-                      : activeTab === 'alerts'               ? <DashboardErrorBoundary key="alerts">         <AlertsPanel />          </DashboardErrorBoundary>
-                      : activeTab === 'whale-events'         ? <DashboardErrorBoundary key="whale-events">    <TopWhaleEvents24h />    </DashboardErrorBoundary>
-                      : activeTab === 'multicharts'          ? <DashboardErrorBoundary key="multicharts">    <PolymarketPanel />      </DashboardErrorBoundary>
-                      : activeTab === 'new-pairs'            ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />        </DashboardErrorBoundary>
-                      : activeTab === 'gainers'              ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
-                      : activeTab === 'whale-portfolio'      ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />       </DashboardErrorBoundary>
-                      : activeTab === 'news'                 ? <DashboardErrorBoundary key="news">           <NewsOfToday />          </DashboardErrorBoundary>
-                      : activeTab === 'omni-explorer'        ? <DashboardErrorBoundary key="omni-explorer">  <OmniExplorer />         </DashboardErrorBoundary>
-                      : activeTab === 'api'                  ? <DashboardErrorBoundary key="api">            <ApiTerminal />          </DashboardErrorBoundary>
-                      : activeTab === 'portfolio'            ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />        </DashboardErrorBoundary>
-                      : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
-                      : activeTab === 'brc-explorer'         ? <DashboardErrorBoundary key="brc">            <BRCExplorerShell />     </DashboardErrorBoundary>
-                      : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
-                      : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <PortfolioDashboard />   </DashboardErrorBoundary>
-                      : activeTab === 'gold-ticket'          ? <DashboardErrorBoundary key="gold">           <GoldTicketPanel />      </DashboardErrorBoundary>
-                      : activeTab === 'zk-shield'            ? <DashboardErrorBoundary key="zk-shield">      <ZKShieldStation />      </DashboardErrorBoundary>
-                      : activeTab === 'neural-graph'         ? <DashboardErrorBoundary key="neural-graph">   <EntityGraphVis />       </DashboardErrorBoundary>
-                      : activeTab === 'sovereign-vault'      ? <DashboardErrorBoundary key="sov-vault">      <SovereignVault />       </DashboardErrorBoundary>
-                      : null
-                    }
-                </motion.div>
-            </AnimatePresence>
+            {/* Unified switch — WhaleProShell handles the AnimatePresence internally */}
+            {
+                activeTab === 'dashboard'            ? <DashboardErrorBoundary key="dashboard">      <PremiumMatrixStack />   </DashboardErrorBoundary>
+              : activeTab === 'watchlist'            ? <DashboardErrorBoundary key="watchlist">      <WatchlistTable />       </DashboardErrorBoundary>
+              : activeTab === 'alerts'               ? <DashboardErrorBoundary key="alerts">         <AlertsPanel />          </DashboardErrorBoundary>
+              : activeTab === 'whale-events'         ? <DashboardErrorBoundary key="whale-events">    <VirtualizedFirehose />  </DashboardErrorBoundary>
+              : activeTab === 'multicharts'          ? <DashboardErrorBoundary key="multicharts">    <div className="w-full max-w-6xl mx-auto p-4 md:p-8 bg-[#020202] rounded-2xl border border-white/8"><InstitutionalQuantChart /></div> </DashboardErrorBoundary>
+              : activeTab === 'new-pairs'            ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />        </DashboardErrorBoundary>
+              : activeTab === 'gainers'              ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
+              : activeTab === 'whale-portfolio'      ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />       </DashboardErrorBoundary>
+              : activeTab === 'news'                 ? <DashboardErrorBoundary key="news">           <NewsOfToday />          </DashboardErrorBoundary>
+              : activeTab === 'omni-explorer'        ? <DashboardErrorBoundary key="omni-explorer">  <OmniExplorer />         </DashboardErrorBoundary>
+              : activeTab === 'api'                  ? <DashboardErrorBoundary key="api">            <ApiTerminal />          </DashboardErrorBoundary>
+              : activeTab === 'portfolio'            ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />        </DashboardErrorBoundary>
+              : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
+              : activeTab === 'brc-explorer'         ? <DashboardErrorBoundary key="brc">            <BRCExplorerShell />     </DashboardErrorBoundary>
+              : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
+              : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <PortfolioDashboard />   </DashboardErrorBoundary>
+              : activeTab === 'gold-ticket'          ? <DashboardErrorBoundary key="gold">           <GoldTicketPanel />      </DashboardErrorBoundary>
+              : activeTab === 'zk-shield'            ? <DashboardErrorBoundary key="zk-shield">      <ZKShieldStation />      </DashboardErrorBoundary>
+              : activeTab === 'neural-graph'         ? <DashboardErrorBoundary key="neural-graph">   <EntityGraphVis />       </DashboardErrorBoundary>
+              : activeTab === 'sovereign-vault'      ? <DashboardErrorBoundary key="sov-vault">      <SovereignVault />       </DashboardErrorBoundary>
+              : null
+            }
         </WhaleProShell>
     );
 }

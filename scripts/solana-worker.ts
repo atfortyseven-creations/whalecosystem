@@ -51,15 +51,30 @@ async function interceptThermodynamicAnomalies() {
         console.warn(`[SOLANA] RPC endpoint failed. Router will route to next healthy node.`);
     });
 
-    // Subscribe ONLY to transactions touching the ComputeBudget program
-    const filter: LogsFilter = {
-        mentions: [COMPUTE_BUDGET_PROGRAM.toBase58() as any]
-    };
+    // ── RPC PROTOCOL FIX ────────────────────────────────────────────────────────
+    // The 'mentions' filter with native system programs (ComputeBudget et al.) is
+    // rejected by most RPC nodes with code -32602 'Invalid mentions provided'.
+    // Native programs are blocklisted at the subscription layer.
+    //
+    // Solution: use the universal 'all' filter and apply program checks inside the
+    // callback. Functionally identical; universally accepted by all RPC providers.
+    const filter: LogsFilter = 'all';
 
     console.log(`[SOLANA] 🔊 Subscribing to ComputeBudget logs (Processed Commitment)...`);
 
     connection.onLogs(filter, async (logs, ctx) => {
         if (logs.err || !logs.logs || !Array.isArray(logs.logs)) return;
+
+        // Application-layer filter: skip transactions that didn't invoke ComputeBudget.
+        // This replaces the broken 'mentions' RPC filter which rejects native programs.
+        const touchesComputeBudget = logs.logs.some(
+            l => typeof l === 'string' && l.includes(COMPUTE_BUDGET_PROGRAM.toBase58())
+        );
+        // Also catch by log content — some RPCs don't show full program invocations
+        const hasComputeUnitPrice = logs.logs.some(
+            l => typeof l === 'string' && l.includes('SetComputeUnitPrice')
+        );
+        if (!touchesComputeBudget && !hasComputeUnitPrice) return;
 
         // Fast regex parse to find the exact SetComputeUnitPrice instruction
         const priceLog = logs.logs.find(l => typeof l === 'string' && l.includes('SetComputeUnitPrice'));

@@ -7,7 +7,7 @@ import {
     TrendingUp, Code, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, ShieldAlert, Newspaper, LifeBuoy,
-    GraduationCap, Crown, PieChart, Briefcase, Network
+    GraduationCap, Crown, PieChart, Briefcase, Network, Eye
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -26,10 +26,10 @@ interface NavItem {
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Markets ──
     { id: 'dashboard',       label: 'Dashboard',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Markets' },
-    { id: 'watchlist',       label: 'Watchlist',         icon: <Star size={17}/>,            badge: 'Pro' },
-    { id: 'alerts',          label: 'Alerts',            icon: <Bell size={17}/> },
-    { id: 'whale-events',    label: 'Top Whales 24h',    icon: <TrendingUp size={17}/>,       badge: 'LIVE', badgeColor: '#D4AF37' },
-    { id: 'multicharts',     label: 'Multicharts',       icon: <BarChart2 size={17}/> },
+    { id: 'watchlist',       label: 'Tactical Watchlist',icon: <Eye size={17}/> },
+    { id: 'alerts',          label: 'Smart Alerts',      icon: <Bell size={17}/> },
+    { id: 'whale-events',    label: 'Global Firehose',   icon: <TrendingUp size={17}/>,       badge: 'LIVE', badgeColor: '#D4AF37' },
+    { id: 'multicharts',     label: 'Quant Charts',      icon: <BarChart2 size={17}/>,       badge: 'NEW', badgeColor: '#00FF55' },
     { id: 'new-pairs',       label: 'New Pairs',         icon: <Zap size={17}/>,              badge: 'Live', badgeColor: '#00C076' },
     { id: 'gainers',         label: 'Gainers & Losers',  icon: <TrendingUp size={17}/> },
     // ── Intelligence ──

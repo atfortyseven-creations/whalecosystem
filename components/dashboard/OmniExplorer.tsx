@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Search, Activity, Box, ArrowRight, Clock, ShieldCheck, AlignLeft, Loader2, AlertCircle } from "lucide-react";
 import { usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
+import { OmniMatrixCanvas } from '@/components/3d/OmniMatrixCanvas';
 
 export function OmniExplorer() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -90,12 +91,15 @@ export function OmniExplorer() {
     };
 
     return (
-        <div className="min-h-full w-full bg-[#000000] text-[#FFFFFF] font-mono p-4 md:p-8 flex flex-col gap-12 selection:bg-[#00FF55] selection:text-black overflow-y-auto">
+        <div className="relative min-h-full w-full font-mono p-4 md:p-8 flex flex-col gap-12 selection:bg-[#00FF55] selection:text-black overflow-hidden bg-[#020202]">
             
-            {/* Header / Search Area */}
-            <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-12 pb-8 gap-8">
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">
+            <OmniMatrixCanvas />
+
+            <div className="relative z-10 w-full h-full overflow-y-auto flex flex-col gap-12 custom-scrollbar">
+                {/* Header / Search Area */}
+                <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-12 pb-8 gap-8">
+                    <div className="text-center space-y-4">
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white drop-shadow-lg">
                         OMNICHAIN <span className="text-[#00FF55]">EXPLORER</span>
                     </h1>
                     <p className="text-[11px] text-[#888888] tracking-[0.2em] uppercase max-w-2xl">
@@ -130,14 +134,14 @@ export function OmniExplorer() {
 
                 {/* Search Results Panel */}
                 {searchError && (
-                    <div className="w-full border border-[#FF3B30]/40 bg-[#FF3B30]/5 p-4 flex items-center gap-3">
+                    <div className="w-full border border-[#FF3B30]/40 bg-[#FF3B30]/10 backdrop-blur-md p-4 flex items-center gap-3 shadow-2xl">
                         <AlertCircle size={16} className="text-[#FF3B30] shrink-0" />
                         <span className="text-[11px] text-[#FF3B30] uppercase tracking-widest">{searchError}</span>
                     </div>
                 )}
                 {searchResults !== null && (
-                    <div className="w-full border border-[#222222] bg-[#020202]">
-                        <div className="flex items-center justify-between p-4 border-b border-[#222222] bg-[#050505]">
+                    <div className="w-full border border-[#222222]/50 bg-[#020202]/80 backdrop-blur-xl shadow-2xl">
+                        <div className="flex items-center justify-between p-4 border-b border-[#222222]/50 bg-[#050505]/80">
                             <div className="flex items-center gap-3">
                                 <Search size={14} className="text-[#00FF55]" />
                                 <h2 className="text-[12px] font-black uppercase tracking-widest">
@@ -177,11 +181,11 @@ export function OmniExplorer() {
             </div>
 
             {/* Matrix Data Grids */}
-            <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
                 
                 {/* LATEST BLOCKS TABLE */}
-                <div className="border border-[#222222] bg-[#020202]">
-                    <div className="flex items-center justify-between p-4 border-b border-[#222222] bg-[#050505]">
+                <div className="border border-[#222222]/50 bg-[#020202]/80 backdrop-blur-xl shadow-2xl">
+                    <div className="flex items-center justify-between p-4 border-b border-[#222222]/50 bg-[#050505]/80">
                         <div className="flex items-center gap-3">
                             <Box size={16} className="text-[#00FF55]" />
                             <h2 className="text-[12px] font-black uppercase tracking-widest text-[#FFFFFF]">LATEST BLOCKS</h2>
@@ -226,8 +230,8 @@ export function OmniExplorer() {
                 </div>
 
                 {/* LATEST MASSIVE TXS TABLE */}
-                <div className="border border-[#222222] bg-[#020202]">
-                    <div className="flex items-center justify-between p-4 border-b border-[#222222] bg-[#050505]">
+                <div className="border border-[#222222]/50 bg-[#020202]/80 backdrop-blur-xl shadow-2xl">
+                    <div className="flex items-center justify-between p-4 border-b border-[#222222]/50 bg-[#050505]/80">
                         <div className="flex items-center gap-3">
                             <Activity size={16} className="text-[#00FF55]" />
                             <h2 className="text-[12px] font-black uppercase tracking-widest text-[#FFFFFF]">LATEST LARGE TRANSACTIONS</h2>
@@ -277,11 +281,12 @@ export function OmniExplorer() {
             </div>
 
              {/* Footer Info */}
-             <div className="text-center pt-8 pb-4">
-                 <p className="text-[9px] text-[#555555] font-mono tracking-[0.3em] uppercase">
-                     UPDATED IN REAL-TIME
+             <div className="text-center pt-8 pb-4 opacity-50">
+                 <p className="text-[9px] text-[#FFFFFF] font-mono tracking-[0.3em] uppercase">
+                     POWERED BY ZERO-KNOWLEDGE PROOFS
                  </p>
              </div>
+            </div>
         </div>
     );
 }

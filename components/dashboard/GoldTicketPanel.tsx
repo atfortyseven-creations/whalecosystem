@@ -410,7 +410,7 @@ export function GoldTicketPanel() {
   }
 
   // ── ALREADY HOLDS TICKET ─────────────────────────────────────────────────────
-  if (hasTicket || isConfirmed) {
+  if (hasTicket || isConfirmed || dbStats?.ticket) {
     return (
       <div className="w-full max-w-5xl mx-auto space-y-6 py-8">
         {/* Verified Banner */}
@@ -421,7 +421,7 @@ export function GoldTicketPanel() {
           <div className="flex items-center gap-3">
             <CheckCircle2 size={20} className="text-[#D4AF37]" />
             <div>
-              <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37]">Identity Verified On-Chain</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37]">Identity Verified {hasTicket ? 'On-Chain' : 'Off-Chain'}</p>
               <p className="text-[9px] font-mono text-[#888888] mt-0.5">
                 {address ? truncAddr(address) : 'Connected'} · Optimism
               </p>
@@ -542,10 +542,27 @@ export function GoldTicketPanel() {
 
   // ── MAIN LANDING ─────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col space-y-8 max-w-5xl mx-auto py-8">
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.2 }
+        }
+      }}
+      className="flex flex-col space-y-8 max-w-5xl mx-auto py-8"
+    >
 
       {/* ── Hero ── */}
-      <div className="relative bg-[#050505] rounded-[2.5rem] overflow-hidden p-10 md:p-14 shadow-2xl">
+      <motion.div 
+        variants={{
+          hidden: { opacity: 0, y: 30, filter: 'blur(10px)' },
+          visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }
+        }}
+        className="relative bg-[#050505] rounded-[2.5rem] overflow-hidden p-10 md:p-14 shadow-2xl"
+      >
         {/* Ambient gold */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 65%)' }} />
@@ -625,10 +642,16 @@ export function GoldTicketPanel() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Traits & Properties ── */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <motion.div 
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+        }}
+        className="grid md:grid-cols-2 gap-6"
+      >
 
         {/* What you get */}
         <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
@@ -705,10 +728,16 @@ export function GoldTicketPanel() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Claim Steps ── */}
-      <div className="grid md:grid-cols-3 gap-5">
+      <motion.div 
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+        }}
+        className="grid md:grid-cols-3 gap-5"
+      >
         {[
           {
             n: '01', title: 'Connect Wallet',
@@ -725,8 +754,8 @@ export function GoldTicketPanel() {
             desc: mintPrice > 0n
               ? `Pay ${fmtEth(mintPrice)} ETH on Optimism L2 to mint your soulbound NFT.`
               : 'Mint your Whale Gold Ticket NFT. Pay gas only on Optimism L2.',
-            status: hasTicket ? 'DONE' : isConnected && !isWrongNetwork ? 'READY' : 'WAITING',
-            action: isConnected && !isWrongNetwork && !hasTicket
+            status: (hasTicket || dbStats?.ticket) ? 'DONE' : isConnected && !isWrongNetwork ? 'READY' : 'WAITING',
+            action: isConnected && !isWrongNetwork && !(hasTicket || dbStats?.ticket)
               ? (
                  <div className="mt-4 w-full">
                      <SignaturePad onSignature={setSignatureData} disabled={isTxPending || isConfirming} />
@@ -744,13 +773,17 @@ export function GoldTicketPanel() {
           },
           {
             n: '03', title: 'Access Activated',
-            desc: 'Your ticket is verified on-chain. Instant access to all Whale Alert Network institutional tools.',
-            status: hasTicket ? 'DONE' : 'LOCKED',
+            desc: 'Your ticket is verified. Instant access to all Whale Alert Network institutional tools.',
+            status: (hasTicket || dbStats?.ticket) ? 'DONE' : 'LOCKED',
             action: null,
           },
         ].map((s, i) => (
-          <div
+          <motion.div
             key={i}
+            variants={{
+              hidden: { opacity: 0, scale: 0.95, y: 20 },
+              visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+            }}
             className={`p-7 rounded-3xl border transition-all ${s.status === 'DONE' ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20' : s.status === 'READY' ? 'bg-white border-[#050505] shadow-lg shadow-black/5' : 'bg-white border-[#E5E5E5]'}`}
           >
             <div className="flex items-center justify-between mb-5">
@@ -767,9 +800,9 @@ export function GoldTicketPanel() {
             <h3 className="text-base font-black text-[#050505] uppercase tracking-tight mb-2">{s.title}</h3>
             <p className="text-[11px] text-[#888888] leading-relaxed">{s.desc}</p>
             {s.action}
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* ── Contract footer ── */}
       <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -848,6 +881,6 @@ export function GoldTicketPanel() {
             })}
          </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

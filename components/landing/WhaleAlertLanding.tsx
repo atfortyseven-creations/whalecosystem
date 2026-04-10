@@ -353,17 +353,17 @@ export function WhaleAlertLanding() {
         <div 
           className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
           style={{
-             backgroundImage: "url('/api/checkpoint-image?name=image%20(2).jpg')",
+             backgroundImage: "url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')",
              backgroundRepeat: "repeat",
-             backgroundSize: "600px auto",
+             backgroundSize: "400px auto",
              backgroundPosition: "top left",
-             opacity: 0.95
+             opacity: 0.75
           }}
         >
         </div>
 
         {/* Subtle overlay to guarantee text readability in light and dark mode WITHOUT blurring the pattern */}
-        <div className="fixed inset-0 pointer-events-none -z-10 bg-white/20 dark:bg-black/60 transition-colors duration-300" />
+        <div className="fixed inset-0 pointer-events-none -z-10 bg-white/40 dark:bg-black/40 transition-colors duration-300" />
         
         {/* Wrap content in a relative z-10 index to stay above the backdrop overlay */}
         <div className="relative z-10 w-full">
@@ -772,11 +772,11 @@ export function WhaleAlertLanding() {
             willChange: "auto",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
-            backgroundImage: "url('/api/checkpoint-image?name=image%20(3).jpg')",
+            backgroundImage: "url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')",
             backgroundRepeat: "repeat",
-            backgroundSize: "800px auto",
+            backgroundSize: "400px auto",
             backgroundPosition: "center center",
-            opacity: 1, 
+            opacity: 0.75, 
           }}
         />
         {/* Dark mode overlay */}
