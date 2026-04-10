@@ -34,7 +34,20 @@ export function MobileLanding() {
     const { open: openWallet } = useAppKit();
 
     return (
-        <div style={{ backgroundColor: "transparent", color: "#FFFFFF" }} className="min-h-screen overflow-y-auto w-full selection:bg-[#00FF55] selection:text-[#000000] font-mono">
+        <div style={{ backgroundColor: "transparent", color: "#FFFFFF" }} className="min-h-screen overflow-y-auto w-full selection:bg-[#00FF55] selection:text-[#000000] font-mono relative">
+            {/* GLOBAL COSMIC WALLPAPER */}
+            <div 
+              className="fixed inset-0 pointer-events-none z-0 transition-colors duration-300"
+              style={{
+                 backgroundImage: "url('/patron-cosmico-4k.png')",
+                 backgroundRepeat: "no-repeat",
+                 backgroundSize: "cover",
+                 backgroundPosition: "center",
+                 opacity: 0.5,
+                 transform: "translateZ(0)",
+                 willChange: "transform",
+              }}
+            />
             {/* ── INIT/HERO ── */}
             <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 text-center border-b border-[#222222]">
                 <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: `linear-gradient(#00FF55 1px, transparent 1px), linear-gradient(90deg, #00FF55 1px, transparent 1px)`, backgroundSize: '20px 20px' }} />
@@ -94,19 +107,16 @@ export function MobileLanding() {
 
             {/* ── BRIDGE MODULE ── */}
             <Section id="s-connect" className="justify-start pt-16 pb-24 overflow-hidden relative">
-                {/* MAX-PPI HOKUSAI WAVE BACKGROUND */}
-                <div
-                    aria-hidden="true"
-                    className="absolute inset-0 z-0 pointer-events-none"
+                {/* 4K HOKUSAI WAVE BACKGROUND */}
+                <img
+                    src="/olas-hokusai-4k.png"
+                    alt="Hokusai Bridge Waves"
+                    className="absolute bottom-0 left-0 w-full h-auto pointer-events-none select-none"
                     style={{
                         transform: "translateZ(0)",
-                        willChange: "auto",
-                        backgroundImage: "url('/wave-pattern-bg.jpg')",
-                        backgroundRepeat: "repeat",
-                        backgroundSize: "320px 200px",
-                        backgroundPosition: "top left",
-                        opacity: 0.15,
-                        mixBlendMode: "screen"
+                        willChange: "transform",
+                        opacity: 0.92,
+                        zIndex: 1
                     }}
                 />
                 

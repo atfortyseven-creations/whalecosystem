@@ -353,10 +353,10 @@ export function WhaleAlertLanding() {
         <div 
           className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
           style={{
-             backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
-             backgroundRepeat: "repeat",
-             backgroundSize: "420px auto",
-             backgroundPosition: "top left",
+             backgroundImage: "url('/patron-cosmico-4k.png')",
+             backgroundRepeat: "no-repeat",
+             backgroundSize: "cover",
+             backgroundPosition: "center",
              opacity: 0.72,
              transform: "translateZ(0)",
              willChange: "transform",
@@ -775,28 +775,23 @@ export function WhaleAlertLanding() {
             willChange: "transform",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
-            backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
-            backgroundRepeat: "repeat",
-            backgroundSize: "420px auto",
-            backgroundPosition: "top center",
+            backgroundImage: "url('/patron-cosmico-4k.png')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             opacity: 0.72,
           }}
         />
 
-        {/* Layer 2: Hokusai blue waves pinned to the bottom — NO repeat, covers full width */}
-        <div
-          aria-hidden="true"
-          className="absolute bottom-0 left-0 right-0 z-[2] pointer-events-none"
+        {/* Layer 2: Hokusai blue waves perfectly scaled via native img logic */}
+        <img
+          src="/olas-hokusai-4k.png"
+          alt="Hokusai Waves"
+          className="absolute bottom-0 left-0 w-full h-auto z-[2] pointer-events-none select-none"
           style={{
-            backgroundImage: "url('/api/checkpoint-image?name=olas-hokusai-4k.png')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "100% auto",
-            backgroundPosition: "bottom center",
-            height: "340px",
             transform: "translateZ(0)",
             willChange: "transform",
             opacity: 0.92,
-            mixBlendMode: "multiply",
           }}
         />
 

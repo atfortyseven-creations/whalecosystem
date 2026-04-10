@@ -7,7 +7,7 @@
 
 import WebSocket from 'ws';
 
-const WS_URL = process.env.GETBLOCK_ETH_WS_2!;
+const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS;
 const WHALE_USD_THRESHOLD = parseInt(process.env.WHALE_THRESHOLD_USD || '50000', 10);
 
 // ERC-20 Transfer event topic
@@ -49,6 +49,10 @@ class WhaleWebSocketEngine {
 
     connect() {
         if (this.ws?.readyState === WebSocket.OPEN) return;
+        if (!WS_URL) {
+            console.warn('[WhaleEngine] GETBLOCK_ETH_WS_2 is not set. Real-time stream disabled.');
+            return;
+        }
 
         this.ws = new WebSocket(WS_URL);
 

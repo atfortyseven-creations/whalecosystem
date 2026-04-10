@@ -43,15 +43,8 @@ function getSanitizedRedisUrl(): string {
         return `${protocol}://${auth}${host}:${port}`;
     }
 
-    // Attempt Railway Proxy if we ONLY have a password
-    if (isLikelyPassword && !host) {
-        const fallBackHost = 'roundhouse.proxy.rlwy.net'; 
-        return `redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@${fallBackHost}:${port}`;
-    }
-
-    // [CRITICAL FIX] If it's not a valid URL by this point, DO NOT return just a random string
-    // as ioredis will interpret it as a domain name and cause endless ENOTFOUND loops!
-    return '';
+    // Do not guess proxy URL port to prevent silent ETIMEDOUT when port differs. Let the client fail fast.
+    return rawUrl.includes('://') ? rawUrl : '';
 }
 
 const REDIS_URL = getSanitizedRedisUrl();
