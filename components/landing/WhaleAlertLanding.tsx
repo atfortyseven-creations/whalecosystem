@@ -351,19 +351,19 @@ export function WhaleAlertLanding() {
         
         {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (iOS/Android/PC Parity) */}
         <div 
-          className="fixed inset-0 pointer-events-none -z-10 transition-colors duration-300"
+          className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
           style={{
              backgroundImage: "url('/api/checkpoint-image?name=image%20(2).jpg')",
              backgroundRepeat: "repeat",
              backgroundSize: "600px auto",
              backgroundPosition: "top left",
-             opacity: 0.25
+             opacity: 0.95
           }}
         >
         </div>
 
-        {/* Subtle overlay to guarantee text readability in light and dark mode */}
-        <div className="fixed inset-0 pointer-events-none -z-[5] bg-white/60 dark:bg-black/80 backdrop-blur-[2px] transition-colors duration-300" />
+        {/* Subtle overlay to guarantee text readability in light and dark mode WITHOUT blurring the pattern */}
+        <div className="fixed inset-0 pointer-events-none -z-10 bg-white/20 dark:bg-black/60 transition-colors duration-300" />
         
         {/* Wrap content in a relative z-10 index to stay above the backdrop overlay */}
         <div className="relative z-10 w-full">
@@ -398,11 +398,8 @@ export function WhaleAlertLanding() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
       <section className="relative flex flex-col items-center justify-center min-h-[100vh] px-6 pt-20">
-        {/* Grid background */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)`, backgroundSize: '48px 48px' }} />
-        {/* Radial fade */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 0%, rgba(250,249,246,0.95) 100%)" }} />
+        {/* Minimal Gradient instead of Grid so background pattern shines through */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, transparent 40%, rgba(250,249,246,0.3) 100%)" }} />
 
         {/* ── LEFT PANEL: News of Today — screens ≥ 1280px (xl) ——————————— */}
         {/* NOTE: Using Tailwind xl (1280px) instead of custom 1400px media query.
@@ -766,6 +763,7 @@ export function WhaleAlertLanding() {
            background-size: cover & background-position: bottom center ensures
            it scales up without breaking aspect ratio, keeping the waves at the bottom.
            ────────────────────────────────────────────────────────────────────── */}
+        {/* ── MAX-PPI DOWNHEAD BACKGROUND ── */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 pointer-events-none"
@@ -775,15 +773,14 @@ export function WhaleAlertLanding() {
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
             backgroundImage: "url('/api/checkpoint-image?name=image%20(3).jpg')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "100% auto",
-            backgroundPosition: "bottom center",
-            opacity: 0.6,     // Increased opacity to ensure the downhead wave is clearly visible
-            backgroundColor: "#FAF9F6",
+            backgroundRepeat: "repeat",
+            backgroundSize: "800px auto",
+            backgroundPosition: "center center",
+            opacity: 1, 
           }}
         />
-        {/* Dark mode overlay: Since this is a light-themed Hokusai wave, dark mode strips it or blends it */}
-        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.95 }} />
+        {/* Dark mode overlay */}
+        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.85 }} />
 
         <div className="relative z-20 max-w-3xl mx-auto text-center">
           <Reveal>

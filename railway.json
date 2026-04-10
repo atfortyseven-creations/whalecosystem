@@ -1,3 +1,10 @@
 {
-  "$schema": "https://railway.app/railway.schema.json"
+  "$schema": "https://railway.app/railway.schema.json",
+  "crons": [
+    {
+      "path": "/api/cron/indexer",
+      "schedule": "*/15 * * * * *",
+      "comment": "1TB Aggregation Indexer: Pre-computes all heavy analytics into Redis every 15s"
+    }
+  ]
 }

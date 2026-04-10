@@ -2,22 +2,41 @@ import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
 
-// [ESTABILIDAD] Prisma singleton pattern.
-// FIX: Previously only cached to global when NODE_ENV !== 'production'.
-// On Vercel in production, each Lambda invocation that did not hit the module
-// cache would create a new PrismaClient with its own connection pool (up to 10
-// connections), rapidly exhausting PostgreSQL's max_connections under any
-// meaningful load. The correct pattern is unconditional global caching —
-// Prisma's own documentation specifies this exact pattern.
-//
-// Also removed the eager prisma.$connect() call. Prisma connects lazily on
-// first query — the eager connect on every cold start was blocking module
-// init unnecessarily and could mask startup-time errors.
+// [ESTABILIDAD CÓSMICA] Prisma Singleton for Massive Multi-Replica Deployments
+// Extracts standard DATABASE_URL to inject pgBouncer params preventing connection exhaustion.
+
+function getPooledDatabaseUrl() {
+    const rawUrl = process.env.DATABASE_URL;
+    if (!rawUrl) return undefined;
+    
+    // Si ya trae poolers, retornarla tal cual
+    if (rawUrl.includes('pgbouncer=true')) return rawUrl;
+
+    try {
+        const urlObj = new URL(rawUrl);
+        // Si no estamos en Supabase o un protocolo extraño (solo psql estándar), inyectamos límites de seguridad.
+        if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
+            urlObj.searchParams.set('pgbouncer', 'true');
+            if (!urlObj.searchParams.has('connection_limit')) {
+                // Al escalar a 42-100 réplicas, limitar cada contenedor a 5 conexiones para no colapsar pgBouncer.
+                urlObj.searchParams.set('connection_limit', '5');
+            }
+        }
+        return urlObj.toString();
+    } catch {
+        return rawUrl;
+    }
+}
+
 export const prisma =
     globalForPrisma.prisma ??
     new PrismaClient({
+        datasources: {
+            db: {
+                url: process.env.NODE_ENV === 'production' ? getPooledDatabaseUrl() : process.env.DATABASE_URL,
+            },
+        },
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
     });
 
-// Always assign — works correctly in both development (hot-reload) and production
 globalForPrisma.prisma = prisma;

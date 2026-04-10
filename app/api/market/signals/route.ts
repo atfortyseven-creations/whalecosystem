@@ -25,6 +25,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -204,8 +205,25 @@ export async function GET(req: NextRequest) {
     const token  = tierCfg.filtersAllowed  ? (params.get('token')   ?? undefined) : undefined;
     const minUsd = tierCfg.filtersAllowed  ? Number(params.get('minUsd') ?? 0)    : 0;
 
-    // Fetch signals from Prisma
+    const CACHE_KEY = `api:market-signals:tier-${keyRecord.tier}:limit-${tierCfg.eventLimit}:chain-${chain ?? 'ALL'}:token-${token ?? 'ALL'}:minUsd-${minUsd}`;
+
     try {
+        // [PHASE 4 - REDIS MICRO-CACHING - 5s TTL to protect DB but keep real-time latency]
+        const cached = await safeRedisGet(CACHE_KEY);
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            return NextResponse.json({
+                ...parsed,
+                meta: { ...parsed.meta, remaining, quota: tierCfg.rateLimit, cached: true }
+            }, {
+                headers: {
+                    'Cache-Control': 'no-store',
+                    'X-RateLimit-Limit': String(tierCfg.rateLimit),
+                    'X-RateLimit-Remaining': String(remaining),
+                }
+            });
+        }
+
         const { prisma } = await import('@/lib/prisma');
         const where: any = {};
         if (chain)  where.chain = chain.toUpperCase();
@@ -232,16 +250,22 @@ export async function GET(req: NextRequest) {
 
         const signals = rows.map(sanitizeSignal);
 
-        return NextResponse.json({
+        const responsePayload = {
             signals,
             meta: {
                 tier:      keyRecord.tier,
                 count:     signals.length,
                 limit:     tierCfg.eventLimit,
-                quota:     tierCfg.rateLimit,
-                remaining,
                 timestamp: new Date().toISOString(),
             },
+        };
+
+        // Cache for 5 seconds to absorb spikes without losing real-time feel
+        await safeRedisSet(CACHE_KEY, JSON.stringify(responsePayload), 'EX', 5);
+
+        return NextResponse.json({
+            ...responsePayload,
+            meta: { ...responsePayload.meta, remaining, quota: tierCfg.rateLimit, cached: false }
         }, {
             headers: {
                 'Cache-Control': 'no-store',

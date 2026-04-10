@@ -17,6 +17,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,7 +29,15 @@ export async function GET(req: NextRequest) {
     const limit     = Math.min(100, Number(params.get('limit') ?? 20));
     const minDetect = Number(params.get('minDetections') ?? 1);
 
+    const CACHE_KEY = `api:hall-of-fame:limit-${limit}:min-${minDetect}`;
+
     try {
+        // [PHASE 4 - REDIS CACHE FAST PATH]
+        const cached = await safeRedisGet(CACHE_KEY);
+        if (cached) {
+            return NextResponse.json(JSON.parse(cached));
+        }
+
         const { prisma } = await import('@/lib/prisma');
 
         // Aggregate community detections from whaleActivity where metadata.communityDetection = true
@@ -98,20 +107,30 @@ export async function GET(req: NextRequest) {
                         : '🥉 WATCHER',
                 }));
 
-            return NextResponse.json({
+            const responsePayload = {
                 hallOfFame: sorted,
                 totalEntries: sorted.length,
                 source:        'fallback-aggregation',
                 updatedAt:     new Date().toISOString(),
-            });
+                cached:        true,
+            };
+
+            await safeRedisSet(CACHE_KEY, JSON.stringify(responsePayload), 'EX', 60);
+
+            return NextResponse.json({ ...responsePayload, cached: false });
         }
 
-        return NextResponse.json({
+        const responsePayload = {
             hallOfFame:   detections,
             totalEntries: detections.length,
             source:       'community-detection-table',
             updatedAt:    new Date().toISOString(),
-        });
+            cached:       true,
+        };
+
+        await safeRedisSet(CACHE_KEY, JSON.stringify(responsePayload), 'EX', 60);
+
+        return NextResponse.json({ ...responsePayload, cached: false });
 
     } catch (err: any) {
         return NextResponse.json(
@@ -127,6 +146,10 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { walletAddress, txHash, chain, description } = body;
+
+        // Invalidate Hall of Fame CACHE if new detection enters CACHE_KEY might vary by params, so we can wipe the base if we used a wildcard mechanism, but here we update records async.
+        const INVALIDATE_CACHE_KEY = `api:hall-of-fame:limit-20:min-1`;
+        await safeRedisSet(INVALIDATE_CACHE_KEY, '', 'EX', 1);
 
         if (!walletAddress || !txHash || !chain) {
             return NextResponse.json(

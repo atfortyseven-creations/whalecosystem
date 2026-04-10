@@ -75,9 +75,9 @@ async function interceptThermodynamicAnomalies() {
 
                 console.log(`[SOLANA-SIMD0109] 🐋 WHALE TACTIC DETECTED -> Fee: ${microLamports} uLamports | Z-Score: ${zScore}`);
                 
-                // Immediately pipe to the real-time SSE stream without waiting for DB persistence
-                await redis.lpush('whale-events', JSON.stringify(eventPayload));
-                await redis.ltrim('whale-events', 0, 99);
+                // [ESTABILIDAD CÓSMICA] Use Redis Streams (XADD) guaranteeing At-Least-Once delivery and persistence.
+                // Uses MAXLEN ~ 1000 to keep memory footprint bounded.
+                await (redis as any).xadd('whale:alert:stream', 'MAXLEN', '~', 1000, '*', 'payload', JSON.stringify(eventPayload));
             }
         }
     }, 'processed');

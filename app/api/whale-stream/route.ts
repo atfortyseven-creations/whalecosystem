@@ -57,6 +57,8 @@ export async function GET(req: NextRequest) {
             send('connected', { status: 'sovereign', timestamp: new Date().toISOString() });
 
             let lastId: string | undefined;
+            // [ESTABILIDAD CÓSMICA] Puntero de Stream para no consumir duplicados. Inicia en el último evento ('$')
+            let redisStreamId = '$';
             let running = true;
 
             req.signal.addEventListener('abort', () => {
@@ -69,14 +71,27 @@ export async function GET(req: NextRequest) {
 
             while (running) {
                 try {
-                    // ─── Primary path: Redis queue ─────────────────────────────
+                    // ─── Primary path: Redis Streams ───────────────────────────
                     if (redis) {
-                        // BLPOP with 15s timeout — blocks until item available
-                        const result = await (redis as any).blpop('whale:alert:queue', 15);
+                        // XREAD bloqueante por 15s. No elimina el dato de la cola.
+                        const result = await (redis as any).xread('BLOCK', 15000, 'STREAMS', 'whale:alert:stream', redisStreamId);
+                        
                         if (result) {
-                            const [, raw] = result;
-                            const alert = JSON.parse(raw);
-                            send('whale', alert);
+                            // result structure: [ [ 'whale:alert:stream', [ [ msgId, ['payload', jsonString] ] ] ] ]
+                            const streamData = result[0];
+                            const messages = streamData[1];
+                            
+                            for (const message of messages) {
+                                redisStreamId = message[0]; // Actualizamos puntero
+                                const fieldValues = message[1];
+                                
+                                // Parseamos el index 1 que asume ['payload', '{"hash":...}']
+                                const jsonPayload = fieldValues[1];
+                                if (jsonPayload) {
+                                    const alert = JSON.parse(jsonPayload);
+                                    send('whale', alert);
+                                }
+                            }
                         } else {
                             // Timeout — send heartbeat
                             send('heartbeat', { ts: Date.now() });

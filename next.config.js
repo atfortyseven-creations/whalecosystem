@@ -58,6 +58,13 @@ const nextConfig = {
     compress: true,
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
+    reactStrictMode: true,
+    swcMinify: true,
+
+    experimental: {
+        optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber'],
+        serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
+    },
 
     typescript: {
         ignoreBuildErrors: true
@@ -66,13 +73,7 @@ const nextConfig = {
         ignoreDuringBuilds: true
     },
 
-    // External packages: Only specify packages with native bindings (Rust/C++/WASM).
-    // Pure JS packages (ethers, stripe, bcryptjs, snarkjs) will be automatically traced
-    // and optimally bundled inside the .next/standalone/node_modules output.
-    serverExternalPackages: [
-        '@prisma/client',
-        'prisma'
-    ],
+    // External packages are defined above in experimental.serverComponentsExternalPackages
 
     env: {
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',

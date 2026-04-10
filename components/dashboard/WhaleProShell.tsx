@@ -252,20 +252,21 @@ export function WhaleProShell({
                         
                         {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (Dashboard Parallax Purity) */}
                         <div 
-                            className="fixed inset-0 pointer-events-none -z-10 bg-[#050810] transition-colors duration-300"
+                            className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
                             style={{
-                                backgroundImage: `url('/dashboard-bg.jpg')`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center 80%',
-                                backgroundRepeat: 'no-repeat',
+                                backgroundImage: `url('/api/checkpoint-image?name=image%20(3).jpg')`,
+                                backgroundSize: '800px auto',
+                                backgroundPosition: 'center center',
+                                backgroundRepeat: 'repeat',
                                 imageRendering: 'crisp-edges',
                                 transform: 'translateZ(0)',
-                                willChange: 'transform'
+                                willChange: 'transform',
+                                opacity: 0.95
                             }}
                         />
 
-                        {/* Immersive glassmorphism / darkening overlay for perfect readability while scrolling */}
-                        <div className="fixed inset-0 pointer-events-none -z-[5] bg-white/40 dark:bg-black/70 backdrop-blur-[2px] transition-colors duration-300" />
+                        {/* Immersive darkening overlay for perfect readability while scrolling WITHOUT completely obscuring the pattern */}
+                        <div className="fixed inset-0 pointer-events-none -z-10 bg-white/10 dark:bg-black/60 transition-colors duration-300" />
                         
                         <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10">
                             <AnimatePresence mode="wait">

@@ -1,12 +1,14 @@
 // schema.prisma
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  // Habilitamos extensiones PostgreSQL nativas para indexación de texto y vectores
+  extensions = [pg_trgm, btree_gin, unaccent]
 }
 
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions", "fullTextSearch", "fullTextIndex"]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,6 +27,11 @@ model Article {
   author      String
 
   sector      Sector?  @relation(fields: [sectorId], references: [id])
+
+  // ── 🔍 INDEXACIÓN CÓSMICA: Articulación para texto completo e informes temporales
+  @@index([category, publishedAt(sort: Desc)])  // Filtrado rápido por categoría + cronología
+  @@index([bias, sentiment])                    // Análisis de polaridad institucional
+  @@index([sectorId, publishedAt(sort: Desc)])  // Drill-down por sector en dashboards
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,6 +47,10 @@ model Sector {
   volume24h   Float     @default(0.0)
   zScore      Float     // Custom Whale Rotation Score
   articles    Article[]
+
+  // ── 🔍 INDEXACIÓN CÓSMICA: Rendimiento y ordenamiento dinámico
+  @@index([zScore(sort: Desc)])   // Top Sectors by Whale Rotation Score
+  @@index([totalTvl(sort: Desc)]) // Ranking por TVL en tiempo real
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,13 +99,8 @@ model User {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  // FIX: worldIdNullifierHash was MISSING from the User model.
-  // Both /api/verify-human and /api/user/status read and write this field,
-  // but it was absent from schema.prisma causing Prisma P2009
-  // (unknown field) at runtime on every World ID verification attempt.
   worldIdNullifierHash String? @unique
   
-  // Environment Variables (Unique Per User)
   theme           String      @default("light")
   currency        String      @default("USD")
   language        String      @default("es-ES")
@@ -102,13 +108,17 @@ model User {
   allowAnalytics  Boolean     @default(true)
   testnetMode     Boolean     @default(false)
   
-  // FIX: Missing fields required by Clerk auth and SNX integrations
   clerkId         String?     @unique
   snxAccountId    String?     @unique
   
   watchlists      Watchlist[]
   alerts          Alert[]
   progress        UserProgress[]
+
+  // ── 🔍 INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
+  @@index([tier, lastActive(sort: Desc)])  // Consulta de usuarios activos por tier
+  @@index([isPro, createdAt(sort: Desc)])  // Funnel de conversión Pro
+  @@index([createdAt(sort: Desc)])         // Registro cronológico general
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -322,13 +332,14 @@ model WhaleActivity {
   timestamp       DateTime @default(now())
   isZkVerified    Boolean  @default(false)
 
-  // FIX: Critical missing indexes.
-  // Without these, leaderboard GROUP BY walletAddress does a full table scan
-  // across millions of rows — unusable latency at production scale.
-  // The (chain, timestamp) composite index accelerates per-chain timeline queries.
-  @@index([walletAddress])
-  @@index([chain, timestamp])
-  @@index([timestamp])
+  // ── 🔍 INDEXACIÓN CÓSMICA: Sistema de índices multi-dimensional para el 1TB de Railway
+  @@index([walletAddress])                           // Lookup individual por wallet
+  @@index([chain, timestamp(sort: Desc)])            // Stream temporal por cadena (dashboard)
+  @@index([timestamp(sort: Desc)])                   // Feed cronológico global
+  @@index([type, chain, timestamp(sort: Desc)])      // Filtrado por tipo de evento
+  @@index([token, timestamp(sort: Desc)])            // Token-level analytics (liquidez)
+  @@index([isZkVerified, timestamp(sort: Desc)])     // Alertas ZK verificadas prioritarias
+  @@index([walletAddress, chain, timestamp(sort: Desc)]) // Perfil por wallet por cadena
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -461,6 +472,11 @@ model GlobalWhaleEvent {
   amountUSD       Float
   protocol        String
   timestamp       DateTime @default(now())
+
+  // ── 🔍 INDEXACIÓN CÓSMICA: Eventos Macro para pantalla de liderazgo institucional
+  @@index([protocol, timestamp(sort: Desc)])  // Filtrado por protocolo en tiempo real
+  @@index([amountUSD(sort: Desc)])            // Ranking de mayores transacciones
+  @@index([timestamp(sort: Desc)])            // Vista cronológica global
 }
 
 model AlertRule {
@@ -495,6 +511,10 @@ model BlockchainTransaction {
   blockNumber     Int
   status          String
   createdAt       DateTime @default(now())
+
+  // ── 🔍 INDEXACIÓN CÓSMICA: Estado de transacciones para reconciliación ultra-rápida
+  @@index([status, createdAt(sort: Desc)])   // Monitoreo de pendientes en tiempo real
+  @@index([blockNumber(sort: Desc)])         // Lookup por bloque
 }
 
 // FIX: Session polyfill for JWT verification route fallback

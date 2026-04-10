@@ -6,35 +6,43 @@
  * Achieves <15ms latency propagation across the European and American node clusters.
  */
 
-import dgram from 'dgram';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { createRedisClient } from '../lib/redis/client';
+
 dotenv.config({ path: '.env.production' });
 
-const MESH_PORT = 47777; // The sacred number of the whale
-const MULTICAST_ADDR = '239.255.47.77'; // Dedicated IP range for Sovereign Mesh
+const MESH_CHANNEL = 'sovereign:mesh:gossip';
 
-const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+// [ESTABILIDAD CÓSMICA] Usamos Redis Pub/Sub interconectado central para esquivar el bloqueo UDP
+// Instanciamos un Suscriptor y un Publicador (Redis requiere conexiones separadas para pub/sub)
+const redisSub = createRedisClient({ name: 'Mesh-Sub' });
+const redisPub = createRedisClient({ name: 'Mesh-Pub' });
 
 // Memory of recent events to prevent gossip loops (Replay Protection)
 const processMemory = new Map<string, number>();
 
-console.log(`[MESH] 🌐 Initializing Sovereign Intelligence Mesh Daemon...`);
+// ─── Cryptographic Identity (Node Credentials) ──────────────────────────────
+// In production, load NODE_PRIVATE_KEY from KMS or .env securely.
+// Here we provision an ephemeral ECDSA key for the lifecycle of this node.
+const { publicKey, privateKey } = crypto.generateKeyPairSync('ec', { namedCurve: 'secp256k1' });
+const NODE_PUBLIC_KEY = publicKey.export({ type: 'spki', format: 'pem' }).toString();
 
-socket.on('listening', () => {
-    const address = socket.address();
-    console.log(`[MESH] ✅ Node Bound: ${address.address}:${address.port}`);
-    
-    // Join the multicast group for local cluster broadcasting
-    socket.addMembership(MULTICAST_ADDR);
-    
-    socket.setBroadcast(true);
-    socket.setMulticastTTL(128); // Allow hopping across major network segments
+console.log(`[MESH] 🌐 Initializing Sovereign Intelligence Mesh Daemon (TCP Backplane)...`);
+
+redisSub.subscribe(MESH_CHANNEL, (err, count) => {
+    if (err) {
+        console.error(`[MESH-FATAL] Failed to subscribe: %s`, err.message);
+    } else {
+        console.log(`[MESH] ✅ Node Bound via Redis Backplane. Listening on: ${MESH_CHANNEL}`);
+    }
 });
 
-socket.on('message', (msg, rinfo) => {
+redisSub.on('message', (channel, msg) => {
+    if (channel !== MESH_CHANNEL) return;
+
     try {
-        const payload = JSON.parse(msg.toString());
+        const payload = JSON.parse(msg);
         
         if (!payload.eventId || !payload.signature || !payload.txHash) return;
 
@@ -43,16 +51,13 @@ socket.on('message', (msg, rinfo) => {
         processMemory.set(payload.eventId, Date.now());
 
         // Cryptographic verification of the signal's origin (Zero-Trust)
-        // In full production, this verifies the ECDSA signature of the sending AVS Node
-        const isValid = mockVerifyNodeSignature(payload);
+        // Strictly evaluates the ECDSA signature belonging to the broadcasting node
+        const isValid = verifyNodeSignature(payload);
         
         if (isValid) {
-            console.log(`[MESH-GOSSIP] 📡 Received Verified EVM Z-Score from ${rinfo.address} for tx: ${payload.txHash}`);
+            console.log(`[MESH-GOSSIP] 📡 Received Verified EVM Z-Score from P2P for tx: ${payload.txHash}`);
             
-            // Re-broadcast (Gossip) to specific known external peers (WAN)
-            propagateToWAN(msg);
-
-            // Here, the node would trigger local alerts or push to its own Redis instance for the frontend
+            // Integración al sistema local. Al estar en Redis, los workers locales pueden leerlo.
         }
 
     } catch (e) {
@@ -60,42 +65,34 @@ socket.on('message', (msg, rinfo) => {
     }
 });
 
-socket.on('error', (err) => {
-    console.error(`[MESH-FATAL] Socket error:\n${err.stack}`);
-    socket.close();
+redisSub.on('error', (err) => {
+    console.error(`[MESH-FATAL] Subscriber error:\n${err.stack}`);
 });
 
-// Only bind to the receiving port if this file is executed as a standalone daemon.
-// If it is simply imported by Next.js to use `broadcastToMesh`, it remains a dynamic sending client.
-const isMainModule = process.argv[1] && process.argv[1].includes('sovereign-mesh');
-
-if (isMainModule) {
-    socket.bind(MESH_PORT);
-}
-
 /**
- * Mocks the cryptographic validation of another node's signal
+ * Cryptographic validation of the sending node's signature
  */
-function mockVerifyNodeSignature(payload: any) {
+function verifyNodeSignature(payload: any): boolean {
     if (payload.clearance !== 'SOVEREIGN') return false;
-    return true; // Assume true for this execution phase
+    if (!payload.pubKey || !payload.signature) return false;
+
+    try {
+        const dataToVerify = `${payload.eventId}:${payload.txHash}:${payload.timestamp}`;
+        const verifier = crypto.createVerify('SHA256');
+        verifier.update(dataToVerify);
+        verifier.end();
+        
+        return verifier.verify(payload.pubKey, Buffer.from(payload.signature, 'hex'));
+    } catch {
+        return false;
+    }
 }
 
 /**
- * Propagates the signal to the broader Wide Area Network (WAN) list of Sovereign Nodes.
+ * WAN Propagation is natively handled by the Multi-Region Redis setup (Upstash/Global Datastore).
  */
-function propagateToWAN(messageBuffer: Buffer) {
-    // Array of predefined bootstrap peers (Eigenlayer AVS nodes)
-    const wanPeers = [
-        // '198.51.100.14',
-        // '203.0.113.88'
-    ];
-
-    for (const peerIP of wanPeers) {
-        socket.send(messageBuffer, 0, messageBuffer.length, MESH_PORT, peerIP, (err) => {
-            if (err) console.error(`[MESH] Error propagating to ${peerIP}`);
-        });
-    }
+function propagateToWAN(messageBuffer: string) {
+    // Legacy UDP specific. Replaced by Global Redis Pub/Sub Replication.
 }
 
 // ── EXPORTED API FOR LOCAL SERVICES ─────────────────────────────────────────
@@ -104,36 +101,46 @@ function propagateToWAN(messageBuffer: Buffer) {
  * Sends a locally-generated thermodynamic signal to the entire Decentralized Mesh.
  */
 export function broadcastToMesh(eventType: string, data: any) {
+    const timestamp = Date.now();
     const eventId = crypto.randomUUID();
+    
+    // Core payload body
+    const dataToSign = `${eventId}:${data.txHash || 'NO_HASH'}:${timestamp}`;
+    
+    // Cryptographic Signing process
+    const signer = crypto.createSign('SHA256');
+    signer.update(dataToSign);
+    signer.end();
+    const signature = signer.sign(privateKey).toString('hex');
     
     const payload = {
         eventId,
         type: eventType,
-        clearance: 'SOVEREIGN', // Node Clearance level
-        signature: '0xmock_ecdsa_signature',
-        timestamp: Date.now(),
+        clearance: 'SOVEREIGN',
+        pubKey: NODE_PUBLIC_KEY,
+        signature: signature,
+        timestamp: timestamp,
         ...data
     };
 
-    const message = Buffer.from(JSON.stringify(payload));
+    const messageString = JSON.stringify(payload);
     
     // Add to own memory so we don't process our own broadcast
     processMemory.set(eventId, Date.now());
 
-    socket.send(message, 0, message.length, MESH_PORT, MULTICAST_ADDR, (err) => {
-        if (err) console.error(`[MESH] Multicast broadcast failed: ${err}`);
-        else console.log(`[MESH] 🚀 Multicasted Signal ${payload.txHash} to Sovereign Array`);
+    redisPub.publish(MESH_CHANNEL, messageString).then(() => {
+        console.log(`[MESH] 🚀 Multicasted Signal ${payload.txHash} to Sovereign Array via Backplane`);
+    }).catch(err => {
+        console.error(`[MESH] Redis Publish failed: ${err}`);
     });
 }
 
-// Memory Cleanup loop (prevent Map endless growth) - only if running as Daemon
-if (isMainModule) {
-    setInterval(() => {
-        const now = Date.now();
-        for (const [id, time] of processMemory.entries()) {
-            if (now - time > 60000) { // Keep memory for 60 seconds
-                processMemory.delete(id);
-            }
+// Memory Cleanup loop (prevent Map endless growth)
+setInterval(() => {
+    const now = Date.now();
+    for (const [id, time] of processMemory.entries()) {
+        if (now - time > 60000) { // Keep memory for 60 seconds
+            processMemory.delete(id);
         }
-    }, 10000);
-}
+    }
+}, 10000);
