@@ -244,16 +244,17 @@ export function WhaleProShell({
                 <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#FAF9F6] dark:bg-[#050810]">
                     <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
                         
-                        {/* HARDWARE-ACCELERATED IMMERSIVE WATERMARK LAYER */}
+                        {/* HARDWARE-ACCELERATED IMMERSIVE WATERMARK LAYER — 4K ukiyo-e */}
                         <div 
                             className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 hidden dark:block"
                             style={{
-                                backgroundImage: `url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')`,
-                                backgroundSize: '250px auto',
+                                backgroundImage: `url('/api/checkpoint-image?name=patron-cosmico-4k.png')`,
+                                backgroundSize: '280px auto',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'repeat',
                                 transform: 'translateZ(0)',
-                                opacity: 0.035,
+                                willChange: 'transform',
+                                opacity: 0.038,
                                 mixBlendMode: 'screen',
                                 filter: 'invert(1) hue-rotate(180deg)'
                             }}
@@ -261,12 +262,13 @@ export function WhaleProShell({
                         <div 
                             className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 block dark:hidden"
                             style={{
-                                backgroundImage: `url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')`,
-                                backgroundSize: '250px auto',
+                                backgroundImage: `url('/api/checkpoint-image?name=patron-cosmico-4k.png')`,
+                                backgroundSize: '280px auto',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'repeat',
                                 transform: 'translateZ(0)',
-                                opacity: 0.06,
+                                willChange: 'transform',
+                                opacity: 0.062,
                                 mixBlendMode: 'multiply'
                             }}
                         />

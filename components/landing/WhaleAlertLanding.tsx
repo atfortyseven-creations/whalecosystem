@@ -349,18 +349,19 @@ export function WhaleAlertLanding() {
   return (
     <div ref={containerRef} className="relative w-full overflow-x-hidden text-black dark:text-white font-sans transition-colors duration-300">
         
-        {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (iOS/Android/PC Parity) */}
+        {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER — 4K ukiyo-e pattern */}
         <div 
           className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
           style={{
-             backgroundImage: "url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')",
+             backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
              backgroundRepeat: "repeat",
-             backgroundSize: "400px auto",
+             backgroundSize: "420px auto",
              backgroundPosition: "top left",
-             opacity: 0.75
+             opacity: 0.72,
+             transform: "translateZ(0)",
+             willChange: "transform",
           }}
-        >
-        </div>
+        />
 
         {/* Subtle overlay to guarantee text readability in light and dark mode WITHOUT blurring the pattern */}
         <div className="fixed inset-0 pointer-events-none -z-10 bg-white/40 dark:bg-black/40 transition-colors duration-300" />
@@ -763,24 +764,44 @@ export function WhaleAlertLanding() {
            background-size: cover & background-position: bottom center ensures
            it scales up without breaking aspect ratio, keeping the waves at the bottom.
            ────────────────────────────────────────────────────────────────────── */}
-        {/* ── MAX-PPI DOWNHEAD BACKGROUND ── */}
+        {/* ── 4K DOWNHEAD BACKGROUND: repating ukiyo-e pattern + Hokusai wave bottom layer ── */}
+
+        {/* Layer 1: Repeating wave pattern at 72% opacity */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
             transform: "translateZ(0)",
-            willChange: "auto",
+            willChange: "transform",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
-            backgroundImage: "url('/api/checkpoint-image?name=nuevo-patron-cosmico.jpg')",
+            backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
             backgroundRepeat: "repeat",
-            backgroundSize: "400px auto",
-            backgroundPosition: "center center",
-            opacity: 0.75, 
+            backgroundSize: "420px auto",
+            backgroundPosition: "top center",
+            opacity: 0.72,
           }}
         />
-        {/* Dark mode overlay */}
-        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.85 }} />
+
+        {/* Layer 2: Hokusai blue waves pinned to the bottom — NO repeat, covers full width */}
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 left-0 right-0 z-[2] pointer-events-none"
+          style={{
+            backgroundImage: "url('/api/checkpoint-image?name=olas-hokusai-4k.png')",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "100% auto",
+            backgroundPosition: "bottom center",
+            height: "340px",
+            transform: "translateZ(0)",
+            willChange: "transform",
+            opacity: 0.92,
+            mixBlendMode: "multiply",
+          }}
+        />
+
+        {/* Dark mode overlay: hides the light-mode olas in dark mode, keeps pattern */}
+        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "#050810", opacity: 0.82 }} />
 
         <div className="relative z-20 max-w-3xl mx-auto text-center">
           <Reveal>
