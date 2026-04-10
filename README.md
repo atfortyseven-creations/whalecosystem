@@ -67,7 +67,8 @@ El sistema procesa y analiza transacciones de alto valor (ballenas) a través de
 | **Lucide React** | Sistema de iconografía institucional |
 | **SWR + React Query** | Fetching de datos con caché inteligente |
 | **Recharts + D3** | Gráficos de analytics institucionales |
-| **TradingView** | Charts de precio y volumen en tiempo real |
+| **Lightweight Charts v5** | Charts Pro acelerados por Hardware (Zero-Crash API) |
+| **Aztec Brutalism UI** | Arquitectura visual minimalista, texto-driven sin neones |
 
 ### Backend & Datos
 | Tecnología | Uso |
@@ -113,9 +114,10 @@ El corazón del sistema. Captura transacciones de alto valor en tiempo real medi
 
 ### 2. 🌐 Sovereign Mesh Network
 Red P2P descentralizada para propagación de señales ZK entre nodos:
-- **Protocolo**: Redis Pub/Sub sobre TCP (compatible con VPCs de Railway/AWS)
+- **Protocolo**: Redis Pub/Sub sobre TCP (compatible con VPCs de Railway/AWS).
 - **Criptografía**: Firma ECDSA real por nodo. Cada señal lleva `pubKey + signature` verificables.
-- **Replay Protection**: `processMemory` con ventana de 60 segundos para evitar bucles de gossip.
+- **Auto-Escalado Seguro**: Cola de retención límite `MAXLEN` (OOM prevent) y BullMQ Stalled Jobs Detection.
+- **Client-Side Zero-Fetch Policy**: El frontend no hace llamadas directas a APIs externas (venciendo CORS, Rate Limits y adblockers globally) mediante proxy inverso en memoria React Context.
 
 ### 3. 📊 1TB Indexing Engine
 Motor de pre-cómputo que mantiene el 1TB de PostgreSQL accesible en microsegundos:
@@ -292,7 +294,11 @@ Este rol exige un profundo dominio de los fundamentos de las Ciencias de la Comp
    - Ingeniería visual directa sobre la caché del Compositor de GPU (Zero-Paint Pipelines, *will-change* matrices). Experiencia inmersiva uniendo WebGL (*Three.js, R3F*) con matemáticas vectoriales atadas al scroll del usuario (*GSAP, Lenis*).
 
 6. **DevOps Determinista e Infraestructura Inmutable:**
-   - Gobierno puro contiguo de la red a través de Bash Scripting, Webhooks asíncronos, despliegues dockerizados en nube privada de lata densidad (*Railway Pro, AWS*), y protocolos estables de Fallover-RPC.
+   - Gobierno puro contiguo de la red a través de Bash Scripting, Webhooks asíncronos y despliegues dockerizados en nube privada (*Railway Pro*).
+   - Desarrollo de guardianes activos (*Watchdogs*) que suicidan contenedores ante latencias RPC, forzando Auto-Healing instantáneo.
+
+7. **Doctrina Visual Institutional-Grade (Aztec Brutalism):**
+   - Rechazo frontal de estéticas gamificadas (neones, luces pulsantes, badges). Implementación de UIs solemnes, orientadas a terminal de texto de máxima legibilidad (Railway-inspired).
 
 ### 💡 Perfil Cognitivo Excluyente
 
