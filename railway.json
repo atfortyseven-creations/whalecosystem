@@ -1,10 +1,4 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
-  "crons": [
-    {
-      "path": "/api/cron/indexer",
-      "schedule": "* * * * *",
-      "comment": "1TB Aggregation Indexer: Runs every minute. Redis TTLs (15-120s) ensure freshness between runs."
-    }
-  ]
+  "crons": []
 }
