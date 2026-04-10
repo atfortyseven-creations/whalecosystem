@@ -24,6 +24,8 @@ import {
   Time,
   CandlestickData,
   HistogramData,
+  CandlestickSeries,
+  HistogramSeries,
 } from 'lightweight-charts';
 import { useVIPStore } from '@/lib/vip-store';
 
@@ -164,7 +166,7 @@ export function InstitutionalQuantChart() {
       handleScale:  { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
     });
 
-    const candle = chart.addCandlestickSeries({
+    const candle = chart.addSeries(CandlestickSeries, {
       upColor:       PALETTE.upColor,
       downColor:     PALETTE.downColor,
       borderVisible: false,
@@ -172,7 +174,7 @@ export function InstitutionalQuantChart() {
       wickDownColor: PALETTE.downColor,
     });
 
-    const volume = chart.addHistogramSeries({
+    const volume = chart.addSeries(HistogramSeries, {
       color:        PALETTE.accentGold,
       priceFormat:  { type: 'volume' },
       priceScaleId: 'vol',

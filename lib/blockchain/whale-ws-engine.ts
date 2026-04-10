@@ -7,7 +7,7 @@
 
 import WebSocket from 'ws';
 
-const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS;
+const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS || 'wss://ethereum-rpc.publicnode.com';
 const WHALE_USD_THRESHOLD = parseInt(process.env.WHALE_THRESHOLD_USD || '50000', 10);
 
 // ERC-20 Transfer event topic

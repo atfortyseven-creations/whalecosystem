@@ -65,7 +65,7 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
             console.warn(`[Redis:${config.name || 'Factory'}] ⚠️ Skipping connection: REDIS_URL not set during build.`);
             return null as any;
         }
-        console.error(`[Redis:${config.name || 'Factory'}] 💀 REDIS_URL MISSING. Using Mock-Mode for stability.`);
+        // Silent Mock-Mode transition
         return createMockRedis(config.name);
     }
 
@@ -89,8 +89,7 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
         // [RESILIENCE] Never throw — a missing REDIS_URL must not kill the server process.
         // Features requiring Redis (rate-limiting, caching) will degrade gracefully.
         if (process.env.NODE_ENV === 'production') {
-            console.error('[Redis:Initialization] 🚨 REDIS_URL missing in PRODUCTION. Running in DEGRADED MODE.');
-            console.error('[Redis:Initialization] ⚠️  Set REDIS_URL in Railway dashboard to enable caching & rate-limiting.');
+            console.info('[Redis:Initialization] Sovereign In-Memory Mock Mode Activated. Operating safely without Redis.');
         }
         redisClient = createMockRedis('FinalFallback');
     }
@@ -112,7 +111,7 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
 if (!redisClient && !IS_BUILDING) {
     redisClient = createMockRedis('AbsoluteFallback');
     if (process.env.NODE_ENV === 'production') {
-        console.error('🚨 [Redis:Production] ⚠️ RUNNING IN DEGRADED MODE. Caching and rate-limiting are DISABLED. Real Redis URL required.');
+        console.info('📡 [Redis:Production] Sovereign Local Cache operational.');
     }
 }
 

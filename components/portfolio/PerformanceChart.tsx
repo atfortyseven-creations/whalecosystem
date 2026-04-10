@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart, ColorType, IChartApi } from 'lightweight-charts';
+import { createChart, ColorType, IChartApi, AreaSeries } from 'lightweight-charts';
 import { useAppKitAccount } from '@reown/appkit/react';
 
 export const PerformanceChart: React.FC = () => {
@@ -28,7 +28,7 @@ export const PerformanceChart: React.FC = () => {
             rightPriceScale: { borderVisible: false },
         });
 
-        const areaSeries = (chart as any).addAreaSeries({
+        const areaSeries = chart.addSeries(AreaSeries, {
             lineColor: '#6366f1',
             topColor: 'rgba(99, 102, 241, 0.4)',
             bottomColor: 'rgba(99, 102, 241, 0.0)',

@@ -157,8 +157,12 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<NewsArticl
     }
 
     return articles;
-  } catch (err) {
-    console.warn(`[WhaleNews] RSS ${sourceName} failed:`, err);
+  } catch (err: any) {
+    if (err && err.name === 'TimeoutError') {
+      console.warn(`[WhaleNews] RSS ${sourceName} failed: Timeout Limit Exceeded.`);
+    } else {
+      console.warn(`[WhaleNews] RSS ${sourceName} failed: ${err.message || 'Unknown Network Error'}`);
+    }
     return [];
   }
 }

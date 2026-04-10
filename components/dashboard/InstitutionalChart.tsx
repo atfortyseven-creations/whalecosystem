@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import { createChart, ColorType, IChartApi, ISeriesApi } from 'lightweight-charts';
+import { createChart, ColorType, IChartApi, ISeriesApi, HistogramSeries, AreaSeries } from 'lightweight-charts';
 
 interface ChartProps {
   data: { time: string; value: number }[];
@@ -62,7 +62,7 @@ export const InstitutionalChart: React.FC<ChartProps> = ({
 
     if (isZScoreMode) {
       // Rotation Heatmap style (Histogram)
-      series = chart.addHistogramSeries({
+      series = chart.addSeries(HistogramSeries, {
         color: lineColor,
         priceFormat: { type: 'volume' },
       });
@@ -74,7 +74,7 @@ export const InstitutionalChart: React.FC<ChartProps> = ({
       series.setData(zData);
     } else {
       // Standard TVL / Volume format (Area)
-      series = chart.addAreaSeries({
+      series = chart.addSeries(AreaSeries, {
         lineColor,
         topColor: areaTopColor,
         bottomColor: areaBottomColor,

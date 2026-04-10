@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, RefreshCw, Info } from 'lucide-react';
 import { useMarketStore } from '@/store/useMarketStore';
-import { createChart, ColorType, IChartApi, ISeriesApi, Time } from 'lightweight-charts';
+import { createChart, ColorType, IChartApi, ISeriesApi, Time, AreaSeries } from 'lightweight-charts';
 
 const TIMEFRAME_MAP: Record<string, string> = {
   '1h': '1m',
@@ -59,7 +59,7 @@ export default function LiquidationHeatmap() {
       timeScale: { timeVisible: true, secondsVisible: false },
       rightPriceScale: { borderVisible: false },
     });
-    const areaSeries = chart.addAreaSeries({
+    const areaSeries = chart.addSeries(AreaSeries, {
       lineColor: '#B37FEB',
       topColor: 'rgba(179,127,235,0.4)',
       bottomColor: 'rgba(179,127,235,0.0)',

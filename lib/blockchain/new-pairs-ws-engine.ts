@@ -11,9 +11,11 @@ import WebSocket from 'ws';
 const WS_ENDPOINTS = [
     'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a',
     'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
-    'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131'
+    'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131',
+    'wss://ethereum-rpc.publicnode.com'
 ];
 let currentWsIndex = 0;
+let backoff = 5000;
 
 // UniswapV3 Factory
 const UNISWAP_V3_FACTORY  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'.toLowerCase();
@@ -112,7 +114,10 @@ class NewPairsWebSocketEngine {
     private scheduleReconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         currentWsIndex = (currentWsIndex + 1) % WS_ENDPOINTS.length;
-        this.reconnectTimer = setTimeout(() => this.connect(), 5000);
+        this.reconnectTimer = setTimeout(() => {
+            backoff = Math.min(backoff * 1.5, 30000); // Max 30s
+            this.connect();
+        }, backoff);
     }
 
     subscribe(fn: PairListener) {
