@@ -87,12 +87,6 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
       <style dangerouslySetInnerHTML={{ __html: `
         .msv-hide-scrollbar::-webkit-scrollbar { display: none; }
         .msv-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .msv-dot-pattern {
-          background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-          background-size: 32px 32px;
-          will-change: transform;
-          transform: translateZ(0);
-        }
         .msv-snap-container {
           scroll-snap-type: y mandatory;
           overflow-y: scroll;
@@ -114,15 +108,16 @@ const AnimatedPattern = React.memo(function AnimatedPattern() {
         .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
       ` }} />
       {/* Zero-Trust Background adhering to light/dark system */}
-      <div className="fixed inset-0 z-0 overflow-hidden bg-[#FDFBF7] dark:bg-[#000000]" />
-      {/* Optional subtle dot overlay for depth */}
-      <motion.div
-        aria-hidden="true"
-        className="fixed -inset-[32px] msv-dot-pattern pointer-events-none z-[1] opacity-20 dark:opacity-10"
-        animate={{ x: [0, -32], y: [0, -32] }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        style={{ willChange: 'transform' }}
+      <div 
+         className="fixed inset-0 z-0 opacity-70 pointer-events-none transition-colors duration-300"
+         style={{
+            backgroundImage: "url('/patron-cosmico-4k.png')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "auto",
+            backgroundPosition: "top left",
+         }}
       />
+      <div className="fixed inset-0 z-1 pointer-events-none bg-white/40 dark:bg-[#050505]/60 transition-colors duration-300" />
     </>
   );
 });
@@ -386,12 +381,12 @@ function PageHero({
       </header>
 
       {/* HERO */}
-      <main className="w-full max-w-sm flex flex-col items-center text-center z-10 flex-1 justify-center">
+      <main className="w-full max-w-sm flex flex-col items-center text-center z-10 flex-1 justify-center relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center"
+          className="flex flex-col items-center w-full bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-6 shadow-2xl border border-black/5 dark:border-white/5 relative z-20"
           style={{ willChange: 'transform, opacity' }}
         >
           <WorldFinancialClocks />
@@ -566,55 +561,80 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
 // ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative bg-transparent text-black dark:text-white">
-      <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-sm mx-auto">
-        <div className="text-[14px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
-          <div className="flex items-center gap-3 mb-4">
+    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-4 sm:px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative text-black dark:text-white bg-transparent">
+        {/* Layer 2: Hokusai blue waves perfectly scaled via native img logic */}
+        <img
+          src="/olas-hokusai-4k.png"
+          alt="Hokusai Waves"
+          className="absolute bottom-0 left-0 w-full h-auto z-[0] pointer-events-none select-none opacity-90 object-cover"
+          style={{
+            transform: "translateZ(0)",
+            willChange: "transform",
+          }}
+        />
+        {/* Dark mode overlay for olas to fade naturally */}
+        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "linear-gradient(to top, #050810 0%, transparent 60%)", opacity: 0.9 }} />
+
+      <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-md mx-auto bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-8 sm:p-10 shadow-2xl border border-black/5 dark:border-white/5">
+        <div className="text-[13px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
+          
+          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 bg-clip-text text-black dark:text-white">WHALE ALERT NETWORK<br /><span className="text-xs uppercase tracking-[0.3em] opacity-40">Sovereign Intelligence</span></h2>
+
+          <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">00</span>
             <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ABSTRACT</span>
           </div>
           <p>
-            The Whale Alert Network represents a paradigm shift in decentralized financial intelligence and blockchain analytics. This repository encapsulates the foundational logic, distributed mesh networking interfaces, cryptography-enforced endpoints, and proprietary user-interaction frameworks constituting the Whale Alert Node. Engineered with strict adherence to Zero-Trust principles and immutable non-custodial methodologies, the system aggregates, verifies, and disseminates institutional-grade on-chain telemetry.
+            Whale Alert Network es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red soberana (Sovereign Mesh). Procesa transacciones de gran valor con latencias de sub-500ms usando Z-scores y ZK Proofs.
           </p>
           
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">01</span>
             <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">INFRASTRUCTURE</span>
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">STACK TÉCNICO</span>
           </div>
-          <p>
-            The backend relies on an unconditionally deterministic environment structured around Next.js App Router topologies, integrating directly with high-frequency PostgreSQL atomic transactions. Legacy session authentication paradigms have been entirely deprecated. The network operates strictly utilizing cryptographic identity verifications. Users authenticate by signing deterministic cryptographic challenges directly with their hierarchical deterministic wallets.
-          </p>
+          <ul className="space-y-4 pl-2 opacity-90 text-[12px]">
+            <li><strong>Frontend:</strong> Next.js 15, Three.js, GSAP 3, Wagmi.</li>
+            <li><strong>Backend:</strong> PostgreSQL 1TB, Redis Streams (At-Least-Once), BullMQ.</li>
+            <li><strong>Blockchain:</strong> Solana SIMD-0109 Workers, EVM Mempool Scanners, Hardhat.</li>
+            <li><strong>Seguridad:</strong> ECDSA secp256k1, ZK SnarkJS, SIWE.</li>
+          </ul>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">02</span>
             <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ZK-SHIELD</span>
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">MÓDULOS DE RED</span>
           </div>
-          <p>
-            At the apex of our asynchronous operation array lies the Zero-Knowledge processing unit, interfaced through conceptual alignment with the Aztec Network. This computational bastion ensures that all executed state transitions regarding user identity and priority access maintain programmable cryptographic finality. By synthesizing deterministic database routing with homomorphic encryption validation, the node operates as an impartial, cryptographic arbiter.
-          </p>
+          <ul className="space-y-4 pl-2 opacity-90 text-[12px]">
+            <li><strong>Real-Time Whale Stream:</strong> Captura de mempool pre-resolución de liquidez.</li>
+            <li><strong>Sovereign Mesh Network:</strong> P2P descentralizada vía Redis Pub/Sub TCP con ECDSA real.</li>
+            <li><strong>1TB Indexing Engine:</strong> Agregadores en paralelo actualizando leaderboards globales.</li>
+            <li><strong>ZK AVS Integración:</strong> Validación de señales usando EigenLayer AVS.</li>
+          </ul>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">03</span>
             <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">GENESIS TELEMETRY</span>
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ROADMAP 2026/2027</span>
           </div>
-          <p>
-            The Genesis access tier mandates absolute non-repudiation. Utilizing an integrated HTML5 diagnostic canvas array, the user's manual signature is captured digitally and compressed alongside environmental telemetry logs. This telemetry is verified asynchronously alongside the L2 block confirmation. The result is an indelible, real-time cryptographic receipt of the individual's admission into the intelligence terminal.
-          </p>
+          <ul className="space-y-2 pl-2 opacity-90 list-disc list-inside text-[12px]">
+            <li>Implementación de Prisma Accelerate.</li>
+            <li>Migración de Streams a Apache Kafka.</li>
+            <li>IA predictiva LSTM para deltas institucionales.</li>
+            <li>Expansión a 10,000 Nodos distribuídos.</li>
+          </ul>
 
-          <p className="font-bold pt-8 border-t border-black/10 dark:border-white/10 mt-12 text-[11px] uppercase tracking-widest text-center opacity-40">
+          <p className="font-bold pt-8 border-t border-black/10 dark:border-white/10 mt-12 text-[10px] uppercase tracking-widest text-center opacity-40">
             Immutable Data. Zero-Trust Verification. Extreme Precision.
           </p>
           
-          <div className="pt-12 flex items-center justify-center gap-8 mt-10">
+          <div className="pt-8 flex items-center justify-center gap-8 mt-6">
               <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
                   <Twitter size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
               </a>
-              <div className="relative w-24 h-24 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center bg-white/5 shadow-md">
-                  <img src="/official-whale-monochrome.png" className="w-14 h-14 dark:invert opacity-95 drop-shadow-sm" alt="The Whale" />
+              <div className="relative w-20 h-20 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center bg-white/5 shadow-md">
+                  <img src="/official-whale-monochrome.png" className="w-12 h-12 dark:invert opacity-95 drop-shadow-sm" alt="The Whale" />
               </div>
               <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
                   <Github size={20} className="opacity-60 hover:opacity-100 transition-opacity" />

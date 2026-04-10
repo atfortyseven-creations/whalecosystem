@@ -354,12 +354,12 @@ export function WhaleAlertLanding() {
           className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
           style={{
              backgroundImage: "url('/patron-cosmico-4k.png')",
-             backgroundRepeat: "no-repeat",
-             backgroundSize: "cover",
-             backgroundPosition: "center",
-             opacity: 0.72,
+             backgroundRepeat: "repeat",
+             backgroundSize: "auto",
+             backgroundPosition: "top left",
              transform: "translateZ(0)",
              willChange: "transform",
+             opacity: 0.72,
           }}
         />
 
@@ -417,7 +417,7 @@ export function WhaleAlertLanding() {
           <WhalePostIframePanel />
         </div>
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center">
+        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-10 md:p-20 shadow-2xl border border-black/5 dark:border-white/5">
           <AnimatePresence mode="wait">
             {!showClearance ? (
               <motion.div key="core" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -673,7 +673,7 @@ export function WhaleAlertLanding() {
       <section className="py-32 px-6 bg-white dark:bg-[#0A0A0A] border-t border-black/[0.05] dark:border-white/[0.05]">
         <div className="max-w-4xl mx-auto font-sans">
           <Reveal>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-8 text-center">Protocol Manifesto</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-8 text-center">Manifesto Técnico Integral</p>
             <h2 className="text-3xl md:text-5xl font-black text-black dark:text-white tracking-tighter mb-16 text-center leading-tight">
               WHALE ALERT NETWORK:<br/>THE SOVEREIGN INTELLIGENCE PROTOCOL
             </h2>
@@ -685,72 +685,150 @@ export function WhaleAlertLanding() {
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">00</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">ABSTRACT</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">PROTOCOL ABSTRACT</span>
               </div>
               <p>
-                The Whale Alert Network represents a paradigm shift in decentralized financial intelligence and blockchain analytics. This repository encapsulates the foundational logic, distributed mesh networking interfaces, cryptography-enforced endpoints, and proprietary user-interaction frameworks constituting the Whale Alert Node. Engineered with strict adherence to Zero-Trust principles and immutable non-custodial methodologies, the system aggregates, verifies, and disseminates institutional-grade on-chain telemetry. It bypasses conventional visualization abstraction layers by operating synchronously with Ethereum Virtual Machine (EVM) mempool execution environments and scalable Rollup architectures.
+                <strong>Whale Alert Network</strong> es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red soberana (Sovereign Mesh) para proporcionar una capa de conocimiento sin precedentes sobre los movimientos de capital cripto a gran escala.
               </p>
+              <p className="mt-4">
+                El sistema procesa y analiza transacciones de alto valor (ballenas) a través de múltiples redes blockchain simultáneamente, aplicando filtros criptográficos ZK, correlaciones temporales de señales y algoritmos de puntuación Z-score propietarios, todo con latencias de sub-500ms.
+              </p>
+              <blockquote className="mt-6 border-l-2 border-black/20 dark:border-white/20 pl-6 italic opacity-80">
+                "El conocimiento del mercado más poderoso no es el que puedes comprar. Es el que el mercado emite y nadie más puede leer."
+              </blockquote>
             </Reveal>
 
             <Reveal delay={0.2}>
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">01</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">ARCHITECTURAL ONTOLOGY AND CORE INFRASTRUCTURE</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">ARQUITECTURA DEL SISTEMA</span>
               </div>
-              <p className="mb-6">
-                The backend relies on an unconditionally deterministic environment structured around Next.js App Router topologies, integrating directly with high-frequency PostgreSQL atomic transactions. This infrastructure departs from traditional web service dependencies by acting specifically as an immutable relay for zero-knowledge data.
-              </p>
-              <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-2">A. Non-Custodial Session Handshakes</h4>
-              <p className="mb-6">
-                Legacy session authentication paradigms have been entirely deprecated. The network operates strictly utilizing cryptographic identity verifications. Elliptic curve digital signature algorithms (ECDSA) manage all authorization matrices. Users authenticate by signing deterministic cryptographic challenges directly with their hierarchical deterministic wallets, generating verifiable payloads that the backend mathematically validates without ever assuming custodial control or storing sensitive authentication vectors.
-              </p>
-              <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-2">B. The Sovereign Aztec Rollup Integration (ZK-Shield)</h4>
-              <p>
-                At the apex of our asynchronous operation array lies the Zero-Knowledge processing unit, interfaced through conceptual alignment with the Aztec Network. This computational bastion ensures that all executed state transitions regarding user identity and priority access maintain programmable cryptographic finality. By synthesizing deterministic database routing with homomorphic encryption validation, the node operates as an impartial, cryptographic arbiter.
-              </p>
+              <pre className="bg-black/5 dark:bg-white/5 p-6 rounded-xl font-mono text-[10px] md:text-[11px] overflow-x-auto whitespace-pre text-black/80 dark:text-white/80">
+{`┌─────────────────────────────────────────────────────────────────┐
+│                    WHALE ALERT NETWORK v3.0                     │
+├─────────────────┬───────────────────┬───────────────────────────┤
+│   FRONTEND      │    BACKEND CORE   │   SOVEREIGN LAYER         │
+│                 │                   │                           │
+│  Next.js 15     │  PostgreSQL 1TB   │  Sovereign Mesh (TCP)     │
+│  TypeScript     │  Redis Streams    │  ECDSA P-256 Signing      │
+│  Three.js       │  Prisma ORM       │  ZK Proof Verification    │
+│  GSAP + Framer  │  Redis Pub/Sub    │  AVS Node Network         │
+│  Wagmi/Viem     │  BullMQ Queues    │  EigenLayer Integration   │
+│  Tailwind CSS   │  PgBouncer Pool   │  Deadman Switch Contract  │
+├─────────────────┴───────────────────┴───────────────────────────┤
+│                    INFRASTRUCTURE LAYER                         │
+│                                                                 │
+│  Railway Pro (42 réplicas · 1TB Storage · 1000 vCPU)            │
+│  Docker Compose (web + worker-solana + worker-mesh)             │
+│  GitHub Actions CI → Railway Auto-Deploy                        │
+│  Global RPC Router (6 endpoints · Auto-Failover)                │
+└─────────────────────────────────────────────────────────────────┘`}
+              </pre>
             </Reveal>
 
             <Reveal delay={0.3}>
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">02</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">THE SEVEN-PHASE MATHEMATICAL INTERFACE (TERMINAL ARCHITECTURE)</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">STACK TÉCNICO COMPLETO</span>
               </div>
-              <p className="mb-6">
-                The frontend execution layer is constructed adopting an "Aztec Brutalist" aesthetic framework—a rigorous, strictly monochromatic design system prioritizing low-latency rendering and maximum data density. It eliminates superfluous animations in favor of high-fidelity institutional terminal metrics. The Terminal is segmented into seven core operational phases:
-              </p>
-              <ul className="space-y-4 text-[13px] border-l border-black/10 dark:border-white/10 pl-6">
-                <li><strong className="text-black dark:text-white font-black">Phase I (Core Dashboard):</strong> Real-time assimilation of global liquidity events, dark pool transactions, and whale capitalization matrices.</li>
-                <li><strong className="text-black dark:text-white font-black">Phase II (Global Market):</strong> A decentralized tracking mechanism mapping directly to Polymarket and synthetic frameworks.</li>
-                <li><strong className="text-black dark:text-white font-black">Phase III (Institutional Watchlist):</strong> Aggressively guarded entity-tracking table allowing users to monitor designated EVM addresses.</li>
-                <li><strong className="text-black dark:text-white font-black">Phase IV (Pro Matrix Analytics):</strong> A restricted operational layer offering granular, sub-second volume delta computations.</li>
-                <li><strong className="text-black dark:text-white font-black">Phase V (Advanced Alert Telemetry):</strong> Programmable event-listeners executing immediate callbacks upon critical chain-state alterations.</li>
-                <li><strong className="text-black dark:text-white font-black">Phase VI (Multichart Overlay):</strong> High-precision algorithmic integrations running multi-layered temporal charts synchronously.</li>
-                <li><strong className="text-black dark:text-white font-black">Phase VII (Sovereign Genesis Node):</strong> The definitive authentication tier. Users mint the Sovereign Golden Ticket to cement identity, requiring geographic telemetry and a raw cryptographic signature broadcast to the Global Genesis Ledger.</li>
-              </ul>
+              
+              <div className="grid md:grid-cols-2 gap-8 mt-6">
+                <div>
+                  <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-4">Frontend</h4>
+                  <ul className="space-y-3 text-[13px]">
+                    <li><strong className="text-black dark:text-white">Next.js 15</strong> (App Router) - SSR/SSG/Streaming</li>
+                    <li><strong className="text-black dark:text-white">TypeScript 5.7</strong> - Tipado estricto</li>
+                    <li><strong className="text-black dark:text-white">Three.js + R3F</strong> - Renderizado 3D</li>
+                    <li><strong className="text-black dark:text-white">GSAP 3 + Framer Motion</strong> - Animaciones alta performance</li>
+                    <li><strong className="text-black dark:text-white">Wagmi + Viem</strong> - Conexión Web3</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-4">Backend & Datos</h4>
+                  <ul className="space-y-3 text-[13px]">
+                    <li><strong className="text-black dark:text-white">PostgreSQL (1TB) + Prisma 6</strong> - Base principal</li>
+                    <li><strong className="text-black dark:text-white">PgBouncer</strong> - Connection pooling (42+ réplicas)</li>
+                    <li><strong className="text-black dark:text-white">Redis Streams</strong> - Eventos persistentes At-Least-Once</li>
+                    <li><strong className="text-black dark:text-white">BullMQ</strong> - Cola para workers escalables</li>
+                    <li><strong className="text-black dark:text-white">Neo4j</strong> - Grafo de relaciones (Arkham killer)</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-4">Blockchain & Scanners</h4>
+                  <ul className="space-y-3 text-[13px]">
+                    <li><strong className="text-black dark:text-white">Solana Web3.js</strong> - Captura de señales SIMD-0109</li>
+                    <li><strong className="text-black dark:text-white">Ethers.js 6 + Viem</strong> - Mempool EVM multinodo</li>
+                    <li><strong className="text-black dark:text-white">Hardhat + Solidity</strong> - Contratos inteligentes</li>
+                    <li><strong className="text-black dark:text-white">SnarkJS</strong> - ZK Proofs</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-4">Seguridad Institucional</h4>
+                  <ul className="space-y-3 text-[13px]">
+                    <li><strong className="text-black dark:text-white">ECDSA secp256k1</strong> - Firma criptográfica de red</li>
+                    <li><strong className="text-black dark:text-white">SIWE</strong> - Autenticación no custodial</li>
+                    <li><strong className="text-black dark:text-white">HMAC-SHA256</strong> - API keys institucionales</li>
+                  </ul>
+                </div>
+              </div>
             </Reveal>
 
             <Reveal delay={0.4}>
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">03</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">CRYPTOGRAPHIC SIGNATURE AND TELEMETRY LOGGING</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">MÓDULOS DE RED</span>
               </div>
-              <p>
-                The Genesis access tier mandates absolute non-repudiation. Utilizing an integrated HTML5 diagnostic canvas array, the user's manual signature is captured digitally and compressed alongside environmental telemetry logs (Timestamp, Address Sequence, Geographic Code, and Planetary Node). This telemetry is verified asynchronously alongside the L2 block confirmation. Once finality is achieved on Optimism, the payload is securely packaged to the PostgreSQL database, resulting in an indelible, real-time cryptographic receipt of the individual's admission into the intelligence terminal.
-              </p>
+              <ul className="space-y-6 text-[13px] border-l-2 border-black/10 dark:border-white/10 pl-6 mt-6">
+                <li>
+                  <strong className="text-black dark:text-white font-black block mb-1">🐋 Real-Time Whale Stream (SSE)</strong>
+                  El corazón del sistema. Captura transacciones de alto valor en tiempo real mediante Solana Workers (SIMD-0109 monitor de Priority Fees) y EVM Scanners antes de que se resuelva la liquidez. Enlazado por Redis Streams.
+                </li>
+                <li>
+                  <strong className="text-black dark:text-white font-black block mb-1">🌐 Sovereign Mesh Network</strong>
+                  Red P2P descentralizada para propagación de señales ZK entre nodos. Funciona con Redis Pub/Sub sobre TCP, donde cada señal lleva su pubKey y signature (ECDSA) con protección de repetición.
+                </li>
+                <li>
+                  <strong className="text-black dark:text-white font-black block mb-1">📊 1TB Indexing Engine</strong>
+                  Motor de pre-cómputo que mantiene el petabyte de datos en PostgreSQL accesible en microsegundos, usando 6 agregadores paralelos en crons de 15 segundos y 14 índices Prisma compuestos.
+                </li>
+                <li>
+                  <strong className="text-black dark:text-white font-black block mb-1">🔐 API Institucional & ZK AVS</strong>
+                  Acceso escalonado resguardado por validaciones criptográficas. Integrado con SnarkJS y EigenLayer AVS para validación de señales descentralizada por conocimiento cero.
+                </li>
+              </ul>
             </Reveal>
 
             <Reveal delay={0.5}>
               <div className="flex items-center gap-4 mb-4">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">04</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">DEPLOYMENT AND REPLICATION (PRIVACY BY VOID)</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">VISION DE FUTURO (ROADMAP)</span>
               </div>
-              <p>
-                In parallel to robust desktop computation, the terminal deploys a rigorous Mobile Enforcer topology. Utilizing highly optimized client hydration barriers, the system guarantees perfect rendering across diverse mobile processor constraints (mitigating legacy WebKit engine errors natively). The network operates flawlessly across edge-delivery mechanisms and scalable cloud environments via automated rigorous deployment hooks. The entire framework encapsulates a relentless pursuit of transparency, real-time accuracy, and unyielding privacy. It adheres permanently to the doctrine of "Privacy by Void”—where the most secure data is the data the system fundamentally refuses to harbor.
-              </p>
+              <div className="grid md:grid-cols-2 gap-6 mt-6">
+                <div className="bg-black/[0.03] dark:bg-white/[0.03] p-6">
+                  <h4 className="font-black text-black dark:text-white mb-2">Q2 - Q3 2026</h4>
+                  <ul className="space-y-2 text-[12px] opacity-80 list-disc pl-4">
+                    <li>Prisma Accelerate Global Pooler</li>
+                    <li>Dashboard de observabilidad interno</li>
+                    <li>Despliegue de EigenLayer AVS en Mainnet</li>
+                    <li>Migración a Apache Kafka (1M+ eventos/hr)</li>
+                    <li>App Nativa iOS/Android (Push APNs)</li>
+                  </ul>
+                </div>
+                <div className="bg-black/[0.03] dark:bg-white/[0.03] p-6">
+                  <h4 className="font-black text-black dark:text-white mb-2">Q4 2026 - 2027+</h4>
+                  <ul className="space-y-2 text-[12px] opacity-80 list-disc pl-4">
+                    <li>API Pública v1 con SDK Python/JS</li>
+                    <li>IA Predictiva LSTM para movimientos de ballenas</li>
+                    <li>Pruebas zkTLS para fuentes Web2</li>
+                    <li>Red P2P Sovereign de 10,000 Nodos</li>
+                    <li>Protocolo L2 Privado Nativo</li>
+                  </ul>
+                </div>
+              </div>
             </Reveal>
 
           </div>
@@ -776,9 +854,9 @@ export function WhaleAlertLanding() {
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
             backgroundImage: "url('/patron-cosmico-4k.png')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundRepeat: "repeat",
+            backgroundSize: "auto",
+            backgroundPosition: "top left",
             opacity: 0.72,
           }}
         />
