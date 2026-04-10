@@ -351,16 +351,15 @@ export function WhaleAlertLanding() {
         
         {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (iOS/Android/PC Parity) */}
         <div 
-          className="fixed inset-0 pointer-events-none -z-10 bg-[#FAF9F6] dark:bg-[#050810] transition-colors duration-300"
+          className="fixed inset-0 pointer-events-none -z-10 transition-colors duration-300"
+          style={{
+             backgroundImage: "url('/wave-pattern-bg.jpg')",
+             backgroundRepeat: "repeat",
+             backgroundSize: "320px 200px",
+             backgroundPosition: "top left",
+             opacity: 0.15
+          }}
         >
-          <Image 
-            src="/ios-android-hq.jpg" 
-            alt="Landing Background Waves" 
-            fill 
-            className="object-cover object-center opacity-40 dark:opacity-20" 
-            quality={100} 
-            priority
-          />
         </div>
 
         {/* Subtle overlay to guarantee text readability in light and dark mode */}
@@ -775,11 +774,11 @@ export function WhaleAlertLanding() {
             willChange: "auto",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden" as any,
-            backgroundImage: "url('/hokusai-downhead.jpg')",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
+            backgroundImage: "url('/wave-pattern-bg.jpg')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "320px 200px",
             backgroundPosition: "bottom center",
-            opacity: 0.9,     // Slight opacity if text needs it, but image center is white
+            opacity: 0.15,     // Slight opacity if text needs it, but image center is white
             backgroundColor: "#FAF9F6",
           }}
         />

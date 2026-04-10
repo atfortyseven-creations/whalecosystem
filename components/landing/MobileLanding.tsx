@@ -34,7 +34,7 @@ export function MobileLanding() {
     const { open: openWallet } = useAppKit();
 
     return (
-        <div style={{ backgroundColor: "#000000", color: "#FFFFFF" }} className="min-h-screen overflow-y-auto w-full selection:bg-[#00FF55] selection:text-[#000000] font-mono">
+        <div style={{ backgroundColor: "transparent", color: "#FFFFFF" }} className="min-h-screen overflow-y-auto w-full selection:bg-[#00FF55] selection:text-[#000000] font-mono">
             {/* ── INIT/HERO ── */}
             <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 text-center border-b border-[#222222]">
                 <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: `linear-gradient(#00FF55 1px, transparent 1px), linear-gradient(90deg, #00FF55 1px, transparent 1px)`, backgroundSize: '20px 20px' }} />
@@ -101,12 +101,12 @@ export function MobileLanding() {
                     style={{
                         transform: "translateZ(0)",
                         willChange: "auto",
-                        backgroundImage: "url('/hokusai-downhead.jpg')",
-                        backgroundRepeat: "no-repeat",
-                        backgroundSize: "cover",
-                        backgroundPosition: "bottom center",
-                        opacity: 0.25, // Lower opacity to keep neon green text highly legible on mobile black theme
-                        mixBlendMode: "luminosity" // Blends beautifully into the black background
+                        backgroundImage: "url('/wave-pattern-bg.jpg')",
+                        backgroundRepeat: "repeat",
+                        backgroundSize: "320px 200px",
+                        backgroundPosition: "top left",
+                        opacity: 0.15,
+                        mixBlendMode: "screen"
                     }}
                 />
                 

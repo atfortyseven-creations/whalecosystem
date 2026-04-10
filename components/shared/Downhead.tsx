@@ -17,7 +17,7 @@ export function Downhead() {
                 borderTop: "1px solid rgba(255, 255, 255, 0.05)",
                 color: "#E0E0E0"
             }} 
-            className="w-full py-16 px-6 lg:px-20 relative overflow-hidden font-sans selection:bg-[#D4AF37]/30 selection:text-white"
+            className="w-full py-16 px-6 lg:px-20 relative overflow-hidden font-sans selection:bg-[#D4AF37]/30 selection:text-white wave-surface-strong"
         >
             <div className="max-w-[1400px] mx-auto relative z-10">
                 {/* Upper Footer: Logo & Subscription */}

@@ -19,15 +19,14 @@ export function UniversalEliteWallpaper() {
     return (
         <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden select-none bg-white dark:bg-black transition-colors duration-300">
             {/* The Majestic Fluid Layer — Multiplied for Depth using Ultra HQ Image */}
-            <div className="absolute inset-0 z-0">
-                <Image 
-                    src="/ios-android-hq.jpg" 
-                    alt="Institutional Wallpaper Background" 
-                    fill 
-                    className="object-cover object-center opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-screen saturate-150" 
-                    quality={100} 
-                    priority 
-                />
+            <div className="absolute inset-0 z-0" 
+                style={{ 
+                    backgroundImage: "url('/wave-pattern-bg.jpg')", 
+                    backgroundSize: "320px 200px", 
+                    backgroundRepeat: "repeat",
+                    backgroundPosition: "top left"
+                }}
+            >
             </div>
             
             {/* Subtle Vignette for Institutional Focus (Elite Gold) */}
