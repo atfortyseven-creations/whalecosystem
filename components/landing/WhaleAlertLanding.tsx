@@ -480,9 +480,7 @@ export function WhaleAlertLanding() {
       {/* ── ABSTRACT ────────────────────────────────────────────────────────── */}
       <section className="py-24 px-6 relative z-10">
         <div className="max-w-4xl mx-auto bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-16 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm">
-          <Reveal>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-6">The Platform</p>
-          </Reveal>
+
           <Reveal delay={0.05}>
             <h2 className="font-sans text-3xl md:text-5xl font-black text-black dark:text-white leading-tight tracking-tighter mb-8 max-w-3xl">
               A new standard for blockchain intelligence.
@@ -508,7 +506,7 @@ export function WhaleAlertLanding() {
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-3xl mx-auto text-center">
-              <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-3">Terminal Architecture</p>
+
               <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
                 Seven operational phases.
               </h2>
@@ -560,7 +558,7 @@ export function WhaleAlertLanding() {
                   <img src="/official-whale-monochrome.png" className="w-16 h-16 invert dark:invert-0 opacity-80" alt="Genesis" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/30 dark:text-black/30 font-black mb-3">Genesis Access Tier</p>
+
                   <h3 className="font-sans text-2xl md:text-3xl font-black text-white dark:text-black tracking-tighter mb-4">Sovereign Genesis Node</h3>
                   <p className="text-[13px] text-white/50 dark:text-black/50 leading-relaxed max-w-2xl">
                     Mint your Gold Ticket — a limited ERC-1155 on Optimism L2. Upon minting, the protocol captures your signature on a cryptographic canvas, records your geolocation, timestamp, and wallet address, then broadcasts the record to the Global Genesis Ledger in real time. 200 tickets total. No exceptions.
@@ -585,7 +583,7 @@ export function WhaleAlertLanding() {
             <div>
               <Reveal>
                 <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-4">Infrastructure</p>
+
                   <h2 className="font-sans text-3xl md:text-5xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">
                     Built to last.<br/>Built to scale.
                   </h2>
@@ -618,7 +616,7 @@ export function WhaleAlertLanding() {
         <div className="max-w-4xl mx-auto text-center">
           <Reveal>
             <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-2xl mx-auto">
-              <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/40 dark:text-white/40 font-black mb-4">Cryptographic Signature Log</p>
+
               <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
                 The Global Genesis Ledger.
               </h2>
@@ -655,12 +653,7 @@ export function WhaleAlertLanding() {
                 </div>
               ))}
 
-              <div className="px-6 py-4 flex items-center justify-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                <span className="text-[9px] font-mono font-black uppercase tracking-widest text-black/20 dark:text-white/20">
-                  Live — each mint records the user's actual drawn signature
-                </span>
-              </div>
+
             </div>
           </Reveal>
 
@@ -671,7 +664,7 @@ export function WhaleAlertLanding() {
       <section className="py-32 px-6 bg-white dark:bg-[#0A0A0A] border-t border-black/[0.05] dark:border-white/[0.05]">
         <div className="max-w-4xl mx-auto font-sans">
           <Reveal>
-            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-black/25 dark:text-white/25 font-black mb-8 text-center">Manifesto Técnico Integral</p>
+
             <h2 className="text-3xl md:text-5xl font-black text-black dark:text-white tracking-tighter mb-16 text-center leading-tight">
               WHALE ALERT NETWORK:<br/>THE SOVEREIGN INTELLIGENCE PROTOCOL
             </h2>
@@ -738,6 +731,15 @@ export function WhaleAlertLanding() {
               <div className="flex items-center gap-4 mb-6">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">02</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">STACK TECNOLÓGICO</span>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8 mt-6">
+                <div>
+                  <h4 className="font-mono text-[11px] font-black text-black dark:text-white uppercase tracking-widest mb-4">Frontend & UX</h4>
+                  <ul className="space-y-3 text-[13px]">
+                    <li><strong className="text-black dark:text-white">Next.js 15 + TypeScript</strong> - Server Components con App Router</li>
+                    <li><strong className="text-black dark:text-white">Framer Motion + GSAP</strong> - Animaciones institucionales</li>
+                    <li><strong className="text-black dark:text-white">Three.js</strong> - Visualizaciones 3D en tiempo real</li>
                     <li><strong className="text-black dark:text-white">Wagmi + Viem</strong> - Conexión Web3</li>
                   </ul>
                 </div>
@@ -902,9 +904,7 @@ export function WhaleAlertLanding() {
         <div className="relative z-20 border-t border-black/10 dark:border-white/10 px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/70 dark:bg-black/70 backdrop-blur-xl mt-auto">
           <div className="flex items-center gap-3">
             <img src="/official-whale-monochrome.png" className="w-5 h-5 dark:invert opacity-60" alt="" />
-            <span className="font-mono text-[9px] uppercase tracking-widest text-black/80 dark:text-white/80 font-black drop-shadow-sm">
-              Immutable Data · Zero-Trust Verification · Extreme Precision
-            </span>
+
           </div>
           <span className="font-mono text-[9px] uppercase tracking-widest text-black/50 dark:text-white/50 font-bold text-center md:text-right">
             Privacy by Void. No data stored. All communication is end-to-end verified.
