@@ -39,27 +39,30 @@ class NewPairsWebSocketEngine {
     public  buffer:   NewPairEvent[] = [];
 
     connect() {
-        if (this.ws?.readyState === WebSocket.OPEN) return;
+        if (this.ws?.readyState === WebSocket.OPEN || this.ws?.readyState === WebSocket.CONNECTING) return;
 
         const currentUrl = WS_ENDPOINTS[currentWsIndex];
-        this.ws = new WebSocket(currentUrl);
+        const socket = new WebSocket(currentUrl);
+        this.ws = socket;
 
-        this.ws.on('open', () => {
+        socket.on('open', () => {
             console.info('[NewPairsEngine] GetBlock WS connected (EP3)');
-            this.ws!.send(JSON.stringify({
-                jsonrpc: '2.0', id: 1,
-                method:  'eth_subscribe',
-                params:  [
-                    'logs',
-                    {
-                        address: UNISWAP_V3_FACTORY,
-                        topics:  [POOL_CREATED_TOPIC],
-                    }
-                ],
-            }));
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    jsonrpc: '2.0', id: 1,
+                    method:  'eth_subscribe',
+                    params:  [
+                        'logs',
+                        {
+                            address: UNISWAP_V3_FACTORY,
+                            topics:  [POOL_CREATED_TOPIC],
+                        }
+                    ],
+                }));
+            }
         });
 
-        this.ws.on('message', (raw: Buffer) => {
+        socket.on('message', (raw: Buffer) => {
             try {
                 const msg = JSON.parse(raw.toString());
                 if (msg.method === 'eth_subscription' && msg.params?.result) {
@@ -68,12 +71,12 @@ class NewPairsWebSocketEngine {
             } catch { /* ignore */ }
         });
 
-        this.ws.on('close', () => {
+        socket.on('close', () => {
             console.warn('[NewPairsEngine] WS closed — reconnecting in 5s');
             this.scheduleReconnect();
         });
 
-        this.ws.on('error', (err) => {
+        socket.on('error', (err) => {
             console.error('[NewPairsEngine] WS error:', err.message);
         });
     }
@@ -114,7 +117,7 @@ class NewPairsWebSocketEngine {
 
     subscribe(fn: PairListener) {
         this.listeners.add(fn);
-        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        if (!this.ws || (this.ws.readyState !== WebSocket.OPEN && this.ws.readyState !== WebSocket.CONNECTING)) {
             this.connect();
         }
         return () => this.listeners.delete(fn);

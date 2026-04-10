@@ -124,8 +124,20 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
                 console.warn(`[Redis:${config.name || 'Client'}] 🔄 Reconnecting on critical error: ${err.message}`);
             }
             return shouldReconnect;
+    });
+
+    // [FATAL ERROR SUPPRESSION]
+    // ioredis emits 'error' events that will crash the Node.js process if unhandled.
+    // Railway's proxy frequently drops connections causing ETIMEDOUT.
+    // We catch them here to keep the process alive while ioredis auto-reconnects.
+    client.on('error', (err: any) => {
+        // Only log critical/unexpected errors, ignore standard timeouts that will auto-reconnect
+        if (!err.message.includes('ETIMEDOUT') && !err.message.includes('ECONNRESET')) {
+            console.error(`[Redis:${config.name || 'Client'}] Handled background error: ${err.message}`);
         }
     });
+
+    return client;
 }
 
 let redisClient: any;
