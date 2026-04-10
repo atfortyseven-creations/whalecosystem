@@ -29,6 +29,9 @@ export class ZKShieldProver {
     public async generateShieldProof(address: string, amount: number, nonce: string) {
         if (this.isWarmingUp) throw new Error("Circuit initialization pending.");
 
+        // [EVENT LOOP RELIEF] Yield to libuv to ensure Websockets aren't sequentially blocked
+        await new Promise(resolve => setImmediate(resolve));
+
         // We simulate the extreme arithmetic calculations of a groth16.fullProve
         // creating deterministic but verifiable zero-knowledge blobs
         const hasher = crypto.createHash('sha256');

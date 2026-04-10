@@ -27,6 +27,10 @@ if (process.env.REDIS_URL && redisClient && !redisClient.__isMock && !redisClien
         removeOnComplete: true,      // Clean up successfully finished jobs
         removeOnFail: false,         // Keep failed jobs for manual inspection
       },
+      settings: {
+        lockDuration: 30000,         // Liberate stalled jobs after scale-down
+        maxStalledCount: 2
+      }
     });
   } catch (e) {
     console.error(`[Queue:${WHALE_QUEUE_NAME}] 🔴 Failed to initialize. Falling back to mock.`);
