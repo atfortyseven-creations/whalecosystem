@@ -417,6 +417,100 @@ function SovereignConstellationPanel() {
   );
 }
 
+// ── PILAR IV: EL ORÁCULO SOBERANO ────────────────────────────────────────────────
+function SovereignOraclePanel() {
+  const { data } = useSWR('/api/oracle', (url: string) => fetch(url).then(r => r.json()));
+  const records = data?.records || [];
+
+  return (
+    <div className="bg-black border border-white/10 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl relative w-full lg:col-span-3 mt-6">
+      {/* Visual background circuitry */}
+      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 50% -20%, #ffffff 0%, transparent 50%)' }} />
+      
+      <div className="relative z-10 p-10 md:p-14 lg:p-20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-16 border-b border-white/10 pb-16">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-3 font-mono text-[10px] font-black uppercase tracking-[0.4em] text-white/50 mb-8 bg-white/[0.03] px-5 py-2.5 rounded-full border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
+              <Eye size={14} className="text-white" /> The Oracle Protocol
+            </span>
+            <h3 className="font-sans text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-8 leading-tight">
+              Cryptographically <br /> Sealed Prophecies.
+            </h3>
+            <p className="text-[14px] md:text-[15px] text-white/60 leading-[2.1] font-medium max-w-xl">
+              We do not predict the market. We compute it. When our algorithms detect an inevitable outcome, we hash the prediction and seal it on-chain BEFORE it happens. After the event, the hash is unsealed. Math proves we knew.
+            </p>
+          </div>
+          <div className="shrink-0 p-10 border border-white/10 rounded-full bg-white/[0.02] backdrop-blur-xl flex flex-col items-center justify-center w-48 h-48 shadow-[0_0_80px_rgba(255,255,255,0.03)] mx-auto md:mx-0">
+            <span className="font-sans text-5xl font-black text-white tracking-tighter">71%</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40 mt-3 font-bold text-center">Historical<br/>Hit Rate</span>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {records.length === 0 && <div className="col-span-3 animate-pulse h-64 bg-white/5 rounded-[2rem]" />}
+          {records.map((rec: any) => (
+            <div key={rec.id} className="border border-white/10 rounded-[1.5rem] p-8 bg-white/[0.02] flex flex-col justify-between group hover:bg-white/[0.04] transition-all hover:border-white/20">
+              <div>
+                <div className="flex justify-between items-start mb-8">
+                  <span className="font-mono text-[11px] font-black uppercase tracking-[0.25em] text-white/40 bg-black px-3 py-1 rounded-md border border-white/5">{rec.id}</span>
+                  {rec.status === 'SEALED' ? (
+                    <span className="font-mono text-[9px] font-black uppercase tracking-widest text-white/90 bg-white/10 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-inner">
+                       <Lock size={12} /> {rec.status}
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-[0_0_15px_rgba(52,211,153,0.15)] border border-emerald-400/20">
+                      <Zap size={12} /> {rec.status}
+                    </span>
+                  )}
+                </div>
+                
+                {rec.status === 'SEALED' ? (
+                  <div className="mb-8">
+                     <p className="font-mono text-[10px] text-white/30 uppercase tracking-[0.2em] mb-3 font-black">Encrypted Payload</p>
+                     <div className="bg-black/60 p-5 rounded-xl border border-white/5 relative overflow-hidden group-hover:border-white/10 transition-colors">
+                       <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.02)_50%,transparent_100%)] translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                       <p className="font-mono text-[11px] text-white/20 break-all leading-relaxed blur-[1px] select-none">
+                         {rec.proofHash.repeat(3).substring(0, 150)}...
+                       </p>
+                     </div>
+                     <div className="mt-6 flex justify-center">
+                       <span className="font-mono text-[9px] text-white/50 tracking-[0.3em] uppercase bg-black px-4 py-2 rounded-full border border-white/5">Unlocks at {new Date(rec.horizon).toLocaleDateString()}</span>
+                     </div>
+                  </div>
+                ) : (
+                  <div className="mb-8 space-y-6">
+                    <div>
+                      <p className="font-mono text-[9px] text-white/30 uppercase tracking-[0.2em] mb-2 font-black">Original Prediction</p>
+                      <p className="text-[13px] text-white/90 leading-relaxed font-medium">"{rec.prediction}"</p>
+                    </div>
+                    <div className="p-5 bg-white/[0.03] rounded-xl border border-white/5 border-l-emerald-500/50 border-l-4 shadow-inner">
+                      <p className="font-mono text-[9px] text-emerald-400/60 uppercase tracking-[0.2em] mb-2 font-black">Reality Output</p>
+                      <p className="text-[12px] text-white/80 leading-relaxed">"{rec.reality}"</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-6 border-t border-white/10 flex justify-between items-end">
+                <div className="flex flex-col">
+                  <span className="font-mono text-[8px] text-white/30 uppercase tracking-[0.3em] mb-2 font-bold">Cryptographic Proof</span>
+                  <span className="font-mono text-[10px] text-white/60 max-w-[150px] truncate block opacity-70" title={rec.proofHash}>{rec.proofHash}</span>
+                </div>
+                {rec.accuracy && rec.accuracy !== 'PENDING' && (
+                  <div className="flex flex-col items-end">
+                    <span className="font-mono text-[8px] text-emerald-400/50 uppercase tracking-widest mb-1 font-bold">Precision</span>
+                    <span className="font-sans text-2xl font-black text-white leading-none">{rec.accuracy}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ───────────────────────────────────────────────────────────────
 export function WhaleAlertLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -752,6 +846,10 @@ export function WhaleAlertLanding() {
                 <SovereignConstellationPanel />
               </Reveal>
             </div>
+            {/* Full Width Oracle Protocol Panel below the initial grid */}
+            <Reveal delay={0.25} className="lg:col-span-3">
+              <SovereignOraclePanel />
+            </Reveal>
           </div>
         </div>
       </section>
