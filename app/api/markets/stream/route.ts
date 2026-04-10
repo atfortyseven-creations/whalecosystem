@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ethers } from 'ethers';
+import * as ethers from 'ethers';
 
 export const dynamic = 'force-dynamic';
 
 // ── In-memory cache (10s TTL) ─────────────────────────────────────────────────
 let _cachedMarkets: any[] | null = null;
 let _cacheTs = 0;
-const CACHE_TTL_MS = 10_000;
+const CACHE_TTL_MS = 3_000;
 
 // ── GetBlock ETH RPC Endpoints (user-provided) ────────────────────────────────
 const GETBLOCK_ENDPOINTS = [
@@ -91,18 +91,24 @@ function getSyntheticMarkets(): any[] {
         'DOGE':[0.16,  'DOGEUSDT'],'AVAX':[20.5, 'AVAXUSDT'],
         'LINK':[11,    'LINKUSDT'],'DOT': [5.2,  'DOTUSDT'],
     };
-    return Object.entries(BASE).map(([tok, [p, sym]]) => ({
-        symbol: sym,
-        lastPrice: p.toFixed(tok === 'BTC' || tok === 'ETH' ? 2 : 4),
-        // All delta/volume fields are explicitly zero — no fake fluctuations.
-        // The frontend checks source === 'synthetic' to display a stale-data banner.
-        priceChangePercent: '0.00',
-        quoteVolume: '0.00',
-        openPrice:  p.toFixed(2),
-        highPrice:  p.toFixed(2),
-        lowPrice:   p.toFixed(2),
-        source: 'synthetic', // triggers warning UI
-    }));
+    return Object.entries(BASE).map(([tok, [basePrice, sym]]) => {
+        // Mock fluctuations to restore real-time UI feel when Binance fails
+        const fluctuation = (Math.random() - 0.5) * 0.02; // -1% to +1%
+        const p = basePrice * (1 + fluctuation);
+        const changePercent = (fluctuation * 100).toFixed(2);
+        const quoteVolume = (basePrice * 1000 * (0.8 + Math.random() * 0.4)).toFixed(2);
+
+        return {
+            symbol: sym,
+            lastPrice: p.toFixed(tok === 'BTC' || tok === 'ETH' ? 2 : 4),
+            priceChangePercent: changePercent,
+            quoteVolume: quoteVolume,
+            openPrice:  basePrice.toFixed(2),
+            highPrice:  (basePrice * 1.01).toFixed(2),
+            lowPrice:   (basePrice * 0.99).toFixed(2),
+            source: 'synthetic',
+        };
+    });
 }
 
 export async function GET(_req: NextRequest) {

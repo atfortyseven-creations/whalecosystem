@@ -9,6 +9,8 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { SiweMessage } from 'siwe';
 import { MarketStreamProvider } from '@/context/MarketStreamContext';
 import { WhaleStreamProvider } from '@/context/WhaleStreamContext';
+import { VIPStoreBootstrap } from '@/components/providers/VIPStoreBootstrap';
+import { AlphaToaster } from '@/components/ui/AlphaToaster';
 
 const queryClient = new QueryClient();
 
@@ -79,6 +81,8 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
           >
             <MarketStreamProvider>
               <WhaleStreamProvider>
+                <AlphaToaster />
+                <VIPStoreBootstrap />
                 {children}
               </WhaleStreamProvider>
             </MarketStreamProvider>

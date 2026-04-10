@@ -1,53 +1,74 @@
 "use client";
 
 import React, { memo, useRef, useEffect, useState } from 'react';
-import { FixedSizeList as List, areEqual } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
 import { useVIPStore, WhaleEvent } from '@/lib/vip-store';
-import { Activity, ArrowRight, Clock, ShieldAlert, Zap } from 'lucide-react';
+import { Activity, ArrowRight, Zap } from 'lucide-react';
+
+// Dynamic imports to avoid SSR crashes (React Error #130)
+const FixedSizeList = dynamic<any>(
+    () => import('react-window').then(m => m.FixedSizeList),
+    { ssr: false }
+);
+const AutoSizer = dynamic<any>(
+    () => import('react-virtualized-auto-sizer'),
+    { ssr: false }
+);
 
 // ============================================================================
-// ROW COMPONENT (Memoized to prevent unnecessary re-renders during scroll)
+// SKELETON COMPONENT
+// ============================================================================
+const FirehoseSkeleton = () => (
+    <div className="w-full flex flex-col gap-2 p-4 border-b border-[#111111]">
+        <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 w-1/4">
+                <div className="h-2 w-12 bg-white/5 rounded animate-pulse" />
+                <div className="h-3 w-16 bg-white/10 rounded animate-pulse" />
+            </div>
+            <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
+            <div className="flex flex-col items-end gap-1 w-1/2">
+                <div className="h-3 w-20 bg-white/10 rounded animate-pulse" />
+                <div className="h-2 w-16 bg-white/5 rounded animate-pulse" />
+            </div>
+        </div>
+    </div>
+);
+
+// ============================================================================
+// ROW COMPONENT
 // ============================================================================
 const FirehoseRow = memo(({ data, index, style }: any) => {
     const event: WhaleEvent = data[index];
-    
-    // Safety check in case array shrinks
     if (!event) return null;
 
-    const isBuy = event.action === 'BUY' || event.action === 'COMPRA';
+    const isBuy  = event.action === 'BUY'  || event.action === 'COMPRA';
     const isSell = event.action === 'SELL' || event.action === 'VENTA';
-    
-    let actionColor = 'text-[#888888]';
-    let bgPulse = 'bg-white/5';
-    
-    if (isBuy) {
-        actionColor = 'text-[#00C076] drop-shadow-[0_0_8px_rgba(0,192,118,0.3)]';
-        bgPulse = 'bg-[#00C076]/5 border-[#00C076]/20';
-    } else if (isSell) {
-        actionColor = 'text-[#FF3B30] drop-shadow-[0_0_8px_rgba(255,59,48,0.3)]';
-        bgPulse = 'bg-[#FF3B30]/5 border-[#FF3B30]/20';
-    }
 
-    const timeString = new Date(event.ts).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second:'2-digit' });
+    let actionColor = 'text-[#888888]';
+    let bgPulse     = 'border-transparent';
+
+    if (isBuy)  { actionColor = 'text-[#00C076]'; bgPulse = 'border-[#00C076]/10 bg-[#00C076]/3'; }
+    if (isSell) { actionColor = 'text-[#FF3B30]'; bgPulse = 'border-[#FF3B30]/10 bg-[#FF3B30]/3'; }
+
+    const timeString = new Date(event.ts).toLocaleTimeString('en-US', {
+        hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
 
     return (
         <div style={style} className="px-2 py-1">
-            <motion.div 
-                initial={{ opacity: 0, x: -20, backgroundColor: 'rgba(255,255,255,1)' }}
-                animate={{ opacity: 1, x: 0, backgroundColor: 'rgba(0,0,0,0)' }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
                 className={`w-full h-full flex flex-col justify-center border-b border-[#111111] ${bgPulse} hover:bg-[#1A1A1A] transition-colors cursor-pointer rounded-sm px-4`}
-                style={{ willChange: 'transform, opacity, background-color' }}
             >
                 <div className="flex items-center justify-between">
-                    
                     {/* LEFT: Time & Token */}
                     <div className="flex items-center gap-4 w-1/4">
                         <span className="text-[10px] font-mono text-[#555555] tracking-widest">{timeString}</span>
                         <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${isBuy ? 'bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.8)]' : isSell ? 'bg-[#FF3B30] shadow-[0_0_8px_rgba(255,59,48,0.8)]' : 'bg-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.8)]'}`} />
+                            <div className={`w-1.5 h-1.5 rounded-full ${isBuy ? 'bg-[#00C076]' : isSell ? 'bg-[#FF3B30]' : 'bg-[#D4AF37]'}`} />
                             <span className="text-xs font-black text-white tracking-widest">{event.token}</span>
                         </div>
                     </div>
@@ -55,7 +76,8 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
                     {/* MIDDLE: Amounts */}
                     <div className="flex flex-col items-center justify-center w-1/4">
                         <span className={`text-sm font-mono font-black tracking-tighter ${actionColor}`}>
-                            {isBuy ? '+' : isSell ? '-' : ''} {(parseFloat(event.amount) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} {event.token}
+                            {isBuy ? '+' : isSell ? '-' : ''}
+                            {(parseFloat(event.amount) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} {event.token}
                         </span>
                         <span className="text-[10px] font-mono text-white/50 tracking-widest uppercase">
                             ${(event.usdNum || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -75,15 +97,16 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
                         </div>
                         <div className="flex flex-col items-end">
                             <span className="text-[11px] font-black tracking-widest text-white uppercase">{event.label}</span>
-                            <span className="text-[9px] font-mono text-[#555555]">{event.wallet.substring(0,6)}...{event.wallet.slice(-4)}</span>
+                            <span className="text-[9px] font-mono text-[#555555]">
+                                {event.wallet.substring(0, 6)}...{event.wallet.slice(-4)}
+                            </span>
                         </div>
                     </div>
-
                 </div>
             </motion.div>
         </div>
     );
-}, areEqual);
+});
 
 FirehoseRow.displayName = 'FirehoseRow';
 
@@ -92,8 +115,13 @@ FirehoseRow.displayName = 'FirehoseRow';
 // ============================================================================
 export function VirtualizedFirehose() {
     const whaleEvents = useVIPStore(state => state.whaleEvents);
-    const listRef = useRef<List>(null);
+    const listRef     = useRef<any>(null);
     const [autoScroll, setAutoScroll] = useState(true);
+    const [isMounted,  setIsMounted]  = useState(false);
+    const [showJumpTop, setShowJumpTop] = useState(false);
+
+    // Dynamic imports SSR guard
+    useEffect(() => { setIsMounted(true); }, []);
 
     // Keep scroll at top if autoScroll is enabled
     useEffect(() => {
@@ -102,9 +130,17 @@ export function VirtualizedFirehose() {
         }
     }, [whaleEvents, autoScroll]);
 
+    const handleJumpTop = () => {
+        if (listRef.current) {
+            listRef.current.scrollTo(0);
+            setAutoScroll(true);
+            setShowJumpTop(false);
+        }
+    };
+
     return (
-        <div className="w-full h-full flex flex-col bg-[#020202] border border-[#222222] rounded-sm shadow-[4px_4px_0_0_#050505]">
-            
+        <div className="w-full h-full flex flex-col bg-[#020202] border border-[#222222] rounded-sm shadow-[4px_4px_0_0_#050505] relative group">
+
             {/* HEADER */}
             <div className="flex items-center justify-between p-4 border-b border-[#222222] bg-[#050505]">
                 <div className="flex items-center gap-3">
@@ -112,11 +148,11 @@ export function VirtualizedFirehose() {
                     <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-white">
                         Global Liquidity Firehose
                     </h2>
-                    <span className="px-2 py-0.5 bg-[#00C076]/10 border border-[#00C076]/30 text-[#00C076] text-[9px] font-black rounded-sm shadow-[0_0_10px_rgba(0,192,118,0.2)]">
+                    <span className="px-2 py-0.5 bg-[#00C076]/10 border border-[#00C076]/30 text-[#00C076] text-[9px] font-black rounded-sm">
                         LIVE
                     </span>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.8)]" />
@@ -128,54 +164,82 @@ export function VirtualizedFirehose() {
             </div>
 
             {/* VIRTUALIZED LIST CONTAINER */}
-            <div 
-                className="flex-1 relative w-full h-[500px]" // Min height constraint
-                onMouseEnter={() => setAutoScroll(false)}
-                onMouseLeave={() => setAutoScroll(true)}
+            <div
+                className="flex-1 relative w-full"
+                style={{ minHeight: 400 }}
+                onMouseEnter={() => {
+                    setAutoScroll(false);
+                    setShowJumpTop(true);
+                }}
+                onMouseLeave={() => {
+                    // Don't auto-resume if they are scrolled way down
+                }}
             >
-                {/* Empty State */}
-                {whaleEvents.length === 0 && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-[#020202]">
-                        <Zap size={24} className="text-[#333333] animate-pulse" />
-                        <span className="text-[10px] font-black text-[#555555] uppercase tracking-[0.3em]">
-                            Awaiting Neurometric Feeds...
-                        </span>
+                {/* Empty State / Skeleton — shown briefly before bootstrap kicks in */}
+                {(!isMounted || whaleEvents.length === 0) && (
+                    <div className="absolute inset-0 z-10 bg-[#020202] flex flex-col">
+                        {Array.from({ length: 10 }).map((_, i) => <FirehoseSkeleton key={i} />)}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 backdrop-blur-sm">
+                            <Zap size={24} className="text-[#00FF55] animate-pulse" />
+                            <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                                Syncing Neurometric Feeds…
+                            </span>
+                        </div>
                     </div>
                 )}
 
-                {/* AutoSizer expands to fill the flex-1 container */}
-                <AutoSizer>
-                    {({ height, width }: { height: number; width: number }) => (
-                        <List
-                            ref={listRef}
-                            height={height}
-                            itemCount={whaleEvents.length}
-                            itemSize={64} // Fixed height per row for mathematical precision
-                            width={width}
-                            itemData={whaleEvents}
-                            className="scrollbar-hide"
-                            itemKey={(index, data) => data[index]?.id || index}
-                        >
-                            {FirehoseRow}
-                        </List>
-                    )}
-                </AutoSizer>
+                {/* Only render list on client with data */}
+                {isMounted && whaleEvents.length > 0 && (
+                    <AutoSizer>
+                        {({ height, width }: { height: number; width: number }) => (
+                            <FixedSizeList
+                                ref={listRef}
+                                height={height || 400}
+                                itemCount={whaleEvents.length}
+                                itemSize={64}
+                                width={width || 800}
+                                itemData={whaleEvents}
+                                className="scrollbar-hide"
+                                itemKey={(index: number, data: WhaleEvent[]) => data[index]?.id || index}
+                            >
+                                {FirehoseRow}
+                            </FixedSizeList>
+                        )}
+                    </AutoSizer>
+                )}
 
-                {/* Top fade gradient */}
-                <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-[#020202] to-transparent pointer-events-none z-10" />
-                {/* Bottom fade gradient */}
-                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#020202] to-transparent pointer-events-none z-10" />
+                {/* Fade gradients */}
+                <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#020202] to-transparent pointer-events-none z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#020202] to-transparent pointer-events-none z-10" />
+
+                {/* Floating "Jump to Top" / Resume Control */}
+                <AnimatePresence>
+                    {!autoScroll && showJumpTop && (
+                        <motion.button
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            onClick={handleJumpTop}
+                            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-[#00FF55] text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-[0_10px_30px_rgba(0,255,85,0.4)] hover:scale-105 transition-transform active:scale-95"
+                        >
+                            <ChevronUp size={12} /> Jump to Live Stream
+                        </motion.button>
+                    )}
+                </AnimatePresence>
             </div>
-            
+
             {/* FOOTER */}
             <div className="p-2 border-t border-[#111111] bg-[#050505] flex items-center justify-between">
                 <span className="text-[8px] font-mono text-[#555555] uppercase tracking-[0.3em]">
                     Powered by Zero-Knowledge Nodes
                 </span>
                 {!autoScroll && (
-                    <span className="text-[8px] font-black text-[#D4AF37] uppercase tracking-[0.2em] animate-pulse">
-                        Auto-Scroll Paused
-                    </span>
+                    <button 
+                        onClick={() => setAutoScroll(true)}
+                        className="text-[8px] font-black text-[#00FF55] uppercase tracking-[0.2em] animate-pulse hover:underline"
+                    >
+                        Resume Alpha Feed
+                    </button>
                 )}
             </div>
         </div>

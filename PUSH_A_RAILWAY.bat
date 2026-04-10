@@ -1,18 +1,19 @@
 @echo off
-echo ==============================================
-echo [WHALE ALERT] Iniciando Push Seguro a la Nube
-echo ==============================================
+setlocal
+echo ========================================================
+echo [SOVEREIGN TERMINAL] Protocol: High-Fidelity Cloud Push
+echo ========================================================
 echo.
-echo 1. Guardando archivos (git add .)
+echo Phase 1: Context Capture (git add .)
 git add .
 echo.
-echo 2. Empaquetando cambios (git commit)
-git commit -m "fix(build): remove prisma db push from build time — Railway green deploy"
+echo Phase 2: Cipher Metadata (git commit)
+git commit -m "feat(intel): institutional hardening, alpha toaster integration, and real-time telemetry engine [Clearance Nivel 9]"
 echo.
-echo 3. Enviando a los servidores de Railway/Github (git push)
+echo Phase 3: Synchronizing with Genesis Server (git push)
 git push origin main --force
 echo.
-echo ==============================================
-echo [WHALE ALERT] PUSH COMPLETADO. Verifica Railway.
-echo ==============================================
+echo ========================================================
+echo [WHALE ALERT] TRANSMISSION COMPLETE. Verify Railway Logs.
+echo ========================================================
 pause
