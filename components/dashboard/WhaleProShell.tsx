@@ -13,6 +13,7 @@ import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
+import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
 
 interface NavItem {
     id: string;
@@ -49,13 +50,50 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold-ticket',     label: 'Genesis Clearance',       icon: <Crown size={17}/> },
 ];
 
+function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
+    const [flash, setFlash] = useState<'up' | 'down' | null>(null);
+    const prevValue = React.useRef(value);
+
+    React.useEffect(() => {
+        if (value !== prevValue.current) {
+            const v = parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
+            const p = parseFloat(String(prevValue.current).replace(/[^0-9.-]+/g, ""));
+            if (!isNaN(v) && !isNaN(p)) {
+                setFlash(v > p ? 'up' : 'down');
+                const timer = setTimeout(() => setFlash(null), 600);
+                prevValue.current = value;
+                return () => clearTimeout(timer);
+            }
+            prevValue.current = value;
+        }
+    }, [value]);
+
+    return (
+        <div className="relative">
+            <AnimatePresence>
+                {flash && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 0.15, scale: 1.05 }}
+                        exit={{ opacity: 0 }}
+                        className={`absolute inset-0 -m-1 rounded-sm blur-md ${flash === 'up' ? 'bg-[#00FF55]' : 'bg-[#FF3B30]'}`}
+                    />
+                )}
+            </AnimatePresence>
+            <div className="relative z-10 transition-colors duration-300">
+                {children}
+            </div>
+        </div>
+    );
+}
+
 function LiveMarketBand() {
-    const { markets, isConnected: streamConnected } = useMarketStream();
+    const { markets, isConnected: streamConnected, mode } = useMarketStream();
 
     const btc = markets.get('BTCUSDT');
     const eth = markets.get('ETHUSDT');
 
-    interface StatItem { label: string; value: string; chg: string | null; up: boolean; }
+    interface StatItem { label: string; value: string; chg: string | null; up: boolean; rawValue: number; }
 
     const items: StatItem[] = [];
 
@@ -66,6 +104,7 @@ function LiveMarketBand() {
             value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(),
             chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(1) + '%',
             up: chgPct >= 0,
+            rawValue: parseFloat(btc.lastPrice || '0'),
         });
     }
     if (eth) {
@@ -75,6 +114,7 @@ function LiveMarketBand() {
             value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(),
             chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(1) + '%',
             up: chgPct >= 0,
+            rawValue: parseFloat(eth.lastPrice || '0'),
         });
     }
 
@@ -97,16 +137,21 @@ function LiveMarketBand() {
             {items.map((item, i) => (
                 <div key={i} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
                     <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{item.label}</span>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-[10px] font-black font-mono text-white truncate">{item.value}</span>
-                        {item.chg && (
-                            <span className={`text-[8px] font-black leading-none ${item.up ? 'text-[#00FF55]' : 'text-[#FF3B30]'}`}>
-                                {item.chg}
-                            </span>
-                        )}
-                    </div>
+                    <PriceFlash value={item.rawValue}>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-[10px] font-black font-mono text-white truncate">{item.value}</span>
+                            {item.chg && (
+                                <span className={`text-[8px] font-black leading-none ${item.up ? 'text-[#00FF55]' : 'text-[#FF3B30]'}`}>
+                                    {item.chg}
+                                </span>
+                            )}
+                        </div>
+                    </PriceFlash>
                 </div>
             ))}
+            <div className={`px-2 py-0.5 rounded text-[7px] font-black uppercase tracking-widest border ml-4 ${mode === 'live' ? 'bg-[#00FF55]/10 border-[#00FF55]/30 text-[#00FF55]' : 'bg-[#FF9500]/10 border-[#FF9500]/30 text-[#FF9500]'}`}>
+                {mode} mode
+            </div>
         </>
     );
 }
@@ -126,6 +171,9 @@ export function WhaleProShell({
     const [searchQuery, setSearchQuery] = useState('');
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const { setSettingsOpen } = useSettingsStore();
+
+    // Telemetry from context
+    const { latency, isConnected, mode } = useMarketStream();
 
     return (
         <>
@@ -265,7 +313,9 @@ export function WhaleProShell({
                                     style={{ willChange: 'transform, opacity, filter', transformOrigin: 'top center' }}
                                     className="w-full h-full"
                                 >
-                                    {children}
+                                    <InstitutionalErrorBoundary moduleName="Neurometric Terminal Node">
+                                        {children}
+                                    </InstitutionalErrorBoundary>
                                 </motion.div>
                             </AnimatePresence>
                         </div>
@@ -276,11 +326,22 @@ export function WhaleProShell({
                 {/* ─── Status Bar ─── */}
                 <footer className="h-8 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5"><Globe size={11} /> Global Latency: 12ms</span>
-                        <span className="flex items-center gap-1.5"><Cpu size={11} /> Network Nodes: ACTIVE</span>
+                        <span className="flex items-center gap-1.5 min-w-[120px]">
+                            <Globe size={11} /> Global Latency: 
+                            <span className={latency > 150 ? 'text-[#FF3B30]' : latency > 0 ? 'text-[#00FF55]' : 'text-[#888888]'}>
+                                {latency > 0 ? `${latency}ms` : 'SYNCING'}
+                            </span>
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                            <Cpu size={11} /> Nodes: 
+                            <span className={isConnected ? 'text-[#00FF55]' : 'text-[#FF3B30]'}>
+                                {isConnected ? 'ACTIVE' : 'DEGRADED'}
+                            </span>
+                            {mode === 'synthetic' && <span className="ml-1 text-[7px] border border-[#FF9500]/50 text-[#FF9500] px-1 rounded-sm">INTERNAL FALLBACK</span>}
+                        </span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5"><Shield size={11} /> SSL: SECURE</span>
+                        <span className="flex items-center gap-1.5"><Shield size={11} /> {mode === 'live' ? 'Protocol: Live' : 'Protocol: Simulated'}</span>
                         <span className="text-[#888888]">© 2026 WHALECOSYSTEM CORP.</span>
                     </div>
                 </footer>

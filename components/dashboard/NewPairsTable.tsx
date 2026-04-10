@@ -44,16 +44,35 @@ export function NewPairsTable() {
             if (res.ok) {
                 const data = await res.json();
                 if (data.pairs && data.pairs.length > 0) {
-                    // EP3 live pairs prepended — they are the genuinely newest
-                    const merged = [...livePairs, ...data.pairs].slice(0, 50);
-                    setPairs(merged);
+                    // Deduplicated merge: prioritizing livePairs (most recent)
+                    setPairs(prev => {
+                        const seen = new Set();
+                        const result: any[] = [];
+                        [...livePairs, ...data.pairs, ...prev].forEach(p => {
+                            if (p?.id && !seen.has(p.id)) {
+                                seen.add(p.id);
+                                result.push(p);
+                            }
+                        });
+                        return result.slice(0, 100);
+                    });
                     setLastRefresh(new Date());
                     return;
                 }
             }
             // Fallback: at least show live EP3 pairs
             if (livePairs.length > 0) {
-                setPairs(livePairs);
+                setPairs(prev => {
+                    const seen = new Set();
+                    const result: any[] = [];
+                    [...livePairs, ...prev].forEach(p => {
+                        if (p?.id && !seen.has(p.id)) {
+                            seen.add(p.id);
+                            result.push(p);
+                        }
+                    });
+                    return result.slice(0, 100);
+                });
                 setLastRefresh(new Date());
             }
         } catch (e) {
@@ -100,11 +119,15 @@ export function NewPairsTable() {
                             security: { score: 88, honeypotRisk: false, lpBurned: false, mintRevoked: false },
                             taxes: { buy: 0, sell: 0 },
                         };
-                        setPairs(prev => [newPair, ...prev].slice(0, 100));
+                        setPairs(prev => {
+                            // Deduplicate SSE events immediately
+                            if (prev.some(p => p.id === newPair.id)) return prev;
+                            return [newPair, ...prev].slice(0, 100);
+                        });
                         setLastRefresh(new Date());
                     } else if (msg.type === 'HISTORY' && Array.isArray(msg.pairs)) {
                         // Initial buffer from EP3 engine
-                        const histPairs = msg.pairs.map((ev: any, i: number) => ({
+                        const histPairs = msg.pairs.map((ev: any) => ({
                             id:          ev.pool,
                             chain:       'ethereum',
                             dex:         `Uniswap V3`,
@@ -121,7 +144,11 @@ export function NewPairsTable() {
                             security: { score: 88, honeypotRisk: false, lpBurned: false, mintRevoked: false },
                             taxes: { buy: 0, sell: 0 },
                         }));
-                        setPairs(prev => [...histPairs, ...prev].slice(0, 100));
+                        setPairs(prev => {
+                            const seen = new Set(prev.map(p => p.id));
+                            const uniqueHist = histPairs.filter(p => !seen.has(p.id));
+                            return [...uniqueHist, ...prev].slice(0, 100);
+                        });
                     }
                 } catch {}
             });

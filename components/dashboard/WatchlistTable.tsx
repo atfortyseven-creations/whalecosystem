@@ -8,9 +8,12 @@ import {
     X, Check
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { List as RWList } from 'react-window';
-const List = RWList as any;
-import AutoSizer from 'react-virtualized-auto-sizer';
+import dynamic from 'next/dynamic';
+const List = dynamic(
+    () => import('react-window').then(m => ({ default: m.FixedSizeList as any })),
+    { ssr: false }
+) as any;
+const AutoSizer = dynamic(() => import('react-virtualized-auto-sizer'), { ssr: false });
 import { useMarketStream } from '@/context/MarketStreamContext';
 
 // ── XSS Sanitization ────────────────────────────────────────────────────────────
