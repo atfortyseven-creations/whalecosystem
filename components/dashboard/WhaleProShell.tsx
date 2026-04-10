@@ -25,12 +25,13 @@ interface NavItem {
 
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Markets ──
-    { id: 'dashboard',       label: 'Dashboard',       icon: <LayoutDashboard size={17}/>, dividerBefore: 'Markets' },
-    { id: 'watchlist',       label: 'Watchlist',        icon: <Star size={17}/>,            badge: 'Pro' },
-    { id: 'alerts',          label: 'Alerts',           icon: <Bell size={17}/> },
-    { id: 'multicharts',     label: 'Multicharts',      icon: <BarChart2 size={17}/> },
-    { id: 'new-pairs',       label: 'New Pairs',        icon: <Zap size={17}/>,             badge: 'Live', badgeColor: '#00C076' },
-    { id: 'gainers',         label: 'Gainers & Losers', icon: <TrendingUp size={17}/> },
+    { id: 'dashboard',       label: 'Dashboard',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Markets' },
+    { id: 'watchlist',       label: 'Watchlist',         icon: <Star size={17}/>,            badge: 'Pro' },
+    { id: 'alerts',          label: 'Alerts',            icon: <Bell size={17}/> },
+    { id: 'whale-events',    label: 'Top Whales 24h',    icon: <TrendingUp size={17}/>,       badge: 'LIVE', badgeColor: '#D4AF37' },
+    { id: 'multicharts',     label: 'Multicharts',       icon: <BarChart2 size={17}/> },
+    { id: 'new-pairs',       label: 'New Pairs',         icon: <Zap size={17}/>,              badge: 'Live', badgeColor: '#00C076' },
+    { id: 'gainers',         label: 'Gainers & Losers',  icon: <TrendingUp size={17}/> },
     // ── Intelligence ──
     { id: 'whale-portfolio', label: 'Whale Intelligence',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
     { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
@@ -240,33 +241,38 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300"
-                    style={{
-                        background: `
-                            radial-gradient(ellipse at 50% 0%, rgba(0,150,255,0.08) 0%, transparent 60%),
-                            #050810
-                        `,
-                    }}
-                >
+                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#FAF9F6] dark:bg-[#050810]">
                     <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
                         
-                        {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER (Dashboard Parallax Purity) */}
+                        {/* HARDWARE-ACCELERATED IMMERSIVE WATERMARK LAYER */}
                         <div 
-                            className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300"
+                            className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 hidden dark:block"
                             style={{
-                                backgroundImage: `url('/api/checkpoint-image?name=image%20(3).jpg')`,
-                                backgroundSize: '800px auto',
+                                backgroundImage: `url('/CHECKPOINT/nuevo-patron-cosmico.jpg')`,
+                                backgroundSize: '250px auto',
                                 backgroundPosition: 'center center',
                                 backgroundRepeat: 'repeat',
-                                imageRendering: 'crisp-edges',
                                 transform: 'translateZ(0)',
-                                willChange: 'transform',
-                                opacity: 0.95
+                                opacity: 0.035,
+                                mixBlendMode: 'screen',
+                                filter: 'invert(1) hue-rotate(180deg)'
+                            }}
+                        />
+                        <div 
+                            className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 block dark:hidden"
+                            style={{
+                                backgroundImage: `url('/CHECKPOINT/nuevo-patron-cosmico.jpg')`,
+                                backgroundSize: '250px auto',
+                                backgroundPosition: 'center center',
+                                backgroundRepeat: 'repeat',
+                                transform: 'translateZ(0)',
+                                opacity: 0.06,
+                                mixBlendMode: 'multiply'
                             }}
                         />
 
-                        {/* Immersive darkening overlay for perfect readability while scrolling WITHOUT completely obscuring the pattern */}
-                        <div className="fixed inset-0 pointer-events-none -z-10 bg-white/10 dark:bg-black/60 transition-colors duration-300" />
+                        {/* Immersive radial glow overlay (Preserved from old main background) */}
+                        <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(0,150,255,0.04)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(0,150,255,0.08)_0%,transparent_60%)] transition-colors duration-300" />
                         
                         <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10">
                             <AnimatePresence mode="wait">

@@ -3,8 +3,8 @@
   "crons": [
     {
       "path": "/api/cron/indexer",
-      "schedule": "*/15 * * * * *",
-      "comment": "1TB Aggregation Indexer: Pre-computes all heavy analytics into Redis every 15s"
+      "schedule": "* * * * *",
+      "comment": "1TB Aggregation Indexer: Runs every minute. Redis TTLs (15-120s) ensure freshness between runs."
     }
   ]
 }

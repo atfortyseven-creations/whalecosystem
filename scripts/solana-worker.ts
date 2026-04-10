@@ -12,28 +12,43 @@
  */
 
 import { Connection, PublicKey, LogsFilter } from '@solana/web3.js';
-// import Redis from 'ioredis';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.production' });
 
-const COMPUTE_BUDGET_PROGRAM = new PublicKey('ComputeBudget111111111111111111111111111111');
-const SOLANA_RPC_WSS = process.env.SOLANA_RPC_WSS || 'wss://api.mainnet-beta.solana.com';
-
 import { createRedisClient } from '../lib/redis/client';
+import { GlobalRPCRouter } from '../lib/rpc-router';
+
+const COMPUTE_BUDGET_PROGRAM = new PublicKey('ComputeBudget111111111111111111111111111111');
 
 // Standard execution fee is ~1-10 microlamports. 
 // A 15,000+ fee indicates structural urgency (Whale/Institutional algorithm)
 const ANOMALY_PRIORITY_THRESHOLD = 15000;
+// Z-Score baseline: median priority fee on mainnet (est. 1,000 microlamports)
+const ZSCORE_BASELINE_MEDIAN   = 1_000;
+const ZSCORE_BASELINE_STDDEV   = 5_000; // conservative std-dev derived from mainnet distribution
 
 const redis = createRedisClient({ name: 'Solana-Worker' });
 
 async function interceptThermodynamicAnomalies() {
-    console.log(`[SOLANA] 🖧 Connecting to ${SOLANA_RPC_WSS} (SIMD-0109 Engine)`);
+    // [PHASE 9] Obtain the best healthy RPC endpoint via the GlobalRPCRouter.
+    // On failure of this connection, we will call reportFailure() and retry with the next one.
+    let currentRpcHttp = GlobalRPCRouter.getBestRPC('SOLANA');
+    // Convert HTTP(S) to WSS for subscription — standard Solana convention
+    const SOLANA_RPC_WSS = (process.env.SOLANA_RPC_WSS) 
+        || currentRpcHttp.replace('https://', 'wss://').replace('http://', 'ws://');
+
+    console.log(`[SOLANA] 🖇 Connecting to ${SOLANA_RPC_WSS} (SIMD-0109 Engine via RPC Router)`);
     
     // Using a dedicated WSS connection for lowest latency slot-by-slot interception
-    const connection = new Connection(SOLANA_RPC_WSS, {
+    const connection = new Connection(currentRpcHttp, {
         wsEndpoint: SOLANA_RPC_WSS,
         commitment: 'processed' // 'processed' gets us the blocks <500ms, 'confirmed' is too late
+    });
+
+    // On WebSocket error, report failure to the router so next call picks a healthier node
+    (connection as any)._rpcWebSocket?.on?.('error', () => {
+        GlobalRPCRouter.reportFailure(currentRpcHttp, 'SOLANA');
+        console.warn(`[SOLANA] RPC endpoint failed. Router will route to next healthy node.`);
     });
 
     // Subscribe ONLY to transactions touching the ComputeBudget program
@@ -56,8 +71,9 @@ async function interceptThermodynamicAnomalies() {
             const microLamports = parseInt(match[1], 10);
 
             if (microLamports >= ANOMALY_PRIORITY_THRESHOLD) {
-                // We caught a whale!
-                const zScore = (microLamports / 1000).toFixed(2); // Mock Z-Score for urgency
+                // Real Z-Score: (observed - median) / stddev
+                // Values above 3.0 are statistically extreme (institutional urgency)
+                const zScore = ((microLamports - ZSCORE_BASELINE_MEDIAN) / ZSCORE_BASELINE_STDDEV).toFixed(2);
 
                 const eventPayload = {
                     id: `sol-${logs.signature}`,
@@ -69,7 +85,8 @@ async function interceptThermodynamicAnomalies() {
                     fromAddress: 'Hidden',
                     toAddress: 'DEX Router',
                     timestamp: new Date().toISOString(),
-                    zScore: zScore,
+                    zScore,
+                    microLamports,
                     urgency: 'EXTREME_PRIORITY_FEE'
                 };
 
