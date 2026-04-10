@@ -24,29 +24,29 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // ── Markets ──
-    { id: 'dashboard',       label: 'Dashboard',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Markets' },
-    { id: 'watchlist',       label: 'Tactical Watchlist',icon: <Eye size={17}/> },
-    { id: 'alerts',          label: 'Smart Alerts',      icon: <Bell size={17}/> },
-    { id: 'whale-events',    label: 'Global Firehose',   icon: <TrendingUp size={17}/>,       badge: 'LIVE', badgeColor: '#D4AF37' },
-    { id: 'multicharts',     label: 'Quant Charts',      icon: <BarChart2 size={17}/>,       badge: 'NEW', badgeColor: '#00FF55' },
-    { id: 'new-pairs',       label: 'New Pairs',         icon: <Zap size={17}/>,              badge: 'Live', badgeColor: '#00C076' },
-    { id: 'gainers',         label: 'Gainers & Losers',  icon: <TrendingUp size={17}/> },
-    // ── Intelligence ──
-    { id: 'whale-portfolio', label: 'Whale Intelligence',  icon: <PieChart size={17}/>,        dividerBefore: 'Intelligence' },
-    { id: 'news',            label: 'News of Today',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
-    { id: 'api',             label: 'API Terminal',     icon: <Code size={17}/> },
-    { id: 'zk-shield',       label: 'ZK Shield Station',icon: <Shield size={17}/>,          badge: 'ZKP', badgeColor: '#00FF55' },
-    { id: 'neural-graph',    label: 'Neural Graph',     icon: <Network size={17}/>,         badge: 'LIVE', badgeColor: '#0052FF' },
-    { id: 'sovereign-vault', label: 'User',            icon: <ShieldAlert size={17}/>,     badge: 'USER', badgeColor: '#0052FF' },
-    { id: 'omni-explorer',   label: 'Aztec Explorer',   icon: <Search size={17}/>,          badge: 'ZK', badgeColor: '#00FF55' },
-    { id: 'portfolio',       label: 'Portfolio',        icon: <Wallet size={17}/> },
-    // ── Learn & Support ──
-    { id: 'academy',         label: 'Whale Academy',    icon: <GraduationCap size={17}/>,   dividerBefore: 'Learn & Support' },
-    { id: 'brc-explorer',    label: 'BRC Standards',    icon: <Code size={17}/>,            badge: 'BSV', badgeColor: '#E2B33D' },
-    { id: 'support',         label: 'Whale Support',    icon: <LifeBuoy size={17}/> },
-    { id: 'humanidfi-portfolio', label: 'Whale Portfolio', icon: <Briefcase size={17}/> },
-    { id: 'gold-ticket',     label: 'Gold Ticket',      icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
+    // ── Global Consensus ──
+    { id: 'dashboard',       label: 'Genesis Terminal',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Global Consensus' },
+    { id: 'watchlist',       label: 'Observed UTXOs',          icon: <Eye size={17}/> },
+    { id: 'alerts',          label: 'Network Triggers',        icon: <Bell size={17}/> },
+    { id: 'whale-events',    label: 'Raw Mempool Stream',      icon: <TrendingUp size={17}/>,       badge: 'LIVE', badgeColor: '#D4AF37' },
+    { id: 'multicharts',     label: 'Heuristic Visuals',       icon: <BarChart2 size={17}/>,       badge: 'NEW', badgeColor: '#00FF55' },
+    { id: 'new-pairs',       label: 'Genesis Contracts',       icon: <Zap size={17}/>,              badge: 'Live', badgeColor: '#00C076' },
+    { id: 'gainers',         label: 'Entropy Deltas',          icon: <TrendingUp size={17}/> },
+    // ── Cryptographic Espionage ──
+    { id: 'whale-portfolio', label: 'Entity Heuristics',       icon: <PieChart size={17}/>,        dividerBefore: 'Crypto Espionage' },
+    { id: 'news',            label: 'Chronological Cipher',    icon: <Newspaper size={17}/>,       badge: 'New', badgeColor: '#0052FF' },
+    { id: 'api',             label: 'Direct RPC Terminal',     icon: <Code size={17}/> },
+    { id: 'zk-shield',       label: 'ZK Cloak Protocol',       icon: <Shield size={17}/>,          badge: 'ZKP', badgeColor: '#00FF55' },
+    { id: 'neural-graph',    label: 'Association Graph',       icon: <Network size={17}/>,         badge: 'LIVE', badgeColor: '#0052FF' },
+    { id: 'sovereign-vault', label: 'Cryptographic ID',        icon: <ShieldAlert size={17}/>,     badge: 'USER', badgeColor: '#0052FF' },
+    { id: 'omni-explorer',   label: 'Aztec Layer-2 Node',      icon: <Search size={17}/>,          badge: 'ZK', badgeColor: '#00FF55' },
+    { id: 'portfolio',       label: 'Sovereign Capital State', icon: <Wallet size={17}/> },
+    // ── Protocol Doctrine ──
+    { id: 'academy',         label: 'The Whitepaper Academy',  icon: <GraduationCap size={17}/>,   dividerBefore: 'Protocol Doctrine' },
+    { id: 'brc-explorer',    label: 'Bitcoin Primitives',      icon: <Code size={17}/>,            badge: 'BSV', badgeColor: '#E2B33D' },
+    { id: 'support',         label: 'Operator Assist',         icon: <LifeBuoy size={17}/> },
+    { id: 'humanidfi-portfolio', label: 'Cold Storage Vault',  icon: <Briefcase size={17}/> },
+    { id: 'gold-ticket',     label: 'Genesis Clearance',       icon: <Crown size={17}/>,           badge: '$5', badgeColor: '#D4AF37' },
 ];
 
 function LiveMarketBand() {
@@ -134,12 +134,12 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-screen bg-white dark:bg-[#000000] text-black dark:text-white overflow-hidden font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
+        <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
             
             {/* ─── Persistent Pro Sidebar ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="h-full border-r border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex flex-col z-50 relative shadow-none transition-colors duration-300"
+                className="h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex flex-col z-50 relative shadow-none transition-colors duration-300"
             >
 
                 {/* Sidebar Navigation */}
@@ -172,9 +172,9 @@ export function WhaleProShell({
                                         }
                                     `}
                                 >
-                                    <span className={isActive ? 'text-black dark:text-white' : isGold ? 'text-[#D4AF37]' : ''}>{item.icon}</span>
+                                    <span className={isActive ? 'text-[#050505]' : isGold ? 'text-[#D4AF37]' : 'text-[#888888]'}>{item.icon}</span>
                                     {!isCollapsed && (
-                                        <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none">
+                                        <span className={`text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none ${isActive ? 'text-[#050505]' : 'text-[#555555]'}`}>
                                             {item.label}
                                         </span>
                                     )}
@@ -182,7 +182,7 @@ export function WhaleProShell({
                                         <span
                                             className="text-[7px] font-black px-1.5 py-0.5 rounded uppercase"
                                             style={isActive
-                                                ? { background: 'rgba(255,255,255,0.2)', color: 'white' }
+                                                ? { background: 'rgba(5,5,5,0.1)', color: '#050505' }
                                                 : { background: (item.badgeColor || '#D4AF37') + '18', color: item.badgeColor || '#D4AF37', border: `1px solid ${(item.badgeColor || '#D4AF37')}40` }
                                             }
                                         >
@@ -190,7 +190,7 @@ export function WhaleProShell({
                                         </span>
                                     )}
                                     {isActive && (
-                                        <motion.div layoutId="nav-indicator" className="absolute left-0 w-1 h-5 bg-black dark:bg-white rounded-r-full" />
+                                        <motion.div layoutId="nav-indicator" className="absolute left-0 w-1 h-5 bg-[#050505] rounded-r-full" />
                                     )}
                                 </button>
                             </div>
@@ -241,40 +241,27 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#FAF9F6] dark:bg-[#050810]">
+                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#EFEFEF]">
                     <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
                         
                         {/* HARDWARE-ACCELERATED IMMERSIVE WATERMARK LAYER — 4K ukiyo-e */}
                         <div 
-                            className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 hidden dark:block"
+                            className="absolute inset-0 pointer-events-none -z-20 transition-colors duration-300"
                             style={{
-                                backgroundImage: `url('/api/checkpoint-image?name=patron-cosmico-4k.png')`,
-                                backgroundSize: '280px auto',
-                                backgroundPosition: 'center center',
+                                backgroundImage: `url('/patron-cosmico-4k.png')`,
+                                backgroundSize: 'clamp(200px, 35vw, 600px)',
+                                backgroundPosition: 'center top',
                                 backgroundRepeat: 'repeat',
                                 transform: 'translateZ(0)',
                                 willChange: 'transform',
-                                opacity: 0.038,
-                                mixBlendMode: 'screen',
-                                filter: 'invert(1) hue-rotate(180deg)'
-                            }}
-                        />
-                        <div 
-                            className="fixed inset-0 pointer-events-none -z-20 transition-colors duration-300 block dark:hidden"
-                            style={{
-                                backgroundImage: `url('/api/checkpoint-image?name=patron-cosmico-4k.png')`,
-                                backgroundSize: '280px auto',
-                                backgroundPosition: 'center center',
-                                backgroundRepeat: 'repeat',
-                                transform: 'translateZ(0)',
-                                willChange: 'transform',
-                                opacity: 0.062,
+                                opacity: 0.15,
                                 mixBlendMode: 'multiply'
                             }}
                         />
 
-                        {/* Immersive radial glow overlay (Preserved from old main background) */}
-                        <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(0,150,255,0.04)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse_at_50%_0%,rgba(0,150,255,0.08)_0%,transparent_60%)] transition-colors duration-300" />
+                        {/* Immersive radial glow overlay to focus center */}
+                        <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.3)_0%,transparent_80%)] transition-colors duration-300" />
+
                         
                         <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10">
                             <AnimatePresence mode="wait">
