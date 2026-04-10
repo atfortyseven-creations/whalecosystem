@@ -31,7 +31,7 @@ export class EntityGraphMiner {
         // Fetch known whales from postgres
         const entities = await prisma.onChainEntity.findMany({
             take: 30,
-            orderBy: { lastActive: 'desc' }
+            orderBy: { updatedAt: 'desc' }
         });
 
         // Construct D3 Force-Directed Graph data

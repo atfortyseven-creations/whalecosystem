@@ -30,44 +30,50 @@ const NODE_PUBLIC_KEY = publicKey.export({ type: 'spki', format: 'pem' }).toStri
 
 console.log(`[MESH] 🌐 Initializing Sovereign Intelligence Mesh Daemon (TCP Backplane)...`);
 
-redisSub.subscribe(MESH_CHANNEL, (err, count) => {
-    if (err) {
-        console.error(`[MESH-FATAL] Failed to subscribe: %s`, err.message);
-    } else {
-        console.log(`[MESH] ✅ Node Bound via Redis Backplane. Listening on: ${MESH_CHANNEL}`);
-    }
-});
-
-redisSub.on('message', (channel, msg) => {
-    if (channel !== MESH_CHANNEL) return;
-
-    try {
-        const payload = JSON.parse(msg);
-        
-        if (!payload.eventId || !payload.signature || !payload.txHash) return;
-
-        // Replay/Loop Guard
-        if (processMemory.has(payload.eventId)) return;
-        processMemory.set(payload.eventId, Date.now());
-
-        // Cryptographic verification of the signal's origin (Zero-Trust)
-        // Strictly evaluates the ECDSA signature belonging to the broadcasting node
-        const isValid = verifyNodeSignature(payload);
-        
-        if (isValid) {
-            console.log(`[MESH-GOSSIP] 📡 Received Verified EVM Z-Score from P2P for tx: ${payload.txHash}`);
-            
-            // Integración al sistema local. Al estar en Redis, los workers locales pueden leerlo.
+if (typeof redisSub.subscribe === 'function') {
+    redisSub.subscribe(MESH_CHANNEL, (err, count) => {
+        if (err) {
+            console.error(`[MESH-FATAL] Failed to subscribe: %s`, err.message);
+        } else {
+            console.log(`[MESH] ✅ Node Bound via Redis Backplane. Listening on: ${MESH_CHANNEL}`);
         }
+    });
+} else {
+    console.warn(`[MESH] Redis client mocks 'subscribe' - running in degraded standalone mesh mode.`);
+}
 
-    } catch (e) {
-        // Drop malformed packets silently to prevent DDoS
-    }
-});
+if (typeof redisSub.on === 'function') {
+    redisSub.on('message', (channel, msg) => {
+        if (channel !== MESH_CHANNEL) return;
 
-redisSub.on('error', (err) => {
-    console.error(`[MESH-FATAL] Subscriber error:\n${err.stack}`);
-});
+        try {
+            const payload = JSON.parse(msg);
+            
+            if (!payload.eventId || !payload.signature || !payload.txHash) return;
+
+            // Replay/Loop Guard
+            if (processMemory.has(payload.eventId)) return;
+            processMemory.set(payload.eventId, Date.now());
+
+            // Cryptographic verification of the signal's origin (Zero-Trust)
+            // Strictly evaluates the ECDSA signature belonging to the broadcasting node
+            const isValid = verifyNodeSignature(payload);
+            
+            if (isValid) {
+                console.log(`[MESH-GOSSIP] 📡 Received Verified EVM Z-Score from P2P for tx: ${payload.txHash}`);
+                
+                // Integración al sistema local. Al estar en Redis, los workers locales pueden leerlo.
+            }
+
+        } catch (e) {
+            // Drop malformed packets silently to prevent DDoS
+        }
+    });
+
+    redisSub.on('error', (err) => {
+        console.error(`[MESH-FATAL] Subscriber error:\n${err.stack}`);
+    });
+}
 
 /**
  * Cryptographic validation of the sending node's signature
@@ -128,11 +134,15 @@ export function broadcastToMesh(eventType: string, data: any) {
     // Add to own memory so we don't process our own broadcast
     processMemory.set(eventId, Date.now());
 
-    redisPub.publish(MESH_CHANNEL, messageString).then(() => {
-        console.log(`[MESH] 🚀 Multicasted Signal ${payload.txHash} to Sovereign Array via Backplane`);
-    }).catch(err => {
-        console.error(`[MESH] Redis Publish failed: ${err}`);
-    });
+    if (typeof redisPub.publish === 'function') {
+        redisPub.publish(MESH_CHANNEL, messageString).then(() => {
+            console.log(`[MESH] 🚀 Multicasted Signal ${payload.txHash} to Sovereign Array via Backplane`);
+        }).catch((err: any) => {
+            console.error(`[MESH] Redis Publish failed: ${err}`);
+        });
+    } else {
+        console.warn(`[MESH] Dropped outbound signal: Redis is in mock mode.`);
+    }
 }
 
 // Memory Cleanup loop (prevent Map endless growth)

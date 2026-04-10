@@ -6,48 +6,28 @@ import {
   type TransactionMetadata 
 } from './transactions';
 
-/**
- * Create a new transaction record
- */
 export async function createTransaction(data: CreateTransactionData) {
   return prisma.transaction.create({
     data: {
-      authUserId: data.authUserId,
-      hash: data.hash,
-      chainId: data.chainId,
+      txHash: data.hash,
       type: data.type,
       status: data.status,
-      from: data.from,
-      to: data.to,
-      value: data.value,
-      tokenAddress: data.tokenAddress,
-      tokenSymbol: data.tokenSymbol,
+      fromAddress: data.from,
+      toAddress: data.to,
+      amount: parseFloat(data.value) || 0,
+      token: data.tokenSymbol || 'ETH',
       timestamp: new Date(),
-      metadata: data.metadata as any,
     },
   });
 }
 
-/**
- * Get transaction history for a user
- */
-export async function getTransactionHistory(
-  authUserId: string,
-  options?: {
-    chainId?: number;
-    chainIds?: number[];
-    type?: TransactionType;
-    limit?: number;
-    offset?: number;
-  }
-) {
-  const where: any = { authUserId };
-  
-  if (options?.chainIds && options.chainIds.length > 0) {
-    where.chainId = { in: options.chainIds };
-  } else if (options?.chainId) {
-    where.chainId = options.chainId;
-  }
+export async function getTransactionHistory(authUserId: string, options?: any) {
+  const where: any = { 
+    OR: [
+      { fromAddress: authUserId },
+      { toAddress: authUserId }
+    ]
+  };
   
   if (options?.type) {
     where.type = options.type;
@@ -60,70 +40,63 @@ export async function getTransactionHistory(
     skip: options?.offset || 0,
   });
 
-  return transactions;
+  return transactions.map((t: any) => ({
+    ...t,
+    hash: t.txHash,
+    from: t.fromAddress,
+    to: t.toAddress,
+    value: t.amount.toString(),
+    tokenSymbol: t.token
+  }));
 }
 
-/**
- * Get transaction by hash
- */
 export async function getTransactionByHash(hash: string) {
   return prisma.transaction.findUnique({
-    where: { hash },
+    where: { txHash: hash },
   });
 }
 
-/**
- * Update transaction status
- */
 export async function updateTransactionStatus(
   hash: string,
   status: TransactionStatus,
   metadata?: Partial<TransactionMetadata>
 ) {
-  const existingTx = await getTransactionByHash(hash);
-  
-  const updatedMetadata = metadata
-    ? { ...(existingTx?.metadata as any), ...metadata }
-    : existingTx?.metadata;
-
   return prisma.transaction.update({
-    where: { hash },
+    where: { txHash: hash },
     data: {
       status,
-      metadata: updatedMetadata as any,
     },
   });
 }
 
-/**
- * Get pending transactions
- */
 export async function getPendingTransactions(authUserId: string) {
   return prisma.transaction.findMany({
     where: {
-      authUserId,
+      OR: [
+        { fromAddress: authUserId },
+        { toAddress: authUserId }
+      ],
       status: TransactionStatus.PENDING,
     },
     orderBy: { timestamp: 'desc' },
   });
 }
 
-/**
- * Get transaction statistics
- */
 export async function getTransactionStats(authUserId: string) {
+  const baseWhere = {
+    OR: [
+      { fromAddress: authUserId },
+      { toAddress: authUserId }
+    ]
+  };
+
   const [total, pending, confirmed, failed] = await Promise.all([
-    prisma.transaction.count({ where: { authUserId } }),
-    prisma.transaction.count({ where: { authUserId, status: TransactionStatus.PENDING } }),
-    prisma.transaction.count({ where: { authUserId, status: TransactionStatus.CONFIRMED } }),
-    prisma.transaction.count({ where: { authUserId, status: TransactionStatus.FAILED } }),
+    prisma.transaction.count({ where: baseWhere }),
+    prisma.transaction.count({ where: { ...baseWhere, status: TransactionStatus.PENDING } }),
+    prisma.transaction.count({ where: { ...baseWhere, status: TransactionStatus.CONFIRMED } }),
+    prisma.transaction.count({ where: { ...baseWhere, status: TransactionStatus.FAILED } }),
   ]);
 
-  return {
-    total,
-    pending,
-    confirmed,
-    failed,
-  };
+  return { total, pending, confirmed, failed };
 }
 
