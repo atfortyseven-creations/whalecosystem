@@ -62,7 +62,18 @@ async function interceptThermodynamicAnomalies() {
 
     console.log(`[SOLANA] 🔊 Subscribing to ComputeBudget logs (Processed Commitment)...`);
 
+    // [WATCHDOG] Prevents silent "ghost" websocket disconnects
+    let lastMessageTime = Date.now();
+    const watchdog = setInterval(() => {
+        if (Date.now() - lastMessageTime > 15000) {
+            console.error('[SOLANA-WATCHDOG] SIMD-0109 RPC Timeout. Forcing cascade restart...');
+            process.exit(1); 
+        }
+    }, 5000);
+
     connection.onLogs(filter, async (logs, ctx) => {
+        lastMessageTime = Date.now(); // Reset watchdog
+        
         if (logs.err || !logs.logs || !Array.isArray(logs.logs)) return;
 
         // Application-layer filter: skip transactions that didn't invoke ComputeBudget.

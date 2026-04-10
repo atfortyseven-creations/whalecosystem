@@ -32,8 +32,8 @@ export async function POST(request: Request) {
         };
 
         // Fire-and-Forget into Redis Stream (O(1) latency)
-        // Format: XADD STREAM_KEY * data JSON_String
-        await redis.xadd(STREAM_KEY, '*', 'data', JSON.stringify(event));
+        // Format: XADD STREAM_KEY MAXLEN ~ 100000 * data JSON_String
+        await redis.xadd(STREAM_KEY, 'MAXLEN', '~', 100000, '*', 'data', JSON.stringify(event));
 
         return NextResponse.json({ 
             success: true, 
