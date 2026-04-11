@@ -18,7 +18,7 @@ echo Phase 1: Context Capture (git add .)
 git add .
 echo.
 echo Phase 2: Cipher Metadata (git commit)
-git commit -m "feat(intel): stratospheric build optimization, native audit integration [Sovereign Speed v3.8]"
+git commit -m "fix(ipad+perf): eradicate iPad blank screen + mobile scroll lag; add 16 chains; Rainbow Wallet creation flow; patron-cosmico-4k GPU overlay; zero blur-orb rendering contract"
 echo.
 echo Phase 3: Transmitting to Genesis Server (git push)
 git push origin main --force

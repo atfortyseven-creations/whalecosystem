@@ -2,7 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { mainnet, base, arbitrum, optimism } from 'wagmi/chains';
+import { mainnet, base, arbitrum, optimism, polygon, bsc, avalanche, zksync, linea, scroll, celo, mantle, fantom, blast, gnosis, moonbeam } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme, getDefaultConfig, RainbowKitAuthenticationProvider, createAuthenticationAdapter } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
@@ -16,16 +16,45 @@ import { WalletConnectionBridge } from '@/components/providers/WalletConnectionB
 
 const queryClient = new QueryClient();
 
-// Sovereign AppKit Configuration
+// Sovereign AppKit Configuration — ALL CHAINS ENABLED
 const config = getDefaultConfig({
   appName: 'Sovereign Terminal Omniverse',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
-  chains: [mainnet, optimism, base, arbitrum],
+  chains: [
+    mainnet,
+    base,
+    arbitrum,
+    optimism,
+    polygon,
+    bsc,
+    avalanche,
+    zksync,
+    linea,
+    scroll,
+    celo,
+    mantle,
+    fantom,
+    blast,
+    gnosis,
+    moonbeam,
+  ],
   transports: {
-    [mainnet.id]: http(),
-    [optimism.id]: http(),
-    [base.id]: http(),
+    [mainnet.id]:  http(),
+    [base.id]:     http(),
     [arbitrum.id]: http(),
+    [optimism.id]: http(),
+    [polygon.id]:  http(),
+    [bsc.id]:      http(),
+    [avalanche.id]:http(),
+    [zksync.id]:   http(),
+    [linea.id]:    http(),
+    [scroll.id]:   http(),
+    [celo.id]:     http(),
+    [mantle.id]:   http(),
+    [fantom.id]:   http(),
+    [blast.id]:    http(),
+    [gnosis.id]:   http(),
+    [moonbeam.id]: http(),
   },
   ssr: true,
 });

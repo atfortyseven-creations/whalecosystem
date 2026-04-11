@@ -103,116 +103,95 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
         );
     }
 
-    // 4. LOADING STATE - Cinematic loader matching landing page theme
+    // 4. LOADING STATE — GPU-safe, zero blur filters
     if (isLoading && assets.length === 0) {
         return (
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="min-h-[500px] flex flex-col items-center justify-center bg-white/95 overflow-hidden rounded-3xl relative"
+                className="min-h-[500px] flex flex-col items-center justify-center rounded-3xl relative overflow-hidden"
+                style={{ background: 'rgba(11,14,17,0.97)' }}
             >
-                {/* Background orbs matching landing page - Soft Light mode variant */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                    <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-blue-100/50 blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
-                    <div className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-slate-100/40 blur-[100px] animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[30vw] rounded-full bg-blue-50/30 blur-[80px] animate-pulse" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
-                </div>
-
-                {/* Animated grid overlay */}
-                <div 
+                {/* Subtle dot-grid — no blur, no animate-pulse, pure CSS */}
+                <div
                     className="absolute inset-0 pointer-events-none opacity-[0.04]"
-                    style={{ 
-                        backgroundImage: 'linear-gradient(rgba(79,70,229,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(79,70,229,0.8) 1px, transparent 1px)',
-                        backgroundSize: '40px 40px'
-                    }} 
+                    style={{
+                        backgroundImage: 'radial-gradient(circle, rgba(99,102,241,0.9) 1px, transparent 0)',
+                        backgroundSize: '32px 32px',
+                    }}
                 />
 
                 {/* Center content */}
-                <div className="relative z-10 flex flex-col items-center gap-10 px-8 text-center">
-                    {/* Pulsing Shield Icon */}
-                    <div className="relative">
-                        <div className="absolute inset-0 scale-[2.5] rounded-full bg-indigo-500/10 blur-3xl animate-pulse" style={{ animationDuration: '2s' }} />
-                        <motion.div
-                            animate={{ scale: [1, 1.06, 1] }}
-                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                            className="relative"
-                        >
-                            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" className="drop-shadow-[0_0_30px_rgba(99,102,241,0.6)]">
-                                <path 
-                                    d="M12 2L4 6V12C4 16.418 7.582 20.5 12 22C16.418 20.5 20 16.418 20 12V6L12 2Z" 
-                                    stroke="rgba(99,102,241,0.9)" 
-                                    strokeWidth="1.5" 
+                <div className="relative z-10 flex flex-col items-center gap-8 px-8 text-center">
+                    {/* Shield icon — CSS border-spin only, zero blur */}
+                    <div className="relative w-20 h-20">
+                        <div
+                            className="absolute inset-0 rounded-full border-2 border-indigo-500/20"
+                            style={{ animation: 'spin 3s linear infinite' }}
+                        />
+                        <div
+                            className="absolute inset-2 rounded-full border-2 border-purple-500/30"
+                            style={{ animation: 'spin 2s linear infinite reverse' }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M12 2L4 6V12C4 16.418 7.582 20.5 12 22C16.418 20.5 20 16.418 20 12V6L12 2Z"
+                                    stroke="rgba(99,102,241,0.9)"
+                                    strokeWidth="1.5"
                                     fill="rgba(79,70,229,0.15)"
                                 />
-                                <path 
-                                    d="M9 12L11 14L15 10" 
-                                    stroke="rgba(129,140,248,0.8)" 
-                                    strokeWidth="1.5" 
-                                    strokeLinecap="round" 
+                                <path
+                                    d="M9 12L11 14L15 10"
+                                    stroke="rgba(129,140,248,0.9)"
+                                    strokeWidth="1.5"
+                                    strokeLinecap="round"
                                     strokeLinejoin="round"
                                 />
                             </svg>
-                        </motion.div>
+                        </div>
                     </div>
 
-                    {/* Title */}
-                    <div className="space-y-3">
-                        <motion.h2
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-2xl md:text-3xl font-black uppercase tracking-[0.2em] text-slate-900"
-                        >
-                            SINCRONIZANDO LIBRO DE PORTAFOLIO
-                        </motion.h2>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            className="text-[10px] font-bold uppercase tracking-[0.35em] text-indigo-600/70"
-                        >
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-black uppercase tracking-[0.2em] text-white/90">
+                            SINCRONIZANDO PORTAFOLIO
+                        </h2>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-indigo-400/70">
                             MAXIMUM SECURITY ENCRYPTION
-                        </motion.p>
+                        </p>
                     </div>
 
-                    {/* Animated progress scanlines */}
-                    <div className="w-64 md:w-80 space-y-3">
+                    {/* Progress lines — transform only, no layout triggers */}
+                    <div className="w-64 md:w-72 space-y-3">
                         {['Conectando nodos RPC', 'Indexando cadenas', 'Calculando posiciones'].map((label, i) => (
                             <motion.div
                                 key={label}
-                                initial={{ opacity: 0, x: -20 }}
+                                initial={{ opacity: 0, x: -16 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.5 + i * 0.2 }}
+                                transition={{ delay: 0.3 + i * 0.15 }}
                                 className="flex items-center gap-3"
                             >
-                                <motion.div
-                                    animate={{ opacity: [0.3, 1, 0.3] }}
-                                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.5 }}
-                                    className="w-1.5 h-1.5 rounded-full bg-indigo-600 flex-shrink-0"
-                                />
-                                <div className="flex-1 h-px bg-slate-200 relative overflow-hidden rounded-full">
+                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
+                                <div className="flex-1 h-px bg-white/10 relative overflow-hidden rounded-full">
                                     <motion.div
-                                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-600 to-purple-500"
+                                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-purple-400"
                                         initial={{ width: '0%' }}
                                         animate={{ width: ['0%', '100%', '0%'] }}
-                                        transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.4, ease: 'easeInOut' }}
+                                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.35, ease: 'easeInOut' }}
                                     />
                                 </div>
-                                <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider">{label}</span>
+                                <span className="text-[9px] font-mono text-white/30 uppercase tracking-wider">{label}</span>
                             </motion.div>
                         ))}
                     </div>
                 </div>
 
-                {/* Bottom timestamp */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="absolute bottom-8 right-8 font-mono text-[10px] text-slate-400 uppercase tracking-wider"
-                >
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </motion.div>
+                <style jsx global>{`
+                    @keyframes spin {
+                        from { transform: rotate(0deg); }
+                        to   { transform: rotate(360deg); }
+                    }
+                `}</style>
             </motion.div>
         );
     }
@@ -232,16 +211,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         : "bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50 backdrop-blur-xl" // Heavy effects on desktop
                 )}
             >
-                {/* Gradient Orbs - Simplified on mobile */}
-                {!isMobile && (
-                    <>
-                        <div className={cn(
-                            "absolute -top-32 -right-32 w-96 h-96 blur-[140px] rounded-full opacity-20 transition-all duration-1000",
-                            isProfit ? "bg-emerald-500" : "bg-red-500"
-                        )} />
-                        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-500/10 blur-[140px] rounded-full" />
-                    </>
-                )}
+                {/* ZERO BLUR ORBS — removed for iPad GPU performance */}
                 
                 <div className="relative z-10 flex justify-between items-start">
                     <div className="space-y-6">
