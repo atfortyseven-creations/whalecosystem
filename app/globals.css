@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ──────────────────────────────────────────────────────────────────────────
+   IOS 15 / SAFARI WEBKIT UNIVERSAL COMPATIBILITY LAYER
+   Resolves blank screen, viewport bugs, and font rendering on iOS 15.x
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Fix iOS Safari 100vh blank bottom space bug */
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* iOS 15 Safari fix */
+  -webkit-text-size-adjust: 100%;     /* Prevent iOS auto text-size increase */
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent; /* Remove tap flash on iOS */
+  touch-action: manipulation;          /* Disable double-tap zoom globally */
+}
+
+/* iOS Safari: Prevent 16px font auto-zoom on input focus */
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+/* iOS-safe momentum scrolling for all scrollable containers */
+[class*="overflow-y-auto"],
+[class*="overflow-y-scroll"],
+[class*="overflow-auto"],
+[class*="overflow-scroll"] {
+  -webkit-overflow-scrolling: touch;
+}
+
 /* UNIVERSAL A11Y FOCUS */
 :focus-visible {
   outline: 2px solid #00f2ea;
@@ -371,6 +405,23 @@
 
 .z-stratosphere {
   z-index: 9999 !important;
+}
+
+html,
+body,
+:root {
+  scroll-behavior: smooth;
+  height: 100%;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch; /* Mobile hardware acceleration for scrolling */
+}
+
+/* Force hardware composite on heavily animated global components */
+.hardware-accelerated {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000;
 }
 
 /* GPU scroll container — use on long scrollable lists */

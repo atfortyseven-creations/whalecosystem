@@ -5,16 +5,16 @@ export const runtime = 'nodejs';
 export const revalidate = 60; // Cache 1 min
 
 // ── The Oracle Protocol ──────────────────────────────────────────────────────
-// The system predicts major capital flows BEFORE they hit the public mempool
-// or news aggregators. The prediction is hashed to SHA-256 and sealed on-chain.
-// When the time horizon is reached, the prediction is unsealed, proving mathematically
-// that the system knew something impossible.
+// The system calculates probability vectors for major capital flows BEFORE they hit the public mempool
+// or news aggregators. The projection is hashed to SHA-256 and cryptographically sealed.
+// When the time horizon is reached, the projection is unsealed, proving mathematically
+// that the system accurately modeled the execution environment.
 
 // Format: 
 // The actual hash is generated dynamically to be mathematically sound for demo,
 // but conceptually represents an on-chain commitment scheme.
 
-const RAW_PROPHESIES = [
+const RAW_PROJECTIONS = [
   {
     id: 'V-089',
     horizon: '2026-03-12T14:00:00Z',
@@ -50,7 +50,7 @@ function generateProof(text: string, timestamp: string) {
 
 export async function GET() {
   try {
-    const records = RAW_PROPHESIES.map(prophecy => {
+    const records = RAW_PROJECTIONS.map(prophecy => {
       const proofHash = generateProof(prophecy.prediction, prophecy.sealTimestamp);
       
       return {
@@ -69,7 +69,7 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
-      protocol: 'sovereign_oracle',
+      protocol: 'predictive_execution',
       uptime: '99.999%',
       activeSeals: records.filter(r => r.status === 'SEALED').length,
       records

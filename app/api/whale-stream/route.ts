@@ -19,6 +19,10 @@ import { NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+// Concurrency Cap: Prevent Node.js EMFILE exhaustion
+let activePodConnections = 0;
+const MAX_CONCURRENT_SSE = 200;
+
 // Redis import is conditional — the worker sets the queue, this endpoint reads it.
 // If Redis is not available (local dev without Docker), we fall back to long-polling
 // against Prisma directly.
@@ -40,6 +44,19 @@ async function getPrismaClient() {
 }
 
 export async function GET(req: NextRequest) {
+    if (activePodConnections >= MAX_CONCURRENT_SSE) {
+        console.warn(`[SSE:Throttle] Max concurrent streams (${activePodConnections}) reached. Rejecting connection with Backoff.`);
+        return new Response(JSON.stringify({ error: 'System at capacity. Please reconnect later.' }), {
+            status: 503,
+            headers: {
+                'Content-Type': 'application/json',
+                'Retry-After': '30', // Instruct client EventSource to backoff
+            }
+        });
+    }
+
+    activePodConnections++;
+
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
@@ -61,10 +78,17 @@ export async function GET(req: NextRequest) {
             let redisStreamId = '$';
             let running = true;
 
-            req.signal.addEventListener('abort', () => {
+            let isCleanedUp = false;
+
+            const cleanup = () => {
+                if (isCleanedUp) return;
+                isCleanedUp = true;
                 running = false;
+                activePodConnections--;
                 try { controller.close(); } catch {}
-            });
+            };
+
+            req.signal.addEventListener('abort', cleanup);
 
             const redis = await getRedisClient();
             const prisma = await getPrismaClient();
@@ -134,6 +158,9 @@ export async function GET(req: NextRequest) {
                     await new Promise(r => setTimeout(r, 3000));
                 }
             }
+
+            // Ensure cleanup happens if loop exits gracefully or crashes outside try-catch
+            cleanup();
         },
     });
 

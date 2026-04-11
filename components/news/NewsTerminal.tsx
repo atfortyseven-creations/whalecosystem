@@ -482,27 +482,33 @@ export function NewsTerminal() {
                       >
                         {selected.description
                           ? selected.description.split(/\n\n+/).map((p, i) => (
-                              <p key={i}>{p}</p>
+                              <p key={i} className="mb-6">{p}</p>
                             ))
                           : (
-                              <>
-                                <p>Nuestros nodos de telemetría termodinámica han identificado un vector asimétrico inusual. Este desarrollo técnico ha activado los protocolos de vigilancia de Nivel-Alfa dentro de nuestra infraestructura institucional, dada su propagación anómala que excede los parámetros estándar de volatilidad. Los sistemas de alerta temprana revelan una concentración atípica de liquidez de alto valor preparándose en la antesala de este horizonte temporal.</p>
-                                <p>Desde la perspectiva del análisis matricial de liquidez, los operadores de Nivel 1 —entidades con capitales superiores a los $10 millones en activos digitales— se encuentran ejecutando discretas pero sistemáticas realineaciones de exposición. El flujo de datos en cadena apunta claramente a una reestructuración estratégica de carteras, migrando desde libros de órdenes centralizados hacia capas profundas de autocustodia. Históricamente, este patrón antecede expansiones direccionales masivas en un transcurso de 48 horas, sugiriendo una inminente compresión asimétrica del mercado.</p>
-                                <p>El análisis correlacionado a través de los ecosistemas EVM proyecta una agresiva reprecificación de derivados en el muy corto plazo. Las métricas de interés abierto exponen una divergencia estructural absoluta entre el sentimiento especulativo minorista y el riguroso posicionamiento estratégico institucional, el cual acumula silenciosamente posiciones largas fuertemente respaldadas. Recomendamos a los operadores provistos de motores soberanos de inteligencia mantener una postura de pura observación estratégica, aguardando una confirmación estructural intacta antes de comprometer cualquier nivel de capital algorítmico.</p>
-                              </>
+                              <div className="space-y-6">
+                                <p>El ecosistema de activos digitales continúa demostrando una profunda transformación estructural a medida que la adopción institucional acelera su paso. Evaluamos recientemente la densidad del libro de órdenes en los principales mercados al contado (spot markets), observando un desplazamiento evidente desde el volumen puramente especulativo minorista hacia posiciones subyacentes de retención a largo plazo. Los creadores de mercado (market makers) están ajustando activamente sus estrategias de provisión de liquidez en respuesta a regulaciones más claras en jurisdicciones de primer nivel.</p>
+                                
+                                <p>Una de las áreas más críticas de desarrollo en el ciclo actual es la compresión del espacio de bloque y la economía subyacente de las soluciones de Capa 2 (Layer 2). Al abstraer la ejecución fuera de la red principal de Ethereum pero anclando la finalidad, los Rollups optimistas y de conocimiento cero (ZK-Rollups) no solo han reducido drásticamente los costos de transacción para el usuario final, sino que han habilitado una nueva generación de protocolos financieros descentralizados de alta frecuencia.</p>
+                                
+                                <p>Analizando la migración de liquidez de las finanzas tradicionales hacia la cadena, observamos un pronunciado incremento en la acuñación de activos del mundo real (RWAs) tokenizados. Las letras del tesoro estadounidense y los fondos del mercado monetario son ahora fácilmente programables, lo que inyecta una tasa libre de riesgo real dentro del espacio DeFi, estabilizando colaterales y reduciendo el apalancamiento excesivo en activos estables.</p>
+                                
+                                <p>Es importante destacar la resiliencia técnica de la red, particularmente durante episodios de alta volatilidad donde históricamente se experimentaban retrasos en la liquidación y picos de tarifas desmedidos. La introducción de Proto-Danksharding (EIP-4844) ha cumplido sus expectativas base, permitiendo acomodar picos abruptos de demanda institucional sin congestión catastrófica, estableciendo un suelo firme para futuras estrategias de trading algorítmico escalable.</p>
+
+                                <p>Los operadores sofisticados deberán enfocarse en la divergencia inminente entre protocolos que capturan valor y aquellos puramente inflacionarios. A medida que madura el modelo económico Web3, métricas como ingresos por protocolo, retención de capital por usuario y estructuras de tokenomics deflacionarias a largo plazo serán el divisor definitivo entre proyectos viables y redes redundantes. Seguimos monitoreando la profundidad agregada del mercado global a la espera de rompimientos direccionales significativos.</p>
+                              </div>
                             )
                         }
                       </div>
 
                     {/* FOOTER LEGAL */}
                     <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>
-                      <div className="flex justify-between items-center font-mono text-[8px] uppercase tracking-[0.3em] mb-3"
+                      <div className="flex justify-between items-center font-mono text-[10px] uppercase tracking-widest font-bold mb-3"
                            style={{ color: MUTED }}>
-                        <span>Whale Alert Network — Intel Report</span>
-                        <span>No Reliance / Educational Only</span>
+                        <span>Professional Analysis Report</span>
+                        <span>Strictly Educational Insights</span>
                       </div>
-                      <p className="font-mono text-[8px] leading-relaxed uppercase tracking-wide" style={{ color: MUTED }}>
-                        La información presentada tiene fines exclusivamente educativos e informativos. Operar en mercados de criptoactivos implica riesgo de pérdida total de capital. Ningún contenido de esta terminal constituye asesoramiento financiero, legal ni fiscal. Zero almacenamiento de datos personales. Todas las transacciones están sujetas a las leyes vigentes de su jurisdicción.
+                      <p className="font-mono text-xs leading-relaxed uppercase tracking-wide opacity-50" style={{ color: MUTED }}>
+                        The analytical material provided herein is solely for educational purposes and should not be construed as investment, financial, or legal advice. Trading and interacting with digital assets inherently involves substantial risk, and full capital loss is possible. Information provided reflects market states at the time of publication.
                       </p>
                     </div>
                   </div>

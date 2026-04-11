@@ -52,7 +52,7 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
                 id: ++logCounter,
                 timestamp: timeStr,
                 type: 'warning',
-                message: <span><span className="text-[#E5E5E5]">[{data.chain?.toUpperCase() || 'ETH'}]</span> ⚡ ALERTA INSTITUCIONAL: {data.type || 'Transfer'} detectado por <span className="text-[#FF9500] font-black">${(data.usdValue || data.amountUsd || 0).toLocaleString()}</span> USD.</span>
+                message: <span><span className="text-[#E5E5E5]">[{data.chain?.toUpperCase() || 'ETH'}]</span> ALERTA INSTITUCIONAL: {data.type || 'Transfer'} detectado por <span className="text-[#FF9500] font-black">${(data.usdValue || data.amountUsd || 0).toLocaleString()}</span> USD.</span>
             }]);
         });
 

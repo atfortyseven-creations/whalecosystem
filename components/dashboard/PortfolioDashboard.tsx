@@ -53,18 +53,20 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
         }
     }, [effectiveAddress, fetchPortfolio]);
 
-    // 2. DETECT NEW ASSETS FOR ANIMATION
+    // 2. DETECT NEW ASSETS FOR ANIMATION (with leak-safe cleanup)
     useEffect(() => {
         const currentAssetIds = assets.map(a => `${a.symbol}-${a.network}`);
         const newIds = currentAssetIds.filter(id => !previousAssets.includes(id));
         
+        let clearTimer: ReturnType<typeof setTimeout> | null = null;
         if (newIds.length > 0 && previousAssets.length > 0) {
             setNewAssetIds(new Set(newIds));
-            // Clear animation after 3 seconds
-            setTimeout(() => setNewAssetIds(new Set()), 3000);
+            // Clear animation after 3 seconds — MUST be cleaned up on unmount
+            clearTimer = setTimeout(() => setNewAssetIds(new Set()), 3000);
         }
         
         setPreviousAssets(currentAssetIds);
+        return () => { if (clearTimer) clearTimeout(clearTimer); };
     }, [assets]);
 
     const isProfit = totalChange24h >= 0;
@@ -107,7 +109,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 overflow-hidden"
+                className="min-h-[500px] flex flex-col items-center justify-center bg-white/95 overflow-hidden rounded-3xl relative"
             >
                 {/* Background orbs matching landing page - Soft Light mode variant */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">

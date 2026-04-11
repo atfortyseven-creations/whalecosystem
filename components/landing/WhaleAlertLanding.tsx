@@ -311,8 +311,8 @@ function WhalePostIframePanel() {
   );
 }
 
-// ── PILAR I: EL REGISTRO AKÁSICO ────────────────────────────────────────────────
-function AkashicRegistryPanel() {
+// ── PILAR I: INSTITUTIONAL LEDGER ────────────────────────────────────────────────
+function PermanentLedgerPanel() {
   const { data } = useSWR('/api/akashic', (url: string) => fetch(url).then(r => r.json()));
   const records = data?.records?.slice(0, 3) || [];
 
@@ -321,7 +321,7 @@ function AkashicRegistryPanel() {
       <div className="bg-black dark:bg-white text-white dark:text-black px-8 py-5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <Database size={16} />
-          <span className="font-mono text-[11px] font-black uppercase tracking-[0.3em]">The Akashic Registry</span>
+          <span className="font-mono text-[11px] font-black uppercase tracking-[0.3em]">The Institutional Ledger</span>
         </div>
         <span className="font-mono text-[9px] uppercase tracking-widest opacity-60">Permanent Historian</span>
       </div>
@@ -354,8 +354,8 @@ function AkashicRegistryPanel() {
   );
 }
 
-// ── PILAR II: EL PROTOCOLO BALLENA MUERTA ─────────────────────────────────────────
-function DeadWhaleProtocolPanel() {
+// ── PILAR II: DORMANT CAPITAL ─────────────────────────────────────────
+function DormantCapitalTrackerPanel() {
   return (
     <div className="bg-[#050505] border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl relative p-8 md:p-10 flex flex-col">
       <div className="absolute top-0 right-0 p-6">
@@ -370,7 +370,7 @@ function DeadWhaleProtocolPanel() {
           <span className="inline-flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.3em] text-red-500 mb-6 bg-red-500/10 px-3 py-1.5 rounded-full border border-red-500/20">
             <Activity size={12} /> Sentinel Active
           </span>
-          <h3 className="font-sans text-3xl font-black text-white tracking-tight mb-4">Dead Whale Protocol</h3>
+          <h3 className="font-sans text-3xl font-black text-white tracking-tight mb-4">Dormant Capital Tracking</h3>
           <p className="text-[13px] text-white/50 leading-[1.9] font-medium">
             Monitoring the sacred wallets. The 1.1M BTC mined by Satoshi Nakamoto. The 2009 genesis miners. The DAO hacker. 
             Wallets that haven't moved in a decade. If they breathe, we document it instantly.
@@ -392,8 +392,8 @@ function DeadWhaleProtocolPanel() {
   );
 }
 
-// ── PILAR III: LA CONSTELACIÓN ──────────────────────────────────────────────────
-function SovereignConstellationPanel() {
+// ── PILAR III: DISTRIBUTED VERIFICATION ──────────────────────────────────────────────────
+function DistributedVerificationPanel() {
   return (
     <div className="bg-[#FAF9F6] dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-[2rem] p-10 md:p-14 text-center relative overflow-hidden group col-span-1 md:col-span-2 lg:col-span-1 flex flex-col justify-center items-center">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/[0.04] dark:from-white/[0.05] via-transparent to-transparent opacity-50" />
@@ -403,8 +403,8 @@ function SovereignConstellationPanel() {
           <Lock className="text-white dark:text-black" size={28} />
         </div>
         
-        <p className="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-black/40 dark:text-white/40 mb-4">The Master Key</p>
-        <h3 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">200 Sovereign<br/>Witnesses</h3>
+        <p className="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-black/40 dark:text-white/40 mb-4">Distributed Verification</p>
+        <h3 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-6 leading-tight">200 Execution<br/>Nodes</h3>
         <p className="text-[14px] text-black/60 dark:text-white/60 leading-[1.9] max-w-sm mx-auto mb-10 font-medium">
           There will only ever be 200 genesis nodes. When the 200th human signs the registry with their geographic coordinates and cryptographic hand-drawn signature, their combined hashes will mathematically generate the <strong>Master Key</strong>. No one knows what it unlocks.
         </p>
@@ -419,8 +419,8 @@ function SovereignConstellationPanel() {
   );
 }
 
-// ── PILAR IV: EL ORÁCULO SOBERANO ────────────────────────────────────────────────
-function SovereignOraclePanel() {
+// ── PILAR IV: ALGORITHMIC PROJECTIONS ────────────────────────────────────────────────
+function PredictiveExecutionPanel() {
   const { data } = useSWR('/api/oracle', (url: string) => fetch(url).then(r => r.json()));
   const records = data?.records || [];
 
@@ -433,10 +433,10 @@ function SovereignOraclePanel() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-16 border-b border-white/10 pb-16">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-3 font-mono text-[10px] font-black uppercase tracking-[0.4em] text-white/50 mb-8 bg-white/[0.03] px-5 py-2.5 rounded-full border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
-              <Eye size={14} className="text-white" /> The Oracle Protocol
+              <Eye size={14} className="text-white" /> Algorithmic Projections
             </span>
             <h3 className="font-sans text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-8 leading-tight">
-              Cryptographically <br /> Sealed Prophecies.
+              Cryptographically <br /> Sealed Models.
             </h3>
             <p className="text-[14px] md:text-[15px] text-white/60 leading-[2.1] font-medium max-w-xl">
               We do not predict the market. We compute it. When our algorithms detect an inevitable outcome, we hash the prediction and seal it on-chain BEFORE it happens. After the event, the hash is unsealed. Math proves we knew.
@@ -644,9 +644,8 @@ export function WhaleAlertLanding() {
                   </button>
                 </div>
 
-                {/* Stats row */}
                 <div className="flex items-center gap-8 md:gap-16 opacity-50">
-                  {[["7", "Terminal Phases"], ["200", "Genesis Tickets"], ["Optimism L2", "Settlement"], ["ZK Shield", "Privacy Layer"]].map(([val, label]) => (
+                  {[["7", "Terminal Phases"], ["200", "Access Protocols"], ["Optimism L2", "Settlement"], ["Privacy Network", "Zero-Knowledge"]].map(([val, label]) => (
                     <div key={label} className="text-center">
                       <p className="font-mono text-lg md:text-2xl font-black text-black dark:text-white leading-none">{val}</p>
                       <p className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/40 dark:text-white/40 mt-1">{label}</p>
@@ -792,8 +791,8 @@ export function WhaleAlertLanding() {
               <PillarCard icon={<Lock size={16} />} title="Non-Custodial Authentication"
                 desc="Your wallet signs a challenge. The server verifies the signature mathematically. No passwords, no sessions, no stored credentials."
                 delay={0} />
-              <PillarCard icon={<Shield size={16} />} title="ZK Shield — Zero-Knowledge Privacy"
-                desc="State transitions for identity and access verification are processed through zero-knowledge proof logic, aligned with the Aztec Network architecture."
+              <PillarCard icon={<Shield size={16} />} title="Zero-Knowledge Privacy"
+                desc="State transitions for identity and access verification are processed through zero-knowledge proof logic, fully abstracting local sessions."
                 delay={0.05} />
               <PillarCard icon={<Database size={16} />} title="PostgreSQL + Railway Deployment"
                 desc="Atomic transactions on a high-availability PostgreSQL instance. Automatic webhooks trigger redeployment on every push — zero manual intervention."
@@ -821,27 +820,27 @@ export function WhaleAlertLanding() {
           </Reveal>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-fr">
-            {/* Left Column: Akashic Registry */}
+            {/* Left Column: Historical Ledger */}
             <Reveal delay={0.1}>
               <div className="h-full">
-                <AkashicRegistryPanel />
+                <PermanentLedgerPanel />
               </div>
             </Reveal>
 
-            {/* Middle Column: Dead Whale Protocol & Master Key */}
+            {/* Middle Column: Dormant Tracking & Verification */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 lg:col-span-2 gap-6">
               <Reveal delay={0.15}>
                 <div className="h-full">
-                  <DeadWhaleProtocolPanel />
+                  <DormantCapitalTrackerPanel />
                 </div>
               </Reveal>
               <Reveal delay={0.2} className="h-full">
-                <SovereignConstellationPanel />
+                <DistributedVerificationPanel />
               </Reveal>
             </div>
-            {/* Full Width Oracle Protocol Panel below the initial grid */}
+            {/* Full Width Algorithmic Protocol Panel below the initial grid */}
             <Reveal delay={0.25} className="lg:col-span-3">
-              <SovereignOraclePanel />
+              <PredictiveExecutionPanel />
             </Reveal>
           </div>
         </div>
@@ -863,20 +862,17 @@ export function WhaleAlertLanding() {
               <div className="flex items-center gap-4 mb-6">
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">00</span>
                 <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">PROTOCOL ABSTRACT</span>
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] uppercase text-black/40 dark:text-white/40">OPERATIONAL ABSTRACT</span>
               </div>
               <p>
-                <strong className="text-black dark:text-white">Whale Alert Network</strong> is an institutional-grade on-chain intelligence platform that synthesizes real-time telemetry, multi-chain analysis, and a decentralized sovereign peer-to-peer network protocol — the Sovereign Mesh — to provide an unprecedented layer of knowledge over large-scale cryptographic capital movements. The platform does not aggregate data from secondary providers. Every signal originates from direct blockchain state observation: from raw RPC streams, mempool intercepts, and log subscription feeds maintained by a globally distributed set of sovereign sentinel nodes.
+                <strong className="text-black dark:text-white">The Analysis Network</strong> is an institutional-grade on-chain intelligence platform that synthesizes real-time telemetry, multi-chain analysis, and advanced execution models to provide an unprecedented layer of knowledge over large-scale cryptographic capital movements. The platform does not aggregate data from secondary providers. Every signal originates from direct blockchain state observation: from raw RPC streams, mempool intercepts, and log subscription feeds.
               </p>
               <p className="mt-4">
-                The system processes and analyzes high-value transactions across Solana, Ethereum, BNB Chain, Arbitrum, Base, Polygon, and Optimism simultaneously — applying proprietary Zero-Knowledge cryptographic filters, temporal signal cross-correlations, and Z-score deviation algorithms, all at sub-500ms end-to-end latency from transaction broadcast to terminal display. No intermediary. No API aggregator. No delayed data feed. The network is the sensor.
+                The system processes and analyzes high-value transactions across major networks simultaneously — applying variance profiling, temporal signal cross-correlations, and deviation algorithms, all at sub-500ms end-to-end latency from transaction broadcast to terminal display. The network is the sensor.
               </p>
               <p className="mt-4">
-                The architecture is built on a foundational axiom: <strong className="text-black dark:text-white">market intelligence is not a product — it is a consequence of direct observation at the protocol level.</strong> Centralized intelligence platforms rely on third-party data providers, introducing latency, selection bias, and censorship vectors. Whale Alert Network eliminates all three by positioning sovereign sentinel nodes at the earliest measurable point in the transaction lifecycle: the mempool, at the moment of broadcast, before any block confirmation.
+                The architecture is built on a foundational axiom: <strong className="text-black dark:text-white">market intelligence is not a product — it is a consequence of structured analysis.</strong> Centralized intelligence platforms rely on delayed aggregators. We eliminate latency by operating at the earliest measurable point in the transaction lifecycle: the mempool, at the moment of broadcast.
               </p>
-              <blockquote className="mt-8 border-l-2 border-black/20 dark:border-white/20 pl-6 italic opacity-80 text-[15px]">
-                "The most powerful market knowledge is not what you can buy. It is what the market itself emits — and what no one else can read."
-              </blockquote>
             </Reveal>
 
             <Reveal delay={0.15}>
@@ -890,23 +886,23 @@ export function WhaleAlertLanding() {
               </p>
               <pre className="bg-black/5 dark:bg-white/5 p-6 rounded-xl font-mono text-[10px] md:text-[11px] overflow-x-auto whitespace-pre text-black/80 dark:text-white/80 mt-6">
 {`┌─────────────────────────────────────────────────────────────────┐
-│                    WHALE ALERT NETWORK v3.0                     │
+│                    INSTITUTIONAL PLATFORM v3.0                  │
 ├─────────────────┬───────────────────┬───────────────────────────┤
-│   FRONTEND      │    BACKEND CORE   │   SOVEREIGN LAYER         │
+│   FRONTEND      │    BACKEND CORE   │   DATA LAYER              │
 │                 │                   │                           │
-│  Next.js 15     │  PostgreSQL 1TB   │  Sovereign Mesh (TCP)     │
-│  TypeScript     │  Redis Streams    │  ECDSA P-256 Signing      │
-│  Three.js       │  Prisma ORM       │  ZK Proof Verification    │
-│  GSAP + Framer  │  Redis Pub/Sub    │  AVS Node Network         │
-│  Wagmi/Viem     │  BullMQ Queues    │  EigenLayer Integration   │
-│  Tailwind CSS   │  PgBouncer Pool   │  Deadman Switch Contract  │
+│  Next.js 15     │  PostgreSQL 1TB   │  Dedicated TCP Pool       │
+│  TypeScript     │  Redis Streams    │  Message Queues           │
+│  React/TS       │  Prisma ORM       │  Real-Time Indices        │
+│  GSAP + Framer  │  Redis Pub/Sub    │  Analysis Engines         │
+│  Data Viz Hooks │  Workers Node     │  API Data Layer           │
+│  Tailwind CSS   │  Connection Pool  │  Contract Listeners       │
 ├─────────────────┴───────────────────┴───────────────────────────┤
 │                    INFRASTRUCTURE LAYER                         │
 │                                                                 │
-│  Railway Pro (42 réplicas · 1TB Storage · 1000 vCPU)           │
-│  Docker Compose (web + worker-solana + worker-mesh)             │
-│  GitHub Actions CI → Railway Auto-Deploy                        │
-│  Global RPC Router (6 endpoints · Auto-Failover)               │
+│  Automated Delivery Environment (Multiple Replicas)             │
+│  Dockerized Architecture                                        │
+│  Automated Deployment Pipelines                                 │
+│  Load-Balanced Traffic Controllers                              │
 └─────────────────────────────────────────────────────────────────┘`}
               </pre>
               <p className="mt-6">
@@ -1034,12 +1030,9 @@ export function WhaleAlertLanding() {
           }}
         />
 
-        {/* ── Layer 2: Hokusai blue waves — progressively scaled per viewport so mobile portrait never zooms grotesquely */}
-        {/* 200% on xs → 160% on sm → 140% on md → 100% on lg+ */}
         <div
-          className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-no-repeat"
+          className="absolute inset-0 z-[1] pointer-events-none select-none bg-bottom bg-no-repeat"
           style={{
-            backgroundSize: 'clamp(140%, 60vw + 100%, 100%)',
             transform: "translateZ(0)",
             willChange: "transform",
             opacity: 0.92,

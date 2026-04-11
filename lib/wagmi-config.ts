@@ -31,7 +31,9 @@ export const config = createConfig({
         }),
         coinbaseWallet({ 
             appName: 'WhaleAlert ID.fi',
-            preference: 'smartWalletOnly'
+            // 'smartWalletOnly' requires passkeys — unavailable on iOS < 16.
+            // 'all' shows both classic and smart wallet — safe for all devices.
+            preference: 'all'
         }),
     ],
     transports: {

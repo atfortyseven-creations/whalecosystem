@@ -4,11 +4,11 @@ import { createHash } from 'crypto';
 export const runtime = 'nodejs';
 export const revalidate = 60; // Cache 1 min
 
-// ── Akashic Registry ─────────────────────────────────────────────────────────
-// The permanent editorial record of all significant whale movements.
+// ── The Akashic Registry ─────────────────────────────────────────────────────────
+// The permanent execution record of all significant capital movements.
 // Each entry > $50M gets a unique sequential number, a timestamp,
 // an on-chain hash (SHA-256), and an editorial note.
-// This is the Thucydides of crypto — the primary source of record.
+// This serves as the primary source of record for large-scale institutional flow.
 
 const STATIC_REGISTRY = [
   {

@@ -98,7 +98,7 @@ export function WhaleStreamProvider({ children }: { children: React.ReactNode })
                 const raw = JSON.parse(e.data) as Omit<WhaleEvent, 'id'>;
                 const event: WhaleEvent = {
                     ...raw,
-                    id: crypto.randomUUID(),
+                    id: crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
                 };
                 setEvents(prev => {
                     const next = [event, ...prev];
@@ -108,9 +108,9 @@ export function WhaleStreamProvider({ children }: { children: React.ReactNode })
         });
 
         es.addEventListener('heartbeat', () => {
-            // No-op: keeps the connection alive, confirms it's open
+            // Unconditional — avoids stale closure over initial isConnected = false
             if (!isMounted.current) return;
-            if (!isConnected) setIsConnected(true);
+            setIsConnected(true);
         });
 
         es.addEventListener('error', (e: MessageEvent) => {

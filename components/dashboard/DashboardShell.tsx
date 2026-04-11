@@ -257,7 +257,7 @@ function OperationsCanvas({
             type, x, y,
             title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
             status: 'syncing',
-            latency: Math.floor(Math.random() * 30) + 5,
+            latency: 12, // Hardware connection
             data: {}
         };
         setNodes(prev => {

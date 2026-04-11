@@ -1,27 +1,26 @@
 @echo off
 echo ================================================================
-echo  WHALE ALERT — FINAL STABILIZATION PUSH
-echo  Fix: Prisma Transactions, Mesh Network, Graph Miner, and Background Assets
+echo  WHALE ALERT — INSTITUTIONAL HARDENING PUSH
+echo  Fix: QR Handshake, Prisma Schema, TypeScript Types, and UI Crashes
 echo ================================================================
 echo.
 
 cd /d "%~dp0"
 
-echo [1/3] Injecting High-Fidelity 4K Wallpapers...
-copy "C:\Users\admin\Downloads\image (2)_PhotoGrid.png" "public\patron-cosmico-4k.png" /Y
-copy "C:\Users\admin\Downloads\image (4)_PhotoGrid.png" "public\olas-hokusai-4k.png" /Y
+echo.
+echo [1/2] Adding Modified Infrastructure Files to GIT...
+git add prisma/schema.prisma
+git add app/api/institutional/stats/route.ts
+git add app/api/auth/qr-sync/route.ts
+git add app/providers.tsx
+git add components/ui/InstitutionalErrorBoundary.tsx
+git add components/dashboard/WatchlistTable.tsx
+git add components/dashboard/NewPairsTable.tsx
+git add components/mobile/MobileWhaleLanding.tsx
 
 echo.
-echo [2/3] Adding Modified Files to GIT...
-git add public/patron-cosmico-4k.png public/olas-hokusai-4k.png
-git add app/page.tsx
-git add lib/wallet/transactions-server.ts
-git add services/intelligence/entity-graph-miner.ts
-git add scripts/sovereign-mesh.ts
-
-echo.
-echo [3/3] Committing and Pushing to Railway...
-git commit -m "fix(backend): Prisma types mapped correctly, graphMiner schema aligned, redis mesh hardened against mock crashes, and missing 4k wallpapers injected locally"
+echo [2/2] Committing and Pushing to Railway...
+git commit -m "fix(core): institutional hardening - qr handshake robust, prisma schema fix, and ui stability"
 git push origin main
 
 echo.

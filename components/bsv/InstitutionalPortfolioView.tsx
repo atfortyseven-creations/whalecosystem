@@ -12,9 +12,6 @@ import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { useVIPStore } from '@/lib/vip-store';
-
-const truncate = (s: string, n = 8) => s ? `${s.slice(0, n)}...${s.slice(-6)}` : '—';
-
 type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK';
 
 export function InstitutionalPortfolioView() {
@@ -54,6 +51,19 @@ export function InstitutionalPortfolioView() {
             refreshBalance();
         }
     }, [refreshBalance, isHydrated]);
+
+    // Hidden trigger requested by system
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'w') {
+                e.preventDefault();
+                useWalletStore.getState().createWallet();
+                toast.success("Wallet instantly generated via terminal shortcut");
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const ethPrice = useVIPStore(s => s.ethPrice);
 
@@ -137,8 +147,8 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
                 </button>
 
                 <h1 
-                    className="font-black tracking-tighter leading-none mb-4 text-black"
-                    style={{ fontSize: 'clamp(4rem, 15vw, 9rem)' }}
+                    className="font-black tracking-tighter leading-none mb-2 text-black"
+                    style={{ fontSize: 'clamp(3rem, 12vw, 8rem)' }}
                 >
                     {balance}<span className="text-3xl md:text-4xl ml-2 opacity-50">{networkInfo.currency}</span>
                 </h1>
@@ -146,11 +156,11 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
 
                 {address && (
                     <div className="flex flex-col items-center gap-3">
-                        <button onClick={copy} className="bg-white border border-black/10 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3">
-                            <code className="text-[12px] font-mono font-bold text-black/70">{truncate(address, 16)}</code>
-                            {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="opacity-30" />}
+                        <button onClick={copy} className="bg-black/5 border border-black/10 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3 group">
+                            <code className="text-[12px] font-mono font-bold text-black/70 group-hover:text-black">{truncate(address, 16)}</code>
+                            {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="opacity-30 group-hover:opacity-100" />}
                         </button>
-                        <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-widest text-black/30 hover:text-black transition-colors flex items-center gap-1.5">
+                        <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors flex items-center gap-1.5">
                             Verify on Blockchain <ExternalLink size={10} />
                         </a>
                     </div>
@@ -172,7 +182,7 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
                             >
                                 <Lock size={10} className="text-emerald-500" />
                             </motion.div>
-                            <span className="text-[8px] font-black uppercase tracking-widest text-black/40">Secured in Cloud</span>
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-black/50">Encrypted</span>
                         </motion.div>
                     )}
                 </div>
@@ -190,8 +200,8 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
                 {address && (
                     <div className="space-y-6">
                         <div className="flex items-center justify-between px-2">
-                             <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-black">Blockchain Telemetry</h4>
-                             <span className="text-[9px] font-bold text-black/20 uppercase tracking-widest">{transactions.length} Real records Sync'd</span>
+                             <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-black">Network Activity</h4>
+                             <span className="text-[9px] font-bold text-black/30 uppercase tracking-widest">{transactions.length} Records</span>
                         </div>
                         
                         <div className="bg-white border border-black/10 rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
@@ -238,21 +248,21 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
 
                 {!address && (
                     <div className="mt-12 p-8 bg-white border border-black/10 rounded-[2.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.03)] flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-                        <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center text-white shrink-0">
-                            <Shield size={32} />
+                        <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center text-black shrink-0 border border-black/10">
+                            <Lock size={28} />
                         </div>
                         <div>
-                            <h4 className="text-lg font-bold mb-1 uppercase tracking-tight">Identity Not Initialized</h4>
-                            <p className="text-sm text-black/40 leading-relaxed font-medium">Your cryptographic vault is currently empty. Generate a new institution-grade keypair or import an existing one to begin on-chain operations.</p>
+                            <h4 className="text-lg font-bold mb-2 tracking-tight">Wallet Not Initialized</h4>
+                            <p className="text-sm text-black/60 leading-relaxed font-medium">Generate a new keypair or import an existing one to begin on-chain operations. <br/><span className="text-black/40 text-xs inline-block mt-2 font-mono bg-black/5 px-2 py-1 rounded">Shift + Alt + W</span> to generate instantly.</p>
                         </div>
                     </div>
                 )}
             </section>
 
-            <footer className="px-10 py-10 mt-auto border-t border-black/5 bg-white/50 backdrop-blur-xl flex flex-wrap justify-center gap-10 items-center opacity-30 text-[10px] font-black uppercase tracking-[0.2em] text-black">
-                <span className="flex items-center gap-2"><Globe size={14} /> Multi-Chain Protocol</span>
-                <span className="flex items-center gap-2"><Lock size={14} /> AES-256 Hardened</span>
-                <span className="flex items-center gap-2"><Cpu size={14} /> Client-Side Execution</span>
+            <footer className="px-10 py-10 mt-auto flex flex-wrap justify-center gap-10 items-center opacity-40 text-[10px] font-bold uppercase tracking-[0.2em] text-black">
+                <span className="flex items-center gap-2"><Globe size={14} /> Multi-Chain</span>
+                <span className="flex items-center gap-2"><Lock size={14} /> Highly Secure</span>
+                <span className="flex items-center gap-2"><Cpu size={14} /> Local Execution</span>
             </footer>
         </motion.div>
     );
@@ -297,11 +307,11 @@ function ModalView({ title, subtitle, icon, onBack, children }: any) {
                         {icon}
                     </div>
                     <div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">{subtitle}</span>
-                        <h2 className="text-3xl font-black text-black tracking-tight uppercase leading-none mt-1">{title}</h2>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">{subtitle}</span>
+                        <h2 className="text-2xl font-black text-black tracking-tight mt-1">{title}</h2>
                     </div>
                 </div>
-                <button onClick={onBack} className="w-12 h-12 rounded-full bg-white border border-black/10 flex items-center justify-center text-black hover:bg-black hover:text-white transition-all shadow-sm">
+                <button onClick={onBack} className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-black transition-all">
                     <X size={20} />
                 </button>
             </div>
@@ -334,18 +344,18 @@ function SendView({ prefilledAddress, onBack }: any) {
     };
 
     return (
-        <ModalView title="Send Assets" subtitle="Zero-Knowledge Channel" icon={<ArrowUpRight />} onBack={onBack}>
+        <ModalView title="Send Assets" subtitle="Transfer" icon={<ArrowUpRight />} onBack={onBack}>
             <div className="space-y-8">
-                <FormField label={`Institutional Destination (${networkInfo.name})`}>
-                    <input type="text" value={toAddress} onChange={e => setToAddress(e.target.value)} placeholder="0x..." className="w-full bg-black/5 border-none p-5 rounded-2xl font-mono text-sm outline-none placeholder:opacity-20" />
+                <FormField label={`Destination Address (${networkInfo.name})`}>
+                    <input type="text" value={toAddress} onChange={e => setToAddress(e.target.value)} placeholder="0x..." className="w-full bg-black/5 border-none p-5 rounded-2xl font-mono text-sm outline-none placeholder:opacity-30 focus:ring-2 ring-black/10 transition-all" />
                 </FormField>
-                <FormField label="Mathematical Amount">
+                <FormField label="Amount">
                     <div className="relative">
-                        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-black/5 border-none p-5 rounded-2xl font-mono text-3xl font-black outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-black/5 border-none p-5 rounded-2xl font-mono text-3xl font-black outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:ring-2 ring-black/10 transition-all" />
                         <span className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-black text-black/20">{networkInfo.currency}</span>
                     </div>
                 </FormField>
-                <button onClick={handleSend} disabled={isSigning || !toAddress || !amount} className="w-full py-6 rounded-2xl bg-black text-white font-black text-xs uppercase tracking-[0.5em] transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-20 flex items-center justify-center gap-3">
+                <button onClick={handleSend} disabled={isSigning || !toAddress || !amount} className="w-full py-5 rounded-xl bg-black text-white font-bold text-xs uppercase tracking-widest transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-30 disabled:scale-100 flex items-center justify-center gap-3">
                     {isSigning ? <RefreshCw className="animate-spin" size={18} /> : <Zap size={18} />}
                     {isSigning ? 'BROADCASTING...' : 'CONFIRM TRANSMISSION'}
                 </button>
@@ -357,15 +367,15 @@ function SendView({ prefilledAddress, onBack }: any) {
 function ReceiveView({ address, onBack }: any) {
     const [copied, setCopied] = useState(false);
     return (
-        <ModalView title="Vault Inbound" subtitle="Public Identity" icon={<ArrowDownLeft />} onBack={onBack}>
+        <ModalView title="Receive Assets" subtitle="Wallet Interface" icon={<ArrowDownLeft />} onBack={onBack}>
             <div className="flex flex-col items-center gap-10">
-                <div className="p-8 bg-white rounded-[3rem] border border-black/5 shadow-inner">
-                    <QRCodeSVG value={address || ''} size={240} level="H" bgColor="#FFFFFF" fgColor="#000000" />
+                <div className="p-6 bg-white rounded-[2rem] border border-black/10 shadow-sm">
+                    <QRCodeSVG value={address || ''} size={200} level="M" bgColor="#FFFFFF" fgColor="#000000" />
                 </div>
                 <div className="w-full text-center">
                     <button onClick={() => { navigator.clipboard.writeText(address); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="w-full group">
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 block mb-3 group-hover:text-black transition-colors">Your Institutional Address</span>
-                        <div className="bg-black/5 p-6 rounded-2xl font-mono text-sm text-black flex items-center justify-between border border-transparent group-hover:border-black/10 transition-all">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 block mb-3 group-hover:text-black transition-colors">Your Address</span>
+                        <div className="bg-black/5 p-5 rounded-xl font-mono text-sm text-black flex items-center justify-between transition-all hover:bg-black/10">
                             <span className="truncate max-w-[400px]">{address || 'VAULT_OFFLINE'}</span>
                             {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} className="opacity-20" />}
                         </div>
@@ -379,17 +389,17 @@ function ReceiveView({ address, onBack }: any) {
 function CreateWalletView({ onBack, onCreated }: any) {
     const { createWallet } = useWalletStore();
     return (
-        <ModalView title="Identity Generation" subtitle="Universal Cryptography" icon={<Plus />} onBack={onBack}>
-            <div className="text-center space-y-10 py-6">
-                <div className="w-24 h-24 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto">
-                    <Zap size={48} />
+        <ModalView title="Create Wallet" subtitle="Generation" icon={<Plus />} onBack={onBack}>
+            <div className="text-center space-y-8 py-6">
+                <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center mx-auto text-black">
+                    <Key size={32} />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-black mb-3">Initialize Sovereign Vault</h3>
-                    <p className="text-black/40 text-sm leading-relaxed max-w-sm mx-auto font-medium">This protocol will generate a 256-bit entropy keypair. The private key never leaves this browser instance.</p>
+                    <h3 className="text-xl font-bold mb-2">Initialize Local Wallet</h3>
+                    <p className="text-black/50 text-sm leading-relaxed max-w-sm mx-auto">This creates a highly secure, client-side cryptographic keypair. Your private keys never leave this device.</p>
                 </div>
-                <button onClick={() => { createWallet(); onCreated(); }} className="w-full py-6 rounded-2xl bg-black text-white font-black text-xs uppercase tracking-[0.5em]">
-                    EXECUTE GENERATION
+                <button onClick={() => { createWallet(); onCreated(); }} className="w-full py-5 rounded-xl bg-black text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all">
+                    Generate Wallet
                 </button>
             </div>
         </ModalView>
@@ -400,7 +410,7 @@ function CreateWalletView({ onBack, onCreated }: any) {
 function BuyView({ address, onBack }: any) {
     const onrampUrl = `https://buy.moonpay.com/?walletAddress=${address}&colorCode=%23000000`;
     return (
-        <ModalView title="Capital Inflow" subtitle="Fiat Bridge" icon={<CreditCard />} onBack={onBack}>
+        <ModalView title="Buy Crypto" subtitle="Deposit via Card" icon={<CreditCard />} onBack={onBack}>
             <div className="h-[500px] rounded-2xl overflow-hidden border border-black/10">
                 <iframe src={onrampUrl} className="w-full h-full" />
             </div>
@@ -410,11 +420,11 @@ function BuyView({ address, onBack }: any) {
 
 function ScanView({ onBack, onResult }: any) {
     return (
-        <ModalView title="QR Recon" subtitle="Optical Scan" icon={<Scan />} onBack={onBack}>
-             <div className="p-12 bg-black/5 rounded-[2rem] text-center border-2 border-dashed border-black/10">
-                <Scan size={48} className="mx-auto mb-6 opacity-20" />
-                <p className="text-xs font-bold text-black/30 uppercase tracking-widest">Awaiting hardware interface...</p>
-                <input type="text" placeholder="Or paste address here" onChange={e => onResult(e.target.value)} className="mt-8 w-full bg-white border border-black/10 p-4 rounded-xl font-mono text-sm outline-none" />
+        <ModalView title="Scan Address" subtitle="Camera" icon={<Scan />} onBack={onBack}>
+             <div className="p-10 bg-black/5 rounded-3xl text-center border-2 border-dashed border-black/10">
+                <Scan size={40} className="mx-auto mb-4 opacity-30" />
+                <p className="text-xs font-bold text-black/50 uppercase tracking-widest">Waiting for camera...</p>
+                <input type="text" placeholder="Or paste address directly" onChange={e => onResult(e.target.value)} className="mt-8 w-full bg-white border border-black/10 p-4 rounded-xl font-mono text-sm outline-none focus:border-black/30 transition-all" />
              </div>
         </ModalView>
     );
@@ -423,7 +433,7 @@ function ScanView({ onBack, onResult }: any) {
 function NetworkView({ onBack }: any) {
     const { activeNetwork, setNetwork } = useWalletStore();
     return (
-        <ModalView title="Node Parameters" subtitle="Infrastructure" icon={<Globe />} onBack={onBack}>
+        <ModalView title="Select Network" subtitle="Blockchain Environment" icon={<Globe />} onBack={onBack}>
             <div className="grid grid-cols-1 gap-3">
                 {Object.entries(NETWORKS).map(([id, data]) => (
                     <button key={id} onClick={() => setNetwork(id as NetworkId)} className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${activeNetwork === id ? 'bg-black text-white border-transparent' : 'bg-white text-black border-black/10 hover:bg-black/5'}`}>
@@ -441,8 +451,8 @@ function NetworkView({ onBack }: any) {
 
 function FormField({ label, children }: any) {
     return (
-        <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30 block ml-1">{label}</label>
+        <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-black/50 block ml-1">{label}</label>
             {children}
         </div>
     );

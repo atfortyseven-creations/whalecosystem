@@ -33,7 +33,8 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'multicharts',     label: 'Heuristic Visuals',       icon: <BarChart2 size={17}/> },
     { id: 'new-pairs',       label: 'Genesis Contracts',       icon: <Zap size={17}/> },
     { id: 'gainers',         label: 'Entropy Deltas',          icon: <TrendingUp size={17}/> },
-    // ── Cryptographic Espionage ──
+    
+    // ── Crypto Espionage ──
     { id: 'whale-portfolio', label: 'Entity Heuristics',       icon: <PieChart size={17}/>,        dividerBefore: 'Crypto Espionage' },
     { id: 'news',            label: 'Chronological Cipher',    icon: <Newspaper size={17}/> },
     { id: 'api',             label: 'Direct RPC Terminal',     icon: <Code size={17}/> },
@@ -42,6 +43,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'sovereign-vault', label: 'Cryptographic ID',        icon: <ShieldAlert size={17}/> },
     { id: 'omni-explorer',   label: 'Aztec Layer-2 Node',      icon: <Search size={17}/> },
     { id: 'portfolio',       label: 'Sovereign Capital State', icon: <Wallet size={17}/> },
+    
     // ── Protocol Doctrine ──
     { id: 'academy',         label: 'The Whitepaper Academy',  icon: <GraduationCap size={17}/>,   dividerBefore: 'Protocol Doctrine' },
     { id: 'brc-explorer',    label: 'Bitcoin Primitives',      icon: <Code size={17}/> },
@@ -224,7 +226,7 @@ export function WhaleProShell({
                                         </span>
                                     )}
                                     {isActive && (
-                                        <motion.div layoutId="nav-indicator" className="absolute left-0 w-1 h-5 bg-[#050505] rounded-r-full" />
+                                        <motion.div layoutId="nav-indicator" layout className="absolute left-0 w-1 h-5 bg-[#050505] rounded-r-full" style={{ transform: 'translateZ(0)', willChange: 'transform' }} />
                                     )}
                                 </button>
                             </div>
@@ -275,45 +277,33 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#EFEFEF]">
-                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 perspective-[1000px]">
+                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#EFEFEF]" style={{ contain: 'strict', transform: 'translateZ(0)' }}>
+                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10" style={{ contain: 'content', transform: 'translateZ(0)' }}>
                         
-                        {/* HARDWARE-ACCELERATED IMMERSIVE WATERMARK LAYER — 4K ukiyo-e */}
-                        <div 
-                            className="absolute inset-0 pointer-events-none -z-20 transition-colors duration-300"
-                            style={{
-                                backgroundImage: `url('/patron-cosmico-4k.png')`,
-                                backgroundSize: 'clamp(200px, 35vw, 600px)',
-                                backgroundPosition: 'center top',
-                                backgroundRepeat: 'repeat',
-                                transform: 'translateZ(0)',
-                                willChange: 'transform',
-                                opacity: 0.15,
-                                mixBlendMode: 'multiply'
-                            }}
-                        />
-
                         {/* Immersive radial glow overlay to focus center */}
                         <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.3)_0%,transparent_80%)] transition-colors duration-300" />
 
                         
-                        <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10">
+                        <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, y: 30, scale: 0.98, filter: 'blur(10px)', rotateX: 5 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', rotateX: 0 }}
-                                    exit={{ opacity: 0, y: -30, scale: 0.98, filter: 'blur(10px)', rotateX: -5 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
                                     transition={{ 
                                         type: "spring", 
                                         stiffness: 400, 
                                         damping: 30, 
                                         mass: 0.8,
                                     }}
-                                    style={{ willChange: 'transform, opacity, filter', transformOrigin: 'top center' }}
-                                    className="w-full h-full"
+                                    style={{ 
+                                        willChange: 'transform, opacity',
+                                        transform: 'translate3d(0,0,0)'
+                                    }}
+                                    className="h-full"
                                 >
-                                    <InstitutionalErrorBoundary moduleName="Neurometric Terminal Node">
+                                    <InstitutionalErrorBoundary moduleName="Processing Execution Node">
                                         {children}
                                     </InstitutionalErrorBoundary>
                                 </motion.div>

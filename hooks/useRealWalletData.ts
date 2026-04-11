@@ -94,7 +94,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
             return data;
         },
         enabled: !!effectiveAddress,
-            refetchInterval: 5000, // Sync Elite assets every 5s for price reactivity
+            refetchInterval: 30_000, // Prevent RPC hammering at scale (was 5s)
     });
 
     // 5. Procesamiento y Enriquecimiento de Datos

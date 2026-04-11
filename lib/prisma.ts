@@ -5,16 +5,18 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined 
 function getProductionUrl(): string | undefined {
     const rawUrl = process.env.DATABASE_URL;
     if (!rawUrl) return undefined;
-    if (rawUrl.includes('pgbouncer=true')) return rawUrl;
 
     try {
         const urlObj = new URL(rawUrl);
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
+            // Force PgBouncer
             urlObj.searchParams.set('pgbouncer', 'true');
-            // LIMITACIÓN INSTITUCIONAL: máximo 3 conexiones por réplica
+            // Strict Institutional limit: Max 3 connection out of 500 total pool per container
             urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '3');
-            // Timeout agresivo para evitar colgar el boot
+            // Aggressive TCP timeout
             urlObj.searchParams.set('connect_timeout', '10');
+            // Max time a connection can be held in the pool
+            urlObj.searchParams.set('pool_timeout', '15');
         }
         return urlObj.toString();
     } catch {

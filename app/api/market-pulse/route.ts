@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTokenPrice } from '@/lib/wallet/tokens';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function GET(req: NextRequest) {
     try {
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
         };
 
         // 2. Fetch candles (Best effort from Binance for real data)
-        const candlesRes = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=24');
+        const candlesRes = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=24', { cache: 'no-store' });
         const candlesRaw = await candlesRes.json();
         const candles = candlesRaw.map((c: any) => ({
             time: Math.floor(c[0] / 1000),
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
         }));
 
         // 3. Fetch 24h stats for realistic liquidation derivation
-        const volRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+        const volRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', { cache: 'no-store' });
         const volData = await volRes.json();
         const baseVolume = parseFloat(volData.quoteVolume); // 24h Volume in USDT
         const priceChange = Math.abs(parseFloat(volData.priceChangePercent));

@@ -13,6 +13,40 @@ enum PlanTier {
   ELITE = 'ELITE',
 }
 
+// Memory-based Edge Rate Limiter (Pod-Level Scope)
+// At 400M users, this prevents individual container CPU asphyxiation
+const rateLimitMap = new Map<string, { count: number; expiresAt: number }>();
+
+function checkEdgeRateLimit(ip: string, tier: PlanTier): { success: boolean, maxReqs: number } {
+  // Free accounts: 30 requests per 10s. Pro accounts: 100 requests per 10s.
+  const maxReqs = tier === PlanTier.PRO || tier === PlanTier.ELITE ? 100 : 30;
+  const now = Date.now();
+  const windowMs = 10000; // 10 seconds
+
+  const record = rateLimitMap.get(ip);
+  if (!record || now > record.expiresAt) {
+    rateLimitMap.set(ip, { count: 1, expiresAt: now + windowMs });
+    return { success: true, maxReqs };
+  }
+
+  if (record.count >= maxReqs) {
+    return { success: false, maxReqs };
+  }
+
+  record.count++;
+  return { success: true, maxReqs };
+}
+
+// Routine to prevent memory leakage in the map
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, record] of rateLimitMap.entries()) {
+        if (now > record.expiresAt) {
+            rateLimitMap.delete(ip);
+        }
+    }
+}, 60000);
+
 // SECURITY MIDDLEWARE — "THE IRON GATE v5 - WHALE FORTRESS"
 // Absolute protection against bots, path traversal, and unauthorized route discovery.
 
@@ -100,18 +134,18 @@ export default clerkMiddleware(async (auth, request) => {
             userTier = tierMeta.plan as PlanTier;
           }
         }
-        // const rateLimit = await RedisRateLimiter.check(ip, userTier);
-        // if (!rateLimit.success) {
-        //   return new NextResponse(JSON.stringify({ error: 'System busy. Retry in 60s.' }), { 
-        //     status: 429, 
-        //     headers: { 'Content-Type': 'application/json' } 
-        //   });
-        // }
+        
+        // C-2 FIX: Execute Pod-Level Edge Rate Limiting
+        const limitCheck = checkEdgeRateLimit(ip, userTier);
+        if (!limitCheck.success) {
+          console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (${limitCheck.maxReqs} reqs/10s)`);
+          return new NextResponse(
+            JSON.stringify({ error: 'SYSTEM_BUSY', message: 'Rate limit exceeded. Retry in 10s.' }), 
+            { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '10' } }
+          );
+        }
       } catch (rateLimitErr) {
-        // M-4 FIX: Redis failure is a critical alert, not a silent pass.
-        // Log it as an emergency and fall through (fail-open is safer than hard-blocking users
-        // on infrastructure failure, but ops must be notified immediately).
-        console.error('[WhaleFortress:CRITICAL] Redis rate limiter failure — operating without limit enforcement. Investigate immediately.', rateLimitErr);
+        console.error('[WhaleFortress:CRITICAL] Rate limiter evaluation block failed.', rateLimitErr);
       }
     }
 

@@ -9,6 +9,10 @@ const nextConfig = {
         '@react-three/drei',
         '@react-three/postprocessing',
         'postprocessing',
+        'framer-motion',
+        'wagmi',
+        'viem',
+        'lucide-react'
     ],
     webpack: (config, { isServer }) => {
         // [LEGENDARY BUILD FIX] Force bypass for missing third-party SDK dependencies

@@ -94,9 +94,8 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
                 }
             } finally {
                 if (isMounted) {
-                    // Poll with slight jitter (2.8s - 3.2s) for natural flow
-                    const jitter = 2800 + Math.random() * 400;
-                    timeoutId = setTimeout(fetchStream, jitter);
+                    // Fixed 3s interval — deterministic, no synthetic fluctuation
+                    timeoutId = setTimeout(fetchStream, 3000);
                 }
             }
         };

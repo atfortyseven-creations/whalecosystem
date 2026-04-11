@@ -98,14 +98,13 @@ export const metadata = {
 }
 
 export const viewport = {
-  themeColor: '#FAF9F6', // Perfect Ivory Monochrome Match
+  themeColor: '#FAF9F6',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   minimumScale: 1,
-  userScalable: false,
+  userScalable: true,
   viewportFit: 'cover',
-  interactiveWidget: 'resizes-visual',
 }
 
 export default async function RootLayout({
@@ -183,6 +182,12 @@ export default async function RootLayout({
         <head>
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          {/* iOS 15 compatibility - explicit viewport for Safari WebKit */}
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+          {/* Prevent iOS Safari from auto-detecting phone numbers as links */}
+          <meta name="format-detection" content="telephone=no" />
+          {/* Prevent Safari from creating a zoom effect on input fields */}
+          <meta name="mobile-web-app-capable" content="yes" />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

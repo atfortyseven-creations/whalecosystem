@@ -29,22 +29,17 @@ export async function GET() {
         return NextResponse.json({ 
             status: (meshAlive && solanaAlive) ? 'healthy' : 'degraded', 
             timestamp: new Date().toISOString(),
-            replica: replicaId,
-            uptime: process.uptime(),
-            telemetry: {
-                db: { status: 'OK', latencyMs: dbLatency },
-                redis: { status: redisHealth.ok ? 'OK' : 'FAIL', mode: redisHealth.mode },
-                workers: {
-                    mesh: meshAlive ? 'ACTIVE' : 'INACTIVE',
-                    solana: solanaAlive ? 'ACTIVE' : 'INACTIVE'
-                }
+            // Infra details intentionally omitted from public response
+            services: {
+                db: dbLatency < 500 ? 'OK' : 'DEGRADED',
+                cache: redisHealth.ok ? 'OK' : 'DEGRADED',
+                workers: (meshAlive && solanaAlive) ? 'OK' : 'DEGRADED',
             }
         }, { status: 200 });
     } catch (e: any) {
+        // Never expose internal error messages publicly
         return NextResponse.json({ 
-            status: 'unhealthy', 
-            error: e.message,
-            replica: replicaId 
+            status: 'unhealthy',
         }, { status: 503 });
     }
 }
