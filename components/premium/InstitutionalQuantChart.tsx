@@ -92,24 +92,34 @@ function buildBarsFromStore(resolution: Resolution): {
   // Convert buckets → OHLCV
   const sorted = [...buckets.entries()].sort(([a], [b]) => a - b).slice(-maxBars);
 
-  let lastClose = 50_000_000; // synthetic baseline in USD
+  // Map net flow to a "price" proxy for visual pattern recognition
+  let lastClose = 0; // Starting baseline at 0 for real net-flow attribution
   const candles: CandlestickData[] = [];
   const volumes: HistogramData[]   = [];
 
   sorted.forEach(([ts, vals]) => {
-    const totalVol = vals.reduce((s, v) => s + v, 0);
-    // Map volume to a "price" range for visual interest (0 – 200M USD)
-    const normalized = Math.min(totalVol / 200_000_000, 1) * 100_000_000;
-    const noise       = (Math.random() - 0.5) * 2_000_000;
-    const open        = lastClose;
-    const close       = Math.max(1_000_000, normalized + noise);
-    const high        = Math.max(open, close) * (1 + Math.random() * 0.02);
-    const low         = Math.min(open, close) * (1 - Math.random() * 0.02);
-    lastClose         = close;
+    // Separate Buy and Sell volume accurately using event signatures
+    // (In This implementation we're using usdNum total but we can refine to net-flow buy/sell)
+    // Actually, I'll use the events in the bucket to determine net direction
+    const bucketEvents = events.filter((ev: any) => {
+      const et = typeof ev.ts === 'number' ? ev.ts : 0;
+      return Math.floor(et / interval) * interval === ts;
+    });
+
+    const buyVol  = bucketEvents.filter((e: any) => e.action === 'BUY'  || e.action === 'COMPRA').reduce((s, e: any) => s + (e.usdNum || 0), 0);
+    const sellVol = bucketEvents.filter((e: any) => e.action === 'SELL' || e.action === 'VENTA').reduce((s, e: any) => s + (e.usdNum || 0), 0);
+    const netFlow = buyVol - sellVol;
+    const totalVol = buyVol + sellVol;
+
+    const open  = lastClose;
+    const close = lastClose + netFlow;
+    const high  = Math.max(open, close);
+    const low   = Math.min(open, close);
+    lastClose   = close;
 
     const isUp = close >= open;
     candles.push({ time: ts as Time, open, high, low, close });
-    volumes.push({ time: ts as Time, value: totalVol || 1_000_000, color: isUp ? PALETTE.volUp : PALETTE.volDown });
+    volumes.push({ time: ts as Time, value: totalVol || 0, color: isUp ? PALETTE.volUp : PALETTE.volDown });
   });
 
   return { candles, volumes };
