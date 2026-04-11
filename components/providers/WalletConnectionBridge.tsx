@@ -16,8 +16,16 @@ export function WalletConnectionBridge() {
     const syncAddress = useWalletStore(state => state.syncAddress);
 
     useEffect(() => {
-        // Automatically sync the Wagmi address into our internal state management.
-        // If disconnected, pass null to clear the active view.
+        // PROTECTION: If the user has a local managed wallet (Intel) with a private key,
+        // we do NOT let the bridge clear it automatically just because MetaMask is disconnected.
+        const hasManagedWallet = useWalletStore.getState().privateKey !== null;
+        
+        if (!isConnected && hasManagedWallet) {
+            console.log("[BRIDGE] Managed wallet detected. Skipping syncAddress(null) to preserve identity persistence.");
+            return;
+        }
+
+        // Otherwise, sync the Wagmi address into our internal state management.
         syncAddress(isConnected ? address || null : null);
     }, [address, isConnected, syncAddress]);
 

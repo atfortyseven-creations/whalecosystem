@@ -11,9 +11,10 @@ interface TransactionStatusModalProps {
     message?: string;
     onClose?: () => void;
     txHash?: string;
+    networkId?: string;
 }
 
-export function TransactionStatusModal({ isOpen, status, title, message, onClose, txHash }: TransactionStatusModalProps) {
+export function TransactionStatusModal({ isOpen, status, title, message, onClose, txHash, networkId }: TransactionStatusModalProps) {
     // Determine content based on status
     const isSuccess = status === 'SUCCESS';
     const isLoading = status === 'LOADING';
@@ -113,7 +114,15 @@ export function TransactionStatusModal({ isOpen, status, title, message, onClose
                             {/* TX Hash Link if Success */}
                             {isSuccess && txHash && (
                                 <a 
-                                    href={`https://polygonscan.com/tx/${txHash}`} // TODO: Dynamic chain explorer
+                                    href={
+                                        networkId === 'ethereum'  ? `https://etherscan.io/tx/${txHash}` :
+                                        networkId === 'polygon'   ? `https://polygonscan.com/tx/${txHash}` :
+                                        networkId === 'arbitrum'  ? `https://arbiscan.io/tx/${txHash}` :
+                                        networkId === 'optimism'  ? `https://optimistic.etherscan.io/tx/${txHash}` :
+                                        networkId === 'base'      ? `https://basescan.org/tx/${txHash}` :
+                                        networkId === 'avalanche' ? `https://snowtrace.io/tx/${txHash}` :
+                                        `https://polygonscan.com/tx/${txHash}` // Sovereign Failover
+                                    }
                                     target="_blank" 
                                     rel="noreferrer"
                                     className="inline-block mt-4 text-orange-500 font-bold text-sm hover:underline"

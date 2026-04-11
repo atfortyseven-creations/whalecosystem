@@ -33,6 +33,8 @@ interface WalletState {
   setNetwork: (network: NetworkId) => void;
   setProtocol: (protocol: ProtocolType) => void;
   syncAddress: (address: string | null) => void;
+  cloudSync: () => Promise<void>;
+  restoreFromCloud: () => Promise<void>;
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -71,6 +73,7 @@ export const useWalletStore = create<WalletState>()(
             description: `Address: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
           });
           get().updateBalance();
+          get().cloudSync();
         } catch (error) {
           console.error("Failed to generate wallet:", error);
           toast.error("Generation Failed", { description: "Cryptographic entropy creation failed." });
@@ -94,6 +97,7 @@ export const useWalletStore = create<WalletState>()(
             description: `Recovered: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
           });
           get().updateBalance();
+          get().cloudSync();
           return true;
         } catch (error) {
           console.error("Invalid private key during import:", error);
@@ -256,6 +260,38 @@ export const useWalletStore = create<WalletState>()(
         set({ address: addr, privateKey: null, balance: "0.0", isCustom: false });
         if (addr) {
            get().updateBalance();
+        }
+      },
+
+      cloudSync: async () => {
+        const { address, privateKey } = get();
+        if (!address || !privateKey) return;
+
+        try {
+          await fetch('/api/wallets/sync', {
+            method: 'POST',
+            body: JSON.stringify({
+              wallets: [{ address, label: 'Sovereign Intel' }]
+            })
+          });
+        } catch (e) {
+          console.error("[CLOUD-SYNC] Logic failure:", e);
+        }
+      },
+
+      restoreFromCloud: async () => {
+        try {
+          const res = await fetch('/api/wallets/sync');
+          const { wallets } = await res.json();
+          if (wallets && wallets.length > 0) {
+             // For now, we just sync the most recent one if we are empty
+             if (!get().address) {
+                set({ address: wallets[0].address, balance: '0.0', isCustom: false });
+                get().updateBalance();
+             }
+          }
+        } catch (e) {
+          console.error("[CLOUD-RESTORE] Identity failure:", e);
         }
       }
     }),
