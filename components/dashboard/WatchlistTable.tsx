@@ -15,6 +15,7 @@ const List = dynamic(
 ) as any;
 const AutoSizer = dynamic(() => import('react-virtualized-auto-sizer'), { ssr: false });
 import { useMarketStream } from '@/context/MarketStreamContext';
+import { useAccount } from 'wagmi';
 
 // ── XSS Sanitization ────────────────────────────────────────────────────────────
 // Strips HTML/script injection vectors before any user input touches
@@ -154,6 +155,7 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
 
 export function WatchlistTable() {
     const { markets } = useMarketStream();
+    const { address } = useAccount();
     const [data, setData]       = useState<{ tokens: any[], wallets: any[] }>({ tokens: [], wallets: [] });
     const [loading, setLoading] = useState(true);
     const [search, setSearch]   = useState('');
@@ -232,7 +234,8 @@ export function WatchlistTable() {
                 // Only add local tokens the server doesn't know about yet
                 let localTokens: any[] = [];
                 try {
-                    const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                    const prefix = `SOV_WL_${address?.toLowerCase()}`;
+                    const localStr = (typeof window !== 'undefined' && address) ? localStorage.getItem(`${prefix}_TOKENS`) : null;
                     if (localStr) {
                          const parsed = JSON.parse(localStr);
                          if (Array.isArray(parsed)) localTokens = parsed;
@@ -245,7 +248,8 @@ export function WatchlistTable() {
                 // Fallback entirely to local
                 let localTokens: any[] = [];
                 try {
-                    const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                    const prefix = `SOV_WL_${address?.toLowerCase()}`;
+                    const localStr = (typeof window !== 'undefined' && address) ? localStorage.getItem(`${prefix}_TOKENS`) : null;
                     if (localStr) {
                          const parsed = JSON.parse(localStr);
                          if (Array.isArray(parsed)) localTokens = parsed;
@@ -257,7 +261,8 @@ export function WatchlistTable() {
             console.error('Error fetching watchlist', e);
             let localTokens: any[] = [];
             try {
-                const localStr = typeof window !== 'undefined' ? localStorage.getItem('SOVEREIGN_WATCHLIST_TOKENS') : null;
+                const prefix = `SOV_WL_${address?.toLowerCase()}`;
+                const localStr = (typeof window !== 'undefined' && address) ? localStorage.getItem(`${prefix}_TOKENS`) : null;
                 if (localStr) {
                      const parsed = JSON.parse(localStr);
                      if (Array.isArray(parsed)) localTokens = parsed;
@@ -269,11 +274,19 @@ export function WatchlistTable() {
         }
     };
 
-    useEffect(() => { fetchWatchlist(); }, []);
+    useEffect(() => { 
+        if (!address) {
+            setData({ tokens: [], wallets: [] });
+            setLoading(false);
+            return;
+        }
+        fetchWatchlist(); 
+    }, [address]);
 
     const saveToLocal = (item: any) => {
-       if (typeof window === 'undefined') return;
-       const key = item.type === 'TOKEN' ? 'SOVEREIGN_WATCHLIST_TOKENS' : 'SOVEREIGN_WATCHLIST_WALLETS';
+       if (typeof window === 'undefined' || !address) return;
+       const prefix = `SOV_WL_${address.toLowerCase()}`;
+       const key = item.type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
        let existing: any[] = [];
        try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
        if (!existing.some((e: any) => e.address === item.address || e.symbol === item.symbol)) {
@@ -282,8 +295,9 @@ export function WatchlistTable() {
     };
 
     const removeFromLocal = (idOrSymbol: string, type: 'TOKEN' | 'WALLET') => {
-       if (typeof window === 'undefined') return;
-       const key = type === 'TOKEN' ? 'SOVEREIGN_WATCHLIST_TOKENS' : 'SOVEREIGN_WATCHLIST_WALLETS';
+       if (typeof window === 'undefined' || !address) return;
+       const prefix = `SOV_WL_${address.toLowerCase()}`;
+       const key = type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
        let existing: any[] = [];
        try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
        const filtered = existing.filter((e: any) => e.id !== idOrSymbol && e.symbol !== idOrSymbol);

@@ -1,28 +1,51 @@
-// [CRITICAL] This route must NEVER import external services (Prisma, Redis, MongoDB, etc.)
-// Railway healthcheck polls this every 10s using wget with a minimal User-Agent.
-// Any import crash here = deployment fails = "1/1 replicas never became healthy"
-
-// Force Node.js runtime — Edge runtime lacks process.uptime()
-export const runtime = 'nodejs';
-
-// No caching — Railway needs a fresh response on every poll
-export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { checkRedisHealth, redisClient } from '@/lib/redis/client';
 
 export async function GET() {
-  // Return 200 immediately. No DB ping, no Redis ping, no external calls.
-  // Those checks belong in /api/health/deep — not here.
-  return Response.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    env: process.env.NODE_ENV || 'unknown',
-    version: process.env.npm_package_version || '3.0.0',
-  }, {
-    status: 200,
-    headers: {
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
-      'Content-Type': 'application/json',
+    const replicaId = process.env.RAILWAY_REPLICA_ID || 'local';
+    const start = Date.now();
+    
+    try {
+        // [1] DB Integrity Ping
+        await prisma.$queryRaw`SELECT 1`;
+        const dbLatency = Date.now() - start;
+
+        // [2] Redis & Worker Telemetry
+        const redisHealth = await checkRedisHealth();
+        
+        let meshAlive = false;
+        let solanaAlive = false;
+
+        if (redisClient && !redisClient.__isMock) {
+            const meshHb = await redisClient.get(`hb:worker:mesh:${replicaId}`);
+            const solanaHb = await redisClient.get(`hb:worker:solana:${replicaId}`);
+            
+            const now = Date.now();
+            meshAlive = meshHb && (now - parseInt(meshHb)) < 35000;
+            solanaAlive = solanaHb && (now - parseInt(solanaHb)) < 35000;
+        }
+
+        return NextResponse.json({ 
+            status: (meshAlive && solanaAlive) ? 'healthy' : 'degraded', 
+            timestamp: new Date().toISOString(),
+            replica: replicaId,
+            uptime: process.uptime(),
+            telemetry: {
+                db: { status: 'OK', latencyMs: dbLatency },
+                redis: { status: redisHealth.ok ? 'OK' : 'FAIL', mode: redisHealth.mode },
+                workers: {
+                    mesh: meshAlive ? 'ACTIVE' : 'INACTIVE',
+                    solana: solanaAlive ? 'ACTIVE' : 'INACTIVE'
+                }
+            }
+        }, { status: 200 });
+    } catch (e: any) {
+        return NextResponse.json({ 
+            status: 'unhealthy', 
+            error: e.message,
+            replica: replicaId 
+        }, { status: 503 });
     }
-  });
 }
 

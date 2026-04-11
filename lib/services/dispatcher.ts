@@ -7,7 +7,11 @@ import pLimit from 'p-limit';
 
 const STREAM_KEY = 'global_crypto_alerts';
 const CONSUMER_GROUP = 'dispatch_squad';
-const CONSUMER_NAME = `worker_${process.pid}`;
+// Institutional Stability: use replica ID to prevent consumer name bloat on restarts
+const CONSUMER_NAME = process.env.RAILWAY_REPLICA_ID 
+    ? `replica_${process.env.RAILWAY_REPLICA_ID}` 
+    : `worker_${process.pid}`;
+
 
 export class MegalodonDispatcher {
     private isRunning = false;

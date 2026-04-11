@@ -9,10 +9,9 @@
 import WebSocket from 'ws';
 
 const WS_ENDPOINTS = [
-    'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a',
-    'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
-    'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131',
-    'wss://ethereum-rpc.publicnode.com'
+    process.env.GETBLOCK_WS_EP1 || 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a',
+    process.env.GETBLOCK_WS_EP2 || 'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
+    process.env.NEXT_PUBLIC_WS_RPC_URL || 'wss://ethereum-rpc.publicnode.com'
 ];
 let currentWsIndex = 0;
 let backoff = 5000;
@@ -37,6 +36,8 @@ class NewPairsWebSocketEngine {
     private ws:       WebSocket | null = null;
     private listeners: Set<PairListener> = new Set();
     private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+    private isAlive: boolean = true;
     // In-memory buffer of latest new pairs (last 50)
     public  buffer:   NewPairEvent[] = [];
 
@@ -49,6 +50,10 @@ class NewPairsWebSocketEngine {
 
         socket.on('open', () => {
             console.info('[NewPairsEngine] GetBlock WS connected (EP3)');
+            this.isAlive = true;
+            backoff = 5000; // Reset backoff on success
+            this.startHeartbeat();
+
             if (socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({
                     jsonrpc: '2.0', id: 1,
@@ -73,8 +78,13 @@ class NewPairsWebSocketEngine {
             } catch { /* ignore */ }
         });
 
+        socket.on('pong', () => {
+            this.isAlive = true;
+        });
+
         socket.on('close', () => {
-            console.warn('[NewPairsEngine] WS closed — reconnecting in 5s');
+            console.warn('[NewPairsEngine] WS closed — reconnecting');
+            this.stopHeartbeat();
             this.scheduleReconnect();
         });
 
@@ -111,6 +121,23 @@ class NewPairsWebSocketEngine {
         this.listeners.forEach(fn => fn(event));
     }
 
+    private startHeartbeat() {
+        this.stopHeartbeat();
+        this.heartbeatTimer = setInterval(() => {
+            if (this.isAlive === false) {
+                console.warn('[NewPairsEngine] Heartbeat missed — terminating connection');
+                this.ws?.terminate();
+                return;
+            }
+            this.isAlive = false;
+            this.ws?.ping();
+        }, 30000); // 30s pulse
+    }
+
+    private stopHeartbeat() {
+        if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    }
+
     private scheduleReconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
         currentWsIndex = (currentWsIndex + 1) % WS_ENDPOINTS.length;
@@ -130,6 +157,7 @@ class NewPairsWebSocketEngine {
 
     disconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        this.stopHeartbeat();
         this.ws?.close();
         this.ws = null;
     }

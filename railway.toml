@@ -5,5 +5,14 @@ dockerfilePath = "Dockerfile"
 [deploy]
 startCommand = "sh ./start.sh"
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 5
+restartPolicyMaxRetries = 10
 sleepApplication = true
+
+# Healthcheck institucional (crítico para evitar 522)
+[healthcheck]
+path = "/api/health"
+interval = 10
+timeout = 45
+startPeriod = 90
+retries = 8
+

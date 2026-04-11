@@ -26,6 +26,72 @@ interface LiveMarketState {
     expectedMove: number;
 }
 
+function MacroMetricsCard() {
+    const [stats, setStats] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await fetch('/api/institutional/stats');
+                const data = await res.json();
+                setStats(data);
+            } catch (e) {
+                console.error('Failed to fetch institutional stats');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+        const interval = setInterval(fetchStats, 15000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const volumeNum = stats?.totalVolumeUSD ? parseFloat(stats.totalVolumeUSD) : 0;
+    const volumeFormatted = volumeNum > 1e9 
+        ? `${(volumeNum / 1e9).toFixed(2)}B` 
+        : volumeNum > 1e6 
+            ? `${(volumeNum / 1e6).toFixed(1)}M`
+            : volumeNum.toLocaleString();
+
+    return (
+        <div className="bg-white border border-[#E5E5E5] text-[#050505] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-xl relative overflow-hidden group transition-all h-full">
+            <div className="absolute -inset-2 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#00C076]/10 via-transparent to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
+            <p className="text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
+                <Activity size={12}/> Global Liquidity Matrix
+            </p>
+            {loading ? (
+                <div className="space-y-2 animate-pulse">
+                    <div className="h-8 bg-[#E5E5E5] rounded w-3/4" />
+                    <div className="h-4 bg-[#FAF9F6] rounded w-1/2" />
+                </div>
+            ) : (
+                <>
+                    <h2 className="text-4xl font-mono text-[#00C076] tracking-tighter drop-shadow-sm relative z-10">
+                        ${volumeFormatted}
+                    </h2>
+                    <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mt-2 relative z-10">
+                        Institutional Net Flow (24H)
+                    </p>
+                    {stats?.topPairs && (
+                        <div className="mt-4 pt-4 border-t border-[#E5E5E5] relative z-10">
+                            <p className="text-[8px] font-black text-[#555] uppercase tracking-[0.2em] mb-2">Alpha Targets (Top Peers)</p>
+                            <div className="flex gap-2 flex-wrap">
+                                {stats.topPairs.slice(0, 3).map((p: any) => (
+                                    <span key={p.symbol} className="text-[9px] font-mono font-bold bg-[#FAF9F6] border border-[#E5E5E5] px-2 py-0.5 rounded text-[#050505]">
+                                        {p.symbol}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+}
+
+
 function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
     const { markets } = useMarketStream();
     const [isHovered, setIsHovered] = useState(false);
@@ -194,18 +260,7 @@ export function PremiumMatrixStack() {
 
                         {/* ─── Card: Macro Metrics ─── */}
                         {card.id === 'macro-metrics' && (
-                            <div className="bg-white border border-[#E5E5E5] text-[#050505] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-xl relative overflow-hidden group transition-all h-full">
-                                <div className="absolute -inset-2 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#00C076]/10 via-transparent to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
-                                <p className="text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] mb-4 flex items-center gap-2 relative z-10">
-                                    <Activity size={12}/> Global Liquidity Matrix
-                                </p>
-                                <h2 className="text-4xl font-mono text-[#00C076] tracking-tighter drop-shadow-sm relative z-10">
-                                    +14.2%
-                                </h2>
-                                <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mt-2 relative z-10">
-                                    Institutional Net Flow (24H)
-                                </p>
-                            </div>
+                            <MacroMetricsCard />
                         )}
 
                         {/* ─── Card: System Status ─── */}
@@ -276,9 +331,10 @@ export function PremiumMatrixStack() {
                         </button>
                     )}
                     <div className="hidden lg:flex items-center gap-3 bg-white border border-[#E5E5E5] px-4 py-2 rounded-full shadow-sm">
-                        <span className="w-2 h-2 rounded-full bg-[#00C076]"/>
-                        <span className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Live Orderbook Connected</span>
+                        <span className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse"/>
+                        <span className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Institutional Mesh Active</span>
                     </div>
+
                 </div>
             </div>
 

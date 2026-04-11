@@ -1,55 +1,12 @@
-import { Queue } from 'bullmq';
 import { redisClient } from '../redis/client';
+import { OmnichannelAlertEvent, AlertChain, AlertSeverity } from '../types/alerts';
 
 /**
- * Whale Alerts Queue Configuration
- * This queue handles the asynchronous dispatch of notifications (Telegram, Mail, etc.)
- * to ensure the primary blockchain escanners don't stall.
+ * 🌌 UNIFIED COSMIC MESSAGE BUS Proxy (v3.0)
+ * Replaces legacy BullMQ logic with pure Redis Streams to achieve <10ms 
+ * internal propagation across the institutional cluster.
  */
-export const WHALE_QUEUE_NAME = 'whale-alerts-queue';
-
-/**
- * Singleton Queue Instance
- * Note: BullMQ uses ioredis internally. We pass the already established redisClient connection.
- */
-let whaleQueueInstance: any;
-
-if (process.env.REDIS_URL && redisClient && !redisClient.__isMock && !redisClient.__isBuildMock) {
-  try {
-    whaleQueueInstance = new Queue(WHALE_QUEUE_NAME, {
-      connection: redisClient,
-      defaultJobOptions: {
-        attempts: 3,                 // Retry up to 3 times on failure
-        backoff: {
-          type: 'exponential',
-          delay: 5000,               // Start with 5s delay, doubling each time
-        },
-        removeOnComplete: true,      // Clean up successfully finished jobs
-        removeOnFail: false,         // Keep failed jobs for manual inspection
-      },
-      settings: {
-        lockDuration: 30000,         // Liberate stalled jobs after scale-down
-        maxStalledCount: 2
-      }
-    });
-  } catch (e) {
-    console.error(`[Queue:${WHALE_QUEUE_NAME}] 🔴 Failed to initialize. Falling back to mock.`);
-    whaleQueueInstance = {
-      add: async () => { console.warn(`⚠️ [Queue] Degraded: Alert not queued.`); return null; },
-    };
-  }
-} else {
-  // Mock Queue to prevent crashes when redis is bypassed or invalid
-  console.warn(`[Queue:${WHALE_QUEUE_NAME}] ⚠️ Redis unavailable or invalid. Using Mock Queue (Alerts won't be queued).`);
-  whaleQueueInstance = {
-    add: async () => { 
-        // No-op mock
-        return null; 
-    },
-  };
-}
-
-export const whaleQueue = whaleQueueInstance;
+export const WHALE_QUEUE_NAME = 'global_crypto_alerts';
 
 export interface WhaleJobData {
   hash: string;
@@ -59,13 +16,72 @@ export interface WhaleJobData {
   amount: number;
   usdValue: number;
   blockNumber: string;
-  chain: string;
-  type: string;
+  chain: string; // e.g., "ethereum", "solana"
+  type: string;  // e.g., "Transfer", "Swap"
   metadata?: any;
 }
 
-/** Helper to add a job to the queue */
+/** 
+ * Helper to add a job — now optimized for Redis Streams 
+ */
 export async function addWhaleToQueue(data: WhaleJobData) {
-  return whaleQueue.add('process-alert', data);
+  if (!redisClient || redisClient.__isMock) {
+    if (process.env.NODE_ENV !== 'production') {
+        console.warn(`[StreamProxy] Redis unavailable. Logged: ${data.hash}`);
+    }
+    return null;
+  }
+
+  // Normalize chain string to AlertChain enum
+  const chainMap: Record<string, AlertChain> = {
+    'ethereum': 'ETH',
+    'solana': 'SOL',
+    'bitcoin': 'BTC',
+    'base': 'BASE',
+    'binance-smart-chain': 'BNB',
+    'polygon': 'POLYGON'
+  };
+
+  const chain: AlertChain = chainMap[data.chain.toLowerCase()] || 'MULTICHAIN';
+  const severity: AlertSeverity = data.usdValue > 10000000 ? 'ASTRONOMICAL' : 'CRITICAL';
+
+  const event: OmnichannelAlertEvent = {
+    eventId: `evm-${data.hash}`,
+    timestamp: Date.now(),
+    type: 'WHALE_TX',
+    chain,
+    severity,
+    payload: {
+      asset: data.asset,
+      amountUsd: data.usdValue,
+      fromAddress: data.from,
+      toAddress: data.to,
+      hash: data.hash,
+      metrics: {
+        amount: data.amount,
+        blockNumber: data.blockNumber,
+        ...data.metadata
+      }
+    },
+    targetAudience: 'GLOBAL',
+    channels: ['TELEGRAM', 'DISCORD', 'UI_INAPP']
+  };
+
+  try {
+    // [ESTABILIDAD CÓSMICA] Atomic write to the unified stream
+    return await (redisClient as any).xadd(
+        WHALE_QUEUE_NAME, 
+        'MAXLEN', '~', 10000, 
+        '*', 
+        'payload', JSON.stringify(event)
+    );
+  } catch (err: any) {
+    console.error(`[StreamProxy] 💀 Failed to enqueue event ${data.hash}:`, err.message);
+    return null;
+  }
 }
 
+// Deprecated BullMQ singleton for backward compatibility
+export const whaleQueue = {
+    add: async (_name: string, data: WhaleJobData) => addWhaleToQueue(data)
+};

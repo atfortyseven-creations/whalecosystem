@@ -62,7 +62,16 @@ async function interceptThermodynamicAnomalies() {
 
     console.log(`[SOLANA] 🔊 Subscribing to ComputeBudget logs (Processed Commitment)...`);
 
+    // [HEARTBEAT] Signal worker vitality every 10s
+    setInterval(async () => {
+        try {
+            const hbKey = `hb:worker:solana:${process.env.RAILWAY_REPLICA_ID || 'local'}`;
+            await (redis as any).set(hbKey, Date.now(), 'EX', 30);
+        } catch (e) {}
+    }, 10000);
+
     // [WATCHDOG] Prevents silent "ghost" websocket disconnects
+
     let lastMessageTime = Date.now();
     const watchdog = setInterval(() => {
         if (Date.now() - lastMessageTime > 15000) {
@@ -102,25 +111,32 @@ async function interceptThermodynamicAnomalies() {
                 const zScore = ((microLamports - ZSCORE_BASELINE_MEDIAN) / ZSCORE_BASELINE_STDDEV).toFixed(2);
 
                 const eventPayload = {
-                    id: `sol-${logs.signature}`,
+                    eventId: `sol-${logs.signature}`,
+                    timestamp: Date.now(),
+                    type: 'WHALE_TX',
                     chain: 'SOLANA',
-                    txHash: logs.signature,
-                    amount: 'Unknown (Encrypted until confirmed)',
-                    usdValue: 'Evaluating...',
-                    tokenSymbol: 'SPL',
-                    fromAddress: 'Hidden',
-                    toAddress: 'DEX Router',
-                    timestamp: new Date().toISOString(),
-                    zScore,
-                    microLamports,
-                    urgency: 'EXTREME_PRIORITY_FEE'
+                    severity: microLamports > 50000 ? 'ASTRONOMICAL' : 'CRITICAL',
+                    payload: {
+                        asset: 'SOL',
+                        amountUsd: 0, // Calculated downstream or placeholder
+                        fromAddress: 'Hidden',
+                        toAddress: 'DEX_ROUTER',
+                        hash: logs.signature,
+                        metrics: {
+                            zScore,
+                            microLamports,
+                            urgency: 'EXTREME_PRIORITY_FEE'
+                        }
+                    },
+                    targetAudience: 'GLOBAL',
+                    channels: ['TELEGRAM', 'DISCORD', 'UI_INAPP']
                 };
 
                 console.log(`[SOLANA-SIMD0109] 🐋 WHALE TACTIC DETECTED -> Fee: ${microLamports} uLamports | Z-Score: ${zScore}`);
                 
-                // [ESTABILIDAD CÓSMICA] Use Redis Streams (XADD) guaranteeing At-Least-Once delivery and persistence.
-                // Uses MAXLEN ~ 1000 to keep memory footprint bounded.
-                await (redis as any).xadd('whale:alert:stream', 'MAXLEN', '~', 1000, '*', 'payload', JSON.stringify(eventPayload));
+                // [ESTABILIDAD CÓSMICA] Unified Message Bus: global_crypto_alerts
+                await (redis as any).xadd('global_crypto_alerts', 'MAXLEN', '~', 10000, '*', 'payload', JSON.stringify(eventPayload));
+
             }
         }
     }, 'processed');

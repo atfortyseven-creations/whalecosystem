@@ -8,6 +8,7 @@
 import WebSocket from 'ws';
 
 const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS || 'wss://ethereum-rpc.publicnode.com';
+let backoff = 5000;
 const WHALE_USD_THRESHOLD = parseInt(process.env.WHALE_THRESHOLD_USD || '50000', 10);
 
 // ERC-20 Transfer event topic
@@ -45,6 +46,8 @@ class WhaleWebSocketEngine {
     private ws:          WebSocket | null = null;
     private listeners:   Set<WhaleListener> = new Set();
     private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+    private isAlive: boolean = true;
     private subId:       string | null = null;
 
     connect() {
@@ -58,6 +61,10 @@ class WhaleWebSocketEngine {
 
         this.ws.on('open', () => {
             console.info('[WhaleEngine] GetBlock WS connected (EP2)');
+            this.isAlive = true;
+            backoff = 5000; // Reset on success
+            this.startHeartbeat();
+            
             // Subscribe to ALL Transfer logs — we filter by USD value in handler
             this.ws!.send(JSON.stringify({
                 jsonrpc: '2.0', id: 1,
@@ -83,8 +90,13 @@ class WhaleWebSocketEngine {
             } catch { /* ignore parse errors */ }
         });
 
+        this.ws.on('pong', () => {
+            this.isAlive = true;
+        });
+
         this.ws.on('close', () => {
-            console.warn('[WhaleEngine] WS disconnected — reconnecting in 5s');
+            console.warn('[WhaleEngine] WS disconnected — reconnecting');
+            this.stopHeartbeat();
             this.scheduleReconnect();
         });
 
@@ -126,9 +138,29 @@ class WhaleWebSocketEngine {
         this.listeners.forEach(fn => fn(event));
     }
 
+    private startHeartbeat() {
+        this.stopHeartbeat();
+        this.heartbeatTimer = setInterval(() => {
+            if (this.isAlive === false) {
+                console.warn('[WhaleEngine] Whale Heartbeat missed — terminating');
+                this.ws?.terminate();
+                return;
+            }
+            this.isAlive = false;
+            this.ws?.ping();
+        }, 30000); // 30s pulse
+    }
+
+    private stopHeartbeat() {
+        if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
+    }
+
     private scheduleReconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
-        this.reconnectTimer = setTimeout(() => this.connect(), 5000);
+        this.reconnectTimer = setTimeout(() => {
+            backoff = Math.min(backoff * 1.5, 30000);
+            this.connect();
+        }, backoff);
     }
 
     subscribe(fn: WhaleListener) {
@@ -141,6 +173,7 @@ class WhaleWebSocketEngine {
 
     disconnect() {
         if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        this.stopHeartbeat();
         this.ws?.close();
         this.ws = null;
     }

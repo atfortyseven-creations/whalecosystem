@@ -145,6 +145,14 @@ export function broadcastToMesh(eventType: string, data: any) {
     }
 }
 
+// Heartbeat loop (Signal vitality to cluster health matrix)
+setInterval(async () => {
+    try {
+        const hbKey = `hb:worker:mesh:${process.env.RAILWAY_REPLICA_ID || 'local'}`;
+        await (redisPub as any).set(hbKey, Date.now(), 'EX', 30);
+    } catch (e) {}
+}, 10000);
+
 // Memory Cleanup loop (prevent Map endless growth)
 setInterval(() => {
     const now = Date.now();
@@ -154,3 +162,4 @@ setInterval(() => {
         }
     }
 }, 10000);
+

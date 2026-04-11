@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useVIPStore, WhaleEvent } from '@/lib/vip-store';
 import { ExternalLink, ArrowUpRight, ArrowDownLeft, Eye, EyeOff, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAccount } from 'wagmi';
 
 /**
  * AlphaToaster 
@@ -13,6 +14,7 @@ import { toast } from 'sonner';
  * Designed for absolute perfection and elegance.
  */
 export function AlphaToaster() {
+    const { isConnected } = useAccount();
     const whaleEvents = useVIPStore(state => state.whaleEvents);
     const [activeAlert, setActiveAlert] = useState<WhaleEvent | null>(null);
     const [isMuted, setIsMuted] = useState(false);
@@ -21,6 +23,11 @@ export function AlphaToaster() {
     const USD_TO_EUR = 0.93;
 
     useEffect(() => {
+        // [INSTITUTIONAL GUARD] Do not trigger alerts in Genesis mode (Sovereign Isolation)
+        if (!isConnected) {
+            if (activeAlert) setActiveAlert(null);
+            return;
+        }
         if (whaleEvents.length > 0 && !isMuted) {
             const latest = whaleEvents[0];
             // Defensive Audit: Improved threshold for better visibility
@@ -32,7 +39,7 @@ export function AlphaToaster() {
                 }
             }
         }
-    }, [whaleEvents, activeAlert?.id, isMuted]);
+    }, [whaleEvents, activeAlert?.id, isMuted, isConnected]);
 
     const formatEUR = (usd: number) => {
         const eur = usd * USD_TO_EUR;

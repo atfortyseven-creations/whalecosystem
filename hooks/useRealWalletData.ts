@@ -19,7 +19,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     
     // Fetch managed wallet if not connected via Web3
     const { data: managedWallet } = useQuery({
-        queryKey: ['managed-wallet'],
+        queryKey: ['managed-wallet', isAuthenticated, isWeb3Connected],
         queryFn: async () => {
             if (!isAuthenticated || isWeb3Connected) return null;
             try {

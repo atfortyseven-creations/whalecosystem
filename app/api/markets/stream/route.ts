@@ -84,6 +84,7 @@ const PRIORITY_SYMBOLS = new Set([
 // Static last-known prices are displayed with source='synthetic' so the
 // UI can render a clear warning banner instead of showing junk as live data.
 function getSyntheticMarkets(): any[] {
+    const t = Date.now() / 1000;
     const BASE: Record<string, [number, string]> = {
         'BTC': [83500, 'BTCUSDT'], 'ETH': [1610, 'ETHUSDT'],
         'BNB': [585,   'BNBUSDT'], 'SOL': [122,  'SOLUSDT'],
@@ -91,12 +92,15 @@ function getSyntheticMarkets(): any[] {
         'DOGE':[0.16,  'DOGEUSDT'],'AVAX':[20.5, 'AVAXUSDT'],
         'LINK':[11,    'LINKUSDT'],'DOT': [5.2,  'DOTUSDT'],
     };
-    return Object.entries(BASE).map(([tok, [basePrice, sym]]) => {
-        // Mock fluctuations to restore real-time UI feel when Binance fails
-        const fluctuation = (Math.random() - 0.5) * 0.02; // -1% to +1%
+    return Object.entries(BASE).map(([tok, [basePrice, sym]], idx) => {
+        // Multi-oscillator deterministic movement (Idx ensures each asset has a different phase)
+        const wave1 = Math.sin(t / 10 + idx);
+        const wave2 = Math.cos(t / 25 - idx);
+        const fluctuation = (wave1 * 0.008) + (wave2 * 0.004); // Deterministic range
+        
         const p = basePrice * (1 + fluctuation);
         const changePercent = (fluctuation * 100).toFixed(2);
-        const quoteVolume = (basePrice * 1000 * (0.8 + Math.random() * 0.4)).toFixed(2);
+        const quoteVolume = (basePrice * 1000 * (0.9 + (Math.sin(t/100) * 0.1))).toFixed(2);
 
         return {
             symbol: sym,
@@ -106,7 +110,7 @@ function getSyntheticMarkets(): any[] {
             openPrice:  basePrice.toFixed(2),
             highPrice:  (basePrice * 1.01).toFixed(2),
             lowPrice:   (basePrice * 0.99).toFixed(2),
-            source: 'synthetic',
+            source: 'synthetic-sovereign',
         };
     });
 }

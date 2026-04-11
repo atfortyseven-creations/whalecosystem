@@ -19,6 +19,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { useVIPStore } from '@/lib/vip-store';
+import { useAccount } from 'wagmi';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 const PARTICLE_COUNT    = 800;
@@ -55,6 +56,7 @@ function initParticles(w: number, h: number): Particle[] {
 }
 
 export function OmniMatrixCanvas() {
+  const { isConnected, address } = useAccount();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef  = useRef<{
     particles: Particle[];
@@ -98,9 +100,12 @@ export function OmniMatrixCanvas() {
       const ch = canvas!.height / (window.devicePixelRatio || 1);
 
       // ── Read whale store imperatively (zero React re-render) ───────────
-      const events    = useVIPStore.getState().whaleEvents ?? [];
-      const intensity = Math.min(events.length / 400, 1.0);
-      const speedMult = 1.0 + intensity * 1.8;
+      // ── Genesis vs Sovereign Theme ─────────────────────────────────────
+      const MAIN_HUB_COLOR = isConnected ? { r: 212, g: 175, b: 55 } : { r: 0, g: 195, b: 255 }; // Gold vs Cyan
+      const MESH_COLOR     = isConnected ? { r: 30,  g: 40,  b: 60  } : { r: 10, g: 20, b: 40  };
+      const events         = useVIPStore.getState().whaleEvents ?? [];
+      const intensity      = Math.min(events.length / 400, 1.0);
+      const speedMult      = (isConnected ? 1.0 : 0.6) + intensity * 1.8;
 
       // ── Background clear ───────────────────────────────────────────────
       ctx!.fillStyle = '#020202';
@@ -130,11 +135,11 @@ export function OmniMatrixCanvas() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < EDGE_THRESHOLD) {
             const alpha = edgeAlpha * (1 - dist / EDGE_THRESHOLD);
-            // Gold edge if both are hot, else dim
+            // Theme-aware edges
             if (pi.isHot && pj.isHot) {
-              ctx!.strokeStyle = `rgba(212,175,55,${alpha})`;
+              ctx!.strokeStyle = `rgba(${MAIN_HUB_COLOR.r},${MAIN_HUB_COLOR.g},${MAIN_HUB_COLOR.b},${alpha})`;
             } else {
-              ctx!.strokeStyle = `rgba(80,120,180,${alpha * 0.6})`;
+              ctx!.strokeStyle = `rgba(${MESH_COLOR.r},${MESH_COLOR.g},${MESH_COLOR.b},${alpha * 0.6})`;
             }
             ctx!.beginPath();
             ctx!.moveTo(pi.x, pi.y);
@@ -152,24 +157,25 @@ export function OmniMatrixCanvas() {
         const alpha   = flicker * glow;
 
         if (p.isHot) {
-          // Gold glow: two concentric circles
+          // Theme-aware Glow
           const glowR = p.radius * (3 + intensity * 3);
           const grad  = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
-          grad.addColorStop(0, `rgba(${GOLD.r},${GOLD.g},${GOLD.b},${alpha})`);
-          grad.addColorStop(1, 'rgba(212,175,55,0)');
+          grad.addColorStop(0, `rgba(${MAIN_HUB_COLOR.r},${MAIN_HUB_COLOR.g},${MAIN_HUB_COLOR.b},${alpha})`);
+          grad.addColorStop(1, `rgba(${MAIN_HUB_COLOR.r},${MAIN_HUB_COLOR.g},${MAIN_HUB_COLOR.b},0)`);
           ctx!.fillStyle = grad;
           ctx!.beginPath();
           ctx!.arc(p.x, p.y, glowR, 0, Math.PI * 2);
           ctx!.fill();
 
           // Core dot
-          ctx!.fillStyle = `rgba(255,230,100,${Math.min(alpha * 1.5, 1)})`;
+          const coreColor = isConnected ? '255,230,100' : '200,240,255';
+          ctx!.fillStyle = `rgba(${coreColor},${Math.min(alpha * 1.5, 1)})`;
           ctx!.beginPath();
           ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
           ctx!.fill();
         } else {
-          // Dim blue node
-          ctx!.fillStyle = `rgba(${DIM.r},${DIM.g},${DIM.b},${alpha})`;
+          // Dim secondary nodes
+          ctx!.fillStyle = `rgba(${MESH_COLOR.r},${MESH_COLOR.g},${MESH_COLOR.b},${alpha})`;
           ctx!.beginPath();
           ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
           ctx!.fill();
@@ -186,10 +192,11 @@ export function OmniMatrixCanvas() {
       ctx!.fillStyle = vignette;
       ctx!.fillRect(0, 0, cw, ch);
 
-      // ── Live stats HUD ────────────────────────────────────────────────
+      // ── Live stats HUD & Genesis Status ──────────────────────────────
       ctx!.font = '9px "Roboto Mono", monospace';
-      ctx!.fillStyle = 'rgba(212,175,55,0.45)';
-      ctx!.fillText(`WHALE MESH · ${events.length} EVT · INT ${(intensity * 100).toFixed(0)}%`, 12, ch - 12);
+      ctx!.fillStyle = isConnected ? 'rgba(212,175,55,0.45)' : 'rgba(0,195,255,0.45)';
+      const statusText = isConnected ? `SOVEREIGN MESH • ${address?.slice(0,6)}` : 'GENESIS STATE • ISOLATED';
+      ctx!.fillText(`${statusText} • ${events.length} EVT • INT ${(intensity * 100).toFixed(0)}%`, 12, ch - 12);
     }
 
     tick();
@@ -198,7 +205,7 @@ export function OmniMatrixCanvas() {
       cancelAnimationFrame(stateRef.current.raf);
       observer.disconnect();
     };
-  }, []);
+  }, [isConnected, address]);
 
   return (
     <div

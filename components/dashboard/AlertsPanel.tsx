@@ -227,7 +227,15 @@ export function AlertsPanel() {
         } finally { setLoading(false); }
     };
 
-    useEffect(() => { refresh(); }, [address]);
+    useEffect(() => { 
+        if (!address) {
+            setAlerts([]);
+            seenSSEIds.current.clear();
+            setLoading(false);
+            return;
+        }
+        refresh(); 
+    }, [address]);
 
     // ─── Inject high-value SSE whale events as auto-alert rules ──────────
     // Threshold: $500K USD — matches institutional-grade monitoring standard.
@@ -236,7 +244,9 @@ export function AlertsPanel() {
     const seenSSEIds = React.useRef<Set<string>>(new Set());
 
     useEffect(() => {
-        if (!sseEvents.length) return;
+        // [INSTITUTIONAL GUARD] Do not process alerts or show toasts if wallet is disconnected
+        if (!sseEvents.length || !address) return;
+        
         const latest = sseEvents[0];
         if (seenSSEIds.current.has(latest.id)) return;
         seenSSEIds.current.add(latest.id);
@@ -264,11 +274,14 @@ export function AlertsPanel() {
         const usdM  = (usdValue / 1e6).toFixed(2);
         const from  = `${latest.from?.slice(0, 6)}…${latest.from?.slice(-4)}`;
         const to    = `${latest.to?.slice(0,  6)}…${latest.to?.slice(-4)}`;
+        
+        // Final UI Layer Guard
         toast(`🐋 $${usdM}M ${latest.asset} · ${latest.chain} · ${from} → ${to}`, {
             duration: 9000,
             style: { background: '#050505', color: '#D4AF37', fontFamily: 'monospace', fontSize: '11px' },
         });
-    }, [sseEvents]);
+    }, [sseEvents, address]);
+
 
     const handleDelete = async (id: string) => {
         if (!address) return;

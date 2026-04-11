@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Search, Activity, Box, ArrowRight, Clock, ShieldCheck, AlignLeft, Loader2, AlertCircle } from "lucide-react";
-import { usePublicClient, useBlockNumber } from 'wagmi';
+import { useAccount, usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
 import { OmniMatrixCanvas } from '@/components/3d/OmniMatrixCanvas';
 
 export function OmniExplorer() {
+    const { address } = useAccount();
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState<any[] | null>(null);
@@ -20,6 +21,11 @@ export function OmniExplorer() {
 
     // ── On-chain block feed ─────────────────────────────────────────────────
     useEffect(() => {
+        if (!address) {
+            setBlocks([]);
+            setMassiveTxs([]);
+            return;
+        }
         if (!publicClient || !blockNumber) return;
 
         const fetchBlock = async () => {
