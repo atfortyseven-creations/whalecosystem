@@ -23,6 +23,7 @@ interface WalletState {
   isCustom: boolean;
   activeNetwork: NetworkId;
   activeProtocol: ProtocolType;
+  isUpdatingBalance: boolean;
   
   createWallet: () => void;
   importWallet: (privateKey: string) => boolean;
@@ -42,6 +43,7 @@ export const useWalletStore = create<WalletState>()(
       isCustom: false,
       activeNetwork: 'polygon',
       activeProtocol: 'RPC',
+      isUpdatingBalance: false,
 
       setNetwork: (network: NetworkId) => {
         set({ activeNetwork: network, balance: "0.0" });
@@ -105,8 +107,10 @@ export const useWalletStore = create<WalletState>()(
       },
 
       updateBalance: async () => {
-        const { address, activeNetwork, activeProtocol } = get();
-        if (!address) return;
+        const { address, activeNetwork, activeProtocol, isUpdatingBalance } = get();
+        if (!address || isUpdatingBalance) return;
+        
+        set({ isUpdatingBalance: true });
 
         try {
           const networkData = NETWORKS[activeNetwork];
@@ -151,6 +155,8 @@ export const useWalletStore = create<WalletState>()(
           }
         } catch (error) {
           console.error("Failed to sync balance:", error);
+        } finally {
+          set({ isUpdatingBalance: false });
         }
       },
 

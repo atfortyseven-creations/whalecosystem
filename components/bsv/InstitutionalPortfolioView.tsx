@@ -10,93 +10,48 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
-import { useWalletStore, NETWORKS, NetworkId, ProtocolType } from '@/lib/store/wallet-store';
+import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 
-// ─────────────────────────────────────────────────────────────────
-//  UTILITY: truncate address for display
-// ─────────────────────────────────────────────────────────────────
 const truncate = (s: string, n = 8) => s ? `${s.slice(0, n)}...${s.slice(-6)}` : '—';
 
 type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK';
 
 export function InstitutionalPortfolioView() {
-    const { address, balance, updateBalance } = useWalletStore();
+    const { address, balance, updateBalance, activeNetwork } = useWalletStore();
     const [view, setView] = useState<View>('HOME');
     const [prefilledAddress, setPrefilledAddress] = useState('');
-    const [pulse, setPulse] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [transactions, setTransactions] = useState<any[]>([]);
 
-    // Ghost Memory Fix: Ref for address
-    const addressRef = React.useRef(address);
-    useEffect(() => { addressRef.current = address; }, [address]);
-
-    // Live balance refresh
     const refreshBalance = useCallback(async () => {
-        if (!addressRef.current) return;
+        if (!address) return;
         setLoading(true);
         try {
             await updateBalance();
-            setPulse(p => !p);
+            // Also fetch real transactions (No Mockdata)
+            const res = await fetch(`/api/transactions?userId=${address}`);
+            if (res.ok) {
+                const data = await res.json();
+                setTransactions(Array.isArray(data) ? data : []);
+            }
+        } catch (e) {
+            console.error("[PORTFOLIO] Sync failure:", e);
         } finally { setLoading(false); }
-    }, [updateBalance]);
+    }, [address, updateBalance]);
 
-    // 550K Quota Throttler & Focus-Aware Polling & Transak Hyper-Sync
     useEffect(() => {
-        let isFocused = true;
-        let t: NodeJS.Timeout;
-        let hyperSyncT: NodeJS.Timeout;
-
-        const handleFocus = () => { 
-            isFocused = true; 
-            refreshBalance(); 
-        };
-        const handleBlur = () => { isFocused = false; };
-
-        // Transak Phantom Deposit Listener
-        const handleMessage = (message: any) => {
-            if (message?.data?.event_id === 'TRANSAK_ORDER_SUCCESSFUL' || message?.data?.event_id === 'TRANSAK_ORDER_COMPLETED') {
-                toast.success("Fiat Confirmed", { description: "Processing on-chain delivery. Hyper-Sync engaged." });
-                // Engage 3-second Hyper-Sync override
-                hyperSyncT = setInterval(() => {
-                    refreshBalance();
-                }, 3000);
-                
-                // Disengage Hyper-Sync after 45 seconds (assumed block finality)
-                setTimeout(() => clearInterval(hyperSyncT), 45000);
-            }
-        };
-
-        window.addEventListener('focus', handleFocus);
-        window.addEventListener('blur', handleBlur);
-        window.addEventListener('message', handleMessage);
-
-        // Initial fetch
         refreshBalance();
-
-        // 45s polling cycle, specifically dropping all network requests when user is out of tab to save API limits.
-        t = setInterval(() => {
-            if (isFocused && document.visibilityState === 'visible') {
-                refreshBalance();
-            }
-        }, 45000);
-
-        return () => {
-            clearInterval(t);
-            clearInterval(hyperSyncT);
-            window.removeEventListener('focus', handleFocus);
-            window.removeEventListener('blur', handleBlur);
-            window.removeEventListener('message', handleMessage);
-        };
     }, [refreshBalance]);
 
+    const scannerBase = activeNetwork === 'polygon' ? 'https://polygonscan.com' : 'https://etherscan.io';
     const balanceFiat = `$${(parseFloat(balance || "0") * 3100).toFixed(2)}`;
 
     return (
-        <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[80vh]">
+        <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[85vh] bg-[#fdfcf9]">
             
-            {/* The same grid background as the support page */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-              style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 40px)' }} />
+            {/* Fine Grid Background */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.05]"
+              style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 60px)' }} />
 
             <AnimatePresence mode="wait">
                 {view === 'HOME' && (
@@ -104,8 +59,8 @@ export function InstitutionalPortfolioView() {
                         address={address}
                         balance={balance}
                         balanceFiat={balanceFiat}
-                        pulse={pulse}
                         loading={loading}
+                        transactions={transactions}
                         onRefresh={refreshBalance}
                         onSend={() => setView('SEND')}
                         onReceive={() => setView('RECEIVE')}
@@ -113,55 +68,23 @@ export function InstitutionalPortfolioView() {
                         onCreate={() => setView('CREATE')}
                         onBuy={() => setView('BUY')}
                         onNetworkClick={() => setView('NETWORK')}
+                        scannerBase={scannerBase}
                     />
                 )}
-                {view === 'NETWORK' && (
-                    <NetworkView key="network"
-                        onBack={() => setView('HOME')}
-                    />
-                )}
-                {view === 'SEND' && (
-                    <SendView key="send"
-                        prefilledAddress={prefilledAddress}
-                        onBack={() => { setView('HOME'); setPrefilledAddress(''); }}
-                    />
-                )}
-                {view === 'BUY' && (
-                    <BuyView key="buy"
-                        address={address}
-                        onBack={() => setView('HOME')}
-                    />
-                )}
-                {view === 'RECEIVE' && (
-                    <ReceiveView key="receive"
-                        address={address}
-                        onBack={() => setView('HOME')}
-                    />
-                )}
-                {view === 'SCAN' && (
-                    <ScanView key="scan"
-                        onBack={() => setView('HOME')}
-                        onResult={(addr: string) => { setView('SEND'); setPrefilledAddress(addr); }}
-                    />
-                )}
-                {view === 'CREATE' && (
-                    <CreateWalletView key="create"
-                        onBack={() => setView('HOME')}
-                        onCreated={() => setView('HOME')}
-                    />
-                )}
+                {view === 'NETWORK' && <NetworkView key="network" onBack={() => setView('HOME')} />}
+                {view === 'SEND' && <SendView key="send" prefilledAddress={prefilledAddress} onBack={() => { setView('HOME'); setPrefilledAddress(''); }} />}
+                {view === 'BUY' && <BuyView key="buy" address={address} onBack={() => setView('HOME')} />}
+                {view === 'RECEIVE' && <ReceiveView key="receive" address={address} onBack={() => setView('HOME')} />}
+                {view === 'SCAN' && <ScanView key="scan" onBack={() => setView('HOME')} onResult={(addr: string) => { setView('SEND'); setPrefilledAddress(addr); }} />}
+                {view === 'CREATE' && <CreateWalletView key="create" onBack={() => setView('HOME')} onCreated={() => setView('HOME')} />}
             </AnimatePresence>
         </div>
     );
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  HOME VIEW
-// ─────────────────────────────────────────────────────────────────
-function HomeView({ address, balance, balanceFiat, pulse, loading, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick }: any) {
+function HomeView({ address, balance, balanceFiat, loading, transactions, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick, scannerBase }: any) {
     const [copied, setCopied] = useState(false);
     const { clearWallet, activeNetwork } = useWalletStore();
-    
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
 
     const copy = () => {
@@ -169,78 +92,188 @@ function HomeView({ address, balance, balanceFiat, pulse, loading, onRefresh, on
         navigator.clipboard.writeText(address);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        toast.success("Address Captured");
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col relative z-10"
-        >
-            <section className="px-8 pt-16 pb-10 flex flex-col items-center text-center relative">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col relative z-20">
+            <section className="px-8 pt-20 pb-12 flex flex-col items-center text-center">
                 {address && (
-                    <button onClick={clearWallet} className="absolute top-4 right-4 p-2 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition-all">
-                        <Trash size={14} />
+                    <button onClick={clearWallet} className="absolute top-6 right-6 p-2.5 bg-white border border-black/10 rounded-xl shadow-sm hover:bg-rose-50 text-rose-500 transition-all">
+                        <Trash size={16} />
                     </button>
                 )}
-                <button onClick={onNetworkClick} className="flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-black/5 border border-black/10 hover:bg-black/10 transition-colors mx-auto shrink-0 relative mt-4">
-                    <div className="w-1.5 h-1.5 rounded-full transition-all duration-1000 bg-black/20" 
-                         style={{ backgroundColor: pulse ? networkInfo.color : undefined, boxShadow: pulse ? `0 0 8px ${networkInfo.color}` : 'none' }} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">
-                        {address ? `${networkInfo.name} ACTIVE` : 'NO WALLET'}
+                
+                <button onClick={onNetworkClick} className="bg-white border border-black/10 px-5 py-2 rounded-full shadow-sm hover:border-black/20 transition-all flex items-center gap-2.5 mb-8">
+                    <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: networkInfo.color }} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">
+                        {address ? `${networkInfo.name} Network` : 'No Identity Linked'}
                     </span>
                 </button>
 
-                <h1 className="text-7xl md:text-9xl font-aztec-serif font-black tracking-tighter leading-none mb-2 text-black transition-colors duration-500">
-                    {balance}<span className="text-3xl md:text-5xl ml-3 transition-colors duration-500" style={{ color: networkInfo.color }}>{networkInfo.currency}</span>
+                <h1 
+                    className="font-black tracking-tighter leading-none mb-4 text-black"
+                    style={{ fontSize: 'clamp(4rem, 15vw, 9rem)' }}
+                >
+                    {balance}<span className="text-3xl md:text-4xl ml-2 opacity-50">{networkInfo.currency}</span>
                 </h1>
-                <p className="text-black/40 font-aztec-mono text-sm mb-4">{balanceFiat} USD</p>
+                <p className="text-black/30 font-mono text-sm tracking-widest uppercase mb-10">{balanceFiat} USD VALUE</p>
 
                 {address && (
-                    <button onClick={copy} className="flex items-center gap-2 px-4 py-2 bg-black/5 border border-black/10 rounded-full hover:border-black/20 transition-all">
-                        <span className="text-[11px] font-aztec-mono text-black/50">{truncate(address, 12)}</span>
-                        {copied ? <Check size={12} className="text-[var(--aztec-orchid)]" /> : <Copy size={12} className="text-black/30" />}
-                    </button>
+                    <div className="flex flex-col items-center gap-3">
+                        <button onClick={copy} className="bg-white border border-black/10 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-3">
+                            <code className="text-[12px] font-mono font-bold text-black/70">{truncate(address, 16)}</code>
+                            {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="opacity-30" />}
+                        </button>
+                        <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="text-[9px] font-black uppercase tracking-widest text-black/30 hover:text-black transition-colors flex items-center gap-1.5">
+                            Verify on Blockchain <ExternalLink size={10} />
+                        </a>
+                    </div>
                 )}
 
-                <button onClick={onRefresh} disabled={loading} className="mt-4 p-2 text-black/20 hover:text-black/60 transition-all">
-                    <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                <button onClick={onRefresh} disabled={loading} className="mt-8 p-3 bg-white border border-black/10 rounded-full shadow-sm hover:rotate-180 transition-all duration-700">
+                    <RefreshCw size={16} className={loading ? 'animate-spin opacity-40' : 'opacity-20'} />
                 </button>
             </section>
 
-            <section className="px-8 pb-8">
-                <div className="grid grid-cols-5 md:grid-cols-5 gap-3 mb-8 max-w-2xl mx-auto">
-                    <ActionBtn icon={CreditCard} label="Buy" color="orchid" onClick={onBuy} disabled={!address} />
-                    <ActionBtn icon={ArrowUpRight} label="Send" color="orchid" onClick={onSend} disabled={!address} />
-                    <ActionBtn icon={ArrowDownLeft} label="Receive" color="aqua" onClick={onReceive} disabled={!address} />
-                    <ActionBtn icon={QrIcon} label="Scan QR" color="chartreuse" onClick={onScan} disabled={!address} />
-                    <ActionBtn icon={Plus} label="New Wallet" color="black" onClick={onCreate} />
+            <section className="px-8 pb-12 max-w-4xl mx-auto w-full">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-20">
+                    <ActionCard icon={CreditCard} label="Deposit" sub="Buy Assets" onClick={onBuy} disabled={!address} />
+                    <ActionCard icon={ArrowUpRight} label="Transmit" sub="Send Funds" onClick={onSend} disabled={!address} />
+                    <ActionCard icon={ArrowDownLeft} label="Inbound" sub="Receive" onClick={onReceive} disabled={!address} />
+                    <ActionCard icon={QrIcon} label="Scan QR" sub="Auto-Fill" onClick={onScan} disabled={!address} />
+                    <ActionCard icon={Plus} label="New Intel" sub="Create Wallet" onClick={onCreate} highlighted />
                 </div>
 
+                {address && (
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between px-2">
+                             <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-black">Blockchain Telemetry</h4>
+                             <span className="text-[9px] font-bold text-black/20 uppercase tracking-widest">{transactions.length} Real records Sync'd</span>
+                        </div>
+                        
+                        <div className="bg-white border border-black/10 rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
+                            {transactions.length > 0 ? (
+                                <div className="divide-y divide-black/5">
+                                    {transactions.map((tx: any) => (
+                                        <a 
+                                            key={tx.hash} 
+                                            href={`${scannerBase}/tx/${tx.hash}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-between p-7 hover:bg-black/[0.02] transition-colors group"
+                                        >
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                                                    {tx.type === 'SEND' ? <ArrowUpRight size={18} /> : <Zap size={18} />}
+                                                </div>
+                                                <div>
+                                                    <span className="text-[11px] font-black uppercase tracking-widest block mb-0.5">{tx.type}</span>
+                                                    <span className="text-[10px] font-mono text-black/30">{truncate(tx.hash, 12)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-[12px] font-black block mb-0.5">-{tx.fromAmount} {tx.fromToken}</span>
+                                                <span className={`text-[9px] font-bold uppercase tracking-widest ${tx.status === 'SUCCESS' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                    {tx.status}
+                                                </span>
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-20 text-center flex flex-col items-center">
+                                    <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center text-black/10 mb-6 border-2 border-dashed border-black/10">
+                                        <Cpu size={24} />
+                                    </div>
+                                    <h5 className="text-[10px] font-black uppercase tracking-[0.3em] text-black/20">No on-chain history found</h5>
+                                    <p className="text-[10px] text-black/10 max-w-[200px] mt-2 font-medium">Initial transmissions have not yet been broadcast to the cluster.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {!address && (
-                    <div className="p-6 rounded-3xl border border-black/10 bg-white flex gap-4 items-start mx-auto max-w-lg mt-12 shadow-sm">
-                        <AlertTriangle size={20} className="text-black/40 shrink-0 mt-0.5" />
+                    <div className="mt-12 p-8 bg-white border border-black/10 rounded-[2.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.03)] flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                        <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center text-white shrink-0">
+                            <Shield size={32} />
+                        </div>
                         <div>
-                            <p className="text-[11px] font-black uppercase tracking-widest text-black mb-1">Vault Not Initialized</p>
-                            <p className="text-[11px] text-black/50 leading-relaxed">Click "New Wallet" to securely generate a local Ethereum/Polygon keypair, or import an existing private key in browser memory.</p>
+                            <h4 className="text-lg font-bold mb-1 uppercase tracking-tight">Identity Not Initialized</h4>
+                            <p className="text-sm text-black/40 leading-relaxed font-medium">Your cryptographic vault is currently empty. Generate a new institution-grade keypair or import an existing one to begin on-chain operations.</p>
                         </div>
                     </div>
                 )}
             </section>
 
-            <footer className="px-8 py-6 mt-auto border-t border-black/5 flex justify-center gap-10 items-center opacity-40 text-[9px] font-black uppercase tracking-widest">
-                <span className="flex items-center gap-2"><Globe size={12} /> Polygon Mainnet</span>
-                <span className="flex items-center gap-2"><Shield size={12} /> Secure Personal Vault</span>
-                <span className="flex items-center gap-2"><Cpu size={12} /> Local Memory Architecture</span>
+            <footer className="px-10 py-10 mt-auto border-t border-black/5 bg-white/50 backdrop-blur-xl flex flex-wrap justify-center gap-10 items-center opacity-30 text-[10px] font-black uppercase tracking-[0.2em] text-black">
+                <span className="flex items-center gap-2"><Globe size={14} /> Multi-Chain Protocol</span>
+                <span className="flex items-center gap-2"><Lock size={14} /> AES-256 Hardened</span>
+                <span className="flex items-center gap-2"><Cpu size={14} /> Client-Side Execution</span>
             </footer>
         </motion.div>
     );
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  SEND VIEW
-// ─────────────────────────────────────────────────────────────────
+            <footer className="px-10 py-10 mt-auto border-t border-black/5 bg-white/50 backdrop-blur-xl flex flex-wrap justify-center gap-10 items-center opacity-30 text-[10px] font-black uppercase tracking-[0.2em] text-black">
+                <span className="flex items-center gap-2"><Globe size={14} /> Multi-Chain Protocol</span>
+                <span className="flex items-center gap-2"><Lock size={14} /> AES-256 Hardened</span>
+                <span className="flex items-center gap-2"><Cpu size={14} /> Client-Side Execution</span>
+            </footer>
+        </motion.div>
+    );
+}
+
+function ActionCard({ icon: Icon, label, sub, onClick, disabled, highlighted }: any) {
+    return (
+        <motion.button
+            whileHover={{ y: -4, shadow: '0 20px 30px rgba(0,0,0,0.05)' }}
+            whileTap={{ scale: 0.96 }}
+            onClick={onClick}
+            disabled={disabled}
+            className={`flex flex-col items-start p-6 rounded-[2rem] border transition-all text-left group disabled:opacity-30 disabled:cursor-not-allowed ${
+                highlighted 
+                    ? 'bg-black text-white border-transparent' 
+                    : 'bg-white text-black border-black/10 hover:border-black/30'
+            }`}
+        >
+            <div className={`p-3 rounded-xl mb-4 transition-colors ${highlighted ? 'bg-white/10 text-white' : 'bg-black/5 text-black group-hover:bg-black group-hover:text-white'}`}>
+                <Icon size={20} />
+            </div>
+            <span className="text-[11px] font-black uppercase tracking-widest block mb-0.5">{label}</span>
+            <span className={`text-[10px] font-medium opacity-40 ${highlighted ? 'text-white/60' : 'text-black/40'}`}>{sub}</span>
+        </motion.button>
+    );
+}
+
+function ModalView({ title, subtitle, icon, onBack, children }: any) {
+    return (
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="flex flex-col max-w-2xl mx-auto w-full pt-12 pb-20 px-6">
+            <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-white shadow-lg">
+                        {icon}
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">{subtitle}</span>
+                        <h2 className="text-3xl font-black text-black tracking-tight uppercase leading-none mt-1">{title}</h2>
+                    </div>
+                </div>
+                <button onClick={onBack} className="w-12 h-12 rounded-full bg-white border border-black/10 flex items-center justify-center text-black hover:bg-black hover:text-white transition-all shadow-sm">
+                    <X size={20} />
+                </button>
+            </div>
+            <div className="bg-white border border-black/10 rounded-[3rem] p-10 shadow-[0_30px_60px_rgba(0,0,0,0.05)]">
+                {children}
+            </div>
+        </motion.div>
+    );
+}
+
+// Sub-views implementation (Send, Receive, Create, Network, Buy, Scan) 
+// Redesigning them to match the new Solid White Elite style
+
 function SendView({ prefilledAddress, onBack }: any) {
     const { sendTransaction, activeNetwork } = useWalletStore();
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
@@ -256,351 +289,121 @@ function SendView({ prefilledAddress, onBack }: any) {
             if (txHash) {
                 onBack();
             }
-        } finally {
-            setIsSigning(false);
-        }
+        } finally { setIsSigning(false); }
     };
 
     return (
-        <ModalView title="Send Asset" subtitle="Outbound Transmission" icon={<ArrowUpRight />} onBack={onBack}>
-            <div className="space-y-5">
-                <Field label={`Destination Address (${networkInfo.name})`}>
-                    <input
-                        type="text" value={toAddress}
-                        onChange={e => setToAddress(e.target.value)}
-                        placeholder="0x..."
-                        className="w-full bg-black/[0.02] border border-black/10 p-4 rounded-2xl font-aztec-mono text-sm outline-none transition-all placeholder:text-black/20"
-                        style={{ borderColor: toAddress ? networkInfo.color : '' }}
-                    />
-                </Field>
-                <Field label={`Amount (${networkInfo.currency})`}>
+        <ModalView title="Send Assets" subtitle="Zero-Knowledge Channel" icon={<ArrowUpRight />} onBack={onBack}>
+            <div className="space-y-8">
+                <FormField label={`Institutional Destination (${networkInfo.name})`}>
+                    <input type="text" value={toAddress} onChange={e => setToAddress(e.target.value)} placeholder="0x..." className="w-full bg-black/5 border-none p-5 rounded-2xl font-mono text-sm outline-none placeholder:opacity-20" />
+                </FormField>
+                <FormField label="Mathematical Amount">
                     <div className="relative">
-                        <input
-                            type="number" value={amount}
-                            onChange={e => setAmount(e.target.value)}
-                            placeholder="0.0"
-                            className="w-full bg-black/[0.02] border border-black/10 p-4 rounded-2xl font-aztec-mono text-xl font-black outline-none transition-all pr-16 placeholder:text-black/20"
-                            style={{ borderColor: amount ? networkInfo.color : '' }}
-                        />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black" style={{ color: networkInfo.color }}>{networkInfo.currency}</span>
+                        <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-black/5 border-none p-5 rounded-2xl font-mono text-3xl font-black outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-black text-black/20">{networkInfo.currency}</span>
                     </div>
-                </Field>
-                <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    onClick={handleSend}
-                    disabled={isSigning || !toAddress || !amount}
-                    className="w-full py-5 rounded-2xl bg-black text-white font-black text-[11px] uppercase tracking-[0.4em] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                    style={{ backgroundColor: (isSigning || !toAddress || !amount) ? '#000000' : networkInfo.color }}
-                >
-                    {isSigning ? <><RefreshCw size={16} className="animate-spin" /> Processing...</> : <><Send size={16} /> Initiate Transmission</>}
-                </motion.button>
+                </FormField>
+                <button onClick={handleSend} disabled={isSigning || !toAddress || !amount} className="w-full py-6 rounded-2xl bg-black text-white font-black text-xs uppercase tracking-[0.5em] transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-20 flex items-center justify-center gap-3">
+                    {isSigning ? <RefreshCw className="animate-spin" size={18} /> : <Zap size={18} />}
+                    {isSigning ? 'BROADCASTING...' : 'CONFIRM TRANSMISSION'}
+                </button>
             </div>
         </ModalView>
     );
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  RECEIVE VIEW
-// ─────────────────────────────────────────────────────────────────
 function ReceiveView({ address, onBack }: any) {
     const [copied, setCopied] = useState(false);
-
     return (
-        <ModalView title="Receive Asset" subtitle="Inbound Transfer" icon={<ArrowDownLeft />} onBack={onBack}>
-            <div className="flex flex-col items-center gap-6">
-                <div className="p-5 bg-white rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-black/[0.04]">
-                    {address ? (
-                        <QRCodeSVG value={address} size={200} level="H" bgColor="#FFFFFF" fgColor="#000000" />
-                    ) : (
-                        <div className="w-[200px] h-[200px] flex items-center justify-center text-black/30 text-sm">No wallet yet</div>
-                    )}
+        <ModalView title="Vault Inbound" subtitle="Public Identity" icon={<ArrowDownLeft />} onBack={onBack}>
+            <div className="flex flex-col items-center gap-10">
+                <div className="p-8 bg-white rounded-[3rem] border border-black/5 shadow-inner">
+                    <QRCodeSVG value={address || ''} size={240} level="H" bgColor="#FFFFFF" fgColor="#000000" />
                 </div>
-
-                <div className="w-full">
-                    <p className="text-[9px] text-black/40 uppercase tracking-widest mb-2 text-center">Your Address</p>
-                    <button
-                        onClick={() => { navigator.clipboard.writeText(address); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                        className="w-full flex items-center justify-between px-5 py-4 bg-black/[0.02] border border-black/10 rounded-2xl hover:border-[var(--aztec-orchid)] transition-all"
-                    >
-                        <code className="text-xs font-aztec-mono text-[var(--aztec-orchid)] truncate max-w-[280px]">{address || 'No wallet initialized'}</code>
-                        {copied ? <Check size={14} className="text-[var(--aztec-orchid)] shrink-0" /> : <Copy size={14} className="text-black/30 shrink-0" />}
-                    </button>
-                </div>
-
-                <div className="p-4 bg-black/5 border border-black/10 rounded-2xl text-[10px] text-black/40 font-aztec-mono text-center">
-                    Only send compatible EVM tokens to this address.
-                </div>
-            </div>
-        </ModalView>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────
-//  SCAN VIEW
-// ─────────────────────────────────────────────────────────────────
-function ScanView({ onBack, onResult }: any) {
-    const [manual, setManual] = useState('');
-
-    return (
-        <ModalView title="QR Scanner" subtitle="Address Recovery" icon={<QrIcon />} onBack={onBack}>
-            <div className="space-y-6">
-                <div className="p-6 bg-black/[0.02] border border-black/10 rounded-3xl text-center">
-                    <QrIcon size={48} className="mx-auto text-black/20 mb-3" />
-                    <p className="text-[11px] font-aztec-mono text-black/50 mb-4">Camera scanning requires mobile browser. Paste address manually below:</p>
-                </div>
-
-                <Field label="Paste EVM Address">
-                    <input
-                        type="text" value={manual}
-                        onChange={e => setManual(e.target.value)}
-                        placeholder="0x..."
-                        className="w-full bg-black/[0.02] border border-black/10 p-4 rounded-2xl font-aztec-mono text-sm focus:border-[var(--aztec-orchid)] outline-none transition-all placeholder:text-black/20"
-                    />
-                </Field>
-
-                <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => { if (manual) { onResult(manual); toast.success('Address loaded into Send form.'); } }}
-                    disabled={!manual}
-                    className="w-full py-5 rounded-2xl bg-black text-white font-black text-[11px] uppercase tracking-[0.4em] hover:bg-[var(--aztec-orchid)] transition-all disabled:opacity-40"
-                >
-                    Load Address
-                </motion.button>
-            </div>
-        </ModalView>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────
-//  BUY VIEW
-// ─────────────────────────────────────────────────────────────────
-function BuyView({ address, onBack }: any) {
-    const { activeNetwork } = useWalletStore();
-    const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
-    
-    const encodedAddress = encodeURIComponent(address || '');
-    // Using MoonPay for ultimate iframe robustness without API key origin blocks
-    const onrampUrl = `https://buy.moonpay.com/?currencyCode=${networkInfo.currency.toLowerCase()}&walletAddress=${encodedAddress}&colorCode=%230a0a0a`;
-
-    return (
-        <ModalView title="Buy Crypto" subtitle="Real Fiat Integration" icon={<CreditCard />} onBack={onBack}>
-            <div className="flex flex-col h-full rounded-2xl overflow-hidden border border-black/10 bg-black/5 relative">
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-black/40 pointer-events-none">
-                    <RefreshCw size={24} className="animate-spin mb-4" />
-                    <p className="font-black tracking-widest uppercase text-[10px]">Initializing Secure Gateway...</p>
-                </div>
-                <iframe 
-                    src={onrampUrl} 
-                    allow="camera;microphone;payment" 
-                    className="w-full h-[500px] border-none bg-white relative z-10"
-                    title="Fiat Onramp"
-                />
-            </div>
-            <div className="mt-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700/80 text-[10px] uppercase font-black tracking-widest text-center flex items-center justify-center gap-2">
-                <Shield size={14} /> Purchases will reflect automatically in your portfolio
-            </div>
-        </ModalView>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────
-//  NETWORK CONFIGURATION VIEW
-// ─────────────────────────────────────────────────────────────────
-function NetworkView({ onBack }: any) {
-    const { activeNetwork, activeProtocol, setNetwork, setProtocol } = useWalletStore();
-
-    return (
-        <ModalView title="Node Parameters" subtitle="API Interfacing" icon={<Globe />} onBack={onBack}>
-            <div className="space-y-8">
-                <Field label="Active Backbone">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {Object.entries(NETWORKS).map(([key, data]) => {
-                            const isSelected = activeNetwork === key;
-                            return (
-                                <button
-                                    key={key}
-                                    onClick={() => setNetwork(key as NetworkId)}
-                                    className={`p-3 rounded-2xl border text-left transition-all ${isSelected ? 'border-transparent text-white' : 'border-black/10 bg-transparent text-black/40 hover:bg-black/5'}`}
-                                    style={{ backgroundColor: isSelected ? data.color : undefined }}
-                                >
-                                    <p className="text-[10px] font-black uppercase tracking-wider mb-1">{data.name}</p>
-                                    <p className="text-[8px] font-mono opacity-60">Layer 1/2</p>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </Field>
-
-                <Field label="Protocol Selection">
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            onClick={() => setProtocol('RPC')}
-                            className={`p-4 rounded-2xl border text-center transition-all ${activeProtocol === 'RPC' ? 'border-black bg-black text-white' : 'border-black/10 bg-transparent text-black/40 hover:bg-black/5'}`}
-                        >
-                            <p className="text-[12px] font-black uppercase tracking-wider">JSON-RPC</p>
-                            <p className="text-[9px] font-mono opacity-50 block mt-1">RESTful standard</p>
-                        </button>
-                        <button
-                            onClick={() => setProtocol('WSS')}
-                            className={`p-4 rounded-2xl border text-center transition-all ${activeProtocol === 'WSS' ? 'border-black bg-black text-white' : 'border-black/10 bg-transparent text-black/40 hover:bg-black/5'}`}
-                        >
-                            <p className="text-[12px] font-black uppercase tracking-wider">WebSocket</p>
-                            <p className="text-[9px] font-mono opacity-50 block mt-1">Real-time Stream</p>
-                        </button>
-                    </div>
-                </Field>
-                
-                <div className="p-4 bg-black/5 border border-black/10 rounded-2xl mt-4">
-                    <p className="text-[10px] font-mono text-black/40">
-                        {activeProtocol === 'WSS' ? 'Active WSS Endpoint: ' : 'Active RPC Node: '} <br/>
-                        <span className="text-black/70 mt-1 block truncate">
-                            {activeProtocol === 'WSS' ? NETWORKS[activeNetwork as NetworkId].wss : NETWORKS[activeNetwork as NetworkId].rpc}
-                        </span>
-                    </p>
-                </div>
-            </div>
-        </ModalView>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────
-//  CREATE WALLET VIEW
-// ─────────────────────────────────────────────────────────────────
-function CreateWalletView({ onBack, onCreated }: any) {
-    const { createWallet, importWallet } = useWalletStore();
-    const [mode, setMode] = useState<'NEW' | 'IMPORT'>('NEW');
-    const [importKey, setImportKey] = useState('');
-
-    const handleCreate = () => {
-        createWallet();
-        onCreated();
-    };
-
-    const handleImport = () => {
-        if (importWallet(importKey.trim())) {
-            onCreated();
-        }
-    };
-
-    return (
-        <ModalView title={mode === 'NEW' ? 'Create Wallet' : 'Import Wallet'} subtitle="Secure Memory Keys" icon={<Key />} onBack={onBack}>
-            <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                    <button
-                        onClick={() => setMode('NEW')}
-                        className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${mode === 'NEW' ? 'bg-[var(--aztec-orchid)] text-white border-transparent' : 'bg-black/5 border-black/10 text-black/50 hover:border-black/20'}`}
-                    >
-                        <Plus size={14} className="mx-auto mb-1" />
-                        New Wallet
-                    </button>
-                    <button
-                        onClick={() => setMode('IMPORT')}
-                        className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${mode === 'IMPORT' ? 'bg-[var(--aztec-aqua)] text-white border-transparent' : 'bg-black/5 border-black/10 text-black/50 hover:border-black/20'}`}
-                    >
-                        <Key size={14} className="mx-auto mb-1" />
-                        Import Key
-                    </button>
-                </div>
-
-                {mode === 'NEW' ? (
-                    <>
-                        <div className="p-5 bg-black/[0.03] border border-black/10 rounded-2xl text-[10px] text-black/60 font-aztec-mono leading-relaxed">
-                            A high-entropy cryptographic wallet will be securely generated exclusively in this local browser memory environment. By proceeding, you assert complete cryptographic ownership over your keys.
+                <div className="w-full text-center">
+                    <button onClick={() => { navigator.clipboard.writeText(address); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="w-full group">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 block mb-3 group-hover:text-black transition-colors">Your Institutional Address</span>
+                        <div className="bg-black/5 p-6 rounded-2xl font-mono text-sm text-black flex items-center justify-between border border-transparent group-hover:border-black/10 transition-all">
+                            <span className="truncate max-w-[400px]">{address || 'VAULT_OFFLINE'}</span>
+                            {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} className="opacity-20" />}
                         </div>
-                        <motion.button
-                            whileTap={{ scale: 0.97 }}
-                            onClick={handleCreate}
-                            className="w-full py-5 rounded-2xl bg-black text-white font-black text-[11px] uppercase tracking-[0.4em] hover:brightness-110 transition-all flex items-center justify-center gap-3"
-                        >
-                            <Zap size={16} /> Generate Wallet
-                        </motion.button>
-                    </>
-                ) : (
-                    <>
-                        <Field label="Enter Private Key (Hex)">
-                            <textarea
-                                value={importKey}
-                                onChange={e => setImportKey(e.target.value)}
-                                placeholder="0x..."
-                                rows={3}
-                                className="w-full bg-black/[0.02] border border-black/10 p-4 rounded-2xl font-aztec-mono text-sm focus:border-[var(--aztec-aqua)] outline-none transition-all resize-none placeholder:text-black/20"
-                            />
-                        </Field>
-                        <motion.button
-                            whileTap={{ scale: 0.97 }}
-                            onClick={handleImport}
-                            disabled={!importKey.trim()}
-                            className="w-full py-5 rounded-2xl bg-[var(--aztec-aqua)] text-white font-black text-[11px] uppercase tracking-[0.4em] hover:brightness-110 transition-all disabled:opacity-40"
-                        >
-                            Import & Initialize
-                        </motion.button>
-                    </>
-                )}
+                    </button>
+                </div>
             </div>
         </ModalView>
     );
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  SHARED: MODAL WRAPPER
-// ─────────────────────────────────────────────────────────────────
-function ModalView({ title, subtitle, icon, onBack, children }: any) {
+function CreateWalletView({ onBack, onCreated }: any) {
+    const { createWallet } = useWalletStore();
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            className="flex flex-col relative z-20"
-        >
-            <div className="flex items-center gap-5 px-8 pt-12 pb-8 border-b border-black/5 shrink-0">
-                <button onClick={onBack} className="p-3 rounded-2xl bg-black/5 hover:bg-black/10 transition-all text-black">
-                    <X size={18} />
-                </button>
-                <div className="w-12 h-12 rounded-2xl bg-[var(--aztec-orchid)]/10 flex items-center justify-center text-[var(--aztec-orchid)]">
-                    {icon}
+        <ModalView title="Identity Generation" subtitle="Universal Cryptography" icon={<Plus />} onBack={onBack}>
+            <div className="text-center space-y-10 py-6">
+                <div className="w-24 h-24 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto">
+                    <Zap size={48} />
                 </div>
                 <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[var(--aztec-orchid)]/80">{subtitle}</p>
-                    <h2 className="text-2xl font-aztec-serif font-black uppercase tracking-tight text-black">{title}</h2>
+                    <h3 className="text-2xl font-black mb-3">Initialize Sovereign Vault</h3>
+                    <p className="text-black/40 text-sm leading-relaxed max-w-sm mx-auto font-medium">This protocol will generate a 256-bit entropy keypair. The private key never leaves this browser instance.</p>
                 </div>
+                <button onClick={() => { createWallet(); onCreated(); }} className="w-full py-6 rounded-2xl bg-black text-white font-black text-xs uppercase tracking-[0.5em]">
+                    EXECUTE GENERATION
+                </button>
             </div>
-            <div className="flex-1 p-8">
-                {children}
-            </div>
-        </motion.div>
+        </ModalView>
     );
 }
 
-// ─────────────────────────────────────────────────────────────────
-//  SHARED: ACTION BUTTON
-// ─────────────────────────────────────────────────────────────────
-function ActionBtn({ icon: Icon, label, onClick, disabled, color }: any) {
-    const colors: Record<string, string> = {
-        chartreuse: 'hover:bg-[var(--aztec-chartreuse)] hover:text-black hover:border-[var(--aztec-chartreuse)]',
-        orchid: 'hover:bg-[var(--aztec-orchid)] hover:text-white border-black/5',
-        aqua: 'hover:bg-[var(--aztec-aqua)] hover:text-white border-black/5',
-        black: 'hover:bg-black hover:text-white border-black/5 text-black',
-    };
+// Minimal helpers for other views
+function BuyView({ address, onBack }: any) {
+    const onrampUrl = `https://buy.moonpay.com/?walletAddress=${address}&colorCode=%23000000`;
     return (
-        <motion.button
-            whileHover={{ y: -3 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={onClick}
-            disabled={disabled}
-            className={`flex flex-col items-center justify-center p-6 bg-black/[0.015] border border-black/5 rounded-[2rem] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed group text-black/70 ${colors[color] || ''}`}
-        >
-            <Icon size={22} className="mb-2 opacity-70 group-hover:opacity-100" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-black">{label}</span>
-        </motion.button>
+        <ModalView title="Capital Inflow" subtitle="Fiat Bridge" icon={<CreditCard />} onBack={onBack}>
+            <div className="h-[500px] rounded-2xl overflow-hidden border border-black/10">
+                <iframe src={onrampUrl} className="w-full h-full" />
+            </div>
+        </ModalView>
     );
 }
 
-// SHARED: FORM FIELD
-function Field({ label, children }: any) {
+function ScanView({ onBack, onResult }: any) {
     return (
-        <div className="space-y-2">
-            <label className="text-[9px] font-black uppercase tracking-widest text-black/50">{label}</label>
+        <ModalView title="QR Recon" subtitle="Optical Scan" icon={<Scan />} onBack={onBack}>
+             <div className="p-12 bg-black/5 rounded-[2rem] text-center border-2 border-dashed border-black/10">
+                <Scan size={48} className="mx-auto mb-6 opacity-20" />
+                <p className="text-xs font-bold text-black/30 uppercase tracking-widest">Awaiting hardware interface...</p>
+                <input type="text" placeholder="Or paste address here" onChange={e => onResult(e.target.value)} className="mt-8 w-full bg-white border border-black/10 p-4 rounded-xl font-mono text-sm outline-none" />
+             </div>
+        </ModalView>
+    );
+}
+
+function NetworkView({ onBack }: any) {
+    const { activeNetwork, setNetwork } = useWalletStore();
+    return (
+        <ModalView title="Node Parameters" subtitle="Infrastructure" icon={<Globe />} onBack={onBack}>
+            <div className="grid grid-cols-1 gap-3">
+                {Object.entries(NETWORKS).map(([id, data]) => (
+                    <button key={id} onClick={() => setNetwork(id as NetworkId)} className={`flex items-center justify-between p-6 rounded-2xl border transition-all ${activeNetwork === id ? 'bg-black text-white border-transparent' : 'bg-white text-black border-black/10 hover:bg-black/5'}`}>
+                        <div className="flex items-center gap-4">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: data.color }} />
+                            <span className="font-black uppercase tracking-widest text-xs">{data.name}</span>
+                        </div>
+                        <span className="text-[10px] font-mono opacity-40">{data.currency}</span>
+                    </button>
+                ))}
+            </div>
+        </ModalView>
+    );
+}
+
+function FormField({ label, children }: any) {
+    return (
+        <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30 block ml-1">{label}</label>
             {children}
         </div>
     );
 }
+

@@ -186,9 +186,12 @@ export interface VIPStoreState {
 
 function parseUsd(raw: string): number {
     if (!raw) return 0;
-    const n = parseFloat(raw.replace(/[$KM,]/g, ''));
-    if (raw.includes('M')) return n * 1_000_000;
-    if (raw.includes('K')) return n * 1_000;
+    // Remove symbols and handle localized number formats (commas/spaces)
+    const sanitized = raw.replace(/[^0-9.MK]/gi, '').replace(/,/g, '');
+    const n = parseFloat(sanitized);
+    if (isNaN(n)) return 0;
+    if (raw.toUpperCase().includes('M')) return n * 1_000_000;
+    if (raw.toUpperCase().includes('K')) return n * 1_000;
     return n;
 }
 
@@ -284,7 +287,9 @@ export const useVIPStore = create<VIPStoreState>()(
                     const tokenCandles = [...(newCandleFeeds[p] || [])];
                     let candle = tokenCandles.find(c => c.ts === minuteTs);
                     
-                    const price = e.usdNum / Math.max(1, parseFloat(e.amount) || 1); 
+                    const amountStr = (e.amount || "1").toString().replace(/,/g, '');
+                    const amountNum = Math.max(0.00000001, parseFloat(amountStr) || 1);
+                    const price = e.usdNum / amountNum;
                     // Note: This is an approximation of unit price per event
 
                     if (!candle) {
@@ -337,7 +342,7 @@ export const useVIPStore = create<VIPStoreState>()(
         setMempool: (mempool) => set({ mempool, lastMempoolUpdate: Date.now() }),
         setFundingRates: (fundingRates) => set({ fundingRates, lastFundingUpdate: Date.now() }),
         setLiquidations: (liquidations) => set({ liquidations, lastLiqUpdate: Date.now() }),
-        setSatoshiWallets: (satoshiWhlets) => set({ satoshiWallets: satoshiWhlets, lastSatoshiUpdate: Date.now() }),
+        setSatoshiWallets: (satoshiWallets) => set({ satoshiWallets, lastSatoshiUpdate: Date.now() }),
         setVolumeData: (volumeData) => set({ volumeData, lastVolumeUpdate: Date.now() }),
         setEthPrice: (ethPrice) => set({ ethPrice }),
         setBtcPrice: (btcPrice) => set({ btcPrice }),

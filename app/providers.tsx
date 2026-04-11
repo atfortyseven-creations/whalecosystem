@@ -82,6 +82,7 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
             <MarketStreamProvider>
               <WhaleStreamProvider>
                 <AlphaToaster />
+                <ShortcutVisualizer />
                 <VIPStoreBootstrap />
                 {children}
               </WhaleStreamProvider>

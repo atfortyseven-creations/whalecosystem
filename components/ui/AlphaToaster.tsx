@@ -3,109 +3,137 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVIPStore, WhaleEvent } from '@/lib/vip-store';
-import { ShieldAlert, Zap, TrendingUp, TrendingDown, ExternalLink } from 'lucide-react';
+import { ExternalLink, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
 /**
- * AlphaToaster
+ * AlphaToaster 
  * 
- * High-fidelity institutional alert system.
- * Monitors the VIP store for "MEGA" level whale transactions ($10M+)
- * and displays a premium Aztecs-style notification.
+ * Minimalist, high-fidelity notification system.
+ * Designed for absolute perfection and elegance.
  */
 export function AlphaToaster() {
     const whaleEvents = useVIPStore(state => state.whaleEvents);
     const [activeAlert, setActiveAlert] = useState<WhaleEvent | null>(null);
+
+    // Fixed conversion rate (approximate for display perfection)
+    const USD_TO_EUR = 0.93;
 
     useEffect(() => {
         if (whaleEvents.length > 0) {
             const latest = whaleEvents[0];
             // Only trigger for MEGA whales (> $10M) or high confidence alpha moves
             if (latest.tier === 'MEGA' || latest.confidence > 98) {
-                // Prevent duplicate alerts for the same event
                 if (activeAlert?.id !== latest.id) {
                     setActiveAlert(latest);
-                    const timer = setTimeout(() => setActiveAlert(null), 8000);
+                    const timer = setTimeout(() => setActiveAlert(null), 10000);
                     return () => clearTimeout(timer);
                 }
             }
         }
     }, [whaleEvents, activeAlert?.id]);
 
+    const formatEUR = (usd: number) => {
+        const eur = usd * USD_TO_EUR;
+        if (eur >= 1_000_000) return `${(eur / 1_000_000).toFixed(2)}M€`;
+        if (eur >= 1000) return `${(eur / 1000).toFixed(1)}K€`;
+        return `${eur.toFixed(2)}€`;
+    };
+
+    const isBuy = (action: string) => 
+        action.toUpperCase().includes('BUY') || 
+        action.toUpperCase().includes('COMPRA');
+
+    // Stratospheric Sanitization: Replace tacky backend labels with institutional terminology
+    const sanitizeLabel = (label: string) => {
+        const tacky = ["ALPHA CLEARANCE", "LIVE ALERT", "CLEARANCE ALERT"];
+        const upperLabel = label.toUpperCase();
+        if (tacky.some(t => upperLabel.includes(t))) return "Institutional Signal";
+        return label;
+    };
+
     return (
-        <div className="fixed bottom-12 right-6 z-[100] pointer-events-none flex flex-col gap-3">
-            <AnimatePresence>
+        <div className="fixed top-8 right-8 z-[100] pointer-events-none flex flex-col items-end">
+            <AnimatePresence mode="wait">
                 {activeAlert && (
                     <motion.div
-                        initial={{ opacity: 0, x: 100, scale: 0.9, filter: 'blur(10px)' }}
-                        animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, x: 20, scale: 0.95, filter: 'blur(5px)' }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        className="pointer-events-auto group"
+                        key={activeAlert.id}
+                        initial={{ opacity: 0, scale: 0.98, y: -20, filter: 'blur(12px)' }}
+                        animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, scale: 0.95, y: -10, filter: 'blur(8px)' }}
+                        transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                        className="pointer-events-auto"
                     >
-                        <div className="relative w-80 bg-white/95 dark:bg-[#050505]/95 backdrop-blur-xl border border-black/10 dark:border-[#00FF55]/20 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(0,255,85,0.1)]">
+                        <div className="relative group overflow-hidden bg-white/5 dark:bg-black/60 backdrop-blur-3xl border border-white/10 dark:border-white/5 rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col min-w-[340px]">
                             
-                            {/* Accent Glow */}
-                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#00FF55] to-transparent animate-pulse" />
+                            {/* Subtle Ambient Glow */}
+                            <div className={`absolute -top-[50%] -right-[50%] w-[100%] h-[100%] blur-[80px] rounded-full opacity-30 pointer-events-none transition-colors duration-700 ${
+                                isBuy(activeAlert.action) ? 'bg-emerald-500/10' : 'bg-rose-500/10'
+                            }`} />
                             
-                            <div className="p-4">
-                                <div className="flex items-center justify-between mb-3">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-1">
+                                            Sovereign Signal
+                                        </span>
+                                        <h3 className="text-[16px] font-bold text-white tracking-tight">
+                                            {sanitizeLabel(activeAlert.label)}
+                                        </h3>
+                                    </div>
+                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${
+                                        isBuy(activeAlert.action) 
+                                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                                            : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                                    }`}>
+                                        {isBuy(activeAlert.action) ? <ArrowUpRight size={12} /> : <ArrowDownLeft size={12} />}
+                                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">
+                                            {isBuy(activeAlert.action) ? 'COMPRA' : 'VENTA'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-10 mb-6">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[9px] font-medium uppercase tracking-widest text-white/20">Valoración</span>
+                                        <span className="text-[17px] font-mono font-black text-white tracking-wide">
+                                            {formatEUR(activeAlert.usdNum)}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col gap-1 items-end text-right">
+                                        <span className="text-[9px] font-medium uppercase tracking-widest text-white/20">Asset</span>
+                                        <span className="text-[14px] font-mono font-bold text-white tracking-wide truncate max-w-[120px]">
+                                            {Number(activeAlert.amount).toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-[11px] text-white/50">{activeAlert.token}</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between pt-5 border-t border-white/5">
+                                    <a 
+                                        href={`https://etherscan.io/tx/${activeAlert.hash}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group/link flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors duration-300"
+                                    >
+                                        VERIFY ON CIPHER
+                                        <ExternalLink size={11} className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform duration-300" />
+                                    </a>
                                     <div className="flex items-center gap-2">
-                                        <div className="p-1.5 bg-[#00FF55]/10 border border-[#00FF55]/30 rounded-lg">
-                                            <ShieldAlert size={14} className="text-[#00FF55]" />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00FF55]">
-                                            Alpha Clearance Alert
+                                        <span className="text-[9px] font-mono text-white/20 uppercase tracking-tighter">
+                                            {activeAlert.hash.slice(0, 6)}...{activeAlert.hash.slice(-4)}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-1 text-[8px] font-mono text-[#888888] uppercase tracking-widest">
-                                        <Zap size={10} className="text-[#00FF55] animate-pulse" /> Live
-                                    </div>
                                 </div>
-
-                                <div className="space-y-2.5">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[14px] font-black tracking-tight text-black dark:text-white">
-                                            {activeAlert.label}
-                                        </span>
-                                        <div className="flex items-center gap-1">
-                                            {activeAlert.action === 'SELL' ? (
-                                                <TrendingDown size={14} className="text-[#FF3B30]" />
-                                            ) : (
-                                                <TrendingUp size={14} className="text-[#00C076]" />
-                                            )}
-                                            <span className={`text-[12px] font-black ${activeAlert.action === 'SELL' ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}>
-                                                {activeAlert.usdValue} {activeAlert.action}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between text-[10px] font-mono border-t border-black/5 dark:border-white/5 pt-2">
-                                        <div className="flex flex-col">
-                                            <span className="text-[#888888] uppercase text-[7px] mb-0.5">Asset</span>
-                                            <span className="text-black dark:text-gray-300 font-bold">{activeAlert.amount} {activeAlert.token}</span>
-                                        </div>
-                                        <div className="flex flex-col items-end">
-                                            <span className="text-[#888888] uppercase text-[7px] mb-0.5">Validation</span>
-                                            <span className="text-[#00C076] font-bold">{activeAlert.confidence}% Confirmed</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button 
-                                    onClick={() => window.open(`https://etherscan.io/tx/${activeAlert.hash}`, '_blank')}
-                                    className="w-full mt-4 flex items-center justify-center gap-2 py-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/5 dark:border-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all text-[#888888] hover:text-black dark:hover:text-white"
-                                >
-                                    Verify on Cipher <ExternalLink size={10} />
-                                </button>
                             </div>
 
-                            {/* Decorative Grid Progress Bar */}
-                            <motion.div 
-                                initial={{ width: "100%" }}
-                                animate={{ width: "0%" }}
-                                transition={{ duration: 8, ease: "linear" }}
-                                className="h-0.5 bg-[#00FF55]/40"
-                            />
+                            {/* Minimal Progress Bar */}
+                            <div className="h-[2px] w-full bg-white/5">
+                                <motion.div 
+                                    initial={{ width: "100%" }}
+                                    animate={{ width: "0%" }}
+                                    transition={{ duration: 10, ease: "linear" }}
+                                    className={`h-full ${isBuy(activeAlert.action) ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`}
+                                />
+                            </div>
                         </div>
                     </motion.div>
                 )}
@@ -113,3 +141,4 @@ export function AlphaToaster() {
         </div>
     );
 }
+
