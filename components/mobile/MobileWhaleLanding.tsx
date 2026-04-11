@@ -694,7 +694,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
       }
 
       const signature = await signMessageAsync({
-          message: `WHALE_HANDSHAKE:${token}`
+          message: `RE-CONNECT-WHALE-SESSION-${token}`
       });
 
       const res = await fetch('/api/auth/qr-sync', {

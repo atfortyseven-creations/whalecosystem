@@ -332,7 +332,7 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         fetch('/api/wallet/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ walletAddress: address, signature }),
+          body: JSON.stringify({ walletAddress: address, signature, message }),
         }).catch(() => {});
 
         onSigned();

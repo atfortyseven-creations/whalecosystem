@@ -50,7 +50,7 @@ export function ConnectWalletModal() {
                     setView('selection');
                 }
             } catch (e) {}
-        }, 2000);
+        }, 850);
         return () => clearInterval(interval);
     }, [isPolling, qrSession]);
 
