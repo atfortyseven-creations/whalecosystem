@@ -6,24 +6,13 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, ExternalLink, Shield, ArrowRight, Loader2, Twitter } from "lucide-react";
 import dynamic from "next/dynamic";
-import { coinbaseWallet } from "wagmi/connectors";
+import { coinbaseWallet, injected } from "wagmi/connectors";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { CelestialMeshBackground } from "./CelestialMeshBackground";
 
 // QR code renderer using qrcode.react
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
 
-// ── Background grid ─────────────────────────────────────────────────────────────
-function Grid() {
-  return (
-    <div
-      className="fixed inset-0 pointer-events-none"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.03) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,0,0,0.03) 1.5px, transparent 1.5px)`,
-        backgroundSize: "64px 64px", // Increased size to 'zoom out' and reveal the pattern
-        opacity: 0.8,
-      }}
-    />
-  );
-}
 
 // ── Wallet option button ────────────────────────────────────────────────────────
 function WalletButton({
@@ -166,8 +155,8 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-safe min-h-screen flex flex-col bg-[#FAF9F6] dark:bg-[#080808] text-black dark:text-white">
-      <Grid />
+    <div className="min-h-safe min-h-screen flex flex-col bg-white text-black dark:text-white relative">
+      <CelestialMeshBackground />
 
       {/* ── NAV ── */}
       <header className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-black/[0.05] dark:border-white/[0.05] bg-white/70 dark:bg-black/60 backdrop-blur-sm">

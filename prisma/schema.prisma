@@ -244,6 +244,7 @@ model OnChainEntity {
   totalVolumeUSD  Float    @default(0.0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  lastActive      DateTime @default(now())
   
   labels          EntityLabel[]
 }
@@ -444,6 +445,9 @@ model Transaction {
   fromAddress     String
   toAddress       String
   timestamp       DateTime @default(now())
+  authUserId      String?
+
+  @@index([authUserId])
 }
 
 model SocialRecovery {

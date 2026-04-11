@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 import { CinematicWhaleLogo } from './CinematicWhaleLogo';
 import { LiveTerminalWidgets } from './LiveTerminalWidgets';
 import { WhaleOfflineGame } from './WhaleOfflineGame';
+import { CelestialMeshBackground } from '../landing/CelestialMeshBackground';
 
 // ─── DEEP LINK HELPERS ───────────────────────────────────────────────────────
 
@@ -81,44 +82,31 @@ function detectWalletBrowser(): 'metamask' | 'trust' | 'coinbase' | 'rainbow' | 
 
 // ─── BACKGROUND PATTERN ──────────────────────────────────────────────────────
 
-const AnimatedPattern = React.memo(function AnimatedPattern() {
+const MobileSnapStyles = React.memo(function MobileSnapStyles() {
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: `
-        .msv-hide-scrollbar::-webkit-scrollbar { display: none; }
-        .msv-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .msv-snap-container {
-          scroll-snap-type: y mandatory;
-          overflow-y: scroll;
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-          -webkit-overflow-scrolling: touch;
-          overscroll-behavior: contain;
-        }
-        .msv-snap-container::-webkit-scrollbar { display: none; }
-        .msv-snap-page {
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
-          contain: layout style paint;
-        }
-        @keyframes msv-fade-in-down {
-          from { opacity: 0; transform: translateY(-8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
-      ` }} />
-      {/* Zero-Trust Background adhering to light/dark system */}
-      <div 
-         className="fixed inset-0 z-0 opacity-70 pointer-events-none transition-colors duration-300"
-         style={{
-            backgroundImage: "url('/patron-cosmico-4k.png')",
-            backgroundRepeat: "repeat",
-            backgroundSize: "auto",
-            backgroundPosition: "top left",
-         }}
-      />
-      <div className="fixed inset-0 z-1 pointer-events-none bg-white/40 dark:bg-[#050505]/60 transition-colors duration-300" />
-    </>
+    <style dangerouslySetInnerHTML={{ __html: `
+      .msv-hide-scrollbar::-webkit-scrollbar { display: none; }
+      .msv-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .msv-snap-container {
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+      .msv-snap-container::-webkit-scrollbar { display: none; }
+      .msv-snap-page {
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        contain: layout style paint;
+      }
+      @keyframes msv-fade-in-down {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-down { animation: msv-fade-in-down 0.25s ease forwards; }
+    ` }} />
   );
 });
 
@@ -850,7 +838,8 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
 
   return (
     <div className="w-full h-screen min-h-screen bg-transparent overflow-hidden relative">
-      <AnimatedPattern />
+      <MobileSnapStyles />
+      <CelestialMeshBackground />
       <WalletPickerModal isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
 
       {/* 4-page snap container */}

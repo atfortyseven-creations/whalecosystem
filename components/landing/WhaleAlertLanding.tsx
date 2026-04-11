@@ -6,6 +6,8 @@ import { Terminal, Database, Shield, Binary, Activity, Eye, Zap, Lock, Globe, Ar
 import { useRouter } from "next/navigation";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useUIStore } from "@/lib/store/ui-store";
+import { useLenis } from "@/hooks/useLenis";
+import { CelestialMeshBackground } from "./CelestialMeshBackground";
 import { Footer } from "@/components/layout/Footer";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
@@ -548,24 +550,9 @@ export function WhaleAlertLanding() {
   return (
     <div ref={containerRef} className="relative w-full overflow-x-hidden text-black dark:text-white font-sans transition-colors duration-300">
         
-        {/* HARDWARE-ACCELERATED INSTITUTIONAL GRID LAYER */}
-        <div 
-          className="fixed inset-0 pointer-events-none -z-20"
-          style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.03) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,0,0,0.03) 1.5px, transparent 1.5px)`,
-            backgroundSize: '64px 64px', // PC Zone scale - 'zoomed out' feel
-            transform: "translateZ(0)",
-            willChange: "transform",
-            opacity: 0.85,
-          }}
-        />
+        {/* HIGH-FIDELITY 240HZ CELESTIAL BACKGROUND */}
+        <CelestialMeshBackground />
         
-        {/* Subtle ukiyo-e watermark for texture depth */}
-        <div 
-          className="fixed inset-0 pointer-events-none -z-15 opacity-[0.03] dark:opacity-[0.05] bg-[url('/patron-cosmico-4k.png')] bg-repeat"
-          style={{ backgroundSize: '200px 200px' }}
-        />
-
         {/* Subtle overlay to guarantee text readability in light and dark mode WITHOUT blurring the pattern */}
         <div className="fixed inset-0 pointer-events-none -z-10 bg-white/40 dark:bg-black/40 transition-colors duration-300" />
         

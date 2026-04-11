@@ -4,7 +4,7 @@ import React, { memo, useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useVIPStore, WhaleEvent } from '@/lib/vip-store';
-import { Activity, ArrowRight, Zap } from 'lucide-react';
+import { Activity, ArrowRight, Zap, ChevronUp } from 'lucide-react';
 
 // Dynamic imports to avoid SSR crashes (React Error #130)
 const FixedSizeList = dynamic<any>(
