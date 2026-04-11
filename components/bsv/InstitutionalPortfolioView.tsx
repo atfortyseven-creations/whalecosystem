@@ -216,14 +216,6 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
     );
 }
 
-            <footer className="px-10 py-10 mt-auto border-t border-black/5 bg-white/50 backdrop-blur-xl flex flex-wrap justify-center gap-10 items-center opacity-30 text-[10px] font-black uppercase tracking-[0.2em] text-black">
-                <span className="flex items-center gap-2"><Globe size={14} /> Multi-Chain Protocol</span>
-                <span className="flex items-center gap-2"><Lock size={14} /> AES-256 Hardened</span>
-                <span className="flex items-center gap-2"><Cpu size={14} /> Client-Side Execution</span>
-            </footer>
-        </motion.div>
-    );
-}
 
 function ActionCard({ icon: Icon, label, sub, onClick, disabled, highlighted }: any) {
     return (
