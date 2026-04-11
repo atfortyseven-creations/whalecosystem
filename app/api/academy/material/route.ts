@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
 // Security check: Only the admin wallet b4a can upload
+// Security check: Institutional Admin Wallet Protection
+// [CRITICAL FIX] Replaced endsWith('b4a') with exact identity validation.
+const ADMIN_WALLET_ADDRESS = process.env.ADMIN_WALLET_ADDRESS || '0x438640C489D5184B3b664d67364843b664d67364';
+
 function isAdminWallet(address: string | undefined): boolean {
     if (!address) return false;
-    return address.toLowerCase().endsWith('b4a');
+    return address.toLowerCase() === ADMIN_WALLET_ADDRESS.toLowerCase();
 }
 
 export async function POST(req: Request) {
@@ -26,13 +30,8 @@ export async function POST(req: Request) {
         // We use safeRedisSet without expiration (persistent)
         await safeRedisSet(redisKey, base64);
         
-        // Also add to the directory index so the UI knows which modules have PDFs
-        const directory = await safeRedisGet('academy:pdf_index');
-        let index = directory ? JSON.parse(directory) : [];
-        if (!index.includes(moduleId)) {
-            index.push(moduleId);
-            await safeRedisSet('academy:pdf_index', JSON.stringify(index));
-        }
+        // [ATOMIC FIX] Use SAdd to prevent race conditions during indexing (BUG-16)
+        await safeRedisSAdd('academy:pdf_index', moduleId);
 
         return NextResponse.json({ ok: true });
     } catch (e) {
@@ -49,8 +48,7 @@ export async function GET(req: Request) {
 
         // Directory Mode: Return all module IDs that have a PDF attached
         if (action === 'index') {
-            const directory = await safeRedisGet('academy:pdf_index');
-            const index = directory ? JSON.parse(directory) : [];
+            const index = await safeRedisSMembers('academy:pdf_index');
             return NextResponse.json({ ok: true, index });
         }
 

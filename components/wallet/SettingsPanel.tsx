@@ -2,21 +2,20 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DollarSign, Globe, Smartphone, Bell, Shield, Moon, ChevronRight, Key, ShieldCheck } from 'lucide-react';
+import { DollarSign, Globe, Smartphone, Bell, Shield, Moon, ChevronRight, Key, ShieldCheck, Loader2 } from 'lucide-react';
 import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions';
 import BiometricGuard from '@/components/wallet/BiometricGuard';
 import { startRegistration } from '@simplewebauthn/browser';
 import { toast } from 'sonner';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 export default function SettingsPanel() {
+  const { address: authUserId, isConnected } = useSovereignAccount();
   const [currency, setCurrency] = useState('USD');
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('Light');
   const [showSecret, setShowSecret] = useState(false);
   const [isRegisteringPasskey, setIsRegisteringPasskey] = useState(false);
-
-  // Hardcoded for now, real app should get from auth context
-  const authUserId = "cm6lcm2b600003b6m7k8j9l0n"; 
 
   const registerPasskey = async () => {
     setIsRegisteringPasskey(true);

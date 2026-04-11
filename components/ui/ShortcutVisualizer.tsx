@@ -2,17 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useWalletStore } from '@/lib/store/wallet-store';
-import { Key } from 'lucide-react';
 
 /**
  * ShortcutVisualizer
- * 
- * High-fidelity visual indicator for global cryptographic shortcuts.
- * Listens for Shift + Alt + W to trigger wallet generation.
+ *
+ * Pure visual indicator only — shows the Shift+Alt+W key combo on screen
+ * when any of those keys are pressed. Does NOT trigger wallet creation.
+ *
+ * Wallet creation is handled EXCLUSIVELY by the Portfolio page,
+ * ensuring the shortcut only fires in the correct context.
  */
 export function ShortcutVisualizer() {
-    const { createWallet } = useWalletStore();
     const [keys, setKeys] = useState({
         shift: false,
         alt: false,
@@ -25,12 +25,7 @@ export function ShortcutVisualizer() {
             if (e.shiftKey) setKeys(prev => ({ ...prev, shift: true }));
             if (e.altKey) setKeys(prev => ({ ...prev, alt: true }));
             if (key === 'w') setKeys(prev => ({ ...prev, w: true }));
-
-            // Trigger combo
-            if (e.shiftKey && e.altKey && key === 'w') {
-                e.preventDefault();
-                createWallet();
-            }
+            // NO action triggered here — only the /portfolio page handles the combo.
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
@@ -47,7 +42,7 @@ export function ShortcutVisualizer() {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [createWallet]);
+    }, []);
 
     const isAnyPressed = keys.shift || keys.alt || keys.w;
 

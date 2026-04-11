@@ -3,20 +3,25 @@
 import { useEffect, useState } from "react";
 
 /**
- * WavePatternOverlay — patron-cosmico-4k.png
+ * WavePatternOverlay — Dual Wallpaper System
  *
- * RENDERING CONTRACT:
- * - position: fixed           → stays on GPU compositor layer, never re-paints on scroll
- * - translateZ(0)             → forces own GPU layer (no shared layer blending)
- * - backfaceVisibility:hidden → prevents Safari from toggling paint on layer flip
- * - backgroundAttachment: scroll (NOT fixed!) → 'fixed' inside a fixed element causes
- *   iOS Safari remaps to 'scroll' anyway + causes massive composite invalidations.
- *   Using 'scroll' on a fixed element = same visual result, zero jank.
- * - will-change: auto         → do NOT set will-change:transform — it would force
- *   re-compositing EVERY frame even when nothing changes.
- * - NO blur() filter          → blur on a fixed element forces rasterize + composite
- *   every frame (60 * blurPasses * pixels) = #1 cause of iPad lag. Removed entirely.
- * - pointer-events: none      → never blocks touch / scroll events
+ * Layer 1 — patron-cosmico-4k.png (top):
+ *   Seamless abstract circular wave pattern as full-viewport texture.
+ *   Fixed, GPU compositor layer, zero scroll re-paint.
+ *   Dark: inverted subtle screen blend. Light: ink multiply.
+ *
+ * Layer 2 — olas-hokusai-4k.png (bottom):
+ *   The Hokusai great wave anchored to the bottom of every page.
+ *   Width: 100%, height: auto. Covers the entire bottom edge.
+ *   Very low opacity — purely decorative, never competing with content.
+ *
+ * RENDERING CONTRACT (both layers):
+ *  - position: fixed          → GPU compositor layer, never re-paints on scroll
+ *  - translateZ(0)            → own GPU layer
+ *  - backfaceVisibility:hidden → prevents Safari layer-flip toggle
+ *  - backgroundAttachment: scroll (NOT fixed!) → 'fixed' inside fixed = iOS jank
+ *  - NO blur() filter         → #1 cause of iPad/iPhone scroll lag. Removed.
+ *  - pointer-events: none     → never blocks touch/scroll events
  */
 export function WavePatternOverlay() {
   const [isLight, setIsLight] = useState(false);
@@ -30,33 +35,60 @@ export function WavePatternOverlay() {
     return () => obs.disconnect();
   }, []);
 
+  const cosmicoOpacity = isLight ? 0.065 : 0.028;
+  const hokusaiOpacity = isLight ? 0.10 : 0.055;
+
   return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: "none",
-        // GPU compositor layer — own layer, never invalidated by scroll
-        transform: "translateZ(0)",
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        // NO will-change — avoids unnecessary rasterize cycles
-        // patron-cosmico-4k.png served via /api/checkpoint-image CDN route
-        backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
-        backgroundRepeat: "repeat",
-        backgroundSize: "280px auto",
-        // 'scroll' on a fixed div = correct visual on ALL platforms, zero jank
-        backgroundAttachment: "scroll",
-        // Light mode: visible subtle ink texture
-        // Dark mode: inverted to white, screen blend, very faint
-        opacity: isLight ? 0.072 : 0.035,
-        mixBlendMode: isLight ? "multiply" : "screen",
-        filter: isLight ? "none" : "invert(1) hue-rotate(180deg)",
-        // Pixel-perfect rendering at all DPR scales
-        imageRendering: "auto",
-      }}
-    />
+    <>
+      {/* ── Layer 1: Patron Cosmico — seamless tiled texture ──────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden" as any,
+          backgroundImage: "url('/patron-cosmico-4k.png')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "260px auto",
+          backgroundAttachment: "scroll",
+          opacity: cosmicoOpacity,
+          mixBlendMode: (isLight ? "multiply" : "screen") as any,
+          filter: isLight ? "none" : "invert(1) hue-rotate(180deg)",
+          imageRendering: "auto",
+        }}
+      />
+
+      {/* ── Layer 2: Olas Hokusai — bottom-anchored wave strip ────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden" as any,
+          height: "clamp(120px, 18vw, 280px)",
+          backgroundImage: "url('/olas-hokusai-4k.png')",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "bottom center",
+          backgroundSize: "100% auto",
+          backgroundAttachment: "scroll",
+          opacity: hokusaiOpacity,
+          mixBlendMode: (isLight ? "multiply" : "screen") as any,
+          filter: isLight ? "none" : "invert(1) hue-rotate(200deg)",
+          // Subtle fade toward the top of the strip to blend into content
+          maskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+    </>
   );
 }

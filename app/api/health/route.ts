@@ -22,8 +22,10 @@ export async function GET() {
             const solanaHb = await redisClient.get(`hb:worker:solana:${replicaId}`);
             
             const now = Date.now();
-            meshAlive = meshHb && (now - parseInt(meshHb)) < 35000;
-            solanaAlive = solanaHb && (now - parseInt(solanaHb)) < 35000;
+            // parseInt(null) === NaN — NaN < 35000 is always false → always degraded.
+            // Use explicit null guard before parsing.
+            meshAlive = !!meshHb && (now - parseInt(meshHb, 10)) < 35000;
+            solanaAlive = !!solanaHb && (now - parseInt(solanaHb, 10)) < 35000;
         }
 
         return NextResponse.json({ 

@@ -103,32 +103,36 @@ const metadata = {
     icons: [`${APP_URL}/official-whale-legendary.png`],
 }
 
-// Singleton guard — createAppKit must only be called once per page load.
-// Calling it twice (e.g. due to HMR or context remount) throws an internal error
-// that manifests as the "Algo salió mal" crash screen on mobile browsers.
+// ── CRITICAL: createAppKit must be called at module level (not inside window check).
+// Reown AppKit hooks (useAppKit, useAppKitAccount, etc.) are used during SSR in
+// Next.js server components. The hooks throw "Please call createAppKit before
+// using useAppKit hook" when this function hasn't been called before the hook runs.
+// Solution: Call createAppKit unconditionally at module import time with a singleton
+// guard. The WagmiAdapter's ssr:true handles the server-side hydration safely.
 let appKitInitialized = false;
 
-if (typeof window !== 'undefined' && !appKitInitialized) {
-    appKitInitialized = true;
-    try {
+try {
+    if (!appKitInitialized) {
+        appKitInitialized = true;
         createAppKit({
             adapters: [wagmiAdapter],
             networks,
             projectId,
             metadata,
             features: {
-                analytics: true,
-                email: true, 
-                socials: ['google', 'x', 'github', 'discord', 'apple'],
+                analytics: false,
+                email: false,
+                socials: [],
                 swaps: false,
                 onramp: false,
             },
-            themeMode: 'light',
+            themeMode: 'dark',
             themeVariables: {
-                '--w3m-accent': '#1D1A10',
-                '--w3m-color-mix': '#F2ECD8',
+                '--w3m-accent': '#ffffff',
+                '--w3m-color-mix': '#050505',
                 '--w3m-border-radius-master': '2rem',
-                '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif'
+                '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif',
+                '--w3m-z-index': '9999',
             },
             enableInjected: true,
             enableEIP6963: true,
@@ -144,9 +148,9 @@ if (typeof window !== 'undefined' && !appKitInitialized) {
             allWallets: 'SHOW',
             customWallets: []
         });
-    } catch (e) {
-        console.warn('[AppKit] Initialization skipped (already initialized):', e);
     }
+} catch (e) {
+    console.warn('[AppKit] Initialization skipped (already initialized):', e);
 }
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {

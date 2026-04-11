@@ -474,7 +474,7 @@ export function WatchlistTable() {
                                                                 {search.length >= 2 ? (
                                                                     <button onClick={() => {
                                                                         const newItem = { ...t, type: 'TOKEN', marketData: md };
-                                                                        saveToLocal(newItem);
+                                                                        saveToLocal(newItem, address);
                                                                         setData(prev => ({ ...prev, tokens: [...prev.tokens, newItem] }));
                                                                         setSearch('');
                                                                         toast.success(`${t.symbol} saved to watchlist`);

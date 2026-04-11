@@ -244,6 +244,37 @@ export async function safeRedisSet(key: string, value: string, ...args: any[]): 
     }
 }
 
+export async function safeRedisSAdd(key: string, member: string): Promise<void> {
+    try {
+        if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
+            const current = memoryStore.get(key) || [];
+            if (!current.includes(member)) {
+                memoryStore.set(key, [...current, member]);
+            }
+            return;
+        }
+        await Promise.race([
+            redisClient.sadd(key, member),
+            new Promise<void>((resolve) => setTimeout(resolve, 500))
+        ]);
+    } catch {}
+}
+
+export async function safeRedisSMembers(key: string): Promise<string[]> {
+    try {
+        if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
+            return memoryStore.get(key) || [];
+        }
+        const members = await Promise.race([
+            redisClient.smembers(key),
+            new Promise<string[]>((resolve) => setTimeout(() => resolve([]), 500))
+        ]);
+        return Array.isArray(members) ? members : [];
+    } catch {
+        return [];
+    }
+}
+
 /**
  * Health check — use in /api/health-check to verify Redis connectivity
  */

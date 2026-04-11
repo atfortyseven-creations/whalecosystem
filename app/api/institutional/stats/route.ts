@@ -1,34 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import Redis from 'ioredis';
-
-// Sanitize and reconstruct REDIS_URL for high-performance direct access
-function getSanitizedRedisUrl(): string {
-    const rawUrl = (process.env.REDIS_URL || '').toString().trim().replace(/^["']|["']$/g, '');
-    if (rawUrl.startsWith('redis://') || rawUrl.startsWith('rediss://')) return rawUrl;
-    
-    const host = process.env.REDISHOST || process.env.REDIS_HOST || process.env.RAILWAY_REDIS_HOST;
-    const port = process.env.REDISPORT || process.env.REDIS_PORT || '6379';
-    const user = process.env.REDISUSER || process.env.REDIS_USER || 'default';
-    const pass = process.env.REDISPASSWORD || process.env.REDIS_PASSWORD || rawUrl;
-    
-    if (host) {
-        const protocol = (process.env.REDIS_TLS === 'true' || port === '6380' || rawUrl.includes('rediss')) ? 'rediss' : 'redis';
-        const auth = pass ? `${user}:${pass}@` : '';
-        return `${protocol}://${auth}${host}:${port}`;
-    }
-    return '';
-}
-
-const REDIS_URL = getSanitizedRedisUrl();
-const redis = REDIS_URL ? new Redis(REDIS_URL, { family: 4 }) : null;
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
+import { randomUUID } from 'crypto';
 
 export async function GET() {
     try {
-        if (redis) {
-            const cache = await redis.get('institutional:stats');
-            if (cache) return NextResponse.json(JSON.parse(cache));
-        }
+        const cached = await safeRedisGet('institutional:stats');
+        if (cached) return NextResponse.json(JSON.parse(cached));
 
         // Aggregate institutional metrics
         const [volumeAgg, whaleCount, topPairs] = await prisma.$transaction([
@@ -61,13 +39,11 @@ export async function GET() {
         };
 
 
-        if (redis) {
-            await redis.set('institutional:stats', JSON.stringify(stats), 'EX', 15);
-        }
+        await safeRedisSet('institutional:stats', JSON.stringify(stats), 'EX', 15);
 
         return NextResponse.json(stats);
     } catch (error: any) {
-        const traceId = crypto.randomUUID();
+        const traceId = randomUUID();
         console.error(`[INSTITUTIONAL-STATS] 💀 Failure (Trace: ${traceId}):`, error.message);
         return NextResponse.json({ 
             error: 'Institutional metric aggregation unavailable', 
