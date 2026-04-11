@@ -45,7 +45,8 @@ const RAW_PROJECTIONS = [
 ];
 
 function generateProof(text: string, timestamp: string) {
-  return createHash('sha256').update(`${text}_${timestamp}_WHALE_NETWORK_SALT`).digest('hex');
+  const salt = process.env.ORACLE_PROOF_SALT || 'institutional_oracle_default_salt_v1';
+  return createHash('sha256').update(`${text}_${timestamp}_${salt}`).digest('hex');
 }
 
 export async function GET() {

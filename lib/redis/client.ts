@@ -130,9 +130,11 @@ export async function safeRedisGet(key: string): Promise<string | null> {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
             return await (redisClient as any).get(key);
         }
+        // Institutional grade timeout: 1500ms. 
+        // 200ms was too fast for Railway proxy under load.
         return await Promise.race([
             redisClient.get(key),
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 200)) // AGGRESSIVE: 200ms or skip
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500))
         ]);
     } catch {
         return null;
@@ -149,10 +151,10 @@ export async function safeRedisSet(key: string, value: string, ...args: any[]): 
             }
             return;
         }
-        // Fire-and-forget with a 500ms timeout — never block the response path
+        // 2500ms for mutation operations
         await Promise.race([
             redisClient.set(key, value, ...args),
-            new Promise<void>((resolve) => setTimeout(resolve, 500))
+            new Promise<void>((resolve) => setTimeout(resolve, 2500))
         ]);
     } catch {
         // Silently ignore — cache is an optimization, not a requirement
@@ -170,7 +172,7 @@ export async function safeRedisSAdd(key: string, member: string): Promise<void> 
         }
         await Promise.race([
             redisClient.sadd(key, member),
-            new Promise<void>((resolve) => setTimeout(resolve, 500))
+            new Promise<void>((resolve) => setTimeout(resolve, 2500))
         ]);
     } catch {}
 }
@@ -182,7 +184,7 @@ export async function safeRedisSMembers(key: string): Promise<string[]> {
         }
         const members = await Promise.race([
             redisClient.smembers(key),
-            new Promise<string[]>((resolve) => setTimeout(() => resolve([]), 500))
+            new Promise<string[]>((resolve) => setTimeout(() => resolve([]), 2500))
         ]);
         return Array.isArray(members) ? members : [];
     } catch {

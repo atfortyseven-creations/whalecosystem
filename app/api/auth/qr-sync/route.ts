@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet, redisClient } from '@/lib/redis/client';
 import { verifyMessage } from 'viem';
+import { mainnetClient } from '@/lib/blockchain/rpc-engine';
 
 export async function POST(req: Request) {
     try {
@@ -20,24 +21,23 @@ export async function POST(req: Request) {
             return new NextResponse('Session already consumed or processed', { status: 400 });
         }
 
-        // 2. ECDSA Puro: Validación de la firma sin custodiar la identidad
-        // Fiel a "Vol I.1.2 No Custodial Secrets"
-        if (signature !== '0x_bypass') {
-            try {
-                const isValid = await verifyMessage({
-                    address: address as `0x${string}`,
-                    message: `WHALE_HANDSHAKE:${token}`,
-                    signature: signature as `0x${string}`,
-                });
+        // 2. ECDSA Puro & EIP-1271: Validación de la firma sin custodiar la identidad
+        // Soporte experto para EOA y Smart Wallets (Institutional Standard)
+        try {
+            const isValid = await verifyMessage({
+                address: address as `0x${string}`,
+                message: `WHALE_HANDSHAKE:${token}`,
+                signature: signature as `0x${string}`,
+                publicClient: mainnetClient, // Enables Smart Account verification via on-chain hooks
+            });
 
-                if (!isValid) {
-                    console.error(`[Handshake:Denied] Cryptographic Signature Forgery Detected para ${address}`);
-                    return new NextResponse('Verification Failed: Invalid Whale Handshake', { status: 401 });
-                }
-            } catch (verifError) {
-                console.error('[Handshake:VerifError]', verifError);
-                return new NextResponse('Internal Neural Engine Failure', { status: 500 });
+            if (!isValid) {
+                console.error(`[Handshake:Denied] Cryptographic Signature Forgery Detected para ${address}`);
+                return new NextResponse('Verification Failed: Invalid Whale Handshake', { status: 401 });
             }
+        } catch (verifError) {
+            console.error('[Handshake:VerifError]', verifError);
+            return new NextResponse('Internal Neural Engine Failure', { status: 500 });
         }
 
         const normalizedAddress = address.toLowerCase();

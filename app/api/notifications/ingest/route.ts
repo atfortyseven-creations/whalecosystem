@@ -10,6 +10,15 @@ const STREAM_KEY = 'global_crypto_alerts';
 // We inject directly into Redis Streams.
 export async function POST(request: Request) {
     try {
+        // [INSTITUTIONAL HARDENING]: Authentication mandatory for ingestion
+        const authKey = request.headers.get('X-Ingest-Key');
+        const internalKey = process.env.INTERNAL_INGEST_KEY || 'whale_ingest_institutional_v1';
+        
+        if (!authKey || authKey !== internalKey) {
+            console.warn(`[INGEST:Unauthorized] Access denied from IP: ${request.headers.get('x-forwarded-for')}`);
+            return NextResponse.json({ error: 'Omega Clearance Level Required' }, { status: 401 });
+        }
+
         const body = await request.json();
         const { type, chain, severity, payload, targetAudience, userIds, channels } = body;
 

@@ -687,10 +687,20 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
     });
 
     try {
+      // 🕵️ EXPERT: Instead of a bypass, we perform a real cryptographic signature
+      const signMessageAsync = signRef.current;
+      if (!signMessageAsync) {
+        throw new Error('Neural Engine not initialized (Signature service missing)');
+      }
+
+      const signature = await signMessageAsync({
+          message: `WHALE_HANDSHAKE:${token}`
+      });
+
       const res = await fetch('/api/auth/qr-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, address: currentAddress, signature: '0x_bypass_active' }),
+        body: JSON.stringify({ token, address: currentAddress, signature }),
       });
 
       if (res.ok) {
@@ -718,9 +728,12 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
         setIsProcessing(false);
       }
     } catch (e: any) {
-      toast.error('MESH_SYNC_FAILURE', {
+      const isUserReject = e?.code === 4001 || e?.message?.includes('rejected');
+      toast.error(isUserReject ? 'SIGNATURE_REJECTED' : 'MESH_SYNC_FAILURE', {
         id: tid,
-        description: 'Network anomaly detected. Protocol handshake aborted.'
+        description: isUserReject 
+            ? 'User declined the security handshake.' 
+            : 'Network anomaly detected. Protocol handshake aborted.'
       });
       isProcessingRef.current = false;
       setIsProcessing(false);
