@@ -11,6 +11,7 @@ import { MarketStreamProvider } from '@/context/MarketStreamContext';
 import { WhaleStreamProvider } from '@/context/WhaleStreamContext';
 import { VIPStoreBootstrap } from '@/components/providers/VIPStoreBootstrap';
 import { AlphaToaster } from '@/components/ui/AlphaToaster';
+import { ShortcutVisualizer } from '@/components/ui/ShortcutVisualizer';
 
 const queryClient = new QueryClient();
 

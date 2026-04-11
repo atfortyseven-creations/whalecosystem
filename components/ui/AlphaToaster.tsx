@@ -21,8 +21,8 @@ export function AlphaToaster() {
     useEffect(() => {
         if (whaleEvents.length > 0) {
             const latest = whaleEvents[0];
-            // Only trigger for MEGA whales (> $10M) or high confidence alpha moves
-            if (latest.tier === 'MEGA' || latest.confidence > 98) {
+            // Defensive Audit: Ensure latest exists before accessing properties
+            if (latest && (latest.tier === 'MEGA' || latest.confidence > 98)) {
                 if (activeAlert?.id !== latest.id) {
                     setActiveAlert(latest);
                     const timer = setTimeout(() => setActiveAlert(null), 10000);
