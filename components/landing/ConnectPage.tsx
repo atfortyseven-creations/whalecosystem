@@ -3,11 +3,10 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { injected } from "wagmi/connectors";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, ExternalLink, Shield, ArrowRight, Loader2, Twitter } from "lucide-react";
 import dynamic from "next/dynamic";
+import { coinbaseWallet } from "wagmi/connectors";
 
 // QR code renderer using qrcode.react
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
@@ -18,8 +17,9 @@ function Grid() {
     <div
       className="fixed inset-0 pointer-events-none"
       style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)`,
-        backgroundSize: "48px 48px",
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.03) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,0,0,0.03) 1.5px, transparent 1.5px)`,
+        backgroundSize: "64px 64px", // Increased size to 'zoom out' and reveal the pattern
+        opacity: 0.8,
       }}
     />
   );
@@ -65,6 +65,8 @@ function WalletButton({
 // ── Main ────────────────────────────────────────────────────────────────────────
 export default function ConnectPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionIdParam = searchParams.get("session");
   const { isConnected, address } = useAccount();
   const { connect, isPending } = useConnect();
   const { openConnectModal } = useConnectModal();
@@ -132,7 +134,29 @@ export default function ConnectPage() {
   }, [isConnected, mounted, router]);
 
   const handleInjected = () => connect({ connector: injected() });
+  const handleCoinbase = () => connect({ 
+    connector: coinbaseWallet({ preference: 'smartWalletOnly' }) 
+  });
   const handleWC = () => openConnectModal?.();
+
+  // Handshake mobile session to desktop
+  useEffect(() => {
+    if (!mounted || !isConnected || !address || !sessionIdParam) return;
+    
+    const handshake = async () => {
+      try {
+        await fetch(`/api/auth/qr-session?id=${sessionIdParam}`, {
+          method: "POST",
+          body: JSON.stringify({ address })
+        });
+        console.log("[SYNC] Handshake completed for session:", sessionIdParam);
+        setSyncStatus("SYNCED");
+      } catch (e) {
+        console.error("[SYNC] Handshake failed:", e);
+      }
+    };
+    handshake();
+  }, [mounted, isConnected, address, sessionIdParam]);
 
   // Build QR URL: deep-link to this connect page via mobile
   const qrUrl = typeof window !== "undefined"
@@ -311,7 +335,7 @@ export default function ConnectPage() {
                     logo="/wallets/coinbase.png"
                     name="Coinbase Wallet"
                     badge="Smart Wallet · MPC"
-                    onClick={handleInjected}
+                    onClick={handleCoinbase}
                     delay={0.15}
                   />
                   <WalletButton

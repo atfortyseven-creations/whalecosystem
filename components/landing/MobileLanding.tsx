@@ -35,15 +35,13 @@ export function MobileLanding() {
 
     return (
         <div style={{ backgroundColor: "transparent", color: "#FFFFFF" }} className="min-h-screen overflow-y-auto w-full selection:bg-[#00FF55] selection:text-[#000000] font-mono relative">
-            {/* GLOBAL COSMIC WALLPAPER */}
+            {/* INSTITUTIONAL BLUEPRINT GRID */}
             <div 
-              className="fixed inset-0 pointer-events-none z-0 transition-colors duration-300"
+              className="fixed inset-0 pointer-events-none z-0"
               style={{
-                 backgroundImage: "url('/patron-cosmico-4k.png')",
-                 backgroundRepeat: "no-repeat",
-                 backgroundSize: "cover",
-                 backgroundPosition: "center",
-                 opacity: 0.5,
+                 backgroundImage: "linear-gradient(rgba(0,255,85,0.03) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,255,85,0.03) 1.5px, transparent 1.5px)",
+                 backgroundSize: "64px 64px", // PC Zone/Institutional scale
+                 opacity: 0.8,
                  transform: "translateZ(0)",
                  willChange: "transform",
               }}

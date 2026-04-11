@@ -548,16 +548,22 @@ export function WhaleAlertLanding() {
   return (
     <div ref={containerRef} className="relative w-full overflow-x-hidden text-black dark:text-white font-sans transition-colors duration-300">
         
-        {/* HARDWARE-ACCELERATED IMMERSIVE BACKGROUND LAYER — 4K ukiyo-e pattern */}
-        {/* Mobile: 120px tile — tight enough to feel like texture, not zoom. Desktop: 400px wide for full artwork fidelity */}
+        {/* HARDWARE-ACCELERATED INSTITUTIONAL GRID LAYER */}
         <div 
-          className="fixed inset-0 pointer-events-none -z-20 bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
+          className="fixed inset-0 pointer-events-none -z-20"
           style={{
-            backgroundSize: 'clamp(100px, 25vw, 400px)',
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.03) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,0,0,0.03) 1.5px, transparent 1.5px)`,
+            backgroundSize: '64px 64px', // PC Zone scale - 'zoomed out' feel
             transform: "translateZ(0)",
             willChange: "transform",
-            opacity: 0.72,
+            opacity: 0.85,
           }}
+        />
+        
+        {/* Subtle ukiyo-e watermark for texture depth */}
+        <div 
+          className="fixed inset-0 pointer-events-none -z-15 opacity-[0.03] dark:opacity-[0.05] bg-[url('/patron-cosmico-4k.png')] bg-repeat"
+          style={{ backgroundSize: '200px 200px' }}
         />
 
         {/* Subtle overlay to guarantee text readability in light and dark mode WITHOUT blurring the pattern */}

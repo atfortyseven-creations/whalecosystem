@@ -1,6 +1,6 @@
 import { http, createConfig } from 'wagmi'
 import { mainnet, base, bsc, optimism } from 'wagmi/chains'
-import { injected, walletConnect } from 'wagmi/connectors'
+import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors'
 
 // Project ID for WalletConnect
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WC_PROJECT_ID || '0ce6bdc0b433d45ab19d32f130dd4f18';
@@ -28,6 +28,10 @@ export const config = createConfig({
                 url: 'https://humanidfi.com',
                 icons: ['/official-whale-legendary.png'],
             }
+        }),
+        coinbaseWallet({ 
+            appName: 'WhaleAlert ID.fi',
+            preference: 'smartWalletOnly'
         }),
     ],
     transports: {

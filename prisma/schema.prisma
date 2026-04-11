@@ -509,11 +509,21 @@ model KYCRecord {
 model BlockchainTransaction {
   id              String   @id @default(uuid())
   txHash          String   @unique
+  userId          String?  // Relates to User.walletAddress or AuthUser.id
   blockNumber     Int
   status          String
+  type            String   @default("SWAP")
+  fromChain       String?
+  toChain         String?
+  fromToken       String?
+  toToken         String?
+  fromAmount      String?
+  metadata        Json     @default("{}")
   createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Estado de transacciones para reconciliación ultra-rápida
+  @@index([userId])                          // Lookup de historial por usuario
   @@index([status, createdAt(sort: Desc)])   // Monitoreo de pendientes en tiempo real
   @@index([blockNumber(sort: Desc)])         // Lookup por bloque
 }

@@ -272,6 +272,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - models/ (your local assets)
      */
-    '/((?!_next/static|_next/image|favicon.ico|models/|api/auth|api/health).*)',
+    '/((?!_next/static|_next/image|favicon.ico|models/|api/health).*)',
   ],
 };

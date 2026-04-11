@@ -22,9 +22,10 @@ import { useVIPStore } from '@/lib/vip-store';
 import { useAccount } from 'wagmi';
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const PARTICLE_COUNT    = 800;
-const EDGE_THRESHOLD    = 90;   // px — max distance for drawing a constellation edge
-const BASE_SPEED        = 0.18;
+const PARTICLE_COUNT    = 450;  // Optimized from 800 for institutional performance
+const EDGE_THRESHOLD    = 100;  // px
+const EDGE_THRESHOLD_SQ = 10000; // threshold^2 to avoid Math.sqrt
+const BASE_SPEED        = 0.22; // Slightly faster for responsiveness
 const GOLD              = { r: 212, g: 175, b: 55 };
 const DIM               = { r: 30,  g: 40,  b: 60  };
 
@@ -61,8 +62,9 @@ export function OmniMatrixCanvas() {
   const stateRef  = useRef<{
     particles: Particle[];
     raf: number;
+    lastTime: number;
     t: number;
-  }>({ particles: [], raf: 0, t: 0 });
+  }>({ particles: [], raf: 0, lastTime: 0, t: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,10 +93,15 @@ export function OmniMatrixCanvas() {
     stateRef.current.particles = initParticles(w, h);
 
     // ── rAF render loop ────────────────────────────────────────────────────
-    function tick() {
-      stateRef.current.raf = requestAnimationFrame(tick);
+    function tick(now: number) {
       const s = stateRef.current;
-      s.t += 0.016;
+      s.raf = requestAnimationFrame(tick);
+      
+      // Calculate delta for 240Hz smoothness
+      if (!s.lastTime) s.lastTime = now;
+      const dt = (now - s.lastTime) / 16.67; // Normalize to 60fps base
+      s.lastTime = now;
+      s.t += 0.016 * dt;
 
       const cw = canvas!.width  / (window.devicePixelRatio || 1);
       const ch = canvas!.height / (window.devicePixelRatio || 1);
@@ -113,8 +120,8 @@ export function OmniMatrixCanvas() {
 
       // ── Update positions ──────────────────────────────────────────────
       for (const p of s.particles) {
-        p.x += p.vx * speedMult;
-        p.y += p.vy * speedMult;
+        p.x += p.vx * speedMult * dt;
+        p.y += p.vy * speedMult * dt;
         // Wrap around screen edges (toroidal topology)
         if (p.x < 0)   p.x += cw;
         if (p.x > cw)  p.x -= cw;
@@ -132,9 +139,10 @@ export function OmniMatrixCanvas() {
           const pj = s.particles[j];
           const dx = pi.x - pj.x;
           const dy = pi.y - pj.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < EDGE_THRESHOLD) {
-            const alpha = edgeAlpha * (1 - dist / EDGE_THRESHOLD);
+          const distSq = dx * dx + dy * dy;
+          
+          if (distSq < EDGE_THRESHOLD_SQ) {
+            const alpha = edgeAlpha * (1 - distSq / EDGE_THRESHOLD_SQ);
             // Theme-aware edges
             if (pi.isHot && pj.isHot) {
               ctx!.strokeStyle = `rgba(${MAIN_HUB_COLOR.r},${MAIN_HUB_COLOR.g},${MAIN_HUB_COLOR.b},${alpha})`;
@@ -199,7 +207,7 @@ export function OmniMatrixCanvas() {
       ctx!.fillText(`${statusText} • ${events.length} EVT • INT ${(intensity * 100).toFixed(0)}%`, 12, ch - 12);
     }
 
-    tick();
+    requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(stateRef.current.raf);
