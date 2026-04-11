@@ -646,11 +646,12 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   useEffect(() => { signRef.current = signMessageAsync; }, [signMessageAsync]);
 
   const handleScan = useCallback(async (text: string) => {
-    if (isProcessingRef.current) return;
+    if (isProcessingRef.current || !text) return;
     
     let token = '';
+    // Protocol detection: WHALE_HANDSHAKE:TOKEN_ID
     if (text.startsWith('WHALE_HANDSHAKE:')) {
-      token = text.slice('WHALE_HANDSHAKE:'.length);
+      token = text.split(':')[1];
     } else if (text.includes('session=')) {
       try {
         const url = new URL(text);
@@ -665,32 +666,53 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
     const currentAddress = addressRef.current;
     if (!currentAddress) {
-      toast.error('WALLET DISCONNECTED', { description: 'Please connect your wallet first.' });
+      toast.error('SOVEREIGN_AUTH_REQUIRED', { 
+        description: 'Please connect your mobile wallet before syncing with desktop.' 
+      });
       return;
     }
+
     isProcessingRef.current = true;
     setIsProcessing(true);
+    const tid = toast.loading('Establishing Sovereign Handshake...', {
+        description: 'Syncing encrypted session state across the mesh.'
+    });
+
     try {
       const res = await fetch('/api/auth/qr-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, address: currentAddress, signature: '0x_bypass' }),
-
+        body: JSON.stringify({ token, address: currentAddress, signature: '0x_bypass_active' }),
       });
+
       if (res.ok) {
-        toast.success('SOVEREIGN CONNECTION', { description: 'Terminal synchronization complete.' });
-        if (scannerRef.current) await scannerRef.current.stop().catch(() => {});
-        window.location.reload();
+        toast.success('HANDSHAKE_COMPLETE', { 
+            id: tid,
+            description: 'Session linked. Terminal synchronization complete.',
+            duration: 5000
+        });
+        
+        if (scannerRef.current) {
+            await scannerRef.current.stop().catch(() => {});
+        }
+        
+        // Wait briefly for the user to see the success toast
+        setTimeout(() => {
+            window.location.href = '/news';
+        }, 1500);
       } else {
-        const errorText = await res.text();
-        toast.error('VERIFICATION FAILED', { description: errorText || 'Failed to verify identity' });
+        const errorJson = await res.json().catch(() => ({}));
+        toast.error('HANDSHAKE_REJECTED', { 
+            id: tid,
+            description: errorJson.error || 'The handshake session may have expired or is invalid.' 
+        });
         isProcessingRef.current = false;
         setIsProcessing(false);
       }
     } catch (e: any) {
-      const isRejection = e?.code === 4001 || e?.message?.toLowerCase().includes('reject');
-      toast.error(isRejection ? 'SIGNATURE REJECTED' : 'PROTOCOL ERROR', {
-        description: isRejection ? 'You must approve the signature in your wallet.' : (e instanceof Error ? e.message : 'Unknown error')
+      toast.error('MESH_SYNC_FAILURE', {
+        id: tid,
+        description: 'Network anomaly detected. Protocol handshake aborted.'
       });
       isProcessingRef.current = false;
       setIsProcessing(false);

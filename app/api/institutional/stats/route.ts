@@ -44,9 +44,9 @@ export async function GET() {
         const stats = {
             totalVolumeUSD: volumeAgg[0]?.sum || 0,
             whaleCount,
-            topPairs: topPairs.map(p => ({
+            topPairs: (topPairs as any[]).map(p => ({
                 symbol: p.token,
-                activityCount: p._count._all
+                activityCount: p._count?._all || 0
             })),
             timestamp: new Date().toISOString()
         };

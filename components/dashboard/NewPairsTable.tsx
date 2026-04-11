@@ -48,7 +48,7 @@ export function NewPairsTable() {
                     setPairs(prev => {
                         const seen = new Set();
                         const result: any[] = [];
-                        [...livePairs, ...data.pairs, ...prev].forEach(p => {
+                        [...livePairs, ...data.pairs, ...prev].forEach((p: any) => {
                             if (p?.id && !seen.has(p.id)) {
                                 seen.add(p.id);
                                 result.push(p);
@@ -65,7 +65,7 @@ export function NewPairsTable() {
                 setPairs(prev => {
                     const seen = new Set();
                     const result: any[] = [];
-                    [...livePairs, ...prev].forEach(p => {
+                    [...livePairs, ...prev].forEach((p: any) => {
                         if (p?.id && !seen.has(p.id)) {
                             seen.add(p.id);
                             result.push(p);
@@ -145,8 +145,8 @@ export function NewPairsTable() {
                             taxes: { buy: 0, sell: 0 },
                         }));
                         setPairs(prev => {
-                            const seen = new Set(prev.map(p => p.id));
-                            const uniqueHist = histPairs.filter(p => !seen.has(p.id));
+                            const seen = new Set(prev.map((p: any) => p.id));
+                            const uniqueHist = histPairs.filter((p: any) => !seen.has(p.id));
                             return [...uniqueHist, ...prev].slice(0, 100);
                         });
                     }
@@ -179,15 +179,15 @@ export function NewPairsTable() {
     };
 
     const filtered = pairs
-        .filter(p => p != null && typeof p === 'object')
-        .filter(p => chainFilter === 'all' || p.chain === chainFilter)
-        .filter(p => {
+        .filter((p: any) => p != null && typeof p === 'object')
+        .filter((p: any) => chainFilter === 'all' || p.chain === chainFilter)
+        .filter((p: any) => {
             const score = p.security?.score ?? 50;
             if (rugFilter === 'verified') return score >= 65;
             if (rugFilter === 'risky')    return score < 65;
             return true;
         })
-        .filter(p =>
+        .filter((p: any) =>
             (p.baseToken?.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
             (p.baseToken?.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
             (p.chain ?? '').toLowerCase().includes(search.toLowerCase())
