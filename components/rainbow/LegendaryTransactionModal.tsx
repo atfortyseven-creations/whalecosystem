@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "./GlassCard";
-import { X, Send, Repeat, Globe, ArrowRight, Loader2, ChevronDown, Shield, Zap } from "lucide-react";
+import { X, Send, Repeat, Globe, ArrowRight, Loader2, ChevronDown, Shield, Zap, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { useTransactionHandler } from "@/hooks/useTransactionHandler";
 import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { getExplorerTxUrl } from "@/lib/wallet/chains";
 import { useQueryClient } from "@tanstack/react-query";
-import { encodeFunctionData } from "viem";
+import { encodeFunctionData, parseUnits } from "viem";
 import { TokenSelector } from "@/components/wallet/TokenSelector";
+import { InstitutionalErrorBoundary } from "@/components/ui/InstitutionalErrorBoundary";
 
 interface LegendaryTransactionModalProps {
   isOpen: boolean;
@@ -443,16 +444,73 @@ export function LegendaryTransactionModal({
             exit={{ scale: 0.98, opacity: 0, y: 30 }}
             className="relative w-full max-w-lg"
           >
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 rounded flex-shrink-0 border border-green-500/20">
-                                <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-                                <span className="text-[8px] font-black text-green-500 uppercase">Live On-Chain</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-              </div>
+            <InstitutionalErrorBoundary moduleName="EliteTransfer">
+              <GlassCard className="p-0 border-white/10 overflow-hidden bg-[#0A0D10] shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+                
+                <div className="bg-gradient-to-b from-white/[0.03] to-transparent p-6 border-b border-white/5">
+                  <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20">
+                              <Shield size={18} className="text-indigo-400" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-black tracking-tighter uppercase italic text-white">Elite Transfer</h2>
+                            <p className="text-[8px] font-black text-indigo-400/60 uppercase tracking-[0.3em]">Institutional Grade Execution</p>
+                          </div>
+                      </div>
+                      <button onClick={onClose} className="text-white/20 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full">
+                          <X size={20} />
+                      </button>
+                  </div>
+
+                  <div className="flex bg-black p-1.5 rounded-2xl border border-white/5 mb-4 shadow-inner">
+                      {(["send", "swap", "bridge", "buy"] as const).map((t) => (
+                          <button
+                              key={t}
+                              onClick={() => {
+                                  setMode(t);
+                                  setSubMode(t === 'buy' ? 'USD' : 'standard');
+                              }}
+                              className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${mode === t ? 'bg-white text-black shadow-2xl scale-[1.02]' : 'text-white/20 hover:text-white/50'}`}
+                          >
+                              {t}
+                          </button>
+                      ))}
+                  </div>
+
+                  <div className="flex gap-4 px-1">
+                      {mode === 'send' && (["standard", "private", "ens"] as const).map(s => (
+                          <button key={s} onClick={() => setSubMode(s)} className={`text-[9px] font-black uppercase tracking-tighter transition-colors ${subMode === s ? 'text-indigo-400 underline underline-offset-4' : 'text-white/20 hover:text-white/40'}`}>
+                              {s === 'private' && <Shield size={8} className="inline mr-1" />}
+                              {s}
+                          </button>
+                      ))}
+                      {mode === 'swap' && (["aggregator", "limit"] as const).map(s => (
+                          <button key={s} onClick={() => setSubMode(s)} className={`text-[9px] font-black uppercase tracking-tighter transition-colors ${subMode === s ? 'text-indigo-400 underline underline-offset-4' : 'text-white/20 hover:text-white/40'}`}>{s}</button>
+                      ))}
+                  </div>
+
+                  {/* Status HUD */}
+                  {(mode === 'swap' || mode === 'bridge') && (
+                      <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-4">
+                          <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                                      <Activity size={14} className="text-indigo-400" />
+                                  </div>
+                                  <div>
+                                      <div className="text-[10px] font-black text-white uppercase tracking-widest">Sovereign Routing Active</div>
+                                      <div className="text-[9px] text-white/30 mt-0.5">Real-time Liquidity Aggregation via Li.Fi Hub</div>
+                                  </div>
+                              </div>
+                              <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 rounded flex-shrink-0 border border-green-500/20">
+                                  <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                                  <span className="text-[8px] font-black text-green-500 uppercase">Live On-Chain</span>
+                              </div>
+                          </div>
+                      </div>
+                  )}
+                </div>
 
               <div className="p-8 space-y-6">
                 

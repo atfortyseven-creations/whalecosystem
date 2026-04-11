@@ -69,8 +69,7 @@ const nextConfig = {
     serverExternalPackages: ['@prisma/client', 'prisma', 'ioredis', 'neo4j-driver', 'snarkjs'],
 
     experimental: {
-        optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber'],
-        instrumentationHook: true,
+        optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber']
     },
 
     typescript: {
