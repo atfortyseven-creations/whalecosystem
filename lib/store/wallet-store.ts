@@ -32,6 +32,7 @@ interface WalletState {
   sendTransaction: (to: string, amount: string) => Promise<string | null>;
   setNetwork: (network: NetworkId) => void;
   setProtocol: (protocol: ProtocolType) => void;
+  syncAddress: (address: string | null) => void;
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -243,6 +244,18 @@ export const useWalletStore = create<WalletState>()(
             description: error?.reason || error?.message || "Execution failed at the network level."
           });
           return null;
+        }
+      },
+      
+      syncAddress: (addr: string | null) => {
+        const current = get().address;
+        if (current === addr) return;
+        
+        // If syncing a new address, clear any internal private keys to maintain security 
+        // and ensure the UI reflects the external provider's authority.
+        set({ address: addr, privateKey: null, balance: "0.0", isCustom: false });
+        if (addr) {
+           get().updateBalance();
         }
       }
     }),
