@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
+    const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`, {
+        next: { revalidate: 30 }
+    });
     
     if (!res.ok) {
       if (res.status === 451) {
@@ -28,7 +30,11 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=59'
+      }
+    });
   } catch (error) {
     console.error('Binance proxy error:', error);
     return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });

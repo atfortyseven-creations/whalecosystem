@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { safeStorage } from '@/lib/security/safe-storage';
 
 export interface NewsArticle {
   id: string;
@@ -57,7 +58,7 @@ export const useNewsStore = create<NewsState>()(
     }),
     {
       name: 'whale-news-archive-v2', // nueva clave para no colisionar con la anterior
-      storage: createJSONStorage(() => localStorage), // localStorage para persistencia permanente por mes
+      storage: createJSONStorage(() => safeStorage), // localStorage (safe) para persistencia permanente por mes
     }
   )
 );

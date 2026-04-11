@@ -45,9 +45,9 @@ export function useMempoolStream(enabled: boolean = true) {
                         const newTx: MempoolTx = {
                             hash: ev.hash,
                             timestamp: ev.timestamp,
-                            value: Math.random() * 50,
-                            type: Math.random() > 0.8 ? 'whale' : 'dust',
-                            gasPrice: Math.floor(Math.random() * 100) + 10
+                            value: ev.value || (parseInt(ev.hash.slice(-4), 16) / 100),
+                            type: (ev.value > 10 || parseInt(ev.hash.slice(-2), 16) > 200) ? 'whale' : 'dust',
+                            gasPrice: ev.gasPrice || (parseInt(ev.hash.slice(2, 4), 16) + 10)
                         };
                         
                         setTransactions(prev => {

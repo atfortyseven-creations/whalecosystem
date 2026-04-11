@@ -36,6 +36,7 @@ import {
   Moon,
   Menu,
   Zap,
+  Plus
 } from "lucide-react";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -171,6 +172,91 @@ function ChainSelector() {
             </motion.div>
           </>
         )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// --- Rainbow Perfect Account Switcher ---
+function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefined }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const handleGenerateWallet = async () => {
+      try {
+          toast.loading("Generating Sovereign Wallet...");
+          await fetch('/api/wallet/create', { method: 'POST' });
+          window.location.reload();
+      } catch {
+          toast.error("Failed to generate wallet");
+      }
+  };
+
+  return (
+    <div className="relative z-[60]">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-3 px-2 py-1.5 rounded-[20px] hover:bg-white/5 transition-colors border border-transparent hover:border-white/5"
+      >
+         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-inner flex items-center justify-center border border-white/20">
+            <span className="text-[14px] font-black tracking-tight text-white shadow-sm font-mono uppercase">
+                {userAddress ? userAddress.slice(2, 4) : '?'}
+            </span>
+         </div>
+         <div className="flex flex-col items-start leading-none gap-1">
+             <span className="text-white font-black text-sm tracking-tight hover:text-purple-400 transition-colors">Main Wallet</span>
+             <span className="text-white/40 text-[10px] font-mono font-bold tracking-widest">{userAddress ? `${userAddress.slice(0,6)}...${userAddress.slice(-4)}` : 'Not Connected'}</span>
+         </div>
+         <ChevronDown size={14} className={`text-white/40 ml-2 transition-transform duration-300 ${isOpen ? 'rotate-180':''}`} />
+      </button>
+
+      <AnimatePresence>
+         {isOpen && (
+             <>
+                 <motion.div 
+                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                     className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} 
+                 />
+                 <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-3 w-72 bg-[#161A1E] border border-white/10 rounded-3xl shadow-2xl p-2 z-50 overflow-hidden"
+                 >
+                     <div className="text-[9px] font-black text-white/30 uppercase tracking-[0.25em] px-4 py-3 border-b border-white/5 mb-2">
+                         Your Profiles Array
+                     </div>
+                     <button className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/10 text-left mb-1 hover:bg-white/10 transition-colors group">
+                         <div className="flex items-center gap-4">
+                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg"><Wallet size={16} className="text-white"/></div>
+                             <div>
+                                 <div className="text-sm font-black text-white tracking-tight">Main Wallet</div>
+                                 <div className="text-[10px] text-white/40 font-mono tracking-widest">{userAddress?.slice(0,6)}...{userAddress?.slice(-4)}</div>
+                             </div>
+                         </div>
+                         <CheckCircle2 size={18} className="text-emerald-400 shadow-emerald-500/20 drop-shadow-md"/>
+                     </button>
+                     
+                     <div className="h-px bg-white/[0.04] my-2" />
+                     
+                     <button onClick={() => { setIsOpen(false); handleGenerateWallet(); }} className="w-full flex items-center gap-4 p-3.5 rounded-2xl hover:bg-white/5 transition-colors text-left group">
+                         <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center border border-white/10 text-white/60 group-hover:text-white group-hover:border-purple-500/30 transition-all"><Plus size={18}/></div>
+                         <div>
+                             <div className="text-sm font-black text-white tracking-tight">Generate New Identity</div>
+                             <div className="flex items-center gap-1.5 mt-1.5">
+                                 <div className="flex gap-1">
+                                    <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-white/40 border border-white/10">Shift</kbd>
+                                    <span className="text-white/20 text-[9px] font-bold">+</span>
+                                    <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-white/40 border border-white/10">Alt</kbd>
+                                    <span className="text-white/20 text-[9px] font-bold">+</span>
+                                    <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-purple-400 border border-purple-500/30">W</kbd>
+                                 </div>
+                             </div>
+                         </div>
+                     </button>
+                 </motion.div>
+             </>
+         )}
       </AnimatePresence>
     </div>
   );
@@ -348,6 +434,25 @@ export default function PortfolioView({
     html.classList.toggle("dark");
   };
 
+  // ─ Global Shortcut Interceptor for Auto-Generation ─
+  useEffect(() => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
+        if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'w') {
+            e.preventDefault();
+            toast.loading("Instantiating Genesis Sovereign Vault...", { id: 'wallet-gen' });
+            try {
+                await fetch('/api/wallet/create', { method: 'POST' });
+                toast.success("New algorithmic identity securely injected.", { id: 'wallet-gen' });
+                window.location.reload(); 
+            } catch {
+                toast.error("Cryptographic Handshake failed.", { id: 'wallet-gen' });
+            }
+        }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // History fetch
   useEffect(() => {
     if (!userAddress) return;
@@ -462,25 +567,12 @@ export default function PortfolioView({
           WebkitBackdropFilter: "blur(20px)",
         }}
       >
-        {/* Left: Logo + Brand */}
+        {/* Left: Interactive Account Profile (Rainbow Style) */}
         <div className="flex items-center gap-3">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/10 border border-white/10 text-white font-black text-xs"
-            style={{ fontFamily: "monospace" }}
-          >
-            🐋
-          </div>
-          <div>
-            <div className="text-white font-black text-sm tracking-tight leading-none">
-              WHALE ALERT NETWORK
-            </div>
-            <div className="text-white/30 text-[9px] font-black uppercase tracking-[0.3em] mt-0.5">
-              Terminal
-            </div>
-          </div>
+          <RainbowAccountSwitcher userAddress={userAddress} />
         </div>
 
-        {/* Right: Chain selector + Theme + Connect */}
+        {/* Right: Chain selector + Tools */}
         <div className="flex items-center gap-2">
           <ChainSelector />
           <button

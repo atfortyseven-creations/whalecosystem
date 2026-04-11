@@ -1,7 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
-import { getLocationFromIP, parseUserAgent } from "@/lib/geolocation";
 import { headers } from "next/headers";
 
 export const authOptions: NextAuthOptions = {
@@ -32,7 +31,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (!user.email) return false;
 
-      // Sync with AuthUser table
+      // Sync with AuthUser table (only known schema fields)
       try {
         const existingUser = await prisma.authUser.findUnique({
           where: { email: user.email },
@@ -42,9 +41,8 @@ export const authOptions: NextAuthOptions = {
           await prisma.authUser.create({
             data: {
               email: user.email,
-              name: user.name || profile?.name,
-              verified: true, // OAuth emails are verified
-              passwordHash: "oauth_google", 
+              // AuthUser schema: id, email, walletAddress, recoveryEmail, encryptedPrivateKey, createdAt, updatedAt
+              // No 'name', 'verified', or 'passwordHash' columns exist in schema.prisma
             },
           });
         }
@@ -58,23 +56,13 @@ export const authOptions: NextAuthOptions = {
       // On initial sign in
       if (trigger === 'signIn' || (user && account)) {
         try {
-          // Generate a session ID to track this specific login
           const sessionId = crypto.randomUUID();
           token.sessionId = sessionId;
 
-          // Gather device info
           const headersList = await headers();
-          const userAgent = headersList.get('user-agent') || 'Unknown';
           const ip = headersList.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
-          
-          // GENERATE FINGERPRINT (Legendary Security Proxy)
-          const fingerprint = Buffer.from(`${userAgent}-${ip}`).toString('base64');
-          token.fingerprint = fingerprint;
 
-          const { deviceType, browser, os } = parseUserAgent(userAgent);
-          const location = await getLocationFromIP(ip);
-
-          // Find AuthUser to link
+          // Find AuthUser to link — Session schema: sessionToken, userId, expiresAt, ipAddress
           const authUser = await prisma.authUser.findUnique({
             where: { email: token.email! }
           });
@@ -83,18 +71,9 @@ export const authOptions: NextAuthOptions = {
              await prisma.session.create({
                data: {
                  sessionToken: sessionId,
-                 authUserId: authUser.id,
+                 userId: authUser.id,   // Session.userId — correct schema column
                  expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                 userAgent,
                  ipAddress: ip,
-                 fingerprint, // PERSIST FINGERPRINT
-                 deviceType,
-                 browser,
-                 os,
-                 country: location.country,
-                 city: location.city,
-                 latitude: location.latitude,
-                 longitude: location.longitude,
                }
              });
           }
@@ -108,43 +87,24 @@ export const authOptions: NextAuthOptions = {
       if (token.sessionId) {
         // @ts-ignore
         session.sessionId = token.sessionId;
-        
-        // Verify session is still active in DB and fetch wallet info
+
+        // Session schema has no relation to AuthUser. Verify session exists in DB.
         try {
           const dbSession = await prisma.session.findUnique({
             where: { sessionToken: token.sessionId as string },
-            include: {
-              authUser: {
-                select: {
-                    // walletAddress: true, // TEMPORARILY COMMENTED - column doesn't exist yet in production
-                    name: true,
-                    email: true
-                }
-              }
-            } as any
           });
-          
+
           if (!dbSession) {
-             return {} as any; 
+            return {} as any;
           }
 
-          // @ts-ignore
+          // Enrich with user email from token (already present in JWT)
           session.user = {
             ...session.user,
-            // walletAddress: (dbSession as any).authUser?.walletAddress, // TEMPORARILY COMMENTED
-            name: (dbSession as any).authUser?.name,
-            email: (dbSession as any).authUser?.email
-          } as any;
-          
-          const now = new Date();
-          if (dbSession.lastActivity.getTime() < now.getTime() - 5 * 60 * 1000) { 
-             await prisma.session.update({
-               where: { id: dbSession.id },
-               data: { lastActivity: now }
-             });
-          }
-        } catch(e) {
-             console.error("Session verification failed", e);
+            email: token.email ?? session.user?.email,
+          };
+        } catch (e) {
+          console.error("Session verification failed", e);
         }
       }
       return session;
@@ -161,8 +121,10 @@ import bcrypt from 'bcryptjs';
 /**
  * Generate a 6-digit verification code
  */
+import crypto from 'crypto';
+
 export function generateVerificationCode(): string {
-  const code = Math.floor(100000 + Math.random() * 900000);
+  const code = crypto.randomInt(100000, 999999);
   return code.toString();
 }
 

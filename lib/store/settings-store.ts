@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { safeStorage } from '@/lib/security/safe-storage';
 
 export interface SettingsState {
     theme: 'light' | 'dark' | 'system';
@@ -49,7 +50,7 @@ export const useSettingsStore = create<SettingsState>()(
         }),
         {
             name: 'sovereign-settings-store',
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => safeStorage),
             partialize: (state) => ({ 
                 theme: state.theme,
                 currency: state.currency,

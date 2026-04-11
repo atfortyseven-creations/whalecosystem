@@ -486,6 +486,10 @@ body,
     text-wrap: balance;
   }
 
+  /* IOS 15 / SAFARI WEBKIT DVH OVERRIDE GLOBAL */
+  .min-h-screen { min-height: 100dvh !important; }
+  .h-screen { height: 100dvh !important; }
+
   /* Safe Area / Fallback VP utilities for iOS 15 */
   .min-h-safe {
     min-height: 100vh;

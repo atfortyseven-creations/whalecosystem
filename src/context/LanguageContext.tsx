@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { translations, Language, TranslationKey } from '@/lib/translations';
+import { safeStorage } from '@/lib/security/safe-storage';
 
 interface LanguageContextType {
     language: Language;
@@ -17,7 +18,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem('human_defi_lang') as Language;
+        const saved = safeStorage.getItem('human_defi_lang') as Language;
         if (saved && (saved === 'en' || saved === 'es')) {
             setLanguageState(saved);
         }
@@ -26,7 +27,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
-        localStorage.setItem('human_defi_lang', lang);
+        safeStorage.setItem('human_defi_lang', lang);
     };
 
     const toggleLanguage = () => {

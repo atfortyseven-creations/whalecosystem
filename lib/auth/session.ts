@@ -7,10 +7,10 @@ export async function createSession(authUserId: string) {
   const expiresAt = new Date(Date.now() + SESSION_DURATION);
   const sessionToken = crypto.randomUUID();
 
-  // 1. Persist session in Database (Source of Truth)
+  // 1. Persist session in Database — Session schema: sessionToken, userId, expiresAt, ipAddress
   const session = await prisma.session.create({
     data: {
-      authUserId,
+      userId: authUserId,   // Session.userId — correct column per schema.prisma
       sessionToken,
       expiresAt,
     },
@@ -35,11 +35,10 @@ export async function getSession() {
 
   if (!sessionToken) return null;
 
-  // 3. Verify Session against DB
+  // 3. Verify Session against DB — no relation to include (Session has no user FK in schema)
   try {
     const session = await prisma.session.findUnique({
       where: { sessionToken },
-      include: { user: true },
     });
 
     if (!session) return null;

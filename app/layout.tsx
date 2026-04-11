@@ -14,7 +14,6 @@ import { Toaster } from 'sonner'
 import { CookieProvider } from "@/components/privacy/CookieContext";
 import { CookieConsent } from "@/components/privacy/CookieConsent";
 import { GoogleTagManager } from "@/components/privacy/GoogleTagManager";
-import { initializeBackgroundServices } from "@/lib/services/init";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { ReactNode } from "react";
 import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
@@ -114,9 +113,6 @@ export default async function RootLayout({
 }) {
   const headersList = await headers();
   const cookies = headersList.get('cookie');
-
-  // Start the omni-channel background event dispatcher
-  initializeBackgroundServices();
 
   const jsonLd = {
     "@context": "https://schema.org",

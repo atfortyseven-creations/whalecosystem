@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAccount } from 'wagmi';
+import { safeStorage } from '@/lib/security/safe-storage';
 
 interface WorldContextType {
     isVerified: boolean;
@@ -42,7 +43,7 @@ export const WorldProvider = ({ children }: { children: ReactNode }) => {
             const walletKey = `world-id-proof-${address.toLowerCase()}`;
 
             // 1. Check LocalStorage specific to this wallet first (Fast Path)
-            const savedProof = localStorage.getItem(walletKey);
+            const savedProof = safeStorage.getItem(walletKey);
             if (savedProof) {
                 setIsVerified(true);
                 setNullifierHash(savedProof);
@@ -60,12 +61,12 @@ export const WorldProvider = ({ children }: { children: ReactNode }) => {
                         setNullifierHash(data.nullifierHash);
                         // Sync specific wallet proof to local storage
                         if (data.nullifierHash) {
-                            localStorage.setItem(walletKey, data.nullifierHash);
+                            safeStorage.setItem(walletKey, data.nullifierHash);
                         }
                     } else {
                         // If server says not verified, remove local proof (security enforcement)
                         if (savedProof) {
-                            localStorage.removeItem(walletKey);
+                            safeStorage.removeItem(walletKey);
                             setIsVerified(false);
                             setNullifierHash(null);
                         }
@@ -108,7 +109,7 @@ export const WorldProvider = ({ children }: { children: ReactNode }) => {
                 console.log("[WorldContext] ✅ Backend verification successful.");
                 setIsVerified(true);
                 setNullifierHash(data.nullifier_hash || result.nullifier_hash);
-                localStorage.setItem(`world-id-proof-${address.toLowerCase()}`, data.nullifier_hash || result.nullifier_hash);
+                safeStorage.setItem(`world-id-proof-${address.toLowerCase()}`, data.nullifier_hash || result.nullifier_hash);
             } else {
                 console.error("[WorldContext] ❌ Verification failed:", data.detail || "Unknown error");
                 throw new Error(data.detail || "Verification failed");
