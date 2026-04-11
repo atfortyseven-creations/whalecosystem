@@ -55,6 +55,8 @@ export function InstitutionalPortfolioView() {
         }
     }, [refreshBalance, isHydrated]);
 
+    const ethPrice = useVIPStore(s => s.ethPrice);
+
     if (!isHydrated) {
         return (
             <div className="flex items-center justify-center min-h-[85vh] bg-[#fdfcf9]">
@@ -63,7 +65,6 @@ export function InstitutionalPortfolioView() {
         );
     }
 
-    const ethPrice = useVIPStore(s => s.ethPrice);
 
     const scannerBase = activeNetwork === 'polygon' ? 'https://polygonscan.com' : 'https://etherscan.io';
     // Use the institutional oracle price, falling back to a safe floor if not yet sync'd

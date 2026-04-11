@@ -19,6 +19,7 @@ function formatTXO(address: string | undefined, symbol: string): string {
 export default function PortfolioDashboard({ walletAddress }: { walletAddress?: string }) {
     const { open } = useAppKit();
     const { isConnected: isWeb3Connected, address: web3Address } = useAppKitAccount();
+    const isMobile = useIsMobile();
     
     // Prioritize passed address (Added Wallet) over connected Web3 address
     const effectiveAddress = walletAddress || web3Address;
@@ -215,7 +216,6 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     }
 
     // 5. MAIN DASHBOARD - LEGENDARY DESIGN
-    const isMobile = useIsMobile();
     
     return (
         <div className="w-full relative space-y-8">

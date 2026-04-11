@@ -72,18 +72,15 @@ export function VIPStoreBootstrap() {
         };
 
         // 1. Immediate bootstrap using live or cached oracle prices
+        // 1. Unified Event Hydration: Pure On-Chain Data only
+        // [MODIFIED] No more generateSyntheticEvents. We go straight to polling real DB records.
         if (!hasBootstrapped.current) {
             hasBootstrapped.current = true;
-            fetchOraclePrices().then(() => {
-                mergeWhaleEvents(generateSyntheticEvents(60, pricesRef.current));
-            });
+            fetchOraclePrices();
         }
 
-        // 2. Continuous live simulation (every 4s) using oracle scaling
-        const liveSimInterval = setInterval(() => {
-            const count = 2 + Math.floor(Math.random() * 4);
-            mergeWhaleEvents(generateSyntheticEvents(count, pricesRef.current));
-        }, 4000);
+        // [DEACTIVATED] Synthetic live simulation loop removed to protect data integrity.
+        // The real-time SSE stream (/api/whale-events/stream) now manages all live updates.
 
         // 3. Periodic Oracle Sync (every 10s) to keep valuations current
         const oracleSyncId = setInterval(fetchOraclePrices, 10000);
@@ -110,7 +107,7 @@ export function VIPStoreBootstrap() {
         pollReal(); 
 
         return () => {
-            clearInterval(liveSimInterval);
+            // [MODIFIED] No liveSimInterval to clear
             clearInterval(oracleSyncId);
             if (pollingIntervalId.current) clearInterval(pollingIntervalId.current);
         };

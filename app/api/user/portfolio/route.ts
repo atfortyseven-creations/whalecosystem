@@ -7,16 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserPortfolio } from '@/lib/blockchain/getblock-engine';
 
-export const dynamic = 'force-dynamic';
+import { PriceService } from '@/lib/blockchain/PriceService';
 
-// Known token USD prices (approximate — will be enriched by EP4 pool prices)
-const USD_PRICES: Record<string, number> = {
-    ETH:   2200, WETH:  2200, WBTC:  68000, BTC: 68000,
-    USDC:  1,    USDT:  1,    DAI:   1,
-    LINK:  14,   UNI:   8,    AAVE:  95,    MKR: 1800,
-    ARB:   1.1,  OP:    2.1,  PEPE:  0.000012, SHIB: 0.000025,
-    MATIC: 0.75, LDO:   2.3,
-};
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
@@ -29,19 +22,28 @@ export async function GET(req: NextRequest) {
 
         const { ethBalance, tokens } = await getUserPortfolio(address);
 
-        // Compute USD values
-        const ethUsd = ethBalance * (USD_PRICES['ETH'] || 2200);
+        // Fetch Real-Time Oracle prices for ALL assets (EP1 On-Chain + PriceService)
+        const assetQueries = [
+            { symbol: 'ETH' },
+            ...tokens.map(t => ({ symbol: t.symbol, address: (t as any).contractAddress }))
+        ];
+        const realPrices = await PriceService.getBulkPrices(assetQueries);
+
+        // Compute USD values with Real Oracle Data
+        const ethPriceData = realPrices['ETH'] || { price: 2300 };
+        const ethUsd = ethBalance * ethPriceData.price;
+        
         const tokenList = tokens.map(t => {
-            const usdPrice = USD_PRICES[t.symbol] || 0;
-            const usdValue = t.balance * usdPrice;
+            const pData = realPrices[t.symbol.toUpperCase()] || { price: 0 };
+            const usdValue = t.balance * pData.price;
             return {
                 symbol:       t.symbol,
                 name:         t.symbol,
                 balance:      t.balance,
-                usdPrice,
+                usdPrice:     pData.price,
                 usdValue,
-                change24h:    0,          // EP4 will enrich this via pool prices
-                portfolioPct: 0,          // calculated below after total
+                change24h:    (pData as any).change24h || 0,
+                portfolioPct: 0,
                 chain:        'ethereum',
             };
         });
@@ -49,11 +51,11 @@ export async function GET(req: NextRequest) {
         // ETH native position
         const ethPosition = {
             symbol: 'ETH', name: 'Ethereum',
-            balance: ethBalance, usdPrice: USD_PRICES['ETH'], usdValue: ethUsd,
-            change24h: 0, portfolioPct: 0, chain: 'ethereum',
+            balance: ethBalance, usdPrice: ethPriceData.price, usdValue: ethUsd,
+            change24h: (ethPriceData as any).change24h || 0, portfolioPct: 0, chain: 'ethereum',
         };
 
-        const all = [ethPosition, ...tokenList].filter(t => t.usdValue > 1);
+        const all = [ethPosition, ...tokenList].filter(t => t.usdValue > 1 || t.symbol === 'ETH');
         const totalUsd = all.reduce((s, t) => s + t.usdValue, 0);
         all.forEach(t => { t.portfolioPct = totalUsd > 0 ? (t.usdValue / totalUsd) * 100 : 0; });
 
