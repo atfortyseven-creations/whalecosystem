@@ -556,36 +556,38 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
             if (!token) return;
 
             try {
-                const res = await fetch(`/api/auth/qr-session?id=${token}`);
+                // High-fidelity timestamp for Absolute Zero-Cache
+                const res = await fetch(`/api/auth/qr-session?id=${token}&_t=${Date.now()}`);
                 
                 if (!res.ok) {
                     ConsecutiveErrors++;
-                    if (ConsecutiveErrors > 5) {
-                        console.warn('[QR_MILITARY] Persistent network failure, maintaining session but slowing down...');
-                        // Slow down if failing persistently
-                    }
                     return;
                 }
 
                 ConsecutiveErrors = 0;
                 const data = await res.json();
                 
-                // Adaptive polling: if server says 'waiting', it means infrastructure is alive.
-                // Maintain current loop.
                 if (data.status === 'waiting') return;
 
-                if (data.status === 'complete') {
+                if (data.status === 'complete' && data.address) {
                     clearInterval(intervalId);
                     setSyncStatus('SYNCED');
+
+                    // ─── ABSOLUTE INGESTION ──────────────────────────────────────
+                    // Direct browser adoption of the handshake address.
+                    // Set cookie as fail-safe backup for the backend header.
+                    document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; sameSite=lax`;
                     
                     // Instant Unlock transition
                     setTimeout(() => {
                         setLinked(true);
-                        toast.success("ACCESO CONCEDIDO", { 
-                            description: "Identidad sincronizada via Handshake Militar.",
+                        toast.success("IDENTIDAD VERIFICADA", { 
+                            description: `Handshake completo con ${data.address.slice(0, 8)}...`,
                             className: "font-black tracking-widest uppercase" 
                         });
-                        setTimeout(() => window.location.reload(), 800);
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 1200);
                     }, 800);
                 } else if (data.status === 'expired') {
                     clearInterval(intervalId);
@@ -671,19 +673,19 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                             className="relative p-4 bg-white rounded-2xl shadow-inner w-full h-full flex items-center justify-center"
                           >
                             <QRCodeSVG
-                              value={`WHALE_HANDSHAKE:${qrSession}`}
-                              style={{ width: '100%', height: '100%' }}
-                              level="H"
-                              bgColor="transparent"
-                              fgColor="#050505"
-                              includeMargin={false}
-                              imageSettings={{
-                                src: "/official-whale-monochrome.png",
-                                x: undefined, y: undefined,
-                                height: 32, width: 32,
-                                excavate: true,
-                              }}
-                            />
+                               value={`https://www.humanidfi.com/sync?session=${qrSession}`}
+                               style={{ width: '100%', height: '100%' }}
+                               level="H"
+                               bgColor="transparent"
+                               fgColor="#050505"
+                               includeMargin={false}
+                               imageSettings={{
+                                 src: "/official-whale-monochrome.png",
+                                 x: undefined, y: undefined,
+                                 height: 32, width: 32,
+                                 excavate: true,
+                               }}
+                             />
                           </motion.div>
                         ) : syncStatus === 'SYNCED' ? (
                           <motion.div

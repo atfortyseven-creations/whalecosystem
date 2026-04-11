@@ -657,14 +657,20 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   const handleScan = useCallback(async (text: string) => {
     if (isProcessingRef.current || !text) return;
     
-    let token = '';
-    // Protocol detection: WHALE_HANDSHAKE:TOKEN_ID
+    // Protocol detection: WHALE_HANDSHAKE:TOKEN_ID or https://humanidfi.com/sync?session=TOKEN_ID
     if (text.startsWith('WHALE_HANDSHAKE:')) {
       token = text.split(':')[1];
     } else if (text.includes('session=')) {
       try {
+        // Advanced URL parsing with recursive fallback
         const url = new URL(text);
         token = url.searchParams.get('session') || '';
+        
+        // Secondary fallback for raw split in case of aggressive URL encoding / URI interference
+        if (!token) {
+           const match = text.match(/session=([a-zA-Z0-9-]+)/);
+           token = match ? match[1] : '';
+        }
       } catch {
         const parts = text.split('session=');
         token = parts.length > 1 ? parts[1].split('&')[0] : '';

@@ -21,64 +21,62 @@ export async function GET(request: Request) {
 
     const val = await safeRedisGet(`qr:${id}`);
     
+    // Create base response headers for Absolute Zero-Cache
+    const headers = new Headers();
+    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    headers.set('Pragma', 'no-cache');
+    headers.set('Expires', '0');
+
     // ─── INSTITUTIONAL RESILIENCE ───────────────────────────────────────────
-    // If Redis timed out, do NOT tell the client 'expired'. Tell them 'waiting'
-    // so they maintain the current QR instead of refreshing it inappropriately.
     if (val === 'TIMEOUT') {
-        return NextResponse.json({ status: 'waiting' });
+        return NextResponse.json({ status: 'waiting' }, { headers });
     }
 
     if (!val) {
-        return NextResponse.json({ status: 'expired' });
+        return NextResponse.json({ status: 'expired' }, { headers });
     }
 
     if (val === 'PENDING') {
-        return NextResponse.json({ status: 'pending' });
-    }
-
-    // Already consumed (rapid double-poll) — still report complete to unblock the desktop gate
-    if (val === 'CONSUMED') {
-        return NextResponse.json({ status: 'complete' });
+        return NextResponse.json({ status: 'pending' }, { headers });
     }
 
     try {
         const valStr = val as string;
+        let data: any = null;
+        
         if (valStr.startsWith('{')) {
-            const data = JSON.parse(valStr);
-            if (data.address) {
-                // Mark consumed immediately — prevents race condition on concurrent polls
-                await safeRedisSet(`qr:${id}`, 'CONSUMED', 'EX', 60);
+            data = JSON.parse(valStr);
+        }
 
-                // ─── CRITICAL FIX ───────────────────────────────────────────────
-                // cookies().set() from 'next/headers' does NOT work inside a GET
-                // Route Handler in Next.js App Router — it throws "Cookies can only
-                // be modified in a Server Action or Route Handler" at runtime.
-                // The correct approach for any Route Handler verb is to use
-                // NextResponse with the Set-Cookie header directly.
-                // ────────────────────────────────────────────────────────────────
-                const response = NextResponse.json(
-                    { status: 'complete', address: data.address },
-                    { status: 200 }
-                );
-
-                // ─── DESKTOP PERSISTENCE ──────────────────────────────────────
-                // We must set the cookie on the polling response so the desktop
-                // browser persists the link across refreshes.
-                response.cookies.set('sovereign_handshake', data.address, {
-                    path: '/',
-                    maxAge: 604800,
-                    sameSite: 'lax',
-                });
-
-                console.log(`[QR_SESSION:Complete] Token consumed, cookie set for ${data.address}`);
-                return response;
+        // If data is available, it means the handshake was successful (either fresh or locked)
+        if (data && data.address) {
+            // Institutional State Lock: Instead of 'CONSUMED' (which loses data), we 
+            // maintain the 'LOCKED_RESULT' state for 120s to ensure the client reloads successfully.
+            if (data.status !== 'LOCKED_RESULT') {
+                await safeRedisSet(`qr:${id}`, JSON.stringify({ 
+                    ...data, 
+                    status: 'LOCKED_RESULT' 
+                }), 'EX', 120);
             }
+
+            const response = NextResponse.json(
+                { status: 'complete', address: data.address },
+                { status: 200, headers }
+            );
+
+            // ─── ABSOLUTE PERSISTENCE ──────────────────────────────────────
+            response.cookies.set('sovereign_handshake', data.address, {
+                path: '/',
+                maxAge: 604800,
+                sameSite: 'lax',
+            });
+
+            return response;
         }
     } catch (e) {
         console.error('[QR_SESSION_PARSE_ERROR]', e);
-        return NextResponse.json({ status: 'error', message: 'Payload invalid' }, { status: 500 });
+        return NextResponse.json({ status: 'error', message: 'Payload invalid' }, { status: 500, headers });
     }
 
-    // Unexpected state — treat as still pending
-    return NextResponse.json({ status: 'pending' });
+    return NextResponse.json({ status: 'pending' }, { headers });
 }
