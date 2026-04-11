@@ -65,7 +65,7 @@ const INJECTION_PATTERNS = [
   /<script[\s>]/i,                             // XSS
   /javascript:/i,                              // JS protocol injection
   /(\bunion\b.*\bselect\b|\bselect\b.*\bfrom\b|\bdrop\b.*\btable\b)/i, // SQLi
-  /\$\{.*\}/,                                  // Template injection
+  /\$\{.*[()=`].*\}/,                          // Template injection (refined to avoid false positives)
   /\bexec\b\s*\(/i,                            // Code execution attempt
   /%00/,                                       // Null byte injection
   /%2e%2e/i,                                   // URL-encoded traversal
@@ -109,6 +109,7 @@ function buildChallengeResponse(retryAfter: number, ip: string): NextResponse {
 // The in-memory window acts as the FIRST line of defense at zero latency.
 
 const ipWindows = new Map<string, { count: number; resetAt: number }>();
+const MAX_WAF_CACHE = 1000; // [STABILITY] Limit memory growth in Edge Runtime
 
 function inMemoryRateCheck(key: string, max: number, windowSec: number): boolean {
   const now = Date.now();
@@ -124,14 +125,13 @@ function inMemoryRateCheck(key: string, max: number, windowSec: number): boolean
   return true;
 }
 
-// GC the map every ~500 requests to prevent memory growth on hot edges
-let gcCounter = 0;
+// ─── OPTIMIZED GC FOR EDGE ───────────────────────────────────────────────────
+// [BUG-12 FIX] Avoid O(n) synchronous iterations that block the Edge event loop.
+// Instead of full cleanup, we use a size limit (LRU-ish) and passive cleanup.
 function maybeGC() {
-  if (++gcCounter % 500 === 0) {
-    const now = Date.now();
-    for (const [key, win] of ipWindows) {
-      if (now > win.resetAt) ipWindows.delete(key);
-    }
+  if (ipWindows.size > MAX_WAF_CACHE) {
+    // Aggressive clear if cache balloons unexpectedly
+    ipWindows.clear();
   }
 }
 

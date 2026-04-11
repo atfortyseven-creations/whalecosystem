@@ -186,12 +186,12 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
                 </div>
 
-                <style jsx global>{`
+                <style dangerouslySetInnerHTML={{ __html: `
                     @keyframes spin {
                         from { transform: rotate(0deg); }
                         to   { transform: rotate(360deg); }
                     }
-                `}</style>
+                `}} />
             </motion.div>
         );
     }

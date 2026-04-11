@@ -147,7 +147,7 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
                 <div ref={endOfLogsRef} />
             </div>
             
-            <style jsx>{`
+            <style dangerouslySetInnerHTML={{ __html: `
                 .terminal-scroll::-webkit-scrollbar {
                     width: 4px;
                 }
@@ -158,7 +158,7 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
                     background: rgba(255,255,255,0.1);
                     border-radius: 4px;
                 }
-            `}</style>
+            `}} />
         </motion.div>
     );
 }

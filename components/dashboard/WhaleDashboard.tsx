@@ -25,8 +25,14 @@ import { ZKShieldStation }         from '@/components/dashboard/ZKShieldStation'
 import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
 import { SovereignVault }          from '@/components/dashboard/SovereignVault';
 import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
-import PortfolioDashboard          from '@/components/dashboard/PortfolioDashboard';
+import dynamic from 'next/dynamic';
 import { VirtualizedFirehose }     from '@/components/premium/VirtualizedFirehose';
+
+// PortfolioDashboard uses useAppKit/useAppKitAccount — must be ssr:false
+const PortfolioDashboard = dynamic(
+  () => import('@/components/dashboard/PortfolioDashboard'),
+  { ssr: false }
+);
 
 import "@/app/dashboard/dashboard.css";
 

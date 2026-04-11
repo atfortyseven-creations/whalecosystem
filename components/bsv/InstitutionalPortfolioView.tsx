@@ -52,18 +52,7 @@ export function InstitutionalPortfolioView() {
         }
     }, [refreshBalance, isHydrated]);
 
-    // Hidden trigger requested by system
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'w') {
-                e.preventDefault();
-                useWalletStore.getState().createWallet();
-                toast.success("Wallet instantly generated via terminal shortcut");
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+
 
     const ethPrice = useVIPStore(s => s.ethPrice);
 

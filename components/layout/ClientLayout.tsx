@@ -7,14 +7,12 @@ import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { DropdownNav } from '@/components/site/DropdownNav';
 import { SiteNavigationPill } from '@/components/shared/SiteNavigationPill';
 import { SystemsUtilityHeader } from '@/components/shared/SystemsUtilityHeader';
-import { ConnectWalletModal } from '@/components/shared/ConnectWalletModal';
 import { GlobalTokenTicker } from '@/components/shared/GlobalTokenTicker';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { MobileNavBar } from '@/components/layout/MobileNavBar';
 import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
-import { LinkedGate } from '@/components/shared/LinkedGate';
 import dynamic from 'next/dynamic';
 
 // ─── Lazy GPU-heavy components ──────────────────────────────────────────
@@ -35,6 +33,19 @@ const UtilityPanels = dynamic(
 );
 const BillionWhaleNotification = dynamic(
   () => import('@/components/shared/UtilityPanels').then(m => m.BillionWhaleNotification),
+  { ssr: false }
+);
+
+// ─── AppKit-dependent components (ssr: false to prevent "createAppKit" SSR error) ──
+// These components call useAppKit/useAppKitAccount hooks unconditionally in their render
+// body. Next.js SSR-renders 'use client' components on the server for hydration, which
+// triggers the hooks before the AppKit context exists — causing the digest:3117477805 crash.
+const ConnectWalletModal = dynamic(
+  () => import('@/components/shared/ConnectWalletModal').then(m => ({ default: m.ConnectWalletModal })),
+  { ssr: false }
+);
+const LinkedGate = dynamic(
+  () => import('@/components/shared/LinkedGate').then(m => ({ default: m.LinkedGate })),
   { ssr: false }
 );
 

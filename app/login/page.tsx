@@ -1,280 +1,439 @@
 "use client";
 
-import { useState } from "react";
-import { SignIn, useSignUp, useSignIn } from "@clerk/nextjs";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import { ImmersiveBackground } from "@/components/premium/ImmersiveBackground";
-import { Mail, Smartphone, CheckCircle2, ArrowRight, ShieldCheck, UserPlus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/navigation";
+import {
+  Chrome,
+  Smartphone,
+  Shield,
+  ChevronDown,
+  CheckCircle2,
+  ArrowRight,
+  Wifi,
+  Puzzle,
+  Wallet,
+  Lock,
+  Zap,
+} from "lucide-react";
 
-type AuthStep = "CHOICE" | "GOOGLE" | "REG_EMAIL" | "REG_EMAIL_CODE" | "REG_SMS" | "REG_SMS_CODE" | "WELCOME";
-
-export default function LoginPage() {
-  const [step, setStep] = useState<AuthStep>("CHOICE");
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [isPending, setIsPending] = useState(false);
-  const [authMode, setAuthMode] = useState<"signUp" | "signIn">("signUp");
-  
-  const { isLoaded: isSignUpLoaded, signUp, setActive: setSignUpActive } = useSignUp();
-  const { isLoaded: isSignInLoaded, signIn, setActive: setSignInActive } = useSignIn();
-  const isLoaded = isSignUpLoaded && isSignInLoaded;
-
-  const nextStep = (s: AuthStep) => setStep(s);
-
+// ── Wave Background using olas-hokusai-4k.png ──────────────────────────────────
+function WaveBackground() {
   return (
-    <main className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-black selection:bg-indigo-500/30">
-      
-      {/* LEGENARY 3D BACKGROUND (WHITE REVERSE) */}
-      <ImmersiveBackground theme="light" />
-
-      {/* AUTH CARD CONTAINER */}
-      <div className="relative z-10 w-full max-w-[440px] px-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "circOut" }}
-          className="relative group mx-auto"
-        >
-          {/* Neon Glow Outer */}
-          <div className="absolute -inset-1 bg-gradient-to-b from-indigo-500/10 to-purple-600/10 rounded-[2.5rem] blur-3xl opacity-40" />
-          
-          {/* Main Card (WHITE THEME) */}
-          <div className="relative bg-white/80 backdrop-blur-3xl border border-gray-200/50 rounded-[2.5rem] p-10 shadow-2xl overflow-hidden min-h-[460px] flex flex-col items-center justify-center">
-            
-            <AnimatePresence mode="wait">
-              {step === "CHOICE" && (
-                <motion.div 
-                  key="choice"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="w-full space-y-6 text-center"
-                >
-                    <div className="mb-12">
-                      <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-slate-100 shadow-sm relative group-hover:scale-110 transition-transform duration-700">
-                        <img src="/official-whale-legendary.png" className="w-12 h-12 drop-shadow-md object-contain" alt="Whale Alert" />
-                      </div>
-                      <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.5em] mb-3">Corporate Hub</h2>
-                      <h1 className="text-2xl font-black text-slate-950 tracking-tight">Welcome to the Family.</h1>
-                    </div>
-
-                  {/* CLERK GOOGLE & METAMASK BUTTONS ONLY */}
-                  <div className="auth-wrapper-legendary w-full flex justify-center">
-                    <SignIn 
-                      appearance={{
-                        layout: {
-                          socialButtonsVariant: "blockButton",
-                          socialButtonsPlacement: "bottom"
-                        },
-                        elements: {
-                          rootBox: "w-full flex justify-center",
-                          card: "bg-transparent shadow-none border-none p-0 m-0 w-full",
-                          header: "hidden",
-                          dividerRow: "hidden",
-                          socialButtonsBlockButton: "bg-gray-50 text-gray-900 border border-gray-200 hover:bg-gray-100 h-14 rounded-2xl transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98] w-full",
-                          socialButtonsBlockButtonText: "font-black uppercase tracking-[0.1em] text-xs text-gray-700",
-                          footer: "hidden",
-                          form: "hidden",
-                          identityPreview: "hidden",
-                        }
-                      }}
-                      routing="hash"
-                      fallbackRedirectUrl="/"
-                      signUpFallbackRedirectUrl="/"
-                    />
-                  </div>
-
-                  <button 
-                    onClick={() => nextStep("REG_EMAIL")}
-                    className="w-full h-16 bg-slate-950 hover:bg-black text-white rounded-[1.5rem] flex items-center justify-center gap-4 transition-all group shadow-[0_15px_30px_rgba(0,0,0,0.1)] hover:scale-105 active:scale-95"
-                  >
-                    <UserPlus className="w-5 h-5 text-white/80 group-hover:text-white" />
-                    <span className="text-xs font-black text-white uppercase tracking-[0.3em]">Corporate Access</span>
-                  </button>
-                </motion.div>
-              )}
-
-              {step === "REG_EMAIL" && (
-                <motion.div 
-                   key="email"
-                   initial={{ opacity: 0, x: 20 }}
-                   animate={{ opacity: 1, x: 0 }}
-                   exit={{ opacity: 0, x: -20 }}
-                   className="w-full space-y-6"
-                >
-                   <div className="text-center mb-8">
-                     <Mail className="w-8 h-8 text-indigo-400 mx-auto mb-4" />
-                     <h2 className="text-xl font-black text-white uppercase tracking-wider">Clearance Email</h2>
-                     <p className="text-[10px] text-white/30 uppercase tracking-widest mt-2">Enter your secure Gmail node</p>
-                   </div>
-                   <input 
-                      type="email" 
-                      placeholder="address@example.com"
-                      className="w-full h-14 bg-white/5 border border-white/10 rounded-xl px-4 text-white font-mono text-sm focus:outline-none focus:border-indigo-500/50 transition-colors"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                   />
-                   <button 
-                      onClick={async () => {
-                         if (!isLoaded) return;
-                         try {
-                           setIsPending(true);
-                           await signUp.create({ emailAddress: email });
-                           await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-                           setAuthMode("signUp");
-                           nextStep("REG_EMAIL_CODE");
-                         } catch (err: any) {
-                           if (err.errors?.[0]?.code === "form_identifier_exists") {
-                             try {
-                               const { supportedFirstFactors } = await signIn.create({ identifier: email });
-                               
-                               const emailCodeFactor = supportedFirstFactors?.find(
-                                 (factor: any) => factor.strategy === "email_code"
-                               ) as any;
-
-                               if (emailCodeFactor) {
-                                 await signIn.prepareFirstFactor({
-                                   strategy: "email_code",
-                                   emailAddressId: emailCodeFactor.emailAddressId,
-                                 });
-                                 setAuthMode("signIn");
-                                 nextStep("REG_EMAIL_CODE");
-                               } else {
-                                 toast.error("Email code login not supported for this account.");
-                               }
-                             } catch (signInErr: any) {
-                               console.error("SignIn Error:", signInErr);
-                               toast.error(signInErr.errors?.[0]?.message || "Failed to initiate login");
-                             }
-                           } else {
-                             console.error("SignUp Error:", err);
-                             toast.error(err.errors?.[0]?.message || "Failed to send code");
-                           }
-                         } finally {
-                           setIsPending(false);
-                         }
-                      }}
-                      disabled={!email || isPending}
-                      className="w-full h-14 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all disabled:opacity-30"
-                   >
-                      {isPending ? "Dispatching..." : "Dispatch Code"} <ArrowRight className="w-4 h-4" />
-                   </button>
-                </motion.div>
-              )}
-
-              {step === "REG_EMAIL_CODE" && (
-                <motion.div 
-                   key="email_code"
-                   initial={{ opacity: 0, x: 20 }}
-                   animate={{ opacity: 1, x: 0 }}
-                   exit={{ opacity: 0, x: -20 }}
-                   className="w-full space-y-6"
-                >
-                   <div className="text-center mb-8">
-                     <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-4" />
-                     <h2 className="text-xl font-black text-white uppercase tracking-wider">Verify Node</h2>
-                     <p className="text-[10px] text-white/30 uppercase tracking-widest mt-2">Code transmitted to {email}</p>
-                   </div>
-                   <div className="grid grid-cols-1 gap-3">
-                      <input 
-                        type="text" 
-                        maxLength={6} 
-                        placeholder="123456"
-                        className="w-full h-14 bg-white/5 border border-white/10 rounded-xl text-center text-2xl tracking-[0.5em] font-black text-white focus:outline-none focus:border-indigo-500/50" 
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                      />
-                   </div>
-                   <button 
-                       onClick={async () => {
-                        if (!isLoaded) return;
-                        try {
-                          setIsPending(true);
-                          
-                          if (authMode === "signUp") {
-                            const completeSignUp = await signUp.attemptEmailAddressVerification({ code });
-                            if (completeSignUp.status === "complete") {
-                              await setSignUpActive({ session: completeSignUp.createdSessionId });
-                              nextStep("WELCOME");
-                            } else {
-                              console.error(completeSignUp);
-                              toast.error("Verification not complete");
-                            }
-                          } else {
-                            const completeSignIn = await signIn.attemptFirstFactor({ strategy: "email_code", code });
-                            if (completeSignIn.status === "complete") {
-                              await setSignInActive({ session: completeSignIn.createdSessionId });
-                              nextStep("WELCOME");
-                            } else {
-                              console.error(completeSignIn);
-                              toast.error("Verification not complete");
-                            }
-                          }
-                        } catch (err: any) {
-                          console.error(err);
-                          toast.error(err.errors?.[0]?.message || "Invalid Code");
-                        } finally {
-                          setIsPending(false);
-                        }
-                      }}
-                      disabled={code.length !== 6 || isPending}
-                      className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex justify-center items-center gap-2 font-black uppercase text-xs tracking-widest transition-all disabled:opacity-30"
-                   >
-                      {isPending ? "Verifying..." : "Confirm Identity"}
-                   </button>
-                </motion.div>
-              )}
-
-
-
-
-
-              {step === "WELCOME" && (
-                <motion.div 
-                   key="welcome"
-                   initial={{ opacity: 0, scale: 0.9 }}
-                   animate={{ opacity: 1, scale: 1 }}
-                   className="text-center py-10"
-                >
-                    <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-10 border border-emerald-500/20 shadow-inner">
-                       <CheckCircle2 className="w-12 h-12 text-emerald-500" />
-                    </div>
-                    <h2 className="text-4xl font-black text-slate-950 uppercase tracking-tighter mb-4 italic">Node Sync Success</h2>
-                    <p className="text-[11px] text-slate-400 uppercase tracking-[0.4em] font-black mb-12">Authorized Account active. Enter the matrix.</p>
-                   <button 
-                      onClick={() => window.location.href = "/"}
-                      className="px-10 py-4 bg-white text-black rounded-xl font-black uppercase tracking-[0.2em] text-xs hover:scale-105 transition-all shadow-xl"
-                   >
-                      Enter System →
-                   </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div id="clerk-captcha" />
-          </div>
-        </motion.div>
-      </div>
-
-      <style jsx global>{`
-        .auth-wrapper-legendary .cl-internal-ph6787,
-        .auth-wrapper-legendary .cl-dividerRow {
-          display: none !important;
-        }
-        .auth-wrapper-legendary .cl-socialButtons {
-          flex-direction: column !important;
-          gap: 12px !important;
-          display: flex !important;
-          width: 100% !important;
-        }
-        /* Hide everything except Google and Metamask - for both block and icon buttons */
-        .auth-wrapper-legendary .cl-socialButtonsBlockButton:not(:has(.cl-socialButtonsProviderIcon__google)):not(:has(.cl-socialButtonsProviderIcon__metamask)),
-        .auth-wrapper-legendary .cl-socialButtonsIconButton:not(:has(.cl-socialButtonsProviderIcon__google)):not(:has(.cl-socialButtonsProviderIcon__metamask)) {
-          display: none !important;
-        }
-      `}</style>
-    </main>
+    <div className="fixed inset-0 z-0 pointer-events-none">
+      {/* The legendary wave image — hardware accelerated, zero quality loss */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "url('/olas-hokusai-4k.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+          backgroundRepeat: "no-repeat",
+          transform: "translateZ(0)",
+          willChange: "transform",
+        }}
+      />
+      {/* Overlay to keep text readable — dark at bottom, transparent at top */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(2,6,23,0.55) 0%, rgba(2,6,23,0.72) 40%, rgba(2,6,23,0.88) 100%)",
+        }}
+      />
+    </div>
   );
 }
 
+// ── Instruction Step Card ──────────────────────────────────────────────────────
+function StepCard({
+  step,
+  icon,
+  title,
+  description,
+  delay = 0,
+}: {
+  step: number;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex gap-5 items-start p-6 rounded-2xl"
+      style={{
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+      }}
+    >
+      {/* Step number */}
+      <div className="shrink-0 w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+        <span className="font-black text-xs text-white/70 font-mono">{String(step).padStart(2, "0")}</span>
+      </div>
 
+      {/* Icon */}
+      <div className="shrink-0 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/80">
+        {icon}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <p className="font-black text-white text-sm uppercase tracking-wider mb-1">{title}</p>
+        <p className="text-white/55 text-[12px] leading-relaxed">{description}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Scroll Indicator ───────────────────────────────────────────────────────────
+function ScrollHint() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.5, duration: 0.8 }}
+      className="flex flex-col items-center gap-2 mt-10"
+    >
+      <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/35">
+        Scroll para conectar
+      </p>
+      <motion.div
+        animate={{ y: [0, 6, 0] }}
+        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+        className="w-6 h-10 rounded-full border border-white/25 flex items-start justify-center pt-2"
+      >
+        <motion.div
+          animate={{ height: ["30%", "60%", "30%"], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          className="w-[2px] bg-white/60 rounded-full"
+        />
+      </motion.div>
+      <ChevronDown size={14} className="text-white/35 animate-bounce" />
+    </motion.div>
+  );
+}
+
+// ── Connect Panel (Panel 2) ────────────────────────────────────────────────────
+function ConnectPanel() {
+  const { openConnectModal } = useConnectModal();
+  const { isConnected, address } = useAccount();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isConnected) {
+      setTimeout(() => router.replace("/"), 1200);
+    }
+  }, [isConnected, router]);
+
+  return (
+    <section
+      className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-20"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-md"
+      >
+        {/* Card */}
+        <div
+          className="rounded-[2.5rem] p-10 flex flex-col items-center text-center gap-8"
+          style={{
+            background: "rgba(255,255,255,0.07)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.4)",
+          }}
+        >
+          {/* Logo */}
+          <div
+            className="w-20 h-20 rounded-[1.8rem] flex items-center justify-center"
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            <img
+              src="/official-whale-legendary.png"
+              alt="Whale Alert"
+              className="w-12 h-12 object-contain drop-shadow-lg"
+            />
+          </div>
+
+          {/* Text */}
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-white/35 mb-3">
+              Sovereign Terminal
+            </p>
+            <h2 className="text-3xl font-black text-white tracking-tighter leading-tight mb-3">
+              Conecta tu Wallet
+            </h2>
+            <p className="text-white/50 text-[13px] leading-relaxed">
+              Autenticación no custodial. Tu firma criptográfica es tu identidad — sin contraseñas, sin cuentas.
+            </p>
+          </div>
+
+          {/* Connect button */}
+          {isConnected ? (
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              className="w-full flex flex-col items-center gap-3"
+            >
+              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                <CheckCircle2 size={32} className="text-emerald-400" />
+              </div>
+              <p className="font-black text-white uppercase tracking-widest text-sm">
+                ¡Conectado!
+              </p>
+              <p className="font-mono text-white/40 text-[11px]">
+                {address?.slice(0, 10)}…{address?.slice(-8)}
+              </p>
+              <p className="font-mono text-[9px] uppercase tracking-widest text-white/25">
+                Redirigiendo al terminal…
+              </p>
+            </motion.div>
+          ) : (
+            <button
+              onClick={() => openConnectModal?.()}
+              className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-3 group"
+              style={{
+                background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(230,230,230,0.9) 100%)",
+                color: "#050505",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.02)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 16px 48px rgba(0,0,0,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)";
+              }}
+            >
+              <Wallet size={18} />
+              Conectar Wallet
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          )}
+
+          {/* Security note */}
+          <div className="flex items-start gap-3 pt-2 border-t border-white/10 w-full text-left">
+            <Lock size={13} className="text-white/30 mt-0.5 shrink-0" />
+            <p className="text-white/30 text-[10px] leading-relaxed">
+              Autenticación ECDSA. Tus claves privadas nunca salen de tu dispositivo. Compatible con MetaMask, Rainbow, Coinbase Wallet y cualquier wallet injected o WalletConnect.
+            </p>
+          </div>
+
+          {/* Supported networks */}
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {["ETH", "BASE", "ARB", "OP", "POL"].map((n) => (
+              <span
+                key={n}
+                className="font-mono text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
+                style={{
+                  background: "rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  color: "rgba(255,255,255,0.4)",
+                }}
+              >
+                {n}
+              </span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
+// ── Main Page ──────────────────────────────────────────────────────────────────
+export default function LoginPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen bg-[#020617]">
+      <WaveBackground />
+
+      {/* ── PANEL 1: EDUCATIONAL GUIDE ────────────────────────────────── */}
+      <section className="relative z-10 min-h-screen flex flex-col px-6 py-16 max-w-2xl mx-auto">
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="flex items-center gap-3 mb-16"
+        >
+          <img
+            src="/official-whale-monochrome.png"
+            className="w-7 h-7 brightness-0 invert opacity-70"
+            alt="Whale Alert"
+          />
+          <span className="font-black text-sm uppercase tracking-tight text-white/60">
+            Whale Alert Network
+          </span>
+          <div className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-mono text-[8px] uppercase tracking-widest text-white/40">Live</span>
+          </div>
+        </motion.div>
+
+        {/* Hero Text */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-12"
+        >
+          <p className="font-mono text-[9px] uppercase tracking-[0.5em] text-white/35 mb-5">
+            Guía de Acceso · Sovereign Terminal
+          </p>
+          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-[1.05] mb-5">
+            Cómo conectar
+            <br />
+            <span className="text-white/50">tu wallet</span>
+          </h1>
+          <p className="text-white/50 text-[14px] leading-relaxed max-w-lg">
+            El Sovereign Terminal usa autenticación <span className="text-white/80 font-bold">Web3 pura</span> — sin email, sin contraseñas, sin cuentas. Solo tu wallet y tu firma criptográfica.
+          </p>
+        </motion.div>
+
+        {/* ── OPCIÓN A: Chrome Extension ── */}
+        <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex items-center gap-3 mb-4"
+          >
+            <div className="h-px flex-1 bg-white/10" />
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.25)" }}>
+              <Chrome size={12} className="text-indigo-400" />
+              <span className="font-mono text-[9px] uppercase tracking-widest text-indigo-300 font-black">Desde Chrome / Brave</span>
+            </div>
+            <div className="h-px flex-1 bg-white/10" />
+          </motion.div>
+
+          <div className="flex flex-col gap-3">
+            <StepCard
+              step={1}
+              icon={<Puzzle size={18} />}
+              title="Instala MetaMask o la extensión"
+              description='Ve a la Chrome Web Store y busca "MetaMask" (el zorro naranja). Instala la extensión oficial. También funciona con Coinbase Wallet Extension, Rainbow, Rabby, y cualquier extensión EIP-6963 compatible.'
+              delay={0.35}
+            />
+            <StepCard
+              step={2}
+              icon={<Wallet size={18} />}
+              title="Crea o importa tu wallet"
+              description='Al abrir MetaMask por primera vez, crea una nueva wallet (guarda tu seed phrase en un lugar seguro) o importa una existente. Una vez configurada, la extensión aparecerá en la barra de Chrome.'
+              delay={0.45}
+            />
+            <StepCard
+              step={3}
+              icon={<Zap size={18} />}
+              title="Haz scroll y pulsa «Conectar Wallet»"
+              description='Desplázate hacia abajo en esta página. Pulsa el botón "Conectar Wallet". Tu extensión mostrará una ventana de confirmación. Aprueba la conexión — eso es todo.'
+              delay={0.55}
+            />
+          </div>
+        </div>
+
+        {/* ── OPCIÓN B: Wallet Móvil ── */}
+        <div className="mb-2">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="flex items-center gap-3 mb-4"
+          >
+            <div className="h-px flex-1 bg-white/10" />
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}>
+              <Smartphone size={12} className="text-emerald-400" />
+              <span className="font-mono text-[9px] uppercase tracking-widest text-emerald-300 font-black">Desde Móvil (WalletConnect)</span>
+            </div>
+            <div className="h-px flex-1 bg-white/10" />
+          </motion.div>
+
+          <div className="flex flex-col gap-3">
+            <StepCard
+              step={1}
+              icon={<Smartphone size={18} />}
+              title="Descarga una wallet móvil"
+              description='Instala MetaMask, Rainbow, Trust Wallet o Coinbase Wallet desde el App Store o Google Play. Son gratuitas y de código abierto.'
+              delay={0.65}
+            />
+            <StepCard
+              step={2}
+              icon={<Wifi size={18} />}
+              title="Haz scroll y usa WalletConnect"
+              description='En el panel de conexión (debajo), selecciona "WalletConnect". Se mostrará un código QR. Escanéalo con tu wallet móvil — la sesión se sincronizará automáticamente.'
+              delay={0.75}
+            />
+          </div>
+        </div>
+
+        {/* ── Security Badge ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9 }}
+          className="mt-8 flex items-start gap-3 px-5 py-4 rounded-2xl"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <Shield size={16} className="text-white/30 mt-0.5 shrink-0" />
+          <p className="text-white/35 text-[11px] leading-relaxed">
+            <span className="text-white/60 font-bold">100% Non-Custodial.</span>{" "}
+            Nunca pedimos ni almacenamos tu seed phrase, clave privada ni email. La autenticación es puramente criptográfica mediante ECDSA.
+          </p>
+        </motion.div>
+
+        {/* Scroll hint */}
+        <ScrollHint />
+      </section>
+
+      {/* ── PANEL 2: CONNECT BUTTON ───────────────────────────────────── */}
+      <ConnectPanel />
+
+      {/* Footer */}
+      <footer className="relative z-10 px-8 py-6 border-t border-white/[0.06] flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img src="/official-whale-monochrome.png" className="w-4 h-4 brightness-0 invert opacity-25" alt="" />
+          <span className="font-mono text-[8px] uppercase tracking-widest text-white/20">
+            Whale Alert Network · Sovereign Terminal
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          {["MetaMask", "Rainbow", "Coinbase", "WalletConnect"].map((w) => (
+            <span key={w} className="font-mono text-[7px] uppercase tracking-widest text-white/15 hidden md:block">
+              {w}
+            </span>
+          ))}
+        </div>
+      </footer>
+    </div>
+  );
+}
