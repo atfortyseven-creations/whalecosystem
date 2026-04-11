@@ -39,14 +39,12 @@ function buildSyntheticMap(): Map<string, MarketData> {
     ];
     const m = new Map<string, MarketData>();
     BASE.forEach(([sym, base]) => {
-        const fluctuation = (Math.random() - 0.5) * 0.04;
-        const price = base * (1 + fluctuation);
         m.set(sym, {
             symbol: sym,
-            lastPrice: price.toFixed(sym === 'BTCUSDT' || sym === 'ETHUSDT' ? 2 : 4),
-            priceChangePercent: (fluctuation * 100).toFixed(2),
-            quoteVolume: (base * 1000 * (0.8 + Math.random() * 0.4)).toFixed(2),
-            source: 'client-synthetic',
+            lastPrice: base.toFixed(sym === 'BTCUSDT' || sym === 'ETHUSDT' ? 2 : 4),
+            priceChangePercent: "0.00",
+            quoteVolume: (base * 1000).toFixed(2),
+            source: 'client-deterministic',
         });
     });
     return m;

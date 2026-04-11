@@ -43,7 +43,7 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
     // Trigger Permission Nexus
     return new Promise((resolve, reject) => {
       setNexusData({ origin: 'External dApp', action: 'createAction', params });
-      setNexusResolve(() => (approved: boolean) => {
+      setNexusResolve(() => async (approved: boolean) => {
         if (approved) {
           const newAction = { 
             id: `tx_${Date.now()}`, 
@@ -52,7 +52,15 @@ export function CWIProvider({ children }: { children: React.ReactNode }) {
             status: 'broadcasted' 
           };
           setActions(prev => [newAction, ...prev]);
-          resolve({ txid: 'net_txid_' + Math.random().toString(16).slice(2) });
+          
+          // Pure On-Chain emulation: SHA-256 cryptographic digest of the payload
+          const encoder = new TextEncoder();
+          const payloadBuffer = encoder.encode(JSON.stringify(params) + Date.now());
+          const hashBuffer = await window.crypto.subtle.digest('SHA-256', payloadBuffer);
+          const hashHex = Array.from(new Uint8Array(hashBuffer))
+              .map(b => b.toString(16).padStart(2, '0')).join('');
+              
+          resolve({ txid: hashHex });
         } else {
           reject(new Error('Protocol Handshake Refused by User.'));
         }

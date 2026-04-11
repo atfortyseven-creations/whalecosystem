@@ -70,6 +70,7 @@ const nextConfig = {
 
     experimental: {
         optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber'],
+        instrumentationHook: true,
     },
 
     typescript: {

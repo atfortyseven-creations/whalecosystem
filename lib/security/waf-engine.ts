@@ -33,13 +33,29 @@ const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
   '/api':                     { max: 300,  windowSec: 60    },  // global API fallback
 };
 
+// ─── LEGITIMATE BROWSER UA WHITELIST (bypass scoring entirely) ───────────────
+// iOS Safari UA patterns — must never be flagged as malicious.
+// iOS 15-18 UA: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_x like Mac OS X) ...'
+// iOS Private Mode can send a shorter UA but always contains 'Safari' or 'WebKit'.
+const LEGITIMATE_UA_PATTERNS = [
+  /mozilla\/5\.0.*iphone/i,
+  /mozilla\/5\.0.*ipad/i,
+  /mozilla\/5\.0.*ipod/i,
+  /mozilla\/5\.0.*mac os x.*applewebkit/i,  // macOS Safari
+  /mozilla\/5\.0.*android.*mobile.*safari/i, // Android Chrome/WebView
+  /mozilla\/5\.0.*android.*safari/i,
+  /mozilla\/5\.0.*windows.*trident/i,        // IE (legacy, but legitimate)
+  /mozilla\/5\.0.*windows.*rv:/i,            // Firefox Windows
+  /mozilla\/5\.0.*x11.*linux/i,              // Linux browsers
+];
+
 // ─── KNOWN MALICIOUS BOT SIGNATURES ──────────────────────────────────────────
 const MALICIOUS_UA_PATTERNS = [
   /sqlmap/i, /nikto/i, /nmap/i, /masscan/i, /zgrab/i, /dirbuster/i,
   /gobuster/i, /wfuzz/i, /nuclei/i, /burpsuite/i, /acunetix/i,
   /nessus/i, /openvas/i, /metasploit/i, /hydra/i, /medusa/i,
-  /curl\/7\.[0-4]/i,   // Very old curl — common in ancient exploit scripts
-  /python-requests\/2\.[0-1]/i, // Very old requests lib
+  /curl\/7\.[0-4]/i,              // Very old curl — common in ancient exploit scripts
+  /python-requests\/2\.[0-1]/i,  // Very old requests lib
   /libwww-perl/i, /lwp-request/i, /go-http-client\/1\.0/i,
 ];
 
@@ -148,15 +164,24 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
   maybeGC();
 
   // ── VECTOR 1: Malicious User-Agent Fingerprint ────────────────────────────
-  if (!ua || ua.length < 5) {
+  // CRITICAL iOS FIX: iOS Safari in Private Mode sends a trimmed UA that may
+  // be unexpectedly short. Only score a completely EMPTY UA — never score
+  // a UA just because it's short. Legit iOS UAs start with 'Mozilla/5.0'.
+  if (!ua || ua.length === 0) {
+    // Completely absent UA — bot-like
     anomalyScore += 5;
     reasons.push('NO_UA');
   } else {
-    for (const pattern of MALICIOUS_UA_PATTERNS) {
-      if (pattern.test(ua)) {
-        anomalyScore += 10;
-        reasons.push(`MALICIOUS_UA:${pattern.source.slice(0, 20)}`);
-        break;
+    // If it matches a known-legitimate browser pattern, skip all malicious checks.
+    // This prevents false-positive blocks on iOS Safari, stock Android WebView, etc.
+    const isLegitimateUA = LEGITIMATE_UA_PATTERNS.some(p => p.test(ua));
+    if (!isLegitimateUA) {
+      for (const pattern of MALICIOUS_UA_PATTERNS) {
+        if (pattern.test(ua)) {
+          anomalyScore += 10;
+          reasons.push(`MALICIOUS_UA:${pattern.source.slice(0, 20)}`);
+          break;
+        }
       }
     }
   }

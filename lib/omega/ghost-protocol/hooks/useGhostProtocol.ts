@@ -19,7 +19,9 @@ export const useGhostProtocol = () => {
             const wasmPath = "/omega/ghost-protocol/proveHumanity.wasm";
             const zkeyPath = "/omega/ghost-protocol/circuit_final.zkey";
 
-            const secret = BigInt(Math.floor(Math.random() * 1000000000)); // Generating authentic user secret
+            const randomArray = new Uint32Array(1);
+            window.crypto.getRandomValues(randomArray);
+            const secret = BigInt(randomArray[0]); // Generating authentic cryptographic user secret
 
             // DYNAMIC IMPORT: Lazy load the heavy math library (snarkjs)
             // @ts-ignore

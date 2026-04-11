@@ -69,7 +69,19 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, [isConnected, isPublicPage, router, mounted]);
 
     if (!mounted) {
-        return null;
+        // CRITICAL iOS FIX: Never return null from a Provider-tree component.
+        // Returning null on first render breaks React hydration on iOS Safari —
+        // it causes the entire Provider subtree to unmount and re-mount,
+        // triggering a cascade of context errors and a blank screen.
+        // An invisible skeleton div preserves the tree while mounting.
+        return (
+            <GateStateContext.Provider value={{ state: 'AUTH', hasPlayedIntro: false }}>
+                <div
+                    aria-hidden="true"
+                    style={{ visibility: 'hidden', position: 'fixed', inset: 0, zIndex: -1 }}
+                />
+            </GateStateContext.Provider>
+        );
     }
 
     return (

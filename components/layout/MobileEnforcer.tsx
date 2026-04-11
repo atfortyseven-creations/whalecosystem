@@ -38,10 +38,18 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         setMounted(true);
         window.addEventListener('resize', checkMobile);
 
-        // Only restore news bypass if wallet is already connected AND
-        // the session was explicitly set by the user (not auto on fresh load).
-        const bypassActive = typeof sessionStorage !== 'undefined'
-            && sessionStorage.getItem('mobile_news_bypass') === 'true';
+        // CRITICAL iOS FIX: In iOS Safari Private Mode or nested WKWebViews,
+        // accessing sessionStorage can throw a SecurityError and crash the entire app.
+        // We MUST wrap it in a try/catch.
+        let bypassActive = false;
+        try {
+            if (typeof sessionStorage !== 'undefined') {
+                 bypassActive = sessionStorage.getItem('mobile_news_bypass') === 'true';
+            }
+        } catch (e) {
+            console.warn('[Safety] iOS Private Mode restricted sessionStorage read.');
+        }
+
         const hasSovereignCookie = typeof document !== 'undefined'
             && (document.cookie.includes('sovereign_handshake=') || document.cookie.includes('wallet-auth='));
 
@@ -58,25 +66,38 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
         if (isConnected && !prevConnected.current) {
             // New connection — always show landing, never auto-enter news
-            if (typeof sessionStorage !== 'undefined') {
-                sessionStorage.removeItem('mobile_news_bypass');
-            }
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.removeItem('mobile_news_bypass');
+                }
+            } catch (e) {}
             setShowNews(false);
         }
 
         if (!isConnected && prevConnected.current) {
             // Disconnected — also reset to landing
             setShowNews(false);
-            if (typeof sessionStorage !== 'undefined') {
-                sessionStorage.removeItem('mobile_news_bypass');
-            }
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.removeItem('mobile_news_bypass');
+                }
+            } catch (e) {}
         }
 
         prevConnected.current = isConnected;
     }, [isConnected, mounted]);
 
     if (!mounted) {
-        return <div className="min-h-screen bg-[#FAF9F6]" />;
+        // CRITICAL iOS FIX: We MUST render children here.
+        // If we omit `children` during SSR / initial mount, the entire
+        // <Web3SovereignProvider> gets unmounted and then re-mounted on hydration.
+        // iOS Safari heavily penalizes this and causes a total blank screen crash.
+        // We render it invisibly until client-side layout calculates.
+        return (
+            <div style={{ visibility: 'hidden', opacity: 0 }} className="pointer-events-none min-h-screen">
+                {children}
+            </div>
+        );
     }
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
@@ -92,9 +113,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         return (
             <MobileSovereignLanding
                 onEnterNews={() => {
-                    if (typeof sessionStorage !== 'undefined') {
-                        sessionStorage.setItem('mobile_news_bypass', 'true');
-                    }
+                    try {
+                        if (typeof sessionStorage !== 'undefined') {
+                            sessionStorage.setItem('mobile_news_bypass', 'true');
+                        }
+                    } catch (e) {}
                     setShowNews(true);
                 }}
             />

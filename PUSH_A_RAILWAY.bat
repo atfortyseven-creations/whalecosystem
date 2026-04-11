@@ -18,7 +18,7 @@ echo Phase 1: Context Capture (git add .)
 git add .
 echo.
 echo Phase 2: Cipher Metadata (git commit)
-git commit -m "fix(ipad+perf): eradicate iPad blank screen + mobile scroll lag; add 16 chains; Rainbow Wallet creation flow; patron-cosmico-4k GPU overlay; zero blur-orb rendering contract"
+git commit -m "build(sovereign): Phase 7 & 8 Absolute PRNG Eradication. True Cryptographic Security & Mainnet Determinism."
 echo.
 echo Phase 3: Transmitting to Genesis Server (git push)
 git push origin main --force

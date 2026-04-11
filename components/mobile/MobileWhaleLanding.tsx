@@ -20,12 +20,18 @@ import {
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
-import { Html5Qrcode } from 'html5-qrcode';
 import { toast } from 'sonner';
 import { CinematicWhaleLogo } from './CinematicWhaleLogo';
 import { LiveTerminalWidgets } from './LiveTerminalWidgets';
 import { WhaleOfflineGame } from './WhaleOfflineGame';
 import { CelestialMeshBackground } from '../landing/CelestialMeshBackground';
+// NOTE: Html5Qrcode is NOT imported here at module level.
+// Importing it statically causes navigator.mediaDevices to be accessed
+// at module load time, which throws a TypeError on iOS Safari WebView
+// (getUserMedia requires an explicit user gesture + HTTPS + active document).
+// It is dynamically imported inside the QR scanner useEffect instead.
+// (getUserMedia requires an explicit user gesture + HTTPS + active document).
+// It is dynamically imported inside the QR scanner useEffect instead.
 
 // ─── DEEP LINK HELPERS ───────────────────────────────────────────────────────
 
@@ -640,7 +646,9 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   const signRef = useRef<any>(signMessageAsync);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const scannerRef = useRef<Html5Qrcode | null>(null);
+  // Use unknown type while the dynamic import is pending
+  const scannerRef = useRef<any>(null);
+  const [scannerReady, setScannerReady] = useState(false);
 
   useEffect(() => { addressRef.current = address; }, [address]);
   useEffect(() => { signRef.current = signMessageAsync; }, [signMessageAsync]);
@@ -720,15 +728,55 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const scanner = new Html5Qrcode('qr-reader');
-    scannerRef.current = scanner;
-    scanner.start(
-      { facingMode: 'environment' },
-      { fps: 15, qrbox: (w, h) => { const s = Math.min(w, h) * 0.7; return { width: s, height: s }; } },
-      (text) => handleScan(text),
-      () => {}
-    ).catch(() => setError('Cámara no autorizada'));
-    return () => { if (scannerRef.current) scannerRef.current.stop().catch(() => {}); };
+    // CRITICAL iOS FIX: Dynamically import Html5Qrcode INSIDE the effect.
+    // This prevents the module-level navigator.mediaDevices call that crashes
+    // iOS Safari / WKWebView. The import only runs after:
+    //   1. The component is mounted (DOM exists)
+    //   2. The user has already tapped the "Scan" button (gesture requirement)
+    // These two conditions together satisfy iOS getUserMedia security policy.
+    let cancelled = false;
+    let localScanner: any = null;
+
+    async function startScanner() {
+      try {
+        // Dynamic import — NO module-level side effects
+        const { Html5Qrcode } = await import('html5-qrcode');
+        if (cancelled) return;
+
+        const scanner = new Html5Qrcode('qr-reader');
+        scannerRef.current = scanner;
+        localScanner = scanner;
+        setScannerReady(true);
+
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 15, qrbox: (w: number, h: number) => { const s = Math.min(w, h) * 0.7; return { width: s, height: s }; } },
+          (text: string) => handleScan(text),
+          () => {}
+        );
+      } catch (err: any) {
+        if (!cancelled) {
+          // Friendly iOS-specific error messaging
+          const isPermissionError =
+            err?.name === 'NotAllowedError' ||
+            err?.name === 'PermissionDeniedError' ||
+            (typeof err?.message === 'string' && err.message.toLowerCase().includes('permission'));
+          setError(isPermissionError
+            ? 'Cámara bloqueada. Ve a Ajustes → Safari → Cámara y permite el acceso.'
+            : 'Cámara no disponible. Asegúrate de estar en HTTPS.'
+          );
+        }
+      }
+    }
+
+    startScanner();
+
+    return () => {
+      cancelled = true;
+      if (localScanner) {
+        localScanner.stop().catch(() => {});
+      }
+    };
   }, [handleScan]);
 
   return (
