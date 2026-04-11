@@ -20,6 +20,13 @@ export async function GET(request: Request) {
     }
 
     const val = await safeRedisGet(`qr:${id}`);
+    
+    // ─── INSTITUTIONAL RESILIENCE ───────────────────────────────────────────
+    // If Redis timed out, do NOT tell the client 'expired'. Tell them 'waiting'
+    // so they maintain the current QR instead of refreshing it inappropriately.
+    if (val === 'TIMEOUT') {
+        return NextResponse.json({ status: 'waiting' });
+    }
 
     if (!val) {
         return NextResponse.json({ status: 'expired' });

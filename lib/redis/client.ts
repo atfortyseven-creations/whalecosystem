@@ -120,24 +120,24 @@ export { redisClient };
 export const createSubClient = (name: string) => createRedisClient({ name, isSubscriber: true });
 
 /**
- * ⚡ SAFE REDIS — wraps any redis call in a 500ms timeout.
- * If Redis is unreachable (e.g., DNS failure), returns null immediately
- * instead of blocking the entire API for 300 seconds.
- * Use this EVERYWHERE in critical API paths.
+ * ⚡ SAFE REDIS — wraps any redis call in a timeout.
+ * Returns 'TIMEOUT' if it takes longer than 1500ms, allowing the caller 
+ * to distinguish between a missing key and a network failure.
  */
-export async function safeRedisGet(key: string): Promise<string | null> {
+export async function safeRedisGet(key: string): Promise<string | null | 'TIMEOUT'> {
     try {
         if ((redisClient as any).__isMock || (redisClient as any).__isBuildMock) {
             return await (redisClient as any).get(key);
         }
-        // Institutional grade timeout: 1500ms. 
-        // 200ms was too fast for Railway proxy under load.
+        
+        // Institutional grade timeout: 1500ms.
         return await Promise.race([
             redisClient.get(key),
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500))
+            new Promise<'TIMEOUT'>((resolve) => setTimeout(() => resolve('TIMEOUT'), 1500))
         ]);
-    } catch {
-        return null;
+    } catch (e) {
+        console.error(`[Redis:SafeGet] Critical Infrastructure Error:`, e);
+        return 'TIMEOUT';
     }
 }
 

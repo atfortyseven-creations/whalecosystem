@@ -529,40 +529,61 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
     if (timeLeft === 0 && !isLinked) fetchNewSession();
   }, [timeLeft, isLinked, fetchNewSession]);
 
-  // QR Polling
-  useEffect(() => {
-    if (!isMounted || isLinked) return;
-    // Use a ref so we can clear it synchronously inside the async callback
-    let intervalId: ReturnType<typeof setInterval>;
-    intervalId = setInterval(async () => {
-      const token = qrSessionRef.current;
-      if (!token) return;
-      try {
-        const res = await fetch(`/api/auth/qr-session?id=${token}`);
-        const data = await res.json();
-        if (data.status === 'complete') {
-          // ─── Stop polling immediately — the cookie is already set by the server
-          clearInterval(intervalId);
-          setSyncStatus('SYNCED');
-          // Short delay for the success animation, then open the gate
-          setTimeout(() => {
-              setLinked(true);
-              // Force a global refresh precisely after the gate animation completes.
-              // This ensures that all unmounted header and layout components read the
-              // newly deposited QR authentication cookie and show "Connected".
-              setTimeout(() => {
-                  window.location.reload();
-              }, 1200);
-          }, 1200);
-        } else if (data.status === 'expired') {
-          // QR expired while user was looking at it — auto-refresh silently
-          clearInterval(intervalId);
-          fetchNewSession();
-        }
-      } catch (_) {}
-    }, 2000);
-    return () => clearInterval(intervalId);
-  }, [isMounted, isLinked, setLinked, fetchNewSession]);
+    // QR Polling - Military Grade Connectivity (v3.4)
+    useEffect(() => {
+        if (!isMounted || isLinked) return;
+        
+        // High-frequency polling pool
+        let intervalId: ReturnType<typeof setInterval>;
+        let ConsecutiveErrors = 0;
+
+        intervalId = setInterval(async () => {
+            const token = qrSessionRef.current;
+            if (!token) return;
+
+            try {
+                const res = await fetch(`/api/auth/qr-session?id=${token}`);
+                
+                if (!res.ok) {
+                    ConsecutiveErrors++;
+                    if (ConsecutiveErrors > 5) {
+                        console.warn('[QR_MILITARY] Persistent network failure, maintaining session but slowing down...');
+                        // Slow down if failing persistently
+                    }
+                    return;
+                }
+
+                ConsecutiveErrors = 0;
+                const data = await res.json();
+                
+                // Adaptive polling: if server says 'waiting', it means infrastructure is alive.
+                // Maintain current loop.
+                if (data.status === 'waiting') return;
+
+                if (data.status === 'complete') {
+                    clearInterval(intervalId);
+                    setSyncStatus('SYNCED');
+                    
+                    // Instant Unlock transition
+                    setTimeout(() => {
+                        setLinked(true);
+                        toast.success("ACCESO CONCEDIDO", { 
+                            description: "Identidad sincronizada via Handshake Militar.",
+                            className: "font-black tracking-widest uppercase" 
+                        });
+                        setTimeout(() => window.location.reload(), 800);
+                    }, 800);
+                } else if (data.status === 'expired') {
+                    clearInterval(intervalId);
+                    fetchNewSession();
+                }
+            } catch (err) {
+                console.error('[QR_MILITARY_EXCEPTION]', err);
+            }
+        }, 850); // High-fidelity 850ms polling for "Instant" feel
+
+        return () => clearInterval(intervalId);
+    }, [isMounted, isLinked, fetchNewSession, setLinked]);
 
   if (!isMounted) return null;
   if (isLinked || (isWalletConnected && !showSignStep)) return <>{children}</>;

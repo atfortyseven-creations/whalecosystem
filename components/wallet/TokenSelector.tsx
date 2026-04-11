@@ -37,8 +37,27 @@ export function TokenSelector({
     const [tokens, setTokens] = useState<Token[]>([]);
     const [isLoadingTokens, setIsLoadingTokens] = useState(false);
     const [searchResults, setSearchResults] = useState<Token[]>([]);
+    const [institutionalTokens, setInstitutionalTokens] = useState<Token[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Fetch Institutional Tokens
+    useEffect(() => {
+        const fetchInstitutional = async () => {
+            try {
+                // We'll call a dedicated endpoint or the lib directly if in Server Component,
+                // but since this is client-side, we can use the same tokens API with a flag
+                const res = await fetch(`/api/wallet/tokens/institutional?chainId=${chainId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setInstitutionalTokens(data.tokens || []);
+                }
+            } catch (e) {
+                console.error("Failed to fetch institutional tokens:", e);
+            }
+        };
+        fetchInstitutional();
+    }, [chainId]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -180,9 +199,39 @@ export function TokenSelector({
                         </div>
 
                         <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1 min-h-[200px]">
+                            {/* Section: Institutional Assets (Expert Curated) */}
+                            {!searchQuery && (
+                                <>
+                                    <div className="px-3 py-1 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] sticky top-0 bg-[#1e202b] z-10 flex items-center gap-2">
+                                        <Shield size={10} /> Institutional Assets
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-1 p-2">
+                                        {/* This will be populated by a new useEffect or passed via props */}
+                                        {institutionalTokens.map((asset, idx) => (
+                                            <button
+                                                key={`inst-${idx}`}
+                                                onClick={() => {
+                                                    onSelect(asset);
+                                                    setIsOpen(false);
+                                                }}
+                                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-indigo-500/30 group"
+                                            >
+                                                {asset.logoURI ? (
+                                                    <img src={asset.logoURI} className="w-4 h-4 rounded-full" />
+                                                ) : (
+                                                    <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[8px] font-black">{asset.symbol.slice(0, 2)}</div>
+                                                )}
+                                                <span className="text-[10px] font-bold text-white/70 group-hover:text-white uppercase">{asset.symbol}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+
+
                             {/* Section: My Assets */}
                             {!searchQuery && (
-                                <div className="px-3 py-1 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] sticky top-0 bg-[#1e202b] z-10">My Assets</div>
+                                <div className="px-3 py-1 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] sticky top-0 bg-[#1e202b] z-10">Live Balances</div>
                             )}
                             
                             {!searchQuery && isLoadingTokens && (
