@@ -98,7 +98,7 @@ const SkeletonRow = () => (
 function ChainSelector() {
   const chainId = useChainId();
   const { chains, switchChain, isPending } = useSwitchChain();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [isOpen, setIsOpen] = useState(false);
 
   const current = chains.find((c) => c.id === chainId);
@@ -487,9 +487,10 @@ export default function PortfolioView({
   }, [userAddress]);
 
   const handleAction = (action: string, mode?: string) => {
-    if (action === "Send" || action === "Buy" || action === "Sell") {
+    if (action === "Send" || action === "Buy" || action === "Swap" || action === "Bridge" || action === "Sell") {
       const m =
         action === "Sell" ? "swap" :
+        action === "Swap" ? "swap" :
         action === "Buy" ? "buy" :
         mode === "bridge" ? "bridge" : "send";
       setTransferMode(m as any);
@@ -551,9 +552,12 @@ export default function PortfolioView({
   // ─ Render ─
   return (
     <div
-      className="relative min-h-screen text-white font-sans selection:bg-purple-500/30"
-      style={{ background: "#0B0E11" }}
+      className="relative min-h-screen text-black font-sans selection:bg-black/10"
+      style={{ background: "#fdfcf9" }}
     >
+      {/* Institutional Grid Pattern */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.05]"
+          style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 60px)' }} />
       {/* ══════════════════════════════════════════════════════
           HEADER — Matches screenshot exactly
           Whale logo · Brand · Dark on left, tools on right
@@ -575,6 +579,25 @@ export default function PortfolioView({
         {/* Right: Chain selector + Tools */}
         <div className="flex items-center gap-2">
           <ChainSelector />
+           <div className="flex items-center gap-6">
+            <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Institutional Node</span>
+                <div className="flex items-center gap-2">
+                    <div className="w-1.2 h-1.2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">{userAddress?.slice(0, 6)}...{userAddress?.slice(-4)}</span>
+                </div>
+            </div>
+            <button
+                onClick={() => {
+                    document.cookie = 'sovereign_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                    window.location.reload();
+                }}
+                className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-red-500/20 group transition-all border border-white/10"
+            >
+                <X size={14} className="text-white/40 group-hover:text-red-400" />
+            </button>
+          </div>
+          
           <button
             onClick={toggleTheme}
             className="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white/50 hover:text-white"
@@ -639,54 +662,30 @@ export default function PortfolioView({
         ) : (
           <>
             {/* ─ Hero Balance ─ */}
+            <div className="text-center space-y-4 mb-12 relative z-10">
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="text-center mt-8 mb-10"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-black/[0.03] border border-black/5 rounded-full"
             >
-              <p className="text-white/30 font-black text-[10px] uppercase tracking-[0.4em] mb-3">
-                Net Worth
-              </p>
-
-              {/* Large balance — no blur animation, pure opacity transition */}
-              <motion.h1
-                key={totalValue}
-                initial={{ opacity: 0.6 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="text-5xl md:text-7xl font-black tracking-tighter mb-5 text-white break-words"
-                style={{ fontVariantNumeric: "tabular-nums" }}
-              >
-                ${safeToLocaleString(totalValue, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </motion.h1>
-
-              {/* 24H Change pill — exactly matching screenshot */}
-              <div
-                className={`inline-flex items-center gap-2 px-5 py-2 rounded-full border font-black text-xs tracking-widest ${
-                  change24hValue >= 0
-                    ? "border-green-500/30 text-green-400 bg-green-500/5"
-                    : "border-red-500/30 text-red-400 bg-red-500/5"
-                }`}
-              >
-                <div
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    change24hValue >= 0 ? "bg-green-500" : "bg-red-500"
-                  }`}
-                  style={{ boxShadow: change24hValue >= 0 ? "0 0 6px #22c55e" : "0 0 6px #ef4444" }}
-                />
-                <span>
-                  {change24hValue >= 0 ? "+" : "-"}$
-                  {Math.abs(change24hValue).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-                <span className="opacity-50">
-                  24H CHANGE ({safeToFixed(change24hPercent, 2)}%)
-                </span>
-              </div>
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">Net Worth // Non-Custodial Real-Time</span>
             </motion.div>
+            
+            <h1 className="text-8xl md:text-9xl font-black tracking-tighter text-black flex items-center justify-center gap-4">
+              <span className="opacity-20 text-4xl md:text-6xl">$</span>
+              {totalValue || "0.00"}
+            </h1>
+            
+            <div className="flex items-center justify-center gap-3">
+               <div className="px-5 py-2 bg-green-500 text-white rounded-full text-[11px] font-black uppercase tracking-widest shadow-xl shadow-green-500/20">
+                 +{change24hValue || "0.00"} 24h
+               </div>
+               <div className="px-5 py-2 bg-black/[0.03] border border-black/5 text-black/40 rounded-full text-[11px] font-black uppercase tracking-widest">
+                 {change24hPercent || "0.00"}% Yield
+               </div>
+            </div>
+          </div>
 
             {/* ─ Action Cluster (Send / Receive / Swap / Buy) ─ */}
             <ActionCluster onAction={handleAction} />

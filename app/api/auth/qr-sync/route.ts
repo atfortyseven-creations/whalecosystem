@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet, redisClient } from '@/lib/redis/client';
 import { verifyMessage } from 'viem';
+import { getClientForChain } from '@/lib/blockchain/rpc-engine';
 import { mainnetClient } from '@/lib/blockchain/rpc-engine';
 
 export async function POST(req: Request) {
     try {
-        const { token, address, signature } = await req.json();
+        const body = await req.json();
+        const { token, address, signature, chainId } = body;
         
         if (!token || !address || !signature) {
-            return new NextResponse('Missing parameters (Handshake Protocol Failure)', { status: 400 });
+            return NextResponse.json({ error: 'Missing sync data' }, { status: 400 });
         }
 
         // 1. Inhumane Perfection: Evitar race conditions asegurando TTL restrictivo
@@ -21,23 +23,40 @@ export async function POST(req: Request) {
             return new NextResponse('Session already consumed or processed', { status: 400 });
         }
 
-        // 2. ECDSA Puro & EIP-1271: Validación de la firma sin custodiar la identidad
-        // Soporte experto para EOA y Smart Wallets (Institutional Standard)
+        // 2. Validate cryptographic signature
+        // We now support multi-chain verification for Smart Wallets on Polygon
+        let isValid = false;
         try {
-            const isValid = await verifyMessage({
+            const message = `RE-CONNECT-WHALE-SESSION-${token}`;
+            
+            // Standard EIP-191 verification
+            isValid = await verifyMessage({
                 address: address as `0x${string}`,
-                message: `WHALE_HANDSHAKE:${token}`,
-                signature: signature as `0x${string}`,
-                publicClient: mainnetClient, // Enables Smart Account verification via on-chain hooks
+                message,
+                signature: signature as `0x${string}`
             });
 
-            if (!isValid) {
-                console.error(`[Handshake:Denied] Cryptographic Signature Forgery Detected para ${address}`);
-                return new NextResponse('Verification Failed: Invalid Whale Handshake', { status: 401 });
+            // If not valid and we have a chainId, try EIP-1271 (Smart Wallet) verification
+            if (!isValid && chainId) {
+                console.log(`[QR-Sync] Falling back to Chain ${chainId} verification for ${address}`);
+                // In a production environment, we would use viem's publicClient.verifyMessage
+                // which handles both EIP-191 and EIP-1271 automatically.
+                const client = getClientForChain(chainId);
+                if (client) {
+                    isValid = await client.verifyMessage({
+                        address: address as `0x${string}`,
+                        message,
+                        signature: signature as `0x${string}`
+                    });
+                }
             }
-        } catch (verifError) {
-            console.error('[Handshake:VerifError]', verifError);
-            return new NextResponse('Internal Neural Engine Failure', { status: 500 });
+        } catch (e: any) {
+            console.error('[QR-Sync] Signature verification error:', e);
+            return NextResponse.json({ error: 'Verification failed' }, { status: 401 });
+        }
+
+        if (!isValid) {
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
         }
 
         const normalizedAddress = address.toLowerCase();
@@ -64,18 +83,11 @@ export async function POST(req: Request) {
         console.log(`[Handshake:Success] OMEGA Sync verified for ${normalizedAddress} on token ${token.slice(0, 8)}...`);
         
         // [PERFECTION] Set cookie for the mobile user so they transition to the news shell
-        const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
-        return new NextResponse('Omega Clearance Granted', { 
-            status: 200,
-            headers: {
-                'Set-Cookie': [
-                    `whale_handshake=${normalizedAddress}`,
-                    'Path=/',
-                    `Max-Age=${THIRTY_DAYS_S}`,
-                    'SameSite=Lax',
-                    'Secure' // Obligatorio en entornos OMEGA
-                ].join('; '),
-            }
+        const response = NextResponse.json({ status: 'queued' });
+        response.cookies.set('sovereign_handshake', normalizedAddress, {
+            path: '/',
+            maxAge: 604800,
+            sameSite: 'lax',
         });
     } catch (e: any) {
         console.error('[QR_SYNC_FATAL]', e);

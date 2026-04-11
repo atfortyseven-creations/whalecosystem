@@ -123,8 +123,9 @@ export function LegendaryTransactionModal({
   useEffect(() => {
       const asset = balances.find(b => b.symbol === fromAssetSymbol);
       if (asset) {
-          const chain = CHAINS.find(c => c.id === asset.chainId);
-          if (chain) setSourceChain(chain);
+          const targetChainId = asset.chainId;
+          const chainObj = CHAINS.find(c => c.id === targetChainId);
+          if (chainObj) setSourceChain(chainObj);
       }
   }, [fromAssetSymbol, balances]);
 
@@ -143,17 +144,18 @@ export function LegendaryTransactionModal({
         return;
     }
 
+    const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
+    const amountInUnits = parseUnits(amount, activeFromAsset?.decimals || 18);
+
     const fetchQuote = async () => {
         try {
             setErrorMsg(null);
             
             // Resolve addresses
-            const fromAsset = balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
-            const fromTokenAddress = fromAsset?.address || resolveTokenAddress(fromAssetSymbol, sourceChain.id);
+            const fromTokenAddress = activeFromAsset?.address || resolveTokenAddress(fromAssetSymbol, sourceChain.id);
             const toTokenAddress = resolveTokenAddress(toAssetSymbol, mode === 'swap' ? sourceChain.id : targetChain.id);
             
-            const decimals = fromAsset?.decimals || 18;
-            const amountInWei = (Number(amount) * (10 ** decimals)).toFixed(0);
+            const amountInWei = amountInUnits.toString();
 
             if (mode === 'buy') {
                 // Mock price for buy estimation if not calling provider yet
@@ -287,7 +289,6 @@ export function LegendaryTransactionModal({
               }
 
               const decimals = activeFromAsset.decimals || 18;
-              const amountInWei = (Number(amount) * (10 ** decimals)).toFixed(0);
               
               toast.info("Preparing Transaction", { description: subMode === 'private' ? "Routing through MEV-Protected RPC..." : "Please confirm in your wallet..." });
 
@@ -300,11 +301,14 @@ export function LegendaryTransactionModal({
                                fromAssetSymbol === 'POL' ||
                                fromAssetSymbol === 'MATIC';
 
+              // [PERFECTION] Use parseUnits for exact precision
+              const amountInUnits = parseUnits(amount, decimals);
+
               if (isNative) {
                   hash = await walletClient.sendTransaction({
                       to: finalRecipient as `0x${string}`,
-                      value: BigInt(amountInWei),
-                      chain: walletClient.chain
+                      value: amountInUnits,
+                      chain: sourceChain as any
                   });
               } else {
                   const data = encodeFunctionData({
@@ -316,13 +320,13 @@ export function LegendaryTransactionModal({
                           outputs: [{ type: 'bool' }]
                       }],
                       functionName: 'transfer',
-                      args: [finalRecipient as `0x${string}`, BigInt(amountInWei)]
+                      args: [finalRecipient as `0x${string}`, amountInUnits]
                   });
 
                   hash = await walletClient.sendTransaction({
                       to: activeFromAsset.address as `0x${string}`,
                       data,
-                      chain: walletClient.chain
+                      chain: sourceChain as any
                   });
               }
 
@@ -338,7 +342,7 @@ export function LegendaryTransactionModal({
                       toChain: sourceChain.id,
                       fromToken: activeFromAsset.address,
                       toToken: activeFromAsset.address,
-                      fromAmount: amountInWei,
+                      fromAmount: amountInUnits.toString(),
                       metadata: {
                           recipient: finalRecipient,
                           symbol: fromAssetSymbol,
@@ -402,13 +406,14 @@ export function LegendaryTransactionModal({
 
               // ─── STANDARD SWAP/BRIDGE PATH ────────────────────────────────────
               const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
+              const amountInUnits = parseUnits(amount, activeFromAsset?.decimals || 18);
 
               const hash = await executeSwap({
                   fromChain: sourceChain.id,
                   toChain: mode === 'swap' ? sourceChain.id : targetChain.id,
                   fromToken: activeFromAsset?.address || fromAssetSymbol,
                   toToken: toAsset?.address || toAssetSymbol,
-                  fromAmount: amount,
+                  fromAmount: amountInUnits.toString(),
                   slippage: 0.005
               });
 

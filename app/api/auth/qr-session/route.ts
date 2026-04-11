@@ -56,21 +56,9 @@ export async function GET(request: Request) {
                 // The correct approach for any Route Handler verb is to use
                 // NextResponse with the Set-Cookie header directly.
                 // ────────────────────────────────────────────────────────────────
-                const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
                 const response = NextResponse.json(
                     { status: 'complete', address: data.address },
-                    {
-                        headers: {
-                            'Set-Cookie': [
-                                `sovereign_handshake=${data.address}`,
-                                'Path=/',
-                                `Max-Age=${THIRTY_DAYS_S}`,
-                                'SameSite=Lax',
-                                // Intentionally NOT HttpOnly — the client gate reads
-                                // document.cookie to detect an existing handshake.
-                            ].join('; '),
-                        },
-                    }
+                    { status: 200 }
                 );
 
                 console.log(`[QR_SESSION:Complete] Token consumed, cookie set for ${data.address}`);
