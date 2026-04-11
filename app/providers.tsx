@@ -48,9 +48,6 @@ const authenticationAdapter = createAuthenticationAdapter({
       nonce,
     });
   },
-  getMessageBody: ({ message }) => {
-    return message.prepareMessage();
-  },
   verify: async ({ message, signature }) => {
     const response = await fetch('/api/siwe/verify', {
       method: 'POST',

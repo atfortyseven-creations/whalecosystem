@@ -234,6 +234,21 @@ model GoldenTicket {
 // SOVEREIGN INTELLIGENCE CORPUS (ARKHAM/NANSEN KILLER)
 // ─────────────────────────────────────────────────────────────────────────────
 
+model IntelItem {
+  id          String   @id @default(uuid())
+  url         String   @unique
+  title       String
+  source      String
+  aiSummary   String?  @db.Text
+  category    String   @default("FINANCE")
+  priority    String   @default("SOVEREIGN")
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([publishedAt(sort: Desc)])
+  @@index([category, publishedAt(sort: Desc)])
+}
+
 model OnChainEntity {
   id              String   @id @default(uuid())
   address         String   @unique

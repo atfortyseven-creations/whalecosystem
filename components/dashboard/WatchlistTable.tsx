@@ -10,9 +10,9 @@ import {
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 const List = dynamic(
-    () => import('react-window').then(m => ({ default: m.FixedSizeList as any })),
+    () => import('react-window').then(m => m.FixedSizeList as any),
     { ssr: false }
-) as any;
+);
 const AutoSizer = dynamic(() => import('react-virtualized-auto-sizer'), { ssr: false });
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { useAccount } from 'wagmi';
@@ -45,6 +45,7 @@ const CHAIN_COLORS: Record<string, string> = {
 
 /* ── Inline Add Modal ───────────────────────────────────────────────── */
 function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLETS'; onClose: () => void; onAdded: () => void }) {
+    const { address } = useAccount();
     const [type, setType]   = useState<'TOKENS' | 'WALLETS'>(view);
     const [value, setValue] = useState('');
     const [label, setLabel] = useState('');
@@ -58,8 +59,6 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
         if (!value.trim()) return;
         setSaving(true);
         const tid = toast.loading('Adding to watchlist…');
-        // FIX: Sanitize all user inputs before they reach localStorage or
-        // any downstream visualizer (D3, EntityGraphVis) to block XSS.
         const safeValue = sanitize(value);
         const safeLabel = sanitize(label);
         try {
@@ -74,13 +73,13 @@ function AddWatchlistModal({ view, onClose, onAdded }: { view: 'TOKENS' | 'WALLE
             if (res.ok) {
                 toast.success('Added to watchlist', { id: tid });
             } else {
-                saveToLocal(body);
+                saveToLocal(body, address);
                 toast.success('Added locally', { id: tid });
             }
             onAdded();
             onClose();
         } catch {
-            saveToLocal({ type: 'TOKEN', address: safeValue, symbol: safeValue.toUpperCase() });
+            saveToLocal({ type: 'TOKEN', address: safeValue, symbol: safeValue.toUpperCase() }, address);
             toast.success('Added locally', { id: tid });
             onAdded();
             onClose();
@@ -283,27 +282,6 @@ export function WatchlistTable() {
         fetchWatchlist(); 
     }, [address]);
 
-    const saveToLocal = (item: any) => {
-       if (typeof window === 'undefined' || !address) return;
-       const prefix = `SOV_WL_${address.toLowerCase()}`;
-       const key = item.type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
-       let existing: any[] = [];
-       try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
-       if (!existing.some((e: any) => e.address === item.address || e.symbol === item.symbol)) {
-           localStorage.setItem(key, JSON.stringify([...existing, { ...item, id: crypto.randomUUID?.() ?? Date.now().toString(36), marketData: {}, chain: item.chain || 'ethereum', entryPrice: null }]));
-       }
-    };
-
-    const removeFromLocal = (idOrSymbol: string, type: 'TOKEN' | 'WALLET') => {
-       if (typeof window === 'undefined' || !address) return;
-       const prefix = `SOV_WL_${address.toLowerCase()}`;
-       const key = type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
-       let existing: any[] = [];
-       try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
-       const filtered = existing.filter((e: any) => e.id !== idOrSymbol && e.symbol !== idOrSymbol);
-       localStorage.setItem(key, JSON.stringify(filtered));
-    };
-
     const handleDelete = async (id: string, type: 'TOKEN' | 'WALLET') => {
         const tid = toast.loading('Removing from watchlist…');
         const tokenInfo = data.tokens.find(t => t.id === id);
@@ -311,19 +289,19 @@ export function WatchlistTable() {
             const sym = tokenInfo ? tokenInfo.symbol : id;
             const res = await fetch(`/api/watchlist?symbol=${sym}`, { method: 'DELETE' });
             if (res.ok) { 
-                removeFromLocal(id, type);
-                removeFromLocal(sym, type);
+                removeFromLocal(id, type, address);
+                removeFromLocal(sym, type, address);
                 toast.success('Removed', { id: tid }); 
                 fetchWatchlist(); 
             } else {
-                removeFromLocal(id, type);
-                removeFromLocal(sym, type);
+                removeFromLocal(id, type, address);
+                removeFromLocal(sym, type, address);
                 if (type === 'TOKEN') setData(prev => ({ ...prev, tokens: prev.tokens.filter(t => t.id !== id && t.symbol !== sym) }));
                 if (type === 'WALLET') setData(prev => ({ ...prev, wallets: prev.wallets.filter(w => w.id !== id) }));
                 toast.success('Removed locally', { id: tid });
             }
         } catch { 
-            removeFromLocal(id, type);
+            removeFromLocal(id, type, address);
             if (type === 'TOKEN') setData(prev => ({ ...prev, tokens: prev.tokens.filter(t => t.id !== id) }));
             if (type === 'WALLET') setData(prev => ({ ...prev, wallets: prev.wallets.filter(w => w.id !== id) }));
             toast.success('Removed locally', { id: tid });
@@ -646,4 +624,26 @@ export function WatchlistTable() {
         </div>
         </>
     );
+}
+// ── Helpers ─────────────────────────────────────────────────────────
+
+function saveToLocal(item: any, address?: string) {
+    if (typeof window === 'undefined' || !address) return;
+    const prefix = `SOV_WL_${address.toLowerCase()}`;
+    const key = item.type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
+    let existing: any[] = [];
+    try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    if (!existing.some((e: any) => e.address === item.address || e.symbol === item.symbol)) {
+        localStorage.setItem(key, JSON.stringify([...existing, { ...item, id: crypto.randomUUID?.() ?? Date.now().toString(36), marketData: {}, chain: item.chain || 'ethereum', entryPrice: null }]));
+    }
+}
+
+function removeFromLocal(idOrSymbol: string, type: 'TOKEN' | 'WALLET', address?: string) {
+    if (typeof window === 'undefined' || !address) return;
+    const prefix = `SOV_WL_${address.toLowerCase()}`;
+    const key = type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
+    let existing: any[] = [];
+    try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    const filtered = existing.filter((e: any) => e.address !== idOrSymbol && e.id !== idOrSymbol && e.symbol !== idOrSymbol);
+    localStorage.setItem(key, JSON.stringify(filtered));
 }

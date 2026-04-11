@@ -59,9 +59,9 @@ export async function POST(req: Request) {
             signature, 
             syncedAt: Date.now(),
             protocol: 'LEGENDARY_HANDSHAKE_v1'
-        }), 'EX', 30); // Reduced from 300 to 30 for max strictness
-
-        console.log(`[Handshake:Success] OMEGA Sync verified for ${normalizedAddress} on token ${token}`);
+        }), 'EX', 60); // Increased from 30 to 60 for better device handshake reliability
+        
+        console.log(`[Handshake:Success] OMEGA Sync verified for ${normalizedAddress} on token ${token.slice(0, 8)}...`);
         
         // [PERFECTION] Set cookie for the mobile user so they transition to the news shell
         const THIRTY_DAYS_S = 30 * 24 * 60 * 60;
