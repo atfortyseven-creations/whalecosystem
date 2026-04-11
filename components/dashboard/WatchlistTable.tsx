@@ -219,7 +219,7 @@ export function WatchlistTable() {
                 const json = await res.json();
                 const serverData = Array.isArray(json.data) ? json.data : [];
                 const serverTokens: any[] = serverData.map((item: any) => ({
-                    id: item.id || crypto.randomUUID(),
+                    id: item.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2)),
                     type: 'TOKEN',
                     symbol: item.symbol,
                     name: item.symbol + ' Token',

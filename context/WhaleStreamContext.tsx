@@ -98,7 +98,7 @@ export function WhaleStreamProvider({ children }: { children: React.ReactNode })
                 const raw = JSON.parse(e.data) as Omit<WhaleEvent, 'id'>;
                 const event: WhaleEvent = {
                     ...raw,
-                    id: crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+                    id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
                 };
                 setEvents(prev => {
                     const next = [event, ...prev];

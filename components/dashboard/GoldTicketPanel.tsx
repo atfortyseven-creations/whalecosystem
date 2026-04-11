@@ -246,15 +246,59 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
 }
 
 
-function LivePulse() {
+function GlobalLedger({ feed }: { feed: any[] }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+      <div className="bg-white border border-[#E5E5E5] rounded-3xl overflow-hidden mt-8 shadow-sm">
+         <div className="px-8 py-6 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center">
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">Ledger Tickets</span>
+         </div>
+         <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] bg-white border-b border-[#F0F0F0]"
+              style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
+              <div className="px-8 py-4">Secured Address</div>
+              <div className="px-8 py-4">Timestamp</div>
+              <div className="px-8 py-4 text-right">Signature</div>
+         </div>
+         <div className="divide-y divide-[#F0F0F0]">
+            {!feed?.length && (
+                <div className="p-8 text-center text-[10px] font-mono text-[#888888]">Awaiting Genesis Mints...</div>
+            )}
+            {feed?.map((f: any, i: number) => {
+                if (!f) return null;
+                let parsed: any = null;
+                try {
+                   const raw = JSON.parse(f.signatureData);
+                   if (raw && typeof raw === 'object') parsed = raw;
+                } catch(e) { }
+                if (!parsed) parsed = { signature: f.signatureData ?? '' };
+                const displaySig: string = parsed.signature || f.signatureData || '';
+
+                return (
+                    <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid items-center hover:bg-[#FAF9F6] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
+                        <div className="px-8 py-5">
+                             <div className="flex items-center gap-2">
+                                <CheckCircle2 size={12} className="text-[#00C076]" />
+                                <span className="text-[11px] font-mono font-bold text-[#050505]">{truncAddr(f.userAddress || '')}</span>
+                             </div>
+                        </div>
+                        <div className="px-8 py-5 text-[10px] font-mono text-[#888888]">
+                             {f.claimedAt ? new Date(f.claimedAt).toLocaleString() : '—'}
+                        </div>
+                         <div className="px-8 py-2 flex justify-end">
+                              {displaySig && displaySig.startsWith('data:image') ? (
+                                 <img src={displaySig} className="h-8 max-w-[100px] object-contain opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
+                              ) : (
+                                 <div className="border border-[#E5E5E5] bg-white rounded" style={{ width: 100, height: 32 }}>
+                                   <svg width="100%" height="100%" viewBox="0 0 100 32" fill="none">
+                                     <path d="M8,20 C18,8 28,24 38,14 C48,4 58,26 68,16 C78,8 88,20 92,14" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                   </svg>
+                                 </div>
+                              )}
+                         </div>
+                    </motion.div>
+                );
+            })}
+         </div>
       </div>
-      <span className="text-[10px] uppercase font-black tracking-widest text-[#00C076]">LIVE</span>
-    </div>
   );
 }
 
@@ -485,7 +529,6 @@ export function GoldTicketPanel() {
         <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
           <div className="flex items-center justify-between mb-6">
             <p className="text-[10px] font-black uppercase tracking-widest text-[#888888]">Genesis Collection · Mint Progress</p>
-            <LivePulse />
           </div>
           <SupplyBar minted={displayMinted} max={displayMax} />
         </div>
@@ -511,6 +554,8 @@ export function GoldTicketPanel() {
         >
           Initialize Terminal
         </button>
+
+        <GlobalLedger feed={dbStats?.feed || []} />
       </div>
     );
   }
@@ -703,7 +748,6 @@ export function GoldTicketPanel() {
           <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
             <div className="flex items-center justify-between mb-6">
               <p className="text-[10px] font-black uppercase tracking-widest text-[#888888]">Mint Progress · Live</p>
-              <LivePulse />
             </div>
             <SupplyBar minted={displayMinted} max={displayMax} />
           </div>
@@ -828,59 +872,7 @@ export function GoldTicketPanel() {
         </div>
       </div>
 
-      {/* ── Global Mint Ledger ── */}
-      <div className="bg-white border border-[#E5E5E5] rounded-3xl overflow-hidden mt-8 shadow-sm">
-         <div className="px-8 py-6 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center">
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">Ledger Tickets</span>
-         </div>
-         <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] bg-white border-b border-[#F0F0F0]"
-              style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-              <div className="px-8 py-4">Secured Address</div>
-              <div className="px-8 py-4">Timestamp</div>
-              <div className="px-8 py-4 text-right">Signature</div>
-         </div>
-         <div className="divide-y divide-[#F0F0F0]">
-            {!dbStats?.feed?.length && (
-                <div className="p-8 text-center text-[10px] font-mono text-[#888888]">Awaiting Genesis Mints...</div>
-            )}
-            {dbStats?.feed?.map((f: any, i: number) => {
-                if (!f) return null;
-                let parsed: any = null;
-                try {
-                   const raw = JSON.parse(f.signatureData);
-                   // JSON.parse('null') returns null — guard explicitly
-                   if (raw && typeof raw === 'object') parsed = raw;
-                } catch(e) { /* not json, treat as raw dataurl */ }
-                if (!parsed) parsed = { signature: f.signatureData ?? '' };
-                const displaySig: string = parsed.signature || f.signatureData || '';
-
-                return (
-                    <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid items-center hover:bg-[#FAF9F6] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-                        <div className="px-8 py-5">
-                             <div className="flex items-center gap-2">
-                                <CheckCircle2 size={12} className="text-[#00C076]" />
-                                <span className="text-[11px] font-mono font-bold text-[#050505]">{truncAddr(f.userAddress || '')}</span>
-                             </div>
-                        </div>
-                        <div className="px-8 py-5 text-[10px] font-mono text-[#888888]">
-                             {f.claimedAt ? new Date(f.claimedAt).toLocaleString() : '—'}
-                        </div>
-                         <div className="px-8 py-2 flex justify-end">
-                              {displaySig && displaySig.startsWith('data:image') ? (
-                                 <img src={displaySig} className="h-8 max-w-[100px] object-contain opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
-                              ) : (
-                                 <div className="border border-[#E5E5E5] bg-white rounded" style={{ width: 100, height: 32 }}>
-                                   <svg width="100%" height="100%" viewBox="0 0 100 32" fill="none">
-                                     <path d="M8,20 C18,8 28,24 38,14 C48,4 58,26 68,16 C78,8 88,20 92,14" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                   </svg>
-                                 </div>
-                              )}
-                         </div>
-                    </motion.div>
-                );
-            })}
-         </div>
-      </div>
+      <GlobalLedger feed={dbStats?.feed || []} />
     </motion.div>
   );
 }

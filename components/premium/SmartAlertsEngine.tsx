@@ -93,7 +93,7 @@ export default function SmartAlertsEngine({ isPremium, selectedWalletAddress }: 
       console.log("🔔 [SmartAlerts] Instanteous Push Received:", data);
       
       const newAlert: SmartAlert = {
-        id: data.hash || crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+        id: data.hash || ((typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`),
         type: 'whale_move',
         walletLabel: 'Whale Tracker',
         walletAddress: data.from || '0x',

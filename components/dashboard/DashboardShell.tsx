@@ -253,7 +253,7 @@ function OperationsCanvas({
         const x = cx - rect.left - pan.x - 88;
         const y = cy - rect.top - pan.y - 44;
         const node: NodeData = {
-            id: crypto.randomUUID?.() ?? Date.now().toString(36),
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2),
             type, x, y,
             title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
             status: 'syncing',
@@ -337,7 +337,7 @@ function OperationsCanvas({
                 if (targetId !== draftEdge.sourceNodeId) {
                     // Valid connection
                     const newEdge: EdgeData = {
-                        id: crypto.randomUUID?.() ?? Date.now().toString(36),
+                        id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2),
                         source: draftEdge.isSourceOut ? draftEdge.sourceNodeId : targetId,
                         target: draftEdge.isSourceOut ? targetId : draftEdge.sourceNodeId
                     };

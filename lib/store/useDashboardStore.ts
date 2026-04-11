@@ -23,7 +23,7 @@ export const useDashboardStore = create<DashboardState>()(
             addLog: (msg, type = 'info') => set((state) => {
                 const now = new Date();
                 const newLog: ActivityLog = {
-                    id: crypto.randomUUID?.() ?? Date.now().toString(36),
+                    id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2),
                     time: now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second:'2-digit' }),
                     msg,
                     type,
