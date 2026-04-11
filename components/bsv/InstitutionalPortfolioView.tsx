@@ -11,6 +11,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
+import { useVIPStore } from '@/lib/vip-store';
 
 const truncate = (s: string, n = 8) => s ? `${s.slice(0, n)}...${s.slice(-6)}` : '—';
 
@@ -43,8 +44,12 @@ export function InstitutionalPortfolioView() {
         refreshBalance();
     }, [refreshBalance]);
 
+    const ethPrice = useVIPStore(s => s.ethPrice);
+
     const scannerBase = activeNetwork === 'polygon' ? 'https://polygonscan.com' : 'https://etherscan.io';
-    const balanceFiat = `$${(parseFloat(balance || "0") * 3100).toFixed(2)}`;
+    // Use the institutional oracle price, falling back to a safe floor if not yet sync'd
+    const priceOracle = ethPrice > 0 ? ethPrice : 3100; 
+    const balanceFiat = `$${(parseFloat(balance || "0") * priceOracle).toFixed(2)}`;
 
     return (
         <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[85vh] bg-[#fdfcf9]">

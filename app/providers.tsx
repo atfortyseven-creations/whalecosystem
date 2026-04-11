@@ -12,6 +12,7 @@ import { WhaleStreamProvider } from '@/context/WhaleStreamContext';
 import { VIPStoreBootstrap } from '@/components/providers/VIPStoreBootstrap';
 import { AlphaToaster } from '@/components/ui/AlphaToaster';
 import { ShortcutVisualizer } from '@/components/ui/ShortcutVisualizer';
+import { WalletConnectionBridge } from '@/components/providers/WalletConnectionBridge';
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
               <WhaleStreamProvider>
                 <AlphaToaster />
                 <ShortcutVisualizer />
+                <WalletConnectionBridge />
                 <VIPStoreBootstrap />
                 {children}
               </WhaleStreamProvider>
