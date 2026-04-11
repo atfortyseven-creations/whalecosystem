@@ -18,11 +18,12 @@ const truncate = (s: string, n = 8) => s ? `${s.slice(0, n)}...${s.slice(-6)}` :
 type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK';
 
 export function InstitutionalPortfolioView() {
-    const { address, balance, updateBalance, activeNetwork } = useWalletStore();
+    const { address, balance, updateBalance, activeNetwork, restoreFromCloud } = useWalletStore();
     const [view, setView] = useState<View>('HOME');
     const [prefilledAddress, setPrefilledAddress] = useState('');
     const [loading, setLoading] = useState(false);
     const [transactions, setTransactions] = useState<any[]>([]);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     const refreshBalance = useCallback(async () => {
         if (!address) return;
@@ -41,8 +42,26 @@ export function InstitutionalPortfolioView() {
     }, [address, updateBalance]);
 
     useEffect(() => {
-        refreshBalance();
-    }, [refreshBalance]);
+        setIsHydrated(true);
+        // Attempt to restore identity from cloud if local is empty
+        if (!address) {
+            restoreFromCloud();
+        }
+    }, [address, restoreFromCloud]);
+
+    useEffect(() => {
+        if (isHydrated) {
+            refreshBalance();
+        }
+    }, [refreshBalance, isHydrated]);
+
+    if (!isHydrated) {
+        return (
+            <div className="flex items-center justify-center min-h-[85vh] bg-[#fdfcf9]">
+                <RefreshCw size={40} className="animate-spin text-black/10" />
+            </div>
+        );
+    }
 
     const ethPrice = useVIPStore(s => s.ethPrice);
 
@@ -136,9 +155,26 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
                     </div>
                 )}
 
-                <button onClick={onRefresh} disabled={loading} className="mt-8 p-3 bg-white border border-black/10 rounded-full shadow-sm hover:rotate-180 transition-all duration-700">
-                    <RefreshCw size={16} className={loading ? 'animate-spin opacity-40' : 'opacity-20'} />
-                </button>
+                <div className="flex items-center gap-4 mt-8">
+                     <button onClick={onRefresh} disabled={loading} className="p-3 bg-white border border-black/10 rounded-full shadow-sm hover:rotate-180 transition-all duration-700">
+                        <RefreshCw size={16} className={loading ? 'animate-spin opacity-40' : 'opacity-20'} />
+                    </button>
+                    {address && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-black/5 rounded-full border border-black/5"
+                        >
+                            <motion.div 
+                                animate={{ opacity: [0.4, 1, 0.4] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <Lock size={10} className="text-emerald-500" />
+                            </motion.div>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-black/40">Secured in Cloud</span>
+                        </motion.div>
+                    )}
+                </div>
             </section>
 
             <section className="px-8 pb-12 max-w-4xl mx-auto w-full">
@@ -225,13 +261,20 @@ function HomeView({ address, balance, balanceFiat, loading, transactions, onRefr
 function ActionCard({ icon: Icon, label, sub, onClick, disabled, highlighted }: any) {
     return (
         <motion.button
-            whileHover={{ y: -4, shadow: '0 20px 30px rgba(0,0,0,0.05)' }}
+            whileHover={{ 
+                scale: 1.02, 
+                y: -6, 
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' 
+            }}
             whileTap={{ scale: 0.96 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             onClick={onClick}
             disabled={disabled}
             className={`flex flex-col items-start p-6 rounded-[2rem] border transition-all text-left group disabled:opacity-30 disabled:cursor-not-allowed ${
                 highlighted 
-                    ? 'bg-black text-white border-transparent' 
+                    ? 'bg-black text-white border-transparent shadow-[0_20px_40px_rgba(0,0,0,0.2)]' 
                     : 'bg-white text-black border-black/10 hover:border-black/30'
             }`}
         >

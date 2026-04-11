@@ -26,8 +26,8 @@ export function CelestialMeshBackground() {
     <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden bg-white transform-gpu">
       {/* Layer 1: Animated Mesh Gradients (GPU Accelerated) */}
       <motion.div 
-        style={{ scale: meshScale, opacity: meshOpacity }}
-        className="absolute inset-0 will-change-transform"
+        style={{ scale: meshScale, opacity: meshOpacity, willChange: 'transform' }}
+        className="absolute inset-0"
       >
         <motion.div
           animate={{
@@ -60,13 +60,14 @@ export function CelestialMeshBackground() {
         }}
       >
         <div 
-          className="absolute inset-0 will-change-transform"
+          className="absolute inset-0"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px)`,
             backgroundSize: '80px 80px',
             transform: 'translate3d(0,0, -200px)',
             transformOrigin: 'top center',
-            height: '300%'
+            height: '300%',
+            willChange: 'transform'
           }}
         />
       </motion.div>
@@ -87,9 +88,10 @@ export function CelestialMeshBackground() {
                 top: `${20 + (i * 15)}%`,
                 left: `${10 + (i * 20)}%`,
                 scale: useTransform(smoothProgress, [0, 1], [1, 1.5 + (i * 0.1)]),
-                rotate: useTransform(smoothProgress, [0, 1], [0, 90 + (i * 45)])
+                rotate: useTransform(smoothProgress, [0, 1], [0, 90 + (i * 45)]),
+                willChange: 'transform'
               }}
-              className="absolute border border-black/5 w-48 h-48 rotate-45 flex items-center justify-center opacity-[0.1] will-change-transform"
+              className="absolute border border-black/5 w-48 h-48 rotate-45 flex items-center justify-center opacity-[0.1]"
             >
                 <div className="w-full h-px bg-black/5" />
                 <div className="h-full w-px bg-black/5 absolute left-1/2" />
@@ -117,9 +119,10 @@ function Particle({ smoothProgress, stretch, index }: { smoothProgress: any, str
         left: `${initialX.current}%`,
         top: y,
         scaleY: stretch,
-        opacity: useTransform(smoothProgress, [0, 0.5, 1], [0.2, 0.6, 0.2])
+        opacity: useTransform(smoothProgress, [0, 0.5, 1], [0.2, 0.6, 0.2]),
+        willChange: 'transform'
       }}
-      className="absolute w-[2px] h-[2px] bg-slate-400 rounded-full blur-[1px] will-change-transform"
+      className="absolute w-[2px] h-[2px] bg-slate-400 rounded-full blur-[1px]"
     />
   );
 }

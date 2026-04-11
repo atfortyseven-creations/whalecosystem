@@ -67,7 +67,13 @@ export async function GET() {
 
         return NextResponse.json(stats);
     } catch (error: any) {
-        console.error('[INSTITUTIONAL-STATS] 💀 Failure:', error.message);
-        return NextResponse.json({ error: 'System busy', code: 503 }, { status: 503 });
+        const traceId = crypto.randomUUID();
+        console.error(`[INSTITUTIONAL-STATS] 💀 Failure (Trace: ${traceId}):`, error.message);
+        return NextResponse.json({ 
+            error: 'Institutional metric aggregation unavailable', 
+            code: 'SVC_STATS_UNAVAILABLE',
+            traceId,
+            status: 503 
+        }, { status: 503 });
     }
 }

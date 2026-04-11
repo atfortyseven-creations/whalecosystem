@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
-// FIX Bug 13: Complete rewrite. Replaced 100% mock generated leaderboard with
-// a real database query against WhaleActivity. Ranks wallets by actual on-chain
-// USD volume ingested by the EVM/SOL/BTC workers. No more fake users, no Math.random().
-// The leaderboard only shows data that exists in the database.
-
+/**
+ * GET /api/gamification/leaderboard
+ * 
+ * CORE PERFORMANCE: Ranks institutional identities by on-chain volume.
+ * UTILIZES: Pre-computed Redis index with a 120s freshness window.
+ */
 export const dynamic = 'force-dynamic';
+const CACHE_KEY = 'cache:leaderboard:institutional';
 
 export async function GET(req: NextRequest) {
     try {
@@ -14,8 +17,17 @@ export async function GET(req: NextRequest) {
         const type  = searchParams.get('type')  || 'volume';
         const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
+        // ── CACHE LAYER (MAXIMA PERFECCION) ───────────────────────────────────
         if (type === 'volume') {
-            // Aggregate real on-chain whale volume from the database
+           const cached = await safeRedisGet(`${CACHE_KEY}:${limit}`);
+           if (cached) {
+               return NextResponse.json(JSON.parse(cached), {
+                   headers: { 'X-Cache': 'HIT', 'Cache-Control': 'no-store' }
+               });
+           }
+        }
+
+        if (type === 'volume') {
             const grouped = await prisma.$queryRaw<
                 Array<{ walletAddress: string; totalUsd: number; txCount: bigint }>
             >`
@@ -32,29 +44,34 @@ export async function GET(req: NextRequest) {
             const entries = grouped.map((row, i) => ({
                 rank:          i + 1,
                 walletAddress: row.walletAddress,
-                // Truncate address for display; never invent one
                 username:      `${row.walletAddress.slice(0, 6)}…${row.walletAddress.slice(-4)}`,
                 value:         Number(row.totalUsd).toFixed(2),
                 txCount:       Number(row.txCount),
                 badge:         i < 3 ? (['gold', 'silver', 'bronze'] as const)[i] : null,
             }));
 
-            return NextResponse.json({
+            const payload = {
                 type,
                 entries,
                 totalEntries: entries.length,
                 source: 'on-chain',
                 timestamp: Date.now(),
+            };
+
+            // PERSIST TO CACHE
+            await safeRedisSet(`${CACHE_KEY}:${limit}`, JSON.stringify(payload), 'EX', 120);
+
+            return NextResponse.json(payload, {
+                headers: { 'X-Cache': 'MISS', 'Cache-Control': 'no-store' }
             });
         }
 
-        // For other types (winRate, alpha) — return empty until real scoring exists
-        // rather than fake data that misleads users.
+        // For other types (winRate, alpha) — pending real scores
         return NextResponse.json({
             type,
             entries: [],
             source: 'pending',
-            message: `Leaderboard type '${type}' requires additional on-chain analytics indexing not yet available.`,
+            message: `Leaderboard type '${type}' requires additional on-chain analytics indexing.`,
             timestamp: Date.now(),
         });
 

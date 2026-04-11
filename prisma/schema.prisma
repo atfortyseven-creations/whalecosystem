@@ -498,6 +498,8 @@ model WatchedWallet {
   walletAddress   String
   label           String?
   createdAt       DateTime @default(now())
+
+  @@unique([userId, walletAddress])
 }
 
 model KYCRecord {
