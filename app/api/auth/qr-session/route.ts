@@ -61,6 +61,15 @@ export async function GET(request: Request) {
                     { status: 200 }
                 );
 
+                // ─── DESKTOP PERSISTENCE ──────────────────────────────────────
+                // We must set the cookie on the polling response so the desktop
+                // browser persists the link across refreshes.
+                response.cookies.set('sovereign_handshake', data.address, {
+                    path: '/',
+                    maxAge: 604800,
+                    sameSite: 'lax',
+                });
+
                 console.log(`[QR_SESSION:Complete] Token consumed, cookie set for ${data.address}`);
                 return response;
             }

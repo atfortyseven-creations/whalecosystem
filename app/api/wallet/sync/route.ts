@@ -3,25 +3,44 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { cashier } from '@/lib/wallet/deposit-watcher';
+import { verifyMessage } from 'viem';
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json().catch(() => ({}));
-    const { walletAddress } = body;
+    const { walletAddress, signature, message } = body;
 
-    let userId = session?.user?.email;
-
-    // Resolve User ID: Prefer direct walletAddress if provided (for WalletConnect users)
-    // Fallback to session email linked to wallet
-    if (walletAddress) {
-        userId = walletAddress;
-    } else if (session?.user?.email) {
-        const authUser = await prisma.authUser.findUnique({
-            where: { email: session.user.email },
-            select: { walletAddress: true }
+    // ─── INSTITUTIONAL AUTHENTICATION RESOLUTION ─────────────────────────────
+    const hasHandshakeCookie = req.cookies.get('sovereign_handshake')?.value;
+    
+    if (signature && message && walletAddress) {
+      try {
+        const isValid = await verifyMessage({
+            address: walletAddress as `0x${string}`,
+            message: message,
+            signature: signature as `0x${string}`
         });
-        if (authUser?.walletAddress) userId = authUser.walletAddress;
+
+        if (!isValid) {
+            console.error(`[Security:Handshake] Verification FAILED for ${walletAddress}`);
+            return NextResponse.json({ error: 'Identity verification failed: Signature mismatch.' }, { status: 401 });
+        }
+        
+        console.log(`[Security:Handshake] Identity verified via ECDSA for ${walletAddress}`);
+      } catch (e: any) {
+        console.error(`[Security:Handshake:Error]`, e.message);
+        return NextResponse.json({ error: 'Indentity verification error: Invalid payload.' }, { status: 400 });
+      }
+    } else if (!session?.user?.email && !hasHandshakeCookie) {
+      // If no signature/message AND no session AND no handshake cookie, we reject.
+      return NextResponse.json({ error: 'Unauthorized: Cryptographic Handshake required.' }, { status: 401 });
+    }
+
+    let userId = walletAddress || hasHandshakeCookie || session?.user?.email;
+
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized: No identity resolved.' }, { status: 401 });
     }
 
     if (!userId) {

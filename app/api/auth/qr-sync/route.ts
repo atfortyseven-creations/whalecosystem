@@ -56,6 +56,7 @@ export async function POST(req: Request) {
         }
 
         if (!isValid) {
+            console.warn(`[Handshake:Reject] Invalid signature for ${address}. Token: ${token.slice(0, 8)}... Expected: RE-CONNECT-WHALE-SESSION-${token}`);
             return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
         }
 

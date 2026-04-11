@@ -36,7 +36,8 @@ import {
   Moon,
   Menu,
   Zap,
-  Plus
+  Plus,
+  X
 } from "lucide-react";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
