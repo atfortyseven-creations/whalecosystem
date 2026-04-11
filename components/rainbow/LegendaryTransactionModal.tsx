@@ -767,10 +767,11 @@ export function LegendaryTransactionModal({
                 )}
               </div>
             </GlassCard>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
+          </InstitutionalErrorBoundary>
+        </motion.div>
+      </div>
+    )}
+  </AnimatePresence>
+);
 }
 
