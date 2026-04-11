@@ -34,11 +34,16 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
 
     const { address: sovereignAddress } = useWalletStore();
     
-    // Priority: 1. Manual override, 2. Web3 Connected, 3. Sovereign Store, 4. Managed/Auth
-    const effectiveAddress = overrideAddress || web3Address || sovereignAddress || managedWallet?.address;
+    // [PERFECTION] Immediate Handshake Resolution (High-Efficiency Cookie Reader)
+    const handshakeAddressFromCookie = typeof document !== 'undefined' 
+        ? document.cookie.split('; ').find(r => r.trim().startsWith('sovereign_handshake=0x'))?.split('=')[1]?.toLowerCase() 
+        : null;
+
+    // Priority Hierarchy: 1. Manual override, 2. Web3 Provider, 3. Immediate Handshake, 4. Store Persistence
+    const effectiveAddress = overrideAddress || web3Address || handshakeAddressFromCookie || sovereignAddress || managedWallet?.address;
 
     // [DEBUG] Monitor address resolution changes
-    // console.log('[useRealWalletData] Address Resolution:', { effectiveAddress, isConnected, isAuthenticated, isWeb3Connected });
+    // console.log('[useRealWalletData] Address Resolution:', { effectiveAddress, isConnected, isAuthenticated, isWeb3Connected, handshakeAddressFromCookie });
 
     // 1. On-Chain Balance (Wagmi ya maneja su propio caché/reactividad)
     const { data: balanceData, isLoading: isBalanceLoading } = useBalance({

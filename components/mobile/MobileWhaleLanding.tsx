@@ -163,6 +163,7 @@ const WALLET_OPTIONS = [
   { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
   { id: 'coinbase', name: 'COINBASE WALLET',desc: 'SMART WALLET / APP', iconType: 'coinbase' },
   { id: 'rainbow',  name: 'RAINBOW WALLET',      desc: 'MOBILE APP', iconType: 'rainbow' },
+  { id: 'walletConnect', name: 'WALLETCONNECT', desc: 'ALL WALLETS (QR)', iconType: 'walletconnect' },
 ];
 
 function WalletIcon({ type }: { type: string }) {

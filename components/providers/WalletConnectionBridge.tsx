@@ -16,12 +16,20 @@ export function WalletConnectionBridge() {
     const syncAddress = useWalletStore(state => state.syncAddress);
 
     useEffect(() => {
-        const hasHandshake = document.cookie.split('; ').some(row => row.startsWith('sovereign_handshake=0x'));
+        // [AUDITED] Extract handshake address from cookie with strict validation
+        const cookies = document.cookie.split('; ');
+        const handshakeCookie = cookies.find(row => row.trim().startsWith('sovereign_handshake=0x'));
+        const handshakeAddress = handshakeCookie ? handshakeCookie.split('=')[1]?.trim().toLowerCase() : null;
         
         if (isConnected && address) {
-            syncAddress(address);
-        } else if (!hasHandshake) {
-            // Only clear the address if NO handshake is present
+            // Priority 1: Direct Web3 Connection (MetaMask/Rainbow/AppKit)
+            syncAddress(address.toLowerCase());
+        } else if (handshakeAddress && handshakeAddress.startsWith('0x')) {
+            // Priority 2: Sovereign Handshake (QR Link)
+            // This enables "any wallet" functionality by bridging the mobile-linked address.
+            syncAddress(handshakeAddress);
+        } else {
+            // State: Purged/Disconnected
             syncAddress(null);
         }
     }, [isConnected, address, syncAddress]);

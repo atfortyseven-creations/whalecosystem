@@ -130,6 +130,16 @@ const PC_WALLETS = [
     bgColor: '#F5F0FF',
     borderColor: '#7B3FE420',
   },
+  {
+    id: 'walletconnect',
+    name: 'All Wallets',
+    description: 'WalletConnect / QR Code',
+    icon: '🔗',
+    isImage: false,
+    color: '#3B99FC',
+    bgColor: '#F0F8FF',
+    borderColor: '#3B99FC20',
+  },
 ];
 
 // ─── PC WALLET PICKER MODAL ─────────────────────────────────────────────────
@@ -177,8 +187,12 @@ function PCWalletPickerModal({
         openAppKit({ view: 'Connect' });
         onClose();
       }
+    } else if (walletId === 'walletconnect') {
+      // Direct WalletConnect Modal (Universal Bridge)
+      openAppKit({ view: 'Connect' });
+      onClose();
     } else {
-      // Trust, Coinbase, Rainbow → WalletConnect QR via AppKit
+      // Coinbase, Rainbow, etc. → Specific AppKit views or general connect
       openAppKit({ view: 'Connect' });
       onClose();
     }
