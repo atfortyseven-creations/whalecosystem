@@ -11,11 +11,14 @@ import { SovereignBridge } from '@/components/premium/SovereignBridge';
 import { useDashboardStore } from '@/lib/store/useDashboardStore';
 import Link from 'next/link';
 import { useAccount, useBalance } from 'wagmi';
+import { lazy, Suspense } from 'react';
+
+const SovereignIntelTab = lazy(() => import('./SovereignIntelTab'));
 
 // ─────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────
-type Tab = 'canvas' | 'portfolio' | 'activity' | 'settings';
+type Tab = 'canvas' | 'portfolio' | 'activity' | 'settings' | 'sovereign';
 type NodeType = 'wallet' | 'bot' | 'contract' | 'api';
 
 interface NodeData {
@@ -871,6 +874,7 @@ export function DashboardShell() {
         { id: 'canvas', icon: <LayoutDashboard size={15} />, label: 'Operations Canvas' },
         { id: 'portfolio', icon: <Wallet size={15} />, label: 'Portfolio' },
         { id: 'activity', icon: <Terminal size={15} />, label: 'Activity' },
+        { id: 'sovereign', icon: <Zap size={15} className="text-emerald-500" />, label: 'Sovereign Intel' },
         { id: 'settings', icon: <Settings size={15} />, label: 'Settings' },
     ];
 
@@ -998,6 +1002,18 @@ export function DashboardShell() {
                     {tab === 'portfolio' && <PortfolioTab />}
                     {tab === 'activity' && <ActivityTab />}
                     {tab === 'settings' && <SettingsTab />}
+                    {tab === 'sovereign' && (
+                        <Suspense fallback={
+                            <div className="flex-1 flex items-center justify-center bg-black/5">
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="w-10 h-10 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-emerald-500/40">Initializing SAL Mainframe...</p>
+                                </div>
+                            </div>
+                        }>
+                            <SovereignIntelTab />
+                        </Suspense>
+                    )}
                 </div>
             </div>
 
