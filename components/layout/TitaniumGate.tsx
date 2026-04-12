@@ -36,7 +36,13 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     useEffect(() => {
         setMounted(true);
-    }, []);
+        // Fail-safe: if after 2s we are still stuck, force APP state if on public page
+        const timer = setTimeout(() => {
+            if (isPublicPage) setState('APP');
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [isPublicPage]);
+
     useEffect(() => {
         const checkAccess = () => {
             if (!mounted) return;
@@ -62,27 +68,14 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
             // Otherwise: Access Denied
             setState('AUTH');
-            router.push('/');
+            if (pathname !== '/') router.push('/');
         };
 
         checkAccess();
-    }, [isConnected, isPublicPage, router, mounted]);
+    }, [isConnected, isPublicPage, router, mounted, pathname]);
 
-    if (!mounted) {
-        // CRITICAL iOS FIX: Never return null from a Provider-tree component.
-        // Returning null on first render breaks React hydration on iOS Safari —
-        // it causes the entire Provider subtree to unmount and re-mount,
-        // triggering a cascade of context errors and a blank screen.
-        // An invisible skeleton div preserves the tree while mounting.
-        return (
-            <GateStateContext.Provider value={{ state: 'AUTH', hasPlayedIntro: false }}>
-                <div
-                    aria-hidden="true"
-                    style={{ visibility: 'hidden', position: 'fixed', inset: 0, zIndex: -1 }}
-                />
-            </GateStateContext.Provider>
-        );
-    }
+    // [iOS PERFECTION] We no longer return an invisible div. Instead, we render
+    // the provider structure immediately to avoid React Tree mismatch crashes.
 
     return (
         <GateStateContext.Provider value={{ state, hasPlayedIntro: true }}>
