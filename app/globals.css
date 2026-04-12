@@ -378,7 +378,6 @@ body,
   /* scroll-behavior managed by Lenis — not CSS */
   /* CRITICAL: height:100% removed — causes iPad Safari blank screen.
      Body/html height is auto by default; min-height:100vh on body handles full-page layout. */
-  overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
 
