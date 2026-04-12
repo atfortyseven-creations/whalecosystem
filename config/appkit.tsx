@@ -94,7 +94,7 @@ const queryClient = new QueryClient()
 
 // CRITICAL: URL must match exactly the domain registered in WalletConnect Cloud.
 // Using a fixed production URL prevents auth failures caused by localhost/preview mismatches.
-const APP_URL = 'https://humanidfi.com';
+const APP_URL = 'https://www.humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
