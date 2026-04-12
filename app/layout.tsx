@@ -201,13 +201,11 @@ export default async function RootLayout({
                <GoogleTagManager gtmId="GTM-52B9SCRM" />
                 <Providers cookies={cookies}>
                   <GlobalErrorBoundary>
-                      <Web3SovereignProvider>
-                        <MobileEnforcer>
-                          <ClientLayout>
-                            {children}
-                          </ClientLayout>
-                        </MobileEnforcer>
-                      </Web3SovereignProvider>
+                    <MobileEnforcer>
+                      <ClientLayout>
+                        {children}
+                      </ClientLayout>
+                    </MobileEnforcer>
                   </GlobalErrorBoundary>
                   <Toaster richColors position="top-right" />
                   <CookieConsent />
