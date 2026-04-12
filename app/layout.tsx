@@ -20,6 +20,7 @@ import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
 import { ClientOverlays } from "@/components/layout/ClientOverlays";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
+import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -195,13 +196,15 @@ export default async function RootLayout({
                <ErrorSuppressor />
                <GoogleTagManager gtmId="GTM-52B9SCRM" />
                 <Providers cookies={cookies}>
-                  <MobileEnforcer>
-                    <Web3SovereignProvider>
-                      <ClientLayout>
-                        {children}
-                      </ClientLayout>
-                    </Web3SovereignProvider>
-                  </MobileEnforcer>
+                  <GlobalErrorBoundary>
+                    <MobileEnforcer>
+                      <Web3SovereignProvider>
+                        <ClientLayout>
+                          {children}
+                        </ClientLayout>
+                      </Web3SovereignProvider>
+                    </MobileEnforcer>
+                  </GlobalErrorBoundary>
                   <Toaster richColors position="top-right" />
                   <CookieConsent />
                   <ClientOverlays />

@@ -252,10 +252,10 @@ export function LegendaryTransactionModal({
                   try {
                       const { mainnetClient } = await import('@/lib/blockchain/rpc-engine');
                       //@ts-ignore
-                      const address = await mainnetClient.getEnsAddress({ name: recipient });
-                      if (!address) throw new Error("Could not resolve ENS name");
-                      finalRecipient = address;
-                      toast.success("ENS Resolved", { id: 'ens-resolve', description: `Target: ${address.slice(0, 10)}...` });
+                      const resolvedAddress = await mainnetClient.getEnsAddress({ name: recipient });
+                      if (!resolvedAddress) throw new Error("Could not resolve ENS name");
+                      finalRecipient = resolvedAddress;
+                      toast.success("ENS Resolved", { id: 'ens-resolve', description: `Target: ${resolvedAddress.slice(0, 10)}...` });
                   } catch (e: any) {
                       toast.error("ENS Resolution Failed", { id: 'ens-resolve', description: e.message });
                       setLoading(false);
@@ -662,7 +662,7 @@ export function LegendaryTransactionModal({
                                 </div>
                             </div>
                             <div className="flex justify-between text-[10px] font-black tracking-tight uppercase">
-                                <span className="text-white/20">Approx $0.00</span>
+                                <span className="text-white/20">Approx ${safeToLocaleString(parseFloat(amount || '0') * (balances.find(b => b.symbol === fromAssetSymbol)?.usdPrice || 0), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 <button 
                                     onClick={() => {
                                         const asset = balances.find(b => b.symbol === fromAssetSymbol);

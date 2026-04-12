@@ -6,15 +6,20 @@ FROM node:22-slim AS base
 
 # Install build dependencies for native modules (libp2p/webrtc)
 RUN apt-get update && apt-get install -y \
-    libc6 \
+    libc6-dev \
+    libc6-compat \
+    libstdc++6 \
     openssl \
     python3 \
     make \
     g++ \
+    gcc \
     cmake \
     git \
     build-essential \
     wget \
+    pkg-config \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # ─── STAGE 1: INSTALL DEPENDENCIES ──────────────────────────────────────────
