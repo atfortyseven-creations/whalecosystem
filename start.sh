@@ -1,3 +1,14 @@
 #!/bin/sh
 set -e
-exec npx next start -p ${PORT:-3000} -H 0.0.0.0
+
+echo "🚀 [Start] Initializing Sovereign Infrastructure..."
+
+# 1. Database Alignment
+npx prisma generate
+npx prisma migrate deploy
+
+# 2. Total Process Orchestration
+# We use start:all which is defined in package.json to run:
+# next start + gateway + scanner + alerts + solana + mesh
+exec npm run start:all
+

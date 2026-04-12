@@ -8,6 +8,8 @@ import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createAppKit } from '@reown/appkit/react'
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
 
 // 1. Get projectId — Falls back to real project ID so the app renders even without the env var.
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
@@ -166,7 +168,9 @@ export function Web3ModalProvider({ children, cookies }: { children: ReactNode; 
     return (
         <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>
             <QueryClientProvider client={queryClient}>
-                {children}
+                <RainbowKitProvider theme={darkTheme()}>
+                    {children}
+                </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider>
     )

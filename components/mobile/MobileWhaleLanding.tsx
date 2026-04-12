@@ -766,13 +766,40 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    // [EXPERT] Auto-Process Token from URL if present
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get('session');
-    if (urlToken && !isProcessingRef.current) {
-        console.log(`[Handshake] Auto-processing token from URL: ${urlToken}`);
-        handleScan(urlToken);
-    }
+    // [EXPERT] Auto-Process Token from URL or Persisted State
+    const checkPendingHandshake = async () => {
+        if (isProcessingRef.current || !addressRef.current) return;
+
+        let token = '';
+        
+        // 1. Check URL
+        const params = new URLSearchParams(window.location.search);
+        token = params.get('session') || params.get('handshake') || '';
+
+        // 2. Check Persisted State (Fallback for post-connection refresh)
+        if (!token) {
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    token = sessionStorage.getItem('pending_handshake_session') || '';
+                }
+            } catch (e) {}
+        }
+
+        if (token && addressRef.current) {
+            console.log(`[Handshake] Initiating auto-handshake for token: ${token}`);
+            
+            // Clear from storage immediately to prevent loop on failure
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.removeItem('pending_handshake_session');
+                }
+            } catch (e) {}
+
+            handleScan(`WHALE_HANDSHAKE:${token}`);
+        }
+    };
+
+    checkPendingHandshake();
 
     // Cleanup only
     return () => {
