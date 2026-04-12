@@ -81,7 +81,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         <GateStateContext.Provider value={{ state, hasPlayedIntro: true }}>
             <AnimatePresence mode="wait">
                 {/* THE APPLICATION */}
-                {(state === 'APP') && (
+                {(state === 'APP') ? (
                     <motion.div 
                         key="app-content"
                         initial={{ opacity: 0, scale: 0.99 }}
@@ -92,6 +92,29 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                         <SafeErrorBoundary>
                             {children}
                         </SafeErrorBoundary>
+                    </motion.div>
+                ) : (
+                    /* THE SKELETON / LOADING ENGINE */
+                    <motion.div
+                        key="gate-loader"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[1000] bg-[#FAF9F6] flex flex-col items-center justify-center p-8"
+                    >
+                         <WhaleAlertLoader />
+                         <div className="mt-8 flex flex-col items-center gap-2">
+                             <div className="w-48 h-[1px] bg-black/5 relative overflow-hidden">
+                                 <motion.div 
+                                     className="absolute inset-0 bg-black/20"
+                                     animate={{ x: ['-100%', '100%'] }}
+                                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                 />
+                             </div>
+                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
+                                 Sovereign Identity Resuming
+                             </span>
+                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>

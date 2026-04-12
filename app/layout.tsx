@@ -188,7 +188,11 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body className="bg-[#FAF9F6] text-[#050505] dark:bg-[#000000] dark:text-[#E0E0E0] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" suppressHydrationWarning>
+        <body 
+          className="bg-[#FAF9F6] text-[#050505] dark:bg-[#000000] dark:text-[#E0E0E0] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" 
+          style={{ backgroundColor: '#FAF9F6' }}
+          suppressHydrationWarning
+        >
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
             {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
             <WavePatternOverlay />

@@ -88,16 +88,9 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     }, [isConnected, mounted]);
 
     if (!mounted) {
-        // CRITICAL iOS FIX: We MUST render children here.
-        // If we omit `children` during SSR / initial mount, the entire
-        // <Web3SovereignProvider> gets unmounted and then re-mounted on hydration.
-        // iOS Safari heavily penalizes this and causes a total blank screen crash.
-        // We render it invisibly until client-side layout calculates.
-        return (
-            <div style={{ visibility: 'hidden', opacity: 0 }} className="pointer-events-none min-h-screen">
-                {children}
-            </div>
-        );
+        // [INSTITUTIONAL PERFECTION] We NO LONGER hide the children.
+        // Hydration errors are best handled by stable skeletons in TitaniumGate.
+        return <>{children}</>;
     }
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
