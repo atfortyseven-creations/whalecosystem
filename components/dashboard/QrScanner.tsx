@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Camera, Loader, RefreshCcw } from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 type ScanState = 'idle' | 'requesting' | 'scanning' | 'validating' | 'success' | 'error';
 
@@ -13,64 +14,43 @@ interface QrScannerProps {
 export function QrScanner({ className }: QrScannerProps) {
     const [state, setState] = useState<ScanState>('idle');
     const [message, setMessage] = useState('');
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
-    const rafRef = useRef<number>(0);
-    const detectorRef = useRef<BarcodeDetector | null>(null);
-    const isRunningRef = useRef(false);
+    const scannerRef = useRef<Html5Qrcode | null>(null);
+    const containerId = "qr-reader-container";
 
     // Stop all camera resources
-    const stopCamera = useCallback(() => {
-        isRunningRef.current = false;
-        cancelAnimationFrame(rafRef.current);
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
-        }
-        if (videoRef.current) videoRef.current.srcObject = null;
-    }, []);
-
-    useEffect(() => () => stopCamera(), [stopCamera]);
-
-    // Scan loop using BarcodeDetector or canvas fallback
-    const scanLoop = useCallback(async (detector: BarcodeDetector) => {
-        if (!isRunningRef.current || !videoRef.current || !canvasRef.current) return;
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            if (ctx) {
-                ctx.drawImage(video, 0, 0);
-                try {
-                    const codes = await detector.detect(canvas);
-                    if (codes.length > 0 && isRunningRef.current) {
-                        isRunningRef.current = false;
-                        cancelAnimationFrame(rafRef.current);
-                        await handleDecode(codes[0].rawValue);
-                        return;
-                    }
-                } catch { /* detection error — keep scanning */ }
+    const stopCamera = useCallback(async () => {
+        if (scannerRef.current && scannerRef.current.isScanning) {
+            try {
+                await scannerRef.current.stop();
+            } catch (err) {
+                console.warn("[Scanner] Stop error:", err);
             }
         }
-        rafRef.current = requestAnimationFrame(() => scanLoop(detector));
     }, []);
+
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, [stopCamera]);
 
     const handleDecode = async (decodedText: string) => {
         setState('validating');
-        stopCamera();
+        await stopCamera();
+        
         try {
             let token = decodedText;
             try {
+                // If it's a URL, extract the token
                 const url = new URL(decodedText);
                 token = url.searchParams.get('token') ?? decodedText;
-            } catch {}
+            } catch {
+                // Not a URL, use raw text as token
+            }
 
             const res = await fetch(`/api/bridge/generate?token=${encodeURIComponent(token)}`);
             const data = await res.json();
+            
             if (data.valid) {
                 setState('success');
                 setMessage(data.message ?? 'Device successfully linked to your account!');
@@ -86,60 +66,57 @@ export function QrScanner({ className }: QrScannerProps) {
 
     const startCamera = async () => {
         setState('requesting');
-        stopCamera();
+        
+        // Ensure previous instances are cleaned up
+        await stopCamera();
 
         try {
-            // Check BarcodeDetector support
-            if (!('BarcodeDetector' in window)) {
-                setState('error');
-                setMessage('QR scanning is not supported in this browser. Please use Chrome or Safari 17+.');
-                return;
-            }
+            const scanner = new Html5Qrcode(containerId);
+            scannerRef.current = scanner;
 
-            detectorRef.current = new BarcodeDetector({ formats: ['qr_code'] });
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
 
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
-            });
+            await scanner.start(
+                { facingMode: "environment" },
+                config,
+                (decodedText) => {
+                    handleDecode(decodedText);
+                },
+                () => {
+                    // Ongoing scan, ignore errors
+                }
+            );
 
-            streamRef.current = stream;
-
-            if (!videoRef.current) { stopCamera(); return; }
-            videoRef.current.srcObject = stream;
-            await videoRef.current.play();
-
-            isRunningRef.current = true;
             setState('scanning');
-            rafRef.current = requestAnimationFrame(() => scanLoop(detectorRef.current!));
-
-        } catch (err: unknown) {
-            const error = err as DOMException;
-            stopCamera();
+        } catch (err: any) {
+            console.error("[Scanner] Start failure:", err);
             setState('error');
-            if (error.name === 'NotAllowedError') {
+            
+            if (err?.toString().includes("NotAllowedError")) {
                 setMessage('Camera access denied. Tap "Allow" when prompted, then try again.');
-            } else if (error.name === 'NotFoundError') {
+            } else if (err?.toString().includes("NotFound")) {
                 setMessage('No camera found on this device.');
             } else {
-                setMessage(`Camera error: ${error.message ?? 'Unknown error'}. Try again.`);
+                setMessage(`Camera error: ${err.message || 'Check permissions and try again.'}`);
             }
+            await stopCamera();
         }
     };
 
-    const reset = () => { stopCamera(); setState('idle'); setMessage(''); };
+    const reset = async () => { 
+        await stopCamera(); 
+        setState('idle'); 
+        setMessage(''); 
+    };
 
     return (
         <div className={`w-full flex flex-col items-center gap-6 ${className ?? ''}`}>
-            {/* Hidden video + canvas — always mounted for instant access */}
-            <video
-                ref={videoRef}
-                playsInline
-                muted
-                autoPlay
-                className="absolute opacity-0 pointer-events-none w-0 h-0"
-                aria-hidden
-            />
-            <canvas ref={canvasRef} className="hidden" aria-hidden />
+            {/* Hidden/Placeholder container for Html5Qrcode */}
+            <div id={containerId} className="hidden pointer-events-none opacity-0 w-0 h-0" />
 
             <AnimatePresence mode="wait">
                 {/* IDLE */}
@@ -186,11 +163,12 @@ export function QrScanner({ className }: QrScannerProps) {
                     <motion.div key="scanning" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                         className="flex flex-col items-center gap-5 w-full">
                         <div className="relative w-72 h-72 rounded-3xl overflow-hidden border border-[var(--aztec-orchid)]/50 shadow-[0_0_40px_rgba(168,85,247,0.2)]">
-                            {/* Mirror the video into view */}
-                            <video ref={undefined} /* already mounted above */
-                                className="hidden" />
-                            {/* Use a visible video element */}
-                            <LiveVideoView videoRef={videoRef} />
+                            {/* The actual video element rendered by html5-qrcode will be moved into this container */}
+                            <div id="scanner-viewfinder" className="w-full h-full [&>video]:w-full [&>video]:h-full [&>video]:object-cover" />
+                            
+                            {/* Inject the video into the viewfinder */}
+                            <VideoReparenter sourceId={containerId} targetId="scanner-viewfinder" />
+
                             {/* Scan overlay */}
                             <div className="absolute inset-0 pointer-events-none">
                                 <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-[var(--aztec-orchid)] rounded-tl-2xl" />
@@ -247,29 +225,28 @@ export function QrScanner({ className }: QrScannerProps) {
     );
 }
 
-// Sub-component that renders the live video in the viewfinder
-function LiveVideoView({ videoRef }: { videoRef: React.RefObject<HTMLVideoElement | null> }) {
-    const localRef = useRef<HTMLVideoElement>(null);
-
+/**
+ * Utility component to move the video element created by html5-qrcode
+ * into the visible viewfinder without breaking React's expectations.
+ */
+function VideoReparenter({ sourceId, targetId }: { sourceId: string; targetId: string }) {
     useEffect(() => {
-        const source = videoRef.current;
-        const target = localRef.current;
-        if (!source || !target) return;
-        // Share the same MediaStream
-        const stream = source.srcObject as MediaStream | null;
-        if (stream) {
-            target.srcObject = stream;
-            target.play().catch(() => {});
-        }
-    }, [videoRef]);
+        const interval = setInterval(() => {
+            const source = document.getElementById(sourceId);
+            const target = document.getElementById(targetId);
+            if (!source || !target) return;
 
-    return (
-        <video
-            ref={localRef}
-            playsInline
-            muted
-            autoPlay
-            className="w-full h-full object-cover"
-        />
-    );
+            const video = source.querySelector('video');
+            if (video && video.parentElement !== target) {
+                // Move video to target
+                target.appendChild(video);
+                // Hide the source's auto-generated elements but keep the video visible
+                source.style.display = 'none';
+                clearInterval(interval);
+            }
+        }, 100);
+        return () => clearInterval(interval);
+    }, [sourceId, targetId]);
+
+    return null;
 }
