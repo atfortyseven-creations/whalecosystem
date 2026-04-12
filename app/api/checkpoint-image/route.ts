@@ -20,19 +20,17 @@ import path from "path";
 const ASSET_ALIAS: Record<string, string[]> = {
   // Main repeating pattern (image 2) — gray ukiyo-e waves
   "patron-cosmico-4k.png": [
-    "C:/Users/admin/Downloads/image (2)_PhotoGrid.png",
-    "C:/Users/admin/.gemini/.antigravity/scratch/Wallet Human Polymarket ID/public/patron-cosmico-4k.png",
+    path.join(process.cwd(), "public", "patron-cosmico-4k.png"),
   ],
   // Downpage Hokusai waves (image 4) — blue waves
   "olas-hokusai-4k.png": [
-    "C:/Users/admin/Downloads/image (4)_PhotoGrid.png",
-    "C:/Users/admin/.gemini/.antigravity/scratch/Wallet Human Polymarket ID/public/olas-hokusai-4k.png",
+    path.join(process.cwd(), "public", "olas-hokusai-4k.png"),
   ],
 };
 
 // Fallback CHECKPOINT folder for legacy references (nuevo-patron-cosmico.jpg etc.)
-const CHECKPOINT_DIR = "C:/Users/admin/.gemini/antigravity/scratch/Wallet Human Polymarket ID/public/CHECKPOINT";
-const PUBLIC_DIR     = "C:/Users/admin/.gemini/.antigravity/scratch/Wallet Human Polymarket ID/public";
+const CHECKPOINT_DIR = path.join(process.cwd(), "public", "CHECKPOINT");
+const PUBLIC_DIR     = path.join(process.cwd(), "public");
 const DOWNLOADS_DIR  = "C:/Users/admin/Downloads";
 
 function detectMime(filePath: string): string {

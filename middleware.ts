@@ -273,10 +273,11 @@ export default clerkMiddleware(async (auth, request) => {
     const cspHeader = [
         "default-src 'self'",
         `script-src ${scriptSrc}`,
+        "worker-src 'self' blob:",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com https://img.clerk.com https://*.clerk.com https://res.cloudinary.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://www.humanidfi.com https://*.googleusercontent.com",
         "font-src 'self' https://fonts.gstatic.com data:",
-        "connect-src 'self' https://api.web3modal.org https://pulse.walletconnect.org https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io https://cca-lite.coinbase.com https://*.coinbase.com",
+        "connect-src 'self' https://api.web3modal.org https://pulse.walletconnect.org https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com wss://*.reown.com https://*.reown.com wss://*.reown.org https://*.reown.org wss://*.reown.app https://*.reown.app wss://*.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://api.walletconnect.com wss://api.walletconnect.com https://*.alchemy.com https://*.infura.io https://go.getblock.us https://go.getblock.io wss://go.getblock.io https://cca-lite.coinbase.com https://*.coinbase.com wss://stream.binance.com:9443 https://stream.binance.com",
         "frame-src 'self' https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://verify.walletconnect.com https://verify.walletconnect.org https://verify.reown.com https://verify.reown.org https://*.reown.com https://*.reown.app https://accounts.google.com",
         "object-src 'none'",
         "base-uri 'self'",
