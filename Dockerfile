@@ -2,15 +2,20 @@
 # Railway Hobby Plan: 8 vCPU / 8 GB RAM
 
 # ─── BASE IMAGE ──────────────────────────────────────────────────────────────
-FROM node:22-alpine AS base
+FROM node:22-slim AS base
 
-RUN apk add --no-cache \
-    libc6-compat \
+# Install build dependencies for native modules (libp2p/webrtc)
+RUN apt-get update && apt-get install -y \
+    libc6 \
     openssl \
     python3 \
     make \
     g++ \
-    wget
+    cmake \
+    git \
+    build-essential \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # ─── STAGE 1: INSTALL DEPENDENCIES ──────────────────────────────────────────
 FROM base AS deps
