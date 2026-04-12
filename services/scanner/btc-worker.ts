@@ -15,88 +15,74 @@ const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50_000;
 // FIX: Startup guard — the worker will refuse to start rather than crashing
 // at runtime with a TypeError ("fetch: BTC_RPC_URL is undefined").
 // Previously: BTC_RPC_URL! non-null assertion silently exploded on first RPC call.
-const BTC_RPC_URL = process.env.GETBLOCK_BTC_RPC || process.env.BITCOIN_RPC_URL;
+const MEMPOOL_API = 'https://mempool.space/api';
 
-async function btcRpcCall(method: string, params: any[] = []) {
-    if (!BTC_RPC_URL) throw new Error('BTC_RPC_URL is not configured. Set GETBLOCK_BTC_RPC or BITCOIN_RPC_URL.');
-
-    // FIX: Added timeout — previously an unresponsive BTC node would hang
-    // the worker loop indefinitely, blocking all subsequent block scans.
-    const response = await fetch(BTC_RPC_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': process.env.BITCOIN_RPC_AUTH ? `Basic ${process.env.BITCOIN_RPC_AUTH}` : '' },
-        body: JSON.stringify({ jsonrpc: "1.0", id: "btc-standalone", method, params }),
-        signal: AbortSignal.timeout(10_000), // 10-second hard timeout per RPC call
+async function fetchMempool(endpoint: string, isJson = true) {
+    const response = await fetch(`${MEMPOOL_API}/${endpoint}`, {
+        signal: AbortSignal.timeout(10_000)
     });
-
-    if (!response.ok) throw new Error(`BTC RPC HTTP ${response.status}: ${await response.text().catch(() => '')}`);
-
-    const data = await response.json();
-    if (data.error) throw new Error(`BTC RPC error ${data.error.code}: ${data.error.message}`);
-    return data.result;
+    if (!response.ok) throw new Error(`Mempool API HTTP ${response.status}: ${await response.text().catch(() => '')}`);
+    return isJson ? response.json() : response.text();
 }
 
 export async function startBtcWorker() {
-    if (!BTC_RPC_URL) {
-        console.error('❌ [BTC Worker] BTC_RPC_URL not set. Worker disabled. Set GETBLOCK_BTC_RPC or BITCOIN_RPC_URL.');
-        return;
-    }
-
     let lastBlock: number;
     try {
-        lastBlock = await btcRpcCall("getblockcount");
-        console.log(`📡 [BTC Scanner] Connected. Height: ${lastBlock}`);
+        const heightText = await fetchMempool('blocks/tip/height', false);
+        lastBlock = parseInt(heightText as string, 10);
+        console.log(`📡 [BTC Scanner] Connected to Mempool.space. Height: ${lastBlock}`);
     } catch (e: any) {
         console.error(`❌ [BTC Scanner] Failed to connect on startup: ${e.message}. Retrying in 60s.`);
         await new Promise(r => setTimeout(r, 60_000));
-        return startBtcWorker(); // Recursive restart
+        return startBtcWorker();
     }
 
-    // FIX: Exponential backoff — same pattern applied to sol-worker.ts.
-    // Previously: fixed 60s sleep on any error regardless of frequency.
     let consecutiveErrors = 0;
-    const MAX_BACKOFF_MS  = 5 * 60_000; // 5 minutes cap
+    const MAX_BACKOFF_MS  = 5 * 60_000;
 
     while (true) {
         try {
-            const currentBlock: number = await btcRpcCall("getblockcount");
+            const heightText = await fetchMempool('blocks/tip/height', false);
+            const currentBlock = parseInt(heightText as string, 10);
 
             if (currentBlock > lastBlock) {
-                // FIX: Chunk block processing to avoid requesting huge block ranges
-                // in a single RPC call after long downtime. Process 1 block at a time
-                // to stay within the RPC node's rate-limit window.
                 const targetBlock = Math.min(currentBlock, lastBlock + 1);
-                const blockHash  = await btcRpcCall("getblockhash", [targetBlock]);
-                const block: any = await btcRpcCall("getblock", [blockHash, 2]);
-                const btcPrice   = await getRealTimePrice("BTC") || 98_000;
+                const blockHash: string = await fetchMempool(`block-height/${targetBlock}`, false) as string;
+                const txids: string[] = await fetchMempool(`block/${blockHash}/txids`) as string[];
+                
+                const btcPrice = await getRealTimePrice("BTC") || 98_000;
+                console.log(`📦 [BTC Scanner] Processing Block ${targetBlock} | ${txids.length} txs`);
 
-                for (const tx of block.tx ?? []) {
-                    let totalOutputBtc = 0;
-                    for (const vout of tx.vout ?? []) {
-                        // FIX: Guard against null/non-numeric vout.value fields
-                        // which appear in OP_RETURN outputs (value = 0) and non-standard scripts
-                        if (typeof vout.value === 'number') totalOutputBtc += vout.value;
-                    }
-                    const usdValue = totalOutputBtc * btcPrice;
+                // To avoid overloading public API, we fetch full tx details only for large movements if possible
+                // or parallelize with limit
+                for (const txid of txids) {
+                    try {
+                        const tx: any = await fetchMempool(`tx/${txid}`);
+                        let totalOutputSats = 0;
+                        for (const vout of tx.vout ?? []) {
+                            totalOutputSats += vout.value ?? 0;
+                        }
+                        const valueBTC = totalOutputSats / 1e8;
+                        const usdValue = valueBTC * btcPrice;
 
-                    if (usdValue >= WHALE_THRESHOLD_USD) {
-                        // Extract sender from first vin's coinbase or scriptSig
-                        const senderAddr = tx.vin?.[0]?.coinbase
-                            ? 'COINBASE'
-                            : (tx.vin?.[0]?.txid || 'Unknown');
-
-                        await processWhaleTx(
-                            tx.txid, senderAddr, "Multiple Outputs",
-                            "BTC", totalOutputBtc, usdValue,
-                            targetBlock, 'BITCOIN', { method: "BTC" }
-                        );
+                        if (usdValue >= WHALE_THRESHOLD_USD) {
+                            const senderAddr = tx.vin?.[0]?.prevout?.scriptpubkey_address ?? 'Unknown';
+                            await processWhaleTx(
+                                tx.txid, senderAddr, "Multiple Outputs",
+                                "BTC", valueBTC, usdValue,
+                                targetBlock, 'BITCOIN', { method: "REST_MEMPOOL" }
+                            );
+                        }
+                    } catch (txErr) {
+                        // Skip individual tx errors to keep the block moving
+                        continue;
                     }
                 }
                 lastBlock = targetBlock;
             }
 
             consecutiveErrors = 0;
-            await new Promise(r => setTimeout(r, 20_000)); // Poll every 20s (~1 BTC block / 10min)
+            await new Promise(r => setTimeout(r, 30_000)); // Poll every 30s
 
         } catch (e: any) {
             consecutiveErrors++;

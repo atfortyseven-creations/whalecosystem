@@ -37,6 +37,30 @@ interface AlchemyTransfer {
   };
 }
 
+async function safeAlchemyFetch(url: string, body: any) {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(10_000)
+    });
+    
+    const text = await response.text();
+    
+    // Alchemy returns "Monthly cap reached" or "402 Payment Required" as text when plan is exhausted
+    if (!text.startsWith('{') && !text.startsWith('[')) {
+      console.warn(`[Alchemy] Non-JSON response (possibly quota reached): ${text.slice(0, 100)}`);
+      return { result: { transfers: [] } };
+    }
+    
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('[Alchemy Fetch Error]', e);
+    return { result: { transfers: [] } };
+  }
+}
+
 async function fetchAlchemyTransfers(address: string, chainId: number): Promise<AlchemyTransfer[]> {
   const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
   const networkMap: Record<number, string> = {
@@ -51,36 +75,26 @@ async function fetchAlchemyTransfers(address: string, chainId: number): Promise<
   const url = `https://${network}.g.alchemy.com/v2/${apiKey}`;
 
   const fetchBatch = async (dir: 'fromAddress' | 'toAddress') => {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 1,
-                method: 'alchemy_getAssetTransfers',
-                params: [{
-                    fromBlock: "0x0",
-                    toBlock: "latest",
-                    [dir]: address,
-                    category: ["external", "internal", "erc20"],
-                    withMetadata: true,
-                    excludeZeroValue: true,
-                    maxCount: "0x64" // 100 transactions per fetch
-                }]
-            })
-        });
-        const data = await response.json();
-        return data.result?.transfers || [];
-    } catch (e) {
-        console.error(`Alchemy ${dir} fetch failed:`, e);
-        return [];
-    }
+    const data = await safeAlchemyFetch(url, {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'alchemy_getAssetTransfers',
+      params: [{
+        fromBlock: "0x0",
+        toBlock: "latest",
+        [dir]: address,
+        category: ["external", "internal", "erc20"],
+        withMetadata: true,
+        excludeZeroValue: true,
+        maxCount: "0x64"
+      }]
+    });
+    return data.result?.transfers || [];
   };
 
   const [outgoing, incoming] = await Promise.all([
-      fetchBatch('fromAddress'),
-      fetchBatch('toAddress')
+    fetchBatch('fromAddress'),
+    fetchBatch('toAddress')
   ]);
 
   return [...outgoing, ...incoming];

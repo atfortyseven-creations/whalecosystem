@@ -29,6 +29,28 @@ const ZSCORE_BASELINE_STDDEV   = 5_000; // conservative std-dev derived from mai
 
 const redis = createRedisClient({ name: 'Solana-Worker' });
 
+const SOLANA_RPC = process.env.SOLANA_RPC_URL || 'https://rpc.ankr.com/solana';
+
+async function solanaRpcCall(method: string, params: any[] = []) {
+    const response = await fetch(SOLANA_RPC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: "2.0", id: "sol-standalone", method, params }),
+    });
+
+    if (response.status === 429) {
+        console.warn('⚠️ [Solana] Rate limited (429). Backing off...');
+        throw new Error('Solana RPC Rate Limit');
+    }
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Solana RPC HTTP ${response.status}: ${text}`);
+    }
+
+    return response.json();
+}
+
 async function interceptThermodynamicAnomalies() {
     // [PHASE 9] Obtain the best healthy RPC endpoint via the GlobalRPCRouter.
     // On failure of this connection, we will call reportFailure() and retry with the next one.

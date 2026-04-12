@@ -7,6 +7,7 @@ const MORALIS_API_KEY = process.env.MORALIS_API_KEY || '';
 
 /**
  * Chain mapping for Moralis API
+ * 🔥 IMPORTANT: Only include chains officially supported by Moralis API v2.2
  */
 export const MORALIS_CHAINS = {
   1: 'eth',
@@ -15,8 +16,7 @@ export const MORALIS_CHAINS = {
   43114: 'avalanche',
   42161: 'arbitrum',
   10: 'optimism',
-  8453: 'base',
-  480: 'worldchain' 
+  8453: 'base'
 } as const;
 
 export type MoralisChain = typeof MORALIS_CHAINS[keyof typeof MORALIS_CHAINS];

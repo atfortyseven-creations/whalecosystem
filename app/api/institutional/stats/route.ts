@@ -5,30 +5,16 @@ import { db } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const startTime = performance.now();
   try {
     const now = new Date();
     const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const last1h = new Date(now.getTime() - 1 * 60 * 60 * 1000);
 
-    // 1. Aggregated Volume (24h)
-    const stats24h = await db.whaleActivity.aggregate({
-      where: {
-        timestamp: { gte: last24h },
-        usdValue: { gte: '50000000' }
-      },
-      _sum: {
-        valueBTC: true
-      },
-      _count: {
-        id: true
-      }
-    });
-
-    // 2. Aggregated Volume (USD Projection) - sum of strings is tricky in Prisma 
-    // We'll fetch the records and sum them for absolute precision on high-value items
+    // 1. Fetch records for Telemetry & Liquid Leak detection
     const records24h = await db.whaleActivity.findMany({
       where: { timestamp: { gte: last24h }, usdValue: { gte: '50000000' } },
-      select: { usdValue: true, institutional: true, entityName: true }
+      select: { usdValue: true, institutional: true, entityName: true, timestamp: true, type: true }
     });
 
     const totalUsdVolume = records24h.reduce((acc, curr) => acc + parseFloat(curr.usdValue), 0);
@@ -36,7 +22,27 @@ export async function GET() {
       ? records24h.filter(r => r.institutional).length / records24h.length 
       : 0;
 
-    // 3. Top Active Entities
+    // 2. Telemetry: Throughput
+    const records1h = records24h.filter(r => new Date(r.timestamp) >= last1h);
+    const whaleThroughput = records1h.length;
+
+    // 3. Liquidity Leak & Supernova Detection
+    const liquidityLeaks = records24h.filter(r => r.type === 'CEX_OUTFLOW' || r.entityName.includes('Binance') || r.entityName.includes('Bybit'));
+    const liquidityBreachDelta = liquidityLeaks.reduce((acc, curr) => acc + parseFloat(curr.usdValue), 0);
+    
+    const supernovaDetected = liquidityLeaks.some(r => parseFloat(r.usdValue) >= 500_000_000);
+    
+    let hazardLevel = 'LOW';
+    if (supernovaDetected) hazardLevel = 'CRITICAL';
+    else if (liquidityBreachDelta > 200_000_000) hazardLevel = 'MEDIUM';
+
+    // 4. Aggregated Volume BTC
+    const stats24h = await db.whaleActivity.aggregate({
+      where: { timestamp: { gte: last24h }, usdValue: { gte: '50000000' } },
+      _sum: { valueBTC: true },
+    });
+
+    // 5. Top Entities
     const entityCounts: Record<string, number> = {};
     records24h.forEach(r => {
       if (r.entityName !== 'Unknown Whale') {
@@ -49,28 +55,28 @@ export async function GET() {
       .slice(0, 3)
       .map(([name, count]) => ({ name, count }));
 
-    // 4. Whale Sentiment (Heuristic)
-    // If institutional ratio > 0.6 and volume > $500M = Aggressive Accumulation
-    let sentiment = 'NEUTRAL';
-    if (totalUsdVolume > 500_000_000 && institutionalRatio > 0.6) sentiment = 'AGGRESSIVE ACCUMULATION';
-    else if (totalUsdVolume > 200_000_000 && institutionalRatio > 0.4) sentiment = 'MODERATE ACCUMULATION';
-    else if (records24h.length > 10) sentiment = 'ACTIVE DISTRIBUTION';
-
-    // 5. SOV-ALPHA Score (0-100)
+    // 6. SOV-ALPHA Score
     const alphaScore = Math.min(Math.floor((totalUsdVolume / 1_000_000_000) * 40 + institutionalRatio * 60), 100);
+
+    const endTime = performance.now();
+    const readLatencyMs = (endTime - startTime).toFixed(2);
 
     return NextResponse.json({
       total24hVolume: totalUsdVolume,
       total24hBtc: stats24h._sum.valueBTC || 0,
-      transactionCount: stats24h._count.id,
+      transactionCount: records24h.length,
       institutionalRatio,
-      sentiment,
+      whaleThroughput,
+      liquidityBreachDelta,
+      supernovaDetected,
+      hazardLevel,
+      readLatencyMs,
       topEntities,
       alphaScore,
       lastUpdated: now.toISOString()
     });
   } catch (err: any) {
     console.error('[API_STATS_ERROR]', err);
-    return NextResponse.json({ error: 'Alpha Engine Fail', details: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Telemetry Engine Fail', details: err.message }, { status: 500 });
   }
 }
