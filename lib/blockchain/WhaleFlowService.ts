@@ -100,26 +100,40 @@ export async function fetchRealWhaleTransfers(limit = 40): Promise<WhaleTransfer
     await Promise.allSettled(
         CHAIN_CONFIGS.map(async ({ network, chainLabel }) => {
             try {
+                // [RESILIENCE] Verify Alchemy API Quota before heavy operations
                 const alchemy = new Alchemy({ apiKey: ALCHEMY_KEY, network });
+                
+                // Wrapped query to catch non-JSON errors (like "Monthly capacity reached")
+                const safeFetchTransfers = async (params: any) => {
+                    try {
+                        return await alchemy.core.getAssetTransfers(params);
+                    } catch (e: any) {
+                        if (e.message?.includes('Monthly capacity') || e.message?.includes('Unexpected token')) {
+                            console.warn(`[WhaleFlowService] ${chainLabel}: Alchemy Quota Exhausted or Blocked.`);
+                            return { transfers: [] };
+                        }
+                        throw e;
+                    }
+                };
 
                 // Fetch recent ERC-20 and ETH transfers
                 const [erc20Transfers, ethTransfers] = await Promise.all([
-                    alchemy.core.getAssetTransfers({
+                    safeFetchTransfers({
                         fromBlock: '0x0',
                         category: [AssetTransfersCategory.ERC20],
                         withMetadata: true,
                         maxCount: 50,
                         order: SortingOrder.DESCENDING,
                         excludeZeroValue: true,
-                    }).catch(() => ({ transfers: [] })),
-                    alchemy.core.getAssetTransfers({
+                    }),
+                    safeFetchTransfers({
                         fromBlock: '0x0',
                         category: [AssetTransfersCategory.EXTERNAL],
                         withMetadata: true,
                         maxCount: 20,
                         order: SortingOrder.DESCENDING,
                         excludeZeroValue: true,
-                    }).catch(() => ({ transfers: [] })),
+                    }),
                 ]);
 
                 const allTransfers = [

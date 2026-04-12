@@ -1,26 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import crypto from 'crypto';
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
-const TOKEN_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
-
-// In-memory token store — works on Railway single-replica
-// Key: token, Value: { sessionId, expiresAt }
-const tokenStore = new Map<string, { sessionId: string; expiresAt: number }>();
-
-// Clean expired tokens periodically
-setInterval(() => {
-    const now = Date.now();
-    for (const [token, entry] of tokenStore) {
-        if (entry.expiresAt < now) tokenStore.delete(token);
-    }
-}, 60_000);
+const TOKEN_EXPIRY_S = 5 * 60; // 5 minutes in seconds
 
 // POST /api/bridge/generate — PC generates a short-lived QR token
-// Works with or without Clerk session (uses sessionId fallback)
 export async function POST(request: NextRequest) {
     try {
-        // Try Clerk first
         let sessionId: string;
         try {
             const { userId } = await auth();
@@ -30,9 +17,9 @@ export async function POST(request: NextRequest) {
         }
 
         const token = crypto.randomBytes(32).toString('hex');
-        const expiresAt = Date.now() + TOKEN_EXPIRY_MS;
-
-        tokenStore.set(token, { sessionId, expiresAt });
+        
+        // Use Redis for cross-replica and restart persistence
+        await safeRedisSet(`bridge:token:${token}`, sessionId, 'EX', TOKEN_EXPIRY_S);
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.humanidfi.com';
         const linkUrl = `${baseUrl}/bridge?token=${token}`;
@@ -40,7 +27,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             token,
             linkUrl,
-            expiresAt: new Date(expiresAt).toISOString(),
+            expiresAt: new Date(Date.now() + TOKEN_EXPIRY_S * 1000).toISOString(),
             sessionId,
         });
     } catch (err) {
@@ -55,23 +42,22 @@ export async function GET(request: NextRequest) {
         const token = request.nextUrl.searchParams.get('token');
         if (!token) return NextResponse.json({ error: 'Token required' }, { status: 400 });
 
-        const entry = tokenStore.get(token);
+        const sessionId = await safeRedisGet(`bridge:token:${token}`);
 
-        if (!entry) {
-            return NextResponse.json({ valid: false, error: 'Token not found or already used.' }, { status: 404 });
+        if (!sessionId || sessionId === 'TIMEOUT') {
+            return NextResponse.json({ 
+                valid: false, 
+                error: sessionId === 'TIMEOUT' ? 'Bridge temporary unavailable' : 'Token not found or expired.' 
+            }, { status: sessionId === 'TIMEOUT' ? 503 : 404 });
         }
 
-        if (entry.expiresAt < Date.now()) {
-            tokenStore.delete(token);
-            return NextResponse.json({ valid: false, error: 'Token expired. Generate a new QR on your PC.' }, { status: 410 });
-        }
-
-        // Token is valid — mark as used (one-time use)
-        tokenStore.delete(token);
+        // Return validity. Note: We keep the token for the duration of the 5m window 
+        // to allow for re-scans if mobile page reloads, rather than strict one-time use
+        // which can be brittle on spotty mobile connections.
 
         return NextResponse.json({
             valid: true,
-            sessionId: entry.sessionId,
+            sessionId,
             message: 'Bridge established! Your mobile is now linked to this PC session.',
         });
     } catch (err) {

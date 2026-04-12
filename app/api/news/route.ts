@@ -182,7 +182,12 @@ async function persistToDB(articles: NewsArticle[]) {
           publishedAt: new Date(art.date),
         },
       });
-    } catch { /* non-fatal */ }
+    } catch (e: any) {
+        // [DEGRADED MODE] DB persistence failure is non-fatal for high-fidelity news delivery
+        if (process.env.NODE_ENV !== 'production') {
+            console.warn('[WhaleNews] DB Upsert failed (Degraded Mode Active):', e.message);
+        }
+    }
   }
 }
 
@@ -262,7 +267,15 @@ export async function GET() {
         timestamp: Date.now(),
       });
     }
-  } catch (dbErr) { console.warn('[WhaleNews] DB fallback:', dbErr); }
+  } catch (dbErr: any) { 
+    console.error('[WhaleNews] Critical DB Failure:', dbErr.message);
+    return NextResponse.json({ 
+        success: false, 
+        source: 'error-fallback', 
+        articles: [], 
+        error: 'Institutional news database currently out of sync. Please check again in a few moments.' 
+    }, { status: 200 }); // Status 200 to not crash the landing page's SWR
+  }
 
   return NextResponse.json({ success: false, source: 'none', articles: [], error: 'Todas las fuentes offline.' }, { status: 503 });
 }

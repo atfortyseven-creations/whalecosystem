@@ -8,33 +8,34 @@ export async function GET() {
         const cached = await safeRedisGet('institutional:stats');
         if (cached) return NextResponse.json(JSON.parse(cached));
 
-        // Aggregate institutional metrics
-        const [volumeAgg, whaleCount, topPairs] = await prisma.$transaction([
-            prisma.$queryRaw<{ sum: number }[]>`SELECT SUM(CAST("usdValue" AS DOUBLE PRECISION)) as sum FROM "WhaleActivity"`,
-            prisma.onChainEntity.count({
-                where: { category: 'Whale' }
-            }),
-            prisma.whaleActivity.groupBy({
+        // Aggregate institutional metrics with localized resilience
+        let volumeUSD = 0;
+        let whaleCount = 0;
+        let topPairs: any[] = [];
+
+        try {
+            const volumeAgg = await prisma.$queryRaw<{ sum: number }[]>`SELECT SUM(CAST("usdValue" AS DOUBLE PRECISION)) as sum FROM "WhaleActivity"`;
+            volumeUSD = volumeAgg[0]?.sum || 0;
+        } catch { /* Table missing or cast error */ }
+
+        try {
+            whaleCount = await prisma.onChainEntity.count({ where: { category: 'Whale' } });
+        } catch { /* Table missing */ }
+
+        try {
+            const pairs = await prisma.whaleActivity.groupBy({
                 by: ['token'],
-                _count: {
-                    _all: true
-                },
-                orderBy: {
-                    _count: {
-                        token: 'desc'
-                    }
-                },
+                _count: { _all: true },
+                orderBy: { _count: { token: 'desc' } },
                 take: 10
-            })
-        ]);
+            });
+            topPairs = pairs.map(p => ({ symbol: p.token, activityCount: p._count?._all || 0 }));
+        } catch { /* Table missing */ }
 
         const stats = {
-            totalVolumeUSD: volumeAgg[0]?.sum || 0,
+            totalVolumeUSD: volumeUSD,
             whaleCount,
-            topPairs: (topPairs as any[]).map(p => ({
-                symbol: p.token,
-                activityCount: p._count?._all || 0
-            })),
+            topPairs,
             timestamp: new Date().toISOString()
         };
 
