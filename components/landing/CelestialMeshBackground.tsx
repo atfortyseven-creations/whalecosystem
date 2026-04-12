@@ -3,6 +3,28 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
 
+// Pre-seeded particle data — avoids Math.random() in render which causes
+// SSR/hydration mismatches that silently crash iOS Safari WebView
+const PARTICLE_SEEDS = [
+  { x: 12.4, y: 34.7, speed: 0.42 }, { x: 78.1, y: 12.3, speed: 0.31 },
+  { x: 45.6, y: 67.8, speed: 0.55 }, { x: 23.9, y: 89.1, speed: 0.28 },
+  { x: 91.3, y: 45.2, speed: 0.47 }, { x: 8.7,  y: 23.5, speed: 0.38 },
+  { x: 56.2, y: 78.9, speed: 0.62 }, { x: 34.5, y: 11.4, speed: 0.25 },
+  { x: 67.8, y: 56.3, speed: 0.44 }, { x: 82.3, y: 34.1, speed: 0.53 },
+  { x: 19.6, y: 91.7, speed: 0.36 }, { x: 73.4, y: 28.6, speed: 0.41 },
+  { x: 38.9, y: 62.4, speed: 0.58 }, { x: 51.7, y: 7.9,  speed: 0.33 },
+  { x: 4.3,  y: 48.5, speed: 0.49 }, { x: 88.6, y: 73.2, speed: 0.27 },
+  { x: 29.1, y: 15.8, speed: 0.61 }, { x: 63.5, y: 92.3, speed: 0.35 },
+  { x: 47.2, y: 38.6, speed: 0.46 }, { x: 95.8, y: 59.4, speed: 0.52 },
+];
+
+const SHARD_SEEDS = [
+  { top: 20, left: 10, scaleEnd: 1.5,   rotateEnd: 90  },
+  { top: 35, left: 30, scaleEnd: 1.6,   rotateEnd: 135 },
+  { top: 50, left: 50, scaleEnd: 1.7,   rotateEnd: 180 },
+  { top: 65, left: 70, scaleEnd: 1.8,   rotateEnd: 225 },
+];
+
 // ─── iOS SAFE: CelestialMeshBackground ────────────────────────────────────────
 // CRITICAL FIX: useScroll() on an overflow:hidden container returns zero-delta
 // on iOS Safari (the window doesn't scroll — the snap container does).
@@ -83,36 +105,6 @@ function CelestialMeshDesktop() {
   );
 }
 
-      {/* Layer 3: Particles — each is its OWN component with its own hooks (iOS-safe) */}
-      <div className="absolute inset-0 pointer-events-none">
-        {PARTICLE_SEEDS.map((seed, i) => (
-          <Particle key={i} smoothProgress={smoothProgress} stretch={particleStretch} seed={seed} />
-        ))}
-      </div>
-
-      {/* Layer 4: Geometric Shards */}
-      <GeometricShards smoothProgress={smoothProgress} />
-
-      {/* Vignette: Safely reduced from 80% to 40% */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,white_100%)] opacity-40" />
-    </div>
-  );
-}
-
-// Pre-seeded particle data — avoids Math.random() in render which causes
-// SSR/hydration mismatches that silently crash iOS Safari WebView
-const PARTICLE_SEEDS = [
-  { x: 12.4, y: 34.7, speed: 0.42 }, { x: 78.1, y: 12.3, speed: 0.31 },
-  { x: 45.6, y: 67.8, speed: 0.55 }, { x: 23.9, y: 89.1, speed: 0.28 },
-  { x: 91.3, y: 45.2, speed: 0.47 }, { x: 8.7,  y: 23.5, speed: 0.38 },
-  { x: 56.2, y: 78.9, speed: 0.62 }, { x: 34.5, y: 11.4, speed: 0.25 },
-  { x: 67.8, y: 56.3, speed: 0.44 }, { x: 82.3, y: 34.1, speed: 0.53 },
-  { x: 19.6, y: 91.7, speed: 0.36 }, { x: 73.4, y: 28.6, speed: 0.41 },
-  { x: 38.9, y: 62.4, speed: 0.58 }, { x: 51.7, y: 7.9,  speed: 0.33 },
-  { x: 4.3,  y: 48.5, speed: 0.49 }, { x: 88.6, y: 73.2, speed: 0.27 },
-  { x: 29.1, y: 15.8, speed: 0.61 }, { x: 63.5, y: 92.3, speed: 0.35 },
-  { x: 47.2, y: 38.6, speed: 0.46 }, { x: 95.8, y: 59.4, speed: 0.52 },
-];
 
 // ─── PARTICLE — own component so hooks are ALWAYS called unconditionally ───────
 function Particle({ smoothProgress, stretch, seed }: {
@@ -132,13 +124,6 @@ function Particle({ smoothProgress, stretch, seed }: {
   );
 }
 
-// ─── GEOMETRIC SHARDS — extracted to avoid hook-in-map violation ──────────────
-const SHARD_SEEDS = [
-  { top: 20, left: 10, scaleEnd: 1.5,   rotateEnd: 90  },
-  { top: 35, left: 30, scaleEnd: 1.6,   rotateEnd: 135 },
-  { top: 50, left: 50, scaleEnd: 1.7,   rotateEnd: 180 },
-  { top: 65, left: 70, scaleEnd: 1.8,   rotateEnd: 225 },
-];
 
 function Shard({ smoothProgress, seed }: { smoothProgress: MotionValue<number>; seed: typeof SHARD_SEEDS[0] }) {
   const scale  = useTransform(smoothProgress, [0, 1], [1, seed.scaleEnd]);
