@@ -33,16 +33,31 @@ export function ConnectWalletModal() {
         }
     }, [isConnectModalOpen]);
 
-    // QR Polling Logic
+    // ─── [TRIPLE BLINDAJE] ───
+    // Nivel 1: Escucha de Eventos Globales (vía WalletConnectionBridge + SSE)
+    useEffect(() => {
+        const handleAuthSuccess = () => {
+             console.log('[ConnectModal] 10000% Success Signal Received!');
+             setView('selection');
+             closeConnectModal();
+             // Direct navigation to news hub after successful handshake
+             window.location.href = '/news';
+        };
+        window.addEventListener('sovereign:auth_success', handleAuthSuccess);
+        return () => window.removeEventListener('sovereign:auth_success', handleAuthSuccess);
+    }, [closeConnectModal]);
+
+    // Nivel 2: Polling de Seguridad (Respaldo Institucional)
     useEffect(() => {
         if (!isPolling || !qrSession) return;
+        // Downgraded to 1.5s as it's now just a fallback for the instant SSE bridge
         const interval = setInterval(async () => {
             try {
                 const res = await fetch(`/api/auth/qr-session?id=${qrSession}`);
                 const data = await res.json();
                 if (data.status === 'complete') {
                     clearInterval(interval);
-                    window.location.reload();
+                    window.location.href = '/news';
                 } else if (data.status === 'expired' || data.status === 'error') {
                     clearInterval(interval);
                     setQrSession(null);
@@ -50,7 +65,7 @@ export function ConnectWalletModal() {
                     setView('selection');
                 }
             } catch (e) {}
-        }, 850);
+        }, 1500);
         return () => clearInterval(interval);
     }, [isPolling, qrSession]);
 
@@ -79,6 +94,8 @@ export function ConnectWalletModal() {
             const data = await res.json();
             if (data.sessionId) {
                 setQrSession(data.sessionId);
+                // Persist for WalletConnectionBridge/SSE verification
+                sessionStorage.setItem('pending_qr_session', data.sessionId);
                 setIsPolling(true);
             }
         } catch (e) { setView('selection'); }

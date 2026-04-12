@@ -38,9 +38,22 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         setMounted(true);
         window.addEventListener('resize', checkMobile);
 
-        // CRITICAL iOS FIX: In iOS Safari Private Mode or nested WKWebViews,
-        // accessing sessionStorage can throw a SecurityError and crash the entire app.
-        // We MUST wrap it in a try/catch.
+        // ─── [SOVEREIGN PERSISTENCE] QR Session Capture ───
+        // If user arrives via QR scan, we catch the session token and store it.
+        // This survives the wallet connection redirect.
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSession = urlParams.get('session') || urlParams.get('handshake');
+        
+        if (urlSession) {
+            console.log(`[Handshake] Detected session token in URL: ${urlSession}`);
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.setItem('pending_handshake_session', urlSession);
+                }
+            } catch (e) {}
+        }
+
+        // CRITICAL iOS FIX: In iOS Safari Private Mode...
         let bypassActive = false;
         try {
             if (typeof sessionStorage !== 'undefined') {

@@ -73,28 +73,72 @@ export async function GET(req: NextRequest) {
             // Initial heartbeat
             send('connected', { status: 'sovereign', timestamp: new Date().toISOString() });
 
+            // [CATCH-UP] Initial data blast for Total System Visibility
+            try {
+                const history = await prisma.whaleActivity.findMany({
+                    orderBy: { timestamp: 'desc' },
+                    take: 15,
+                });
+                // Send in reverse (oldest first) so they appear in correct order in UI
+                history.reverse().forEach(row => {
+                    send('whale', {
+                        hash: row.transactionHash,
+                        from: row.fromAddress,
+                        to: row.toAddress,
+                        asset: row.token,
+                        amount: row.amount,
+                        usdValue: row.usdValue,
+                        chain: row.chain,
+                        type: row.type,
+                        timestamp: row.timestamp?.toISOString(),
+                        isHistorical: true
+                    });
+                });
+            } catch (err) {
+                console.error('[SSE:CATCHUP_ERROR]', err);
+            }
+
             let lastId: string | undefined;
-            // [ESTABILIDAD CÓSMICA] Puntero de Stream para no consumir duplicados. Inicia en el último evento ('$')
             let redisStreamId = '$';
             let running = true;
-
             let isCleanedUp = false;
 
-            const cleanup = () => {
+            // ─── [COSMIC BRIDGE] Redis Mesh Listener ─────────────────────────
+            // We create a dedicated subscriber to the Sovereign Auth Bus
+            const { redisClient: subClient } = await import('@/lib/redis/client');
+            const podSub = (subClient as any).duplicate();
+            await podSub.connect().catch(() => {});
+
+            const cleanup = async () => {
                 if (isCleanedUp) return;
                 isCleanedUp = true;
                 running = false;
                 activePodConnections--;
+                try { 
+                    await podSub.unsubscribe('sovereign_mesh_auth_bus').catch(() => {});
+                    await podSub.quit().catch(() => {});
+                } catch {}
                 try { controller.close(); } catch {}
             };
 
             req.signal.addEventListener('abort', cleanup);
+
+            // Listen for Auth Events (QR Handshake Success)
+            podSub.subscribe('sovereign_mesh_auth_bus', (message: string) => {
+                try {
+                    const event = JSON.parse(message);
+                    // Standard: The QR token (sent as session param) matches the socket/stream expectation
+                    // We broadcast to all listeners, clients decide if it's their token.
+                    send('auth-complete', event);
+                } catch {}
+            });
 
             const redis = await getRedisClient();
             const prisma = await getPrismaClient();
 
             while (running) {
                 try {
+
                     // ─── Primary path: Redis Streams ───────────────────────────
                     if (redis) {
                         // XREAD bloqueante por 15s. No elimina el dato de la cola.
