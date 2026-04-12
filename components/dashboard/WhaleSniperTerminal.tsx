@@ -54,22 +54,41 @@ import GenesisContracts from './GenesisContracts';
 import CryptographicID from './CryptographicID';
 import BitcoinPrimitives from './BitcoinPrimitives';
 import InstitutionalLedger from './InstitutionalLedger';
+import { HeuristicEntropySim, EntityHeuristicSim, ChronoCipherSim, StateProtocolSim, DoctrineSim, ClearanceSim } from './CyberSimulators';
 
 export default function WhaleSniperTerminal() {
   const [activeTab, setActiveTab] = useState('terminal');
+  const [isMobile, setIsMobile] = useState(false);
+  const [tabLoading, setTabLoading] = useState(false); // New: Unified Transition Guard
   const { address, isConnected } = useAccount();
   const metrics = useSniperStore((state) => state.metrics);
   const setConnectionStatus = useSniperStore((state) => state.setConnectionStatus);
 
   useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
     setConnectionStatus(true);
-    return () => setConnectionStatus(false);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      setConnectionStatus(false);
+    };
   }, []);
+
+  const handleTabChange = (newTab: string) => {
+    if (newTab === activeTab) return;
+    setTabLoading(true);
+    // Academic/Computational buffer delay
+    setTimeout(() => {
+      setActiveTab(newTab);
+      setTabLoading(false);
+    }, 300);
+  };
 
   const activeCategory = GENESIS_CATEGORIES.find(c => c.id === activeTab) || GENESIS_CATEGORIES[1];
 
   return (
-    <div className="min-h-screen bg-[#000000] text-[#FFFFFF] font-mono flex flex-col relative overflow-hidden selection:bg-[#fff] selection:text-[#000]">
+    <div className="min-h-screen bg-[#000000] text-[#FFFFFF] font-mono flex flex-col relative overflow-hidden selection:bg-[#fff] selection:text-[#000] transform-gpu perspective-1000 will-change-transform">
       
       {/* ── GENESIS STATUS BAR ── */}
       <header className="h-10 border-b border-white/5 bg-[#000000] flex items-center justify-between px-6 text-[10px] uppercase tracking-widest font-bold z-50">
@@ -101,40 +120,42 @@ export default function WhaleSniperTerminal() {
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden">
+      <main className={`flex-1 flex overflow-hidden ${isMobile ? 'flex-col' : 'flex-row'}`}>
         
-        {/* ── TACTICAL CATEGORY SIDEBAR ── */}
-        <nav className="w-64 border-r border-white/5 bg-[#050505] flex flex-col overflow-hidden shrink-0">
-          <div className="p-4 border-b border-white/5 bg-black/40 text-[9px] font-black tracking-[0.3em] text-white/40 uppercase">
-            Directory_Index
-          </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
-            {GENESIS_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveTab(cat.id)}
-                className={`w-full text-left px-3 py-2 text-[10px] transition-all border border-transparent ${
-                  activeTab === cat.id 
-                    ? "bg-white/5 border-white/10 text-emerald-400 font-bold" 
-                    : "text-white/20 hover:text-white/60 hover:bg-white/5"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span>{cat.label}</span>
-                  {activeTab === cat.id && <div className="w-1 h-1 bg-emerald-400" />}
-                </div>
-              </button>
-            ))}
-          </div>
-        </nav>
+        {/* ── TACTICAL CATEGORY SIDEBAR (Desktop Only) ── */}
+        {!isMobile && (
+          <nav className="w-64 border-r border-white/5 bg-[#050505] flex flex-col overflow-hidden shrink-0">
+            <div className="p-4 border-b border-white/5 bg-black/40 text-[9px] font-black tracking-[0.3em] text-white/40 uppercase">
+              Directory_Index
+            </div>
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+              {GENESIS_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleTabChange(cat.id)}
+                  className={`w-full text-left px-3 py-2 text-[10px] transition-all border border-transparent ${
+                    activeTab === cat.id 
+                      ? "bg-white/5 border-white/10 text-emerald-400 font-bold" 
+                      : "text-white/20 hover:text-white/60 hover:bg-white/5"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{cat.label}</span>
+                    {activeTab === cat.id && <div className="w-1 h-1 bg-emerald-400" />}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
 
         {/* ── CONTENT ENGINE ── */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Academic Definition Header */}
-          <div className="px-8 py-6 border-b border-white/5 bg-black/20 shrink-0">
-            <div className="text-[10px] text-white/20 uppercase tracking-[0.4em] mb-2">Academic_Unit // {activeCategory.id}</div>
-            <h1 className="text-xl font-bold tracking-tight mb-2 text-white/90">{activeCategory.label}</h1>
-            <p className="text-[11px] leading-relaxed text-white/40 max-w-3xl">
+          <div className="px-6 md:px-8 py-4 md:py-6 border-b border-white/5 bg-black/20 shrink-0">
+            <div className="text-[9px] md:text-[10px] text-white/20 uppercase tracking-[0.4em] mb-1 md:mb-2 text-center lg:text-left">Academic_Unit // {activeCategory.id}</div>
+            <h1 className="text-lg md:text-xl font-bold tracking-tight mb-1 md:mb-2 text-white/90 text-center lg:text-left">{activeCategory.label}</h1>
+            <p className="text-[10px] md:text-[11px] leading-relaxed text-white/40 max-w-3xl text-center lg:text-left mx-auto lg:mx-0">
               {activeCategory.academic}
             </p>
           </div>
@@ -142,14 +163,26 @@ export default function WhaleSniperTerminal() {
           {/* Dynamic Module Rendering */}
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
             <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-                className="h-full"
-              >
+              {tabLoading ? (
+                 <motion.div 
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   className="h-full flex flex-col space-y-4"
+                 >
+                   <div className="h-8 w-1/4 bg-white/5 animate-pulse rounded" />
+                   <div className="flex-1 bg-white/[0.02] border border-white/5 animate-pulse rounded-lg" />
+                   <div className="h-12 w-full bg-white/5 animate-pulse rounded" />
+                 </motion.div>
+              ) : (
+                 <motion.div
+                   key={activeTab}
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -10 }}
+                   transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                   className="h-full"
+                 >
                 {activeTab === 'consensus' && <GlobalConsensus />}
                 {activeTab === 'terminal' && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
@@ -178,16 +211,22 @@ export default function WhaleSniperTerminal() {
                 {activeTab === 'mempool' && <TelemetryTerminal nodes={[]} />}
                 {activeTab === 'visuals' && <CanvasEngine />}
                 {activeTab === 'contracts' && <GenesisContracts />}
+                {activeTab === 'entropy' && <HeuristicEntropySim />}
                 {activeTab === 'espionage' && <SovereignIntelTab />}
+                {activeTab === 'entity' && <EntityHeuristicSim />}
+                {activeTab === 'cipher' && <ChronoCipherSim />}
                 {activeTab === 'rpc' && <ApiTerminal />}
                 {activeTab === 'zk_aztec' && <ZKShieldStation />}
                 {activeTab === 'graph' && <EntityGraphVis />}
                 {activeTab === 'id' && <CryptographicID />}
                 {activeTab === 'capital' && <WhalePortfolio />}
+                {activeTab === 'state' && <StateProtocolSim />}
+                {activeTab === 'doctrine' && <DoctrineSim />}
                 {activeTab === 'academy' && <WhaleAcademy />}
                 {activeTab === 'primitives' && <BitcoinPrimitives />}
                 {activeTab === 'assist' && <WhaleSupport />}
                 {activeTab === 'vault' && <SovereignVault />}
+                {activeTab === 'clearance' && <ClearanceSim />}
                 
                 {/* Fallback for components in heavy development */}
                 {!['terminal', 'utxos', 'triggers', 'mempool', 'visuals', 'espionage', 'rpc', 'zk_aztec', 'graph', 'capital', 'academy', 'assist', 'vault', 'consensus', 'contracts', 'id', 'primitives'].includes(activeTab) && (
@@ -198,9 +237,29 @@ export default function WhaleSniperTerminal() {
                    </div>
                 )}
               </motion.div>
+              )}
             </AnimatePresence>
           </div>
         </div>
+
+        {/* ── TACTICAL BOTTOM DOCK (Mobile Only) ── */}
+        {isMobile && (
+          <nav className="h-16 border-t border-white/10 bg-[#050505] flex overflow-x-auto custom-scrollbar-hide items-center px-4 gap-2 z-50 shrink-0">
+            {GENESIS_CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => handleTabChange(cat.id)}
+                className={`flex-none px-4 py-2 text-[9px] uppercase tracking-widest transition-all rounded-full border ${
+                  activeTab === cat.id 
+                    ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 font-black" 
+                    : "border-white/5 text-white/30"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </nav>
+        )}
 
       </main>
     </div>

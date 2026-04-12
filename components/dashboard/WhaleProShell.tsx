@@ -25,31 +25,31 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // ── Global Consensus ──
-    { id: 'dashboard',       label: 'Genesis Terminal',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Global Consensus' },
-    { id: 'watchlist',       label: 'Observed UTXOs',          icon: <Eye size={17}/> },
-    { id: 'alerts',          label: 'Network Triggers',        icon: <Bell size={17}/> },
-    { id: 'whale-events',    label: 'Raw Mempool Stream',      icon: <TrendingUp size={17}/> },
-    { id: 'multicharts',     label: 'Heuristic Visuals',       icon: <BarChart2 size={17}/> },
-    { id: 'new-pairs',       label: 'Genesis Contracts',       icon: <Zap size={17}/> },
-    { id: 'gainers',         label: 'Entropy Deltas',          icon: <TrendingUp size={17}/> },
+    // ── Platform Core ──
+    { id: 'dashboard',       label: 'Dashboard',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Platform Core' },
+    { id: 'watchlist',       label: 'Watchlist',          icon: <Eye size={17}/> },
+    { id: 'alerts',          label: 'Alerts',        icon: <Bell size={17}/> },
+    { id: 'whale-events',    label: 'Live Transactions',      icon: <TrendingUp size={17}/> },
+    { id: 'multicharts',     label: 'Multicharts',       icon: <BarChart2 size={17}/> },
+    { id: 'new-pairs',       label: 'New Pairs',       icon: <Zap size={17}/> },
+    { id: 'gainers',         label: 'Gainers & Losers',          icon: <TrendingUp size={17}/> },
     
-    // ── Crypto Espionage ──
-    { id: 'whale-portfolio', label: 'Entity Heuristics',       icon: <PieChart size={17}/>,        dividerBefore: 'Crypto Espionage' },
-    { id: 'news',            label: 'Chronological Cipher',    icon: <Newspaper size={17}/> },
-    { id: 'api',             label: 'Direct RPC Terminal',     icon: <Code size={17}/> },
-    { id: 'zk-shield',       label: 'ZK Cloak Protocol',       icon: <Shield size={17}/> },
-    { id: 'neural-graph',    label: 'Association Graph',       icon: <Network size={17}/> },
-    { id: 'sovereign-vault', label: 'Cryptographic ID',        icon: <ShieldAlert size={17}/> },
-    { id: 'omni-explorer',   label: 'Aztec Layer-2 Node',      icon: <Search size={17}/> },
-    { id: 'portfolio',       label: 'Sovereign Capital State', icon: <Wallet size={17}/> },
+    // ── Analysis ──
+    { id: 'whale-portfolio', label: 'Whale Tracker',       icon: <PieChart size={17}/>,        dividerBefore: 'Analysis' },
+    { id: 'news',            label: 'Market News',    icon: <Newspaper size={17}/> },
+    { id: 'api',             label: 'API Access',     icon: <Code size={17}/> },
+    { id: 'zk-shield',       label: 'Security Center',       icon: <Shield size={17}/> },
+    { id: 'neural-graph',    label: 'Visual Graph',       icon: <Network size={17}/> },
+    { id: 'sovereign-vault', label: 'Secure Vault',        icon: <ShieldAlert size={17}/> },
+    { id: 'omni-explorer',   label: 'Block Explorer',      icon: <Search size={17}/> },
+    { id: 'portfolio',       label: 'My Portfolio', icon: <Wallet size={17}/> },
     
-    // ── Protocol Doctrine ──
-    { id: 'academy',         label: 'The Whitepaper Academy',  icon: <GraduationCap size={17}/>,   dividerBefore: 'Protocol Doctrine' },
-    { id: 'brc-explorer',    label: 'Bitcoin Primitives',      icon: <Code size={17}/> },
-    { id: 'support',         label: 'Operator Assist',         icon: <LifeBuoy size={17}/> },
-    { id: 'humanidfi-portfolio', label: 'Cold Storage Vault',  icon: <Briefcase size={17}/> },
-    { id: 'gold-ticket',     label: 'Genesis Clearance',       icon: <Crown size={17}/> },
+    // ── Resources ──
+    { id: 'academy',         label: 'Academy',  icon: <GraduationCap size={17}/>,   dividerBefore: 'Resources' },
+    { id: 'brc-explorer',    label: 'Bitcoin Network',      icon: <Code size={17}/> },
+    { id: 'support',         label: 'Support Center',         icon: <LifeBuoy size={17}/> },
+    { id: 'humanidfi-portfolio', label: 'Connect Exchange',  icon: <Briefcase size={17}/> },
+    { id: 'gold-ticket',     label: 'Premium Pass',       icon: <Crown size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -186,10 +186,10 @@ export function WhaleProShell({
         />
         <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
             
-            {/* ─── Persistent Pro Sidebar ─── */}
+            {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex flex-col z-50 relative shadow-none transition-colors duration-300"
+                className="hidden md:flex h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 relative shadow-none transition-colors duration-300"
             >
 
                 {/* Sidebar Navigation */}
@@ -313,8 +313,32 @@ export function WhaleProShell({
 
                 </main>
 
+                {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
+                <nav className="md:hidden h-16 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-around px-2 shrink-0 z-50">
+                    {[
+                        { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
+                        { id: 'whale-events', icon: <TrendingUp size={20} />, label: 'Markets' },
+                        { id: 'portfolio', icon: <Wallet size={20} />, label: 'Portfolio' },
+                        { id: 'zk-shield', icon: <ShieldAlert size={20} />, label: 'Settings' },
+                    ].map(tab => {
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => onTabChange(tab.id)}
+                                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+                                    isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
+                                }`}
+                            >
+                                {tab.icon}
+                                <span className={`text-[10px] font-bold ${isActive ? 'opacity-100' : 'opacity-60'}`}>{tab.label}</span>
+                            </button>
+                        );
+                    })}
+                </nav>
+
                 {/* ─── Status Bar ─── */}
-                <footer className="h-8 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-between px-6 shrink-0 transition-colors duration-300">
+                <footer className="hidden md:flex h-8 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 min-w-[120px]">
                             <Globe size={11} /> Global Latency: 

@@ -21,7 +21,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { toast } from 'sonner';
-import { CinematicWhaleLogo } from './CinematicWhaleLogo';
+import { WhaleLogo } from '../shared/WhaleLogo';
 import { LiveTerminalWidgets } from './LiveTerminalWidgets';
 import { WhaleOfflineGame } from './WhaleOfflineGame';
 import { CelestialMeshBackground } from '../landing/CelestialMeshBackground';
@@ -94,12 +94,12 @@ const MobileSnapStyles = React.memo(function MobileSnapStyles() {
       .msv-hide-scrollbar::-webkit-scrollbar { display: none; }
       .msv-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       .msv-snap-container {
-        scroll-snap-type: y mandatory;
+        scroll-snap-type: y proximity;
         overflow-y: scroll;
         -ms-overflow-style: none;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
+        scroll-behavior: smooth;
       }
       .msv-snap-container::-webkit-scrollbar { display: none; }
       .msv-snap-page {
@@ -271,27 +271,27 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-[#000000]/10 backdrop-blur-[10px]"
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
             style={{ willChange: 'opacity' }}
           />
           <motion.div
             initial={{ y: '100%', scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: '100%', scale: 0.98 }}
-            transition={{ type: 'spring', damping: 32, stiffness: 280 }}
-            className="w-full max-w-[340px] bg-white rounded-[2.8rem] p-6 pt-10 relative z-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-black/5"
+            transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+            className="w-full max-w-[340px] bg-[#0A0A0A] rounded-[2.8rem] p-6 pt-10 relative z-10 shadow-[0_20px_80px_rgba(0,0,0,0.8)] border border-white/10 mx-auto"
             style={{ willChange: 'transform' }}
           >
-            <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 bg-[#FAF9F6] text-[#050505]/40 rounded-full flex items-center justify-center hover:text-black hover:bg-black/5 transition-colors">
+            <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 bg-white/5 text-white/40 rounded-full flex items-center justify-center hover:text-white hover:bg-white/10 transition-colors">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
 
             <div className="flex flex-col items-center mb-9">
-              <div className="w-[60px] h-[60px] bg-white border border-black/[0.04] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)] rounded-full flex items-center justify-center mb-5">
-                <img src="/logo-landingpage.png" className="w-[30px] h-[30px]" alt="Whale" />
+              <div className="w-[60px] h-[60px] bg-black border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center mb-5">
+                <WhaleLogo className="w-8 h-8 invert" />
               </div>
-              <h3 className="text-[20px] font-black text-[#050505] tracking-tight mb-1 uppercase">Connect Your Wallet</h3>
-              <p className="text-[9px] text-[#050505]/40 font-black uppercase tracking-[0.12em] text-center px-4">Choose your preferred connection method</p>
+              <h3 className="text-[20px] font-black text-white tracking-tight mb-1 uppercase">Connect Wallet</h3>
+              <p className="text-[9px] text-white/40 font-black uppercase tracking-[0.12em] text-center px-4">Cryptographic authentication</p>
               
               {error && (
                 <div className="mt-4 px-3 py-2 bg-rose-50 text-rose-500 rounded-lg text-[9px] font-bold tracking-widest uppercase border border-rose-100 flex gap-2 w-full text-center items-center justify-center">
@@ -309,17 +309,17 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                     key={wallet.id}
                     onClick={() => !isConnecting && handleWalletSelect(wallet)}
                     disabled={!!isConnecting}
-                    className={`w-full h-[68px] flex items-center justify-between px-5 bg-[#FAF9F6] border border-black/[0.04] rounded-[2rem] transition-all group ${busy ? 'scale-[0.98] opacity-80 border-indigo-500/20 shadow-sm' : 'hover:border-black/10 active:scale-[0.98]'} disabled:cursor-not-allowed`}
+                    className={`w-full h-[68px] flex items-center justify-between px-5 bg-white/5 border border-white/5 rounded-[2rem] transition-all group ${busy ? 'scale-[0.98] opacity-80 border-[#00F2EA]/20 shadow-[0_0_20px_rgba(0,242,234,0.1)]' : 'hover:border-white/20 active:scale-[0.95]'} disabled:cursor-not-allowed`}
                     style={{ willChange: 'transform' }}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-white rounded-[1rem] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center border border-black/[0.02]">
+                      <div className="w-10 h-10 bg-black rounded-[1rem] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.8)] flex items-center justify-center border border-white/10">
                         <WalletIcon type={wallet.iconType} />
                       </div>
                       <div className="text-left flex flex-col justify-center">
-                        <span className="font-black text-[12.5px] text-[#050505] tracking-widest">{wallet.name}</span>
-                        <span className={`text-[8px] font-black uppercase tracking-[0.12em] mt-[1px] ${busy ? 'text-indigo-500 animate-pulse' : 'text-[#050505]/30'}`}>
-                          {busy ? 'CONNECTING...' : wallet.desc}
+                        <span className="font-black text-[12.5px] text-white tracking-widest">{wallet.name}</span>
+                        <span className={`text-[8px] font-black uppercase tracking-[0.12em] mt-[1px] ${busy ? 'text-[#00F2EA] animate-pulse' : 'text-white/30'}`}>
+                          {busy ? 'AUTHENTICATING...' : wallet.desc}
                         </span>
                       </div>
                     </div>
@@ -328,8 +328,8 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
               })}
             </div>
 
-            <button onClick={onClose} className="w-full mt-7 py-3 mb-1 text-[9.5px] font-black text-[#050505]/25 uppercase tracking-[0.35em] active:opacity-50 transition-opacity">
-              Close Window
+            <button onClick={onClose} className="w-full mt-7 py-3 mb-1 text-[9.5px] font-black text-white/30 uppercase tracking-[0.35em] hover:text-white/80 active:opacity-50 transition-opacity">
+              Close Verification
             </button>
           </motion.div>
         </div>
@@ -356,7 +356,7 @@ function PageHero({
   onEnterNews: () => void;
 }) {
   return (
-    <div className="msv-snap-page min-h-safe min-h-screen w-full text-[#050505] font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
+    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
 
       {/* TOP BAR */}
       <header className="w-full flex items-center justify-between z-20 h-10 px-4">
@@ -366,10 +366,10 @@ function PageHero({
             {isConnected && (
               <button
                 onClick={onDisconnect}
-                className="w-10 h-10 bg-black/5 dark:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform text-black border border-black/10 dark:text-white dark:border-white/10"
+                className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center active:scale-[0.85] transition-transform text-white border border-white/10"
                 style={{ willChange: 'transform' }}
               >
-                <RefreshCw size={14} className="opacity-60" />
+                <RefreshCw size={14} className="opacity-60 text-white" />
               </button>
             )}
         </div>
@@ -381,56 +381,55 @@ function PageHero({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center w-full bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-6 shadow-2xl border border-black/5 dark:border-white/5 relative z-20"
+          className="flex flex-col items-center w-full bg-[#0A0A0A]/80 backdrop-blur-2xl rounded-[3rem] p-6 shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 relative z-20"
           style={{ willChange: 'transform, opacity' }}
         >
-          <WorldFinancialClocks />
+          <div className="flex items-center gap-2 mb-6 pointer-events-none mt-2 opacity-50">
+           <Activity size={12} className="text-[#00F2EA]" />
+           <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black text-white">NETWORK SYNCED</span>
+          </div>
 
           {/* Animated Whale Logo bounded nicely */}
           {!isConnected && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
-                animate={{ y: [0, -20, 0], opacity: 1 }}
+                animate={{ y: [0, -10, 0], opacity: 1 }}
                 transition={{
-                  duration: 3,
+                  duration: 4,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="w-[340px] h-[340px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-2xl"
+                className="w-[280px] h-[280px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
                 style={{ willChange: 'transform' }}
               >
-                <img 
-                  src="/official-whale-monochrome.png" 
-                  className="w-full h-full object-contain" 
-                  alt="Whale Logo" 
-                />
+                <WhaleLogo className="w-full h-full object-contain invert" variant="monochrome" priority />
               </motion.div>
           )}
 
           {!isConnected ? (
             <div className="w-full space-y-4">
-              <p className="text-[12px] font-bold text-black/40 dark:text-white/40 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
-                Sync across devices<br />seamlessly.
+              <p className="text-[12px] font-bold text-white/50 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
+                Terminal Auth Mode
               </p>
 
               <button
                 onClick={onConnect}
-                className="w-full h-[88px] bg-black dark:bg-white text-white dark:text-black rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 active:scale-[0.98] transition-all shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_40px_-15px_rgba(255,255,255,0.2)] group border border-black/5 dark:border-white/5"
+                className="w-full h-[80px] bg-white text-black rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-4 active:scale-[0.95] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] group"
                 style={{ willChange: 'transform' }}
               >
-                <Wallet size={20} className="text-white/40 dark:text-black/40 group-active:translate-x-1 transition-transform" />
-                CONNECT WALLET
+                <Wallet size={18} className="text-black/50 group-active:translate-x-1 transition-transform" />
+                INITIATE SESSIONS
               </button>
             </div>
           ) : (
-            <div className="w-full space-y-4">
-              <div className="w-full bg-[#FAF9F6] border border-black/10 rounded-[2rem] p-5 mb-4 text-center shadow-sm">
+            <div className="w-full space-y-4 mt-8">
+              <div className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-5 mb-4 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[11px] font-black text-[#050505] uppercase tracking-[0.2em]">IDENTITY VERIFIED</span>
+                   <div className="w-2 h-2 rounded-full bg-[#00F2EA] shadow-[0_0_10px_#00F2EA] animate-pulse" />
+                   <span className="text-[11px] font-black text-white uppercase tracking-[0.2em]">IDENTITY VERIFIED</span>
                 </div>
-                <span className="text-[10px] font-bold text-[#050505]/60 uppercase tracking-[0.08em] leading-relaxed block">
-                  Wallet successfully connected to the terminal
+                <span className="text-[10px] font-light text-white/50 uppercase tracking-[0.08em] leading-relaxed block">
+                  Encrypted handshake completed
                 </span>
               </div>
 
@@ -438,14 +437,14 @@ function PageHero({
                 {/* Option 1: View Intelligence */}
                 <button
                   onClick={onEnterNews}
-                  className="w-full h-[72px] bg-[#050505] border-2 border-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/20 active:scale-[0.98] group"
+                  className="w-full h-[72px] bg-[#111] border border-white/10 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all hover:bg-white/5 active:scale-[0.95] group"
                   style={{ willChange: 'transform' }}
                 >
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
-                    <Activity size={20} className="text-white" />
+                    <Activity size={20} className="text-[#00F2EA]" />
                     <div className="text-left leading-tight">
                       <p className="tracking-[0.3em] font-black">ENTER TERMINAL</p>
-                      <p className="text-[8px] opacity-60 mt-1 font-bold">MOBILE INTELLIGENCE HUB</p>
+                      <p className="text-[8px] opacity-40 mt-1 font-bold">MOBILE INTELLIGENCE HUB</p>
                     </div>
                   </div>
                   <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform" />
@@ -454,17 +453,17 @@ function PageHero({
                 {/* Option 2: Sync PC */}
                 <button
                   onClick={onScan}
-                  className="w-full h-[72px] bg-white border-2 border-[#050505] text-[#050505] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-lg shadow-black/5 active:scale-[0.98] group"
+                  className="w-full h-[72px] bg-white text-black border border-transparent rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-[0.95] group"
                   style={{ willChange: 'transform' }}
                 >
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
-                    <QrCode size={20} className="text-[#050505]" />
+                    <QrCode size={20} className="text-black" />
                     <div className="text-left leading-tight">
-                      <p className="tracking-[0.3em] font-black">SYNC DESKTOP</p>
-                      <p className="text-[8px] opacity-40 mt-1 font-bold">SCAN HANDSHAKE QR CODE</p>
+                      <p className="tracking-[0.3em] font-black w-max">SYNC DESKTOP</p>
+                      <p className="text-[8px] opacity-60 mt-1 font-black">QR HANDSHAKE SCANNER</p>
                     </div>
                   </div>
-                  <ChevronRight size={16} className="opacity-20 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -487,15 +486,15 @@ function PageHero({
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         style={{ willChange: 'transform' }}
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]">EXPLORE</span>
-        <ChevronDown size={14} className="text-[#050505]" />
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">SYSTEM DOCS</span>
+        <ChevronDown size={14} className="text-white/50" />
       </motion.div>
 
       {/* FINGERPRINT */}
       <div className="absolute bottom-4 left-0 w-full flex items-center justify-center gap-3 opacity-[0.05] pointer-events-none">
-        <div className="h-px bg-black flex-1 mx-8" />
-        <Fingerprint size={20} />
-        <div className="h-px bg-black flex-1 mx-8" />
+        <div className="h-px bg-white/20 flex-1 mx-8" />
+        <Fingerprint size={20} className="text-white" />
+        <div className="h-px bg-white/20 flex-1 mx-8" />
       </div>
     </div>
   );
@@ -589,7 +588,7 @@ function PageManifesto() {
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-md mx-auto bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-8 sm:p-10 shadow-2xl border border-black/5 dark:border-white/5">
         <div className="text-[13px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
           
-          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 bg-clip-text text-black dark:text-white">WHALE ALERT NETWORK<br /><span className="text-xs uppercase tracking-[0.3em] opacity-40">Sovereign Intelligence</span></h2>
+          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 bg-clip-text text-black dark:text-white">WHALE ALERT NETWORK<br /><span className="text-xs uppercase tracking-[0.3em] opacity-40">Institutional Terminal</span></h2>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">00</span>
@@ -597,7 +596,7 @@ function PageManifesto() {
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ABSTRACT</span>
           </div>
           <p>
-            Whale Alert Network es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red soberana (Sovereign Mesh). Procesa transacciones de gran valor con latencias de sub-500ms usando Z-scores y ZK Proofs.
+            Whale Alert Network es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red P2P. Procesa transacciones de gran valor con latencias de sub-500ms usando Z-scores y ZK Proofs.
           </p>
           
           <div className="flex items-center gap-3 mb-4 mt-8">
@@ -619,7 +618,7 @@ function PageManifesto() {
           </div>
           <ul className="space-y-4 pl-2 opacity-90 text-[12px]">
             <li><strong>Real-Time Whale Stream:</strong> Captura de mempool pre-resolución de liquidez.</li>
-            <li><strong>Sovereign Mesh Network:</strong> P2P descentralizada vía Redis Pub/Sub TCP con ECDSA real.</li>
+            <li><strong>Decentralized Mesh Network:</strong> P2P descentralizada vía Redis Pub/Sub TCP con ECDSA real.</li>
             <li><strong>1TB Indexing Engine:</strong> Agregadores en paralelo actualizando leaderboards globales.</li>
             <li><strong>ZK AVS Integración:</strong> Validación de señales usando EigenLayer AVS.</li>
           </ul>
@@ -645,7 +644,7 @@ function PageManifesto() {
                   <Twitter size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
               </a>
               <div className="relative w-20 h-20 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center bg-white/5 shadow-md">
-                  <img src="/official-whale-monochrome.png" className="w-12 h-12 dark:invert opacity-95 drop-shadow-sm" alt="The Whale" />
+                  <WhaleLogo className="w-12 h-12" />
               </div>
               <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
                   <Github size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
@@ -699,7 +698,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
     const currentAddress = addressRef.current;
     if (!currentAddress) {
-      toast.error('SOVEREIGN_AUTH_REQUIRED', { 
+      toast.error('AUTH_REQUIRED', { 
         description: 'Please connect your mobile wallet before syncing with desktop.' 
       });
       return;
@@ -707,8 +706,8 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
 
     isProcessingRef.current = true;
     setIsProcessing(true);
-    const tid = toast.loading('Establishing Sovereign Handshake...', {
-        description: 'Syncing encrypted session state across the mesh.'
+    const tid = toast.loading('Establishing Encrypted Handshake...', {
+        description: 'Syncing session state across the mesh.'
     });
 
     try {
@@ -837,14 +836,21 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#FAF9F6] z-[10000] flex flex-col p-8 overflow-hidden">
+    <div className="fixed inset-0 bg-[#FAF9F6] z-[10000] flex flex-col p-8 overflow-hidden relative">
+      <img
+        src="/olas-hokusai-4k.png"
+        alt="Hokusai Waves"
+        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-overlay"
+        style={{ transform: "translateZ(0)", willChange: "transform" }}
+        fetchPriority="high"
+      />
+      <div className="relative z-10 flex flex-col h-full w-full">
       <header className="flex items-center justify-between mb-12">
         <button onClick={onBack} className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-black/5 shadow-sm active:scale-75 transition-transform" style={{ willChange: 'transform' }}>
           <MoveRight size={18} className="rotate-180" />
         </button>
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/40">Sovereign Link Active</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/40">Encrypted Link Active</span>
         </div>
       </header>
 
@@ -895,10 +901,11 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
       </div>
 
       {error && (
-        <div className="bg-red-50 p-6 rounded-3xl text-center text-red-600 font-black text-[10px] uppercase tracking-widest border border-red-100">
+        <div className="bg-red-50 p-6 rounded-3xl text-center text-red-600 font-black text-[10px] uppercase tracking-widest border border-red-100 mt-4">
           {error}
         </div>
       )}
+      </div>
     </div>
   );
 }

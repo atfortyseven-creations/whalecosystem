@@ -97,8 +97,9 @@ export default function InstitutionalHeader() {
       {/* Layer 2: Core Navigation & Utilities */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
         <div className="flex items-center gap-12">
-          <div className="flex items-center gap-2">
-            <span className="text-purple-600">✧</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <WhaleLogo className="w-8 h-8" variant="monochrome" priority />
             <span className="font-serif text-xl font-black tracking-normal">WHALE ALERT NETWORK</span>
           </div>
           <nav className="flex items-center gap-8 font-bold opacity-80">

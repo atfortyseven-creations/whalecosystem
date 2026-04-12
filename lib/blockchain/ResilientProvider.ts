@@ -23,81 +23,117 @@ interface RPCEndpoint {
  * EP6: https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d
  */
 
-// ── Todos los GetBlock endpoints del usuario ─────────────────────────────────
-const GETBLOCK_POOL = [
-  'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f', // EP1
-  'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d', // EP2
-  'https://go.getblock.us/88747de304e04365ac4c85789ba4fe54', // EP3
-  'https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24', // EP4
-  'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', // EP5
-  'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d', // EP6
-];
+// ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
+const GETBLOCK_PAIRS = [
+  { 
+    rpc: process.env.GETBLOCK_ETH_RPC_1, 
+    wss: process.env.GETBLOCK_ETH_WS_2 
+  },
+  { 
+    rpc: process.env.GETBLOCK_ETH_RPC_4, 
+    wss: process.env.GETBLOCK_ETH_WS_3 
+  },
+].filter(p => p.rpc && p.wss);
 
-// Endpoints públicos de fallback cuando todos los GetBlock estén exhaustos
-const BSC_PUBLIC_FALLBACKS = [
-  'https://bsc-dataseed1.binance.org',
-  'https://bsc-dataseed2.binance.org',
-  'https://bsc-dataseed1.defibit.io',
-];
+// Endpoints públicos de fallback (Sexta línea de defensa e inyección web3 masiva)
+const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
+  1: {
+    rpc: [
+      `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
+      'https://rpc.ankr.com/eth',
+      'https://1rpc.io/eth',
+      'https://eth.llamarpc.com',
+      'https://cloudflare-eth.com'
+    ],
+    wss: [
+      'wss://ethereum-rpc.publicnode.com'
+    ]
+  },
+  56: {
+    rpc: [
+      'https://binance.llamarpc.com',
+      'https://1rpc.io/bnb',
+      'https://bsc-dataseed1.binance.org',
+      'https://bsc-dataseed2.binance.org',
+      'https://bsc.meowrpc.com'
+    ],
+    wss: [
+      'wss://bsc-rpc.publicnode.com'
+    ]
+  },
+  137: {
+    rpc: [
+      'https://polygon.llamarpc.com',
+      'https://1rpc.io/matic',
+      'https://polygon.meowrpc.com',
+      'https://polygon-rpc.com'
+    ],
+    wss: [
+      'wss://polygon-bor-rpc.publicnode.com'
+    ]
+  },
+  8453: {
+    rpc: [
+      process.env.GETBLOCK_BASE_RPC || '',
+      'https://base.llamarpc.com',
+      'https://1rpc.io/base',
+      'https://mainnet.base.org',
+      'https://base.meowrpc.com'
+    ].filter(Boolean),
+    wss: [
+      'wss://base-rpc.publicnode.com'
+    ]
+  }
+};
 
-const BASE_PUBLIC_FALLBACKS = [
-  'https://mainnet.base.org',
-  'https://base.llamarpc.com',
-];
-
-const POLYGON_PUBLIC_FALLBACKS = [
-  'https://polygon.llamarpc.com',
-  'https://polygon-rpc.com',
-];
-
-const ETH_PUBLIC_FALLBACKS = [
-  'https://eth.llamarpc.com',
-  'https://cloudflare-eth.com',
-];
-
-const EXHAUSTION_COOLDOWN_MS = 3 * 60 * 1000; // 3 minutos
+const EXHAUSTION_COOLDOWN_MS = 10 * 60 * 1000; // 10 minutos para 402/429
 
 export class ResilientProvider {
   private endpoints: RPCEndpoint[];
   private providers: ethers.JsonRpcProvider[];
   private wsProvider?: ethers.WebSocketProvider;
-  private wssUrl?: string;
+  private wssUrls: string[];
+  private currentWssIndex: number = 0;
   private chainId: number;
   private networkCache?: ethers.Network;
 
-  constructor(urls: string[], chainId: number = 1, wssUrl?: string) {
+  constructor(chainId: number = 1) {
     this.chainId = chainId;
-    this.wssUrl = wssUrl;
+    
+    // Unificar pares específicos de GetBlock + Fallbacks por cadena
+    const urls = [
+      ...(chainId === 1 ? GETBLOCK_PAIRS.map(p => p.rpc!) : []),
+      ...(FALLBACKS[chainId]?.rpc || [])
+    ].filter(Boolean);
 
-    const validUrls = urls.filter(u => u && u.startsWith('http'));
-    if (validUrls.length === 0) {
-      throw new Error('ResilientProvider: No valid RPC URLs provided');
-    }
+    this.wssUrls = [
+      ...(chainId === 1 ? GETBLOCK_PAIRS.map(p => p.wss!) : []),
+      ...(FALLBACKS[chainId]?.wss || [])
+    ].filter(Boolean);
 
-    this.endpoints = validUrls.map(url => ({
+    this.endpoints = urls.map(url => ({
       url,
       isHealthy: true,
       exhausted: false,
       errorCount: 0,
     }));
 
-    this.providers = validUrls.map(url =>
+    this.providers = urls.map(url =>
       new ethers.JsonRpcProvider(url, chainId, { staticNetwork: true })
     );
+
+    console.log(`[ResilientProvider] 🚀 Booted for chain ${chainId} with ${urls.length} endpoints.`);
   }
 
   private getActiveEndpoints(): number[] {
     const now = Date.now();
-    // Restaurar endpoints que han completado el cooldown
     for (const ep of this.endpoints) {
       if (ep.exhausted && ep.exhaustedAt && now - ep.exhaustedAt > EXHAUSTION_COOLDOWN_MS) {
         ep.exhausted = false;
         ep.errorCount = 0;
         ep.isHealthy = true;
-        console.log(`[ResilientProvider] ♻️  Endpoint restaurado (chain ${this.chainId}): ${ep.url.slice(0, 50)}`);
       }
     }
-    // Retornar índices de endpoints disponibles
     return this.endpoints
       .map((ep, i) => ({ ep, i }))
       .filter(({ ep }) => !ep.exhausted && ep.isHealthy)
@@ -109,169 +145,84 @@ export class ResilientProvider {
     ep.exhausted = true;
     ep.isHealthy = false;
     ep.exhaustedAt = Date.now();
-    console.warn(
-      `[ResilientProvider] 💀 Agotado (chain ${this.chainId}) — ${reason}: ${ep.url.slice(0, 50)}`
-    );
-  }
-
-  private markError(index: number) {
-    this.endpoints[index].errorCount++;
-    if (this.endpoints[index].errorCount >= 3) {
-      this.markExhausted(index, 'errorCount >= 3');
+    console.warn(`[ResilientProvider] 💀 BLACKLISTED (${this.chainId}) — ${reason}: ${ep.url.slice(0, 40)}...`);
+    
+    // Si era un WSS activo, rotar
+    if (this.chainId === 1 && index < this.wssUrls.length) {
+        this.reconnectWS();
     }
   }
 
   async call<T>(fn: (provider: ethers.JsonRpcProvider) => Promise<T>): Promise<T> {
-    let activeIndices = this.getActiveEndpoints();
+    const activeIndices = this.getActiveEndpoints();
 
     if (activeIndices.length === 0) {
-      console.warn(`[ResilientProvider] ⚠️ Todos los endpoints exhaustos (chain ${this.chainId}). Reseteando...`);
-      this.endpoints.forEach(ep => {
-        ep.exhausted = false;
-        ep.isHealthy = true;
-        ep.errorCount = 0;
-      });
-      activeIndices = this.endpoints.map((_, i) => i);
+      // Emergency reset
+      this.endpoints.forEach(ep => { ep.exhausted = false; ep.isHealthy = true; });
+      return fn(this.providers[0]);
     }
 
     for (const i of activeIndices) {
       try {
         const result = await fn(this.providers[i]);
-        this.endpoints[i].errorCount = 0; // Éxito — resetear contador
         return result;
       } catch (error: any) {
-        const msg = error?.message ?? '';
-        const code = error?.code ?? '';
         const status = error?.status ?? error?.statusCode ?? 0;
+        const msg = error?.message?.toLowerCase() ?? '';
 
-        // Detectar CU agotados / auth inválida
-        const isExhausted =
-          status === 401 || status === 429 || status === 402 ||
-          msg.includes('401') || msg.includes('429') || msg.includes('402') ||
-          msg.includes('Unknown token') || msg.includes('quota') ||
-          msg.includes('limit exceeded') || msg.includes('unauthorized') ||
-          code === '-32005' || code === '-32001';
-
-        if (isExhausted) {
-          this.markExhausted(i, `HTTP/RPC auth error: ${msg.slice(0, 80)}`);
-          continue; // Pasar al siguiente endpoint
-        }
-
-        // Error de red / DNS → también agotar
-        if (msg.includes('ENOTFOUND') || msg.includes('fetch failed') || msg.includes('network')) {
-          this.markExhausted(i, 'network error');
+        // CIRCUIT BREAKER: 402/429/401 → Instant skip
+        if (status === 402 || status === 429 || status === 401 || msg.includes('402') || msg.includes('quota') || msg.includes('limit')) {
+          this.markExhausted(i, `API_LIMIT_${status}`);
           continue;
         }
 
-        // Error temporal → incrementar contador
-        this.markError(i);
-        console.warn(`⚠️ [ResilientProvider] Error en endpoint ${i} (chain ${this.chainId}): ${msg.slice(0, 100)}`);
+        this.endpoints[i].errorCount++;
+        if (this.endpoints[i].errorCount >= 2) {
+            this.markExhausted(i, 'REPEATED_FAILURE');
+        }
       }
     }
-
-    // Si todos los de alta prioridad fallaron, usar el primero disponible como último recurso
-    const lastResort = this.providers.find((_, i) => !this.endpoints[i].exhausted) || this.providers[0];
-    return fn(lastResort);
+    return fn(this.providers[activeIndices[0]]);
   }
 
   private initWebSocket(url: string) {
+    if (typeof window !== 'undefined') return; // Server-side only
     try {
-      console.log(`📡 [WS:SHIELD] Initializing stream for chain ${this.chainId}`);
       this.wsProvider = new ethers.WebSocketProvider(url);
-
-      this.wsProvider.on('error', (err: any) => {
-        console.warn(`⚠️ [WS:SHIELD] Stream Error (${this.chainId}):`, err.message);
-        if (err.message.includes('401') || err.message.includes('403')) {
-          console.error(`💀 [WS:SHIELD] Auth failure for chain ${this.chainId}. Disabling WS.`);
-          this.wsProvider = undefined;
-          return;
-        }
-        this.reconnectWS();
-      });
-    } catch (e: any) {
-      console.error(`💀 [WS:SHIELD] Failed to init:`, e.message);
+      this.wsProvider.on('error', () => this.reconnectWS());
+    } catch (e) {
+      this.reconnectWS();
     }
   }
 
   private reconnectWS() {
-    if (!this.wssUrl) return;
-    console.log(`🔄 [WS:SHIELD] Reconnecting for chain ${this.chainId}...`);
-    setTimeout(() => this.initWebSocket(this.wssUrl!), 5000);
+    if (this.wssUrls.length === 0) return;
+    this.currentWssIndex = (this.currentWssIndex + 1) % this.wssUrls.length;
+    console.log(`[WS] 🔄 Rotating to Pair Index ${this.currentWssIndex}`);
+    setTimeout(() => this.initWebSocket(this.wssUrls[this.currentWssIndex]), 5000);
   }
 
   getProvider(): ethers.JsonRpcProvider {
     return new Proxy(this.providers[0], {
-      get: (target, prop, receiver) => {
-        const originalValue = (target as any)[prop];
-        if (typeof originalValue === 'function') {
-          const resilienceMethods = [
-            'send', 'call', 'getBalance', 'getCode', 'getStorage',
-            'getTransactionCount', 'getBlock', 'getTransaction',
-            'getTransactionReceipt', 'getBlockNumber', 'getLogs',
-            'estimateGas', 'getFeeData',
-          ];
-          if (resilienceMethods.includes(prop as string)) {
-            return (...args: any[]) => this.call(p => (p as any)[prop](...args));
-          }
-          if (prop === 'getNetwork') {
-            return async () => {
-              if (this.networkCache) return this.networkCache;
-              this.networkCache = await this.call(p => p.getNetwork());
-              return this.networkCache;
-            };
-          }
-          return originalValue.bind(target);
+      get: (target, prop) => {
+        const resilienceMethods = ['send', 'call', 'getBalance', 'getCode', 'getStorage', 'getTransactionCount', 'getBlock', 'getTransaction', 'getTransactionReceipt', 'getBlockNumber', 'getLogs', 'estimateGas'];
+        if (resilienceMethods.includes(prop as string)) {
+          return (...args: any[]) => this.call(p => (p as any)[prop](...args));
         }
-        return Reflect.get(target, prop, receiver);
+        return (target as any)[prop];
       },
     });
   }
 
   getWsProvider(): ethers.WebSocketProvider | undefined {
-    if (!this.wssUrl) return undefined;
-    if (!this.wsProvider) this.initWebSocket(this.wssUrl);
+    if (this.wssUrls.length === 0) return undefined;
+    if (!this.wsProvider) this.initWebSocket(this.wssUrls[this.currentWssIndex]);
     return this.wsProvider;
-  }
-
-  /** Debug: estado de todos los endpoints */
-  getStatus() {
-    return this.endpoints.map(ep => ({
-      url: ep.url.slice(0, 55),
-      healthy: ep.isHealthy,
-      exhausted: ep.exhausted,
-      errorCount: ep.errorCount,
-    }));
   }
 }
 
-// ── WebSocket endpoints ── ─────────────────────────────────────────────────
-const EP_WSS_1 = 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a';
-const EP_WSS_2 = 'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343';
-const EP_WSS_3 = 'wss://go.getblock.io/36eed0bdbb894920b7eff3516a90f131';
-
-// ── Singleton instances ───────────────────────────────────────────────────────
-
-// Ethereum: todos los 6 GetBlock EPs + fallbacks públicos
-export const ethereumResilientProvider = new ResilientProvider(
-  [...GETBLOCK_POOL, ...ETH_PUBLIC_FALLBACKS].filter(Boolean),
-  1,
-  EP_WSS_1
-);
-
-// BSC: todos los 6 GetBlock EPs + dataseed públicos de Binance
-export const bscResilientProvider = new ResilientProvider(
-  [...GETBLOCK_POOL, ...BSC_PUBLIC_FALLBACKS].filter(Boolean),
-  56
-);
-
-// Base: todos los 6 GetBlock EPs + fallbacks públicos
-export const baseResilientProvider = new ResilientProvider(
-  [...GETBLOCK_POOL, ...BASE_PUBLIC_FALLBACKS].filter(Boolean),
-  8453
-);
-
-// Polygon: todos los 6 GetBlock EPs + fallbacks públicos
-export const polygonResilientProvider = new ResilientProvider(
-  [...GETBLOCK_POOL, ...POLYGON_PUBLIC_FALLBACKS].filter(Boolean),
-  137
-);
+// ── Singleton instances ──
+export const ethereumResilientProvider = new ResilientProvider(1);
+export const bscResilientProvider = new ResilientProvider(56);
+export const baseResilientProvider = new ResilientProvider(8453);
+export const polygonResilientProvider = new ResilientProvider(137);
