@@ -750,4 +750,3 @@ function handleWalletConnect(id: string) {
   if (btn) btn.click();
   else window.dispatchEvent(new CustomEvent('sovereign:trigger_connect', { detail: { id } }));
 }
-}
