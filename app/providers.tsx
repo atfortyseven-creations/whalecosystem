@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { mainnet, base, arbitrum, optimism, polygon, bsc, avalanche, zksync, linea, scroll, celo, mantle, fantom, blast, gnosis, moonbeam } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,8 +13,11 @@ import { VIPStoreBootstrap } from '@/components/providers/VIPStoreBootstrap';
 import { AlphaToaster } from '@/components/ui/AlphaToaster';
 import { ShortcutVisualizer } from '@/components/ui/ShortcutVisualizer';
 import { WalletConnectionBridge } from '@/components/providers/WalletConnectionBridge';
+import { SovereignVaultBootstrap } from '@/components/providers/SovereignVaultBootstrap';
 
-const queryClient = new QueryClient();
+// BUG-12 FIX: Do NOT create QueryClient at module level — it leaks state
+// between server-rendered requests in Railway multi-replica environments.
+// Must be created per-component instance using useState.
 
 // Sovereign AppKit Configuration — ALL CHAINS ENABLED
 const config = getDefaultConfig({
@@ -91,6 +94,11 @@ const authenticationAdapter = createAuthenticationAdapter({
 });
 
 export function Web3SovereignProvider({ children }: { children: ReactNode }) {
+  // BUG-12 FIX: per-instance QueryClient prevents SSR data leaks across users
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { staleTime: 10_000, retry: 1 } }
+  }));
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -113,6 +121,7 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
                 <ShortcutVisualizer />
                 <WalletConnectionBridge />
                 <VIPStoreBootstrap />
+                <SovereignVaultBootstrap />
                 {children}
               </WhaleStreamProvider>
             </MarketStreamProvider>

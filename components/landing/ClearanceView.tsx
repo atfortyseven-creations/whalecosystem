@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Clock, User, Terminal, Activity, ChevronLeft } from "lucide-react";
-import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt, useConnect } from "wagmi";
+import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { parseEther } from "viem";
 import { useNewsStore } from "@/lib/store/news-store";
@@ -50,14 +50,22 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
   const { isLoading: isWaiting, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   const [rates, setRates] = useState<{ eur: number; usd: number } | null>(null);
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const timeRef = React.useRef<HTMLSpanElement>(null);
   const [mounted, setMounted] = useState(false);
-  const { connect } = useConnect();
+
 
   useEffect(() => {
     setMounted(true);
     fetchCryptoRates().then(setRates);
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    
+    // Low-thermal DOM Clock
+    const timer = setInterval(() => {
+       if (timeRef.current) {
+           const now = new Date();
+           timeRef.current.innerText = `${now.toLocaleDateString("es-ES", { year: "numeric", month: "2-digit", day: "2-digit" })} · ${now.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+       }
+    }, 1000);
+    
     return () => clearInterval(timer);
   }, []);
 
@@ -72,14 +80,9 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
 
   const handleTransact = () => {
     if (!isConnected) return;
-    // FIX Bug 15b: Chain-switch guard.
-    // switchChain() is async — if the user's wallet is on the wrong network,
-    // initiate the switch and return immediately. Do NOT call sendTransaction
-    // in the same click because chainId may not have updated yet.
-    // The user will click again after the wallet confirms the network switch.
     if (chainId !== TARGET_CHAIN) {
         if (switchChain) switchChain({ chainId: TARGET_CHAIN });
-        return; // hard stop — never fall through to sendTransaction on wrong chain
+        return;
     }
     sendTransaction({ to: TARGET_TREASURY, value: parseEther(ethAmount) });
   };
@@ -87,10 +90,8 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
   const isWrongNetwork = isConnected && chainId !== TARGET_CHAIN;
   const isExecuting = isPending || isWaiting;
 
-  const formatDate = (date: Date) =>
-    date.toLocaleDateString("es-ES", { year: "numeric", month: "2-digit", day: "2-digit" });
-  const formatTime = (date: Date) =>
-    date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  // We only run this formatting once at mount time for hydration
+  const initialDateStr = mounted ? `${new Date().toLocaleDateString("es-ES", { year: "numeric", month: "2-digit", day: "2-digit" })} · ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}` : 'Sincronizando reloj L2...';
 
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
@@ -125,8 +126,8 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-black/40">
                 <Clock size={12} />
-                <span className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold min-w-[200px]">
-                  {mounted ? `${formatDate(currentTime)} · ${formatTime(currentTime)}` : 'Sincronizando reloj L2...'}
+                <span ref={timeRef} className="font-mono text-[9px] uppercase tracking-[0.25em] font-bold min-w-[200px]">
+                  {initialDateStr}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-black/40">

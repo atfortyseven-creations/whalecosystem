@@ -6,7 +6,7 @@ import { useSWRConfig } from 'swr';
 import { formatUnits } from 'viem';
 import { transactionNotifier } from '@/lib/wallet/transaction-notifier';
 
-import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
+import { safeToFixed } from '@/lib/utils/number-format';
 /**
  * [LEGENDARY] Enhanced Smart WebSocket Hook
  * - Monitors pending transactions for instant alerts
@@ -20,6 +20,7 @@ export function useSmartWebSockets(address: string | undefined, enabled = true) 
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const { mutate } = useSWRConfig();
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!address || !enabled) return;
@@ -117,7 +118,6 @@ export function useSmartWebSockets(address: string | undefined, enabled = true) 
             if (!isIncoming) return;
 
             console.log('🌌 [Legendary] Incoming transaction detected:', tx.hash);
-            setLastTx(tx);
 
             // Determine if it's native ETH or ERC20
             let amount = '0';
@@ -128,7 +128,7 @@ export function useSmartWebSockets(address: string | undefined, enabled = true) 
             if (tx.value && tx.value !== '0x0') {
                 // Native ETH transfer
                 const ethValue = formatUnits(BigInt(tx.value), 18);
-                amount = parseFloat(safeToFixed(ethValue, 4));
+                amount = parseFloat(safeToFixed(ethValue, 4)).toString();
                 symbol = 'ETH';
                 
                 // Estimate USD value (could fetch real-time price here)
@@ -139,24 +139,30 @@ export function useSmartWebSockets(address: string | undefined, enabled = true) 
                 symbol = 'Tokens';
             }
 
-            // Use centralized notifier service
-            transactionNotifier.notify({
-                hash: tx.hash,
-                amount,
-                symbol,
-                usdValue,
-                source: 'wallet',
-                type: 'incoming',
-                timestamp: Date.now(),
-                chainId: 1 // Ethereum mainnet
-            });
+            // [ANTI-DDOS] Clear previous debounce
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+            
+            // Set new debounce threshold (avoid 60 updates per second)
+            debounceTimerRef.current = setTimeout(() => {
+                 setLastTx(tx); // Only trigger React Render once event stream settles
+                 
+                 // Use centralized notifier service AFTER debouncing
+                 transactionNotifier.notify({
+                     hash: tx.hash,
+                     amount: amount,
+                     symbol,
+                     usdValue,
+                     source: 'wallet',
+                     type: 'incoming',
+                     timestamp: Date.now(),
+                     chainId: '1' // Ethereum mainnet — must be string for notifier/SIWE compat
+                 });
 
-            // Trigger portfolio refresh with a slight delay to allow for confirmation
-            setTimeout(() => {
-                mutate('portfolio-assets');
-                console.log('🌌 [Legendary] Portfolio cache invalidated');
-            }, 1000); // 1 second delay (optimized for high frequency)
-
+                 mutate('portfolio-assets');
+                 console.log('🌌 [Legendary] Portfolio cache invalidated after debounce');
+            }, 2500); // 2.5 seconds debounce (Institutional rate-limit)
         };
 
         // Initialize connection
@@ -166,6 +172,9 @@ export function useSmartWebSockets(address: string | undefined, enabled = true) 
         return () => {
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
+            }
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
             }
             if (wsRef.current) {
                 wsRef.current.close();

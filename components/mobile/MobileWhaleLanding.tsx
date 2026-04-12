@@ -503,30 +503,46 @@ function PageHero({
 
 // ─── LIVE METRICS ─────────────────────────────────────────────────────────────
 function LiveFPS() {
-  const [fps, setFps] = useState(0);
-  const [mounted, setMounted] = useState(false);
+  const spanRef = useRef<HTMLSpanElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
   const timesRef = useRef<number[]>([]);
+
   useEffect(() => {
-    setMounted(true);
     let last = performance.now();
     let raf: number;
+    let frameCount = 0;
+    
     const loop = (now: number) => {
-      const dt = now - last; last = now;
+      frameCount++;
+      const dt = now - last; 
+      last = now;
+      
       timesRef.current.push(dt);
       if (timesRef.current.length > 30) timesRef.current.shift();
-      const avg = timesRef.current.reduce((a,b)=>a+b,0)/timesRef.current.length;
-      setFps(Math.round(1000/avg));
+      
+      // Throttle DOM updates to save CPU (update every 15 frames instead of 60)
+      if (frameCount % 15 === 0 && spanRef.current && dotRef.current) {
+         const avg = timesRef.current.reduce((a,b)=>a+b,0)/timesRef.current.length;
+         const fps = Math.round(1000/avg) || 60;
+         const color = fps >= 55 ? '#34D399' : fps >= 30 ? '#FBBF24' : '#F87171';
+         
+         spanRef.current.innerText = `${fps}`;
+         spanRef.current.style.color = color;
+         dotRef.current.style.background = color;
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, []);
-  if (!mounted) return null;
-  const color = fps >= 55 ? '#34D399' : fps >= 30 ? '#FBBF24' : '#F87171';
+
   return (
     <div className="flex items-center gap-1.5">
-      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: color }} />
-      <span className="font-mono text-[10px] font-black" style={{ color }}>{fps}<span className="opacity-50">fps</span></span>
+      <div ref={dotRef} className="w-1.5 h-1.5 rounded-full" style={{ background: '#34D399' }} />
+      <span className="font-mono text-[10px] font-black">
+         <span ref={spanRef} style={{ color: '#34D399' }}>60</span>
+         <span className="opacity-50">fps</span>
+      </span>
     </div>
   );
 }
@@ -748,25 +764,21 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    // CRITICAL iOS FIX: Dynamically import Html5Qrcode INSIDE the effect.
-    // This prevents the module-level navigator.mediaDevices call that crashes
-    // iOS Safari / WKWebView. The import only runs after:
-    //   1. The component is mounted (DOM exists)
-    //   2. The user has already tapped the "Scan" button (gesture requirement)
-    // These two conditions together satisfy iOS getUserMedia security policy.
-    let cancelled = false;
-    let localScanner: any = null;
+    // Cleanup only
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(() => {});
+      }
+    };
+  }, []);
 
-    async function startScanner() {
+  const initCamera = async () => {
       try {
-        // Dynamic import — NO module-level side effects
         const { Html5Qrcode } = await import('html5-qrcode');
-        if (cancelled) return;
-
         const scanner = new Html5Qrcode('qr-reader');
         scannerRef.current = scanner;
-        localScanner = scanner;
         setScannerReady(true);
+        setError(null);
 
         await scanner.start(
           { facingMode: 'environment' },
@@ -775,29 +787,17 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
           () => {}
         );
       } catch (err: any) {
-        if (!cancelled) {
-          // Friendly iOS-specific error messaging
           const isPermissionError =
             err?.name === 'NotAllowedError' ||
             err?.name === 'PermissionDeniedError' ||
             (typeof err?.message === 'string' && err.message.toLowerCase().includes('permission'));
           setError(isPermissionError
-            ? 'Cámara bloqueada. Ve a Ajustes → Safari → Cámara y permite el acceso.'
-            : 'Cámara no disponible. Asegúrate de estar en HTTPS.'
+            ? 'Cámara bloqueada. Ve a Ajustes → Safari → Cámara y activa el permiso.'
+            : 'Cámara no disponible. Asegúrate de estar en un entorno seguro HTTPS.'
           );
-        }
+          setScannerReady(false);
       }
-    }
-
-    startScanner();
-
-    return () => {
-      cancelled = true;
-      if (localScanner) {
-        localScanner.stop().catch(() => {});
-      }
-    };
-  }, [handleScan]);
+  };
 
   return (
     <div className="fixed inset-0 bg-[#FAF9F6] z-[10000] flex flex-col p-8 overflow-hidden">
@@ -812,8 +812,21 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center relative">
-        <div className="w-full max-w-sm aspect-square bg-white rounded-[4rem] overflow-hidden relative shadow-2xl p-4 border border-black/5">
-          <div id="qr-reader" className="w-full h-full rounded-[3rem] overflow-hidden" />
+        <div className="w-full max-w-sm aspect-square bg-white rounded-[4rem] overflow-hidden relative shadow-2xl p-4 border border-black/5 flex items-center justify-center">
+          
+          {!scannerReady && !isProcessing && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/5 backdrop-blur-sm rounded-[3rem]">
+                  <button 
+                      onClick={initCamera}
+                      className="w-48 h-16 bg-black text-white rounded-[2rem] font-black uppercase tracking-[0.15em] text-[11px] shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-2"
+                  >
+                     <Eye size={16}/> Start Camera
+                  </button>
+                  {error && <p className="text-[10px] text-red-500 font-bold mt-4 px-8 text-center">{error}</p>}
+              </div>
+          )}
+
+          <div id="qr-reader" className="w-full h-full rounded-[3rem] overflow-hidden bg-black/5" />
           {/* Corner sight overlay */}
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
             <div className="w-[75%] h-[75%] border-2 border-white/20 rounded-[3rem] relative">

@@ -95,7 +95,7 @@ export function LegendaryTransactionModal({
 
   // Asset State
   const [fromAssetSymbol, setFromAssetSymbol] = useState(balances[0]?.symbol || "ETH");
-  const [fromAsset, setFromAsset] = useState<any>(balances[0]); // Source Token Object
+  const [fromAsset, setFromAsset] = useState<any>(balances[0] || null); // Source Token Object
   const [toAssetSymbol, setToAssetSymbol] = useState("USDC");
   const [toAsset, setToAsset] = useState<any>(null); // For Universal Swap
   
@@ -282,13 +282,13 @@ export function LegendaryTransactionModal({
 
               // Get the selected asset
               const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
-              if (!activeFromAsset) {
+              if (!activeFromAsset && mode !== 'buy') {
                   toast.error("Asset Not Found", { description: `Cannot find ${fromAssetSymbol} on ${sourceChain.name}` });
                   setLoading(false);
                   return;
               }
 
-              const decimals = activeFromAsset.decimals || 18;
+              const decimals = activeFromAsset?.decimals || 18;
               
               toast.info("Preparing Transaction", { description: subMode === 'private' ? "Routing through MEV-Protected RPC..." : "Please confirm in your wallet..." });
 

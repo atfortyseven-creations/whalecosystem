@@ -6,21 +6,26 @@
 <h3 align="center">The Sovereign Intelligence Protocol — Institutional Grade On-Chain Analytics</h3>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/Version-3.0.0-gold?style=for-the-badge" alt="Version"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Version-4.0.0--Final-gold?style=for-the-badge" alt="Version"></a>
   <a href="#"><img src="https://img.shields.io/badge/Railway-Pro%20Deploy-blueviolet?style=for-the-badge&logo=railway" alt="Railway"></a>
   <a href="#"><img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js"></a>
   <a href="#"><img src="https://img.shields.io/badge/Node-22.11.0-green?style=for-the-badge&logo=node.js" alt="Node"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Chains-EVM%20%7C%20Solana%20%7C%20BSV-blue?style=for-the-badge" alt="Chains"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Security-ZK%20%2B%20ECDSA-red?style=for-the-badge" alt="Security"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Chains-16%20EVM%20%2B%20Solana-blue?style=for-the-badge" alt="Chains"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Vault-EIP--1193%20Sovereign-red?style=for-the-badge" alt="Vault"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Mobile-Xiaomi%20%2B%20iOS%20Hardened-orange?style=for-the-badge" alt="Mobile"></a>
 </p>
 
 ---
 
 ## 📌 Protocol Abstract
 
-**Whale Alert Network** es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red soberana (Sovereign Mesh) para proporcionar una capa de conocimiento sin precedentes sobre los movimientos de capital cripto a gran escala.
+El sistema procesa transacciones de alto valor (ballenas) a través de múltiples redes simultáneamente aplicando filtros ZK, correlaciones temporales y Z-score propietario con latencias sub-500ms. El **Sovereign Akashic Ledger** registra cada handshake con hashes SHA-256 reales de Ethereum Mainnet en tiempo real, proporcionando una pista de auditoría inmutable de grado institucional.
 
-El sistema procesa y analiza transacciones de alto valor (ballenas) a través de múltiples redes blockchain simultáneamente, aplicando filtros criptográficos ZK, correlaciones temporales de señales y algoritmos de puntuación Z-score propietarios, todo con latencias de sub-500ms.
+### 💎 Key Institutional Features
+- **Zero-Trust Signing**: EIP-1193 Sovereign Vault integrado (sin custodios externos).
+- **Multi-Chain Handshake**: Sincronización nativa con 16 redes EVM (Base, Arbitrum, etc).
+- **Akashic Transparency**: Registro público de hashes SHA-256 para verificación de integridad de señales.
+- **Mobile Perfection**: Optimización extrema para dispositivos de bajo consumo (Xiaomi/Redmi) y WebKit (iOS).
 
 > *"El conocimiento del mercado más poderoso no es el que puedes comprar. Es el que el mercado emite y nadie más puede leer."*
 
@@ -344,12 +349,16 @@ whalecosystem/
 
 ## 🛡️ Postura de Seguridad
 
-- **Zero-Trust**: Ninguna clave privada de usuario es almacenada. Todo es validación por firma.
-- **SIWE**: Autenticación mediante EIP-712 Sign-In with Ethereum con nonces de un solo uso.
-- **HMAC-SHA256**: Autenticación de API keys institucionales con comparación resistente a timing attacks.
+- **Sovereign EIP-1193 Vault**: La clave privada nunca abandona el browser. Se firma con `viem` `LocalAccount` en-cliente — sin custodios, sin servidores.
+- **Domain-Keyed XOR Encryption**: El vault se cifra en `localStorage` con clave derivada del `window.location.origin`. No sobrevive cambios de dominio.
+- **Zero-Trust**: Ninguna clave privada de usuario toca el servidor ni la base de datos.
+- **SIWE**: Autenticación EIP-712 Sign-In with Ethereum con nonces de un solo uso.
+- **HMAC-SHA256**: API keys institucionales con comparación resistente a timing attacks.
 - **ECDSA secp256k1**: Cada señal del Sovereign Mesh está firmada criptográficamente por el nodo emisor.
-- **Zod Validation**: Todas las variables de entorno son validadas en tiempo de boot, evitando fallos silenciosos.
-- **PgBouncer**: Límite de 5 conexiones por réplica, evitando agotamiento del pool en escenarios de 42+ instancias.
+- **Zod Validation**: Variables de entorno validadas en tiempo de boot.
+- **PgBouncer**: Límite de 5 conexiones por réplica, evitando agotamiento del pool en 42+ instancias.
+- **Anti-DDOS WebSocket**: Debounce de 2500ms en `useSmartWebSockets` previene saturación en ráfagas de transacciones.
+- **iOS WebKit Compliant**: Cámara QR inicializada solo por user-gesture explícito — sin crash silencioso en Safari.
 
 ---
 

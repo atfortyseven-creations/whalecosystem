@@ -50,6 +50,7 @@ import { DepositModal } from "./DepositModal";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { useSmartWebSockets } from "@/hooks/useSmartWebSockets";
+import { useSovereignConnect } from "@/hooks/useSovereignConnect";
 import { OptimisticExecutionIndicator } from "./OptimisticExecutionIndicator";
 import { safeToFixed, safeToLocaleString } from "@/lib/utils/number-format";
 
@@ -179,17 +180,16 @@ function ChainSelector() {
 }
 
 // --- Rainbow Perfect Account Switcher ---
+import { GenerateWalletWizard } from "../wallet/GenerateWalletWizard";
+
 function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
+  const { activateSovereignVault } = useSovereignConnect();
   
-  const handleGenerateWallet = async () => {
-      try {
-          toast.loading("Generating Sovereign Wallet...");
-          await fetch('/api/wallet/create', { method: 'POST' });
-          window.location.reload();
-      } catch {
-          toast.error("Failed to generate wallet");
-      }
+  const handleGenerateWallet = async (privateKey: string, address: string) => {
+      setShowWizard(false);
+      await activateSovereignVault(privateKey, address);
   };
 
   return (
@@ -240,14 +240,13 @@ function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefin
                      
                      <div className="h-px bg-white/[0.04] my-2" />
                      
-                     <button onClick={() => { setIsOpen(false); handleGenerateWallet(); }} className="w-full flex items-center gap-4 p-3.5 rounded-2xl hover:bg-white/5 transition-colors text-left group">
+                     <button onClick={() => { setIsOpen(false); setShowWizard(true); }} className="w-full flex items-center gap-4 p-3.5 rounded-2xl hover:bg-white/5 transition-colors text-left group">
                          <div className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center border border-white/10 text-white/60 group-hover:text-white group-hover:border-purple-500/30 transition-all"><Plus size={18}/></div>
                          <div>
                              <div className="text-sm font-black text-white tracking-tight">Generate New Identity</div>
                              <div className="flex items-center gap-1.5 mt-1.5">
                                  <div className="flex gap-1">
-                                    <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-white/40 border border-white/10">Shift</kbd>
-                                    <span className="text-white/20 text-[9px] font-bold">+</span>
+                                    <span className="text-white/40 text-[9px] font-bold uppercase tracking-widest">Sovereign Onboarding Flow</span>
                                     <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-white/40 border border-white/10">Alt</kbd>
                                     <span className="text-white/20 text-[9px] font-bold">+</span>
                                     <kbd className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 text-purple-400 border border-purple-500/30">W</kbd>
@@ -259,86 +258,29 @@ function RainbowAccountSwitcher({ userAddress }: { userAddress: string | undefin
              </>
          )}
       </AnimatePresence>
+      {showWizard && <GenerateWalletWizard onCancel={() => setShowWizard(false)} onComplete={handleGenerateWallet} />}
     </div>
   );
 }
 
 // --- Rainbow Wallet Connection Steps ---
-// Follows exact Rainbow Wallet UX: pick option → animated steps → done
-type SetupStep = "idle" | "choosing" | "creating" | "importing" | "done";
 
 function RainbowOnboarding() {
-  const [step, setStep] = useState<SetupStep>("choosing");
-  const [progress, setProgress] = useState(0);
-  const [progressLabel, setProgressLabel] = useState("");
+  const [step, setStep] = useState<"choosing" | "importing">("choosing");
+  const [showWizard, setShowWizard] = useState(false);
+  const { activateSovereignVault } = useSovereignConnect();
 
-  const CREATE_STEPS = [
-    "Generating secure entropy...",
-    "Deriving HD key tree...",
-    "Encrypting seed phrase...",
-    "Linking on-chain identity...",
-    "Finalising Sovereign Vault...",
-  ];
-
-  const simulateCreate = useCallback(async () => {
-    setStep("creating");
-    for (let i = 0; i < CREATE_STEPS.length; i++) {
-      setProgressLabel(CREATE_STEPS[i]);
-      setProgress(((i + 1) / CREATE_STEPS.length) * 100);
-      await new Promise((r) => setTimeout(r, 800));
-    }
-    setStep("done");
-    // Hand off to existing SIWE / auto-create flow
-    try {
-      await fetch("/api/wallet/create", { method: "POST" });
-    } catch {}
-    window.location.reload();
-  }, []);
-
-  if (step === "creating") {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-10 px-8 text-center">
-        {/* Pulsing ring — CSS only, no blur, 60fps */}
-        <div className="relative w-24 h-24">
-          <div
-            className="absolute inset-0 rounded-full border-2 border-white/10"
-            style={{ animation: "spin 3s linear infinite" }}
-          />
-          <div
-            className="absolute inset-2 rounded-full border-2 border-purple-500/30"
-            style={{ animation: "spin 2s linear infinite reverse" }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Zap size={28} className="text-purple-400" />
-          </div>
-        </div>
-
-        <div className="space-y-2 w-full max-w-xs">
-          <p className="text-white font-black text-sm uppercase tracking-widest">
-            Creating Vault
-          </p>
-          <p className="text-white/40 text-xs font-mono">{progressLabel}</p>
-          <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden mt-4">
-            <motion.div
-              className="h-full bg-gradient-to-r from-purple-500 to-blue-400 rounded-full"
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4 }}
-            />
-          </div>
-          <p className="text-white/20 text-[10px] font-mono mt-1">
-            {Math.round(progress)}%
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const handleGenerateWallet = async (privateKey: string, address: string) => {
+      setShowWizard(false);
+      await activateSovereignVault(privateKey, address);
+  };
 
   if (step === "importing") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-8 text-center">
         <ConnectButton />
-        <p className="text-white/30 text-xs">
-          Connect your existing wallet using RainbowKit
+        <p className="text-white/30 text-xs hover:text-white/70 transition-colors cursor-pointer" onClick={() => setStep("choosing")}>
+          ← Go Back
         </p>
       </div>
     );
@@ -369,14 +311,14 @@ function RainbowOnboarding() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          onClick={simulateCreate}
+          onClick={() => setShowWizard(true)}
           className="w-full py-4 rounded-2xl font-black text-sm text-white tracking-wide"
           style={{
             background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
             boxShadow: "0 4px 24px rgba(99,102,241,0.35)",
           }}
         >
-          🌈 Create a new wallet
+          🌈 Create Sovereign Identity
         </motion.button>
 
         {/* I already have one */}
@@ -393,6 +335,8 @@ function RainbowOnboarding() {
       <p className="text-white/20 text-[10px] tracking-widest uppercase">
         Non-custodial · On-chain · Sovereign
       </p>
+
+      {showWizard && <GenerateWalletWizard onCancel={() => setShowWizard(false)} onComplete={handleGenerateWallet} />}
     </div>
   );
 }
@@ -435,25 +379,7 @@ export default function PortfolioView({
     html.classList.toggle("dark");
   };
 
-  // ─ Global Shortcut Interceptor for Auto-Generation ─
-  useEffect(() => {
-    const handleKeyDown = async (e: KeyboardEvent) => {
-        if (e.shiftKey && e.altKey && e.key.toLowerCase() === 'w') {
-            e.preventDefault();
-            toast.loading("Instantiating Genesis Sovereign Vault...", { id: 'wallet-gen' });
-            try {
-                await fetch('/api/wallet/create', { method: 'POST' });
-                toast.success("New algorithmic identity securely injected.", { id: 'wallet-gen' });
-                window.location.reload(); 
-            } catch {
-                toast.error("Cryptographic Handshake failed.", { id: 'wallet-gen' });
-            }
-        }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
+  // Removed obsolete global window shortcut. Use GenerateWalletWizard UI directly.
   // History fetch
   useEffect(() => {
     if (!userAddress) return;
