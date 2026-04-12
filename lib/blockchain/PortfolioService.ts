@@ -207,7 +207,12 @@ export class PortfolioService {
       };
 
     } catch (error: any) {
-      console.error(`[Portfolio-Moralis] ❌ ERROR for chain ${chainId}:`, error.message);
+      const isQuotaHit = error.message.includes('401') || error.message.includes('Quota') || error.message.includes('consumed');
+      if (isQuotaHit) {
+        console.warn(`[Portfolio-Moralis] 🛡️ Quota Limit Detected for ${chainId}. Triggering High-Fidelity Fallback.`);
+      } else {
+        console.error(`[Portfolio-Moralis] ❌ ERROR for chain ${chainId}:`, error.message);
+      }
       
       // 🔥 [SENIOR RESILIENCE] Attempt RPC Fallback for ANY chain if Moralis fails
       try {
@@ -633,9 +638,12 @@ export class PortfolioService {
       // For whales, we might want to return 0 gracefully instead of an error object that might break the UI
       return {
         totalValueUsd: 0,
+        change24hPercent: 0,
+        change24hUSD: 0,
         tokens: [],
         chainBreakdown: {},
         address,
+        status: 'DEGRADED',
         error: 'FETCH_FAILED'
       } as any;
     }

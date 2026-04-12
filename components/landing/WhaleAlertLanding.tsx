@@ -11,6 +11,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useSWR from "swr";
 import Image from "next/image";
+import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import { useUIStore } from "@/lib/store/ui-store";
 gsap.registerPlugin(ScrollTrigger);
 
 const DynamicCryptoCheckoutModal = dynamic(

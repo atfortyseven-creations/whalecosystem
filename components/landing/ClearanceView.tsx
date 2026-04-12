@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Clock, User, Terminal, Activity, ChevronLeft } from "lucide-react";
-import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt } from "wagmi";
+import { useSendTransaction, useAccount, useSwitchChain, useWaitForTransactionReceipt, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { parseEther } from "viem";
 import { useNewsStore } from "@/lib/store/news-store";
@@ -45,6 +45,7 @@ export interface ClearanceViewProps {
 export function ClearanceView({ onBack }: ClearanceViewProps) {
   const { setNewsSubscribed } = useNewsStore();
   const { address, isConnected, chainId } = useAccount();
+  const { connect } = useConnect();
   const { switchChain } = useSwitchChain();
   const { sendTransaction, data: txHash, isPending, error: writeError } = useSendTransaction();
   const { isLoading: isWaiting, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
