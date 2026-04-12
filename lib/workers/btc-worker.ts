@@ -10,17 +10,20 @@ const MIN_USD_VALUE = 50_000_000;   // $50M umbral institucional
 const POLL_INTERVAL = 60_000;       // revisar cada 60s
 
 // ─── Mapa de entidades institucionales conocidas ─────────────────────────────
-const INSTITUTIONAL_WALLETS: Record<string, string> = {
-  'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh': 'MicroStrategy',
-  '1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ':          'MicroStrategy',
-  'bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h': 'BlackRock IBIT',
-  'bc1qrp33g0q5c5txsp9arybkx43zejtvr23b6gzz5y': 'Fidelity FBTC',
-  '3BbDtxBSjgfTRxaBUgR2JACWRukLKxZzEh':          'Grayscale GBTC',
-  '385cR5DM96n1HvBDMDLaxN6ZdKVmqhJ8Y':           'Grayscale GBTC',
-  'bc1qazcm763858nkj2dj986etajv6wquslv8uxjj4': 'Coinbase Custody',
-  '3JZq4atUahhuA9rLhXLMhhTo7J9TgJezpe':          'Coinbase Custody',
-  'bc1qgdjqv0av3q56jvd82tkdjpy7gdp9ut8tlqmgrpmv24sq90ecnvqqjwvw97': 'Binance',
-  '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo':          'Binance',
+// ─── Mapa de entidades institucionales conocidas con metadatos de élite ──────
+const INSTITUTIONAL_WALLETS: Record<string, { name: string; sector: string; confirmed: boolean }> = {
+  'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh': { name: 'MicroStrategy', sector: 'CORPORATE', confirmed: true },
+  '1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ':          { name: 'MicroStrategy', sector: 'CORPORATE', confirmed: true },
+  'bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h': { name: 'BlackRock IBIT', sector: 'ETF', confirmed: true },
+  'bc1qrp33g0q5c5txsp9arybkx43zejtvr23b6gzz5y': { name: 'Fidelity FBTC', sector: 'ETF', confirmed: true },
+  '3BbDtxBSjgfTRxaBUgR2JACWRukLKxZzEh':          { name: 'Grayscale GBTC', sector: 'ETF', confirmed: true },
+  '385cR5DM96n1HvBDMDLaxN6ZdKVmqhJ8Y':           { name: 'Grayscale GBTC', sector: 'ETF', confirmed: true },
+  'bc1qazcm763858nkj2dj986etajv6wquslv8uxjj4': { name: 'Coinbase Custody', sector: 'CUSTODIAN', confirmed: true },
+  '3JZq4atUahhuA9rLhXLMhhTo7J9TgJezpe':          { name: 'Coinbase Custody', sector: 'CUSTODIAN', confirmed: true },
+  'bc1qgdjqv0av3q56jvd82tkdjpy7gdp9ut8tlqmgrpmv24sq90ecnvqqjwvw97': { name: 'Binance', sector: 'EXCHANGE', confirmed: true },
+  '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo':          { name: 'Binance', sector: 'EXCHANGE', confirmed: true },
+  'bc1qf0ghst0euhscck8p3q7p5pux8uxg08uxxxjjsh': { name: 'Ark Invest', sector: 'ETF', confirmed: true },
+  '3K6m8sc9p68etajv983mqfghst0euhscck':          { name: 'MicroStrategy (Cold)', sector: 'CORPORATE', confirmed: true },
 };
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -70,17 +73,17 @@ function attributeTransaction(tx: MempoolTx) {
   const all = [...fromAddresses, ...toAddresses];
   for (const addr of all) {
     if (INSTITUTIONAL_WALLETS[addr]) {
-      return { entity: INSTITUTIONAL_WALLETS[addr], institutional: true };
+      const { name, sector } = INSTITUTIONAL_WALLETS[addr];
+      return { entity: name, institutional: true, metadata: { sector } };
     }
   }
 
-  // Heurística de alta fidelidad: >$100M y pocos outputs
   const totalSats = tx.vout.reduce((sum, o) => sum + (o.value ?? 0), 0);
   if (totalSats > 1500 * 1e8 && tx.vout.length <= 3) {
-    return { entity: 'Unknown Institutional Whale', institutional: true };
+    return { entity: 'Unknown Institutional Whale', institutional: true, metadata: { sector: 'UNKNOWN_INSTITUTIONAL' } };
   }
 
-  return { entity: 'Unknown Whale', institutional: false };
+  return { entity: 'Unknown Whale', institutional: false, metadata: { sector: 'RETAIL' } };
 }
 
 // ─── Procesador ───────────────────────────────────────────────────────────────
@@ -121,6 +124,7 @@ export async function scanBlock(height: number, btcPrice: number) {
             blockHeight: height,
             timestamp:   new Date(tx.status.block_time * 1000),
             confirmed:   tx.status.confirmed,
+            metadata:    attribution.metadata as any,
           }
         });
 

@@ -18,18 +18,36 @@ interface LedgerEntry {
   confirmed: boolean;
 }
 
+interface Stats {
+  total24hVolume: number;
+  total24hBtc: number;
+  transactionCount: number;
+  institutionalRatio: number;
+  sentiment: string;
+  topEntities: { name: string; count: number }[];
+  alphaScore: number;
+}
+
 export default function InstitutionalLedger() {
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [totalIndexed, setTotalIndexed] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/institutional/ledger');
-        const data = await res.json();
-        setEntries(data.entries || []);
-        setTotalIndexed(data.totalIndexed || 0);
+        const [ledgerRes, statsRes] = await Promise.all([
+          fetch('/api/institutional/ledger'),
+          fetch('/api/institutional/stats')
+        ]);
+        
+        const ledgerData = await ledgerRes.json();
+        const statsData = await statsRes.json();
+        
+        setEntries(ledgerData.entries || []);
+        setTotalIndexed(ledgerData.totalIndexed || 0);
+        setStats(statsData);
       } catch (err) {
         console.error('[LEDGER_FETCH_ERROR]', err);
       } finally {
@@ -53,22 +71,66 @@ export default function InstitutionalLedger() {
 
   return (
     <div className="flex-1 flex flex-col bg-black/40 font-mono text-[10px] uppercase overflow-hidden">
-      {/* ── TACTICAL BANNER ── */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-emerald-500/10 bg-emerald-500/[0.02] shrink-0">
-        <div className="flex items-center gap-2 text-emerald-400">
-           <Landmark size={14} />
-           <span className="font-black tracking-[0.25em]">PERMANENT HISTORIAN // IMMUTABLE RECORD</span>
-        </div>
-        <div className="ml-auto flex items-center gap-6">
-           <div className="flex items-center gap-2">
-             <span className="text-white/20">TOTAL INDEXED:</span>
-             <span className="text-white/60">{totalIndexed} ENTRIES</span>
-           </div>
-           <div className="flex items-center gap-2">
-             <span className="text-white/20">THRESHOLD:</span>
-             <span className="text-amber-500/60">> $50.0M</span>
-           </div>
-        </div>
+      {/* ── SOV-ALPHA INSIGHT GRID ── */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-white/5 border-b border-white/5 shrink-0">
+         <div className="bg-black/60 p-5 flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
+               <Activity size={40} className="text-emerald-500" />
+            </div>
+            <span className="text-[8px] font-black text-white/30 tracking-[0.3em]">24H_INSTITUTIONAL_FLOW</span>
+            <span className="text-xl font-black text-white">
+               ${((stats?.total24hVolume || 0) / 1e6).toFixed(1)}M
+            </span>
+            <div className="flex items-center gap-2 mt-2">
+               <div className="h-1 flex-1 bg-white/5 overflow-hidden">
+                  <motion.div 
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "0%" }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="h-full w-full bg-emerald-500/40" 
+                  />
+               </div>
+               <span className="text-[8px] text-emerald-500/60 font-black">ACTIVE</span>
+            </div>
+         </div>
+
+         <div className="bg-black/60 p-5 flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-2 opacity-10">
+               <Shield size={40} className="text-amber-500" />
+            </div>
+            <span className="text-[8px] font-black text-white/30 tracking-[0.3em]">WHALE_SENTIMENT</span>
+            <span className="text-[14px] font-black text-amber-500 truncate" title={stats?.sentiment}>
+               {stats?.sentiment || 'INITIALIZING'}
+            </span>
+            <span className="text-[8px] text-white/20 font-black mt-2 tracking-widest">
+               RATIO: {( (stats?.institutionalRatio || 0) * 100).toFixed(1)}% INST.
+            </span>
+         </div>
+
+         <div className="bg-black/60 p-5 flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-2 opacity-10">
+               <Landmark size={40} className="text-blue-500" />
+            </div>
+            <span className="text-[8px] font-black text-white/30 tracking-[0.3em]">DOMINANT_ENTITY_24H</span>
+            <span className="text-xl font-black text-white">
+               {stats?.topEntities[0]?.name || 'SCANNING...'}
+            </span>
+            <span className="text-[8px] text-white/20 font-black mt-2 tracking-widest">
+               {stats?.topEntities[0]?.count || 0} MAJOR_TXS
+            </span>
+         </div>
+
+         <div className="bg-[#0A0A0A] p-5 flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-emerald-500/[0.01] pointer-events-none" />
+            <span className="text-[8px] font-black text-white/30 tracking-[0.3em]">SOV-ALPHA_SCORE</span>
+            <div className="flex items-baseline gap-2">
+               <span className="text-3xl font-black text-white/90">{stats?.alphaScore || 0}</span>
+               <span className="text-xs text-white/20">/100</span>
+            </div>
+            <div className="mt-2 text-[7px] text-white/10 uppercase tracking-[0.2em] leading-relaxed">
+               Proprietary weight of volume, frequency, and institutional correlation depth.
+            </div>
+         </div>
       </div>
 
       {/* ── COLUMN HEADERS ── */}
