@@ -673,6 +673,8 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   const handleScan = useCallback(async (text: string) => {
     if (isProcessingRef.current || !text) return;
     
+    let token = '';
+
     // Protocol detection: WHALE_HANDSHAKE:TOKEN_ID or https://humanidfi.com/sync?session=TOKEN_ID
     if (text.startsWith('WHALE_HANDSHAKE:')) {
       token = text.split(':')[1];
@@ -764,13 +766,21 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    // [EXPERT] Auto-Process Token from URL if present
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('session');
+    if (urlToken && !isProcessingRef.current) {
+        console.log(`[Handshake] Auto-processing token from URL: ${urlToken}`);
+        handleScan(urlToken);
+    }
+
     // Cleanup only
     return () => {
       if (scannerRef.current) {
         scannerRef.current.stop().catch(() => {});
       }
     };
-  }, []);
+  }, [handleScan]);
 
   const initCamera = async () => {
       try {
@@ -901,6 +911,25 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
   useEffect(() => {
     setWalletBrowser(detectWalletBrowser());
   }, []);
+
+  // [EXPERT] Auto-Sync Deep Link Detection
+  // If the user lands on /sync?session=... (via native QR scan), 
+  // we automatically trigger the handshake if connected.
+  useEffect(() => {
+    if (!isMounted || !isConnected || !address || view === 'scanner') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const sessionToken = params.get('session');
+    
+    if (sessionToken && !sessionStorage.getItem(`synced_${sessionToken}`)) {
+        console.log(`[Auto-Sync] Detected session token in URL: ${sessionToken}`);
+        // Transition to scanner view but with pre-filled token logic
+        // We'll actually just call the sync logic directly or show the scanner UI in 'processing' mode
+        setView('scanner');
+        // The MobileQRScanner will handle the rest if we passing the token down
+        // For simplicity in this shell, we let the user see the scanner and it will 'auto-scan' if we detect the param
+    }
+  }, [isMounted, isConnected, address, view]);
 
   const handleConnectTrigger = useCallback(() => {
     if (walletBrowser) {

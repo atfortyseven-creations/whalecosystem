@@ -100,6 +100,15 @@ export default clerkMiddleware(async (auth, request) => {
     const wafBlock = await runWAF(request);
     if (wafBlock) return wafBlock;
 
+    // [VIRTUAL ROUTE] Canonical Sync Bridge
+    // If user scans a QR code that points to /sync, we rewrite it to /
+    // This allows the MobileEnforcer to catch the ?session=XYZ param on the main page.
+    if (pathname === '/sync') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.rewrite(url);
+    }
+
     // 0. GEOFENCING — Regulatory Firewall (CFTC/OFAC)
     if (isGeoRestrictedRoute(request)) {
       if (RESTRICTED_COUNTRIES.includes(country)) {
