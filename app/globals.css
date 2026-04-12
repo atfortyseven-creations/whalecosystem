@@ -228,46 +228,7 @@ textarea {
      We suppress it on touch devices with the media query below —
      WavePatternOverlay (DOM element) handles mobile correctly.
      ═══════════════════════════════════════════════════════════ */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-
-    /* === GPU COMPOSITOR CONTRACT ===
-       translateZ(0): own compositor layer, never re-paints
-       background-attachment: scroll (NOT fixed!) on a fixed element:
-         - iOS Safari remaps 'fixed' backgrounds to 'scroll' internally anyway
-         - but doing so AFTER layout = causes repaint on every scroll frame
-         - Using 'scroll' explicitly = zero scroll-linked repaints on iPad/iOS
-    */
-    transform: translateZ(0);
-    will-change: auto;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-
-    background-image: var(--wave-pattern);
-    background-repeat: repeat;
-    background-size: 250px auto;
-    background-attachment: scroll; /* NOT fixed — prevents iOS scroll lag */
-
-    opacity: var(--wave-pattern-opacity);
-    mix-blend-mode: multiply;
-  }
-
-  /* In dark mode, invert the watermark to white and blend as screen */
-  .dark body::before {
-    opacity: 0.035;
-    mix-blend-mode: screen;
-    filter: invert(1) hue-rotate(180deg);
-  }
-
-  @media (hover: none) and (pointer: coarse) {
-    body::before {
-      display: none;
-    }
-  }
+  /* body::before removed to prevent GPU compositing storm with WavePatternOverlay */
 
   /* All direct children of body must stack ABOVE the wave pattern overlay */
   body > * {
