@@ -172,7 +172,6 @@ export const arbitrumClient = createPublicClient({
 export const avalancheClient = createPublicClient({
   chain: avalanche,
   transport: makeTransport([
-    GB_EP2, GB_EP4,
     `https://avalanche-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://api.avax.network/ext/bc/C/rpc',
   ]),
