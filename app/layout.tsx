@@ -50,7 +50,7 @@ export const metadata = {
   authors: [{ name: 'Whale Alert Network Team' }],
   creator: 'Whale Alert Network Team',
   publisher: 'Whale Alert Network Team',
-  metadataBase: new URL('https://humanidfi.com'),
+  metadataBase: new URL('https://www.humanidfi.com'),
   alternates: {
     canonical: '/',
   },
@@ -76,7 +76,7 @@ export const metadata = {
   openGraph: {
     title: 'HOME | Whale Alert Network',
     description: 'La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.',
-    url: 'https://humanidfi.com',
+    url: 'https://www.humanidfi.com',
     siteName: 'Whale Alert Network',
     images: [
       {
@@ -120,19 +120,19 @@ export default async function RootLayout({
     "@graph": [
       {
         "@type": "WebSite",
-        "url": "https://humanidfi.com/",
+        "url": "https://www.humanidfi.com/",
         "name": "Whale Alert Network",
         "description": "La comunidad definitiva de Whale Alert Network para el análisis y seguimiento on-chain de criptomonedas en tiempo real.",
         "publisher": {
-          "@id": "https://humanidfi.com/#organization"
+          "@id": "https://www.humanidfi.com/#organization"
         }
       },
       {
         "@type": "Organization",
-        "@id": "https://humanidfi.com/#organization",
+        "@id": "https://www.humanidfi.com/#organization",
         "name": "Whale Alert Network Team",
-        "url": "https://humanidfi.com",
-        "logo": "https://humanidfi.com/logo-landingpage.png",
+        "url": "https://www.humanidfi.com",
+        "logo": "https://www.humanidfi.com/logo-landingpage.png",
         "sameAs": [
           "https://github.com/atfortyseven-creations/whalecosystem"
         ]
@@ -143,10 +143,10 @@ export default async function RootLayout({
         "operatingSystem": "Web",
         "applicationCategory": "FinanceApplication",
         "creator": {
-          "@id": "https://humanidfi.com/#organization"
+          "@id": "https://www.humanidfi.com/#organization"
         },
         "description": "Whale Alert Network terminal for real-time elite on-chain intelligence.",
-        "url": "https://humanidfi.com/network",
+        "url": "https://www.humanidfi.com/network",
         "featureList": [
           "Sovereign PC Vault (Local Daemon Zero-Trust)",
           "Next.js Hybrid Safari iOS Webview + QR State Sync",
@@ -196,23 +196,22 @@ export default async function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
             {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
             <WavePatternOverlay />
-            <CookieProvider>
-               <ErrorSuppressor />
-               <GoogleTagManager gtmId="GTM-52B9SCRM" />
-                <Providers cookies={cookies}>
-                  <GlobalErrorBoundary>
-                    <MobileEnforcer>
-                      <ClientLayout>
-                        {children}
-                      </ClientLayout>
-                    </MobileEnforcer>
-                  </GlobalErrorBoundary>
-                  <Toaster richColors position="top-right" />
-                  <CookieConsent />
-                  <ClientOverlays />
-                  <ErrorSuppressor />
-                </Providers>
-            </CookieProvider>
+            <Providers cookies={cookies}>
+              <GlobalErrorBoundary>
+                <MobileEnforcer>
+                  <ClientLayout>
+                    <CookieProvider>
+                      <ErrorSuppressor />
+                      <GoogleTagManager gtmId="GTM-52B9SCRM" />
+                      {children}
+                      <Toaster richColors position="top-right" />
+                      <CookieConsent />
+                      <ClientOverlays />
+                    </CookieProvider>
+                  </ClientLayout>
+                </MobileEnforcer>
+              </GlobalErrorBoundary>
+            </Providers>
           </ThemeProvider>
         </body>
       </html>
