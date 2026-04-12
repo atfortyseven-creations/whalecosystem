@@ -350,6 +350,7 @@ export class IntelligenceService {
         } catch (e) {
             console.error('[Yield Discovery] Fail-safe triggered:', e);
             return [];
+        }
     }
 
     /**
