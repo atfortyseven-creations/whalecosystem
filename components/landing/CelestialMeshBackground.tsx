@@ -42,8 +42,8 @@ function CelestialMeshStatic() {
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.06)_0%,transparent_70%)] blur-[100px]"
       />
-      {/* Vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,white_100%)] opacity-80" />
+      {/* Vignette: Safely reduced from 80% to 40% */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,white_100%)] opacity-40" />
     </div>
   );
 }
@@ -104,8 +104,8 @@ function CelestialMeshDesktop() {
       {/* Layer 4: Geometric Shards */}
       <GeometricShards smoothProgress={smoothProgress} />
 
-      {/* Vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,white_100%)] opacity-80" />
+      {/* Vignette: Safely reduced from 80% to 40% */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,white_100%)] opacity-40" />
     </div>
   );
 }

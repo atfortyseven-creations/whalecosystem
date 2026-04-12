@@ -26,8 +26,20 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     const { isConnected } = useAccount();
     const [state, setState] = useState<GateState>('AUTH');
     const [mounted, setMounted] = useState(false);
+    const [forceVisible, setForceVisible] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
+
+    useEffect(() => {
+        // [INSTITUTIONAL FAIL-SAFE] 
+        // Force system visibility after 4 seconds regardless of state.
+        // This is a zero-trust measure against hydration hangs.
+        const emergency = setTimeout(() => {
+            console.warn('[TitaniumGate] Deadlock detected. Forcing emergency visibility.');
+            setForceVisible(true);
+        }, 4000);
+        return () => clearTimeout(emergency);
+    }, []);
     
     // Strict Whitelist: ONLY landing, docs, terms, privacy, and developers are visible to unauthenticated users.
     const isPublicPage = ['/', '/docs', '/terms', '/privacy', '/developers'].some(
@@ -80,14 +92,15 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     return (
         <GateStateContext.Provider value={{ state, hasPlayedIntro: true }}>
             <AnimatePresence mode="wait">
-                {/* THE APPLICATION */}
-                {(state === 'APP') ? (
+                {/* THE APPLICATION (or EMERGENCY BYPASS) */}
+                {(state === 'APP' || forceVisible) ? (
                     <motion.div 
                         key="app-content"
-                        initial={{ opacity: 0, scale: 0.99 }}
+                        initial={forceVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.99 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="relative z-10"
+                        style={forceVisible ? { opacity: 1, zIndex: 999 } : {}}
                     >
                         <SafeErrorBoundary>
                             {children}

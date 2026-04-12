@@ -552,14 +552,11 @@ export function WhaleAlertLanding() {
         {/* HIGH-FIDELITY 240HZ CELESTIAL BACKGROUND */}
         <CelestialMeshBackground />
         
-        {/* Subtle overlay to guarantee text readability in light and dark mode WITHOUT blurring the pattern */}
-        <div className="fixed inset-0 pointer-events-none -z-10 bg-white/40 dark:bg-black/40 transition-colors duration-300" />
-        
-        {/* Wrap content in a relative z-10 index to stay above the backdrop overlay */}
-        <div className="relative z-10 w-full">
+        {/* Wrap content in a relative z-20 index to stay above the backdrop overlay */}
+        <div className="relative z-20 w-full">
       {/* ── NAV ─────────────────────────────────────────────────────────────── */}
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-8 py-4 transition-all duration-300"
         animate={{ 
           background: scrolled ? "rgba(250,249,246,0.92)" : "transparent",
           backdropFilter: scrolled ? "blur(16px)" : "none",
@@ -603,10 +600,10 @@ export function WhaleAlertLanding() {
           <WhalePostIframePanel />
         </div>
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-10 md:p-20 shadow-2xl border border-black/5 dark:border-white/5">
-          <AnimatePresence mode="wait">
+        <div className="relative z-30 w-full max-w-5xl mx-auto flex flex-col items-center text-center bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-10 md:p-20 shadow-2xl border border-black/5 dark:border-white/5">
+          <AnimatePresence mode="popLayout">
             {!showClearance ? (
-              <motion.div key="core" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              <motion.div key="core" initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col items-center">
 
                 {/* Logo */}
