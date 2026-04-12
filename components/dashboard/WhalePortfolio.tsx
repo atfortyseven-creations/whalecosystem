@@ -55,11 +55,11 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function WhalePortfolio() {
-    const [view, setView] = useState<'leaderboard' | 'portfolio'>('leaderboard');
-    const [search, setSearch] = useState('');
-    const [lastUpdated, setLastUpdated] = useState(new Date());
-    const [liveWhaleCount, setLiveWhaleCount] = useState(0); // EP2 live counter
-    const [mounted, setMounted] = useState(false);
+    const [view, setView] = React.useState<'leaderboard' | 'portfolio'>('leaderboard');
+    const [search, setSearch] = React.useState('');
+    const [lastUpdated, setLastUpdated] = React.useState(new Date());
+    const [liveWhaleCount, setLiveWhaleCount] = React.useState(0);
+    const [mounted, setMounted] = React.useState(false);
 
     // Real wallet address from wagmi
     const { address, isConnected } = useAccount();

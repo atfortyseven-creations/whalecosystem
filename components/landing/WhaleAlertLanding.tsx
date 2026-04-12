@@ -13,6 +13,7 @@ import useSWR from "swr";
 import Image from "next/image";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { useUIStore } from "@/lib/store/ui-store";
+import { UltraFluidSection, UltraFluidLayer } from "./UltraFluidEngine";
 gsap.registerPlugin(ScrollTrigger);
 
 const DynamicCryptoCheckoutModal = dynamic(
@@ -600,67 +601,76 @@ export function WhaleAlertLanding() {
           <WhalePostIframePanel />
         </div>
 
-        <div className="relative z-30 w-full max-w-5xl mx-auto flex flex-col items-center text-center bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-10 md:p-20 shadow-2xl border border-black/5 dark:border-white/5">
-          <AnimatePresence mode="popLayout">
-            {!showClearance ? (
-              <motion.div key="core" initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col items-center">
+        <div className="relative z-30 w-full max-w-5xl mx-auto">
+          <UltraFluidSection
+            className="flex flex-col items-center text-center bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-10 md:p-20 shadow-2xl border border-black/5 dark:border-white/5"
+            yRange={["0px", "-40px"]}
+          >
+            {({ y, opacity, scale }) => (
+              <UltraFluidLayer style={{ y, opacity, scale }} className="w-full">
+                <AnimatePresence mode="popLayout">
+                  {!showClearance ? (
+                    <motion.div key="core" initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      className="flex flex-col items-center">
 
-                {/* Logo */}
-                <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="mb-10"
-                >
-                  <img src="/official-whale-monochrome.png" className="w-56 h-56 md:w-80 md:h-80 dark:invert drop-shadow-2xl" alt="Whale Alert Network" />
-                </motion.div>
+                      {/* Logo */}
+                      <motion.div
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="mb-10"
+                      >
+                        <img src="/official-whale-monochrome.png" className="w-56 h-56 md:w-80 md:h-80 dark:invert drop-shadow-2xl" alt="Whale Alert Network" />
+                      </motion.div>
 
-                {/* Title */}
-                <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-black text-black dark:text-white leading-[0.92] tracking-tighter mb-8 max-w-3xl">
-                  Whale Alert<br />
-                  <span className="text-black/20 dark:text-white/20">Network</span>
-                </h1>
+                      {/* Title */}
+                      <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-black text-black dark:text-white leading-[0.92] tracking-tighter mb-8 max-w-3xl">
+                        Whale Alert<br />
+                        <span className="text-black/20 dark:text-white/20">Network</span>
+                      </h1>
 
-                {/* Description */}
-                <p className="text-base md:text-lg text-black/50 dark:text-white/50 max-w-2xl leading-relaxed mb-12 font-light">
-                  A real-time intelligence platform for tracking large-scale blockchain movements,
-                  dark pool activity, and institutional capital flows — across every major chain, simultaneously.
-                </p>
+                      {/* Description */}
+                      <p className="text-base md:text-lg text-black/50 dark:text-white/50 max-w-2xl leading-relaxed mb-12 font-light">
+                        A real-time intelligence platform for tracking large-scale blockchain movements,
+                        dark pool activity, and institutional capital flows — across every major chain, simultaneously.
+                      </p>
 
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-16">
-                  <button onClick={handleEntry}
-                    className="px-10 py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.25em] text-[11px] hover:scale-105 active:scale-95 transition-transform shadow-xl shadow-black/10 flex items-center gap-3">
-                    <ArrowRight size={14} />
-                    Enter Terminal
-                  </button>
-                  <button onClick={() => setShowClearance(true)}
-                    className="px-10 py-4 border border-black/15 dark:border-white/15 text-black dark:text-white font-black uppercase tracking-[0.25em] text-[11px] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                    Get Access Pass
-                  </button>
-                </div>
+                      {/* CTAs */}
+                      <div className="flex flex-col sm:flex-row gap-4 mb-16">
+                        <button onClick={handleEntry}
+                          className="px-10 py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.25em] text-[11px] hover:scale-105 active:scale-95 transition-transform shadow-xl shadow-black/10 flex items-center gap-3">
+                          <ArrowRight size={14} />
+                          Enter Terminal
+                        </button>
+                        <button onClick={() => setShowClearance(true)}
+                          className="px-10 py-4 border border-black/15 dark:border-white/15 text-black dark:text-white font-black uppercase tracking-[0.25em] text-[11px] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                          Get Access Pass
+                        </button>
+                      </div>
 
-                <div className="flex items-center gap-8 md:gap-16 opacity-50">
-                  {[["7", "Terminal Phases"], ["200", "Access Protocols"], ["Optimism L2", "Settlement"], ["Privacy Network", "Zero-Knowledge"]].map(([val, label]) => (
-                    <div key={label} className="text-center">
-                      <p className="font-mono text-lg md:text-2xl font-black text-black dark:text-white leading-none">{val}</p>
-                      <p className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/40 dark:text-white/40 mt-1">{label}</p>
-                    </div>
-                  ))}
-                </div>
+                      <div className="flex items-center gap-8 md:gap-16 opacity-50">
+                        {[["7", "Terminal Phases"], ["200", "Access Protocols"], ["Optimism L2", "Settlement"], ["Privacy Network", "Zero-Knowledge"]].map(([val, label]) => (
+                          <div key={label} className="text-center">
+                            <p className="font-mono text-lg md:text-2xl font-black text-black dark:text-white leading-none">{val}</p>
+                            <p className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/40 dark:text-white/40 mt-1">{label}</p>
+                          </div>
+                        ))}
+                      </div>
 
-                {/* Scroll hint */}
-                <motion.div animate={{ y: [0, 5, 0] }} transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-20">
-                  <ChevronDown size={18} />
-                </motion.div>
-              </motion.div>
-            ) : (
-              <motion.div key="clearance" initial={{ opacity: 0, filter: "blur(10px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} className="w-full max-w-2xl">
-                <ClearanceHeroView onBack={() => setShowClearance(false)} />
-              </motion.div>
+                      {/* Scroll hint */}
+                      <motion.div animate={{ y: [0, 5, 0] }} transition={{ duration: 2, repeat: Infinity }}
+                        className="mt-12 flex flex-col items-center gap-1 opacity-20">
+                        <ChevronDown size={18} />
+                      </motion.div>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="clearance" initial={{ opacity: 0, filter: "blur(10px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} className="w-full">
+                      <ClearanceHeroView onBack={() => setShowClearance(false)} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </UltraFluidLayer>
             )}
-          </AnimatePresence>
+          </UltraFluidSection>
         </div>
       </section>
 
@@ -692,79 +702,84 @@ export function WhaleAlertLanding() {
       </section>
 
       {/* ── 7 PHASES ────────────────────────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02]">
-        <div className="max-w-6xl mx-auto">
-          <Reveal>
-            <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-3xl mx-auto text-center">
+      <UltraFluidSection 
+        className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05] bg-black/[0.02] dark:bg-white/[0.02]"
+        yRange={["20px", "-20px"]}
+      >
+        {({ y, opacity }) => (
+          <UltraFluidLayer style={{ y, opacity }} className="max-w-6xl mx-auto">
+            <Reveal>
+              <div className="bg-white/95 dark:bg-[#0A0A0A]/95 p-8 md:p-10 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 backdrop-blur-sm mb-12 max-w-3xl mx-auto text-center">
 
-              <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
-                Seven operational phases.
-              </h2>
-              <p className="text-[13px] text-black/60 dark:text-white/60 mx-auto max-w-xl leading-relaxed font-medium">
-                The terminal is structured into distinct, independent modules. Each phase targets a specific layer of market intelligence.
-              </p>
-            </div>
-          </Reveal>
+                <h2 className="font-sans text-3xl md:text-4xl font-black text-black dark:text-white tracking-tighter mb-4">
+                  Seven operational phases.
+                </h2>
+                <p className="text-[13px] text-black/60 dark:text-white/60 mx-auto max-w-xl leading-relaxed font-medium">
+                  The terminal is structured into distinct, independent modules. Each phase targets a specific layer of market intelligence.
+                </p>
+              </div>
+            </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.06] dark:bg-white/[0.06] shadow-2xl rounded-[2rem] overflow-hidden border border-black/5 dark:border-white/5">
-            <div className="bg-[#FAF9F6] dark:bg-[#080808]">
-              <PhaseCard number="I" icon={<Activity size={18} />} title="Core Intelligence Dashboard"
-                desc="Real-time whale transactions, dark pool activity, and liquidity events across all major chains. Everything updates via WebSocket — no page refresh needed."
-                delay={0} />
-            </div>
-            <div className="bg-[#FAF9F6] dark:bg-[#080808]">
-              <PhaseCard number="II" icon={<Globe size={18} />} title="Global Market Exchange"
-                desc="Live tracking of Polymarket prediction markets and synthetic instruments. See exactly where institutional capital is positioning before the crowd."
-                delay={0.05} />
-            </div>
-            <div className="bg-[#FAF9F6] dark:bg-[#080808]">
-              <PhaseCard number="III" icon={<Eye size={18} />} title="Institutional Watchlist"
-                desc="Track any wallet address or token. Server-verified state ensures your watchlist is always in sync — across devices and sessions."
-                delay={0.1} />
-            </div>
-            <div className="bg-[#FAF9F6] dark:bg-[#080808]">
-              <PhaseCard number="IV" icon={<Zap size={18} />} title="Pro Matrix Analytics"
-                desc="Sub-second volume deltas, order book depth, and historical variance analysis. Designed for operators who need the full data picture."
-                delay={0.15} />
-            </div>
-            <div className="bg-[#FAF9F6] dark:bg-[#080808]">
-              <PhaseCard number="V" icon={<Terminal size={18} />} title="Advanced Alert System"
-                desc="Define custom triggers — price thresholds, volume spikes, whale wallet movements. Receive instant callbacks the moment conditions are met."
-                delay={0.2} />
-            </div>
-            <div className="bg-[#FAF9F6] dark:bg-[#080808]">
-              <PhaseCard number="VI" icon={<Database size={18} />} title="Multichart Overlay"
-                desc="Multiple TradingView charts running simultaneously. Monitor macro liquidity across Bitcoin, Ethereum, Solana, and L2 networks in parallel."
-                delay={0.25} />
-            </div>
-          </div>
-
-          {/* Phase VII — special */}
-          <Reveal delay={0.3} className="mt-px">
-            <div className="relative border border-black/10 dark:border-white/10 p-10 md:p-16 bg-black dark:bg-white overflow-hidden">
-              <div className="absolute top-6 right-8 font-mono text-[10px] font-black uppercase tracking-[0.3em] text-white/10 dark:text-black/10">Phase VII</div>
-              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-10">
-                <div className="shrink-0">
-                  <img src="/official-whale-monochrome.png" className="w-16 h-16 invert dark:invert-0 opacity-80" alt="Genesis" />
-                </div>
-                <div className="flex-1">
-
-                  <h3 className="font-sans text-2xl md:text-3xl font-black text-white dark:text-black tracking-tighter mb-4">Sovereign Genesis Node</h3>
-                  <p className="text-[13px] text-white/50 dark:text-black/50 leading-relaxed max-w-2xl">
-                    Mint your Gold Ticket — a limited ERC-1155 on Optimism L2. Upon minting, the protocol captures your signature on a cryptographic canvas, records your geolocation, timestamp, and wallet address, then broadcasts the record to the Global Genesis Ledger in real time. 200 tickets total. No exceptions.
-                  </p>
-                </div>
-                <div className="shrink-0">
-                  <button onClick={() => router.push('/ticket')}
-                    className="px-8 py-4 bg-white dark:bg-black text-black dark:text-white font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-opacity whitespace-nowrap">
-                    Claim Ticket
-                  </button>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/[0.06] dark:bg-white/[0.06] shadow-2xl rounded-[2rem] overflow-hidden border border-black/5 dark:border-white/5">
+              <div className="bg-[#FAF9F6] dark:bg-[#080808]">
+                <PhaseCard number="I" icon={<Activity size={18} />} title="Core Intelligence Dashboard"
+                  desc="Real-time whale transactions, dark pool activity, and liquidity events across all major chains. Everything updates via WebSocket — no page refresh needed."
+                  delay={0} />
+              </div>
+              <div className="bg-[#FAF9F6] dark:bg-[#080808]">
+                <PhaseCard number="II" icon={<Globe size={18} />} title="Global Market Exchange"
+                  desc="Live tracking of Polymarket prediction markets and synthetic instruments. See exactly where institutional capital is positioning before the crowd."
+                  delay={0.05} />
+              </div>
+              <div className="bg-[#FAF9F6] dark:bg-[#080808]">
+                <PhaseCard number="III" icon={<Eye size={18} />} title="Institutional Watchlist"
+                  desc="Track any wallet address or token. Server-verified state ensures your watchlist is always in sync — across devices and sessions."
+                  delay={0.1} />
+              </div>
+              <div className="bg-[#FAF9F6] dark:bg-[#080808]">
+                <PhaseCard number="IV" icon={<Zap size={18} />} title="Pro Matrix Analytics"
+                  desc="Sub-second volume deltas, order book depth, and historical variance analysis. Designed for operators who need the full data picture."
+                  delay={0.15} />
+              </div>
+              <div className="bg-[#FAF9F6] dark:bg-[#080808]">
+                <PhaseCard number="V" icon={<Terminal size={18} />} title="Advanced Alert System"
+                  desc="Define custom triggers — price thresholds, volume spikes, whale wallet movements. Receive instant callbacks the moment conditions are met."
+                  delay={0.2} />
+              </div>
+              <div className="bg-[#FAF9F6] dark:bg-[#080808]">
+                <PhaseCard number="VI" icon={<Database size={18} />} title="Multichart Overlay"
+                  desc="Multiple TradingView charts running simultaneously. Monitor macro liquidity across Bitcoin, Ethereum, Solana, and L2 networks in parallel."
+                  delay={0.25} />
               </div>
             </div>
-          </Reveal>
-        </div>
-      </section>
+
+            {/* Phase VII — special */}
+            <Reveal delay={0.3} className="mt-px">
+              <div className="relative border border-black/10 dark:border-white/10 p-10 md:p-16 bg-black dark:bg-white overflow-hidden">
+                <div className="absolute top-6 right-8 font-mono text-[10px] font-black uppercase tracking-[0.3em] text-white/10 dark:text-black/10">Phase VII</div>
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-10">
+                  <div className="shrink-0">
+                    <img src="/official-whale-monochrome.png" className="w-16 h-16 invert dark:invert-0 opacity-80" alt="Genesis" />
+                  </div>
+                  <div className="flex-1">
+
+                    <h3 className="font-sans text-2xl md:text-3xl font-black text-white dark:text-black tracking-tighter mb-4">Sovereign Genesis Node</h3>
+                    <p className="text-[13px] text-white/50 dark:text-black/50 leading-relaxed max-w-2xl">
+                      Mint your Gold Ticket — a limited ERC-1155 on Optimism L2. Upon minting, the protocol captures your signature on a cryptographic canvas, records your geolocation, timestamp, and wallet address, then broadcasts the record to the Global Genesis Ledger in real time. 200 tickets total. No exceptions.
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <button onClick={() => router.push('/ticket')}
+                      className="px-8 py-4 bg-white dark:bg-black text-black dark:text-white font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-opacity whitespace-nowrap">
+                      Claim Ticket
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </UltraFluidLayer>
+        )}
+      </UltraFluidSection>
 
       {/* ── INFRASTRUCTURE PILLARS ────────────────────────────────────────────── */}
       <section className="py-24 px-6 border-t border-black/[0.05] dark:border-white/[0.05]">

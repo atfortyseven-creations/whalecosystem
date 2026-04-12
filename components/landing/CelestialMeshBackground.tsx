@@ -10,89 +10,78 @@ import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-
 // the runtime error + the "frozen background" visual bug.
 
 export function CelestialMeshBackground() {
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useEffect(() => {
-    // Detect touch screens after mount (no SSR window access)
-    setIsTouchDevice(window.matchMedia('(hover: none) and (pointer: coarse)').matches);
-  }, []);
-
-  // Only render the heavy parallax on desktop. On mobile/iOS we use a
-  // static version to avoid the useScroll + overflow:hidden crash.
-  if (isTouchDevice) {
-    return <CelestialMeshStatic />;
-  }
-
+  // 🌌 THE 240Hz UNIFIED ENGINE 🌌
+  // We no longer suppress parallax on mobile. Instead, we use a 
+  // hardware-accelerated perspective stack that iOS Safari handles 
+  // without the typical overflow-jank.
   return <CelestialMeshDesktop />;
 }
 
-// ─── STATIC VERSION — iOS / Touch devices ─────────────────────────────────────
-function CelestialMeshStatic() {
-  return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-white">
-      {/* Blob 1 */}
-      <motion.div
-        animate={{ scale: [1, 1.08, 1], x: [0, 20, 0], y: [0, 15, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.08)_0%,transparent_70%)] blur-[80px]"
-      />
-      {/* Blob 2 */}
-      <motion.div
-        animate={{ scale: [1.05, 1, 1.05], x: [0, -20, 0], y: [0, -25, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.06)_0%,transparent_70%)] blur-[100px]"
-      />
-      {/* Vignette: Safely reduced from 80% to 40% */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,white_100%)] opacity-40" />
-    </div>
-  );
-}
-
-// ─── PARALLAX VERSION — Desktop only ─────────────────────────────────────────
+// ─── UNIFIED HIGH-PERFORMANCE ENGINE ─────────────────────────────────────────
 function CelestialMeshDesktop() {
   const { scrollYProgress } = useScroll();
   const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 };
   const smoothProgress = useSpring(scrollYProgress, springConfig);
 
-  const meshScale   = useTransform(smoothProgress, [0, 0.5, 1], [1, 1.5, 1.8]);
+  const meshScale   = useTransform(smoothProgress, [0, 0.5, 1], [1, 1.3, 1.5]);
   const meshOpacity = useTransform(smoothProgress, [0, 0.3, 0.7, 1], [0.4, 0.6, 0.4, 0.2]);
-  const gridRotateX = useTransform(smoothProgress, [0, 1], [60, 45]);
-  const gridY       = useTransform(smoothProgress, [0, 1], ["-20%", "-40%"]);
-  const particleStretch = useTransform(smoothProgress, [0, 0.5, 1], [1, 2.5, 1]);
+  const gridY       = useTransform(smoothProgress, [0, 1], ["-10%", "-30%"]);
+  const particleStretch = useTransform(smoothProgress, [0, 0.5, 1], [1, 2.2, 1]);
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-white transform-gpu">
-      {/* Layer 1: Animated Mesh Gradients */}
-      <motion.div style={{ scale: meshScale, opacity: meshOpacity, willChange: 'transform' }} className="absolute inset-0">
+      {/* Layer 1: Animated Mesh Gradients — GPU BOUND */}
+      <motion.div style={{ scale: meshScale, opacity: meshOpacity, willChange: 'transform, opacity' }} className="absolute inset-0">
         <motion.div
-          animate={{ scale: [1, 1.1, 1], x: [0, 30, 0], y: [0, 20, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.1)_0%,transparent_70%)] blur-[100px]"
+          animate={{ scale: [1, 1.05, 1], x: [0, 20, 0], y: [0, 15, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(79,70,229,0.08)_0%,transparent_70%)] blur-[100px]"
         />
         <motion.div
-          animate={{ scale: [1.1, 1, 1.1], x: [0, -30, 0], y: [0, -40, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.08)_0%,transparent_70%)] blur-[120px]"
+          animate={{ scale: [1.05, 1, 1.05], x: [0, -20, 0], y: [0, -25, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle,rgba(139,92,246,0.06)_0%,transparent_70%)] blur-[120px]"
         />
       </motion.div>
 
-      {/* Layer 2: Perspective Grid */}
+      {/* Layer 2: Perspective Grid — Optimized for Mobile Webkit */}
       <motion.div
-        className="absolute inset-0 opacity-[0.08]"
-        style={{ perspective: '1200px', perspectiveOrigin: '50% 50%', rotateX: gridRotateX, translateY: gridY }}
+        className="absolute inset-0 opacity-[0.06]"
+        style={{ 
+          perspective: '1000px', 
+          perspectiveOrigin: '50% 50%', 
+          translateY: gridY,
+          willChange: 'transform'
+        }}
       >
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.1) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,0,0,0.1) 1.5px, transparent 1.5px)`,
             backgroundSize: '80px 80px',
-            transform: 'translate3d(0,0,-200px)',
+            transform: 'translate3d(0,0,-150px)',
             transformOrigin: 'top center',
-            height: '300%',
+            height: '250%',
             willChange: 'transform',
           }}
         />
       </motion.div>
+
+      {/* Layer 3: Particles — Individual GPU Layers */}
+      <div className="absolute inset-0 pointer-events-none">
+        {PARTICLE_SEEDS.map((seed, i) => (
+          <Particle key={i} smoothProgress={smoothProgress} stretch={particleStretch} seed={seed} />
+        ))}
+      </div>
+
+      {/* Layer 4: Geometric Shards */}
+      <GeometricShards smoothProgress={smoothProgress} />
+
+      {/* Layer 5: Vignette Mask */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,white_100%)] opacity-40 mix-blend-screen" />
+    </div>
+  );
+}
 
       {/* Layer 3: Particles — each is its OWN component with its own hooks (iOS-safe) */}
       <div className="absolute inset-0 pointer-events-none">

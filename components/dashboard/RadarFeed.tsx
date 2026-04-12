@@ -1,3 +1,4 @@
+// components/dashboard/RadarFeed.tsx
 "use client";
 
 import React, { useEffect } from 'react';
@@ -5,6 +6,7 @@ import { useWhaleFeed } from '@/hooks/useWhaleFeed';
 import { useSniperStore } from '@/store/useSniperStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWhaleStream } from '@/context/WhaleStreamContext';
+import { Clock, Hash, Zap, Landmark, Activity } from 'lucide-react';
 
 export default function RadarFeed() {
   const { unifiedWhaleFeed } = useWhaleFeed();
@@ -12,31 +14,25 @@ export default function RadarFeed() {
   const alerts = useSniperStore((state) => state.alerts);
   const filters = useSniperStore((state) => state.filters);
 
-  // ─── Secondary Real-Time Source: SSE Stream ──────────────────────────────
-  // The SSE context delivers events pushed directly from the EVM/BTC/SOL workers
-  // via Redis queue → /api/whale-stream → EventSource.
-  // These events are piped into the same Zustand store for unified rendering.
   const { events: sseEvents, isConnected: sseConnected } = useWhaleStream();
 
-  // ─── Primary Source: Unified Whale Feed (WebSocket / Polling) ────────────
   useEffect(() => {
     if (!unifiedWhaleFeed.length) return;
     const latest = unifiedWhaleFeed[0];
     pushAlert({
       id: latest.id || latest.hash,
       txHash: latest.hash,
-      asset: latest.asset || 'UNKNOWN',
+      asset: latest.asset || 'N/A',
       amount: Number(latest.amount || 0),
       usdValue: Number(latest.usdValue || 0),
-      from: latest.from || 'UNKNOWN',
-      to: latest.to || 'UNKNOWN',
-      chain: latest.chain || 'UNKNOWN',
+      from: latest.from || 'N/A',
+      to: latest.to || 'N/A',
+      chain: latest.chain || 'BASE',
       action: (latest.action === 'COMPRA' || latest.action === 'BUY') ? 'BUY' : latest.action === 'SELL' ? 'SELL' : 'TRANSFER',
       timestamp: latest.timestamp,
     } as any);
   }, [unifiedWhaleFeed, pushAlert]);
 
-  // ─── Secondary Source: SSE Stream (WhaleStreamContext) ─────────────────
   useEffect(() => {
     if (!sseEvents.length) return;
     const latest = sseEvents[0];
@@ -55,76 +51,74 @@ export default function RadarFeed() {
   }, [sseEvents, pushAlert]);
 
   return (
-    <div className="flex flex-col absolute inset-0 bg-[#050505] p-2">
-      <div className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white/30 border-b border-white/5 mb-2 shrink-0 items-center">
-        <span className="flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-[#00C076] shadow-[0_0_6px_rgba(0,192,118,0.7)]' : 'bg-white/20'} animate-pulse`} />
-          TIME
+    <div className="flex flex-col h-full bg-black font-mono">
+      {/* ── HEADER ── */}
+      <div className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[8px] font-black uppercase tracking-[0.3em] text-white/30 border-b border-white/5 shrink-0 items-center">
+        <span className="flex items-center gap-2">
+          <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-white/10'} animate-pulse`} />
+          UTC_TIME
         </span>
-        <span>SIGNATURE // ROUTE</span>
-        <span className="text-right">VOLUME (USD)</span>
+        <span>SIGNATURE // PROTOCOL</span>
+        <span className="text-right">VOLUME_USD</span>
         <span className="text-right">ASSET</span>
         <span className="text-right">ACT</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1 pr-2">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         <AnimatePresence initial={false}>
           {alerts.map((alert) => (
             <motion.div
               key={alert.id}
-              initial={{ opacity: 0, x: -10, filter: 'brightness(1.5)' }}
-              animate={{ opacity: 1, x: 0, filter: 'brightness(1)' }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-[120px_1fr_120px_80px_60px] gap-4 px-4 py-2 border-b border-white/[0.02] bg-[#050505] hover:bg-[#080808] transition-all group relative cursor-crosshair"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-3 border-b border-white/[0.02] hover:bg-white/[0.03] transition-colors items-center group cursor-crosshair"
             >
-              <div className="absolute inset-0 border border-[#e0ff00]/0 group-hover:border-[#e0ff00]/30 transition-colors pointer-events-none z-10" />
-              
-              {/* TIME & CHAIN */}
-              <div className="flex flex-col justify-center">
-                <span className="text-[10px] text-white/60">
-                  {new Date(alert.timestamp).toISOString().split('T')[1].slice(0, -1)}
+              {/* TIME */}
+              <div className="flex flex-col">
+                <span className="text-[10px] text-white/60 font-bold tracking-tighter">
+                  {new Date(alert.timestamp).toLocaleTimeString([], { hour12: false })}
                 </span>
-                <span className="text-[8px] text-white/30 truncate">{alert.chain}</span>
+                <span className="text-[7px] text-white/20 uppercase tracking-widest">{alert.chain}</span>
               </div>
 
               {/* HASH / ROUTE */}
-              <div className="flex flex-col justify-center overflow-hidden">
-                 <span className="text-[10px] text-white/90 truncate font-mono">
+              <div className="flex flex-col overflow-hidden">
+                 <span className="text-[9px] text-white/90 truncate opacity-80 group-hover:opacity-100 transition-opacity">
                     {alert.txHash}
                  </span>
-                 <div className="flex items-center gap-2 text-[8px] text-white/40 font-mono mt-0.5">
-                    <span className="truncate w-20">{alert.from.slice(0,6)}...</span>
+                 <div className="flex items-center gap-2 text-[7px] text-white/20 mt-1 uppercase tracking-widest">
+                    <span>{alert.from.slice(0,6)}</span>
                     <span>→</span>
-                    <span className="truncate w-20">{alert.to.slice(0,6)}...</span>
+                    <span>{alert.to.slice(0,6)}</span>
                  </div>
               </div>
 
               {/* VOLUME USD */}
-              <div className="flex items-center justify-end z-20">
-                <span className={`text-[11px] font-black font-mono tracking-tighter ${
-                  alert.usdValue >= 10000000 ? 'text-[#e0ff00] drop-shadow-[0_0_8px_rgba(224,255,0,0.5)]' : 'text-white'
+              <div className="text-right">
+                <span className={`text-[10px] font-black tracking-tighter ${
+                  alert.usdValue >= 1000000 ? 'text-emerald-500' : 'text-white/80'
                 }`}>
-                  ${alert.usdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  ${(alert.usdValue / 1e3).toFixed(1)}K
                 </span>
               </div>
 
               {/* ASSET */}
-              <div className="flex items-center justify-end">
-                 <span className="text-[10px] uppercase font-bold text-white/70 px-2 py-0.5 bg-white/5 rounded-sm">
+              <div className="text-right">
+                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
                    {alert.asset}
                  </span>
               </div>
 
-              {/* ACTION (BUY/SELL) WITH FLASH */}
-              <div className="flex items-center justify-end z-20">
-                 <span className={`text-[9px] font-black px-2 py-1 w-full text-center tracking-widest uppercase ${
+              {/* ACTION */}
+              <div className="flex justify-end">
+                 <span className={`text-[8px] font-black px-2 py-0.5 border ${
                    alert.action === 'BUY' 
-                     ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' 
+                     ? 'border-emerald-500/20 text-emerald-500' 
                      : alert.action === 'SELL'
-                     ? 'text-rose-400 bg-rose-400/10 border border-rose-400/20'
-                     : 'text-cyan-400 bg-cyan-400/10 border border-cyan-400/20'
+                     ? 'border-rose-500/20 text-rose-500'
+                     : 'border-white/10 text-white/40'
                  }`}>
-                   {alert.action}
+                   {alert.action.slice(0, 4)}
                  </span>
               </div>
             </motion.div>
@@ -132,17 +126,9 @@ export default function RadarFeed() {
         </AnimatePresence>
 
         {alerts.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center opacity-30 gap-6">
-            <div className="relative">
-              <div className="w-12 h-12 border border-[#e0ff00]/20 rounded-none animate-[spin_3s_linear_infinite]" />
-              <div className="w-12 h-12 border border-[#e0ff00]/40 rounded-none absolute inset-0 animate-[spin_2s_linear_infinite_reverse]" />
-              <div className="w-2 h-2 bg-[#e0ff00] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full shadow-[0_0_15px_#e0ff00]" />
-            </div>
-            <span className="text-[10px] uppercase tracking-widest">
-              Awaiting Mempool Ignition...
-              <br/>
-              (Min Volume: ${filters.minVolumeUsd.toLocaleString()})
-            </span>
+          <div className="flex flex-col items-center justify-center py-20 opacity-20 gap-4">
+             <Activity size={24} className="animate-pulse" />
+             <span className="text-[9px] font-black uppercase tracking-[0.5em]">Awaiting_Network_Synapse...</span>
           </div>
         )}
       </div>

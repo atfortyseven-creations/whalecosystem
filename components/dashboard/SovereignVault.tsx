@@ -298,22 +298,21 @@ export function SovereignVault() {
         <div className="min-h-full w-full bg-[#000000] text-[#FFFFFF] font-mono p-4 md:p-8 flex flex-col gap-8 selection:bg-[#FF3B30] selection:text-white overflow-y-auto">
             <div className="flex flex-col items-start w-full max-w-5xl mx-auto pt-8 pb-8 gap-8">
 
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter flex items-center gap-4 border-b border-[#222] pb-6 w-full">
-                    <ShieldAlert className="text-[#FF3B30]" size={40} />
-                    SOVEREIGN <span className="text-[#888888]">VAULT</span>
+                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter flex items-center gap-4 border-b border-white/10 pb-6 w-full">
+                    <ShieldAlert className="text-rose-500" size={40} />
+                    VAULT <span className="text-white/20">PROTOCOL</span>
                 </h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 
                     {/* DEADMAN SWITCH */}
-                    <div className="border border-[#222222] bg-[#020202] flex flex-col p-6 relative overflow-hidden hover:border-[#FF3B30]/50 transition-colors">
-                        <div className="absolute top-0 right-0 p-4 opacity-10"><Fingerprint size={120} /></div>
+                    <div className="border border-white/5 bg-white/[0.02] flex flex-col p-6 relative overflow-hidden transition-all">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
-                            <Activity size={24} className={vaultData?.deadman ? "text-[#00FF55]" : "text-[#FF3B30]"} />
+                            <Activity size={24} className={vaultData?.deadman ? "text-emerald-500" : "text-rose-500"} />
                             <h2 className="text-xl font-black uppercase tracking-widest">Deadman Switch</h2>
                         </div>
-                        <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
-                            Cryptographic failsafe. If you miss a 90-day heartbeat, encrypted payload ownership transfers to beneficiary.
+                        <p className="text-[10px] text-white/40 uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
+                            Cryptographic failsafe mechanism. Proprietary ownership transfers to beneficiary upon inactivity threshold detection.
                         </p>
                         <div className="flex-1" />
                         {vaultData?.deadman ? (
@@ -325,7 +324,7 @@ export function SovereignVault() {
                                 <button
                                     onClick={handlePing}
                                     disabled={isPinging}
-                                    className="w-full bg-[#050505] border border-[#333333] hover:border-[#00FF55] hover:text-[#00FF55] text-white py-3 text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                    className="w-full bg-[#050505] border border-white/10 hover:border-emerald-500/50 hover:text-emerald-500 text-white py-3 text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                 >
                                     {isPinging ? 'TRANSMITTING...' : 'EMIT HEARTBEAT PING'}
                                 </button>
@@ -334,30 +333,29 @@ export function SovereignVault() {
                             <button
                                 onClick={handleDeployDeadman}
                                 disabled={!isConnected}
-                                className="w-full bg-[#FF3B30]/10 border border-[#FF3B30] text-[#FF3B30] py-3 text-[11px] font-black uppercase tracking-widest hover:bg-[#FF3B30]/20 transition-all relative z-10 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="w-full bg-rose-500/10 border border-rose-500/40 text-rose-500 py-3 text-[11px] font-black uppercase tracking-widest hover:bg-rose-500/20 transition-all relative z-10 disabled:opacity-40"
                             >
-                                {isConnected ? 'DEPLOY DEADMAN SWITCH' : 'CONNECT WALLET FIRST'}
+                                {isConnected ? 'DEPLOY DEADMAN FAILSAFE' : 'CONNECT WALLET'}
                             </button>
                         )}
                     </div>
 
                     {/* TIMELOCK VAULT */}
-                    <div className="border border-[#222222] bg-[#020202] flex flex-col p-6 relative overflow-hidden hover:border-[#0052FF]/50 transition-colors">
-                        <div className="absolute top-0 right-0 p-4 opacity-10"><Clock size={120} /></div>
+                    <div className="border border-white/5 bg-white/[0.02] flex flex-col p-6 relative overflow-hidden transition-all">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
-                            <Lock size={24} className="text-[#0052FF]" />
+                            <Lock size={24} className="text-blue-500" />
                             <h2 className="text-xl font-black uppercase tracking-widest">TimeLock Vault</h2>
                         </div>
-                        <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
-                            Lock tokens on-chain for a mandatory horizon. Immune against panic selling during volatile cycles.
+                        <p className="text-[10px] text-white/40 uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
+                            Deterministic asset locking protocol. Secures capital against volatility via mandatory on-chain temporal constraints.
                         </p>
                         <div className="flex-1" />
                         <button
                             onClick={handleLock}
                             disabled={isLocking || !isConnected}
-                            className="w-full bg-[#0052FF] text-white py-3 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed relative z-10"
+                            className="w-full bg-blue-600 text-white py-3 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all disabled:opacity-40 relative z-10"
                         >
-                            {isLocking ? 'SIGNING...' : isConnected ? 'DEPLOY TIMELOCK (0.001 ETH → 24H)' : 'CONNECT WALLET FIRST'}
+                            {isLocking ? 'SIGNING...' : isConnected ? 'DEPLOY TIMELOCK (0.001 ETH)' : 'CONNECT WALLET'}
                         </button>
                     </div>
 

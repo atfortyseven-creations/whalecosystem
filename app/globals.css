@@ -14,12 +14,21 @@ html {
 }
 
 body {
-  min-height: 100vh;
-  /* Removed -webkit-fill-available */
+  min-height: 100dvh;
+  /* GPU acceleration for the entire document viewport */
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  
   -webkit-text-size-adjust: 100%;     /* Prevent iOS auto text-size increase */
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent; /* Remove tap flash on iOS */
-  touch-action: manipulation;          /* Disable double-tap zoom globally */
+  touch-action: pan-x pan-y;          /* Optimal for Lenis / Pan movements */
+  
+  /* Safe Area / Notch Support */
+  padding-left:   env(safe-area-inset-left, 0px);
+  padding-right:  env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* iOS Safari: Prevent 16px font auto-zoom on input focus */
@@ -52,8 +61,9 @@ textarea {
   /* GPU Layer Acceleration for standard cards */
   .premium-card-gpu {
     backface-visibility: hidden;
-    transform: translateZ(0);
-    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    will-change: transform, opacity;
   }
 
   :root {
@@ -361,11 +371,14 @@ textarea {
 /* Full GPU compositor layer — for heavy animated cards/overlays */
 .transform-gpu {
   transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   perspective: 1000px;
   -webkit-perspective: 1000px;
   will-change: transform, opacity;
+  /* Subpixel rendering fix for translated elements */
+  -webkit-font-smoothing: antialiased;
 }
 
 .z-stratosphere {

@@ -17,9 +17,9 @@ interface LogEntry {
     type: 'info' | 'success' | 'warning' | 'error';
 }
 
-export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [logs, setLogs] = useState<LogEntry[]>([]);
+export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    const [logs, setLogs] = React.useState<LogEntry[]>([]);
     const endOfLogsRef = useRef<HTMLDivElement>(null);
 
     // Reemplazar simulación con streams WebSockets reales del motor de Node.js
@@ -99,53 +99,59 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
     }, [logs, isExpanded]);
 
     return (
-        <motion.div 
-            initial={{ y: 200, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className={`absolute bottom-4 left-4 right-[360px] bg-[#0c0c0c]/80 backdrop-blur-2xl border border-white/10 rounded-2xl flex flex-col overflow-hidden transition-all duration-300 shadow-[0_20px_40px_rgba(0,0,0,0.5)] z-40 ${isExpanded ? 'h-64' : 'h-12'}`}
+        <div 
+            className={`w-full bg-[#0c0c0c]/80 backdrop-blur-2xl border border-white/10 rounded-2xl flex flex-col overflow-hidden transition-all duration-300 shadow-[0_20px_40px_rgba(0,0,0,0.5)] z-40 ${isExpanded ? 'h-full min-h-[400px]' : 'h-12'}`}
         >
-            {/* Header / Truncated View */}
-            <div 
-                className="h-12 flex items-center justify-between px-4 cursor-pointer hover:bg-white/5"
-                onClick={() => setIsExpanded(!isExpanded)}
-            >
-                <div className="flex items-center gap-3 w-full truncate">
-                    <Terminal size={14} className="text-[var(--aztec-chartreuse)]" />
-                    <div className="text-xs font-mono text-white/50 truncate">
-                        {logs.length > 0 ? (
-                            <span className="flex gap-4">
-                                <span>[{logs[logs.length-1].timestamp}]</span>
-                                {logs[logs.length-1].message}
-                            </span>
-                        ) : (
-                            <span className="flex items-center gap-2"><Loader size={12} className="animate-spin" /> Awaiting Telemetry...</span>
-                        )}
+            <AnimatePresence>
+                {/* Header / Truncated View */}
+                <div 
+                    className="h-12 flex items-center justify-between px-4 cursor-pointer hover:bg-white/5"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                >
+                    <div className="flex items-center gap-3 w-full truncate">
+                        <Terminal size={14} className="text-[#e0ff00]" />
+                        <div className="text-xs font-mono text-white/50 truncate">
+                            {logs.length > 0 ? (
+                                <span className="flex gap-4">
+                                    <span>[{logs[logs.length-1].timestamp}]</span>
+                                    {logs[logs.length-1].message}
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-2"><Loader size={12} className="animate-spin" /> Awaiting Telemetry...</span>
+                            )}
+                        </div>
                     </div>
+                    <button className="p-1 hover:bg-white/10 rounded ml-2">
+                        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
+                            <ChevronsDown size={14} className="text-white/40" />
+                        </motion.div>
+                    </button>
                 </div>
-                <button className="p-1 hover:bg-white/10 rounded ml-2">
-                    <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
-                        <ChevronsDown size={14} className="text-white/40" />
-                    </motion.div>
-                </button>
-            </div>
 
-            {/* Expanded Console Logs */}
-            <div className="flex-1 overflow-y-auto p-4 border-t border-white/5 font-mono text-xs flex flex-col gap-2 terminal-scroll">
-                {logs.map(log => (
-                    <div key={log.id} className="flex gap-4 items-start">
-                        <span className="text-white/30 shrink-0">[{log.timestamp}]</span>
-                        <span className={
-                            log.type === 'success' ? 'text-white' : 
-                            log.type === 'error' ? 'text-red-400' : 
-                            log.type === 'warning' ? 'text-yellow-400/80' : 
-                            'text-white/70'
-                        }>
-                            {log.message}
-                        </span>
-                    </div>
-                ))}
-                <div ref={endOfLogsRef} />
-            </div>
+                {isExpanded && (
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex-1 overflow-y-auto p-4 border-t border-white/5 font-mono text-xs flex flex-col gap-2 terminal-scroll bg-black/50"
+                    >
+                        {logs.map(log => (
+                            <div key={log.id} className="flex gap-4 items-start">
+                                <span className="text-white/30 shrink-0">[{log.timestamp}]</span>
+                                <span className={
+                                    log.type === 'success' ? 'text-white' : 
+                                    log.type === 'error' ? 'text-red-400' : 
+                                    log.type === 'warning' ? 'text-yellow-400/80' : 
+                                    'text-white/70'
+                                }>
+                                    {log.message}
+                                </span>
+                            </div>
+                        ))}
+                        <div ref={endOfLogsRef} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
             
             <style dangerouslySetInnerHTML={{ __html: `
                 .terminal-scroll::-webkit-scrollbar {
@@ -159,7 +165,6 @@ export function TelemetryTerminal({ nodes }: TelemetryTerminalProps) {
                     border-radius: 4px;
                 }
             `}} />
-        </motion.div>
+        </div>
     );
-}
-
+});

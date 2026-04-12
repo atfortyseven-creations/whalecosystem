@@ -14,31 +14,46 @@ import ExecutionDock from './ExecutionDock';
 const GENESIS_CATEGORIES = [
   { id: 'consensus', label: 'Global Consensus', academic: 'Análisis del sentimiento macro estructural derivado de la agregación de datos on-chain globales.' },
   { id: 'terminal', label: 'Genesis Terminal', academic: 'Centro de orquestación de señales vitales y convergencia de métricas de red.' },
-  { id: 'utxos', label: 'Observed UTXOs', academic: 'Estudio detallado de las salidas de transacciones no gastadas para mapear la distribución de la riqueza.' },
-  { id: 'triggers', label: 'Network Triggers', academic: 'Monitoreo de umbrales críticos de gas y congestión que disparan alertas de volatilidad.' },
-  { id: 'mempool', label: 'Raw Mempool', academic: 'Inspección en tiempo real de transacciones pendientes para predecir la saturación del bloque.' },
-  { id: 'heuristic', label: 'Stream Heuristic', academic: 'Algoritmos de flujo que detectan patrones de comportamiento ballena antes de la confirmación.' },
-  { id: 'visuals', label: 'Visuals', academic: 'Representación geométrica de alta fidelidad para la comprensión de volúmenes transaccionales.' },
-  { id: 'contracts', label: 'Genesis Contracts', academic: 'Auditoría heurística de contratos inteligentes fundacionales y su estado de ejecución.' },
-  { id: 'entropy', label: 'Entropy Deltas', academic: 'Medición de la varianza térmica del mercado para detectar anomalías de precio.' },
-  { id: 'espionage', label: 'Crypto Espionage', academic: 'Agregación de inteligencia colectiva y filtrado de ruido para señales institucionales.' },
-  { id: 'entity', label: 'Entity Heuristics', academic: 'Clasificación determinista de billeteras mediante comportamiento histórico.' },
-  { id: 'cipher', label: 'Chronological Cipher', academic: 'Registro histórico encriptado de los hitos más significativos de la cadena de bloques.' },
-  { id: 'rpc', label: 'Direct RPC Terminal', academic: 'Consola de bajo nivel para comunicación cruda con los nodos de la red.' },
-  { id: 'cloak', label: 'ZK Cloak', academic: 'Módulo de privacidad avanzada basado en pruebas de conocimiento cero.' },
-  { id: 'graph', label: 'Protocol Association Graph', academic: 'Visualización de las interconexiones y dependencias entre protocolos DeFi.' },
-  { id: 'id', label: 'Cryptographic ID', academic: 'Gestión inmutable de la identidad digital del usuario soberano.' },
-  { id: 'aztec', label: 'Aztec Layer-2 Node', academic: 'Telemetría específica de redes de privacidad de segunda capa.' },
-  { id: 'capital', label: 'Sovereign Capital', academic: 'Sistema de gestión de activos y rendimientos con visor de custodia total.' },
-  { id: 'state', label: 'State Protocol', academic: 'Definición del estado actual de los protocolos críticos monitorizados.' },
-  { id: 'doctrine', label: 'Doctrine', academic: 'Los principios fundamentales y reglas operativas del Terminal Génesis.' },
-  { id: 'whitepaper', label: 'The Whitepaper', academic: 'Repositorio de fundamentos académicos y arquitectura técnica de la red.' },
-  { id: 'academy', label: 'Academy', academic: 'Motor educativo para la progresión en el dominio de las herramientas on-chain.' },
-  { id: 'primitives', label: 'Bitcoin Primitives', academic: 'Estudio de las capas base y fundamentos criptográficos de Bitcoin.' },
-  { id: 'assist', label: 'Operator Assist', academic: 'Módulo de asistencia táctica impulsado por IA para la toma de decisiones.' },
-  { id: 'vault', label: 'Cold Storage Vault', academic: 'Panel de monitoreo de activos en almacenamiento frío y firmas multisig.' },
-  { id: 'clearance', label: 'Genesis Clearance', academic: 'Gestión de niveles de acceso y seguridad perimetral del sistema.' }
+  { id: 'utxos', label: 'Observed UTXOs', academic: 'Mapeo determinista de la distribución BTC y reactivación de capital inactivo.' },
+  { id: 'triggers', label: 'Network Triggers', academic: 'Umbrales críticos de gas y parámetros de red que activan respuestas tácticas.' },
+  { id: 'mempool', label: 'Raw Mempool', academic: 'Inspección de baja latencia del área de espera transaccional para predicción de bloques.' },
+  { id: 'visuals', label: 'Heuristic Visuals', academic: 'Representación geométrica de alta fidelidad para la comprensión de volúmenes.' },
+  { id: 'contracts', label: 'Genesis Contracts', academic: 'Auditoría heurística de contratos inteligentes y flujos de ejecución.' },
+  { id: 'entropy', label: 'Entropy Deltas', academic: 'Medición de la varianza térmica del mercado para detección de anomalías.' },
+  { id: 'espionage', label: 'Crypto Espionage', academic: 'Agregación de inteligencia colectiva y filtrado de señales institucionales.' },
+  { id: 'entity', label: 'Entity Heuristics', academic: 'Clasificación de entidades mediante comportamiento histórico y heurística on-chain.' },
+  { id: 'cipher', label: 'Chronological Cipher', academic: 'Registro encriptado de hitos históricos de la cadena de bloques.' },
+  { id: 'rpc', label: 'Direct RPC Terminal', academic: 'Consola de comunicación cruda con la topología de nodos de red.' },
+  { id: 'zk_aztec', label: 'ZK Aztec Protocol', academic: 'Unificación de privacidad ZK-SNARKs y escalabilidad de segunda capa Aztec.' },
+  { id: 'graph', label: 'Association Graph', academic: 'Visualización de interconexiones y flujo de valor entre protocolos.' },
+  { id: 'id', label: 'Cryptographic ID', academic: 'Gestión inmutable de la identidad digital soberana.' },
+  { id: 'capital', label: 'Sovereign Capital', academic: 'Gestión de activos, rendimientos y visor de flujo de capital institucional.' },
+  { id: 'state', label: 'State Protocol', academic: 'Definición del estado operacional de protocolos críticos.' },
+  { id: 'doctrine', label: 'Doctrine', academic: 'Principios fundamentales y protocolos de actuación del Terminal Génesis.' },
+  { id: 'academy', label: 'Academy', academic: 'Motor educativo para el progreso en el dominio técnico on-chain.' },
+  { id: 'primitives', label: 'Bitcoin Primitives', academic: 'Estudio de capas base, BRC-20, Runes y fundamentos de Bitcoin.' },
+  { id: 'assist', label: 'Operator Assist', academic: 'Asistencia táctica impulsada por IA para soporte operacional.' },
+  { id: 'vault', label: 'Vault Protocol', academic: 'Panel de custodia en almacenamiento frío y firmas institucionales.' },
+  { id: 'clearance', label: 'Genesis Clearance', academic: 'Gestión de niveles de acceso y seguridad perimetral.' }
 ];
+
+// Component Mapping for Perfection 3.1
+import { TelemetryTerminal } from './TelemetryTerminal';
+import { AlertsPanel } from './AlertsPanel';
+import { SovereignVault } from './SovereignVault';
+import { WhalePortfolio } from './WhalePortfolio';
+import { ZKShieldStation } from './ZKShieldStation';
+import { SovereignIntelTab } from './SovereignIntelTab';
+import { ApiTerminal } from './ApiTerminal';
+import { EntityGraphVis } from './EntityGraphVis';
+import { WhaleAcademy } from './WhaleAcademy';
+import { WhaleSupport } from './WhaleSupport';
+import { CanvasEngine } from './CanvasEngine';
+import GlobalConsensus from './GlobalConsensus';
+import GenesisContracts from './GenesisContracts';
+import CryptographicID from './CryptographicID';
+import BitcoinPrimitives from './BitcoinPrimitives';
+import InstitutionalLedger from './InstitutionalLedger';
 
 export default function WhaleSniperTerminal() {
   const [activeTab, setActiveTab] = useState('terminal');
@@ -135,7 +150,7 @@ export default function WhaleSniperTerminal() {
                 transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
                 className="h-full"
               >
-                {activeTab === 'consensus' && <div className="text-white/20 text-xs">Consensus analysis engine offline in early access.</div>}
+                {activeTab === 'consensus' && <GlobalConsensus />}
                 {activeTab === 'terminal' && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
                     <div className="border border-white/5 bg-white/[0.02] p-6">
@@ -155,12 +170,31 @@ export default function WhaleSniperTerminal() {
                   </div>
                 )}
                 {activeTab === 'utxos' && <InstitutionalLedger />}
-                {/* Fallback for other 23 tabs in development */}
-                {!['terminal', 'utxos'].includes(activeTab) && (
+                {activeTab === 'triggers' && (
+                  <div className="h-full border border-white/5 bg-white/[0.02] p-6 overflow-hidden">
+                    <AlertsPanel />
+                  </div>
+                )}
+                {activeTab === 'mempool' && <TelemetryTerminal nodes={[]} />}
+                {activeTab === 'visuals' && <CanvasEngine />}
+                {activeTab === 'contracts' && <GenesisContracts />}
+                {activeTab === 'espionage' && <SovereignIntelTab />}
+                {activeTab === 'rpc' && <ApiTerminal />}
+                {activeTab === 'zk_aztec' && <ZKShieldStation />}
+                {activeTab === 'graph' && <EntityGraphVis />}
+                {activeTab === 'id' && <CryptographicID />}
+                {activeTab === 'capital' && <WhalePortfolio />}
+                {activeTab === 'academy' && <WhaleAcademy />}
+                {activeTab === 'primitives' && <BitcoinPrimitives />}
+                {activeTab === 'assist' && <WhaleSupport />}
+                {activeTab === 'vault' && <SovereignVault />}
+                
+                {/* Fallback for components in heavy development */}
+                {!['terminal', 'utxos', 'triggers', 'mempool', 'visuals', 'espionage', 'rpc', 'zk_aztec', 'graph', 'capital', 'academy', 'assist', 'vault', 'consensus', 'contracts', 'id', 'primitives'].includes(activeTab) && (
                    <div className="flex flex-col items-center justify-center h-full opacity-20 filter grayscale">
                       <Skull size={48} className="mb-4" />
-                      <div className="text-[10px] font-black tracking-widest uppercase">Vault_Access_Pending</div>
-                      <div className="text-[8px] mt-1 text-white/40">GENESIS_CLEARANCE_REQUIRED</div>
+                      <div className="text-[10px] font-black tracking-widest uppercase text-white/40">Protocol_Layer_Handshake</div>
+                      <div className="text-[8px] mt-1 text-white/20">AWAITING_INDEX_RESPONSE // {activeTab.toUpperCase()}</div>
                    </div>
                 )}
               </motion.div>
