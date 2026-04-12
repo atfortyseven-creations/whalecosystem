@@ -101,34 +101,50 @@ async function processWhaleTx(
     const exists = await prisma.whaleActivity.findUnique({ where: { transactionHash: hash } });
     if (exists) return;
 
-    console.log(`🐋 [BTC] Whale detected: $${usdValue.toLocaleString()} USD | tx: ${hash.slice(0, 16)}...`);
+    // SCORING: Large BTC movements are institutional by default in our engine
+    const isInstitutional = usdValue > 1000000;
+    
+    // TELEMETRY: Snapshot current price for the Historian
+    let btcPrice = 0;
+    try {
+        btcPrice = await getRealTimePrice("BTC") || 98000;
+    } catch {
+        btcPrice = 98000;
+    }
 
-    // FIX: Silent .catch(e => {}) replaced with explicit error logging.
-    // Silent suppression was hiding persistent DB failures that would cause
-    // whales to be permanently lost from the intelligence feed silently.
+    console.log(`🐋 [BTC] SOVEREIGN_BREACH: $${(usdValue / 1e6).toFixed(2)}M | tx: ${hash.slice(0, 8)}`);
+
     await prisma.whaleActivity.create({
         data: {
+            immutableId: crypto.randomUUID(),
             walletAddress: from,
             type: "BTC_TRANSFER",
             token: asset,
             amount: amount.toString(),
             usdValue: usdValue.toString(),
+            valueBTC: amount, // For BTC workers, amount IS the BTC value
+            btcPriceAtTx: btcPrice,
             fromAddress: from,
             toAddress: to,
             transactionHash: hash,
             blockNumber: BigInt(blockNumber),
             chain,
-            metadata,
+            institutional: isInstitutional,
+            metadata: {
+                ...metadata,
+                supernova: usdValue > 100_000_000
+            },
             timestamp: new Date(),
         }
     }).catch(e => {
-        console.error(`❌ [BTC] DB persist failed for ${hash}: ${e.message}`);
+        console.error(`❌ [BTC] DB Persistence Fail: ${e.message}`);
     });
 
     await addWhaleToQueue({
-        hash, from, to, asset, amount, usdValue,
-        blockNumber: blockNumber.toString(), chain, type: "BTC", metadata,
+        hash, from, to, asset, amount, usdValue, valueBTC: amount,
+        blockNumber: blockNumber.toString(), chain, type: "BTC", 
+        institutional: isInstitutional, metadata,
     }).catch(e => {
-        console.error(`❌ [BTC] Redis queue failed for ${hash}: ${e.message}`);
+        console.error(`❌ [BTC] Redis Queue Fail: ${e.message}`);
     });
 }

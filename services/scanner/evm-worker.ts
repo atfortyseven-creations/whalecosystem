@@ -146,28 +146,57 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
     const exists = await prisma.whaleActivity.findUnique({ where: { transactionHash: hash } });
     if (exists) return;
 
-    console.log(`🌊 [${chain}] Standalone WHALE: $${usdValue.toLocaleString()} USD`);
+    // SCORING: Calculate institutional probability based on whale history or known addresses
+    // For this phase, we flag large transfers as institutional by default for the Sovereign Terminal view.
+    const isInstitutional = usdValue > 1000000;
+    
+    // TELEMETRY: Real-time BTC Equivalence calculation for the Cosmic Ledger
+    let btcPrice = 0;
+    try {
+        btcPrice = await getRealTimePrice("BTC") || 65000;
+    } catch {
+        btcPrice = 65000; // Inhuman Resilience Fallback
+    }
+    const valueBTC = usdValue / btcPrice;
+
+    // CLASSIFICATION: CEX Outflow Detection (Liquidity Leak)
+    const isCexOutflow = metadata.isExchangeOutflow || from.toLowerCase().includes('binance') || from.toLowerCase().includes('coinbase');
+    const type = isCexOutflow ? 'CEX_OUTFLOW' : (metadata.method || "TRANSFER");
+
+    console.log(`🌊 [${chain}] SOVEREIGN_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
 
     await prisma.whaleActivity.create({
         data: {
+            immutableId: crypto.randomUUID(), 
             walletAddress: from,
-            type: metadata.method || "TRANSFER",
+            type: type,
             token: asset,
             amount: amount.toString(),
             usdValue: usdValue.toString(),
+            valueBTC: valueBTC,
+            btcPriceAtTx: btcPrice,
             fromAddress: from,
             toAddress: to,
             transactionHash: hash,
             blockNumber: BigInt(blockNumber),
             chain,
-            metadata,
+            institutional: isInstitutional,
+            metadata: {
+                ...metadata,
+                liquidityShock: isCexOutflow,
+                detectionLatency: 0 // Will be updated by terminal telemetry
+            },
             timestamp: new Date(),
         }
     }).catch(e => {
-        console.error(`❌ [${chain}] Error persisting whale activity in DB:`, e.message);
+        console.error(`❌ [${chain}] DB Persistence Fail:`, e.message);
     });
 
-    await addWhaleToQueue({ hash, from, to, asset, amount, usdValue, blockNumber: blockNumber.toString(), chain, type: metadata.method, metadata }).catch(e => {
-        console.error(`❌ [${chain}] Error adding whale to Redis queue:`, e.message);
+    await addWhaleToQueue({ 
+        hash, from, to, asset, amount, usdValue, valueBTC, 
+        blockNumber: blockNumber.toString(), chain, type, 
+        institutional: isInstitutional, metadata 
+    }).catch(e => {
+        console.error(`❌ [${chain}] Redis Queue Fail:`, e.message);
     });
 }
