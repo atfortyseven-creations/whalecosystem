@@ -335,28 +335,34 @@ model PrivacyDonation {
 
 model WhaleActivity {
   id              String   @id @default(uuid())
-  walletAddress   String
-  type            String   // 'TRANSFER', 'SWAP', 'MINT', 'BURN'
-  token           String
-  amount          String
-  usdValue        String
+  immutableId     String   @unique               // SOV-XXXX-YYYYYY (determinista del txHash)
+  walletAddress   String?                        // Opcional para BTC (usar toAddress)
+  type            String   @default("TRANSFER")  // 'TRANSFER', 'SWAP', 'MINT', 'BURN'
+  token           String   @default("BTC")
+  amount          String   @default("0")
+  usdValue        String   @default("0")
+  valueBTC        Float    @default(0)           // Valor real en satoshis/btc
+  btcPriceAtTx    Float    @default(0)           // Precio histórico capturado
   fromAddress     String
   toAddress       String
   transactionHash String   @unique
-  blockNumber     BigInt
-  chain           String
+  blockNumber     BigInt?
+  blockHeight     Int?                           // Altura del bloque BTC
+  chain           String   @default("BTC")
+  entityName      String   @default("Unknown")    // MicroStrategy, BlackRock, etc.
+  institutional   Boolean  @default(false)
+  confirmed       Boolean  @default(true)
   metadata        Json?
   timestamp       DateTime @default(now())
   isZkVerified    Boolean  @default(false)
 
-  // ── 🔍 INDEXACIÓN CÓSMICA: Sistema de índices multi-dimensional para el 1TB de Railway
-  @@index([walletAddress])                           // Lookup individual por wallet
-  @@index([chain, timestamp(sort: Desc)])            // Stream temporal por cadena (dashboard)
-  @@index([timestamp(sort: Desc)])                   // Feed cronológico global
-  @@index([type, chain, timestamp(sort: Desc)])      // Filtrado por tipo de evento
-  @@index([token, timestamp(sort: Desc)])            // Token-level analytics (liquidez)
-  @@index([isZkVerified, timestamp(sort: Desc)])     // Alertas ZK verificadas prioritarias
-  @@index([walletAddress, chain, timestamp(sort: Desc)]) // Perfil por wallet por cadena
+  // ── 🔍 INDEXACIÓN INSTITUCIONAL
+  @@index([usdValue])
+  @@index([valueBTC])
+  @@index([timestamp(sort: Desc)])
+  @@index([institutional])
+  @@index([entityName])
+  @@index([chain, timestamp(sort: Desc)])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

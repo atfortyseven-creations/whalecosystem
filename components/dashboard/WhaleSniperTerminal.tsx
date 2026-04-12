@@ -9,10 +9,12 @@ import { toast } from 'sonner';
 
 // Note: Logic inside these modules will be built in Phase 2
 import RadarFeed from './RadarFeed';
+import InstitutionalLedger from './InstitutionalLedger';
 import SniperBrain from './SniperBrain';
 import ExecutionDock from './ExecutionDock';
 
 export default function WhaleSniperTerminal() {
+  const [activeTab, setActiveTab] = React.useState<'radar' | 'ledger'>('radar');
   const { address, isConnected } = useAccount();
   const metrics = useSniperStore((state) => state.metrics);
   const setConnectionStatus = useSniperStore((state) => state.setConnectionStatus);
@@ -108,12 +110,25 @@ export default function WhaleSniperTerminal() {
         <div className="bg-[#050505] lg:row-span-2 flex flex-col overflow-hidden relative group h-full">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#e0ff00]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-white/40 shrink-0">
-            <span className="flex items-center gap-2"><Activity size={12} className="text-[#e0ff00]" /> RADAR_STREAM // MEMPOOL_CAPTURE</span>
-            <span className="text-white/20">REALTIME_WSS</span>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setActiveTab('radar')}
+                className={`flex items-center gap-2 transition-colors ${activeTab === 'radar' ? "text-[#e0ff00]" : "text-white/20 hover:text-white/40"}`}
+              >
+                <Activity size={12} /> RADAR_STREAM
+              </button>
+              <button 
+                onClick={() => setActiveTab('ledger')}
+                className={`flex items-center gap-2 transition-colors ${activeTab === 'ledger' ? "text-emerald-400" : "text-white/20 hover:text-white/40"}`}
+              >
+                <Database size={12} /> INSTITUTIONAL_LEDGER
+              </button>
+            </div>
+            <span className="text-white/20">{activeTab === 'radar' ? 'REALTIME_WSS' : 'PERMANENT_HISTORIAN'}</span>
           </div>
           <div className="flex-1 relative">
             <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
-              <RadarFeed />
+              {activeTab === 'radar' ? <RadarFeed /> : <InstitutionalLedger />}
             </div>
           </div>
         </div>
