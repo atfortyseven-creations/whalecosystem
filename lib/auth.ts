@@ -1,6 +1,34 @@
-import { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import bcrypt from "bcryptjs";
+
+/**
+ * SOVEREIGN AUTH UTILITIES
+ */
+
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export function isValidPassword(password: string): boolean {
+  // Institutional requirement: min 8 chars, 1 uppercase, 1 number
+  return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 12);
+}
+
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  if (!password || !hash) return false;
+  return bcrypt.compare(password, hash);
+}
+
+export function generateVerificationCode(): string {
+  // Secure 6-digit numeric pin
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 /**
  * SOVEREIGN AUTH CONFIGURATION (High Pro 3.1)
