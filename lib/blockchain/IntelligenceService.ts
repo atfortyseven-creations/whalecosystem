@@ -350,7 +350,8 @@ export class IntelligenceService {
         } catch (e) {
             console.error('[Yield Discovery] Fail-safe triggered:', e);
             return [];
-        }
+    }
+
     /**
      * 🔥 [SOVEREIGN DISCOVERY] getLiveGovProposals
      * Fetches real-time DAO proposals (Optimism, Uniswap, Aave) via Snapshot/Tally logic blueprints.
