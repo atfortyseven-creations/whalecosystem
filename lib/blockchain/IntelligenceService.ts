@@ -312,6 +312,8 @@ export class IntelligenceService {
         }
 
         return { score: Math.min(washScore, 100), patterns };
+    }
+
     /**
      * 🔥 [SOVEREIGN DISCOVERY] getLiveYieldOpportunities
      * Scans real on-chain liquidity pools via Premium RPCs. 
