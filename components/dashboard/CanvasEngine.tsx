@@ -8,17 +8,8 @@ import { ContextMenu } from './ContextMenu';
 import { TelemetryTerminal } from './TelemetryTerminal';
 import { WhaleSonar } from './WhaleSonar';
 
-export type NodeType = 'wallet' | 'bot' | 'contract' | 'api';
-
-export interface NodeData {
-    id: string;
-    type: NodeType;
-    x: number;
-    y: number;
-    title: string;
-    status: 'syncing' | 'active' | 'error';
-    latency: number;
-}
+import { NodeType, NodeData, EdgeData } from './CanvasEngine';
+import { useAccount } from 'wagmi';
 
 export interface EdgeData {
     id: string;
@@ -39,6 +30,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export function CanvasEngine() {
+    const { address } = useAccount();
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Real persistent state — loaded from DB
@@ -57,15 +49,16 @@ export function CanvasEngine() {
     // --- LOAD from DB on mount ---
     useEffect(() => {
         const load = async () => {
+            if (!address) { setIsLoading(false); return; }
             try {
-                const res = await fetch('/api/dashboard', { cache: 'no-store' });
+                const res = await fetch(`/api/dashboard?address=${address}`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('Failed to load canvas');
                 const data = await res.json();
                 setNodes(Array.isArray(data.nodes) ? data.nodes : []);
                 setEdges(Array.isArray(data.edges) ? data.edges : []);
+                if (data.pan) setPan(data.pan);
                 if (data.lastSyncedAt) setLastSynced(new Date(data.lastSyncedAt));
             } catch {
-                // User not authenticated or first visit — start with empty canvas
                 setNodes([]);
                 setEdges([]);
             } finally {
@@ -74,14 +67,14 @@ export function CanvasEngine() {
             }
         };
         load();
-    }, []);
+    }, [address]);
 
     // --- AUTOSAVE to DB (debounced 1.5s after any change) ---
     const debouncedNodes = useDebounce(nodes, 1500);
     const debouncedEdges = useDebounce(edges, 1500);
 
     useEffect(() => {
-        if (!isInitialized.current || isLoading) return;
+        if (!isInitialized.current || isLoading || !address) return;
 
         const save = async () => {
             setIsSaving(true);
@@ -89,7 +82,12 @@ export function CanvasEngine() {
                 const res = await fetch('/api/dashboard', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nodes: debouncedNodes, edges: debouncedEdges }),
+                    body: JSON.stringify({ 
+                        address,
+                        nodes: debouncedNodes, 
+                        edges: debouncedEdges,
+                        pan 
+                    }),
                 });
                 if (res.ok) {
                     const data = await res.json();
@@ -101,7 +99,7 @@ export function CanvasEngine() {
         };
 
         save();
-    }, [debouncedNodes, debouncedEdges, isLoading]);
+    }, [debouncedNodes, debouncedEdges, address, pan, isLoading]);
 
     // Context Menu
     const handleContextMenu = useCallback((e: React.MouseEvent, nodeId?: string) => {
@@ -168,7 +166,8 @@ export function CanvasEngine() {
 
             {/* Loading Overlay */}
             {isLoading && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#050505]/80 backdrop-blur-md">
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#050505]/80"
+                     style={{ backdropFilter: 'var(--mobile-blur, blur(12px))', WebkitBackdropFilter: 'var(--mobile-blur, blur(12px))' }}>
                     <div className="text-center space-y-4">
                         <div className="w-12 h-12 border-2 border-[var(--aztec-orchid)] border-t-transparent rounded-full animate-spin mx-auto" />
                         <p className="font-aztec-mono text-[10px] uppercase tracking-widest text-white/40">Loading Canvas State...</p>

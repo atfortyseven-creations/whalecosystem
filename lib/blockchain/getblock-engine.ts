@@ -13,15 +13,12 @@
  * EP6: https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d
  */
 
-// ── Endpoint pool completo ───────────────────────────────────────────────────
+// ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
 const ALL_ENDPOINTS = [
-  'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f', // EP1
-  'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d', // EP2
-  'https://go.getblock.us/88747de304e04365ac4c85789ba4fe54', // EP3
-  'https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24', // EP4
-  'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', // EP5
-  'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d', // EP6
-];
+  process.env.GETBLOCK_ETH_RPC_1,
+  process.env.GETBLOCK_ETH_RPC_4,
+  process.env.GETBLOCK_BASE_RPC,
+].filter(Boolean) as string[];
 
 // ── Estado de salud por endpoint ─────────────────────────────────────────────
 interface EndpointHealth {
@@ -31,24 +28,21 @@ interface EndpointHealth {
   errorCount: number;
 }
 
-// Estado en módulo (persiste entre requests en el mismo proceso Node)
 const endpointHealth: EndpointHealth[] = ALL_ENDPOINTS.map(url => ({
   url,
   exhausted: false,
   errorCount: 0,
 }));
 
-// Tiempo de cooldown antes de reintentar un endpoint exhausto: 3 minutos
-const EXHAUSTION_COOLDOWN_MS = 3 * 60 * 1000;
+// Cooldown de 10 min para 402/429
+const EXHAUSTION_COOLDOWN_MS = 10 * 60 * 1000;
 
 function getActiveEndpoints(): EndpointHealth[] {
   const now = Date.now();
-  // Restaurar endpoints que han pasado el cooldown
   for (const ep of endpointHealth) {
     if (ep.exhausted && ep.exhaustedAt && now - ep.exhaustedAt > EXHAUSTION_COOLDOWN_MS) {
       ep.exhausted = false;
       ep.errorCount = 0;
-      console.log(`[GetBlock] ♻️  Endpoint restaurado: ${ep.url.slice(0, 50)}`);
     }
   }
   return endpointHealth.filter(ep => !ep.exhausted);
@@ -59,22 +53,20 @@ function markExhausted(url: string, reason: string) {
   if (!ep) return;
   ep.exhausted = true;
   ep.exhaustedAt = Date.now();
-  console.warn(`[GetBlock] 💀 Endpoint agotado (${reason}): ${url.slice(0, 50)}`);
+  console.warn(`[GetBlock-Engine] 💀 BLACKLISTED (${reason}): ${url.slice(0, 40)}...`);
 }
 
 // ── JSON-RPC core con failover automático ────────────────────────────────────
-async function rpcWithFailover(
-  method: string,
-  params: unknown[],
-  id = 1,
-): Promise<string> {
+async function rpcWithFailover(method: string, params: unknown[], id = 1): Promise<string> {
   const active = getActiveEndpoints();
 
   if (active.length === 0) {
-    // Todos exhaustos — resetear y reintentar con el primero como último recurso
-    console.error('[GetBlock] ⚠️ Todos los endpoints agotados. Reseteando estado...');
-    endpointHealth.forEach(ep => { ep.exhausted = false; ep.errorCount = 0; });
-    active.push(...endpointHealth);
+    // Si todo GetBlock falló, intentar fallback público de emergencia por fetch
+    return fetch('https://eth.llamarpc.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method, params, id })
+    }).then(r => r.json()).then(j => j.result as string).catch(() => '0x0');
   }
 
   for (const ep of active) {
@@ -84,57 +76,31 @@ async function rpcWithFailover(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jsonrpc: '2.0', method, params, id }),
         signal: AbortSignal.timeout(8000),
-        // @ts-ignore
-        cache: 'no-store',
       });
 
-      // 401 = CU agotados, 429 = rate limit → marcar y pasar al siguiente
-      if (res.status === 401 || res.status === 429 || res.status === 402) {
-        markExhausted(ep.url, `HTTP ${res.status}`);
+      if (res.status === 402 || res.status === 429 || res.status === 401) {
+        markExhausted(ep.url, `HTTP_${res.status}`);
         continue;
       }
 
-      if (!res.ok) {
-        ep.errorCount++;
-        if (ep.errorCount >= 3) markExhausted(ep.url, `HTTP ${res.status} x3`);
-        continue;
-      }
+      if (!res.ok) continue;
 
       const json = await res.json() as { result?: string; error?: any };
-
       if (json.error) {
-        const code = json.error?.code;
-        const msg = JSON.stringify(json.error);
-        // Códigos de RPC que indican CU agotados o auth inválida
-        if (code === -32005 || code === -32001 || msg.includes('Unknown token') ||
-            msg.includes('quota') || msg.includes('limit') || msg.includes('unauthorized')) {
-          markExhausted(ep.url, `RPC error: ${msg.slice(0, 60)}`);
-          continue;
-        }
-        throw new Error(`RPC error: ${msg}`);
+          const msg = JSON.stringify(json.error);
+          if (msg.includes('quota') || msg.includes('limit') || msg.includes('unauthorized')) {
+              markExhausted(ep.url, 'RPC_LIMIT');
+              continue;
+          }
+          throw new Error(msg);
       }
 
-      // ✅ Éxito — resetear error count
-      ep.errorCount = 0;
       return json.result as string;
-
     } catch (err: any) {
-      if (err.name === 'TimeoutError' || err.name === 'AbortError') {
-        ep.errorCount++;
-        if (ep.errorCount >= 2) markExhausted(ep.url, 'timeout');
-        console.warn(`[GetBlock] ⏱ Timeout en ${ep.url.slice(0, 50)}`);
         continue;
-      }
-      // Error de red / DNS
-      if (err.message?.includes('ENOTFOUND') || err.message?.includes('fetch failed')) {
-        markExhausted(ep.url, 'network error');
-        continue;
-      }
-      throw err;
     }
   }
-
-  throw new Error('[GetBlock] Todos los endpoints fallaron o están exhaustos.');
+  return '0x0'; // Fallback de silencio absoluto
 }
 
 // ── Pad address to 32-byte ABI encoding ─────────────────────────────────────

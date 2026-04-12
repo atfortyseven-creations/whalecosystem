@@ -114,6 +114,7 @@ model User {
   
   watchlists      Watchlist[]
   alerts          Alert[]
+  canvasState     CanvasState?
   progress        UserProgress[]
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
@@ -157,6 +158,17 @@ model Alert {
   metric      String   // e.g., "BTC", "ETH_GAS"
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CanvasState {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  nodes       Json     // Institutional Node Topography
+  edges       Json     // Connection Matrices
+  pan         Json?    // Navigation Coordinates
+  lastSyncedAt DateTime @default(now())
   
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -467,6 +479,13 @@ model Transaction {
   toAddress       String
   timestamp       DateTime @default(now())
   authUserId      String?
+
+  chainId         Int      @default(1)
+  value           String?
+  tokenSymbol     String?
+  blockNumber     BigInt?  @default(0)
+  gasUsed         BigInt?  @default(0)
+  metadata        Json?    @default("{}")
 
   @@index([authUserId])
 }

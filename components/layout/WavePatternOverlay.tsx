@@ -25,8 +25,10 @@ import { useEffect, useState } from "react";
  */
 export function WavePatternOverlay() {
   const [isLight, setIsLight] = useState(false);
-
+  const [mounted, setMounted] = useState(false);
+ 
   useEffect(() => {
+    setMounted(true);
     const html = document.documentElement;
     const check = () => setIsLight(!html.classList.contains("dark"));
     check();
@@ -34,7 +36,9 @@ export function WavePatternOverlay() {
     obs.observe(html, { attributes: true, attributeFilter: ["class"] });
     return () => obs.disconnect();
   }, []);
-
+ 
+  if (!mounted) return null;
+ 
   const cosmicoOpacity = isLight ? 0.065 : 0.028;
   const hokusaiOpacity = isLight ? 0.10 : 0.055;
 

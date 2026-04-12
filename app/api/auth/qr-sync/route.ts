@@ -90,6 +90,8 @@ export async function POST(req: Request) {
             maxAge: 604800,
             sameSite: 'lax',
         });
+
+        return response;
     } catch (e: any) {
         console.error('[QR_SYNC_FATAL]', e);
         return new NextResponse('Internal Neural Engine Failure', { status: 500 });

@@ -75,7 +75,7 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
                     <div className="space-y-2">
                         <label className="text-[8px] font-black text-white/20 uppercase tracking-widest">Identifier</label>
                         <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                            placeholder="GENESIS_ALERT_01"
+                            placeholder="SYSTEM_ALERT_01"
                             className="w-full bg-white/[0.02] border border-white/5 px-4 py-3 text-[10px] text-white outline-none focus:border-emerald-500/50 transition-all uppercase"
                         />
                     </div>
@@ -163,14 +163,14 @@ export function AlertsPanel() {
                 method: 'POST', 
                 body: JSON.stringify({ 
                     name: formData.name,
-                    asset: formData.asset,
-                    conditionLogic: formData.type,
-                    priceThreshold: parseFloat(formData.threshold),
+                    metric: formData.asset,
+                    condition: formData.type === 'PRICE_ABOVE' ? 'ABOVE' : 'BELOW',
+                    threshold: parseFloat(formData.threshold),
                     address 
                 }) 
             });
             if (res.ok) {
-                toast.success('Genesis Trigger Primed', { id: tid });
+                toast.success('System Trigger Primed', { id: tid });
                 refresh();
             } else {
                 toast.error('Local Deployment Only // Backend Unavailable', { id: tid });
@@ -265,7 +265,7 @@ export function AlertsPanel() {
             <div className="px-8 py-3 border-t border-white/5 bg-white/[0.01] flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4 text-[8px] text-white/20 uppercase tracking-[0.4em]">
                     <div className="flex items-center gap-2">
-                        <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500 animate-pulse' : 'bg-white/10'}`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-white/10'}`} />
                         <span>Telemetry:_{sseConnected ? 'ENABLED' : 'OFFLINE'}</span>
                     </div>
                     <span>Cluster_Rules:_{alerts.length}</span>

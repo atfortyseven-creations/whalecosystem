@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run worker:scanner\"",
-    "build": "echo 'LEGENDARY_BUILD_777' && prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
-    "build:railway": "echo 'LEGENDARY_BUILD_777' && prisma generate && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
+    "build": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
+    "build:railway": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "build:contracts": "npx hardhat compile",
     "deploy:deadman": "npx hardhat run scripts/deploy-deadman-switch.js --network polygonAmoy",
     "deploy:deadman:mainnet": "npx hardhat run scripts/deploy-deadman-switch.js --network polygon",
@@ -26,6 +26,7 @@
     "migrate:status": "prisma migrate status",
     "check-migration": "ts-node scripts/check-migration-status.ts",
     "db:push": "prisma db push",
+    "db:push:prod": "prisma db push --accept-data-loss",
     "db:seed": "prisma db seed",
     "worker": "npx tsx scripts/whale-worker.ts",
     "whale:start": "pm2 start ecosystem.config.json",

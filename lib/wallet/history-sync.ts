@@ -78,18 +78,21 @@ export const historySyncService = {
 
             // Upsert: Create if new, update if exists (e.g. status change)
             await prisma.transaction.upsert({
-                where: { hash: tx.hash },
+                where: { txHash: tx.hash },
                 create: {
                     authUserId,
-                    hash: tx.hash,
-                    chainId,
+                    txHash: tx.hash,
                     type,
                     status: TransactionStatus.CONFIRMED, // Historical is always confirmed
-                    from: tx.from,
-                    to: tx.to || "",
-                    value: tx.value || 0,
-                    tokenSymbol: tx.asset || 'ETH',
+                    amount: typeof tx.value === 'string' ? parseFloat(tx.value) : Number(tx.value || 0),
+                    token: tx.asset || 'ETH',
+                    fromAddress: tx.from,
+                    toAddress: tx.to || "",
                     timestamp: tx.timestamp ? new Date(tx.timestamp) : new Date(),
+                    
+                    chainId,
+                    value: String(tx.value || 0),
+                    tokenSymbol: tx.asset || 'ETH',
                     blockNumber: tx.blockNum ? BigInt(tx.blockNum) : undefined,
                     metadata: {
                         category: tx.category,

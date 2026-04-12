@@ -23,10 +23,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const { isConnected: isWeb3Connected, address: web3Address } = useAppKitAccount();
     const isMobile = useIsMobile();
     
-    // Integration with Sovereign Managed Identities
+    // Integration with Encrypted Managed Identities
     const { address: sovereignAddress, accounts, switchAccount } = useWalletStore();
     
-    // Prioritize: 1. Passed Prop, 2. Web3 Connection, 3. Sovereign Managed Active Account
+    // Prioritize: 1. Passed Prop, 2. Web3 Connection, 3. Encrypted Managed Active Account
     const effectiveAddress = walletAddress || web3Address || sovereignAddress;
     const isConnected = !!effectiveAddress;
 
@@ -80,23 +80,30 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-3xl" />
-                <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500/20 blur-[80px] rounded-full animate-pulse" />
+            <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 relative overflow-hidden rounded-3xl border border-white/5 shadow-2xl">
+                <img
+                    src="/olas-hokusai-4k.png"
+                    alt="Hokusai Waves"
+                    className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay pointer-events-none"
+                    style={{ transform: "translateZ(0)", willChange: "transform" }}
+                    fetchPriority="high"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent" />
+                
+                <div className="relative z-10">
                     <div className="relative p-8 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 text-blue-400 border border-blue-500/20">
                         <Wallet size={80} strokeWidth={1.5} />
                     </div>
                 </div>
-                <div className="space-y-3 max-w-md relative">
+                <div className="space-y-3 max-w-md relative z-10">
                     <h2 className="text-4xl font-black text-white tracking-tight bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
                         VAULT ACCESS
                     </h2>
                     <p className="text-gray-500 text-sm leading-relaxed font-medium">
-                        Connect your Web3 identity or generate a Sovereign wallet to unlock Elite-grade portfolio surveillance.
+                        Connect your Web3 identity or generate an encrypted wallet to unlock tier-1 portfolio surveillance.
                     </p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-4 relative z-10">
                     <button
                         onClick={() => open()}
                         className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-black rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl"
@@ -107,7 +114,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         onClick={() => useWalletStore.getState().createWallet()}
                         className="px-8 py-4 bg-white/5 border border-white/10 text-white font-black rounded-2xl hover:bg-white/10 transition-all"
                     >
-                        CREATE SOVEREIGN
+                        CREATE VAULT
                     </button>
                 </div>
             </div>
@@ -274,8 +281,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     Sync Status
                                 </div>
                                 <div className="text-3xl font-black text-emerald-400 font-mono flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                    LIVE
+                                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                    SYNCED
                                 </div>
                             </div>
                         </div>

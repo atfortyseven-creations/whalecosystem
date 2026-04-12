@@ -19,6 +19,8 @@ body {
   transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
   
   -webkit-text-size-adjust: 100%;     /* Prevent iOS auto text-size increase */
   text-size-adjust: 100%;
@@ -42,126 +44,92 @@ textarea {
 [class*="overflow-y-auto"],
 [class*="overflow-y-scroll"],
 [class*="overflow-auto"],
-[class*="overflow-scroll"] {
-  -webkit-overflow-scrolling: touch;
+[class*="overflow-scroll"],
+.custom-scrollbar {
+  -webkit-overflow-scrolling: touch !important;
+  transform: translate3d(0,0,0); /* Force GPU layer for scrollable blocks */
 }
 
-/* UNIVERSAL A11Y FOCUS */
-:focus-visible {
-  outline: 2px solid #00f2ea;
-  outline-offset: 4px;
-  box-shadow: 0 0 0 4px rgba(0, 242, 234, 0.1);
-  border-radius: 2px;
-}
-
-/* SYSTEM_REV_1.0.42_LEGENDARY_REFRESH */
-@layer base {
-  /* Rendering Optimization for long pages (removed to fix iOS Safari blanks) */
-
-  /* GPU Layer Acceleration for standard cards */
-  .premium-card-gpu {
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform: translate3d(0, 0, 0);
-    will-change: transform, opacity;
+  /* UNIVERSAL A11Y FOCUS */
+  :focus-visible {
+    outline: 2px solid #00f2ea00;
+  }
+  
+  /* Rendering Optimization for long pages */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Reduced heavy filter usage at global level for scroll speed */
   }
 
   :root {
-    /* --- AZTEC NETWORK BRAND PALETTE --- */
-    --aztec-parchment: #F2EEE1;
-    --aztec-ink: #1A1400;
+    /* --- PREMIUM CREAM BRAND PALETTE (Light Mode) --- */
+    --bg-page: #FFFDF8;
+    --bg-surface: #F8F5EE;
+    --bg-card: #FFFFFF;
+
+    --text-primary: #1C1917; /* Slate 900 for high contrast */
+    --text-secondary: #57534E;
+    --text-muted: #A8A29E;
+
+    --border-main: rgba(0, 0, 0, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(0, 0, 0, 0.05);
     
-    /* Core colors */
-    --aztec-chartreuse: #D4FF2B;
-    --aztec-orchid: #FF2DF4;
-    --aztec-aqua: #2BFAE9;
-    --aztec-vermillion: #FF1A1A;
-    
-    /* Base colors */
-    --aztec-malachite: #001F18;
-    --aztec-aubergine: #2E0026;
-    --aztec-lapis: #00122E;
-    --aztec-oxblood: #2E0700;
+    /* Institutional Accents */
+    --accent-primary: #00F2EA; /* Pure Cyan */
+    --accent-secondary: #00E5FF;
+    --accent-emerald: #10B981;
+    --accent-glow: rgba(0, 242, 234, 0.15);
 
-    /* Base Variables mapping */
-    --bg-page: var(--aztec-parchment);
-    --bg-surface: var(--aztec-parchment);
-    --bg-card: var(--aztec-parchment);
+    /* Glass blur boundaries (Optimized for Mobile) */
+    --zk-glass-blur: 16px;
+    --zk-glass-blur-heavy: 24px;
 
-    --text-primary: var(--aave-carbon);
-    --text-secondary: var(--aave-gray);
-    --text-muted: #a3a3a3;
-
-    --border-main: rgba(33, 29, 29, 0.1);
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(33, 29, 29, 0.05);
-    
-    /* Premium Accents */
-    --accent-primary: var(--aave-purple);
-    --accent-glow: rgba(152, 150, 255, 0.2);
-
-    /* Glass blur sizes */
-    --zk-glass-blur: 20px;
-    --zk-glass-blur-heavy: 40px;
+    /* Modern Hsl System (light mode) */
+    --background: 45 40% 98%;
+    --foreground: 0 0% 10%;
 
     /* ═══════════════════════════════════════════════════════
-       MARCA DE AGUA CÓSMICA 4K (PATRÓN INSTITUCIONAL NUEVO)
-       image (2)_PhotoGrid.png — ukiyo-e wave pattern, repeating.
-       Tile: 420px base at 72% opacity (landing) / 280px at 6% (dashboard).
-       Hardware-accelerated: translateZ(0) + willChange:transform.
+       MARCA DE AGUA CÓSMICA 4K / HOKUSAI (TRANSPARENT BLEND)
        ═══════════════════════════════════════════════════════ */
     --wave-pattern: url("/api/checkpoint-image?name=patron-cosmico-4k.png");
-    --wave-pattern-opacity: 0.072;
-    /* Hokusai Downpage: image (4)_PhotoGrid.png — blue waves, no-repeat, bottom-anchored */
+    --wave-pattern-opacity: 0.04;
     --olas-hokusai: url("/api/checkpoint-image?name=olas-hokusai-4k.png");
-    --olas-hokusai-opacity: 0.92;
+    --olas-hokusai-opacity: 0.15;
   }
 
 
   .dark {
-    /* --- AAVE DARK MODE --- */
-    --bg-page: var(--aave-carbon);
-    --bg-surface: #1a1a1a;
-    --bg-card: #212121;
+    /* Pure Web3 Fallback inherits from root */
+    --bg-page: #000000;
+    --bg-surface: #0a0a0a;
+    --bg-card: #111111;
 
     --text-primary: #ffffff;
-    --text-secondary: var(--aave-gray);
+    --text-secondary: #a3a3a3;
     --text-muted: #525252;
 
     --border-main: rgba(255, 255, 255, 0.1);
-    --glass-bg: rgba(33, 29, 29, 0.6);
+    --glass-bg: rgba(0, 0, 0, 0.6);
     --glass-border: rgba(255, 255, 255, 0.05);
-    
-    /* Modern Hsl System (Dashboard Compatibility) */
-    --background: 240 10% 3.9%;
+
+    /* Modern Hsl System */
+    --background: 240 10% 4%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 240 10% 4%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --primary-foreground: 240 6% 10%;
 
     /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--aave-purple) 0%, var(--aave-purple-light) 100%);
-    --gradient-accent: linear-gradient(135deg, var(--aave-teal) 0%, var(--aave-teal-light) 100%);
-    --gradient-surface: linear-gradient(135deg, rgba(152, 150, 255, 0.05) 0%, rgba(57, 190, 183, 0.05) 100%);
+    --gradient-primary: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-emerald) 0%, #34D399 100%);
     
     /* Premium Glows */
-    --glow-purple: 0 0 40px rgba(152, 150, 255, 0.3);
-    --glow-teal: 0 0 40px rgba(0, 130, 123, 0.3);
-    --glow-blue: 0 0 40px rgba(0, 138, 255, 0.3);
+    --glow-purple: 0 0 30px rgba(152, 150, 255, 0.2);
+    --glow-teal: 0 0 30px rgba(0, 242, 234, 0.2);
+    --glow-blue: 0 0 30px rgba(0, 138, 255, 0.2);
   }
 
   html {
@@ -219,7 +187,7 @@ textarea {
     user-select: text;
 
     @apply antialiased transition-colors duration-300;
-    @apply bg-white dark:bg-[#000000] text-black dark:text-white;
+    @apply bg-[#000000] text-white;
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -344,14 +312,18 @@ textarea {
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     }
 
-    /* PHASE 30: GLOBAL IMMERSIVE TRANSPARENCY ENFORCEMENT
-       NOTE: body and main are EXCLUDED intentionally — they carry
-       theme background tokens (`bg-white dark:bg-[#000000]`).
-       Only deep sub-elements that sit on top of a themed parent
-       should be transparent.
-    */
+    /* IMMERSIVE TRANSPARENCY ENFORCEMENT */
     #root, .min-h-screen, section {
         background: transparent !important;
+    }
+
+    /* PURE WEB3 FLOATING NAV REFINEMENTS */
+    .capsule-nav-glass {
+        background: rgba(10, 10, 10, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
 }
 

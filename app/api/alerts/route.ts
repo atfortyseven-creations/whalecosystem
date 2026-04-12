@@ -4,27 +4,26 @@ import { prisma } from '@/lib/prisma';
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
-        const wallet = searchParams.get('address');
+        const wallet = searchParams.get('address')?.toLowerCase();
         
         if (!wallet) {
-             return NextResponse.json({ success: true, alerts: [] }); // No wallet = no alerts, perfectly clean
+             return NextResponse.json({ success: true, alerts: [] });
         }
 
         const alerts = await prisma.alert.findMany({
-            where: { userId: wallet.toLowerCase() },
+            where: { userId: wallet },
             orderBy: { createdAt: 'desc' }
         });
         
-        // Map back to what the frontend expects
+        // Map back to frontend expected structure
         const mapped = alerts.map(a => ({
             id: a.id,
-            name: `Alert for ${a.metric}`,
-            conditionLogic: 'CUSTOM',
-            targetAddress: a.metric,
-            priceThreshold: a.threshold,
-            enabled: a.isActive,
+            name: a.metric ? `Trigger: ${a.metric}` : 'Custom Alert',
+            type: a.condition === 'ABOVE' ? 'PRICE_ABOVE' : 'PRICE_BELOW',
+            asset: a.metric,
+            threshold: a.threshold,
+            status: a.isActive ? 'ACTIVE' : 'PAUSED',
             createdAt: a.createdAt,
-            actions: { notifyPush: true }
         }));
         
         return NextResponse.json({ success: true, alerts: mapped });
@@ -42,27 +41,27 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: 'Wallet address required' }, { status: 400 });
         }
 
-        // Ensure user exists
+        // Auto-provision Sovereign User if missing
         await prisma.user.upsert({
             where: { walletAddress: wallet },
-            update: {},
-            create: { walletAddress: wallet }
+            update: { lastActive: new Date() },
+            create: { walletAddress: wallet, tier: 'basic' }
         });
 
         const newAlert = await prisma.alert.create({
             data: {
                 userId: wallet,
-                targetType: body.type || 'PRICE',
-                condition: 'ABOVE',
+                targetType: 'PRICE', // Defaulting to price observation
+                condition: body.condition || 'ABOVE',
                 threshold: Number(body.threshold) || 0,
-                metric: body.asset || 'BTC',
-                isActive: body.status !== 'PAUSED',
+                metric: body.metric || 'BTC',
+                isActive: true,
             }
         });
         return NextResponse.json({ success: true, alert: newAlert });
     } catch (e: any) {
-        console.error(e);
-        return NextResponse.json({ success: false, error: e.message || 'Error saving alert' }, { status: 500 });
+        console.error('[ALERTS_POST_FAILURE]', e);
+        return NextResponse.json({ success: false, error: 'Database Synchronization Failure' }, { status: 500 });
     }
 }
 

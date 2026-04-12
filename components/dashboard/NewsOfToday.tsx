@@ -223,7 +223,7 @@ export function NewsOfToday() {
                                 value={search} 
                                 onChange={e => setSearch(e.target.value)} 
                                 placeholder="Search publications…"
-                                className="w-full md:w-64 bg-transparent border-b border-black/10 dark:border-white/20 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 pb-1 font-serif italic outline-none focus:border-black dark:focus:border-white transition-all"
+                                className="w-full md:w-64 bg-transparent border-b border-black/10 dark:border-white/20 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 pb-1 font-serif outline-none focus:border-black dark:focus:border-white transition-all"
                             />
                             <button onClick={refresh} disabled={loading} className="p-2 border border-black/10 dark:border-white/20 rounded-full hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 group">
                                 <RefreshCw size={14} className={`${loading ? 'animate-spin' : ''}`} />
@@ -250,7 +250,7 @@ export function NewsOfToday() {
                                         <span className={`text-[10px] font-black uppercase tracking-widest ${isExpanded ? '' : 'opacity-80'}`}>
                                             {a.source}
                                         </span>
-                                        <span className={`text-[11px] font-serif italic ${isExpanded ? 'opacity-60' : 'opacity-40'}`}>
+                                        <span className={`text-[11px] font-serif ${isExpanded ? 'opacity-60' : 'opacity-40'}`}>
                                             {timeAgo(a.publishedAt)}
                                         </span>
                                     </div>
@@ -337,7 +337,7 @@ export function NewsOfToday() {
                 {/* Empty State */}
                 {filtered.length === 0 && (
                     <div className="py-24 text-center">
-                        <p className="font-serif italic opacity-50 text-lg">"No publications met the criteria."</p>
+                        <p className="font-serif opacity-50 text-lg">"No publications met the criteria."</p>
                     </div>
                 )}
                 
