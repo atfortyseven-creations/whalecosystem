@@ -37,7 +37,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         const emergency = setTimeout(() => {
             console.warn('[TitaniumGate] Deadlock detected. Forcing emergency visibility.');
             setForceVisible(true);
-        }, 4000);
+        }, 5000);
         return () => clearTimeout(emergency);
     }, []);
     
@@ -94,18 +94,14 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             <AnimatePresence mode="wait">
                 {/* THE APPLICATION (or EMERGENCY BYPASS) */}
                 {(state === 'APP' || forceVisible) ? (
-                    <motion.div 
-                        key="app-content"
-                        initial={forceVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.99 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    <div 
                         className="relative z-10"
-                        style={forceVisible ? { opacity: 1, zIndex: 999 } : {}}
+                        style={forceVisible ? { opacity: 1, zIndex: 999, display: 'block' } : {}}
                     >
                         <SafeErrorBoundary>
                             {children}
                         </SafeErrorBoundary>
-                    </motion.div>
+                    </div>
                 ) : (
                     /* THE SKELETON / LOADING ENGINE */
                     <motion.div
