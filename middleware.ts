@@ -243,11 +243,23 @@ export default clerkMiddleware(async (auth, request) => {
     // This matches the CSP posture of Tier-1 financial institutions.
     //
     const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
-    const isWalletRoute = pathname.startsWith('/api/wallet') || pathname === '/';
-
-    const scriptSrc = isWalletRoute
-        ? `'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.humanidfi.com https://*.walletconnect.com https://*.walletconnect.org https://*.reown.com https://*.reown.app https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com https://accounts.google.com`
-        : `'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.humanidfi.com https://*.clerk.accounts.dev https://*.google-analytics.com https://*.googletagmanager.com https://accounts.google.com`;
+    
+    // Unified High-Fidelity Script Source for Absolute Web3 Connectivity
+    const scriptSrc = [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://*.clerk.com",
+        "https://clerk.humanidfi.com",
+        "https://*.clerk.accounts.dev",
+        "https://*.walletconnect.com",
+        "https://*.walletconnect.org",
+        "https://*.reown.com",
+        "https://*.reown.app",
+        "https://*.google-analytics.com",
+        "https://*.googletagmanager.com",
+        "https://accounts.google.com"
+    ].join(' ');
 
     const cspHeader = [
         "default-src 'self'",

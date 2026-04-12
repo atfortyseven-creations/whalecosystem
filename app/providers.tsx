@@ -14,6 +14,15 @@ import { AlphaToaster } from '@/components/ui/AlphaToaster';
 import { ShortcutVisualizer } from '@/components/ui/ShortcutVisualizer';
 import { WalletConnectionBridge } from '@/components/providers/WalletConnectionBridge';
 import { SovereignVaultBootstrap } from '@/components/providers/SovereignVaultBootstrap';
+import { createAppKit } from '@reown/appkit/react';
+
+// Unified Metadata for High-Fidelity Handshake
+const metadata = {
+  name: 'Whale Alert Network',
+  description: 'Sovereign Terminal Omniverse',
+  url: 'https://humanidfi.com',
+  icons: ['https://humanidfi.com/logo-landingpage.png']
+};
 
 // BUG-12 FIX: Do NOT create QueryClient at module level — it leaks state
 // between server-rendered requests in Railway multi-replica environments.
@@ -60,6 +69,21 @@ const config = getDefaultConfig({
     [moonbeam.id]: http(),
   },
   ssr: true,
+});
+
+// [CRITICAL FIX] Initialize AppKit (Web3Modal) context.
+// Without this, useAppKit() hooks in LinkedGate and other components 
+// throw a silent error, leading to a white screen.
+createAppKit({
+  adapters: [], // Using existing wagmi config via context
+  wagmiConfig: config,
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
+  metadata,
+  features: {
+    analytics: true,
+    email: false,
+    socials: false,
+  }
 });
 
 // Hardened SIWE Adapter
