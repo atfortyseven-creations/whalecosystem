@@ -1,187 +1,23 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { toast } from 'sonner';
-import { useSWRConfig } from 'swr';
-import { formatUnits } from 'viem';
-import { transactionNotifier } from '@/lib/wallet/transaction-notifier';
+import { useEffect } from 'react';
+import { useWebSocketStore } from '@/lib/store/websocket-store';
 
-import { safeToFixed } from '@/lib/utils/number-format';
 /**
  * [LEGENDARY] Enhanced Smart WebSocket Hook
- * - Monitors pending transactions for instant alerts
- * - Detects native ETH and ERC20 transfers
- * - Triggers SWR revalidation for portfolio updates
- * - Shows rich notifications with amounts
+ * - Refactored for Phase 3 PWA/Zustand Global Architecture 
+ * - Now wraps the global useWebSocketStore
  */
 export function useSmartWebSockets(address: string | undefined, enabled = true) {
-    const [lastTx, setLastTx] = useState<any>(null);
-    const [connected, setConnected] = useState(false);
-    const wsRef = useRef<WebSocket | null>(null);
-    const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const { mutate } = useSWRConfig();
-    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const { connectAlchemy, disconnect, lastAlchemyTx, isConnected } = useWebSocketStore();
 
     useEffect(() => {
         if (!address || !enabled) return;
+        connectAlchemy(address);
 
-        const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
-        if (!apiKey) {
-            console.warn('[WebSocket] NEXT_PUBLIC_ALCHEMY_API_KEY not configured');
-            return;
-        }
+        // Cleanup disabled intentionally to maintain global persistence across PWA routes
+        // Only disconnect if explicitly requested by unmounting the root provider (which we don't do)
+    }, [address, enabled, connectAlchemy]);
 
-        let reconnectAttempts = 0;
-        const MAX_RECONNECT_ATTEMPTS = 5;
-        const RECONNECT_DELAY = 5000; // 5 seconds
-
-        const connect = () => {
-            try {
-                // Connect to Alchemy WebSocket
-                const ws = new WebSocket(`wss://eth-mainnet.g.alchemy.com/v2/${apiKey}`);
-                wsRef.current = ws;
-
-                ws.onopen = () => {
-                    console.log('🌌 [Legendary] Smart Socket Connected');
-                    setConnected(true);
-                    reconnectAttempts = 0;
-
-                    // Subscribe to pending transactions
-                    ws.send(JSON.stringify({
-                        jsonrpc: "2.0",
-                        id: 1,
-                        method: "eth_subscribe",
-                        params: ["alchemy_pendingTransactions", { 
-                            toAddress: [address],
-                            hashesOnly: false
-                        }]
-                    }));
-
-                    // Also subscribe to mined transactions for confirmation
-                    ws.send(JSON.stringify({
-                        jsonrpc: "2.0",
-                        id: 2,
-                        method: "eth_subscribe",
-                        params: ["alchemy_minedTransactions", { 
-                            addresses: [{ to: address }],
-                            includeRemoved: false
-                        }]
-                    }));
-                };
-
-                ws.onmessage = (event) => {
-                    try {
-                        const message = JSON.parse(event.data);
-                        
-                        // Handle subscription confirmations
-                        if (message.result && !message.params) {
-                            console.log('🌌 [Socket] Subscription confirmed:', message.id);
-                            return;
-                        }
-
-                        // Handle transaction notifications
-                        if (message.method === 'eth_subscription' && message.params?.result) {
-                            const tx = message.params.result;
-                            handleTransaction(tx);
-                        }
-                    } catch (e) {
-                        console.error('[Socket] Parse error:', e);
-                    }
-                };
-
-                ws.onerror = (error) => {
-                    console.error('🌌 [Socket] Error:', error);
-                    setConnected(false);
-                };
-
-                ws.onclose = () => {
-                    console.log('🌌 [Socket] Connection closed');
-                    setConnected(false);
-
-                    // Attempt to reconnect with exponential backoff
-                    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                        reconnectAttempts++;
-                        console.log(`🌌 [Socket] Reconnecting... (attempt ${reconnectAttempts})`);
-                        reconnectTimeoutRef.current = setTimeout(() => {
-                            connect();
-                        }, RECONNECT_DELAY * reconnectAttempts);
-                    }
-                };
-
-            } catch (error) {
-                console.error('[Socket] Connection failed:', error);
-            }
-        };
-
-        const handleTransaction = async (tx: any) => {
-            const isIncoming = tx.to?.toLowerCase() === address.toLowerCase();
-            if (!isIncoming) return;
-
-            console.log('🌌 [Legendary] Incoming transaction detected:', tx.hash);
-
-            // Determine if it's native ETH or ERC20
-            let amount = '0';
-            let symbol = 'ETH';
-            let isToken = false;
-            let usdValue: number | undefined;
-
-            if (tx.value && tx.value !== '0x0') {
-                // Native ETH transfer
-                const ethValue = formatUnits(BigInt(tx.value), 18);
-                amount = parseFloat(safeToFixed(ethValue, 4)).toString();
-                symbol = 'ETH';
-                
-                // Estimate USD value (could fetch real-time price here)
-                usdValue = parseFloat(amount) * 2500; // Rough estimate
-            } else if (tx.input && tx.input.length > 10) {
-                // Possible ERC20 transfer
-                isToken = true;
-                symbol = 'Tokens';
-            }
-
-            // [ANTI-DDOS] Clear previous debounce
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
-            }
-            
-            // Set new debounce threshold (avoid 60 updates per second)
-            debounceTimerRef.current = setTimeout(() => {
-                 setLastTx(tx); // Only trigger React Render once event stream settles
-                 
-                 // Use centralized notifier service AFTER debouncing
-                 transactionNotifier.notify({
-                     hash: tx.hash,
-                     amount: amount,
-                     symbol,
-                     usdValue,
-                     source: 'wallet',
-                     type: 'incoming',
-                     timestamp: Date.now(),
-                     chainId: '1' // Ethereum mainnet — must be string for notifier/SIWE compat
-                 });
-
-                 mutate('portfolio-assets');
-                 console.log('🌌 [Legendary] Portfolio cache invalidated after debounce');
-            }, 2500); // 2.5 seconds debounce (Institutional rate-limit)
-        };
-
-        // Initialize connection
-        connect();
-
-        // Cleanup
-        return () => {
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-            }
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
-            }
-            if (wsRef.current) {
-                wsRef.current.close();
-            }
-        };
-    }, [address, enabled, mutate]);
-
-    return { lastTx, connected };
+    return { lastTx: lastAlchemyTx, connected: isConnected };
 }
-

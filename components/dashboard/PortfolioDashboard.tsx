@@ -8,6 +8,8 @@ import { usePortfolioStore } from '@/lib/portfolio/store';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { PortfolioSkeleton } from '@/components/ui/SkeletonLoader';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
@@ -47,6 +49,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const [newAssetIds, setNewAssetIds] = useState<Set<string>>(new Set());
     const [mounted, setMounted] = useState(false);
     const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+    const [isEyesOff, setIsEyesOff] = useState(false);
 
     useEffect(() => { setMounted(true); }, []);
 
@@ -124,12 +127,12 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             {/* 🔥 DASHBOARD HEADER & ACCOUNT SWITCHER */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <div className="w-12 h-12 rounded-2xl bg-black/5 border border-black/[0.08] flex items-center justify-center text-black/40">
                         <PieChart size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-black text-white tracking-tight uppercase">Intelligence Dashboard</h2>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Identity Monitoring</p>
+                        <h2 className="text-xl font-black text-black tracking-tight uppercase">Intelligence Dashboard</h2>
+                        <p className="text-[10px] font-bold text-black/30 uppercase tracking-widest">Active Identity Monitoring</p>
                     </div>
                 </div>
 
@@ -137,20 +140,20 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 <div className="relative">
                     <button 
                         onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
-                        className="flex items-center gap-3 px-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
+                        className="flex items-center gap-3 px-4 py-2.5 bg-black/[0.04] border border-black/[0.08] rounded-2xl hover:bg-black/[0.07] transition-all group"
                     >
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] font-black text-white">
+                        <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center text-[10px] font-black text-white">
                             {effectiveAddress.slice(2, 4).toUpperCase()}
                         </div>
                         <div className="text-left">
-                            <div className="text-[10px] font-black text-white tracking-tight truncate max-w-[100px]">
+                            <div className="text-[10px] font-black text-black tracking-tight truncate max-w-[100px]">
                                 {accounts.find(a => a.address.toLowerCase() === effectiveAddress.toLowerCase())?.label || 'External Wallet'}
                             </div>
-                            <div className="text-[8px] font-mono text-white/30 truncate max-w-[80px]">
+                            <div className="text-[8px] font-mono text-black/30 truncate max-w-[80px]">
                                 {effectiveAddress.slice(0, 6)}...{effectiveAddress.slice(-4)}
                             </div>
                         </div>
-                        <ChevronDown size={14} className={cn("text-white/20 transition-transform", isSwitcherOpen && "rotate-180")} />
+                        <ChevronDown size={14} className={cn("text-black/20 transition-transform", isSwitcherOpen && "rotate-180")} />
                     </button>
 
                     <AnimatePresence>
@@ -159,9 +162,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                className="absolute top-full right-0 mt-2 w-64 bg-[#1a1c24] border border-white/10 rounded-2xl shadow-2xl z-50 p-2 space-y-1"
+                                className="absolute top-full right-0 mt-2 w-64 bg-white border border-black/[0.08] rounded-2xl shadow-2xl z-50 p-2 space-y-1"
+                                style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}
                             >
-                                <div className="px-3 py-1.5 text-[8px] font-black text-white/20 uppercase tracking-widest">Switch Identity</div>
+                                <div className="px-3 py-1.5 text-[8px] font-black text-black/25 uppercase tracking-widest">Switch Identity</div>
                                 {accounts.map((acc) => (
                                     <button
                                         key={acc.address}
@@ -171,28 +175,28 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                         }}
                                         className={cn(
                                             "w-full flex items-center justify-between p-2.5 rounded-xl transition-all group",
-                                            effectiveAddress.toLowerCase() === acc.address.toLowerCase() ? "bg-indigo-500/10 border border-indigo-500/20" : "hover:bg-white/5 border border-transparent"
+                                            effectiveAddress.toLowerCase() === acc.address.toLowerCase() ? "bg-black/[0.05] border border-black/[0.08]" : "hover:bg-black/[0.03] border border-transparent"
                                         )}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-black text-white">
+                                            <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-[10px] font-black text-black/60">
                                                 {acc.address.slice(2, 4).toUpperCase()}
                                             </div>
                                             <div className="text-left">
-                                                <div className="text-[10px] font-bold text-white uppercase">{acc.label}</div>
-                                                <div className="text-[8px] font-mono text-white/30">{acc.address.slice(0, 6)}...{acc.address.slice(-4)}</div>
+                                                <div className="text-[10px] font-bold text-black uppercase">{acc.label}</div>
+                                                <div className="text-[8px] font-mono text-black/30">{acc.address.slice(0, 6)}...{acc.address.slice(-4)}</div>
                                             </div>
                                         </div>
-                                        {effectiveAddress.toLowerCase() === acc.address.toLowerCase() && <Check size={14} className="text-indigo-400" />}
+                                        {effectiveAddress.toLowerCase() === acc.address.toLowerCase() && <Check size={14} className="text-black/40" />}
                                     </button>
                                 ))}
-                                <div className="h-px bg-white/5 my-1" />
+                                <div className="h-px bg-black/[0.05] my-1" />
                                 <button 
                                     onClick={() => {
                                         useWalletStore.getState().createWallet();
                                         setIsSwitcherOpen(false);
                                     }}
-                                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-500/10 text-emerald-400 transition-all border border-transparent hover:border-emerald-500/20"
+                                    className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#00C076]/5 text-[#00C076] transition-all border border-transparent hover:border-[#00C076]/20"
                                 >
                                     <UserPlus size={16} />
                                     <span className="text-[10px] font-black uppercase tracking-widest">New Identity</span>
@@ -211,23 +215,39 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             >
                 <div className="relative z-10 flex justify-between items-start">
                     <div className="space-y-8">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2.5 rounded-xl bg-black/5 border border-black/[0.06]">
-                                <TrendingUp size={16} className="text-black" strokeWidth={2.5} />
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-xl bg-black/5 border border-black/[0.06]">
+                                    <TrendingUp size={16} className="text-black" strokeWidth={2.5} />
+                                </div>
+                                <h3 className="text-[11px] font-black text-black/30 uppercase tracking-[0.3em]">
+                                    DISPOSABLE NET WORTH
+                                </h3>
                             </div>
-                            <h3 className="text-[11px] font-black text-black/30 uppercase tracking-[0.3em]">
-                                DISPOSABLE NET WORTH
-                            </h3>
+                            <button 
+                                onClick={() => setIsEyesOff(!isEyesOff)}
+                                className="text-black/20 hover:text-black/60 transition-colors"
+                            >
+                                <Eye size={16} />
+                            </button>
                         </div>
                         
                         <div className="flex items-baseline gap-8">
                             <motion.span 
-                                key={totalValue}
+                                key={isEyesOff ? 'hidden' : totalValue}
                                 initial={{ scale: 1.02 }}
                                 animate={{ scale: 1 }}
-                                className="text-8xl font-black text-black tracking-tighter font-mono"
+                                className="text-8xl font-black text-black tracking-tighter font-mono flex items-center"
                             >
-                                ${safeToLocaleString(totalValue, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                <span className="mr-1 text-[0.8em] text-black/50">$</span>
+                                {isEyesOff ? (
+                                    <span>******</span>
+                                ) : (
+                                    <AnimatedCounter 
+                                        value={totalValue} 
+                                        format={(val) => safeToLocaleString(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                                    />
+                                )}
                             </motion.span>
                             
                             <motion.div 
@@ -241,7 +261,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 )}
                             >
                                 {isProfit ? <ArrowUpRight size={20} strokeWidth={3} /> : <ArrowDownRight size={20} strokeWidth={3} />}
-                                {safeToFixed(Math.abs(totalChange24h), 2)}%
+                                {isEyesOff ? "****" : safeToFixed(Math.abs(totalChange24h), 2)}%
                             </motion.div>
                         </div>
 
@@ -251,7 +271,16 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     <PieChart size={12} />
                                     ACTIVE ASSETS
                                 </div>
-                                <div className="text-4xl font-black text-black font-mono">{assets.length}</div>
+                                <div className="text-4xl font-black text-black font-mono flex items-center justify-between gap-4">
+                                    {isEyesOff ? "***" : <AnimatedCounter value={assets.length} />}
+                                    <div className="w-10 h-10 opacity-30 mt-1">
+                                        <svg viewBox="0 0 32 32" className="w-full h-full -rotate-90">
+                                            <circle r="16" cx="16" cy="16" fill="#e5e5e5" />
+                                            <circle r="16" cx="16" cy="16" fill="black" strokeDasharray="60 100" strokeWidth="32" />
+                                            <circle r="16" cx="16" cy="16" fill="#00C076" strokeDasharray="15 100" strokeDashoffset="-60" strokeWidth="32" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div className="w-px bg-black/[0.06]" />
@@ -260,7 +289,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <Globe size={12} />
                                     NETWORK NODES
+                                </div>
+                                <div className="text-4xl font-black text-black font-mono">14</div>
                             </div>
+                            
                             <div className="w-px bg-black/[0.06]" />
                             
                             <div className="space-y-1">
@@ -283,6 +315,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         <RefreshCcw size={24} className={cn(isLoading && "animate-spin")} strokeWidth={2.5} />
                     </button>
                 </div>
+            </motion.div>
+
             {/* 🔥 ASSET LIST */}
             <div className="relative rounded-[2.5rem] border border-black/[0.06] bg-white shadow-xl overflow-hidden">
                 <div className="px-10 py-8 border-b border-black/[0.06] flex justify-between items-center">
@@ -296,7 +330,13 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 </div>
                 
                 <div className="divide-y divide-black/[0.03]">
-                    <AnimatePresence mode="popLayout">
+                    {isLoading && assets.length === 0 ? (
+                        <div className="p-8">
+                            <PortfolioSkeleton />
+                        </div>
+                    ) : (
+                        <>
+                        <AnimatePresence mode="popLayout">
                         {assets.map((asset, idx) => {
                             const assetId = `${asset.symbol}-${asset.network}`;
                             const isNew = newAssetIds.has(assetId);
@@ -322,10 +362,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     
                                     <div className="text-right mx-10 relative z-10">
                                         <div className="text-black font-mono font-black text-3xl tracking-tighter">
-                                            ${safeToLocaleString(asset.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </div>
                                         <div className="text-[10px] text-black/30 font-bold uppercase tracking-widest mt-1">
-                                            {safeToFixed(asset.balance, 6)} {asset.symbol}
+                                            {isEyesOff ? "**" : safeToFixed(asset.balance, 6)} {asset.symbol}
                                         </div>
                                     </div>
 
@@ -346,11 +386,13 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     
                     {assets.length === 0 && !isLoading && (
                         <div className="py-24 text-center space-y-4">
-                            <Eye size={48} className="text-gray-700 mx-auto" strokeWidth={1.5} />
-                            <p className="text-gray-600 text-sm font-bold uppercase tracking-widest">
+                            <Eye size={48} className="text-black/10 mx-auto" strokeWidth={1.5} />
+                            <p className="text-black/30 text-sm font-bold uppercase tracking-widest">
                                 No assets detected for this identity
                             </p>
                         </div>
+                    )}
+                        </>
                     )}
                 </div>
             </div>
