@@ -22,32 +22,85 @@ export async function createTransaction(data: CreateTransactionData) {
 }
 
 export async function getTransactionHistory(authUserId: string, options?: any) {
-  const where: any = { 
-    OR: [
-      { fromAddress: authUserId },
-      { toAddress: authUserId }
-    ]
-  };
-  
-  if (options?.type) {
-    where.type = options.type;
-  }
+  const limit = options?.limit || 50;
+  const offset = options?.offset || 0;
 
-  const transactions = await prisma.transaction.findMany({
-    where,
-    orderBy: { timestamp: 'desc' },
-    take: options?.limit || 50,
-    skip: options?.offset || 0,
-  });
+  // ── UNIFICACIÓN SOBERANA DE TRIPLE FLUJO (5000T) ──────────────────────────
+  // Consolidamos Ledger (Transaction), Inteligencia (WhaleActivity) y Red (BlockchainTransaction)
+  const [legacy, whales, blockchain] = await Promise.all([
+    prisma.transaction.findMany({
+      where: { 
+        OR: [{ fromAddress: authUserId }, { toAddress: authUserId }],
+        ...(options?.type ? { type: options.type } : {})
+      },
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+      skip: offset,
+    }),
+    prisma.whaleActivity.findMany({
+      where: {
+        OR: [
+          { fromAddress: authUserId },
+          { toAddress: authUserId },
+          { walletAddress: authUserId }
+        ]
+      },
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+    }),
+    prisma.blockchainTransaction.findMany({
+      where: { userId: authUserId },
+      orderBy: { createdAt: 'desc' },
+      take: limit
+    })
+  ]);
 
-  return transactions.map((t: any) => ({
-    ...t,
-    hash: t.txHash,
-    from: t.fromAddress,
-    to: t.toAddress,
-    value: t.amount.toString(),
-    tokenSymbol: t.token
-  }));
+  // Mapeo unificado para el Ledger de Alta Fidelidad
+  const unified = [
+    ...legacy.map((t: any) => ({
+      ...t,
+      hash: t.txHash,
+      from: t.fromAddress,
+      to: t.toAddress,
+      value: t.amount.toString(),
+      tokenSymbol: t.token,
+      isWhale: false,
+      source: 'LEDGER'
+    })),
+    ...whales.map((w: any) => ({
+      ...w,
+      hash: w.transactionHash,
+      from: w.fromAddress,
+      to: w.toAddress,
+      value: w.amount,
+      tokenSymbol: w.token,
+      status: 'CONFIRMED',
+      type: w.type,
+      timestamp: w.timestamp,
+      isWhale: true,
+      institutional: w.institutional,
+      valueBTC: w.valueBTC,
+      source: 'WHALE_INTEL'
+    })),
+    ...blockchain.map((b: any) => ({
+      ...b,
+      hash: b.txHash,
+      from: b.userId || 'UNKNOWN',
+      to: 'N/A',
+      value: b.fromAmount || '0',
+      tokenSymbol: b.fromToken || 'CRYPTO',
+      status: b.status,
+      type: b.type,
+      timestamp: b.createdAt,
+      isWhale: false,
+      source: 'BLOCKCHAIN_SYNC'
+    }))
+  ];
+
+  // Re-ordenamiento cronológico total bajo lógica determinista
+  return unified
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, limit);
 }
 
 export async function getTransactionByHash(hash: string) {

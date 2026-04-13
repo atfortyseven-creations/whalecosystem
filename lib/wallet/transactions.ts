@@ -37,13 +37,19 @@ export interface CreateTransactionData {
   hash: string;
   chainId: number;
   type: TransactionType;
+  baseType?: string; // e.g. 'TRANSFER', 'SWAP'
   status: TransactionStatus;
   from: string;
   to: string;
-  value: string; // in wei
+  value: string; // in wei or decimal string
   tokenAddress?: string;
   tokenSymbol?: string;
   metadata?: TransactionMetadata;
+  // ── INSTITUTIONAL INTELLIGENCE ──────────────────────────────────────────
+  isWhale?: boolean;
+  institutional?: boolean;
+  valueBTC?: string;
+  logo?: string;
 }
 
 /**
