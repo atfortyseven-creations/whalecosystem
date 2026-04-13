@@ -362,6 +362,27 @@ whalecosystem/
 
 ---
 
+## 🏛️ Alianzas Estratégicas e Infraestructura Soberana
+
+El **Whale Alert Network** opera bajo el respaldo tecnológico de las entidades líderes en infraestructura criptográfica y computación distribuida. Estas alianzas garantizan la integridad, la privacidad y la persistencia de las señales institucionales a escala global.
+
+### Aztec Network
+Implementamos la capa de privacidad soberana de Aztec para garantizar que el flujo de inteligencia ZK se procese con un grado de anonimato institucional. Su tecnología de rollups de conocimiento cero es el pilar sobre el cual construimos nuestras atestaciones inmutables.
+
+### GetBlock
+La infraestructura de nodos de GetBlock proporciona el acceso redundante y de ultra-baja latencia a las 16 redes EVM monitoreadas por el terminal. Su robustez técnica permite que el Sovereign Mesh opere con tiempos de respuesta sub-milisegundo.
+
+### Alchemy
+Constituye el núcleo de nuestra capa de datos enriquecida. Mediante el uso de su infraestructura de indexación avanzada, el Whale Alert Network procesa terabytes de información histórica y tiempo real con una precisión matemática absoluta.
+
+### Redis
+El motor de estado global del sistema. Redis garantiza la persistencia de los flujos de datos asíncronos y la sincronización en tiempo real entre los nodos del Mesh, gestionando la concurrencia masiva sin comprometer la integridad estructural.
+
+### Morpho
+Nuestra integración con Morpho permite la gestión eficiente de la liquidez y el monitoreo de mercados de préstamo peer-to-peer. Su modelo de eficiencia de capital es fundamental para las estrategias de análisis de mercado de alta frecuencia que el terminal emite.
+
+---
+
 <p align="center">
   <strong>Whale Alert Network</strong> · Powered by Mathematics · Bound by Decentralization · Driven by Truth
   <br>
