@@ -12,18 +12,17 @@ interface WhaleLogoProps {
 /**
  * 🐋 SOVEREIGN BRAND IDENTITY ENGINE
  * Centrally manages the official whale logo visualization.
- * Robust against theme transitions and hydration mismatches.
  */
 export function WhaleLogo({ 
     className = "w-10 h-10", 
     variant = 'monochrome',
-    priority = false 
+    priority = true 
 }: WhaleLogoProps) {
-    // Official logo asset selection
+    // Reference the institutional logo via our hardened checkpoint-image API
     return (
         <div className={`relative flex items-center justify-center ${className}`}>
             <Image
-                src="/official-whale.png"
+                src="/api/checkpoint-image?name=whale-logo-institutional.png"
                 alt="Whale Alert Network"
                 fill
                 className="object-contain transition-all duration-300 transform-gpu"

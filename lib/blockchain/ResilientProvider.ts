@@ -142,6 +142,8 @@ export class ResilientProvider {
 
   private markExhausted(index: number, reason: string) {
     const ep = this.endpoints[index];
+    if (ep.exhausted) return; // Prevent log spam if already exhausted
+
     ep.exhausted = true;
     ep.isHealthy = false;
     ep.exhaustedAt = Date.now();
@@ -185,8 +187,16 @@ export class ResilientProvider {
     return fn(this.providers[activeIndices[0]]);
   }
 
-  private initWebSocket(url: string) {
     if (typeof window !== 'undefined') return; // Server-side only
+    
+    // [SECURITY FIX] Ensure we don't try to connect to an HTTP URL as a WebSocket
+    // This prevents "Unexpected server response: 200" from ethers.
+    if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+      console.error(`[ResilientProvider] 🚫 MALFORMED_WS_URL skipping: ${url}`);
+      this.reconnectWS();
+      return;
+    }
+
     try {
       this.wsProvider = new ethers.WebSocketProvider(url);
       this.wsProvider.on('error', () => this.reconnectWS());
