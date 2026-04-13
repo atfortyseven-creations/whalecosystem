@@ -34,8 +34,6 @@ export const ScrollFloat = ({
     stagger = 0.03
 }: ScrollFloatProps) => {
     const containerRef = useRef<HTMLHeadingElement>(null);
-    ...
-};
 
     const splitText = useMemo(() => {
         const text = typeof children === 'string' ? children : '';
