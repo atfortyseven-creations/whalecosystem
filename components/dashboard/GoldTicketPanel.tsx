@@ -10,8 +10,9 @@ import {
 import { injected } from 'wagmi/connectors';
 import {
   Zap, Users, Lock, ExternalLink,
-  Clock, CheckCircle2, Flame, PenTool
+  Clock, CheckCircle2, Flame, PenTool, ShieldCheck, ArrowRight
 } from 'lucide-react';
+import { WhaleLogo } from '@/components/shared/WhaleLogo';
 
 // ── Contract ──────────────────────────────────────────────────────────────────
 const CONTRACT = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
@@ -56,53 +57,47 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
   const urgencyColor = isAlmostFull ? '#FF9500' : '#D4AF37';
 
   return (
-    <div className="w-full space-y-3">
-      {/* Numbers */}
+    <div className="w-full space-y-4">
       <div className="flex items-end justify-between">
         <div>
-          <span className="text-4xl font-black font-mono text-[#050505] tracking-tighter leading-none">
+          <span className="text-5xl font-black font-mono text-black tracking-tighter leading-none">
             {minted}
           </span>
-          <span className="text-lg font-black font-mono text-[#888888] ml-1">/ {max}</span>
+          <span className="text-xl font-black font-mono text-black/20 ml-2">/ {max}</span>
         </div>
         <div className="text-right">
-          <p className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Remaining</p>
-          <p
-            className="text-2xl font-black font-mono tracking-tighter"
-            style={{ color: urgencyColor }}
-          >
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">Remaining Slots</p>
+          <p className="text-2xl font-black font-mono tracking-tighter text-[#D4AF37]">
             {remaining}
           </p>
         </div>
       </div>
 
-      {/* Bar */}
-      <div className="relative h-2 bg-[#F0F0F0] rounded-full overflow-hidden">
+      <div className="relative h-3 bg-black/5 rounded-full overflow-hidden">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
-          style={{ background: `linear-gradient(90deg, ${urgencyColor}99, ${urgencyColor})` }}
+          style={{ background: urgencyColor }}
           initial={{ width: 0 }}
           animate={{ width: `${fill}%` }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
         />
-        {/* Shimmer */}
         <motion.div
-          className="absolute inset-y-0 w-12 rounded-full"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)' }}
-          animate={{ left: [`${fill - 5}%`, `${fill + 2}%`, `${fill - 5}%`] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-y-0 w-24"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)' }}
+          animate={{ left: ['-100%', '100%'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
         />
       </div>
 
-      <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-widest">
-        <span style={{ color: urgencyColor }} className="font-black">{fill}% CLAIMED</span>
+      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em]">
+        <span className="text-[#D4AF37]">{fill}% INSTITUTIONAL CAP REACHED</span>
         {isAlmostFull && (
           <motion.span
             animate={{ opacity: [1, 0.4, 1] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
-            className="flex items-center gap-1 text-[#FF9500] font-black"
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="flex items-center gap-2 text-[#FF9500]"
           >
-            <Flame size={10} /> ALMOST FULL
+            <Flame size={12} /> CRITICAL SCARCITY
           </motion.span>
         )}
       </div>
@@ -112,9 +107,9 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
 
 function StatChip({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`flex flex-col gap-1 px-5 py-4 rounded-2xl border ${accent ? 'bg-[#D4AF37]/5 border-[#D4AF37]/25' : 'bg-white border-[#E5E5E5]'}`}>
-      <p className="text-[8px] font-black text-[#888888] uppercase tracking-[0.22em]">{label}</p>
-      <p className={`text-sm font-black font-mono tracking-tight ${accent ? 'text-[#B8962E]' : 'text-[#050505]'}`}>{value}</p>
+    <div className={`flex flex-col gap-2 px-6 py-5 rounded-3xl border ${accent ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20 shadow-[0_10px_30px_rgba(212,175,55,0.05)]' : 'bg-white border-black/[0.06] shadow-xl'}`}>
+      <p className="text-[10px] font-black text-black/30 uppercase tracking-[0.2em]">{label}</p>
+      <p className={`text-base font-black font-mono tracking-tighter ${accent ? 'text-[#D4AF37]' : 'text-black'}`}>{value}</p>
     </div>
   );
 }
@@ -124,8 +119,7 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   const [isDrawing, setIsDrawing] = React.useState(false);
   const [hasDrawn, setHasDrawn] = React.useState(false);
 
-  // Scale canvas buffer to match its displayed size (prevents blurry strokes on HiDPI)
-  React.useEffect(() => {
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const dpr = window.devicePixelRatio || 1;
@@ -140,10 +134,7 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
   const start = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -163,10 +154,9 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
     if (!ctx) return;
     const pos = getPos(e);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = '#050505';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
     ctx.stroke();
     setHasDrawn(true);
   };
@@ -174,127 +164,72 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   const stop = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    if (hasDrawn && canvasRef.current) {
-      onSignature(canvasRef.current.toDataURL('image/png'));
-    }
-  };
-
-  const clear = () => {
-    if (disabled) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setHasDrawn(false);
-    onSignature("");
+    if (hasDrawn && canvasRef.current) onSignature(canvasRef.current.toDataURL('image/png'));
   };
 
   return (
-    <div className="flex flex-col gap-3 mt-6 select-none">
+    <div className="flex flex-col gap-4 mt-8">
       <div className="flex items-center justify-between">
-        <label className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Draw Your Signature</label>
-        {hasDrawn && !disabled && (
-          <button onClick={clear} className="text-[9px] font-black uppercase tracking-widest text-[#888888] hover:text-[#FF3B30] transition-colors">
-            Clear
-          </button>
-        )}
+         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">Manual Endorsement</label>
+         {hasDrawn && !disabled && (
+           <button onClick={() => {
+             const ctx = canvasRef.current?.getContext('2d');
+             ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+             setHasDrawn(false);
+             onSignature("");
+           }} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3B30] hover:scale-105 transition-all">Reset Pad</button>
+         )}
       </div>
 
-      {/* Canvas surface */}
-      <div
-        className={`relative w-full rounded-xl overflow-hidden transition-all duration-200 ${
-          hasDrawn
-            ? 'border-2 border-[#D4AF37]/50 bg-[#FFFEF9] shadow-[0_0_0_4px_rgba(212,175,55,0.08)]'
-            : 'border-2 border-dashed border-[#DDDDDD] bg-white'
-        }`}
-        style={{ height: 160 }}
-      >
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full cursor-crosshair touch-none"
-          style={{ touchAction: 'none' }}
-          onPointerDown={start}
-          onPointerMove={draw}
-          onPointerUp={stop}
-          onPointerLeave={stop}
-        />
-
-        {/* Instruction overlay — only shown before drawing */}
+      <div className={`relative w-full h-[180px] rounded-[2rem] overflow-hidden border-2 border-dashed transition-all ${hasDrawn ? 'border-[#D4AF37] bg-white shadow-2xl' : 'border-black/10 bg-black/5'}`}>
+        <canvas ref={canvasRef} className="w-full h-full cursor-crosshair touch-none" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerLeave={stop} />
         {!hasDrawn && !disabled && (
-          <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center gap-2">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-            </svg>
-            <p className="text-[11px] font-black uppercase tracking-widest text-[#CCCCCC]">Draw your signature here</p>
-            <p className="text-[9px] font-mono text-[#DDDDDD]">Use your mouse, trackpad or finger</p>
-            <div className="absolute bottom-8 left-8 right-8 border-b border-[#F0F0F0]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20">
+            <PenTool size={32} className="text-black mb-3" />
+            <p className="text-[11px] font-black uppercase tracking-[0.3em]">Sign Cryptographic Endorsement</p>
           </div>
         )}
-
-        {/* Disabled overlay */}
-        {disabled && <div className="absolute inset-0 bg-white/60 pointer-events-none" />}
       </div>
-
-      {/* Status */}
-      <p className={`text-[9px] font-mono uppercase tracking-widest transition-colors ${
-        hasDrawn ? 'text-[#D4AF37] font-black' : 'text-[#CCCCCC]'
-      }`}>
-        {hasDrawn ? '✓ Signature captured — ready to mint' : 'Your signature will be saved with your mint forever'}
-      </p>
     </div>
   );
 }
 
-
 function GlobalLedger({ feed }: { feed: any[] }) {
   return (
-      <div className="bg-white border border-[#E5E5E5] rounded-3xl overflow-hidden mt-8 shadow-sm">
-         <div className="px-8 py-6 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center">
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">Ledger Tickets</span>
+      <div className="bg-white border border-black/[0.08] rounded-[3rem] overflow-hidden mt-12 shadow-2xl">
+         <div className="px-10 py-8 border-b border-black/[0.04] bg-black/5 flex items-center justify-between">
+             <span className="text-[11px] font-black uppercase tracking-[0.3em] text-black">IMMUTABLE GENESIS LEDGER</span>
+             <span className="text-[9px] font-black text-black/20 uppercase tracking-[0.4em]">Optimism Mainnet</span>
          </div>
-         <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] bg-white border-b border-[#F0F0F0]"
+         <div className="grid text-[10px] font-black text-black/30 uppercase tracking-[0.2em] bg-white border-b border-black/[0.04]"
               style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-              <div className="px-8 py-4">Secured Address</div>
-              <div className="px-8 py-4">Timestamp</div>
-              <div className="px-8 py-4 text-right">Signature</div>
+              <div className="px-10 py-5">Verified Sovereign</div>
+              <div className="px-10 py-5">Temporal Entry</div>
+              <div className="px-10 py-5 text-right">Cryptographic Seal</div>
          </div>
-         <div className="divide-y divide-[#F0F0F0]">
-            {!feed?.length && (
-                <div className="p-8 text-center text-[10px] font-mono text-[#888888]">Awaiting Genesis Mints...</div>
-            )}
+         <div className="divide-y divide-black/[0.04]">
             {feed?.map((f: any, i: number) => {
-                if (!f) return null;
-                let parsed: any = null;
+                let displaySig = "";
                 try {
-                   const raw = JSON.parse(f.signatureData);
-                   if (raw && typeof raw === 'object') parsed = raw;
-                } catch(e) { }
-                if (!parsed) parsed = { signature: f.signatureData ?? '' };
-                const displaySig: string = parsed.signature || f.signatureData || '';
-
+                  const parsed = JSON.parse(f.signatureData);
+                  displaySig = parsed.signature || f.signatureData;
+                } catch { displaySig = f.signatureData; }
+                
                 return (
-                    <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid items-center hover:bg-[#FAF9F6] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-                        <div className="px-8 py-5">
-                             <div className="flex items-center gap-2">
-                                <CheckCircle2 size={12} className="text-[#00C076]" />
-                                <span className="text-[11px] font-mono font-bold text-[#050505]">{truncAddr(f.userAddress || '')}</span>
-                             </div>
+                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
+                        <div className="px-10 py-6 flex items-center gap-3">
+                             <div className="w-2 h-2 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
+                             <span className="text-sm font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
                         </div>
-                        <div className="px-8 py-5 text-[10px] font-mono text-[#888888]">
-                             {f.claimedAt ? new Date(f.claimedAt).toLocaleString() : '—'}
+                        <div className="px-10 py-6 text-[10px] font-black font-mono text-black/40 uppercase">
+                             {new Date(f.claimedAt).toLocaleTimeString()}
                         </div>
-                         <div className="px-8 py-2 flex justify-end">
-                              {displaySig && displaySig.startsWith('data:image') ? (
-                                 <img src={displaySig} className="h-8 max-w-[100px] object-contain opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
-                              ) : (
-                                 <div className="border border-[#E5E5E5] bg-white rounded" style={{ width: 100, height: 32 }}>
-                                   <svg width="100%" height="100%" viewBox="0 0 100 32" fill="none">
-                                     <path d="M8,20 C18,8 28,24 38,14 C48,4 58,26 68,16 C78,8 88,20 92,14" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                   </svg>
-                                 </div>
+                         <div className="px-10 py-2 flex justify-end">
+                              {displaySig?.startsWith('data:image') && (
+                                 <img src={displaySig} className="h-10 opacity-70 mix-blend-multiply grayscale hover:grayscale-0 transition-all" alt="Sig" />
                               )}
                          </div>
-                    </motion.div>
+                    </div>
                 );
             })}
          </div>
@@ -302,577 +237,150 @@ function GlobalLedger({ feed }: { feed: any[] }) {
   );
 }
 
-// ── MAIN PANEL ────────────────────────────────────────────────────────────────
 export function GoldTicketPanel() {
   const { address, isConnected, chainId } = useAccount();
-  const { connect }      = useConnect();
-  const { switchChain, isPending: isSwitching }  = useSwitchChain({
-    mutation: {
-      onError: (error) => toast.error(`Failed to switch network: ${error.message}`)
-    }
-  });
-  const [dbStats, setDbStats] = useState<{ totalClaimed: number; remaining: number; ticket?: any; feed?: any[] } | null>(null);
+  const { connect } = useConnect();
+  const { switchChain } = useSwitchChain();
+  const { signMessage, isSuccess: isConfirmed, reset: resetTx } = useSignMessage();
+  const [dbStats, setDbStats] = useState<any>(null);
   const [signatureData, setSignatureData] = useState<string>("");
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => setIsMounted(true), []);
 
-  const hasValidSignature = signatureData.length > 50;
-
-  const fetchDbStats = useCallback(async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const q = address ? `?address=${address}` : '';
       const res = await fetch(`/api/golden-ticket/claim${q}`);
-      if (res.ok) {
-        const json = await res.json();
-        setDbStats({ totalClaimed: json.totalClaimed, remaining: json.remaining, ticket: json.ticket, feed: json.feed });
-      }
-    } catch { /* silent */ }
+      const json = await res.json();
+      setDbStats(json);
+    } catch {}
   }, [address]);
 
   useEffect(() => {
-    fetchDbStats();
-    const id = setInterval(fetchDbStats, 3000); // hyper-realtime
+    fetchStats();
+    const id = setInterval(fetchStats, 5000);
     return () => clearInterval(id);
-  }, [fetchDbStats]);
-
-  // ── On-chain reads ───────────────────────────────────────────────────────────
-  const { data: balanceData, refetch: refetchBalance } = useReadContract({
-    address: CONTRACT,
-    abi: ABI,
-    functionName: 'balanceOf',
-    args: address ? [address, 1n] : undefined,
-    query: { enabled: !!address, refetchInterval: 10_000 },
-  });
-
-  const { data: supplyData } = useReadContract({
-    address: CONTRACT,
-    abi: ABI,
-    functionName: 'totalSupply',
-    args: [1n],
-    query: { refetchInterval: 10_000 },
-  });
-
-  const { data: maxSupplyData } = useReadContract({
-    address: CONTRACT,
-    abi: ABI,
-    functionName: 'maxSupply',
-    args: [1n],
-    query: { refetchInterval: 30_000 },
-  });
-
-  const { data: mintPriceData } = useReadContract({
-    address: CONTRACT,
-    abi: ABI,
-    functionName: 'mintPrice',
-    query: { staleTime: 60_000 },
-  });
-
-  const hasTicket   = Boolean(balanceData && BigInt(balanceData as any) > 0n);
-  const chainMinted = supplyData    ? Number(supplyData)    : null;
-  const chainMax    = maxSupplyData ? Number(maxSupplyData) : null;
-  const mintPrice: bigint = mintPriceData ? BigInt(mintPriceData as any) : 0n;
-
-  // Prefer on-chain supply; fall back to DB counter
-  const displayMinted   = chainMinted   ?? dbStats?.totalClaimed ?? 0;
-  const displayMax      = chainMax      ?? MAX_SUPPLY;
-  const displayRemain   = displayMax - displayMinted;
-  const isWrongNetwork  = isConnected && chainId !== OPTIMISM_CHAIN_ID;
-
-  // ── Off-chain write ──────────────────────────────────────────────────────────
-  const {
-    signMessage, data: cryptoSignature,
-    isPending: isTxPending, isError: isTxError, error: txError, reset: resetTx, isSuccess: isConfirmed
-  } = useSignMessage();
-
-  const isConfirming = false; // Kept for backwards UI compat
+  }, [fetchStats]);
 
   useEffect(() => {
     if (isConfirmed && address) {
-      const execClaim = async () => {
-          try {
-            const tid = toast.loading('Securing geographic telemetry...');
-            let geoRes: any = {};
-            try {
-              const geoReq = await fetch('https://ipapi.co/json/');
-              geoRes = await geoReq.json();
-            } catch (e) {
-              console.warn('Geolocation failed', e);
-            }
-
-            const telepack = {
-              signature: signatureData,
-              ip: geoRes.ip || '0.0.0.0',
-              country: geoRes.country_name || 'Classified',
-              planet: 'Earth / E.A.R.T.H',
-              timestamp: new Date().toISOString()
-            };
-
-            await fetch('/api/golden-ticket/claim', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ walletAddress: address, signatureData: JSON.stringify(telepack), cryptoSignature })
-            });
-            toast.success('Access Granted ✓', { id: tid });
-            refetchBalance();
-            fetchDbStats();
-          } catch (e) {}
+      const exec = async () => {
+        toast.loading('Encoding Institutional Identity...');
+        await fetch('/api/golden-ticket/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ walletAddress: address, signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() }) })
+        });
+        toast.success('Access Granted ✓');
+        fetchStats();
       };
-      execClaim();
+      exec();
     }
-  }, [isConfirmed, address, cryptoSignature, signatureData, refetchBalance, fetchDbStats]);
+  }, [isConfirmed, address, signatureData, fetchStats]);
 
-  useEffect(() => {
-    if (isTxError && txError) {
-      const msg = (txError as any)?.shortMessage ?? txError?.message ?? 'Rejected';
-      toast.error(msg.slice(0, 90));
-      resetTx();
-    }
-  }, [isTxError, txError, resetTx]);
+  const hasTicket = dbStats?.ticket || false;
 
-  const handleConnect = () => connect({ connector: injected() });
-
-  const handleMint = () => {
-    if (!isConnected) { toast.error('Connect your wallet first'); return; }
-    if (hasTicket) { toast.info('This wallet already holds a Whale Gold Ticket.'); return; }
-    try {
-      signMessage({
-        message: `I am claiming my Genesis identity for ${address?.toLowerCase()} on Whale Alert Network. Gasless.`
-      });
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to build signature request');
-    }
-  };
-
-  // ── PRE-HYDRATION FALLBACK ───────────────────────────────────────────────────
-  if (!isMounted) {
-    return (
-      <div className="w-full flex justify-center items-center py-20 min-h-[400px]">
-         <div className="w-10 h-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // ── ALREADY HOLDS TICKET ─────────────────────────────────────────────────────
-  if (hasTicket || isConfirmed || dbStats?.ticket) {
-    return (
-      <div className="w-full max-w-5xl mx-auto space-y-6 py-8">
-        {/* Verified Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between bg-[#D4AF37]/8 border border-[#D4AF37]/25 rounded-2xl px-8 py-5"
-        >
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={20} className="text-[#D4AF37]" />
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37]">Identity Verified {hasTicket ? 'On-Chain' : 'Off-Chain'}</p>
-              <p className="text-[9px] font-mono text-[#888888] mt-0.5">
-                {address ? truncAddr(address) : 'Connected'} · Optimism
-              </p>
-            </div>
-          </div>
-          <a
-            href={`https://optimistic.etherscan.io/address/${CONTRACT}`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#888888] hover:text-[#050505] transition-colors"
-          >
-            View Contract <ExternalLink size={11} />
-          </a>
-        </motion.div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatChip label="Serial Designation" value={dbStats?.ticket?.serialCode || "GENESIS-0000"} accent />
-          <StatChip label="Sequence Index" value={`#${dbStats?.ticket?.ticketNumber || '...'}`} />
-          <StatChip label="Timestamp" value={dbStats?.ticket?.claimedAt ? new Date(dbStats.ticket.claimedAt).toLocaleDateString() : "Live"} />
-          <StatChip label="Settlement Layer" value="Optimism" />
-        </div>
-
-        {dbStats?.ticket?.signatureData && (
-          <div className="w-full flex flex-col md:flex-row gap-6 p-8 border border-[#E5E5E5] bg-[#FAF9F6] rounded-2xl">
-            {(() => {
-              let parsed: any = null;
-              try { 
-                const raw = JSON.parse(dbStats.ticket.signatureData);
-                // JSON.parse('null') returns null — guard explicitly
-                if (raw && typeof raw === 'object') parsed = raw;
-              } catch(e) { /* not json */ }
-              // Fallback: treat the whole string as a raw PNG dataURL
-              if (!parsed) {
-                parsed = { signature: dbStats.ticket.signatureData, planet: 'E.A.R.T.H', country: 'Classified', ip: '0.0.0.0' };
-              }
-              const finalSig = parsed.signature || dbStats.ticket.signatureData;
-
-              return (
-                <>
-                  <div className="flex-1 space-y-4">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-[#888888] pb-2 border-b border-[#E5E5E5]">Sovereign Telemetry Log</p>
-                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">Planetary Node</p><p className="text-[11px] font-mono font-black text-[#050505]">{parsed.planet}</p></div>
-                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">Geolocation</p><p className="text-[11px] font-mono font-black text-[#050505]">{parsed.country}</p></div>
-                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">IP Address</p><p className="text-[11px] font-mono font-black text-[#050505]">{parsed.ip}</p></div>
-                        <div className="space-y-1"><p className="text-[8px] text-[#888888] font-black uppercase tracking-widest">Secured Address</p><p className="text-[11px] font-mono font-black text-[#050505]">{address ? truncAddr(address) : '...'}</p></div>
-                     </div>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-center p-6 border border-[#E5E5E5] bg-white rounded-xl shadow-inner">
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[#888888] mb-4">Cryptographic Signature</span>
-                      <img src={finalSig} className="max-w-[200px] h-auto opacity-80 mix-blend-multiply pointer-events-none" alt="Signature" />
-                      <div className="w-32 border-b border-[#050505]/20 mt-2" />
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        )}
-
-        {/* Supply Bar */}
-        <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#888888]">Genesis Collection · Mint Progress</p>
-          </div>
-          <SupplyBar minted={displayMinted} max={displayMax} />
-        </div>
-
-        {/* Contract Info */}
-        <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Smart Contract · Optimism Mainnet</p>
-            <p className="text-[11px] font-mono text-[#050505] mt-1">{CONTRACT}</p>
-          </div>
-          <a
-            href={`https://optimistic.etherscan.io/address/${CONTRACT}#readContract`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#050505] hover:opacity-70 transition-opacity whitespace-nowrap"
-          >
-            Read Contract <ExternalLink size={12} />
-          </a>
-        </div>
-
-        <button
-          onClick={() => window.location.reload()}
-          className="w-full py-4 bg-[#050505] text-white rounded text-[#050505] text-xs font-black uppercase tracking-[0.25em] hover:bg-black/90 transition-all active:scale-[0.98]"
-        >
-          Initialize Terminal
-        </button>
-
-        <GlobalLedger feed={dbStats?.feed || []} />
-      </div>
-    );
-  }
-
-  // ── MINTING IN PROGRESS ──────────────────────────────────────────────────────
-  if (isTxPending || isConfirming) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-8">
-        <div className="relative w-20 h-20">
-          <motion.div
-            animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-            className="absolute -inset-2 rounded-full border-2 border-dashed border-[#D4AF37]/20"
-          />
-          <div className="w-20 h-20 rounded-full border-4 border-[#D4AF37] border-t-transparent animate-spin" />
-        </div>
-        <div className="text-center space-y-2 max-w-sm">
-          <h3 className="text-lg font-black uppercase tracking-tight text-[#050505]">
-            {isTxPending ? 'Confirm in Wallet' : 'Securing Telemetry…'}
-          </h3>
-          <p className="text-[11px] text-[#888888]">
-            {isTxPending
-              ? 'Approve the signature in your wallet. Do not close this tab.'
-              : 'Signature verified. Awaiting backend synchronization.'}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ── MAIN LANDING ─────────────────────────────────────────────────────────────
   return (
-    <motion.div 
-      initial="hidden"
-      animate="visible"
-      variants={{
-        hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: { staggerChildren: 0.2 }
-        }
-      }}
-      className="flex flex-col space-y-8 max-w-5xl mx-auto py-8"
-    >
-
-      {/* ── Hero ── */}
-      <motion.div 
-        variants={{
-          hidden: { opacity: 0, y: 30, filter: 'blur(10px)' },
-          visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }
-        }}
-        className="relative bg-[#050505] rounded-[2.5rem] overflow-hidden p-10 md:p-14 shadow-2xl"
-      >
-        {/* Ambient gold */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 65%)' }} />
-
-        {/* Live badge spacing placeholder */}
-        <div className="flex justify-end mb-8">
-          <a
-            href={`https://optimistic.etherscan.io/address/${CONTRACT}`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[9px] font-mono text-white/20 hover:text-white/50 transition-colors"
-          >
-            {CONTRACT.slice(0, 10)}…{CONTRACT.slice(-8)} <ExternalLink size={9} />
-          </a>
-        </div>
-
-        <div className="relative z-10 grid md:grid-cols-2 gap-10 items-center">
-          {/* Left: info */}
-          <div>
-            <h1 className="text-5xl md:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
-              Golden Access
-            </h1>
-            <p className="text-sm text-white/50 leading-relaxed mb-6">
-              A permanent, non-transferable cryptographic identity on Optimism.
-              Strictly limited to one per address. Global supply constrained to <span className="text-[#D4AF37] font-bold">200 units</span>.
-            </p>
-
-            {mintPrice > 0n && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/5">
-                <Zap size={12} className="text-[#D4AF37]" />
-                <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest">
-                  Mint Price: {fmtEth(mintPrice)} ETH
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Right: live supply counter */}
-          <div className="bg-white/5 border border-white/8 rounded-2xl p-8 space-y-6">
-
-            {/* Counter */}
-            <div className="text-center space-y-1">
-              <motion.p
-                key={displayMinted}
-                initial={{ opacity: 0.4, scale: 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-7xl font-black font-mono text-[#D4AF37] tracking-tighter leading-none"
-              >
-                {displayMinted}
-              </motion.p>
-              <p className="text-[11px] font-mono text-white/30">of {displayMax} minted</p>
-            </div>
-
-            {/* Progress */}
-            <div className="space-y-2">
-              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: 'linear-gradient(90deg, #D4AF3799, #D4AF37)' }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct(displayMinted, displayMax)}%` }}
-                  transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                />
-              </div>
-              <div className="flex justify-between text-[8px] font-mono text-white/20">
-                <span>0</span>
-                <span className="text-[#D4AF37]/50 font-black">{pct(displayMinted, displayMax)}% CLAIMED</span>
-                <span>{displayMax}</span>
-              </div>
-            </div>
-
-            {/* Remaining slots urgency */}
-            <div className="flex items-center justify-center gap-2 pt-2 border-t border-white/5">
-              <Clock size={11} className="text-white/20" />
-              <span className="text-[9px] font-mono text-white/30">
-                <span className="text-white/70 font-black">{displayRemain}</span> slots remaining
-              </span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── Traits & Properties ── */}
-      <motion.div 
-        variants={{
-          hidden: { opacity: 0, y: 20 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
-        }}
-        className="grid md:grid-cols-2 gap-6"
-      >
-
-        {/* What you get */}
-        <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#888888] mb-6">What This Ticket Grants</p>
-          <ul className="space-y-5">
-            {[
-              {
-                n: '01',
-                title: 'Permanent On-Chain Access',
-                desc: 'Your membership is permanently encoded in the Optimism L2 blockchain. Unlike traditional subscriptions, this access never expires, cannot be revoked, and requires no renewal fees — ever.',
-                tag: 'Non-Expiring',
-              },
-              {
-                n: '02',
-                title: 'Whale Intelligence Suite',
-                desc: 'Unlock real-time tracking of on-chain whale movements across BTC, ETH, BASE, and BSC. Includes institutional alpha signals, large-cap flow data, and cross-chain activity feeds.',
-                tag: 'Full Access',
-              },
-              {
-                n: '03',
-                title: 'Genesis Badge',
-                desc: 'Holders of this Genesis ticket carry a verifiable on-chain identity that distinguishes them from all future membership tiers. Genesis status is immutable once minted.',
-                tag: 'Exclusive',
-              },
-              {
-                n: '04',
-                title: 'One Ticket Per Wallet',
-                desc: 'The smart contract enforces a strict one-ticket-per-address rule. This NFT is soulbound to your wallet — it cannot be transferred, resold, or duplicated, making your genesis identity unique.',
-                tag: 'Soulbound',
-              },
-            ].map((item, i) => (
-              <li key={i} className="flex items-start gap-4 pb-5 border-b border-[#F5F5F5] last:border-0 last:pb-0">
-                <span className="text-[9px] font-black font-mono text-[#CCCCCC] mt-0.5 shrink-0 w-5">{item.n}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[11px] font-black text-[#050505] uppercase tracking-wide">{item.title}</p>
-                    <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-[#D4AF37]/10 text-[#B8962E] border border-[#D4AF37]/20 shrink-0">{item.tag}</span>
+    <div className="w-full max-w-6xl mx-auto py-12 px-6 space-y-12">
+      
+      {/* ── HERO ── */}
+      <div className="relative bg-white border border-black/[0.08] rounded-[3.5rem] overflow-hidden p-12 md:p-20 shadow-2xl">
+         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#D4AF37]/5 rounded-full blur-[120px] -mr-40 -mt-40" />
+         
+         <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+               <div className="flex items-center gap-3 mb-8">
+                  <div className="w-3 h-3 rounded-full bg-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
+                  <span className="text-[12px] font-black uppercase tracking-[0.4em] text-black/30">Lvl.04 Sovereign Membership</span>
+               </div>
+               <h1 className="text-6xl md:text-8xl font-black text-black uppercase tracking-tighter leading-[0.85] mb-8">
+                  GOLD <span className="text-[#D4AF37]">WHALE</span> NETWORK
+               </h1>
+               <p className="text-lg text-black/40 font-bold leading-relaxed mb-10 max-w-xl font-sans">
+                  The Gold Whale Network is the ultimate echelon of institutional tracking. It provides permanent, encrypted access to the core mempool engine and the largest capital flow signatures across the ledger.
+               </p>
+               <div className="flex flex-wrap gap-4">
+                  <div className="px-6 py-3 bg-black text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl">
+                     GENESIS STATUS: ACTIVE
                   </div>
-                  <p className="text-[10px] text-[#888888] leading-relaxed">{item.desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* NFT properties + live supply bar */}
-        <div className="space-y-4">
-          {/* Live supply bar card */}
-          <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#888888]">Mint Progress · Live</p>
+                  <div className="px-6 py-3 border border-black/10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-black/40">
+                     OPTIMISM SETTLEMENT
+                  </div>
+               </div>
             </div>
-            <SupplyBar minted={displayMinted} max={displayMax} />
-          </div>
 
-          {/* Token Properties */}
-          <div className="bg-white border border-[#E5E5E5] rounded-3xl p-6">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#888888] mb-4">NFT Properties</p>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { k: 'Standard', v: 'ERC-1155' },
-                { k: 'Network', v: 'Optimism L2' },
-                { k: 'Collection', v: 'Genesis' },
-                { k: 'Max Supply', v: String(displayMax) },
-                { k: 'Transferable', v: 'No' },
-                { k: 'Burnable', v: 'No' },
-              ].map(({ k, v }) => (
-                <div key={k} className="bg-[#FAF9F6] rounded-xl px-3 py-2.5 border border-[#F0F0F0]">
-                  <p className="text-[8px] font-black uppercase tracking-widest text-[#888888]">{k}</p>
-                  <p className="text-[11px] font-black text-[#050505] mt-0.5">{v}</p>
-                </div>
-              ))}
+            <div className="bg-black/5 border border-black/[0.04] p-12 rounded-[3rem] space-y-10 shadow-inner">
+               <div className="text-center space-y-2">
+                  <motion.div key={dbStats?.totalClaimed} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-8xl font-black font-mono text-black leading-none tracking-tighter">
+                     {dbStats?.totalClaimed || '000'}
+                  </motion.div>
+                  <p className="text-[12px] font-black uppercase tracking-[0.3em] text-black/20">Genesis Endorsements Issued</p>
+               </div>
+               <SupplyBar minted={dbStats?.totalClaimed || 0} max={MAX_SUPPLY} />
             </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── Claim Steps ── */}
-      <motion.div 
-        variants={{
-          hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
-        }}
-        className="grid md:grid-cols-3 gap-5"
-      >
-        {[
-          {
-            n: '01', title: 'Connect Wallet',
-            desc: 'Connect via MetaMask, Rabby, or any injected Web3 wallet on Optimism.',
-            status: isConnected && !isWrongNetwork ? 'DONE' : isConnected && isWrongNetwork ? 'SWITCH' : 'PENDING',
-            action: !isConnected
-              ? <button onClick={handleConnect} className="mt-4 w-full py-3 bg-[#050505] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#1a1a1a] transition-all">Connect Wallet</button>
-              : isWrongNetwork
-              ? <button disabled={isSwitching} onClick={() => switchChain?.({ chainId: OPTIMISM_CHAIN_ID })} className={`mt-4 w-full py-3 ${isSwitching ? 'bg-[#FF9500]/70 cursor-wait' : 'bg-[#FF9500] hover:opacity-80 active:scale-[0.98]'} text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all`}>{isSwitching ? 'Switching Network...' : 'Switch to Optimism'}</button>
-              : null,
-          },
-          {
-            n: '02', title: 'Mint Your Ticket',
-            desc: mintPrice > 0n
-              ? `Pay ${fmtEth(mintPrice)} ETH on Optimism L2 to mint your soulbound NFT.`
-              : 'Mint your Whale Gold Ticket NFT. Pay gas only on Optimism L2.',
-            status: (hasTicket || dbStats?.ticket) ? 'DONE' : isConnected && !isWrongNetwork ? 'READY' : 'WAITING',
-            action: isConnected && !isWrongNetwork && !(hasTicket || dbStats?.ticket)
-              ? (
-                 <div className="mt-4 w-full">
-                     <SignaturePad onSignature={setSignatureData} disabled={isTxPending || isConfirming} />
-                     <button 
-                         onClick={handleMint} 
-                         disabled={!hasValidSignature || isTxPending || isConfirming}
-                         className={`mt-4 w-full py-3 font-black uppercase tracking-widest text-[10px] text-[#050505] rounded shadow-sm transition-all focus:outline-none ${!hasValidSignature || isTxPending ? 'opacity-30 grayscale cursor-not-allowed' : 'opacity-100 hover:opacity-90 shadow-[#D4AF37]/20 hover:scale-[1.02] active:scale-[0.98]'}`}
-                         style={{ background: 'linear-gradient(135deg, #D4AF37, #C5A017)' }}
-                     >
-                         {mintPrice > 0n ? `Mint Access · ${fmtEth(mintPrice)} ETH` : 'Initialize Minting Sequence'}
-                     </button>
-                 </div>
-              )
-              : null,
-          },
-          {
-            n: '03', title: 'Access Activated',
-            desc: 'Your ticket is verified. Instant access to all Whale Alert Network institutional tools.',
-            status: (hasTicket || dbStats?.ticket) ? 'DONE' : 'LOCKED',
-            action: null,
-          },
-        ].map((s, i) => (
-          <motion.div
-            key={i}
-            variants={{
-              hidden: { opacity: 0, scale: 0.95, y: 20 },
-              visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
-            }}
-            className={`p-7 rounded-3xl border transition-all ${s.status === 'DONE' ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20' : s.status === 'READY' ? 'bg-white border-[#050505] shadow-lg shadow-black/5' : 'bg-white border-[#E5E5E5]'}`}
-          >
-            <div className="flex items-center justify-between mb-5">
-              <span className={`text-[11px] font-black font-mono ${s.status === 'DONE' ? 'text-[#D4AF37]' : s.status === 'READY' ? 'text-[#050505]' : 'text-[#CCCCCC]'}`}>{s.n}</span>
-              <span className={`text-[8px] px-2 py-0.5 rounded border font-black uppercase tracking-widest ${
-                s.status === 'DONE' ? 'bg-[#D4AF37] text-white border-transparent' :
-                s.status === 'READY' ? 'bg-[#050505] text-white border-transparent' :
-                s.status === 'SWITCH' ? 'bg-[#FF9500] text-white border-transparent' :
-                'bg-[#FAF9F6] text-[#888888] border-[#E5E5E5]'
-              }`}>
-                {s.status}
-              </span>
-            </div>
-            <h3 className="text-base font-black text-[#050505] uppercase tracking-tight mb-2">{s.title}</h3>
-            <p className="text-[11px] text-[#888888] leading-relaxed">{s.desc}</p>
-            {s.action}
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* ── Contract footer ── */}
-      <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <p className="text-[9px] font-black uppercase tracking-widest text-[#888888]">Verified Smart Contract · Optimism Mainnet</p>
-          <p className="text-[10px] font-mono text-[#050505]">{CONTRACT}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <a
-            href={`https://optimistic.etherscan.io/address/${CONTRACT}#readContract`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#888888] hover:text-[#050505] transition-colors"
-          >
-            Read Contract <ExternalLink size={10} />
-          </a>
-          <a
-            href={`https://optimistic.etherscan.io/address/${CONTRACT}#writeContract`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#888888] hover:text-[#050505] transition-colors"
-          >
-            Write Contract <ExternalLink size={10} />
-          </a>
-        </div>
+         </div>
       </div>
+
+      {/* ── INTERACTIVE MINT SECTION ── */}
+      {!hasTicket && (
+        <div className="grid lg:grid-cols-2 gap-12">
+            <div className="bg-white border border-black/[0.08] rounded-[3rem] p-12 shadow-2xl h-fit">
+                <h3 className="text-2xl font-black uppercase tracking-tighter mb-8">Endorsement Protocol</h3>
+                <div className="space-y-6">
+                    <div className="flex items-center gap-6 p-6 bg-black/5 rounded-2xl group hover:bg-[#D4AF37]/5 transition-all cursor-pointer border border-transparent hover:border-[#D4AF37]/20">
+                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center font-black text-lg group-hover:text-[#D4AF37]">1</div>
+                        <div className="flex flex-col">
+                            <span className="text-[11px] font-black uppercase tracking-widest text-black/40">Identity Binding</span>
+                            <span className="text-sm font-black uppercase text-black">Connect Verified Wallet</span>
+                        </div>
+                        <ArrowRight className="ml-auto text-black/10 group-hover:text-[#D4AF37] transition-all" />
+                    </div>
+                    <div className="flex items-center gap-6 p-6 bg-black/5 rounded-2xl group hover:bg-[#D4AF37]/5 transition-all cursor-pointer border border-transparent hover:border-[#D4AF37]/20">
+                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center font-black text-lg group-hover:text-[#D4AF37]">2</div>
+                        <div className="flex flex-col">
+                            <span className="text-[11px] font-black uppercase tracking-widest text-black/40">Manual Endorsement</span>
+                            <span className="text-sm font-black uppercase text-black">Sign the Sovereign Pad</span>
+                        </div>
+                        <ArrowRight className="ml-auto text-black/10 group-hover:text-[#D4AF37] transition-all" />
+                    </div>
+                    <div className="flex items-center gap-6 p-6 bg-black/5 rounded-2xl group hover:bg-[#D4AF37]/5 transition-all cursor-pointer border border-transparent hover:border-[#D4AF37]/20">
+                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center font-black text-lg group-hover:text-[#D4AF37]">3</div>
+                        <div className="flex flex-col">
+                            <span className="text-[11px] font-black uppercase tracking-widest text-black/40">Network Entry</span>
+                            <span className="text-sm font-black uppercase text-black">Mint Permanent Access</span>
+                        </div>
+                        <ArrowRight className="ml-auto text-black/10 group-hover:text-[#D4AF37] transition-all" />
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white border border-black/[0.08] rounded-[3.5rem] p-12 shadow-2xl">
+                <h3 className="text-2xl font-black uppercase tracking-tighter mb-4 text-center">Claim Access</h3>
+                <SignaturePad onSignature={setSignatureData} disabled={hasTicket} />
+                
+                <button 
+                  onClick={() => {
+                    if (!isConnected) connect({ connector: injected() });
+                    else if (signatureData.length < 50) toast.error("Signature required on pad");
+                    else signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
+                  }}
+                  className="w-full mt-10 py-7 bg-black text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[12px] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_20px_60px_rgba(0,0,0,0.15)]"
+                >
+                  {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'}
+                </button>
+            </div>
+        </div>
+      )}
+
+      {/* ── ALREADY HAS TICKET ── */}
+      {hasTicket && (
+        <div className="grid md:grid-cols-2 gap-8">
+            <StatChip label="MEMBER SERIAL" value={dbStats.ticket.serialCode} accent />
+            <StatChip label="IDENTIFICATION" value={truncAddr(address!)} />
+            <StatChip label="ENTRY POINT" value="Optimism L2" />
+            <StatChip label="STATUS" value="VERIFIED SOVEREIGN" />
+        </div>
+      )}
 
       <GlobalLedger feed={dbStats?.feed || []} />
-    </motion.div>
+    </div>
   );
 }

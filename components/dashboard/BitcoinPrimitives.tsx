@@ -29,15 +29,12 @@ export default function BitcoinPrimitives() {
   ];
 
   useEffect(() => {
-    // Initial check (starts empty as the user saw)
     setStandards(INITIAL_STANDARDS);
   }, []);
 
   const handleSync = async () => {
     setIsSyncing(true);
-    // Simulating deep index synchronization across BRC/Runes protocols
-    await new Promise(r => setTimeout(r, 3000));
-    
+    await new Promise(r => setTimeout(r, 2000));
     setStandards([
       { id: 'brc20', name: 'BRC-20', version: '1.2.0', status: 'INDEXED', indexedValue: '4,205.4 BTC', txCount: 84210, lastUpdate: new Date().toISOString(), description: 'Ordinal inscription-based fungible token standard on Bitcoin.' },
       { id: 'runes', name: 'RUNES', version: '0.1.0', status: 'INDEXED', indexedValue: '12,400.0 BTC', txCount: 156000, lastUpdate: new Date().toISOString(), description: 'UTXO-based fungible token protocol for high-efficiency issuance.' },
@@ -50,73 +47,73 @@ export default function BitcoinPrimitives() {
   const filtered = standards.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
 
   return (
-    <div className="h-full bg-black text-white font-mono flex flex-col p-8 gap-8">
+    <div className="h-full bg-transparent flex flex-col p-8 gap-8">
       
       {/* ── ACADEMIC INTRO ── */}
-      <div className="border border-white/5 bg-white/[0.01] p-6 flex items-start gap-6">
-        <div className="p-3 bg-emerald-500/10 rounded-none border border-emerald-500/20 text-emerald-500">
+      <div className="bg-white border border-black/[0.06] rounded-3xl p-8 flex items-center gap-8 shadow-sm">
+        <div className="p-4 bg-black rounded-2xl text-white">
           <Layers size={24} />
         </div>
-        <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest mb-2">BITCOIN_PRIMITIVE_INDEXER // V3.1</h2>
-          <p className="text-[10px] text-white/40 leading-relaxed max-w-2xl uppercase tracking-widest">
-            The study of base layer primitives and emerging standards. This module monitors the evolution of metadata protocols, 
+        <div className="flex-1">
+          <h2 className="text-[12px] font-black uppercase tracking-[0.2em] mb-2 text-black">BITCOIN NETWORK PRIMITIVES</h2>
+          <p className="text-[10px] text-black/40 leading-relaxed max-w-2xl uppercase tracking-widest font-bold">
+            Monitoring the evolution of base layer primitives and emerging standards. This terminal indexes metadata protocols, 
             inscription-based assets, and custodial-free issuance mechanisms within the Bitcoin topology.
           </p>
         </div>
         <button 
           onClick={handleSync}
           disabled={isSyncing}
-          className="ml-auto flex items-center gap-3 px-6 py-3 bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all disabled:opacity-50"
+          className="flex items-center gap-3 px-8 py-4 bg-black text-white text-[10px] font-black uppercase tracking-widest hover:bg-black/80 transition-all disabled:opacity-50 rounded-2xl"
         >
           <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-          {isSyncing ? 'Executing_Deep_Sync' : 'Synchronize_Standards'}
+          {isSyncing ? 'Executing Sync' : 'Re-index Standards'}
         </button>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
         {filtered.map((std) => (
-          <div key={std.id} className="border border-white/5 bg-white/[0.02] p-6 group hover:border-white/10 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 flex items-center justify-center border border-white/10 text-white/40 group-hover:text-white transition-colors">
-                  <Cpu size={14} />
+          <div key={std.id} className="bg-white border border-black/[0.06] rounded-3xl p-8 group hover:border-[#00F2EA]/20 transition-all shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-black/5 text-black/20 group-hover:bg-[#00F2EA]/10 group-hover:text-[#00F2EA] transition-all">
+                  <Cpu size={18} />
                 </div>
                 <div>
-                  <h3 className="text-[11px] font-black tracking-widest uppercase">{std.name} <span className="text-white/20 text-[8px] ml-2">VERSION_{std.version}</span></h3>
-                  <div className="text-[8px] text-white/20 mt-1 uppercase tracking-widest">{std.description}</div>
+                  <h3 className="text-sm font-black tracking-tight uppercase text-black">{std.name} <span className="text-black/20 text-[9px] ml-2 tracking-widest">REV_{std.version}</span></h3>
+                  <div className="text-[9px] text-black/40 mt-1 uppercase tracking-widest font-bold leading-tight max-w-[200px]">{std.description}</div>
                 </div>
               </div>
-              <span className={`text-[8px] font-black px-2 py-0.5 border ${
-                std.status === 'INDEXED' ? 'border-emerald-500/20 text-emerald-500 bg-emerald-500/5' : 'border-white/10 text-white/40'
+              <span className={`text-[9px] font-black px-3 py-1 rounded-full border ${
+                std.status === 'INDEXED' ? 'border-[#00C076]/20 text-[#00C076] bg-[#00C076]/5' : 'border-black/10 text-black/20'
               }`}>
                 {std.status}
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-px bg-white/5 mt-6 border border-white/5">
-              <div className="p-4 bg-black flex flex-col gap-1">
-                <span className="text-[7px] text-white/30 uppercase tracking-[0.2em]">Total_Value</span>
-                <span className="text-xs font-bold text-white/90">{std.indexedValue}</span>
+            <div className="grid grid-cols-3 gap-px bg-black/[0.03] mt-8 rounded-2xl overflow-hidden border border-black/[0.03]">
+              <div className="p-5 bg-white flex flex-col gap-1">
+                <span className="text-[8px] text-black/30 uppercase tracking-[0.2em] font-black">VALUATION</span>
+                <span className="text-[13px] font-black text-black">{std.indexedValue}</span>
               </div>
-              <div className="p-4 bg-black flex flex-col gap-1">
-                <span className="text-[7px] text-white/30 uppercase tracking-[0.2em]">Tx_Count</span>
-                <span className="text-xs font-bold text-white/90">{std.txCount.toLocaleString()}</span>
+              <div className="p-5 bg-white flex flex-col gap-1">
+                <span className="text-[8px] text-black/30 uppercase tracking-[0.2em] font-black">ENTROPY</span>
+                <span className="text-[13px] font-black text-black">{std.txCount.toLocaleString()}</span>
               </div>
-              <div className="p-4 bg-black flex flex-col gap-1">
-                <span className="text-[7px] text-white/30 uppercase tracking-[0.2em]">Last_Heur</span>
-                <span className="text-xs font-bold text-white/90">{std.lastUpdate !== '--' ? std.lastUpdate.slice(11, 19) : '--'}</span>
+              <div className="p-5 bg-white flex flex-col gap-1">
+                <span className="text-[8px] text-black/30 uppercase tracking-[0.2em] font-black">LAST_SYNC</span>
+                <span className="text-[13px] font-black text-black">{std.lastUpdate !== '--' ? std.lastUpdate.slice(11, 19) : '--'}</span>
               </div>
             </div>
             
             {std.status === 'INDEXED' && (
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                   <ShieldCheck size={10} className="text-emerald-500" />
-                   <span className="text-[8px] text-white/40 uppercase tracking-widest">Protocol_Handshake_Secure</span>
+                   <ShieldCheck size={12} className="text-[#00C076]" />
+                   <span className="text-[9px] text-black/20 uppercase tracking-widest font-black">PRIMITIVE_HANDSHAKE_OK</span>
                 </div>
-                <button className="text-[8px] text-white/20 hover:text-white transition-colors underline uppercase tracking-widest">
-                  View_Registry
+                <button className="text-[9px] text-[#00F2EA] hover:opacity-60 transition-colors uppercase tracking-widest font-black">
+                  EXPLORE REGISTRY &gt;
                 </button>
               </div>
             )}
@@ -125,18 +122,18 @@ export default function BitcoinPrimitives() {
       </div>
 
       {/* ── FOOTER TELEMETRY ── */}
-      <div className="mt-auto border-t border-white/5 pt-4 flex justify-between items-center text-[8px] text-white/20 uppercase tracking-[0.5em]">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1">
-            <div className="w-1 h-1 bg-white/20" />
-            <span>Layer_0:_Bitcoin_Core</span>
+      <div className="mt-auto border-t border-black/[0.06] pt-6 flex justify-between items-center text-[9px] text-black/20 uppercase tracking-[0.4em] font-bold">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-black/10" />
+            <span>L0: BTC_MAINNET</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-1 h-1 bg-emerald-500" />
-            <span>Mempool_Oracle:_Active</span>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+            <span>ORACLE_STREAMS: ACTIVE</span>
           </div>
         </div>
-        <span>BITCOIN_PRIMITIVES_V3.1_PRODUCTION</span>
+        <span>BITCOIN_PRIMITIVES_V3.1_LIGHT_SYNC</span>
       </div>
 
     </div>

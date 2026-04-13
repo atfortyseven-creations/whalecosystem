@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { WhaleAlertLanding } from '@/components/landing/WhaleAlertLanding';
+import WhaleAlertLanding from '@/components/landing/WhaleAlertLanding';
 
 export default function Home() {
   return (

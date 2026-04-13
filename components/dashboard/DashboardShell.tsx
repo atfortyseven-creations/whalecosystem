@@ -5,20 +5,70 @@ import {
     LayoutDashboard, Wallet, Activity, Settings, QrCode, X,
     Plus, Cpu, Bot, Link as LinkIcon, ChevronRight, Circle,
     Zap, TrendingUp, AlertTriangle, Terminal, RefreshCw, Home,
-    Save
+    Save, Search, Shield, BookOpen, GraduationCap, Link2, Globe
 } from 'lucide-react';
 import { SovereignBridge } from '@/components/premium/SovereignBridge';
-import { useDashboardStore } from '@/lib/store/useDashboardStore';
-import Link from 'next/link';
-import { useAccount, useBalance } from 'wagmi';
 import { lazy, Suspense } from 'react';
+import { WhaleLogo } from '../shared/WhaleLogo';
+import { useAccount, useBalance } from 'wagmi';
+import { create } from 'zustand';
 
+// ─────────────────────────────────────────
+// State Management
+// ─────────────────────────────────────────
+interface Log {
+    id: string;
+    time: string;
+    msg: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+}
+
+interface DashboardState {
+    logs: Log[];
+    addLog: (msg: string, type?: Log['type']) => void;
+    clearLogs: () => void;
+}
+
+const useDashboardStore = create<DashboardState>((set) => ({
+    logs: [],
+    addLog: (msg, type = 'info') => set((state) => ({
+        logs: [{
+            id: Math.random().toString(36).substring(7),
+            time: new Date().toLocaleTimeString(),
+            msg,
+            type
+        }, ...state.logs].slice(0, 50)
+    })),
+    clearLogs: () => set({ logs: [] })
+}));
+
+// ─────────────────────────────────────────
+// Lazy Components
+// ─────────────────────────────────────────
 const SovereignIntelTab = lazy(() => import('./SovereignIntelTab'));
+const OmniExplorer = lazy(() => import('./OmniExplorer'));
+const GoldTicketPanel = lazy(() => import('./GoldTicketPanel'));
+const WhaleAcademy = lazy(() => import('./WhaleAcademy'));
+const SecurityScanner = lazy(() => import('./SecurityScanner'));
+const WhaleSupport = lazy(() => import('./WhaleSupport'));
+const BitcoinPrimitives = lazy(() => import('./BitcoinPrimitives'));
+const ConnectExchange = lazy(() => import('./ConnectExchange'));
+const NewPairsTable = lazy(() => import('./NewPairsTable'));
+const GainersLosersPanel = lazy(() => import('./GainersLosersPanel'));
+const PortfolioDashboard = lazy(() => import('./PortfolioDashboard'));
+const ApiTerminal = lazy(() => import('./ApiTerminal'));
 
 // ─────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────
-type Tab = 'canvas' | 'portfolio' | 'activity' | 'settings' | 'sovereign';
+type Category = 'TERMINAL' | 'MARKET' | 'VAULT' | 'ACADEMY' | 'MEMBERSHIP';
+type DashboardTab = 
+    | 'explorer' | 'alerts' | 'live-txs'
+    | 'tracker' | 'new-pairs' | 'gainers-losers' | 'api' | 'topography'
+    | 'portfolio' | 'security'
+    | 'bitcoin-net' | 'support' | 'exchange'
+    | 'gold-whale';
+
 type NodeType = 'wallet' | 'bot' | 'contract' | 'api';
 
 interface NodeData {
@@ -29,7 +79,7 @@ interface NodeData {
     title: string;
     status: 'active' | 'syncing' | 'error';
     latency: number;
-    data?: any; // For config panel
+    data?: any;
 }
 
 interface EdgeData {
@@ -38,799 +88,14 @@ interface EdgeData {
     target: string;
 }
 
-// ─────────────────────────────────────────
-// Icons per type
-// ─────────────────────────────────────────
-function NodeIcon({ type, size = 14 }: { type: NodeType; size?: number }) {
-    switch (type) {
-        case 'wallet': return <Wallet size={size} />;
-        case 'bot': return <Bot size={size} />;
-        case 'contract': return <Cpu size={size} />;
-        case 'api': return <LinkIcon size={size} />;
-    }
-}
-
 const STATUS_COLOR: Record<string, string> = {
-    active: '#4ade80',
-    syncing: '#38bdf8',
-    error: '#f87171',
+    active: '#00C076',
+    syncing: '#00F2EA',
+    error: '#FF3B30',
 };
 
 // ─────────────────────────────────────────
-// Mini canvas node card
-// ─────────────────────────────────────────
-function CanvasNode({
-    node,
-    selected,
-    onPointerDown,
-    onClick,
-    onAnchorDragStart,
-}: {
-    node: NodeData;
-    selected: boolean;
-    onPointerDown: (e: React.PointerEvent) => void;
-    onClick: () => void;
-    onAnchorDragStart: (e: React.PointerEvent, nodeId: string, isSource: boolean) => void;
-}) {
-    // We provide a right anchor (output) and left anchor (input)
-    return (
-        <div
-            onPointerDown={onPointerDown}
-            onClick={(e) => { e.stopPropagation(); onClick(); }}
-            style={{ transform: `translate(${node.x}px, ${node.y}px)`, position: 'absolute', top: 0, left: 0 }}
-            className={`w-44 cursor-grab active:cursor-grabbing select-none rounded-xl border shadow-lg transition-all z-10 ${
-                selected
-                    ? 'border-black/20 shadow-[0_4px_20px_rgba(0,0,0,0.15)] bg-white'
-                    : 'border-black/[0.08] hover:border-black/20 bg-white/90'
-            }`}
-        >
-            {/* Input Anchor (Left) */}
-            <div 
-                className="absolute top-1/2 -translate-y-1/2 -left-1.5 w-3 h-3 rounded-full bg-[#111] border border-[#a855f7] cursor-crosshair z-20 hover:scale-125 transition-transform"
-                onPointerDown={(e) => onAnchorDragStart(e, node.id, false)}
-            />
-
-            <div className="px-3 py-2.5 flex items-center gap-2 pointer-events-none" style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                <div className="text-black/40">
-                    <NodeIcon type={node.type} size={13} />
-                </div>
-                <span className={`text-xs font-semibold truncate flex-1 ${selected ? 'text-black' : 'text-black/80'}`}>
-                    {node.title}
-                </span>
-                <Circle
-                    size={7}
-                    fill={STATUS_COLOR[node.status]}
-                    strokeWidth={0}
-                    style={{ color: STATUS_COLOR[node.status] }}
-                />
-            </div>
-            <div className="px-3 py-2 flex items-center justify-between pointer-events-none">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-black/30">{node.type}</span>
-                <span className="text-[10px] font-mono text-black/30">{node.latency}ms</span>
-            </div>
-
-            {/* Output Anchor (Right) */}
-            <div 
-                className="absolute top-1/2 -translate-y-1/2 -right-1.5 w-3 h-3 rounded-full bg-[#111] border border-[#a855f7] cursor-crosshair z-20 hover:scale-125 transition-transform"
-                onPointerDown={(e) => onAnchorDragStart(e, node.id, true)}
-            />
-        </div>
-    );
-}
-
-// ─────────────────────────────────────────
-// Context menu
-// ─────────────────────────────────────────
-function ContextMenu({
-    x, y, nodeId, onClose, onAdd, onDelete,
-}: {
-    x: number; y: number; nodeId?: string;
-    onClose: () => void;
-    onAdd: (type: NodeType) => void;
-    onDelete: () => void;
-}) {
-    return (
-        <>
-            <div className="fixed inset-0 z-40" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose(); }} />
-            <div
-                style={{ top: y, left: x }}
-                className="fixed z-50 w-52 rounded-xl border border-black/[0.08] bg-white/95 backdrop-blur-xl shadow-2xl overflow-hidden py-1"
-                onContextMenu={(e) => e.preventDefault()}
-            >
-                {!nodeId ? (
-                    <>
-                        <MenuLabel>Add Node</MenuLabel>
-                        {(['wallet', 'bot', 'contract', 'api'] as NodeType[]).map(t => (
-                            <MenuItem key={t} onClick={() => { onAdd(t); onClose(); }} icon={<NodeIcon type={t} />}>
-                                {t.charAt(0).toUpperCase() + t.slice(1)}
-                            </MenuItem>
-                        ))}
-                    </>
-                ) : (
-                    <>
-                        <MenuLabel>Node Actions</MenuLabel>
-                        <MenuItem onClick={() => { onDelete(); onClose(); }} icon={<X size={13} />} danger>
-                            Delete Node
-                        </MenuItem>
-                    </>
-                )}
-            </div>
-        </>
-    );
-}
-
-function MenuLabel({ children }: { children: React.ReactNode }) {
-    return <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-black/30 font-mono">{children}</div>;
-}
-
-function MenuItem({ children, onClick, icon, danger }: {
-    children: React.ReactNode; onClick: () => void;
-    icon?: React.ReactNode; danger?: boolean;
-}) {
-    return (
-        <button
-            onClick={onClick}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors ${
-                danger ? 'text-red-500 hover:bg-red-500/10' : 'text-black/70 hover:bg-black/5 hover:text-black'
-            }`}
-        >
-            <span className="opacity-50">{icon}</span>
-            {children}
-        </button>
-    );
-}
-
-// ─────────────────────────────────────────
-// Helper to draw a bezier curve
-// ─────────────────────────────────────────
-function generateBezierPath(sx: number, sy: number, tx: number, ty: number) {
-    const dx = Math.abs(tx - sx);
-    const controlPointOffset = Math.max(dx * 0.5, 50);
-    return `M ${sx} ${sy} C ${sx + controlPointOffset} ${sy}, ${tx - controlPointOffset} ${ty}, ${tx} ${ty}`;
-}
-
-// ─────────────────────────────────────────
-// Operations Canvas (the main tab)
-// ─────────────────────────────────────────
-function OperationsCanvas({ 
-    selectedId, 
-    setSelectedId, 
-    nodes, setNodes 
-}: { 
-    selectedId: string | null; 
-    setSelectedId: (id: string | null) => void; 
-    nodes: NodeData[]; 
-    setNodes: React.Dispatch<React.SetStateAction<NodeData[]>>;
-}) {
-    const { addLog } = useDashboardStore();
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [edges, setEdges] = useState<EdgeData[]>([]);
-    const [pan, setPan] = useState({ x: 0, y: 0 });
-    const [isPanning, setIsPanning] = useState(false);
-    const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
-    const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; nodeId?: string } | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [lastSaved, setLastSaved] = useState<string>('');
-    const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-    
-    // Edge dragging state
-    const [draftEdge, setDraftEdge] = useState<{ sourceNodeId: string, isSourceOut: boolean, mouseX: number, mouseY: number } | null>(null);
-
-    const panStart = useRef({ x: 0, y: 0, px: 0, py: 0 });
-    const dragNodeStart = useRef({ mx: 0, my: 0, nx: 0, ny: 0 });
-
-    // Load from DB
-    useEffect(() => {
-        fetch('/api/dashboard', { cache: 'no-store' })
-            .then(r => r.ok ? r.json() : null)
-            .then(d => {
-                if (d?.nodes) setNodes(d.nodes);
-                if (d?.edges) setEdges(d.edges);
-                addLog('Canvas topography loaded from PostgreSQL', 'success');
-            })
-            .catch(() => addLog('Failed to load canvas from database', 'error'))
-            .finally(() => setIsLoading(false));
-    }, []);
-
-    // Debounced autosave
-    const schedSave = useCallback((n: NodeData[], e: EdgeData[]) => {
-        if (saveTimer.current) clearTimeout(saveTimer.current);
-        saveTimer.current = setTimeout(async () => {
-            try {
-                const r = await fetch('/api/dashboard', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nodes: n, edges: e }),
-                });
-                if (r.ok) {
-                    const time = new Date().toLocaleTimeString();
-                    setLastSaved(time);
-                }
-            } catch {}
-        }, 1500);
-    }, []);
-
-    const addNode = useCallback((type: NodeType, cx: number, cy: number) => {
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (!rect) return;
-        const x = cx - rect.left - pan.x - 88;
-        const y = cy - rect.top - pan.y - 44;
-        const node: NodeData = {
-            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2),
-            type, x, y,
-            title: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-            status: 'syncing',
-            latency: 12, // Hardware connection
-            data: {}
-        };
-        setNodes(prev => {
-            const next = [...prev, node];
-            schedSave(next, edges);
-            return next;
-        });
-        setTimeout(() => setNodes(prev => prev.map(n => n.id === node.id ? { ...n, status: 'active' } : n)), 800);
-        addLog(`Deployed ${type} node to topography`, 'info');
-        setSelectedId(node.id);
-    }, [pan, edges, schedSave, addLog]);
-
-    const deleteNode = useCallback((id: string) => {
-        setNodes(prev => {
-            const next = prev.filter(n => n.id !== id);
-            setEdges(prevE => {
-                const nextE = prevE.filter(e => e.source !== id && e.target !== id);
-                schedSave(next, nextE);
-                return nextE;
-            });
-            return next;
-        });
-        if (selectedId === id) setSelectedId(null);
-        addLog(`Deleted node from topography`, 'warning');
-    }, [selectedId, schedSave, addLog]);
-
-    // Canvas panning — pointer events
-    const onCanvasPointerDown = (e: React.PointerEvent) => {
-        if (draggingNodeId || draftEdge) return;
-        if (e.button !== 0 && e.button !== 1) return; // Allow panning with middle or left click
-        setIsPanning(true);
-        panStart.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
-        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    };
-
-    const onCanvasPointerMove = (e: React.PointerEvent) => {
-        if (draggingNodeId) {
-            // Move node
-            setNodes(prev => prev.map(n => {
-                if (n.id !== draggingNodeId) return n;
-                return {
-                    ...n,
-                    x: dragNodeStart.current.nx + (e.clientX - dragNodeStart.current.mx),
-                    y: dragNodeStart.current.ny + (e.clientY - dragNodeStart.current.my),
-                };
-            }));
-        } else if (draftEdge) {
-            // Update draft line mouse pos
-            const rect = containerRef.current?.getBoundingClientRect();
-            if (rect) {
-                setDraftEdge({
-                    ...draftEdge,
-                    mouseX: e.clientX - rect.left - pan.x,
-                    mouseY: e.clientY - rect.top - pan.y
-                });
-            }
-        } else if (isPanning) {
-            setPan({
-                x: panStart.current.px + (e.clientX - panStart.current.x),
-                y: panStart.current.py + (e.clientY - panStart.current.y),
-            });
-        }
-    };
-
-    const onCanvasPointerUp = (e: React.PointerEvent) => {
-        if (draggingNodeId) {
-            setNodes(prev => { schedSave(prev, edges); return prev; });
-            setDraggingNodeId(null);
-        }
-        if (draftEdge) {
-            // Let's see if we dropped on another node
-            const elements = document.elementsFromPoint(e.clientX, e.clientY);
-            const targetNodeEl = elements.find(el => el.getAttribute('data-node-id'));
-            
-            if (targetNodeEl) {
-                const targetId = targetNodeEl.getAttribute('data-node-id')!;
-                if (targetId !== draftEdge.sourceNodeId) {
-                    // Valid connection
-                    const newEdge: EdgeData = {
-                        id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2),
-                        source: draftEdge.isSourceOut ? draftEdge.sourceNodeId : targetId,
-                        target: draftEdge.isSourceOut ? targetId : draftEdge.sourceNodeId
-                    };
-                    
-                    // Don't duplicate edges
-                    if (!edges.find(edge => edge.source === newEdge.source && edge.target === newEdge.target)) {
-                        setEdges(prev => {
-                            const next = [...prev, newEdge];
-                            schedSave(nodes, next);
-                            return next;
-                        });
-                        addLog('Established topology connection', 'success');
-                    }
-                }
-            }
-            setDraftEdge(null);
-        }
-        setIsPanning(false);
-    };
-
-    const startNodeDrag = (e: React.PointerEvent, node: NodeData) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setSelectedId(node.id);
-        setDraggingNodeId(node.id);
-        dragNodeStart.current = { mx: e.clientX, my: e.clientY, nx: node.x, ny: node.y };
-        (containerRef.current as HTMLElement)?.setPointerCapture(e.pointerId);
-    };
-
-    const startAnchorDrag = (e: React.PointerEvent, nodeId: string, isSourceOut: boolean) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const rect = containerRef.current?.getBoundingClientRect();
-        if (rect) {
-            setDraftEdge({
-                sourceNodeId: nodeId,
-                isSourceOut,
-                mouseX: e.clientX - rect.left - pan.x,
-                mouseY: e.clientY - rect.top - pan.y
-            });
-            (containerRef.current as HTMLElement)?.setPointerCapture(e.pointerId);
-        }
-    };
-
-    const onCtxMenu = (e: React.MouseEvent, nodeId?: string) => {
-        if (draftEdge) return;
-        e.preventDefault();
-        e.stopPropagation();
-        setCtxMenu({ x: e.clientX, y: e.clientY, nodeId });
-    };
-
-    if (isLoading) {
-        return (
-            <div className="flex-1 flex items-center justify-center" style={{ background: 'transparent' }}>
-                <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 rounded-full border-2 border-black/30 border-t-black animate-spin" />
-                    <p className="text-[11px] font-mono text-black/30 uppercase tracking-widest">Loading canvas…</p>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="flex-1 relative overflow-hidden" style={{ background: 'transparent' }}>
-            {/* Dot grid — black dots on light background */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 0)',
-                    backgroundSize: '32px 32px',
-                    backgroundPosition: `${pan.x % 32}px ${pan.y % 32}px`,
-                }}
-            />
-
-            {/* Top toolbar */}
-            <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/90 border border-black/[0.08] text-[10px] font-mono text-black/40 shadow-sm backdrop-blur-sm">
-                    <Circle size={5} fill="#4ade80" strokeWidth={0} className="text-[#4ade80]" />
-                    {lastSaved ? `Saved ${lastSaved}` : 'Canvas ready'}
-                </div>
-                <button
-                    onClick={() => { setPan({ x: 0, y: 0 }); }}
-                    className="px-2.5 py-1.5 rounded-lg bg-white/90 border border-black/[0.08] text-[10px] font-mono text-black/40 hover:text-black/70 hover:border-black/20 transition-colors flex items-center gap-1.5 shadow-sm backdrop-blur-sm"
-                >
-                    <RefreshCw size={10} /> Reset view
-                </button>
-            </div>
-
-            {/* Empty state */}
-            {nodes.length === 0 && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-                    <Plus size={32} className="text-black/10 mb-4" />
-                    <p className="text-[11px] font-mono text-black/20 uppercase tracking-widest">Right-click to add your first node</p>
-                </div>
-            )}
-
-            {/* Canvas interaction surface */}
-            <div
-                ref={containerRef}
-                className={`absolute inset-0 ${isPanning ? 'cursor-grabbing' : 'cursor-default'}`}
-                onPointerDown={onCanvasPointerDown}
-                onPointerMove={onCanvasPointerMove}
-                onPointerUp={onCanvasPointerUp}
-                onContextMenu={(e) => onCtxMenu(e)}
-                onClick={() => setSelectedId(null)}
-            >
-                {/* Transform layer */}
-                <div style={{ transform: `translate(${pan.x}px, ${pan.y}px)`, position: 'absolute', inset: 0 }}>
-                    
-                    {/* Edges SVG Layer */}
-                    <svg className="absolute inset-0 overflow-visible pointer-events-none z-0">
-                        {edges.map(edge => {
-                            const sourceNode = nodes.find(n => n.id === edge.source);
-                            const targetNode = nodes.find(n => n.id === edge.target);
-                            if (!sourceNode || !targetNode) return null;
-                            
-                            // Right side of source node (w-44 = 176px)
-                            const sx = sourceNode.x + 176;
-                            const sy = sourceNode.y + 30; // approx center vertically
-                            // Left side of target node
-                            const tx = targetNode.x;
-                            const ty = targetNode.y + 30;
-                            
-                            return (
-                                <path 
-                                    key={edge.id}
-                                    d={generateBezierPath(sx, sy, tx, ty)}
-                                    fill="none"
-                                    stroke="url(#purpleGlow)"
-                                    strokeWidth="2"
-                                    className="opacity-70 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]"
-                                />
-                            );
-                        })}
-
-                        {/* Draft Edge */}
-                        {draftEdge && (() => {
-                            const sourceNode = nodes.find(n => n.id === draftEdge.sourceNodeId);
-                            if (!sourceNode) return null;
-                            const sx = draftEdge.isSourceOut ? sourceNode.x + 176 : sourceNode.x;
-                            const sy = sourceNode.y + 30;
-                            const tx = draftEdge.mouseX;
-                            const ty = draftEdge.mouseY;
-                            
-                            return (
-                                <path 
-                                    d={generateBezierPath(draftEdge.isSourceOut ? sx : tx, draftEdge.isSourceOut ? sy : ty, draftEdge.isSourceOut ? tx : sx, draftEdge.isSourceOut ? ty : sy)}
-                                    fill="none"
-                                    stroke="#a855f7"
-                                    strokeWidth="2"
-                                    strokeDasharray="4 4"
-                                    className="animate-pulse"
-                                />
-                            );
-                        })()}
-
-                        <defs>
-                            <linearGradient id="purpleGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor="#a855f7" stopOpacity="0.4" />
-                                <stop offset="50%" stopColor="#c084fc" stopOpacity="1" />
-                                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.4" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-
-                    {/* Nodes Layer */}
-                    {nodes.map(node => (
-                        <div key={node.id} data-node-id={node.id} className="absolute z-10" style={{ transform: `translate(${node.x}px, ${node.y}px)` }}>
-                            <CanvasNode
-                                node={{...node, x: 0, y: 0}} // Transform applied to parent wrapper for Hit detection
-                                selected={selectedId === node.id}
-                                onClick={() => setSelectedId(node.id === selectedId ? null : node.id)}
-                                onPointerDown={(e) => startNodeDrag(e, node)}
-                                onAnchorDragStart={startAnchorDrag}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Context menu */}
-            {ctxMenu && (
-                <ContextMenu
-                    x={ctxMenu.x}
-                    y={ctxMenu.y}
-                    nodeId={ctxMenu.nodeId}
-                    onClose={() => setCtxMenu(null)}
-                    onAdd={(type) => addNode(type, ctxMenu.x, ctxMenu.y)}
-                    onDelete={() => {
-                        if (ctxMenu.nodeId) deleteNode(ctxMenu.nodeId);
-                    }}
-                />
-            )}
-        </div>
-    );
-}
-
-// ─────────────────────────────────────────
-// Node Config Slide-over Panel
-// ─────────────────────────────────────────
-function NodeConfigPanel({ node, onClose, onUpdate }: { node: NodeData; onClose: () => void; onUpdate: (nd: NodeData) => void }) {
-    const [title, setTitle] = useState(node.title);
-    const [addr, setAddr] = useState(node.data?.address || '');
-    const [webhook, setWebhook] = useState(node.data?.webhook || '');
-    
-    // Sync state if node changes externally
-    useEffect(() => {
-        setTitle(node.title);
-        setAddr(node.data?.address || '');
-        setWebhook(node.data?.webhook || '');
-    }, [node]);
-
-    const handleSave = () => {
-        onUpdate({
-            ...node,
-            title,
-            data: { ...node.data, address: addr, webhook }
-        });
-    };
-
-    return (
-        <aside
-            className="w-80 shrink-0 flex flex-col absolute right-0 top-0 bottom-0 z-30 shadow-2xl"
-            style={{
-                background: 'rgba(250,249,246,0.97)',
-                borderLeft: '1px solid rgba(0,0,0,0.08)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-            }}
-        >
-            <div className="px-4 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                <div className="flex items-center gap-2">
-                    <NodeIcon type={node.type} size={16} />
-                    <span className="font-semibold text-sm text-black/80">Node Config</span>
-                </div>
-                <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-black/5 text-black/30 hover:text-black/70 transition-colors">
-                    <X size={15} />
-                </button>
-            </div>
-
-            <div className="flex-1 p-5 overflow-y-auto space-y-6">
-                {/* General Settings */}
-                <div className="space-y-3">
-                    <label className="text-[10px] font-mono uppercase tracking-widest text-black/40">Node Title</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm text-black outline-none focus:border-black/30 shadow-sm"
-                    />
-                </div>
-
-                {/* Specific Settings */}
-                {node.type === 'wallet' && (
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-mono uppercase tracking-widest text-black/40">Tracked Address</label>
-                        <input
-                            type="text"
-                            placeholder="0x..."
-                            value={addr}
-                            onChange={(e) => setAddr(e.target.value)}
-                            className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm text-black font-mono outline-none focus:border-black/30 shadow-sm"
-                        />
-                    </div>
-                )}
-
-                {node.type === 'bot' && (
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-mono uppercase tracking-widest text-black/40">Strategy Webhook</label>
-                        <input
-                            type="text"
-                            placeholder="https://api..."
-                            value={webhook}
-                            onChange={(e) => setWebhook(e.target.value)}
-                            className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm text-black font-mono outline-none focus:border-black/30 shadow-sm"
-                        />
-                    </div>
-                )}
-
-                {(node.type === 'contract' || node.type === 'api') && (
-                    <div className="p-3 bg-black/5 border border-black/10 rounded-lg">
-                        <p className="text-[11px] text-black/60 leading-relaxed">Advanced config requires institutional tier subscription.</p>
-                    </div>
-                )}
-            </div>
-
-            <div className="p-4" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
-                <button
-                    onClick={handleSave}
-                    className="w-full py-2.5 rounded-lg bg-black text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
-                >
-                    <Save size={15} /> Save Configuration
-                </button>
-            </div>
-        </aside>
-    );
-}
-
-// ─────────────────────────────────────────
-// Activity Tab — Unified UI + Backend Core Logs
-// ─────────────────────────────────────────
-function ActivityTab() {
-    const { logs: localLogs, clearLogs } = useDashboardStore();
-    const [backendLogs, setBackendLogs] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        let mounted = true;
-        const fetchLogs = async () => {
-            try {
-                const res = await fetch('/api/logs');
-                const json = await res.json();
-                if (mounted && json.data) {
-                    setBackendLogs(json.data);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-            if (mounted) setLoading(false);
-        };
-        
-        // Initial fetch
-        fetchLogs();
-        
-        // Poll every 10 seconds for Heartbeat logs
-        const interval = setInterval(fetchLogs, 10000);
-        return () => { mounted = false; clearInterval(interval); };
-    }, []);
-
-    // Merge UI logs and Backend Core logs
-    const unifiedLogs = [
-        ...localLogs.map(l => ({ id: l.id, time: l.time, msg: l.msg, type: l.type, source: 'UI' })),
-        ...backendLogs.map(l => {
-            const d = new Date(l.createdAt);
-            return {
-                id: l.id,
-                time: `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`,
-                msg: l.message,
-                type: l.level,
-                source: l.source.toUpperCase()
-            };
-        })
-    ].sort((a, b) => b.id.localeCompare(a.id)); // Crude sort by CUID/Date
-
-    return (
-        <div className="flex-1 p-6 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                    <h2 className="text-sm font-semibold text-black/70">System Activity</h2>
-                    {!loading && <span className="flex h-2 w-2 rounded-full bg-[#4ade80] animate-pulse" title="Core Engine Connected"></span>}
-                </div>
-                <button onClick={clearLogs} className="text-[10px] font-mono text-black/30 hover:text-black/60 uppercase tracking-widest px-2 py-1 rounded bg-black/5">
-                    Clear UI Logs
-                </button>
-            </div>
-            
-            {unifiedLogs.length === 0 ? (
-                <div className="text-center text-black/20 text-xs font-mono py-10 border border-dashed border-black/10 rounded-xl flex flex-col items-center gap-2 bg-white/60">
-                    {loading ? (
-                        <>
-                            <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
-                            Connecting to Engine Database...
-                        </>
-                    ) : (
-                        "No activity recorded in the database or current session."
-                    )}
-                </div>
-            ) : (
-                <div className="space-y-1 font-mono text-xs">
-                    {unifiedLogs.map(log => {
-                        let colorClass = 'text-black/50';
-                        if (log.type === 'success') colorClass = 'text-emerald-600';
-                        if (log.type === 'warning') colorClass = 'text-amber-600';
-                        if (log.type === 'error') colorClass = 'text-red-500';
-                        if (log.type === 'info') colorClass = 'text-sky-600';
-                        
-                        return (
-                            <div key={log.id} className="flex items-start gap-3 py-2 border-b border-black/[0.05] last:border-0 hover:bg-black/[0.02] px-2 rounded transition-colors -mx-2">
-                                <span className="text-black/20 shrink-0 w-16 align-top">{log.time}</span>
-                                <span className={`shrink-0 w-20 text-[9px] uppercase tracking-widest bg-black/[0.03] px-1 py-0.5 rounded text-center ${log.source === 'UI' ? 'text-black/30' : 'text-black/60 border border-black/20'}`}>
-                                    [{log.source}]
-                                </span>
-                                <span className={`${colorClass} leading-[1.4]`}>{log.msg}</span>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-        </div>
-    );}
-
-// ─────────────────────────────────────────
-// Settings Tab
-// ─────────────────────────────────────────
-function SettingsTab() {
-    return (
-        <div className="flex-1 p-6 overflow-y-auto">
-            <h2 className="text-sm font-semibold text-white/80 mb-6">Settings</h2>
-            <div className="space-y-4 max-w-md">
-                <Section title="Device Bridge">
-                    <SovereignBridge />
-                </Section>
-            </div>
-        </div>
-    );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-    return (
-        <div className="rounded-xl border border-white/[0.07] overflow-hidden" style={{ backgroundColor: '#111' }}>
-            <div className="px-4 py-3 border-b border-white/[0.06]">
-                <span className="text-[11px] font-mono uppercase tracking-widest text-white/40">{title}</span>
-            </div>
-            <div className="p-4">{children}</div>
-        </div>
-    );
-}
-
-// ─────────────────────────────────────────
-// Portfolio Tab — Live Wagmi Data
-// ─────────────────────────────────────────
-function PortfolioTab() {
-    const { address, isConnected } = useAccount();
-    const { data: balance } = useBalance({ address });
-    const { addLog } = useDashboardStore();
-
-    useEffect(() => {
-        if (isConnected && address) {
-            addLog(`Portfolio synced with wallet ${address.slice(0, 6)}...${address.slice(-4)}`, 'success');
-        }
-    }, [isConnected, address, addLog]);
-
-    return (
-        <div className="flex-1 p-6 overflow-y-auto">
-            <h2 className="text-sm font-semibold text-white/80 mb-6">Portfolio</h2>
-            
-            {isConnected && address ? (
-                <>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div className="rounded-xl border border-[#4ade80]/20 bg-[#4ade80]/5 p-4 shadow-[0_0_20px_rgba(74,222,128,0.05)]">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-mono uppercase tracking-widest text-[#4ade80]">Native Balance</span>
-                                <span className="text-[#4ade80]"><TrendingUp size={14} /></span>
-                            </div>
-                            <div className="text-2xl font-semibold text-white">
-                                {balance?.formatted ? parseFloat(balance.formatted).toFixed(4) : '0.0000'} <span className="text-sm text-white/40">{balance?.symbol}</span>
-                            </div>
-                        </div>
-
-                        <div className="rounded-xl border border-white/[0.07] bg-[#111] p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-mono uppercase tracking-widest text-white/30">Active Nodes</span>
-                                <span className="text-white/20"><Zap size={14} /></span>
-                            </div>
-                            <div className="text-xl font-semibold text-white/70">Live Topology</div>
-                        </div>
-
-                        <div className="rounded-xl border border-white/[0.07] bg-[#111] p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-mono uppercase tracking-widest text-white/30">System Alerts</span>
-                                <span className="text-white/20"><AlertTriangle size={14} /></span>
-                            </div>
-                            <div className="text-xl font-semibold text-white/70">No incidents</div>
-                        </div>
-                    </div>
-
-                    <div className="rounded-xl border border-white/[0.07] p-5" style={{ backgroundColor: '#111' }}>
-                        <h3 className="text-xs font-semibold text-white/80 mb-4">Connected Wallet</h3>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.05] font-mono text-sm">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#a855f7] to-[#4ade80] opacity-80" />
-                            <span className="text-white/80">{address}</span>
-                            <span className="ml-auto text-[10px] uppercase tracking-widest text-[#4ade80] bg-[#4ade80]/10 px-2 py-1 rounded">Connected</span>
-                        </div>
-                    </div>
-                </>
-            ) : (
-                <div className="rounded-xl border border-white/[0.07] py-16 text-center flex flex-col items-center" style={{ backgroundColor: '#111' }}>
-                    <Wallet size={32} className="text-white/10 mb-4" />
-                    <p className="text-sm font-semibold text-white/60 mb-2">No Wallet Connected</p>
-                    <p className="text-xs text-white/30 font-mono max-w-xs leading-relaxed">
-                        Connect your Web3 wallet via the main terminal hub to aggregate live on-chain data here.
-                    </p>
-                </div>
-            )}
-        </div>
-    );
-}
-
-// ─────────────────────────────────────────
-// Sidebar nav item
+// Sidebar Components
 // ─────────────────────────────────────────
 function NavItem({ icon, label, active, onClick }: {
     icon: React.ReactNode; label: string; active: boolean; onClick: () => void;
@@ -838,27 +103,33 @@ function NavItem({ icon, label, active, onClick }: {
     return (
         <button
             onClick={onClick}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11px] transition-all duration-200 uppercase tracking-widest font-black ${
                 active
-                    ? 'bg-black/8 text-black border border-black/10'
-                    : 'text-black/40 hover:text-black/70 hover:bg-black/5'
+                    ? 'bg-black text-white shadow-lg shadow-black/10'
+                    : 'text-black/40 hover:text-black hover:bg-black/5'
             }`}
         >
-            <span className={active ? 'text-black/70' : 'text-current'}>{icon}</span>
-            <span className="font-medium">{label}</span>
-            {active && <ChevronRight size={12} className="ml-auto text-black/20" />}
+            <span className={`shrink-0 ${active ? 'text-[#00F2EA]' : 'text-current opacity-40'}`}>{icon}</span>
+            <span className="truncate">{label}</span>
+            {active && <ChevronRight size={12} className="ml-auto text-white/40" />}
         </button>
     );
 }
 
+function CategoryHeader({ label }: { label: string }) {
+    return (
+        <div className="px-3 pt-6 pb-2 text-[9px] font-black text-black/20 uppercase tracking-[0.3em]">
+            {label}
+        </div>
+    );
+}
+
 // ─────────────────────────────────────────
-// Dashboard Shell — the main export
+// Main Shell
 // ─────────────────────────────────────────
 export function DashboardShell() {
-    const [tab, setTab] = useState<Tab>('canvas');
+    const [tab, setTab] = useState<DashboardTab>('explorer');
     const [bridgeOpen, setBridgeOpen] = useState(false);
-    
-    // Lift state so Shell can pass to Canvas & Config Panel
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [nodes, setNodes] = useState<NodeData[]>([]);
 
@@ -866,182 +137,212 @@ export function DashboardShell() {
 
     const handleNodeUpdate = (updatedNode: NodeData) => {
         setNodes(prev => prev.map(n => n.id === updatedNode.id ? updatedNode : n));
-        // Autosave handled in Canvas implicitly when DB loads, but we should trigger it manually here ideally.
-        // For now, next canvas interaction saves it.
     };
-
-    const navItems: { id: Tab; icon: React.ReactNode; label: string }[] = [
-        { id: 'canvas', icon: <LayoutDashboard size={15} />, label: 'Operations Canvas' },
-        { id: 'portfolio', icon: <Wallet size={15} />, label: 'Portfolio' },
-        { id: 'activity', icon: <Terminal size={15} />, label: 'Activity' },
-        { id: 'sovereign', icon: <Zap size={15} className="text-emerald-500" />, label: 'Sovereign Intel' },
-        { id: 'settings', icon: <Settings size={15} />, label: 'Settings' },
-    ];
 
     return (
         <div
             data-dashboard="true"
-            className="flex text-black"
+            className="flex text-black font-sans"
             style={{
                 position: 'fixed', inset: 0, zIndex: 100,
                 width: '100vw', height: '100vh', overflow: 'hidden',
+                backgroundColor: '#FAF9F6' // Institutional Background
             }}
         >
-            {/* ── COSMIC PATTERN BACKGROUND ── exact same layer as landing page */}
+            {/* ── COSMIC PATTERN BACKGROUND ── */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[url('/patron-cosmico-4k.png')] bg-repeat bg-left-top"
+                className="absolute inset-0 pointer-events-none bg-[url('/api/checkpoint-image?name=patron-cosmico-4k.png')] bg-repeat bg-left-top"
                 style={{
                     backgroundSize: 'clamp(100px, 18vw, 320px)',
-                    opacity: 0.55,
+                    opacity: 0.08,
                     zIndex: 0,
-                    transform: 'translateZ(0)',
-                    willChange: 'transform',
                 }}
             />
-            {/* Light wash so text stays readable */}
-            <div className="absolute inset-0 bg-[#FAF9F4]/70 pointer-events-none" style={{ zIndex: 1 }} />
-            {/* All children above the background */}
-            <div className="relative z-10 flex w-full h-full overflow-hidden" style={{ color: '#0A0A0A' }}>
 
-            {/* ── LEFT SIDEBAR ── cream glass panel */}
-            <aside
-                className="dashboard-shell-aside w-52 shrink-0 flex flex-col"
-                style={{
-                    background: 'rgba(250,249,246,0.92)',
-                    borderRight: '1px solid rgba(0,0,0,0.08)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                }}
-            >
-                {/* Wordmark */}
-                <div className="px-4 py-4" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-black/40">Operations V2</span>
-                </div>
-
-                {/* Nav */}
-                <nav className="flex-1 p-2 space-y-0.5">
-                    {navItems.map(item => (
-                        <NavItem
-                            key={item.id}
-                            icon={item.icon}
-                            label={item.label}
-                            active={tab === item.id}
-                            onClick={() => { setTab(item.id); setSelectedId(null); }}
-                        />
-                    ))}
-                </nav>
-
-                {/* Bottom Tools */}
-                <div className="p-2 space-y-1" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
-                    <button
-                        onClick={() => setBridgeOpen(v => !v)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                            bridgeOpen
-                                ? 'bg-black/10 text-black border border-black/15'
-                                : 'text-black/40 hover:text-black/70 hover:bg-black/5'
-                        }`}
-                    >
-                        <QrCode size={14} />
-                        <span className="font-medium text-sm">Device Bridge</span>
-                    </button>
-                    
-                    <Link
-                        href="/"
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-black/40 hover:text-black/70 hover:bg-black/5 transition-colors"
-                    >
-                        <Home size={14} />
-                        <span className="font-medium text-sm">Terminal Hub</span>
-                    </Link>
-                </div>
-            </aside>
-
-            {/* ── MAIN AREA ── */}
-            <div className="flex-1 flex flex-col min-w-0 relative">
-
-                {/* Top bar */}
-                <header
-                    className="dashboard-shell-header h-12 shrink-0 flex items-center px-4 gap-3 z-20"
-                    style={{
-                        background: 'rgba(250,249,246,0.80)',
-                        borderBottom: '1px solid rgba(0,0,0,0.07)',
-                        backdropFilter: 'blur(12px)',
-                        WebkitBackdropFilter: 'blur(12px)',
-                    }}
+            {/* ── DASHBOARD UI LAYER ── */}
+            <div className="relative z-10 flex w-full h-full overflow-hidden">
+                
+                {/* ── SIDEBAR ── */}
+                <aside 
+                    className="w-64 shrink-0 flex flex-col border-r border-black/[0.06] bg-white/40 backdrop-blur-xl"
                 >
-                    <span className="text-sm font-medium text-black/50">
-                        {navItems.find(n => n.id === tab)?.label}
-                    </span>
-                    <div className="ml-auto flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-black/25 uppercase tracking-widest">humanidfi.com/dashboard</span>
+                    <div className="px-6 py-8 border-b border-black/[0.06] flex items-center gap-3">
+                        <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center text-white">
+                            <WhaleLogo size={24} color="white" />
+                        </div>
+                        <div>
+                            <span className="text-sm font-black uppercase tracking-tighter block text-black">Sovereign</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 -mt-1 block">Terminal</span>
+                        </div>
                     </div>
-                </header>
 
-                {/* Content */}
-                <div className="flex-1 flex overflow-hidden relative">
-                    {tab === 'canvas' && (
-                        <>
-                            <div className={`flex-1 transition-all duration-300 ${selectedNode ? 'mr-80' : ''}`}>
-                                <OperationsCanvas
-                                    selectedId={selectedId}
-                                    setSelectedId={setSelectedId}
-                                    nodes={nodes}
-                                    setNodes={setNodes}
-                                />
+                    <nav className="flex-1 overflow-y-auto p-4 space-y-1 scrollbar-hide">
+                        <CategoryHeader label="Terminal" />
+                        <NavItem id="explorer" icon={<Search size={14}/>} label="Block Explorer" active={tab==='explorer'} onClick={()=>setTab('explorer')} />
+                        <NavItem id="alerts" icon={<Activity size={14}/>} label="Live Alerts" active={tab==='alerts'} onClick={()=>setTab('alerts')} />
+                        <NavItem id="live-txs" icon={<RefreshCw size={14}/>} label="Live Transactions" active={tab==='live-txs'} onClick={()=>setTab('live-txs')} />
+
+                        <CategoryHeader label="Market Intelligence" />
+                        <NavItem id="tracker" icon={<Globe size={14}/>} label="Whale Tracker" active={tab==='tracker'} onClick={()=>setTab('tracker')} />
+                        <NavItem id="new-pairs" icon={<Plus size={14}/>} label="New Pairs" active={tab==='new-pairs'} onClick={()=>setTab('new-pairs')} />
+                        <NavItem id="gainers-losers" icon={<TrendingUp size={14}/>} label="Gainers & Losers" active={tab==='gainers-losers'} onClick={()=>setTab('gainers-losers')} />
+                        <NavItem id="topography" icon={<LayoutDashboard size={14}/>} label="Visual Graph" active={tab==='topography'} onClick={()=>setTab('topography')} />
+                        <NavItem id="api" icon={<Terminal size={14}/>} label="API Access" active={tab==='api'} onClick={()=>setTab('api')} />
+
+                        <CategoryHeader label="Secure Vault" />
+                        <NavItem id="portfolio" icon={<Wallet size={14}/>} label="My Portfolio" active={tab==='portfolio'} onClick={()=>setTab('portfolio')} />
+                        <NavItem id="security" icon={<Shield size={14}/>} label="Security Center" active={tab==='security'} onClick={()=>setTab('security')} />
+
+                        <CategoryHeader label="Academy" />
+                        <NavItem id="bitcoin-net" icon={<Cpu size={14}/>} label="Bitcoin Network" active={tab==='bitcoin-net'} onClick={()=>setTab('bitcoin-net')} />
+                        <NavItem id="support" icon={<GraduationCap size={14}/>} label="Support Center" active={tab==='support'} onClick={()=>setTab('support')} />
+                        <NavItem id="exchange" icon={<Link2 size={14}/>} label="Connect Exchange" active={tab==='exchange'} onClick={()=>setTab('exchange')} />
+
+                        <CategoryHeader label="Membership" />
+                        <NavItem id="gold-whale" icon={<Zap size={14} className="text-[#D4AF37]"/>} label="Gold Whale Network" active={tab==='gold-whale'} onClick={()=>setTab('gold-whale')} />
+                    </nav>
+
+                    <div className="p-4 border-t border-black/[0.06]">
+                        <button 
+                            onClick={() => setBridgeOpen(!bridgeOpen)}
+                            className="w-full flex items-center justify-between px-4 py-3 bg-black/5 hover:bg-black/10 rounded-2xl transition-all group"
+                        >
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black/40 group-hover:text-black">Device Bridge</span>
+                            <QrCode size={14} className="text-black/20 group-hover:text-black" />
+                        </button>
+                    </div>
+                </aside>
+
+                {/* ── CONTENT AREA ── */}
+                <main className="flex-1 flex flex-col min-w-0 bg-transparent relative">
+                    <header className="h-16 shrink-0 border-b border-black/[0.06] bg-white/20 backdrop-blur-md px-8 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-black/20 uppercase tracking-[0.3em]">Module // </span>
+                            <span className="text-xs font-black uppercase tracking-tighter text-black">{tab.replace('-', ' ')}</span>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <div className="hidden md:flex flex-col items-end">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-black/20">Operational Status</span>
+                                <span className="text-[10px] font-black text-[#00C076] uppercase tracking-widest flex items-center gap-1.5">
+                                    <Circle size={6} fill="#00C076" strokeWidth={0} /> System Stable
+                                </span>
                             </div>
-                            
-                            {/* Node property slide-over */}
-                            {selectedNode && (
-                                <NodeConfigPanel
-                                    node={selectedNode}
-                                    onClose={() => setSelectedId(null)}
-                                    onUpdate={handleNodeUpdate}
-                                />
-                            )}
-                        </>
-                    )}
-                    {tab === 'portfolio' && <PortfolioTab />}
-                    {tab === 'activity' && <ActivityTab />}
-                    {tab === 'settings' && <SettingsTab />}
-                    {tab === 'sovereign' && (
+                            <div className="h-8 w-[1px] bg-black/[0.06]" />
+                            <div className="flex items-center gap-4 text-black/30 hover:text-black transition-colors cursor-pointer">
+                                <span className="text-[10px] font-black uppercase tracking-widest uppercase">Institutional v2.4</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div className="flex-1 overflow-hidden relative">
                         <Suspense fallback={
-                            <div className="flex-1 flex items-center justify-center bg-black/5">
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/20">
                                 <div className="flex flex-col items-center gap-4">
-                                    <div className="w-10 h-10 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-emerald-500/40">Initializing SAL Mainframe...</p>
+                                    <div className="w-10 h-10 border-2 border-black/5 border-t-black rounded-full animate-spin" />
+                                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20">Establishing Synchronous Link...</p>
                                 </div>
                             </div>
                         }>
-                            <SovereignIntelTab />
+                            {renderTabContent(tab, {
+                                selectedId, setSelectedId,
+                                nodes, setNodes,
+                                selectedNode,
+                                handleNodeUpdate
+                            })}
                         </Suspense>
-                    )}
-                </div>
+                    </div>
+                </main>
             </div>
 
-            {/* ── DEVICE BRIDGE DRAWER ── */}
-            {bridgeOpen && (
-                <aside
-                    className="w-72 shrink-0 flex flex-col z-30 shadow-2xl"
-                    style={{
-                        background: 'rgba(250,249,246,0.96)',
-                        borderLeft: '1px solid rgba(0,0,0,0.08)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                    }}
-                >
-                    <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-                        <div>
-                            <p className="text-xs font-semibold text-black/70">Device Bridge</p>
-                            <p className="text-[10px] font-mono text-black/30 mt-0.5">Generate QR on PC → scan on mobile</p>
+            {/* ── BRIDGE DRAWER ── */}
+            <AnimatePresence>
+                {bridgeOpen && (
+                    <motion.aside
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        className="w-80 border-l border-black/[0.06] bg-white/95 backdrop-blur-3xl z-50 shadow-2xl flex flex-col"
+                    >
+                        <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
+                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Physical Bridge</div>
+                            <button onClick={()=>setBridgeOpen(false)} className="p-2 hover:bg-black/5 rounded-xl transition-all">
+                                <X size={16} className="text-black/40" />
+                            </button>
                         </div>
-                        <button onClick={() => setBridgeOpen(false)} className="p-1.5 rounded-lg hover:bg-black/5 text-black/30 hover:text-black/60 transition-colors">
-                            <X size={14} />
-                        </button>
+                        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+                            <SovereignBridge />
+                        </div>
+                    </motion.aside>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ─────────────────────────────────────────
+// Tab Router Logic
+// ─────────────────────────────────────────
+function renderTabContent(tab: DashboardTab, props: any) {
+    switch (tab) {
+        // TERMINAL
+        case 'explorer': return <OmniExplorer />;
+        case 'alerts': return <ActivityTab />;
+        case 'live-txs': return <LiveTransactions />;
+        
+        // MARKET
+        case 'tracker': return <SovereignIntelTab />;
+        case 'new-pairs': return <NewPairsTable />;
+        case 'gainers-losers': return <GainersLosersPanel />;
+        case 'topography': return <VisualTopography />;
+        case 'api': return <ApiTerminal />;
+
+        // VAULT
+        case 'portfolio': return <PortfolioDashboard />;
+        case 'security': return <SecurityScanner />;
+
+        // ACADEMY
+        case 'bitcoin-net': return <BitcoinPrimitives />;
+        case 'support': return <WhaleSupport />;
+        case 'exchange': return <ConnectExchange />;
+
+        // MEMBERSHIP
+        case 'gold-whale': return <GoldTicketPanel />;
+        
+        default: return <div className="p-12 text-center text-black/20 uppercase font-black text-[10px] tracking-widest">Component Protocol Not Found</div>;
+    }
+}
+
+// ─────────────────────────────────────────
+// Mock Activity / Logs (Internal for Shell)
+// ─────────────────────────────────────────
+function ActivityTab() {
+    const { logs } = useDashboardStore();
+    return (
+        <div className="p-8 h-full overflow-y-auto font-mono scrollbar-hide">
+            <div className="mb-8">
+                <h2 className="text-xl font-black text-black uppercase tracking-tighter">Event Telemetry</h2>
+                <p className="text-[10px] text-black/40 font-bold uppercase tracking-widest mt-1">Live infrastructure audit log</p>
+            </div>
+            <div className="space-y-3">
+                {logs.map(log => (
+                    <div key={log.id} className="flex gap-4 p-4 bg-white border border-black/[0.04] rounded-2xl group hover:border-black/10 transition-all">
+                        <span className="text-[10px] font-bold text-black/20 shrink-0 w-20">{log.time}</span>
+                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border shrink-0 ${
+                            log.type === 'success' ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20' :
+                            log.type === 'error' ? 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20' :
+                            'bg-black/5 text-black/40 border-black/10'
+                        }`}>
+                            {log.type}
+                        </span>
+                        <span className="text-[11px] font-bold text-black/70 leading-relaxed">{log.msg}</span>
                     </div>
-                    <div className="p-4 overflow-y-auto flex-1">
-                        <SovereignBridge />
+                ))}
+                {logs.length === 0 && (
+                    <div className="py-20 text-center border-2 border-dashed border-black/[0.05] rounded-[2.5rem]">
+                        <p className="text-[11px] font-black text-black/10 uppercase tracking-[0.4em]">No Telemetry Recorded</p>
                     </div>
-                </aside>
-            )}
+                )}
             </div>
         </div>
     );

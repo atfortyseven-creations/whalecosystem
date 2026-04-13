@@ -16,9 +16,10 @@ import { UltraFluidSection, UltraFluidLayer } from './UltraFluidEngine';
 // Optimized QR Component
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
 
-function Tag({ children }: { children: React.ReactNode }) {
+function Tag({ children, color = "teal" }: { children: React.ReactNode; color?: "teal" | "gold" }) {
+    const colorClasses = color === "teal" ? "text-[#00F2EA] bg-[#00F2EA]/10 border-[#00F2EA]/20" : "text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/20";
     return (
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 text-[9px] font-mono font-black uppercase tracking-[0.3em] text-teal-400 rounded-full">
+        <span className={`inline-flex items-center gap-2 px-4 py-1.5 border text-[9px] font-mono font-black uppercase tracking-[0.3em] rounded-full backdrop-blur-xl ${colorClasses}`}>
             {children}
         </span>
     );
@@ -36,7 +37,6 @@ export function MobileLanding() {
 
     const [qrSession, setQrSession] = useState<string | null>(null);
     const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">("IDLE");
-    const qrRef = useRef<string | null>(null);
 
     // ── Handshake & Session Logic ──────────────────────────────────────────
     const fetchSession = useCallback(async () => {
@@ -49,18 +49,13 @@ export function MobileLanding() {
     }, []);
 
     useEffect(() => {
-        if (isConnected) return; // Only for new sessions
+        if (isConnected) return;
         fetchSession();
     }, [isConnected, fetchSession]);
 
-    useEffect(() => {
-        qrRef.current = qrSession;
-    }, [qrSession]);
-
-    // Handshake logic: If mobile user hits this with a session ID, push their address to the hub
+    // Handshake logic
     useEffect(() => {
         if (!isConnected || !address || !sessionIdParam) return;
-        
         const handshake = async () => {
             try {
                 await fetch(`/api/auth/qr-session?id=${sessionIdParam}`, {
@@ -69,9 +64,7 @@ export function MobileLanding() {
                 });
                 setSyncStatus("SYNCED");
                 setTimeout(() => router.push("/dashboard"), 1500);
-            } catch (e) {
-                console.error("[SYNC] Handshake failed:", e);
-            }
+            } catch (e) {}
         };
         handshake();
     }, [isConnected, address, sessionIdParam, router]);
@@ -81,27 +74,27 @@ export function MobileLanding() {
         : "";
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white selection:bg-teal-500/30 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#FAF9F6] text-[#050505] selection:bg-[#00F2EA]/30 font-sans relative overflow-x-hidden">
             
             {/* ── BACKGROUND LAYERS: Inhuman Depth ── */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div 
-                  className="absolute inset-0 opacity-[0.05] mix-blend-screen bg-repeat"
+                  className="absolute inset-0 opacity-[0.06] mix-blend-multiply bg-repeat"
                   style={{ 
-                    backgroundImage: "url('/api/checkpoint-image?name=corporate-cube-grid.jpg')",
-                    backgroundSize: '400px auto'
+                    backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
+                    backgroundSize: 'clamp(300px, 50vw, 600px) auto' // Zero-zoom relative scaling
                   }}
                 />
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-[#FAF9F6]" />
             </div>
 
             {/* ── NAVIGATION ── */}
-            <nav className="fixed top-0 left-0 w-full z-50 px-6 py-8 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent backdrop-blur-sm px-8">
+            <nav className="fixed top-0 left-0 w-full z-50 px-8 py-8 flex justify-between items-center bg-white/60 backdrop-blur-xl border-b border-black/[0.03]">
                 <div className="flex items-center gap-3">
                     <WhaleLogo className="w-8 h-8" />
-                    <span className="text-[10px] font-black uppercase tracking-tighter">Whale Alert</span>
+                    <span className="text-[10px] font-black uppercase tracking-tighter text-black">Whale Alert Network</span>
                 </div>
-                <Tag>Active</Tag>
+                <div className="w-2 h-2 rounded-full bg-[#00F2EA] animate-pulse shadow-[0_0_8px_rgba(0,242,234,0.5)]" />
             </nav>
 
             {/* ── HERO ── */}
@@ -113,55 +106,58 @@ export function MobileLanding() {
                             animate={{ opacity: 1, y: 0 }} 
                             className="mb-8"
                         >
-                             <Tag><Shield size={10} /> Secure Bridge</Tag>
+                             <Tag><Shield size={10} /> Institutional Handshake</Tag>
                         </motion.div>
 
                         <ScrollFloat 
                             containerClassName="mb-10"
-                            textClassName="text-7xl font-black tracking-tighter uppercase leading-[0.85] text-white"
+                            textClassName="text-7xl font-black tracking-tighter uppercase leading-[0.85] text-black"
                             animationDuration={1.2}
                             stagger={0.05}
                         >
                             WHALE ALERT
                         </ScrollFloat>
 
-                        <p className="text-white/40 text-[11px] leading-relaxed mb-12 uppercase tracking-[0.2em] font-medium max-w-[280px]">
-                            Establish cryptographic parity to mirror terminal operations on-mobile.
+                        <p className="text-black/40 text-[11px] leading-relaxed mb-12 uppercase tracking-[0.2em] font-black max-w-[280px]">
+                            Secure identity parity for real-time institutional mempool tracking.
                         </p>
 
                         <button
                             onClick={() => { document.getElementById('s-connect')?.scrollIntoView({ behavior: 'smooth' }); }}
-                            className="w-full bg-white text-black font-black text-[12px] uppercase tracking-[0.3em] py-7 rounded-full flex items-center justify-center gap-4 shadow-[0_20px_60px_rgba(255,255,255,0.1)] transition-transform active:scale-95"
+                            className="w-full bg-black text-white font-black text-[11px] uppercase tracking-[0.3em] py-7 rounded-full flex items-center justify-center gap-4 shadow-2xl transition-transform active:scale-95"
                         >
-                            Start Handshake <ArrowRight size={14} />
+                            Establish Link <ArrowRight size={14} />
                         </button>
                     </UltraFluidLayer>
                 )}
             </UltraFluidSection>
 
             {/* ── CONNECTION BRIDGE ── */}
-            <section id="s-connect" className="relative min-h-screen flex flex-col items-center justify-start px-6 pt-32 pb-40 border-t border-white/5 bg-black/60 backdrop-blur-3xl">
+            <section id="s-connect" className="relative min-h-screen flex flex-col items-center justify-start px-6 pt-32 pb-40 border-t border-black/[0.03] bg-white/80 backdrop-blur-3xl">
                 
-                {/* Olas Hokusai Mobile Footer */}
+                {/* [INHUMAN ALIGNMENT] Waves perfectly enlinked with the footer logic */}
                 <div 
-                    className="absolute inset-0 z-0 opacity-20 grayscale"
+                    className="absolute inset-x-0 bottom-0 h-1/2 z-0 opacity-[0.3] grayscale mix-blend-multiply"
                     style={{ 
                         backgroundImage: "url('/api/checkpoint-image?name=olas-hokusai-4k.png')",
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center bottom'
+                        backgroundSize: '100% auto', // Forced aspect integrity
+                        backgroundPosition: 'center bottom',
+                        backgroundRepeat: 'no-repeat'
                     }}
                 />
+                
+                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent opacity-100" />
 
                 <div className="relative z-10 w-full max-w-sm">
                     <div className="text-center mb-16 px-4">
-                        <Tag><QrCode size={10} /> Sync Terminal</Tag>
+                        <Tag color="gold"><QrCode size={10} /> Sync Terminal</Tag>
                         <ScrollFloat 
                             containerClassName="mt-8 mb-6"
-                            textClassName="text-5xl font-black tracking-tighter uppercase text-white"
+                            textClassName="text-6xl font-black tracking-tighter uppercase text-black"
                         >
-                            BRIDGE ADPT
+                            BRIDGE HUB
                         </ScrollFloat>
-                        <p className="text-white/30 text-[10px] leading-relaxed uppercase tracking-[0.25em] font-bold">
+                        <p className="text-black/30 text-[10px] leading-relaxed uppercase tracking-[0.25em] font-black">
                             Align matrix for session persistence
                         </p>
                     </div>
@@ -171,71 +167,75 @@ export function MobileLanding() {
                             <motion.div 
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="flex flex-col gap-4 p-8 border border-white/10 bg-white/[0.03] rounded-[2.5rem] backdrop-blur-2xl"
+                                className="flex flex-col gap-5 p-8 border border-black/[0.06] bg-white rounded-[2.5rem] shadow-2xl"
                             >
                                 <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
-                                        <CheckCircle size={22} className="text-teal-500" />
+                                    <div className="w-14 h-14 rounded-2xl bg-[#00F2EA]/10 border border-[#00F2EA]/20 flex items-center justify-center shadow-inner">
+                                        <CheckCircle size={24} className="text-[#00F2EA]" />
                                     </div>
-                                    <div>
-                                        <p className="text-white text-[14px] font-black tracking-tight leading-none">
+                                    <div className="flex flex-col gap-1">
+                                        <p className="text-black text-[15px] font-black tracking-tighter leading-none">
                                             Handshake Active
                                         </p>
-                                        <p className="text-white/30 text-[9px] uppercase tracking-widest mt-2">
-                                            {address ? `${address.slice(0, 10)}...${address.slice(-6)}` : "AUTH_PENDING"}
+                                        <p className="text-black/40 text-[9px] font-black uppercase tracking-[0.2em] mt-1">
+                                            {address ? `${address.slice(0, 8)}...${address.slice(-6)}` : "VERIFIED_SOVEREIGN"}
                                         </p>
                                     </div>
                                 </div>
-                                <Activity className="text-teal-500/50 w-full h-8 mt-4" />
+                                <div className="h-[1px] w-full bg-black/[0.04]" />
+                                <div className="flex items-center justify-center py-2 h-10 w-full overflow-hidden opacity-30">
+                                     <Activity size={32} className="text-[#00F2EA] animate-pulse" />
+                                </div>
                             </motion.div>
                         ) : (
                             <div className="grid gap-4">
                                 <button
                                     onClick={() => openSignIn({ redirectUrl: '/' })}
-                                    className="w-full py-6 bg-white/5 border border-white/10 text-white font-black text-[12px] uppercase tracking-[0.25em] flex items-center justify-center gap-4 rounded-full active:scale-95 transition-all hover:bg-white/10"
+                                    className="w-full py-7 bg-white border border-black/[0.08] text-black font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-4 rounded-full active:scale-95 transition-all shadow-xl"
                                 >
-                                    <Lock size={14} className="text-teal-500"/>
+                                    <Lock size={14} className="text-black/20"/>
                                     Access Identity
                                 </button>
                                 <button
                                     onClick={() => openWallet()}
-                                    className="w-full py-6 bg-white/5 border border-white/10 text-white font-black text-[12px] uppercase tracking-[0.25em] flex items-center justify-center gap-4 rounded-full active:scale-95 transition-all hover:bg-white/10"
+                                    className="w-full py-7 bg-white border border-black/[0.08] text-black font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-4 rounded-full active:scale-95 transition-all shadow-xl"
                                 >
-                                    <Wallet size={14} className="text-teal-500"/>
+                                    <Wallet size={14} className="text-black/20"/>
                                     Link Wallet
                                 </button>
                             </div>
                         )}
 
-                        <div className="flex items-center gap-6 py-10">
-                            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-white/10" />
-                            <span className="text-[9px] uppercase tracking-[0.4em] font-black text-white/20 whitespace-nowrap italic">Encrypted Handshake</span>
-                            <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-white/10" />
+                        <div className="flex items-center gap-6 py-12">
+                            <div className="flex-1 h-[1px] bg-black/[0.06]" />
+                            <span className="text-[10px] uppercase tracking-[0.4em] font-black text-black/10 whitespace-nowrap">Institutional Crypt</span>
+                            <div className="flex-1 h-[1px] bg-black/[0.06]" />
                         </div>
 
                         {/* QR Sync UI */}
                         <div className="relative group">
-                            <div className="absolute -inset-4 bg-teal-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <div className="relative p-8 border border-white/10 rounded-[3rem] bg-black/40 backdrop-blur-3xl flex flex-col items-center">
-                                <div className="p-4 bg-white rounded-2xl mb-8">
+                            <div className="absolute -inset-8 bg-[#00F2EA]/5 blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="relative p-10 border border-black/[0.08] rounded-[3.5rem] bg-white shadow-[0_40px_100px_rgba(0,0,0,0.08)] flex flex-col items-center">
+                                <div className="p-5 bg-white border border-black/[0.04] rounded-3xl mb-10 shadow-xl">
                                     {qrSession ? (
-                                        <QRCode value={qrUrl} size={200} bgColor="#FFFFFF" fgColor="#0F0F0F" level="M" />
+                                        <QRCode value={qrUrl} size={220} bgColor="#FFFFFF" fgColor="#000000" level="M" />
                                     ) : (
-                                        <div className="w-[200px] h-[200px] flex items-center justify-center">
-                                            <Loader2 className="animate-spin text-black/20" size={32} />
+                                        <div className="w-[220px] h-[220px] flex items-center justify-center">
+                                            <Loader2 className="animate-spin text-black/10" size={40} />
                                         </div>
                                     )}
                                 </div>
-                                <p className="text-[10px] text-white/30 text-center uppercase tracking-[0.25em] leading-relaxed max-w-[240px]">
-                                    Awaiting cryptographically unique response from terminal registry.
+                                <p className="text-[11px] text-black/40 text-center uppercase tracking-[0.3em] font-black leading-relaxed max-w-[260px] mb-2">
+                                    Awaiting cryptographically unique handshake from terminal registry.
                                 </p>
                             </div>
                         </div>
 
-                        <div className="pt-20 pb-10 flex flex-col items-center gap-4">
-                            <WhaleLogo className="w-10 h-10 opacity-20 grayscale" />
-                            <p className="text-[9px] font-mono tracking-widest text-white/10 uppercase">
-                                Sovereign Network · v3.0.0
+                        <div className="pt-24 pb-12 flex flex-col items-center gap-6">
+                            <WhaleLogo className="w-12 h-12 grayscale opacity-10" />
+                            <div className="h-[1px] w-20 bg-black/5" />
+                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-black/10">
+                                SYSTEM.SOVEREIGN.v3.4
                             </p>
                         </div>
                     </div>

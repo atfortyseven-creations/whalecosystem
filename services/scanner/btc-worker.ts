@@ -19,26 +19,37 @@ const MEMPOOL_API = 'https://mempool.space/api';
 
 async function fetchMempool(endpoint: string, isJson = true) {
     const response = await fetch(`${MEMPOOL_API}/${endpoint}`, {
-        signal: AbortSignal.timeout(10_000)
+        signal: AbortSignal.timeout(12_000)
     });
-    if (!response.ok) throw new Error(`Mempool API HTTP ${response.status}: ${await response.text().catch(() => '')}`);
+    
+    // [INHUMAN DEFENSE] Detect 429 and trigger backoff
+    if (response.status === 429) {
+        throw new Error("RATE_LIMIT_429");
+    }
+    
+    if (!response.ok) throw new Error(`Mempool API HTTP ${response.status}`);
     return isJson ? response.json() : response.text();
 }
 
+async function sleep(ms: number) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
 export async function startBtcWorker() {
+    console.log("🟠 [BTC Hub] Activating Batched Sovereign Ingestion...");
     let lastBlock: number;
     try {
         const heightText = await fetchMempool('blocks/tip/height', false);
         lastBlock = parseInt(heightText as string, 10);
-        console.log(`📡 [BTC Scanner] Connected to Mempool.space. Height: ${lastBlock}`);
+        console.log(`📡 [BTC Scanner] Genesis sync height: ${lastBlock}`);
     } catch (e: any) {
-        console.error(`❌ [BTC Scanner] Failed to connect on startup: ${e.message}. Retrying in 60s.`);
-        await new Promise(r => setTimeout(r, 60_000));
+        console.error(`❌ [BTC Scanner] Startup fail: ${e.message}`);
+        await sleep(60_000);
         return startBtcWorker();
     }
 
     let consecutiveErrors = 0;
-    const MAX_BACKOFF_MS  = 5 * 60_000;
+    const MAX_BACKOFF_MS  = 10 * 60_000;
 
     while (true) {
         try {
@@ -51,44 +62,54 @@ export async function startBtcWorker() {
                 const txids: string[] = await fetchMempool(`block/${blockHash}/txids`) as string[];
                 
                 const btcPrice = await getRealTimePrice("BTC") || 98_000;
-                console.log(`📦 [BTC Scanner] Processing Block ${targetBlock} | ${txids.length} txs`);
+                console.log(`📦 [BTC Hub] Chunking Block ${targetBlock} (${txids.length} txs)...`);
 
-                // To avoid overloading public API, we fetch full tx details only for large movements if possible
-                // or parallelize with limit
-                for (const txid of txids) {
-                    try {
-                        const tx: any = await fetchMempool(`tx/${txid}`);
-                        let totalOutputSats = 0;
-                        for (const vout of tx.vout ?? []) {
-                            totalOutputSats += vout.value ?? 0;
-                        }
-                        const valueBTC = totalOutputSats / 1e8;
-                        const usdValue = valueBTC * btcPrice;
+                // [INSTITUTIONAL EFFICIENCY] Process in chunks of 50 to avoid API bans
+                const CHUNK_SIZE = 50;
+                for (let i = 0; i < txids.length; i += CHUNK_SIZE) {
+                    const chunk = txids.slice(i, i + CHUNK_SIZE);
+                    
+                    // Parallelize within each chunk, but with inter-chunk jitter
+                    await Promise.all(chunk.map(async (txid) => {
+                        try {
+                            const tx: any = await fetchMempool(`tx/${txid}`);
+                            let totalOutputSats = 0;
+                            for (const vout of tx.vout ?? []) {
+                                totalOutputSats += vout.value ?? 0;
+                            }
+                            const valueBTC = totalOutputSats / 1e8;
+                            const usdValue = valueBTC * btcPrice;
 
-                        if (usdValue >= WHALE_THRESHOLD_USD) {
-                            const senderAddr = tx.vin?.[0]?.prevout?.scriptpubkey_address ?? 'Unknown';
-                            await processWhaleTx(
-                                tx.txid, senderAddr, "Multiple Outputs",
-                                "BTC", valueBTC, usdValue,
-                                targetBlock, 'BITCOIN', { method: "REST_MEMPOOL" }
-                            );
+                            if (usdValue >= WHALE_THRESHOLD_USD) {
+                                const senderAddr = tx.vin?.[0]?.prevout?.scriptpubkey_address ?? 'Unknown';
+                                await processWhaleTx(
+                                    tx.txid, senderAddr, "Multiple Outputs",
+                                    "BTC", valueBTC, usdValue,
+                                    targetBlock, 'BITCOIN', { method: "REST_MEMPOOL" }
+                                );
+                            }
+                        } catch (txErr: any) {
+                            if (txErr.message === "RATE_LIMIT_429") throw txErr;
                         }
-                    } catch (txErr) {
-                        // Skip individual tx errors to keep the block moving
-                        continue;
-                    }
+                    }));
+                    
+                    // Jitter between chunks (250ms - 500ms)
+                    await sleep(250 + Math.random() * 250);
                 }
                 lastBlock = targetBlock;
             }
 
             consecutiveErrors = 0;
-            await new Promise(r => setTimeout(r, 30_000)); // Poll every 30s
+            await sleep(30_000); 
 
         } catch (e: any) {
             consecutiveErrors++;
-            const backoff = Math.min(60_000 * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
-            console.error(`❌ [BTC] Worker error #${consecutiveErrors}. Backoff ${backoff / 1000}s:`, e.message);
-            await new Promise(r => setTimeout(r, backoff));
+            const is429 = e.message === "RATE_LIMIT_429";
+            const baseWait = is429 ? 180_000 : 60_000;
+            const backoff = Math.min(baseWait * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
+            
+            console.error(`❌ [BTC] Worker backoff #${consecutiveErrors} (${e.message}): ${backoff / 1000}s`);
+            await sleep(backoff);
         }
     }
 }

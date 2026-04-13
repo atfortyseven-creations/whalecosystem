@@ -1,4 +1,14 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
-  "crons": []
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "npm run build:railway"
+  },
+  "deploy": {
+    "startCommand": "npx pm2-runtime start ecosystem.config.json",
+    "restartPolicyType": "ON_FAILURE",
+    "healthCheckPath": "/",
+    "healthCheckTimeout": 180,
+    "numReplicas": 1
+  }
 }

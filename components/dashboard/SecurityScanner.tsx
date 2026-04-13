@@ -48,25 +48,25 @@ export default function SecurityScanner() {
     };
 
     const getVerdictColor = (v: string) => {
-        if (v === 'SAFE') return 'var(--az-emerald)';
-        if (v === 'CAUTION') return 'var(--az-amber)';
-        if (v === 'DANGER') return 'var(--az-rose)';
-        return 'var(--az-rose)';
+        if (v === 'SAFE') return '#00C076';
+        if (v === 'CAUTION') return '#FF9500';
+        if (v === 'DANGER') return '#FF3B30';
+        return '#FF3B30';
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        <div className="flex flex-col h-full overflow-hidden bg-transparent">
             {/* Header / Search */}
-            <div style={{ padding: '24px', borderBottom: '1px solid var(--az-border)' }}>
-                <div className="az-label-lime" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Shield size={12} /> CONTRACT SCANNER
+            <div className="p-8 border-b border-black/[0.06] bg-white">
+                <div className="flex items-center gap-2 text-[10px] font-black text-[#00F2EA] uppercase tracking-widest mb-6">
+                    <Shield size={14} /> SECURITY SCANNER TERMINAL
                 </div>
-                <form onSubmit={scan} style={{ display: 'flex', gap: 12 }}>
+                <form onSubmit={scan} className="flex gap-4">
                     <select 
                         value={chain} 
                         onChange={(e) => setChain(e.target.value)}
-                        className="az-select"
-                        style={{ width: 120 }}
+                        className="bg-black/5 border border-black/[0.06] rounded-xl px-4 py-3 text-[10px] font-black uppercase outline-none focus:border-[#00F2EA] transition-all"
+                        style={{ width: 140 }}
                     >
                         <option value="ethereum">ETHEREUM</option>
                         <option value="bsc">BSC</option>
@@ -75,19 +75,18 @@ export default function SecurityScanner() {
                         <option value="base">BASE</option>
                         <option value="solana">SOLANA</option>
                     </select>
-                    <div style={{ flex: 1, position: 'relative' }}>
+                    <div className="flex-1 relative">
                         <input 
                             type="text"
-                            placeholder="PEGA LA DIRECCIÓN DEL CONTRATO (0x...)"
+                            placeholder="INPUT CONTRACT ADDRESS (0x...)"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            className="az-input"
-                            style={{ paddingLeft: 40 }}
+                            className="w-full bg-black/[0.02] border border-black/[0.06] rounded-xl px-12 py-3 text-sm font-mono outline-none focus:border-[#00F2EA] transition-all placeholder:text-black/20"
                         />
-                        <Search size={14} color="rgba(255,255,255,0.2)" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
+                        <Search size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-black/20" />
                     </div>
-                    <button type="submit" disabled={loading} className="az-btn-primary" style={{ padding: '0 24px' }}>
-                        {loading ? 'ESCANEANDO...' : 'ANALIZAR'}
+                    <button type="submit" disabled={loading} className="bg-black text-white px-8 rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-all disabled:opacity-30">
+                        {loading ? 'SCANNING...' : 'SCAN'}
                     </button>
                 </form>
             </div>
@@ -129,19 +128,24 @@ export default function SecurityScanner() {
                     {report && !loading && (
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                            style={{ padding: 24 }}
+                            className="p-8"
                         >
                             {/* Summary Header */}
-                            <div className="az-surface-2" style={{ padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderLeft: `4px solid ${getVerdictColor(report.verdict)}` }}>
+                            <div className="bg-white border border-black/[0.06] rounded-3xl p-8 flex justify-between items-center mb-8 shadow-sm overflow-hidden relative">
+                                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: getVerdictColor(report.verdict) }} />
                                 <div>
-                                    <div className="az-label" style={{ marginBottom: 4 }}>TOKEN DETECTADO</div>
-                                    <h2 className="az-header-lg" style={{ fontFamily: 'var(--font-mono)' }}>{report.name} ({report.symbol})</h2>
-                                    <p className="az-label" style={{ fontSize: 9, marginTop: 4, opacity: 0.5 }}>{report.address}</p>
+                                    <div className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em] mb-2">DETECTED ASSET</div>
+                                    <h2 className="text-2xl font-black text-black tracking-tight">{report.name} ({report.symbol})</h2>
+                                    <p className="text-[10px] font-mono text-black/20 mt-1">{report.address}</p>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div className="az-label" style={{ marginBottom: 4 }}>SAFETY SCORE</div>
-                                    <div className="az-value-xl" style={{ color: getVerdictColor(report.verdict) }}>{report.safetyScore}<span style={{ fontSize: 16, opacity: 0.3 }}>/100</span></div>
-                                    <div className="az-badge" style={{ background: getVerdictColor(report.verdict), color: '#000', border: 'none', marginTop: 8 }}>{report.verdict}</div>
+                                <div className="text-right">
+                                    <div className="text-[9px] font-black text-black/30 uppercase tracking-[0.2em] mb-2">SECURITY STATUS</div>
+                                    <div className="text-3xl font-black font-mono" style={{ color: getVerdictColor(report.verdict) }}>
+                                        {report.safetyScore}<span className="text-sm opacity-30">/100</span>
+                                    </div>
+                                    <div className="inline-flex mt-3 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-white" style={{ backgroundColor: getVerdictColor(report.verdict) }}>
+                                        {report.verdict}
+                                    </div>
                                 </div>
                             </div>
 

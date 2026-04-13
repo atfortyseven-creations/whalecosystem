@@ -17,7 +17,6 @@ import {
   Twitter,
   Github
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAccount, useConnect, useSignMessage, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { toast } from 'sonner';
@@ -279,7 +278,7 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             animate={{ y: 0, scale: 1 }}
             exit={{ y: '100%', scale: 0.98 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="w-full max-w-[340px] bg-[#0A0A0A] rounded-[2.8rem] p-6 pt-10 relative z-10 shadow-[0_20px_80px_rgba(0,0,0,0.8)] border border-white/10 mx-auto"
+            className="w-full max-w-[340px] bg-white rounded-[2.8rem] p-6 pt-10 relative z-10 shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-black/5 mx-auto"
             style={{ willChange: 'transform' }}
           >
             <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 bg-white/5 text-white/40 rounded-full flex items-center justify-center hover:text-white hover:bg-white/10 transition-colors">
@@ -287,11 +286,11 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             </button>
 
             <div className="flex flex-col items-center mb-9">
-              <div className="w-[60px] h-[60px] bg-black border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.1)] rounded-full flex items-center justify-center mb-5">
-                <WhaleLogo className="w-8 h-8 invert" />
+              <div className="w-[60px] h-[60px] bg-white border border-black/5 shadow-xl rounded-full flex items-center justify-center mb-5">
+                <WhaleLogo className="w-8 h-8" />
               </div>
-              <h3 className="text-[20px] font-black text-white tracking-tight mb-1 uppercase">Connect Wallet</h3>
-              <p className="text-[9px] text-white/40 font-black uppercase tracking-[0.12em] text-center px-4">Cryptographic authentication</p>
+              <h3 className="text-[20px] font-black text-black tracking-tight mb-1 uppercase">Connect Wallet</h3>
+              <p className="text-[9px] text-black/40 font-black uppercase tracking-[0.12em] text-center px-4">Cryptographic authentication</p>
               
               {error && (
                 <div className="mt-4 px-3 py-2 bg-rose-50 text-rose-500 rounded-lg text-[9px] font-bold tracking-widest uppercase border border-rose-100 flex gap-2 w-full text-center items-center justify-center">
@@ -313,12 +312,12 @@ function WalletPickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                     style={{ willChange: 'transform' }}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-black rounded-[1rem] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.8)] flex items-center justify-center border border-white/10">
+                      <div className="w-10 h-10 bg-white rounded-[1rem] shadow-sm flex items-center justify-center border border-black/5">
                         <WalletIcon type={wallet.iconType} />
                       </div>
                       <div className="text-left flex flex-col justify-center">
-                        <span className="font-black text-[12.5px] text-white tracking-widest">{wallet.name}</span>
-                        <span className={`text-[8px] font-black uppercase tracking-[0.12em] mt-[1px] ${busy ? 'text-[#00F2EA] animate-pulse' : 'text-white/30'}`}>
+                        <span className="font-black text-[12.5px] text-black tracking-widest">{wallet.name}</span>
+                        <span className={`text-[8px] font-black uppercase tracking-[0.12em] mt-[1px] ${busy ? 'text-[#00F2EA] animate-pulse' : 'text-black/30'}`}>
                           {busy ? 'AUTHENTICATING...' : wallet.desc}
                         </span>
                       </div>
@@ -362,14 +361,17 @@ function PageHero({
       <header className="w-full flex items-center justify-between z-20 h-10 px-4">
         <div className="flex-1" />
         <div className="flex items-center gap-3">
-            <ThemeToggle />
+            <div className="flex flex-col items-end gap-1">
+               <span className="text-[8px] font-mono font-black text-[#00F2EA] animate-pulse">NETWORK SYNCED: 99.9%</span>
+               <span className="text-[8px] font-mono font-black text-black/30">MOBILE AUTH: OK</span>
+            </div>
             {isConnected && (
               <button
                 onClick={onDisconnect}
-                className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center active:scale-[0.85] transition-transform text-white border border-white/10"
+                className="w-10 h-10 bg-black/5 rounded-full flex items-center justify-center active:scale-[0.85] transition-transform text-black border border-black/10"
                 style={{ willChange: 'transform' }}
               >
-                <RefreshCw size={14} className="opacity-60 text-white" />
+                <RefreshCw size={14} className="opacity-60 text-black" />
               </button>
             )}
         </div>
@@ -381,7 +383,7 @@ function PageHero({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center w-full bg-[#0A0A0A]/80 backdrop-blur-2xl rounded-[3rem] p-6 shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 relative z-20"
+          className="flex flex-col items-center w-full bg-white/80 backdrop-blur-2xl rounded-[3rem] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-black/10 relative z-20"
           style={{ willChange: 'transform, opacity' }}
         >
           {/* Status badge removed for maximum fluidity */}
@@ -399,33 +401,24 @@ function PageHero({
                 className="w-[280px] h-[280px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
                 style={{ willChange: 'transform' }}
               >
-                <WhaleLogo className="w-full h-full object-contain" variant="monochrome" priority />
+                <WhaleLogo className="w-full h-full object-contain" priority />
               </motion.div>
           )}
 
           {!isConnected ? (
             <div className="w-full space-y-4">
-              <p className="text-[12px] font-bold text-white/50 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
+              <p className="text-[12px] font-bold text-black/40 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
                 Whale Alert Network
               </p>
-
-              <button
-                onClick={onConnect}
-                className="w-full h-[80px] bg-white text-black rounded-[2.5rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-4 active:scale-[0.95] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] group"
-                style={{ willChange: 'transform' }}
-              >
-                <Wallet size={18} className="text-black/50 group-active:translate-x-1 transition-transform" />
-                Connect your Wallet
-              </button>
             </div>
           ) : (
             <div className="w-full space-y-4 mt-8">
               <div className="w-full bg-white/5 border border-white/10 rounded-[2rem] p-5 mb-4 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
                    <div className="w-2 h-2 rounded-full bg-[#00F2EA] shadow-[0_0_10px_#00F2EA] animate-pulse" />
-                   <span className="text-[11px] font-black text-white uppercase tracking-[0.2em]">IDENTITY VERIFIED</span>
+                   <span className="text-[11px] font-black text-black uppercase tracking-[0.2em]">IDENTITY VERIFIED</span>
                 </div>
-                <span className="text-[10px] font-light text-white/50 uppercase tracking-[0.08em] leading-relaxed block">
+                <span className="text-[10px] font-light text-black/50 uppercase tracking-[0.08em] leading-relaxed block">
                   Encrypted handshake completed
                 </span>
               </div>
@@ -434,7 +427,7 @@ function PageHero({
                 {/* Option 1: View Intelligence */}
                 <button
                   onClick={onEnterNews}
-                  className="w-full h-[72px] bg-[#111] border border-white/10 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all hover:bg-white/5 active:scale-[0.95] group"
+                  className="w-full h-[72px] bg-black text-white border border-transparent rounded-[2rem] font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-between px-8 transition-all hover:scale-[1.02] active:scale-[0.95] group"
                   style={{ willChange: 'transform' }}
                 >
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
@@ -467,29 +460,45 @@ function PageHero({
           )}
 
           {isConnected && address && (
-            <div className="mt-10 opacity-20">
-              <span className="text-[10px] font-mono font-black tracking-widest">
-                ID: {address.slice(0, 10).toUpperCase()}...{address.slice(-6).toUpperCase()}
+            <div className="mt-10 opacity-40">
+              <span className="text-[10px] font-mono font-black text-black tracking-widest leading-none">
+                 [ BARCODE_INTEGRITY_VERIFIED ]
               </span>
+              <div className="mt-2 h-5 w-full flex items-center justify-center gap-1 opacity-20">
+                 {Array.from({length: 32}).map((_,i) => (
+                    <div key={i} className={`h-full w-[2px] bg-black ${i % 3 === 0 ? 'h-3' : i % 5 === 0 ? 'h-5' : 'h-2'}`} />
+                 ))}
+              </div>
             </div>
           )}
         </motion.div>
       </main>
 
+      <footer className="relative z-10 w-full mb-8">
+        <button 
+          onClick={onConnect}
+          className="w-full py-6 bg-[#00F2EA] text-black font-black uppercase tracking-[0.3em] text-[11px] rounded-[2rem] shadow-[0_15px_45px_rgba(0,242,234,0.3)] hover:scale-105 active:scale-95 transition-all"
+        >
+          {isConnected ? `LINKED: ${address?.slice(0, 6)}...` : "Connect your Wallet"}
+        </button>
+      </footer>
+
       {/* SCROLL HINT */}
+      {/* FINGERPRINT ENFORCEMENT */}
       <motion.div
-        className="flex flex-col items-center gap-1 z-10 opacity-30"
+        className="flex flex-col items-center gap-1 z-10 opacity-20"
         animate={{ y: [0, 4, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         style={{ willChange: 'transform' }}
       >
-        <ChevronDown size={14} className="text-white/50" />
+        <Fingerprint size={28} className="text-[#00F2EA]" />
+        <span className="text-[8px] font-mono font-black tracking-[0.4em] uppercase text-black mt-2">Hold for Terminal Biometrics</span>
       </motion.div>
 
-      {/* FINGERPRINT */}
-      <div className="absolute bottom-4 left-0 w-full flex items-center justify-center gap-3 opacity-[0.05] pointer-events-none">
-        <div className="h-px bg-white/20 flex-1 mx-8" />
-        <div className="h-px bg-white/20 flex-1 mx-8" />
+      {/* FINGERPRINT BRACKETS */}
+      <div className="absolute bottom-4 left-0 w-full flex items-center justify-center gap-3 opacity-[0.2] pointer-events-none">
+        <div className="h-px bg-black/10 flex-1 mx-8" />
+        <div className="h-px bg-black/10 flex-1 mx-8" />
       </div>
     </div>
   );

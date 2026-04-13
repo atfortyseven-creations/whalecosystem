@@ -6,6 +6,10 @@ import { addWhaleToQueue } from "../../lib/queues/whaleQueue";
 
 dotenv.config();
 
+async function sleep(ms: number) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
 // ── RPC with timeout ────────────────────────────────────────────────────────
 // FIX: Add AbortSignal.timeout() so a stalled Solana RPC node cannot block
 // the worker loop indefinitely. Previously, a hung connection would freeze
@@ -16,8 +20,14 @@ async function solanaRpcCall(method: string, params: any[] = []) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jsonrpc: "2.0", id: "sol-standalone", method, params }),
-        signal: AbortSignal.timeout(8000), // 8-second hard timeout per RPC call
+        signal: AbortSignal.timeout(10000), // Institutional 10-second hard timeout 
     });
+    
+    // [INHUMAN DEFENSE] Explicitly handle 429 to trigger parent backoff
+    if (response.status === 429) {
+        throw new Error("RATE_LIMIT_429");
+    }
+    
     if (!response.ok) throw new Error(`Solana RPC HTTP ${response.status}`);
     const data = await response.json();
     if (data.error) throw new Error(`Solana RPC error: ${JSON.stringify(data.error)}`);
@@ -25,19 +35,14 @@ async function solanaRpcCall(method: string, params: any[] = []) {
 }
 
 // ── Wallet list ─────────────────────────────────────────────────────────────
-// FIX: Hardcoded wallet list replaced with DB-driven approach.
-// Workers now query the OnChainEntity table for Solana-tagged addresses,
-// falling back to a minimal static list only when the DB is empty.
-// This enables institutional-grade live wallet fleet management through the UI.
 async function getTargetWallets(): Promise<string[]> {
     try {
         const entities = await prisma.onChainEntity.findMany({
-            where: { address: { startsWith: '' } }, // Solana addresses are base58, not 0x
+            where: { address: { startsWith: '' } }, 
             select: { address: true },
             take: 100,
         });
 
-        // Filter to likely Solana addresses (base58, 32-44 chars, no 0x prefix)
         const solanaAddrs = entities
             .map(e => e.address)
             .filter(a => !a.startsWith('0x') && a.length >= 32 && a.length <= 44);
@@ -47,7 +52,6 @@ async function getTargetWallets(): Promise<string[]> {
         // DB unavailable — fall through to static fallback
     }
 
-    // Static fallback: known top-tier Solana whale wallets for minimal coverage
     return [
         "9WzDXwBbmxg8EXKFEV9sA4Ycdz975dGv9mC6xEqtXoGz",
         "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
@@ -57,19 +61,20 @@ async function getTargetWallets(): Promise<string[]> {
 }
 
 export async function startSolanaWorker() {
+    console.log("🦅 [SOL Hub] Activating Adaptive Solana Surveillance...");
     let lastSignatures = new Map<string, string>();
-    // FIX: Exponential backoff state — prevents log flooding and CPU spin
-    // when Solana mainnet is rate-limiting or degraded.
     let consecutiveErrors = 0;
-    const MAX_BACKOFF_MS  = 5 * 60 * 1000; // 5 minutes max
+    const MAX_BACKOFF_MS  = 10 * 60 * 1000; // 10 minutes max for institutional patience
 
     while (true) {
         try {
-            // Refresh wallet list every cycle (picks up newly added onchain entities)
             const targetWallets = await getTargetWallets();
 
             for (const wallet of targetWallets) {
                 try {
+                    // [JITTER] Inject small inter-wallet delay to avoid RPC bursts
+                    await sleep(800 + Math.random() * 400);
+
                     const sigs = await solanaRpcCall("getSignaturesForAddress", [wallet, { limit: 5 }]);
                     if (!sigs || sigs.length === 0) continue;
 
@@ -82,8 +87,6 @@ export async function startSolanaWorker() {
                     }]);
 
                     if (tx) {
-                        // Null-safe balance access — malformed or failed Solana txs
-                        // may have null meta or empty balances arrays.
                         const postBal = tx.meta?.postBalances?.[0] ?? 0;
                         const preBal  = tx.meta?.preBalances?.[0]  ?? 0;
                         const solChange = Math.abs((postBal - preBal) / 1e9);
@@ -99,24 +102,29 @@ export async function startSolanaWorker() {
                     }
 
                     lastSignatures.set(wallet, latest);
+                    consecutiveErrors = 0; // Reset on successful wallet scan
+
                 } catch (walletErr: any) {
-                    // Per-wallet error: skip this wallet, continue to next
+                    if (walletErr.message === "RATE_LIMIT_429") {
+                        // [CRITICAL SCALE] If we hit a 429, we must back off the ENTIRE worker immediately
+                        console.warn(`[SOL] 🛡️ Global Rate Limit detected on wallet ${wallet.slice(0, 5)}. Cooling down...`);
+                        throw walletErr; // Re-throw to trigger outer backoff
+                    }
                     console.warn(`⚠ [SOL] Wallet ${wallet.slice(0, 8)}... skipped: ${walletErr.message}`);
                 }
             }
 
-            // Successful cycle — reset backoff
             consecutiveErrors = 0;
-            await new Promise(r => setTimeout(r, 30_000)); // 30s between sweeps
+            await sleep(30_000); // Standard cycle sleep
 
         } catch (e: any) {
-            // FIX: Exponential backoff on consecutive errors.
-            // Previously: fixed 60s sleep regardless of error frequency.
-            // Now: 60s → 120s → 240s → ... capped at 5 minutes.
             consecutiveErrors++;
-            const backoff = Math.min(60_000 * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
-            console.error(`❌ [SOL] Worker error #${consecutiveErrors}. Backoff ${backoff / 1000}s:`, e.message);
-            await new Promise(r => setTimeout(r, backoff));
+            // Exponential institutional backoff
+            const baseWait = e.message === "RATE_LIMIT_429" ? 120_000 : 60_000;
+            const backoff = Math.min(baseWait * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
+            
+            console.error(`❌ [SOL] Worker failure #${consecutiveErrors} (${e.message}). Scaling delay to ${backoff / 1000}s...`);
+            await sleep(backoff);
         }
     }
 }
@@ -129,11 +137,13 @@ async function processWhaleTx(
     const exists = await prisma.whaleActivity.findUnique({ where: { transactionHash: hash } });
     if (exists) return;
 
+    // Calculate BTC Equivalence for the sovereign view
+    let btcPrice = await getRealTimePrice("BTC") || 65000;
+    const valueBTC = usdValue / btcPrice;
+
     await prisma.whaleActivity.upsert({
         where: { transactionHash: hash },
-        update: {
-            usdValue: usdValue.toString(),
-        },
+        update: { usdValue: usdValue.toString() },
         create: {
             immutableId: `SOL-${hash.slice(0, 16)}`, 
             walletAddress: from,
@@ -141,6 +151,8 @@ async function processWhaleTx(
             token: asset,
             amount: amount.toString(),
             usdValue: usdValue.toString(),
+            valueBTC: valueBTC,
+            btcPriceAtTx: btcPrice,
             fromAddress: from,
             toAddress: to,
             transactionHash: hash,
@@ -151,14 +163,14 @@ async function processWhaleTx(
         }
     }).catch(e => {
         if (!e.message.includes('Unique constraint')) {
-            console.error(`❌ [${chain}] Error persisting SOL whale activity:`, e.message);
+            console.error(`❌ [${chain}] Persistence Fail:`, e.message);
         }
     });
 
     await addWhaleToQueue({
-        hash, from, to, asset, amount, usdValue,
+        hash, from, to, asset, amount, usdValue, valueBTC,
         blockNumber: blockNumber.toString(), chain, type: "SOL", metadata,
     }).catch(e => {
-        console.error(`❌ [${chain}] Error adding SOL whale to Redis queue:`, e.message);
+        console.error(`❌ [${chain}] Queue Fail:`, e.message);
     });
 }

@@ -101,9 +101,9 @@ export const viewport = {
   themeColor: '#FAF9F6',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
   minimumScale: 1,
-  userScalable: true,
+  userScalable: false,
   viewportFit: 'cover',
 }
 
@@ -189,11 +189,10 @@ export default async function RootLayout({
           />
         </head>
         <body 
-          className="bg-[#FAF9F6] text-[#050505] dark:bg-[#000000] dark:text-[#E0E0E0] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" 
-          style={{ backgroundColor: '#FAF9F6' }}
+          className="bg-[#FAF9F6] text-[#050505] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" 
           suppressHydrationWarning
         >
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
             {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
             <WavePatternOverlay />
             <Providers cookies={cookies}>

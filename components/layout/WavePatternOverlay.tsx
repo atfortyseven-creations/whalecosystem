@@ -24,23 +24,17 @@ import { useEffect, useState } from "react";
  *  - pointer-events: none     → never blocks touch/scroll events
  */
 export function WavePatternOverlay() {
-  const [isLight, setIsLight] = useState(false);
   const [mounted, setMounted] = useState(false);
  
   useEffect(() => {
     setMounted(true);
-    const html = document.documentElement;
-    const check = () => setIsLight(!html.classList.contains("dark"));
-    check();
-    const obs = new MutationObserver(check);
-    obs.observe(html, { attributes: true, attributeFilter: ["class"] });
-    return () => obs.disconnect();
   }, []);
  
   if (!mounted) return null;
  
-  const cosmicoOpacity = isLight ? 0.065 : 0.028;
-  const hokusaiOpacity = isLight ? 0.10 : 0.055;
+  // Institutional White constants
+  const cosmicoOpacity = 0.05;
+  const hokusaiOpacity = 0.12;
 
   return (
     <>
@@ -53,15 +47,13 @@ export function WavePatternOverlay() {
           zIndex: 0,
           pointerEvents: "none",
           transform: "translateZ(0)",
-          backfaceVisibility: "hidden",
-          WebkitBackfaceVisibility: "hidden" as any,
-          backgroundImage: "url('/patron-cosmico-4k.png')",
+          WebkitTransform: "translateZ(0)",
+          backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
           backgroundRepeat: "repeat",
-          backgroundSize: "260px auto",
+          backgroundSize: "280px auto", // Balanced texture scale
           backgroundAttachment: "scroll",
           opacity: cosmicoOpacity,
-          mixBlendMode: (isLight ? "multiply" : "screen") as any,
-          filter: isLight ? "none" : "invert(1) hue-rotate(180deg)",
+          mixBlendMode: "multiply",
           imageRendering: "auto",
         }}
       />
@@ -69,6 +61,7 @@ export function WavePatternOverlay() {
       {/* ── Layer 2: Olas Hokusai — bottom-anchored wave strip ────────────── */}
       <div
         aria-hidden="true"
+        className="hokusai-strip"
         style={{
           position: "fixed",
           left: 0,
@@ -77,20 +70,20 @@ export function WavePatternOverlay() {
           zIndex: 0,
           pointerEvents: "none",
           transform: "translateZ(0)",
-          backfaceVisibility: "hidden",
-          WebkitBackfaceVisibility: "hidden" as any,
-          height: "clamp(120px, 18vw, 280px)",
-          backgroundImage: "url('/olas-hokusai-4k.png')",
+          WebkitTransform: "translateZ(0)",
+          // Responsive height that anchors the wave perfectly
+          height: "clamp(100px, 15vh, 220px)",
+          backgroundImage: "url('/api/checkpoint-image?name=olas-hokusai-4k.png')",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "bottom center",
-          backgroundSize: "100% auto",
+          // 'Contain' logic ensures every pixel of the wave strip is seen without cropping/zoom on small screens
+          backgroundSize: "100% auto", 
           backgroundAttachment: "scroll",
           opacity: hokusaiOpacity,
-          mixBlendMode: (isLight ? "multiply" : "screen") as any,
-          filter: isLight ? "none" : "invert(1) hue-rotate(200deg)",
-          // Subtle fade toward the top of the strip to blend into content
-          maskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
-          WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+          mixBlendMode: "multiply",
+          // Advanced masking for 'Inhuman' fluid connection
+          maskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0) 100%)",
         }}
       />
     </>

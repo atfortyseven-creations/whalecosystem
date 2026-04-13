@@ -46,7 +46,8 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://cloudflare-eth.com'
     ],
     wss: [
-      'wss://ethereum-rpc.publicnode.com'
+      'wss://ethereum-rpc.publicnode.com',
+      'wss://eth.llamarpc.com'
     ]
   },
   56: {
@@ -55,16 +56,19 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://1rpc.io/bnb',
       'https://bsc-dataseed1.binance.org',
       'https://bsc-dataseed2.binance.org',
-      'https://bsc.meowrpc.com'
+      'https://bsc.meowrpc.com',
+      'https://rpc.ankr.com/bsc'
     ],
     wss: [
-      'wss://bsc-rpc.publicnode.com'
+      'wss://bsc-rpc.publicnode.com',
+      'wss://binance.llamarpc.com'
     ]
   },
   137: {
     rpc: [
       'https://polygon.llamarpc.com',
       'https://1rpc.io/matic',
+      'https://rpc.ankr.com/polygon',
       'https://polygon.meowrpc.com',
       'https://polygon-rpc.com'
     ],
@@ -78,10 +82,12 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://base.llamarpc.com',
       'https://1rpc.io/base',
       'https://mainnet.base.org',
-      'https://base.meowrpc.com'
+      'https://base.meowrpc.com',
+      'https://rpc.ankr.com/base'
     ].filter(Boolean),
     wss: [
-      'wss://base-rpc.publicnode.com'
+      'wss://base-rpc.publicnode.com',
+      'wss://base.llamarpc.com'
     ]
   }
 };
@@ -95,12 +101,12 @@ export class ResilientProvider {
   private wssUrls: string[];
   private currentWssIndex: number = 0;
   private chainId: number;
-  private networkCache?: ethers.Network;
+  private destroyed: boolean = false;
+  private subscriptions: PersistentSubscription[] = [];
 
   constructor(chainId: number = 1) {
     this.chainId = chainId;
     
-    // Unificar pares específicos de GetBlock + Fallbacks por cadena
     const urls = [
       ...(chainId === 1 ? GETBLOCK_PAIRS.map(p => p.rpc!) : []),
       ...(FALLBACKS[chainId]?.rpc || [])
@@ -125,7 +131,33 @@ export class ResilientProvider {
     console.log(`[ResilientProvider] 🚀 Booted for chain ${chainId} with ${urls.length} endpoints.`);
   }
 
+  public destroy() {
+    this.destroyed = true;
+    if (this.wsProvider) {
+        this.wsProvider.removeAllListeners();
+        this.wsProvider.destroy();
+    }
+  }
+
+  /**
+   * [HIGH FIDELITY] Subscribe to blockchain events with automatic rotation recovery.
+   * This is the institutional standard for long-running telemetry daemons.
+   */
+  public on(type: 'block' | any, callbackOrFilter: any, callback?: any) {
+    if (type === 'block') {
+        this.subscriptions.push({ type: 'block', callback: callbackOrFilter });
+    } else {
+        this.subscriptions.push({ type: 'filter', filter: type, callback: callbackOrFilter });
+    }
+    
+    // Attach immediately if provider is ready
+    if (this.wsProvider) {
+        this.wsProvider.on(type, callbackOrFilter);
+    }
+  }
+
   private getActiveEndpoints(): number[] {
+    if (this.destroyed) return [];
     const now = Date.now();
     for (const ep of this.endpoints) {
       if (ep.exhausted && ep.exhaustedAt && now - ep.exhaustedAt > EXHAUSTION_COOLDOWN_MS) {
@@ -142,14 +174,13 @@ export class ResilientProvider {
 
   private markExhausted(index: number, reason: string) {
     const ep = this.endpoints[index];
-    if (ep.exhausted) return; // Prevent log spam if already exhausted
+    if (!ep || ep.exhausted) return;
 
     ep.exhausted = true;
     ep.isHealthy = false;
     ep.exhaustedAt = Date.now();
     console.warn(`[ResilientProvider] 💀 BLACKLISTED (${this.chainId}) — ${reason}: ${ep.url.slice(0, 40)}...`);
     
-    // Si era un WSS activo, rotar
     if (this.chainId === 1 && index < this.wssUrls.length) {
         this.reconnectWS();
     }
@@ -159,21 +190,18 @@ export class ResilientProvider {
     const activeIndices = this.getActiveEndpoints();
 
     if (activeIndices.length === 0) {
-      // Emergency reset
       this.endpoints.forEach(ep => { ep.exhausted = false; ep.isHealthy = true; });
       return fn(this.providers[0]);
     }
 
     for (const i of activeIndices) {
       try {
-        const result = await fn(this.providers[i]);
-        return result;
+        return await fn(this.providers[i]);
       } catch (error: any) {
         const status = error?.status ?? error?.statusCode ?? 0;
         const msg = error?.message?.toLowerCase() ?? '';
 
-        // CIRCUIT BREAKER: 402/429/401 → Instant skip
-        if (status === 402 || status === 429 || status === 401 || msg.includes('402') || msg.includes('quota') || msg.includes('limit')) {
+        if (status === 429 || status === 402 || status === 401 || msg.includes('limit') || msg.includes('quota')) {
           this.markExhausted(i, `API_LIMIT_${status}`);
           continue;
         }
@@ -188,10 +216,8 @@ export class ResilientProvider {
   }
 
   private initWebSocket(url: string) {
-    if (typeof window !== 'undefined') return; // Server-side only
+    if (typeof window !== 'undefined' || this.destroyed) return;
     
-    // [SECURITY FIX] Ensure we don't try to connect to an HTTP URL as a WebSocket
-    // This prevents "Unexpected server response: 200" from ethers.
     if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
       console.error(`[ResilientProvider] 🚫 MALFORMED_WS_URL skipping: ${url}`);
       this.reconnectWS();
@@ -199,17 +225,43 @@ export class ResilientProvider {
     }
 
     try {
-      this.wsProvider = new ethers.WebSocketProvider(url);
-      this.wsProvider.on('error', () => this.reconnectWS());
-    } catch (e) {
+      const newProvider = new ethers.WebSocketProvider(url);
+      
+      newProvider.on('error', (err: any) => {
+          console.error(`[WS-CORE] Asynchronous crash prevented for ${url.slice(0, 30)}:`, err?.message || 'Unknown');
+          this.reconnectWS();
+      });
+
+      // [RESILIENCE RECOVERY] Re-apply all persistent subscriptions
+      this.subscriptions.forEach(sub => {
+          if (sub.type === 'block') {
+              newProvider.on('block', sub.callback);
+          } else {
+              newProvider.on(sub.filter, sub.callback);
+          }
+      });
+
+      this.wsProvider = newProvider;
+
+    } catch (e: any) {
+      console.error(`[WS-FATAL] Immediate connection failure for ${url}:`, e.message);
       this.reconnectWS();
     }
   }
 
   private reconnectWS() {
-    if (this.wssUrls.length === 0) return;
+    if (this.wssUrls.length === 0 || this.destroyed) return;
+    
+    if (this.wsProvider) {
+        try {
+            this.wsProvider.removeAllListeners();
+            this.wsProvider.destroy();
+        } catch {}
+        this.wsProvider = undefined;
+    }
+
     this.currentWssIndex = (this.currentWssIndex + 1) % this.wssUrls.length;
-    console.log(`[WS] 🔄 Rotating to Pair Index ${this.currentWssIndex}`);
+    console.log(`[WS] 🔄 Scaling to Next Endpoint Index ${this.currentWssIndex}...`);
     setTimeout(() => this.initWebSocket(this.wssUrls[this.currentWssIndex]), 5000);
   }
 

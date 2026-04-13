@@ -29,14 +29,10 @@ const TRANSFER_TOPIC = ethers.id("Transfer(address,address,uint256)");
 
 export async function startEvmWorker(resilient: ResilientProvider, chainLabel: string) {
   console.log(`📡 [${chainLabel} Hub] Activating Standalone EVM Stream...`);
-  const ws = resilient.getWsProvider();
   
-  if (!ws) {
-      console.warn(`⚠️ [${chainLabel}] No WebSocket. Using Polling.`);
-      return startPollingWorker(resilient, chainLabel);
-  }
-
-  ws.on("block", async (blockNumber) => {
+  // [INHUMAN RESILIENCE] Use persistent subscription model.
+  // This ensures listeners survive WebSocket rotations automatically.
+  resilient.on("block", async (blockNumber: number) => {
     try {
         const block = await resilient.call<any>(p => p.getBlock(blockNumber, true));
         if (!block || !block.prefetchedTransactions) return;
@@ -53,7 +49,7 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
   });
 
   const filter = { topics: [TRANSFER_TOPIC] };
-  ws.on(filter, async (log) => {
+  resilient.on(filter, async (log: any) => {
     try {
         const config = TOKEN_CONFIG[log.address.toLowerCase()];
         if (!config) return;
@@ -79,8 +75,14 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
         if (usdValue >= WHALE_THRESHOLD_USD) {
             await processWhaleTx(log.transactionHash, from, to, config.symbol, tokenAmount, usdValue, log.blockNumber, chainLabel, { method: "ERC20" });
         }
-    } catch (e) {/* outer safety net — daemon must never crash */}
+    } catch (e: any) {/* outer safety net — daemon must never crash */}
   });
+
+  // Fallback check: If no WebSocket providers available at boot, start polling
+  if (!resilient.getWsProvider()) {
+      console.warn(`⚠️ [${chainLabel}] No initial WebSocket. Booting Polling fallback.`);
+      startPollingWorker(resilient, chainLabel);
+  }
 }
 
 async function startPollingWorker(resilient: ResilientProvider, chainLabel: string) {

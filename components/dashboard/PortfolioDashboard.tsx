@@ -80,39 +80,37 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[500px] text-center space-y-8 relative overflow-hidden rounded-3xl border border-white/5 shadow-2xl">
+            <div className="flex flex-col items-center justify-center min-h-[600px] text-center space-y-12 relative overflow-hidden rounded-[2.5rem] border border-black/[0.06] bg-white shadow-xl">
                 <img
-                    src="/olas-hokusai-4k.png"
+                    src="/api/checkpoint-image?name=olas-hokusai-4k.png"
                     alt="Hokusai Waves"
-                    className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay pointer-events-none"
+                    className="absolute inset-0 w-full h-full object-cover opacity-[0.03] mix-blend-multiply pointer-events-none"
                     style={{ transform: "translateZ(0)", willChange: "transform" }}
-                    fetchPriority="high"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent" />
                 
                 <div className="relative z-10">
-                    <div className="relative p-8 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 text-blue-400 border border-blue-500/20">
+                    <div className="relative p-10 rounded-full bg-black/5 text-black/20 border border-black/[0.06]">
                         <Wallet size={80} strokeWidth={1.5} />
                     </div>
                 </div>
-                <div className="space-y-3 max-w-md relative z-10">
-                    <h2 className="text-4xl font-black text-white tracking-tight bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                <div className="space-y-4 max-w-md relative z-10">
+                    <h2 className="text-5xl font-black text-black tracking-tighter uppercase leading-none">
                         VAULT ACCESS
                     </h2>
-                    <p className="text-gray-500 text-sm leading-relaxed font-medium">
+                    <p className="text-black/40 text-sm leading-relaxed font-bold uppercase tracking-widest">
                         Connect your Web3 identity or generate an encrypted wallet to unlock tier-1 portfolio surveillance.
                     </p>
                 </div>
                 <div className="flex gap-4 relative z-10">
                     <button
                         onClick={() => open()}
-                        className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-black rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl"
+                        className="px-10 py-5 bg-black text-white font-black rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-black/20 uppercase tracking-[0.2em] text-[11px]"
                     >
                         CONNECT WALLET
                     </button>
                     <button
                         onClick={() => useWalletStore.getState().createWallet()}
-                        className="px-8 py-4 bg-white/5 border border-white/10 text-white font-black rounded-2xl hover:bg-white/10 transition-all"
+                        className="px-10 py-5 bg-black/5 border border-black/[0.06] text-black/60 font-black rounded-2xl hover:bg-black/10 transition-all uppercase tracking-[0.2em] text-[11px]"
                     >
                         CREATE VAULT
                     </button>
@@ -209,30 +207,25 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={cn(
-                    "relative p-10 rounded-3xl border border-white/10 overflow-hidden group",
-                    isMobile 
-                        ? "bg-slate-900/80" 
-                        : "bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50 backdrop-blur-xl"
-                )}
+                className="relative p-12 rounded-[2.5rem] border border-black/[0.06] overflow-hidden group bg-white shadow-xl"
             >
                 <div className="relative z-10 flex justify-between items-start">
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                                <TrendingUp size={16} className="text-blue-400" strokeWidth={2.5} />
+                            <div className="p-2.5 rounded-xl bg-black/5 border border-black/[0.06]">
+                                <TrendingUp size={16} className="text-black" strokeWidth={2.5} />
                             </div>
-                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em]">
-                                Total Net Worth
+                            <h3 className="text-[11px] font-black text-black/30 uppercase tracking-[0.3em]">
+                                DISPOSABLE NET WORTH
                             </h3>
                         </div>
                         
-                        <div className="flex items-baseline gap-6">
+                        <div className="flex items-baseline gap-8">
                             <motion.span 
                                 key={totalValue}
-                                initial={{ scale: 1.05 }}
+                                initial={{ scale: 1.02 }}
                                 animate={{ scale: 1 }}
-                                className="text-7xl font-black text-white tracking-tight font-mono"
+                                className="text-8xl font-black text-black tracking-tighter font-mono"
                             >
                                 ${safeToLocaleString(totalValue, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </motion.span>
@@ -241,47 +234,42 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 initial={{ scale: 0.9, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-full font-black text-base backdrop-blur-sm",
+                                    "flex items-center gap-2 px-6 py-2 rounded-full font-black text-lg transition-colors",
                                     isProfit 
-                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                                        : "bg-red-500/10 text-red-400 border border-red-500/20"
+                                        ? "bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20" 
+                                        : "bg-[#FF3B30]/10 text-[#FF3B30] border border-[#FF3B30]/20"
                                 )}
                             >
-                                {isProfit ? <ArrowUpRight size={18} strokeWidth={3} /> : <ArrowDownRight size={18} strokeWidth={3} />}
+                                {isProfit ? <ArrowUpRight size={20} strokeWidth={3} /> : <ArrowDownRight size={20} strokeWidth={3} />}
                                 {safeToFixed(Math.abs(totalChange24h), 2)}%
                             </motion.div>
                         </div>
 
-                        <div className="flex gap-8 mt-8">
+                        <div className="flex gap-10 mt-10">
                             <div className="space-y-1">
-                                <div className="text-gray-500 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <PieChart size={12} />
-                                    Active Assets
+                                    ACTIVE ASSETS
                                 </div>
-                                <div className="text-3xl font-black text-white font-mono">{assets.length}</div>
+                                <div className="text-4xl font-black text-black font-mono">{assets.length}</div>
                             </div>
                             
-                            <div className="w-px bg-white/10" />
+                            <div className="w-px bg-black/[0.06]" />
                             
                             <div className="space-y-1">
-                                <div className="text-gray-500 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <Globe size={12} />
-                                    Networks
-                                </div>
-                                <div className="text-3xl font-black text-white font-mono">
-                                    {new Set(assets.map(a => a.network)).size}
-                                </div>
+                                    NETWORK NODES
                             </div>
-
-                            <div className="w-px bg-white/10" />
+                            <div className="w-px bg-black/[0.06]" />
                             
                             <div className="space-y-1">
-                                <div className="text-gray-500 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                <div className="text-black/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                                     <Activity size={12} />
-                                    Sync Status
+                                    SYNC STATUS
                                 </div>
-                                <div className="text-3xl font-black text-emerald-400 font-mono flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                <div className="text-4xl font-black text-[#00C076] font-mono flex items-center gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-[#00C076] animate-pulse" />
                                     SYNCED
                                 </div>
                             </div>
@@ -290,26 +278,24 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
 
                     <button
                         onClick={() => effectiveAddress && fetchPortfolio(effectiveAddress)}
-                        className="p-4 hover:bg-white/5 rounded-2xl transition-all text-gray-400 hover:text-white border border-white/0 hover:border-white/10 group"
+                        className="p-5 hover:bg-black/5 rounded-[1.5rem] transition-all text-black/20 hover:text-black border border-transparent hover:border-black/[0.06] group"
                     >
-                        <RefreshCcw size={20} className={cn(isLoading && "animate-spin")} strokeWidth={2} />
+                        <RefreshCcw size={24} className={cn(isLoading && "animate-spin")} strokeWidth={2.5} />
                     </button>
                 </div>
-            </motion.div>
-
             {/* 🔥 ASSET LIST */}
-            <div className="relative rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50 backdrop-blur-xl overflow-hidden">
-                <div className="px-8 py-6 border-b border-white/10 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                            <Activity size={18} className="text-emerald-400" strokeWidth={2.5} />
-                            <h4 className="text-base font-black text-white uppercase tracking-widest">On-Chain Holdings</h4>
+            <div className="relative rounded-[2.5rem] border border-black/[0.06] bg-white shadow-xl overflow-hidden">
+                <div className="px-10 py-8 border-b border-black/[0.06] flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-1.5 h-4 bg-[#00C076] rounded-full" />
+                            <h4 className="text-xl font-black text-black uppercase tracking-tighter">On-Chain Holdings</h4>
                         </div>
                     </div>
-                    <span className="text-xs font-bold text-gray-600 uppercase tracking-tight">Real-Time Oracle Feed</span>
+                    <span className="text-[10px] font-black text-black/20 uppercase tracking-[0.3em]">Institutional Feed // Live</span>
                 </div>
                 
-                <div className="divide-y divide-white/[0.05]">
+                <div className="divide-y divide-black/[0.03]">
                     <AnimatePresence mode="popLayout">
                         {assets.map((asset, idx) => {
                             const assetId = `${asset.symbol}-${asset.network}`;
@@ -318,39 +304,39 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             return (
                                 <motion.div
                                     key={assetId}
-                                    initial={isNew ? { opacity: 0, x: -20, backgroundColor: 'rgba(16, 185, 129, 0.1)' } : false}
-                                    animate={{ opacity: 1, x: 0, backgroundColor: 'rgba(0, 0, 0, 0)' }}
+                                    initial={isNew ? { opacity: 0, x: -20, backgroundColor: 'rgba(0, 192, 118, 0.05)' } : false}
+                                    animate={{ opacity: 1, x: 0, backgroundColor: 'rgba(255, 255, 255, 1)' }}
                                     exit={{ opacity: 0, x: 20 }}
-                                    className="px-8 py-6 flex items-center justify-between hover:bg-white/[0.02] transition-all group relative cursor-pointer"
+                                    className="px-10 py-8 flex items-center justify-between hover:bg-black/[0.01] transition-all group relative cursor-pointer"
                                 >
-                                    <div className="flex items-center gap-5 relative z-10 flex-1">
-                                        <div className="relative w-12 h-12 rounded-xl flex items-center justify-center font-black text-base border-2 bg-blue-500/10 border-blue-500/20 text-blue-400">
+                                    <div className="flex items-center gap-6 relative z-10 flex-1">
+                                        <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg border bg-black/5 border-black/[0.06] text-black/40 group-hover:bg-black group-hover:text-white transition-all">
                                             {asset.symbol.slice(0, 3)}
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-white font-black text-base tracking-tight">{asset.symbol}</div>
-                                            <div className="text-xs text-gray-500 font-mono font-bold">{asset.network}</div>
+                                            <div className="text-lg font-black text-black tracking-tight">{asset.symbol}</div>
+                                            <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{asset.network}</div>
                                         </div>
-                                        <ArrowRight size={16} className="text-gray-700 ml-auto mr-4" strokeWidth={2} />
+                                        <ArrowRight size={18} className="text-black/10 ml-auto mr-6 group-hover:text-[#00F2EA] transition-all" strokeWidth={2.5} />
                                     </div>
                                     
-                                    <div className="text-right mx-8 relative z-10">
-                                        <div className="text-white font-mono font-black text-2xl tracking-tight">
+                                    <div className="text-right mx-10 relative z-10">
+                                        <div className="text-black font-mono font-black text-3xl tracking-tighter">
                                             ${safeToLocaleString(asset.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </div>
-                                        <div className="text-xs text-gray-600 font-mono mt-1">
+                                        <div className="text-[10px] text-black/30 font-bold uppercase tracking-widest mt-1">
                                             {safeToFixed(asset.balance, 6)} {asset.symbol}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4 relative z-10">
-                                        <div className="text-right space-y-1">
-                                            <div className="text-gray-400 font-mono text-sm font-bold">
+                                    <div className="flex items-center gap-6 relative z-10">
+                                        <div className="text-right">
+                                            <div className="text-black/40 font-black text-[10px] uppercase tracking-widest">
                                                 {formatTXO(effectiveAddress, asset.symbol)}
                                             </div>
                                         </div>
-                                        <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                                            <span className="text-amber-400 font-black text-xs">{idx + 1}</span>
+                                        <div className="w-12 h-12 rounded-2xl bg-black/5 border border-black/[0.06] flex items-center justify-center group-hover:border-[#D4AF37]/40 transition-all">
+                                            <span className="text-black/30 font-black text-xs group-hover:text-[#D4AF37]">{idx + 1}</span>
                                         </div>
                                     </div>
                                 </motion.div>
