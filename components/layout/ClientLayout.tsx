@@ -24,15 +24,15 @@ import dynamic from 'next/dynamic';
 // artifacts on integrated GPUs (Intel HD, Apple M1 base). One wallpaper
 // system is sufficient for the entire Aztec Brutalist aesthetic.
 const UniversalEliteWallpaper = dynamic(
-  () => import('@/components/shared/UniversalEliteWallpaper').then(m => m.UniversalEliteWallpaper),
+  () => import('@/components/shared/UniversalEliteWallpaper').then(m => ({ default: m.UniversalEliteWallpaper })),
   { ssr: false }
 );
 const UtilityPanels = dynamic(
-  () => import('@/components/shared/UtilityPanels').then(m => m.UtilityPanels),
+  () => import('@/components/shared/UtilityPanels').then(m => ({ default: m.UtilityPanels })),
   { ssr: false }
 );
 const BillionWhaleNotification = dynamic(
-  () => import('@/components/shared/UtilityPanels').then(m => m.BillionWhaleNotification),
+  () => import('@/components/shared/UtilityPanels').then(m => ({ default: m.BillionWhaleNotification })),
   { ssr: false }
 );
 

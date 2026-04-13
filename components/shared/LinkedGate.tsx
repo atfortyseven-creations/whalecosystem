@@ -464,9 +464,6 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setIsMounted(true);
 
-    // Validate persisted isLinked against actual session state.
-    // If there's no valid cookie AND no wallet connected, reset the gate.
-    // This prevents old localStorage state from bypassing the gate on a new visit.
     if (typeof document !== 'undefined') {
       const hasHandshake = document.cookie
         .split('; ')
@@ -474,11 +471,30 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
       if (hasHandshake) {
         setLinked(true);
       } else if (!isWalletConnected) {
-        // No cookie and no wallet → force gate to show regardless of persisted state
         setLinked(false);
       }
     }
-  }, []); // run once on mount only
+  }, []);
+
+  // ─── SCROLL LOCK ENFORCEMENT ───────────────────────────────────────────
+  // Prevents the background page from scrolling while the gate is active.
+  useEffect(() => {
+    if (!isMounted) return;
+    
+    // If the gate is active (isLinked is false), prevent body scroll.
+    if (!isLinked && !isWalletConnected) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [isLinked, isWalletConnected, isMounted]);
 
   // When wallet connects — check sign status and show sign step if needed
   useEffect(() => {
