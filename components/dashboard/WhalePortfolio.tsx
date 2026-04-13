@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import useSWR from 'swr';
-import ScrollFloat from '@/components/ui/ScrollFloat';
+import { ScrollFloat } from '@/components/ui/ScrollFloat';
 
 interface WhaleEntity {
     rank: number;

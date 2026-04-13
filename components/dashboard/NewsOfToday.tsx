@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ExternalLink, ShieldCheck, ShieldAlert, Clock } from 'lucide-react';
-import ScrollFloat from '@/components/ui/ScrollFloat';
+import { ScrollFloat } from '@/components/ui/ScrollFloat';
 
 interface NewsArticle {
     id: string;

@@ -22,7 +22,7 @@ interface ScrollFloatProps {
     stagger?: number;
 }
 
-const ScrollFloat = ({
+export const ScrollFloat = ({
     children,
     scrollContainerRef,
     containerClassName = '',
@@ -34,6 +34,8 @@ const ScrollFloat = ({
     stagger = 0.03
 }: ScrollFloatProps) => {
     const containerRef = useRef<HTMLHeadingElement>(null);
+    ...
+};
 
     const splitText = useMemo(() => {
         const text = typeof children === 'string' ? children : '';
@@ -101,5 +103,3 @@ const ScrollFloat = ({
         </h2>
     );
 };
-
-export default ScrollFloat;

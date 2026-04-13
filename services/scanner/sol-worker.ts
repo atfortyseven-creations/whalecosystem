@@ -129,8 +129,13 @@ async function processWhaleTx(
     const exists = await prisma.whaleActivity.findUnique({ where: { transactionHash: hash } });
     if (exists) return;
 
-    await prisma.whaleActivity.create({
-        data: {
+    await prisma.whaleActivity.upsert({
+        where: { transactionHash: hash },
+        update: {
+            usdValue: usdValue.toString(),
+        },
+        create: {
+            immutableId: `SOL-${hash.slice(0, 16)}`, 
             walletAddress: from,
             type: "SOL_TRANSFER",
             token: asset,
@@ -145,7 +150,9 @@ async function processWhaleTx(
             timestamp: new Date(),
         }
     }).catch(e => {
-        console.error(`❌ [${chain}] Error persisting SOL whale activity:`, e.message);
+        if (!e.message.includes('Unique constraint')) {
+            console.error(`❌ [${chain}] Error persisting SOL whale activity:`, e.message);
+        }
     });
 
     await addWhaleToQueue({

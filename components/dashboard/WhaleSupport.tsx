@@ -8,7 +8,7 @@ import {
     Zap, Shield, Phone, Book, Send
 } from 'lucide-react';
 import { toast } from 'sonner';
-import ScrollFloat from '@/components/ui/ScrollFloat';
+import { ScrollFloat } from '@/components/ui/ScrollFloat';
 
 interface Ticket {
     id: string;

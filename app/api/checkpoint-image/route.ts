@@ -11,15 +11,12 @@ import path from "path";
 // ── Asset alias map ──────────────────────────────────────────────────────────
 // Maps clean semantic names → actual filesystem paths
 const ASSET_ALIAS: Record<string, string[]> = {
-  "patron-cosmico-4k.png": [
-    path.join(process.cwd(), "public", "patron-cosmico-4k.png"),
-  ],
-  "olas-hokusai-4k.png": [
-    path.join(process.cwd(), "public", "olas-hokusai-4k.png"),
+  "official-whale-sovereign.png": [
+    path.join(process.cwd(), "public", "official-whale-sovereign.png"),
   ],
   "whale-logo-institutional.png": [
+    path.join(process.cwd(), "public", "official-whale-sovereign.png"),
     path.join(process.cwd(), "public", "whale-logo-institutional.png"),
-    path.join(process.cwd(), "public", "Gemini_Generated_Image_dzte5edzte5edzte.png"),
   ],
   "corporate-cube-grid.jpg": [
     path.join(process.cwd(), "public", "corporate-cube-grid.jpg"),

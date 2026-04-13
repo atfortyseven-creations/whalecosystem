@@ -165,8 +165,14 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
 
     console.log(`🌊 [${chain}] SOVEREIGN_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
 
-    await prisma.whaleActivity.create({
-        data: {
+    await prisma.whaleActivity.upsert({
+        where: { transactionHash: hash },
+        update: {
+            usdValue: usdValue.toString(), // Update dynamic price-dependent fields
+            valueBTC: valueBTC,
+            btcPriceAtTx: btcPrice,
+        },
+        create: {
             immutableId: crypto.randomUUID(), 
             walletAddress: from,
             type: type,
@@ -184,12 +190,14 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
             metadata: {
                 ...metadata,
                 liquidityShock: isCexOutflow,
-                detectionLatency: 0 // Will be updated by terminal telemetry
+                detectionLatency: 0 
             },
             timestamp: new Date(),
         }
     }).catch(e => {
-        console.error(`❌ [${chain}] DB Persistence Fail:`, e.message);
+        if (!e.message.includes('Unique constraint')) {
+            console.error(`❌ [${chain}] DB Persistence Fail:`, e.message);
+        }
     });
 
     await addWhaleToQueue({ 
