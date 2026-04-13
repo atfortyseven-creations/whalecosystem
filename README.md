@@ -2,7 +2,7 @@
 
 # WHALE ALERT NETWORK
 
-**The Sovereign Intelligence Protocol for Institutional On-Chain Analytics**
+
 
 *Designed, engineered, and deployed by a single independent developer*
 
