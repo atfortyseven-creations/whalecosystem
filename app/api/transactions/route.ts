@@ -42,8 +42,12 @@ export async function POST(req: Request) {
     }
 }
 
+import { 
+    getTransactionHistory 
+} from '@/lib/wallet/transactions-server';
+
 /**
- * Gets user transactions
+ * Gets user transactions - Unified Sovereign Flow
  */
 export async function GET(req: Request) {
     try {
@@ -54,16 +58,14 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
         }
 
-        const transactions = await prisma.blockchainTransaction.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'desc' },
-            take: 50
-        });
+        // ── UNIFICACIÓN DE EXPLORADOR (5000T) ──────────────────────────────────
+        // Ya no consultamos una sola tabla; usamos el motor de unificación.
+        const transactions = await getTransactionHistory(userId, { limit: 50 });
 
         return NextResponse.json(transactions);
     } catch (error: any) {
-        console.warn('[TransactionsAPI] DB Connection failed, returning empty list.', error.message);
-        return NextResponse.json([]); // Return empty list instead of crashing
+        console.warn('[TransactionsAPI] Unified sync failed, returning empty list.', error.message);
+        return NextResponse.json([]); 
     }
 }
 
