@@ -20,6 +20,9 @@ import { NextRequest, NextResponse } from 'next/server';
 const BLOCK_THRESHOLD     = 10;
 const CHALLENGE_THRESHOLD = 5;
 
+// ─── BYPASS IPS (Institutional Whitelist) ──────────────────────────────────
+const BYPASS_IPS = ['127.0.0.1', '91.126.42.179'];
+
 // ─── PER-ENDPOINT RATE LIMITS (requests / window in seconds) ─────────────────
 // Tighter limits on write/trade endpoints to prevent automation abuse.
 const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
@@ -30,7 +33,7 @@ const ENDPOINT_LIMITS: Record<string, { max: number; windowSec: number }> = {
   '/api/polymarket':          { max: 100,  windowSec: 60    },
   '/api/auth':                { max: 20,   windowSec: 60    },
   '/api/user/status':         { max: 60,   windowSec: 60    },
-  '/api':                     { max: 300,  windowSec: 60    },  // global API fallback
+  '/api':                     { max: 1200, windowSec: 60    },  // Increased for high-frequency institutional telemetry
 };
 
 // ─── LEGITIMATE BROWSER UA WHITELIST (bypass scoring entirely) ───────────────
@@ -153,9 +156,9 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
   const ua       = req.headers.get('user-agent') ?? '';
   const method   = req.method;
 
-  // ── BYPASS: Infra / Healthcheck paths (Railway wget, K8s probe, Next.js static) ────
-  if (WAF_BYPASS_PATHS.some(p => pathname.startsWith(p))) {
-    return null; // unconditional pass-through — no scoring applied
+  // ── BYPASS: Infra / Healthcheck / Authorized IPs ──────────────────────────
+  if (WAF_BYPASS_PATHS.some(p => pathname.startsWith(p)) || BYPASS_IPS.includes(ip)) {
+    return null; // unconditional pass-through — no scoring or rate limiting applied
   }
 
   let anomalyScore = 0;
