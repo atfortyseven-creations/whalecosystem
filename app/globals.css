@@ -118,49 +118,26 @@ textarea {
     --background: 240 10% 4%;
     --foreground: 0 0% 98%;
     --card: 240 10% 4%;
-    --card-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 6% 10%;
-
-    /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-    --gradient-accent: linear-gradient(135deg, var(--accent-emerald) 0%, #34D399 100%);
-    
-    /* Premium Glows */
-    --glow-purple: 0 0 30px rgba(152, 150, 255, 0.2);
-    --glow-teal: 0 0 30px rgba(0, 242, 234, 0.2);
-    --glow-blue: 0 0 30px rgba(0, 138, 255, 0.2);
-  }
-
-  html {
-    /* scroll-behavior: smooth is intentionally REMOVED — Lenis (SmoothScroll.tsx)
-       manages smooth scrolling. Having both active causes double-animation jank
-       and breaks Lenis scroll position sync. */
+     html {
+    /* Lenis (SmoothScroll.tsx) manages the smoothing. */
     -webkit-tap-highlight-color: transparent;
-    /* pan-x pan-y explicitly allows the browser to pass wheel/touch scroll
-       events through to Lenis. 'manipulation' only prevents double-tap zoom
-       but can silently eat scroll on some engines. */
     touch-action: pan-x pan-y;
 
     /* === STRATOSPHERIC GPU RENDERING === */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Subpixel rendering on retina/high-DPI */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 
     /* Prevent horizontal layout overflow */
     overflow-x: hidden;
     width: 100%;
-    /* Allow full vertical scrolling — auto instead of 100% */
+    
+    /* Let only the body or the master container scroll */
     min-height: 100%;
     height: auto;
 
-    /* === FLUID RESPONSIVE FONT SCALE ===
-       Optimized for "No Eye Strain" across all viewports.
-       PC: 17px base, Mobile: 14px base.
-    */
     font-size: clamp(14px, 1vw + 10px, 17px);
     line-height: 1.6;
     letter-spacing: -0.01em;
@@ -174,7 +151,9 @@ textarea {
 
     min-width: 320px;
     overflow-x: hidden;
-    overflow-y: auto;
+    /* overflow-y: auto intentionally kept as the master scroll. 
+       LinkedGate will suppress this via inline styles when active. */
+    overflow-y: auto; 
 
     padding-left:   env(safe-area-inset-left);
     padding-right:  env(safe-area-inset-right);
