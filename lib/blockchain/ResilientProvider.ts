@@ -231,7 +231,7 @@ export class ResilientProvider {
     }
 
     try {
-      const newProvider = new ethers.WebSocketProvider(url);
+      const newProvider = new ethers.WebSocketProvider(url, this.chainId);
       
       newProvider.on('error', (err: any) => {
           const msg = err?.message || 'Unknown';

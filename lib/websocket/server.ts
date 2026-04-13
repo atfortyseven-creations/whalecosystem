@@ -112,7 +112,8 @@ export function initializeWebSocket(httpServer: HttpServer): Server {
     if (process.env.ALCHEMY_WEB3_WSS) {
         try {
             const { WebSocketProvider } = require('ethers');
-            const wsProvider = new WebSocketProvider(process.env.ALCHEMY_WEB3_WSS);
+            const wsProvider = new WebSocketProvider(process.env.ALCHEMY_WEB3_WSS, 1);
+            wsProvider.on('error', (err: any) => console.error('Mempool WS error:', err.message || err));
             console.log('📡 [Mempool WS] Connected directly to Alchemy PendingTransactions');
             
             // Ultra-fast global stream (throttle or sample for UI rendering)

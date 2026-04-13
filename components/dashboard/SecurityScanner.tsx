@@ -57,16 +57,16 @@ export default function SecurityScanner() {
     return (
         <div className="flex flex-col h-full overflow-hidden bg-transparent">
             {/* Header / Search */}
-            <div className="p-8 border-b border-black/[0.06] bg-white">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#00F2EA] uppercase tracking-widest mb-6">
+            <div className="p-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(13,16,20,0.8)' }}>
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mb-5" style={{ color: '#00F2EA' }}>
                     <Shield size={14} /> SECURITY SCANNER TERMINAL
                 </div>
-                <form onSubmit={scan} className="flex gap-4">
-                    <select 
-                        value={chain} 
+                <form onSubmit={scan} className="flex gap-3">
+                    <select
+                        value={chain}
                         onChange={(e) => setChain(e.target.value)}
-                        className="bg-black/5 border border-black/[0.06] rounded-xl px-4 py-3 text-[10px] font-black uppercase outline-none focus:border-[#00F2EA] transition-all"
-                        style={{ width: 140 }}
+                        className="rounded-xl px-4 py-3 text-[10px] font-black uppercase outline-none transition-all text-white"
+                        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', width: 140 }}
                     >
                         <option value="ethereum">ETHEREUM</option>
                         <option value="bsc">BSC</option>
@@ -76,20 +76,24 @@ export default function SecurityScanner() {
                         <option value="solana">SOLANA</option>
                     </select>
                     <div className="flex-1 relative">
-                        <input 
+                        <input
                             type="text"
                             placeholder="INPUT CONTRACT ADDRESS (0x...)"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            className="w-full bg-black/[0.02] border border-black/[0.06] rounded-xl px-12 py-3 text-sm font-mono outline-none focus:border-[#00F2EA] transition-all placeholder:text-black/20"
+                            className="w-full rounded-xl px-12 py-3 text-sm font-mono outline-none transition-all text-white"
+                            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', caretColor: '#00F2EA' }}
                         />
-                        <Search size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-black/20" />
+                        <Search size={14} className="absolute left-5 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.2)' }} />
                     </div>
-                    <button type="submit" disabled={loading} className="bg-black text-white px-8 rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-all disabled:opacity-30">
+                    <button type="submit" disabled={loading}
+                        className="px-8 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-30 text-black"
+                        style={{ background: '#fff', boxShadow: '0 4px 20px rgba(255,255,255,0.1)' }}>
                         {loading ? 'SCANNING...' : 'SCAN'}
                     </button>
                 </form>
             </div>
+
 
             <div style={{ flex: 1, overflowY: 'auto' }} className="az-scroll">
                 <AnimatePresence mode="wait">

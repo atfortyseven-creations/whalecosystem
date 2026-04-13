@@ -639,3 +639,191 @@
   background: var(--az-lime);
   color: #fff;
 }
+
+/* ═══════════════════════════════════════════════════
+   DARK TERMINAL THEME — Overrides for DashboardShell v2
+   Background: #0B0E11 · Accent: #00F2EA
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Dark scrollbar (custom-scrollbar utility) ─── */
+.custom-scrollbar::-webkit-scrollbar              { width: 3px; }
+.custom-scrollbar::-webkit-scrollbar-track        { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb        { background: rgba(255,255,255,0.10); border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover  { background: rgba(0,242,234,0.35); }
+
+/* ─── Hide scrollbar entirely (used in sidebar/tabs) ─── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Dark skeleton shimmer ─── */
+.dark-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 100%
+  );
+  background-size: 400% 100%;
+  animation: az-shimmer 1.8s infinite;
+}
+
+/* ─── Dark surface variants ─── */
+.dark-surface  { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+.dark-surface-2{ background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); }
+
+/* ─── Teal glow utility ─── */
+.glow-teal  { box-shadow: 0 0 20px rgba(0,242,234,0.15); }
+.text-teal  { color: #00F2EA; }
+
+/* ─── Dark data row ─── */
+.dark-data-row {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.12s;
+}
+.dark-data-row:hover { background: rgba(255,255,255,0.025); }
+
+/* ─── Dark column header ─── */
+.dark-col-header {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.20);
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(11,14,17,0.80);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  backdrop-filter: blur(8px);
+}
+
+/* ─── Dark tab bar ─── */
+.dark-tab-bar {
+  display: flex;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.02);
+  flex-shrink: 0;
+}
+
+.dark-tab {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgba(255,255,255,0.30);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dark-tab:hover  { color: rgba(255,255,255,0.70); background: rgba(255,255,255,0.03); }
+.dark-tab.active { color: #00F2EA; border-bottom-color: #00F2EA; background: rgba(0,242,234,0.04); }
+
+/* ─── Dark badge ─── */
+.dark-badge {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.dark-badge-teal   { background: rgba(0,242,234,0.12);  border: 1px solid rgba(0,242,234,0.25);  color: #00F2EA; }
+.dark-badge-green  { background: rgba(0,192,118,0.12);  border: 1px solid rgba(0,192,118,0.25);  color: #00C076; }
+.dark-badge-red    { background: rgba(255,59,48,0.12);  border: 1px solid rgba(255,59,48,0.25);  color: #FF3B30; }
+.dark-badge-gold   { background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.25); color: #D4AF37; }
+.dark-badge-ghost  { background: rgba(255,255,255,0.05);border: 1px solid rgba(255,255,255,0.12);color: rgba(255,255,255,0.50); }
+
+/* ─── Dark spinner ─── */
+.dark-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.08);
+  border-top-color: #00F2EA;
+  border-radius: 50%;
+  animation: az-spin 0.7s linear infinite;
+}
+
+/* ─── Animate float (used in various panels) ─── */
+@keyframes animate-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.animate-float { animation: animate-float 4s ease-in-out infinite; }
+
+/* ─── Hz-240 performance layer ─── */
+.hz-240       { transform: translateZ(0); will-change: transform; }
+.hz-240-image { object-fit: cover; transform: translateZ(0); will-change: transform; }
+
+/* ─── Section blend transitions ─── */
+.section-blend-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 120px; z-index: 2; pointer-events: none;
+  background: linear-gradient(to bottom, #FAF9F6 0%, transparent 100%);
+}
+.section-blend-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 120px; z-index: 2; pointer-events: none;
+  background: linear-gradient(to top, #FAF9F6 0%, transparent 100%);
+}
+/* ─── Aztec h1 font shorthand ─── */
+.font-aztec-h1 {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+
+/* ═══════════════════════════════════════════════════
+   GLOBAL DARK THEME OVERRIDE FOR LEGACY SUB-PANELS
+   Forces all light-themed legacy components into the 
+   institutional dark theme inside DashboardShell.
+   ═══════════════════════════════════════════════════ */
+
+[data-dashboard="true"] .bg-white,
+[data-dashboard="true"] .bg-\[\#FAF9F6\],
+[data-dashboard="true"] .bg-white\/90 {
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: #ffffff !important;
+}
+
+[data-dashboard="true"] .text-black,
+[data-dashboard="true"] .text-\[\#050505\] {
+  color: #ffffff !important;
+}
+
+[data-dashboard="true"] .border-\[\#E5E5E5\],
+[data-dashboard="true"] .border-black\/\[0\.06\],
+[data-dashboard="true"] .border-black\/\[0\.04\] {
+  border-color: var(--theme-border) !important;
+}
+
+[data-dashboard="true"] .text-\[\#888888\],
+[data-dashboard="true"] .text-black\/30,
+[data-dashboard="true"] .text-black\/40,
+[data-dashboard="true"] .text-black\/60 {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-dashboard="true"] .bg-black\/5,
+[data-dashboard="true"] .bg-black\/\[0\.02\] {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+[data-dashboard="true"] .shadow-sm,
+[data-dashboard="true"] .shadow-lg,
+[data-dashboard="true"] .shadow-xl {
+  box-shadow: none !important;
+}

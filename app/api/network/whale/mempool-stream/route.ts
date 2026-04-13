@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
             }
 
             try {
-                const provider = new ethers.WebSocketProvider(wsUrl);
+                const provider = new ethers.WebSocketProvider(wsUrl, 1);
+                
+                // Catch internal provider errors to prevent process crash
+                provider.on('error', (err) => console.error("Mempool stream Provider Error:", err.message || err));
                 
                 // Throttle control: We don't want to choke the browser with 5000 tx/sec.
                 // We'll queue them and process a batch, or just emit a percentage of the mempool 

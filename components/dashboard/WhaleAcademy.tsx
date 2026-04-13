@@ -83,44 +83,47 @@ export function WhaleAcademy() {
 
     if (selectedLesson && selectedCourse) {
         return (
-            <div className="flex flex-col h-full space-y-4">
+            <div className="flex flex-col h-full space-y-4 p-6 overflow-y-auto">
                 <div className="flex items-center gap-3">
                     <button onClick={() => setSelectedLesson(null)}
-                        className="p-2 rounded-xl border border-[#E5E5E5] text-[#888888] hover:text-[#050505] transition-colors">
+                        className="p-2 rounded-xl transition-colors" style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}>
                         <ChevronRight size={16} className="rotate-180"/>
                     </button>
-                    <span className="text-[10px] font-black text-[#888888] uppercase tracking-widest">{selectedCourse.title}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>{selectedCourse.title}</span>
                 </div>
-                <div className="flex-1 bg-white border border-[#E5E5E5] rounded-2xl p-8 shadow-sm">
-                    <div className="flex items-center gap-3 mb-6">
+                <div className="flex-1 rounded-2xl p-7" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    <div className="flex items-center gap-3 mb-5">
                         <span className="text-[8px] px-2 py-1 rounded font-black uppercase" style={{ background: LEVEL_COLORS[selectedLesson.level] + '20', color: LEVEL_COLORS[selectedLesson.level] }}>
                             {selectedLesson.level}
                         </span>
-                        <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1"><Clock size={10}/>{selectedLesson.duration}</span>
+                        <span className="text-[9px] font-mono flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.3)' }}><Clock size={10}/>{selectedLesson.duration}</span>
                     </div>
-                    <h1 className="text-2xl font-black text-[#050505] mb-4">{selectedLesson.title}</h1>
-                    <p className="text-sm text-[#888888] leading-relaxed mb-8 max-w-2xl">{selectedLesson.description}</p>
+                    <h1 className="text-2xl font-black text-white mb-3">{selectedLesson.title}</h1>
+                    <p className="text-sm leading-relaxed mb-7 max-w-2xl" style={{ color: 'rgba(255,255,255,0.45)' }}>{selectedLesson.description}</p>
 
-                    {/* Simulated lesson content */}
-                    <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl p-6 space-y-4">
+                    {/* Simulated video */}
+                    <div className="rounded-xl p-5 space-y-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                         <div className="flex items-center gap-2">
-                            <PlayCircle size={20} className="text-[#050505]"/>
-                            <span className="text-xs font-black text-[#050505] uppercase tracking-widest">Video Lesson</span>
+                            <PlayCircle size={18} style={{ color: '#00F2EA' }}/>
+                            <span className="text-xs font-black text-white uppercase tracking-widest">Video Lesson</span>
                         </div>
-                        <div className="aspect-video bg-[#E5E5E5] rounded-xl flex items-center justify-center">
+                        <div className="aspect-video rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
                             <div className="text-center">
-                                <PlayCircle size={56} className="text-[#888888] mx-auto mb-2"/>
-                                <p className="text-[10px] font-black text-[#888888] uppercase">Connect to premium to watch</p>
+                                <PlayCircle size={52} className="mx-auto mb-3" style={{ color: 'rgba(255,255,255,0.12)' }}/>
+                                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>Premium access required to watch</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex gap-3 mt-8">
+                    <div className="flex gap-3 mt-7">
                         <button onClick={() => setSelectedLesson(null)}
-                            className="px-6 py-3 border border-[#E5E5E5] rounded-xl text-[10px] font-black uppercase tracking-widest text-[#888888] hover:text-[#050505] transition-colors">
-                            ← Back to Course
+                            className="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors"
+                            style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}>
+                            ← Back
                         </button>
-                        <button onClick={markLessonComplete} className="flex-1 py-3 bg-[#050505] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/85 transition-colors flex items-center justify-center gap-2">
+                        <button onClick={markLessonComplete}
+                            className="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 text-black"
+                            style={{ background: '#fff' }}>
                             <CheckCircle size={14}/> {selectedLesson.completed ? 'Completed' : 'Mark Complete'}
                         </button>
                     </div>
@@ -131,56 +134,68 @@ export function WhaleAcademy() {
 
     if (selectedCourse) {
         return (
-            <div className="flex flex-col space-y-5">
-                <button onClick={() => setSelectedCourse(null)} className="flex items-center gap-2 text-[10px] font-black text-[#888888] uppercase tracking-widest hover:text-[#050505] transition-colors w-fit">
+            <div className="flex flex-col space-y-4 p-6 overflow-y-auto">
+                <button onClick={() => setSelectedCourse(null)}
+                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest w-fit transition-colors"
+                    style={{ color: 'rgba(255,255,255,0.3)' }}>
                     <ChevronRight size={14} className="rotate-180"/> All Courses
                 </button>
-                <div className="bg-white border border-[#E5E5E5] rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-start gap-4 mb-5">
-                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shrink-0" style={{ background: selectedCourse.color }}>
+
+                <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    <div className="flex items-start gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0" style={{ background: selectedCourse.color }}>
                             {selectedCourse.icon}
                         </div>
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                                <h2 className="text-sm font-black text-[#050505]">{selectedCourse.title}</h2>
+                                <h2 className="text-sm font-black text-white">{selectedCourse.title}</h2>
                                 {selectedCourse.badge && (
-                                    <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20">{selectedCourse.badge}</span>
+                                    <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase" style={{ background: 'rgba(212,175,55,0.12)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.25)' }}>{selectedCourse.badge}</span>
                                 )}
                             </div>
-                            <p className="text-[10px] text-[#888888] leading-relaxed">{selectedCourse.description}</p>
+                            <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{selectedCourse.description}</p>
                             <div className="flex items-center gap-4 mt-3">
-                                <div className="flex-1 max-w-[200px] h-1.5 bg-[#E5E5E5] rounded-full overflow-hidden">
-                                    <div className="h-full bg-[#050505] rounded-full" style={{ width: `${selectedCourse.progress}%` }}/>
+                                <div className="flex-1 max-w-[200px] h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                                    <div className="h-full rounded-full transition-all" style={{ width: `${selectedCourse.progress}%`, background: selectedCourse.color }}/>
                                 </div>
-                                <span className="text-[9px] font-black text-[#888888] uppercase">{selectedCourse.progress}% complete</span>
-                                <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1"><Clock size={9}/>{selectedCourse.totalDuration}</span>
+                                <span className="text-[9px] font-black uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>{selectedCourse.progress}% complete</span>
+                                <span className="text-[9px] font-mono flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.3)' }}><Clock size={9}/>{selectedCourse.totalDuration}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="space-y-3">
+
+                <div className="space-y-2">
                     {selectedCourse.lessons.map((lesson, i) => (
                         <motion.div key={lesson.id}
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
                             onClick={() => !lesson.locked && setSelectedLesson(lesson)}
-                            className={`bg-white border border-[#E5E5E5] rounded-xl p-4 flex items-center gap-4 transition-all ${lesson.locked ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-sm hover:border-[#050505]/20 cursor-pointer'}`}>
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${lesson.completed ? 'bg-[#00C076] text-white' : lesson.locked ? 'bg-[#E5E5E5] text-[#888888]' : 'bg-[#FAF9F6] border border-[#E5E5E5] text-[#888888]'}`}>
-                                {lesson.completed ? <CheckCircle size={18}/> : lesson.locked ? <Lock size={16}/> : <PlayCircle size={18}/>}
+                            className="rounded-xl p-4 flex items-center gap-4 transition-all"
+                            style={{
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.07)',
+                                opacity: lesson.locked ? 0.5 : 1,
+                                cursor: lesson.locked ? 'not-allowed' : 'pointer',
+                            }}>
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                                style={{
+                                    background: lesson.completed ? '#00C076' : 'rgba(255,255,255,0.06)',
+                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    color: lesson.completed ? '#fff' : 'rgba(255,255,255,0.4)',
+                                }}>
+                                {lesson.completed ? <CheckCircle size={16}/> : lesson.locked ? <Lock size={14}/> : <PlayCircle size={16}/>}
                             </div>
                             <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-black text-[#888888]">Lesson {i + 1}</span>
-                                    <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase" style={{ background: LEVEL_COLORS[lesson.level] + '20', color: LEVEL_COLORS[lesson.level] }}>
-                                        {lesson.level}
-                                    </span>
+                                <div className="flex items-center gap-2 mb-0.5">
+                                    <span className="text-[10px] font-black" style={{ color: 'rgba(255,255,255,0.3)' }}>Lesson {i + 1}</span>
+                                    <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase" style={{ background: LEVEL_COLORS[lesson.level] + '20', color: LEVEL_COLORS[lesson.level] }}>{lesson.level}</span>
                                 </div>
-                                <p className="text-[11px] font-black text-[#050505]">{lesson.title}</p>
-                                <p className="text-[9px] text-[#888888] mt-0.5">{lesson.description}</p>
+                                <p className="text-[11px] font-black text-white">{lesson.title}</p>
+                                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{lesson.description}</p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                                <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1"><Clock size={9}/>{lesson.duration}</span>
-                                {lesson.locked && <Lock size={12} className="text-[#888888]"/>}
-                                {!lesson.locked && <ChevronRight size={14} className="text-[#888888]"/>}
+                                <span className="text-[9px] font-mono flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.3)' }}><Clock size={9}/>{lesson.duration}</span>
+                                <ChevronRight size={13} style={{ color: 'rgba(255,255,255,0.2)' }}/>
                             </div>
                         </motion.div>
                     ))}
@@ -191,68 +206,69 @@ export function WhaleAcademy() {
 
     // Main courses grid
     return (
-        <div className="flex flex-col space-y-5">
+        <div className="flex flex-col space-y-5 p-6 overflow-y-auto">
             {/* Header */}
-            <div className="bg-white border border-[#E5E5E5] rounded-2xl p-6 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#050505] flex items-center justify-center">
-                    <GraduationCap size={22} className="text-white"/>
+            <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,242,234,0.1)', border: '1px solid rgba(0,242,234,0.2)' }}>
+                    <GraduationCap size={20} style={{ color: '#00F2EA' }}/>
                 </div>
                 <div>
-                    <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest">Whale Academy</h2>
-                    <p className="text-[10px] text-[#888888]">Professional-grade crypto education · {COURSES.reduce((s, c) => s + c.lessons.length, 0)} lessons · {COURSES.length} courses</p>
+                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Whale Academy</h2>
+                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Professional-grade crypto education · {COURSES.reduce((s, c) => s + c.lessons.length, 0)} lessons · {COURSES.length} courses</p>
                 </div>
-                <div className="ml-auto flex items-center gap-4">
+                <div className="ml-auto flex items-center gap-5">
                     {[
-                        { label: 'Total Hours', value: '12h+', color: '#050505' },
+                        { label: 'Total Hours', value: '12h+', color: '#fff' },
                         { label: 'Courses', value: COURSES.length.toString(), color: '#627EEA' },
                         { label: 'Avg Rating', value: '4.9★', color: '#D4AF37' },
                     ].map((s, i) => (
                         <div key={i} className="text-center">
                             <div className="text-lg font-black font-mono" style={{ color: s.color }}>{s.value}</div>
-                            <div className="text-[8px] text-[#888888] uppercase tracking-widest">{s.label}</div>
+                            <div className="text-[8px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>{s.label}</div>
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* Courses Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {COURSES.map((course, i) => (
                     <motion.div key={course.id}
                         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                         onClick={() => setSelectedCourse(course)}
-                        className="bg-white border border-[#E5E5E5] rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer">
+                        className="rounded-2xl overflow-hidden hover:scale-[1.02] hover:-translate-y-0.5 transition-all cursor-pointer"
+                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                         {/* Color stripe */}
-                        <div className="h-1.5" style={{ background: course.color }}/>
-                        <div className="p-6">
+                        <div className="h-1" style={{ background: course.color }}/>
+                        <div className="p-5">
                             <div className="flex items-start gap-4 mb-4">
-                                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0" style={{ background: course.color }}>
+                                <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white shrink-0" style={{ background: course.color }}>
                                     {course.icon}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                                        <h3 className="text-[11px] font-black text-[#050505] truncate">{course.title}</h3>
+                                        <h3 className="text-[11px] font-black text-white truncate">{course.title}</h3>
                                         {course.badge && (
-                                            <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 shrink-0">{course.badge}</span>
+                                            <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase shrink-0" style={{ background: 'rgba(212,175,55,0.12)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.25)' }}>{course.badge}</span>
                                         )}
                                     </div>
-                                    <p className="text-[9px] text-[#888888] leading-relaxed line-clamp-2">{course.description}</p>
+                                    <p className="text-[9px] leading-relaxed line-clamp-2" style={{ color: 'rgba(255,255,255,0.4)' }}>{course.description}</p>
                                 </div>
                             </div>
 
                             {/* Progress */}
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="flex-1 h-1 bg-[#E5E5E5] rounded-full overflow-hidden">
+                                <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
                                     <div className="h-full rounded-full transition-all" style={{ width: `${course.progress}%`, background: course.color }}/>
                                 </div>
-                                <span className="text-[8px] font-black text-[#888888] shrink-0">{course.progress}%</span>
+                                <span className="text-[8px] font-black shrink-0" style={{ color: 'rgba(255,255,255,0.3)' }}>{course.progress}%</span>
                             </div>
 
                             {/* Meta */}
-                            <div className="flex items-center gap-4 text-[9px] text-[#888888]">
+                            <div className="flex items-center gap-4 text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
                                 <span className="flex items-center gap-1"><BookOpen size={10}/>{course.lessons.length} lessons</span>
                                 <span className="flex items-center gap-1"><Clock size={10}/>{course.totalDuration}</span>
-                                <span className="flex items-center gap-1 text-[#D4AF37]"><Star size={10} className="fill-[#D4AF37]"/>4.9</span>
+                                <span className="flex items-center gap-1" style={{ color: '#D4AF37' }}><Star size={10} className="fill-[#D4AF37]"/>4.9</span>
                             </div>
 
                             {/* Level badges */}
@@ -261,18 +277,18 @@ export function WhaleAcademy() {
                                     const count = course.lessons.filter(l => l.level === lvl).length;
                                     return count > 0 ? (
                                         <span key={lvl} className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase"
-                                            style={{ background: LEVEL_COLORS[lvl] + '15', color: LEVEL_COLORS[lvl] }}>
+                                            style={{ background: LEVEL_COLORS[lvl] + '18', color: LEVEL_COLORS[lvl] }}>
                                             {count} {lvl}
                                         </span>
                                     ) : null;
                                 })}
                             </div>
                         </div>
-                        <div className="px-6 py-3 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between">
-                            <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest">
+                        <div className="px-5 py-3 flex items-center justify-between" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                            <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>
                                 {course.lessons.filter(l => l.completed).length}/{course.lessons.length} completed
                             </span>
-                            <span className="text-[9px] font-black text-[#050505] flex items-center gap-1">
+                            <span className="text-[9px] font-black text-white flex items-center gap-1">
                                 {course.progress === 0 ? 'Start Course' : course.progress === 100 ? 'Review' : 'Continue'} <ChevronRight size={12}/>
                             </span>
                         </div>
