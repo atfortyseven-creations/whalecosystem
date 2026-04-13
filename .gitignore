@@ -29,7 +29,7 @@ ts-debug.log*
 .env.railway
 .env.production.template
 .env.example
-ecosystem.config.json
+
 
 # vercel
 .vercel

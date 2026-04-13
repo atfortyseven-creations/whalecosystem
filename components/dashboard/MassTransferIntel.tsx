@@ -18,32 +18,21 @@
  * Refresh: 10 seconds (live intelligence feed)
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useSWR from "swr";
-import { useWebSocketStore } from "@/lib/store/websocket-store";
+import { useWebSocketStore, WhaleEvent } from "@/lib/store/websocket-store";
 import {
   Activity, TrendingUp, Zap, AlertTriangle, Globe,
   ChevronRight, Filter, RefreshCw, ArrowRight, Copy, ExternalLink, Bell, BellOff
 } from "lucide-react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { MassTransferSkeleton } from "@/components/ui/SkeletonLoader";
-import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+import { MassTransferSkeleton } from "@/components/ui/skeleton-loader";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface WhaleEvent {
-  hash: string;
-  wallet: string;
-  token: string;
-  amount: number;
-  usdValue: number;
-  action: string;
-  dex: string;
-  tier: string;
-  timestamp: string;
-}
 
 interface LeaderEntry {
   address: string;
@@ -444,8 +433,8 @@ export default function MassTransferIntel() {
 
     return f.sort((a, b) => {
       switch (sortBy) {
-        case 'time_desc': return b.timestamp - a.timestamp;
-        case 'time_asc':  return a.timestamp - b.timestamp;
+        case 'time_desc': return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        case 'time_asc':  return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
         case 'usd_desc':  return b.usdValue - a.usdValue;
         case 'usd_asc':   return a.usdValue - b.usdValue;
         default: return 0;
@@ -524,7 +513,7 @@ export default function MassTransferIntel() {
             }}
           >
             <option value="">All Chains</option>
-            {[...new Set(events.map(e => e.chain))].map(chain => (
+            {Array.from(new Set(events.map(e => e.chain).filter(Boolean) as string[])).map(chain => (
               <option key={chain} value={chain}>{chain}</option>
             ))}
           </select>

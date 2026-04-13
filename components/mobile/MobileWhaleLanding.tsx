@@ -355,7 +355,10 @@ function PageHero({
   onEnterNews: () => void;
 }) {
   return (
-    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative">
+    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col items-center justify-between pb-12 pt-12 px-8 overflow-hidden relative" style={{ backgroundColor: '#FAF9F6' }}>
+
+      {/* ANIMATED SOVEREIGN WALLPAPER ─────────────────────────────────────── */}
+      <CelestialMeshBackground waveOpacity={0.7} patternOpacity={0.055} gradientOpacity={0.8} />
 
       {/* TOP BAR */}
       <header className="w-full flex items-center justify-between z-20 h-10 px-4">

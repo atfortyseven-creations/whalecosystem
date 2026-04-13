@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 /* ──────────────────────────────────────────────────────────────────────────
+   A11Y GLOBAL REDUCED MOTION SUPPORT (Audit A11y & Motion Compliance)
+   ────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
    IOS 15 / SAFARI WEBKIT UNIVERSAL COMPATIBILITY LAYER
    Resolves blank screen, viewport bugs, and font rendering on iOS 15.x
    ────────────────────────────────────────────────────────────────────────── */
@@ -825,4 +839,106 @@ body,
   }
 }
 
+
+/* ============================================================
+   MISSING UTILITIES — Sovereign Terminal v4.2
+   Critical additions for bug-free production rendering.
+   ============================================================ */
+
+/* scrollbar-hide — used across dashboard tab containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* animate-float — gentle vertical oscillation for WhaleLogo in CTA */
+@keyframes float {
+  0%,  100% { transform: translate3d(0,  0px, 0); }
+  50%        { transform: translate3d(0, -12px, 0); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ============================================================
+   SECTION FUSION SYSTEM — 240Hz GPU-composited blend zones
+   Eliminates hard edges between light and dark landing sections.
+   Use on the BOTTOM of a light section or TOP of a dark section.
+   ============================================================ */
+
+/* Top of dark section — fades FROM the ivory (#FAF9F6) ABOVE it */
+.section-blend-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(
+    to bottom,
+    #FAF9F6 0%,
+    rgba(250, 249, 246, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 15;
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+/* Bottom of dark section — fades back TO ivory (#FAF9F6) */
+.section-blend-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(
+    to top,
+    #FAF9F6 0%,
+    rgba(250, 249, 246, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 15;
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+/* ============================================================
+   240Hz GPU CONTRACT ENFORCEMENT
+   All elements using these classes bypass CPU repaints entirely.
+   Only transform and opacity are allowed to change at runtime.
+   filter changes are explicitly prohibited on 240Hz-locked elements.
+   ============================================================ */
+
+/* Applied to any element that must render at monitor native refresh rate */
+.hz-240 {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  isolation: isolate;
+}
+
+/* Applied to parallax containers that drift via Framer Motion */
+.hz-240-drift {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  contain: layout paint;
+}
+
+/* Applied to background photo layers (Logan Voss, Hokusai) */
+.hz-240-image {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  image-rendering: -webkit-optimize-contrast;
+}
 

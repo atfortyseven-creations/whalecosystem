@@ -42,11 +42,13 @@ async function getActiveClients(): Promise<number> {
         return parseInt(count || '0');
     } catch {
         return 1; // Safety fallback
-  // Comprehensive Token Configuration is now managed within the specific scanner modules
+    }
+}
+
+// Comprehensive Token Configuration is now managed within the specific scanner modules
 // (evm-worker.ts) to ensure modularity and high-fidelity isolation.
 
 const TRANSFER_TOPIC = ethers.id("Transfer(address,address,uint256)");
-t256)");
 
 async function startWorker() {
     try {

@@ -8,8 +8,8 @@ import { usePortfolioStore } from '@/lib/portfolio/store';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { PortfolioSkeleton } from '@/components/ui/SkeletonLoader';
-import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+import { PortfolioSkeleton } from '@/components/ui/skeleton-loader';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 

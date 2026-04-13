@@ -54,7 +54,7 @@
     "helm:uninstall": "helm uninstall whale-alert --namespace whale-alert"
   },
   "engines": {
-    "node": ">=22.11.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

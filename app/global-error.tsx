@@ -1,43 +1,60 @@
+"use client";
 
-'use client';
+import { useEffect } from "react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default function GlobalError({
-    error,
-    reset,
+  error,
+  reset,
 }: {
-    error: Error & { digest?: string };
-    reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
-    return (
-        <html>
-            <body style={{ background: '#0a0a0a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
-                <div style={{ textAlign: 'center', padding: '2rem', maxWidth: '440px', width: '100%' }}>
-                    <div style={{ width: 64, height: 64, background: 'rgba(239,68,68,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                    </div>
+  useEffect(() => {
+    console.error("Global Application Fault:", error);
+  }, [error]);
 
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', margin: '0 0 1rem' }}>Terminal Error</h2>
+  return (
+    <html lang="en">
+      <body className={`${inter.className} bg-[#FAF9F6] text-[#050505] antialiased`}>
+        <div className="flex flex-col items-center justify-center min-h-screen space-y-8 text-center px-4">
+          
+          <div className="relative z-10 w-full max-w-lg p-10 bg-white border border-black/5 rounded-[2.5rem] shadow-2xl flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mb-6 ring-[12px] ring-[#FF3B30]/5">
+              <AlertTriangle size={40} />
+            </div>
 
-                    <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                        A critical error has interrupted the Sovereign Terminal. Reinitializing...
-                    </p>
+            <h1 className="text-3xl font-black text-black uppercase tracking-widest mb-3">
+              Fatal Kernel Panic
+            </h1>
+            
+            <p className="text-sm font-bold text-black/50 leading-relaxed mb-8 max-w-sm">
+              The Sovereign Terminal encountered a critical root fault in the React mounting tree. The system halted to prevent state corruption.
+            </p>
 
-                    {process.env.NODE_ENV === 'development' && (
-                        <pre style={{ fontSize: '0.7rem', textAlign: 'left', color: '#fca5a5', background: 'rgba(239,68,68,0.1)', padding: '1rem', borderRadius: '0.5rem', overflowX: 'auto', maxHeight: 160, marginBottom: '1.5rem', border: '1px solid rgba(239,68,68,0.2)' }}>
-                            {error.message}
-                        </pre>
-                    )}
+            {error.digest && (
+              <div className="w-full bg-black/5 rounded-2xl p-4 mb-8 border border-black/10 flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-black/40">Fault Digest ID:</span>
+                <span className="text-xs font-mono font-bold text-[#FF3B30] bg-[#FF3B30]/10 px-2 py-0.5 rounded">{error.digest}</span>
+              </div>
+            )}
 
-                    <button
-                        onClick={() => reset()}
-                        style={{ padding: '0.75rem 1.5rem', background: '#ffffff', color: '#0a0a0a', fontWeight: 700, borderRadius: '0.75rem', border: 'none', cursor: 'pointer', width: '100%', fontSize: '0.875rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}
-                    >
-                        Reinitialize Terminal
-                    </button>
-                </div>
-            </body>
-        </html>
-    );
+            <button 
+              onClick={() => reset()}
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-black hover:bg-black/90 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-black/10 hover:shadow-black/20 hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <RefreshCw size={16} className="opacity-50" />
+              Force Terminal Restart
+            </button>
+            <p className="mt-6 text-[10px] font-black text-black/20 uppercase tracking-widest">
+              Action forces complete DOM remount
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  );
 }

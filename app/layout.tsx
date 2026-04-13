@@ -21,6 +21,7 @@ import { ClientOverlays } from "@/components/layout/ClientOverlays";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
+import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -192,7 +193,11 @@ export default async function RootLayout({
           className="bg-[#FAF9F6] text-[#050505] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" 
           suppressHydrationWarning
         >
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
+            Skip to absolute content
+          </a>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <ScrollProgressBar />
             {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
             <WavePatternOverlay />
             <Providers cookies={cookies}>

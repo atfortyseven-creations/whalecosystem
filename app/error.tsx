@@ -1,38 +1,70 @@
+"use client";
 
-'use client';
+import { useEffect } from "react";
+import Link from 'next/link';
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 
-import { useEffect } from 'react';
-
-export default function Error({
-    error,
-    reset,
+export default function ErrorPage({
+  error,
+  reset,
 }: {
-    error: Error & { digest?: string };
-    reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
-    useEffect(() => {
-        // Log the error to an error reporting service
-        console.error(error);
-    }, [error]);
+  useEffect(() => {
+    // Optionally log the error to an error reporting service
+    console.error("Application Error:", error);
+  }, [error]);
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4 p-8 text-center bg-black/90 text-white z-[9999]">
-            <h2 className="text-2xl font-bold text-red-500">Something went wrong!</h2>
-            <p className="text-gray-400 font-mono text-sm max-w-md">
-                {error.message || "An unexpected error occurred."}
-            </p>
-            {error.stack && (
-                <pre className="text-[10px] text-red-400/60 max-w-2xl overflow-auto p-4 bg-black/50 rounded-lg text-left whitespace-pre-wrap font-mono">
-                    {error.stack}
-                </pre>
-            )}
-            <button
-                onClick={() => reset()}
-                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full border border-white/20 transition-all"
-            >
-                Try again
-            </button>
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[75vh] space-y-8 text-center bg-[#FAF9F6]">
+      {/* Background Texture */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: 'url("/api/checkpoint-image?name=patron-cosmico-4k.png")',
+          backgroundSize: '300px auto',
+          backgroundPosition: 'center'
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-md p-8 bg-white border border-black/5 rounded-3xl shadow-2xl flex flex-col items-center">
+        <div className="w-16 h-16 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mb-6 ring-8 ring-[#FF3B30]/5">
+          <AlertTriangle size={32} />
         </div>
-    );
-}
 
+        <h1 className="text-2xl font-black text-black uppercase tracking-widest mb-2">
+          System Fault
+        </h1>
+        
+        <p className="text-[13px] font-bold text-black/50 leading-relaxed mb-6">
+          The sovereign terminal encountered an unexpected execution fault. Our sentinels have logged the anomaly.
+        </p>
+
+        {error.digest && (
+          <div className="w-full bg-black/5 rounded-xl p-3 mb-8 border border-black/10 flex items-center justify-between">
+            <span className="text-[10px] font-black uppercase tracking-widest text-black/40">Fault ID:</span>
+            <span className="text-[11px] font-mono font-bold text-black/70">{error.digest}</span>
+          </div>
+        )}
+
+        <div className="flex w-full items-center gap-3">
+            <button 
+              onClick={() => reset()}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-black/5 hover:bg-black/10 text-black text-[11px] font-black uppercase tracking-widest rounded-2xl transition-colors"
+            >
+              <RefreshCw size={14} className="opacity-50" />
+              Reset State
+            </button>
+            <Link 
+              href="/"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 bg-black hover:bg-black/90 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl transition-colors shadow-lg shadow-black/10"
+            >
+              <Home size={14} className="opacity-50" />
+              Terminal Root
+            </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

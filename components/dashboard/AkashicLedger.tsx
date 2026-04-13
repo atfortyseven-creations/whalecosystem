@@ -18,7 +18,7 @@ import useSWR from "swr";
 import { useWebSocketStore, AkashicRecord } from "@/lib/store/websocket-store";
 import { AlertTriangle, Database, Shield, ChevronDown, Clock, Hash, CheckCircle2, ExternalLink, Download, LayoutTemplate } from "lucide-react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { AkashicSkeleton } from "@/components/ui/SkeletonLoader";
+import { AkashicSkeleton } from "@/components/ui/skeleton-loader";
 import { toast } from "sonner";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -425,7 +425,7 @@ export default function AkashicLedger() {
     if (!data?.records) return;
     const header = "ID,Chain,Tier,Amount,AmountUSD,From,To,Block,Hash,Timestamp\n";
     const rows = sortedRecords.map(r => 
-      `${r.id},${r.chain},${r.tier},${r.amount},${r.amountUsd},${r.from},${r.to},${r.blockNumber},${r.hash},${new Date(r.timestamp).toISOString()}`
+      `${r.id},${r.chain},${(r as any).tier || 'UNRATED'},${r.amount},${r.amountUsd},${r.from},${r.to},${r.blockNumber},${r.hash},${new Date(r.timestamp).toISOString()}`
     ).join("\n");
     const blob = new Blob([header + rows], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

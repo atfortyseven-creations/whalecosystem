@@ -13,9 +13,15 @@ import path from "path";
 const ASSET_ALIAS: Record<string, string[]> = {
   "official-whale-sovereign.png": [
     path.join(process.cwd(), "public", "official-whale-sovereign.png"),
+    path.join(process.cwd(), "public", "logo-landingpage.png"),
+    path.join(process.cwd(), "public", "official-whale-legendary.png"),
+    path.join(process.cwd(), "public", "official-whale-monochrome.png"),
+    path.join(process.cwd(), "public", "whale-logo.png"),
+    path.join(process.cwd(), "public", "official-whale.png"),
   ],
   "whale-logo-institutional.png": [
     path.join(process.cwd(), "public", "official-whale-sovereign.png"),
+    path.join(process.cwd(), "public", "logo-landingpage.png"),
     path.join(process.cwd(), "public", "whale-logo-institutional.png"),
   ],
   "corporate-cube-grid.jpg": [
@@ -25,7 +31,10 @@ const ASSET_ALIAS: Record<string, string[]> = {
   "celestial-mesh-watermark.png": [
     path.join(process.cwd(), "public", "celestial-mesh-watermark.png"),
     path.join(process.cwd(), "public", "patron-cosmico-4k.png"),
-  ]
+  ],
+  "logan-voss.jpg": [
+    path.join(process.cwd(), "public", "models", "update", "logan-voss-VTWMWadBMvM-unsplash.jpg"),
+  ],
 };
 
 const PUBLIC_DIR = path.join(process.cwd(), "public");
