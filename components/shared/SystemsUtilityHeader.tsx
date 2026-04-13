@@ -87,7 +87,7 @@ export function SystemsUtilityHeader() {
                             className="font-mono text-[7px] font-bold uppercase tracking-widest mt-0.5"
                             style={{ color: 'rgba(0,0,0,0.35)' }}
                         >
-                            {isConnected ? 'Connected Wallet' : 'Connect Terminal'}
+                            {isConnected ? 'Connected Wallet' : 'Connect your Wallet'}
                         </span>
                     </div>
                     <div

@@ -384,10 +384,7 @@ function PageHero({
           className="flex flex-col items-center w-full bg-[#0A0A0A]/80 backdrop-blur-2xl rounded-[3rem] p-6 shadow-[0_0_80px_rgba(0,0,0,0.8)] border border-white/10 relative z-20"
           style={{ willChange: 'transform, opacity' }}
         >
-          <div className="flex items-center gap-2 mb-6 pointer-events-none mt-2 opacity-50">
-           <Activity size={12} className="text-[#00F2EA]" />
-           <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black text-white">NETWORK SYNCED</span>
-          </div>
+          {/* Status badge removed for maximum fluidity */}
 
           {/* Animated Whale Logo bounded nicely */}
           {!isConnected && (
@@ -402,14 +399,14 @@ function PageHero({
                 className="w-[280px] h-[280px] mx-auto mb-10 flex items-center justify-center relative drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
                 style={{ willChange: 'transform' }}
               >
-                <WhaleLogo className="w-full h-full object-contain invert" variant="monochrome" priority />
+                <WhaleLogo className="w-full h-full object-contain" variant="monochrome" priority />
               </motion.div>
           )}
 
           {!isConnected ? (
             <div className="w-full space-y-4">
               <p className="text-[12px] font-bold text-white/50 uppercase tracking-[0.15em] mb-10 max-w-[260px] mx-auto leading-relaxed">
-                Terminal Auth Mode
+                Whale Alert Network
               </p>
 
               <button
@@ -418,7 +415,7 @@ function PageHero({
                 style={{ willChange: 'transform' }}
               >
                 <Wallet size={18} className="text-black/50 group-active:translate-x-1 transition-transform" />
-                INITIATE SESSIONS
+                Connect your Wallet
               </button>
             </div>
           ) : (
@@ -486,14 +483,12 @@ function PageHero({
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         style={{ willChange: 'transform' }}
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">SYSTEM DOCS</span>
         <ChevronDown size={14} className="text-white/50" />
       </motion.div>
 
       {/* FINGERPRINT */}
       <div className="absolute bottom-4 left-0 w-full flex items-center justify-center gap-3 opacity-[0.05] pointer-events-none">
         <div className="h-px bg-white/20 flex-1 mx-8" />
-        <Fingerprint size={20} className="text-white" />
         <div className="h-px bg-white/20 flex-1 mx-8" />
       </div>
     </div>
@@ -588,7 +583,7 @@ function PageManifesto() {
       <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-md mx-auto bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-8 sm:p-10 shadow-2xl border border-black/5 dark:border-white/5">
         <div className="text-[13px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
           
-          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 bg-clip-text text-black dark:text-white">WHALE ALERT NETWORK<br /><span className="text-xs uppercase tracking-[0.3em] opacity-40">Institutional Terminal</span></h2>
+          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 bg-clip-text text-black dark:text-white">WHALE ALERT NETWORK</h2>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">00</span>

@@ -114,11 +114,9 @@ textarea {
     --glass-bg: rgba(0, 0, 0, 0.6);
     --glass-border: rgba(255, 255, 255, 0.05);
 
-    /* Modern Hsl System */
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 4%;
-     html {
+  }
+
+  html {
     /* Lenis (SmoothScroll.tsx) manages the smoothing. */
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-x pan-y;
