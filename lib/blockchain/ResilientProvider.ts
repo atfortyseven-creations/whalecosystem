@@ -187,6 +187,7 @@ export class ResilientProvider {
     return fn(this.providers[activeIndices[0]]);
   }
 
+  private initWebSocket(url: string) {
     if (typeof window !== 'undefined') return; // Server-side only
     
     // [SECURITY FIX] Ensure we don't try to connect to an HTTP URL as a WebSocket
