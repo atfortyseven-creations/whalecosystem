@@ -347,7 +347,7 @@ model PrivacyDonation {
 
 model WhaleActivity {
   id              String   @id @default(uuid())
-  immutableId     String   @unique               // SOV-XXXX-YYYYYY (determinista del txHash)
+  immutableId     String?  @unique               // SOV-XXXX-YYYYYY (determinista del txHash)
   walletAddress   String?                        // Opcional para BTC (usar toAddress)
   type            String   @default("TRANSFER")  // 'TRANSFER', 'SWAP', 'MINT', 'BURN'
   token           String   @default("BTC")
