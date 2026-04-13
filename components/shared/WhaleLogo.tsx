@@ -22,8 +22,8 @@ export function WhaleLogo({
     return (
         <div className={`relative flex items-center justify-center ${className}`}>
             <Image
-                src="/api/checkpoint-image?name=whale-logo-institutional.png"
-                alt="Whale Alert Network"
+                src="/api/checkpoint-image?name=official-whale-sovereign.png"
+                alt="Sovereign Whale Alert"
                 fill
                 className="object-contain transition-all duration-300 transform-gpu"
                 priority={priority}

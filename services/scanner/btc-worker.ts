@@ -114,15 +114,21 @@ async function processWhaleTx(
 
     console.log(`🐋 [BTC] SOVEREIGN_BREACH: $${(usdValue / 1e6).toFixed(2)}M | tx: ${hash.slice(0, 8)}`);
 
-    await prisma.whaleActivity.create({
-        data: {
+    await prisma.whaleActivity.upsert({
+        where: { transactionHash: hash },
+        update: {
+            usdValue: usdValue.toString(),
+            valueBTC: amount,
+            btcPriceAtTx: btcPrice,
+        },
+        create: {
             immutableId: crypto.randomUUID(),
             walletAddress: from,
             type: "BTC_TRANSFER",
             token: asset,
             amount: amount.toString(),
             usdValue: usdValue.toString(),
-            valueBTC: amount, // For BTC workers, amount IS the BTC value
+            valueBTC: amount, 
             btcPriceAtTx: btcPrice,
             fromAddress: from,
             toAddress: to,
@@ -137,7 +143,9 @@ async function processWhaleTx(
             timestamp: new Date(),
         }
     }).catch(e => {
-        console.error(`❌ [BTC] DB Persistence Fail: ${e.message}`);
+        if (!e.message.includes('Unique constraint')) {
+            console.error(`❌ [BTC] DB Persistence Fail: ${e.message}`);
+        }
     });
 
     await addWhaleToQueue({

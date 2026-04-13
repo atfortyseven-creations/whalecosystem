@@ -13,7 +13,7 @@ import Image from "next/image";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { UltraFluidSection, UltraFluidLayer } from "./UltraFluidEngine";
-import ScrollFloat from "@/components/ui/ScrollFloat";
+import { ScrollFloat } from "@/components/ui/ScrollFloat";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
