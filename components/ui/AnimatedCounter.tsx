@@ -8,6 +8,7 @@ export function AnimatedCounter({
   duration = 1,
   className = "",
   format = (val: number) => val.toString(),
+  style,
 }: {
   value: number;
   duration?: number;

@@ -15,6 +15,7 @@ export interface WhaleJobData {
   asset: string;
   amount: number;
   usdValue: number;
+  valueBTC?: number;
   blockNumber: string;
   chain: string; // e.g., "ethereum", "solana"
   type: string;  // e.g., "Transfer", "Swap"

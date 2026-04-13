@@ -51,19 +51,19 @@ const useDashboardStore = create<DashboardState>((set) => ({
 // Lazy Components
 // ─────────────────────────────────────────
 const SovereignIntelTab  = lazy(() => import('./SovereignIntelTab'));
-const OmniExplorer       = lazy(() => import('./OmniExplorer'));
-const GoldTicketPanel    = lazy(() => import('./GoldTicketPanel'));
-const WhaleAcademy       = lazy(() => import('./WhaleAcademy'));
+const OmniExplorer       = lazy(() => import('./OmniExplorer').then(m => ({ default: m.OmniExplorer })));
+const GoldTicketPanel    = lazy(() => import('./GoldTicketPanel').then(m => ({ default: m.GoldTicketPanel })));
+const WhaleAcademy       = lazy(() => import('./WhaleAcademy').then(m => ({ default: m.WhaleAcademy })));
 const SecurityScanner    = lazy(() => import('./SecurityScanner'));
-const WhaleSupport       = lazy(() => import('./WhaleSupport'));
+const WhaleSupport       = lazy(() => import('./WhaleSupport').then(m => ({ default: m.WhaleSupport })));
 const BitcoinPrimitives  = lazy(() => import('./BitcoinPrimitives'));
 const ConnectExchange    = lazy(() => import('./ConnectExchange'));
-const NewPairsTable      = lazy(() => import('./NewPairsTable'));
-const GainersLosersPanel = lazy(() => import('./GainersLosersPanel'));
+const NewPairsTable      = lazy(() => import('./NewPairsTable').then(m => ({ default: m.NewPairsTable })));
+const GainersLosersPanel = lazy(() => import('./GainersLosersPanel').then(m => ({ default: m.GainersLosersPanel })));
 const PortfolioDashboard = lazy(() => import('./PortfolioDashboard'));
-const ApiTerminal        = lazy(() => import('./ApiTerminal'));
-const AkashicLedger      = lazy(() => import('./AkashicLedger').then(m => ({ default: m.AkashicLedger ?? m.default })));
-const MassTransferIntel  = lazy(() => import('./MassTransferIntel').then(m => ({ default: m.MassTransferIntel ?? m.default })));
+const ApiTerminal        = lazy(() => import('./ApiTerminal').then(m => ({ default: m.ApiTerminal })));
+const AkashicLedger      = lazy(() => import('./AkashicLedger'));
+const MassTransferIntel  = lazy(() => import('./MassTransferIntel'));
 
 // ─────────────────────────────────────────
 // Types
@@ -258,7 +258,7 @@ export function DashboardShell() {
             <AnimatedCosmicPattern />
 
             {/* ── COMMAND PALETTE (Cmd+K) ─────────────────────────────────────── */}
-            <CommandPalette onNavigate={setTab} onBridgeOpen={() => setBridgeOpen(true)} />
+            <CommandPalette onNavigate={(t) => setTab(t as DashboardTab)} onBridgeOpen={() => setBridgeOpen(true)} />
 
             {/* ── FIRST LAUNCH WELCOME (Modal) ────────────────────────────────── */}
             <WelcomeModal />

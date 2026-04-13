@@ -104,7 +104,7 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
                   symbol,
                   usdValue: parseFloat(amount) * 2500, // mock fallback
                   source: 'wallet', type: 'incoming',
-                  timestamp: Date.now(), chainId: '1'
+                  timestamp: Date.now(), chainId: 1
               });
             }
           }

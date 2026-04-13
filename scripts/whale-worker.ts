@@ -26,11 +26,23 @@ const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
 
 // Global Exception Handlers for Maximum Stability
 process.on('uncaughtException', (err) => {
+  // Gracefully handle expected third-party WS rejections (403/429) without alarming logs
+  if (err.message && (err.message.includes('403') || err.message.includes('429'))) {
+    console.warn(`🛡️ [WS-SHIELD] Suppressed external WS rejection: ${err.message}. Connection will auto-heal.`);
+    return;
+  }
   console.error('💀 [PROCESS] Uncaught Exception:', err.message);
   console.error(err.stack);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason: any, promise) => {
+  if (reason && reason.message && (reason.message.includes('403') || reason.message.includes('429'))) {
+    console.warn(`🛡️ [WS-SHIELD] Suppressed unhandled WS rejection: ${reason.message}. Connection will auto-heal.`);
+    return;
+  }
+  // Ignore ethers internal WS-CORE unknown ID errors which log aggressively on public nodes
+  if (reason && reason.reasonCode === 'UNKNOWN_ID') return;
+  
   console.error('💀 [PROCESS] Unhandled Rejection at:', promise, 'reason:', reason);
 });
 

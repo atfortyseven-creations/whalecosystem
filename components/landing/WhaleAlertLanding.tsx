@@ -826,7 +826,7 @@ export default function WhaleAlertLanding() {
                   className="w-20 h-20 rounded-[2rem] flex items-center justify-center mb-10"
                   style={{ background: INSTITUTIONAL_INK }}
                 >
-                  <WhaleLogo className="w-12 h-12" color="#fff" />
+                  <WhaleLogo className="w-12 h-12 text-white" />
                 </div>
 
                 <h2

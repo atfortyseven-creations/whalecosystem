@@ -123,7 +123,8 @@ export async function startSolanaWorker() {
             const baseWait = e.message === "RATE_LIMIT_429" ? 120_000 : 60_000;
             const backoff = Math.min(baseWait * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);
             
-            console.error(`❌ [SOL] Worker failure #${consecutiveErrors} (${e.message}). Scaling delay to ${backoff / 1000}s...`);
+            const logPrefix = e.message === "RATE_LIMIT_429" ? "🛡️ [SOL] Rate limit cooldown" : `❌ [SOL] Worker error`;
+            console.error(`${logPrefix} #${consecutiveErrors} (${e.message}). Delay: ${backoff / 1000}s...`);
             await sleep(backoff);
         }
     }

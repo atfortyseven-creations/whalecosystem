@@ -94,6 +94,12 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
 
 const EXHAUSTION_COOLDOWN_MS = 10 * 60 * 1000; // 10 minutos para 402/429
 
+interface PersistentSubscription {
+  type: 'block' | 'filter';
+  filter?: any;
+  callback: any;
+}
+
 export class ResilientProvider {
   private endpoints: RPCEndpoint[];
   private providers: ethers.JsonRpcProvider[];
@@ -228,7 +234,9 @@ export class ResilientProvider {
       const newProvider = new ethers.WebSocketProvider(url);
       
       newProvider.on('error', (err: any) => {
-          console.error(`[WS-CORE] Asynchronous crash prevented for ${url.slice(0, 30)}:`, err?.message || 'Unknown');
+          const msg = err?.message || 'Unknown';
+          if (msg.includes('UNKNOWN_ID')) return; // Ignore harmless out-of-sync block responses
+          console.warn(`[WS-CORE] Asynchronous reconnect for ${url.slice(0, 30)}:`, msg);
           this.reconnectWS();
       });
 
