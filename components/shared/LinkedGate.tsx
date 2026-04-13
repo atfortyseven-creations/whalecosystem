@@ -101,12 +101,23 @@ function WaterSplash({ x, y, onComplete }: { x: number; y: number; onComplete: (
 // (SVG filters removed to prevent mobile 240Hz frame-pacing drops)
 
 // ─── WALLET DEFINITIONS ─────────────────────────────────────────────────────
-const PC_WALLETS = [
+interface PCWallet {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  isImage: boolean;
+  color: string;
+  tag: string;
+}
+
+const PC_WALLETS: PCWallet[] = [
   {
     id: 'metamask',
     name: 'METAMASK',
     description: 'BROWSER EXTENSION · INJECTED',
     icon: '/official-whale-monochrome.png', // Fallback to monochrome for elite look
+    isImage: true,
     color: '#050505',
     tag: 'INJECTED'
   },
@@ -115,6 +126,7 @@ const PC_WALLETS = [
     name: 'COINBASE WALLET',
     description: 'SMART WALLET · MPC',
     icon: '/official-whale-monochrome.png', 
+    isImage: true,
     color: '#050505',
     tag: 'MPC'
   },
@@ -123,6 +135,7 @@ const PC_WALLETS = [
     name: 'WALLETCONNECT',
     description: 'UNIVERSAL · ANY WALLET',
     icon: '/official-whale-monochrome.png', 
+    isImage: true,
     color: '#050505',
     tag: 'UNIVERSAL'
   },
@@ -131,6 +144,7 @@ const PC_WALLETS = [
     name: 'RABBY WALLET',
     description: 'MULTI-CHAIN · INJECTED',
     icon: '/official-whale-monochrome.png',
+    isImage: true,
     color: '#050505',
     tag: 'INJECTED'
   },
@@ -228,7 +242,7 @@ function PCWalletPickerModal({
               <div className="w-14 h-14 bg-[#F9F8F4] rounded-[1.5rem] flex items-center justify-center mb-5 border border-black/5 shadow-sm">
                 <img src="/official-whale-monochrome.png" className="w-9 h-9 object-contain" alt="Whale" />
               </div>
-              <h2 className="text-2xl font-black text-[#050505] tracking-tighter uppercase">Connect Your Wallet</h2>
+              <h2 className="text-2xl font-black text-[#050505] tracking-tighter uppercase">Connect your Wallet</h2>
               <p className="text-[11px] font-bold text-[#050505]/40 uppercase tracking-[0.1em] mt-1.5 text-center">
                 Choose your preferred connection method
               </p>
@@ -260,7 +274,7 @@ function PCWalletPickerModal({
                           {wallet.name}
                         </span>
                         {isThisConnecting ? (
-                          <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-[0.15em] mt-0.5 block animate-pulse">
+                          <span className="text-[9px] font-bold text-[#00F2EA] uppercase tracking-[0.15em] mt-0.5 block animate-pulse">
                             Connecting...
                           </span>
                         ) : (
@@ -270,7 +284,7 @@ function PCWalletPickerModal({
                         )}
                       </div>
                     </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isThisConnecting ? 'bg-indigo-500' : 'bg-white opacity-0 group-hover:opacity-100'} shadow-sm`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isThisConnecting ? 'bg-[#00F2EA]' : 'bg-white opacity-0 group-hover:opacity-100'} shadow-sm`}>
                       {isThisConnecting
                         ? <RefreshCw size={13} className="text-white animate-spin" />
                         : <ChevronRight size={15} className="text-black/50" />
@@ -624,7 +638,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
         </div>
         <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-black/20">
           <span className="text-black/40">Secure</span>
-          <span>Terminal</span>
+          <span>Network</span>
           <span>Access</span>
         </div>
       </header>
@@ -701,8 +715,8 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
               {/* ── RIGHT PANEL: DIRECT CONNECT ── */}
               <div className="p-12 flex flex-col">
                 <div className="mb-12">
-                   <div className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4">Desktop Connection</div>
-                   <h2 className="text-3xl font-black tracking-tighter text-black mb-4 leading-none">Connect your wallet directly</h2>
+                   <div className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-4">Direct Connection</div>
+                   <h2 className="text-3xl font-black tracking-tighter text-black mb-4 leading-none">Connect your Wallet</h2>
                    <p className="text-[11px] font-medium text-black/40 leading-relaxed uppercase tracking-wider max-w-sm">
                      Select your preferred wallet to authenticate. No password required — your wallet signs a cryptographic message.
                    </p>
