@@ -150,13 +150,6 @@ export default function WalletConnect() {
 
                                         <div className="pt-4 space-y-2">
                                             <button 
-                                                onClick={() => open({ view: 'Networks' })}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#1F1F1F]/5 hover:bg-[#1F1F1F]/10 transition-all text-xs font-black uppercase tracking-wider"
-                                            >
-                                                <Globe size={14} />
-                                                Switch Network
-                                            </button>
-                                            <button 
                                                 onClick={() => disconnect()}
                                                 className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-all text-xs font-black uppercase tracking-wider"
                                             >

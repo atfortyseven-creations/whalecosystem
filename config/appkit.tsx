@@ -121,6 +121,10 @@ try {
             networks,
             projectId,
             metadata,
+            // ── allowUnsupportedChain: prevents AppKit from auto-triggering the
+            // "Switch Network" modal when the user's wallet is on a network not
+            // in our list. Network switching is handled exclusively in Portfolio.
+            allowUnsupportedChain: true,
             features: {
                 analytics: false,
                 email: false,
@@ -134,7 +138,7 @@ try {
                 '--w3m-color-mix': '#050505',
                 '--w3m-border-radius-master': '2rem',
                 '--w3m-font-family': 'FT Regola Neue, Inter, sans-serif',
-                '--w3m-z-index': '9999',
+                '--w3m-z-index': 9999,
             },
             enableInjected: true,
             enableEIP6963: true,

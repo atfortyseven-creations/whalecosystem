@@ -195,7 +195,7 @@ export function ConnectWalletModal() {
                                         <div className="space-y-2">
                                             <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
                                                 <div className="flex items-center gap-3">
-                                                    <WindowIcon size={16} className="text-[#050505]" />
+                                                    <Wallet size={16} className="text-[#050505]" />
                                                     <span className="text-[12px] font-black text-[#050505] uppercase tracking-wide">All Wallets</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">

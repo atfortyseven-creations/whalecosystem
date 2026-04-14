@@ -161,19 +161,19 @@ export function TokenSelector({
         <div className={`relative ${className}`} ref={dropdownRef}>
             <button 
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-all select-none min-w-[120px] justify-between"
+                className="bg-black/5 border border-black/10 rounded-xl px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-black/10 transition-all select-none min-w-[120px] justify-between"
             >
                 <div className="flex items-center gap-2">
                     {selectedToken?.logoURI ? (
                         <img src={selectedToken.logoURI} className="w-5 h-5 rounded-full" />
                     ) : (
-                        <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[8px] font-black">
+                        <div className="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[8px] font-black text-[#050505]">
                             {selectedToken?.symbol?.slice(0, 2) || '??'}
                         </div>
                     )}
-                    <span className="font-black tracking-tight">{selectedToken?.symbol || 'Select'}</span>
+                    <span className="font-black tracking-tight text-[#050505]">{selectedToken?.symbol || 'Select'}</span>
                 </div>
-                <ChevronDown size={14} className={`text-white/40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-black/40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             <AnimatePresence>
@@ -182,28 +182,29 @@ export function TokenSelector({
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute top-full right-0 mt-2 w-[320px] bg-[#1e202b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 p-1 max-h-[400px] flex flex-col"
+                        className="absolute right-0 mt-2 w-[320px] bg-white border border-black/10 rounded-2xl shadow-xl overflow-hidden z-[110] p-1 max-h-[400px] flex flex-col origin-top-right text-[#050505]"
+                        style={{ top: '100%' }}
                     >
                         {/* Search Bar */}
-                        <div className="p-2 border-b border-white/5 mb-2">
+                        <div className="p-2 border-b border-black/5 mb-2">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/20" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-black/30" />
                                 <input 
                                     autoFocus
                                     placeholder="Search name or paste address..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/5 rounded-lg py-2 pl-9 pr-3 text-xs text-white outline-none focus:border-indigo-500/30 transition-all font-medium placeholder:text-white/20"
+                                    className="w-full bg-[#FAF9F6] border border-black/5 rounded-lg py-2 pl-9 pr-3 text-xs text-[#050505] outline-none focus:border-black/30 transition-all font-medium placeholder:text-black/30"
                                 />
                             </div>
                         </div>
 
-                        <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1 min-h-[200px]">
+                        <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-black/10 flex-1 min-h-[200px]">
                             {/* Section: Institutional Assets (Expert Curated) */}
                             {!searchQuery && (
                                 <>
-                                    <div className="px-3 py-1 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] sticky top-0 bg-[#1e202b] z-10 flex items-center gap-2">
-                                        <Shield size={10} /> Institutional Assets
+                                    <div className="px-3 py-1 text-[10px] font-black text-[#050505] uppercase tracking-[0.2em] sticky top-0 bg-white z-10 flex items-center gap-2">
+                                        <Shield size={10} className="text-[#050505]" /> Institutional Assets
                                     </div>
                                     <div className="grid grid-cols-2 gap-1 p-2">
                                         {/* This will be populated by a new useEffect or passed via props */}
@@ -214,14 +215,14 @@ export function TokenSelector({
                                                     onSelect(asset);
                                                     setIsOpen(false);
                                                 }}
-                                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-indigo-500/30 group"
+                                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/[0.02] hover:bg-black/[0.05] transition-all border border-black/5 hover:border-black/10 group"
                                             >
                                                 {asset.logoURI ? (
                                                     <img src={asset.logoURI} className="w-4 h-4 rounded-full" />
                                                 ) : (
-                                                    <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[8px] font-black">{asset.symbol.slice(0, 2)}</div>
+                                                    <div className="w-4 h-4 rounded-full bg-black/5 flex items-center justify-center text-[8px] font-black text-[#050505]">{asset.symbol.slice(0, 2)}</div>
                                                 )}
-                                                <span className="text-[10px] font-bold text-white/70 group-hover:text-white uppercase">{asset.symbol}</span>
+                                                <span className="text-[10px] font-bold text-[#050505]/70 group-hover:text-[#050505] uppercase">{asset.symbol}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -231,12 +232,12 @@ export function TokenSelector({
 
                             {/* Section: My Assets */}
                             {!searchQuery && (
-                                <div className="px-3 py-1 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] sticky top-0 bg-[#1e202b] z-10">Live Balances</div>
+                                <div className="px-3 py-1 text-[10px] font-black text-black/40 uppercase tracking-[0.2em] sticky top-0 bg-white z-10 border-t border-black/5 pt-2">Live Balances</div>
                             )}
                             
                             {!searchQuery && isLoadingTokens && (
                                 <div className="flex justify-center py-4">
-                                    <Loader2 className="w-4 h-4 text-white/20 animate-spin" />
+                                    <Loader2 className="w-4 h-4 text-black/20 animate-spin" />
                                 </div>
                             )}
                             
@@ -249,21 +250,21 @@ export function TokenSelector({
                                         onSelect(asset);
                                         setIsOpen(false);
                                     }}
-                                    className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors flex items-center justify-between group"
+                                    className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors flex items-center justify-between group"
                                 >
                                     <div className="flex items-center gap-3">
                                         {asset.logoURI ? (
                                             <img src={asset.logoURI} className="w-7 h-7 rounded-full" />
                                         ) : (
-                                            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black">{asset.symbol.slice(0, 2)}</div>
+                                            <div className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-[10px] font-black text-[#050505]">{asset.symbol.slice(0, 2)}</div>
                                         )}
                                         <div>
-                                            <div className="text-white font-bold text-sm tracking-tight">{asset.symbol}</div>
-                                            <div className="text-white/30 text-[10px] font-medium max-w-[120px] truncate">{asset.name}</div>
+                                            <div className="text-[#050505] font-black text-sm tracking-tight">{asset.symbol}</div>
+                                            <div className="text-black/40 text-[10px] font-bold max-w-[120px] truncate">{asset.name}</div>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-xs font-mono font-bold text-white/50">{parseFloat(asset.balanceFormatted || '0').toFixed(4)}</div>
+                                        <div className="text-xs font-mono font-black text-[#050505]/60">{parseFloat(asset.balanceFormatted || '0').toFixed(4)}</div>
                                         {selectedToken?.address === asset.address && <Check size={14} className="ml-auto text-emerald-500 mt-1" />}
                                     </div>
                                 </button>
@@ -272,11 +273,11 @@ export function TokenSelector({
                             {/* Section: Search Results */}
                             {searchQuery && (
                                 <>
-                                    <div className="px-3 py-2 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] border-t border-white/5 mt-2 sticky top-0 bg-[#1e202b] z-10">Global Search</div>
+                                    <div className="px-3 py-2 text-[10px] font-black text-[#050505] uppercase tracking-[0.2em] border-t border-black/5 mt-2 sticky top-0 bg-white z-10">Global Search</div>
                                     {isSearching ? (
                                         <div className="py-8 flex flex-col items-center gap-2">
-                                            <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
-                                            <span className="text-[10px] font-bold text-white/20">Scanning Network...</span>
+                                            <Loader2 className="w-5 h-5 text-black/40 animate-spin" />
+                                            <span className="text-[10px] font-bold text-black/40">Scanning Network...</span>
                                         </div>
                                     ) : searchResults.length > 0 ? (
                                         searchResults.map((asset, idx) => (
@@ -286,24 +287,24 @@ export function TokenSelector({
                                                     onSelect(asset);
                                                     setIsOpen(false);
                                                 }}
-                                                className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors flex items-center gap-3"
+                                                className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 transition-colors flex items-center gap-3"
                                             >
                                                 {asset.logoURI ? (
                                                     <img src={asset.logoURI} className="w-7 h-7 rounded-full" />
                                                 ) : (
-                                                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black">{asset.symbol.slice(0, 2)}</div>
+                                                    <div className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-[10px] font-black text-[#050505]">{asset.symbol.slice(0, 2)}</div>
                                                 )}
                                                 <div className="flex-1">
                                                     <div className="flex justify-between">
-                                                        <div className="text-white font-bold text-sm tracking-tight">{asset.symbol}</div>
-                                                        <div className="text-[9px] bg-white/10 px-1.5 rounded text-white/50 font-mono self-start">ERC20</div>
+                                                        <div className="text-[#050505] font-black text-sm tracking-tight">{asset.symbol}</div>
+                                                        <div className="text-[9px] bg-black/5 px-1.5 py-0.5 rounded text-black/60 font-mono font-bold self-start">ERC20</div>
                                                     </div>
-                                                    <div className="text-white/30 text-[10px] font-medium truncate max-w-[200px]">{asset.name}</div>
+                                                    <div className="text-black/40 text-[10px] font-bold truncate max-w-[200px]">{asset.name}</div>
                                                 </div>
                                             </button>
                                         ))
                                     ) : (
-                                        <div className="py-8 text-center text-white/20 text-xs">No tokens found</div>
+                                        <div className="py-8 text-center text-black/30 font-bold text-xs uppercase tracking-widest">No tokens found</div>
                                     )}
                                 </>
                             )}
