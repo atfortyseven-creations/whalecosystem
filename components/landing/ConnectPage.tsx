@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useAccount, useConnect } from "wagmi";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { 
-  CheckCircle2, 
   Shield, 
   ArrowRight, 
   Loader2, 
@@ -13,26 +12,22 @@ import {
   QrCode, 
   Wallet, 
   Lock, 
-  Smartphone, 
   Cpu, 
   Fingerprint, 
-  ChevronRight,
   Github
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { coinbaseWallet, injected } from "wagmi/connectors";
 import { useAppKit } from "@reown/appkit/react";
-import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 
 // QR code renderer using qrcode.react
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
 
-// ── Shared Sub-Components ────────────────────────────────────────────────────────
-function InstitutionalBadge({ children, icon: Icon }: any) {
+// ── Institutional Components ───────────────────────────────────────────────────
+function InstitutionalBadge({ children, icon: Icon }: { children: React.ReactNode, icon?: any }) {
   return (
-    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/[0.03] border border-black/5">
-      {Icon && <Icon size={8} className="text-black/40" />}
-      <span className="text-[8px] font-mono font-black uppercase tracking-[0.2em] text-black/40">{children}</span>
+    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/40 backdrop-blur-md border border-black/5 shadow-sm">
+      {Icon && <Icon size={10} className="text-black/60" />}
+      <span className="text-[9px] font-mono font-black uppercase tracking-[0.3em] text-black/60">{children}</span>
     </div>
   );
 }
@@ -40,20 +35,22 @@ function InstitutionalBadge({ children, icon: Icon }: any) {
 function WalletButton({ logo, name, badge, onClick, loading, delay = 0 }: any) {
   return (
     <motion.button
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
       transition={{ delay }}
       onClick={loading ? undefined : onClick}
-      className="group relative w-full flex items-center gap-4 p-5 bg-[#FAF9F6] hover:bg-white border border-black/[0.03] hover:border-black/10 rounded-[28px] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-0.5 text-[#050505]"
+      className="group relative w-full flex items-center gap-5 p-5 bg-white/60 hover:bg-white backdrop-blur-xl border border-black/[0.04] hover:border-black/20 rounded-[32px] transition-all duration-500 shadow-sm hover:shadow-2xl hover:-translate-y-1 text-[#050505]"
     >
-      <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center p-2.5 shadow-sm group-hover:scale-105 transition-transform duration-500">
+      <div className="w-14 h-14 rounded-2xl bg-white border border-black/[0.04] flex items-center justify-center p-3 shadow-sm group-hover:scale-110 transition-transform duration-700">
         <img src={logo} alt={name} className="w-full h-full object-contain" />
       </div>
       <div className="flex-1 text-left">
-        <p className="text-[13px] font-black uppercase tracking-tight">{name}</p>
-        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5">{badge}</p>
+        <p className="text-[14px] font-black uppercase tracking-tight leading-none">{name}</p>
+        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-1.5">{badge}</p>
       </div>
-      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
+      <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-500">
+        <ArrowRight size={16} className="transition-transform duration-500 group-hover:translate-x-1" />
+      </div>
     </motion.button>
   );
 }
@@ -61,7 +58,6 @@ function WalletButton({ logo, name, badge, onClick, loading, delay = 0 }: any) {
 // ── Main Controller ─────────────────────────────────────────────────────────────
 export default function ConnectPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
   const { open: openAppKit } = useAppKit();
@@ -72,7 +68,6 @@ export default function ConnectPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Handshake session generation
   const fetchSession = useCallback(async () => {
     try {
       setSyncStatus("AWAITING");
@@ -84,7 +79,6 @@ export default function ConnectPage() {
 
   useEffect(() => { if (!qrSession) fetchSession(); }, [qrSession, fetchSession]);
 
-  // Auth Bridge Cycle
   useEffect(() => {
     if (!qrSession || syncStatus === "SYNCED") return;
     const bridge = setInterval(async () => {
@@ -104,7 +98,6 @@ export default function ConnectPage() {
     return () => clearInterval(bridge);
   }, [qrSession, syncStatus, router]);
 
-  // Redirection guard
   useEffect(() => {
     if (isConnected && mounted) {
       const hasHandshake = document.cookie.includes("sovereign_handshake=");
@@ -125,165 +118,216 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans">
-      {/* ── [EXPERT] FIXED BACKDROP ── */}
-      <WavePatternOverlay />
+    <div className="h-screen w-full overflow-hidden flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans select-none">
       
-      {/* ── HEADER ── */}
-      <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-4">
-           <img src="/official-whale-monochrome.png" className="w-8 h-8" alt="Whale" />
+      {/* ── LAYER 1: BACKDROP WAVE WALLPAPER (IMAGE 1) ────────────────────── */}
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: "url('/waves-handshake.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.95,
+          mixBlendMode: 'multiply'
+        }}
+      />
+
+      {/* ── [PROTOCOL] INSTITUTIONAL HEADER ────────────────────────────────── */}
+      <header className="relative z-[100] h-[72px] flex items-center justify-between px-10 border-b border-black/[0.04] bg-white/60 backdrop-blur-2xl">
+        <div className="flex items-center gap-5">
+           <div className="w-11 h-11 bg-black flex items-center justify-center rounded-2xl shadow-xl shadow-black/10">
+              <img src="/official-whale-monochrome.png" className="w-8 h-8 invert" alt="Whale" />
+           </div>
            <div className="flex flex-col leading-none">
-              <span className="text-[15px] font-black uppercase tracking-tighter">Whale Alert Network</span>
-              <span className="text-[8px] font-mono font-bold uppercase tracking-[0.4em] opacity-30 mt-1">Sovereign Protocol v6.12.0</span>
+              <span className="text-[17px] font-black uppercase tracking-tighter">Whale Alert Network</span>
+              <span className="text-[9px] font-mono font-black uppercase tracking-[0.4em] opacity-30 mt-1.5">Sovereign Terminal v6.12.0</span>
            </div>
         </div>
         
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden lg:flex items-center gap-10">
            <InstitutionalBadge icon={Shield}>Zero Custody</InstitutionalBadge>
            <InstitutionalBadge icon={Lock}>ECDSA Verified</InstitutionalBadge>
-           <InstitutionalBadge icon={Cpu}>Metal Ingress</InstitutionalBadge>
+           <InstitutionalBadge icon={Cpu}>Protocol Ingress</InstitutionalBadge>
         </div>
       </header>
 
-      {/* ── COMMAND CENTER ── */}
-      <main className="relative z-10 flex flex-col items-center pt-20 pb-32">
+      {/* ── [TERMINAL] MAIN COMMAND CENTER ─────────────────────────────────── */}
+      <main className="flex-1 relative z-10 flex items-center justify-center p-8">
         
-        {/* THE IMMERSIVE 1.09x ZOOM TERMINAL */}
+        {/* THE IMMERSIVE 1.09x ZOOM HANDSHAKE WRAPPER */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1.09, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden"
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-[1100px] h-full max-h-[680px] grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[48px] border border-black/10 shadow-[0_50px_120px_-30px_rgba(0,0,0,0.15)] overflow-hidden"
         >
-            {/* LEFT: QR PANEL */}
-            <div className="relative p-12 lg:p-16 flex flex-col bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-black/[0.06]">
-              <div className="absolute -bottom-20 -left-20 opacity-[0.03] pointer-events-none">
-                 <img src="/official-whale-monochrome.png" className="w-[480px] h-[480px] grayscale" alt="" />
-              </div>
-              <div className="relative z-10">
-                <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30 mb-4">Institutional Handshake</p>
-                <h2 className="text-4xl font-black tracking-tight leading-none mb-6">Mobile Sync</h2>
-                <p className="text-[12px] text-black/50 font-semibold leading-relaxed max-w-xs mb-10">
-                  Scan this sovereign handshake code to bridge your device to the intelligence mesh.
-                </p>
-
-                <div className="flex flex-col items-center gap-8">
-                  <div className="p-6 bg-white rounded-[42px] shadow-sm border border-black/5">
-                    {qrSession ? (
-                      <QRCode value={qrUrl} size={200} level="H" bgColor="#FFFFFF" fgColor="#050505" />
-                    ) : (
-                      <div className="w-[200px] h-[200px] flex items-center justify-center">
-                        <Loader2 size={32} className="animate-spin text-black/10" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-black/5">
-                    <div className={`w-2 h-2 rounded-full ${syncStatus === 'SYNCED' ? 'bg-emerald-500' : 'bg-black/20 animate-pulse'}`} />
-                    <span className="text-[9px] font-mono font-black uppercase tracking-widest text-black/60">
-                      {syncStatus === 'SYNCED' ? 'SESSION LINKED' : 'AWAITING RESPONSE…'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT: CONNECT PANEL */}
-            <div className="p-12 lg:p-16 flex flex-col bg-white">
-               <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30 mb-4">Direct Access</p>
-               <h2 className="text-3xl font-black tracking-tighter leading-none mb-8">Connect Wallet</h2>
-
-               <div className="flex flex-col gap-3.5 flex-1">
-                  <WalletButton 
-                    logo="/wallets/metamask.svg" 
-                    name="MetaMask" 
-                    badge="Browser Injected" 
-                    onClick={() => handleConnector('injected')} 
-                    loading={isPending} 
-                  />
-                  <WalletButton 
-                    logo="/wallets/coinbase.png" 
-                    name="Coinbase Wallet" 
-                    badge="MPC Smart Wallet" 
-                    onClick={() => handleConnector('coinbase')} 
-                  />
-                  <WalletButton 
-                    logo="/wallets/rainbow.png" 
-                    name="Rainbow (+550 Wallets)" 
-                    badge="WalletConnect" 
-                    onClick={() => openAppKit()} 
-                  />
-                  <WalletButton 
-                    logo="/wallets/rabby.png" 
-                    name="Rabby" 
-                    badge="Advanced EOA" 
-                    onClick={() => handleConnector('rabby')} 
-                  />
+            
+            {/* ── PANEL L: QR HANDSHAKE (DARK IVORY) ── */}
+            <div className="relative p-14 lg:p-20 flex flex-col bg-[#FAF9F6] border-r border-black/[0.04] overflow-hidden">
+               {/* Background Layer: Whale Phantom */}
+               <div className="absolute -bottom-24 -left-24 opacity-[0.02] pointer-events-none">
+                 <img src="/official-whale-monochrome.png" className="w-[520px] h-[520px] grayscale" alt="" />
                </div>
 
-               <div className="mt-10 p-5 bg-[#FAF9F6] border border-black/5 rounded-3xl flex items-start gap-3">
-                  <Fingerprint size={16} className="text-black/30 mt-0.5" />
-                  <p className="text-[10px] text-black/40 font-semibold leading-relaxed">
-                    ECDSA Verification. This portal does not hold custody of assets. All interactions are verified on-chain.
-                  </p>
+               <div className="relative z-10 flex flex-col h-full">
+                  <header className="mb-12">
+                    <div className="flex items-center gap-2.5 mb-4">
+                       <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
+                       <p className="text-[11px] font-mono font-black uppercase tracking-[0.4em] text-black/30">Intelligence Handshake</p>
+                    </div>
+                    <h2 className="text-5xl font-black tracking-tighter leading-none text-black">
+                       Mobile<br /><span className="italic text-black/40">Sync Protocol</span>
+                    </h2>
+                  </header>
+
+                  <div className="flex-1 flex flex-col items-center justify-center gap-10">
+                     <div className="relative p-8 bg-white rounded-[50px] shadow-2xl shadow-black/5 border border-black/[0.01]">
+                        {qrSession ? (
+                          <div className="relative">
+                             <QRCode value={qrUrl} size={240} level="H" bgColor="#FFFFFF" fgColor="#050505" />
+                             {syncStatus === 'SYNCED' && (
+                               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-white/95 backdrop-blur-md flex items-center justify-center rounded-[32px]">
+                                  <div className="flex flex-col items-center gap-4">
+                                     <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                                        <CheckCircle2 size={32} className="text-white" />
+                                     </div>
+                                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Protocol Linked</span>
+                                  </div>
+                               </motion.div>
+                             )}
+                          </div>
+                        ) : (
+                          <div className="w-[240px] h-[240px] flex items-center justify-center bg-black/[0.01] rounded-3xl">
+                             <Loader2 size={32} className="animate-spin text-black/10" />
+                          </div>
+                        )}
+                        {/* Geometric Accents */}
+                        <div className="absolute -top-3 -left-3 w-12 h-12 border-t-2 border-l-2 border-black/5 rounded-tl-[50px]" />
+                        <div className="absolute -bottom-3 -right-3 w-12 h-12 border-b-2 border-r-2 border-black/5 rounded-br-[50px]" />
+                     </div>
+
+                     <div className="flex flex-col items-center gap-5">
+                        <div className="flex items-center gap-3.5 bg-white px-6 py-3 rounded-full border border-black/5 shadow-sm">
+                           <div className={`w-2.5 h-2.5 rounded-full ${syncStatus === 'SYNCED' ? 'bg-emerald-500 shadow-emerald-500/50' : 'bg-black/20 animate-pulse'}`} />
+                           <span className="text-[10px] font-mono font-black uppercase tracking-widest text-black/60">
+                             {qrSession ? (syncStatus === 'SYNCED' ? 'SECURE_LINK_LOCKED' : 'AWAITING_HANDSHAKE') : 'INITIALIZING_SSE…'}
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+
+                  <footer className="mt-auto pt-10 border-t border-black/[0.04] flex items-center justify-between opacity-30">
+                     <span className="text-[9px] font-mono font-black uppercase tracking-widest">v6.12.0_SOVEREIGN</span>
+                     <div className="flex gap-6">
+                        <Twitter size={14} />
+                        <Github size={14} />
+                     </div>
+                  </footer>
                </div>
             </div>
+
+            {/* ── PANEL R: DIRECT CONNECT (IMAGE 2 BACKDROP) ── */}
+            <div 
+              className="relative p-14 lg:p-20 flex flex-col overflow-hidden"
+              style={{
+                backgroundImage: "url('/cubes-handshake.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+               {/* Translucent Overlay for High-Pro Clarity */}
+               <div className="absolute inset-0 bg-white/85 backdrop-blur-[2px] z-0" />
+
+               <div className="relative z-10 flex flex-col h-full">
+                  <header className="mb-12">
+                    <div className="flex items-center gap-2.5 mb-4">
+                       <span className="w-2 h-2 rounded-full bg-black/10" />
+                       <p className="text-[11px] font-mono font-black uppercase tracking-[0.4em] text-black/40">Direct Access Ingress</p>
+                    </div>
+                    <h2 className="text-4xl font-black tracking-tighter leading-none text-[#050505]">
+                       Connect<br /><span className="italic text-black/40">Sovereign Wallet</span>
+                    </h2>
+                  </header>
+
+                  <div className="flex flex-col gap-4 flex-1">
+                     <WalletButton 
+                        logo="/wallets/metamask.svg" 
+                        name="MetaMask" 
+                        badge="Extension Ingress" 
+                        onClick={() => handleConnector('injected')} 
+                        loading={isPending} 
+                        delay={0.1}
+                     />
+                     <WalletButton 
+                        logo="/wallets/coinbase.png" 
+                        name="Coinbase" 
+                        badge="MPC Smart Vault" 
+                        onClick={() => handleConnector('coinbase')} 
+                        delay={0.2}
+                     />
+                     <WalletButton 
+                        logo="/wallets/rainbow.png" 
+                        name="Rainbow" 
+                        badge="Universal Link" 
+                        onClick={() => handleConnector('rainbow')} 
+                        delay={0.3}
+                     />
+                     <WalletButton 
+                        logo="/wallets/rabby.png" 
+                        name="Rabby Wallet" 
+                        badge="Advanced Forensic" 
+                        onClick={() => handleConnector('rabby')} 
+                        delay={0.4}
+                     />
+                  </div>
+
+                  <div className="mt-12 p-6 bg-white/40 backdrop-blur-xl border border-black/5 rounded-[32px] flex items-start gap-4">
+                     <div className="w-12 h-12 rounded-2xl bg-white border border-black/[0.04] flex items-center justify-center shadow-sm shrink-0">
+                        <Fingerprint size={20} className="text-black/30" />
+                     </div>
+                     <p className="text-[11px] text-black/50 font-semibold leading-relaxed">
+                        Establishing a secure handshake via ECDSA proof of ownership. Private keys are never exposed to the network infrastructure.
+                     </p>
+                  </div>
+               </div>
+            </div>
+
         </motion.div>
-
-        {/* ── [RECOVERY] INSTITUTIONAL MANIFESTO ── */}
-        <section className="relative z-10 w-full max-w-[840px] px-8 pt-48 pb-64 text-[12px] leading-[2.2] tracking-wide text-black/60">
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-8 text-black">The Origin and Vision</h2>
-            <p className="mb-6">
-              The blockchain ecosystem suffers from a fundamental asymmetry of information. The raw data produced by public distributed ledgers is theoretically visible to anyone. In practice, however, the velocity, volume, and structural complexity of that data mean that only those with access to advanced indexing infrastructure can extract meaning from it in time to act upon that meaning.
-            </p>
-            <p className="mb-6">
-              A private institution with a team of engineers can deploy purpose-built systems to detect a significant capital movement nearly four minutes before that movement propagates through the public mempool. An individual operating without institutional infrastructure cannot.
-            </p>
-            <p className="mb-16">
-               The Whale Alert Network was conceived specifically to dismantle that barrier, to build from first principles an intelligence system capable of detecting, verifying, and disseminating high value capital movements with accuracy and latency sufficient to place the individual user on the same informational footing as an institutional actor.
-            </p>
-
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-8 text-black">Architectural Philosophy</h2>
-            <p className="mb-6">
-              The zero mock mandate ensures no component of the system displays fabricated data in place of real on-chain state. Every signal surfaced by the system is sourced directly from live blockchain state verified on chain, processed cryptographically, and delivered with an editorial context that a trained analyst could act upon immediately.
-            </p>
-            <p className="mb-16">
-              The institutional grade standard mandates that the production quality must be indistinguishable from that of an institutional engineering organization. This applies to code quality, interface design, database schema structure, and visual presentation.
-            </p>
-
-            <div className="grid grid-cols-2 gap-12 pt-16 border-t border-black/5">
-              <div>
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-black mb-4">Protocol Sovereignty</h3>
-                <p className="text-[11px] leading-relaxed">Non-custodial infrastructure. Your keys never leave your device. The network provides intelligence; you retain control.</p>
-              </div>
-              <div>
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-black mb-4">Zero Knowledge Access</h3>
-                <p className="text-[11px] leading-relaxed">Sybil-resistant verification without compromising privacy. Verified identity mesh via cryptographically secure signatures.</p>
-              </div>
-            </div>
-        </section>
       </main>
 
-      {/* ── FOOTER ── */}
-      <footer className="relative z-[100] px-12 py-12 border-t border-black/[0.04] bg-white/50 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-8">
-         <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <img src="/official-whale-monochrome.png" className="w-5 h-5 opacity-40" alt="" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">© Whale Alert Network</span>
+      {/* ── [FOOTER] INSTITUTIONAL LEGACY ──────────────────────────────────── */}
+      <footer className="relative z-[100] h-[72px] px-12 border-t border-black/[0.04] bg-white/60 backdrop-blur-2xl flex items-center justify-between">
+         <div className="flex items-center gap-12">
+            <span className="text-[10px] font-mono font-black uppercase tracking-[0.5em] text-black/20">© Whale Alert Network</span>
+            <div className="hidden md:flex items-center gap-8">
+               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors cursor-pointer">Security Ledger</span>
+               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors cursor-pointer">Protocol Mesh</span>
             </div>
-            <p className="text-[9px] font-mono text-black/30 tracking-widest uppercase">Privacy by Design · Sovereignty Verified</p>
          </div>
-
+         
          <div className="flex items-center gap-8">
-            <a href="https://twitter.com/WhaleAlert" className="text-black/30 hover:text-black transition-colors"><Twitter size={18} /></a>
-            <a href="https://github.com" className="text-black/30 hover:text-black transition-colors"><Github size={18} /></a>
-            <div className="w-px h-8 bg-black/10 mx-2" />
-            <div className="flex flex-col items-end">
-               <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Status: Operational</span>
-               <span className="text-[8px] font-mono text-emerald-500 uppercase tracking-widest font-bold">L1/L2 Ingress Active</span>
+            <div className="flex items-center gap-2">
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
+               <span className="text-[9px] font-mono font-black uppercase tracking-widest text-emerald-600/60">Systems_Synced</span>
             </div>
+            <button className="flex items-center gap-2.5 text-[10px] font-black uppercase tracking-widest text-[#050505]/60 hover:text-black transition-all">
+               Handshake Support
+               <ArrowRight size={12} />
+            </button>
          </div>
       </footer>
+
+      {/* ── STYLE INJECTIONS ──────────────────────────────────────────────── */}
+      <style jsx global>{`
+        @font-face {
+          font-family: 'Sovereign-Mono';
+          src: local('JetBrains Mono'), local('Menlo'), monospace;
+        }
+        body {
+          background-color: #FAF9F6;
+          overflow: hidden;
+        }
+      `}</style>
     </div>
   );
 }
