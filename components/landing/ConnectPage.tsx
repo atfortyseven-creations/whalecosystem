@@ -121,7 +121,7 @@ export default function ConnectPage() {
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1.09, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden"
+          className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden"
         >
             <div className="relative p-12 lg:p-16 flex flex-col bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-black/[0.06]">
               <div className="absolute -bottom-20 -left-20 opacity-[0.03] pointer-events-none">
@@ -151,9 +151,9 @@ export default function ConnectPage() {
             </div>
 
             <div 
-              className="relative p-12 lg:p-16 flex flex-col overflow-hidden"
+              className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-transparent"
               style={{
-                backgroundImage: "url('/peakpx.png')",
+                backgroundImage: "url('/peakpx.jpg')",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
