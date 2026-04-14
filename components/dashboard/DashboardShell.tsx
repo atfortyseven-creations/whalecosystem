@@ -98,16 +98,6 @@ const NAV_GROUPS = [
         ],
     },
     {
-        label: 'Resources',
-        items: [
-            { id: 'academy',     icon: GraduationCap, label: 'Whale Academy' },
-            { id: 'library',     icon: BookOpen,      label: 'The Library' },
-            { id: 'support',     icon: LifeBuoy,      label: 'Support Hub' },
-            { id: 'bitcoin-net', icon: Cpu,           label: 'Bitcoin Network' },
-            { id: 'exchange',    icon: Link2,          label: 'Connect Exchange' },
-        ],
-    },
-    {
         label: 'Premium',
         items: [
             { id: 'premium', icon: Zap, label: 'Premium Pass', gold: true },

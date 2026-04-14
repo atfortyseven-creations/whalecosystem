@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, RefreshCcw, TrendingUp, Wallet, Loader2, PieChart, Activity, Globe, Zap, Eye, ArrowRight, ChevronDown, Check, UserPlus, Github, Twitter } from 'lucide-react';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { usePortfolioStore } from '@/lib/portfolio/store';
 import { useWalletStore } from '@/lib/store/wallet-store';
@@ -395,6 +395,51 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         </>
                     )}
                 </div>
+            </div>
+
+            {/* ── UNIFIED WAVE & DOWNHEAD FOOTER ── */}
+            <div className="relative w-full min-h-[500px] flex flex-col justify-end overflow-hidden pt-32 mt-16 rounded-[2.5rem] border border-black/5" style={{ background: '#FAF9F6' }}>
+                {/* Massive Wave Background */}
+                <img 
+                    src="/olas-hokusai-4k.png" 
+                    alt="The Great Wave" 
+                    className="absolute bottom-0 left-0 w-full h-[120%] object-cover object-bottom opacity-95 z-0"
+                    style={{ transform: "translateZ(0)", willChange: "transform" }}
+                />
+                
+                {/* Protective Top Fades */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F6] via-transparent to-transparent z-[1]" />
+                
+                {/* Footer Real Estate */}
+                <footer className="relative z-10 w-full pb-12 pt-32 mt-auto">
+                    <div className="max-w-[840px] mx-auto px-8 flex flex-col items-center gap-8 bg-white/40 backdrop-blur-md rounded-3xl py-8 border border-white/40 shadow-2xl">
+                        {/* Social and Central Whale */}
+                        <div className="flex items-center justify-center gap-8">
+                            <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
+                                <Twitter size={20} style={{ color: '#050505', opacity: 0.8 }} />
+                            </a>
+                            <div className="w-16 h-16 flex items-center justify-center bg-white/60 rounded-3xl shadow-lg border border-white/50">
+                                <img src="/official-whale-monochrome.png" className="w-10 h-10 opacity-100" alt="Whale" />
+                            </div>
+                            <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
+                                <Github size={20} style={{ color: '#050505', opacity: 0.8 }} />
+                            </a>
+                        </div>
+
+                        {/* Legal links */}
+                        <div className="flex flex-wrap justify-center gap-8 items-center mt-4">
+                            <a href="/docs/privacy-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Privacy Policy</a>
+                            <a href="/docs/terms-of-service" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Terms of Service</a>
+                            <a href="/docs/risk-disclosure" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Risk Disclosure</a>
+                            <a href="/docs/cookie-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Cookie Policy</a>
+                        </div>
+
+                        {/* Copyright */}
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-50 text-black text-center">
+                            © {new Date().getFullYear()} Whale Alert Network · All rights reserved
+                        </p>
+                    </div>
+                </footer>
             </div>
         </div>
     );

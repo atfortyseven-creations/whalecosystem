@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import dynamic from "next/dynamic";
 import { Github, Twitter } from "lucide-react";
+import { useAppKit } from "@reown/appkit/react";
+import { WhaleLogo } from "@/components/shared/WhaleLogo";
 
 const DynamicCryptoCheckoutModal = dynamic(
   () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
@@ -19,18 +21,18 @@ const MUTED= "rgba(5,5,5,0.60)";
 export default function WhaleAlertLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
+  const { open } = useAppKit();
   const [showGate, setShowGate] = useState(false);
 
   useEffect(() => {
     if (!address && !sessionStorage.getItem('visited_connect')) {
       sessionStorage.setItem('visited_connect', '1');
-      router.push("/connect");
     }
-  }, [address, router]);
+  }, [address]);
 
   const handleEntry = () => {
     if (address) router.push("/dashboard");
-    else router.push("/connect");
+    else open();
   };
 
   return (
@@ -66,33 +68,43 @@ export default function WhaleAlertLanding() {
         }}
       />
 
-      <div className="absolute inset-x-0 bottom-0 z-[2] pointer-events-none h-[40vh] min-h-[400px] max-h-[800px]">
-        {/* The Wave Image */}
-        <div className="absolute inset-0 overflow-hidden">
-          <img 
-            src="/olas-hokusai-4k.png" 
-            alt="The Great Wave" 
-            loading="lazy"
-            decoding="async"
-            style={{ 
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              width: "100%", 
-              height: "100%", 
-              objectFit: "cover",
-              objectPosition: "bottom center",
-              opacity: 0.95
-            }} 
-          />
-        </div>
-        
-        {/* The Fusion Gradient to transition pattern/ivory into waves seamlessly */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F6] via-[#FAF9F6]/95 to-transparent z-[3]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent z-[3]" />
-      </div>
 
-      {/* Nav-bar removed as requested to leave it perfectly clean */}
+      {/* ── Fixed Header Pill with Connect Wallet Button ── */}
+      <motion.header
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-4 left-1/2 -translate-x-1/2 w-full max-w-[840px] z-50 flex items-center justify-between px-5 py-3 rounded-full"
+        style={{
+          background: "rgba(255,255,255,0.72)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          border: `1px solid rgba(5,5,5,0.10)`,
+          boxShadow: "0 4px 20px rgba(5,5,5,0.07)",
+        }}
+      >
+        <div className="flex items-center gap-2.5">
+          <WhaleLogo className="w-6 h-6 shrink-0" />
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-tight text-[#050505]">
+              Whale Alert Network
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={handleEntry}
+          className="px-4 py-2 rounded-full font-sans font-black uppercase tracking-wide transition-transform active:scale-[0.96]"
+          style={{
+            backgroundColor: "#050505",
+            color: "#FFFFFF",
+            fontSize: "9.5px",
+            letterSpacing: "0.15em"
+          }}
+        >
+          {address ? "OPEN TERMINAL" : "CONNECT WALLET"}
+        </button>
+      </motion.header>
 
       {/* Text Content Layer */}
       <div className="relative z-10 max-w-[840px] mx-auto px-8 pt-24 pb-64 text-[11px] md:text-[12px] leading-[2.2] tracking-wide" style={{ color: MUTED }}>
@@ -185,36 +197,50 @@ export default function WhaleAlertLanding() {
         )}
       </AnimatePresence>
 
-      {/* ── DOWNHEAD (FOOTER) ── */}
-      <footer className="relative z-10 border-t border-black/5 mt-0 pb-12 pt-8">
-        <div className="max-w-[840px] mx-auto px-8 flex flex-col items-center gap-8">
-          {/* Social and Central Whale */}
-          <div className="flex items-center justify-center gap-8">
-            <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors">
-              <Twitter size={16} style={{ color: INK, opacity: 0.6 }} />
-            </a>
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
+      {/* ── UNIFIED WAVE & DOWNHEAD FOOTER ── */}
+      <div className="relative w-full min-h-[500px] flex flex-col justify-end overflow-hidden pt-32">
+        {/* Massive Wave Background */}
+        <img 
+          src="/olas-hokusai-4k.png" 
+          alt="The Great Wave" 
+          className="absolute bottom-0 left-0 w-full h-[120%] object-cover object-bottom opacity-95 z-0"
+          style={{ transform: "translateZ(0)", willChange: "transform" }}
+        />
+        
+        {/* Protective Top Fades */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F6] via-transparent to-transparent z-[1]" />
+        
+        {/* Footer Real Estate */}
+        <footer className="relative z-10 w-full pb-12 pt-32 mt-auto">
+          <div className="max-w-[840px] mx-auto px-8 flex flex-col items-center gap-8 bg-white/40 backdrop-blur-md rounded-3xl py-8 border border-white/40 shadow-2xl">
+            {/* Social and Central Whale */}
+            <div className="flex items-center justify-center gap-8">
+              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
+                <Twitter size={20} style={{ color: INK, opacity: 0.8 }} />
+              </a>
+              <div className="w-16 h-16 flex items-center justify-center bg-white/60 rounded-3xl shadow-lg border border-white/50">
+                <img src="/official-whale-monochrome.png" className="w-10 h-10 opacity-100" alt="Whale" />
+              </div>
+              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
+                <Github size={20} style={{ color: INK, opacity: 0.8 }} />
+              </a>
             </div>
-            <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors">
-              <Github size={16} style={{ color: INK, opacity: 0.6 }} />
-            </a>
-          </div>
 
-          {/* Legal links */}
-          <div className="flex flex-wrap justify-center gap-6 items-center">
-            <a href="/docs/privacy-policy" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Privacy Policy</a>
-            <a href="/docs/terms-of-service" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Terms of Service</a>
-            <a href="/docs/risk-disclosure" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Risk Disclosure</a>
-            <a href="/docs/cookie-policy" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Cookie Policy</a>
-          </div>
+            {/* Legal links */}
+            <div className="flex flex-wrap justify-center gap-8 items-center mt-4">
+              <a href="/docs/privacy-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Privacy Policy</a>
+              <a href="/docs/terms-of-service" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Terms of Service</a>
+              <a href="/docs/risk-disclosure" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Risk Disclosure</a>
+              <a href="/docs/cookie-policy" className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Cookie Policy</a>
+            </div>
 
-          {/* Copyright */}
-          <p className="text-[9px] font-mono uppercase tracking-[0.3em]" style={{ color: MUTED }}>
-            © {new Date().getFullYear()} Whale Alert Network · All rights reserved · Institutional Intelligence Infrastructure
-          </p>
-        </div>
-      </footer>
+            {/* Copyright */}
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-50 text-black">
+              © {new Date().getFullYear()} Whale Alert Network · All rights reserved
+            </p>
+          </div>
+        </footer>
+      </div>
     </main>
   );
 }

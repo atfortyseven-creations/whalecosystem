@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-
 import { useUIStore } from "@/lib/store/ui-store";
+import { useAppKit } from "@reown/appkit/react";
 
 const DynamicQRScannerModal = dynamic(
   () => import("@/components/wallet/QRScannerModal"),
@@ -23,13 +23,14 @@ export function MobileLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
+  const { open } = useAppKit();
   const [showScanner, setShowScanner] = useState(false);
 
   const handleEntry = () => {
     if (address) router.push("/dashboard");
     else {
-      console.log("[Mobile] Opening Cryptographic Vault...");
-      openConnectModal();
+      console.log("[Mobile] Opening Reown AppKit Vault...");
+      open();
     }
   };
 
@@ -59,49 +60,7 @@ export function MobileLanding() {
         />
       </div>
 
-      {/* ── Downpage Wave with 20% zoom and expert fade ── */}
-      <div className="absolute inset-x-0 bottom-0 z-[2] pointer-events-none" style={{ height: "1200px" }}>
-        {/* The Wave Image */}
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          overflow: "hidden"
-        }}>
-          <img 
-            src="/olas-hokusai-4k.png" 
-            alt="The Great Wave" 
-            loading="lazy"
-            decoding="async"
-            style={{ 
-              position: "absolute",
-              bottom: "-5%",
-              left: "-10%",
-              width: "120%", 
-              height: "auto", 
-              transform: "scale(1.2) translateZ(0)", // +20% zoom requested
-              willChange: "transform",
-              transformOrigin: "bottom center",
-              opacity: 0.98
-            }} 
-          />
-        </div>
-        
-        {/* The Fusion Gradient to transition perfectly into waves */}
-        <div 
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "linear-gradient(to bottom, #FAF9F6 0%, rgba(250, 249, 246, 0.98) 10%, rgba(250, 249, 246, 0) 100%)",
-            zIndex: 3
-          }}
-        />
-      </div>
+
 
       {/* ── Fixed Header Pill with Connect Wallet Button ── */}
       <motion.header
@@ -265,36 +224,50 @@ export function MobileLanding() {
         )}
       </AnimatePresence>
 
-      {/* ── DOWNHEAD (FOOTER) ── */}
-      <footer className="relative z-10 border-t border-black/5 mt-0 pb-12 pt-8">
-        <div className="max-w-[840px] mx-auto px-8 flex flex-col items-center gap-8">
-          {/* Social and Central Whale */}
-          <div className="flex items-center justify-center gap-8">
-            <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: INK, opacity: 0.6 }}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5 5 9.2 5 9.2c.5.2 1 .3 1.5.3C4.1 7.1 5 1 5 1c1.8 2.2 4.6 3.6 7.6 3.8A4.2 4.2 0 0 1 18.2 2.6c1.2-.2 2.4-.7 3.8-1.5z"/></svg>
-            </a>
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
+      {/* ── UNIFIED WAVE & DOWNHEAD FOOTER ── */}
+      <div className="relative w-full min-h-[500px] flex flex-col justify-end overflow-hidden pt-32">
+        {/* Massive Wave Background */}
+        <img 
+          src="/olas-hokusai-4k.png" 
+          alt="The Great Wave" 
+          className="absolute bottom-0 left-0 w-[120%] -ml-[10%] h-[120%] object-cover object-bottom opacity-95 z-0"
+          style={{ transform: "scale(1.2) translateZ(0)", transformOrigin: "bottom center", willChange: "transform" }}
+        />
+        
+        {/* Protective Top Fades */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F6] via-[#FAF9F6]/80 to-transparent z-[1]" />
+        
+        {/* Footer Real Estate */}
+        <footer className="relative z-10 w-full pb-12 pt-32 mt-auto">
+          <div className="max-w-[840px] mx-auto px-6 flex flex-col items-center gap-8 bg-white/40 backdrop-blur-md rounded-3xl py-8 border border-white/40 shadow-2xl mx-4">
+            {/* Social and Central Whale */}
+            <div className="flex items-center justify-center gap-6">
+              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: INK, opacity: 0.8 }}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5 5 9.2 5 9.2c.5.2 1 .3 1.5.3C4.1 7.1 5 1 5 1c1.8 2.2 4.6 3.6 7.6 3.8A4.2 4.2 0 0 1 18.2 2.6c1.2-.2 2.4-.7 3.8-1.5z"/></svg>
+              </a>
+              <div className="w-16 h-16 flex items-center justify-center bg-white/60 rounded-3xl shadow-lg border border-white/50">
+                <img src="/official-whale-monochrome.png" className="w-10 h-10 opacity-100" alt="Whale" />
+              </div>
+              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 bg-white/50 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: INK, opacity: 0.8 }}><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+              </a>
             </div>
-            <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-10 h-10 border border-black/10 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: INK, opacity: 0.6 }}><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-            </a>
-          </div>
 
-          {/* Legal links */}
-          <div className="flex flex-wrap justify-center gap-6 items-center">
-            <a href="/docs/privacy-policy" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Privacy Policy</a>
-            <a href="/docs/terms-of-service" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Terms of Service</a>
-            <a href="/docs/risk-disclosure" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Risk Disclosure</a>
-            <a href="/docs/cookie-policy" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Cookie Policy</a>
-          </div>
+            {/* Legal links */}
+            <div className="flex flex-wrap justify-center gap-6 items-center mt-4">
+              <a href="/docs/privacy-policy" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Privacy</a>
+              <a href="/docs/terms-of-service" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Terms</a>
+              <a href="/docs/risk-disclosure" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Risk</a>
+              <a href="/docs/cookie-policy" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505] hover:text-[#00F2EA] transition-colors">Cookies</a>
+            </div>
 
-          {/* Copyright */}
-          <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-center mt-2" style={{ color: MUTED }}>
-            © {new Date().getFullYear()} Whale Alert Network · All rights reserved
-          </p>
-        </div>
-      </footer>
+            {/* Copyright */}
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] mt-2 opacity-50 text-black text-center mx-4">
+              © {new Date().getFullYear()} Whale Alert Network · All rights reserved
+            </p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

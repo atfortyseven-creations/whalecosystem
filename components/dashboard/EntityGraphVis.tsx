@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network, Zap, Loader2, WifiOff, Search, Info, Maximize2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { OmniExplorer } from './OmniExplorer';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -136,8 +137,9 @@ export function EntityGraphVis() {
     }, [matrixData, isOffline]);
 
     return (
-        <div className="w-full h-full overflow-hidden flex flex-col items-center p-4">
-        <div className="w-full h-full flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-2xl font-mono overflow-hidden shadow-sm shrink-0">
+        <div className="w-full flex flex-col items-center p-0 md:p-4 gap-8 mb-24">
+        {/* GRAPH PANEL */}
+        <div className="w-full min-h-[75vh] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-[2rem] font-mono overflow-hidden shadow-sm shrink-0 relative z-10">
             {/* ── HEADER ── */}
             <div className="px-8 py-6 border-b border-[#E5E5E5] flex items-center justify-between shrink-0 bg-[#FAF9F6]">
                 <div className="flex items-center gap-4">
@@ -225,6 +227,11 @@ export function EntityGraphVis() {
                 </div>
                 <span>ASSOCIATION_GRAPH_v3.1_ACTIVE</span>
             </div>
+        </div>
+
+        {/* SEARCH BLOCK & BRC EXPLORER MODULE INJECTION */}
+        <div className="w-full relative z-0">
+            <OmniExplorer />
         </div>
         </div>
     );

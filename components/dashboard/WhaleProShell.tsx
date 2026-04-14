@@ -37,17 +37,10 @@ const SIDEBAR_ITEMS: NavItem[] = [
     
     // ── Deep Intelligence ──
     { id: 'neural-graph',    label: 'Entity Graph',     icon: <Network size={17}/>, dividerBefore: 'Intelligence' },
-    { id: 'omni-explorer',   label: 'Search Block',     icon: <Search size={17}/> },
-    { id: 'brc-explorer',    label: 'BRC Explorer',     icon: <Box size={17}/> },
     
     // ── Sovereignty & Vault ──
     { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>, dividerBefore: 'Sovereignty' },
-    { id: 'sovereign-vault', label: 'Cold Storage',     icon: <Lock size={17}/> },
     { id: 'zk-shield',       label: 'ZK Shield',        icon: <ShieldAlert size={17}/> },
-
-    // ── Academy & Support ──
-    { id: 'academy',         label: 'The Library',      icon: <GraduationCap size={17}/>, dividerBefore: 'Resources' },
-    { id: 'support',         label: 'Support Hub',      icon: <LifeBuoy size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
