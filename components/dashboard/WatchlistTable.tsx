@@ -341,7 +341,8 @@ export function WatchlistTable() {
                 />
             )}
         </AnimatePresence>
-        <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex items-start justify-center p-4">
+        <div className="flex flex-col w-full h-full min-h-[600px] bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm">
 
             {/* ── Toolbar ── */}
             <div className="px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-4 flex-wrap">
@@ -614,10 +615,11 @@ export function WatchlistTable() {
             )}
 
             {/* ── Footer ── */}
-            <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
+            <div className="px-6 py-4 border-t border-[#E5E5E5] bg-[#FAF9F6] rounded-b-2xl flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                 <span>{view === 'TOKENS' ? tokensFiltered.length : walletsFiltered.length} items · Enriched with market data</span>
                 <span>Data refreshes on page load</span>
             </div>
+        </div>
         </div>
         </>
     );

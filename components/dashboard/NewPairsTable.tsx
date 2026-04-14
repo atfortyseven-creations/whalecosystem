@@ -196,7 +196,8 @@ export function NewPairsTable() {
     const chains: Chain[] = NETWORKS;
 
     return (
-        <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-4">
+        <div className="flex flex-col h-full min-h-[600px] w-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm shrink-0">
 
             {/* ── Toolbar ── */}
             <div className="px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
@@ -409,6 +410,7 @@ export function NewPairsTable() {
                 <span>{filtered.length} pairs shown · refreshes every 8s</span>
                 <span>Security powered by Whale Alert Network Engine</span>
             </div>
+        </div>
         </div>
     );
 }

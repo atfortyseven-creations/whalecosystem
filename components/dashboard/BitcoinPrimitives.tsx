@@ -47,17 +47,17 @@ export default function BitcoinPrimitives() {
   const filtered = standards.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
 
   return (
-    <div className="h-full flex flex-col p-6 gap-6 overflow-y-auto">
+    <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-6 gap-6 bg-[#FFFFFF] text-[#050505] shrink-0 min-h-[600px]">
 
       {/* ── HEADER ── */}
-      <div className="flex items-center justify-between gap-4 p-5 rounded-2xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="flex items-center justify-between gap-4 p-5 rounded-2xl bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <Layers size={22} style={{ color: '#00F2EA' }} />
+          <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#E5E5E5]">
+            <Layers size={22} className="text-[#050505]" />
           </div>
           <div>
-            <h2 className="text-[13px] font-black uppercase tracking-[0.15em] text-white mb-1">Bitcoin Network Primitives</h2>
-            <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed max-w-2xl" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <h2 className="text-[13px] font-black uppercase tracking-[0.15em] text-[#050505] mb-1">Bitcoin Network Primitives</h2>
+            <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed max-w-2xl text-[#888888]">
               Monitoring base layer primitives, inscription-based assets, and custodial-free issuance mechanisms.
             </p>
           </div>
@@ -65,8 +65,7 @@ export default function BitcoinPrimitives() {
         <button
           onClick={handleSync}
           disabled={isSyncing}
-          className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shrink-0 text-black"
-          style={{ background: '#fff', boxShadow: '0 4px 20px rgba(255,255,255,0.08)' }}
+          className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50 shrink-0 text-white bg-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] border border-transparent hover:border-[#E5E5E5]"
         >
           <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
           {isSyncing ? 'Executing Sync' : 'Re-index Standards'}
@@ -75,35 +74,35 @@ export default function BitcoinPrimitives() {
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filtered.map((std) => (
-          <div key={std.id} className="rounded-2xl p-6 group hover:scale-[1.01] transition-all cursor-pointer" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div key={std.id} className="rounded-2xl p-6 group hover:scale-[1.01] transition-all cursor-pointer bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 flex items-center justify-center rounded-xl transition-all" style={{ background: 'rgba(0,242,234,0.08)', border: '1px solid rgba(0,242,234,0.15)' }}>
-                  <Cpu size={18} style={{ color: '#00F2EA' }} />
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl transition-all bg-[#FFFFFF] border border-[#E5E5E5] group-hover:border-[#050505]">
+                  <Cpu size={18} className="text-[#050505]" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black tracking-tight uppercase text-white">{std.name} <span className="text-[9px] ml-2 tracking-widest" style={{ color: 'rgba(255,255,255,0.2)' }}>REV_{std.version}</span></h3>
-                  <div className="text-[9px] mt-0.5 uppercase tracking-widest font-bold leading-tight max-w-[200px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{std.description}</div>
+                  <h3 className="text-sm font-black tracking-tight uppercase text-[#050505]">{std.name} <span className="text-[9px] ml-2 tracking-widest text-[#888888]">REV_{std.version}</span></h3>
+                  <div className="text-[9px] mt-0.5 uppercase tracking-widest font-bold leading-tight max-w-[200px] text-[#888888]">{std.description}</div>
                 </div>
               </div>
-              <span className={`text-[9px] font-black px-3 py-1 rounded-full border ${
+              <span className={`text-[9px] font-black px-3 py-1 rounded-md border ${
                 std.status === 'INDEXED'
-                  ? 'border-[#00C076]/25 text-[#00C076]'
-                  : 'text-white/25 border-white/10'
-              }`} style={{ background: std.status === 'INDEXED' ? 'rgba(0,192,118,0.1)' : 'rgba(255,255,255,0.04)' }}>
+                  ? 'border-[#00C076]/30 text-[#00C076] bg-[#00C076]/10'
+                  : 'text-[#888888] border-[#E5E5E5] bg-[#FFFFFF]'
+              }`}>
                 {std.status}
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-px rounded-xl overflow-hidden mt-4" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <div className="grid grid-cols-3 gap-px rounded-xl overflow-hidden mt-4 border border-[#E5E5E5] bg-[#E5E5E5]">
               {[
                 { label: 'Valuation', value: std.indexedValue },
                 { label: 'Entropy', value: std.txCount.toLocaleString() },
                 { label: 'Last Sync', value: std.lastUpdate !== '--' ? std.lastUpdate.slice(11, 19) : '--' },
               ].map(item => (
-                <div key={item.label} className="p-4 flex flex-col gap-1" style={{ background: 'rgba(13,16,20,0.8)' }}>
-                  <span className="text-[8px] uppercase tracking-[0.2em] font-black" style={{ color: 'rgba(255,255,255,0.25)' }}>{item.label}</span>
-                  <span className="text-[13px] font-black font-mono text-white">{item.value}</span>
+                <div key={item.label} className="p-4 flex flex-col gap-1 bg-[#FFFFFF]">
+                  <span className="text-[8px] uppercase tracking-[0.2em] font-black text-[#888888]">{item.label}</span>
+                  <span className="text-[13px] font-black font-mono text-[#050505]">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -111,10 +110,10 @@ export default function BitcoinPrimitives() {
             {std.status === 'INDEXED' && (
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={12} style={{ color: '#00C076' }} />
-                  <span className="text-[9px] uppercase tracking-widest font-black" style={{ color: 'rgba(255,255,255,0.25)' }}>PRIMITIVE_HANDSHAKE_OK</span>
+                  <ShieldCheck size={12} className="text-[#00C076]" />
+                  <span className="text-[9px] uppercase tracking-widest font-black text-[#888888]">PRIMITIVE_HANDSHAKE_OK</span>
                 </div>
-                <button className="text-[9px] font-black uppercase tracking-widest transition-colors" style={{ color: '#00F2EA' }}>
+                <button className="text-[9px] font-black uppercase tracking-widest transition-colors text-[#050505] hover:text-[#888888]">
                   EXPLORE REGISTRY &gt;
                 </button>
               </div>
@@ -124,10 +123,10 @@ export default function BitcoinPrimitives() {
       </div>
 
       {/* ── FOOTER ── */}
-      <div className="pt-4 flex justify-between items-center text-[9px] uppercase tracking-[0.3em] font-bold" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.2)' }}>
+      <div className="pt-4 flex justify-between items-center text-[9px] uppercase tracking-[0.3em] font-bold border-t border-[#E5E5E5] text-[#888888]">
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#E5E5E5]" />
             <span>L0: BTC_MAINNET</span>
           </div>
           <div className="flex items-center gap-2">

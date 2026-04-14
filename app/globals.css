@@ -155,10 +155,9 @@ textarea {
     touch-action: pan-x pan-y;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
-    user-select: text;
-
-    @apply antialiased transition-colors duration-300;
-    @apply bg-[#FAF9F6] text-[#050505];
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
   }
 
   /* ═══════════════════════════════════════════════════════════

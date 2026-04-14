@@ -217,8 +217,8 @@ export default function PortfolioPage() {
           <div className="flex flex-col items-center gap-3">
             <button
               onClick={() => open()}
-              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] transition-all hover:opacity-80"
-              style={{ background: INK, color: "#FFF" }}
+              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] transition-all hover:opacity-80 shadow-lg"
+              style={{ background: "#0052FF", color: "#FFFFFF" }}
             >
               Connect Wallet
             </button>
@@ -437,11 +437,11 @@ export default function PortfolioPage() {
                 </div>
                 <button onClick={() => { setShowCreateAccount(false); setAccountCreated(false); }} style={{ color: MUTED }} className="text-[10px] font-mono font-black uppercase tracking-widest hover:opacity-100 opacity-50 transition-opacity">Close</button>
               </div>
-              <div className="p-6 space-y-5">
+              <div className="p-6">
                 {accountCreated ? (
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-4 py-4">
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-                      <ShieldCheck size={24} className="text-emerald-500" />
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-4 py-8">
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                      <ShieldCheck size={28} className="text-emerald-500" />
                     </div>
                     <div className="text-center space-y-1">
                       <p className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Account Initiated</p>
@@ -451,51 +451,53 @@ export default function PortfolioPage() {
                   </motion.div>
                 ) : (
                   <>
-                    {/* Coinbase Smart Wallet */}
-                    <div className="rounded-2xl border p-5 space-y-4" style={{ borderColor: BORDER, background: BG }}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
-                          <img src="/wallets/coinbase.png" alt="Coinbase" className="w-8 h-8 object-contain" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Coinbase Smart Wallet */}
+                      <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
+                        <div className="flex items-start gap-4 mb-6">
+                          <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 overflow-hidden" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
+                            <img src="/wallets/coinbase.png" alt="Coinbase" className="w-8 h-8 object-contain" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-black text-sm" style={{ color: INK }}>Smart Wallet</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>Passkeys · No Seed</div>
+                            <p className="text-[11px] mt-2 leading-relaxed" style={{ color: MUTED }}>Free on-chain account powered by Account Abstraction. Sign in effortlessly with passkeys.</p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-black text-sm" style={{ color: INK }}>Coinbase Smart Wallet</div>
-                          <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>ERC-4337 · No seed phrase required</div>
-                          <p className="text-xs mt-2 leading-relaxed" style={{ color: MUTED }}>Create a free on-chain account powered by Account Abstraction. Sign in with passkeys — no browser extension needed.</p>
-                        </div>
+                        <button
+                          onClick={handleCreateOnChainAccount}
+                          disabled={creatingAccount}
+                          className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+                          style={{ background: "#0052FF", color: '#FFFFFF' }}
+                        >
+                          {creatingAccount ? <><Loader2 size={14} className="animate-spin" /> Creating...</> : <><Plus size={14} /> Create Account</>}
+                        </button>
                       </div>
-                      <button
-                        onClick={handleCreateOnChainAccount}
-                        disabled={creatingAccount}
-                        className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                        style={{ background: INK, color: '#FFF' }}
-                      >
-                        {creatingAccount ? <><Loader2 size={14} className="animate-spin" /> Creating...</> : <><Plus size={14} /> Create Coinbase Account</>}
-                      </button>
+
+                      {/* AppKit Universal */}
+                      <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
+                        <div className="flex items-start gap-4 mb-6">
+                          <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
+                            <Globe size={22} style={{ color: MUTED }} strokeWidth={1.5} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-black text-sm" style={{ color: INK }}>Universal Account</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>Web3 Standard</div>
+                            <p className="text-[11px] mt-2 leading-relaxed" style={{ color: MUTED }}>Connect or create a new account using any supported Web3 provider via WalletConnect.</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => open()}
+                          className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:bg-black/5 flex items-center justify-center gap-2 border shadow-sm"
+                          style={{ borderColor: BORDER, background: "#FAF9F6", color: INK }}
+                        >
+                          <ExternalLink size={14} /> Open Browser
+                        </button>
+                      </div>
                     </div>
 
-                    {/* AppKit Universal */}
-                    <div className="rounded-2xl border p-5 space-y-4" style={{ borderColor: BORDER, background: BG }}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0" style={{ borderColor: BORDER, background: CARD }}>
-                          <Globe size={22} style={{ color: MUTED }} strokeWidth={1.5} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-black text-sm" style={{ color: INK }}>Universal Account</div>
-                          <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>Any wallet · WalletConnect</div>
-                          <p className="text-xs mt-2 leading-relaxed" style={{ color: MUTED }}>Connect any existing wallet or create a new account with any supported provider through WalletConnect.</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => open()}
-                        className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:opacity-80 flex items-center justify-center gap-2 border"
-                        style={{ borderColor: BORDER, background: CARD, color: INK }}
-                      >
-                        <ExternalLink size={14} /> Open Wallet Browser
-                      </button>
-                    </div>
-
-                    <p className="text-[9px] font-mono uppercase tracking-widest text-center" style={{ color: MUTED }}>
-                      Non-custodial · Your keys, your assets · Zero server access
+                    <p className="mt-5 text-[9px] font-mono uppercase tracking-widest text-center" style={{ color: MUTED }}>
+                      Non-custodial · Institutional Grade · Zero server access
                     </p>
                   </>
                 )}
