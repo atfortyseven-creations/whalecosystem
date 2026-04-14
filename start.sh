@@ -1,15 +1,22 @@
 #!/bin/sh
 # ─────────────────────────────────────────────────────────────────────────────
-# SOVEREIGN TERMINAL — INSTITUTIONAL BOOT SEQUENCE
-# Atomic, crash-proof, zero-dependency initialization protocol.
-# All processes are orchestrated by PM2-runtime for self-healing resilience.
+# SOVEREIGN TERMINAL — CRASH-PROOF BOOT SEQUENCE
 # ─────────────────────────────────────────────────────────────────────────────
-set -e
+# NOTE: NO set -e — individual command failures must NOT kill the container.
+# Each phase has its own error handling.
 
-echo "[Sovereign] Phase 1: Database alignment..."
-npx prisma generate
-npx prisma migrate deploy
+echo "[Sovereign] ═══════════════════════════════════════════════"
+echo "[Sovereign] Phase 1: Prisma client generation..."
+echo "[Sovereign] ═══════════════════════════════════════════════"
+npx prisma generate || echo "[Sovereign] WARNING: prisma generate failed — continuing anyway"
 
-echo "[Sovereign] Phase 2: Launching PM2 process mesh from /app..."
-# Use absolute path to ecosystem config to prevent CWD resolution failures.
+echo "[Sovereign] ═══════════════════════════════════════════════"
+echo "[Sovereign] Phase 2: Database migration..."
+echo "[Sovereign] ═══════════════════════════════════════════════"
+npx prisma migrate deploy || echo "[Sovereign] WARNING: migrate deploy failed — DB may be at latest schema"
+
+echo "[Sovereign] ═══════════════════════════════════════════════"
+echo "[Sovereign] Phase 3: Launching PM2 process mesh..."
+echo "[Sovereign] Port: ${PORT:-3000}"
+echo "[Sovereign] ═══════════════════════════════════════════════"
 exec ./node_modules/.bin/pm2-runtime start /app/ecosystem.config.json

@@ -4,29 +4,29 @@
       "name": "sovereign-web",
       "script": "node_modules/next/dist/bin/next",
       "args": "start",
-      "cwd": ".",
+      "cwd": "/app",
       "interpreter": "node",
       "instances": 1,
       "exec_mode": "fork",
       "env": {
         "NODE_ENV": "production",
         "HOSTNAME": "0.0.0.0",
-        "PORT": "3000",
         "NODE_OPTIONS": "--max-old-space-size=2048"
       },
       "max_memory_restart": "1800M",
       "restart_delay": 3000,
       "exp_backoff_restart_delay": 200,
-      "max_restarts": 10,
+      "max_restarts": 15,
       "watch": false,
       "kill_timeout": 5000,
-      "wait_ready": false
+      "wait_ready": false,
+      "autorestart": true
     },
     {
       "name": "sovereign-worker",
       "script": "node_modules/.bin/tsx",
       "args": "scripts/whale-worker.ts",
-      "cwd": ".",
+      "cwd": "/app",
       "interpreter": "none",
       "instances": 1,
       "exec_mode": "fork",
@@ -35,11 +35,12 @@
         "WHALE_WORKER_FORCE_START": "true"
       },
       "max_memory_restart": "800M",
-      "restart_delay": 5000,
-      "exp_backoff_restart_delay": 300,
-      "max_restarts": 10,
+      "restart_delay": 10000,
+      "exp_backoff_restart_delay": 500,
+      "max_restarts": 5,
       "watch": false,
-      "kill_timeout": 5000
+      "kill_timeout": 5000,
+      "autorestart": true
     }
   ]
 }
