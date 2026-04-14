@@ -27,7 +27,10 @@ export function MobileLanding() {
 
   const handleEntry = () => {
     if (address) router.push("/dashboard");
-    else openConnectModal?.();
+    else {
+      console.log("[Mobile] Opening Cryptographic Vault...");
+      openConnectModal();
+    }
   };
 
   return (
@@ -262,7 +265,15 @@ export function MobileLanding() {
 
       <AnimatePresence>
         {showScanner && (
-          <DynamicQRScannerModal isOpen={showScanner} onClose={() => setShowScanner(false)} onScan={(data: string) => alert(data)} />
+          <DynamicQRScannerModal 
+            isOpen={showScanner} 
+            onClose={() => setShowScanner(false)} 
+            onScan={() => {
+                setShowScanner(false);
+                // Redirect or show success
+                setTimeout(() => router.push("/dashboard"), 500);
+            }} 
+          />
         )}
       </AnimatePresence>
     </div>

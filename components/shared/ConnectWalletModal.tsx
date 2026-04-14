@@ -132,8 +132,8 @@ export function ConnectWalletModal() {
                                 <Shield size={14} className="text-[#050505]" />
                             </div>
                             <div>
-                                <div className="text-[12px] font-black text-[#050505] uppercase tracking-widest leading-none">Connect Wallet</div>
-                                <div className="text-[9px] font-mono text-black/50 uppercase tracking-widest mt-1">Secure Portal</div>
+                                <div className="text-[12px] font-black text-[#050505] uppercase tracking-widest leading-none">Cryptographic Vault</div>
+                                <div className="text-[9px] font-mono text-black/50 uppercase tracking-widest mt-1">Sovereign Connection Portal</div>
                             </div>
                         </div>
                         <button onClick={closeConnectModal} className="text-black/40 hover:text-black hover:bg-black/5 transition-colors p-2 rounded-full">
@@ -255,7 +255,6 @@ export function ConnectWalletModal() {
                                                 </div>
                                             )}
                                         </div>
-                                    </div>
 
                                     {/* Console Log */}
                                     {isPolling && (

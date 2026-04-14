@@ -1,122 +1,138 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Camera, Image as ImageIcon, Zap } from 'lucide-react';
+import { X, Shield } from 'lucide-react';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { useAccount } from 'wagmi';
 
 interface QRScannerModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onScan: (data: string) => void;
+    onScan?: (data: string) => void;
 }
 
 export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerModalProps) {
     const [error, setError] = useState<string | null>(null);
-    const videoRef = React.useRef<HTMLVideoElement>(null);
+    const [scanning, setScanning] = useState(false);
+    const { address } = useAccount();
+    const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
-    React.useEffect(() => {
-        let stream: MediaStream | null = null;
-
+    useEffect(() => {
         if (isOpen) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then((s) => {
-                    stream = s;
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = stream;
-                    }
-                })
-                .catch((err) => {
-                    console.error("Camera error:", err);
-                    setError("Unable to access camera. Please ensure permissions are granted.");
-                });
+            setScanning(true);
+            // Wait for DOM to be ready
+            const timer = setTimeout(() => {
+                try {
+                    const scanner = new Html5QrcodeScanner(
+                        "qr-reader",
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        /* verbose= */ false
+                    );
+                    scannerRef.current = scanner;
+
+                    scanner.render(async (decodedText) => {
+                        console.log("[QR:Scan] Detected:", decodedText);
+                        try {
+                            const url = new URL(decodedText);
+                            const sessionId = url.searchParams.get("session");
+                            
+                            if (sessionId && address) {
+                                // Execute Handshake
+                                const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ address })
+                                });
+
+                                if (res.ok) {
+                                    scanner.clear().catch(console.error);
+                                    setScanning(false);
+                                    if (onScan) onScan(decodedText);
+                                    setTimeout(() => onClose(), 1000);
+                                } else {
+                                    setError("Handshake failed. Refresh the PC code.");
+                                }
+                            } else if (!address) {
+                                setError("Connect your mobile wallet first.");
+                            }
+                        } catch (e) {
+                            console.error("[QR:Error] Parse failure:", e);
+                        }
+                    }, (err) => {
+                        // Scan errors are noisy, ignore them
+                    });
+                } catch (e) {
+                    console.error("Scanner init error:", e);
+                    setError("Camera access required for Sovereign Sync.");
+                }
+            }, 300);
+            return () => clearTimeout(timer);
         }
 
         return () => {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+            if (scannerRef.current) {
+                scannerRef.current.clear().catch(console.error);
+                scannerRef.current = null;
             }
         };
-    }, [isOpen]);
+    }, [isOpen, address, onClose, onScan]);
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl">
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/95 backdrop-blur-2xl">
                     
-                    {/* Close Button */}
                     <button 
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-50"
+                        className="absolute top-6 right-6 p-4 rounded-full bg-[#050505]/5 text-[#050505] hover:bg-[#050505]/10 transition-all z-50 border border-[#050505]/10"
                     >
                         <X size={24} />
                     </button>
 
                     <motion.div 
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        className="w-full max-w-md h-[80vh] flex flex-col items-center justify-center relative"
+                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                        className="w-full max-w-md flex flex-col items-center px-6 relative"
                     >
-                        {/* Scanner Frame */}
-                        <div className="relative w-72 h-72 border-2 border-white/20 rounded-3xl overflow-hidden shadow-[0_0_100px_-20px_rgba(168,85,247,0.5)] bg-black">
-                            
-                            {/* Camera Feed */}
+                        <div className="flex items-center gap-3 mb-8">
+                             <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
+                             <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">Link Session</h2>
+                        </div>
+
+                        <div className="relative w-full aspect-square max-w-[320px] bg-white border border-[#050505]/10 rounded-[32px] overflow-hidden shadow-2xl flex items-center justify-center">
                             {!error ? (
-                                <video 
-                                    ref={videoRef}
-                                    autoPlay 
-                                    playsInline 
-                                    muted 
-                                    className="w-full h-full object-cover"
-                                />
+                                <div id="qr-reader" className="w-full h-full !border-none" />
                             ) : (
-                                <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
-                                    <p className="text-red-400 text-sm font-bold">{error}</p>
+                                <div className="p-8 text-center space-y-4">
+                                    <Shield size={32} className="mx-auto text-red-500 opacity-50" />
+                                    <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">{error}</p>
+                                    <button 
+                                        onClick={() => setError(null)}
+                                        className="text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 bg-black text-white rounded-full"
+                                    >
+                                        RETRY
+                                    </button>
                                 </div>
                             )}
 
-                            {/* Scanning Animation Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/10 to-transparent w-full h-full animate-scan pointer-events-none" />
-                            <div className="absolute top-0 left-0 w-full h-1 bg-purple-500 shadow-[0_0_20px_#a855f7] animate-scan-line pointer-events-none" />
-
-                            {/* Corner Accents */}
-                            <div className="absolute top-4 left-4 w-8 h-8 border-t-4 border-l-4 border-purple-500 rounded-tl-xl pointer-events-none" />
-                            <div className="absolute top-4 right-4 w-8 h-8 border-t-4 border-r-4 border-purple-500 rounded-tr-xl pointer-events-none" />
-                            <div className="absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 border-purple-500 rounded-bl-xl pointer-events-none" />
-                            <div className="absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 border-purple-500 rounded-br-xl pointer-events-none" />
+                            {scanning && !error && (
+                                <div className="absolute inset-0 pointer-events-none">
+                                    <div className="absolute inset-x-8 top-1/2 h-[2px] bg-black/10 animate-pulse" />
+                                    <div className="absolute inset-4 border-2 border-dashed border-black/5 rounded-2xl" />
+                                </div>
+                            )}
                         </div>
 
-                        {/* Instructions */}
-                        <div className="mt-8 text-center space-y-2">
-                            <h3 className="text-xl font-bold text-white">Scan QR Code</h3>
-                            <p className="text-white/50 text-sm max-w-[200px] mx-auto">
-                                Point camera at a Wallet address or WalletConnect QR
+                        <div className="mt-10 text-center space-y-3">
+                            <p className="text-[12px] text-[#050505]/60 leading-relaxed font-semibold max-w-[280px]">
+                                Point your camera at the QR code displayed on the PC terminal to synchronize instantly.
                             </p>
                         </div>
-
-                        {/* Actions */}
-                        <div className="mt-8 flex gap-4">
-                            <button className="flex flex-col items-center gap-2 text-white/50 hover:text-white transition-colors">
-                                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                                    <ImageIcon size={20} />
-                                </div>
-                                <span className="text-xs">Upload</span>
-                            </button>
-                            <button className="flex flex-col items-center gap-2 text-white/50 hover:text-white transition-colors">
-                                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                                    <Zap size={20} />
-                                </div>
-                                <span className="text-xs">Flash</span>
-                            </button>
-                        </div>
-
                     </motion.div>
                 </div>
             )}
         </AnimatePresence>
     );
 }
-
-// Add these animations to your global css or tailwind config
-// @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
-

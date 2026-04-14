@@ -9,7 +9,7 @@ import {
     Save, Search, Shield, BookOpen, GraduationCap, Link2, Globe,
     Database, Bell, CheckCircle2, AlertCircle, Lock, BarChart2, Newspaper,
     Star, Eye, ArrowUpRight, ArrowDownRight, Flame, Layers,
-    Hash, Activity as ActivityIcon, Clock, Users, DollarSign
+    Hash, Activity as ActivityIcon, Clock, Users, DollarSign, LifeBuoy
 } from 'lucide-react';
 import { SovereignBridge } from '@/components/premium/SovereignBridge';
 import { WhaleLogo } from '../shared/WhaleLogo';
@@ -63,7 +63,7 @@ type DashboardTab =
     | 'dashboard' | 'watchlist' | 'alerts' | 'live-txs' | 'multicharts'
     | 'new-pairs' | 'gainers-losers' | 'whale-tracker' | 'market-news'
     | 'api' | 'security' | 'visual-graph' | 'vault' | 'block-explorer'
-    | 'portfolio' | 'academy' | 'bitcoin-net' | 'support' | 'exchange' | 'premium';
+    | 'portfolio' | 'academy' | 'bitcoin-net' | 'support' | 'exchange' | 'premium' | 'library';
 
 // ─── Sidebar nav data ──────────────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -100,9 +100,10 @@ const NAV_GROUPS = [
     {
         label: 'Resources',
         items: [
-            { id: 'academy',     icon: GraduationCap, label: 'Academy' },
+            { id: 'academy',     icon: GraduationCap, label: 'Whale Academy' },
+            { id: 'library',     icon: BookOpen,      label: 'The Library' },
+            { id: 'support',     icon: LifeBuoy,      label: 'Support Hub' },
             { id: 'bitcoin-net', icon: Cpu,           label: 'Bitcoin Network' },
-            { id: 'support',     icon: BookOpen,      label: 'Support Center' },
             { id: 'exchange',    icon: Link2,          label: 'Connect Exchange' },
         ],
     },
@@ -198,7 +199,7 @@ function DashboardOverview() {
         { time: '08:11', msg: '500K USDC bridge: Arbitrum → Ethereum', type: 'info' },
     ];
     return (
-        <div className="p-6 space-y-6 h-full overflow-y-auto">
+        <div className="p-6 space-y-6">
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Dashboard</h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Institutional intelligence overview</p>
@@ -236,7 +237,7 @@ function WatchlistPanel() {
         { sym: 'LINK', name: 'Chainlink',   price: '$17.44',    change: 3.9,  vol: '$390M'  },
     ];
     return (
-        <div className="p-6 space-y-4 h-full overflow-y-auto">
+        <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Watchlist</h2>
@@ -287,7 +288,7 @@ function AlertsPanel() {
     ];
     const colors: Record<string, string> = { success: T.green, alert: T.red, warning: T.gold, info: T.teal };
     return (
-        <div className="p-6 space-y-4 h-full overflow-y-auto">
+        <div className="p-6 space-y-4">
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Alerts</h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Event telemetry · Live infrastructure audit</p>
@@ -331,7 +332,7 @@ function LiveTransactionsPanel() {
     ];
     const typeColor: Record<string,string> = { TRANSFER: T.teal, SWAP: T.blue, LIQUIDATION: T.red, BRIDGE: T.gold };
     return (
-        <div className="p-6 space-y-4 h-full overflow-y-auto">
+        <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Live Transactions</h2>
@@ -371,7 +372,7 @@ function LiveTransactionsPanel() {
 function MultichartsPanel() {
     const pairs = ['ETH/USDT','BTC/USDT','SOL/USDT','ARB/USDT'];
     return (
-        <div className="p-6 space-y-4 h-full overflow-y-auto">
+        <div className="p-6 space-y-4">
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Multicharts</h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Multi-pair analysis · Real-time candlesticks</p>
@@ -409,7 +410,7 @@ function MarketNewsPanel() {
     ];
     const impactColor: Record<string,string> = { bullish: T.green, bearish: T.red, neutral: 'rgba(255,255,255,0.3)' };
     return (
-        <div className="p-6 space-y-4 h-full overflow-y-auto">
+        <div className="p-6 space-y-4">
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Market News</h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Institutional intelligence · Curated feed</p>
@@ -435,7 +436,7 @@ function MarketNewsPanel() {
 
 function VisualGraphPanel() {
     return (
-        <div className="p-6 h-full overflow-y-auto space-y-4">
+        <div className="p-6 space-y-4">
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Visual Graph</h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>On-chain topology · Wallet relationship mapping</p>
@@ -474,7 +475,7 @@ function AcademyPanel() {
         { level: '04', title: 'Smart Contract Auditing',desc: 'Vulnerability classes, static analysis, and formal verification.',     tag: 'Expert' },
     ];
     return (
-        <div className="p-6 space-y-4 h-full overflow-y-auto">
+        <div className="p-6 space-y-4">
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Academy</h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Institutional-grade education · On-chain mastery</p>
@@ -522,7 +523,8 @@ function renderTabContent(tab: DashboardTab) {
         case 'vault':         return <AkashicLedger />;
         case 'block-explorer':return <OmniExplorer />;
         case 'portfolio':     return <PortfolioDashboard />;
-        case 'academy':       return <AcademyPanel />;
+        case 'academy':       return <WhaleAcademy />;
+        case 'library':       return <WhaleAcademy />; // Library content handled within Academy framework
         case 'bitcoin-net':   return <BitcoinPrimitives />;
         case 'support':       return <WhaleSupport />;
         case 'exchange':      return <ConnectExchange />;
@@ -542,7 +544,8 @@ const TAB_LABELS: Record<DashboardTab, string> = {
     'whale-tracker':'Whale Tracker','market-news':'Market News','api':'API Access',
     'security':'Security Center','visual-graph':'Visual Graph','vault':'Secure Vault',
     'block-explorer':'Block Explorer','portfolio':'My Portfolio','academy':'Academy',
-    'bitcoin-net':'Bitcoin Network','support':'Support Center','exchange':'Connect Exchange','premium':'Premium Pass',
+    'bitcoin-net':'Bitcoin Network','support':'Support Hub','exchange':'Connect Exchange','premium':'Premium Pass',
+    'library': 'The Library'
 };
 
 // ─── Main Shell ────────────────────────────────────────────────────────────────
@@ -746,7 +749,7 @@ export function DashboardShell() {
                     </header>
 
                     {/* Tab content */}
-                    <div className="flex-1 overflow-hidden relative">
+                    <div className="flex-1 overflow-y-auto relative bg-[#0B0E11] scrollbar-hide">
                         <Suspense fallback={<TabLoader/>}>
                             <AnimatePresence mode="wait">
                                 <motion.div
@@ -755,7 +758,6 @@ export function DashboardShell() {
                                     animate={{ opacity:1, y:0 }}
                                     exit={{ opacity:0, y:-6 }}
                                     transition={{ duration:0.18, ease:'easeOut' }}
-                                    className="absolute inset-0 overflow-y-auto scrollbar-hide"
                                 >
                                     {renderTabContent(tab)}
                                 </motion.div>
