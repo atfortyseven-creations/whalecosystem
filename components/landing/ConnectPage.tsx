@@ -7,8 +7,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, ExternalLink, Shield, ArrowRight, Loader2, Twitter } from "lucide-react";
 import dynamic from "next/dynamic";
 import { coinbaseWallet, injected } from "wagmi/connectors";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { CelestialMeshBackground } from "./CelestialMeshBackground";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 // QR code renderer using qrcode.react
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
@@ -58,13 +59,15 @@ export default function ConnectPage() {
   const sessionIdParam = searchParams.get("session");
   const { isConnected, address } = useAccount();
   const { connect, isPending } = useConnect();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
 
   const [mounted, setMounted] = useState(false);
   const [justConnected, setJustConnected] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">("IDLE");
+  const [showScanner, setShowScanner] = useState(false);
   const qrRef = useRef<string | null>(null);
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { qrRef.current = qrSession; }, [qrSession]);
@@ -111,22 +114,73 @@ export default function ConnectPage() {
   useEffect(() => {
     if (!mounted) return;
     const fromDisconnect = sessionStorage.getItem("__disconnected__");
-    if (isConnected && !fromDisconnect) router.replace("/");
+    if (isConnected && !fromDisconnect) {
+        // If we are on mobile, instead of redirecting immediately, we might want to show the scanner
+        if (window.innerWidth < 1024 && !sessionIdParam) {
+            setShowScanner(true);
+        } else {
+            router.replace("/");
+        }
+    }
     if (fromDisconnect) sessionStorage.removeItem("__disconnected__");
-  }, [mounted, isConnected, router]);
+  }, [mounted, isConnected, router, sessionIdParam]);
 
   // Celebrate → redirect
   useEffect(() => {
     if (!mounted || !isConnected) return;
+    if (window.innerWidth < 1024 && !sessionIdParam && !justConnected) {
+       setShowScanner(true);
+       return;
+    }
     setJustConnected(true);
-    setTimeout(() => router.replace("/"), 1800);
-  }, [isConnected, mounted, router]);
+    if (!showScanner) {
+        setTimeout(() => router.replace("/"), 1800);
+    }
+  }, [isConnected, mounted, router, sessionIdParam, showScanner]);
 
   const handleInjected = () => connect({ connector: injected() });
   const handleCoinbase = () => connect({ 
     connector: coinbaseWallet({ preference: 'smartWalletOnly' }) 
   });
-  const handleWC = () => openConnectModal?.();
+  const handleWC = () => open();
+
+  // Initialize Scanner when showScanner is true
+  useEffect(() => {
+    if (showScanner && mounted) {
+      setTimeout(() => {
+        if (!scannerRef.current) {
+          scannerRef.current = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+          scannerRef.current.render((decodedText) => {
+             // Expecting a URL like /connect?session=xxx
+             try {
+                const url = new URL(decodedText);
+                const sessionFromQr = url.searchParams.get("session");
+                if (sessionFromQr && address) {
+                   scannerRef.current?.clear();
+                   fetch(`/api/auth/qr-session?id=${sessionFromQr}`, {
+                     method: "POST",
+                     body: JSON.stringify({ address })
+                   }).then(() => {
+                     setSyncStatus("SYNCED");
+                     setJustConnected(true);
+                     setShowScanner(false);
+                     setTimeout(() => { window.location.href = "/"; }, 1500);
+                   });
+                }
+             } catch (e) {
+                console.error("Invalid QR Code", e);
+             }
+          }, undefined);
+        }
+      }, 100);
+    }
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
+      }
+    };
+  }, [showScanner, mounted, address]);
 
   // Handshake mobile session to desktop
   useEffect(() => {
@@ -198,6 +252,29 @@ export default function ConnectPage() {
               <p className="font-mono text-[10px] uppercase tracking-widest text-[#050505]/30 font-bold">
                 Entering terminal…
               </p>
+            </motion.div>
+
+          ) : showScanner ? (
+            /* ── SCANNER FOR MOBILE ── */
+            <motion.div
+              key="scanner"
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center p-8 w-full max-w-md bg-white border border-[#050505]/10 rounded-3xl shadow-2xl"
+            >
+               <div className="flex items-center gap-3 mb-6">
+                 <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
+                 <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">Link Session</h2>
+               </div>
+               <p className="text-[12px] text-[#050505]/50 mb-6 leading-relaxed font-semibold text-center">
+                 Scan the QR code displayed on your PC screen to sync your connection securely.
+               </p>
+               <div className="w-full aspect-square max-w-[300px] mb-4 relative overflow-hidden rounded-2xl border-4 border-[#050505]/5">
+                 <div id="reader" className="w-full h-full bg-[#FAF9F6] !border-none" />
+               </div>
+               <button onClick={() => { setShowScanner(false); setJustConnected(true); setTimeout(() => router.replace("/"), 1000); }} className="text-[10px] font-mono uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] transition-colors mt-4">
+                 Skip & Enter Terminal
+               </button>
             </motion.div>
 
           ) : (

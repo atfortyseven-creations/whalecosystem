@@ -206,7 +206,7 @@ export function PremiumMatrixStack() {
         : PERFECTION_TOKENS.slice(5, 10);
 
     return (
-        <div className="w-full h-full flex flex-col space-y-8 animate-in fade-in duration-700 font-sans pb-16">
+        <div className="w-full h-full flex flex-col space-y-8 animate-in fade-in duration-700 font-sans pb-10 overflow-y-auto msv-hide-scrollbar">
 
             {/* ─── DRAGGABLE STAT CARDS ─── */}
             <Reorder.Group

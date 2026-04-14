@@ -178,7 +178,7 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex min-h-screen bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
+        <div className="flex h-[100dvh] overflow-hidden bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
@@ -270,8 +270,8 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF]">
-                    <div className="flex-1 relative z-10">
+                <main className="flex-1 relative flex flex-col overflow-hidden transition-colors duration-300 bg-[#EFEFEF]">
+                    <div className="flex-1 relative z-10 overflow-y-auto no-scrollbar">
                         
                         {/* Immersive radial glow overlay to focus center */}
                         <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.3)_0%,transparent_80%)] transition-colors duration-300" />

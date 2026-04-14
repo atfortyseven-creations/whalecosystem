@@ -49,7 +49,8 @@ export function ZKShieldStation() {
     };
 
     return (
-        <div className="h-full w-full bg-[#FFFFFF] text-[#050505] font-sans flex flex-col overflow-hidden">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col items-center p-4">
+        <div className="h-full min-h-[600px] w-full bg-[#FFFFFF] text-[#050505] border border-[#E5E5E5] rounded-2xl font-sans flex flex-col overflow-hidden shrink-0 shadow-sm">
             
             {/* ── ACADEMIC INTRO ── */}
             <div className="p-8 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between shrink-0">
@@ -138,6 +139,7 @@ export function ZKShieldStation() {
                <span>Non-Custodian Isolation Engine</span>
             </div>
 
+        </div>
         </div>
     );
 }

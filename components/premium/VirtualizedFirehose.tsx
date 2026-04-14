@@ -20,16 +20,16 @@ const AutoSizer = dynamic<any>(
 // SKELETON COMPONENT
 // ============================================================================
 const FirehoseSkeleton = () => (
-    <div className="w-full flex flex-col gap-2 p-4 border-b border-[#111111]">
+    <div className="w-full flex flex-col gap-2 p-4 border-b border-[#E5E5E5] bg-white">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 w-1/4">
-                <div className="h-2 w-12 bg-white/5 rounded animate-pulse" />
-                <div className="h-3 w-16 bg-white/10 rounded animate-pulse" />
+                <div className="h-2 w-12 bg-black/5 rounded animate-pulse" />
+                <div className="h-3 w-16 bg-black/10 rounded animate-pulse" />
             </div>
-            <div className="h-4 w-24 bg-white/10 rounded animate-pulse" />
+            <div className="h-4 w-24 bg-black/10 rounded animate-pulse" />
             <div className="flex flex-col items-end gap-1 w-1/2">
-                <div className="h-3 w-20 bg-white/10 rounded animate-pulse" />
-                <div className="h-2 w-16 bg-white/5 rounded animate-pulse" />
+                <div className="h-3 w-20 bg-black/10 rounded animate-pulse" />
+                <div className="h-2 w-16 bg-black/5 rounded animate-pulse" />
             </div>
         </div>
     </div>
@@ -61,15 +61,15 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className={`w-full h-full flex flex-col justify-center border-b border-[#111111] ${bgPulse} hover:bg-[#1A1A1A] transition-colors cursor-pointer rounded-sm px-4`}
+                className={`w-full h-full flex flex-col justify-center border-b border-[#E5E5E5] ${bgPulse} hover:bg-[#FAF9F6] bg-white transition-colors cursor-pointer rounded-sm px-4`}
             >
                 <div className="flex items-center justify-between">
                     {/* LEFT: Time & Token */}
                     <div className="flex items-center gap-4 w-1/4">
-                        <span className="text-[10px] font-mono text-[#555555] tracking-widest">{timeString}</span>
+                        <span className="text-[10px] font-mono text-[#888888] tracking-widest">{timeString}</span>
                         <div className="flex items-center gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full ${isBuy ? 'bg-[#00C076]' : isSell ? 'bg-[#FF3B30]' : 'bg-[#D4AF37]'}`} />
-                            <span className="text-xs font-black text-white tracking-widest">{event.token}</span>
+                            <span className="text-xs font-black text-[#050505] tracking-widest">{event.token}</span>
                         </div>
                     </div>
 
@@ -79,7 +79,7 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
                             {isBuy ? '+' : isSell ? '-' : ''}
                             {(parseFloat(event.amount) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} {event.token}
                         </span>
-                        <span className="text-[10px] font-mono text-white/50 tracking-widest uppercase">
+                        <span className="text-[10px] font-mono text-[#888888] tracking-widest uppercase">
                             ${(event.usdNum || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </span>
                     </div>
@@ -87,17 +87,17 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
                     {/* RIGHT: Action & Wallet */}
                     <div className="flex items-center justify-end gap-6 w-1/2">
                         <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 border border-[#333] text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] rounded-sm">
+                            <span className="px-2 py-0.5 border border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.2em] rounded-sm">
                                 {event.action}
                             </span>
-                            <ArrowRight size={10} className="text-[#333333]" />
+                            <ArrowRight size={10} className="text-[#888888]" />
                             <span className="text-[11px] font-mono text-[#D4AF37] uppercase tracking-widest">
                                 {event.dex}
                             </span>
                         </div>
                         <div className="flex flex-col items-end">
-                            <span className="text-[11px] font-black tracking-widest text-white uppercase">{event.label}</span>
-                            <span className="text-[9px] font-mono text-[#555555]">
+                            <span className="text-[11px] font-black tracking-widest text-[#050505] uppercase">{event.label}</span>
+                            <span className="text-[9px] font-mono text-[#888888]">
                                 {event.wallet.substring(0, 6)}...{event.wallet.slice(-4)}
                             </span>
                         </div>
@@ -139,13 +139,14 @@ export function VirtualizedFirehose() {
     };
 
     return (
-        <div className="w-full h-full flex flex-col bg-[#020202] border border-[#222222] rounded-sm shadow-[4px_4px_0_0_#050505] relative group">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex items-start justify-center p-4">
+        <div className="w-full h-full min-h-[600px] shrink-0 flex flex-col bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl shadow-sm relative group">
 
             {/* HEADER */}
-            <div className="flex items-center justify-between p-4 border-b border-[#222222] bg-[#050505]">
+            <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5] bg-[#FAF9F6] rounded-t-xl">
                 <div className="flex items-center gap-3">
                     <Activity size={16} className="text-[#00C076] animate-pulse" />
-                    <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-white">
+                    <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#050505]">
                         Global Liquidity Firehose
                     </h2>
                     <span className="px-2 py-0.5 bg-[#00C076]/10 border border-[#00C076]/30 text-[#00C076] text-[9px] font-black rounded-sm">
@@ -177,11 +178,11 @@ export function VirtualizedFirehose() {
             >
                 {/* Empty State / Skeleton — shown briefly before bootstrap kicks in */}
                 {(!isMounted || whaleEvents.length === 0) && (
-                    <div className="absolute inset-0 z-10 bg-[#020202] flex flex-col">
+                    <div className="absolute inset-0 z-10 bg-[#FFFFFF] flex flex-col">
                         {Array.from({ length: 10 }).map((_, i) => <FirehoseSkeleton key={i} />)}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 backdrop-blur-sm">
-                            <Zap size={24} className="text-[#00FF55] animate-pulse" />
-                            <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/40 backdrop-blur-sm">
+                            <Zap size={24} className="text-[#00C076] animate-pulse" />
+                            <span className="text-[10px] font-black text-[#050505] uppercase tracking-[0.3em]">
                                 Syncing Neurometric Feeds…
                             </span>
                         </div>
@@ -209,8 +210,8 @@ export function VirtualizedFirehose() {
                 )}
 
                 {/* Fade gradients */}
-                <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#020202] to-transparent pointer-events-none z-10" />
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#020202] to-transparent pointer-events-none z-10" />
+                <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[#FFFFFF] to-transparent pointer-events-none z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#FFFFFF] to-transparent pointer-events-none z-10" />
 
                 {/* Floating "Jump to Top" / Resume Control */}
                 <AnimatePresence>
@@ -229,19 +230,20 @@ export function VirtualizedFirehose() {
             </div>
 
             {/* FOOTER */}
-            <div className="p-2 border-t border-[#111111] bg-[#050505] flex items-center justify-between">
-                <span className="text-[8px] font-mono text-[#555555] uppercase tracking-[0.3em]">
+            <div className="p-4 border-t border-[#E5E5E5] bg-[#FAF9F6] rounded-b-xl flex items-center justify-between">
+                <span className="text-[8px] font-mono text-[#888888] uppercase tracking-[0.3em]">
                     Powered by Zero-Knowledge Nodes
                 </span>
                 {!autoScroll && (
                     <button 
                         onClick={() => setAutoScroll(true)}
-                        className="text-[8px] font-black text-[#00FF55] uppercase tracking-[0.2em] animate-pulse hover:underline"
+                        className="text-[8px] font-black text-[#00C076] uppercase tracking-[0.2em] animate-pulse hover:underline"
                     >
                         Resume Alpha Feed
                     </button>
                 )}
             </div>
+        </div>
         </div>
     );
 }

@@ -216,7 +216,8 @@ export function GainersLosersPanel() {
     const hasData = allRows.length > 0;
 
     return (
-        <div className="flex flex-col space-y-5">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-4">
+        <div className="flex flex-col space-y-5 h-full min-h-[600px] shrink-0">
 
             {/* ── Summary Cards ── */}
             <div className="grid grid-cols-2 gap-4">
@@ -399,6 +400,7 @@ export function GainersLosersPanel() {
                     </span>
                 </div>
             </div>
+        </div>
         </div>
     );
 }

@@ -293,8 +293,8 @@ export function SovereignVault() {
     };
 
     return (
-        <div className="min-h-full w-full bg-[#FFFFFF] text-[#050505] font-mono p-4 md:p-8 flex flex-col gap-8 overflow-y-auto">
-            <div className="flex flex-col items-start w-full max-w-5xl mx-auto pt-4 pb-8 gap-8">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col items-center bg-[#FFFFFF] text-[#050505] font-mono p-4 md:p-8">
+        <div className="w-full max-w-5xl mx-auto flex flex-col items-start pt-4 gap-8 shrink-0 pb-10 min-h-[600px]">
 
                 <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter flex items-center gap-4 border-b border-[#E5E5E5] pb-6 w-full">
                     <ShieldAlert className="text-[#050505]" size={28} />
@@ -434,6 +434,7 @@ export function SovereignVault() {
                 )}
 
             </div>
+        </div>
         </div>
     );
 }

@@ -128,8 +128,8 @@ export function NewsOfToday() {
     );
 
     return (
-        <div className="w-full flex justify-center py-4 text-[#050505] font-sans">
-            <div className="w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden">
+        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex justify-center py-4 text-[#050505] font-sans">
+            <div className="w-full h-fit bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden shrink-0">
                 
                 {/* ── EXCHANGE STATUS TICKER ── */}
                 <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center px-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 gap-8">

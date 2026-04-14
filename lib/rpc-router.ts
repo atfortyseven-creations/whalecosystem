@@ -18,9 +18,10 @@ function safeParseRPC(envValue: string | undefined, fallback: string): string {
 
 const RPC_POOL: Record<string, RPCEndpoint[]> = {
     SOLANA: [
-        { url: safeParseRPC(process.env.SOLANA_RPC_1, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.SOLANA_RPC_2, 'https://ssc-dao.genesysgo.net'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
-        { url: safeParseRPC(process.env.SOLANA_RPC_3, 'https://solana-api.projectserum.com'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 }
+        { url: safeParseRPC(process.env.SOLANA_RPC_1, 'https://go.getblock.io/d7b69447567646fbbf33146095d32c19'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: safeParseRPC(process.env.SOLANA_RPC_2, 'https://go.getblock.io/3cc93340fea44554a8b3b40d3e071131'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: safeParseRPC(process.env.SOLANA_RPC_3, 'https://api.mainnet-beta.solana.com'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },
+        { url: safeParseRPC(process.env.SOLANA_RPC_4, 'https://ssc-dao.genesysgo.net'), chain: 'SOLANA', latencyMs: 0, health: 'HEALTHY', errorCount: 0 }
     ],
     ETHEREUM: [
         { url: safeParseRPC(process.env.ETH_RPC_1, 'https://cloudflare-eth.com'), chain: 'ETHEREUM', latencyMs: 0, health: 'HEALTHY', errorCount: 0 },

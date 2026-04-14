@@ -35,6 +35,66 @@ Object.entries(BINANCE_MAP).forEach(([key, val]) => {
 
 export const STEEL_DOME_FALLBACKS: Record<string, number> = {};
 
+// ── WSS ENGINE ──
+let isWsConnected = false;
+let wsConnection: any = null;
+
+function connectBinanceWs() {
+  if (isWsConnected || typeof window !== 'undefined') return;
+  isWsConnected = true;
+
+  try {
+    const url = `wss://stream.binance.com:9443/ws/!ticker@arr`;
+    const WS = globalThis.WebSocket || require('ws');
+    const ws = new WS(url);
+    wsConnection = ws;
+
+    ws.onopen = () => {
+      console.log('[PriceHelper] Binance !ticker@arr WSS Connected - Zero-Latency Feed Active');
+    };
+
+    ws.onmessage = (event: any) => {
+      try {
+        const dataStr = typeof event.data === 'string' ? event.data : event.data.toString();
+        const payload = JSON.parse(dataStr);
+        if (Array.isArray(payload)) {
+          payload.forEach((data: any) => {
+             const symbol = REVERSE_MAP[data.s];
+             if (symbol) {
+               priceCache[symbol] = {
+                 price: parseFloat(data.c),
+                 change24h: parseFloat(data.P),
+                 timestamp: Date.now() // WSS keeps this permanently fresh
+               };
+             }
+          });
+        }
+      } catch (e) {
+        // silent parse error
+      }
+    };
+
+    ws.onerror = (e: any) => {
+      console.warn('[PriceHelper] Binance WSS Error', e.message);
+    };
+
+    ws.onclose = () => {
+      isWsConnected = false;
+      wsConnection = null;
+      console.log('[PriceHelper] Binance WSS Closed. Reconnecting in 5s...');
+      setTimeout(connectBinanceWs, 5000);
+    };
+  } catch (e) {
+    isWsConnected = false;
+  }
+}
+
+// Auto-initialize background WSS stream
+if (typeof window === 'undefined') {
+  setTimeout(connectBinanceWs, 2000);
+}
+// ────────────────
+
 async function getDexScreenerPrice(symbol: string): Promise<number> {
   try {
     const url = `https://api.dexscreener.com/latest/dex/search?q=${symbol}`;

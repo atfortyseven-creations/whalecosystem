@@ -279,7 +279,8 @@ export function GoldTicketPanel() {
   const hasTicket = dbStats?.ticket || false;
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-12 px-6 space-y-12">
+    <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col items-center">
+        <div className="w-full max-w-6xl py-12 px-6 space-y-12 shrink-0">
       
       {/* ── HERO ── */}
       <div className="relative bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl overflow-hidden p-10 md:p-14 shadow-sm">
@@ -380,6 +381,7 @@ export function GoldTicketPanel() {
       )}
 
       <GlobalLedger feed={dbStats?.feed || []} />
+        </div>
     </div>
   );
 }

@@ -57,6 +57,7 @@ const GETBLOCK_PAIRS = [
 const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
   1: {
     rpc: [
+      'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8',
       `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://rpc.ankr.com/eth',
       'https://1rpc.io/eth',
@@ -64,12 +65,15 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://cloudflare-eth.com'
     ],
     wss: [
+      'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
       'wss://ethereum-rpc.publicnode.com',
       'wss://eth.llamarpc.com'
     ]
   },
   56: {
     rpc: [
+      'https://go.getblock.io/e264370bb5e047c38d6c87ec0ab42dff',
+      'https://go.getblock.us/6aca5a5ffeba4f2f933766e547d4e3a3',
       'https://binance.llamarpc.com',
       'https://1rpc.io/bnb',
       'https://bsc-dataseed1.binance.org',
