@@ -3,15 +3,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    LayoutDashboard, Star, Bell, BarChart2, Zap,
+    LayoutDashboard, BarChart2,
     TrendingUp, Code, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, ShieldAlert, Newspaper, LifeBuoy,
-    GraduationCap, Crown, PieChart, Briefcase, Network, Eye
+    GraduationCap
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
 
@@ -25,31 +24,20 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // ── Platform Core ──
-    { id: 'dashboard',       label: 'Dashboard',        icon: <LayoutDashboard size={17}/>, dividerBefore: 'Platform Core' },
-    { id: 'watchlist',       label: 'Watchlist',          icon: <Eye size={17}/> },
-    { id: 'alerts',          label: 'Alerts',        icon: <Bell size={17}/> },
-    { id: 'whale-events',    label: 'Live Transactions',      icon: <TrendingUp size={17}/> },
-    { id: 'multicharts',     label: 'Multicharts',       icon: <BarChart2 size={17}/> },
-    { id: 'new-pairs',       label: 'New Pairs',       icon: <Zap size={17}/> },
-    { id: 'gainers',         label: 'Gainers & Losers',          icon: <TrendingUp size={17}/> },
+    // ── Command ──
+    { id: 'dashboard',       label: 'The Terminal',     icon: <LayoutDashboard size={17}/>, dividerBefore: 'Command' },
+    { id: 'news',            label: 'The Whale Post',   icon: <Newspaper size={17}/> },
+    { id: 'whale-events',    label: 'Mempool Radar',    icon: <TrendingUp size={17}/> },
+    { id: 'multicharts',     label: 'Market Matrices',  icon: <BarChart2 size={17}/> },
     
-    // ── Analysis ──
-    { id: 'whale-portfolio', label: 'Whale Tracker',       icon: <PieChart size={17}/>,        dividerBefore: 'Analysis' },
-    { id: 'news',            label: 'Market News',    icon: <Newspaper size={17}/> },
-    { id: 'api',             label: 'API Access',     icon: <Code size={17}/> },
-    { id: 'zk-shield',       label: 'Security Center',       icon: <Shield size={17}/> },
-    { id: 'neural-graph',    label: 'Visual Graph',       icon: <Network size={17}/> },
-    { id: 'sovereign-vault', label: 'Secure Vault',        icon: <ShieldAlert size={17}/> },
-    { id: 'omni-explorer',   label: 'Block Explorer',      icon: <Search size={17}/> },
-    { id: 'portfolio',       label: 'My Portfolio', icon: <Wallet size={17}/> },
+    // ── Vault ──
+    { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>,        dividerBefore: 'Sovereignty' },
+    { id: 'sovereign-vault', label: 'Cold Storage',     icon: <ShieldAlert size={17}/> },
+    { id: 'api',             label: 'Node Access',      icon: <Code size={17}/> },
     
-    // ── Resources ──
-    { id: 'academy',         label: 'Academy',  icon: <GraduationCap size={17}/>,   dividerBefore: 'Resources' },
-    { id: 'brc-explorer',    label: 'Bitcoin Network',      icon: <Code size={17}/> },
-    { id: 'support',         label: 'Support Center',         icon: <LifeBuoy size={17}/> },
-    { id: 'humanidfi-portfolio', label: 'Connect Exchange',  icon: <Briefcase size={17}/> },
-    { id: 'gold-ticket',     label: 'Premium Pass',       icon: <Crown size={17}/> },
+    // ── Infrastructure ──
+    { id: 'academy',         label: 'The Library',      icon: <GraduationCap size={17}/>,   dividerBefore: 'Infrastructure' },
+    { id: 'support',         label: 'Support Hub',      icon: <LifeBuoy size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -206,7 +194,7 @@ export function WhaleProShell({
                                     </div>
                                 )}
                                 {item.dividerBefore && isCollapsed && (
-                                    <div className="my-2 mx-3 h-px bg-black/10 dark:bg-white/10"/>
+                                    <div className="my-2 mx-3 h-px bg-black/10"/>
                                 )}
                                 <button
                                     onClick={() => onTabChange(item.id)}
@@ -214,8 +202,8 @@ export function WhaleProShell({
                                     className={`
                                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative
                                         ${isActive
-                                                ? 'bg-black/5 dark:bg-white/10 text-black dark:text-white shadow-none border border-black/10 dark:border-white/20'
-                                                : 'text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                                                ? 'bg-black/5 text-black shadow-none border border-black/10'
+                                                : 'text-[#888888] hover:text-black hover:bg-black/5'
                                         }
                                     `}
                                 >
@@ -237,7 +225,7 @@ export function WhaleProShell({
                 <div className="px-3 pb-3 pt-1">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10 dark:border-white/10 text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                        className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10 text-[#888888] hover:text-black hover:bg-black/5 transition-all"
                     >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
@@ -248,7 +236,7 @@ export function WhaleProShell({
             <div className="flex-1 flex flex-col min-w-0 relative">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="h-[56px] border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
+                <header className="h-[56px] border-b border-black/10 bg-white flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
@@ -257,20 +245,19 @@ export function WhaleProShell({
                             onFocus={() => setIsPaletteOpen(true)}
                             onClick={() => setIsPaletteOpen(true)}
                             placeholder="Press ⌘K to search..."
-                            className="w-full bg-transparent border border-black/10 dark:border-white/10 text-black dark:text-white rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#00FF55] transition-all cursor-pointer"
+                            className="w-full bg-transparent border border-black/10 text-black rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#000000] transition-all cursor-pointer"
                         />
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 dark:divide-white/10 flex-1 mx-6 overflow-hidden">
+                    <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 flex-1 mx-6 overflow-hidden">
                         <LiveMarketBand />
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <ThemeToggle />
                         <button
                             onClick={() => setSettingsOpen(true)}
                             title="Open Settings"
-                            className="shrink-0 p-2.5 rounded-full border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 text-[#888888] hover:text-black dark:hover:text-white transition-all flex items-center justify-center w-10 h-10"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 text-[#888888] hover:text-black transition-all flex items-center justify-center w-10 h-10"
                         >
                             <Settings size={18} />
                         </button>
@@ -314,11 +301,11 @@ export function WhaleProShell({
                 </main>
 
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-                <nav className="md:hidden h-16 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] flex items-center justify-around px-2 shrink-0 z-50">
+                <nav className="md:hidden h-16 border-t border-black/10 bg-white flex items-center justify-around px-2 shrink-0 z-50">
                     {[
                         { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
-                        { id: 'whale-events', icon: <TrendingUp size={20} />, label: 'Markets' },
-                        { id: 'portfolio', icon: <Wallet size={20} />, label: 'Portfolio' },
+                        { id: 'whale-events', icon: <TrendingUp size={20} />, label: 'Radar' },
+                        { id: 'portfolio', icon: <Wallet size={20} />, label: 'Vault' },
                         { id: 'zk-shield', icon: <ShieldAlert size={20} />, label: 'Settings' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
@@ -327,7 +314,7 @@ export function WhaleProShell({
                                 key={tab.id}
                                 onClick={() => onTabChange(tab.id)}
                                 className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                                    isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
+                                    isActive ? 'text-black' : 'text-[#888888] hover:text-black'
                                 }`}
                             >
                                 {tab.icon}
@@ -338,7 +325,7 @@ export function WhaleProShell({
                 </nav>
 
                 {/* ─── Status Bar ─── */}
-                <footer className="hidden md:flex h-8 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#000000] items-center justify-between px-6 shrink-0 transition-colors duration-300">
+                <footer className="hidden md:flex h-8 border-t border-black/10 bg-white items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 min-w-[120px]">
                             <Globe size={11} /> Global Latency: 

@@ -3,64 +3,44 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore } from '@/lib/store/settings-store';
-import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { 
-    X, Moon, Sun, DollarSign, Globe2, Shield, 
-    Network, ChevronRight, Settings2, Laptop, LogOut, Trash2, AlertTriangle
+    X, DollarSign, Globe2, Shield, 
+    Network, Settings2, LogOut, Trash2, AlertTriangle,
+    EyeOff, Volume2, Box, Cpu, HardDrive
 } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
 
+// Navigation tabs
+type TabKey = 'general' | 'network' | 'sonar' | 'privacy';
 
 export function GlobalSettingsModal() {
     const { 
-        theme, currency, language, showBalances, allowAnalytics, testnetMode, isSettingsOpen,
-        setTheme, setCurrency, setLanguage, setShowBalances, setAllowAnalytics, setTestnetMode,
-        setSettingsOpen, clearAppData
+        theme, currency, language, layoutDensity, rpcNode, whaleThreshold, audioAlerts, stealthMode,
+        testnetMode, isSettingsOpen,
+        setCurrency, setLanguage, setLayoutDensity, setRpcNode, setWhaleThreshold, setAudioAlerts,
+        setStealthMode, setTestnetMode, setSettingsOpen, clearAppData
     } = useSettingsStore();
 
-    const { setTheme: setNextTheme } = useTheme();
     const { disconnect } = useDisconnect();
-
     const [mounted, setMounted] = useState(false);
+    const [activeTab, setActiveTab] = useState<TabKey>('general');
     const [confirmDisconnect, setConfirmDisconnect] = useState(false);
+    
     useEffect(() => setMounted(true), []);
-
-    // Sync Zustand theme with next-themes DOM
-    useEffect(() => {
-        if (mounted) {
-            setNextTheme(theme);
-        }
-    }, [theme, mounted, setNextTheme]);
 
     if (!mounted) return null;
 
     const handleDisconnect = async () => {
-        // Step 1: Mark disconnect intent BEFORE clearing storage
-        // ConnectPage reads this to skip auto-redirect back to dashboard
         try { sessionStorage.setItem('__disconnected__', '1'); } catch {}
-
-        // Step 2: Wagmi disconnect
         try { disconnect(); } catch {}
 
-        // Step 3: Clear only AUTH-related state.
-        // FIX Bug 19: localStorage.clear() was previously wiping ALL keys including
-        // SOVEREIGN_WATCHLIST_TOKENS/WALLETS — permanently destroying weeks of
-        // curated watchlist data in a single click.
-        // Now we surgically remove only session/auth keys, preserving user data.
         const AUTH_KEYS_TO_REMOVE = [
-            'wagmi.store',
-            'wagmi.cache',
-            'WCM_VERSION',
-            '__WC_MODAL_WEB3MODAL__',
-            'nextauth.message',
-            'hasReadDocs',
+            'wagmi.store', 'wagmi.cache', 'WCM_VERSION',
+            '__WC_MODAL_WEB3MODAL__', 'nextauth.message', 'hasReadDocs',
         ];
-        try {
-            AUTH_KEYS_TO_REMOVE.forEach(k => { try { localStorage.removeItem(k); } catch {} });
-        } catch {}
+        try { AUTH_KEYS_TO_REMOVE.forEach(k => { try { localStorage.removeItem(k); } catch {} }); } catch {}
 
-        // Step 4: Clear auth cookies only (not all cookies)
         try {
             const authCookiePattern = /^(next-auth|session|__Secure|__Host)/;
             document.cookie.split(';').forEach(c => {
@@ -75,8 +55,6 @@ export function GlobalSettingsModal() {
 
         setConfirmDisconnect(false);
         setSettingsOpen(false);
-
-        // Step 5: Hard navigate to /connect — do NOT use router.push (wagmi may re-trigger)
         window.location.replace('/connect');
     };
 
@@ -86,225 +64,245 @@ export function GlobalSettingsModal() {
                 <>
                     {/* Backdrop */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         onClick={() => setSettingsOpen(false)}
-                        className="fixed inset-0 bg-[#050505]/40 backdrop-blur-sm z-[100]"
+                        className="fixed inset-0 bg-[#0A0A0A]/60 backdrop-blur-sm z-[100]"
                     />
 
-                    {/* Drawer (Right Side) */}
+                    {/* Massive Drawer */}
                     <motion.div
                         initial={{ x: '100%', opacity: 0.5 }}
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: '100%', opacity: 0.5 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 h-full w-full max-w-md bg-[#FAF9F6] border-l border-[#E5E5E5] z-[101] shadow-2xl overflow-y-auto"
+                        className="fixed top-0 right-0 h-full w-full max-w-3xl bg-[#FAF9F6] border-l border-[#E5E5E5] z-[101] shadow-2xl flex flex-col md:flex-row overflow-hidden"
                     >
-                        <div className="flex flex-col h-full">
-                            {/* Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-[#E5E5E5] bg-white sticky top-0 z-10">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-[#050505] flex items-center justify-center">
-                                        <Settings2 size={16} className="text-white" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-sm font-black text-[#050505] uppercase tracking-widest">Settings</h2>
-                                        <p className="text-[10px] text-[#888888] font-mono">Terminal Environment Variables</p>
-                                    </div>
+                        {/* ─── SIDEBAR TABS ─── */}
+                        <div className="md:w-64 bg-white border-r border-[#E5E5E5] flex flex-col h-full shrink-0">
+                            <div className="flex items-center gap-3 p-6 border-b border-[#E5E5E5]">
+                                <div className="w-8 h-8 rounded-lg bg-[#050505] flex items-center justify-center">
+                                    <Settings2 size={16} className="text-white" />
                                 </div>
-                                <button 
-                                    onClick={() => setSettingsOpen(false)}
-                                    className="p-2 hover:bg-[#F0F0F0] rounded-full transition-colors"
-                                >
-                                    <X size={18} className="text-[#050505]" />
+                                <div>
+                                    <h2 className="text-[12px] font-black text-[#050505] uppercase tracking-widest">Settings</h2>
+                                    <p className="text-[9px] text-[#888888] font-mono">Terminal Variables</p>
+                                </div>
+                                {/* Mobile Close */}
+                                <button onClick={() => setSettingsOpen(false)} className="md:hidden ml-auto p-2">
+                                    <X size={18} />
                                 </button>
                             </div>
 
-                            <div className="p-6 space-y-8 flex-1">
-                                {/* 1. Preferencias */}
-                                <section className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em]">Preferences</h3>
-                                    
-                                    {/* Tema */}
-                                    <div className="bg-white rounded-xl border border-[#E5E5E5] p-1 shadow-sm">
-                                        <div className="flex items-center justify-between p-3 border-b border-[#F0F0F0]">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center">
-                                                    <Sun size={14} className="text-[#050505]" />
-                                                </div>
-                                                <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Theme</span>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-3 gap-1 p-2">
-                                            {[
-                                                { id: 'light', label: 'Light', icon: <Sun size={12}/> },
-                                                { id: 'dark', label: 'Dark', icon: <Moon size={12}/> },
-                                                { id: 'system', label: 'System', icon: <Laptop size={12}/> }
-                                            ].map((t) => (
-                                                <button
-                                                    key={t.id}
-                                                    onClick={() => setTheme(t.id as any)}
-                                                    className={`py-2 flex flex-col items-center justify-center gap-1.5 rounded-lg border transition-all text-[9px] font-black uppercase tracking-wider ${theme === t.id ? 'bg-[#050505] text-[#FAF9F6] border-[#050505]' : 'bg-transparent text-[#888888] border-transparent hover:bg-[#FAF9F6]'}`}
-                                                >
-                                                    {t.icon}
-                                                    {t.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Moneda & Idioma */}
-                                    <div className="bg-white rounded-xl border border-[#E5E5E5] shadow-sm divide-y divide-[#F0F0F0]">
-                                        <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-[#FAF9F6] transition-colors rounded-t-xl" onClick={() => setCurrency(currency === 'USD' ? 'EUR' : 'USD')}>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center">
-                                                    <DollarSign size={14} className="text-[#050505]" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Local Currency</span>
-                                                    <span className="text-[9px] text-[#888888] font-mono">{currency}</span>
-                                                </div>
-                                            </div>
-                                            <ChevronRight size={14} className="text-[#888888]" />
-                                        </div>
-                                        
-                                        <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-[#FAF9F6] transition-colors rounded-b-xl" onClick={() => setLanguage(language === 'es-ES' ? 'en-US' : 'es-ES')}>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] flex items-center justify-center">
-                                                    <Globe2 size={14} className="text-[#050505]" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Language</span>
-                                                    <span className="text-[9px] text-[#888888] font-mono">{language === 'es-ES' ? 'Español (España)' : 'English (US)'}</span>
-                                                </div>
-                                            </div>
-                                            <ChevronRight size={14} className="text-[#888888]" />
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {/* Privacy section removed as per strict system requirements */}
-
-                                {/* 3. Avanzado */}
-                                <section className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-[#FF3B30] uppercase tracking-[0.2em] flex items-center gap-2">
-                                        <Shield size={10} /> Advanced
-                                    </h3>
-                                    
-                                    <div className="bg-white rounded-xl border border-[#FF3B30]/20 shadow-sm overflow-hidden">
-                                        <div className="flex items-center justify-between p-4 border-b border-[#F0F0F0]">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-7 h-7 rounded-md bg-[#FAF9F6] border border-[#FF3B30]/20 flex items-center justify-center">
-                                                    <Network size={14} className="text-[#FF3B30]" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">Testnet Mode</span>
-                                                    <span className="text-[9px] text-[#888888]">Enable Testnets (Sepolia, Goerli)</span>
-                                                </div>
-                                            </div>
-                                            <Toggle enabled={testnetMode} setEnabled={setTestnetMode} emergency />
-                                        </div>
-
-                                        <div className="flex items-center justify-between p-4 border-b border-[#F0F0F0] bg-[#FAF9F6]">
-                                            <div className="flex items-center gap-3 opacity-80">
-                                                <div className="w-7 h-7 rounded-md border border-[#E5E5E5] flex items-center justify-center">
-                                                    <Trash2 size={14} className="text-[#050505]" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider">App Data</span>
-                                                    <span className="text-[9px] text-[#888888]">Purge cache and cookies</span>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={() => {
-                                                    if(confirm("¿Estás seguro de que deseas eliminar permanentemente todos los datos de sesión locales?")) {
-                                                        clearAppData();
-                                                    }
-                                                }}
-                                                className="px-3 py-1.5 rounded-lg border border-[#FF3B30] text-[9px] font-black uppercase text-[#FF3B30] hover:bg-[#FF3B30] hover:text-white transition-colors"
-                                            >
-                                                Clear Data
-                                            </button>
-                                        </div>
-                                        
-                                        {/* Disconnect Account Button */}
-                                        <AnimatePresence mode="wait">
-                                        {!confirmDisconnect ? (
-                                            <motion.div
-                                                key="disconnect-idle"
-                                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                                className="flex items-center justify-between p-4 bg-[#FFF5F5] transition-colors border-t border-[#FF3B30]/10"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-7 h-7 rounded-md border border-[#FF3B30]/30 bg-white flex items-center justify-center">
-                                                        <LogOut size={14} className="text-[#FF3B30]" />
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider">Disconnect Account</span>
-                                                        <span className="text-[9px] text-[#FF3B30]/60">End session · Returns to wallet selector</span>
-                                                    </div>
-                                                </div>
-                                                <button 
-                                                    onClick={() => setConfirmDisconnect(true)}
-                                                    className="px-4 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white shadow-sm hover:bg-[#D32F2F] transition-all active:scale-95"
-                                                >
-                                                    Disconnect
-                                                </button>
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                key="disconnect-confirm"
-                                                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                                                className="flex flex-col gap-3 p-4 bg-[#FF3B30]/5 border-t border-[#FF3B30]/20"
-                                            >
-                                                <div className="flex items-center gap-2 text-[10px] font-black text-[#FF3B30] uppercase tracking-widest">
-                                                    <AlertTriangle size={13} />
-                                                    Confirm Disconnect
-                                                </div>
-                                                <p className="text-[9px] text-[#888888] font-mono leading-relaxed">
-                                    Your wallet will be fully disconnected. You will be taken to the connection screen — no automatic reconnect.
-                                </p>
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        onClick={() => setConfirmDisconnect(false)}
-                                                        className="flex-1 py-2 rounded-lg border border-[#E5E5E5] text-[9px] font-black uppercase text-[#888888] hover:border-[#050505] hover:text-[#050505] transition-all"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                    <button
-                                                        onClick={handleDisconnect}
-                                                        className="flex-1 py-2 rounded-lg bg-[#FF3B30] text-[9px] font-black uppercase text-white hover:bg-[#D32F2F] transition-all active:scale-95"
-                                                    >
-                                                        Yes, Disconnect
-                                                    </button>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                        </AnimatePresence>
-                                    </div>
-                                </section>
-                            </div>
+                            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                                <TabButton id="general" activeTab={activeTab} setActiveTab={setActiveTab} icon={<Box size={14}/>} label="General Settings" />
+                                <TabButton id="network" activeTab={activeTab} setActiveTab={setActiveTab} icon={<Network size={14}/>} label="Network & RPC" />
+                                <TabButton id="sonar" activeTab={activeTab} setActiveTab={setActiveTab} icon={<Volume2 size={14}/>} label="Sonar Alerts" />
+                                <TabButton id="privacy" activeTab={activeTab} setActiveTab={setActiveTab} icon={<Shield size={14}/>} label="Privacy & Security" />
+                            </nav>
                             
-                            {/* Footer */}
-                             <div className="p-6 bg-[#050505] flex flex-col items-center justify-center gap-3">
-                                <div className="flex items-center gap-3">
-                                    <img src="/official-whale-monochrome.png" className="w-7 h-7 invert opacity-80" alt="Whale" />
-                                    <span className="text-[11px] font-black uppercase tracking-widest text-[#FAF9F6]">Whale Alert Network</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer"
-                                       className="flex items-center gap-1.5 text-[#888888] hover:text-[#FAF9F6] transition-colors">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                                        <span className="text-[9px] font-bold uppercase tracking-wider">GitHub</span>
-                                    </a>
-                                    <div className="w-px h-3 bg-[#333]" />
-                                    <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer"
-                                       className="flex items-center gap-1.5 text-[#888888] hover:text-[#FAF9F6] transition-colors">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.261 5.632 5.9-5.632Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>
-                                        <span className="text-[9px] font-bold uppercase tracking-wider">Twitter</span>
-                                    </a>
-                                </div>
+                            <div className="p-4 border-t border-[#E5E5E5] bg-[#FAF9F6]">
+                                <span className="text-[9px] font-bold text-[#888888] uppercase tracking-widest leading-relaxed">
+                                    Sovereign Version 3.1.4<br/>
+                                    Connected to Core Network
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* ─── MAIN CONTENT ─── */}
+                        <div className="flex-1 overflow-y-auto relative h-full"> 
+                            {/* Desktop Close */}
+                            <button onClick={() => setSettingsOpen(false)} className="hidden md:flex absolute top-6 right-6 p-2 bg-white border border-[#E5E5E5] rounded-full hover:bg-black/5 transition-colors z-10">
+                                <X size={16} className="text-black" />
+                            </button>
+
+                            <div className="p-8 pb-32 max-w-xl">
+                                <AnimatePresence mode="wait">
+                                    
+                                    {/* 1. GENERAL */}
+                                    {activeTab === 'general' && (
+                                        <TabContentWrapper key="general">
+                                            <SectionTitle title="Aesthetic & Localization" subtitle="Control the terminal's physical rendering parameters." />
+                                            
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-white border border-[#E5E5E5] mb-2 rounded-xl">
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Theme System (Locked)</label>
+                                                    <div className="flex items-center gap-2 px-3 py-2 bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg">
+                                                        <Shield size={12} className="text-black/40" />
+                                                        <span className="text-[11px] font-bold uppercase tracking-wider text-black opacity-50">Sovereign Ivory Mode Only</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex gap-4">
+                                                    <div className="flex-1 p-4 bg-white border border-[#E5E5E5] rounded-xl cursor-not-allowed">
+                                                        <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Currency</label>
+                                                        <SelectBox value={currency} onChange={(e) => setCurrency(e.target.value as any)}>
+                                                            <option value="USD">USD - US Dollar</option>
+                                                            <option value="EUR">EUR - Euro</option>
+                                                            <option value="GBP">GBP - British Pound</option>
+                                                            <option value="CHF">CHF - Swiss Franc</option>
+                                                        </SelectBox>
+                                                    </div>
+                                                    <div className="flex-1 p-4 bg-white border border-[#E5E5E5] rounded-xl">
+                                                        <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Language</label>
+                                                        <SelectBox value={language} onChange={(e) => setLanguage(e.target.value as any)}>
+                                                            <option value="en-US">English (US)</option>
+                                                            <option value="es-ES">Español</option>
+                                                            <option value="zh-CN">Chinese (Mandarin)</option>
+                                                        </SelectBox>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">Interface Density</label>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        {(['relaxed', 'compact', 'dense'] as const).map(d => (
+                                                            <button 
+                                                                key={d} onClick={() => setLayoutDensity(d)}
+                                                                className={`py-3 rounded-lg border text-[10px] font-black uppercase tracking-wider transition-colors ${layoutDensity === d ? 'border-black bg-black text-white' : 'border-[#E5E5E5] bg-[#FAF9F6] text-[#888888] hover:bg-black/5'}`}
+                                                            >
+                                                                {d}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabContentWrapper>
+                                    )}
+
+                                    {/* 2. NETWORK & RPC */}
+                                    {activeTab === 'network' && (
+                                        <TabContentWrapper key="network">
+                                            <SectionTitle title="Network Intelligence" subtitle="Configure Web3 providers and testnet visibility." />
+                                            
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">RPC Data Source</label>
+                                                    <div className="space-y-2">
+                                                        <RadioOption 
+                                                            group="rpc" id="sovereign_local" checked={rpcNode === 'sovereign_local'} 
+                                                            onChange={() => setRpcNode('sovereign_local')} label="Sovereign Local Node" subtitle="Zero-latency WebSocket stream (Recommended)" 
+                                                        />
+                                                        <RadioOption 
+                                                            group="rpc" id="infura_premium" checked={rpcNode === 'infura_premium'} 
+                                                            onChange={() => setRpcNode('infura_premium')} label="Infura Premium" subtitle="Standard HTTP/WSS polling fallback" 
+                                                        />
+                                                        <RadioOption 
+                                                            group="rpc" id="alchemy_mainnet" checked={rpcNode === 'alchemy_mainnet'} 
+                                                            onChange={() => setRpcNode('alchemy_mainnet')} label="Alchemy Mainnet" subtitle="High-capacity mempool extraction" 
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
+                                                    <div>
+                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Testnet Analytics</span>
+                                                        <span className="text-[10px] text-[#888888] block mt-1">Include Sepolia and Goerli data streams</span>
+                                                    </div>
+                                                    <Toggle enabled={testnetMode} setEnabled={setTestnetMode} emergency />
+                                                </div>
+                                            </div>
+                                        </TabContentWrapper>
+                                    )}
+
+                                    {/* 3. SONAR ALERTS */}
+                                    {activeTab === 'sonar' && (
+                                        <TabContentWrapper key="sonar">
+                                            <SectionTitle title="Sonar Configuration" subtitle="Define thresholds and audio cues for whale tracking." />
+                                            
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 flex justify-between">
+                                                        <span>Detection Threshold</span>
+                                                        <span className="text-black">${whaleThreshold.toLocaleString()}</span>
+                                                    </label>
+                                                    <input 
+                                                        type="range" min="100000" max="50000000" step="100000" 
+                                                        value={whaleThreshold} onChange={(e) => setWhaleThreshold(Number(e.target.value))}
+                                                        className="w-full h-2 bg-[#E5E5E5] rounded-lg appearance-none cursor-pointer accent-black"
+                                                    />
+                                                    <div className="flex justify-between text-[8px] font-mono text-[#888888] mt-2">
+                                                        <span>$100k</span><span>$50M+</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded flex items-center justify-center">
+                                                            <Volume2 size={14} className="text-black" />
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Whale Sonar Audio</span>
+                                                            <span className="text-[10px] text-[#888888] block mt-1">Play ping on transactions above threshold</span>
+                                                        </div>
+                                                    </div>
+                                                    <Toggle enabled={audioAlerts} setEnabled={setAudioAlerts} />
+                                                </div>
+                                            </div>
+                                        </TabContentWrapper>
+                                    )}
+
+                                    {/* 4. PRIVACY */}
+                                    {activeTab === 'privacy' && (
+                                        <TabContentWrapper key="privacy">
+                                            <SectionTitle title="Privacy & Core Systems" subtitle="Advanced institutional security protocols." />
+                                            
+                                            <div className="space-y-4">
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-2 bg-black rounded flex items-center justify-center">
+                                                            <EyeOff size={14} className="text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Stealth Mode</span>
+                                                            <span className="text-[10px] text-[#888888] block mt-1">Obfuscate all financial balances globally</span>
+                                                        </div>
+                                                    </div>
+                                                    <Toggle enabled={stealthMode} setEnabled={setStealthMode} />
+                                                </div>
+
+                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
+                                                    <div className="flex items-center gap-3 opacity-80">
+                                                        <div className="p-2 border border-[#E5E5E5] rounded flex items-center justify-center"><HardDrive size={14}/></div>
+                                                        <div>
+                                                            <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">Clear Cache</span>
+                                                            <span className="text-[10px] text-[#888888] block mt-1">Purges local graph queries</span>
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => { if(confirm("Purge application cache?")) clearAppData(); }} className="px-3 py-1.5 border border-[#FF3B30] text-[#FF3B30] text-[9px] font-black uppercase rounded-lg hover:bg-[#FF3B30] hover:text-white transition-all">
+                                                        Purge
+                                                    </button>
+                                                </div>
+
+                                                {/* Disconnect */}
+                                                <div className="pt-4 border-t border-[#E5E5E5]">
+                                                    {!confirmDisconnect ? (
+                                                        <div className="p-4 bg-[#FFF5F5] border border-[#FF3B30]/20 rounded-xl flex justify-between items-center transition-colors">
+                                                            <div className="flex items-center gap-3">
+                                                                <LogOut size={14} className="text-[#FF3B30]" />
+                                                                <span className="text-[11px] font-black text-[#FF3B30] uppercase tracking-wider block">Disconnect Session</span>
+                                                            </div>
+                                                            <button onClick={() => setConfirmDisconnect(true)} className="px-4 py-2 bg-[#FF3B30] text-white text-[9px] font-black uppercase rounded-lg shadow-sm hover:bg-[#D32F2F] transition-all">
+                                                                Disconnect
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="p-4 bg-white border border-[#FF3B30] shadow-[0_0_15px_rgba(255,59,48,0.1)] rounded-xl flex flex-col gap-3">
+                                                            <div className="flex items-center gap-2 text-[#FF3B30] text-[11px] font-black uppercase tracking-widest">
+                                                                <AlertTriangle size={14} /> Protocol Disconnect
+                                                            </div>
+                                                            <p className="text-[10px] text-[#888888] font-mono leading-relaxed">Ending this session severs the WebSocket mesh. Re-authentication via ECDSA will be required.</p>
+                                                            <div className="flex gap-2">
+                                                                <button onClick={() => setConfirmDisconnect(false)} className="flex-1 py-2 border border-[#E5E5E5] text-[#888888] text-[10px] font-black uppercase rounded-lg hover:border-black hover:text-black transition-all">Cancel</button>
+                                                                <button onClick={handleDisconnect} className="flex-1 py-2 bg-[#FF3B30] text-white text-[10px] font-black uppercase rounded-lg hover:bg-[#D32F2F] transition-all">Confirm Disconnect</button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                            </div>
+                                        </TabContentWrapper>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
                     </motion.div>
@@ -314,20 +312,64 @@ export function GlobalSettingsModal() {
     );
 }
 
-// Minimal toggle switch component
-function Toggle({ enabled, setEnabled, emergency = false }: { enabled: boolean, setEnabled: (val: boolean) => void, emergency?: boolean }) {
+function TabButton({ id, activeTab, setActiveTab, icon, label }: { id: TabKey, activeTab: TabKey, setActiveTab: (id: TabKey) => void, icon: React.ReactNode, label: string }) {
+    const isActive = activeTab === id;
     return (
-        <button 
-            onClick={() => setEnabled(!enabled)}
-            className={`w-10 h-5 rounded-full relative transition-colors ${enabled ? (emergency ? 'bg-[#FF3B30]' : 'bg-[#050505]') : 'bg-[#E5E5E5]'}`}
+        <button
+            onClick={() => setActiveTab(id)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-black uppercase tracking-wider text-[10px] ${isActive ? 'bg-black text-white shadow-md' : 'text-[#888888] hover:bg-black/5 hover:text-black'}`}
         >
-            <motion.div 
-                layout
-                className="w-4 h-4 rounded-full bg-white absolute top-0.5 shadow-sm"
-                initial={false}
-                animate={{ left: enabled ? '22px' : '2px' }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-            />
+            {icon} {label}
         </button>
     );
+}
+
+function TabContentWrapper({ children }: { children: React.ReactNode }) {
+    return (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+            {children}
+        </motion.div>
+    );
+}
+
+function SectionTitle({ title, subtitle }: { title: string, subtitle: string }) {
+    return (
+        <div className="mb-6">
+            <h3 className="text-xl font-aztec-serif font-black uppercase tracking-tighter text-[#050505]">{title}</h3>
+            <p className="text-[11px] text-[#888888] mt-1">{subtitle}</p>
+        </div>
+    );
+}
+
+function SelectBox(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+    return (
+        <div className="relative">
+            <select {...props} className="w-full appearance-none bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg px-3 py-2 text-[11px] font-bold text-black outline-none focus:border-black transition-colors" />
+            <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#888888] pointer-events-none" />
+        </div>
+    );
+}
+
+function RadioOption({ group, id, label, subtitle, checked, onChange }: any) {
+    return (
+        <label className={`flex items-start gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${checked ? 'border-black bg-[#FAF9F6]' : 'border-transparent hover:bg-[#FAF9F6]'}`}>
+            <input type="radio" name={group} id={id} checked={checked} onChange={onChange} className="mt-1 accent-black" />
+            <div>
+                <span className={`block text-[11px] font-black uppercase tracking-wider ${checked ? 'text-black' : 'text-[#888888]'}`}>{label}</span>
+                <span className="block text-[9px] text-[#888888] mt-0.5">{subtitle}</span>
+            </div>
+        </label>
+    );
+}
+
+function Toggle({ enabled, setEnabled, emergency = false }: { enabled: boolean, setEnabled: (val: boolean) => void, emergency?: boolean }) {
+    return (
+        <button onClick={() => setEnabled(!enabled)} className={`w-10 h-5 rounded-full relative transition-colors shrink-0 ${enabled ? (emergency ? 'bg-[#FF3B30]' : 'bg-[#050505]') : 'bg-[#E5E5E5]'}`}>
+            <motion.div layout initial={false} animate={{ left: enabled ? '22px' : '2px' }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} className="w-4 h-4 rounded-full bg-white absolute top-0.5 shadow-sm" />
+        </button>
+    );
+}
+
+function ChevronDown(props: any) {
+    return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>;
 }

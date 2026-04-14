@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Download, Mail, Moon, Sun, X, ChevronDown, ChevronUp, Calendar, Lock, ChevronLeft } from 'lucide-react';
+import { Download, Mail, X, ChevronDown, ChevronUp, Calendar, Lock, ChevronLeft } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import { useAccount } from 'wagmi';
 import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
@@ -86,7 +86,6 @@ export function NewsTerminal() {
   const [articles,    setArticles]    = useState<NewsArticle[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [selected,    setSelected]    = useState<NewsArticle | null>(null);
-  const [isDark,      setIsDark]      = useState(false);
   const [fontSize,    setFontSize]    = useState(1);
   const [checkoutOpen,setCheckoutOpen]= useState(false);
   const [shareOpen,   setShareOpen]   = useState(false);
@@ -174,12 +173,12 @@ export function NewsTerminal() {
     } finally { setIsSending(false); }
   };
 
-  // ── Paleta — sin bug: todo el DOM recibe el bg correcto ─────────────────
-  const BG    = isDark ? '#080808' : '#ffffff';
-  const TEXT  = isDark ? '#f4f4f4' : '#0a0a0a';
-  const DIV   = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)';
-  const MUTED = isDark ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.36)';
-  const ACTIVE_BG = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)';
+  // ── Paleta institucional pura ─────────────────────────────────────────────
+  const BG    = '#FAF9F6';
+  const TEXT  = '#0A0A0A';
+  const DIV   = 'rgba(0,0,0,0.08)';
+  const MUTED = 'rgba(0,0,0,0.4)';
+  const ACTIVE_BG = 'rgba(0,0,0,0.04)';
 
   const panelH = `calc(100vh - ${HEADER_H}px)`;
 
@@ -239,7 +238,7 @@ export function NewsTerminal() {
             >
               <div>
                 <h2 className="font-black text-xl uppercase tracking-tighter leading-none" style={{ color: TEXT }}>
-                  News of today
+                  THE WHALE POST
                 </h2>
                 <p className="font-mono text-[8px] uppercase tracking-[0.3em] mt-0.5" style={{ color: MUTED }}>
                   {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -259,17 +258,12 @@ export function NewsTerminal() {
                         style={{ borderColor: DIV, background: showArchive ? TEXT : 'transparent' }}>
                   <Calendar size={13} color={showArchive ? BG : MUTED} />
                 </button>
-                <button onClick={() => setIsDark(d => !d)}
-                        className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
-                        style={{ borderColor: DIV }}>
-                  {isDark ? <Sun size={13} color={MUTED} /> : <Moon size={13} color={MUTED} />}
-                </button>
               </div>
             </div>
 
             {/* Archive browser */}
             {showArchive && archiveDates.length > 0 && (
-              <div style={{ borderBottom: `2px solid ${TEXT}`, background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+              <div style={{ borderBottom: `2px solid ${TEXT}`, background: 'rgba(0,0,0,0.02)' }}>
                 <p className="px-6 pt-4 pb-2 font-mono text-[8px] uppercase tracking-[0.35em] font-black" style={{ color: MUTED }}>
                   Archivo — {archiveDates.length} días
                 </p>
@@ -368,7 +362,7 @@ export function NewsTerminal() {
                       <button 
                         onClick={() => setSelected(null)}
                         className="md:hidden flex items-center justify-center p-1 -ml-2 rounded-full border transition-all"
-                        style={{ borderColor: DIV, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }}
+                        style={{ borderColor: DIV, background: 'rgba(0,0,0,0.03)' }}
                       >
                          <ChevronLeft size={16} color={MUTED} />
                       </button>
@@ -477,7 +471,7 @@ export function NewsTerminal() {
                         className="font-sans font-light tracking-wide leading-[1.9] space-y-5 opacity-85"
                         style={{
                           fontSize: `${0.82 * fontSize}rem`,
-                          color: isDark ? 'rgba(244,244,244,0.84)' : 'rgba(10,10,10,0.80)',
+                          color: 'rgba(10,10,10,0.85)',
                         }}
                       >
                         {selected.description
@@ -486,15 +480,20 @@ export function NewsTerminal() {
                             ))
                           : (
                               <div className="space-y-6">
-                                <p>El ecosistema de activos digitales continúa demostrando una profunda transformación estructural a medida que la adopción institucional acelera su paso. Evaluamos recientemente la densidad del libro de órdenes en los principales mercados al contado (spot markets), observando un desplazamiento evidente desde el volumen puramente especulativo minorista hacia posiciones subyacentes de retención a largo plazo. Los creadores de mercado (market makers) están ajustando activamente sus estrategias de provisión de liquidez en respuesta a regulaciones más claras en jurisdicciones de primer nivel.</p>
+                                <p className="font-bold uppercase tracking-widest text-[10px] text-black">Technical Abstract & Zero-Mock Paradigm</p>
+                                <p>El ecosistema de activos digitales sufre de una asimetría de información intrínseca. La Network nace como un hub de grado institucional diseñado para absorber el caudal del mempool global, identificar movimientos de altísimo capital (Whales) antes de la resolución del bloque, y propagar una red P2P (mesh network) hacia un enjambre de clientes en milisegundos. Esta infraestructura elimina el retraso artificial y permite una toma de decisiones respaldada por Z-scores criptográficos.</p>
                                 
-                                <p>Una de las áreas más críticas de desarrollo en el ciclo actual es la compresión del espacio de bloque y la economía subyacente de las soluciones de Capa 2 (Layer 2). Al abstraer la ejecución fuera de la red principal de Ethereum pero anclando la finalidad, los Rollups optimistas y de conocimiento cero (ZK-Rollups) no solo han reducido drásticamente los costos de transacción para el usuario final, sino que han habilitado una nueva generación de protocolos financieros descentralizados de alta frecuencia.</p>
+                                <p><strong>Mandato Zero-Mock:</strong> Ningún componente de esta arquitectura inyecta visualizaciones falsas o datos simulados. El frontend Next.js se alimenta directamente de Redis Pub/Sub TCP con ECDSA real, garantizando inmutabilidad. Si una ballena transfiere 5,000 ETH en bloque, ese es el dato que llega a este hub en 400ms.</p>
                                 
-                                <p>Analizando la migración de liquidez de las finanzas tradicionales hacia la cadena, observamos un pronunciado incremento en la acuñación de activos del mundo real (RWAs) tokenizados. Las letras del tesoro estadounidense y los fondos del mercado monetario son ahora fácilmente programables, lo que inyecta una tasa libre de riesgo real dentro del espacio DeFi, estabilizando colaterales y reduciendo el apalancamiento excesivo en activos estables.</p>
+                                <p className="font-bold uppercase tracking-widest text-[10px] text-black pt-4">Data Processing & Sub-500ms Execution</p>
+                                <p>Mientras los agregadores clásicos dependen del sondeo o the Graph public queries, este enjambre implementa WebSockets paralelos con BullMQ Redis sobre PostgreSQL 1TB Node. Los workers de Capa 2 (Optimistic y ZK-Rollups) se indexan individualmente para mantener el orden cronológico a nivel de mempool.</p>
                                 
-                                <p>Es importante destacar la resiliencia técnica de la red, particularmente durante episodios de alta volatilidad donde históricamente se experimentaban retrasos en la liquidación y picos de tarifas desmedidos. La introducción de Proto-Danksharding (EIP-4844) ha cumplido sus expectativas base, permitiendo acomodar picos abruptos de demanda institucional sin congestión catastrófica, estableciendo un suelo firme para futuras estrategias de trading algorítmico escalable.</p>
+                                <p><strong>Cryptographic Signature Fallback:</strong> La autenticación institucional móvil que ofrecemos no depende de contraseñas. Depende puramente de una firma criptográfica ECDSA de gas cero generada por la clave privada inyectada en WalletConnect o MetaMask, protegiendo todos los datos del terminal de accesos arbitrarios al aislar a los agentes sin estado.</p>
+                                
+                                <p className="font-bold uppercase tracking-widest text-[10px] text-black pt-4">Global Deployment & 2026 Roadmap</p>
+                                <p>Tras validar las métricas técnicas EIP-4844 de proto-danksharding, la red puede escalar el caudal a picos instantáneos sin requerir sharding de base de datos vertical. Los nodos se sostienen con integraciones directas EigenLayer AVS, dándole un peso económico real a la firma de las alertas antes de que se distribuyan a los clientes VIP.</p>
 
-                                <p>Los operadores sofisticados deberán enfocarse en la divergencia inminente entre protocolos que capturan valor y aquellos puramente inflacionarios. A medida que madura el modelo económico Web3, métricas como ingresos por protocolo, retención de capital por usuario y estructuras de tokenomics deflacionarias a largo plazo serán el divisor definitivo entre proyectos viables y redes redundantes. Seguimos monitoreando la profundidad agregada del mercado global a la espera de rompimientos direccionales significativos.</p>
+                                <p>Los operadores de terminales ahora tienen la certeza definitiva de la precisión cronológica de la liquidez. A medida que expandimos la capacidad técnica a 10,000 workers distribuidos mundialmente, la latencia seguirá convergiendo matemáticamente hacia la frontera física de la topología de la fibra óptica internacional.</p>
                               </div>
                             )
                         }

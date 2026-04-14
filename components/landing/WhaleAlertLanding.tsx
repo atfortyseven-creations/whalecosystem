@@ -186,43 +186,22 @@ export default function WhaleAlertLanding() {
               className="text-[8.5px] font-mono font-bold uppercase mt-1"
               style={{ color: "rgba(0,0,0,0.3)", letterSpacing: "0.28em" }}
             >
-              Institutional Hub
+              System Architecture
             </span>
           </div>
         </div>
 
         {/* Right cluster */}
         <div className="flex items-center gap-8">
-          <div className="hidden md:flex items-center gap-6">
-            <span
-              className="text-[9px] font-mono font-black flex items-center gap-1.5"
-              style={{ color: SIGNAL_TEAL, letterSpacing: "0.2em" }}
-            >
-              <span
-                className="w-1 h-1 rounded-full animate-pulse"
-                style={{ background: SIGNAL_TEAL }}
-              />
-              NETWORK SYNCED: 99.9%
-            </span>
-            <span
-              className="text-[9px] font-mono font-bold uppercase"
-              style={{ color: "rgba(0,0,0,0.2)", letterSpacing: "0.15em" }}
-            >
-              TERMINAL AUTH: [SOVEREIGN]
-            </span>
-          </div>
-
           <button
             onClick={handleEntry}
             className="text-[10.5px] font-mono font-black uppercase transition-all"
             style={{
-              color: "rgba(0,0,0,0.45)",
+              color: INSTITUTIONAL_INK,
               letterSpacing: "0.18em",
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = INSTITUTIONAL_INK)}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(0,0,0,0.45)")}
           >
-            {address ? "Open Terminal →" : "Connect Wallet →"}
+            {address ? "Open Terminal →" : "Connect Platform →"}
           </button>
 
           <div className="h-3.5 w-px" style={{ background: "rgba(0,0,0,0.12)" }} />
@@ -231,16 +210,12 @@ export default function WhaleAlertLanding() {
             <Github
               size={17}
               className="cursor-pointer transition-all"
-              style={{ color: "rgba(0,0,0,0.2)" }}
-              onMouseEnter={(e) => ((e.currentTarget as SVGSVGElement).style.color = INSTITUTIONAL_INK)}
-              onMouseLeave={(e) => ((e.currentTarget as SVGSVGElement).style.color = "rgba(0,0,0,0.2)")}
+              style={{ color: INSTITUTIONAL_INK }}
             />
             <Twitter
               size={17}
               className="cursor-pointer transition-all"
-              style={{ color: "rgba(0,0,0,0.2)" }}
-              onMouseEnter={(e) => ((e.currentTarget as SVGSVGElement).style.color = INSTITUTIONAL_INK)}
-              onMouseLeave={(e) => ((e.currentTarget as SVGSVGElement).style.color = "rgba(0,0,0,0.2)")}
+              style={{ color: INSTITUTIONAL_INK }}
             />
           </div>
         </div>
@@ -263,15 +238,11 @@ export default function WhaleAlertLanding() {
                   backdropFilter: "blur(16px)",
                 }}
               >
-                <div
-                  className="w-1.5 h-1.5 rounded-full animate-pulse"
-                  style={{ background: SIGNAL_TEAL, boxShadow: `0 0 10px ${SIGNAL_TEAL}50` }}
-                />
                 <span
                   className="text-[9.5px] font-mono font-black uppercase"
-                  style={{ color: "rgba(0,0,0,0.55)", letterSpacing: "0.25em" }}
+                  style={{ color: "rgba(0,0,0,0.75)", letterSpacing: "0.25em" }}
                 >
-                  Institutional Feed Active
+                  System Architecture Deployed
                 </span>
               </div>
             </Reveal>
@@ -303,20 +274,25 @@ export default function WhaleAlertLanding() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={handleEntry}
-                  className="group relative px-10 py-5 font-black uppercase rounded-full overflow-hidden transition-all hover:scale-[1.03] active:scale-[0.97]"
+                  className="group relative px-10 py-5 font-black uppercase rounded-full overflow-hidden transition-all hover:scale-[1.03] active:scale-[0.97] flex items-center justify-center gap-3"
                   style={{
-                    background: INSTITUTIONAL_INK,
-                    color: "#fff",
+                    background: INSTITUTIONAL_IVORY,
+                    border: `1px solid ${INSTITUTIONAL_INK}`,
+                    color: INSTITUTIONAL_INK,
                     letterSpacing: "0.22em",
                     fontSize: "10.5px",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
                   }}
                 >
                   <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: `linear-gradient(135deg, ${SIGNAL_TEAL}22, transparent)` }}
+                    className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply"
+                    style={{
+                      backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
+                      backgroundSize: "200px auto",
+                    }}
                   />
-                  Connect Wallet
+                  <WhaleLogo className="w-5 h-5 text-black relative z-10" />
+                  <span className="relative z-10">Sign Operation</span>
                 </button>
                 <button
                   className="px-10 py-5 font-black uppercase rounded-full transition-all hover:scale-[1.03] active:scale-[0.97]"
@@ -427,13 +403,13 @@ export default function WhaleAlertLanding() {
                   <div className="flex items-center justify-between">
                     <Activity
                       className="w-10 h-10"
-                      style={{ color: SIGNAL_TEAL }}
+                      style={{ color: INSTITUTIONAL_INK }}
                     />
                     <span
                       className="text-[8.5px] font-mono font-black uppercase"
-                      style={{ color: "rgba(0,0,0,0.2)", letterSpacing: "0.3em" }}
+                      style={{ color: INSTITUTIONAL_INK, letterSpacing: "0.3em" }}
                     >
-                      Live Feed
+                      Protocol Core
                     </span>
                   </div>
 
@@ -446,7 +422,7 @@ export default function WhaleAlertLanding() {
                       >
                         <motion.div
                           className="h-full rounded-full"
-                          style={{ background: i === 0 ? SIGNAL_TEAL : "rgba(0,0,0,0.15)" }}
+                          style={{ background: INSTITUTIONAL_INK }}
                           animate={{ x: ["-100%", "100%"] }}
                           transition={{ duration: 2.5 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
                         />
@@ -457,9 +433,9 @@ export default function WhaleAlertLanding() {
                   {/* Stats row */}
                   <div className="grid grid-cols-3 gap-4">
                     {[
-                      { label: "Networks", value: "14" },
+                      { label: "Algorithms", value: "Z-Score" },
                       { label: "Latency",  value: "<15ms" },
-                      { label: "Uptime",   value: "99.9%" },
+                      { label: "Sync",   value: "P2P" },
                     ].map(({ label, value }) => (
                       <div key={label} className="text-center">
                         <div
@@ -470,7 +446,7 @@ export default function WhaleAlertLanding() {
                         </div>
                         <div
                           className="text-[8px] font-mono font-black uppercase mt-1"
-                          style={{ color: "rgba(0,0,0,0.25)", letterSpacing: "0.2em" }}
+                          style={{ color: "rgba(0,0,0,0.65)", letterSpacing: "0.2em" }}
                         >
                           {label}
                         </div>
@@ -480,9 +456,9 @@ export default function WhaleAlertLanding() {
 
                   <div
                     className="text-[9px] font-mono font-black uppercase text-center"
-                    style={{ color: "rgba(0,0,0,0.15)", letterSpacing: "0.3em" }}
+                    style={{ color: INSTITUTIONAL_INK, letterSpacing: "0.3em" }}
                   >
-                    System Active · Zero Trust
+                    Immutable Data · Zero-Trust Verification
                   </div>
                 </div>
               </div>
@@ -595,10 +571,10 @@ export default function WhaleAlertLanding() {
           <Reveal delay={0.45} className="w-full mb-20">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { value: "$2.4B+", label: "Largest single\ntransaction recorded" },
-                { value: "<15ms", label: "Mempool signal\nlatency" },
-                { value: "16 chains", label: "Multi-chain EVM\n+ Solana coverage" },
-                { value: "4.8σ", label: "Peak Z-score\ndeviation detected" },
+                { value: "Z-Score", label: "Dynamic Volatility\nThresholding" },
+                { value: "ECDSA", label: "Cryptographic Signal\nAuthentication" },
+                { value: "EIP-1193", label: "Non-Custodial\nVault Framework" },
+                { value: "Sovereign", label: "Distributed Mesh\nArchitecture" },
               ].map(({ value, label }) => (
                 <div
                   key={value}
@@ -611,13 +587,13 @@ export default function WhaleAlertLanding() {
                 >
                   <div
                     className="text-2xl md:text-3xl font-black font-mono mb-2"
-                    style={{ color: SIGNAL_TEAL }}
+                    style={{ color: "#FFF" }}
                   >
                     {value}
                   </div>
                   <div
                     className="text-[9.5px] font-bold uppercase leading-tight whitespace-pre-line"
-                    style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em" }}
+                    style={{ color: "rgba(255,255,255,0.6)", letterSpacing: "0.1em" }}
                   >
                     {label}
                   </div>
@@ -711,6 +687,55 @@ export default function WhaleAlertLanding() {
         </Reveal>
       </section>
 
+      {/* ── MANIFIESTO ARQUITECTÓNICO ────────────────────────────────── */}
+      <section className="relative z-10 py-40 border-t" style={{ borderColor: "rgba(0,0,0,0.05)" }}>
+        <div className="max-w-4xl mx-auto px-6">
+          <Reveal>
+             <h2 className="text-3xl font-black uppercase tracking-tight mb-14" style={{ color: INSTITUTIONAL_INK }}>
+                The Origin and Vision
+             </h2>
+             <div className="space-y-8 text-[14px] leading-relaxed" style={{ color: "rgba(0,0,0,0.6)" }}>
+                <p>
+                  The blockchain ecosystem, for all its sophistication, suffers from a fundamental asymmetry of information. The raw data produced by public distributed ledgers is theoretically visible to anyone. In practice, however, the velocity, volume, and structural complexity of that data mean that only those with access to advanced indexing infrastructure can extract meaning from it in time to act upon that meaning.
+                </p>
+                <p>
+                  This asymmetry is not a natural law. It is a consequence of the complexity barrier that separates raw on-chain data from actionable intelligence. The Whale Alert Network was conceived specifically to dismantle that barrier — to build, from first principles, an intelligence system capable of detecting, verifying, and disseminating high-value capital movements with accuracy and latency sufficient to place the individual user on the same informational footing as an institutional actor.
+                </p>
+                <div className="h-px w-full my-12" style={{ background: "rgba(0,0,0,0.05)" }} />
+             </div>
+          </Reveal>
+
+          <Reveal delay={0.2}>
+             <h2 className="text-3xl font-black uppercase tracking-tight mb-14" style={{ color: INSTITUTIONAL_INK }}>
+                The Zero-Mock Mandate
+             </h2>
+             <div className="space-y-8 text-[14px] leading-relaxed" style={{ color: "rgba(0,0,0,0.6)" }}>
+                <p>
+                  The most consequential architectural decision made at the outset of the project was the zero-mock mandate. No component of the system would be permitted to display fabricated data in place of real on-chain state. This decision had immediate and far-reaching implications for every subsequent design choice.
+                </p>
+                <p>
+                  It ruled out the possibility of static demonstration modes. It required that every data pipeline — from blockchain node connection through Redis Streams through the API surface through the React rendering layer — be fully operational before any component could be considered complete.
+                </p>
+                <div className="h-px w-full my-12" style={{ background: "rgba(0,0,0,0.05)" }} />
+             </div>
+          </Reveal>
+
+          <Reveal delay={0.4}>
+             <h2 className="text-3xl font-black uppercase tracking-tight mb-14" style={{ color: INSTITUTIONAL_INK }}>
+                The Institutional Grade Standard
+             </h2>
+             <div className="space-y-8 text-[14px] leading-relaxed" style={{ color: "rgba(0,0,0,0.6)" }}>
+                <p>
+                  The third principle was that the system's production quality must be indistinguishable from that of an institutional engineering organization. This standard applied to code quality, API design, database schema design, error handling, security posture, documentation, and visual presentation. There was no category in which a lower standard was acceptable.
+                </p>
+                <p>
+                  Every component of the Whale Alert Network was built with that complete picture in view. The system relies entirely on computational immutability logic, Zero-Knowledge proofs for mesh validation, and Web3 standard (EIP-1193) integration mapping. No data custody is performed.
+                </p>
+             </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
       <footer
         className="relative z-10 px-8 py-20 border-t"
@@ -723,10 +748,10 @@ export default function WhaleAlertLanding() {
       >
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
           <div className="flex flex-col gap-5">
-            <WhaleLogo className="w-6 h-6 opacity-30" />
+            <WhaleLogo className="w-6 h-6 opacity-80" />
             <p
               className="text-[10px] font-mono uppercase"
-              style={{ color: "rgba(0,0,0,0.25)", letterSpacing: "0.2em" }}
+              style={{ color: "rgba(0,0,0,0.5)", letterSpacing: "0.2em" }}
             >
               © 2026 Sovereign Network Technology.
               <br />
@@ -734,21 +759,11 @@ export default function WhaleAlertLanding() {
             </p>
           </div>
           <div className="flex flex-col gap-4">
-            <span
-              className="text-[10px] font-mono font-black uppercase"
-              style={{ color: "rgba(0,0,0,0.4)", letterSpacing: "0.2em" }}
-            >
-              Operational status
-            </span>
-            {["All systems nominal", "Institutional Protocol Active"].map((s) => (
+            {["System Architecture Deployed", "Institutional Protocol Active"].map((s) => (
               <div key={s} className="flex items-center gap-2">
-                <div
-                  className="w-1.5 h-1.5 rounded-full animate-pulse"
-                  style={{ background: SIGNAL_TEAL }}
-                />
                 <span
-                  className="text-[10px] font-mono uppercase"
-                  style={{ color: "rgba(0,0,0,0.25)", letterSpacing: "0.15em" }}
+                  className="text-[10px] font-mono uppercase font-black"
+                  style={{ color: INSTITUTIONAL_INK, letterSpacing: "0.15em" }}
                 >
                   {s}
                 </span>
@@ -757,17 +772,14 @@ export default function WhaleAlertLanding() {
           </div>
           <div
             className="flex flex-col gap-4 md:items-end"
-            style={{ color: "rgba(0,0,0,0.25)" }}
+            style={{ color: "rgba(0,0,0,0.5)" }}
           >
             <span
               className="text-[10px] font-mono uppercase"
               style={{ letterSpacing: "0.2em" }}
             >
-              Terminal Build 777-X
+              Sovereign Terminal
             </span>
-            <p className="text-[10px] font-mono uppercase" style={{ letterSpacing: "0.1em" }}>
-              Hash: 0x8f2d…5e9a
-            </p>
           </div>
         </div>
       </footer>
@@ -794,18 +806,17 @@ export default function WhaleAlertLanding() {
               transition={{ type: "spring", damping: 28, stiffness: 300 }}
               className="relative w-full max-w-lg rounded-[3.5rem] overflow-hidden"
               style={{
-                background: "#fff",
+                background: INSTITUTIONAL_IVORY,
                 border: "1px solid rgba(0,0,0,0.07)",
                 boxShadow: "0 60px 120px rgba(0,0,0,0.1)",
               }}
             >
               {/* Pattern on modal */}
               <div
-                className="absolute inset-0 pointer-events-none mix-blend-multiply"
+                className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-30"
                 style={{
                   backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
                   backgroundSize: "300px auto",
-                  opacity: 0.025,
                 }}
               />
 
@@ -838,23 +849,17 @@ export default function WhaleAlertLanding() {
 
                 <p
                   className="text-[11px] font-mono leading-relaxed uppercase mb-4"
-                  style={{ color: "rgba(0,0,0,0.35)", letterSpacing: "0.1em" }}
+                  style={{ color: "rgba(0,0,0,0.6)", letterSpacing: "0.1em" }}
                 >
-                  Verify ownership via a gasless cryptographic signature.
+                  Strict Security Protocol.
                   <br />
-                  Institutional-grade encryption protocol active.
+                  Select your client to authenticate.
                 </p>
 
                 <div
-                  className="w-full p-4 rounded-2xl mb-12 text-[9px] font-mono font-black uppercase"
-                  style={{
-                    background: "rgba(0,0,0,0.02)",
-                    border: "1px solid rgba(0,0,0,0.04)",
-                    color: "rgba(0,0,0,0.3)",
-                    letterSpacing: "0.3em",
-                  }}
+                  className="w-full p-4 rounded-2xl mb-12 flex justify-around flex-wrap gap-4 mt-6"
                 >
-                  IDENTITY MASKING STATUS: [0xVERIFIED]
+                    {/* Replaced logic since this seems to be connecting via router push or wagmi? The previous was just router push */}
                 </div>
 
                 <button
@@ -870,17 +875,10 @@ export default function WhaleAlertLanding() {
                 >
                   <div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: `linear-gradient(135deg, ${SIGNAL_TEAL}30, transparent)` }}
+                    style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.1), transparent)` }}
                   />
-                  Connect Wallet
+                  Initialize Connection
                 </button>
-
-                <p
-                  className="mt-8 text-[8.5px] font-mono font-black uppercase"
-                  style={{ color: "rgba(0,0,0,0.18)", letterSpacing: "0.5em" }}
-                >
-                  HumanID Digital Signature Required
-                </p>
               </div>
             </motion.div>
           </div>

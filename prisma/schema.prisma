@@ -585,3 +585,18 @@ model Session {
   createdAt    DateTime @default(now())
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SOVEREIGN WALLET & EXCHANGE STATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ExchangeBalance {
+  id        String   @id @default(uuid())
+  userId    String
+  asset     String
+  free      Float    @default(0.0)
+  locked    Float    @default(0.0)
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, asset])
+  @@index([userId])
+}
