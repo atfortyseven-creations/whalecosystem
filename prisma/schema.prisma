@@ -138,6 +138,7 @@ model Subscription {
   updatedAt DateTime @updatedAt
 }
 
+
 model Watchlist {
   id          String   @id @default(uuid())
   userId      String
@@ -622,4 +623,19 @@ model ExchangeBalance {
   free      Float    @default(0.0)
   locked    Float    @default(0.0)
   updatedAt DateTime @updatedAt
-  
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SYSTEM TELEMETRY
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Log {
+  id        String   @id @default(uuid())
+  level     String   @default("info")
+  message   String
+  source    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+}
