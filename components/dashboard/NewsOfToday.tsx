@@ -5,20 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ExternalLink, ShieldCheck, Clock } from 'lucide-react';
 import { ScrollFloat } from '@/components/ui/ScrollFloat';
 
-interface NewsArticle {
-    id: string;
-    title: string;
-    summary: string;
-    url: string;
-    source: string;
-    publishedAt: string;
-    sentiment: 'bullish' | 'bearish' | 'neutral';
-    veracityScore: number;
-    isFake: boolean;
-    tokens: string[];
+import { NewsArticleIntelligence, MarketSentiment } from '@/lib/news-intelligence';
+
+// Optimized UI Article type extending the core intelligence
+export interface UINewsArticle extends NewsArticleIntelligence {
+    summary: string; // Map to summary for UI consistency
 }
 
-const DEMO_NEWS: NewsArticle[] = [
+const DEMO_NEWS: UINewsArticle[] = [
     {
         id: '1', 
         title: 'Institutional Grade Dark Pools Shift Strategy Ahead of Upcoming Expirations',
@@ -30,6 +24,7 @@ const DEMO_NEWS: NewsArticle[] = [
         veracityScore: 98, 
         isFake: false, 
         tokens: ['BTC', 'ETH'],
+        category: 'Institutional'
     },
     {
         id: '2', 
@@ -42,6 +37,7 @@ const DEMO_NEWS: NewsArticle[] = [
         veracityScore: 95, 
         isFake: false, 
         tokens: ['ETH', 'STRK', 'ZKS'],
+        category: 'Infrastructure'
     },
 ];
 
@@ -72,7 +68,7 @@ function getExchangeStatus() {
 }
 
 export function NewsOfToday() {
-    const [articles, setArticles] = useState<NewsArticle[]>(DEMO_NEWS);
+    const [articles, setArticles] = useState<UINewsArticle[]>(DEMO_NEWS);
     const [loading, setLoading]   = useState(false);
     const [search, setSearch]     = useState('');
     const [expandedId, setExpandedId] = useState<string | null>(null);
