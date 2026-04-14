@@ -55,7 +55,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <TitaniumGate>
                 {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
                 
-                <div className="flex flex-col h-screen w-full relative z-0 overflow-hidden">
+                <div className="min-h-screen w-full relative z-0 flex flex-col">
                     <div className="flex-none w-full z-50">
                         {/* Institutional Header with precise 68px height enforced */}
                         {(
@@ -79,7 +79,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         </div>
                         
                         <ZoomWrapper>
-                            <main className="relative z-10 w-full flex-1 flex flex-col overflow-hidden">
+                            <main className="relative z-10 w-full flex-1 flex flex-col">
                                 {content}
                             </main>
                         </ZoomWrapper>
