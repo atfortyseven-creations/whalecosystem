@@ -47,7 +47,8 @@ const nextConfig = {
     distDir: isExtension ? 'out' : '.next',
 
     images: {
-        unoptimized: true,
+        unoptimized: false,
+        minimumCacheTTL: 31536000,
         remotePatterns: [
             // Universal wildcard — allows images from any HTTPS domain
             // (CoinDesk, CoinTelegraph, Decrypt, etc.)

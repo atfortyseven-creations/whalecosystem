@@ -7,7 +7,7 @@ import {
     TrendingUp, Code, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, ShieldAlert, Newspaper, LifeBuoy,
-    GraduationCap
+    GraduationCap, Bell, Star, Rocket, Network, Lock, Box
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -27,12 +27,24 @@ const SIDEBAR_ITEMS: NavItem[] = [
     // ── Command ──
     { id: 'dashboard',       label: 'The Terminal',     icon: <LayoutDashboard size={17}/>, dividerBefore: 'Command' },
     { id: 'news',            label: 'The Whale Post',   icon: <Newspaper size={17}/> },
-    { id: 'whale-events',    label: 'Mempool Radar',    icon: <TrendingUp size={17}/> },
-    { id: 'multicharts',     label: 'Market Matrices',  icon: <BarChart2 size={17}/> },
+    { id: 'alerts',          label: 'Quantum Alerts',   icon: <Bell size={17}/> },
+    { id: 'watchlist',       label: 'Watchlist',        icon: <Star size={17}/> },
     
-    // ── Vault ──
-    { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>,        dividerBefore: 'Sovereignty' },
-    { id: 'sovereign-vault', label: 'Cold Storage',     icon: <ShieldAlert size={17}/> },
+    // ── Markets ──
+    { id: 'multicharts',     label: 'Market Matrices',  icon: <BarChart2 size={17}/>, dividerBefore: 'Markets' },
+    { id: 'whale-events',    label: 'Mempool Radar',    icon: <Globe size={17}/> },
+    { id: 'gainers',         label: 'Gainers / Losers', icon: <TrendingUp size={17}/> },
+    { id: 'new-pairs',       label: 'Token Discovery',  icon: <Rocket size={17}/> },
+    
+    // ── Deep Intelligence ──
+    { id: 'neural-graph',    label: 'Entity Graph',     icon: <Network size={17}/>, dividerBefore: 'Intelligence' },
+    { id: 'omni-explorer',   label: 'Omni Explorer',    icon: <Search size={17}/> },
+    { id: 'brc-explorer',    label: 'BRC Explorer',     icon: <Box size={17}/> },
+    
+    // ── Sovereignty & Vault ──
+    { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>, dividerBefore: 'Sovereignty' },
+    { id: 'sovereign-vault', label: 'Cold Storage',     icon: <Lock size={17}/> },
+    { id: 'zk-shield',       label: 'ZK Shield',        icon: <ShieldAlert size={17}/> },
     { id: 'api',             label: 'Node Access',      icon: <Code size={17}/> },
     
     // ── Infrastructure ──
@@ -172,12 +184,12 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-screen bg-[#FAF9F6] text-[#050505] overflow-hidden font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
+        <div className="flex min-h-screen bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="hidden md:flex h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 relative shadow-none transition-colors duration-300"
+                className="hidden md:flex sticky top-0 h-screen border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shadow-none transition-colors duration-300"
             >
 
                 {/* Sidebar Navigation */}
@@ -236,7 +248,7 @@ export function WhaleProShell({
             <div className="flex-1 flex flex-col min-w-0 relative">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="h-[56px] border-b border-black/10 bg-white flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
+                <header className="sticky top-0 h-[56px] border-b border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
@@ -264,8 +276,8 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative overflow-hidden flex flex-col transition-colors duration-300 bg-[#EFEFEF]" style={{ contain: 'strict', transform: 'translateZ(0)' }}>
-                    <div className="flex-1 overflow-y-auto no-scrollbar relative z-10" style={{ contain: 'content', transform: 'translateZ(0)' }}>
+                <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF]">
+                    <div className="flex-1 relative z-10">
                         
                         {/* Immersive radial glow overlay to focus center */}
                         <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.3)_0%,transparent_80%)] transition-colors duration-300" />

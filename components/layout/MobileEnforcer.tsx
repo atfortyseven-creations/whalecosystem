@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { MobileWhaleLanding as MobileSovereignLanding } from '@/components/mobile/MobileWhaleLanding';
+import { MobileLanding as MobileSovereignLanding } from '@/components/landing/MobileLanding';
 import dynamic from 'next/dynamic';
 import { useAccount } from 'wagmi';
 
@@ -117,16 +117,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         // Pre-connection → wallet connect buttons
         // Post-connection → manifesto + "VER NOTICIAS" + "ENLAZAR PC"
         return (
-            <MobileSovereignLanding
-                onEnterNews={() => {
-                    try {
-                        if (typeof sessionStorage !== 'undefined') {
-                            sessionStorage.setItem('mobile_news_bypass', 'true');
-                        }
-                    } catch (e) {}
-                    setShowNews(true);
-                }}
-            />
+            <MobileSovereignLanding />
         );
     }
 

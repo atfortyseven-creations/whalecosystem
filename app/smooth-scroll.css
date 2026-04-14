@@ -1,6 +1,8 @@
-/* scroll-behavior: smooth is managed exclusively by Lenis (SmoothScroll.tsx).
-   Setting it here too causes native-browser smooth scroll to fight with Lenis,
-   producing stuttery double-animation. */
+/* Native smooth scrolling is handled by the browser compositor at 240Hz.
+   Lenis was removed for maximum native fluidity and zero-JS overhead. */
+html[data-scroll-behavior="smooth"] {
+  scroll-behavior: smooth;
+}
 
 @supports (scrollbar-width: thin) {
   * {
