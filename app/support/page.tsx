@@ -2,109 +2,216 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Smartphone, Twitter, Globe, ChevronDown, Mail, MessageSquare, Zap, Shield, Clock, CheckCircle, Users } from 'lucide-react';
+import {
+  Send, Twitter, Globe, ChevronDown, Mail,
+  MessageSquare, Shield, Clock, CheckCircle,
+  Users, Smartphone, ArrowUpRight, BookOpen, AlertCircle
+} from 'lucide-react';
 import { toast } from 'sonner';
-import Image from 'next/image';
 import { InstitutionalShell } from '@/components/shared/InstitutionalShell';
-import "@/app/dashboard/dashboard.css";
 
+// ── Design tokens ──────────────────────────────────────────────────────────────
+const BG     = "#FAF9F6";
+const INK    = "#050505";
+const MUTED  = "rgba(5,5,5,0.45)";
+const BORDER = "rgba(5,5,5,0.08)";
+const CARD   = "#FFFFFF";
+
+// ── FAQ ────────────────────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
-  { q: "How do I connect my wallet?", a: "Click 'Connect Wallet' in the top right. We support MetaMask, WalletConnect, and Coinbase Wallet. No email or password required — pure sovereignty from block zero." },
-  { q: "Is my data private?", a: "Yes. All operations use Zero-Knowledge Proofs. We cannot see your identity, balance, or strategy. Your data is stored locally via the Sovereign Vault." },
-  { q: "How do whale alerts work?", a: "Our Whale Worker indexer monitors blockchain transactions 24/7 and surfaces significant capital movements above configurable thresholds in real time." },
-  { q: "What chains do you support?", a: "Ethereum, Arbitrum, Base, Solana, BNB Chain, and Optimism. More chains added continuously as the intelligence grid expands." },
-  { q: "How do I access the VIP terminal?", a: "Connect your wallet and navigate to Whale VIP. Some features require you to hold the requisite node token balance for sovereign access." },
-  { q: "How do I claim the Whale Gold Ticket?", a: "Navigate to the Ticket page, connect your wallet, then draw a full circle with your cursor on the verification zone. The system performs biometric-grade human verification before writing your claim to the genesis ledger." },
+  {
+    q: "How do I connect my wallet to the platform?",
+    a: "Navigate to the Connect page via the top-right button or any 'Connect Wallet' call-to-action. The system supports MetaMask (browser extension and mobile), WalletConnect v2 (compatible with all major mobile wallets including Rainbow, Trust Wallet, and Ledger Live), and Coinbase Wallet with Smart Wallet MPC mode. Authentication is performed via ECDSA cryptographic message signing (EIP-4361 / Sign-In with Ethereum). No email address, password, or personal data is collected or stored at any stage of the process. On mobile devices, scan the QR code displayed on the Connect page using your wallet application to establish a cross-device session."
+  },
+  {
+    q: "Is my financial data and identity private?",
+    a: "Yes, by architectural design. The platform does not store private keys, seed phrases, or biometric data under any circumstances. Wallet authentication produces a signed message that proves address ownership without exposing the private key. Portfolio data displayed within the terminal is fetched directly from public blockchain state via read-only RPC connections — it is never transmitted to or stored on the platform's servers. World ID verification, when used, employs zero-knowledge proofs that confirm personhood without linking the verification to any biometric record visible to the platform."
+  },
+  {
+    q: "How does the Whale Alert detection system identify significant movements?",
+    a: "The ingestion engine maintains persistent WebSocket connections to RPC nodes across sixteen parallel networks. For each incoming transaction, the engine applies a Z-score statistical filter calibrated against a rolling 30-day baseline of per-chain, per-asset-class transaction magnitude distributions. Transactions whose magnitude exceeds 3.5 standard deviations above the rolling mean are classified as candidate significant events. The classification pipeline then applies secondary filters: minimum USD-equivalent value, wallet tier assessment based on historical balance data, and temporal correlation against other events in the rolling 15-minute window to detect coordinated multi-address activity. Signals that pass all filters are written to the Redis Sovereign Mesh stream within milliseconds of blockchain confirmation."
+  },
+  {
+    q: "Which blockchain networks does the platform monitor?",
+    a: "The platform currently monitors sixteen EVM-compatible networks (Ethereum Mainnet, BNB Smart Chain, Arbitrum One, Arbitrum Nova, Optimism, Base, Polygon PoS, zkSync Era, Linea, Scroll, Mantle, Blast, Mode, Zora, Avalanche C-Chain, and Celo) plus Solana via WebSocket subscription to priority fee auction activity. The chain set is expanded continuously as network liquidity and institutional activity levels on candidate networks reach the threshold required to generate statistically meaningful signals."
+  },
+  {
+    q: "What is the Akashic Ledger and how does it differ from the live feed?",
+    a: "The Akashic Ledger is the platform's permanent institutional record. It documents capital movements that satisfy a higher entry threshold than the live feed: a USD-equivalent value above $50 million, confirmed blockchain finality, corroboration by at least one secondary sentinel node, and an editorial determination that the movement represents genuine institutional repositioning rather than routine custodial treasury management. Each entry carries a SHA-256 integrity hash that enables independent tamper detection. The live feed surfaces all events above the configurable threshold in real time; the Akashic Ledger preserves only those of historic macroeconomic significance, with editorial context that contextualizes each movement within the geopolitical and derivatives market conditions prevailing at the time."
+  },
+  {
+    q: "How does the Mass Transfer Intelligence module detect coordinated institutional flows?",
+    a: "Institutional actors rarely execute large position adjustments as single transactions, as doing so telegraphs the trade and moves the market against them before execution completes. The Mass Transfer Intelligence module addresses this by applying Neo4j graph clustering to identify groups of transactions that share temporal proximity (within a 15-minute sliding window), directional alignment, and origin wallet relationships derived from historical transaction graph analysis. Clusters whose aggregate USD value exceeds the Megalodon threshold and whose origin addresses share a graph distance of three or fewer hops are surfaced as coordinated movement events. This methodology successfully reconstructed the coordination structure of the November 2022 FTX pre-collapse withdrawal cascade across seventeen wallet clusters and four chains, which no single-transaction monitoring system detected as a coordinated event in real time."
+  },
+  {
+    q: "How do I access institutional-grade features and what are the tier requirements?",
+    a: "The platform operates on a tiered access model. The Community tier provides access to the live whale feed, basic portfolio analytics, and the public API. The Institutional tier, activated via World ID proof-of-personhood verification combined with the requisite Gold Whale Network membership credential, provides access to the Akashic Ledger, Mass Transfer Intelligence, the Sovereign Vault transaction suite, and the full 99-endpoint institutional API with HMAC-signed request authentication. Tier credentials are issued as EIP-712 signed off-chain documents and optionally registered as non-transferable ERC-1155 tokens on Ethereum Mainnet for on-chain verifiability."
+  },
+  {
+    q: "What should I do if a transaction fails or is stuck pending?",
+    a: "In the Wallet module (accessible from Portfolio), review the transaction in the Send tab. If a transaction is pending for longer than the expected block time of the originating network (typically 12-15 seconds on Ethereum, under 3 seconds on Arbitrum and Base), it may have been submitted with an insufficient gas price relative to network conditions at that moment. You can submit a replacement transaction with the same nonce but a higher gas price — most wallet implementations support this via a 'speed up' option. If you require assistance with a specific transaction hash, submit it via the support form below with the chain name and the transaction hash, and the team will investigate the mempool state at the time of submission."
+  },
 ];
 
+// ── Stats ─────────────────────────────────────────────────────────────────────
 const STATS = [
-  { label: "Avg Response", value: "< 2h", icon: Clock },
-  { label: "Uptime", value: "99.97%", icon: Shield },
-  { label: "Issues Resolved", value: "12,450", icon: CheckCircle },
-  { label: "Support Agents", value: "24 / 7", icon: Users },
+  { label: "Median Response Time", value: "< 2h",    icon: Clock },
+  { label: "Platform Uptime",      value: "99.97%",  icon: Shield },
+  { label: "Queries Resolved",     value: "12,450",  icon: CheckCircle },
+  { label: "Support Availability", value: "24 / 7",  icon: Users },
 ];
 
+// ── Channels ──────────────────────────────────────────────────────────────────
 const CHANNELS = [
-  { icon: Smartphone, label: "Mobile Direct", desc: "Optimized for any device with zero-latency forensic intelligence on the go. Full DApp access from a single tap.", link: null },
-  { icon: Globe, label: "Web Terminal", desc: "Full desktop power: dark pool routing, L1/L2 callstack analysis, and institutional intelligence overlay on demand.", link: null },
-  { icon: Twitter, label: "@whalecosystem", link: "https://x.com/whalecosystem?s=20", desc: "Real-time intelligence pulses and latency-critical network status updates broadcast on X." },
+  {
+    icon: Mail,
+    label: "Secure Dispatch",
+    desc: "Submit detailed technical queries, account issues, or feature requests via the form below. All submissions are processed in order of receipt and acknowledged within two hours during standard operating hours.",
+    link: null,
+    cta: null,
+  },
+  {
+    icon: Twitter,
+    label: "X (Twitter)",
+    desc: "Follow @whalecosystem for real-time intelligence pulses, system status announcements, and institutional market commentary. Direct messages for time-sensitive operational issues are monitored continuously.",
+    link: "https://x.com/whalecosystem",
+    cta: "Follow @whalecosystem",
+  },
+  {
+    icon: BookOpen,
+    label: "Documentation",
+    desc: "The technical architecture, API reference, integration guides, and operational procedures are documented in the system README. Consult the documentation before submitting a support request for technical integration questions.",
+    link: "https://github.com/atfortyseven-creations/whalecosystem",
+    cta: "View Documentation",
+  },
 ];
 
-import { CorporateWhaleLogo } from '@/components/bsv/CorporateWhaleLogo';
+// ── Input style helper ────────────────────────────────────────────────────────
+const inputClass = `
+  w-full px-4 py-3 text-sm bg-white border rounded-xl text-[#050505]
+  placeholder:text-black/30 focus:outline-none transition-colors
+  focus:border-black/30
+`.replace(/\s+/g, ' ').trim();
 
-// ─── WHALE HERO ───
-function WhaleSupportHero() {
+// ── Hero ──────────────────────────────────────────────────────────────────────
+function SupportHero() {
   return (
-    <div className="relative flex flex-col items-center justify-center pt-14 pb-10 px-6 text-center overflow-hidden bg-black text-white">
-      {/* Subtle grid backdrop */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.05]"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 40px)' }} />
-
-      {/* Corporate Whale Logo */}
+    <div
+      className="relative border-b px-8 py-20 text-center"
+      style={{ background: BG, borderColor: BORDER }}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.7, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mb-8"
-      >
-        <motion.div
-          animate={{ y: [-10, 10, -10] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="relative w-32 h-32 flex items-center justify-center"
-        >
-          {/* Glow ring */}
-          <motion.div
-            animate={{ scale: [1, 1.08, 1], opacity: [0.1, 0.3, 0.1] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-full bg-yellow-500/20 blur-3xl z-0"
-          />
-          <CorporateWhaleLogo className="w-full h-full relative z-10 invert" />
-        </motion.div>
-      </motion.div>
-
-      {/* Title */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-2xl mx-auto space-y-5"
       >
-        <h1 className="font-aztec-h1 text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-none mb-4 mt-3">
-          Whale Alert <span className="text-white/50">Support</span>
+        <div
+          className="inline-block px-3 py-1 rounded-full border text-[9px] font-mono font-black uppercase tracking-[0.35em] mb-2"
+          style={{ borderColor: BORDER, color: MUTED }}
+        >
+          Support Centre
+        </div>
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter" style={{ color: INK }}>
+          Whale Alert Network
+          <span className="block font-light" style={{ color: MUTED }}>Support</span>
         </h1>
-        <p className="font-sans text-base text-white/50 max-w-lg mx-auto leading-relaxed">
-          Elite-grade assistance for every node in the network. We operate 24/7 to ensure your sovereign session runs flawlessly.
+        <p className="text-base leading-relaxed max-w-lg mx-auto" style={{ color: MUTED }}>
+          Institutional-grade assistance for every participant in the network. The support centre operates continuously to ensure your access to intelligence infrastructure remains uninterrupted.
         </p>
       </motion.div>
     </div>
   );
 }
 
-class SafeErrorBoundary extends React.Component<any, {hasError: boolean}> {
-  constructor(props: any) { super(props); this.state = { hasError: false }; }
-  static getDerivedStateFromError(error: any) { return { hasError: true }; }
-  componentDidCatch(error: any, info: any) { console.warn("AdBlock intercepted support module.", error); }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <InstitutionalShell title="Whale Support" badge="SUPPORT" badgeVariant="emerald">
-          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6 bg-black text-white">
-             <Shield size={32} className="mb-4 text-white/20" />
-             <p className="font-mono text-[10px] uppercase tracking-widest text-white/50 font-black">
-               [Connection Intercepted by Shield/AdBlock]
-             </p>
-             <p className="font-sans text-sm text-white/40 mt-2">Disable tracking protection to access Support.</p>
+// ── Stats Row ─────────────────────────────────────────────────────────────────
+function StatsRow() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="grid grid-cols-2 md:grid-cols-4 border-b"
+      style={{ borderColor: BORDER }}
+    >
+      {STATS.map((stat, i) => (
+        <div
+          key={i}
+          className="flex flex-col items-center justify-center gap-2 py-10 px-4 transition-colors hover:bg-black/[0.02]"
+          style={{ borderRight: i < 3 ? `1px solid ${BORDER}` : 'none' }}
+        >
+          <stat.icon size={14} style={{ color: MUTED }} />
+          <div className="font-black font-mono text-3xl tracking-tighter" style={{ color: INK }}>
+            {stat.value}
           </div>
-        </InstitutionalShell>
-      );
-    }
-    return this.props.children;
-  }
+          <div className="text-[9px] font-mono uppercase tracking-[0.25em] font-bold" style={{ color: MUTED }}>
+            {stat.label}
+          </div>
+        </div>
+      ))}
+    </motion.div>
+  );
 }
 
-export default function SupportPage() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+// ── FAQ Accordion ─────────────────────────────────────────────────────────────
+function FAQ({ items }: { items: typeof FAQ_ITEMS }) {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <div className="rounded-3xl border overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+      {/* Header */}
+      <div
+        className="flex items-center gap-2.5 px-6 py-4 border-b"
+        style={{ borderColor: BORDER, background: BG }}
+      >
+        <MessageSquare size={12} style={{ color: MUTED }} />
+        <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black" style={{ color: MUTED }}>
+          Frequently Asked Questions
+        </span>
+      </div>
+      <div className="divide-y" style={{ borderColor: BORDER }}>
+        {items.map((item, i) => (
+          <div key={i} style={{ borderColor: BORDER }}>
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              className="w-full flex items-start justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-black/[0.02]"
+            >
+              <span className="font-semibold text-sm leading-snug" style={{ color: INK }}>
+                {item.q}
+              </span>
+              <motion.div
+                animate={{ rotate: open === i ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="shrink-0 mt-0.5"
+              >
+                <ChevronDown size={14} style={{ color: MUTED }} />
+              </motion.div>
+            </button>
+            <AnimatePresence initial={false}>
+              {open === i && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22 }}
+                  className="overflow-hidden"
+                >
+                  <p className="px-6 pb-6 text-sm leading-relaxed" style={{ color: MUTED }}>
+                    {item.a}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Contact Form ──────────────────────────────────────────────────────────────
+function ContactForm() {
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSending, setIsSending] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,178 +223,226 @@ export default function SupportPage() {
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        toast.success('Transmission Successful', { description: 'Intelligence core has received your dispatch.' });
-        setForm({ name: '', email: '', message: '' });
+        toast.success('Message Sent', { description: 'Your inquiry has been received. We will respond within two hours.' });
+        setForm({ name: '', email: '', subject: '', message: '' });
       } else {
-        toast.error('Transmission Failed', { description: 'Network handshake unsuccessful.' });
+        toast.error('Submission Failed', { description: 'Unable to deliver your message. Please try again or contact us via X.' });
       }
     } catch {
-      toast.error('Handshake Timeout');
+      toast.error('Network Error', { description: 'Check your connection and try again.' });
     } finally {
       setIsSending(false);
     }
   };
 
   return (
-    <SafeErrorBoundary>
-    <InstitutionalShell title="Whale Support" badge="SUPPORT" badgeVariant="emerald">
-      <div className="bg-black text-white min-h-screen">
-        {/* Hero */}
-        <WhaleSupportHero />
-
-        {/* Divider */}
-        <div className="w-full h-px bg-white/[0.1]" />
-
-      {/* Stats Row */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="grid grid-cols-2 md:grid-cols-4 border-b border-white/[0.1]"
+    <div className="rounded-3xl border overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+      {/* Header */}
+      <div
+        className="flex items-center gap-2.5 px-6 py-4 border-b"
+        style={{ borderColor: BORDER, background: BG }}
       >
-        {STATS.map((stat, i) => (
-          <div
-            key={i}
-            className={`flex flex-col items-center justify-center gap-2 py-8 px-4 ${i < 3 ? 'border-r border-white/[0.1]' : ''} hover:bg-white/[0.05] transition-colors`}
-          >
-            <stat.icon size={14} className="text-white/30" />
-            <div className="font-aztec-h1 text-3xl font-bold text-white tracking-tighter tabular-nums">{stat.value}</div>
-            <div className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40 font-bold">{stat.label}</div>
+        <Mail size={12} style={{ color: MUTED }} />
+        <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black" style={{ color: MUTED }}>
+          Submit an Inquiry
+        </span>
+      </div>
+
+      <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="font-mono text-[9px] uppercase tracking-[0.2em] font-black block" style={{ color: MUTED }}>
+              Full Name
+            </label>
+            <input
+              type="text"
+              required
+              value={form.name}
+              onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+              placeholder="Your full name"
+              style={{ borderColor: BORDER }}
+              className={inputClass}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="font-mono text-[9px] uppercase tracking-[0.2em] font-black block" style={{ color: MUTED }}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              value={form.email}
+              onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+              placeholder="your@email.com"
+              style={{ borderColor: BORDER }}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] font-black block" style={{ color: MUTED }}>
+            Subject
+          </label>
+          <input
+            type="text"
+            required
+            value={form.subject}
+            onChange={e => setForm(p => ({ ...p, subject: e.target.value }))}
+            placeholder="Brief description of your inquiry"
+            style={{ borderColor: BORDER }}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] font-black block" style={{ color: MUTED }}>
+            Message
+          </label>
+          <textarea
+            required
+            rows={6}
+            value={form.message}
+            onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
+            placeholder="Describe your issue or question in as much detail as possible. For transaction-related issues, include the transaction hash and network name."
+            style={{ borderColor: BORDER }}
+            className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        {/* Notice */}
+        <div
+          className="flex items-start gap-2.5 p-3 rounded-xl border"
+          style={{ borderColor: BORDER, background: BG }}
+        >
+          <AlertCircle size={12} className="mt-0.5 shrink-0" style={{ color: MUTED }} />
+          <p className="text-[10px] leading-relaxed" style={{ color: MUTED }}>
+            Do not include private keys, seed phrases, or passwords in your message. The support team will never request this information.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSending}
+          className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-mono text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-40"
+          style={{ background: INK, color: '#FFF' }}
+        >
+          <Send size={12} />
+          {isSending ? 'Sending…' : 'Submit Inquiry'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+// ── Channels ──────────────────────────────────────────────────────────────────
+function ChannelsSection() {
+  return (
+    <div className="rounded-3xl border overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+      <div
+        className="flex items-center gap-2.5 px-6 py-4 border-b"
+        style={{ borderColor: BORDER, background: BG }}
+      >
+        <Globe size={12} style={{ color: MUTED }} />
+        <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black" style={{ color: MUTED }}>
+          Contact Channels
+        </span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x" style={{ borderColor: BORDER }}>
+        {CHANNELS.map((ch, i) => (
+          <div key={i} className="p-8 flex flex-col gap-4 transition-colors hover:bg-black/[0.02]">
+            <div
+              className="w-10 h-10 border rounded-2xl flex items-center justify-center"
+              style={{ borderColor: BORDER, background: BG }}
+            >
+              <ch.icon size={16} style={{ color: MUTED }} />
+            </div>
+            <div>
+              <div className="font-black text-sm mb-2" style={{ color: INK }}>{ch.label}</div>
+              <p className="text-sm leading-relaxed" style={{ color: MUTED }}>{ch.desc}</p>
+            </div>
+            {ch.link && ch.cta && (
+              <a
+                href={ch.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-start flex items-center gap-1.5 px-4 py-2 border rounded-full font-mono text-[9px] font-black uppercase tracking-widest transition-all hover:bg-black hover:text-white hover:border-black"
+                style={{ borderColor: BORDER, color: MUTED }}
+              >
+                {ch.cta}
+                <ArrowUpRight size={10} />
+              </a>
+            )}
           </div>
         ))}
-      </motion.div>
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-14 space-y-14">
-
-        {/* Contact + FAQ */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="grid lg:grid-cols-2 gap-8"
-        >
-          {/* Contact Form */}
-          <div className="border border-white/[0.1] rounded-3xl overflow-hidden shadow-sm bg-white/[0.02]">
-            <div className="flex items-center gap-2.5 px-6 py-4 border-b border-white/[0.1] bg-white/[0.05]">
-              <Mail size={11} className="text-white/40" />
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/50 font-bold">Secure Dispatch Channel</span>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {[
-                { id: "name", label: "FULL NAME", type: "text", value: form.name, placeholder: "Enter identifier" },
-                { id: "email", label: "EMAIL ADDRESS", type: "email", value: form.email, placeholder: "sovereign@network.io" },
-              ].map(f => (
-                <div key={f.id} className="space-y-1.5">
-                  <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold block">{f.label}</label>
-                  <input
-                    type={f.type}
-                    required
-                    value={f.value}
-                    onChange={e => setForm(p => ({ ...p, [f.id]: e.target.value }))}
-                    placeholder={f.placeholder}
-                    className="w-full px-4 py-3 text-sm font-sans bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder:text-white/25 focus:outline-none focus:border-white/40 transition-colors"
-                  />
-                </div>
-              ))}
-              <div className="space-y-1.5">
-                <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold block">MESSAGE</label>
-                <textarea
-                  required
-                  rows={5}
-                  value={form.message}
-                  onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
-                  placeholder="Describe your situation clearly..."
-                  className="w-full px-4 py-3 text-sm font-sans bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder:text-white/25 focus:outline-none focus:border-white/40 transition-colors resize-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isSending}
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-white text-black rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-white/90 disabled:opacity-50 transition-all shadow-sm"
-              >
-                <Send size={11} />
-                {isSending ? 'TRANSMITTING...' : 'INITIATE SECURE DISPATCH'}
-              </button>
-            </form>
-          </div>
-
-          {/* FAQ */}
-          <div className="border border-white/[0.1] rounded-3xl overflow-hidden shadow-sm bg-white/[0.02]">
-            <div className="flex items-center gap-2.5 px-6 py-4 border-b border-white/[0.1] bg-white/[0.05]">
-              <MessageSquare size={11} className="text-white/40" />
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/50 font-bold">Frequently Asked — Sovereign Protocol</span>
-            </div>
-            <div className="divide-y divide-white/[0.1]">
-              {FAQ_ITEMS.map((item, i) => (
-                <div key={i}>
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left hover:bg-white/[0.05] transition-colors"
-                  >
-                    <span className="font-sans text-sm font-semibold text-white/80 leading-snug">{item.q}</span>
-                    <motion.div animate={{ rotate: openFaq === i ? 180 : 0 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
-                      <ChevronDown size={14} className="text-white/30" />
-                    </motion.div>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {openFaq === i && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
-                        className="overflow-hidden"
-                      >
-                        <p className="px-6 pb-5 font-sans text-sm text-white/50 leading-relaxed">{item.a}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Channels */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="border border-white/[0.1] rounded-3xl overflow-hidden shadow-sm bg-white/[0.02]"
-        >
-          <div className="flex items-center gap-2.5 px-6 py-4 border-b border-white/[0.1] bg-white/[0.05]">
-            <Globe size={11} className="text-white/40" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/50 font-bold">Contact Channels</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.1]">
-            {CHANNELS.map((ch, i) => (
-              <div key={i} className="p-8 flex flex-col gap-4 hover:bg-white/[0.05] transition-colors">
-                <div className="w-10 h-10 border border-white/[0.1] rounded-2xl flex items-center justify-center bg-white/[0.05]">
-                  <ch.icon size={17} className="text-white/50" />
-                </div>
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-white/50 font-bold mb-2">{ch.label}</div>
-                  <p className="font-sans text-sm text-white/50 leading-relaxed">{ch.desc}</p>
-                </div>
-                {ch.link && (
-                  <a
-                    href={ch.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="self-start flex items-center gap-2 mt-2 px-5 py-2 border border-white/20 rounded-full font-mono text-[9px] font-bold uppercase tracking-widest text-white/60 hover:bg-white hover:text-black transition-all"
-                  >
-                    <Zap size={10} /> Follow Now
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
       </div>
     </div>
-  </InstitutionalShell>
-  </SafeErrorBoundary>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+export default function SupportPage() {
+  return (
+    <InstitutionalShell title="Support — Whale Alert Network" badge="SUPPORT" badgeVariant="emerald">
+      <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
+        <SupportHero />
+        <StatsRow />
+
+        <div className="max-w-6xl mx-auto px-6 py-16 space-y-8">
+
+          {/* Primary grid: Contact + FAQ */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35 }}
+            className="grid lg:grid-cols-2 gap-8"
+          >
+            <ContactForm />
+            <FAQ items={FAQ_ITEMS} />
+          </motion.div>
+
+          {/* Channels */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+          >
+            <ChannelsSection />
+          </motion.div>
+
+          {/* Mobile Connect hint */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="rounded-3xl border p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6"
+            style={{ borderColor: BORDER, background: CARD }}
+          >
+            <div
+              className="w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0"
+              style={{ borderColor: BORDER, background: BG }}
+            >
+              <Smartphone size={20} style={{ color: MUTED }} />
+            </div>
+            <div className="flex-1">
+              <div className="font-black text-sm mb-1" style={{ color: INK }}>
+                Connecting from a mobile device?
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
+                Open the Whale Alert Network on your desktop browser, click Connect Wallet, and scan the QR code displayed with your mobile wallet application (MetaMask Mobile, Rainbow, Trust Wallet, or any WalletConnect v2-compatible wallet). Your session will synchronise automatically without requiring any additional configuration.
+              </p>
+            </div>
+            <a
+              href="/connect"
+              className="shrink-0 flex items-center gap-1.5 px-5 py-3 rounded-xl font-mono text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-80"
+              style={{ background: INK, color: '#FFF' }}
+            >
+              Connect Wallet
+              <ArrowUpRight size={12} />
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    </InstitutionalShell>
   );
 }

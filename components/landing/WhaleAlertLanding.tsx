@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import dynamic from "next/dynamic";
+import { Github, Twitter } from "lucide-react";
 
 const DynamicCryptoCheckoutModal = dynamic(
   () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
@@ -22,7 +23,7 @@ export default function WhaleAlertLanding() {
 
   const handleEntry = () => {
     if (address) router.push("/dashboard");
-    else setShowGate(true);
+    else router.push("/connect");
   };
 
   return (
@@ -70,7 +71,7 @@ export default function WhaleAlertLanding() {
           overflow: "hidden"
         }}>
           <img 
-            src="/great-wave.png" 
+            src="/olas-hokusai-4k.png" 
             alt="" 
             loading="lazy"
             decoding="async"
@@ -218,6 +219,53 @@ export default function WhaleAlertLanding() {
           <DynamicCryptoCheckoutModal isOpen={showGate} onClose={() => setShowGate(false)} />
         )}
       </AnimatePresence>
+
+      {/* ── FOOTER ────────────────────────────────────────────────────── */}
+      <footer className="relative z-10 border-t border-black/5 mt-0">
+        <div className="max-w-[840px] mx-auto px-8 py-12 flex flex-col gap-8">
+
+          {/* Social row */}
+          <div className="flex items-center justify-between flex-wrap gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-[#050505] rounded-full" />
+              <span className="text-[11px] font-black uppercase tracking-[0.25em]" style={{ color: INK }}>Whale Alert Network</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://twitter.com/WhaleAlertNetwork"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-black/10 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter size={16} style={{ color: INK, opacity: 0.6 }} />
+              </a>
+              <a
+                href="https://github.com/atfortyseven-creations/whalecosystem"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-black/10 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors"
+                aria-label="GitHub"
+              >
+                <Github size={16} style={{ color: INK, opacity: 0.6 }} />
+              </a>
+            </div>
+          </div>
+
+          {/* Legal links */}
+          <div className="flex flex-wrap gap-6 items-center">
+            <a href="/docs/privacy-policy" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Privacy Policy</a>
+            <a href="/docs/terms-of-service" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Terms of Service</a>
+            <a href="/docs/risk-disclosure" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Risk Disclosure</a>
+            <a href="/docs/cookie-policy" className="text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-100 transition-opacity" style={{ color: MUTED }}>Cookie Policy</a>
+          </div>
+
+          {/* Copyright */}
+          <p className="text-[9px] font-mono uppercase tracking-[0.3em]" style={{ color: MUTED }}>
+            © {new Date().getFullYear()} Whale Alert Network · All rights reserved · Institutional Intelligence Infrastructure
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
