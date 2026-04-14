@@ -8,15 +8,20 @@ declare global {
     var __aiQuotaWarned: boolean | undefined;
 }
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
-});
-
 import { ForensicAnalysis, ForensicSignal } from './ai-types';
 export type { ForensicAnalysis, ForensicSignal };
 
 export class AIService {
-    
+    private _openai: OpenAI | null = null;
+
+    private getOpenAI() {
+        if (!this._openai) {
+            this._openai = new OpenAI({
+                apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
+            });
+        }
+        return this._openai;
+    }
     /**
      * analyzeAddressForensics
      * Generates a high-reasoning forensic report for a blockchain address.
@@ -65,7 +70,7 @@ export class AIService {
         `;
 
         try {
-            const response = await openai.chat.completions.create({
+            const response = await this.getOpenAI().chat.completions.create({
                 model: 'gpt-4o',
                 messages: [
                     { role: 'system', content: 'You are an Elite blockchain forensic engine. Respond only in JSON.' },

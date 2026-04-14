@@ -1,8 +1,15 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
-});
+let _openai: OpenAI | null = null;
+
+function getOpenAI() {
+    if (!_openai) {
+        _openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
+        });
+    }
+    return _openai;
+}
 
 export async function analyzeSentiment(text: string) {
     try {
@@ -25,7 +32,7 @@ export async function analyzeSentiment(text: string) {
         }
         `;
 
-        const response = await openai.chat.completions.create({
+        const response = await getOpenAI().chat.completions.create({
             model: "gpt-4o-mini",
             messages: [{ role: "user", content: prompt }],
             response_format: { type: "json_object" },

@@ -1,32 +1,31 @@
 import { prisma } from '@/lib/prisma';
 import OpenAI from 'openai';
+import { 
+    RawNewsItem, 
+    AIAnalysisResult, 
+    MarketSentiment,
+    NewsArticleIntelligence 
+} from './news-intelligence';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
-});
+let _openai: OpenAI | null = null;
 
-const VERSION_ID = "v2-parallel-sync-777";
-
-export interface RawNewsItem {
-    id: string;
-    title: string;
-    summary: string;
-    url: string;
-    source: string;
-    publishedAt: string | Date;
-    imageUrl?: string;
-    category?: string;
+function getOpenAI(): OpenAI {
+    if (!_openai) {
+        _openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build_time',
+        });
+    }
+    return _openai;
 }
+
+const VERSION_ID = "v2-parallel-sync-777-expert";
 
 export class NewsProcessor {
     /**
      * Processes a batch of news items: Deduplicates, Analyzes via AI, and Saves to DB.
-     */
-    /**
-     * Processes a batch of news items: Deduplicates, Analyzes via AI, and Saves to DB.
      * Parallelized with limited concurrency to prevent timeouts (502).
      */
-    static async processBatch(items: RawNewsItem[]) {
+    static async processBatch(items: RawNewsItem[]): Promise<number> {
         console.log(`[NewsProcessor][${VERSION_ID}] Processing batch of ${items.length} items...`);
         let addedCount = 0;
         
@@ -73,7 +72,8 @@ export class NewsProcessor {
                     finalImageUrl = await this.resurrectImage(item.url) || finalImageUrl;
                 }
 
-                const analysis = await this.analyzeNewsWithAI(item);
+                const analysis: AIAnalysisResult = await this.analyzeNewsWithAI(item);
+                
                 return await prisma.newsArticle.create({
                     data: {
                         externalId: item.id,
@@ -110,7 +110,7 @@ export class NewsProcessor {
         }
     }
 
-    private static async analyzeNewsWithAI(item: RawNewsItem) {
+    private static async analyzeNewsWithAI(item: RawNewsItem): Promise<AIAnalysisResult> {
         try {
             const prompt = `
             Act as a Senior Hedge Fund Analyst specializing in Prediction Markets (Polymarket) and Global Macro nuances.
@@ -136,27 +136,26 @@ export class NewsProcessor {
             }
             `;
 
-            const response = await openai.chat.completions.create({
-                model: "gpt-4o", // Upgraded to 4o for maximum reasoning
+            const response = await getOpenAI().chat.completions.create({
+                model: "gpt-4o",
                 messages: [{ role: "user", content: prompt }],
                 response_format: { type: "json_object" },
-                temperature: 0.3 // Lower temperature for factual strictness
+                temperature: 0.3 
             });
 
             const content = response.choices[0]?.message?.content;
             if (!content) throw new Error("AI returned empty response");
 
-            return JSON.parse(content);
+            return JSON.parse(content) as AIAnalysisResult;
         } catch (error) {
             console.error("[NewsProcessor] AI Analysis failed:", error);
-            // STRICT MODE: Only authentic verifications allowed per user request.
-            // We return a "Pending Analysis" state or throw to prevent saving unverified news.
             return {
                 score: 0,
                 explanation: "Analysis in high-priority processing queue. Pending neural verification.",
                 sentiment: 'neutral',
                 isFake: false,
-                isPending: true // Marker for UI to show 'Analyzing'
+                EliteReliability: 'low',
+                isPending: true 
             };
         }
     }
