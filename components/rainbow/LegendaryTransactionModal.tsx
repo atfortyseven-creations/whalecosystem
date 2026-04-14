@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "./GlassCard";
 import { X, Send, Repeat, Globe, ArrowRight, Loader2, ChevronDown, Shield, Zap, CreditCard } from "lucide-react";
@@ -39,6 +39,54 @@ const CHAINS = [
     { id: 480,   name: "World Chain",  color: "#000000" },
     { id: 84532, name: "Base Sepolia", color: "#0052FF" },
 ];
+
+function NetworkSelectorDropdown({ chain, setChain, label, disabled = false }: { chain: any; setChain: any; label: string; disabled?: boolean }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false); };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, []);
+
+    return (
+        <div className="flex-1 relative" ref={ref}>
+            <label className="text-[9px] font-black uppercase tracking-widest mb-1.5 block" style={{ color: MUTED }}>{label}</label>
+            <button 
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                className={`w-full border rounded-xl p-3 flex items-center justify-between hover:bg-black/[0.02] ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+                style={{ borderColor: BORDER, background: CARD }}
+            >
+                <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: chain.color }} />
+                    <span className="font-bold text-xs" style={{ color: INK }}>{chain.name}</span>
+                </div>
+                {!disabled && <ChevronDown size={14} style={{ color: MUTED }} />}
+            </button>
+            <AnimatePresence>
+                {isOpen && !disabled && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        className="absolute top-full left-0 mt-2 w-[220px] bg-white border border-black/10 rounded-2xl shadow-xl overflow-hidden z-[120] p-1 text-[#050505]"
+                    >
+                        {CHAINS.map((c) => (
+                            <button
+                                key={c.id}
+                                onClick={() => { setChain(c); setIsOpen(false); }}
+                                className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-black/5 flex items-center gap-3 transition-colors"
+                            >
+                                <div className="w-3 h-3 rounded-full shadow-sm" style={{ background: c.color }} />
+                                <span className="font-bold text-xs">{c.name}</span>
+                            </button>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
 
 export function LegendaryTransactionModal({ 
     isOpen, 
@@ -468,32 +516,10 @@ export function LegendaryTransactionModal({
                     <div className="space-y-6">
                         {/* ── BRIDGE CHAIN SELECTION ── */}
                         {mode === 'bridge' && (
-                            <div className="flex items-center gap-4">
-                                <div className="flex-1">
-                                    <label className="text-[9px] font-black uppercase tracking-widest mb-1.5 block" style={{ color: MUTED }}>Source</label>
-                                    <div className="border rounded-xl p-3 flex items-center gap-2" style={{ borderColor: BORDER, background: CARD }}>
-                                        <div className="w-2.5 h-2.5 rounded-full" style={{ background: sourceChain.color }} />
-                                        <span className="font-bold text-xs" style={{ color: INK }}>{sourceChain.name}</span>
-                                    </div>
-                                </div>
-                                <div className="mt-5"><ArrowRight size={14} style={{ color: MUTED }} /></div>
-                                <div className="flex-1">
-                                    <label className="text-[9px] font-black uppercase tracking-widest mb-1.5 block" style={{ color: MUTED }}>Destination</label>
-                                    <button 
-                                        onClick={() => {
-                                            const currIndex = CHAINS.findIndex(c => c.id === targetChain.id);
-                                            setTargetChain(CHAINS[(currIndex + 1) % CHAINS.length]);
-                                        }}
-                                        className="w-full border rounded-xl p-3 flex items-center justify-between hover:bg-black/[0.02]"
-                                        style={{ borderColor: BORDER, background: CARD }}
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: targetChain.color }} />
-                                            <span className="font-bold text-xs" style={{ color: INK }}>{targetChain.name}</span>
-                                        </div>
-                                        <ChevronDown size={14} style={{ color: MUTED }} />
-                                    </button>
-                                </div>
+                            <div className="flex items-center gap-4 relative z-20">
+                                <NetworkSelectorDropdown chain={sourceChain} setChain={setSourceChain} label="Source" disabled />
+                                <div className="mt-5 px-1"><ArrowRight size={14} style={{ color: MUTED }} /></div>
+                                <NetworkSelectorDropdown chain={targetChain} setChain={setTargetChain} label="Destination" />
                             </div>
                         )}
 

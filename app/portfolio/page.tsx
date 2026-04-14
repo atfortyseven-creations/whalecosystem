@@ -5,15 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
   Eye, EyeOff, PieChart, Globe, Copy, Search,
-  ArrowDownLeft, Repeat, CreditCard
+  ArrowDownLeft, Repeat, CreditCard, Plus, ChevronDown,
+  Check, Loader2, ShieldCheck, ExternalLink
 } from 'lucide-react';
-import { LegendaryLoader } from '@/components/ui/LegendaryLoader';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
+import { useAccount, useSwitchChain } from 'wagmi';
+import { mainnet, base, optimism, arbitrum, polygon, worldchain } from 'wagmi/chains';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
+import { coinbaseWallet } from 'wagmi/connectors';
+import { useConnect } from 'wagmi';
 import { toast } from 'sonner';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
@@ -29,6 +33,16 @@ const CHAIN_COLORS: Record<string, string> = {
   "OP Mainnet": "#FF0420", "Polygon": "#8247E5", "BNB Smart Chain": "#F0B90B",
   "Avalanche": "#E84142", "Solana": "#9945FF",
 };
+
+// ── Supported networks for Switch Network ────────────────────────────────────
+const SUPPORTED_CHAINS = [
+  { chain: mainnet,    name: "Ethereum",    color: "#627EEA", symbol: "ETH" },
+  { chain: base,       name: "Base",        color: "#0052FF", symbol: "ETH" },
+  { chain: optimism,   name: "Optimism",    color: "#FF0420", symbol: "ETH" },
+  { chain: arbitrum,   name: "Arbitrum",    color: "#12AAFF", symbol: "ETH" },
+  { chain: polygon,    name: "Polygon",     color: "#8247E5", symbol: "POL" },
+  { chain: worldchain, name: "World Chain", color: "#000000", symbol: "WLD" },
+];
 
 function formatUSD(val: number) {
   if (!val || isNaN(val)) return "$0.00";
@@ -131,9 +145,16 @@ export default function PortfolioPage() {
   const [isTransferOpen, setIsTransferOpen] = useState(false);
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [transferMode, setTransferMode] = useState<"send" | "swap" | "bridge" | "buy">("send");
+  const [showNetworkSwitch, setShowNetworkSwitch] = useState(false);
+  const [showCreateAccount, setShowCreateAccount] = useState(false);
+  const [creatingAccount, setCreatingAccount] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
   const { address: userAddress, isConnected } = useAppKitAccount();
+  const { chain } = useAccount();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
+  const { connect } = useConnect();
   const { open } = useAppKit();
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
@@ -151,6 +172,20 @@ export default function PortfolioPage() {
   const openMode = (m: "send" | "swap" | "bridge" | "buy") => {
     setTransferMode(m);
     setIsTransferOpen(true);
+  };
+
+  const handleCreateOnChainAccount = async () => {
+    setCreatingAccount(true);
+    try {
+      // Coinbase Smart Wallet — creates a new on-chain account for the user
+      connect({ connector: coinbaseWallet({ preference: 'smartWalletOnly' }) });
+      toast.success("Smart Wallet initiated", { description: "Follow the prompts to create your on-chain account." });
+      setAccountCreated(true);
+    } catch (e: any) {
+      toast.error("Account creation failed", { description: e.message });
+    } finally {
+      setCreatingAccount(false);
+    }
   };
 
   // ── Not connected ──
@@ -277,7 +312,7 @@ export default function PortfolioPage() {
             {/* Big number */}
             <div className="flex items-end gap-5 flex-wrap mb-8">
               <div className="text-6xl md:text-7xl font-black tracking-tighter font-mono" style={{ color: INK }}>
-                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : formatUSD(totalPnl ?? 0)}
+                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : formatUSD(Number(totalPnl) ?? 0)}
               </div>
 
               {/* 24h pill */}
@@ -287,9 +322,9 @@ export default function PortfolioPage() {
                 }`}
               >
                 {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {hidden ? "••••" : `${isPositive ? "+" : ""}${formatUSD(change24hUSD ?? 0)}`}
+                {hidden ? "••••" : `${isPositive ? "+" : ""}${formatUSD(Number(change24hUSD) ?? 0)}`}
                 <span className="opacity-60 text-xs">
-                  ({hidden ? "••" : `${safeToFixed(change24hPercent ?? 0, 2)}%`})
+                  ({hidden ? "••" : `${safeToFixed(Number(change24hPercent) ?? 0, 2)}%`})
                 </span>
                 <span className="text-[9px] font-mono opacity-40 ml-1">24H</span>
               </div>
@@ -326,8 +361,148 @@ export default function PortfolioPage() {
             <WalletAction icon={Repeat}         label="Swap"   onClick={() => openMode("swap")}   />
             <WalletAction icon={Globe}          label="Bridge" onClick={() => openMode("bridge")} />
             <WalletAction icon={CreditCard}     label="Buy"    onClick={() => openMode("buy")}    />
+            <WalletAction icon={Globe}          label="Network" onClick={() => setShowNetworkSwitch(s => !s)} />
+            <WalletAction icon={Plus}           label="New Account" onClick={() => setShowCreateAccount(s => !s)} />
           </div>
         </motion.div>
+
+        {/* ── SWITCH NETWORK PANEL ── */}
+        <AnimatePresence>
+          {showNetworkSwitch && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="rounded-3xl border overflow-hidden"
+              style={{ borderColor: BORDER, background: CARD }}
+            >
+              <div className="px-6 py-5 border-b flex items-center justify-between" style={{ borderColor: BORDER }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-5 rounded-full" style={{ background: INK }} />
+                  <h2 className="font-black uppercase tracking-tight text-sm" style={{ color: INK }}>Switch Network</h2>
+                  {chain && (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-black border" style={{ borderColor: BORDER, color: MUTED }}>
+                      Active: {chain.name}
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => setShowNetworkSwitch(false)} style={{ color: MUTED }} className="text-[10px] font-mono font-black uppercase tracking-widest hover:opacity-100 opacity-50 transition-opacity">Close</button>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {SUPPORTED_CHAINS.map(({ chain: c, name, color, symbol }) => {
+                  const isActive = chain?.id === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        switchChain({ chainId: c.id });
+                        toast.info(`Switching to ${name}...`);
+                      }}
+                      disabled={isActive || isSwitching}
+                      className="flex items-center gap-3 p-4 rounded-2xl border transition-all hover:shadow-sm group disabled:cursor-default"
+                      style={{
+                        borderColor: isActive ? color : BORDER,
+                        background: isActive ? `${color}10` : BG,
+                      }}
+                    >
+                      <div className="w-3 h-3 rounded-full shrink-0 shadow-sm" style={{ background: color }} />
+                      <div className="text-left flex-1 min-w-0">
+                        <div className="font-black text-xs truncate" style={{ color: INK }}>{name}</div>
+                        <div className="text-[9px] font-mono uppercase tracking-wider" style={{ color: MUTED }}>{symbol}</div>
+                      </div>
+                      {isActive && <Check size={12} className="text-emerald-500 shrink-0" />}
+                      {isSwitching && !isActive && <Loader2 size={12} className="animate-spin shrink-0" style={{ color: MUTED }} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── CREATE ON-CHAIN ACCOUNT PANEL ── */}
+        <AnimatePresence>
+          {showCreateAccount && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="rounded-3xl border overflow-hidden"
+              style={{ borderColor: BORDER, background: CARD }}
+            >
+              <div className="px-6 py-5 border-b flex items-center justify-between" style={{ borderColor: BORDER }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-5 rounded-full" style={{ background: INK }} />
+                  <h2 className="font-black uppercase tracking-tight text-sm" style={{ color: INK }}>Create On-Chain Account</h2>
+                </div>
+                <button onClick={() => { setShowCreateAccount(false); setAccountCreated(false); }} style={{ color: MUTED }} className="text-[10px] font-mono font-black uppercase tracking-widest hover:opacity-100 opacity-50 transition-opacity">Close</button>
+              </div>
+              <div className="p-6 space-y-5">
+                {accountCreated ? (
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-4 py-4">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                      <ShieldCheck size={24} className="text-emerald-500" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <p className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Account Initiated</p>
+                      <p className="text-xs" style={{ color: MUTED }}>Complete the setup in your wallet to finalize your on-chain account.</p>
+                    </div>
+                    <button onClick={() => { setShowCreateAccount(false); setAccountCreated(false); }} className="px-6 py-2 border rounded-full font-mono text-[10px] uppercase tracking-widest transition-all hover:bg-black/5" style={{ borderColor: BORDER, color: MUTED }}>Dismiss</button>
+                  </motion.div>
+                ) : (
+                  <>
+                    {/* Coinbase Smart Wallet */}
+                    <div className="rounded-2xl border p-5 space-y-4" style={{ borderColor: BORDER, background: BG }}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+                          <img src="/wallets/coinbase.png" alt="Coinbase" className="w-8 h-8 object-contain" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-black text-sm" style={{ color: INK }}>Coinbase Smart Wallet</div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>ERC-4337 · No seed phrase required</div>
+                          <p className="text-xs mt-2 leading-relaxed" style={{ color: MUTED }}>Create a free on-chain account powered by Account Abstraction. Sign in with passkeys — no browser extension needed.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleCreateOnChainAccount}
+                        disabled={creatingAccount}
+                        className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        style={{ background: INK, color: '#FFF' }}
+                      >
+                        {creatingAccount ? <><Loader2 size={14} className="animate-spin" /> Creating...</> : <><Plus size={14} /> Create Coinbase Account</>}
+                      </button>
+                    </div>
+
+                    {/* AppKit Universal */}
+                    <div className="rounded-2xl border p-5 space-y-4" style={{ borderColor: BORDER, background: BG }}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0" style={{ borderColor: BORDER, background: CARD }}>
+                          <Globe size={22} style={{ color: MUTED }} strokeWidth={1.5} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-black text-sm" style={{ color: INK }}>Universal Account</div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: MUTED }}>Any wallet · WalletConnect</div>
+                          <p className="text-xs mt-2 leading-relaxed" style={{ color: MUTED }}>Connect any existing wallet or create a new account with any supported provider through WalletConnect.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => open()}
+                        className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:opacity-80 flex items-center justify-center gap-2 border"
+                        style={{ borderColor: BORDER, background: CARD, color: INK }}
+                      >
+                        <ExternalLink size={14} /> Open Wallet Browser
+                      </button>
+                    </div>
+
+                    <p className="text-[9px] font-mono uppercase tracking-widest text-center" style={{ color: MUTED }}>
+                      Non-custodial · Your keys, your assets · Zero server access
+                    </p>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── HOLDINGS ── */}
         <motion.div
@@ -431,7 +606,8 @@ export default function PortfolioPage() {
             </div>
             <div className="p-6 space-y-3">
               {filteredAssets.slice(0, 8).map((asset: any, i: number) => {
-                const pct = totalPnl > 0 ? ((asset.value ?? 0) / totalPnl) * 100 : 0;
+                const pctTotal = Number(totalPnl);
+                const pct = pctTotal > 0 ? ((asset.value ?? 0) / pctTotal) * 100 : 0;
                 const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
                 return (
                   <div key={i} className="space-y-1.5">
