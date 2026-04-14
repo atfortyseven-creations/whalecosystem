@@ -36,14 +36,12 @@ function OnChainStatusPanel({ address }: { address?: string }) {
     };
 
     return (
-        <div className="w-full border border-[#D4AF37]/20 bg-[#050505] p-6 relative overflow-hidden">
-            {/* Gold accent line */}
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent" />
+        <div className="w-full border border-[#E5E5E5] bg-[#FFFFFF] p-6 relative overflow-hidden rounded-2xl shadow-sm">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                    <Zap size={16} className="text-[#D4AF37]" />
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Live On-Chain Status</h3>
-                    <span className="text-[7px] border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] px-2 py-0.5 font-black uppercase tracking-widest">BASE</span>
+                    <Zap size={16} className="text-[#050505]" />
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">Live On-Chain Status</h3>
+                    <span className="text-[7px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#888888] px-2 py-0.5 font-black uppercase tracking-widest">BASE</span>
                 </div>
                 <button
                     onClick={() => mutate()}
@@ -60,7 +58,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* DeadMan Switch on-chain */}
-                <div className="bg-[#0A0A0A] border border-[#222222] p-4">
+                <div className="bg-[#FAF9F6] border border-[#E5E5E5] p-4 rounded-xl">
                     <div className="text-[9px] text-[#888888] uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Activity size={10} /> WhaleDeadmanSwitch
                     </div>
@@ -78,17 +76,17 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[9px] text-[#888888] uppercase">Last Ping</span>
-                                <span className="text-[9px] font-mono text-white">{new Date(dm.lastPing * 1000).toLocaleDateString()}</span>
+                                <span className="text-[9px] font-mono text-[#050505]">{new Date(dm.lastPing * 1000).toLocaleDateString()}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[9px] text-[#888888] uppercase">Expires</span>
-                                <span className="text-[9px] font-mono text-white">{dm.expiresAtIso?.slice(0,10)}</span>
+                                <span className="text-[9px] font-mono text-[#050505]">{dm.expiresAtIso?.slice(0,10)}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[9px] text-[#888888] uppercase">Days Remaining</span>
                                 <span className={`text-[9px] font-black ${dm.daysRemaining < 14 ? 'text-[#FF9500]' : 'text-[#00C076]'}`}>{dm.daysRemaining}d</span>
                             </div>
-                            <div className="mt-3 h-1 bg-[#111111] rounded-full overflow-hidden">
+                            <div className="mt-3 h-1 bg-[#E5E5E5] rounded-full overflow-hidden">
                                 <div
                                     className="h-full rounded-full transition-all duration-500"
                                     style={{
@@ -111,7 +109,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                 </div>
 
                 {/* HumanTimeLock on-chain */}
-                <div className="bg-[#0A0A0A] border border-[#222222] p-4">
+                <div className="bg-[#FAF9F6] border border-[#E5E5E5] p-4 rounded-xl">
                     <div className="text-[9px] text-[#888888] uppercase tracking-widest mb-3 flex items-center gap-2">
                         <Lock size={10} /> HumanTimeLock
                     </div>
@@ -135,7 +133,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-[9px] text-[#888888] uppercase">Unlocks</span>
-                                        <span className="text-[9px] font-mono text-white">{tl.unlockTimeIso?.slice(0,10)}</span>
+                                        <span className="text-[9px] font-mono text-[#050505]">{tl.unlockTimeIso?.slice(0,10)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-[9px] text-[#888888] uppercase">Days Left</span>
@@ -295,36 +293,36 @@ export function SovereignVault() {
     };
 
     return (
-        <div className="min-h-full w-full bg-[#000000] text-[#FFFFFF] font-mono p-4 md:p-8 flex flex-col gap-8 selection:bg-[#FF3B30] selection:text-white overflow-y-auto">
-            <div className="flex flex-col items-start w-full max-w-5xl mx-auto pt-8 pb-8 gap-8">
+        <div className="min-h-full w-full bg-[#FFFFFF] text-[#050505] font-mono p-4 md:p-8 flex flex-col gap-8 overflow-y-auto">
+            <div className="flex flex-col items-start w-full max-w-5xl mx-auto pt-4 pb-8 gap-8">
 
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter flex items-center gap-4 border-b border-white/10 pb-6 w-full">
-                    <ShieldAlert className="text-rose-500" size={40} />
-                    VAULT <span className="text-white/20">PROTOCOL</span>
+                <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter flex items-center gap-4 border-b border-[#E5E5E5] pb-6 w-full">
+                    <ShieldAlert className="text-[#050505]" size={28} />
+                    VAULT <span className="text-[#888888]">PROTOCOL</span>
                 </h1>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 
                     {/* DEADMAN SWITCH */}
-                    <div className="border border-white/5 bg-white/[0.02] flex flex-col p-6 relative overflow-hidden transition-all">
+                    <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
-                            <Activity size={24} className={vaultData?.deadman ? "text-emerald-500" : "text-rose-500"} />
-                            <h2 className="text-xl font-black uppercase tracking-widest">Deadman Switch</h2>
+                            <Activity size={20} className={vaultData?.deadman ? "text-[#00C076]" : "text-[#888888]"} />
+                            <h2 className="text-sm font-black uppercase tracking-widest">Deadman Switch</h2>
                         </div>
-                        <p className="text-[10px] text-white/40 uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
+                        <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
                             Cryptographic failsafe mechanism. Proprietary ownership transfers to beneficiary upon inactivity threshold detection.
                         </p>
                         <div className="flex-1" />
                         {vaultData?.deadman ? (
                             <div className="flex flex-col gap-3 relative z-10">
-                                <div className="text-[10px] font-bold text-[#00FF55] border border-[#00FF55]/20 bg-[#00FF55]/5 px-3 py-2 uppercase">Status: ARMED</div>
+                                <div className="text-[10px] font-bold text-[#00C076] border border-[#00C076]/20 bg-[#00C076]/5 px-3 py-2 rounded-lg uppercase">Status: ARMED</div>
                                 <div className="text-[9px] text-[#888888] font-mono">
                                     Last Heartbeat: {new Date(vaultData.deadman.lastPing).toLocaleString()}
                                 </div>
                                 <button
                                     onClick={handlePing}
                                     disabled={isPinging}
-                                    className="w-full bg-[#050505] border border-white/10 hover:border-emerald-500/50 hover:text-emerald-500 text-white py-3 text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                    className="w-full bg-[#050505] border border-[#050505] hover:bg-white hover:text-[#050505] text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                 >
                                     {isPinging ? 'TRANSMITTING...' : 'EMIT HEARTBEAT PING'}
                                 </button>
@@ -333,7 +331,7 @@ export function SovereignVault() {
                             <button
                                 onClick={handleDeployDeadman}
                                 disabled={!isConnected}
-                                className="w-full bg-rose-500/10 border border-rose-500/40 text-rose-500 py-3 text-[11px] font-black uppercase tracking-widest hover:bg-rose-500/20 transition-all relative z-10 disabled:opacity-40"
+                                className="w-full bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505] hover:bg-[#050505] hover:text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all relative z-10 disabled:opacity-40"
                             >
                                 {isConnected ? 'DEPLOY DEADMAN FAILSAFE' : 'CONNECT WALLET'}
                             </button>
@@ -341,19 +339,19 @@ export function SovereignVault() {
                     </div>
 
                     {/* TIMELOCK VAULT */}
-                    <div className="border border-white/5 bg-white/[0.02] flex flex-col p-6 relative overflow-hidden transition-all">
+                    <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
-                            <Lock size={24} className="text-blue-500" />
-                            <h2 className="text-xl font-black uppercase tracking-widest">TimeLock Vault</h2>
+                            <Lock size={20} className="text-[#050505]" />
+                            <h2 className="text-sm font-black uppercase tracking-widest">TimeLock Vault</h2>
                         </div>
-                        <p className="text-[10px] text-white/40 uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
+                        <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
                             Deterministic asset locking protocol. Secures capital against volatility via mandatory on-chain temporal constraints.
                         </p>
                         <div className="flex-1" />
                         <button
                             onClick={handleLock}
                             disabled={isLocking || !isConnected}
-                            className="w-full bg-blue-600 text-white py-3 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all disabled:opacity-40 relative z-10"
+                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505] hover:bg-[#050505] hover:text-white py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all disabled:opacity-40 relative z-10"
                         >
                             {isLocking ? 'SIGNING...' : isConnected ? 'DEPLOY TIMELOCK (0.001 ETH)' : 'CONNECT WALLET'}
                         </button>
@@ -365,11 +363,11 @@ export function SovereignVault() {
                 <OnChainStatusPanel address={address} />
 
                 {/* ── GUARDIAN MULTI-SIG ───────────────────────────────────────────── */}
-                <div className="w-full border border-[#222222] bg-[#020202] p-6">
+                <div className="w-full border border-[#E5E5E5] bg-[#FFFFFF] p-6 rounded-2xl shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <Users size={20} className="text-[#D4AF37]" />
-                        <h3 className="text-base font-black uppercase tracking-widest">Guardian Multi-Sig</h3>
-                        <span className="ml-2 text-[9px] border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37] px-2 py-0.5 font-bold uppercase tracking-widest">SECURITY</span>
+                        <Users size={18} className="text-[#050505]" />
+                        <h3 className="text-sm font-black uppercase tracking-widest">Guardian Multi-Sig</h3>
+                        <span className="ml-2 text-[9px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#888888] px-2 py-0.5 font-bold uppercase tracking-widest rounded-md">SECURITY</span>
                     </div>
                     <p className="text-[10px] text-[#888888] uppercase leading-relaxed mb-6 max-w-xl">
                         Add trusted guardian addresses. If your primary key is compromised, guardians can collectively override the vault. Eliminates single-wallet failure risk.
@@ -381,12 +379,12 @@ export function SovereignVault() {
                             value={guardianAddr}
                             onChange={e => setGuardianAddr(e.target.value)}
                             placeholder="GUARDIAN WALLET ADDRESS (0x...)"
-                            className="flex-1 bg-[#050505] border border-[#333333] focus:border-[#D4AF37] text-white px-4 py-3 outline-none text-xs uppercase font-mono tracking-widest placeholder:text-[#444444] transition-colors"
+                            className="flex-1 bg-white border border-[#E5E5E5] focus:border-[#050505] text-[#050505] px-4 py-2.5 outline-none text-xs uppercase font-mono tracking-widest placeholder:text-[#888888] transition-colors rounded-lg"
                         />
                         <button
                             onClick={handleAddGuardian}
                             disabled={addingGuardian}
-                            className="bg-[#D4AF37] text-black px-6 font-black text-xs uppercase tracking-widest hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                            className="bg-[#050505] text-white px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-[#FAF9F6] hover:text-[#050505] border border-transparent hover:border-[#E5E5E5] transition-colors disabled:opacity-50 flex items-center gap-2"
                         >
                             <UserPlus size={14} />
                             {addingGuardian ? 'ADDING...' : 'ADD'}
@@ -396,39 +394,39 @@ export function SovereignVault() {
                     {vaultData?.guardians && vaultData.guardians.length > 0 ? (
                         <div className="flex flex-col gap-2">
                             {vaultData.guardians.map((g: any) => (
-                                <div key={g.id} className="flex items-center justify-between border-b border-[#111111] pb-2">
-                                    <div className="flex flex-col">
-                                        <span className="text-[11px] font-mono text-white">{g.guardianAddress}</span>
-                                        <span className="text-[9px] text-[#D4AF37] uppercase font-bold">Threshold: {g.threshold} signatures</span>
+                                <div key={g.id} className="flex items-center justify-between border-b border-[#E5E5E5] pb-3 pt-1">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[11px] font-mono text-[#050505]">{g.guardianAddress}</span>
+                                        <span className="text-[9px] text-[#888888] uppercase font-bold">Threshold: {g.threshold} signatures</span>
                                     </div>
                                     <button
                                         onClick={() => handleRemoveGuardian(g.guardianAddress)}
-                                        className="text-[#888888] hover:text-[#FF3B30] transition-colors p-2"
+                                        className="text-[#888888] hover:text-[#FF3B30] transition-colors p-2 bg-[#FAF9F6] rounded-md border border-[#E5E5E5] hover:border-[#FF3B30]/30"
                                     >
-                                        <Trash2 size={14} />
+                                        <Trash2 size={12} />
                                     </button>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-[10px] text-[#555555] uppercase font-mono">No guardians configured — vault has single-point-of-failure risk.</div>
+                        <div className="text-[10px] text-[#888888] uppercase font-mono bg-[#FAF9F6] p-4 rounded-lg border border-[#E5E5E5] text-center">No guardians configured — vault has single-point-of-failure risk.</div>
                     )}
                 </div>
 
                 {/* ── ACTIVE TIMELOCKS ─────────────────────────────────────────────── */}
                 {vaultData?.timelock && vaultData.timelock.length > 0 && (
-                    <div className="w-full border border-[#222222] bg-[#050505] p-6">
+                    <div className="w-full border border-[#E5E5E5] bg-[#FFFFFF] p-6 rounded-2xl shadow-sm">
                         <h3 className="text-[11px] font-black uppercase tracking-widest text-[#888888] mb-4">Active Timelocks</h3>
                         <div className="flex flex-col gap-2">
                             {vaultData.timelock.map((t: any) => (
-                                <div key={t.id} className="flex items-center justify-between border-b border-[#111111] pb-2">
-                                    <div className="flex flex-col">
-                                        <span className="text-white text-xs font-mono truncate max-w-xs">{t.txHash || t.id}</span>
-                                        <span className="text-[9px] text-[#FF3B30] uppercase font-bold">
+                                <div key={t.id} className="flex items-center justify-between border-b border-[#E5E5E5] pb-3 pt-1">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[#050505] text-xs font-mono truncate max-w-xs">{t.txHash || t.id}</span>
+                                        <span className="text-[9px] text-[#FF3B30] uppercase font-bold bg-[#FF3B30]/10 px-2 py-0.5 rounded-sm w-fit">
                                             LOCKED UNTIL: {new Date(t.unlockDate).toLocaleString()}
                                         </span>
                                     </div>
-                                    <span className="text-[11px] font-bold text-[#0052FF]">{t.amount} ETH</span>
+                                    <span className="text-[11px] font-bold text-[#0052FF] bg-[#0052FF]/10 px-3 py-1 rounded-md">{t.amount} ETH</span>
                                 </div>
                             ))}
                         </div>

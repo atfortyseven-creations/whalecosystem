@@ -7,7 +7,7 @@ import {
     TrendingUp, Code, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, ShieldAlert, Newspaper, LifeBuoy,
-    GraduationCap, Bell, Star, Rocket, Network, Lock, Box
+    GraduationCap, Bell, Star, Rocket, Network, Lock, Box, Ticket
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -26,30 +26,24 @@ interface NavItem {
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Command ──
     { id: 'dashboard',       label: 'The Terminal',     icon: <LayoutDashboard size={17}/>, dividerBefore: 'Command' },
+    { id: 'gold-ticket',     label: 'Ticket Minting',   icon: <Ticket size={17}/> },
     { id: 'news',            label: 'The Whale Post',   icon: <Newspaper size={17}/> },
-    { id: 'alerts',          label: 'Quantum Alerts',   icon: <Bell size={17}/> },
     { id: 'watchlist',       label: 'Watchlist',        icon: <Star size={17}/> },
     
     // ── Markets ──
-    { id: 'multicharts',     label: 'Market Matrices',  icon: <BarChart2 size={17}/>, dividerBefore: 'Markets' },
-    { id: 'whale-events',    label: 'Mempool Radar',    icon: <Globe size={17}/> },
+    { id: 'whale-events',    label: 'Mempool Radar',    icon: <Globe size={17}/>, dividerBefore: 'Markets' },
     { id: 'gainers',         label: 'Gainers / Losers', icon: <TrendingUp size={17}/> },
     { id: 'new-pairs',       label: 'Token Discovery',  icon: <Rocket size={17}/> },
     
     // ── Deep Intelligence ──
     { id: 'neural-graph',    label: 'Entity Graph',     icon: <Network size={17}/>, dividerBefore: 'Intelligence' },
-    { id: 'omni-explorer',   label: 'Omni Explorer',    icon: <Search size={17}/> },
+    { id: 'omni-explorer',   label: 'Search Block',     icon: <Search size={17}/> },
     { id: 'brc-explorer',    label: 'BRC Explorer',     icon: <Box size={17}/> },
     
     // ── Sovereignty & Vault ──
     { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>, dividerBefore: 'Sovereignty' },
     { id: 'sovereign-vault', label: 'Cold Storage',     icon: <Lock size={17}/> },
     { id: 'zk-shield',       label: 'ZK Shield',        icon: <ShieldAlert size={17}/> },
-    { id: 'api',             label: 'Node Access',      icon: <Code size={17}/> },
-    
-    // ── Infrastructure ──
-    { id: 'academy',         label: 'The Library',      icon: <GraduationCap size={17}/>,   dividerBefore: 'Infrastructure' },
-    { id: 'support',         label: 'Support Hub',      icon: <LifeBuoy size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {

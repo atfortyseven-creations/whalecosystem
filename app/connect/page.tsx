@@ -4,7 +4,7 @@ import ConnectPage from "@/components/landing/ConnectPage";
 export default function Page() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-black/20 dark:text-white/20">
+            <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[#050505]/40">
                 Initializing Sovereign Handshake...
             </div>
         }>

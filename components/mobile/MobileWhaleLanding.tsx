@@ -487,7 +487,7 @@ function PageHero({
               onConnect();
             }
           }}
-          className="w-full py-6 bg-[#FAF9F6] text-black border border-black/10 font-black uppercase tracking-[0.3em] text-[11px] rounded-[2rem] shadow-[0_15px_45px_rgba(0,0,0,0.1)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="w-full py-6 bg-[#050505] text-[#FFFFFF] border border-[#050505] font-black uppercase tracking-[0.3em] text-[11px] rounded-3xl shadow-sm active:scale-[0.98] transition-all"
         >
           {isConnected ? `LINKED: ${address}` : "Connect your Wallet"}
         </button>
@@ -701,7 +701,7 @@ export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
     });
 
     try {
-      // 🕵️ EXPERT: Instead of a bypass, we perform a real cryptographic signature
+      // EXPERT: Instead of a bypass, we perform a real cryptographic signature
       const signMessageAsync = signRef.current;
       if (!signMessageAsync) {
         throw new Error('Neural Engine not initialized (Signature service missing)');

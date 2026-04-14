@@ -60,10 +60,10 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
     <div className="w-full space-y-4">
       <div className="flex items-end justify-between">
         <div>
-          <span className="text-5xl font-black font-mono text-black tracking-tighter leading-none">
+          <span className="text-4xl font-black font-mono text-[#050505] tracking-tighter leading-none">
             {minted}
           </span>
-          <span className="text-xl font-black font-mono text-black/20 ml-2">/ {max}</span>
+          <span className="text-sm font-black font-mono text-[#888888] ml-2">/ {max}</span>
         </div>
         <div className="text-right">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">Remaining Slots</p>
@@ -282,23 +282,22 @@ export function GoldTicketPanel() {
     <div className="w-full max-w-6xl mx-auto py-12 px-6 space-y-12">
       
       {/* ── HERO ── */}
-      <div className="relative bg-white border border-black/[0.08] rounded-[3.5rem] overflow-hidden p-12 md:p-20 shadow-2xl">
-         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#D4AF37]/5 rounded-full blur-[120px] -mr-40 -mt-40" />
+      <div className="relative bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl overflow-hidden p-10 md:p-14 shadow-sm">
          
          <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
             <div>
                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-3 h-3 rounded-full bg-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
-                  <span className="text-[12px] font-black uppercase tracking-[0.4em] text-black/30">Lvl.04 Sovereign Membership</span>
+                  <div className="w-2 h-2 bg-[#050505] shadow-sm" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#888888]">Institutional Auth Layer</span>
                </div>
-               <h1 className="text-6xl md:text-8xl font-black text-black uppercase tracking-tighter leading-[0.85] mb-8">
-                  GOLD <span className="text-[#D4AF37]">WHALE</span> NETWORK
+               <h1 className="text-4xl md:text-5xl font-black text-[#050505] uppercase tracking-tighter leading-tight mb-8 border-b border-[#E5E5E5] pb-6">
+                  TICKET <span className="text-[#888888]">MINTING</span>
                </h1>
-               <p className="text-lg text-black/40 font-bold leading-relaxed mb-10 max-w-xl font-sans">
-                  The Gold Whale Network is the ultimate echelon of institutional tracking. It provides permanent, encrypted access to the core mempool engine and the largest capital flow signatures across the ledger.
+               <p className="text-sm text-[#888888] font-bold leading-relaxed mb-10 max-w-xl font-sans">
+                  The Sovereign Ticket mechanism is the ultimate echelon of institutional tracking. It provides permanent, encrypted access to the core mempool engine and the largest capital flow signatures across the ledger.
                </p>
                <div className="flex flex-wrap gap-4">
-                  <div className="px-6 py-3 bg-black text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl">
+                  <div className="px-6 py-2.5 bg-[#050505] text-[#FFFFFF] rounded-lg font-black text-[10px] uppercase tracking-[0.2em] shadow-sm">
                      GENESIS STATUS: ACTIVE
                   </div>
                   <div className="px-6 py-3 border border-black/10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-black/40">
@@ -322,38 +321,38 @@ export function GoldTicketPanel() {
       {/* ── INTERACTIVE MINT SECTION ── */}
       {!hasTicket && (
         <div className="grid lg:grid-cols-2 gap-12">
-            <div className="bg-white border border-black/[0.08] rounded-[3rem] p-12 shadow-2xl h-fit">
-                <h3 className="text-2xl font-black uppercase tracking-tighter mb-8">Endorsement Protocol</h3>
-                <div className="space-y-6">
-                    <div className="flex items-center gap-6 p-6 bg-black/5 rounded-2xl group hover:bg-[#D4AF37]/5 transition-all cursor-pointer border border-transparent hover:border-[#D4AF37]/20">
-                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center font-black text-lg group-hover:text-[#D4AF37]">1</div>
+            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl p-10 shadow-sm h-fit">
+                <h3 className="text-xl font-black uppercase tracking-widest mb-8 text-[#050505]">Endorsement Protocol</h3>
+                <div className="space-y-4">
+                    <div className="flex items-center gap-6 p-5 bg-[#FAF9F6] rounded-xl group hover:bg-[#050505] transition-all cursor-pointer border border-[#E5E5E5] hover:border-[#050505]">
+                        <div className="w-10 h-10 bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg flex items-center justify-center font-black text-sm text-[#050505]">1</div>
                         <div className="flex flex-col">
-                            <span className="text-[11px] font-black uppercase tracking-widest text-black/40">Identity Binding</span>
-                            <span className="text-sm font-black uppercase text-black">Connect Verified Wallet</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] group-hover:text-[#888888]">Identity Binding</span>
+                            <span className="text-xs font-black uppercase text-[#050505] group-hover:text-[#FFFFFF]">Connect Verified Wallet</span>
                         </div>
-                        <ArrowRight className="ml-auto text-black/10 group-hover:text-[#D4AF37] transition-all" />
+                        <ArrowRight className="ml-auto text-[#888888] group-hover:text-[#FFFFFF] transition-all" />
                     </div>
-                    <div className="flex items-center gap-6 p-6 bg-black/5 rounded-2xl group hover:bg-[#D4AF37]/5 transition-all cursor-pointer border border-transparent hover:border-[#D4AF37]/20">
-                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center font-black text-lg group-hover:text-[#D4AF37]">2</div>
+                    <div className="flex items-center gap-6 p-5 bg-[#FAF9F6] rounded-xl group hover:bg-[#050505] transition-all cursor-pointer border border-[#E5E5E5] hover:border-[#050505]">
+                        <div className="w-10 h-10 bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg flex items-center justify-center font-black text-sm text-[#050505]">2</div>
                         <div className="flex flex-col">
-                            <span className="text-[11px] font-black uppercase tracking-widest text-black/40">Manual Endorsement</span>
-                            <span className="text-sm font-black uppercase text-black">Sign the Sovereign Pad</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] group-hover:text-[#888888]">Manual Endorsement</span>
+                            <span className="text-xs font-black uppercase text-[#050505] group-hover:text-[#FFFFFF]">Sign the Sovereign Pad</span>
                         </div>
-                        <ArrowRight className="ml-auto text-black/10 group-hover:text-[#D4AF37] transition-all" />
+                        <ArrowRight className="ml-auto text-[#888888] group-hover:text-[#FFFFFF] transition-all" />
                     </div>
-                    <div className="flex items-center gap-6 p-6 bg-black/5 rounded-2xl group hover:bg-[#D4AF37]/5 transition-all cursor-pointer border border-transparent hover:border-[#D4AF37]/20">
-                        <div className="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center font-black text-lg group-hover:text-[#D4AF37]">3</div>
+                    <div className="flex items-center gap-6 p-5 bg-[#FAF9F6] rounded-xl group hover:bg-[#050505] transition-all cursor-pointer border border-[#E5E5E5] hover:border-[#050505]">
+                        <div className="w-10 h-10 bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg flex items-center justify-center font-black text-sm text-[#050505]">3</div>
                         <div className="flex flex-col">
-                            <span className="text-[11px] font-black uppercase tracking-widest text-black/40">Network Entry</span>
-                            <span className="text-sm font-black uppercase text-black">Mint Permanent Access</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] group-hover:text-[#888888]">Network Entry</span>
+                            <span className="text-xs font-black uppercase text-[#050505] group-hover:text-[#FFFFFF]">Mint Permanent Access</span>
                         </div>
-                        <ArrowRight className="ml-auto text-black/10 group-hover:text-[#D4AF37] transition-all" />
+                        <ArrowRight className="ml-auto text-[#888888] group-hover:text-[#FFFFFF] transition-all" />
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white border border-black/[0.08] rounded-[3.5rem] p-12 shadow-2xl">
-                <h3 className="text-2xl font-black uppercase tracking-tighter mb-4 text-center">Claim Access</h3>
+            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl p-10 shadow-sm">
+                <h3 className="text-xl font-black uppercase tracking-widest mb-4 text-center text-[#050505]">Claim Access</h3>
                 <SignaturePad onSignature={setSignatureData} disabled={hasTicket} />
                 
                 <button 
@@ -362,7 +361,7 @@ export function GoldTicketPanel() {
                     else if (signatureData.length < 50) toast.error("Signature required on pad");
                     else signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
                   }}
-                  className="w-full mt-10 py-7 bg-black text-white rounded-[2rem] font-black uppercase tracking-[0.4em] text-[12px] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_20px_60px_rgba(0,0,0,0.15)]"
+                  className="w-full mt-10 py-5 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.2em] text-[11px] transition-all"
                 >
                   {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'}
                 </button>
