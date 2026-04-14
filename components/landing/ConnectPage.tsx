@@ -8,7 +8,10 @@ import { CheckCircle2, ExternalLink, Shield, ArrowRight, Loader2, Twitter } from
 import dynamic from "next/dynamic";
 import { coinbaseWallet, injected } from "wagmi/connectors";
 import { useAppKit } from "@reown/appkit/react";
-import { CelestialMeshBackground } from "./CelestialMeshBackground";
+const UniversalEliteWallpaper = dynamic(
+  () => import("@/components/shared/UniversalEliteWallpaper").then((m) => m.UniversalEliteWallpaper),
+  { ssr: false }
+);
 import { Html5QrcodeScanner } from "html5-qrcode";
 
 // QR code renderer using qrcode.react
@@ -233,8 +236,8 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-safe min-h-screen flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans">
-      <CelestialMeshBackground />
+    <div className="min-h-safe min-h-screen flex flex-col bg-transparent text-[#050505] relative font-sans">
+      <UniversalEliteWallpaper />
 
       {/* ── NAV ── */}
       <header className="relative z-50 flex items-center justify-between px-8 py-5 border-b border-[#050505]/5 bg-white/70 backdrop-blur-sm">

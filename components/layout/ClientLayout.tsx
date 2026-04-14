@@ -41,7 +41,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { isConnected } = useAccount();
     
-    const isPublicPath = pathname.startsWith('/docs') || pathname.startsWith('/privacy') || pathname.startsWith('/terms');
+    const isPublicPath = pathname.startsWith('/docs') || pathname.startsWith('/privacy') || pathname.startsWith('/terms') || pathname.startsWith('/connect');
     const content = !isPublicPath ? (
         <LinkedGate>
             {children}

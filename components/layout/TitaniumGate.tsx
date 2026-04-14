@@ -41,8 +41,8 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         return () => clearTimeout(emergency);
     }, []);
     
-    // Strict Whitelist: ONLY landing, docs, terms, privacy, and developers are visible to unauthenticated users.
-    const isPublicPage = ['/', '/docs', '/terms', '/privacy', '/developers'].some(
+    // Strict Whitelist: ONLY connect, docs, terms, privacy, and developers are visible to unauthenticated users.
+    const isPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -80,7 +80,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
             // Otherwise: Access Denied
             setState('AUTH');
-            if (pathname !== '/') router.push('/');
+            if (pathname !== '/connect') router.push('/connect');
         };
 
         checkAccess();
