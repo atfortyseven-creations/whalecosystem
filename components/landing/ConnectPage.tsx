@@ -6,28 +6,23 @@ import { useAccount, useConnect } from "wagmi";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   CheckCircle2, 
-  ExternalLink, 
   Shield, 
   ArrowRight, 
   Loader2, 
   Twitter, 
   QrCode, 
   Wallet, 
-  Zap, 
-  Activity, 
   Lock, 
   Smartphone, 
   Cpu, 
   Fingerprint, 
-  Search,
   ChevronRight,
-  Globe
+  Github
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { coinbaseWallet, injected } from "wagmi/connectors";
 import { useAppKit } from "@reown/appkit/react";
 import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
-import { Html5QrcodeScanner } from "html5-qrcode";
 
 // QR code renderer using qrcode.react
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
@@ -42,37 +37,23 @@ function InstitutionalBadge({ children, icon: Icon }: any) {
   );
 }
 
-function WalletButton({ logo, name, badge, onClick, loading, delay = 0, premium = false }: any) {
+function WalletButton({ logo, name, badge, onClick, loading, delay = 0 }: any) {
   return (
     <motion.button
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       onClick={loading ? undefined : onClick}
-      className={`group relative w-full flex items-center justify-between p-4 rounded-[24px] border transition-all duration-400 ${
-        premium 
-          ? 'bg-[#050505] border-[#050505] text-white shadow-xl shadow-black/10' 
-          : 'bg-white/40 hover:bg-white border-black/[0.06] hover:border-black/20 text-[#050505] shadow-sm hover:shadow-lg'
-      }`}
+      className="group relative w-full flex items-center gap-4 p-5 bg-[#FAF9F6] hover:bg-white border border-black/[0.03] hover:border-black/10 rounded-[28px] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-0.5 text-[#050505]"
     >
-      <div className="flex items-center gap-4">
-        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center p-2 shadow-sm transition-transform duration-500 group-hover:scale-110 ${
-          premium ? 'bg-white/10 border border-white/10' : 'bg-white border border-black/5'
-        }`}>
-          {typeof logo === 'string' ? (
-            <img src={logo} alt={name} className="w-full h-full object-contain" />
-          ) : (
-            logo
-          )}
-        </div>
-        <div className="flex flex-col text-left leading-tight">
-          <span className="text-[12px] font-black uppercase tracking-tight">{name}</span>
-          <span className={`text-[9px] font-mono uppercase tracking-widest mt-0.5 ${premium ? 'text-white/40' : 'text-black/30'}`}>
-            {badge}
-          </span>
-        </div>
+      <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center p-2.5 shadow-sm group-hover:scale-105 transition-transform duration-500">
+        <img src={logo} alt={name} className="w-full h-full object-contain" />
       </div>
-      <ArrowRight size={14} className={`transition-all duration-500 group-hover:translate-x-1 ${premium ? 'text-white/20' : 'text-black/10'}`} />
+      <div className="flex-1 text-left">
+        <p className="text-[13px] font-black uppercase tracking-tight">{name}</p>
+        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5">{badge}</p>
+      </div>
+      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
     </motion.button>
   );
 }
@@ -81,15 +62,13 @@ function WalletButton({ logo, name, badge, onClick, loading, delay = 0, premium 
 export default function ConnectPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isConnected, address } = useAccount();
+  const { isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
   const { open: openAppKit } = useAppKit();
 
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<'QR' | 'DIRECT'>('QR');
   const [qrSession, setQrSession] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">("IDLE");
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -114,7 +93,6 @@ export default function ConnectPage() {
         const data = await res.json();
         if (data.status === 'complete' && data.address) {
           setSyncStatus("SYNCED");
-          setIsRedirecting(true);
           clearInterval(bridge);
           setTimeout(() => {
             document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
@@ -140,8 +118,6 @@ export default function ConnectPage() {
     else openAppKit({ view: 'Connect' });
   };
 
-  const handleAppKit = () => openAppKit({ view: 'Connect' });
-
   const qrUrl = typeof window !== "undefined"
     ? `${window.location.origin}/connect?session=${qrSession ?? ""}`
     : "";
@@ -149,15 +125,14 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="h-screen w-full overflow-hidden flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans select-none">
+    <div className="min-h-screen w-full flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans">
+      {/* ── [EXPERT] FIXED BACKDROP ── */}
       <WavePatternOverlay />
       
-      {/* ── [PROTOCOL] INSTITUTIONAL HEADER ──────────────────────────────────── */}
-      <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl">
+      {/* ── HEADER ── */}
+      <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl shrink-0">
         <div className="flex items-center gap-4">
-           <div className="w-10 h-10 bg-black flex items-center justify-center rounded-xl shadow-xl shadow-black/10">
-              <img src="/official-whale-monochrome.png" className="w-7 h-7 invert" alt="Whale" />
-           </div>
+           <img src="/official-whale-monochrome.png" className="w-8 h-8" alt="Whale" />
            <div className="flex flex-col leading-none">
               <span className="text-[15px] font-black uppercase tracking-tighter">Whale Alert Network</span>
               <span className="text-[8px] font-mono font-bold uppercase tracking-[0.4em] opacity-30 mt-1">Sovereign Protocol v6.12.0</span>
@@ -171,203 +146,142 @@ export default function ConnectPage() {
         </div>
       </header>
 
-      {/* ── [TERMINAL] MAIN COMMAND CENTER ───────────────────────────────────── */}
-      <main className="flex-1 relative z-10 flex items-center justify-center p-6 md:p-12 overflow-hidden">
+      {/* ── COMMAND CENTER ── */}
+      <main className="relative z-10 flex flex-col items-center pt-20 pb-32">
         
-        {/* THE IMMERSIVE 1.09x ZOOM WRAPPER */}
+        {/* THE IMMERSIVE 1.09x ZOOM TERMINAL */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1.09, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-[1040px] h-full max-h-[640px] flex flex-col origin-center"
+          className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden"
         >
-          
-          {/* MOBILE NAVIGATION TABS (MANDATORY FOR FIRST SCREEN) */}
-          <div className="lg:hidden w-full max-w-sm mx-auto mb-6 p-1 bg-black/[0.04] backdrop-blur-md rounded-2xl border border-black/5 flex shadow-sm">
-            <button 
-              onClick={() => setActiveTab('QR')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all duration-300 ${activeTab === 'QR' ? 'bg-white text-black shadow-md' : 'text-black/40'}`}
-            >
-              <QrCode size={14} strokeWidth={2.5} />
-              <span className="text-[10px] font-black uppercase tracking-widest">QR Sync</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab('DIRECT')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all duration-300 ${activeTab === 'DIRECT' ? 'bg-white text-black shadow-md' : 'text-black/40'}`}
-            >
-              <Wallet size={14} strokeWidth={2.5} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Connect</span>
-            </button>
-          </div>
-
-          {/* THE HANDSHAKE CONSOLE */}
-          <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden">
-            
-            {/* ── PANEL L: QR HANDSHAKE & ANALYTICS ── */}
-            <div className={`relative p-10 lg:p-14 flex flex-col bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-black/[0.06] overflow-hidden ${activeTab === 'QR' ? 'flex' : 'hidden lg:flex'}`}>
-              
-               {/* Background Layer: Whale Phantom */}
-               <div className="absolute -bottom-20 -left-20 opacity-[0.03] pointer-events-none transition-transform duration-1000 group-hover:scale-110">
+            {/* LEFT: QR PANEL */}
+            <div className="relative p-12 lg:p-16 flex flex-col bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-black/[0.06]">
+              <div className="absolute -bottom-20 -left-20 opacity-[0.03] pointer-events-none">
                  <img src="/official-whale-monochrome.png" className="w-[480px] h-[480px] grayscale" alt="" />
-               </div>
+              </div>
+              <div className="relative z-10">
+                <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30 mb-4">Institutional Handshake</p>
+                <h2 className="text-4xl font-black tracking-tight leading-none mb-6">Mobile Sync</h2>
+                <p className="text-[12px] text-black/50 font-semibold leading-relaxed max-w-xs mb-10">
+                  Scan this sovereign handshake code to bridge your device to the intelligence mesh.
+                </p>
 
-               <div className="relative z-10 flex flex-col h-full">
-                  <header className="mb-10">
-                    <div className="flex items-center gap-2 mb-3">
-                       <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-                       <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30">Syncing Intelligence</p>
-                    </div>
-                    <h2 className="text-4xl font-black tracking-tight leading-none text-black">
-                       Mobile<br /><span className="italic text-black/40">Handshake</span>
-                    </h2>
-                    <p className="text-[11px] text-black/50 mt-5 font-semibold leading-relaxed max-w-xs">
-                      Scan this sovereign coordinate to bridge your mobile identity with this terminal instance via ECDSA.
-                    </p>
-                  </header>
-
-                  <div className="flex-1 flex flex-col items-center justify-center gap-8">
-                     <div className="relative p-7 bg-white rounded-[42px] shadow-2xl shadow-black/5 border border-black/[0.02]">
-                        {qrSession ? (
-                          <div className="relative">
-                             <QRCode value={qrUrl} size={220} level="H" bgColor="#FFFFFF" fgColor="#050505" />
-                             {syncStatus === 'SYNCED' && (
-                               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                                  <CheckCircle2 size={48} className="text-emerald-500" />
-                               </motion.div>
-                             )}
-                          </div>
-                        ) : (
-                          <div className="w-[220px] h-[220px] flex items-center justify-center bg-black/[0.01] rounded-2xl">
-                             <Loader2 size={32} className="animate-spin text-black/10" />
-                          </div>
-                        )}
-                        {/* QR Grid Deco */}
-                        <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-black/5 rounded-tl-[42px]" />
-                        <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-black/5 rounded-br-[42px]" />
-                     </div>
-
-                     <div className="flex flex-col items-center gap-4">
-                        <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-black/5 shadow-sm">
-                           <div className={`w-2 h-2 rounded-full ${syncStatus === 'SYNCED' ? 'bg-emerald-500 shadow-emerald-500/50' : 'bg-black/20 animate-pulse'}`} />
-                           <span className="text-[9px] font-mono font-black uppercase tracking-widest text-black/60">
-                             {isRedirecting ? 'IDENTITY VERIFIED' : qrSession ? (syncStatus === 'SYNCED' ? 'SESSION LINKED' : 'AWAITING RESPONSE') : 'NEGOTIATING…'}
-                           </span>
-                        </div>
-                        {qrSession && !isRedirecting && (
-                          <button onClick={fetchSession} className="text-[8px] font-mono font-bold uppercase tracking-[0.4em] text-black/20 hover:text-black/60 transition-colors">
-                            REGENERATE HANDSHAKE →
-                          </button>
-                        )}
-                     </div>
+                <div className="flex flex-col items-center gap-8">
+                  <div className="p-6 bg-white rounded-[42px] shadow-sm border border-black/5">
+                    {qrSession ? (
+                      <QRCode value={qrUrl} size={200} level="H" bgColor="#FFFFFF" fgColor="#050505" />
+                    ) : (
+                      <div className="w-[200px] h-[200px] flex items-center justify-center">
+                        <Loader2 size={32} className="animate-spin text-black/10" />
+                      </div>
+                    )}
                   </div>
-
-                  <footer className="mt-8 pt-8 border-t border-black/[0.04]">
-                     <div className="grid grid-cols-2 gap-8">
-                        <div>
-                           <p className="text-[8px] font-mono font-black uppercase tracking-widest text-black/30 mb-2">Protocols Supported</p>
-                           <p className="text-[9px] font-bold text-black/60 uppercase tracking-tight">WalletConnect V2 · SSE · ECDSA</p>
-                        </div>
-                        <div className="flex justify-end items-center gap-4 opacity-30">
-                           <Twitter size={14} />
-                           <Smartphone size={14} />
-                           <Activity size={14} />
-                        </div>
-                     </div>
-                  </footer>
-               </div>
+                  <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-black/5">
+                    <div className={`w-2 h-2 rounded-full ${syncStatus === 'SYNCED' ? 'bg-emerald-500' : 'bg-black/20 animate-pulse'}`} />
+                    <span className="text-[9px] font-mono font-black uppercase tracking-widest text-black/60">
+                      {syncStatus === 'SYNCED' ? 'SESSION LINKED' : 'AWAITING RESPONSE…'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* ── PANEL R: DIRECT CONNECT & PROVIDERS ── */}
-            <div className={`p-10 lg:p-14 flex flex-col bg-white overflow-hidden ${activeTab === 'DIRECT' ? 'flex' : 'hidden lg:flex'}`}>
-               <header className="mb-10">
-                  <div className="flex items-center gap-2 mb-3">
-                     <span className="w-1.5 h-1.5 rounded-full bg-black/10" />
-                     <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30">Direct Ingress</p>
-                  </div>
-                  <h2 className="text-3xl font-black tracking-tighter leading-none text-[#050505]">
-                     Protocol access<br /><span className="italic text-black/40">Connect Wallet</span>
-                  </h2>
-               </header>
+            {/* RIGHT: CONNECT PANEL */}
+            <div className="p-12 lg:p-16 flex flex-col bg-white">
+               <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30 mb-4">Direct Access</p>
+               <h2 className="text-3xl font-black tracking-tighter leading-none mb-8">Connect Wallet</h2>
 
                <div className="flex flex-col gap-3.5 flex-1">
                   <WalletButton 
                     logo="/wallets/metamask.svg" 
                     name="MetaMask" 
-                    badge="Browser Injected · SDK" 
+                    badge="Browser Injected" 
                     onClick={() => handleConnector('injected')} 
                     loading={isPending} 
-                    delay={0.15} 
                   />
                   <WalletButton 
                     logo="/wallets/coinbase.png" 
                     name="Coinbase Wallet" 
                     badge="MPC Smart Wallet" 
                     onClick={() => handleConnector('coinbase')} 
-                    delay={0.2} 
                   />
-                  <div className="grid grid-cols-2 gap-3.5">
-                    <WalletButton 
-                      logo="/wallets/rainbow.png" 
-                      name="Rainbow" 
-                      badge="Mobile" 
-                      onClick={handleAppKit} 
-                      delay={0.25} 
-                    />
-                    <WalletButton 
-                      logo="/wallets/rabby.png" 
-                      name="Rabby" 
-                      badge="Advanced" 
-                      onClick={() => handleConnector('rabby')} 
-                      delay={0.3} 
-                    />
-                  </div>
-                  
-                  {/* EXPANDED MOBILE SUITE FOR HIGH PRO 3.1 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3.5">
-                    <WalletButton 
-                      logo={<QrCode size={18} className="text-white" />} 
-                      name="WalletConnect" 
-                      badge="Search +550 Wallets" 
-                      onClick={handleAppKit} 
-                      delay={0.35} 
-                      premium={true}
-                    />
-                  </div>
+                  <WalletButton 
+                    logo="/wallets/rainbow.png" 
+                    name="Rainbow (+550 Wallets)" 
+                    badge="WalletConnect" 
+                    onClick={() => openAppKit()} 
+                  />
+                  <WalletButton 
+                    logo="/wallets/rabby.png" 
+                    name="Rabby" 
+                    badge="Advanced EOA" 
+                    onClick={() => handleConnector('rabby')} 
+                  />
                </div>
 
-               <div className="mt-10 p-5 bg-[#FAF9F6] border border-black/5 rounded-3xl flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-2xl bg-white border border-black/5 flex items-center justify-center shadow-sm shrink-0">
-                     <Fingerprint size={18} className="text-black/40" />
-                  </div>
-                  <p className="text-[10px] text-black/50 font-semibold leading-relaxed">
-                     By connecting, you verify ownership over your sovereign keys. Private data is encrypted via ECDSA proofs. No cookies or databases touch your assets.
+               <div className="mt-10 p-5 bg-[#FAF9F6] border border-black/5 rounded-3xl flex items-start gap-3">
+                  <Fingerprint size={16} className="text-black/30 mt-0.5" />
+                  <p className="text-[10px] text-black/40 font-semibold leading-relaxed">
+                    ECDSA Verification. This portal does not hold custody of assets. All interactions are verified on-chain.
                   </p>
                </div>
             </div>
-
-          </div>
         </motion.div>
+
+        {/* ── [RECOVERY] INSTITUTIONAL MANIFESTO ── */}
+        <section className="relative z-10 w-full max-w-[840px] px-8 pt-48 pb-64 text-[12px] leading-[2.2] tracking-wide text-black/60">
+            <h2 className="text-[14px] uppercase tracking-widest font-black mb-8 text-black">The Origin and Vision</h2>
+            <p className="mb-6">
+              The blockchain ecosystem suffers from a fundamental asymmetry of information. The raw data produced by public distributed ledgers is theoretically visible to anyone. In practice, however, the velocity, volume, and structural complexity of that data mean that only those with access to advanced indexing infrastructure can extract meaning from it in time to act upon that meaning.
+            </p>
+            <p className="mb-6">
+              A private institution with a team of engineers can deploy purpose-built systems to detect a significant capital movement nearly four minutes before that movement propagates through the public mempool. An individual operating without institutional infrastructure cannot.
+            </p>
+            <p className="mb-16">
+               The Whale Alert Network was conceived specifically to dismantle that barrier, to build from first principles an intelligence system capable of detecting, verifying, and disseminating high value capital movements with accuracy and latency sufficient to place the individual user on the same informational footing as an institutional actor.
+            </p>
+
+            <h2 className="text-[14px] uppercase tracking-widest font-black mb-8 text-black">Architectural Philosophy</h2>
+            <p className="mb-6">
+              The zero mock mandate ensures no component of the system displays fabricated data in place of real on-chain state. Every signal surfaced by the system is sourced directly from live blockchain state verified on chain, processed cryptographically, and delivered with an editorial context that a trained analyst could act upon immediately.
+            </p>
+            <p className="mb-16">
+              The institutional grade standard mandates that the production quality must be indistinguishable from that of an institutional engineering organization. This applies to code quality, interface design, database schema structure, and visual presentation.
+            </p>
+
+            <div className="grid grid-cols-2 gap-12 pt-16 border-t border-black/5">
+              <div>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-black mb-4">Protocol Sovereignty</h3>
+                <p className="text-[11px] leading-relaxed">Non-custodial infrastructure. Your keys never leave your device. The network provides intelligence; you retain control.</p>
+              </div>
+              <div>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-black mb-4">Zero Knowledge Access</h3>
+                <p className="text-[11px] leading-relaxed">Sybil-resistant verification without compromising privacy. Verified identity mesh via cryptographically secure signatures.</p>
+              </div>
+            </div>
+        </section>
       </main>
 
-      {/* ── [FOOTER] INSTITUTIONAL MARK ───────────────────────────────────────── */}
-      <footer className="relative z-[100] h-[72px] px-10 border-t border-black/[0.04] bg-white/70 backdrop-blur-xl flex items-center justify-between">
-         <div className="flex items-center gap-10">
-            <span className="text-[9px] font-mono font-black uppercase tracking-[0.5em] text-black/20">© Whale Alert Network</span>
-            <div className="hidden lg:flex items-center gap-6">
-               <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors cursor-pointer">Security Protocol</span>
-               <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors cursor-pointer">Identity Mesh</span>
+      {/* ── FOOTER ── */}
+      <footer className="relative z-[100] px-12 py-12 border-t border-black/[0.04] bg-white/50 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-8">
+         <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <img src="/official-whale-monochrome.png" className="w-5 h-5 opacity-40" alt="" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">© Whale Alert Network</span>
             </div>
+            <p className="text-[9px] font-mono text-black/30 tracking-widest uppercase">Privacy by Design · Sovereignty Verified</p>
          </div>
-         
-         <div className="flex items-center gap-6">
-            {['ETHEREUM', 'ARBITRUM', 'BASE', 'POLYGON'].map(n => (
-              <span key={n} className="hidden sm:inline-block text-[8px] font-mono font-black tracking-[0.25em] text-black/40 border border-black/[0.03] rounded-full px-3 py-1 bg-black/[0.02]">{n}</span>
-            ))}
-            <div className="w-px h-6 bg-black/[0.06] mx-2" />
-            <button className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/60 hover:text-black transition-colors">
-               Legal Framework
-               <ChevronRight size={10} />
-            </button>
+
+         <div className="flex items-center gap-8">
+            <a href="https://twitter.com/WhaleAlert" className="text-black/30 hover:text-black transition-colors"><Twitter size={18} /></a>
+            <a href="https://github.com" className="text-black/30 hover:text-black transition-colors"><Github size={18} /></a>
+            <div className="w-px h-8 bg-black/10 mx-2" />
+            <div className="flex flex-col items-end">
+               <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Status: Operational</span>
+               <span className="text-[8px] font-mono text-emerald-500 uppercase tracking-widest font-bold">L1/L2 Ingress Active</span>
+            </div>
          </div>
       </footer>
     </div>
