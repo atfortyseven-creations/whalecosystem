@@ -210,7 +210,6 @@ export default function ConnectPage() {
     };
     handshake();
   }, [mounted, isConnected, address, sessionIdParam]);
- admissions:
 
   // Build QR URL: deep-link to this connect page via mobile
   const qrUrl = typeof window !== "undefined"

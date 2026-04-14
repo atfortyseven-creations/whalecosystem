@@ -134,7 +134,6 @@ export function WhaleAcademy() {
 
     if (selectedCourse) {
         return (
-        return (
             <div className="flex flex-col space-y-4 p-6">
                 <button onClick={() => setSelectedCourse(null)}
                     className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest w-fit transition-colors"
@@ -206,7 +205,6 @@ export function WhaleAcademy() {
     }
 
     // Main courses grid
-    return (
     return (
         <div className="flex flex-col space-y-5 p-6">
             {/* Header */}
