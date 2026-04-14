@@ -2,233 +2,146 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, ExternalLink, Shield, ArrowRight, Loader2, Twitter } from "lucide-react";
+import { 
+  CheckCircle2, 
+  ExternalLink, 
+  Shield, 
+  ArrowRight, 
+  Loader2, 
+  Twitter, 
+  QrCode, 
+  Wallet, 
+  Zap, 
+  Activity, 
+  Lock, 
+  Smartphone, 
+  Cpu, 
+  Fingerprint, 
+  Search,
+  ChevronRight,
+  Globe
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { coinbaseWallet, injected } from "wagmi/connectors";
 import { useAppKit } from "@reown/appkit/react";
-const UniversalEliteWallpaper = dynamic(
-  () => import("@/components/shared/UniversalEliteWallpaper").then((m) => m.UniversalEliteWallpaper),
-  { ssr: false }
-);
+import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 import { Html5QrcodeScanner } from "html5-qrcode";
 
 // QR code renderer using qrcode.react
 const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
 
+// ── Shared Sub-Components ────────────────────────────────────────────────────────
+function InstitutionalBadge({ children, icon: Icon }: any) {
+  return (
+    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/[0.03] border border-black/5">
+      {Icon && <Icon size={8} className="text-black/40" />}
+      <span className="text-[8px] font-mono font-black uppercase tracking-[0.2em] text-black/40">{children}</span>
+    </div>
+  );
+}
 
-// ── Wallet option button ────────────────────────────────────────────────────────
-function WalletButton({
-  logo, name, badge, onClick, loading, delay = 0,
-}: {
-  logo: string;
-  name: string;
-  badge: string;
-  onClick: () => void;
-  loading?: boolean;
-  delay?: number;
-}) {
+function WalletButton({ logo, name, badge, onClick, loading, delay = 0, premium = false }: any) {
   return (
     <motion.button
-      onClick={onClick}
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ x: 4 }}
-      whileTap={{ scale: 0.98 }}
-      className="w-full flex items-center gap-5 p-5 bg-white border border-[#050505]/5 hover:border-[#050505]/20 hover:shadow-lg hover:shadow-[#050505]/5 transition-all duration-200 group rounded-2xl"
+      transition={{ delay }}
+      onClick={loading ? undefined : onClick}
+      className={`group relative w-full flex items-center justify-between p-4 rounded-[24px] border transition-all duration-400 ${
+        premium 
+          ? 'bg-[#050505] border-[#050505] text-white shadow-xl shadow-black/10' 
+          : 'bg-white/40 hover:bg-white border-black/[0.06] hover:border-black/20 text-[#050505] shadow-sm hover:shadow-lg'
+      }`}
     >
-      <div className="w-12 h-12 rounded-xl bg-[#FAF9F6] border border-[#050505]/5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-        {loading ? (
-          <Loader2 size={18} className="animate-spin text-[#050505]/40" />
-        ) : (
-          <img src={logo} alt={name} className="w-7 h-7 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-        )}
+      <div className="flex items-center gap-4">
+        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center p-2 shadow-sm transition-transform duration-500 group-hover:scale-110 ${
+          premium ? 'bg-white/10 border border-white/10' : 'bg-white border border-black/5'
+        }`}>
+          {typeof logo === 'string' ? (
+            <img src={logo} alt={name} className="w-full h-full object-contain" />
+          ) : (
+            logo
+          )}
+        </div>
+        <div className="flex flex-col text-left leading-tight">
+          <span className="text-[12px] font-black uppercase tracking-tight">{name}</span>
+          <span className={`text-[9px] font-mono uppercase tracking-widest mt-0.5 ${premium ? 'text-white/40' : 'text-black/30'}`}>
+            {badge}
+          </span>
+        </div>
       </div>
-      <div className="flex-1 text-left min-w-0">
-        <p className="text-[13px] font-black text-[#050505] uppercase tracking-tight">{name}</p>
-        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5">{badge}</p>
-      </div>
-      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
+      <ArrowRight size={14} className={`transition-all duration-500 group-hover:translate-x-1 ${premium ? 'text-white/20' : 'text-black/10'}`} />
     </motion.button>
   );
 }
 
-// ── Main ────────────────────────────────────────────────────────────────────────
+// ── Main Controller ─────────────────────────────────────────────────────────────
 export default function ConnectPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sessionIdParam = searchParams.get("session");
   const { isConnected, address } = useAccount();
-  const { connect, isPending } = useConnect();
-  const { open } = useAppKit();
+  const { connect, connectors, isPending } = useConnect();
+  const { open: openAppKit } = useAppKit();
 
   const [mounted, setMounted] = useState(false);
-  const [justConnected, setJustConnected] = useState(false);
+  const [activeTab, setActiveTab] = useState<'QR' | 'DIRECT'>('QR');
   const [qrSession, setQrSession] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">("IDLE");
-  const [showScanner, setShowScanner] = useState(false);
-  const qrRef = useRef<string | null>(null);
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
-  useEffect(() => { qrRef.current = qrSession; }, [qrSession]);
 
-  // Generate QR session for mobile sync
+  // Handshake session generation
   const fetchSession = useCallback(async () => {
     try {
       setSyncStatus("AWAITING");
       const res = await fetch("/api/auth/qr-session", { method: "POST" });
       const data = await res.json();
       if (data.sessionId) setQrSession(data.sessionId);
-    } catch {}
+    } catch (e) { console.error("[AUTH] Handshake Error:", e); }
   }, []);
 
-  useEffect(() => {
-    if (!mounted || isConnected) return;
-    fetchSession();
-  }, [mounted, isConnected, fetchSession]);
+  useEffect(() => { if (!qrSession) fetchSession(); }, [qrSession, fetchSession]);
 
-  // Poll QR session status
+  // Auth Bridge Cycle
   useEffect(() => {
-    if (!mounted || isConnected) return;
-    const id = setInterval(async () => {
-      const token = qrRef.current;
-      if (!token) return;
+    if (!qrSession || syncStatus === "SYNCED") return;
+    const bridge = setInterval(async () => {
       try {
-        const res = await fetch(`/api/auth/qr-session?id=${token}`);
+        const res = await fetch(`/api/auth/qr-session?id=${qrSession}`);
         const data = await res.json();
-        if (data.status === "complete") {
-          clearInterval(id);
+        if (data.status === 'complete' && data.address) {
           setSyncStatus("SYNCED");
-          setJustConnected(true);
-          setTimeout(() => { window.location.href = "/"; }, 1500);
-        } else if (data.status === "expired") {
-          clearInterval(id);
-          fetchSession();
+          setIsRedirecting(true);
+          clearInterval(bridge);
+          setTimeout(() => {
+            document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
+            router.replace("/dashboard");
+          }, 1200);
         }
-      } catch {}
+      } catch (e) {}
     }, 2000);
-    return () => clearInterval(id);
-  }, [mounted, isConnected, fetchSession]);
+    return () => clearInterval(bridge);
+  }, [qrSession, syncStatus, router]);
 
-  // Auto-redirect if already connected
+  // Redirection guard
   useEffect(() => {
-    if (!mounted) return;
-    const fromDisconnect = sessionStorage.getItem("__disconnected__");
-    if (isConnected && !fromDisconnect) {
-        // If we are on mobile, instead of redirecting immediately, we might want to show the scanner
-        if (window.innerWidth < 1024 && !sessionIdParam) {
-            setShowScanner(true);
-        } else {
-            router.replace("/");
-        }
+    if (isConnected && mounted) {
+      const hasHandshake = document.cookie.includes("sovereign_handshake=");
+      if (hasHandshake) router.replace("/dashboard");
     }
-    if (fromDisconnect) sessionStorage.removeItem("__disconnected__");
-  }, [mounted, isConnected, router, sessionIdParam]);
+  }, [isConnected, mounted, router]);
 
-  // Celebrate → redirect
-  useEffect(() => {
-    if (!mounted || !isConnected) return;
-    if (window.innerWidth < 1024 && !sessionIdParam && !justConnected) {
-       setShowScanner(true);
-       return;
-    }
-    setJustConnected(true);
-    if (!showScanner) {
-        setTimeout(() => router.replace("/"), 1800);
-    }
-  }, [isConnected, mounted, router, sessionIdParam, showScanner]);
-
-  const handleInjected = () => {
-    console.log("[AUTH] Initializing Injected Provider (Google Extension/MetaMask)...");
-    connect({ connector: injected() }, {
-      onSuccess: () => console.log("[AUTH] Extension connection successful ✓"),
-      onError: (err) => console.error("[AUTH] Extension connection failed:", err)
-    });
+  const handleConnector = (id: string) => {
+    const connector = connectors.find(c => c.id === id || c.name.toLowerCase().includes(id));
+    if (connector) connect({ connector });
+    else openAppKit({ view: 'Connect' });
   };
 
-  const handleCoinbase = () => {
-    console.log("[AUTH] Initializing Coinbase Smart Wallet...");
-    connect({ 
-      connector: coinbaseWallet({ preference: 'smartWalletOnly' }) 
-    });
-  };
+  const handleAppKit = () => openAppKit({ view: 'Connect' });
 
-  const handleWC = () => {
-    console.log("[AUTH] Initializing WalletConnect Interface...");
-    open();
-  };
-
-  // Initialize Scanner when showScanner is true
-  useEffect(() => {
-    if (showScanner && mounted) {
-      setTimeout(() => {
-        if (!scannerRef.current) {
-          scannerRef.current = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-          scannerRef.current.render((decodedText) => {
-             // Expecting a URL like /connect?session=xxx
-             try {
-                const url = new URL(decodedText);
-                const sessionFromQr = url.searchParams.get("session");
-                if (sessionFromQr && address) {
-                   scannerRef.current?.clear();
-                   fetch(`/api/auth/qr-session?id=${sessionFromQr}`, {
-                     method: "POST",
-                     body: JSON.stringify({ address })
-                   }).then(() => {
-                     setSyncStatus("SYNCED");
-                     setJustConnected(true);
-                     setShowScanner(false);
-                     setTimeout(() => { window.location.href = "/"; }, 1500);
-                   });
-                }
-             } catch (e) {
-                console.error("Invalid QR Code", e);
-             }
-          }, undefined);
-        }
-      }, 100);
-    }
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-        scannerRef.current = null;
-      }
-    };
-  }, [showScanner, mounted, address]);
-
-  // Handshake mobile session to desktop
-  useEffect(() => {
-    if (!mounted || !isConnected || !address || !sessionIdParam) return;
-    
-    const handshake = async () => {
-      try {
-        console.log("[SYNC] Initializing link for session:", sessionIdParam);
-        const res = await fetch(`/api/auth/qr-session?id=${sessionIdParam}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address })
-        });
-        
-        if (res.ok) {
-          console.log("[SYNC] Handshake completed successfully ✓");
-          setSyncStatus("SYNCED");
-          setJustConnected(true);
-          // Redirect to home after a brief celebratory delay
-          setTimeout(() => { window.location.href = "/"; }, 2000);
-        } else {
-          console.error("[SYNC] Handshake failed with status:", res.status);
-        }
-      } catch (e) {
-        console.error("[SYNC] Network error during handshake:", e);
-      }
-    };
-    handshake();
-  }, [mounted, isConnected, address, sessionIdParam]);
-
-  // Build QR URL: deep-link to this connect page via mobile
   const qrUrl = typeof window !== "undefined"
     ? `${window.location.origin}/connect?session=${qrSession ?? ""}`
     : "";
@@ -236,268 +149,226 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-safe min-h-screen flex flex-col bg-transparent text-[#050505] relative font-sans">
-      <UniversalEliteWallpaper />
-
-      {/* ── NAV ── */}
-      <header className="relative z-50 flex items-center justify-between px-8 py-5 border-b border-[#050505]/5 bg-white/70 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-7 h-7" alt="Whale" />
-          <span className="font-sans font-black text-sm uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
-        </div>
-        <div className="flex items-center gap-6">
-           <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-[#050505]/30 hidden md:block font-bold">
-             Node: v6.12.0-mainnet
-           </span>
-           <div className="flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full border border-black/5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[8px] font-black uppercase tracking-widest text-black/60">Registry Up</span>
+    <div className="h-screen w-full overflow-hidden flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans select-none">
+      <WavePatternOverlay />
+      
+      {/* ── [PROTOCOL] INSTITUTIONAL HEADER ──────────────────────────────────── */}
+      <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl">
+        <div className="flex items-center gap-4">
+           <div className="w-10 h-10 bg-black flex items-center justify-center rounded-xl shadow-xl shadow-black/10">
+              <img src="/official-whale-monochrome.png" className="w-7 h-7 invert" alt="Whale" />
            </div>
+           <div className="flex flex-col leading-none">
+              <span className="text-[15px] font-black uppercase tracking-tighter">Whale Alert Network</span>
+              <span className="text-[8px] font-mono font-bold uppercase tracking-[0.4em] opacity-30 mt-1">Sovereign Protocol v6.12.0</span>
+           </div>
+        </div>
+        
+        <div className="hidden md:flex items-center gap-10">
+           <InstitutionalBadge icon={Shield}>Zero Custody</InstitutionalBadge>
+           <InstitutionalBadge icon={Lock}>ECDSA Verified</InstitutionalBadge>
+           <InstitutionalBadge icon={Cpu}>Metal Ingress</InstitutionalBadge>
         </div>
       </header>
 
-      {/* ── BODY ── */}
-      <main className="flex-1 flex items-center justify-center px-6 py-12 relative z-10">
-        <AnimatePresence mode="wait">
-
-          {/* ── SUCCESS ── */}
-          {justConnected ? (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center gap-6 text-center"
+      {/* ── [TERMINAL] MAIN COMMAND CENTER ───────────────────────────────────── */}
+      <main className="flex-1 relative z-10 flex items-center justify-center p-6 md:p-12 overflow-hidden">
+        
+        {/* THE IMMERSIVE 1.09x ZOOM WRAPPER */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1.09, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-[1040px] h-full max-h-[640px] flex flex-col origin-center"
+        >
+          
+          {/* MOBILE NAVIGATION TABS (MANDATORY FOR FIRST SCREEN) */}
+          <div className="lg:hidden w-full max-w-sm mx-auto mb-6 p-1 bg-black/[0.04] backdrop-blur-md rounded-2xl border border-black/5 flex shadow-sm">
+            <button 
+              onClick={() => setActiveTab('QR')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all duration-300 ${activeTab === 'QR' ? 'bg-white text-black shadow-md' : 'text-black/40'}`}
             >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 18 }}
-                className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center"
-              >
-                <CheckCircle2 size={36} className="text-emerald-500" />
-              </motion.div>
-              <div>
-                <p className="text-2xl font-black uppercase tracking-tighter text-[#050505]">Identity Verified</p>
-                <p className="font-mono text-[11px] text-[#050505]/40 mt-2 font-bold">
-                  {address ? `${address.slice(0, 10)}…${address.slice(-8)}` : ""}
-                </p>
-              </div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-[#050505]/30 font-bold">
-                Entering terminal…
-              </p>
-            </motion.div>
-
-          ) : showScanner ? (
-            /* ── SCANNER FOR MOBILE ── */
-            <motion.div
-              key="scanner"
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center p-8 w-full max-w-md bg-white border border-[#050505]/10 rounded-3xl shadow-2xl"
+              <QrCode size={14} strokeWidth={2.5} />
+              <span className="text-[10px] font-black uppercase tracking-widest">QR Sync</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab('DIRECT')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all duration-300 ${activeTab === 'DIRECT' ? 'bg-white text-black shadow-md' : 'text-black/40'}`}
             >
-               <div className="flex items-center gap-3 mb-6">
-                 <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
-                 <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">Link Session</h2>
+              <Wallet size={14} strokeWidth={2.5} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Connect</span>
+            </button>
+          </div>
+
+          {/* THE HANDSHAKE CONSOLE */}
+          <div className="w-full h-full grid grid-cols-1 lg:grid-cols-2 bg-white rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden">
+            
+            {/* ── PANEL L: QR HANDSHAKE & ANALYTICS ── */}
+            <div className={`relative p-10 lg:p-14 flex flex-col bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-black/[0.06] overflow-hidden ${activeTab === 'QR' ? 'flex' : 'hidden lg:flex'}`}>
+              
+               {/* Background Layer: Whale Phantom */}
+               <div className="absolute -bottom-20 -left-20 opacity-[0.03] pointer-events-none transition-transform duration-1000 group-hover:scale-110">
+                 <img src="/official-whale-monochrome.png" className="w-[480px] h-[480px] grayscale" alt="" />
                </div>
-               <p className="text-[12px] text-[#050505]/50 mb-6 leading-relaxed font-semibold text-center">
-                 Scan the QR code displayed on your PC screen to sync your connection securely.
-               </p>
-               <div className="w-full aspect-square max-w-[300px] mb-4 relative overflow-hidden rounded-2xl border-4 border-[#050505]/5">
-                 <div id="reader" className="w-full h-full bg-[#FAF9F6] !border-none" />
+
+               <div className="relative z-10 flex flex-col h-full">
+                  <header className="mb-10">
+                    <div className="flex items-center gap-2 mb-3">
+                       <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+                       <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30">Syncing Intelligence</p>
+                    </div>
+                    <h2 className="text-4xl font-black tracking-tight leading-none text-black">
+                       Mobile<br /><span className="italic text-black/40">Handshake</span>
+                    </h2>
+                    <p className="text-[11px] text-black/50 mt-5 font-semibold leading-relaxed max-w-xs">
+                      Scan this sovereign coordinate to bridge your mobile identity with this terminal instance via ECDSA.
+                    </p>
+                  </header>
+
+                  <div className="flex-1 flex flex-col items-center justify-center gap-8">
+                     <div className="relative p-7 bg-white rounded-[42px] shadow-2xl shadow-black/5 border border-black/[0.02]">
+                        {qrSession ? (
+                          <div className="relative">
+                             <QRCode value={qrUrl} size={220} level="H" bgColor="#FFFFFF" fgColor="#050505" />
+                             {syncStatus === 'SYNCED' && (
+                               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center rounded-2xl">
+                                  <CheckCircle2 size={48} className="text-emerald-500" />
+                               </motion.div>
+                             )}
+                          </div>
+                        ) : (
+                          <div className="w-[220px] h-[220px] flex items-center justify-center bg-black/[0.01] rounded-2xl">
+                             <Loader2 size={32} className="animate-spin text-black/10" />
+                          </div>
+                        )}
+                        {/* QR Grid Deco */}
+                        <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-black/5 rounded-tl-[42px]" />
+                        <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-black/5 rounded-br-[42px]" />
+                     </div>
+
+                     <div className="flex flex-col items-center gap-4">
+                        <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-black/5 shadow-sm">
+                           <div className={`w-2 h-2 rounded-full ${syncStatus === 'SYNCED' ? 'bg-emerald-500 shadow-emerald-500/50' : 'bg-black/20 animate-pulse'}`} />
+                           <span className="text-[9px] font-mono font-black uppercase tracking-widest text-black/60">
+                             {isRedirecting ? 'IDENTITY VERIFIED' : qrSession ? (syncStatus === 'SYNCED' ? 'SESSION LINKED' : 'AWAITING RESPONSE') : 'NEGOTIATING…'}
+                           </span>
+                        </div>
+                        {qrSession && !isRedirecting && (
+                          <button onClick={fetchSession} className="text-[8px] font-mono font-bold uppercase tracking-[0.4em] text-black/20 hover:text-black/60 transition-colors">
+                            REGENERATE HANDSHAKE →
+                          </button>
+                        )}
+                     </div>
+                  </div>
+
+                  <footer className="mt-8 pt-8 border-t border-black/[0.04]">
+                     <div className="grid grid-cols-2 gap-8">
+                        <div>
+                           <p className="text-[8px] font-mono font-black uppercase tracking-widest text-black/30 mb-2">Protocols Supported</p>
+                           <p className="text-[9px] font-bold text-black/60 uppercase tracking-tight">WalletConnect V2 · SSE · ECDSA</p>
+                        </div>
+                        <div className="flex justify-end items-center gap-4 opacity-30">
+                           <Twitter size={14} />
+                           <Smartphone size={14} />
+                           <Activity size={14} />
+                        </div>
+                     </div>
+                  </footer>
                </div>
-               <button onClick={() => { setShowScanner(false); setJustConnected(true); setTimeout(() => router.replace("/"), 1000); }} className="text-[10px] font-mono uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] transition-colors mt-4">
-                 Skip & Enter Terminal
-               </button>
-            </motion.div>
+            </div>
 
-          ) : (
-
-            /* ── CONNECT ── */
-            <motion.div
-              key="connect"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden border border-[#050505]/10 bg-white rounded-3xl shadow-2xl shadow-black/5"
-            >
-
-              {/* ── LEFT: QR PANEL ── */}
-              <div className="p-10 border-b lg:border-b-0 lg:border-r border-[#050505]/10 flex flex-col relative overflow-hidden bg-[#FAF9F6]">
-                
-                {/* Giant background faded whale logo */}
-                <div className="absolute -bottom-20 -left-20 pointer-events-none opacity-[0.03]">
-                  <img src="/official-whale-monochrome.png" className="w-[400px] h-[400px] object-contain" alt="" />
-                </div>
-
-                <div className="mb-8 relative z-10">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/30 font-black">Institutional Sync</p>
-                    <div className="h-px bg-black/5 flex-1 mx-4" />
-                    <a href="https://twitter.com/whalecosystem" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[9px] font-mono font-black uppercase tracking-widest text-[#00ACEE] hover:opacity-80 transition-opacity bg-[#00ACEE]/10 px-2.5 py-1 rounded-full">
-                      <Twitter size={10} />
-                      @whalecosystem
-                    </a>
+            {/* ── PANEL R: DIRECT CONNECT & PROVIDERS ── */}
+            <div className={`p-10 lg:p-14 flex flex-col bg-white overflow-hidden ${activeTab === 'DIRECT' ? 'flex' : 'hidden lg:flex'}`}>
+               <header className="mb-10">
+                  <div className="flex items-center gap-2 mb-3">
+                     <span className="w-1.5 h-1.5 rounded-full bg-black/10" />
+                     <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-black/30">Direct Ingress</p>
                   </div>
-                  <h2 className="font-sans text-3xl font-black text-[#050505] tracking-tighter leading-tight flex items-center gap-3 italic">
-                    <img src="/official-whale-monochrome.png" className="w-10 h-10 opacity-90" alt="Whale" />
-                    Mobile Link
+                  <h2 className="text-3xl font-black tracking-tighter leading-none text-[#050505]">
+                     Protocol access<br /><span className="italic text-black/40">Connect Wallet</span>
                   </h2>
-                  <p className="text-[12px] text-[#050505]/50 mt-4 leading-relaxed font-semibold">
-                    Scan this sovereign handshake code with your mobile device to bridge your identity to this terminal instance.
-                  </p>
-                </div>
+               </header>
 
-                {/* QR Code */}
-                <div className="flex-1 flex flex-col items-center justify-center gap-6 relative z-10">
-                  <div className="relative p-5 bg-white border border-[#050505]/10 rounded-[32px] shadow-sm">
-                    {/* Corner accents */}
-                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#050505]/10 rounded-tl-[32px]" />
-                    <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#050505]/10 rounded-tr-[32px]" />
-                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#050505]/10 rounded-bl-[32px]" />
-                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#050505]/10 rounded-br-[32px]" />
-
-                    {qrSession ? (
-                      <QRCode
-                        value={qrUrl}
-                        size={200}
-                        bgColor="#ffffff"
-                        fgColor="#050505"
-                        level="M"
-                      />
-                    ) : (
-                      <div className="w-[200px] h-[200px] flex items-center justify-center">
-                        <Loader2 size={28} className="animate-spin text-[#050505]/20" />
-                      </div>
-                    )}
+               <div className="flex flex-col gap-3.5 flex-1">
+                  <WalletButton 
+                    logo="/wallets/metamask.svg" 
+                    name="MetaMask" 
+                    badge="Browser Injected · SDK" 
+                    onClick={() => handleConnector('injected')} 
+                    loading={isPending} 
+                    delay={0.15} 
+                  />
+                  <WalletButton 
+                    logo="/wallets/coinbase.png" 
+                    name="Coinbase Wallet" 
+                    badge="MPC Smart Wallet" 
+                    onClick={() => handleConnector('coinbase')} 
+                    delay={0.2} 
+                  />
+                  <div className="grid grid-cols-2 gap-3.5">
+                    <WalletButton 
+                      logo="/wallets/rainbow.png" 
+                      name="Rainbow" 
+                      badge="Mobile" 
+                      onClick={handleAppKit} 
+                      delay={0.25} 
+                    />
+                    <WalletButton 
+                      logo="/wallets/rabby.png" 
+                      name="Rabby" 
+                      badge="Advanced" 
+                      onClick={() => handleConnector('rabby')} 
+                      delay={0.3} 
+                    />
                   </div>
-
-                  {/* Status indicator */}
-                  <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-[#050505]/5">
-                    {syncStatus === "SYNCED" ? (
-                      <>
-                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        <span className="font-mono text-[9px] uppercase tracking-widest text-emerald-500 font-black">Session linked</span>
-                      </>
-                    ) : (
-                      <>
-                        <motion.span
-                          animate={{ opacity: [1, 0.3, 1] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                          className="w-2 h-2 rounded-full bg-[#050505]/20 inline-block"
-                        />
-                        <span className="font-mono text-[9px] uppercase tracking-widest text-[#050505]/40 font-bold">
-                          {qrSession ? "Awaiting scan" : "Generating code…"}
-                        </span>
-                      </>
-                    )}
+                  
+                  {/* EXPANDED MOBILE SUITE FOR HIGH PRO 3.1 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3.5">
+                    <WalletButton 
+                      logo={<QrCode size={18} className="text-white" />} 
+                      name="WalletConnect" 
+                      badge="Search +550 Wallets" 
+                      onClick={handleAppKit} 
+                      delay={0.35} 
+                      premium={true}
+                    />
                   </div>
+               </div>
 
-                  {/* Refresh */}
-                  {qrSession && syncStatus !== "SYNCED" && (
-                    <button
-                      onClick={fetchSession}
-                      className="font-mono text-[9px] uppercase tracking-widest text-[#050505]/30 hover:text-[#050505] transition-colors font-bold"
-                    >
-                      Refresh code →
-                    </button>
-                  )}
-                </div>
-
-                {/* Compatible wallets note */}
-                <p className="mt-8 text-[9px] font-mono uppercase tracking-widest text-[#050505]/30 text-center font-bold">
-                  Compatible with MetaMask Mobile · Rainbow · Trust Wallet · Coinbase Wallet
-                </p>
-              </div>
-
-              {/* ── RIGHT: DIRECT CONNECT PANEL ── */}
-              <div className="p-10 flex flex-col bg-white">
-                <div className="mb-8">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/30 font-black mb-2">Desktop Connection</p>
-                  <h2 className="font-sans text-2xl font-black text-[#050505] tracking-tighter leading-tight">
-                    Connect your<br />wallet directly
-                  </h2>
-                  <p className="text-[12px] text-[#050505]/50 mt-3 leading-relaxed font-semibold">
-                    Select your preferred wallet to authenticate. No password required — your wallet signs a cryptographic message.
+               <div className="mt-10 p-5 bg-[#FAF9F6] border border-black/5 rounded-3xl flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-white border border-black/5 flex items-center justify-center shadow-sm shrink-0">
+                     <Fingerprint size={18} className="text-black/40" />
+                  </div>
+                  <p className="text-[10px] text-black/50 font-semibold leading-relaxed">
+                     By connecting, you verify ownership over your sovereign keys. Private data is encrypted via ECDSA proofs. No cookies or databases touch your assets.
                   </p>
-                </div>
+               </div>
+            </div>
 
-                {/* Wallet options */}
-                <div className="flex flex-col gap-3 flex-1">
-                  <WalletButton
-                    logo="/wallets/metamask.svg"
-                    name="MetaMask"
-                    badge="Browser extension · Injected"
-                    onClick={handleInjected}
-                    loading={isPending}
-                    delay={0.1}
-                  />
-                  <WalletButton
-                    logo="/wallets/coinbase.png"
-                    name="Coinbase Wallet"
-                    badge="Smart Wallet · MPC"
-                    onClick={handleCoinbase}
-                    delay={0.15}
-                  />
-                  <WalletButton
-                    logo="/wallets/rainbow.png"
-                    name="WalletConnect"
-                    badge="Universal · Any wallet"
-                    onClick={handleWC}
-                    delay={0.2}
-                  />
-                  <WalletButton
-                    logo="/wallets/rabby.png"
-                    name="Rabby Wallet"
-                    badge="Multi-chain · Injected"
-                    onClick={handleInjected}
-                    delay={0.25}
-                  />
-                </div>
-
-                {/* Security note */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-8 pt-6 border-t border-[#050505]/5 flex items-start gap-3"
-                >
-                  <Shield size={14} className="text-[#050505]/30 mt-0.5 shrink-0" />
-                  <p className="text-[10px] text-[#050505]/40 leading-relaxed font-bold">
-                    Non-custodial authentication. Your private keys never leave your device. Authentication is verified via ECDSA — no passwords, no accounts.
-                  </p>
-                </motion.div>
-
-                {/* Networks */}
-                <div className="mt-5 flex items-center gap-2 flex-wrap">
-                  {["Optimism", "Ethereum", "Base", "Arbitrum", "Polygon"].map((n) => (
-                    <span key={n} className="text-[8px] font-mono font-black uppercase tracking-widest px-2.5 py-1 border border-[#050505]/10 rounded-full text-[#050505]/40 bg-[#FAF9F6]">
-                      {n}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </div>
+        </motion.div>
       </main>
 
-      {/* ── FOOTER ── */}
-      <footer className="relative z-10 px-8 py-5 border-t border-[#050505]/5 flex items-center justify-between bg-white">
-        <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-4 h-4 opacity-30" alt="" />
-          <span className="font-mono text-[8px] uppercase tracking-widest text-[#050505]/30 font-bold">
-            Whale Alert Network · Privacy by Void
-          </span>
-        </div>
-        <a
-          href="https://walletconnect.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-widest text-[#050505]/30 hover:text-[#050505] transition-colors font-bold"
-        >
-          WalletConnect <ExternalLink size={10} />
-        </a>
+      {/* ── [FOOTER] INSTITUTIONAL MARK ───────────────────────────────────────── */}
+      <footer className="relative z-[100] h-[72px] px-10 border-t border-black/[0.04] bg-white/70 backdrop-blur-xl flex items-center justify-between">
+         <div className="flex items-center gap-10">
+            <span className="text-[9px] font-mono font-black uppercase tracking-[0.5em] text-black/20">© Whale Alert Network</span>
+            <div className="hidden lg:flex items-center gap-6">
+               <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors cursor-pointer">Security Protocol</span>
+               <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-black/30 hover:text-black transition-colors cursor-pointer">Identity Mesh</span>
+            </div>
+         </div>
+         
+         <div className="flex items-center gap-6">
+            {['ETHEREUM', 'ARBITRUM', 'BASE', 'POLYGON'].map(n => (
+              <span key={n} className="hidden sm:inline-block text-[8px] font-mono font-black tracking-[0.25em] text-black/40 border border-black/[0.03] rounded-full px-3 py-1 bg-black/[0.02]">{n}</span>
+            ))}
+            <div className="w-px h-6 bg-black/[0.06] mx-2" />
+            <button className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/60 hover:text-black transition-colors">
+               Legal Framework
+               <ChevronRight size={10} />
+            </button>
+         </div>
       </footer>
     </div>
   );
