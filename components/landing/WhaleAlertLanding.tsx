@@ -68,42 +68,6 @@ export default function WhaleAlertLanding() {
       />
 
 
-      {/* ── Fixed Header Pill with Connect Wallet Button ── */}
-      <motion.header
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-4 left-1/2 -translate-x-1/2 w-full max-w-[840px] z-50 flex items-center justify-between px-5 py-3 rounded-full"
-        style={{
-          background: "rgba(255,255,255,0.72)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          border: `1px solid rgba(5,5,5,0.10)`,
-          boxShadow: "0 4px 20px rgba(5,5,5,0.07)",
-        }}
-      >
-        <div className="flex items-center gap-2.5">
-          <WhaleLogo className="w-6 h-6 shrink-0" />
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-tight text-[#050505]">
-              Whale Alert Network
-            </div>
-          </div>
-        </div>
-
-        <button
-          onClick={handleEntry}
-          className="px-4 py-2 rounded-full font-sans font-black uppercase tracking-wide transition-transform active:scale-[0.96]"
-          style={{
-            backgroundColor: "#050505",
-            color: "#FFFFFF",
-            fontSize: "9.5px",
-            letterSpacing: "0.15em"
-          }}
-        >
-          {address ? "OPEN TERMINAL" : "CONNECT WALLET"}
-        </button>
-      </motion.header>
 
       {/* Text Content Layer */}
       <div className="relative z-10 max-w-[840px] mx-auto px-8 pt-24 pb-64 text-[11px] md:text-[12px] leading-[2.2] tracking-wide" style={{ color: MUTED }}>
