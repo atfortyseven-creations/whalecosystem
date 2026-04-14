@@ -3,15 +3,24 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "./GlassCard";
-import { X, Send, Repeat, Globe, ArrowRight, Loader2, ChevronDown, Shield, Zap, Activity } from "lucide-react";
+import { X, Send, Repeat, Globe, ArrowRight, Loader2, ChevronDown, Shield, Zap, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { useTransactionHandler } from "@/hooks/useTransactionHandler";
 import { useAccount, useWalletClient, usePublicClient } from "wagmi";
-import { getExplorerTxUrl } from "@/lib/wallet/chains";
 import { useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData, parseUnits } from "viem";
 import { TokenSelector } from "@/components/wallet/TokenSelector";
 import { InstitutionalErrorBoundary } from "@/components/ui/InstitutionalErrorBoundary";
+
+import { useEliteSwap } from "@/hooks/useEliteSwap";
+import { useGaslessSwap } from "@/hooks/useGaslessSwap";
+import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
+
+// ── Design Tokens (Ivory Model) ────────────────────────────────────────────────
+const BG     = "#FAF9F6";
+const INK    = "#050505";
+const MUTED  = "rgba(5,5,5,0.45)";
+const BORDER = "rgba(5,5,5,0.08)";
+const CARD   = "#FFFFFF";
 
 interface LegendaryTransactionModalProps {
   isOpen: boolean;
@@ -22,62 +31,15 @@ interface LegendaryTransactionModalProps {
 }
 
 const CHAINS = [
-    { id: 1, name: "Ethereum", icon: "💎", color: "bg-blue-500" },
-    { id: 137, name: "Polygon", icon: "💜", color: "bg-purple-500" },
-    { id: 8453, name: "Base", icon: "🔵", color: "bg-blue-600" },
-    { id: 42161, name: "Arbitrum", icon: "🔷", color: "bg-blue-400" },
-    { id: 10, name: "Optimism", icon: "🔴", color: "bg-red-500" },
-    { id: 480, name: "World Chain", icon: "🌐", color: "bg-black" },
-    { id: 84532, name: "Base Sepolia", icon: "🔵", color: "bg-blue-600" },
+    { id: 1,     name: "Ethereum",     color: "#627EEA" },
+    { id: 137,   name: "Polygon",      color: "#8247E5" },
+    { id: 8453,  name: "Base",         color: "#0052FF" },
+    { id: 42161, name: "Arbitrum",     color: "#12AAFF" },
+    { id: 10,    name: "Optimism",     color: "#FF0420" },
+    { id: 480,   name: "World Chain",  color: "#000000" },
+    { id: 84532, name: "Base Sepolia", color: "#0052FF" },
 ];
 
-// Address Map for destination tokens (Standardized for Legendary Level)
-const TOKEN_MAP: Record<number, Record<string, string>> = {
-    1: { // Ethereum
-        'USDT': '0xdac17f958d2ee523a2206206994597c13d831ec7',
-        'USDC': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753',
-        'ETH': '0x0000000000000000000000000000000000000000',
-        'WETH': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
-    },
-    137: { // Polygon
-        'USDT': '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-        'USDC': '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
-        'WLD': '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', 
-        'POL': '0x0000000000000000000000000000000000000000',
-        'MATIC': '0x0000000000000000000000000000000000000000'
-    },
-    8453: { // Base
-        'USDC': '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-        'ETH': '0x0000000000000000000000000000000000000000',
-        'WLD': '0x4990d1656209cc5039d91f278077c577002047dc' 
-    },
-    84532: { // Base Sepolia
-        'USDC': '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
-        'ETH': '0x0000000000000000000000000000000000000000',
-        'WLD': '0x4200000000000000000000000000000000000006'
-    },
-    480: { // World Chain
-        'WLD': '0x2cFc85d8E48F8EAB294be644d9E25C3030863003',
-        'USDC': '0x79A02482A880bCE3F13e09Da970dC34db4CD68d7',
-        'ETH': '0x0000000000000000000000000000000000000000'
-    },
-    42161: { // Arbitrum
-        'USDC': '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
-        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753',
-        'ETH': '0x0000000000000000000000000000000000000000'
-    },
-    10: { // Optimism
-        'USDC': '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-        'WLD': '0x163f8c2467924be0ae7b5347228cabf260318753',
-        'ETH': '0x0000000000000000000000000000000000000000'
-    }
-};
-
-import { useEliteSwap } from "@/hooks/useEliteSwap";
-import { useGaslessSwap } from "@/hooks/useGaslessSwap";
-
-import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 export function LegendaryTransactionModal({ 
     isOpen, 
     onClose, 
@@ -91,27 +53,25 @@ export function LegendaryTransactionModal({
   // Chain State
   const { address, chain } = useAccount();
   const [sourceChain, setSourceChain] = useState(CHAINS.find(c => c.id === chain?.id) || CHAINS[0]);
-  const [targetChain, setTargetChain] = useState(CHAINS[2]); // Default to Base
+  const [targetChain, setTargetChain] = useState(CHAINS[2]); // Default Base
 
   // Asset State
   const [fromAssetSymbol, setFromAssetSymbol] = useState(balances[0]?.symbol || "ETH");
-  const [fromAsset, setFromAsset] = useState<any>(balances[0] || null); // Source Token Object
+  const [fromAsset, setFromAsset] = useState<any>(balances[0] || null); 
   const [toAssetSymbol, setToAssetSymbol] = useState("USDC");
-  const [toAsset, setToAsset] = useState<any>(null); // For Universal Swap
+  const [toAsset, setToAsset] = useState<any>(null); 
   
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
   const [loading, setLoading] = useState(false);
   const [quote, setQuote] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [hasGas, setHasGas] = useState(false); // Default to false to show banner if check fails
-  const [useGasless, setUseGasless] = useState(false);
 
-  // Orchestrator Hooks
-  const { executeSwap, resolveTokenAddress, status: orchestratorStatus, error: orchestratorError } = useEliteSwap();
-  const { executeGaslessSwap, isLoading: gaslessLoading } = useGaslessSwap();
+  const { executeSwap, resolveTokenAddress, status: orchestratorStatus } = useEliteSwap();
+  const queryClient = useQueryClient();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
 
-  // Sync mode if changed from parent
   useEffect(() => {
     if (isOpen) {
         setMode(initialMode);
@@ -119,7 +79,6 @@ export function LegendaryTransactionModal({
     }
   }, [isOpen, initialMode, initialSubMode]);
 
-  // Determine Source Chain based on selected asset in Balances
   useEffect(() => {
       const asset = balances.find(b => b.symbol === fromAssetSymbol);
       if (asset) {
@@ -129,14 +88,13 @@ export function LegendaryTransactionModal({
       }
   }, [fromAssetSymbol, balances]);
 
-  // Sync fromAsset state if pending
   useEffect(() => {
      if (balances.length > 0 && !fromAsset) {
          setFromAsset(balances.find(b => b.symbol === fromAssetSymbol) || balances[0]);
      }
   }, [balances, fromAsset, fromAssetSymbol]);
 
-  // Elite Quote Fetcher (Debounced)
+  // Quote Fetcher
   useEffect(() => {
     if (!amount || parseFloat(amount) <= 0 || !isOpen || (mode !== 'swap' && mode !== 'bridge' && mode !== 'buy')) {
         setQuote(null);
@@ -151,20 +109,16 @@ export function LegendaryTransactionModal({
         try {
             setErrorMsg(null);
             
-            // Resolve addresses
             const fromTokenAddress = activeFromAsset?.address || resolveTokenAddress(fromAssetSymbol, sourceChain.id);
             const toTokenAddress = resolveTokenAddress(toAssetSymbol, mode === 'swap' ? sourceChain.id : targetChain.id);
-            
             const amountInWei = amountInUnits.toString();
 
             if (mode === 'buy') {
-                // Mock price for buy estimation if not calling provider yet
                 setQuote({ price: 1.0 }); // Simplified for UI
                 return;
             }
 
-            const res = await fetch(`/api/wallet/swap?action=quote&chainId=${sourceChain.id}&fromToken=${fromTokenAddress}&toToken=${toTokenAddress}&amount=${amountInWei}&fromAddress=${address}`);
-            
+            const res = await fetch(`/api/wallet/swap?action=quote&chainId=${sourceChain.id}&fromToken=${fromTokenAddress}&toToken=${toTokenAddress}&amount=${amountInWei}&address=${address}`);
             if (res.ok) {
                 const data = await res.json();
                 setQuote(data);
@@ -182,52 +136,38 @@ export function LegendaryTransactionModal({
     return () => clearTimeout(timer);
   }, [amount, fromAssetSymbol, toAssetSymbol, sourceChain, targetChain, mode, isOpen, address, balances]);
 
-  // const { address, chain } = useAccount(); // MOVED TO TOP
-  const { data: walletClient } = useWalletClient();
-  const publicClient = usePublicClient();
-  const queryClient = useQueryClient();
-
-  // Check if user has gas for transactions
-  useEffect(() => {
-    const checkGasBalance = async () => {
-      if (!publicClient || !address) {
-          console.log('[GAS CHECK] No client or address');
-          return;
-      }
-      try {
-        console.log(`[GAS CHECK] Checking balance for ${address} on chain ${chain?.id}`);
-        const balance = await publicClient.getBalance({ address });
-        console.log(`[GAS CHECK] Balance: ${balance.toString()} wei`);
-        
-        // Consider user has gas if balance > 0.001 native token (enough for ~1-2 txs)
-        const hasEnough = balance > BigInt(1000000000000000); // 0.001 in wei
-        console.log(`[GAS CHECK] Has enough gas? ${hasEnough}`);
-        
-        setHasGas(hasEnough);
-      } catch (e) {
-        console.error('Failed to check gas balance:', e);
-        // If check fails, assume NO gas to be safe and offer gasless
-        setHasGas(false);
-      }
-    };
-    
-    // Reset gasless state when chain changes
-    setUseGasless(false);
-    checkGasBalance();
-  }, [address, publicClient, sourceChain, chain?.id]);
-
   const handleExecute = async () => {
       if (mode === 'buy') {
           if (!amount) return;
-          toast.info("Security Check Passed", { description: "Redirecting to MoonPay Secure Gateway..." });
-          const currencyCode = toAssetSymbol.toLowerCase();
-          const walletAddr = address || "";
-          const apiKey = process.env.NEXT_PUBLIC_MOONPAY_KEY || "pk_test_123"; 
-          
-          const baseCurrency = ['usd', 'eur', 'gbp'].includes(subMode.toLowerCase()) ? subMode.toLowerCase() : 'usd';
-          const url = `https://buy.moonpay.com/v2/buy?apiKey=${apiKey}&currencyCode=${currencyCode}&baseCurrencyCode=${baseCurrency}&baseCurrencyAmount=${amount}&walletAddress=${walletAddr}`;
-          
-          window.open(url, '_blank');
+          setLoading(true);
+          try {
+              toast.info("Generating Secure Link...", { id: "moonpay-gen" });
+              const currencyCode = toAssetSymbol.toLowerCase();
+              const baseCurrency = ['usd', 'eur', 'gbp'].includes(subMode.toLowerCase()) ? subMode.toLowerCase() : 'usd';
+              
+              const res = await fetch('/api/wallet/moonpay/sign', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      walletAddress: address || "",
+                      baseCurrencyAmount: amount,
+                      baseCurrencyCode: baseCurrency,
+                      currencyCode
+                  })
+              });
+              
+              const data = await res.json();
+              if (data.url) {
+                  toast.success("Gateway Verified", { id: "moonpay-gen", description: "Opening secure session." });
+                  window.open(data.url, '_blank');
+              } else {
+                  throw new Error(data.error || "Unknown signature error");
+              }
+          } catch(e: any) {
+              toast.error("Gateway Failed", { id: "moonpay-gen", description: e.message });
+          } finally {
+              setLoading(false);
+          }
           return;
       }
 
@@ -241,13 +181,7 @@ export function LegendaryTransactionModal({
           if (mode === 'send') {
               let finalRecipient = recipient;
 
-              // ─── ENS RESOLUTION ──────────────────────────────────────────────
               if (subMode === 'ens') {
-                  if (!recipient.includes('.')) {
-                      toast.error("Invalid ENS", { description: "Names should end in .eth" });
-                      setLoading(false);
-                      return;
-                  }
                   toast.loading("Resolving ENS Name...", { id: 'ens-resolve' });
                   try {
                       const { mainnetClient } = await import('@/lib/blockchain/rpc-engine');
@@ -263,45 +197,29 @@ export function LegendaryTransactionModal({
                   }
               }
 
-              // ─── FLASHBOTS PROTECTION ──────────────────────────────────────
-              const isMainnet = sourceChain.id === 1;
-              if (subMode === 'private' && isMainnet) {
-                  toast.loading("Securing Private Route (Flashbots)...", { id: 'send-tx' });
-                  // In a real environment, we'd check if the wallet supports 
-                  // custom RPC per tx. Since we rely on walletClient, 
-                  // we inform the user to use Flashbots Protect if high value.
-                  // For now, we proceed with standard broadcast but mark as private in DB.
-              }
-
-              // Validate final recipient
               if (!finalRecipient || finalRecipient.length < 40) {
                   toast.error("Invalid Recipient", { description: "Please enter a valid address" });
                   setLoading(false);
                   return;
               }
 
-              // Get the selected asset
               const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
-              if (!activeFromAsset && mode !== 'buy') {
+              if (!activeFromAsset) {
                   toast.error("Asset Not Found", { description: `Cannot find ${fromAssetSymbol} on ${sourceChain.name}` });
                   setLoading(false);
                   return;
               }
 
               const decimals = activeFromAsset?.decimals || 18;
-              
-              toast.info("Preparing Transaction", { description: subMode === 'private' ? "Routing through MEV-Protected RPC..." : "Please confirm in your wallet..." });
+              toast.info("Preparing Transaction", { description: "Please confirm in your wallet..." });
 
               let hash: string;
-
-              // Check if it's a native token
               const isNative = activeFromAsset.address === '0x0000000000000000000000000000000000000000' || 
                                activeFromAsset.address === 'native' ||
                                fromAssetSymbol === 'ETH' || 
                                fromAssetSymbol === 'POL' ||
                                fromAssetSymbol === 'MATIC';
 
-              // [PERFECTION] Use parseUnits for exact precision
               const amountInUnits = parseUnits(amount, decimals);
 
               if (isNative) {
@@ -330,7 +248,6 @@ export function LegendaryTransactionModal({
                   });
               }
 
-              // Sync
               await fetch('/api/transactions', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -343,29 +260,19 @@ export function LegendaryTransactionModal({
                       fromToken: activeFromAsset.address,
                       toToken: activeFromAsset.address,
                       fromAmount: amountInUnits.toString(),
-                      metadata: {
-                          recipient: finalRecipient,
-                          symbol: fromAssetSymbol,
-                          sendMode: subMode,
-                          isPrivate: subMode === 'private'
-                      }
+                      metadata: { recipient: finalRecipient, symbol: fromAssetSymbol }
                   })
-              }).catch(e => console.error('[SEND] DB Sync Failed:', e));
+              });
 
               toast.success("Transfer Initiated", { description: `Broadcast successful. Hash: ${hash.slice(0, 10)}...` });
               queryClient.invalidateQueries({ queryKey: ['portfolio-assets'] });
               onClose();
-              return;
 
           } else if (mode === 'swap' || mode === 'bridge') {
-              // ─── REAL 1INCH LIMIT ORDER (EIP-712) ───────────────────────────
               if (subMode === 'limit') {
                   const { ONEINCH_LIMIT_ORDER_V3_TYPE, get1inchOrderDomain } = await import('@/lib/blockchain/eip712');
-                  
                   toast.loading("Generating Secure Limit Intent...", { id: 'limit-order' });
-                  
                   try {
-                      // Construct 1inch V3 Order basic skeleton
                       const order = {
                           salt: BigInt(Date.now()),
                           makerAsset: (fromAsset?.address || '0x...') as `0x${string}`,
@@ -374,21 +281,19 @@ export function LegendaryTransactionModal({
                           receiver: address as `0x${string}`,
                           allowedSender: '0x0000000000000000000000000000000000000000' as `0x${string}`,
                           makingAmount: parseUnits(amount, fromAsset?.decimals || 18),
-                          takingAmount: parseUnits("0", 18), // Would be calculated from target price
+                          takingAmount: parseUnits("0", 18), 
                           offsets: BigInt(0),
                           interactions: '0x' as `0x${string}`,
                       };
-
                       //@ts-ignore
-                      const signature = await walletClient.signTypedData({
+                      await walletClient.signTypedData({
                           account: address as `0x${string}`,
                           domain: get1inchOrderDomain(sourceChain.id),
                           types: ONEINCH_LIMIT_ORDER_V3_TYPE,
                           primaryType: 'Order',
                           message: order,
                       });
-
-                      toast.success("Limit Order Signed", { id: 'limit-order', description: "Order broadcasted to 1inch network." });
+                      toast.success("Limit Order Signed", { id: 'limit-order', description: "Order broadcasted." });
                       onClose();
                   } catch (e: any) {
                       toast.error("Signature Refused", { id: 'limit-order', description: e.message });
@@ -396,15 +301,6 @@ export function LegendaryTransactionModal({
                   return;
               }
 
-              // ─── REAL ONRAMPER INTEGRATION ──────────────────────────────────
-              if (mode === 'buy') {
-                  const onramperUrl = `https://buy.onramper.com/?themeName=dark&containerColor=0a0d10&primaryColor=6366f1&secondaryColor=ffffff&cardColor=1e202b&primaryTextColor=ffffff&secondaryTextColor=ffffff&borderRadius=1.5&wallets=ETH:${address}&defaultCrypto=ETH&isIframe=true`;
-                  window.open(onramperUrl, '_blank');
-                  onClose();
-                  return;
-              }
-
-              // ─── STANDARD SWAP/BRIDGE PATH ────────────────────────────────────
               const activeFromAsset = fromAsset || balances.find(b => b.symbol === fromAssetSymbol && b.chainId === sourceChain.id);
               const amountInUnits = parseUnits(amount, activeFromAsset?.decimals || 18);
 
@@ -418,7 +314,7 @@ export function LegendaryTransactionModal({
               });
 
               if (hash) {
-                  toast.success(`Elite Execution Initiated`, { description: "Atomic swap broadcasted with Flashbots protection." });
+                  toast.success(`Execution Initiated`, { description: "Atomic swap broadcasted." });
                   queryClient.invalidateQueries({ queryKey: ['portfolio-assets'] });
                   onClose();
               }
@@ -431,6 +327,8 @@ export function LegendaryTransactionModal({
       }
   };
 
+  const inputClass = `w-full bg-white border border-black/10 rounded-xl p-4 text-[#050505] font-mono text-sm outline-none focus:border-black/30 transition-all placeholder:text-black/30`;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -440,35 +338,32 @@ export function LegendaryTransactionModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/90 backdrop-blur-3xl"
+            className="absolute inset-0 bg-[#FAF9F6]/80 backdrop-blur-md"
           />
 
           <motion.div
-            initial={{ scale: 0.98, opacity: 0, y: 30 }}
+            initial={{ scale: 0.98, opacity: 0, y: 15 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.98, opacity: 0, y: 30 }}
+            exit={{ scale: 0.98, opacity: 0, y: 15 }}
             className="relative w-full max-w-lg"
           >
-            <InstitutionalErrorBoundary moduleName="EliteTransfer">
-              <GlassCard className="p-0 border-white/10 overflow-hidden bg-[#0A0D10] shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+            <InstitutionalErrorBoundary moduleName="Wallet">
+              <div className="p-0 border rounded-3xl overflow-hidden shadow-2xl" style={{ borderColor: BORDER, background: BG }}>
                 
-                <div className="bg-gradient-to-b from-white/[0.03] to-transparent p-6 border-b border-white/5">
+                <div className="p-6 border-b" style={{ borderColor: BORDER, background: CARD }}>
                   <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20">
-                              <Shield size={18} className="text-indigo-400" />
+                          <div className="w-10 h-10 border rounded-xl flex items-center justify-center" style={{ borderColor: BORDER, background: BG }}>
+                              <Shield size={16} style={{ color: MUTED }} />
                           </div>
-                          <div>
-                            <h2 className="text-xl font-black tracking-tighter uppercase italic text-white">Elite Transfer</h2>
-                            <p className="text-[8px] font-black text-indigo-400/60 uppercase tracking-[0.3em]">Institutional Grade Execution</p>
-                          </div>
+                          <h2 className="text-xl font-black tracking-tighter uppercase" style={{ color: INK }}>Wallet</h2>
                       </div>
-                      <button onClick={onClose} className="text-white/20 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full">
+                      <button onClick={onClose} className="p-2 transition-colors rounded-full hover:bg-black/5" style={{ color: MUTED }}>
                           <X size={20} />
                       </button>
                   </div>
 
-                  <div className="flex bg-black p-1.5 rounded-2xl border border-white/5 mb-4 shadow-inner">
+                  <div className="flex p-1.5 rounded-xl border mb-4" style={{ borderColor: BORDER, background: BG }}>
                       {(["send", "swap", "bridge", "buy"] as const).map((t) => (
                           <button
                               key={t}
@@ -476,7 +371,7 @@ export function LegendaryTransactionModal({
                                   setMode(t);
                                   setSubMode(t === 'buy' ? 'USD' : 'standard');
                               }}
-                              className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${mode === t ? 'bg-white text-black shadow-2xl scale-[1.02]' : 'text-white/20 hover:text-white/50'}`}
+                              className={`flex-1 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-all ${mode === t ? 'bg-[#050505] text-[#FAF9F6] shadow-md' : 'text-black/40 hover:text-black/80'}`}
                           >
                               {t}
                           </button>
@@ -485,64 +380,42 @@ export function LegendaryTransactionModal({
 
                   <div className="flex gap-4 px-1">
                       {mode === 'send' && (["standard", "private", "ens"] as const).map(s => (
-                          <button key={s} onClick={() => setSubMode(s)} className={`text-[9px] font-black uppercase tracking-tighter transition-colors ${subMode === s ? 'text-indigo-400 underline underline-offset-4' : 'text-white/20 hover:text-white/40'}`}>
+                          <button key={s} onClick={() => setSubMode(s)} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${subMode === s ? 'text-[#050505] underline underline-offset-4' : 'text-black/30 hover:text-[#050505]'}`}>
                               {s === 'private' && <Shield size={8} className="inline mr-1" />}
                               {s}
                           </button>
                       ))}
                       {mode === 'swap' && (["aggregator", "limit"] as const).map(s => (
-                          <button key={s} onClick={() => setSubMode(s)} className={`text-[9px] font-black uppercase tracking-tighter transition-colors ${subMode === s ? 'text-indigo-400 underline underline-offset-4' : 'text-white/20 hover:text-white/40'}`}>{s}</button>
+                          <button key={s} onClick={() => setSubMode(s)} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${subMode === s ? 'text-[#050505] underline underline-offset-4' : 'text-black/30 hover:text-[#050505]'}`}>{s}</button>
                       ))}
                   </div>
-
-                  {/* Status HUD */}
-                  {(mode === 'swap' || mode === 'bridge') && (
-                      <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-4">
-                          <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                                      <Activity size={14} className="text-indigo-400" />
-                                  </div>
-                                  <div>
-                                      <div className="text-[10px] font-black text-white uppercase tracking-widest">Sovereign Routing Active</div>
-                                      <div className="text-[9px] text-white/30 mt-0.5">Real-time Liquidity Aggregation via Li.Fi Hub</div>
-                                  </div>
-                              </div>
-                              <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 rounded flex-shrink-0 border border-green-500/20">
-                                  <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-                                  <span className="text-[8px] font-black text-green-500 uppercase">Live On-Chain</span>
-                              </div>
-                          </div>
-                      </div>
-                  )}
                 </div>
 
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6" style={{ background: BG }}>
                 
-                {/* [LEGENDARY] Buy Crypto View */}
+                {/* ── BUY CRYPTO MODE ── */}
                 {mode === 'buy' ? (
                       <div className="space-y-6">
-                        <div className="bg-black/60 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-                           <div className="absolute inset-0 bg-gradient-to-tr from-green-500/5 to-transparent pointer-events-none" />
+                        <div className="border rounded-2xl p-6 relative overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
                            <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Spend ({subMode})</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Spend ({subMode})</label>
                                     <input 
                                         type="number" 
                                         placeholder="100"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full bg-transparent border-none outline-none text-4xl font-black tracking-tighter text-white placeholder:text-white/10"
+                                        className="w-full bg-transparent border-none outline-none text-4xl font-black tracking-tighter"
+                                        style={{ color: INK }}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    {/* Currency Toggles */}
-                                    <div className="flex bg-white/5 rounded-lg p-1 gap-1">
+                                    <div className="flex rounded-lg border p-1 gap-1" style={{ borderColor: BORDER, background: BG }}>
                                         {['USD', 'EUR', 'GBP'].map(c => (
                                             <button 
                                                 key={c}
                                                 onClick={() => setSubMode(c)}
-                                                className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${subMode === c ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`}
+                                                className={`px-3 py-1.5 rounded text-[10px] font-black transition-all ${subMode === c ? 'bg-[#050505] text-[#FAF9F6]' : 'text-black/40 hover:text-[#050505]'}`}
                                             >
                                                 {c}
                                             </button>
@@ -553,24 +426,23 @@ export function LegendaryTransactionModal({
                         </div>
 
                         <div className="flex justify-center -my-3 relative z-10">
-                            <div className="bg-[#161A1E] p-2 rounded-full border border-white/10">
-                                <ArrowRight size={16} className="text-white/40 rotate-90" />
+                            <div className="p-2 rounded-full border shadow-sm" style={{ borderColor: BORDER, background: CARD }}>
+                                <ArrowRight size={14} style={{ color: MUTED }} className="rotate-90" />
                             </div>
                         </div>
 
-                        <div className="bg-black/60 border border-white/10 rounded-2xl p-6 relative">
+                        <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
                             <div className="flex justify-between items-end">
                                 <div className="flex-1">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Receive (Est.)</label>
-                                    <div className="text-4xl font-black tracking-tighter text-white/40">
-                                        {/* Simple Estimate: Amount / Price */}
+                                    <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Receive (Est.)</label>
+                                    <div className="text-4xl font-black tracking-tighter" style={{ color: MUTED }}>
                                         {quote && quote.price ? (Number(amount) / quote.price).toLocaleString(undefined, { maximumFractionDigits: 5 }) : '0.00'}
                                     </div>
                                 </div>
-                                <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex items-center gap-3">
-                                    {/* Quick To Asset Toggle */}
+                                <div className="border rounded-xl px-4 py-2 flex items-center gap-3" style={{ borderColor: BORDER, background: BG }}>
                                     <select 
-                                        className="bg-transparent text-white font-black outline-none border-none"
+                                        className="bg-transparent font-black outline-none border-none text-sm"
+                                        style={{ color: INK }}
                                         value={toAssetSymbol}
                                         onChange={(e) => setToAssetSymbol(e.target.value)}
                                     >
@@ -584,71 +456,62 @@ export function LegendaryTransactionModal({
 
                         <button 
                             onClick={handleExecute}
-                            disabled={!amount}
-                            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 p-5 rounded-2xl font-black text-sm uppercase tracking-[.25em] shadow-xl shadow-green-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                            disabled={!amount || loading}
+                            className="w-full p-4 rounded-xl font-black text-xs uppercase tracking-[0.25em] active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-40"
+                            style={{ background: INK, color: '#FFF' }}
                         >
-                            <span className="text-lg">💳</span>
-                            Continue with Card
+                            {loading ? <Loader2 className="animate-spin" size={16} /> : <CreditCard size={16} />}
+                            {loading ? 'Verifying Gateway…' : 'Continue with Card'}
                         </button>
-                        
-                        <div className="text-center">
-                             <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Powered by Elite Partners</p>
-                             <div className="flex justify-center gap-4 opacity-30 grayscale hover:grayscale-0 transition-all">
-                                 <span className="font-bold">MoonPay</span>
-                                 <span className="font-bold">Transak</span>
-                                 <span className="font-bold">Ramp</span>
-                             </div>
-                        </div>
                       </div>
                 ) : (
                     <div className="space-y-6">
-                        {/* Chain Selection (Only for Bridge) */}
+                        {/* ── BRIDGE CHAIN SELECTION ── */}
                         {mode === 'bridge' && (
                             <div className="flex items-center gap-4">
                                 <div className="flex-1">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block">Source</label>
-                                    <div className="bg-black/40 border border-white/10 rounded-xl p-3 flex items-center gap-2">
-                                        <span>{sourceChain.icon}</span>
-                                        <span className="font-bold text-sm">{sourceChain.name}</span>
+                                    <label className="text-[9px] font-black uppercase tracking-widest mb-1.5 block" style={{ color: MUTED }}>Source</label>
+                                    <div className="border rounded-xl p-3 flex items-center gap-2" style={{ borderColor: BORDER, background: CARD }}>
+                                        <div className="w-2.5 h-2.5 rounded-full" style={{ background: sourceChain.color }} />
+                                        <span className="font-bold text-xs" style={{ color: INK }}>{sourceChain.name}</span>
                                     </div>
                                 </div>
-                                <div className="mt-6 text-white/20"><ArrowRight size={16} /></div>
+                                <div className="mt-5"><ArrowRight size={14} style={{ color: MUTED }} /></div>
                                 <div className="flex-1">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2 block">Destination</label>
+                                    <label className="text-[9px] font-black uppercase tracking-widest mb-1.5 block" style={{ color: MUTED }}>Destination</label>
                                     <button 
                                         onClick={() => {
-                                            // Cycle through chains
                                             const currIndex = CHAINS.findIndex(c => c.id === targetChain.id);
                                             setTargetChain(CHAINS[(currIndex + 1) % CHAINS.length]);
                                         }}
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 flex items-center justify-between hover:border-white/30"
+                                        className="w-full border rounded-xl p-3 flex items-center justify-between hover:bg-black/[0.02]"
+                                        style={{ borderColor: BORDER, background: CARD }}
                                     >
                                         <div className="flex items-center gap-2">
-                                            <span>{targetChain.icon}</span>
-                                            <span className="font-bold text-sm">{targetChain.name}</span>
+                                            <div className="w-2.5 h-2.5 rounded-full" style={{ background: targetChain.color }} />
+                                            <span className="font-bold text-xs" style={{ color: INK }}>{targetChain.name}</span>
                                         </div>
-                                        <ChevronDown size={14} className="text-white/20" />
+                                        <ChevronDown size={14} style={{ color: MUTED }} />
                                     </button>
                                 </div>
                             </div>
                         )}
 
-                        {/* Input and Asset */}
-                        <div className="bg-black/60 border border-white/10 rounded-2xl p-6 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
-                            
+                        {/* ── FROM INPUT ── */}
+                        <div className="border rounded-2xl p-6 relative overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
                             <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
-                                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Selling</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>{mode === 'send' ? 'Amount' : 'Selling'}</label>
                                     <input 
                                         type="number" 
                                         placeholder="0.00"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full bg-transparent border-none outline-none text-4xl font-black tracking-tighter text-white placeholder:text-white/10"
+                                        className="w-full bg-transparent border-none outline-none text-4xl font-black tracking-tighter placeholder-black/10"
+                                        style={{ color: INK }}
                                     />
                                 </div>
-                                <div className="relative group/select">
+                                <div className="relative border rounded-xl" style={{ borderColor: BORDER, background: BG }}>
                                     <TokenSelector 
                                         chainId={sourceChain.id}
                                         address={address}
@@ -657,53 +520,54 @@ export function LegendaryTransactionModal({
                                             setFromAssetSymbol(t.symbol);
                                             setFromAsset(t);
                                         }}
-                                        className="min-w-[140px]"
+                                        className="min-w-[120px]"
                                     />
                                 </div>
                             </div>
                             <div className="flex justify-between text-[10px] font-black tracking-tight uppercase">
-                                <span className="text-white/20">Approx ${safeToLocaleString(parseFloat(amount || '0') * (balances.find(b => b.symbol === fromAssetSymbol)?.usdPrice || 0), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span style={{ color: MUTED }}>Approx ${safeToLocaleString(parseFloat(amount || '0') * (balances.find(b => b.symbol === fromAssetSymbol)?.usdPrice || 0), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 <button 
                                     onClick={() => {
                                         const asset = balances.find(b => b.symbol === fromAssetSymbol);
                                         if (asset) setAmount(asset.balanceFormatted || '0');
                                     }}
-                                    className="text-white/40 hover:text-purple-400 cursor-pointer"
+                                    className="hover:text-black cursor-pointer"
+                                    style={{ color: MUTED }}
                                 >
-                                    Balance: Active MAX
+                                    Balance: MAX
                                 </button>
                             </div>
                         </div>
 
                         {mode !== 'send' && (
                             <div className="relative h-1">
-                                <div className="absolute left-1/2 -top-4 -translate-x-1/2 z-10 w-8 h-8 bg-[#161A1E] border border-white/10 rounded-full flex items-center justify-center text-white/40 hover:text-white transition-colors cursor-pointer">
-                                    <Repeat size={14} />
+                                <div className="absolute left-1/2 -top-4 -translate-x-1/2 z-10 w-8 h-8 border rounded-full flex items-center justify-center cursor-pointer hover:bg-black/5" style={{ borderColor: BORDER, background: CARD, color: MUTED }}>
+                                    <Repeat size={12} />
                                 </div>
                             </div>
                         )}
 
                         {mode === 'send' ? (
                             <div>
-                                <label className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-2 px-1">Recipient</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest block mb-2 px-1" style={{ color: MUTED }}>Recipient</label>
                                 <input 
                                     type="text" 
                                     placeholder="0x..."
                                     value={recipient}
                                     onChange={(e) => setRecipient(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white font-mono text-sm outline-none focus:border-purple-500/50 transition-all"
+                                    className={inputClass}
                                 />
                             </div>
                         ) : (
-                            <div className="bg-black/60 border border-white/10 rounded-2xl p-6">
-                                <div className="flex justify-between items-end mb-4">
+                            <div className="border rounded-2xl p-6" style={{ borderColor: BORDER, background: CARD }}>
+                                <div className="flex justify-between items-end">
                                     <div className="flex-1">
-                                        <label className="text-[10px] font-black text-white/30 uppercase tracking-widest block mb-1">Receiving (Est.)</label>
-                                        <div className="text-4xl font-black tracking-tighter text-white/40">
-                                            {quote ? (Number(quote.estimate?.toAmount) / (10 ** (quote.estimate?.toToken?.decimals || 6))).toFixed(4) : '0.00'}
+                                        <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Receiving (Est.)</label>
+                                        <div className="text-4xl font-black tracking-tighter" style={{ color: MUTED }}>
+                                            {quote && quote.estimate ? (Number(quote.estimate.toAmount) / (10 ** (quote.estimate.toToken?.decimals || 6))).toFixed(4) : '0.00'}
                                         </div>
                                     </div>
-                                    <div className="bg-white/5 border border-white/10 rounded-xl flex items-center gap-3 cursor-pointer">
+                                    <div className="border rounded-xl flex items-center gap-3 cursor-pointer" style={{ borderColor: BORDER, background: BG }}>
                                         <TokenSelector 
                                             chainId={mode === 'swap' ? sourceChain.id : targetChain.id}
                                             address={address}
@@ -712,30 +576,24 @@ export function LegendaryTransactionModal({
                                                 setToAsset(t);
                                                 setToAssetSymbol(t.symbol);
                                             }}
-                                            className="min-w-[140px]"
+                                            className="min-w-[120px]"
                                         />
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Quote Error Message */}
                         {errorMsg && (
-                            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 text-center font-bold">
+                            <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 text-center font-bold">
                                 {errorMsg}
                             </div>
                         )}
 
-                        {/* Price Impact / Fee Summary */}
-                        {quote && (
-                            <div className="space-y-3 bg-white/5 rounded-2xl p-4 border border-white/5">
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-white/40 font-bold uppercase tracking-widest text-[9px]">Route Execution</span>
-                                    <span className="font-mono text-white/80">Li.Fi Aggregator <Zap size={10} className="inline ml-1 text-yellow-500" /></span>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                        <span className="text-white/40 font-bold uppercase tracking-widest text-[9px]">Gas Cost</span>
-                                        <span className="font-mono text-white/60">${quote.estimate?.gasCosts?.[0]?.amountUSD || '0.00'}</span>
+                        {quote && mode !== 'send' && (
+                            <div className="space-y-2.5 rounded-xl p-4 border" style={{ borderColor: BORDER, background: CARD }}>
+                                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest" style={{ color: MUTED }}>
+                                    <span>Route Execution</span>
+                                    <span>Li.Fi Aggregation <Zap size={10} className="inline ml-1 text-black" /></span>
                                 </div>
                             </div>
                         )}
@@ -743,11 +601,12 @@ export function LegendaryTransactionModal({
                         <button 
                             onClick={handleExecute}
                             disabled={loading || !amount || (mode !== 'send' && !quote)}
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 p-5 rounded-2xl font-black text-sm uppercase tracking-[.25em] shadow-xl shadow-purple-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-20 disabled:cursor-not-allowed"
+                            className="w-full p-4 rounded-xl font-black text-xs uppercase tracking-[0.25em] active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
+                            style={{ background: INK, color: '#FFF' }}
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="animate-spin" size={20} />
+                                    <Loader2 className="animate-spin" size={16} />
                                     {orchestratorStatus === 'quoting' ? 'Quoting...' : 
                                      orchestratorStatus === 'approving' ? 'Approving...' : 
                                      orchestratorStatus === 'signing' ? 'Awaiting Signature...' : 
@@ -757,26 +616,19 @@ export function LegendaryTransactionModal({
                             ) : (
                                 <>
                                     Initiate {mode}
-                                    <ArrowRight size={20} />
+                                    <ArrowRight size={16} />
                                 </>
                             )}
                         </button>
 
-                        <div className="flex items-center justify-center gap-4 py-2">
-                            <div className="flex items-center gap-1.5 opacity-40">
-                                <Shield size={12} className="text-green-400" />
-                                <span className="text-[10px] font-black uppercase tracking-tighter">Secured by HSM</span>
-                            </div>
-                        </div>
                     </div>
                 )}
               </div>
-            </GlassCard>
-          </InstitutionalErrorBoundary>
-        </motion.div>
-      </div>
-    )}
-  </AnimatePresence>
-);
+              </div>
+            </InstitutionalErrorBoundary>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
 }
-

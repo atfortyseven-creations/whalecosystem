@@ -15,20 +15,21 @@ export async function POST(req: Request) {
         }
 
         const tx = await prisma.blockchainTransaction.upsert({
-            where: { hash },
+            where: { txHash: hash },
             update: {
                 status: data.status || 'PENDING_RELAY',
                 updatedAt: new Date()
             },
             create: {
-                hash,
+                txHash: hash,
                 userId,
+                blockNumber: metadata?.blockNumber || 0,
                 type: type || 'SWAP',
-                fromChain,
-                toChain,
+                fromChain: fromChain?.toString() || '1',
+                toChain: toChain?.toString() || '1',
                 fromToken,
                 toToken,
-                fromAmount: fromAmount.toString(),
+                fromAmount: fromAmount?.toString() || '0',
                 status: 'PENDING_RELAY',
                 metadata: metadata || {}
             }

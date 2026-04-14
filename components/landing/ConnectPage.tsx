@@ -33,20 +33,20 @@ function WalletButton({
       transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ x: 4 }}
       whileTap={{ scale: 0.98 }}
-      className="w-full flex items-center gap-5 p-5 bg-white dark:bg-white/[0.04] border border-black/[0.07] dark:border-white/[0.08] hover:border-black/25 dark:hover:border-white/20 hover:shadow-lg hover:shadow-black/[0.06] transition-all duration-200 group"
+      className="w-full flex items-center gap-5 p-5 bg-white border border-[#050505]/5 hover:border-[#050505]/20 hover:shadow-lg hover:shadow-[#050505]/5 transition-all duration-200 group rounded-2xl"
     >
-      <div className="w-12 h-12 rounded-2xl bg-[#F5F4F0] dark:bg-white/10 border border-black/5 dark:border-white/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+      <div className="w-12 h-12 rounded-xl bg-[#FAF9F6] border border-[#050505]/5 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
         {loading ? (
-          <Loader2 size={18} className="animate-spin text-black/40" />
+          <Loader2 size={18} className="animate-spin text-[#050505]/40" />
         ) : (
           <img src={logo} alt={name} className="w-7 h-7 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         )}
       </div>
       <div className="flex-1 text-left min-w-0">
-        <p className="text-[13px] font-black text-black dark:text-white uppercase tracking-tight">{name}</p>
-        <p className="text-[10px] font-mono text-black/35 dark:text-white/35 uppercase tracking-widest mt-0.5">{badge}</p>
+        <p className="text-[13px] font-black text-[#050505] uppercase tracking-tight">{name}</p>
+        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5">{badge}</p>
       </div>
-      <ArrowRight size={14} className="text-black/20 dark:text-white/20 group-hover:text-black dark:group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
+      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
     </motion.button>
   );
 }
@@ -155,16 +155,16 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-safe min-h-screen flex flex-col bg-white text-black dark:text-white relative">
+    <div className="min-h-safe min-h-screen flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans">
       <CelestialMeshBackground />
 
       {/* ── NAV ── */}
-      <header className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-black/[0.05] dark:border-white/[0.05] bg-white/70 dark:bg-black/60 backdrop-blur-sm">
+      <header className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-[#050505]/5 bg-white/70 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-7 h-7 dark:invert" alt="Whale" />
-          <span className="font-sans font-black text-sm uppercase tracking-tight text-black dark:text-white">Whale Alert Network</span>
+          <img src="/official-whale-monochrome.png" className="w-7 h-7" alt="Whale" />
+          <span className="font-sans font-black text-sm uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-black/25 dark:text-white/25 hidden md:block">
+        <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-[#050505]/30 hidden md:block font-bold">
           Secure Terminal Access
         </span>
       </header>
@@ -185,17 +185,17 @@ export default function ConnectPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 260, damping: 18 }}
-                className="w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center"
+                className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center"
               >
                 <CheckCircle2 size={36} className="text-emerald-500" />
               </motion.div>
               <div>
-                <p className="text-2xl font-black uppercase tracking-tighter text-black dark:text-white">Identity Verified</p>
-                <p className="font-mono text-[11px] text-black/40 dark:text-white/40 mt-2">
+                <p className="text-2xl font-black uppercase tracking-tighter text-[#050505]">Identity Verified</p>
+                <p className="font-mono text-[11px] text-[#050505]/40 mt-2 font-bold">
                   {address ? `${address.slice(0, 10)}…${address.slice(-8)}` : ""}
                 </p>
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-black/20 dark:text-white/20">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-[#050505]/30 font-bold">
                 Entering terminal…
               </p>
             </motion.div>
@@ -208,42 +208,42 @@ export default function ConnectPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
-              className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden border border-black/[0.06] dark:border-white/[0.07] bg-white dark:bg-[#0D0D0D] shadow-2xl shadow-black/[0.08]"
+              className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden border border-[#050505]/10 bg-white rounded-3xl shadow-2xl shadow-black/5"
             >
 
               {/* ── LEFT: QR PANEL ── */}
-              <div className="p-10 border-b lg:border-b-0 lg:border-r border-black/[0.06] dark:border-white/[0.06] flex flex-col relative overflow-hidden">
+              <div className="p-10 border-b lg:border-b-0 lg:border-r border-[#050505]/10 flex flex-col relative overflow-hidden bg-[#FAF9F6]">
                 
                 {/* Giant background faded whale logo */}
-                <div className="absolute -bottom-20 -left-20 pointer-events-none opacity-[0.03] dark:opacity-[0.05]">
-                  <img src="/official-whale-monochrome.png" className="w-[400px] h-[400px] object-contain dark:invert" alt="" />
+                <div className="absolute -bottom-20 -left-20 pointer-events-none opacity-[0.03]">
+                  <img src="/official-whale-monochrome.png" className="w-[400px] h-[400px] object-contain" alt="" />
                 </div>
 
                 <div className="mb-8 relative z-10">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-black/25 dark:text-white/25 font-black">Mobile Sync</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/30 font-black">Mobile Sync</p>
                     <a href="https://twitter.com/whalecosystem" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[9px] font-mono font-black uppercase tracking-widest text-[#00ACEE] hover:opacity-80 transition-opacity bg-[#00ACEE]/10 px-2.5 py-1 rounded-full">
                       <Twitter size={10} />
                       @whalecosystem
                     </a>
                   </div>
-                  <h2 className="font-sans text-2xl font-black text-black dark:text-white tracking-tighter leading-tight flex items-center gap-3">
-                    <img src="/official-whale-monochrome.png" className="w-8 h-8 dark:invert opacity-90" alt="Whale" />
+                  <h2 className="font-sans text-2xl font-black text-[#050505] tracking-tighter leading-tight flex items-center gap-3">
+                    <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
                     Scan to connect
                   </h2>
-                  <p className="text-[12px] text-black/40 dark:text-white/40 mt-3 leading-relaxed">
+                  <p className="text-[12px] text-[#050505]/50 mt-3 leading-relaxed font-semibold">
                     Open your mobile wallet and scan the QR code below. Your session will sync automatically with this terminal.
                   </p>
                 </div>
 
                 {/* QR Code */}
                 <div className="flex-1 flex flex-col items-center justify-center gap-6 relative z-10">
-                  <div className="relative p-5 bg-white border border-black/[0.08] dark:border-white/[0.08]">
+                  <div className="relative p-5 bg-white border border-[#050505]/10 rounded-[32px] shadow-sm">
                     {/* Corner accents */}
-                    <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-black dark:border-white" />
-                    <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-black dark:border-white" />
-                    <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-black dark:border-white" />
-                    <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-black dark:border-white" />
+                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#050505]/10 rounded-tl-[32px]" />
+                    <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#050505]/10 rounded-tr-[32px]" />
+                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#050505]/10 rounded-bl-[32px]" />
+                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#050505]/10 rounded-br-[32px]" />
 
                     {qrSession ? (
                       <QRCode
@@ -255,13 +255,13 @@ export default function ConnectPage() {
                       />
                     ) : (
                       <div className="w-[200px] h-[200px] flex items-center justify-center">
-                        <Loader2 size={28} className="animate-spin text-black/20" />
+                        <Loader2 size={28} className="animate-spin text-[#050505]/20" />
                       </div>
                     )}
                   </div>
 
                   {/* Status indicator */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-[#050505]/5">
                     {syncStatus === "SYNCED" ? (
                       <>
                         <span className="w-2 h-2 rounded-full bg-emerald-400" />
@@ -272,9 +272,9 @@ export default function ConnectPage() {
                         <motion.span
                           animate={{ opacity: [1, 0.3, 1] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
-                          className="w-2 h-2 rounded-full bg-black/20 dark:bg-white/20 inline-block"
+                          className="w-2 h-2 rounded-full bg-[#050505]/20 inline-block"
                         />
-                        <span className="font-mono text-[9px] uppercase tracking-widest text-black/25 dark:text-white/25">
+                        <span className="font-mono text-[9px] uppercase tracking-widest text-[#050505]/40 font-bold">
                           {qrSession ? "Awaiting scan" : "Generating code…"}
                         </span>
                       </>
@@ -285,7 +285,7 @@ export default function ConnectPage() {
                   {qrSession && syncStatus !== "SYNCED" && (
                     <button
                       onClick={fetchSession}
-                      className="font-mono text-[9px] uppercase tracking-widest text-black/25 dark:text-white/25 hover:text-black dark:hover:text-white transition-colors"
+                      className="font-mono text-[9px] uppercase tracking-widest text-[#050505]/30 hover:text-[#050505] transition-colors font-bold"
                     >
                       Refresh code →
                     </button>
@@ -293,19 +293,19 @@ export default function ConnectPage() {
                 </div>
 
                 {/* Compatible wallets note */}
-                <p className="mt-8 text-[9px] font-mono uppercase tracking-widest text-black/20 dark:text-white/20 text-center">
+                <p className="mt-8 text-[9px] font-mono uppercase tracking-widest text-[#050505]/30 text-center font-bold">
                   Compatible with MetaMask Mobile · Rainbow · Trust Wallet · Coinbase Wallet
                 </p>
               </div>
 
               {/* ── RIGHT: DIRECT CONNECT PANEL ── */}
-              <div className="p-10 flex flex-col">
+              <div className="p-10 flex flex-col bg-white">
                 <div className="mb-8">
-                  <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-black/25 dark:text-white/25 font-black mb-2">Desktop Connection</p>
-                  <h2 className="font-sans text-2xl font-black text-black dark:text-white tracking-tighter leading-tight">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/30 font-black mb-2">Desktop Connection</p>
+                  <h2 className="font-sans text-2xl font-black text-[#050505] tracking-tighter leading-tight">
                     Connect your<br />wallet directly
                   </h2>
-                  <p className="text-[12px] text-black/40 dark:text-white/40 mt-3 leading-relaxed">
+                  <p className="text-[12px] text-[#050505]/50 mt-3 leading-relaxed font-semibold">
                     Select your preferred wallet to authenticate. No password required — your wallet signs a cryptographic message.
                   </p>
                 </div>
@@ -348,10 +348,10 @@ export default function ConnectPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="mt-8 pt-6 border-t border-black/[0.05] dark:border-white/[0.05] flex items-start gap-3"
+                  className="mt-8 pt-6 border-t border-[#050505]/5 flex items-start gap-3"
                 >
-                  <Shield size={14} className="text-black/20 dark:text-white/20 mt-0.5 shrink-0" />
-                  <p className="text-[10px] text-black/30 dark:text-white/30 leading-relaxed">
+                  <Shield size={14} className="text-[#050505]/30 mt-0.5 shrink-0" />
+                  <p className="text-[10px] text-[#050505]/40 leading-relaxed font-bold">
                     Non-custodial authentication. Your private keys never leave your device. Authentication is verified via ECDSA — no passwords, no accounts.
                   </p>
                 </motion.div>
@@ -359,7 +359,7 @@ export default function ConnectPage() {
                 {/* Networks */}
                 <div className="mt-5 flex items-center gap-2 flex-wrap">
                   {["Optimism", "Ethereum", "Base", "Arbitrum", "Polygon"].map((n) => (
-                    <span key={n} className="text-[8px] font-mono font-black uppercase tracking-widest px-2 py-1 border border-black/[0.06] dark:border-white/[0.06] text-black/25 dark:text-white/25">
+                    <span key={n} className="text-[8px] font-mono font-black uppercase tracking-widest px-2.5 py-1 border border-[#050505]/10 rounded-full text-[#050505]/40 bg-[#FAF9F6]">
                       {n}
                     </span>
                   ))}
@@ -372,10 +372,10 @@ export default function ConnectPage() {
       </main>
 
       {/* ── FOOTER ── */}
-      <footer className="relative z-10 px-8 py-4 border-t border-black/[0.04] dark:border-white/[0.04] flex items-center justify-between">
+      <footer className="relative z-10 px-8 py-5 border-t border-[#050505]/5 flex items-center justify-between bg-white">
         <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-4 h-4 dark:invert opacity-30" alt="" />
-          <span className="font-mono text-[8px] uppercase tracking-widest text-black/20 dark:text-white/20">
+          <img src="/official-whale-monochrome.png" className="w-4 h-4 opacity-30" alt="" />
+          <span className="font-mono text-[8px] uppercase tracking-widest text-[#050505]/30 font-bold">
             Whale Alert Network · Privacy by Void
           </span>
         </div>
@@ -383,9 +383,9 @@ export default function ConnectPage() {
           href="https://walletconnect.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-widest text-black/20 dark:text-white/20 hover:text-black/50 dark:hover:text-white/50 transition-colors"
+          className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-widest text-[#050505]/30 hover:text-[#050505] transition-colors font-bold"
         >
-          WalletConnect <ExternalLink size={8} />
+          WalletConnect <ExternalLink size={10} />
         </a>
       </footer>
     </div>

@@ -21,6 +21,13 @@ export default function WhaleAlertLanding() {
   const { address } = useSovereignAccount();
   const [showGate, setShowGate] = useState(false);
 
+  useEffect(() => {
+    if (!address && !sessionStorage.getItem('visited_connect')) {
+      sessionStorage.setItem('visited_connect', '1');
+      router.push("/connect");
+    }
+  }, [address, router]);
+
   const handleEntry = () => {
     if (address) router.push("/dashboard");
     else router.push("/connect");

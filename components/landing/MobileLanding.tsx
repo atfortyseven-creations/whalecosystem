@@ -7,8 +7,10 @@ import dynamic from "next/dynamic";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 
-const DynamicCryptoCheckoutModal = dynamic(
-  () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
+import { useUIStore } from "@/lib/store/ui-store";
+
+const DynamicQRScannerModal = dynamic(
+  () => import("@/components/wallet/QRScannerModal"),
   { ssr: false }
 );
 
@@ -20,11 +22,12 @@ const FAINT = "rgba(5,5,5,0.10)";
 export function MobileLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
-  const [showGate, setShowGate] = useState(false);
+  const { openConnectModal } = useUIStore();
+  const [showScanner, setShowScanner] = useState(false);
 
   const handleEntry = () => {
     if (address) router.push("/dashboard");
-    else setShowGate(true);
+    else openConnectModal?.();
   };
 
   return (
@@ -153,6 +156,32 @@ export function MobileLanding() {
           Whale Alert Network
         </h1>
 
+        {address && (
+           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4 mb-16">
+              <div className="flex items-center gap-2 mb-2">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                 <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]">Synchronized: {address.slice(0,6)}...{address.slice(-4)}</span>
+              </div>
+              <button 
+                onClick={() => setShowScanner(true)} 
+                className="w-full text-center py-4 rounded-full font-black uppercase tracking-widest text-[#FAF9F6] active:scale-[0.98] transition-transform"
+                style={{ background: INK, fontSize: "11px" }}
+              >
+                OPEN SCANNER (SYNC TO PC)
+              </button>
+              <button 
+                onClick={() => {
+                    sessionStorage.setItem('mobile_news_bypass', 'true');
+                    window.location.reload(); 
+                }} 
+                className="w-full text-center py-4 rounded-full font-black uppercase tracking-widest text-[#050505] border border-black/10 active:bg-black/5 active:scale-[0.98] transition-all"
+                style={{ fontSize: "11px" }}
+              >
+                VER NOTICIAS
+              </button>
+           </motion.div>
+        )}
+
         <div className="space-y-20">
           <section>
             <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>The Origin and Vision</h2>
@@ -232,8 +261,8 @@ export function MobileLanding() {
       </div>
 
       <AnimatePresence>
-        {showGate && (
-          <DynamicCryptoCheckoutModal isOpen={showGate} onClose={() => setShowGate(false)} />
+        {showScanner && (
+          <DynamicQRScannerModal isOpen={showScanner} onClose={() => setShowScanner(false)} onScan={(data: string) => alert(data)} />
         )}
       </AnimatePresence>
     </div>
