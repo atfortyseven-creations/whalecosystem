@@ -112,51 +112,52 @@ export function ConnectWalletModal() {
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-4 font-mono">
-                {/* Harsh Black Backdrop */}
+            <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-4 font-sans">
+                {/* Clean Backdrop */}
                 <motion.div
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     onClick={closeConnectModal}
-                    className="absolute inset-0 bg-[#000000]/90 backdrop-blur-sm"
+                    className="absolute inset-0 bg-[#050505]/40 backdrop-blur-md"
                 />
 
-                {/* Modal Console */}
+                {/* Modal Container */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-                    className="relative w-full sm:max-w-[500px] bg-[#050505] border-2 border-[#00FF55] overflow-hidden flex flex-col shadow-[0_0_40px_rgba(0,255,85,0.1)]"
+                    initial={{ opacity: 0, scale: 0.98, y: 15 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98, y: 15 }}
+                    className="relative w-full sm:max-w-[440px] bg-[#FFFFFF] border border-[#050505]/10 rounded-[28px] overflow-hidden flex flex-col shadow-2xl"
                 >
                     {/* Header Bar */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-[#00FF55]/30 bg-[#00FF55]/5">
+                    <div className="flex items-center justify-between px-6 py-5 border-b border-[#050505]/10 bg-[#FAF9F6]">
                         <div className="flex items-center gap-3">
-                            <Terminal size={18} className="text-[#00FF55]" />
+                            <div className="w-8 h-8 rounded-full border border-[#050505]/10 flex items-center justify-center bg-white shadow-sm">
+                                <Shield size={14} className="text-[#050505]" />
+                            </div>
                             <div>
-                                <div className="text-[10px] font-black text-[#00FF55] uppercase tracking-[0.2em] leading-none">CONNECT WALLET</div>
-                                <div className="text-[8px] font-black text-[#888888] uppercase tracking-widest mt-1">SECURE PORTAL</div>
+                                <div className="text-[12px] font-black text-[#050505] uppercase tracking-widest leading-none">Connect Wallet</div>
+                                <div className="text-[9px] font-mono text-black/50 uppercase tracking-widest mt-1">Secure Portal</div>
                             </div>
                         </div>
-                        <button onClick={closeConnectModal} className="text-[#00FF55] hover:text-white hover:bg-[#00FF55] transition-colors p-1">
-                            <X size={16} />
+                        <button onClick={closeConnectModal} className="text-black/40 hover:text-black hover:bg-black/5 transition-colors p-2 rounded-full">
+                            <X size={18} />
                         </button>
                     </div>
 
                     {/* Content */}
                     <div className="px-6 py-8 relative">
-                        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: `linear-gradient(#00FF55 1px, transparent 1px), linear-gradient(90deg, #00FF55 1px, transparent 1px)`, backgroundSize: '10px 10px' }} />
 
                         <AnimatePresence mode="wait">
                             {/* ── SELECTION VIEW ── */}
                             {view === 'selection' && (
                                 <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6 relative z-10">
-                                    <div className="space-y-2">
-                                        <h2 className="text-2xl font-black text-[#FFFFFF] uppercase tracking-tighter">
-                                            CONNECT
+                                    <div className="space-y-1.5 text-center px-4">
+                                        <h2 className="text-[22px] font-black text-[#050505] uppercase tracking-tighter">
+                                            Select Provider
                                         </h2>
-                                        <p className="text-[10px] text-[#888888] uppercase tracking-widest leading-relaxed">
-                                            Select a provider to connect your wallet directly.
+                                        <p className="text-[11px] text-black/60 font-sans leading-relaxed">
+                                            Connect your wallet to access institutional tools and on-chain intelligence.
                                         </p>
                                     </div>
 
-                                    <div className="space-y-4 pt-2">
+                                    <div className="space-y-4 pt-4">
                                         {/* QUICK ACCESS GRID */}
                                         <div className="grid grid-cols-2 gap-3">
                                             {[
@@ -168,62 +169,60 @@ export function ConnectWalletModal() {
                                                 <button 
                                                     key={w.id}
                                                     onClick={w.handler}
-                                                    className="group relative flex flex-col items-center justify-center p-6 border border-[#222222] hover:border-[#00FF55] bg-[#0A0A0A] transition-all overflow-hidden"
+                                                    className="group relative flex flex-col items-center justify-center p-6 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-2xl transition-all shadow-sm shadow-black/5 hover:shadow-md"
                                                 >
-                                                    <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#00FF55]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    <div className="w-12 h-12 mb-3 relative flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-300">
+                                                    <div className="w-10 h-10 mb-3 relative flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
                                                         <img 
                                                             src={w.logo} 
                                                             alt={w.name} 
-                                                            className="max-w-full max-h-full object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"
+                                                            className="max-w-full max-h-full object-contain"
                                                         />
                                                     </div>
-                                                    <span className="text-[10px] font-black text-[#888888] group-hover:text-white uppercase tracking-widest transition-colors">
+                                                    <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest transition-colors">
                                                         {w.name}
                                                     </span>
                                                 </button>
                                             ))}
                                         </div>
 
-                                        <div className="flex items-center gap-4 my-2">
-                                            <div className="flex-1 h-[1px] bg-[#222222]" />
-                                            <span className="text-[8px] font-black text-[#444444] uppercase tracking-[0.3em]">Advanced Portals</span>
-                                            <div className="flex-1 h-[1px] bg-[#222222]" />
+                                        <div className="flex items-center gap-4 my-2 opacity-50">
+                                            <div className="flex-1 h-[1px] bg-black/10" />
+                                            <span className="text-[8px] font-black text-[#050505] uppercase tracking-[0.2em]">OR</span>
+                                            <div className="flex-1 h-[1px] bg-black/10" />
                                         </div>
 
                                         {/* WALLET_CONNECT & LEDGER */}
                                         <div className="space-y-2">
-                                            <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between p-3 border border-[#222222] hover:border-[#00FF55] bg-[#000000] transition-colors">
+                                            <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
                                                 <div className="flex items-center gap-3">
-                                                    <Radio size={14} className="text-[#00FF55]" />
-                                                    <span className="text-[11px] font-black text-[#FFFFFF] uppercase tracking-wider">Other Mobile Wallets</span>
+                                                    <WindowIcon size={16} className="text-[#050505]" />
+                                                    <span className="text-[12px] font-black text-[#050505] uppercase tracking-wide">All Wallets</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[8px] font-black text-[#444444] uppercase tracking-widest">Protocol 2.0</span>
-                                                    <ChevronRight size={14} className="text-[#333333] group-hover:text-[#00FF55]" />
+                                                    <ChevronRight size={14} className="text-black/40 group-hover:text-black" />
                                                 </div>
                                             </button>
 
-                                            <button onClick={handleLedger} className="group w-full flex items-center justify-between p-3 border border-[#222222] hover:border-[#00FF55] bg-[#000000] transition-colors">
-                                                <div className="flex items-center gap-3">
-                                                    <Shield size={14} className="text-[#00FF55]" />
-                                                    <span className="text-[11px] font-black text-[#FFFFFF] uppercase tracking-wider">Hardware Vault</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[8px] font-black text-[#444444] uppercase tracking-widest">Cold Storage</span>
-                                                    <ChevronRight size={14} className="text-[#333333] group-hover:text-[#00FF55]" />
-                                                </div>
-                                            </button>
-
-                                            <button onClick={handleMobileSync} className="group w-full flex items-center justify-between p-4 border border-[#00FF55] bg-[#00FF55]/5 hover:bg-[#00FF55]/20 transition-colors">
-                                                <div className="flex items-center gap-4">
-                                                    <QrCode size={18} className="text-[#00FF55]" />
+                                            <button onClick={handleMobileSync} className="group w-full flex items-center justify-between p-4 border border-[#050505] bg-[#050505] hover:bg-[#222] rounded-xl transition-all shadow-md">
+                                                <div className="flex items-center gap-4 text-white">
+                                                    <QrCode size={18} />
                                                     <div className="text-left">
-                                                        <div className="text-[13px] font-black text-[#FFFFFF] uppercase tracking-wide">Direct QR Handshake</div>
-                                                        <div className="text-[8px] text-[#00FF55] uppercase tracking-[0.2em] mt-0.5">Secure mobile linking</div>
+                                                        <div className="text-[13px] font-black uppercase tracking-wide">Direct QR Handshake</div>
+                                                        <div className="text-[9px] text-white/70 font-mono uppercase tracking-widest mt-0.5">Secure cross-device linking</div>
                                                     </div>
                                                 </div>
-                                                <div className="w-2 h-2 rounded-full bg-[#00FF55] animate-pulse" />
+                                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
+                                            </button>
+
+                                            <button onClick={handleLedger} className="group w-full flex items-center justify-between p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
+                                                <div className="flex items-center gap-3">
+                                                    <Shield size={16} className="text-[#050505]" />
+                                                    <span className="text-[12px] font-black text-[#050505] uppercase tracking-wide">Hardware Wallet</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Cold Storage</span>
+                                                    <ChevronRight size={14} className="text-black/40 group-hover:text-black" />
+                                                </div>
                                             </button>
                                         </div>
                                     </div>
@@ -232,29 +231,21 @@ export function ConnectWalletModal() {
 
                             {/* ── QR VIEW ── */}
                             {view === 'qr' && (
-                                <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-2 space-y-8 relative z-10">
+                                <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-4 space-y-8 relative z-10">
                                     <div className="text-center space-y-2">
-                                        <h3 className="text-2xl font-black text-[#FFFFFF] tracking-widest uppercase">SCAN TO CONNECT</h3>
-                                        <p className="text-[10px] text-[#888888] leading-relaxed max-w-[280px] uppercase tracking-widest">
-                                            Scan this QR code with the designated mobile application.
+                                        <h3 className="text-2xl font-black text-[#050505] tracking-tighter uppercase">SCAN IT</h3>
+                                        <p className="text-[11px] text-black/60 leading-relaxed max-w-[280px]">
+                                            Scan this QR code with the designated mobile application to synchronize sessions.
                                         </p>
                                     </div>
 
-                                    {/* QR Frame - HUD Tactical */}
-                                    <div className="relative p-2">
-                                        {/* Corner decorators */}
-                                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#00FF55]" />
-                                        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#00FF55]" />
-                                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00FF55]" />
-                                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00FF55]" />
-
-                                        <div className="w-[220px] h-[220px] bg-white flex items-center justify-center p-3">
+                                    <div className="relative p-6 bg-white border border-[#050505]/10 rounded-[32px] shadow-sm">
+                                        <div className="w-[200px] h-[200px] bg-white flex items-center justify-center">
                                             {qrSession ? (
-                                                <QRCodeSVG value={`WHALE_HANDSHAKE:${qrSession}`} size={194} level="H" bgColor="#FFFFFF" fgColor="#000000" includeMargin={false} />
+                                                <QRCodeSVG value={`WHALE_HANDSHAKE:${qrSession}`} size={200} level="H" bgColor="#FFFFFF" fgColor="#050505" includeMargin={false} />
                                             ) : (
-                                                <div className="flex flex-col items-center gap-3">
-                                                    <Loader2 className="text-[#000000] animate-spin" size={32} />
-                                                    <p className="text-[10px] text-black font-black uppercase tracking-widest">GENERATING...</p>
+                                                <div className="flex flex-col items-center gap-3 opacity-50">
+                                                    <Loader2 className="text-[#050505] animate-spin" size={32} />
                                                 </div>
                                             )}
                                         </div>
@@ -262,14 +253,14 @@ export function ConnectWalletModal() {
 
                                     {/* Console Log */}
                                     {isPolling && (
-                                        <div className="w-full bg-[#000000] border border-[#222222] p-3">
-                                            <p className="text-[9px] text-[#00FF55] uppercase tracking-widest flex items-center gap-2">
-                                                WAITING FOR CONNECTION...
+                                        <div className="w-full bg-[#FAF9F6] border border-[#050505]/10 p-3 rounded-xl text-center">
+                                            <p className="text-[10px] text-[#050505] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-2">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse"/> WAITING FOR CONNECTION...
                                             </p>
                                         </div>
                                     )}
 
-                                    <button onClick={() => setView('selection')} className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] hover:text-[#00FF55] transition-colors">
+                                    <button onClick={() => setView('selection')} className="text-[11px] font-black text-black/40 uppercase tracking-[0.2em] hover:text-[#050505] transition-colors py-2 px-6">
                                         CANCEL
                                     </button>
                                 </motion.div>
@@ -277,23 +268,23 @@ export function ConnectWalletModal() {
 
                             {/* ── LEDGER VIEW ── */}
                             {view === 'ledger' && (
-                                <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-6 space-y-6 relative z-10">
-                                    <div className="w-16 h-16 border-2 border-[#00FF55] bg-[#00FF55]/10 flex items-center justify-center">
-                                        {ledgerLoading ? <Loader2 size={24} className="text-[#00FF55] animate-spin" /> : <CheckCircle2 size={24} className="text-[#00FF55]" />}
+                                <motion.div key="ledger" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-8 space-y-6 relative z-10">
+                                    <div className="w-20 h-20 rounded-full border border-[#050505]/10 bg-[#FAF9F6] flex items-center justify-center shadow-sm">
+                                        {ledgerLoading ? <Loader2 size={24} className="text-[#050505] animate-spin" /> : <CheckCircle2 size={28} className="text-[#050505]" />}
                                     </div>
 
                                     <div className="text-center space-y-2">
-                                        <h3 className="text-xl font-black text-[#FFFFFF] tracking-widest uppercase">
+                                        <h3 className="text-xl font-black text-[#050505] tracking-tighter uppercase">
                                             {ledgerLoading ? 'CONNECTING...' : 'DEVICE READY'}
                                         </h3>
                                     </div>
 
-                                    <div className="w-full bg-[#000000] border border-[#222222] p-4 flex flex-col gap-2 text-[9px] text-[#888888] uppercase tracking-[0.2em]">
-                                        <div className="flex items-center gap-2"><Zap size={10} className="text-[#00FF55]" /><span>Secure Connection</span></div>
-                                        <div className="flex items-center gap-2"><Shield size={10} className="text-[#00FF55]" /><span>Hardware Protected</span></div>
+                                    <div className="w-full bg-[#FAF9F6] border border-[#050505]/10 rounded-2xl p-5 flex flex-col gap-3 text-[11px] font-bold text-black/60">
+                                        <div className="flex items-center gap-3"><Zap size={14} className="text-[#050505]" /><span>Secure Connection Active</span></div>
+                                        <div className="flex items-center gap-3"><Shield size={14} className="text-[#050505]" /><span>Hardware Protected Session</span></div>
                                     </div>
 
-                                    <button onClick={() => setView('selection')} className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] hover:text-[#00FF55] transition-colors mt-4">
+                                    <button onClick={() => setView('selection')} className="text-[11px] font-black text-black/40 uppercase tracking-[0.2em] hover:text-[#050505] transition-colors mt-6 py-2 px-6">
                                         GO BACK
                                     </button>
                                 </motion.div>

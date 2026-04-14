@@ -1,22 +1,27 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Wallet, RefreshCw, TrendingUp, TrendingDown, Activity,
-  Globe, Eye, EyeOff, ArrowUpRight, ArrowDownRight, Zap,
-  PieChart, Shield, Copy, ExternalLink, ChevronDown, Search
+  Wallet, RefreshCw, ArrowUpRight, ArrowDownRight,
+  Eye, EyeOff, PieChart, Globe, Copy, Search,
+  ArrowDownLeft, Repeat, CreditCard
 } from 'lucide-react';
 import { LegendaryLoader } from '@/components/ui/LegendaryLoader';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
-import { ActionCluster } from '@/components/rainbow/ActionCluster';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
 import { toast } from 'sonner';
-import "@/app/dashboard/dashboard.css";
+
+// ── Palette ──────────────────────────────────────────────────────────────────
+const BG   = "#FAF9F6";
+const INK  = "#050505";
+const MUTED = "rgba(5,5,5,0.45)";
+const BORDER = "rgba(5,5,5,0.08)";
+const CARD  = "#FFFFFF";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
@@ -25,7 +30,6 @@ const CHAIN_COLORS: Record<string, string> = {
   "Avalanche": "#E84142", "Solana": "#9945FF",
 };
 
-// ── Helper ───────────────────────────────────────────────────────────────────
 function formatUSD(val: number) {
   if (!val || isNaN(val)) return "$0.00";
   return `$${safeToLocaleString(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -42,22 +46,23 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: idx * 0.04 }}
-      className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] transition-all group cursor-pointer"
+      transition={{ delay: idx * 0.035 }}
+      className="flex items-center gap-4 px-5 py-4 rounded-2xl border hover:bg-black/[0.02] transition-all cursor-pointer"
+      style={{ borderColor: BORDER, background: CARD }}
     >
-      {/* Icon / Initials */}
+      {/* Token badge */}
       <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-sm shrink-0 border"
-        style={{ background: `${chainColor}18`, borderColor: `${chainColor}30`, color: chainColor }}
+        className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[11px] shrink-0 border"
+        style={{ background: `${chainColor}14`, borderColor: `${chainColor}25`, color: chainColor }}
       >
         {asset.symbol?.slice(0, 3) ?? "?"}
       </div>
 
       {/* Name + network */}
       <div className="flex-1 min-w-0">
-        <div className="font-black text-white text-sm tracking-tight truncate">{asset.symbol}</div>
+        <div className="font-black text-sm tracking-tight truncate" style={{ color: INK }}>{asset.symbol}</div>
         <div className="flex items-center gap-1.5 mt-0.5">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: chainColor }} />
           <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: chainColor }}>
@@ -66,24 +71,24 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
         </div>
       </div>
 
-      {/* Balance */}
+      {/* Token balance */}
       <div className="text-right hidden sm:block">
-        <div className="text-[11px] font-mono text-white/50">
+        <div className="text-[11px] font-mono" style={{ color: MUTED }}>
           {hidden ? "••••" : `${safeToFixed(asset.balance ?? 0, 4)} ${asset.symbol}`}
         </div>
       </div>
 
       {/* 24h change */}
-      <div className={`text-right hidden md:block w-20 ${isPos ? "text-green-400" : "text-red-400"}`}>
-        <div className="flex items-center justify-end gap-0.5 text-xs font-black">
+      <div className={`text-right hidden md:block w-20 text-xs font-black ${isPos ? "text-emerald-600" : "text-rose-500"}`}>
+        <div className="flex items-center justify-end gap-0.5">
           {isPos ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
           {safeToFixed(Math.abs(asset.change24h ?? 0), 2)}%
         </div>
       </div>
 
-      {/* USD Value */}
+      {/* USD value */}
       <div className="text-right w-28 shrink-0">
-        <div className="font-black font-mono text-white text-sm">
+        <div className="font-black font-mono text-sm" style={{ color: INK }}>
           {hidden ? "••••••" : formatUSD(asset.value ?? 0)}
         </div>
       </div>
@@ -91,9 +96,36 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
   );
 }
 
+// ── Wallet action button ─────────────────────────────────────────────────────
+function WalletAction({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: any;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-2 group"
+    >
+      <div
+        className="w-14 h-14 rounded-2xl border flex items-center justify-center transition-all group-hover:bg-black/5 group-active:scale-95"
+        style={{ borderColor: BORDER, background: CARD }}
+      >
+        <Icon size={20} style={{ color: INK }} strokeWidth={1.75} />
+      </div>
+      <span className="text-[10px] font-black uppercase tracking-[0.15em]" style={{ color: MUTED }}>
+        {label}
+      </span>
+    </button>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
-  const [mounted, setMounted] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [search, setSearch] = useState("");
   const [isTransferOpen, setIsTransferOpen] = useState(false);
@@ -106,10 +138,6 @@ export default function PortfolioPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
 
-  useEffect(() => { setMounted(true); }, []);
-
-  if (!mounted) return <LegendaryLoader title="Portfolio" subtitle="Loading on-chain data..." />;
-
   const isPositive = (change24hUSD ?? 0) >= 0;
 
   const filteredAssets = (assets ?? [])
@@ -120,43 +148,42 @@ export default function PortfolioPage() {
     )
     .sort((a: any, b: any) => (b.value ?? 0) - (a.value ?? 0));
 
-  const handleAction = (action: string, mode?: string) => {
-    if (action === "Send" || action === "Swap" || action === "Buy" || action === "Bridge" || action === "Sell") {
-      setTransferMode(action === "Sell" ? "swap" : action === "Swap" ? "swap" : action === "Buy" ? "buy" : mode === "bridge" ? "bridge" : "send");
-      setIsTransferOpen(true);
-    } else if (action === "Receive") {
-      setIsDepositOpen(true);
-    }
+  const openMode = (m: "send" | "swap" | "bridge" | "buy") => {
+    setTransferMode(m);
+    setIsTransferOpen(true);
   };
 
   // ── Not connected ──
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-[#0B0E11] flex items-center justify-center px-6">
-        {/* Grid bg */}
-        <div className="fixed inset-0 pointer-events-none opacity-[0.04]"
-          style={{ backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 60px)' }} />
-
+      <div
+        className="min-h-screen flex items-center justify-center px-6"
+        style={{ background: BG }}
+      >
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative w-full max-w-sm text-center space-y-8"
+          className="w-full max-w-sm text-center space-y-8"
         >
-          <div className="w-24 h-24 mx-auto rounded-3xl bg-white/[0.05] border border-white/10 flex items-center justify-center">
-            <Wallet size={40} className="text-white/40" strokeWidth={1.5} />
+          <div
+            className="w-20 h-20 mx-auto rounded-3xl border flex items-center justify-center"
+            style={{ borderColor: BORDER, background: CARD }}
+          >
+            <Wallet size={32} style={{ color: MUTED }} strokeWidth={1.5} />
           </div>
 
           <div className="space-y-3">
-            <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Portfolio</h1>
-            <p className="text-white/40 text-sm leading-relaxed">
+            <h1 className="text-4xl font-black tracking-tighter uppercase" style={{ color: INK }}>Portfolio</h1>
+            <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
               Connect your wallet to view your on-chain holdings, track performance, and manage assets.
             </p>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center gap-3">
             <button
               onClick={() => open()}
-              className="w-full py-4 bg-white text-black font-black rounded-2xl uppercase tracking-[0.15em] text-[11px] hover:bg-white/90 transition-all shadow-xl shadow-white/10"
+              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] transition-all hover:opacity-80"
+              style={{ background: INK, color: "#FFF" }}
             >
               Connect Wallet
             </button>
@@ -165,7 +192,7 @@ export default function PortfolioPage() {
             </div>
           </div>
 
-          <p className="text-white/20 text-[10px] uppercase tracking-widest">
+          <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
             Non-custodial · On-chain · Real-time
           </p>
         </motion.div>
@@ -174,40 +201,48 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0E11] text-white">
-      {/* Grid background */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.04]"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 60px)' }} />
+    <div className="min-h-screen" style={{ background: BG, color: INK }}>
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b border-white/[0.06]"
-        style={{ background: "rgba(11,14,17,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+      <header
+        className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b"
+        style={{
+          background: "rgba(250,249,246,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderColor: BORDER
+        }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-            <PieChart size={16} className="text-white/60" />
+          <div className="w-8 h-8 rounded-xl border flex items-center justify-center" style={{ borderColor: BORDER, background: CARD }}>
+            <PieChart size={15} style={{ color: MUTED }} />
           </div>
           <div>
-            <div className="font-black text-white text-sm uppercase tracking-tight">Portfolio</div>
-            <div className="text-[9px] font-mono text-white/30 uppercase tracking-widest">On-chain Intelligence</div>
+            <div className="font-black text-sm uppercase tracking-tight" style={{ color: INK }}>Portfolio</div>
+            <div className="text-[9px] font-mono uppercase tracking-widest" style={{ color: MUTED }}>On-chain Intelligence</div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Address badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="font-mono text-[10px] text-white/60">{userAddress ? formatAddr(userAddress) : "—"}</span>
-            <button onClick={() => { navigator.clipboard.writeText(userAddress ?? ""); toast.success("Copied!"); }}
-              className="text-white/20 hover:text-white/60 transition-colors">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
+            <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : "—"}</span>
+            <button
+              onClick={() => { navigator.clipboard.writeText(userAddress ?? ""); toast.success("Copied!"); }}
+              style={{ color: MUTED }}
+              className="hover:opacity-100 transition-opacity opacity-50"
+            >
               <Copy size={10} />
             </button>
           </div>
 
           {/* Refresh */}
-          <button onClick={refresh}
-            className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/10 transition-all text-white/40 hover:text-white">
-            <RefreshCw size={14} className={isLoading ? "animate-spin text-[#00F2EA]" : ""} />
+          <button
+            onClick={refresh}
+            className="p-2 rounded-xl border transition-all hover:bg-black/5"
+            style={{ borderColor: BORDER, background: CARD, color: MUTED }}
+          >
+            <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
           </button>
 
           <div className="scale-90 origin-right">
@@ -216,139 +251,151 @@ export default function PortfolioPage() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-5xl mx-auto px-4 pb-32 pt-8 space-y-6">
+      <main className="max-w-5xl mx-auto px-4 pb-32 pt-8 space-y-5">
 
-        {/* ── HERO BALANCE CARD ── */}
+        {/* ── BALANCE CARD ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl border border-white/[0.08] overflow-hidden"
-          style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)" }}
+          className="rounded-3xl border overflow-hidden"
+          style={{ borderColor: BORDER, background: CARD }}
         >
           <div className="p-8">
             <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <TrendingUp size={14} className="text-white/30" />
-                <span className="text-[10px] font-mono font-black text-white/30 uppercase tracking-[0.3em]">
-                  Total Portfolio Value
-                </span>
-              </div>
-              <button onClick={() => setHidden(h => !h)}
-                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/30 hover:text-white">
+              <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em]" style={{ color: MUTED }}>
+                Total Portfolio Value
+              </span>
+              <button
+                onClick={() => setHidden(h => !h)}
+                className="p-1.5 rounded-lg transition-colors hover:bg-black/5"
+                style={{ color: MUTED }}
+              >
                 {hidden ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
 
-            {/* Big value */}
+            {/* Big number */}
             <div className="flex items-end gap-5 flex-wrap mb-8">
-              <div className="text-6xl md:text-7xl font-black tracking-tighter font-mono text-white">
-                {hidden ? (
-                  <span className="text-white/30">••••••••</span>
-                ) : (
-                  formatUSD(totalPnl ?? 0)
-                )}
+              <div className="text-6xl md:text-7xl font-black tracking-tighter font-mono" style={{ color: INK }}>
+                {hidden ? <span style={{ color: MUTED }}>••••••••</span> : formatUSD(totalPnl ?? 0)}
               </div>
 
-              {/* 24h change pill */}
-              <div className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-black text-sm border ${
-                isPositive
-                  ? "bg-green-500/10 border-green-500/20 text-green-400"
-                  : "bg-red-500/10 border-red-500/20 text-red-400"
-              }`}>
+              {/* 24h pill */}
+              <div
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-black text-sm border ${
+                  isPositive ? "text-emerald-700 bg-emerald-50 border-emerald-200" : "text-rose-600 bg-rose-50 border-rose-200"
+                }`}
+              >
                 {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                 {hidden ? "••••" : `${isPositive ? "+" : ""}${formatUSD(change24hUSD ?? 0)}`}
-                <span className="opacity-70 text-xs">
+                <span className="opacity-60 text-xs">
                   ({hidden ? "••" : `${safeToFixed(change24hPercent ?? 0, 2)}%`})
                 </span>
-                <span className="text-[9px] font-mono opacity-50 ml-1">24H</span>
+                <span className="text-[9px] font-mono opacity-40 ml-1">24H</span>
               </div>
             </div>
 
-            {/* Stats row */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/[0.06]">
+            {/* Stats — no "Status Live" */}
+            <div className="grid grid-cols-2 gap-6 pt-6 border-t" style={{ borderColor: BORDER }}>
               {[
-                { label: "Assets", value: hidden ? "••" : String(assets?.length ?? 0), icon: PieChart, color: "#00F2EA" },
-                { label: "Networks", value: hidden ? "••" : String(new Set(assets?.map((a: any) => a.network)).size ?? 0), icon: Globe, color: "#627EEA" },
-                { label: "Status", value: "Live", icon: Activity, color: "#00C076" },
-              ].map(({ label, value, icon: Icon, color }) => (
+                { label: "Assets", value: hidden ? "••" : String(assets?.length ?? 0) },
+                { label: "Networks", value: hidden ? "••" : String(new Set(assets?.map((a: any) => a.network)).size ?? 0) },
+              ].map(({ label, value }) => (
                 <div key={label} className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5">
-                    <Icon size={11} style={{ color }} />
-                    <span className="text-[9px] font-mono font-black text-white/30 uppercase tracking-widest">{label}</span>
-                  </div>
-                  <div className="font-black font-mono text-2xl text-white" style={label === "Status" ? { color } : {}}>
-                    {label === "Status" ? (
-                      <span className="flex items-center gap-2 text-base">
-                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: color }} />
-                        {value}
-                      </span>
-                    ) : value}
-                  </div>
+                  <span className="text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>{label}</span>
+                  <div className="font-black font-mono text-2xl" style={{ color: INK }}>{value}</div>
                 </div>
               ))}
             </div>
           </div>
         </motion.div>
 
-        {/* ── ACTION CLUSTER ── */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <ActionCluster onAction={handleAction} />
+        {/* ── WALLET ACTION STRIP ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className="rounded-3xl border p-6"
+          style={{ borderColor: BORDER, background: CARD }}
+        >
+          <div className="text-[9px] font-mono font-black uppercase tracking-[0.3em] mb-6" style={{ color: MUTED }}>
+            Wallet
+          </div>
+          <div className="flex justify-around gap-2">
+            <WalletAction icon={ArrowUpRight}   label="Send"   onClick={() => openMode("send")}   />
+            <WalletAction icon={Repeat}         label="Swap"   onClick={() => openMode("swap")}   />
+            <WalletAction icon={Globe}          label="Bridge" onClick={() => openMode("bridge")} />
+            <WalletAction icon={CreditCard}     label="Buy"    onClick={() => openMode("buy")}    />
+          </div>
         </motion.div>
 
-        {/* ── ASSET LIST ── */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="rounded-3xl border border-white/[0.08] overflow-hidden"
-          style={{ background: "rgba(255,255,255,0.02)" }}
+        {/* ── HOLDINGS ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="rounded-3xl border overflow-hidden"
+          style={{ borderColor: BORDER, background: "transparent" }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
+          <div className="flex items-center justify-between px-6 py-5 border-b" style={{ borderColor: BORDER, background: CARD }}>
             <div className="flex items-center gap-3">
-              <div className="w-1 h-5 rounded-full" style={{ background: "#00F2EA" }} />
-              <h2 className="font-black text-white uppercase tracking-tight">Holdings</h2>
-              <span className="px-2 py-0.5 bg-white/[0.06] rounded-full text-[10px] font-mono text-white/40 font-bold">
-                {filteredAssets.length} assets
+              <div className="w-1 h-5 rounded-full" style={{ background: INK }} />
+              <h2 className="font-black uppercase tracking-tight text-sm" style={{ color: INK }}>Holdings</h2>
+              <span
+                className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border"
+                style={{ borderColor: BORDER, color: MUTED }}
+              >
+                {filteredAssets.length}
               </span>
             </div>
 
-            {/* Search */}
             <div className="relative hidden sm:block">
-              <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: MUTED }} />
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search asset..."
-                className="pl-8 pr-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-white/25 transition-colors w-44"
+                className="pl-8 pr-4 py-2 border rounded-xl text-xs focus:outline-none transition-colors w-40"
+                style={{
+                  borderColor: BORDER,
+                  background: BG,
+                  color: INK,
+                }}
               />
             </div>
           </div>
 
-          {/* Column headers */}
-          <div className="flex items-center gap-4 px-5 py-3 border-b border-white/[0.04]">
+          {/* Column labels */}
+          <div className="flex items-center gap-4 px-5 py-3 border-b" style={{ borderColor: BORDER }}>
             <div className="w-11 shrink-0" />
-            <div className="flex-1 text-[9px] font-mono font-black text-white/20 uppercase tracking-widest">Asset</div>
-            <div className="w-28 text-right text-[9px] font-mono font-black text-white/20 uppercase tracking-widest hidden sm:block">Balance</div>
-            <div className="w-20 text-right text-[9px] font-mono font-black text-white/20 uppercase tracking-widest hidden md:block">24H</div>
-            <div className="w-28 text-right text-[9px] font-mono font-black text-white/20 uppercase tracking-widest">Value</div>
+            <div className="flex-1 text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Asset</div>
+            <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest hidden sm:block" style={{ color: MUTED }}>Balance</div>
+            <div className="w-20 text-right text-[9px] font-mono font-black uppercase tracking-widest hidden md:block" style={{ color: MUTED }}>24H</div>
+            <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-widest" style={{ color: MUTED }}>Value</div>
           </div>
 
           {/* Rows */}
-          <div className="p-4 space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
-            {isLoading && (filteredAssets.length === 0) ? (
+          <div className="p-4 space-y-2 max-h-[600px] overflow-y-auto" style={{ background: BG }}>
+            {isLoading && filteredAssets.length === 0 ? (
               <div className="py-16 text-center space-y-3">
-                <RefreshCw size={24} className="text-white/20 mx-auto animate-spin" />
-                <p className="text-white/30 text-sm font-bold uppercase tracking-widest">Loading on-chain data...</p>
+                <RefreshCw size={22} className="mx-auto animate-spin" style={{ color: MUTED }} />
+                <p className="text-sm font-bold uppercase tracking-widest" style={{ color: MUTED }}>Loading on-chain data</p>
               </div>
             ) : filteredAssets.length === 0 ? (
               <div className="py-16 text-center space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                  <Wallet size={28} className="text-white/20" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto rounded-2xl border flex items-center justify-center" style={{ borderColor: BORDER, background: CARD }}>
+                  <Wallet size={26} style={{ color: MUTED }} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-white/50 font-black uppercase tracking-widest text-sm">No Assets Detected</p>
-                  <p className="text-white/20 text-xs">Connect a wallet with on-chain holdings to view your portfolio.</p>
+                  <p className="font-black uppercase tracking-widest text-sm" style={{ color: MUTED }}>No assets detected</p>
+                  <p className="text-xs" style={{ color: MUTED }}>Connect a wallet with on-chain holdings.</p>
                 </div>
-                <button onClick={refresh}
-                  className="px-6 py-2.5 bg-white/[0.06] border border-white/10 rounded-full text-white/50 font-mono text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">
+                <button
+                  onClick={refresh}
+                  className="px-6 py-2.5 border rounded-full font-mono text-[10px] uppercase tracking-widest transition-all hover:bg-black/5"
+                  style={{ borderColor: BORDER, color: MUTED }}
+                >
                   Refresh
                 </button>
               </div>
@@ -361,30 +408,28 @@ export default function PortfolioPage() {
 
           {/* Footer */}
           {filteredAssets.length > 0 && (
-            <div className="px-6 py-4 border-t border-white/[0.06] flex items-center justify-between">
-              <span className="text-[10px] font-mono text-white/25 uppercase tracking-widest">
+            <div className="px-6 py-3 border-t" style={{ borderColor: BORDER, background: CARD }}>
+              <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: MUTED }}>
                 Live on-chain data · Updates every 30s
               </span>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-[10px] font-mono text-green-400/60 uppercase tracking-widest">Connected</span>
-              </div>
             </div>
           )}
         </motion.div>
 
-        {/* ── ALLOCATION BREAKDOWN ── */}
+        {/* ── ALLOCATION ── */}
         {filteredAssets.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            className="rounded-3xl border border-white/[0.08] overflow-hidden p-6"
-            style={{ background: "rgba(255,255,255,0.02)" }}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.22 }}
+            className="rounded-3xl border overflow-hidden"
+            style={{ borderColor: BORDER, background: CARD }}
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-1 h-5 rounded-full" style={{ background: "#627EEA" }} />
-              <h2 className="font-black text-white uppercase tracking-tight">Allocation</h2>
+            <div className="px-6 py-5 border-b flex items-center gap-3" style={{ borderColor: BORDER }}>
+              <div className="w-1 h-5 rounded-full" style={{ background: INK }} />
+              <h2 className="font-black uppercase tracking-tight text-sm" style={{ color: INK }}>Allocation</h2>
             </div>
-
-            <div className="space-y-3">
+            <div className="p-6 space-y-3">
               {filteredAssets.slice(0, 8).map((asset: any, i: number) => {
                 const pct = totalPnl > 0 ? ((asset.value ?? 0) / totalPnl) * 100 : 0;
                 const chainColor = CHAIN_COLORS[asset.network] ?? "#888";
@@ -393,15 +438,15 @@ export default function PortfolioPage() {
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ background: chainColor }} />
-                        <span className="font-bold text-white/70">{asset.symbol}</span>
-                        <span className="font-mono text-white/30">{asset.network}</span>
+                        <span className="font-bold" style={{ color: INK }}>{asset.symbol}</span>
+                        <span className="font-mono" style={{ color: MUTED }}>{asset.network}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-mono text-white/40">{safeToFixed(pct, 1)}%</span>
-                        <span className="font-mono font-black text-white">{hidden ? "••••" : formatUSD(asset.value ?? 0)}</span>
+                        <span className="font-mono" style={{ color: MUTED }}>{safeToFixed(pct, 1)}%</span>
+                        <span className="font-mono font-black" style={{ color: INK }}>{hidden ? "••••" : formatUSD(asset.value ?? 0)}</span>
                       </div>
                     </div>
-                    <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(5,5,5,0.07)" }}>
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(pct, 100)}%` }}
@@ -416,7 +461,6 @@ export default function PortfolioPage() {
             </div>
           </motion.div>
         )}
-
       </main>
 
       {/* ── MODALS ── */}
