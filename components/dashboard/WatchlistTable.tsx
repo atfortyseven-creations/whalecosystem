@@ -161,6 +161,8 @@ export function WatchlistTable() {
     const [view, setView]       = useState<'TOKENS' | 'WALLETS'>('TOKENS');
     const [showAdd, setShowAdd] = useState(false);
     
+    const effectiveAddress = address || 'DEFAULT_WALLET';
+    
     // DexScreener Global Search
     const [globalSearchTokens, setGlobalSearchTokens] = useState<any[]>([]);
     const [isSearchingGlobal, setIsSearchingGlobal] = useState(false);
@@ -233,8 +235,8 @@ export function WatchlistTable() {
                 // Only add local tokens the server doesn't know about yet
                 let localTokens: any[] = [];
                 try {
-                    const prefix = `SOV_WL_${address?.toLowerCase()}`;
-                    const localStr = (typeof window !== 'undefined' && address) ? localStorage.getItem(`${prefix}_TOKENS`) : null;
+                    const prefix = `SOV_WL_${effectiveAddress.toLowerCase()}`;
+                    const localStr = (typeof window !== 'undefined') ? localStorage.getItem(`${prefix}_TOKENS`) : null;
                     if (localStr) {
                          const parsed = JSON.parse(localStr);
                          if (Array.isArray(parsed)) localTokens = parsed;
@@ -247,8 +249,8 @@ export function WatchlistTable() {
                 // Fallback entirely to local
                 let localTokens: any[] = [];
                 try {
-                    const prefix = `SOV_WL_${address?.toLowerCase()}`;
-                    const localStr = (typeof window !== 'undefined' && address) ? localStorage.getItem(`${prefix}_TOKENS`) : null;
+                    const prefix = `SOV_WL_${effectiveAddress.toLowerCase()}`;
+                    const localStr = (typeof window !== 'undefined') ? localStorage.getItem(`${prefix}_TOKENS`) : null;
                     if (localStr) {
                          const parsed = JSON.parse(localStr);
                          if (Array.isArray(parsed)) localTokens = parsed;
@@ -260,8 +262,8 @@ export function WatchlistTable() {
             console.error('Error fetching watchlist', e);
             let localTokens: any[] = [];
             try {
-                const prefix = `SOV_WL_${address?.toLowerCase()}`;
-                const localStr = (typeof window !== 'undefined' && address) ? localStorage.getItem(`${prefix}_TOKENS`) : null;
+                const prefix = `SOV_WL_${effectiveAddress.toLowerCase()}`;
+                const localStr = (typeof window !== 'undefined') ? localStorage.getItem(`${prefix}_TOKENS`) : null;
                 if (localStr) {
                      const parsed = JSON.parse(localStr);
                      if (Array.isArray(parsed)) localTokens = parsed;
@@ -274,13 +276,8 @@ export function WatchlistTable() {
     };
 
     useEffect(() => { 
-        if (!address) {
-            setData({ tokens: [], wallets: [] });
-            setLoading(false);
-            return;
-        }
         fetchWatchlist(); 
-    }, [address]);
+    }, [effectiveAddress]);
 
     const handleDelete = async (id: string, type: 'TOKEN' | 'WALLET') => {
         const tid = toast.loading('Removing from watchlist…');
@@ -628,8 +625,9 @@ export function WatchlistTable() {
 // ── Helpers ─────────────────────────────────────────────────────────
 
 function saveToLocal(item: any, address?: string) {
-    if (typeof window === 'undefined' || !address) return;
-    const prefix = `SOV_WL_${address.toLowerCase()}`;
+    if (typeof window === 'undefined') return;
+    const effectiveAddress = address || 'DEFAULT_WALLET';
+    const prefix = `SOV_WL_${effectiveAddress.toLowerCase()}`;
     const key = item.type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
     let existing: any[] = [];
     try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
@@ -639,8 +637,9 @@ function saveToLocal(item: any, address?: string) {
 }
 
 function removeFromLocal(idOrSymbol: string, type: 'TOKEN' | 'WALLET', address?: string) {
-    if (typeof window === 'undefined' || !address) return;
-    const prefix = `SOV_WL_${address.toLowerCase()}`;
+    if (typeof window === 'undefined') return;
+    const effectiveAddress = address || 'DEFAULT_WALLET';
+    const prefix = `SOV_WL_${effectiveAddress.toLowerCase()}`;
     const key = type === 'TOKEN' ? `${prefix}_TOKENS` : `${prefix}_WALLETS`;
     let existing: any[] = [];
     try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}

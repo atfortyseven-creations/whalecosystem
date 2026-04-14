@@ -72,15 +72,23 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
 
                 if (parsed && parsed.success && Array.isArray(parsed.data)) {
                     if (isMounted) {
-                        const newMap = new Map<string, MarketData>();
-                        parsed.data.forEach((d: MarketData) => {
-                            if (d?.symbol) newMap.set(d.symbol, d);
-                        });
-                        setMarkets(newMap);
-                        setLastUpdate(new Date(parsed.timestamp || Date.now()));
-                        setIsConnected(true);
-                        setLatency(Math.round(end - start));
-                        setMode(parsed.source === 'binance' || parsed.source?.includes('getblock') ? 'live' : 'fallback');
+                        if (parsed.data.length > 0) {
+                            const newMap = new Map<string, MarketData>();
+                            parsed.data.forEach((d: MarketData) => {
+                                if (d?.symbol) newMap.set(d.symbol, d);
+                            });
+                            setMarkets(newMap);
+                            setLastUpdate(new Date(parsed.timestamp || Date.now()));
+                            setIsConnected(true);
+                            setLatency(Math.round(end - start));
+                            setMode(parsed.source === 'binance' || parsed.source?.includes('getblock') ? 'live' : 'fallback');
+                        } else {
+                            // If empty, revert to synthetic
+                            setMarkets(buildSyntheticMap());
+                            setIsConnected(false);
+                            setMode('synthetic');
+                            setLatency(0);
+                        }
                     }
                 }
             } catch {

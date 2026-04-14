@@ -180,7 +180,7 @@ export function NewPairsTable() {
 
     const filtered = pairs
         .filter((p: any) => p != null && typeof p === 'object')
-        .filter((p: any) => chainFilter === 'all' || p.chain === chainFilter)
+        .filter((p: any) => chainFilter === 'all' || p.chain === chainFilter || p.chainId === chainFilter)
         .filter((p: any) => {
             const score = p.security?.score ?? 50;
             if (rugFilter === 'verified') return score >= 65;
@@ -277,11 +277,18 @@ export function NewPairsTable() {
                         ) : (
                             <div className="flex flex-col w-full overflow-y-auto overflow-x-hidden" style={{ height: 520 }}>
                                 {filtered.map((p: any, index: number) => {
-                                    if (!p || !p.security || !p.priceChange || !p.baseToken) {
+                                    if (!p || !p.baseToken) {
                                         return null;
                                     }
-                                    const isRug = (p.security.score ?? 50) < 65;
-                                    const score = p.security.score ?? 50;
+                                    const security = p.security || { score: 50, honeypotRisk: false, lpBurned: false, mintRevoked: false };
+                                    const priceChange = p.priceChange || { m5: 0, h1: 0, h6: 0, h24: 0 };
+                                    const txns = p.txns || { m5: { buys: 0, sells: 0 } };
+                                    const liquidity = p.liquidity || { usd: 0 };
+                                    const traders = p.traders || { makers: 0, snipers: 0 };
+                                    const taxes = p.taxes || { buy: 0, sell: 0 };
+                                    const chainName = p.chain || p.chainId || 'unknown';
+                                    const isRug = (security.score ?? 50) < 65;
+                                    const score = security.score ?? 50;
                                     return (
                                         <div key={p.id || index} className="border-b border-[#F0F0F0]">
                                             <div className="grid hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer min-h-[78px]"
@@ -290,18 +297,18 @@ export function NewPairsTable() {
                                                 {/* Token / Dex */}
                                                 <div className="px-3 flex items-center gap-2.5 overflow-hidden">
                                                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                                        style={{ background: CHAIN_COLORS[p.chain] || '#888' }}>
+                                                        style={{ background: CHAIN_COLORS[chainName] || '#888' }}>
                                                         {p.baseToken.symbol[0]}
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
                                                         <div className="flex items-center gap-1.5">
                                                             <span className="text-[11px] font-black text-[#050505] truncate">{p.baseToken.symbol}</span>
-                                                            <span className="text-[8px] font-mono text-[#888888]">/ {p.quoteToken.symbol}</span>
+                                                            <span className="text-[8px] font-mono text-[#888888]">/ {p.quoteToken?.symbol || 'USD'}</span>
                                                         </div>
                                                         <div className="flex items-center gap-1.5 mt-0.5">
                                                             <span className="text-[8px] font-bold text-[#888888] truncate">{p.baseToken.name}</span>
-                                                            <span className="text-[7px] px-1.5 py-0.5 rounded border border-[#E5E5E5] text-[#888888]" style={{ borderColor: CHAIN_COLORS[p.chain] + '55', color: CHAIN_COLORS[p.chain] }}>{p.chain}</span>
-                                                            <span className="text-[7px] text-[#888888]">{p.dex}</span>
+                                                            <span className="text-[7px] px-1.5 py-0.5 rounded border border-[#E5E5E5] text-[#888888]" style={{ borderColor: CHAIN_COLORS[chainName] + '55', color: CHAIN_COLORS[chainName] }}>{chainName}</span>
+                                                            <span className="text-[7px] text-[#888888]">{p.dexId || p.dex}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -310,8 +317,8 @@ export function NewPairsTable() {
                                                 <div className="px-3">
                                                     <div className="text-[11px] font-black font-mono text-[#050505]">${p.priceUsd}</div>
                                                     <div className="flex gap-2 mt-0.5 text-[9px] font-mono">
-                                                        <span className="text-[#00C076] flex items-center gap-0.5"><ArrowUpRight size={9}/>{p.txns.m5.buys}B</span>
-                                                        <span className="text-[#FF3B30] flex items-center gap-0.5"><ArrowDownRight size={9}/>{p.txns.m5.sells}S</span>
+                                                        <span className="text-[#00C076] flex items-center gap-0.5"><ArrowUpRight size={9}/>{txns.m5?.buys || 0}B</span>
+                                                        <span className="text-[#FF3B30] flex items-center gap-0.5"><ArrowDownRight size={9}/>{txns.m5?.sells || 0}S</span>
                                                     </div>
                                                 </div>
 
@@ -321,28 +328,28 @@ export function NewPairsTable() {
                                                 </div>
 
                                                 {/* 5m % */}
-                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.m5)}`}>
-                                                    {pctFmt(p.priceChange.m5)}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(priceChange.m5 || 0)}`}>
+                                                    {pctFmt(priceChange.m5 || 0)}
                                                 </div>
 
                                                 {/* 1h % */}
-                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h1)}`}>
-                                                    {pctFmt(p.priceChange.h1)}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(priceChange.h1 || 0)}`}>
+                                                    {pctFmt(priceChange.h1 || 0)}
                                                 </div>
 
                                                 {/* 6h % */}
-                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h6)}`}>
-                                                    {pctFmt(p.priceChange.h6)}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(priceChange.h6 || 0)}`}>
+                                                    {pctFmt(priceChange.h6 || 0)}
                                                 </div>
 
                                                 {/* 24h % */}
-                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(p.priceChange.h24)}`}>
-                                                    {pctFmt(p.priceChange.h24)}
+                                                <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(priceChange.h24 || 0)}`}>
+                                                    {pctFmt(priceChange.h24 || 0)}
                                                 </div>
 
                                                 {/* Liquidity */}
                                                 <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                    {fmt(p.liquidity.usd)}
+                                                    {fmt(liquidity.usd || p.liquidity || 0)}
                                                 </div>
 
                                                 {/* MCap */}
@@ -359,11 +366,11 @@ export function NewPairsTable() {
                                                 <div className="px-3 text-right">
                                                     <div className="flex flex-col items-end gap-0.5">
                                                         <span className="text-[10px] font-black font-mono text-[#050505] flex items-center gap-1">
-                                                            <Users size={9} className="text-[#888888]" />{p.traders.makers}
+                                                            <Users size={9} className="text-[#888888]" />{traders.makers || 0}
                                                         </span>
-                                                        {p.traders.snipers > 0 && (
+                                                        {(traders.snipers || 0) > 0 && (
                                                             <span className="text-[8px] font-bold text-[#FF3B30] flex items-center gap-0.5">
-                                                                <Zap size={8}/>{p.traders.snipers} snipers
+                                                                <Zap size={8}/>{traders.snipers} snipers
                                                             </span>
                                                         )}
                                                     </div>
@@ -381,10 +388,10 @@ export function NewPairsTable() {
                                                         {p.security.honeypotRisk && <AlertTriangle size={9} className="text-[#FF9500]" />}
                                                     </div>
                                                     <div className="flex gap-1.5 justify-end mt-1">
-                                                        {p.security.lpBurned     && <span className="text-[7px] font-black text-[#00C076]">LP✓</span>}
-                                                        {p.security.mintRevoked  && <span className="text-[7px] font-black text-[#00C076]">MINT✓</span>}
-                                                        {p.taxes.buy  > 0 && <span className="text-[7px] font-bold text-[#888888]">B:{p.taxes.buy}%</span>}
-                                                        {p.taxes.sell > 0 && <span className="text-[7px] font-bold text-[#888888]">S:{p.taxes.sell}%</span>}
+                                                        {security.lpBurned     && <span className="text-[7px] font-black text-[#00C076]">LP✓</span>}
+                                                        {security.mintRevoked  && <span className="text-[7px] font-black text-[#00C076]">MINT✓</span>}
+                                                        {(taxes.buy || 0)  > 0 && <span className="text-[7px] font-bold text-[#888888]">B:{taxes.buy}%</span>}
+                                                        {(taxes.sell || 0) > 0 && <span className="text-[7px] font-bold text-[#888888]">S:{taxes.sell}%</span>}
                                                     </div>
                                                 </div>
                                             </div>

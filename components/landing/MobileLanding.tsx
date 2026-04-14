@@ -1,174 +1,42 @@
 "use client";
 
-/**
- * MobileLanding.tsx — Whale Alert Network
- * ─────────────────────────────────────────────────────────────────────────────
- * Academic mobile landing. 240Hz touch-first. Zero buttons. Zero lag.
- *
- * Architecture:
- *  • Native document scroll only — no snap containers, no overflow traps.
- *  • All animations: `transform` + `opacity` on GPU compositor layers only.
- *  • No WebGL, no canvas, no heavy blur stacks.
- *  • Cosmic pattern at 140% scale, opacity 0.04, slow drift loop.
- *  • whileInView triggers on scroll — no JS polling.
- *  • Touch targets: 100% passive, no preventDefault calls.
- * ─────────────────────────────────────────────────────────────────────────────
- */
-
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 
-// ─── Design tokens ────────────────────────────────────────────────────────────
+const DynamicCryptoCheckoutModal = dynamic(
+  () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
+  { ssr: false }
+);
+
 const IVORY = "#FAF9F6";
 const INK   = "#050505";
-const MUTED = "rgba(5,5,5,0.42)";
+const MUTED = "rgba(5,5,5,0.65)";
 const FAINT = "rgba(5,5,5,0.10)";
 
-// ─── Inline micro SVG — blockchain node icon ─────────────────────────────────
-function ChainIcon({ size = 32 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <rect x="28" y="28" width="24" height="24" rx="3"
-        stroke={INK} strokeWidth="2.2" />
-      <line x1="40" y1="52" x2="40" y2="68" stroke={INK} strokeWidth="1.8" />
-      <line x1="40" y1="28" x2="40" y2="12" stroke={INK} strokeWidth="1.8" />
-      <line x1="52" y1="40" x2="68" y2="40" stroke={INK} strokeWidth="1.8" />
-      <line x1="28" y1="40" x2="12" y2="40" stroke={INK} strokeWidth="1.8" />
-      <rect x="31" y="4"  width="18" height="12" rx="2" stroke={INK} strokeWidth="1.8" />
-      <rect x="31" y="64" width="18" height="12" rx="2" stroke={INK} strokeWidth="1.8" />
-      <rect x="64" y="34" width="12" height="12" rx="2" stroke={INK} strokeWidth="1.8" />
-      <rect x="4"  y="34" width="12" height="12" rx="2" stroke={INK} strokeWidth="1.8" />
-    </svg>
-  );
-}
-
-// ─── GPU-safe scroll reveal wrapper ──────────────────────────────────────────
-// Uses only `opacity` + `translateY` — zero layout triggers.
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-8%" }}
-      transition={{ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] }}
-      style={{ willChange: "transform, opacity" }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-// ─── Glassmorphism card ───────────────────────────────────────────────────────
-function Card({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return (
-    <Reveal delay={delay}>
-      <div
-        className="rounded-2xl p-6"
-        style={{
-          background: "rgba(255,255,255,0.85)",
-          border: `1px solid ${FAINT}`,
-          boxShadow: "0 4px 20px rgba(5,5,5,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
-        }}
-      >
-        {children}
-      </div>
-    </Reveal>
-  );
-}
-
-// ─── Section separator with number ───────────────────────────────────────────
-function Sep({ n }: { n: string }) {
-  return (
-    <Reveal className="flex items-center gap-4 mb-8">
-      <span
-        className="text-[8px] font-mono font-black"
-        style={{ color: MUTED, letterSpacing: "0.35em" }}
-      >
-        § {n}
-      </span>
-      <div className="flex-1 h-px" style={{ background: FAINT }} />
-    </Reveal>
-  );
-}
-
-// ─── Module card data ─────────────────────────────────────────────────────────
-const MODULES = [
-  {
-    code: "01",
-    title: "Ingestion Engine",
-    desc: "Priority fee interception on Solana + EVM mempool across 16 networks. Z-score at 3.5σ. Sub-15ms from on-chain event to Redis delivery.",
-    stat: "<15ms",
-    unit: "latency",
-  },
-  {
-    code: "02",
-    title: "Sovereign Mesh",
-    desc: "Redis Pub/Sub over 6 significance tiers. ECDSA secp256k1 authentication per signal. Groth16 ZK proof for sentinel membership.",
-    stat: "6",
-    unit: "tiers",
-  },
-  {
-    code: "03",
-    title: "Mass Transfer Intel",
-    desc: "Neo4j graph clustering reconstitutes distributed institutional moves. 15-minute sliding window. Megalodon-tier events auto-flagged.",
-    stat: "$100M+",
-    unit: "threshold",
-  },
-  {
-    code: "04",
-    title: "Akashic Ledger",
-    desc: "SHA-256 tamper-evident registry of events above $50M. 7 fields. Hash recomputed on every GET for live integrity verification.",
-    stat: "SHA-256",
-    unit: "integrity",
-  },
-  {
-    code: "05",
-    title: "Sovereign Vault",
-    desc: "EIP-1193 non-custodial. Private keys never reach the server. Reown AppKit for WalletConnect v2. Dead man's switch via Solidity.",
-    stat: "EIP-1193",
-    unit: "standard",
-  },
-  {
-    code: "06",
-    title: "ZK Infrastructure",
-    desc: "World ID proof-of-personhood. Groth16 BN254 for sentinel auth. Nullifier Sybil resistance. On-chain relay to Optimism verifier.",
-    stat: "Groth16",
-    unit: "proof",
-  },
-];
-
-const STACK = [
-  { cat: "Application", items: ["Next.js 15 App Router", "TypeScript 5.7 Strict"] },
-  { cat: "Blockchain",  items: ["Ethers.js 6 + Viem", "Solana Web3.js"] },
-  { cat: "Data",        items: ["PostgreSQL + Prisma", "Redis Streams + Neo4j"] },
-  { cat: "Security",    items: ["SIWE EIP-4361", "ZK Groth16 + World ID"] },
-];
-
-// ═════════════════════════════════════════════════════════════════════════════
-// COMPONENT
-// ═════════════════════════════════════════════════════════════════════════════
 export function MobileLanding() {
+  const router = useRouter();
+  const { address } = useSovereignAccount();
+  const [showGate, setShowGate] = useState(false);
+
+  const handleEntry = () => {
+    if (address) router.push("/dashboard");
+    else setShowGate(true);
+  };
+
   return (
     <div
       style={{ backgroundColor: IVORY, color: INK, fontFamily: "Inter, system-ui, sans-serif" }}
-      className="relative min-h-screen overflow-x-hidden"
+      className="relative min-h-screen overflow-x-hidden font-sans pb-32"
     >
+      {/* ── Background: Solid Ivory ── */}
+      <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
 
-      {/* ── Cosmic wallpaper (fixed, GPU layer, zero JS per frame) ── */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
-        style={{ background: IVORY }}
-      >
+      {/* ── Cosmic wallpaper ── */}
+      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
         <motion.div
           className="absolute"
           style={{
@@ -176,7 +44,7 @@ export function MobileLanding() {
             backgroundImage: "url('/patron-cosmico-4k.png')",
             backgroundSize: "140%",
             backgroundRepeat: "repeat",
-            opacity: 0.04,
+            opacity: 0.04, // Kept explicitly exactly as it was requested -> "EL FONDO DEL LANDING PAGE DEL MOVIL ESTA PERFECTO"
             mixBlendMode: "multiply",
             willChange: "transform",
           }}
@@ -185,7 +53,62 @@ export function MobileLanding() {
         />
       </div>
 
-      {/* ── Fixed header pill ─────────────────────────────────────── */}
+      {/* ── Downpage Wave with 20% zoom and expert fade ── */}
+      <div className="absolute inset-x-0 bottom-0 z-[2] pointer-events-none" style={{ height: "1000px" }}>
+        {/* The Wave Image */}
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          overflow: "hidden"
+        }}>
+          <img 
+            src="/great-wave.png" 
+            alt="The Great Wave" 
+            loading="lazy"
+            decoding="async"
+            style={{ 
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%", 
+              height: "auto", 
+              transform: "scale(1.2) translateZ(0)", // 20% zoom
+              willChange: "transform",
+              transformOrigin: "bottom center",
+              opacity: 0.95
+            }} 
+          />
+        </div>
+        
+        {/* The Fusion Gradient to transition perfectly into waves */}
+        <div 
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "linear-gradient(to bottom, #FAF9F6 0%, rgba(250, 249, 246, 0.98) 15%, rgba(250, 249, 246, 0) 100%)",
+            zIndex: 3
+          }}
+        />
+        <div 
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "linear-gradient(to top, rgba(250, 249, 246, 0.9) 0%, rgba(250, 249, 246, 0) 60%)",
+            zIndex: 3
+          }}
+        />
+      </div>
+
+      {/* ── Fixed Header Pill with Connect Wallet Button ── */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -201,409 +124,118 @@ export function MobileLanding() {
       >
         <div className="flex items-center gap-2.5">
           <WhaleLogo className="w-6 h-6 shrink-0" />
-          <div>
+          <div className="hidden sm:block">
             <div className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>
               Whale Alert Network
             </div>
-            <div
-              className="text-[7px] font-mono font-bold uppercase"
-              style={{ color: MUTED, letterSpacing: "0.22em" }}
-            >
-              Blockchain Intelligence
-            </div>
           </div>
         </div>
-        {/* Live indicator — static dot, no pulse animation (GPU safe) */}
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ background: "#00C896" }}
-        />
+
+        {/* Connect Wallet Button (Black button, white text, fully integrated with backend hooks) */}
+        <button
+          onClick={handleEntry}
+          className="px-4 py-2 rounded-full font-sans font-black uppercase tracking-wide transition-transform active:scale-[0.96]"
+          style={{
+            backgroundColor: INK,
+            color: "#FFFFFF",
+            fontSize: "9.5px",
+            letterSpacing: "0.15em"
+          }}
+        >
+          {address ? "OPEN TERMINAL" : "CONNECT WALLET"}
+        </button>
       </motion.header>
 
-      {/* ── Content — native body scroll ─────────────────────────── */}
-      <div className="relative z-10 px-4 pt-24 pb-16 max-w-lg mx-auto">
+      {/* ── Fully Text-Based Content Layer (README Content) ── */}
+      <div className="relative z-10 max-w-[840px] mx-auto px-6 pt-36 pb-64 text-[15.5px] leading-[1.8]" style={{ color: MUTED }}>
+        
+        <h1 className="text-[2.6rem] font-black tracking-[-0.03em] leading-[1.1] mb-16" style={{ color: INK }}>
+          Whale Alert Network
+        </h1>
 
-        {/* ─── HERO ─────────────────────────────────────────────── */}
-        <section className="min-h-[88dvh] flex flex-col justify-center">
-
-          <Reveal delay={0.1}>
-            <div className="flex flex-wrap gap-2 mb-10">
-              {["Sovereign Infrastructure", "v2.0 Production", "Open Source"].map((t) => (
-                <span
-                  key={t}
-                  className="text-[7.5px] font-mono font-black uppercase px-3 py-1.5 rounded-full"
-                  style={{
-                    background: "rgba(5,5,5,0.05)",
-                    border: `1px solid ${FAINT}`,
-                    color: MUTED,
-                    letterSpacing: "0.2em",
-                  }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.15}>
-            <div
-              className="w-14 h-14 rounded-xl flex items-center justify-center mb-8"
-              style={{
-                background: "rgba(255,255,255,0.85)",
-                border: `1px solid ${FAINT}`,
-              }}
-            >
-              <ChainIcon size={36} />
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.2}>
-            <h1
-              className="font-black tracking-[-0.04em] leading-[0.84] mb-6"
-              style={{ fontSize: "clamp(3rem,14vw,5rem)", color: INK }}
-            >
-              Whale Alert
-              <br />
-              <span style={{ color: "rgba(5,5,5,0.2)" }}>Network</span>
-            </h1>
-          </Reveal>
-
-          <Reveal delay={0.3}>
-            <p
-              className="text-[14px] leading-[1.75] mb-4"
-              style={{ color: MUTED }}
-            >
-              Sovereign-grade, real-time blockchain intelligence for detecting,
-              verifying, and disseminating high-value capital movements on-chain.
+        <div className="space-y-20">
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>The Origin and Vision</h2>
+            <p className="mb-6">
+              The blockchain ecosystem suffers from a fundamental asymmetry of information. The raw data produced by public distributed ledgers is theoretically visible to anyone. In practice, however, the velocity, volume, and structural complexity of that data mean that only those with access to advanced indexing infrastructure can extract meaning from it in time to act upon that meaning. A private institution with a team of engineers can deploy purpose-built systems to detect a significant capital movement on the Ethereum mainnet nearly four minutes before that movement propagates through the public mempool. An individual operating without institutional infrastructure cannot.
             </p>
-          </Reveal>
-
-          <Reveal delay={0.38}>
-            <p
-              className="text-[9.5px] font-mono font-bold uppercase"
-              style={{ color: "rgba(5,5,5,0.25)", letterSpacing: "0.26em" }}
-            >
-              Designed & engineered by a single independent developer
+            <p className="mb-6">
+              This asymmetry is not a natural law. It is a consequence of the complexity barrier that separates raw on-chain data from actionable intelligence. The Whale Alert Network was conceived specifically to dismantle that barrier, to build from first principles an intelligence system capable of detecting, verifying, and disseminating high value capital movements with accuracy and latency sufficient to place the individual user on the same informational footing as an institutional actor.
             </p>
-          </Reveal>
-
-          {/* Metrics strip */}
-          <Reveal delay={0.48} className="mt-10">
-            <div
-              className="grid grid-cols-3 gap-4 px-5 py-4 rounded-2xl"
-              style={{
-                background: "rgba(255,255,255,0.85)",
-                border: `1px solid ${FAINT}`,
-              }}
-            >
-              {[
-                { v: "<15ms", u: "Latency" },
-                { v: "16",    u: "Networks" },
-                { v: "500+",  u: "Deploys" },
-              ].map(({ v, u }) => (
-                <div key={u} className="text-center">
-                  <div className="text-[15px] font-black font-mono" style={{ color: INK }}>{v}</div>
-                  <div
-                    className="text-[7px] font-mono font-bold uppercase mt-0.5"
-                    style={{ color: MUTED, letterSpacing: "0.18em" }}
-                  >
-                    {u}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-
-        {/* ─── ORIGIN & PHILOSOPHY ──────────────────────────────── */}
-        <section className="pt-24">
-          <Sep n="1" />
-          <Reveal>
-            <h2
-              className="font-black tracking-[-0.03em] leading-[0.88] mb-8"
-              style={{ fontSize: "clamp(1.9rem,8vw,2.6rem)", color: INK }}
-            >
-              Origin &<br />Vision
-            </h2>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p className="text-[13.5px] leading-[1.82] mb-5" style={{ color: MUTED }}>
-              The blockchain ecosystem suffers from a fundamental asymmetry of information.
-              Raw ledger data is theoretically public — yet only those with institutional
-              indexing infrastructure can extract actionable meaning before it becomes irrelevant.
+            <p>
+              The vision that guided the construction of this system was intentionally uncompromising. There would be no mock data, no placeholders, no simulated signals, and no fallback to approximate values in cases where real data was temporarily unavailable. Every signal surfaced by the system would be sourced directly from live blockchain state verified on chain, processed cryptographically, and delivered with an editorial context that a trained analyst could act upon immediately. The system is operational infrastructure, built with absolute precision.
             </p>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <p className="text-[13.5px] leading-[1.82] mb-10" style={{ color: MUTED }}>
-              The Whale Alert Network was built to dismantle that barrier — placing the individual
-              on the same informational footing as an institutional actor, with sub-15ms verified
-              signal delivery and zero mock data at any layer.
+          </section>
+
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>Architectural Philosophy</h2>
+            <p className="mb-6">
+              The zero mock mandate ensures no component of the system displays fabricated data in place of real on-chain state. This decision has immediate and far-reaching implications for every subsequent design choice. It rules out the possibility of static demonstration modes. It requires that every data pipeline from blockchain node connection through downstream networks to the rendering layer be fully operational at all times.
             </p>
-          </Reveal>
-
-          <div className="space-y-3">
-            {[
-              { n: "01", title: "Zero-Mock Mandate",        body: "Every signal sourced from live blockchain state. Empty states over misleading ones at any layer." },
-              { n: "02", title: "Sovereignty Principle",    body: "The server provides intelligence only. Private keys, funds, and decisions remain entirely with the user." },
-              { n: "03", title: "Institutional Standard",   body: "Code quality, security posture, and UX indistinguishable from an institutional engineering organization." },
-            ].map(({ n, title, body }, i) => (
-              <Card key={n} delay={i * 0.08}>
-                <div className="flex items-start gap-4">
-                  <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: INK }}
-                  >
-                    <span className="text-[8px] font-mono font-black" style={{ color: IVORY, letterSpacing: "0.05em" }}>{n}</span>
-                  </div>
-                  <div>
-                    <div className="text-[13px] font-black mb-1.5" style={{ color: INK }}>{title}</div>
-                    <div className="text-[11.5px] leading-relaxed" style={{ color: MUTED }}>{body}</div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* ─── SYSTEM MODULES ───────────────────────────────────── */}
-        <section className="pt-24">
-          <Sep n="2" />
-          <Reveal>
-            <h2
-              className="font-black tracking-[-0.03em] leading-[0.88] mb-4"
-              style={{ fontSize: "clamp(1.9rem,8vw,2.6rem)", color: INK }}
-            >
-              System<br />Modules
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="text-[13px] leading-relaxed mb-10" style={{ color: MUTED }}>
-              Six intelligence modules operating in parallel across all monitored networks.
+            <p className="mb-6">
+              The sovereignty principle dictates that every interaction a user conducts with the system must occur without creating any dependency on the system servers for the security of their assets. The server layer provides intelligence. It does not under any circumstances touch private keys, hold funds in custody, or make decisions on the user's behalf.
             </p>
-          </Reveal>
-
-          <div className="space-y-3">
-            {MODULES.map(({ code, title, desc, stat, unit }, i) => (
-              <Reveal key={code} delay={i * 0.06}>
-                <div
-                  className="rounded-2xl p-6"
-                  style={{
-                    background: "rgba(255,255,255,0.85)",
-                    border: `1px solid ${FAINT}`,
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      className="text-[7.5px] font-mono font-black uppercase"
-                      style={{ color: MUTED, letterSpacing: "0.3em" }}
-                    >
-                      MOD {code}
-                    </span>
-                    <div className="text-right">
-                      <div className="text-[13px] font-black font-mono" style={{ color: INK }}>{stat}</div>
-                      <div
-                        className="text-[7px] font-mono font-bold uppercase"
-                        style={{ color: MUTED, letterSpacing: "0.18em" }}
-                      >
-                        {unit}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-[13px] font-black mb-2" style={{ color: INK }}>{title}</div>
-                  <div className="text-[11px] leading-[1.72]" style={{ color: MUTED }}>{desc}</div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        {/* ─── TECHNOLOGY STACK ─────────────────────────────────── */}
-        <section className="pt-24">
-          <Sep n="3" />
-          <Reveal>
-            <h2
-              className="font-black tracking-[-0.03em] leading-[0.88] mb-4"
-              style={{ fontSize: "clamp(1.9rem,8vw,2.6rem)", color: INK }}
-            >
-              Technology<br />Stack
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="text-[13px] leading-relaxed mb-10" style={{ color: MUTED }}>
-              Every dependency selected for a specific, documented reason.
+            <p>
+              The institutional grade standard mandates that the production quality must be indistinguishable from that of an institutional engineering organization. This standard applies to code quality, interface design, database schema structure, error handling, security posture, and visual presentation.
             </p>
-          </Reveal>
+          </section>
 
-          <div className="space-y-3">
-            {STACK.map(({ cat, items }, i) => (
-              <Card key={cat} delay={i * 0.07}>
-                <div
-                  className="text-[7.5px] font-mono font-black uppercase mb-4 pb-3"
-                  style={{
-                    color: MUTED,
-                    letterSpacing: "0.3em",
-                    borderBottom: `1px solid ${FAINT}`,
-                  }}
-                >
-                  {cat}
-                </div>
-                <ul className="space-y-2">
-                  {items.map((item) => (
-                    <li key={item} className="flex items-center gap-2.5">
-                      <span className="w-1 h-1 rounded-full shrink-0" style={{ background: INK }} />
-                      <span className="text-[12px] font-medium" style={{ color: INK }}>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-
-          {/* 240Hz block */}
-          <Reveal delay={0.2} className="mt-4">
-            <div
-              className="rounded-2xl p-7"
-              style={{ background: INK }}
-            >
-              <div
-                className="text-[7.5px] font-mono font-black uppercase mb-4"
-                style={{ color: "rgba(255,255,255,0.28)", letterSpacing: "0.3em" }}
-              >
-                Performance Contract
-              </div>
-              <div
-                className="text-[2rem] font-black tracking-tight leading-none mb-4"
-                style={{ color: IVORY }}
-              >
-                240Hz
-              </div>
-              <p
-                className="text-[11.5px] leading-relaxed"
-                style={{ color: "rgba(255,255,255,0.45)" }}
-              >
-                All animated elements render at native display refresh rate.
-                GPU compositor layers. Only <code className="font-mono" style={{ color: "rgba(255,255,255,0.65)" }}>transform</code> and <code className="font-mono" style={{ color: "rgba(255,255,255,0.65)" }}>opacity</code> animate — zero layout reflows, zero CPU per frame.
-              </p>
-            </div>
-          </Reveal>
-        </section>
-
-        {/* ─── ROADMAP ──────────────────────────────────────────── */}
-        <section className="pt-24">
-          <Sep n="4" />
-          <Reveal>
-            <h2
-              className="font-black tracking-[-0.03em] leading-[0.88] mb-4"
-              style={{ fontSize: "clamp(1.9rem,8vw,2.6rem)", color: INK }}
-            >
-              Strategic<br />Roadmap
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="text-[13px] leading-relaxed mb-10" style={{ color: MUTED }}>
-              Three phases of progressive decentralization.
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>The Ingestion Engine</h2>
+            <p>
+              The ingestion engine is the operational core of the Whale Alert Network. It is the component responsible for acquiring raw blockchain data across sixteen parallel networks, applying the first layer of significance filtering based on dynamic statistical thresholds, and routing the resulting verified events to the downstream intelligence mesh.
             </p>
-          </Reveal>
+          </section>
 
-          <div className="space-y-3">
-            {[
-              {
-                phase: "Q2 2026", title: "Phase One",
-                items: ["Mass Transfer graph clustering", "World ID verification", "Sonic chain integration"],
-              },
-              {
-                phase: "Q3 2026", title: "Phase Two",
-                items: ["EigenLayer AVS signal validation", "Threshold signature consensus", "Decentralized sentinel registry"],
-              },
-              {
-                phase: "2027+", title: "Phase Three",
-                items: ["Purpose-built telemetry L1", "100ms block time target", "On-chain governance"],
-              },
-            ].map(({ phase, title, items }, i) => (
-              <Reveal key={phase} delay={i * 0.07}>
-                <div
-                  className="rounded-2xl p-6"
-                  style={{
-                    background: "rgba(255,255,255,0.85)",
-                    border: `1px solid ${FAINT}`,
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <span
-                      className="text-[7px] font-mono font-black uppercase px-2.5 py-1 rounded-full"
-                      style={{ background: "rgba(5,5,5,0.05)", color: MUTED, letterSpacing: "0.2em" }}
-                    >
-                      {phase}
-                    </span>
-                    <span className="text-[13px] font-black" style={{ color: INK }}>{title}</span>
-                  </div>
-                  <ul className="space-y-2">
-                    {items.map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <span className="w-1 h-1 rounded-full mt-[6px] shrink-0" style={{ background: INK }} />
-                        <span className="text-[11.5px] leading-relaxed" style={{ color: MUTED }}>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        {/* ─── FOOTER ───────────────────────────────────────────── */}
-        <section className="pt-24 pb-8">
-          <Reveal className="text-center">
-            <ChainIcon size={40} />
-          </Reveal>
-          <Reveal delay={0.1} className="text-center mt-6 mb-4">
-            <h2
-              className="font-black tracking-[-0.03em] leading-[0.88]"
-              style={{ fontSize: "clamp(1.6rem,7vw,2.2rem)", color: INK }}
-            >
-              Every signal verified.<br />
-              Every movement recorded.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.18} className="text-center mb-10">
-            <p className="text-[12px] leading-relaxed" style={{ color: MUTED }}>
-              Open-source sovereign intelligence layer. One developer.
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>Sovereign Mesh Protocol</h2>
+            <p>
+              The Sovereign Mesh is the primary distribution layer that propagates verified intelligence from the ingestion engine to all connected clients seamlessly. It operates as a high-frequency, low-latency network with strict access control, ensuring that authenticated intelligence reaches users with minimal delay and maximum reliability across all defined significance tiers.
             </p>
-          </Reveal>
+          </section>
 
-          {/* Links — tap targets, no button elements */}
-          <Reveal delay={0.24}>
-            <div className="flex justify-center gap-5 flex-wrap">
-              {[
-                { label: "humanidfi.com",  href: "https://humanidfi.com" },
-                { label: "GitHub",         href: "https://github.com/atfortyseven-creations/whalecosystem" },
-                { label: "Support",        href: "https://humanidfi.com/sovereign-support" },
-              ].map(({ label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[9px] font-mono font-bold uppercase"
-                  style={{ color: MUTED, letterSpacing: "0.22em", WebkitTapHighlightColor: "transparent" }}
-                >
-                  {label}
-                </a>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.3} className="mt-8 text-center">
-            <p
-              className="text-[8px] font-mono font-bold uppercase"
-              style={{ color: "rgba(5,5,5,0.18)", letterSpacing: "0.22em" }}
-            >
-              © 2026 atfortyseven-creations · All rights reserved
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>The Akashic Ledger</h2>
+            <p>
+              The Akashic Ledger constitutes the permanent institutional memory of the Whale Alert Network. It serves as the definitive, verified, immutable record of every capital movement that crosses the threshold of systemic significance, providing historical context and permanent documentation for crucial macroeconomic shifts on-chain.
             </p>
-          </Reveal>
-        </section>
+          </section>
 
-      </div>{/* /content */}
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>Mass Transfer Intelligence</h2>
+            <p>
+              The Mass Transfer Intelligence module is explicitly designed to detect and surface a specific category of capital movement that isolated transaction monitoring cannot identify. It maps coordinated multi-address, multi-chain capital flows that collectively reveal an institutional position adjustment of substantial magnitude before it resolves on the market.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>The Sovereign Vault</h2>
+            <p>
+              The Sovereign Vault is the non-custodial wallet management system that empowers users to interact with the full suite of on-chain operations available through the sovereign terminal interface. All key generation and transaction signing execute purely within isolated local environments, ensuring absolute personal sovereignty over capital.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>Zero Knowledge Infrastructure</h2>
+            <p>
+              The zero knowledge proof infrastructure provides two distinct and essential capabilities: private signal authentication for the underlying data mesh, and definitive identity verification for Sybil-resistant access control without ever compromising user privacy or biometric data.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-[22px] font-black tracking-[-0.02em] mb-6" style={{ color: INK }}>The Data Persistence Layer</h2>
+            <p>
+              The data persistence architecture is thoughtfully designed around the principle of separation of concerns. Different categories of data have unique access patterns, consistency requirements, and performance characteristics. Every data object is securely stored in the environment most perfectly suited to those dimensions, creating an exceptionally resilient query foundation.
+            </p>
+          </section>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {showGate && (
+          <DynamicCryptoCheckoutModal isOpen={showGate} onClose={() => setShowGate(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

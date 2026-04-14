@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { useAccount, usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
-import { OmniMatrixCanvas } from '@/components/3d/OmniMatrixCanvas';
 
 export function OmniExplorer() {
     const { address } = useAccount();
@@ -97,41 +96,39 @@ export function OmniExplorer() {
     };
 
     return (
-        <div className="relative min-h-full w-full font-sans p-4 md:p-8 flex flex-col selection:bg-[#00F2EA]/20 selection:text-black overflow-hidden bg-transparent">
+        <div className="relative min-h-full w-full font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 selection:text-[#050505] overflow-hidden bg-[#FFFFFF]">
             
-            <OmniMatrixCanvas />
-
             <div className="relative z-10 w-full h-full overflow-y-auto flex flex-col gap-12 custom-scrollbar">
                 {/* Header / Search Area */}
-                <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-16 pb-12 gap-10">
-                    <div className="text-center space-y-4">
+                <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-16 pb-12 gap-8">
+                    <div className="text-center space-y-4 border-b border-[#E5E5E5] pb-8 w-full">
                         <div className="flex items-center justify-center gap-3 mb-2">
-                             <div className="w-1.5 h-4 bg-[#00F2EA] rounded-full" />
-                             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">Institutional Explorer V2.4</span>
+                             <div className="w-1.5 h-4 bg-[#888888] rounded-full" />
+                             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#888888]">Institutional Global Ledger</span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-black leading-none">
-                            WHALE <span className="text-[#00F2EA]">NETWORK</span>
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#050505] leading-none">
+                            SEARCH <span className="text-[#888888]">BLOCK</span>
                         </h1>
                     </div>
 
-                    <div className="w-full relative group">
+                    <div className="w-full relative group mt-4">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
                             {isSearching
-                                ? <Loader2 size={20} className="text-[#00F2EA] animate-spin" />
-                                : <Search size={20} className="text-black/20 group-focus-within:text-[#00F2EA] transition-colors" />}
+                                ? <Loader2 size={18} className="text-[#050505] animate-spin" />
+                                : <Search size={18} className="text-[#888888] group-focus-within:text-[#050505] transition-colors" />}
                         </div>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            className="w-full bg-white border border-black/[0.08] focus:border-[#00F2EA] text-black p-7 pl-16 outline-none transition-all text-sm uppercase tracking-widest placeholder:text-black/20 rounded-[2rem] shadow-2xl focus:shadow-[0_0_40px_rgba(0,242,234,0.1)]"
+                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] focus:border-[#050505] text-[#050505] p-5 pl-14 outline-none transition-all text-xs font-mono uppercase tracking-widest placeholder:text-[#888888] rounded-2xl shadow-sm"
                             placeholder="SCAN ADDRESS / TX HASH / TOKEN / ENS"
                         />
                         <button
                             onClick={handleSearch}
                             disabled={isSearching}
-                            className="absolute inset-y-3 right-3 bg-black text-white px-10 font-bold text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl shadow-xl"
+                            className="absolute inset-y-2 right-2 bg-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] hover:border-[#E5E5E5] border border-transparent text-white px-8 font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
                         >
                             {isSearching ? 'SCANNING...' : 'SCAN'}
                         </button>
@@ -139,44 +136,44 @@ export function OmniExplorer() {
 
                     {/* Search Results / Errors */}
                     {searchError && (
-                        <div className="w-full border border-[#FF3B30]/20 bg-[#FF3B30]/5 backdrop-blur-md p-5 rounded-2xl flex items-center gap-4 text-[#FF3B30]">
-                            <AlertCircle size={18} className="shrink-0" />
+                        <div className="w-full border border-[#FF3B30]/30 bg-[#FF3B30]/5 p-5 rounded-xl flex items-center gap-4 text-[#FF3B30]">
+                            <AlertCircle size={16} className="shrink-0" />
                             <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{searchError}</span>
                         </div>
                     )}
 
                     {searchResults !== null && (
-                        <div className="w-full border border-black/[0.08] bg-white rounded-[2rem] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
-                            <div className="flex items-center justify-between p-6 bg-black/5 border-b border-black/[0.03]">
+                        <div className="w-full border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                            <div className="flex items-center justify-between p-5 bg-[#FAF9F6] border-b border-[#E5E5E5]">
                                 <div className="flex items-center gap-3">
-                                    <Zap size={14} className="text-[#00F2EA]" />
-                                    <h2 className="text-[12px] font-black uppercase tracking-widest">QUERY RESULTS</h2>
+                                    <Zap size={14} className="text-[#050505]" />
+                                    <h2 className="text-[11px] font-black uppercase tracking-widest">QUERY RESULTS</h2>
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/30">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#888888]">
                                     {searchResults.length} NODES IDENTIFIED
                                 </span>
                             </div>
                             {searchResults.length === 0 ? (
-                                <div className="p-12 text-center text-[11px] font-black text-black/20 uppercase tracking-[0.4em]">
+                                <div className="p-10 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em]">
                                     Graph index return null for &quot;{searchQuery}&quot;
                                 </div>
                             ) : (
-                                <div className="flex flex-col divide-y divide-black/[0.04]">
+                                <div className="flex flex-col divide-y divide-[#E5E5E5]">
                                     {searchResults.map((result: any, i: number) => {
                                         const entity = result.node || result.n || result;
                                         const label = result.label || entity._labels?.[0] || 'Entity';
                                         const name = entity.name || entity.address || entity.symbol || entity.id || 'Unknown';
                                         return (
-                                            <div key={i} className="flex items-center justify-between p-6 hover:bg-black/5 transition-colors group cursor-pointer">
+                                            <div key={i} className="flex items-center justify-between p-5 hover:bg-[#FAF9F6] transition-colors group cursor-pointer">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-[14px] text-black font-black tracking-tighter group-hover:text-[#00F2EA] transition-colors">{name}</span>
+                                                    <span className="text-[13px] text-[#050505] font-mono font-bold group-hover:text-[#888888] transition-colors">{name}</span>
                                                     {entity.description && (
-                                                        <span className="text-[10px] text-black/30 font-bold uppercase tracking-widest">{entity.description}</span>
+                                                        <span className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">{entity.description}</span>
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-4">
-                                                    <span className="px-3 py-1 bg-black/5 border border-black/[0.06] text-[9px] font-black text-black/30 rounded-lg uppercase tracking-widest">{label}</span>
-                                                    <ChevronRight size={14} className="text-black/10 group-hover:translate-x-1 transition-all" />
+                                                    <span className="px-2.5 py-1 bg-[#FAF9F6] border border-[#E5E5E5] text-[9px] font-black text-[#888888] rounded-md uppercase tracking-widest">{label}</span>
+                                                    <ChevronRight size={14} className="text-[#888888] group-hover:translate-x-1 transition-all" />
                                                 </div>
                                             </div>
                                         );
@@ -191,45 +188,45 @@ export function OmniExplorer() {
                 <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 pb-20">
                     
                     {/* BLOCKS PANEL */}
-                    <div className="border border-black/[0.08] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
-                        <div className="flex items-center justify-between p-8 bg-black/5 border-b border-black/[0.03]">
+                    <div className="border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl overflow-hidden shadow-sm">
+                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] border-b border-[#E5E5E5]">
                             <div className="flex items-center gap-3">
-                                <Box size={16} className="text-[#00F2EA]" />
-                                <h2 className="text-[13px] font-black uppercase tracking-[0.2em] text-black">BLOCK TELEMETRY</h2>
+                                <Box size={14} className="text-[#050505]" />
+                                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">BLOCK TELEMETRY</h2>
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">LIVE STREAMING</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#888888]">LIVE STREAMING</span>
                         </div>
 
                         <div className="flex flex-col">
                             {blocks.length === 0 && (
-                                <div className="p-16 text-center text-[11px] font-black text-black/10 uppercase tracking-[0.4em] animate-pulse">Establishing Peer Link...</div>
+                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
                             )}
                             {blocks.map((block, i) => (
                                 <button 
                                     key={i} 
                                     onClick={() => setSelectedBlock(block)}
-                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-8 border-b border-black/[0.03] hover:bg-black/5 transition-all gap-6 group"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-all gap-4 group"
                                 >
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-14 h-14 bg-black/5 rounded-2xl flex items-center justify-center border border-black/[0.06] group-hover:bg-black group-hover:text-white transition-all">
-                                            <Box size={18} />
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-[#FAF9F6] rounded-xl flex items-center justify-center border border-[#E5E5E5] group-hover:bg-[#050505] group-hover:text-white transition-all">
+                                            <Box size={16} />
                                         </div>
-                                        <div className="flex flex-col gap-1.5">
-                                            <span className="text-xl font-black text-black tracking-tighter group-hover:text-[#00F2EA] transition-colors">{block.height}</span>
-                                            <span className="text-[10px] font-black text-black/20 uppercase tracking-widest flex items-center gap-2">
+                                        <div className="flex flex-col gap-1 text-left">
+                                            <span className="text-lg font-mono font-black text-[#050505] group-hover:text-[#888888] transition-colors">{block.height}</span>
+                                            <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center gap-2">
                                                 <Clock size={10} /> {block.age}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-2 sm:text-right">
-                                        <div className="text-[10px] font-black text-black/40 uppercase tracking-widest flex items-center sm:justify-end gap-2">
-                                            <ShieldCheck size={12} className="text-[#00F2EA]" /> 
-                                            VALIDATOR: <span className="text-black font-bold">{block.validator}</span>
+                                    <div className="flex flex-col gap-1.5 sm:text-right">
+                                        <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-2">
+                                            <ShieldCheck size={10} className="text-[#050505]" /> 
+                                            VALIDATOR: <span className="text-[#050505] font-bold">{block.validator}</span>
                                         </div>
-                                        <div className="text-[10px] font-black text-black/20 uppercase tracking-widest flex items-center sm:justify-end gap-3">
+                                        <div className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center sm:justify-end gap-3">
                                             <span>{block.txs} TXS</span>
-                                            <span className="h-3 w-[1px] bg-black/[0.08]" />
+                                            <span className="h-2 w-[1px] bg-[#E5E5E5]" />
                                             <span>{block.size}</span>
                                         </div>
                                     </div>
@@ -239,46 +236,46 @@ export function OmniExplorer() {
                     </div>
 
                     {/* TRANSACTIONS PANEL */}
-                    <div className="border border-black/[0.08] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
-                        <div className="flex items-center justify-between p-8 bg-black/5 border-b border-black/[0.03]">
+                    <div className="border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl overflow-hidden shadow-sm">
+                        <div className="flex items-center justify-between p-6 bg-[#FAF9F6] border-b border-[#E5E5E5]">
                             <div className="flex items-center gap-3">
-                                <Activity size={16} className="text-[#00F2EA]" />
-                                <h2 className="text-[13px] font-black uppercase tracking-[0.2em] text-black">INSTITUTIONAL FLOWS</h2>
+                                <Activity size={14} className="text-[#050505]" />
+                                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">INSTITUTIONAL FLOWS</h2>
                             </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">MEMPOOL STATUS: ACTIVE</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#888888]">MEMPOOL STATUS: ACTIVE</span>
                         </div>
 
                         <div className="flex flex-col">
                             {massiveTxs.length === 0 && (
-                                <div className="p-16 text-center text-[11px] font-black text-black/10 uppercase tracking-[0.4em] animate-pulse">Syncing Mempool Hub...</div>
+                                <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
                             )}
                             {massiveTxs.map((tx, i) => (
                                 <button 
                                     key={i} 
                                     onClick={() => setSelectedTx(tx)}
-                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-8 border-b border-black/[0.03] hover:bg-black/5 transition-all gap-6 group"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-all gap-4 group"
                                 >
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-14 h-14 bg-black/5 rounded-2xl flex items-center justify-center border border-black/[0.06] group-hover:border-[#00F2EA] transition-all">
-                                            <AlignLeft size={18} className="text-black/20 group-hover:text-[#00F2EA]" />
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-[#FAF9F6] rounded-xl flex items-center justify-center border border-[#E5E5E5] group-hover:border-[#050505] transition-all">
+                                            <AlignLeft size={16} className="text-[#888888] group-hover:text-[#050505]" />
                                         </div>
-                                        <div className="flex flex-col gap-1.5 min-w-0">
-                                            <span className="text-[14px] font-black text-black tracking-widest truncate group-hover:text-[#00F2EA] transition-colors">{tx.hash}</span>
-                                            <span className="text-[10px] font-black text-black/20 uppercase tracking-widest flex items-center gap-2">
+                                        <div className="flex flex-col gap-1 text-left min-w-0">
+                                            <span className="text-[11px] font-mono font-bold text-[#050505] truncate group-hover:text-[#888888] transition-colors">{tx.hash}</span>
+                                            <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest flex items-center gap-2">
                                                 <Clock size={10} /> {tx.age}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-3 sm:text-right mt-2 sm:mt-0">
-                                        <div className="flex items-center sm:justify-end gap-3 text-[10px] font-black text-black/20 uppercase tracking-widest">
-                                            <span className="text-black/40">{tx.from}</span>
-                                            <ArrowRight size={12} className="text-black/10" />
-                                            <span className="text-[#00F2EA]">{tx.to}</span>
+                                    <div className="flex flex-col gap-2 sm:text-right mt-2 sm:mt-0">
+                                        <div className="flex items-center sm:justify-end gap-2 text-[9px] font-mono font-bold text-[#888888] uppercase tracking-widest">
+                                            <span className="text-[#888888]">{tx.from}</span>
+                                            <ArrowRight size={10} className="text-[#E5E5E5]" />
+                                            <span className="text-[#050505]">{tx.to}</span>
                                         </div>
-                                        <div className="flex items-center sm:justify-end gap-4">
-                                            <span className="px-2.5 py-1 bg-black/5 text-[9px] font-black text-black/30 rounded-lg uppercase tracking-widest">{tx.type}</span>
-                                            <span className="text-lg font-black text-black tracking-tighter">{tx.value}</span>
+                                        <div className="flex items-center sm:justify-end gap-3">
+                                            <span className="px-2 py-0.5 bg-[#FAF9F6] border border-[#E5E5E5] text-[8px] font-black text-[#888888] rounded-md uppercase tracking-widest">{tx.type}</span>
+                                            <span className="text-sm font-mono font-black text-[#050505] tracking-tighter">{tx.value}</span>
                                         </div>
                                     </div>
                                 </button>

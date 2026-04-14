@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ExternalLink, ShieldCheck, ShieldAlert, Clock } from 'lucide-react';
+import { RefreshCw, ExternalLink, ShieldCheck, Clock } from 'lucide-react';
 import { ScrollFloat } from '@/components/ui/ScrollFloat';
 
 interface NewsArticle {
@@ -128,31 +128,31 @@ export function NewsOfToday() {
     );
 
     return (
-        <div className="w-full flex justify-center py-4 text-black dark:text-white font-sans transition-colors duration-300">
-            <div className="w-full bg-white dark:bg-[#0A0A0A] border-y sm:border sm:rounded-[2px] border-black/10 dark:border-white/10 shadow-[4px_4px_0_0_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0_0_rgba(255,255,255,0.05)] overflow-hidden">
+        <div className="w-full flex justify-center py-4 text-[#050505] font-sans">
+            <div className="w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden">
                 
                 {/* ── EXCHANGE STATUS TICKER ── */}
-                <div className="w-full border-b border-black/5 dark:border-white/5 bg-[#F9F9F9] dark:bg-[#050505] flex items-center px-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 gap-8">
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 shrink-0">
+                <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center px-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 gap-8">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#888888] shrink-0">
                         <Clock size={12} />
                         Global Markets
                     </div>
                     {exchanges.map((ex) => (
                         <div key={ex.name} className="flex items-center gap-2 shrink-0">
-                            <div className={`w-1.5 h-1.5 rounded-full ${ex.open ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30]/50'}`} />
-                            <span className="text-[10px] uppercase font-mono font-bold tracking-wider opacity-80">
-                                {ex.name} <span className="opacity-40 font-normal">[{ex.open ? 'OPEN' : 'CLOSED'}]</span>
+                            <div className={`w-1.5 h-1.5 rounded-full ${ex.open ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30]'}`} />
+                            <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[#050505]">
+                                {ex.name} <span className="text-[#888888] font-normal">[{ex.open ? 'OPEN' : 'CLOSED'}]</span>
                             </span>
                         </div>
                     ))}
                 </div>
 
-                {/* ── THE POST HEADER: ScrollFloat Integration ── */}
-                <div className="px-6 md:px-10 py-10 border-b-4 border-black dark:border-white flex flex-col md:flex-row md:items-end justify-between gap-6 bg-[#FAF9F6] dark:bg-[#080808]">
+                {/* ── THE POST HEADER ── */}
+                <div className="px-6 md:px-10 py-8 border-b-2 border-[#E5E5E5] flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white">
                     <div className="flex flex-col">
                         <ScrollFloat 
                             containerClassName="mb-0"
-                            textClassName="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] text-black dark:text-white"
+                            textClassName="text-3xl md:text-5xl font-black tracking-tight uppercase text-[#050505]"
                             animationDuration={1.2}
                             stagger={0.03}
                         >
@@ -166,46 +166,46 @@ export function NewsOfToday() {
                                 value={search} 
                                 onChange={e => setSearch(e.target.value)} 
                                 placeholder="Search publications…"
-                                className="w-full md:w-64 bg-transparent border-b border-black/10 dark:border-white/20 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 pb-1 font-serif outline-none focus:border-black dark:focus:border-white transition-all"
+                                className="w-full md:w-64 bg-transparent border-b border-[#E5E5E5] text-[#050505] placeholder:text-[#888888] pb-1 font-serif outline-none focus:border-[#050505] transition-all"
                             />
-                            <button onClick={refresh} disabled={loading} className="p-2 border border-black/10 dark:border-white/20 rounded-full hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 group">
+                            <button onClick={refresh} disabled={loading} className="p-2 border border-[#E5E5E5] rounded-full hover:bg-[#FAF9F6] text-[#050505] transition-all disabled:opacity-50 group">
                                 <RefreshCw size={14} className={`${loading ? 'animate-spin' : ''}`} />
                             </button>
                         </div>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold opacity-50">Institutional Intelligence Desk</p>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#888888]">Institutional Intelligence Desk</p>
                     </div>
                 </div>
 
                 {/* ── NEWS STACK ── */}
-                <div className="flex flex-col divide-y divide-black/5 dark:divide-white/5">
+                <div className="flex flex-col divide-y divide-[#E5E5E5]">
                     {filtered.map((a) => {
                         const isExpanded = expandedId === a.id;
                         return (
                             <div key={a.id} className="flex flex-col group">
-                                <div onClick={() => setExpandedId(isExpanded ? null : a.id)} className={`flex flex-col md:flex-row md:items-center px-6 md:px-10 py-6 gap-4 md:gap-8 cursor-pointer transition-colors ${isExpanded ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                                <div onClick={() => setExpandedId(isExpanded ? null : a.id)} className={`flex flex-col md:flex-row md:items-center px-6 md:px-10 py-5 gap-4 md:gap-8 cursor-pointer transition-colors ${isExpanded ? 'bg-[#FAF9F6]' : 'hover:bg-[#FAF9F6]'}`}>
                                     <div className="w-full md:w-40 shrink-0 flex flex-row md:flex-col justify-between md:justify-start items-center md:items-start gap-1">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${isExpanded ? '' : 'opacity-80'}`}>{a.source}</span>
-                                        <span className={`text-[11px] font-serif ${isExpanded ? 'opacity-60' : 'opacity-40'}`}>{timeAgo(a.publishedAt)}</span>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest text-[#050505]`}>{a.source}</span>
+                                        <span className={`text-[11px] font-serif text-[#888888]`}>{timeAgo(a.publishedAt)}</span>
                                     </div>
                                     <div className="flex-1 overflow-hidden">
-                                        <h2 className={`font-serif text-xl md:text-2xl font-bold leading-snug tracking-tight ${isExpanded ? '' : 'group-hover:opacity-80'}`}>{a.title}</h2>
+                                        <h2 className={`font-serif text-lg md:text-xl font-bold leading-tight tracking-tight text-[#050505]`}>{a.title}</h2>
                                     </div>
                                     <div className="hidden md:flex shrink-0 w-8 justify-end">
-                                        <div className={`w-2 h-2 rounded-full ${a.sentiment === 'bullish' ? 'bg-[#00C076]' : a.sentiment === 'bearish' ? 'bg-[#FF3B30]' : 'bg-current opacity-30'}`} />
+                                        <div className={`w-2 h-2 rounded-full ${a.sentiment === 'bullish' ? 'bg-[#00C076]' : a.sentiment === 'bearish' ? 'bg-[#FF3B30]' : 'bg-[#E5E5E5]'}`} />
                                     </div>
                                 </div>
                                 <AnimatePresence>
                                     {isExpanded && (
-                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden bg-[#FAF9F6] dark:bg-[#0A0A0A] border-t border-black dark:border-white">
-                                            <div className="px-6 md:px-10 py-8 md:pl-[224px] pr-6 md:pr-16 flex flex-col space-y-6">
-                                                <p className="font-serif text-lg md:text-xl leading-relaxed text-black/80 dark:text-white/80 first-letter:text-6xl first-letter:font-black first-letter:float-left first-letter:mr-3 first-letter:mt-1">{a.summary}</p>
-                                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-6 mt-2 border-t border-black/10 dark:border-white/10">
+                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden bg-white border-t border-[#E5E5E5]">
+                                            <div className="px-6 md:px-10 py-6 md:pl-[224px] pr-6 md:pr-16 flex flex-col space-y-4">
+                                                <p className="font-serif text-base leading-relaxed text-[#555555]">{a.summary}</p>
+                                                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-4 mt-2 border-t border-[#E5E5E5]">
                                                     <div className="flex items-center gap-4">
-                                                        <span className={`text-[10px] font-black uppercase tracking-widest ${a.isFake ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}>{a.isFake ? 'Unverified' : 'Verified Source'}</span>
-                                                        <div className="w-px h-4 bg-black/10 dark:bg-white/10"/>
-                                                        <span className="text-[12px] font-mono font-black">Integrity: {a.veracityScore}%</span>
+                                                        <span className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1 ${a.isFake ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}><ShieldCheck size={12}/> {a.isFake ? 'Unverified' : 'Verified Source'}</span>
+                                                        <div className="w-px h-4 bg-[#E5E5E5]"/>
+                                                        <span className="text-[11px] text-[#050505] font-mono font-black">Integrity: {a.veracityScore}%</span>
                                                     </div>
-                                                    <a href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-2 bg-black dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity">Full Report <ExternalLink size={12}/></a>
+                                                    <a href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2 bg-[#050505] text-[#FAF9F6] rounded-lg text-[9px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity">Full Report <ExternalLink size={12}/></a>
                                                 </div>
                                             </div>
                                         </motion.div>

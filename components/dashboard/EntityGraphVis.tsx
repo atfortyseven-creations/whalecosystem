@@ -4,7 +4,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
 import * as d3 from 'd3';
-import { Network, Zap, Loader2, WifiOff, Search, Info, Maximize2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Network, Zap, Loader2, WifiOff, Search, Info, Maximize2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());

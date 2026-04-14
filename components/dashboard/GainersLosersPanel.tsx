@@ -359,7 +359,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Rows */}
-                <div className="overflow-y-auto" style={{ height: 520 }}>
+                <div className="w-full">
                     {!hasData ? (
                         <div className="flex flex-col items-center justify-center h-full text-center text-[#888888]">
                             <div className="w-8 h-8 rounded-full border-2 border-[#050505] border-t-transparent animate-spin mb-3"/>

@@ -2,7 +2,7 @@
 
 import React, { memo, useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useVIPStore, WhaleEvent } from '@/lib/vip-store';
 import { Activity, ArrowRight, Zap, ChevronUp } from 'lucide-react';
 
