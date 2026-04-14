@@ -250,6 +250,11 @@ export function MobileLanding() {
             </p>
           </section>
         </div>
+      </div>
+
+      <AnimatePresence>
+        {showScanner && (
+          <DynamicQRScannerModal 
             isOpen={showScanner} 
             onClose={() => setShowScanner(false)} 
             onScan={() => {
