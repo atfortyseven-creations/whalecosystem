@@ -51,7 +51,9 @@ type TabId =
     | 'gold-ticket'
     | 'zk-shield'
     | 'neural-graph'
-    | 'sovereign-vault';
+    | 'sovereign-vault'
+    | 'academy'
+    | 'support';
 
 export default function WhaleDashboard() {
     const [activeTab, setActiveTab] = useState<TabId>('dashboard');
@@ -79,7 +81,9 @@ export default function WhaleDashboard() {
               : activeTab === 'zk-shield'            ? <DashboardErrorBoundary key="zk-shield">      <ZKShieldStation />      </DashboardErrorBoundary>
               : activeTab === 'whale-portfolio'      ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />       </DashboardErrorBoundary>
               : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <PortfolioDashboard />   </DashboardErrorBoundary>
-              : null
+              : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
+               : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
+               : null
             }
         </WhaleProShell>
     );

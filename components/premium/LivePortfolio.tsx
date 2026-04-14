@@ -58,7 +58,7 @@ export function LivePortfolio() {
     const isPositive = change24hUSD >= 0;
 
     return (
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col items-center p-4">
+        <div className="w-full h-auto flex flex-col items-center p-4">
         <div className="w-full max-w-4xl mx-auto space-y-6 shrink-0 pb-10">
             
             <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-[3.5rem] p-10 shadow-sm relative overflow-hidden">

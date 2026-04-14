@@ -83,7 +83,7 @@ export function WhaleAcademy() {
 
     if (selectedLesson && selectedCourse) {
         return (
-            <div className="flex flex-col h-full space-y-4 p-6 overflow-y-auto">
+            <div className="flex flex-col space-y-4 p-6">
                 <div className="flex items-center gap-3">
                     <button onClick={() => setSelectedLesson(null)}
                         className="p-2 rounded-xl transition-colors" style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}>
@@ -134,7 +134,8 @@ export function WhaleAcademy() {
 
     if (selectedCourse) {
         return (
-            <div className="flex flex-col space-y-4 p-6 overflow-y-auto">
+        return (
+            <div className="flex flex-col space-y-4 p-6">
                 <button onClick={() => setSelectedCourse(null)}
                     className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest w-fit transition-colors"
                     style={{ color: 'rgba(255,255,255,0.3)' }}>
@@ -206,7 +207,8 @@ export function WhaleAcademy() {
 
     // Main courses grid
     return (
-        <div className="flex flex-col space-y-5 p-6 overflow-y-auto">
+    return (
+        <div className="flex flex-col space-y-5 p-6">
             {/* Header */}
             <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,242,234,0.1)', border: '1px solid rgba(0,242,234,0.2)' }}>

@@ -240,9 +240,15 @@ export function ConnectWalletModal() {
                                     </div>
 
                                     <div className="relative p-6 bg-white border border-[#050505]/10 rounded-[32px] shadow-sm">
-                                        <div className="w-[200px] h-[200px] bg-white flex items-center justify-center">
                                             {qrSession ? (
-                                                <QRCodeSVG value={`WHALE_HANDSHAKE:${qrSession}`} size={200} level="H" bgColor="#FFFFFF" fgColor="#050505" includeMargin={false} />
+                                                <QRCodeSVG 
+                                                    value={`${window.location.origin}/connect?session=${qrSession}`}
+                                                    size={200}
+                                                    level="H"
+                                                    bgColor="#FFFFFF"
+                                                    fgColor="#050505"
+                                                    includeMargin={false}
+                                                />
                                             ) : (
                                                 <div className="flex flex-col items-center gap-3 opacity-50">
                                                     <Loader2 className="text-[#050505] animate-spin" size={32} />

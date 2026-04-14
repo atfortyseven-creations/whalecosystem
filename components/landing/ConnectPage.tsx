@@ -188,18 +188,29 @@ export default function ConnectPage() {
     
     const handshake = async () => {
       try {
-        await fetch(`/api/auth/qr-session?id=${sessionIdParam}`, {
+        console.log("[SYNC] Initializing link for session:", sessionIdParam);
+        const res = await fetch(`/api/auth/qr-session?id=${sessionIdParam}`, {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ address })
         });
-        console.log("[SYNC] Handshake completed for session:", sessionIdParam);
-        setSyncStatus("SYNCED");
+        
+        if (res.ok) {
+          console.log("[SYNC] Handshake completed successfully ✓");
+          setSyncStatus("SYNCED");
+          setJustConnected(true);
+          // Redirect to home after a brief celebratory delay
+          setTimeout(() => { window.location.href = "/"; }, 2000);
+        } else {
+          console.error("[SYNC] Handshake failed with status:", res.status);
+        }
       } catch (e) {
-        console.error("[SYNC] Handshake failed:", e);
+        console.error("[SYNC] Network error during handshake:", e);
       }
     };
     handshake();
   }, [mounted, isConnected, address, sessionIdParam]);
+ admissions:
 
   // Build QR URL: deep-link to this connect page via mobile
   const qrUrl = typeof window !== "undefined"

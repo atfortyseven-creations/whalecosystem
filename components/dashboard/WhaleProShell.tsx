@@ -44,6 +44,10 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>, dividerBefore: 'Sovereignty' },
     { id: 'sovereign-vault', label: 'Cold Storage',     icon: <Lock size={17}/> },
     { id: 'zk-shield',       label: 'ZK Shield',        icon: <ShieldAlert size={17}/> },
+
+    // ── Academy & Support ──
+    { id: 'academy',         label: 'The Library',      icon: <GraduationCap size={17}/>, dividerBefore: 'Resources' },
+    { id: 'support',         label: 'Support Hub',      icon: <LifeBuoy size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -178,12 +182,12 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-[100dvh] overflow-hidden bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 transition-colors duration-300">
+        <div className="flex h-screen w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="hidden md:flex sticky top-0 h-screen border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shadow-none transition-colors duration-300"
+                className="hidden md:flex sticky top-0 h-screen border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shrink-0"
             >
 
                 {/* Sidebar Navigation */}
@@ -239,7 +243,7 @@ export function WhaleProShell({
             </motion.aside>
 
             {/* ─── Main Content Wrapper ─── */}
-            <div className="flex-1 flex flex-col min-w-0 relative">
+            <div className="flex-1 flex flex-col min-w-0 relative h-screen">
                 
                 {/* ─── Top Master Bar ─── */}
                 <header className="sticky top-0 h-[56px] border-b border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
@@ -270,31 +274,25 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative flex flex-col overflow-hidden transition-colors duration-300 bg-[#EFEFEF]">
-                    <div className="flex-1 relative z-10 overflow-y-auto no-scrollbar">
+                <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF] overflow-y-auto custom-scrollbar scroll-smooth">
+                    <div className="flex-1 relative z-10">
                         
                         {/* Immersive radial glow overlay to focus center */}
-                        <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.3)_0%,transparent_80%)] transition-colors duration-300" />
+                        <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
                         
-                        <div className="p-8 max-w-[1600px] mx-auto w-full h-full relative z-10" style={{ transform: 'translateZ(0)' }}>
+                        <div className="p-8 max-w-[1600px] mx-auto w-full relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, y: 20 }}
+                                    initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
+                                    exit={{ opacity: 0, y: -10 }}
                                     transition={{ 
-                                        type: "spring", 
-                                        stiffness: 400, 
-                                        damping: 30, 
-                                        mass: 0.8,
+                                        duration: 0.3,
+                                        ease: [0.16, 1, 0.3, 1]
                                     }}
-                                    style={{ 
-                                        willChange: 'transform, opacity',
-                                        transform: 'translate3d(0,0,0)'
-                                    }}
-                                    className="h-full"
+                                    className="min-h-full"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
                                         {children}

@@ -139,8 +139,8 @@ export function VirtualizedFirehose() {
     };
 
     return (
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex items-start justify-center p-4">
-        <div className="w-full h-full min-h-[600px] shrink-0 flex flex-col bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl shadow-sm relative group">
+        <div className="w-full h-auto flex items-start justify-center p-0 md:p-4">
+        <div className="w-full h-auto min-h-[700px] shrink-0 flex flex-col bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl shadow-sm relative group overflow-hidden">
 
             {/* HEADER */}
             <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5] bg-[#FAF9F6] rounded-t-xl">
@@ -167,7 +167,7 @@ export function VirtualizedFirehose() {
             {/* VIRTUALIZED LIST CONTAINER */}
             <div
                 className="flex-1 relative w-full"
-                style={{ minHeight: 400 }}
+                style={{ height: 750 }}
                 onMouseEnter={() => {
                     setAutoScroll(false);
                     setShowJumpTop(true);

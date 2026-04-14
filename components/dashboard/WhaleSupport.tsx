@@ -94,7 +94,7 @@ export function WhaleSupport() {
     };
 
     return (
-        <div className="flex flex-col space-y-6 p-6 h-full overflow-y-auto">
+        <div className="flex flex-col space-y-6 p-6">
             {/* ── Header ── */}
             <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Support Center</h2>
