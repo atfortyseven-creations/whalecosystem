@@ -402,7 +402,7 @@ export function NewsTerminal() {
                   {/* IMAGEN HERO — GPU composited full-bleed hero */}
                   <div className="w-full pb-8">
                     <div
-                      className="w-full overflow-hidden bg-[#080808]"
+                      className="w-full overflow-hidden bg-[#F0EFEC]"
                       style={{
                         // Mobile: smaller hero to preserve scroll perf on 6" screens
                         height: `clamp(200px, 45vw, ${Math.round(480 * fontSize)}px)`,
@@ -420,7 +420,7 @@ export function NewsTerminal() {
                         ref={imgRef}
                         src={getArticleImage(selected)}
                         alt={selected.title}
-                        className="w-full h-full object-cover grayscale"
+                        className="w-full h-full object-cover"
                         loading="eager"
                         decoding="async"
                         fetchPriority="high"
