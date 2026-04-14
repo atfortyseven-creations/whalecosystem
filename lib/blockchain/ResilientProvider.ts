@@ -1,5 +1,23 @@
 import { ethers } from 'ethers';
 
+// ── GLOBAL RESILIENCE HACK ──────────────────────────────────────────────────
+// NodeJS `ws` library (used under the hood by ethers.WebSocketProvider) 
+// will emit an unhandled exception and crash the entire process if it receives 
+// an HTTP 403 or 429 during the WS Handshake upgrade. 
+// We intercept it globally to protect the Sovereign Terminal.
+if (typeof process !== 'undefined' && !(globalThis as any).__WS_PROTECTED) {
+    (globalThis as any).__WS_PROTECTED = true;
+    process.on('uncaughtException', (err: any) => {
+        const msg = err?.message || '';
+        if (msg.includes('Unexpected server response') || msg.includes('WebSocket')) {
+            console.warn(`[WhaleFortress:Resilience] Swallowed lethal WSS handshake drop: ${msg}`);
+            return;
+        }
+        console.error('[WhaleFortress:Fatal] Unhandled Exception:', err);
+        process.exit(1);
+    });
+}
+
 interface RPCEndpoint {
   url: string;
   isHealthy: boolean;

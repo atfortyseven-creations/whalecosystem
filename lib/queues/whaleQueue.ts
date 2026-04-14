@@ -19,6 +19,7 @@ export interface WhaleJobData {
   blockNumber: string;
   chain: string; // e.g., "ethereum", "solana"
   type: string;  // e.g., "Transfer", "Swap"
+  institutional?: boolean;
   metadata?: any;
 }
 

@@ -162,7 +162,6 @@ const WALLET_OPTIONS = [
   { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
   { id: 'coinbase', name: 'COINBASE WALLET',desc: 'SMART WALLET / APP', iconType: 'coinbase' },
   { id: 'rainbow',  name: 'RAINBOW WALLET',      desc: 'MOBILE APP', iconType: 'rainbow' },
-  { id: 'walletConnect', name: 'WALLETCONNECT', desc: 'ALL WALLETS (QR)', iconType: 'walletconnect' },
 ];
 
 function WalletIcon({ type }: { type: string }) {
@@ -365,8 +364,9 @@ function PageHero({
         <div className="flex-1" />
         <div className="flex items-center gap-3">
             <div className="flex flex-col items-end gap-1">
-               <span className="text-[8px] font-mono font-black text-[#00F2EA] animate-pulse">NETWORK SYNCED: 99.9%</span>
-               <span className="text-[8px] font-mono font-black text-black/30">MOBILE AUTH: OK</span>
+               {isConnected && (
+                 <span className="text-[9px] font-mono font-black text-black tracking-[0.2em]">CONNECTED</span>
+               )}
             </div>
             {isConnected && (
               <button
@@ -434,13 +434,13 @@ function PageHero({
                   style={{ willChange: 'transform' }}
                 >
                   <div className="grid grid-cols-[auto_1fr] gap-5 items-center">
-                    <Activity size={20} className="text-[#00F2EA]" />
+                    <Activity size={20} className="text-black" />
                     <div className="text-left leading-tight">
-                      <p className="tracking-[0.3em] font-black">ENTER TERMINAL</p>
-                      <p className="text-[8px] opacity-40 mt-1 font-bold">MOBILE INTELLIGENCE HUB</p>
+                      <p className="tracking-[0.3em] font-black">THE WHALE POST</p>
+                      <p className="text-[8px] opacity-40 mt-1 font-bold">INSTITUTIONAL NEWS</p>
                     </div>
                   </div>
-                  <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight size={16} className="opacity-40 group-hover:translate-x-1 transition-transform text-white mix-blend-difference" />
                 </button>
 
                 {/* Option 2: Sync PC */}
@@ -479,30 +479,19 @@ function PageHero({
 
       <footer className="relative z-10 w-full mb-8">
         <button 
-          onClick={onConnect}
-          className="w-full py-6 bg-[#00F2EA] text-black font-black uppercase tracking-[0.3em] text-[11px] rounded-[2rem] shadow-[0_15px_45px_rgba(0,242,234,0.3)] hover:scale-105 active:scale-95 transition-all"
+          onClick={() => {
+            if (isConnected && address) {
+              navigator.clipboard.writeText(address);
+              toast.success("Address copied to clipboard");
+            } else {
+              onConnect();
+            }
+          }}
+          className="w-full py-6 bg-[#FAF9F6] text-black border border-black/10 font-black uppercase tracking-[0.3em] text-[11px] rounded-[2rem] shadow-[0_15px_45px_rgba(0,0,0,0.1)] hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
-          {isConnected ? `LINKED: ${address?.slice(0, 6)}...` : "Connect your Wallet"}
+          {isConnected ? `LINKED: ${address}` : "Connect your Wallet"}
         </button>
       </footer>
-
-      {/* SCROLL HINT */}
-      {/* FINGERPRINT ENFORCEMENT */}
-      <motion.div
-        className="flex flex-col items-center gap-1 z-10 opacity-20"
-        animate={{ y: [0, 4, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ willChange: 'transform' }}
-      >
-        <Fingerprint size={28} className="text-[#00F2EA]" />
-        <span className="text-[8px] font-mono font-black tracking-[0.4em] uppercase text-black mt-2">Hold for Terminal Biometrics</span>
-      </motion.div>
-
-      {/* FINGERPRINT BRACKETS */}
-      <div className="absolute bottom-4 left-0 w-full flex items-center justify-center gap-3 opacity-[0.2] pointer-events-none">
-        <div className="h-px bg-black/10 flex-1 mx-8" />
-        <div className="h-px bg-black/10 flex-1 mx-8" />
-      </div>
     </div>
   );
 }
@@ -578,83 +567,77 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
 // ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-4 sm:px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative text-black dark:text-white bg-transparent">
+    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-4 sm:px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative text-black bg-[#FAF9F6]">
         {/* Layer 2: Hokusai blue waves perfectly scaled via native img logic */}
         <img
           src="/olas-hokusai-4k.png"
           alt="Hokusai Waves"
-          className="absolute bottom-0 left-0 w-full h-auto z-[0] pointer-events-none select-none opacity-90 object-cover"
+          className="absolute bottom-0 left-0 w-full h-auto z-[0] pointer-events-none select-none opacity-40 object-cover"
           style={{
             transform: "translateZ(0)",
             willChange: "transform",
           }}
         />
-        {/* Dark mode overlay for olas to fade naturally */}
-        <div className="absolute inset-0 z-[1] pointer-events-none hidden dark:block" style={{ background: "linear-gradient(to top, #050810 0%, transparent 60%)", opacity: 0.9 }} />
 
-      <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-md mx-auto bg-white dark:bg-[#0A0A0A] rounded-[3rem] p-8 sm:p-10 shadow-2xl border border-black/5 dark:border-white/5">
+      <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-md mx-auto bg-white/95 backdrop-blur-md rounded-[3rem] p-8 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-black/5">
         <div className="text-[13px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
           
-          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 bg-clip-text text-black dark:text-white">WHALE ALERT NETWORK</h2>
+          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 text-black">WHALE ALERT NETWORK</h2>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">00</span>
-            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ABSTRACT</span>
+            <div className="h-px bg-black/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">THE ORIGINS</span>
           </div>
           <p>
-            Whale Alert Network es una plataforma de inteligencia on-chain de grado institucional que combina telemetría en tiempo real, análisis multi-cadena y un protocolo descentralizado de red P2P. Procesa transacciones de gran valor con latencias de sub-500ms usando Z-scores y ZK Proofs.
+            The blockchain ecosystem suffers from a fundamental asymmetry of information. Raw data produced by public ledgers is theoretically visible to anyone. In practice, the velocity and volume of that data mean that only those with advanced infrastructure can extract meaning in time. The Sovereign Network dismantles that barrier.
           </p>
           
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">01</span>
-            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">STACK TÉCNICO</span>
+            <div className="h-px bg-black/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ZERO-MOCK MANDATE</span>
           </div>
-          <ul className="space-y-4 pl-2 opacity-90 text-[12px]">
-            <li><strong>Frontend:</strong> Next.js 15, Three.js, GSAP 3, Wagmi.</li>
-            <li><strong>Backend:</strong> PostgreSQL 1TB, Redis Streams (At-Least-Once), BullMQ.</li>
-            <li><strong>Blockchain:</strong> Solana SIMD-0109 Workers, EVM Mempool Scanners, Hardhat.</li>
-            <li><strong>Seguridad:</strong> ECDSA secp256k1, ZK SnarkJS, SIWE.</li>
+          <p>
+            No component of this system displays fabricated data. Every pipeline — from node connection through Redis Streams to the React rendering layer — operates exclusively on verifiable on-chain state.
+          </p>
+          <ul className="space-y-4 pl-2 opacity-90 text-[12px] mt-4">
+            <li><strong>Frontend:</strong> Next.js 15, Zustand, GSAP 3, Framer Motion 12.</li>
+            <li><strong>Nodes:</strong> EVM Mempool Scanners, Solana SIMD-0109 Workers.</li>
+            <li><strong>Persistence:</strong> 1TB PostgreSQL Engine, Neo4j Graph Topology.</li>
           </ul>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">02</span>
-            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">MÓDULOS DE RED</span>
+            <div className="h-px bg-black/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">SOVEREIGN MESH PROTOCOL</span>
           </div>
-          <ul className="space-y-4 pl-2 opacity-90 text-[12px]">
-            <li><strong>Real-Time Whale Stream:</strong> Captura de mempool pre-resolución de liquidez.</li>
-            <li><strong>Decentralized Mesh Network:</strong> P2P descentralizada vía Redis Pub/Sub TCP con ECDSA real.</li>
-            <li><strong>1TB Indexing Engine:</strong> Agregadores en paralelo actualizando leaderboards globales.</li>
-            <li><strong>ZK AVS Integración:</strong> Validación de señales usando EigenLayer AVS.</li>
-          </ul>
+          <p>
+            The mesh is a publish-subscribe network built on distributed channels. Every signal carries an ECDSA secp256k1 signature generated by a sentinel node, providing sybil resistance and computational immutability.
+          </p>
 
           <div className="flex items-center gap-3 mb-4 mt-8">
             <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">03</span>
-            <div className="h-px bg-black/10 dark:bg-white/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ROADMAP 2026/2027</span>
+            <div className="h-px bg-black/10 flex-1" />
+            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">AKASHIC LEDGER</span>
           </div>
-          <ul className="space-y-2 pl-2 opacity-90 list-disc list-inside text-[12px]">
-            <li>Implementación de Prisma Accelerate.</li>
-            <li>Migración de Streams a Apache Kafka.</li>
-            <li>IA predictiva LSTM para deltas institucionales.</li>
-            <li>Expansión a 10,000 Nodos distribuídos.</li>
-          </ul>
+          <p className="mb-4">
+            The permanent institutional memory of the Whale Alert Network. It is a verified, immutable record of every capital movement exceeding significance thresholds, accompanied by expert geopolitical editorialization.
+          </p>
 
-          <p className="font-bold pt-8 border-t border-black/10 dark:border-white/10 mt-12 text-[10px] uppercase tracking-widest text-center opacity-40">
+          <p className="font-bold pt-8 border-t border-black/10 mt-12 text-[10px] uppercase tracking-widest text-center opacity-40">
             Immutable Data. Zero-Trust Verification. Extreme Precision.
           </p>
           
           <div className="pt-8 flex items-center justify-center gap-8 mt-6">
-              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
-                  <Twitter size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
+              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-black/5 transition-colors shadow-sm">
+                  <Twitter size={20} className="opacity-60 hover:opacity-100 transition-opacity text-black" />
               </a>
-              <div className="relative w-20 h-20 border border-black/10 dark:border-white/10 rounded-full flex items-center justify-center bg-white/5 shadow-md">
-                  <WhaleLogo className="w-12 h-12" />
+              <div className="relative w-20 h-20 border border-black/10 rounded-full flex items-center justify-center bg-transparent drop-shadow-md">
+                  <WhaleLogo className="w-12 h-12 text-black" />
               </div>
-              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 dark:border-white/10 rounded-2xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors shadow-sm">
-                  <Github size={20} className="opacity-60 hover:opacity-100 transition-opacity" />
+              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-black/5 transition-colors shadow-sm">
+                  <Github size={20} className="opacity-60 hover:opacity-100 transition-opacity text-black" />
               </a>
           </div>
         </div>

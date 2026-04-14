@@ -15,15 +15,23 @@ const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50_000;
 // FIX: Startup guard — the worker will refuse to start rather than crashing
 // at runtime with a TypeError ("fetch: BTC_RPC_URL is undefined").
 // Previously: BTC_RPC_URL! non-null assertion silently exploded on first RPC call.
-const MEMPOOL_API = 'https://mempool.space/api';
+const MEMPOOL_APIS = [
+    'https://mempool.space/api',
+    'https://mempool.fractalbitcoin.io/api',
+    'https://blockstream.info/api'
+];
+let currentEndpointIndex = 0;
 
 async function fetchMempool(endpoint: string, isJson = true) {
-    const response = await fetch(`${MEMPOOL_API}/${endpoint}`, {
+    const baseUrl = MEMPOOL_APIS[currentEndpointIndex];
+    const response = await fetch(`${baseUrl}/${endpoint}`, {
         signal: AbortSignal.timeout(12_000)
     });
     
-    // [INHUMAN DEFENSE] Detect 429 and trigger backoff
+    // [INHUMAN DEFENSE] Detect 429 and trigger backoff & rotation
     if (response.status === 429) {
+        currentEndpointIndex = (currentEndpointIndex + 1) % MEMPOOL_APIS.length;
+        console.warn(`⚠️ [BTC Hub] Rate limited on ${baseUrl}. Rotating to ${MEMPOOL_APIS[currentEndpointIndex]}`);
         throw new Error("RATE_LIMIT_429");
     }
     
@@ -64,13 +72,15 @@ export async function startBtcWorker() {
                 const btcPrice = await getRealTimePrice("BTC") || 98_000;
                 console.log(`📦 [BTC Hub] Chunking Block ${targetBlock} (${txids.length} txs)...`);
 
-                // [INSTITUTIONAL EFFICIENCY] Process in chunks of 50 to avoid API bans
-                const CHUNK_SIZE = 50;
+                // [INSTITUTIONAL EFFICIENCY] Process sequentially in small chunks to avoid Mempool API bans.
+                // 3660 txs / 5 items = 732 chunks.
+                const CHUNK_SIZE = 5;
                 for (let i = 0; i < txids.length; i += CHUNK_SIZE) {
                     const chunk = txids.slice(i, i + CHUNK_SIZE);
                     
-                    // Parallelize within each chunk, but with inter-chunk jitter
-                    await Promise.all(chunk.map(async (txid) => {
+                    // Strictly sequential: NO parallel bombardment. 
+                    // Guarantees we stop instantaneously on the first 429.
+                    for (const txid of chunk) {
                         try {
                             const tx: any = await fetchMempool(`tx/${txid}`);
                             let totalOutputSats = 0;
@@ -91,10 +101,10 @@ export async function startBtcWorker() {
                         } catch (txErr: any) {
                             if (txErr.message === "RATE_LIMIT_429") throw txErr;
                         }
-                    }));
+                    }
                     
-                    // Jitter between chunks (250ms - 500ms)
-                    await sleep(250 + Math.random() * 250);
+                    // Jitter between chunks (1000ms - 2000ms) to ensure compliance with free APIs
+                    await sleep(1000 + Math.random() * 1000);
                 }
                 lastBlock = targetBlock;
             }
