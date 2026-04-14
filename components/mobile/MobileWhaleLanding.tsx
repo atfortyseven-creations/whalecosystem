@@ -159,7 +159,9 @@ function WorldFinancialClocks() {
 }
 
 const WALLET_OPTIONS = [
+  { id: 'walletConnect', name: 'WALLETCONNECT', desc: 'QR CODE / ALL WALLETS', iconType: 'walletconnect' },
   { id: 'metamask', name: 'METAMASK',     desc: 'BROWSER EXTENSION',    iconType: 'metamask' },
+  { id: 'trust',    name: 'TRUST WALLET', desc: 'MOBILE APP',           iconType: 'trust' },
   { id: 'coinbase', name: 'COINBASE WALLET',desc: 'SMART WALLET / APP', iconType: 'coinbase' },
   { id: 'rainbow',  name: 'RAINBOW WALLET',      desc: 'MOBILE APP', iconType: 'rainbow' },
 ];
@@ -564,87 +566,95 @@ function AnimatedCounter({ target, duration = 1200, suffix = '' }: { target: num
   return <div ref={ref}>{val.toLocaleString()}{suffix}</div>;
 }
 
-// ─── PAGE 5 · EL MANIFIESTO ABSOLUTO (PURA PALABRA) ───────────────────────────
+// ─── DOWNPAGE · MOBILE FOOTER ─────────────────────────────────────────────────
 function PageManifesto() {
   return (
-    <div className="msv-snap-page min-h-safe min-h-screen w-full font-sans flex flex-col px-4 sm:px-8 pt-24 pb-24 overflow-y-auto msv-hide-scrollbar relative text-black bg-[#FAF9F6]">
-        {/* Layer 2: Hokusai blue waves perfectly scaled via native img logic */}
-        <img
-          src="/olas-hokusai-4k.png"
-          alt="Hokusai Waves"
-          className="absolute bottom-0 left-0 w-full h-auto z-[0] pointer-events-none select-none opacity-40 object-cover"
-          style={{
-            transform: "translateZ(0)",
-            willChange: "transform",
-          }}
-        />
+    <div
+      className="msv-snap-page w-full font-sans relative overflow-hidden text-black bg-[#FAF9F6]"
+      style={{ height: '100svh', minHeight: '-webkit-fill-available' }}
+    >
+      {/* ── Hokusai Wave — full-bleed bottom half ── */}
+      <img
+        src="/olas-hokusai-4k.png"
+        alt="Hokusai Waves"
+        className="absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none z-0"
+        style={{
+          height: '62%',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+        }}
+      />
 
-      <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} transition={{ duration:1.5, ease:[0.16,1,0.3,1] }} className="flex flex-col relative z-10 w-full max-w-md mx-auto bg-white/95 backdrop-blur-md rounded-[3rem] p-8 sm:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-black/5">
-        <div className="text-[13px] leading-relaxed opacity-[0.85] space-y-10 text-left tracking-wide font-medium">
-          
-          <h2 className="text-2xl font-black text-center tracking-tighter mb-8 text-black">WHALE ALERT NETWORK</h2>
+      {/* ── Ivory fade from top so wave doesn't clash ── */}
+      <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-b from-[#FAF9F6] via-transparent to-transparent z-[1] pointer-events-none" />
 
-          <div className="flex items-center gap-3 mb-4 mt-8">
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">00</span>
-            <div className="h-px bg-black/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">THE ORIGINS</span>
+      {/* ── Content layer ── */}
+      <div className="relative z-10 flex flex-col items-center justify-between h-full pt-16 pb-10 px-8">
+
+        {/* Top: Logo + tagline */}
+        <div className="flex flex-col items-center gap-5">
+          <div className="w-20 h-20 bg-white/80 backdrop-blur-sm border border-black/8 rounded-full flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+            <WhaleLogo className="w-11 h-11" />
           </div>
-          <p>
-            The blockchain ecosystem suffers from a fundamental asymmetry of information. Raw data produced by public ledgers is theoretically visible to anyone. In practice, the velocity and volume of that data mean that only those with advanced infrastructure can extract meaning in time. The Sovereign Network dismantles that barrier.
-          </p>
-          
-          <div className="flex items-center gap-3 mb-4 mt-8">
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">01</span>
-            <div className="h-px bg-black/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">ZERO-MOCK MANDATE</span>
+          <div className="text-center">
+            <p className="text-[9px] font-black uppercase tracking-[0.35em] text-black/30 mb-1">Sovereign Network</p>
+            <h2 className="text-[22px] font-black tracking-tighter text-black leading-none">WHALE ALERT</h2>
           </div>
-          <p>
-            No component of this system displays fabricated data. Every pipeline — from node connection through Redis Streams to the React rendering layer — operates exclusively on verifiable on-chain state.
-          </p>
-          <ul className="space-y-4 pl-2 opacity-90 text-[12px] mt-4">
-            <li><strong>Frontend:</strong> Next.js 15, Zustand, GSAP 3, Framer Motion 12.</li>
-            <li><strong>Nodes:</strong> EVM Mempool Scanners, Solana SIMD-0109 Workers.</li>
-            <li><strong>Persistence:</strong> 1TB PostgreSQL Engine, Neo4j Graph Topology.</li>
-          </ul>
 
-          <div className="flex items-center gap-3 mb-4 mt-8">
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">02</span>
-            <div className="h-px bg-black/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">SOVEREIGN MESH PROTOCOL</span>
-          </div>
-          <p>
-            The mesh is a publish-subscribe network built on distributed channels. Every signal carries an ECDSA secp256k1 signature generated by a sentinel node, providing sybil resistance and computational immutability.
-          </p>
+          {/* Divider */}
+          <div className="w-12 h-px bg-black/15" />
 
-          <div className="flex items-center gap-3 mb-4 mt-8">
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">03</span>
-            <div className="h-px bg-black/10 flex-1" />
-            <span className="font-mono text-[8px] font-black tracking-[0.3em] uppercase opacity-40">AKASHIC LEDGER</span>
-          </div>
-          <p className="mb-4">
-            The permanent institutional memory of the Whale Alert Network. It is a verified, immutable record of every capital movement exceeding significance thresholds, accompanied by expert geopolitical editorialization.
-          </p>
-
-          <p className="font-bold pt-8 border-t border-black/10 mt-12 text-[10px] uppercase tracking-widest text-center opacity-40">
-            Immutable Data. Zero-Trust Verification. Extreme Precision.
-          </p>
-          
-          <div className="pt-8 flex items-center justify-center gap-8 mt-6">
-              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-black/5 transition-colors shadow-sm">
-                  <Twitter size={20} className="opacity-60 hover:opacity-100 transition-opacity text-black" />
-              </a>
-              <div className="relative w-20 h-20 border border-black/10 rounded-full flex items-center justify-center bg-transparent drop-shadow-md">
-                  <WhaleLogo className="w-12 h-12 text-black" />
-              </div>
-              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer" className="w-12 h-12 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-black/5 transition-colors shadow-sm">
-                  <Github size={20} className="opacity-60 hover:opacity-100 transition-opacity text-black" />
-              </a>
+          {/* Social Icons */}
+          <div className="flex items-center gap-4">
+            <a
+              href="https://twitter.com/WhaleAlertNetwork"
+              target="_blank"
+              rel="noreferrer"
+              className="w-12 h-12 bg-white/70 border border-black/8 rounded-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+            >
+              <Twitter size={18} className="text-black opacity-70" />
+            </a>
+            <div className="w-14 h-14 bg-white border border-black/10 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.06)]">
+              <WhaleLogo className="w-8 h-8" />
+            </div>
+            <a
+              href="https://github.com/atfortyseven-creations/whalecosystem"
+              target="_blank"
+              rel="noreferrer"
+              className="w-12 h-12 bg-white/70 border border-black/8 rounded-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+            >
+              <Github size={18} className="text-black opacity-70" />
+            </a>
           </div>
         </div>
-      </motion.div>
+
+        {/* Bottom: legal + copyright — sits above the wave */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-5 flex-wrap justify-center">
+            {[
+              { label: 'Privacy', href: '/docs/privacy-policy' },
+              { label: 'Terms', href: '/docs/terms-of-service' },
+              { label: 'Risk', href: '/docs/risk-disclosure' },
+              { label: 'Cookies', href: '/docs/cookie-policy' },
+            ].map(link => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-[9px] font-black uppercase tracking-[0.2em] text-black/40 active:text-black transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+          <p className="text-[8px] font-black uppercase tracking-[0.25em] text-black/25 text-center">
+            © {new Date().getFullYear()} Whale Alert Network · All rights reserved
+          </p>
+        </div>
+      </div>
     </div>
   );
 }// ─── QR SCANNER ───────────────────────────────────────────────────────────────
+
 
 export function MobileQRScanner({ onBack, address, signMessageAsync }: any) {
   const isProcessingRef = useRef(false);
@@ -955,15 +965,11 @@ export function MobileWhaleLanding({ onEnterNews }: { onEnterNews?: () => void }
     }
   }, [isMounted, isConnected, address, view]);
 
+  const { open } = useAppKit();
+
   const handleConnectTrigger = useCallback(() => {
-    if (walletBrowser) {
-      const injected = connectors.find(c => c.id === 'injected' || c.id === 'io.metamask' || c.type === 'injected');
-      if (injected) connect({ connector: injected });
-      else if (connectors.length > 0) connect({ connector: connectors[0] });
-    } else {
-      setIsPickerOpen(true);
-    }
-  }, [connect, connectors, walletBrowser]);
+    setIsPickerOpen(true);
+  }, []);
 
   const handleEnterNews = useCallback(() => {
     if (onEnterNews) {
