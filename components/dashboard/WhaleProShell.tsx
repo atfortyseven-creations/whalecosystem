@@ -175,12 +175,12 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-screen w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell">
+        <div className="flex h-content w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 260 }}
-                className="hidden md:flex sticky top-0 h-screen border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shrink-0"
+                className="hidden md:flex sticky top-0 h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shrink-0"
             >
 
                 {/* Sidebar Navigation */}
@@ -236,7 +236,7 @@ export function WhaleProShell({
             </motion.aside>
 
             {/* ─── Main Content Wrapper ─── */}
-            <div className="flex-1 flex flex-col min-w-0 relative h-screen">
+            <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
                 {/* ─── Top Master Bar ─── */}
                 <header className="sticky top-0 h-[56px] border-b border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">

@@ -623,6 +623,3 @@ model ExchangeBalance {
   locked    Float    @default(0.0)
   updatedAt DateTime @updatedAt
   
-  @@unique([userId, asset])
-  @@index([userId])
-}

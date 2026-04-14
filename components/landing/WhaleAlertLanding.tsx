@@ -14,9 +14,9 @@ const DynamicCryptoCheckoutModal = dynamic(
   { ssr: false }
 );
 
-const BG   = "#FAF9F6";
-const INK  = "#050505";
-const MUTED= "rgba(5,5,5,0.60)";
+import { VISUAL_ASSETS, SYSTEM_THEME } from "@/lib/constants";
+
+const { BG, INK, MUTED, ACCENT } = SYSTEM_THEME;
 
 export default function WhaleAlertLanding() {
   const router = useRouter();
@@ -41,30 +41,29 @@ export default function WhaleAlertLanding() {
       {/* Background layer: solid ivory */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
 
-      {/* Cosmic pattern layer */}
+      {/* Cosmic pattern layer - Enriched and properly blended */}
       <motion.div 
         className="fixed inset-0 z-[1] pointer-events-none"
         style={{
-          width: "140%",
-          height: "140%",
-          top: "-20%",
-          left: "-20%",
-          backgroundImage: "url('/patron-cosmico-4k.png')",
-          backgroundSize: "800px",
+          width: "120%",
+          height: "120%",
+          top: "-10%",
+          left: "-10%",
+          backgroundImage: `url('${VISUAL_ASSETS.WALLPAPER}')`,
+          backgroundSize: "600px",
           backgroundRepeat: "repeat",
-          opacity: 0.15,
+          opacity: 0.25,
           mixBlendMode: "multiply",
           willChange: "transform"
         }}
         animate={{
-          x: [0, -40, 0],
-          y: [0, -25, 0],
+          x: [-20, 20, -20],
+          y: [-20, 20, -20],
         }}
         transition={{
-          duration: 32,
+          duration: 60,
           repeat: Infinity,
-          ease: "linear",
-          repeatType: "mirror"
+          ease: "linear"
         }}
       />
 
@@ -109,9 +108,27 @@ export default function WhaleAlertLanding() {
       {/* Text Content Layer */}
       <div className="relative z-10 max-w-[840px] mx-auto px-8 pt-24 pb-64 text-[11px] md:text-[12px] leading-[2.2] tracking-wide" style={{ color: MUTED }}>
         
-        <h1 className="text-[2.5rem] md:text-[3.5rem] font-black tracking-tight leading-none mb-20 text-center" style={{ color: INK }}>
-          Whale Alert Network
-        </h1>
+        <div className="flex flex-col items-center mb-32">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-24 h-24 mb-10 relative"
+          >
+            <div className="absolute inset-0 bg-black/5 blur-2xl rounded-full" />
+            <WhaleLogo className="w-full h-full relative z-10" />
+          </motion.div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-[3.5rem] md:text-[5.5rem] font-black tracking-tighter leading-[0.9] text-center uppercase italic" 
+            style={{ color: INK }}
+          >
+            The Sovereignty <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-black via-black/40 to-black/20">Protocol</span>
+          </motion.h1>
+          <div className="w-20 h-1 bg-black/10 mt-12 mb-8 rounded-full" />
+          <p className="text-[14px] font-black uppercase tracking-[0.6em] text-black/30">Whale Alert Network · v6.12.0</p>
+        </div>
 
         <div className="space-y-16">
           <section>
@@ -184,9 +201,32 @@ export default function WhaleAlertLanding() {
 
           <section>
             <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>The Data Persistence Layer</h2>
-            <p>
-              The data persistence architecture is thoughtfully designed around the principle of separation of concerns. Different categories of data have unique access patterns, consistency requirements, and performance characteristics. Every data object is securely stored in the environment most perfectly suited to those dimensions, creating an exceptionally resilient query foundation.
-            </p>
+          </section>
+
+          {/* Supported Wallets Section - Institutional Fidelity */}
+          <section className="pt-20 border-t border-black/5">
+             <div className="text-center mb-12">
+                <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-black/40 mb-2">Institutional Support</h2>
+                <div className="text-xl font-black uppercase tracking-tight text-black">Connected Ecosystem</div>
+             </div>
+             
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+                {[
+                  { name: 'MetaMask', icon: VISUAL_ASSETS.WALLETS.METAMASK },
+                  { name: 'Coinbase', icon: VISUAL_ASSETS.WALLETS.COINBASE },
+                  { name: 'Rainbow', icon: VISUAL_ASSETS.WALLETS.RAINBOW },
+                  { name: 'WalletConnect', icon: VISUAL_ASSETS.WALLETS.GENERIC }
+                ].map((wallet) => (
+                  <motion.div 
+                    key={wallet.name}
+                    whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.8)' }}
+                    className="flex flex-col items-center justify-center p-6 bg-white/40 backdrop-blur-sm border border-black/5 rounded-3xl transition-all"
+                  >
+                    <img src={wallet.icon} alt={wallet.name} className="w-10 h-10 mb-4 object-contain filter grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-black/40">{wallet.name}</span>
+                  </motion.div>
+                ))}
+             </div>
           </section>
         </div>
       </div>
@@ -198,14 +238,20 @@ export default function WhaleAlertLanding() {
       </AnimatePresence>
 
       {/* ── UNIFIED WAVE & DOWNHEAD FOOTER ── */}
-      <div className="relative w-full min-h-[500px] flex flex-col justify-end overflow-hidden pt-32">
-        {/* Massive Wave Background */}
-        <img 
-          src="/olas-hokusai-4k.png" 
+      <div className="relative w-full min-h-[600px] flex flex-col justify-end overflow-hidden pt-32">
+        {/* Massive Wave Background - Restored Visibility and Fluidity */}
+        <motion.img 
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          src={VISUAL_ASSETS.WAVES}
           alt="The Great Wave" 
-          className="absolute bottom-0 left-0 w-full h-[120%] object-cover object-bottom opacity-95 z-0"
+          className="absolute bottom-0 left-0 w-full h-[130%] object-cover object-bottom opacity-100 z-0 select-none"
           style={{ transform: "translateZ(0)", willChange: "transform" }}
         />
+        
+        {/* Deep Gradient Shade for text contrast */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#FAF9F6]/80 to-transparent z-[1]" />
         
         {/* Protective Top Fades */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F6] via-transparent to-transparent z-[1]" />

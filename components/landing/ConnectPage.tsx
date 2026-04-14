@@ -138,11 +138,25 @@ export default function ConnectPage() {
     }
   }, [isConnected, mounted, router, sessionIdParam, showScanner]);
 
-  const handleInjected = () => connect({ connector: injected() });
-  const handleCoinbase = () => connect({ 
-    connector: coinbaseWallet({ preference: 'smartWalletOnly' }) 
-  });
-  const handleWC = () => open();
+  const handleInjected = () => {
+    console.log("[AUTH] Initializing Injected Provider (Google Extension/MetaMask)...");
+    connect({ connector: injected() }, {
+      onSuccess: () => console.log("[AUTH] Extension connection successful ✓"),
+      onError: (err) => console.error("[AUTH] Extension connection failed:", err)
+    });
+  };
+
+  const handleCoinbase = () => {
+    console.log("[AUTH] Initializing Coinbase Smart Wallet...");
+    connect({ 
+      connector: coinbaseWallet({ preference: 'smartWalletOnly' }) 
+    });
+  };
+
+  const handleWC = () => {
+    console.log("[AUTH] Initializing WalletConnect Interface...");
+    open();
+  };
 
   // Initialize Scanner when showScanner is true
   useEffect(() => {
@@ -223,14 +237,20 @@ export default function ConnectPage() {
       <CelestialMeshBackground />
 
       {/* ── NAV ── */}
-      <header className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-[#050505]/5 bg-white/70 backdrop-blur-sm">
+      <header className="relative z-50 flex items-center justify-between px-8 py-5 border-b border-[#050505]/5 bg-white/70 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <img src="/official-whale-monochrome.png" className="w-7 h-7" alt="Whale" />
           <span className="font-sans font-black text-sm uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-[#050505]/30 hidden md:block font-bold">
-          Secure Terminal Access
-        </span>
+        <div className="flex items-center gap-6">
+           <span className="font-mono text-[9px] uppercase tracking-[0.35em] text-[#050505]/30 hidden md:block font-bold">
+             Node: v6.12.0-mainnet
+           </span>
+           <div className="flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full border border-black/5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[8px] font-black uppercase tracking-widest text-black/60">Registry Up</span>
+           </div>
+        </div>
       </header>
 
       {/* ── BODY ── */}
@@ -308,18 +328,19 @@ export default function ConnectPage() {
 
                 <div className="mb-8 relative z-10">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/30 font-black">Mobile Sync</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/30 font-black">Institutional Sync</p>
+                    <div className="h-px bg-black/5 flex-1 mx-4" />
                     <a href="https://twitter.com/whalecosystem" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[9px] font-mono font-black uppercase tracking-widest text-[#00ACEE] hover:opacity-80 transition-opacity bg-[#00ACEE]/10 px-2.5 py-1 rounded-full">
                       <Twitter size={10} />
                       @whalecosystem
                     </a>
                   </div>
-                  <h2 className="font-sans text-2xl font-black text-[#050505] tracking-tighter leading-tight flex items-center gap-3">
-                    <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
-                    Scan to connect
+                  <h2 className="font-sans text-3xl font-black text-[#050505] tracking-tighter leading-tight flex items-center gap-3 italic">
+                    <img src="/official-whale-monochrome.png" className="w-10 h-10 opacity-90" alt="Whale" />
+                    Mobile Link
                   </h2>
-                  <p className="text-[12px] text-[#050505]/50 mt-3 leading-relaxed font-semibold">
-                    Open your mobile wallet and scan the QR code below. Your session will sync automatically with this terminal.
+                  <p className="text-[12px] text-[#050505]/50 mt-4 leading-relaxed font-semibold">
+                    Scan this sovereign handshake code with your mobile device to bridge your identity to this terminal instance.
                   </p>
                 </div>
 
