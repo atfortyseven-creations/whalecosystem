@@ -267,13 +267,12 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF] overflow-y-auto custom-scrollbar scroll-smooth">
-                    <div className="flex-1 relative z-10">
-                        
-                        {/* Immersive radial glow overlay to focus center */}
-                        <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
+                <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF] overflow-hidden">
+                    {/* Immersive radial glow overlay */}
+                    <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
-                        
+                    {/* Height-bounded scroller — NO empty space ever appears below content */}
+                    <div className="absolute inset-0 overflow-y-auto custom-scrollbar scroll-smooth">
                         <div className="p-8 max-w-[1600px] mx-auto w-full relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
@@ -285,7 +284,6 @@ export function WhaleProShell({
                                         duration: 0.3,
                                         ease: [0.16, 1, 0.3, 1]
                                     }}
-                                    className="min-h-full"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
                                         {children}
@@ -294,7 +292,6 @@ export function WhaleProShell({
                             </AnimatePresence>
                         </div>
                     </div>
-
                 </main>
 
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}

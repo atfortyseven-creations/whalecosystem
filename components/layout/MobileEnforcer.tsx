@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { MobileLanding as MobileSovereignLanding } from '@/components/landing/MobileLanding';
+import { MobileWhaleLanding as MobileSovereignLanding } from '@/components/mobile/MobileWhaleLanding';
 import dynamic from 'next/dynamic';
 import { useAccount } from 'wagmi';
 
