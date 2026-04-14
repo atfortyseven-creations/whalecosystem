@@ -13,6 +13,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl \
     libstdc++6 \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # ─── STAGE 2: BUILD DEPENDENCIES ─────────────────────────────────────────────

@@ -8,7 +8,7 @@ import { Activity, ArrowRight, Zap, ChevronUp } from 'lucide-react';
 
 // Dynamic imports to avoid SSR crashes (React Error #130)
 const FixedSizeList = dynamic<any>(
-    () => import('react-window').then(m => m.FixedSizeList),
+    () => import('react-window').then(m => (m as any).FixedSizeList),
     { ssr: false }
 );
 const AutoSizer = dynamic<any>(

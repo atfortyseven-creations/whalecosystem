@@ -132,7 +132,7 @@ export function EntityGraphVis() {
             label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
         });
 
-        return () => simulation.stop();
+        return () => { simulation.stop(); };
     }, [matrixData, isOffline]);
 
     return (

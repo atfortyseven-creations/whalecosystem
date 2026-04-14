@@ -9,8 +9,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
-const List = dynamic(
-    () => import('react-window').then(m => m.FixedSizeList as any),
+const List = dynamic<any>(
+    () => import('react-window').then(m => (m as any).FixedSizeList),
     { ssr: false }
 );
 const AutoSizer = dynamic(() => import('react-virtualized-auto-sizer'), { ssr: false });

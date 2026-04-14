@@ -24,10 +24,10 @@
     },
     {
       "name": "sovereign-worker",
-      "script": "node_modules/tsx/dist/cli.js",
+      "script": "node_modules/.bin/tsx",
       "args": "scripts/whale-worker.ts",
       "cwd": ".",
-      "interpreter": "node",
+      "interpreter": "none",
       "instances": 1,
       "exec_mode": "fork",
       "env": {
