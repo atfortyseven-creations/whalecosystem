@@ -435,6 +435,5 @@ export function SovereignVault() {
 
             </div>
         </div>
-        </div>
     );
 }
