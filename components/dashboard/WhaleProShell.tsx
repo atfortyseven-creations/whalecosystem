@@ -273,7 +273,7 @@ export function WhaleProShell({
 
                     {/* Height-bounded scroller — NO empty space ever appears below content */}
                     <div className="absolute inset-0 overflow-y-auto custom-scrollbar scroll-smooth">
-                        <div className="p-8 max-w-[1600px] mx-auto w-full relative z-10" style={{ transform: 'translateZ(0)' }}>
+                        <div className="p-6 pb-4 max-w-[1600px] mx-auto w-full relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}

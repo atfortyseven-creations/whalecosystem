@@ -137,9 +137,9 @@ export function EntityGraphVis() {
     }, [matrixData, isOffline]);
 
     return (
-        <div className="w-full flex flex-col items-center p-0 md:p-4 gap-8 mb-24">
+        <div className="w-full flex flex-col items-center p-0 md:p-4 gap-8">
         {/* GRAPH PANEL */}
-        <div className="w-full min-h-[75vh] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-[2rem] font-mono overflow-hidden shadow-sm shrink-0 relative z-10">
+        <div className="w-full min-h-[85vh] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-[2rem] font-mono overflow-hidden shadow-sm shrink-0 relative z-10">
             {/* ── HEADER ── */}
             <div className="px-8 py-6 border-b border-[#E5E5E5] flex items-center justify-between shrink-0 bg-[#FAF9F6]">
                 <div className="flex items-center gap-4">

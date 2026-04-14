@@ -79,6 +79,9 @@ export function CelestialMeshBackground({
                 className="absolute bottom-0 left-0 w-full z-[2]"
                 style={{
                     height: 'auto',
+                    minHeight: '42%',
+                    objectFit: 'cover',
+                    objectPosition: 'bottom',
                     display: 'block',
                     opacity: waveOpacity,
                     transform: 'translateZ(0)',
@@ -90,7 +93,7 @@ export function CelestialMeshBackground({
             <div
                 className="absolute inset-0 z-[3]"
                 style={{
-                    background: `linear-gradient(to bottom, ${baseColor} 0%, transparent 40%, transparent 65%, ${baseColor} 100%)`,
+                    background: `linear-gradient(to bottom, ${baseColor} 0%, transparent 50%, transparent 60%, ${baseColor} 100%)`,
                     opacity: gradientOpacity,
                 }}
             />

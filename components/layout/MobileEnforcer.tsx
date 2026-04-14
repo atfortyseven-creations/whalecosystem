@@ -117,7 +117,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         // Pre-connection → wallet connect buttons
         // Post-connection → manifesto + "VER NOTICIAS" + "ENLAZAR PC"
         return (
-            <MobileSovereignLanding />
+            <MobileSovereignLanding onEnterNews={() => setShowNews(true)} />
         );
     }
 

@@ -115,7 +115,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         pathname.startsWith('/privacy') ||
                         pathname.startsWith('/terms') ||
                         pathname.startsWith('/ticket') ||
-                        pathname.startsWith('/news')
+                        pathname.startsWith('/news') ||
+                        pathname.startsWith('/connect')
                     ) && <Downhead />}
                     
                     <MobileNavBar />
