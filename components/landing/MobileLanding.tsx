@@ -60,7 +60,7 @@ export function MobileLanding() {
       </div>
 
       {/* ── Downpage Wave with 20% zoom and expert fade ── */}
-      <div className="absolute inset-x-0 bottom-0 z-[2] pointer-events-none" style={{ height: "1000px" }}>
+      <div className="absolute inset-x-0 bottom-0 z-[2] pointer-events-none" style={{ height: "1200px" }}>
         {/* The Wave Image */}
         <div style={{
           position: "absolute",
@@ -71,20 +71,20 @@ export function MobileLanding() {
           overflow: "hidden"
         }}>
           <img 
-            src="/great-wave.png" 
+            src="/olas-hokusai-4k.png" 
             alt="The Great Wave" 
             loading="lazy"
             decoding="async"
             style={{ 
               position: "absolute",
-              bottom: 0,
-              left: 0,
-              width: "100%", 
+              bottom: "-5%",
+              left: "-10%",
+              width: "120%", 
               height: "auto", 
-              transform: "scale(1.2) translateZ(0)", // 20% zoom
+              transform: "scale(1.2) translateZ(0)", // +20% zoom requested
               willChange: "transform",
               transformOrigin: "bottom center",
-              opacity: 0.95
+              opacity: 0.98
             }} 
           />
         </div>
@@ -97,18 +97,7 @@ export function MobileLanding() {
             left: 0,
             width: "100%",
             height: "100%",
-            background: "linear-gradient(to bottom, #FAF9F6 0%, rgba(250, 249, 246, 0.98) 15%, rgba(250, 249, 246, 0) 100%)",
-            zIndex: 3
-          }}
-        />
-        <div 
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "linear-gradient(to top, rgba(250, 249, 246, 0.9) 0%, rgba(250, 249, 246, 0) 60%)",
+            background: "linear-gradient(to bottom, #FAF9F6 0%, rgba(250, 249, 246, 0.98) 10%, rgba(250, 249, 246, 0) 100%)",
             zIndex: 3
           }}
         />
@@ -261,6 +250,35 @@ export function MobileLanding() {
             </p>
           </section>
         </div>
+
+        {/* ── Downpage CTA: Connect Wallet ── */}
+        {!address && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-24 flex flex-col items-center text-center space-y-8"
+          >
+            <div className="w-12 h-[1px]" style={{ backgroundColor: FAINT }} />
+            <div className="space-y-3">
+              <h3 className="text-[18px] font-black tracking-tight" style={{ color: INK }}>Ready to Command the Mesh?</h3>
+              <p className="text-[13px] max-w-[280px] mx-auto opacity-60">Synchronize your sovereign identity to begin monitoring institutional-grade capital flows.</p>
+            </div>
+            
+            <button
+              onClick={handleEntry}
+              className="w-full max-w-[280px] py-5 rounded-full font-sans font-black uppercase tracking-[0.2em] shadow-xl active:scale-[0.97] transition-all"
+              style={{
+                backgroundColor: INK,
+                color: "#FFFFFF",
+                fontSize: "11px",
+                boxShadow: "0 20px 40px rgba(5,5,5,0.15)"
+              }}
+            >
+              CONNECT WALLET
+            </button>
+          </motion.div>
+        )}
       </div>
 
       <AnimatePresence>
