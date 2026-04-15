@@ -87,39 +87,39 @@ export const WalkawayPanel = () => {
     };
 
     return (
-        <Card className="border-red-500/20 bg-black/60 backdrop-blur-xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none" />
-            <CardHeader className="flex flex-row items-center justify-between border-b border-red-500/10 pb-6">
-                <div className="space-y-1">
-                    <CardTitle className="text-red-400/90 tracking-widest text-sm uppercase font-black flex items-center gap-2">
-                        <Shield size={14} /> Walkaway Switch v3
+        <Card className="border-[#FF3B30]/30 bg-[#FFFFFF] shadow-sm relative overflow-hidden rounded-2xl group">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF3B30]/5 to-transparent pointer-events-none" />
+            <CardHeader className="flex flex-row items-center justify-between border-b border-[#F0F0F0] pb-4">
+                <div className="space-y-0.5">
+                    <CardTitle className="text-[#050505] tracking-widest text-[11px] uppercase font-black flex items-center gap-1.5">
+                        <Shield size={14} className="text-[#FF3B30]" /> Walkaway Switch v3
                     </CardTitle>
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">
+                    <p className="text-[9px] text-[#888888] uppercase tracking-widest font-bold">
                         Decentralized Ownership Handover
                     </p>
                 </div>
-                <Badge variant="red" className="px-3 py-1 font-black opacity-80">
+                <Badge variant="outline" className="px-3 py-1 font-black bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20 uppercase tracking-widest text-[8px]">
                     PROTECTED
                 </Badge>
             </CardHeader>
-            <CardContent className="pt-8 space-y-6">
-                <div className="flex flex-col items-center justify-center py-6 border border-white/5 rounded-2xl bg-black/40">
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-white/20 mb-2 font-black">Time until Auto-Handover</p>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-6xl font-black text-red-400 tracking-tighter">
+            <CardContent className="pt-6 space-y-5">
+                <div className="flex flex-col items-center justify-center py-5 border border-[#E5E5E5] rounded-xl bg-[#FAF9F6]">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-[#888888] mb-1 font-black">Time until Auto-Handover</p>
+                    <div className="flex items-baseline gap-1.5">
+                        <span className="text-5xl font-black text-[#FF3B30] tracking-tighter">
                             {daysLeft}
                         </span>
-                        <span className="text-sm font-bold text-red-500/40 uppercase">Days</span>
+                        <span className="text-xs font-bold text-[#FF3B30]/60 uppercase">Days</span>
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    <div className="p-4 rounded-xl bg-red-400/5 border border-red-400/10 space-y-2">
-                        <div className="flex items-center gap-2 text-[10px] font-black uppercase text-red-400/70">
+                <div className="space-y-3">
+                    <div className="p-3.5 rounded-xl bg-[#FF3B30]/5 border border-[#FF3B30]/10 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-[#FF3B30]">
                             <AlertTriangle size={12} />
                             Governance Clause
                         </div>
-                        <p className="text-[11px] leading-relaxed text-white/40">
+                        <p className="text-[10px] leading-relaxed text-[#050505] font-medium">
                             If no heartbeat is detected for 180 consecutive days, all protocol administrative privileges are automatically transferred to the community-governed multi-signature vault.
                         </p>
                     </div>
@@ -128,30 +128,30 @@ export const WalkawayPanel = () => {
                         <Button 
                             onClick={handleHeartbeat}
                             disabled={loading}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest text-xs h-12 gap-2"
+                            className="w-full bg-[#FF3B30] hover:bg-[#FF3B30]/90 text-white font-black uppercase tracking-widest text-[10px] h-10 gap-2 rounded-xl shadow-sm"
                         >
-                            {loading ? <RefreshCw className="animate-spin" size={16} /> : <Lock size={16} />}
+                            {loading ? <RefreshCw className="animate-spin" size={14} /> : <Lock size={14} />}
                             Confirm Founder Vitality
                         </Button>
                     ) : (
-                        <div className="text-center space-y-3">
+                        <div className="text-center space-y-2.5">
                             <Button 
                                 variant="outline" 
-                                className="w-full border-red-500/20 text-red-400/60 hover:text-red-400 hover:bg-red-500/5 font-black uppercase tracking-widest text-xs h-12"
+                                className="w-full border-[#FF3B30]/20 text-[#FF3B30] hover:bg-[#FF3B30]/5 font-black uppercase tracking-widest text-[10px] h-10 rounded-xl"
                             >
                                 Verify Threshold Status
                             </Button>
-                            <p className="text-[9px] text-white/20 uppercase tracking-widest leading-relaxed">
-                                Only the founding identity can reset the timer via ECDSA signature.
+                            <p className="text-[9px] text-[#888888] uppercase tracking-widest leading-relaxed font-bold">
+                                Only the founding identity can reset the timer.
                             </p>
                         </div>
                     )}
                 </div>
 
                 {lastBeat && (
-                    <div className="flex justify-between items-center text-[9px] uppercase tracking-widest text-white/20 font-bold border-t border-white/5 pt-4">
+                    <div className="flex justify-between items-center text-[9px] uppercase tracking-widest text-[#888888] font-black border-t border-[#F0F0F0] pt-3">
                         <span>Last Signal Trace</span>
-                        <span>{new Date(lastBeat).toLocaleString()}</span>
+                        <span className="text-[#050505]">{new Date(lastBeat).toLocaleString()}</span>
                     </div>
                 )}
             </CardContent>

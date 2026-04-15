@@ -216,11 +216,9 @@ export function GainersLosersPanel() {
     const hasData = allRows.length > 0;
 
     return (
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-4">
-        <div className="flex flex-col space-y-5 h-full min-h-[600px] shrink-0">
-
+        <div className="w-full h-full flex flex-col p-4 space-y-5 overflow-hidden text-[#050505] font-sans">
             {/* ── Summary Cards ── */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 shrink-0">
                 {/* Top Gainers */}
                 <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
@@ -293,10 +291,10 @@ export function GainersLosersPanel() {
             </div>
 
             {/* ── Full Table ── */}
-            <div className="bg-white border border-[#E5E5E5] rounded-2xl overflow-hidden shadow-sm">
+            <div className="flex-1 min-h-0 bg-white border border-[#E5E5E5] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden flex flex-col">
 
                 {/* Toolbar Row 1 */}
-                <div className="px-5 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
+                <div className="shrink-0 px-5 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
                     {/* View toggle */}
                     <div className="flex bg-[#F0F0F0] p-1 rounded-xl border border-[#E5E5E5]">
                         {(['all', 'gainers', 'losers'] as ViewMode[]).map(v => (
@@ -338,7 +336,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Toolbar Row 2 — Network selector */}
-                <div className="px-5 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
+                <div className="shrink-0 px-5 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
                     <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest mr-1">Network:</span>
                     {ALL_NETWORKS.map(n => (
                         <button key={n} onClick={() => setNetwork(n)}
@@ -352,7 +350,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Column Headers */}
-                <div className="grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
+                <div className="shrink-0 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
                     style={{ gridTemplateColumns: '36px 2.8fr 1.8fr 1.1fr 1.1fr 1.5fr 0.9fr' }}>
                     {['#', 'Asset', 'Price (USD)', '24H %', 'Trend', 'Volume 24H', 'Type'].map((h, i) => (
                         <div key={h} className={`px-3 py-2.5 ${i >= 3 && i <= 4 ? 'text-right' : i === 0 ? 'text-center' : ''}`}>{h}</div>
@@ -360,7 +358,7 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Rows */}
-                <div className="w-full">
+                <div className="flex-1 w-full overflow-y-auto msv-hide-scrollbar">
                     {!hasData ? (
                         <div className="flex flex-col items-center justify-center h-full text-center text-[#888888]">
                             <div className="w-8 h-8 rounded-full border-2 border-[#050505] border-t-transparent animate-spin mb-3"/>
@@ -393,14 +391,13 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-5 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
+                <div className="shrink-0 px-5 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                     <span>{filtered.length} assets · {network === 'all' ? 'All Networks' : network} · {timeWindow} window</span>
                     <span>
                         {isConnected ? '● LIVE' : '○ RECONNECTING'} · GetBlock EP1–EP4 + Binance 24H
                     </span>
                 </div>
             </div>
-        </div>
         </div>
     );
 }

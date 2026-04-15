@@ -42,36 +42,38 @@ interface RPCEndpoint {
  */
 
 // ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
-const GETBLOCK_PAIRS = [
-  { 
-    rpc: process.env.GETBLOCK_ETH_RPC_1, 
-    wss: process.env.GETBLOCK_ETH_WS_2 
-  },
-  { 
-    rpc: process.env.GETBLOCK_ETH_RPC_4, 
-    wss: process.env.GETBLOCK_ETH_WS_3 
-  },
-].filter(p => p.rpc && p.wss);
+const parseMultiplexKeys = (envVal: string | undefined): string[] => {
+  if (!envVal) return [];
+  return envVal.split(',').map(s => s.trim()).filter(Boolean);
+};
 
 // Endpoints públicos de fallback (Sexta línea de defensa e inyección web3 masiva)
 const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
   1: {
     rpc: [
+      process.env.GETBLOCK_ETH_RPC_1 || '',
+      process.env.GETBLOCK_ETH_RPC_4 || '',
+      ...parseMultiplexKeys(process.env.GETBLOCK_ETH_RPCS),
+      ...parseMultiplexKeys(process.env.ALCHEMY_ETH_RPCS),
       'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8',
       `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://rpc.ankr.com/eth',
       'https://1rpc.io/eth',
       'https://eth.llamarpc.com',
       'https://cloudflare-eth.com'
-    ],
+    ].filter(Boolean),
     wss: [
+      process.env.GETBLOCK_ETH_WS_2 || '',
+      process.env.GETBLOCK_ETH_WS_3 || '',
+      ...parseMultiplexKeys(process.env.GETBLOCK_ETH_WSS),
       'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
       'wss://ethereum-rpc.publicnode.com',
       'wss://eth.llamarpc.com'
-    ]
+    ].filter(Boolean)
   },
   56: {
     rpc: [
+      ...parseMultiplexKeys(process.env.GETBLOCK_BSC_RPCS),
       'https://go.getblock.io/e264370bb5e047c38d6c87ec0ab42dff',
       'https://go.getblock.us/6aca5a5ffeba4f2f933766e547d4e3a3',
       'https://binance.llamarpc.com',
@@ -80,27 +82,31 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://bsc-dataseed2.binance.org',
       'https://bsc.meowrpc.com',
       'https://rpc.ankr.com/bsc'
-    ],
+    ].filter(Boolean),
     wss: [
+      ...parseMultiplexKeys(process.env.GETBLOCK_BSC_WSS),
       'wss://bsc-rpc.publicnode.com',
       'wss://binance.llamarpc.com'
-    ]
+    ].filter(Boolean)
   },
   137: {
     rpc: [
+      ...parseMultiplexKeys(process.env.GETBLOCK_POLYGON_RPCS),
       'https://polygon.llamarpc.com',
       'https://1rpc.io/matic',
       'https://rpc.ankr.com/polygon',
       'https://polygon.meowrpc.com',
       'https://polygon-rpc.com'
-    ],
+    ].filter(Boolean),
     wss: [
+      ...parseMultiplexKeys(process.env.GETBLOCK_POLYGON_WSS),
       'wss://polygon-bor-rpc.publicnode.com'
-    ]
+    ].filter(Boolean)
   },
   8453: {
     rpc: [
       process.env.GETBLOCK_BASE_RPC || '',
+      ...parseMultiplexKeys(process.env.GETBLOCK_BASE_RPCS),
       'https://base.llamarpc.com',
       'https://1rpc.io/base',
       'https://mainnet.base.org',
@@ -108,13 +114,14 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://rpc.ankr.com/base'
     ].filter(Boolean),
     wss: [
+      ...parseMultiplexKeys(process.env.GETBLOCK_BASE_WSS),
       'wss://base-rpc.publicnode.com',
       'wss://base.llamarpc.com'
-    ]
+    ].filter(Boolean)
   }
 };
 
-const EXHAUSTION_COOLDOWN_MS = 10 * 60 * 1000; // 10 minutos para 402/429
+const EXHAUSTION_COOLDOWN_MS = 60 * 1000; // REDUCED EXHAUSTION COOLDOWN TO 60 SECONDS! (Max Agility)
 
 interface PersistentSubscription {
   type: 'block' | 'filter';
@@ -135,28 +142,26 @@ export class ResilientProvider {
   constructor(chainId: number = 1) {
     this.chainId = chainId;
     
-    const urls = [
-      ...(chainId === 1 ? GETBLOCK_PAIRS.map(p => p.rpc!) : []),
-      ...(FALLBACKS[chainId]?.rpc || [])
-    ].filter(Boolean);
+    // Aggressive Multiplexer Array Expansion
+    const urls = FALLBACKS[chainId]?.rpc || [];
+    this.wssUrls = FALLBACKS[chainId]?.wss || [];
 
-    this.wssUrls = [
-      ...(chainId === 1 ? GETBLOCK_PAIRS.map(p => p.wss!) : []),
-      ...(FALLBACKS[chainId]?.wss || [])
-    ].filter(Boolean);
+    // Deduplicate to avoid overlap errors
+    const uniqueUrls = Array.from(new Set(urls));
+    this.wssUrls = Array.from(new Set(this.wssUrls));
 
-    this.endpoints = urls.map(url => ({
+    this.endpoints = uniqueUrls.map(url => ({
       url,
       isHealthy: true,
       exhausted: false,
       errorCount: 0,
     }));
 
-    this.providers = urls.map(url =>
+    this.providers = uniqueUrls.map(url =>
       new ethers.JsonRpcProvider(url, chainId, { staticNetwork: true })
     );
 
-    console.log(`[ResilientProvider] 🚀 Booted for chain ${chainId} with ${urls.length} endpoints.`);
+    console.log(`[ResilientProvider] 🚀 Booted Multiplexer for chain ${chainId} with ${uniqueUrls.length} HTTP / ${this.wssUrls.length} WSS Endpoints.`);
   }
 
   public destroy() {

@@ -196,11 +196,11 @@ export function NewPairsTable() {
     const chains: Chain[] = NETWORKS;
 
     return (
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col p-4">
-        <div className="flex flex-col h-full min-h-[600px] w-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm shrink-0">
+        <div className="w-full h-full p-4 flex flex-col overflow-hidden text-[#050505] font-sans">
+            <div className="flex-1 w-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm flex flex-col min-h-0">
 
             {/* ── Toolbar ── */}
-            <div className="px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
+            <div className="shrink-0 px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
                 {/* Search */}
                 <div className="relative flex-1 min-w-[180px] max-w-xs">
                     <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]" />
@@ -238,7 +238,7 @@ export function NewPairsTable() {
             </div>
 
             {/* ── Network Filter Row (Fix B) ── */}
-            <div className="px-4 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
+            <div className="shrink-0 px-4 py-2 border-b border-[#E5E5E5] bg-white flex items-center gap-2 flex-wrap">
                 <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest mr-1">Network:</span>
                 {chains.map(c => (
                     <button key={c}
@@ -253,10 +253,10 @@ export function NewPairsTable() {
             </div>
 
             {/* ── Table ── */}
-            {/* outer scroll: horizontal only — height is explicit so AutoSizer works */}
-            <div className="flex-1 overflow-x-auto overflow-y-hidden relative" style={{ minHeight: 0 }}>
-                {/* min-width wrapper — must NOT constrain height */}
-                <div style={{ minWidth: 1400, height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* outer scroll: horizontal only */}
+            <div className="flex-1 overflow-x-auto relative min-h-0 flex flex-col">
+                {/* min-width wrapper */}
+                <div style={{ minWidth: 1400 }} className="flex-1 flex flex-col min-h-0">
 
                     {/* Column Headers */}
                     <div className="sticky top-0 z-10 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0"
@@ -267,16 +267,16 @@ export function NewPairsTable() {
                         ))}
                     </div>
 
-                    {/* Rows — explicit height prevents AutoSizer collapse bug */}
-                    <div className="flex-1" style={{ minHeight: 0 }}>
+                    {/* Rows */}
+                    <div className="flex-1 overflow-y-auto msv-hide-scrollbar min-h-0">
                         {loading && pairs.length === 0 ? (
-                            <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center justify-center" style={{ height: 520 }}>
+                            <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center justify-center h-full">
                                 <Loader2 className="animate-spin mb-3" size={22} /> Scanning mempool streams…
                             </div>
                         ) : filtered.length === 0 ? (
-                            <div className="p-12 text-center text-[#888888] text-[10px] font-mono flex items-center justify-center" style={{ height: 520 }}>NO PAIRS MATCH FILTERS</div>
+                            <div className="p-12 text-center text-[#888888] text-[10px] font-mono flex items-center justify-center h-full">NO PAIRS MATCH FILTERS</div>
                         ) : (
-                            <div className="flex flex-col w-full overflow-y-auto overflow-x-hidden" style={{ height: 520 }}>
+                            <div className="flex flex-col w-full h-full">
                                 {filtered.map((p: any, index: number) => {
                                     if (!p || !p.baseToken) {
                                         return null;
@@ -406,7 +406,7 @@ export function NewPairsTable() {
             </div>
 
             {/* ── Status Footer ── */}
-            <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
+            <div className="shrink-0 px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                 <span>{filtered.length} pairs shown · refreshes every 8s</span>
                 <span>Security powered by Whale Alert Network Engine</span>
             </div>

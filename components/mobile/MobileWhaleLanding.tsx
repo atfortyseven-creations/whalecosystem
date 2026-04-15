@@ -596,9 +596,8 @@ function PageManifesto() {
           <div className="w-20 h-20 bg-white/80 backdrop-blur-sm border border-black/8 rounded-full flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
             <WhaleLogo className="w-11 h-11" />
           </div>
-          <div className="text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.35em] text-black/30 mb-1">Sovereign Network</p>
-            <h2 className="text-[22px] font-black tracking-tighter text-black leading-none">WHALE ALERT</h2>
+          <div className="text-center mt-2">
+            <h2 className="text-[22px] font-black tracking-tighter text-black leading-none uppercase">WHALE ALERT</h2>
           </div>
 
           {/* Divider */}

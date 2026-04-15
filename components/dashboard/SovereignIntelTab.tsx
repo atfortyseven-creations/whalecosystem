@@ -2,16 +2,15 @@
 
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Activity, Globe, Lock, Shield, Cpu, RefreshCw, Layers } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Zap, Activity, Globe, Lock, Cpu, RefreshCw, Layers } from 'lucide-react';
 import { useDashboardStore } from '@/lib/store/useDashboardStore';
+import { useMarketStream } from '@/context/MarketStreamContext';
 import { initEternalNode, stopEternalNode } from '@/lib/p2p/eternalNode';
 import { VOSS_MASTER_MATRIX } from '@/lib/vossIntelligenceEngine';
 
-// Lazy load the Walkaway Panel for performance
 const WalkawayPanel = lazy(() => import('./WalkawayPanel').then(m => ({ default: m.WalkawayPanel })));
 
 const SovereignIntelTab: React.FC = () => {
@@ -25,7 +24,8 @@ const SovereignIntelTab: React.FC = () => {
         walkawayDays: 180,
     });
 
-    // Eternal Node Lifecycle
+    const { markets, lastUpdate } = useMarketStream();
+
     useEffect(() => {
         let mounted = true;
         
@@ -49,18 +49,29 @@ const SovereignIntelTab: React.FC = () => {
         };
     }, [isNodeActive, addLog]);
 
-    // Simulated Thermodynamic Pulse
     useEffect(() => {
-        const interval = setInterval(() => {
+        // Compute live thermodynamic metrics from WebSocket
+        const activeMarkets = Array.from(markets.values());
+        if (activeMarkets.length > 0) {
+            const avgVol = activeMarkets.reduce((acc, m) => acc + Math.abs(parseFloat(m.priceChangePercent) || 0), 0) / activeMarkets.length;
+            const totalVol = activeMarkets.reduce((acc, m) => acc + (parseFloat(m.quoteVolume) || 0), 0);
+            
+            setMainframeData(prev => ({
+                ...prev,
+                zScore: 0.85 + (avgVol / 5),
+                mempoolDensity: Math.min(100, 12.4 + (totalVol / 500000000)),
+                entropy: activeMarkets.length * 3 + Math.floor(Math.random() * 10)
+            }));
+        } else {
+            // Fallback mock oscillation if WS is reconnecting
             setMainframeData(prev => ({
                 ...prev,
                 zScore: Math.max(0, prev.zScore + (Math.random() - 0.5) * 0.1),
                 mempoolDensity: Math.max(0, prev.mempoolDensity + (Math.random() - 0.5) * 2),
-                entropy: prev.entropy + Math.floor(Math.random() * 5)
+                entropy: prev.entropy + Math.floor(Math.random() * 5) - 2
             }));
-        }, 2000);
-        return () => clearInterval(interval);
-    }, []);
+        }
+    }, [markets, lastUpdate]);
 
     const [vossSearch, setVossSearch] = useState('');
     const filteredVoss = VOSS_MASTER_MATRIX.filter(v => 
@@ -69,88 +80,86 @@ const SovereignIntelTab: React.FC = () => {
     );
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-[#0A0A0A] text-emerald-400 font-mono overflow-hidden selection:bg-emerald-500/30">
-            {/* Header / Brand Matrix */}
-            <div className="p-8 border-b border-emerald-500/10 bg-black/40 backdrop-blur-md sticky top-0 z-20">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <Layers className="text-emerald-500 animate-pulse" size={24} />
-                            <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase">
-                                Sovereign Akashic Ledger
-                            </h1>
-                        </div>
-                        <p className="text-[10px] text-emerald-500/40 uppercase tracking-[0.4em] font-bold">
-                            Institutional Terminal — Protocol Mainframe v3.0.0
-                        </p>
+        <div className="w-full h-full flex flex-col p-4 overflow-hidden bg-[#FAF9F6]">
+            {/* Header */}
+            <div className="px-6 py-5 border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0">
+                <div>
+                    <div className="flex items-center gap-3 mb-1">
+                        <Layers className="text-[#050505]" size={20} />
+                        <h1 className="text-xl md:text-2xl font-black tracking-tighter text-[#050505] uppercase">
+                            Sovereign Akashic Ledger
+                        </h1>
                     </div>
-                    
-                    <div className="flex items-center gap-4">
-                        <div className="text-right">
-                            <p className="text-[9px] uppercase tracking-widest text-emerald-500/30 mb-1">Network Identity</p>
-                            <p className="text-xs font-bold text-white/60">SAL-GENESIS-NODE-01</p>
-                        </div>
-                        <div className={`w-3 h-3 rounded-full ${isNodeActive ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]' : 'bg-white/10'} transition-all`} />
+                    <p className="text-[10px] text-[#888888] uppercase tracking-[0.2em] font-bold">
+                        Institutional Terminal — Protocol Mainframe v3.0.0
+                    </p>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                    <div className="text-right">
+                        <p className="text-[9px] uppercase tracking-widest text-[#888888] mb-1">Network Identity</p>
+                        <p className="text-[11px] font-black text-[#050505]">SAL-GENESIS-NODE-01</p>
                     </div>
+                    <div className={`w-2.5 h-2.5 rounded-full ${isNodeActive ? 'bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.5)]' : 'bg-[#E5E5E5]'} transition-all`} />
                 </div>
             </div>
 
-            <main className="flex-1 flex flex-col min-h-0 w-full p-4 gap-4 overflow-hidden">
-
-            {/* Thermodynamic KPI Grid — fixed height, never grows */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
+            {/* Main content area */}
+            <main className="flex-1 flex flex-col min-h-0 w-full gap-4 mt-4 overflow-hidden">
+                
+                {/* Thermodynamic KPI Grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
                     <MetricCard 
                         title="Z-Score Atlas" 
                         value={mainframeData.zScore.toFixed(2)} 
                         subtitle="Statistical Anomaly Index"
                         icon={<Activity size={16} />}
-                        color="emerald"
+                        accent="green"
                     />
                     <MetricCard 
                         title="Mempool Density" 
                         value={`${mainframeData.mempoolDensity.toFixed(1)}%`} 
                         subtitle="Transaction Heatmap"
                         icon={<RefreshCw size={16} />}
-                        color="amber"
+                        accent="amber"
                     />
                     <MetricCard 
                         title="Network Entropy" 
                         value={mainframeData.entropy.toString()} 
                         subtitle="Bits of Chaos Detected"
                         icon={<Cpu size={16} />}
-                        color="white"
+                        accent="black"
                     />
                     <MetricCard 
                         title="Walkaway Count" 
                         value={`${mainframeData.walkawayDays}d`} 
                         subtitle="Autonomous Trigger"
                         icon={<Lock size={16} />}
-                        color="red"
+                        accent="red"
                     />
-            </div>{/* /KPI grid */}
+                </div>
 
-            {/* Node Control + Walkaway — fixed shrink-0 row */}
-            <div className="shrink-0 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Node Control / Network Map row */}
+                <div className="shrink-0 grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Node Control Center */}
-                    <Card className="lg:col-span-2 border-emerald-500/10 bg-black/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
-                        <CardHeader className="flex flex-row items-center justify-between border-b border-emerald-500/5 pb-6">
-                            <div className="space-y-1">
-                                <CardTitle className="text-emerald-500/90 tracking-widest text-sm uppercase font-black">
+                    <Card className="lg:col-span-2 border-[#E5E5E5] bg-[#FFFFFF] shadow-sm relative overflow-hidden rounded-2xl">
+                        <CardHeader className="flex flex-row items-center justify-between border-b border-[#F0F0F0] pb-4">
+                            <div className="space-y-0.5">
+                                <CardTitle className="text-[#050505] tracking-widest text-[11px] uppercase font-black">
                                     Eternal Node Configuration
                                 </CardTitle>
-                                <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">
+                                <p className="text-[9px] text-[#888888] uppercase tracking-widest font-bold">
                                     Browser-Based Gossip Propagation Hub
                                 </p>
                             </div>
-                            <Badge variant={isNodeActive ? "emerald" : "outline"} className="px-4 py-1.5 uppercase tracking-widest text-[9px] font-black border-emerald-500/20">
+                            <Badge variant={isNodeActive ? "default" : "outline"} className={`px-3 py-1 uppercase tracking-widest text-[9px] font-black ${isNodeActive ? 'bg-[#00C076] hover:bg-[#00C076]/90 text-white border-transparent' : 'text-[#888888] border-[#E5E5E5]'}`}>
                                 {isNodeActive ? 'Live • Gossiping' : 'Dormant'}
                             </Badge>
                         </CardHeader>
-                        <CardContent className="pt-8">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                        <CardContent className="pt-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-4">
                                         <Switch
                                             id="node-toggle"
                                             checked={isNodeActive}
@@ -158,111 +167,95 @@ const SovereignIntelTab: React.FC = () => {
                                                 setIsNodeActive(val);
                                                 addLog(val ? 'Requesting Node Bootstrap...' : 'Deactivating Node...', val ? 'info' : 'warning');
                                             }}
-                                            className="data-[state=checked]:bg-emerald-500"
+                                            className="data-[state=checked]:bg-[#050505]"
                                         />
-                                        <label htmlFor="node-toggle" className="text-lg font-bold text-white/80 cursor-pointer">
+                                        <label htmlFor="node-toggle" className="text-sm font-black text-[#050505] cursor-pointer">
                                             {isNodeActive ? 'Autonomous Status: ACTIVE' : 'Activate Eternal Node'}
                                         </label>
                                     </div>
-                                    <p className="text-xs text-white/30 max-w-md leading-relaxed">
+                                    <p className="text-[11px] text-[#888888] max-w-md leading-relaxed font-medium">
                                         Activating the node allows your terminal to participate in the decentralized gossip of block metadata and thermodynamic signals. Your IP is masked via WebRTC multi-hop.
                                     </p>
                                 </div>
                                 
-                                <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
-                                        <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">Active Peers</p>
-                                        <p className="text-2xl font-black text-white">{nodeMetrics.peers}</p>
+                                <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
+                                    <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] text-center">
+                                        <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Active Peers</p>
+                                        <p className="text-xl font-black text-[#050505]">{nodeMetrics.peers}</p>
                                     </div>
-                                    <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
-                                        <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">Peer Latency</p>
-                                        <p className="text-2xl font-black text-emerald-500">{isNodeActive ? '14ms' : '--'}</p>
+                                    <div className="p-4 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] text-center">
+                                        <p className="text-[9px] text-[#888888] uppercase tracking-widest mb-1 font-bold">Latency</p>
+                                        <p className="text-xl font-black text-[#00C076]">{isNodeActive ? '14ms' : '--'}</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Node Protocol Visualizer (Simplified) */}
-                            <div className="mt-8 p-4 rounded-xl bg-black/40 border border-emerald-500/5 font-mono text-[10px] space-y-1.5 opacity-60">
-                                <p className="text-emerald-500/40">[SYSTEM] Kademlia DHT Initialized...</p>
-                                <p className="text-white/40">[GOSSIP] Peer 0xAA23...B21 connected</p>
-                                {isNodeActive && (
-                                    <motion.p 
-                                        initial={{ opacity: 0 }} 
-                                        animate={{ opacity: 1 }} 
-                                        transition={{ repeat: Infinity, duration: 2 }}
-                                        className="text-white/60"
-                                    >
-                                        [NETWORK] Receiving thermodynamic block: 0x821...890 (Z-Score: 0.92)
-                                    </motion.p>
-                                )}
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Walkaway Protection */}
-                    <div className="space-y-6">
-                        <Suspense fallback={<div className="h-64 rounded-2xl bg-white/5 animate-pulse" />}>
+                    <div className="space-y-4">
+                        <Suspense fallback={<div className="h-44 rounded-2xl bg-[#E5E5E5] animate-pulse" />}>
                             <WalkawayPanel />
                         </Suspense>
-
-                        <Card className="border-white/5 bg-black/40 p-6 flex flex-col gap-4">
-                            <div className="flex items-center gap-3">
-                                <Globe size={18} className="text-white/20" />
-                                <h4 className="text-[10px] uppercase font-black tracking-widest text-white/40">Network Map</h4>
-                            </div>
-                            <div className="h-32 rounded-xl bg-emerald-500/5 border border-emerald-500/5 flex items-center justify-center relative overflow-hidden">
-                                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--emerald-500)_1px,transparent_0)] bg-[size:16px_16px]" />
-                                <span className="text-[10px] font-bold text-white/20 z-10">TOPOLOGY VISUALIZER LOADING...</span>
-                            </div>
-                        </Card>
                     </div>
-            </div>
+                </div>
 
-            {/* VOSS COSMIC DIRECTIVES — flex-1 scrollable panel */}
-            <div className="flex-1 min-h-0 w-full flex flex-col border border-emerald-500/10 rounded-2xl bg-black/60 overflow-hidden shadow-2xl">
-                    <div className="p-4 border-b border-emerald-500/10 bg-emerald-500/5 flex items-center justify-between shrink-0">
-                        <div className="flex items-center gap-3">
-                            <Zap className="text-emerald-500" size={16} />
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">
+                {/* VOSS MATRIX DIRECTIVES */}
+                <div className="flex-1 min-h-0 w-full flex flex-col border border-[#E5E5E5] rounded-2xl bg-[#FFFFFF] overflow-hidden shadow-sm">
+                    <div className="px-5 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-2">
+                            <Zap className="text-[#050505]" size={14} />
+                            <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">
                                 Voss Cosmic Plan Matrix — 500 Dimensions
                             </h2>
                         </div>
-                        <input 
-                            value={vossSearch}
-                            onChange={e => setVossSearch(e.target.value)}
-                            placeholder="QUERY_AKASHIC_DIRECTIVES..."
-                            className="bg-black/50 border border-emerald-500/20 px-4 py-1.5 rounded-lg text-[9px] uppercase tracking-widest outline-none focus:border-emerald-500/50 transition-colors w-64 placeholder:text-emerald-500/20"
-                        />
-                    </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-                        <div className="space-y-2">
-                            {filteredVoss.map(item => (
-                                <div key={item.id} className="grid md:grid-cols-12 gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-emerald-500/[0.02] hover:border-emerald-500/20 transition-all items-center">
-                                    <div className="md:col-span-1 text-[10px] font-black text-emerald-500/30">
-                                        #{item.id}
-                                    </div>
-                                    <div className="md:col-span-3 space-y-1">
-                                        <div className="text-[11px] font-bold text-white/90 uppercase tracking-widest">{item.title}</div>
-                                        <div className="text-[8px] text-emerald-500/50 uppercase tracking-[0.2em]">{item.categoryName}</div>
-                                    </div>
-                                    <div className="md:col-span-4 text-[9px] text-white/40 leading-relaxed max-w-sm">
-                                        {item.description}
-                                    </div>
-                                    <div className="md:col-span-2 flex flex-col gap-1">
-                                        <span className="text-[7px] text-emerald-500/30 uppercase tracking-[0.2em]">Competitive Edge</span>
-                                        <span className="text-[9px] text-emerald-500/80 font-bold">{item.competitiveEdge}</span>
-                                    </div>
-                                    <div className="md:col-span-2 flex items-center justify-end gap-2">
-                                        <Badge variant="outline" className={`text-[8px] uppercase tracking-widest ${item.priority === 'Crítica' ? 'border-red-500/30 text-red-400' : 'border-emerald-500/30 text-emerald-500'}`}>
-                                            {item.priority}
-                                        </Badge>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="relative">
+                            <input 
+                                value={vossSearch}
+                                onChange={e => setVossSearch(e.target.value)}
+                                placeholder="Filter directives..."
+                                className="bg-[#FFFFFF] border border-[#E5E5E5] px-3 py-1.5 rounded-lg text-[10px] font-medium outline-none focus:border-[#050505] transition-colors w-64 placeholder:text-[#888888] text-[#050505]"
+                            />
                         </div>
+                    </div>
+                    
+                    {/* The list header */}
+                    <div className="grid grid-cols-12 gap-4 px-5 py-2.5 bg-[#FAF9F6] border-b border-[#F0F0F0] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0">
+                        <div className="col-span-1">ID</div>
+                        <div className="col-span-3">Directive</div>
+                        <div className="col-span-4">Description</div>
+                        <div className="col-span-2">Competitive Edge</div>
+                        <div className="col-span-2 text-right">Priority</div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        {filteredVoss.map(item => (
+                            <div key={item.id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors items-start">
+                                <div className="col-span-1 text-[10px] font-black text-[#888888] pt-0.5">
+                                    #{item.id}
+                                </div>
+                                <div className="col-span-3 space-y-0.5">
+                                    <div className="text-[11px] font-black text-[#050505]">{item.title}</div>
+                                    <div className="text-[8px] text-[#888888] font-bold uppercase tracking-widest">{item.categoryName}</div>
+                                </div>
+                                <div className="col-span-4 text-[10px] text-[#888888] leading-relaxed font-medium">
+                                    {item.description}
+                                </div>
+                                <div className="col-span-2 text-[10px] text-[#050505] font-bold leading-relaxed pt-0.5">
+                                    {item.competitiveEdge}
+                                </div>
+                                <div className="col-span-2 flex items-center justify-end">
+                                    <Badge variant="outline" className={`text-[8px] uppercase tracking-widest px-2 py-0.5 font-black ${
+                                        item.priority === 'Crítica' ? 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20' : 
+                                        'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20'
+                                    }`}>
+                                        {item.priority}
+                                    </Badge>
+                                </div>
+                            </div>
+                        ))}
                         {filteredVoss.length === 0 && (
-                            <div className="p-12 text-center text-[10px] uppercase tracking-[0.5em] text-emerald-500/20 font-black">
-                                NO DIRECTIVES FOUND IN AKASHIC LEDGER
+                            <div className="p-12 text-center text-[10px] uppercase tracking-widest text-[#888888] font-black">
+                                No directives found
                             </div>
                         )}
                     </div>
@@ -272,28 +265,28 @@ const SovereignIntelTab: React.FC = () => {
     );
 };
 
-const MetricCard = ({ title, value, subtitle, icon, color }: { 
-    title: string; value: string; subtitle: string; icon: React.ReactNode; color: 'emerald' | 'amber' | 'red' | 'white' 
+const MetricCard = ({ title, value, subtitle, icon, accent }: { 
+    title: string; value: string; subtitle: string; icon: React.ReactNode; accent: 'green' | 'amber' | 'red' | 'black' 
 }) => {
     const colors = {
-        emerald: 'text-emerald-500',
-        amber: 'text-amber-500',
-        red: 'text-red-500',
-        white: 'text-white'
+        green: 'text-[#00C076]',
+        amber: 'text-[#FF9500]',
+        red: 'text-[#FF3B30]',
+        black: 'text-[#050505]'
     };
     
     return (
-        <Card className="border-white/5 bg-black/40 backdrop-blur-xl group hover:border-emerald-500/20 transition-all">
-            <CardHeader className="pb-2">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] uppercase tracking-widest text-white/30 font-black">{title}</span>
-                    <span className="text-white/20 group-hover:text-emerald-500/50 transition-colors">{icon}</span>
+        <Card className="border-[#E5E5E5] bg-[#FFFFFF] shadow-sm rounded-2xl group hover:border-[#050505]/20 transition-all flex flex-col justify-between p-4">
+            <div>
+                <div className="flex items-center justify-between mb-3">
+                    <span className="text-[9px] uppercase tracking-[0.15em] text-[#888888] font-black">{title}</span>
+                    <span className="text-[#888888] group-hover:text-[#050505] transition-colors">{icon}</span>
                 </div>
-                <CardTitle className={`text-3xl font-black ${colors[color]} tracking-tighter`}>{value}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-[9px] uppercase tracking-widest text-white/20 font-bold">{subtitle}</p>
-            </CardContent>
+                <div className={`text-2xl lg:text-3xl font-black ${colors[accent]} tracking-tighter`}>{value}</div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-[#F0F0F0]">
+                <p className="text-[9px] uppercase tracking-widest text-[#888888] font-bold">{subtitle}</p>
+            </div>
         </Card>
     );
 };

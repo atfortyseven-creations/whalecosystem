@@ -8,6 +8,8 @@ import dynamic from "next/dynamic";
 import { Github, Twitter } from "lucide-react";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
+import { QRCodeSVG } from "qrcode.react";
+import { Wallet } from "lucide-react";
 
 const DynamicCryptoCheckoutModal = dynamic(
   () => import("@/components/news/CryptoCheckoutModal").then((m) => m.CryptoCheckoutModal),
@@ -24,10 +26,13 @@ export default function WhaleAlertLanding() {
   const { open } = useAppKit();
   const [showGate, setShowGate] = useState(false);
 
+  const [syncToken, setSyncToken] = useState("");
+
   useEffect(() => {
     if (!address && !sessionStorage.getItem('visited_connect')) {
       sessionStorage.setItem('visited_connect', '1');
     }
+    setSyncToken(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
   }, [address]);
 
   const handleEntry = () => {
@@ -84,88 +89,63 @@ export default function WhaleAlertLanding() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[3.5rem] md:text-[5.5rem] font-black tracking-tighter leading-[0.9] text-center uppercase italic" 
+            className="text-[3.5rem] md:text-[6.5rem] font-black tracking-tighter leading-[0.9] text-center uppercase" 
             style={{ color: INK }}
           >
-            The Sovereignty <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-black via-black/40 to-black/20">Protocol</span>
+            WHALE ALERT <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-black via-black/40 to-black/20">NETWORK</span>
           </motion.h1>
           <div className="w-20 h-1 bg-black/10 mt-12 mb-8 rounded-full" />
-          <p className="text-[14px] font-black uppercase tracking-[0.6em] text-black/30">Whale Alert Network · v6.12.0</p>
+          <p className="text-[14px] font-black uppercase tracking-[0.6em] text-black/30 mb-16">Global Ecosystem · v6.12.0</p>
+          
+          {/* iOS & Android PC connection & QR zone */}
+          <div className="w-full max-w-2xl bg-white/60 backdrop-blur-md border border-black/5 rounded-[2rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.05)] flex flex-col md:flex-row items-center gap-12 relative overflow-hidden">
+             
+             {/* Text and Button Section */}
+             <div className="flex-1 space-y-6 text-center md:text-left relative z-10">
+                <div>
+                   <h2 className="text-xl font-black uppercase tracking-tight text-black mb-1">Synchronize Session</h2>
+                   <p className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-black">iOS & Android Compatible</p>
+                </div>
+                <p className="text-[11px] leading-relaxed text-black/50 font-bold max-w-sm">
+                   Connect your mobile wallet securely to the PC terminal using an encrypted cryptographic handshake. Scan the QR code with your mobile camera.
+                </p>
+                <div className="pt-4">
+                  <button 
+                    onClick={handleEntry}
+                    className="w-full md:w-auto bg-[#050505] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-black/80 transition-all border border-black shadow-md flex items-center justify-center gap-3"
+                  >
+                    <Wallet size={14} />
+                    {address ? "Access Terminal" : "Direct Web3 Connect"}
+                  </button>
+                </div>
+             </div>
+             
+             {/* QR Code Section */}
+             <div className="shrink-0 flex flex-col items-center gap-5 border-t md:border-t-0 md:border-l border-black/10 pt-8 md:pt-0 md:pl-12 w-full md:w-auto relative z-10">
+                <div className="p-5 bg-white rounded-2xl border border-black/5 shadow-sm">
+                   {syncToken ? (
+                      <QRCodeSVG 
+                         value={`https://humanidfi.com/sync?session=${syncToken}`} 
+                         size={140} 
+                         fgColor="#050505" 
+                         bgColor="#ffffff" 
+                         level="H"
+                         imageSettings={{ src: "/official-whale-monochrome.png", width: 32, height: 32, excavate: true }}
+                      />
+                   ) : (
+                      <div className="w-[140px] h-[140px] bg-black/5 animate-pulse rounded-xl" />
+                   )}
+                </div>
+                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-black/40 bg-white/80 px-3 py-1.5 rounded-full border border-black/5">
+                   <div className="w-1.5 h-1.5 bg-[#00C076] rounded-full animate-pulse shadow-[0_0_8px_#00C076]" />
+                   Awaiting Scan
+                </div>
+             </div>
+          </div>
         </div>
 
-        <div className="space-y-16">
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>The Origin and Vision</h2>
-            <p className="mb-4">
-              The blockchain ecosystem suffers from a fundamental asymmetry of information. The raw data produced by public distributed ledgers is theoretically visible to anyone. In practice, however, the velocity, volume, and structural complexity of that data mean that only those with access to advanced indexing infrastructure can extract meaning from it in time to act upon that meaning. A private institution with a team of engineers can deploy purpose-built systems to detect a significant capital movement on the Ethereum mainnet nearly four minutes before that movement propagates through the public mempool. An individual operating without institutional infrastructure cannot.
-            </p>
-            <p className="mb-4">
-              This asymmetry is not a natural law. It is a consequence of the complexity barrier that separates raw on-chain data from actionable intelligence. The Whale Alert Network was conceived specifically to dismantle that barrier, to build from first principles an intelligence system capable of detecting, verifying, and disseminating high value capital movements with accuracy and latency sufficient to place the individual user on the same informational footing as an institutional actor.
-            </p>
-            <p>
-              The vision that guided the construction of this system was intentionally uncompromising. There would be no mock data, no placeholders, no simulated signals, and no fallback to approximate values in cases where real data was temporarily unavailable. Every signal surfaced by the system would be sourced directly from live blockchain state verified on chain, processed cryptographically, and delivered with an editorial context that a trained analyst could act upon immediately. The system is operational infrastructure, built with absolute precision.
-            </p>
-          </section>
 
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>Architectural Philosophy</h2>
-            <p className="mb-4">
-              The zero mock mandate ensures no component of the system displays fabricated data in place of real on-chain state. This decision has immediate and far-reaching implications for every subsequent design choice. It rules out the possibility of static demonstration modes. It requires that every data pipeline from blockchain node connection through downstream networks to the rendering layer be fully operational at all times.
-            </p>
-            <p className="mb-4">
-              The sovereignty principle dictates that every interaction a user conducts with the system must occur without creating any dependency on the system servers for the security of their assets. The server layer provides intelligence. It does not under any circumstances touch private keys, hold funds in custody, or make decisions on the user's behalf.
-            </p>
-            <p>
-              The institutional grade standard mandates that the production quality must be indistinguishable from that of an institutional engineering organization. This standard applies to code quality, interface design, database schema structure, error handling, security posture, and visual presentation.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>The Ingestion Engine</h2>
-            <p>
-              The ingestion engine is the operational core of the Whale Alert Network. It is the component responsible for acquiring raw blockchain data across sixteen parallel networks, applying the first layer of significance filtering based on dynamic statistical thresholds, and routing the resulting verified events to the downstream intelligence mesh.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>Sovereign Mesh Protocol</h2>
-            <p>
-              The Sovereign Mesh is the primary distribution layer that propagates verified intelligence from the ingestion engine to all connected clients seamlessly. It operates as a high-frequency, low-latency network with strict access control, ensuring that authenticated intelligence reaches users with minimal delay and maximum reliability across all defined significance tiers.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>The Akashic Ledger</h2>
-            <p>
-              The Akashic Ledger constitutes the permanent institutional memory of the Whale Alert Network. It serves as the definitive, verified, immutable record of every capital movement that crosses the threshold of systemic significance, providing historical context and permanent documentation for crucial macroeconomic shifts on-chain.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>Mass Transfer Intelligence</h2>
-            <p>
-              The Mass Transfer Intelligence module is explicitly designed to detect and surface a specific category of capital movement that isolated transaction monitoring cannot identify. It maps coordinated multi-address, multi-chain capital flows that collectively reveal an institutional position adjustment of substantial magnitude before it resolves on the market.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>The Sovereign Vault</h2>
-            <p>
-              The Sovereign Vault is the non-custodial wallet management system that empowers users to interact with the full suite of on-chain operations available through the sovereign terminal interface. All key generation and transaction signing execute purely within isolated local environments, ensuring absolute personal sovereignty over capital.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>Zero Knowledge Infrastructure</h2>
-            <p>
-              The zero knowledge proof infrastructure provides two distinct and essential capabilities: private signal authentication for the underlying data mesh, and definitive identity verification for Sybil-resistant access control without ever compromising user privacy or biometric data.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-[14px] uppercase tracking-widest font-black mb-4" style={{ color: INK }}>The Data Persistence Layer</h2>
-          </section>
 
           {/* Supported Wallets Section - Institutional Fidelity */}
           <section className="pt-20 border-t border-black/5">

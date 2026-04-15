@@ -139,11 +139,11 @@ export function VirtualizedFirehose() {
     };
 
     return (
-        <div className="w-full h-auto flex items-start justify-center p-0 md:p-4">
-        <div className="w-full h-auto min-h-[700px] shrink-0 flex flex-col bg-[#FFFFFF] border border-[#E5E5E5] rounded-xl shadow-sm relative group overflow-hidden">
+        <div className="w-full h-full p-4 md:p-6 flex flex-col overflow-hidden text-[#050505] font-sans">
+            <div className="flex-1 w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col min-h-0 relative group overflow-hidden">
 
             {/* HEADER */}
-            <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5] bg-[#FAF9F6] rounded-t-xl">
+            <div className="shrink-0 flex items-center justify-between p-4 border-b border-[#E5E5E5] bg-[#FAF9F6] rounded-t-xl z-20">
                 <div className="flex items-center gap-3">
                     <Activity size={16} className="text-[#00C076] animate-pulse" />
                     <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#050505]">
@@ -166,8 +166,7 @@ export function VirtualizedFirehose() {
 
             {/* VIRTUALIZED LIST CONTAINER */}
             <div
-                className="flex-1 relative w-full"
-                style={{ height: 750 }}
+                className="flex-1 relative w-full min-h-0"
                 onMouseEnter={() => {
                     setAutoScroll(false);
                     setShowJumpTop(true);
@@ -221,7 +220,7 @@ export function VirtualizedFirehose() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             onClick={handleJumpTop}
-                            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-[#00FF55] text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-[0_10px_30px_rgba(0,255,85,0.4)] hover:scale-105 transition-transform active:scale-95"
+                            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-[#050505] text-[#FAF9F6] text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-105 transition-transform active:scale-95 border border-[#E5E5E5]/20"
                         >
                             <ChevronUp size={12} /> Jump to Live Stream
                         </motion.button>
@@ -230,7 +229,7 @@ export function VirtualizedFirehose() {
             </div>
 
             {/* FOOTER */}
-            <div className="p-4 border-t border-[#E5E5E5] bg-[#FAF9F6] rounded-b-xl flex items-center justify-between">
+            <div className="shrink-0 p-4 border-t border-[#E5E5E5] bg-[#FAF9F6] rounded-b-xl flex items-center justify-between z-20">
                 <span className="text-[8px] font-mono text-[#888888] uppercase tracking-[0.3em]">
                     Powered by Zero-Knowledge Nodes
                 </span>

@@ -206,9 +206,11 @@ export function PremiumMatrixStack() {
         : PERFECTION_TOKENS.slice(5, 10);
 
     return (
-        <div className="w-full h-full flex flex-col space-y-8 animate-in fade-in duration-700 font-sans overflow-y-auto msv-hide-scrollbar">
+    return (
+        <div className="w-full h-full flex flex-col gap-6 p-6 animate-in fade-in duration-700 font-sans overflow-hidden">
 
             {/* ─── DRAGGABLE STAT CARDS ─── */}
+            <div className="shrink-0 h-[160px]">
             <Reorder.Group
                 axis="x"
                 values={cards}
@@ -285,9 +287,11 @@ export function PremiumMatrixStack() {
                     </Reorder.Item>
                 ))}
             </Reorder.Group>
+            </div>
 
-            {/* ─── TERMINAL CONTROLS ─── */}
-            <div className="mt-8 flex items-center justify-between border-b-2 border-[#E5E5E5] pb-4 bg-white/70 backdrop-blur-md p-4 rounded-t-xl mb-0 shadow-sm border border-b-0 border-[#E5E5E5]">
+            {/* ─── TERMINAL CONTROLS & TABLE SPLIT ─── */}
+            <div className="flex-1 min-h-0 flex flex-col bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden">
+                <div className="shrink-0 flex items-center justify-between border-b-2 border-[#E5E5E5] p-4 bg-[#FAF9F6]">
                 <div className="flex items-center gap-6">
                     <h3 className="text-2xl font-serif font-black tracking-tight text-[#050505] uppercase drop-shadow-sm">
                         Terminal Feed
@@ -338,28 +342,31 @@ export function PremiumMatrixStack() {
                 </div>
             </div>
 
-            {/* ─── MASTER TABLE ─── */}
-            <div className="w-full border border-[#E5E5E5] bg-white overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-b-xl border-t-0">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-[#FAF9F6] border-b-2 border-[#E5E5E5]">
-                        <tr>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Asset Index</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Last Market Price</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Realized 24h Move</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Total 24h Vol</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Spread Edge</th>
-                            <th className="py-4 px-6 text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Momentum RSI</th>
-                            <th className="py-4 px-6 text-right text-[9px] font-black text-[#050505] uppercase tracking-[0.2em]">Ops</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <AnimatePresence mode="popLayout">
-                            {displayTokens.map((token, idx) => (
-                                <ProTokenRow key={token} symbol={token} index={idx} />
-                            ))}
-                        </AnimatePresence>
-                    </tbody>
-                </table>
+                </div>
+
+                {/* ─── MASTER TABLE ─── */}
+                <div className="flex-1 min-h-0 overflow-y-auto msv-hide-scrollbar">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-[#FAF9F6] border-b-2 border-[#E5E5E5] sticky top-0 z-20">
+                            <tr>
+                                <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Asset Index</th>
+                                <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Last Market Price</th>
+                                <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Realized 24h Move</th>
+                                <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Total 24h Vol</th>
+                                <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Spread Edge</th>
+                                <th className="py-4 px-6 text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Momentum RSI</th>
+                                <th className="py-4 px-6 text-right text-[9px] font-black text-[#888888] uppercase tracking-[0.2em]">Ops</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <AnimatePresence mode="popLayout">
+                                {displayTokens.map((token, idx) => (
+                                    <ProTokenRow key={token} symbol={token} index={idx} />
+                                ))}
+                            </AnimatePresence>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>

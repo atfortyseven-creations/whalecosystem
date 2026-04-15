@@ -124,11 +124,11 @@ export function NewsOfToday() {
     );
 
     return (
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex justify-center py-4 text-[#050505] font-sans">
-            <div className="w-full h-fit bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden shrink-0">
+        <div className="w-full h-full p-6 flex flex-col text-[#050505] font-sans overflow-hidden">
+            <div className="flex-1 w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden flex flex-col min-h-0">
                 
                 {/* ── EXCHANGE STATUS TICKER ── */}
-                <div className="w-full border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center px-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 gap-8">
+                <div className="shrink-0 w-full border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center px-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 gap-8">
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#888888] shrink-0">
                         <Clock size={12} />
                         Global Markets
@@ -144,7 +144,7 @@ export function NewsOfToday() {
                 </div>
 
                 {/* ── THE POST HEADER ── */}
-                <div className="px-6 md:px-10 py-8 border-b-2 border-[#E5E5E5] flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white">
+                <div className="shrink-0 px-6 md:px-10 py-8 border-b-2 border-[#E5E5E5] flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white shrink-0">
                     <div className="flex flex-col">
                         <ScrollFloat 
                             containerClassName="mb-0"
@@ -173,7 +173,7 @@ export function NewsOfToday() {
                 </div>
 
                 {/* ── NEWS STACK ── */}
-                <div className="flex flex-col divide-y divide-[#E5E5E5]">
+                <div className="flex-1 overflow-y-auto msv-hide-scrollbar flex flex-col divide-y divide-[#E5E5E5]">
                     {filtered.map((a) => {
                         const isExpanded = expandedId === a.id;
                         return (

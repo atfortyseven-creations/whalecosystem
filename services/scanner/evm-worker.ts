@@ -11,6 +11,23 @@ dotenv.config();
 
 const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
 
+// ── MAX EFFICIENCY: In-worker price cache (30s TTL) ──────────────────────
+// Without this, getRealTimePrice() is called for EVERY ERC-20 transfer event.
+// On a busy block (hundreds of transfers) this would drain the CU quota instantly.
+// This cache batches requests per symbol across the entire block cycle.
+const _priceCache = new Map<string, { price: number; ts: number }>();
+const PRICE_CACHE_TTL = 30_000; // 30 seconds
+
+async function getCachedPrice(symbol: string): Promise<number> {
+  const cached = _priceCache.get(symbol);
+  if (cached && Date.now() - cached.ts < PRICE_CACHE_TTL) {
+    return cached.price;
+  }
+  const price = await getRealTimePrice(symbol) || 1;
+  _priceCache.set(symbol, { price, ts: Date.now() });
+  return price;
+}
+
 const TOKEN_CONFIG: Record<string, { symbol: string, decimals: number }> = {
   // --- BASE ---
   "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913": { symbol: "USDC", decimals: 6 },
@@ -69,7 +86,7 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
             return; // Malformed log — skip silently, do NOT crash the daemon
         }
 
-        const price = await getRealTimePrice(config.symbol) || 1;
+        const price = await getCachedPrice(config.symbol);
         const usdValue = tokenAmount * price;
 
         if (usdValue >= WHALE_THRESHOLD_USD) {
@@ -94,7 +111,7 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
     // MAX_BLOCK_CHUNK=50 guarantees complete ingestion even after long downtime.
     const MAX_BLOCK_CHUNK = 50;
     let consecutiveErrors = 0;
-    const MAX_BACKOFF_MS  = 5 * 60_000;
+    const MAX_BACKOFF_MS  = 30_000; // REDUCED FROM 5 MIN TO 30 SEC FOR MULTIPLEXER AGILITY
 
     while (true) {
         try {
@@ -109,7 +126,7 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
                 for (const log of logs) {
                     const config = TOKEN_CONFIG[log.address.toLowerCase()];
                     if (config) {
-                        const price = await getRealTimePrice(config.symbol) || 1;
+                        const price = await getCachedPrice(config.symbol);
                         let tokenAmount = 0;
                         try {
                             tokenAmount = parseFloat(ethers.formatUnits(
@@ -134,7 +151,10 @@ async function startPollingWorker(resilient: ResilientProvider, chainLabel: stri
                 lastProcessedBlock = toBlock; // Advance only to processed toBlock, not currentBlock
             }
             consecutiveErrors = 0;
-            await new Promise(r => setTimeout(r, 12_000));
+            // Adaptive polling: if no new block was detected, slow down to 15s to save CUs.
+            // If new blocks were found, stay aggressive at 6s.
+            const noNewBlock = !(await resilient.call<number>(p => p.getBlockNumber()).then(b => b > lastProcessedBlock).catch(() => false));
+            await new Promise(r => setTimeout(r, noNewBlock ? 15_000 : 6_000));
         } catch (e: any) {
             consecutiveErrors++;
             const backoff = Math.min(30_000 * Math.pow(2, consecutiveErrors - 1), MAX_BACKOFF_MS);

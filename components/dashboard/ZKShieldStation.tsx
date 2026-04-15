@@ -49,8 +49,8 @@ export function ZKShieldStation() {
     };
 
     return (
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col items-center p-4">
-        <div className="h-full min-h-[600px] w-full bg-[#FFFFFF] text-[#050505] border border-[#E5E5E5] rounded-2xl font-sans flex flex-col overflow-hidden shrink-0 shadow-sm">
+        <div className="w-full h-full p-4 flex flex-col items-center overflow-hidden">
+        <div className="w-full h-full flex-1 min-h-0 bg-[#FFFFFF] text-[#050505] border border-[#E5E5E5] rounded-2xl font-sans flex flex-col overflow-hidden shadow-sm">
             
             {/* ── ACADEMIC INTRO ── */}
             <div className="p-8 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between shrink-0">
