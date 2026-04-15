@@ -35,22 +35,71 @@ Object.entries(BINANCE_MAP).forEach(([key, val]) => {
 
 export const STEEL_DOME_FALLBACKS: Record<string, number> = {};
 
-// ── WSS ENGINE ──
+// ── WSS ENGINE — Multi-endpoint with exponential backoff ——————————————————————————
+// HTTP 451 = geo-block on stream.binance.com from some Railway regions.
+// We cycle through multiple known endpoints before falling back to REST.
+const WSS_ENDPOINTS = [
+  'wss://data-stream.binance.vision/ws/!miniTicker@arr',
+  'wss://stream.binance.com:9443/ws/!miniTicker@arr',
+  'wss://stream.binance.com/ws/!miniTicker@arr',
+];
+
 let isWsConnected = false;
 let wsConnection: any = null;
+let wsReconnectAttempts = 0;
+let wsEndpointIndex = 0;
+let wsRestFallbackInterval: ReturnType<typeof setInterval> | null = null;
+const WSS_MAX_ATTEMPTS_BEFORE_REST = 6; // after 6 failed WS attempts, switch to REST polling
+
+function startRestFallback() {
+  if (wsRestFallbackInterval) return; // already running
+  console.log('[PriceHelper] Switching to Binance REST polling (WSS geo-blocked)');
+  wsRestFallbackInterval = setInterval(async () => {
+    try {
+      const symbols = Object.values(BINANCE_MAP).slice(0, 20); // top 20 to avoid rate-limit
+      const q = encodeURIComponent(JSON.stringify(symbols));
+      const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${q}`, {
+        signal: AbortSignal.timeout(8000),
+        cache: 'no-store',
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        data.forEach((item: any) => {
+          const sym = REVERSE_MAP[item.symbol];
+          if (sym) {
+            priceCache[sym] = {
+              price: parseFloat(item.lastPrice),
+              change24h: parseFloat(item.priceChangePercent),
+              timestamp: Date.now(),
+            };
+          }
+        });
+      }
+    } catch { /* silent — REST may also be rate-limited */ }
+  }, 30_000); // poll every 30 seconds
+}
 
 function connectBinanceWs() {
   if (isWsConnected || typeof window !== 'undefined') return;
+
+  // If every WSS endpoint has failed repeatedly, fall back to REST polling
+  if (wsReconnectAttempts >= WSS_MAX_ATTEMPTS_BEFORE_REST) {
+    startRestFallback();
+    return;
+  }
+
   isWsConnected = true;
+  const endpoint = WSS_ENDPOINTS[wsEndpointIndex % WSS_ENDPOINTS.length];
 
   try {
-    const url = `wss://stream.binance.com:9443/ws/!ticker@arr`;
     const WS = globalThis.WebSocket || require('ws');
-    const ws = new WS(url);
+    const ws = new WS(endpoint);
     wsConnection = ws;
 
     ws.onopen = () => {
-      console.log('[PriceHelper] Binance !ticker@arr WSS Connected - Zero-Latency Feed Active');
+      console.log(`[PriceHelper] WSS Connected — ${endpoint}`);
+      wsReconnectAttempts = 0; // reset on success
     };
 
     ws.onmessage = (event: any) => {
@@ -59,37 +108,46 @@ function connectBinanceWs() {
         const payload = JSON.parse(dataStr);
         if (Array.isArray(payload)) {
           payload.forEach((data: any) => {
-             const symbol = REVERSE_MAP[data.s];
-             if (symbol) {
-               priceCache[symbol] = {
-                 price: parseFloat(data.c),
-                 change24h: parseFloat(data.P),
-                 timestamp: Date.now() // WSS keeps this permanently fresh
-               };
-             }
+            const symbol = REVERSE_MAP[data.s];
+            if (symbol) {
+              priceCache[symbol] = {
+                price: parseFloat(data.c),
+                change24h: parseFloat(data.P),
+                timestamp: Date.now(),
+              };
+            }
           });
         }
-      } catch (e) {
-        // silent parse error
-      }
+      } catch { /* silent parse error */ }
     };
 
     ws.onerror = (e: any) => {
-      console.warn('[PriceHelper] Binance WSS Error', e.message);
+      // 451 = geo-block. Log once per endpoint, then rotate silently.
+      const msg = e?.message || String(e);
+      if (msg.includes('451') || msg.includes('403')) {
+        console.warn(`[PriceHelper] WSS geo-blocked (${endpoint}). Rotating endpoint…`);
+        wsEndpointIndex++;
+      }
+      isWsConnected = false;
     };
 
     ws.onclose = () => {
       isWsConnected = false;
       wsConnection = null;
-      console.log('[PriceHelper] Binance WSS Closed. Reconnecting in 5s...');
-      setTimeout(connectBinanceWs, 5000);
+      wsReconnectAttempts++;
+      // Exponential backoff: 5s, 10s, 20s, 40s, 60s (cap)
+      const delay = Math.min(5_000 * Math.pow(2, wsReconnectAttempts - 1), 60_000);
+      setTimeout(connectBinanceWs, delay);
     };
-  } catch (e) {
+  } catch {
     isWsConnected = false;
+    wsReconnectAttempts++;
+    const delay = Math.min(5_000 * Math.pow(2, wsReconnectAttempts - 1), 60_000);
+    setTimeout(connectBinanceWs, delay);
   }
 }
 
-// Auto-initialize background WSS stream
+// Auto-initialize background WSS stream (server-side only)
 if (typeof window === 'undefined') {
   setTimeout(connectBinanceWs, 2000);
 }

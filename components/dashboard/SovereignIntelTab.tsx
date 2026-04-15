@@ -95,10 +95,10 @@ const SovereignIntelTab: React.FC = () => {
                 </div>
             </div>
 
-            <main className="flex-1 flex flex-col min-h-0 max-w-7xl mx-auto w-full p-8 space-y-8">
-                
-                {/* Thermodynamic Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <main className="flex-1 flex flex-col min-h-0 w-full p-4 gap-4 overflow-hidden">
+
+            {/* Thermodynamic KPI Grid — fixed height, never grows */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
                     <MetricCard 
                         title="Z-Score Atlas" 
                         value={mainframeData.zScore.toFixed(2)} 
@@ -127,9 +127,10 @@ const SovereignIntelTab: React.FC = () => {
                         icon={<Lock size={16} />}
                         color="red"
                     />
-                </div>
+            </div>{/* /KPI grid */}
 
-                <div className="flex-[0.4] grid grid-cols-1 lg:grid-cols-3 gap-8 shrink-0">
+            {/* Node Control + Walkaway — fixed shrink-0 row */}
+            <div className="shrink-0 grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Node Control Center */}
                     <Card className="lg:col-span-2 border-emerald-500/10 bg-black/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
@@ -215,10 +216,10 @@ const SovereignIntelTab: React.FC = () => {
                             </div>
                         </Card>
                     </div>
-                </div>
+            </div>
 
-                {/* VOSS COSMIC DIRECTIVES */}
-                <div className="flex-1 min-h-0 w-full flex flex-col border border-emerald-500/10 rounded-2xl bg-black/60 overflow-hidden shadow-2xl">
+            {/* VOSS COSMIC DIRECTIVES — flex-1 scrollable panel */}
+            <div className="flex-1 min-h-0 w-full flex flex-col border border-emerald-500/10 rounded-2xl bg-black/60 overflow-hidden shadow-2xl">
                     <div className="p-4 border-b border-emerald-500/10 bg-emerald-500/5 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3">
                             <Zap className="text-emerald-500" size={16} />

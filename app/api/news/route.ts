@@ -169,6 +169,8 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<UINewsArti
 }
 
 async function persistToDB(articles: UINewsArticle[]) {
+  // SOVEREIGN: Fully non-blocking. If the NewsArticle table hasn't been
+  // migrated yet (P2021), we skip silently — the live RSS feed is unaffected.
   for (const art of articles) {
     try {
       await prisma.newsArticle.upsert({
@@ -191,9 +193,12 @@ async function persistToDB(articles: UINewsArticle[]) {
         },
       });
     } catch (e: any) {
-        if (process.env.NODE_ENV !== 'production') {
-            console.warn('[WhaleNews] DB Upsert failed:', e.message);
-        }
+      const msg: string = e?.message || '';
+      const isTableMissing = msg.includes('does not exist') || msg.includes('P2021') || msg.includes('P1009');
+      // Only log in dev, and only for non-table-missing errors
+      if (process.env.NODE_ENV !== 'production' && !isTableMissing) {
+        console.warn('[WhaleNews] DB Upsert failed:', msg.slice(0, 200));
+      }
     }
   }
 }

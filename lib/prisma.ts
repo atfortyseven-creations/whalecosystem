@@ -34,10 +34,17 @@ function createPrismaClient(): PrismaClient {
             : ['query', 'error', 'warn'],
     });
 
-    // Evento de error global para no bloquear la app nunca
+    // Sovereign error filter: suppress P1009 (table not in DB yet) which floods logs
+    // during the window between schema push and migration. Log all other errors normally.
     if (process.env.NODE_ENV === 'production') {
         (client as any).$on('error', (e: any) => {
-            console.error('[PRISMA ERROR] Non-blocking:', e);
+            const msg: string = e?.message || '';
+            const isTableMissing = msg.includes('does not exist in the current database') ||
+                                   msg.includes('P1009') ||
+                                   msg.includes('P2021'); // table does not exist
+            if (!isTableMissing) {
+                console.error('[PRISMA] DB Error:', msg.slice(0, 300));
+            }
         });
     }
 
