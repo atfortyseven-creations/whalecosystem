@@ -40,11 +40,11 @@ export default function VossSupremacyPage() {
                     >
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-mono text-[#8C8C8C]">#{item.id}</span>
-                        <span className={\`text-xs font-mono px-2 py-1 uppercase tracking-wider \${
+                        <span className={`text-xs font-mono px-2 py-1 uppercase tracking-wider ${
                           item.priority === 'Crítica' ? 'bg-red-100 text-red-800' :
                           item.priority === 'Alta' ? 'bg-orange-100 text-orange-800' :
                           'bg-gray-100 text-gray-800'
-                        }\`}>
+                        }`}>
                           Prio: {item.priority}
                         </span>
                       </div>
