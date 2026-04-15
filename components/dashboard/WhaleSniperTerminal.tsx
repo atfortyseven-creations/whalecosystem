@@ -88,7 +88,7 @@ export default function WhaleSniperTerminal() {
   const activeCategory = GENESIS_CATEGORIES.find(c => c.id === activeTab) || GENESIS_CATEGORIES[1];
 
   return (
-    <div className="min-h-screen bg-[#000000] text-[#FFFFFF] font-mono flex flex-col relative overflow-hidden selection:bg-[#fff] selection:text-[#000] transform-gpu perspective-1000 will-change-transform">
+    <div className="h-full w-full bg-[#000000] text-[#FFFFFF] font-mono flex flex-col relative overflow-hidden selection:bg-[#fff] selection:text-[#000] transform-gpu perspective-1000 will-change-transform">
       
       {/* ── GENESIS STATUS BAR ── */}
       <header className="h-10 border-b border-white/5 bg-[#000000] flex items-center justify-between px-6 text-[10px] uppercase tracking-widest font-bold z-50">
@@ -160,8 +160,8 @@ export default function WhaleSniperTerminal() {
             </p>
           </div>
 
-          {/* Dynamic Module Rendering */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+          {/* Dynamic Module Rendering - Bounded to Zero-Scroll */}
+          <div className="flex-1 overflow-hidden p-4 md:p-6 flex flex-col relative">
             <AnimatePresence mode="wait">
               {tabLoading ? (
                  <motion.div 

@@ -152,15 +152,12 @@ export class WebSocketManager {
    * Reconnect with exponential backoff
    */
   private attemptReconnect(streams: string[]) {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('[WS] Max reconnection attempts reached');
-      return;
-    }
-
     this.reconnectAttempts++;
-    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000);
     
-    console.log(`[WS] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    // 50-Year Continuity: Never stop reconnecting. Cap delay at 60 seconds to prevent OOM/DDoS, but guarantee infinite uptime loop.
+    const delay = Math.min(this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts), 60000);
+    
+    console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts} — Sovereign Infinity Loop)`);
 
     setTimeout(() => {
       this.connect(streams);

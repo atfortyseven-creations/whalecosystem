@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Activity, Globe, Lock, Shield, Cpu, RefreshCw, Layers } from 'lucide-react';
 import { useDashboardStore } from '@/lib/store/useDashboardStore';
 import { initEternalNode, stopEternalNode } from '@/lib/p2p/eternalNode';
+import { VOSS_MASTER_MATRIX } from '@/lib/vossIntelligenceEngine';
 
 // Lazy load the Walkaway Panel for performance
 const WalkawayPanel = lazy(() => import('./WalkawayPanel').then(m => ({ default: m.WalkawayPanel })));
@@ -61,8 +62,14 @@ const SovereignIntelTab: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
+    const [vossSearch, setVossSearch] = useState('');
+    const filteredVoss = VOSS_MASTER_MATRIX.filter(v => 
+        v.title.toLowerCase().includes(vossSearch.toLowerCase()) || 
+        v.categoryName.toLowerCase().includes(vossSearch.toLowerCase())
+    );
+
     return (
-        <div className="flex-1 flex flex-col min-h-0 bg-[#0A0A0A] text-emerald-400 font-mono overflow-y-auto selection:bg-emerald-500/30">
+        <div className="flex-1 flex flex-col h-full bg-[#0A0A0A] text-emerald-400 font-mono overflow-hidden selection:bg-emerald-500/30">
             {/* Header / Brand Matrix */}
             <div className="p-8 border-b border-emerald-500/10 bg-black/40 backdrop-blur-md sticky top-0 z-20">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -88,7 +95,7 @@ const SovereignIntelTab: React.FC = () => {
                 </div>
             </div>
 
-            <main className="flex-1 max-w-7xl mx-auto w-full p-8 space-y-8">
+            <main className="flex-1 flex flex-col min-h-0 max-w-7xl mx-auto w-full p-8 space-y-8">
                 
                 {/* Thermodynamic Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -122,7 +129,7 @@ const SovereignIntelTab: React.FC = () => {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="flex-[0.4] grid grid-cols-1 lg:grid-cols-3 gap-8 shrink-0">
                     {/* Node Control Center */}
                     <Card className="lg:col-span-2 border-emerald-500/10 bg-black/60 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
@@ -210,19 +217,53 @@ const SovereignIntelTab: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Legacy Heritage Reference */}
-                <div className="mt-12 flex flex-col md:flex-row items-center justify-between border-t border-white/5 pt-8 gap-6 opacity-30 group hover:opacity-60 transition-opacity">
-                    <div className="space-y-1">
-                        <p className="text-[9px] uppercase tracking-[0.4em] font-black">Sovereign Community Ledger</p>
-                        <p className="text-[10px] font-mono">ETH: 0x7883...7b4a</p>
-                        <p className="text-[10px] font-mono">BTC: bc1qqq...psg6</p>
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <Shield size={24} />
-                        <div className="text-right">
-                            <p className="text-[9px] uppercase tracking-[0.4em] font-black underline">Inhabitant Verification</p>
-                            <p className="text-[10px] opacity-60">Verified On-Chain Intelligence</p>
+                {/* VOSS COSMIC DIRECTIVES */}
+                <div className="flex-1 min-h-0 w-full flex flex-col border border-emerald-500/10 rounded-2xl bg-black/60 overflow-hidden shadow-2xl">
+                    <div className="p-4 border-b border-emerald-500/10 bg-emerald-500/5 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-3">
+                            <Zap className="text-emerald-500" size={16} />
+                            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">
+                                Voss Cosmic Plan Matrix — 500 Dimensions
+                            </h2>
                         </div>
+                        <input 
+                            value={vossSearch}
+                            onChange={e => setVossSearch(e.target.value)}
+                            placeholder="QUERY_AKASHIC_DIRECTIVES..."
+                            className="bg-black/50 border border-emerald-500/20 px-4 py-1.5 rounded-lg text-[9px] uppercase tracking-widest outline-none focus:border-emerald-500/50 transition-colors w-64 placeholder:text-emerald-500/20"
+                        />
+                    </div>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+                        <div className="space-y-2">
+                            {filteredVoss.map(item => (
+                                <div key={item.id} className="grid md:grid-cols-12 gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-emerald-500/[0.02] hover:border-emerald-500/20 transition-all items-center">
+                                    <div className="md:col-span-1 text-[10px] font-black text-emerald-500/30">
+                                        #{item.id}
+                                    </div>
+                                    <div className="md:col-span-3 space-y-1">
+                                        <div className="text-[11px] font-bold text-white/90 uppercase tracking-widest">{item.title}</div>
+                                        <div className="text-[8px] text-emerald-500/50 uppercase tracking-[0.2em]">{item.categoryName}</div>
+                                    </div>
+                                    <div className="md:col-span-4 text-[9px] text-white/40 leading-relaxed max-w-sm">
+                                        {item.description}
+                                    </div>
+                                    <div className="md:col-span-2 flex flex-col gap-1">
+                                        <span className="text-[7px] text-emerald-500/30 uppercase tracking-[0.2em]">Competitive Edge</span>
+                                        <span className="text-[9px] text-emerald-500/80 font-bold">{item.competitiveEdge}</span>
+                                    </div>
+                                    <div className="md:col-span-2 flex items-center justify-end gap-2">
+                                        <Badge variant="outline" className={`text-[8px] uppercase tracking-widest ${item.priority === 'Crítica' ? 'border-red-500/30 text-red-400' : 'border-emerald-500/30 text-emerald-500'}`}>
+                                            {item.priority}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {filteredVoss.length === 0 && (
+                            <div className="p-12 text-center text-[10px] uppercase tracking-[0.5em] text-emerald-500/20 font-black">
+                                NO DIRECTIVES FOUND IN AKASHIC LEDGER
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>

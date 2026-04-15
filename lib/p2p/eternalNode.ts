@@ -9,7 +9,6 @@ import { gossipsub } from '@chainsafe/libp2p-gossipsub';
 import { identify } from '@libp2p/identify';
 import { webRTC } from '@libp2p/webrtc';
 import { webSockets } from '@libp2p/websockets';
-import { all } from '@libp2p/websockets/filters';
 import { bootstrap } from '@libp2p/bootstrap';
 
 let node: any = null;
@@ -36,9 +35,7 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
             },
             transports: [
                 webRTC(),
-                webSockets({
-                    filter: all
-                }),
+                webSockets(),
                 tcp()
             ],
             connectionEncryption: [noise()],
@@ -46,8 +43,12 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
             peerDiscovery: [
                 bootstrap({
                     list: [
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnoo2uR3u2nd6P3R9YpxTQU3kH9ndU1hL1p92437', // Example bootstrap
-                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa6A5TQU3nd6P3R9YpxTQU3kH9ndU1hL1p92437'
+                        // Primary DNS (Protocol Labs)
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmNnoo2uR3u2nd6P3R9YpxTQU3kH9ndU1hL1p92437',
+                        '/dnsaddr/bootstrap.libp2p.io/p2p/QmZa6A5TQU3nd6P3R9YpxTQU3kH9ndU1hL1p92437',
+                        // Secondary IPFS Swarm fallbacks (50-Year Sovereign continuity)
+                        '/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ',
+                        '/ip4/147.75.83.83/tcp/4001/p2p/QmbBHw1Xx9pUpAbrVZVDz1MKhJZWwu3k7kX4h8HCHaTuPZ'
                     ]
                 })
             ],
@@ -55,15 +56,14 @@ export const initEternalNode = async (onMetricsUpdate: (metrics: any) => void) =
                 identify: identify(),
                 dht: kadDHT({
                     clientMode: true, // Browser nodes typically run in client mode
-                }),
+                }) as any,
                 pubsub: gossipsub({
                     allowPublishToZeroTopicPeers: true,
                     emitSelf: false
-                }),
+                }) as any,
             },
             connectionManager: {
-                maxConnections: 50,
-                minConnections: 5,
+                maxConnections: 50
             }
         });
 
