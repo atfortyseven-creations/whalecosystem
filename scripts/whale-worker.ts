@@ -25,22 +25,50 @@ const BTC_RPC_URL = process.env.GETBLOCK_BTC_RPC || process.env.BITCOIN_RPC_URL;
 const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
 
 // Global Exception Handlers for Maximum Stability
-process.on('uncaughtException', (err) => {
-  // Gracefully handle expected third-party WS rejections (401/402/403/429) without alarming logs
-  if (err.message && (err.message.includes('403') || err.message.includes('429') || err.message.includes('402') || err.message.includes('401') || err.message.includes('Unexpected server response'))) {
-    console.warn(`🛡️ [WS-SHIELD] Suppressed external WS rejection: ${err.message}. Connection will auto-heal.`);
+process.on('uncaughtException', (err: any) => {
+  const msg = err?.message || '';
+  const code = err?.code || '';
+  
+  const lethalWSPatterns = [
+    'Unexpected server response',
+    'WebSocket',
+    '403',
+    '429',
+    'ECONNRESET',
+    'ETIMEDOUT',
+    '401',
+    '402'
+  ];
+
+  if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
+    console.warn(`🛡️ [WS-SHIELD] Suppressed external network rejection: ${msg}. Auto-healing...`);
     return;
   }
-  console.error('💀 [PROCESS] Uncaught Exception:', err.message);
+  
+  console.error('💀 [PROCESS] Uncaught Exception:', msg);
   console.error(err.stack);
 });
 
 process.on('unhandledRejection', (reason: any, promise) => {
-  if (reason && reason.message && (reason.message.includes('403') || reason.message.includes('429') || reason.message.includes('402') || reason.message.includes('401') || reason.message.includes('Unexpected server response'))) {
-    console.warn(`🛡️ [WS-SHIELD] Suppressed unhandled WS rejection: ${reason.message}. Connection will auto-heal.`);
+  const msg = reason?.message || '';
+  const code = reason?.code || '';
+
+  const lethalWSPatterns = [
+    'Unexpected server response',
+    'WebSocket',
+    '403',
+    '429',
+    'ECONNRESET',
+    'ETIMEDOUT',
+    '401',
+    '402'
+  ];
+
+  if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
+    console.warn(`🛡️ [WS-SHIELD] Suppressed unhandled network rejection: ${msg}. Auto-healing...`);
     return;
   }
-  // Ignore ethers internal WS-CORE unknown ID errors which log aggressively on public nodes
+  
   if (reason && reason.reasonCode === 'UNKNOWN_ID') return;
   
   console.error('💀 [PROCESS] Unhandled Rejection at:', promise, 'reason:', reason);

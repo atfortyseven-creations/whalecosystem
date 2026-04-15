@@ -53,13 +53,20 @@ export async function startEvmWorker(resilient: ResilientProvider, chainLabel: s
     try {
         const block = await resilient.call<any>(p => p.getBlock(blockNumber, true));
         if (!block || !block.prefetchedTransactions) return;
-        const ethPrice = await getRealTimePrice("ETH") || 3300;
+
+        // Dynamic native token mapping based on chain sector
+        const nativeSymbol = 
+            chainLabel === 'BSC' ? 'BNB' : 
+            chainLabel === 'POLYGON' ? 'MATIC' : 
+            'ETH';
+
+        const nativePrice = await getCachedPrice(nativeSymbol) || (nativeSymbol === 'ETH' ? 3300 : nativeSymbol === 'BNB' ? 580 : 1);
 
         for (const tx of block.prefetchedTransactions) {
-            const valueEth = parseFloat(ethers.formatEther(tx.value));
-            const usdValue = valueEth * ethPrice;
+            const valueNative = parseFloat(ethers.formatEther(tx.value));
+            const usdValue = valueNative * nativePrice;
             if (usdValue >= WHALE_THRESHOLD_USD) {
-                await processWhaleTx(tx.hash, tx.from, tx.to || "Contract", "ETH", valueEth, usdValue, blockNumber, chainLabel, { method: "Native" });
+                await processWhaleTx(tx.hash, tx.from, tx.to || "Contract", nativeSymbol, valueNative, usdValue, blockNumber, chainLabel, { method: "Native" });
             }
         }
     } catch (e: any) {}
