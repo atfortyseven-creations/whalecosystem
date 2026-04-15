@@ -341,8 +341,8 @@ export function WatchlistTable() {
                 />
             )}
         </AnimatePresence>
-        <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex items-start justify-center p-4">
-        <div className="flex flex-col w-full h-full min-h-[600px] bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm">
+        <div className="w-full h-full flex flex-col p-4 overflow-hidden">
+        <div className="flex flex-col w-full flex-1 min-h-0 bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
 
             {/* ── Toolbar ── */}
             <div className="px-4 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-4 flex-wrap">
@@ -371,17 +371,16 @@ export function WatchlistTable() {
                 </button>
             </div>
 
-            {/* ── Token Table ── */}
             {view === 'TOKENS' && (
-                <div className="flex-1 overflow-auto">
-                    <div className="min-w-[1200px]">
+                <div className="flex-1 overflow-auto flex flex-col min-h-0">
+                    <div className="min-w-[1200px] flex flex-col h-full">
                         <div className="sticky top-0 z-10 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
                             style={{ gridTemplateColumns: '2.5fr 1.5fr 1fr 1fr 1.2fr 1fr 1fr 1fr 0.8fr' }}>
                             {['Token', 'Current Price', '24h Chg', 'Entry Price', 'ROI', 'MCap', 'Vol 24h', 'Top-10 Hold.', ''].map((h, i) => (
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
                             ))}
                         </div>
-                        <div className="w-full" style={{ height: 400 }}>
+                        <div className="w-full flex-1 min-h-0 h-full">
                             {loading || isSearchingGlobal ? (
                                 <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center"><Loader2 className="animate-spin mb-3" size={20}/> {isSearchingGlobal ? 'Searching Global DEX Database…' : 'Fetching…'}</div>
                             ) : tokensFiltered.length === 0 ? (
@@ -501,15 +500,15 @@ export function WatchlistTable() {
 
             {/* ── Wallet / Entity Table ── */}
             {view === 'WALLETS' && (
-                <div className="flex-1 overflow-auto">
-                    <div className="min-w-[1200px]">
+                <div className="flex-1 overflow-auto flex flex-col min-h-0">
+                    <div className="min-w-[1200px] flex flex-col h-full">
                         <div className="sticky top-0 z-10 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
                             style={{ gridTemplateColumns: '2.2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr' }}>
                             {['Entity', 'Address', 'Net Worth', 'PnL 30d', 'Win Rate', 'DEX Ratio', 'Alpha Score', 'Last Active', ''].map((h, i) => (
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
                             ))}
                         </div>
-                        <div className="w-full" style={{ height: 400 }}>
+                        <div className="w-full flex-1 min-h-0 h-full">
                             {loading ? (
                                 <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center"><Loader2 className="animate-spin mb-3" size={20}/> Fetching…</div>
                             ) : walletsFiltered.length === 0 ? (

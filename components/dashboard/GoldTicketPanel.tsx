@@ -196,18 +196,18 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
 
 function GlobalLedger({ feed }: { feed: any[] }) {
   return (
-      <div className="bg-white border border-black/[0.08] rounded-[3rem] overflow-hidden mt-12 shadow-2xl">
-         <div className="px-10 py-8 border-b border-black/[0.04] bg-black/5 flex items-center justify-between">
-             <span className="text-[11px] font-black uppercase tracking-[0.3em] text-black">IMMUTABLE GENESIS LEDGER</span>
-             <span className="text-[9px] font-black text-black/20 uppercase tracking-[0.4em]">Optimism Mainnet</span>
+      <div className="w-full h-full bg-white flex flex-col">
+         <div className="px-6 py-4 border-b border-black/[0.04] bg-[#FAF9F6] shrink-0 flex items-center justify-between">
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">IMMUTABLE GENESIS LEDGER</span>
+             <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.3em]">Optimism Mainnet</span>
          </div>
-         <div className="grid text-[10px] font-black text-black/30 uppercase tracking-[0.2em] bg-white border-b border-black/[0.04]"
+         <div className="grid text-[9px] font-black text-black/30 uppercase tracking-[0.2em] bg-white border-b border-black/[0.04] shrink-0"
               style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-              <div className="px-10 py-5">Verified Sovereign</div>
-              <div className="px-10 py-5">Temporal Entry</div>
-              <div className="px-10 py-5 text-right">Cryptographic Seal</div>
+              <div className="px-6 py-3">Verified Sovereign</div>
+              <div className="px-6 py-3">Temporal Entry</div>
+              <div className="px-6 py-3 text-right">Cryptographic Seal</div>
          </div>
-         <div className="divide-y divide-black/[0.04]">
+         <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-black/[0.04]">
             {feed?.map((f: any, i: number) => {
                 let displaySig = "";
                 try {
@@ -217,16 +217,16 @@ function GlobalLedger({ feed }: { feed: any[] }) {
                 
                 return (
                     <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-                        <div className="px-10 py-6 flex items-center gap-3">
-                             <div className="w-2 h-2 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
-                             <span className="text-sm font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
+                        <div className="px-6 py-4 flex items-center gap-3">
+                             <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
+                             <span className="text-xs font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
                         </div>
-                        <div className="px-10 py-6 text-[10px] font-black font-mono text-black/40 uppercase">
+                        <div className="px-6 py-4 text-[9px] font-black font-mono text-black/40 uppercase">
                              {new Date(f.claimedAt).toLocaleTimeString()}
                         </div>
-                         <div className="px-10 py-2 flex justify-end">
+                         <div className="px-6 py-2 flex justify-end">
                               {displaySig?.startsWith('data:image') && (
-                                 <img src={displaySig} className="h-10 opacity-70 mix-blend-multiply grayscale hover:grayscale-0 transition-all" alt="Sig" />
+                                 <img src={displaySig} className="h-6 opacity-70 mix-blend-multiply grayscale hover:grayscale-0 transition-all" alt="Sig" />
                               )}
                          </div>
                     </div>
@@ -279,82 +279,33 @@ export function GoldTicketPanel() {
   const hasTicket = dbStats?.ticket || false;
 
   return (
-    <div className="w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col items-center">
-        <div className="w-full max-w-6xl py-12 px-6 space-y-12 shrink-0">
+    <div className="w-full h-full flex flex-col gap-4 overflow-hidden">
       
-      {/* ── HERO ── */}
-      <div className="relative bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl overflow-hidden p-10 md:p-14 shadow-sm">
-         
-         <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-               <div className="flex items-center gap-3 mb-8">
-                  <div className="w-2 h-2 bg-[#050505] shadow-sm" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#888888]">Institutional Auth Layer</span>
+      {/* ── HERO & INTERACTION (BENTO GRID) ── */}
+      <div className="grid lg:grid-cols-2 gap-4 shrink-0">
+          
+          <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl flex flex-col justify-center p-6 shadow-sm">
+               <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1.5 h-1.5 bg-[#050505] shadow-sm" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#888888]">Institutional Auth Layer</span>
                </div>
-               <h1 className="text-4xl md:text-5xl font-black text-[#050505] uppercase tracking-tighter leading-tight mb-8 border-b border-[#E5E5E5] pb-6">
+               <h1 className="text-2xl lg:text-3xl font-black text-[#050505] uppercase tracking-tighter leading-tight mb-4 border-b border-[#E5E5E5] pb-2">
                   TICKET <span className="text-[#888888]">MINTING</span>
                </h1>
-               <p className="text-sm text-[#888888] font-bold leading-relaxed mb-10 max-w-xl font-sans">
-                  The Sovereign Ticket mechanism is the ultimate echelon of institutional tracking. It provides permanent, encrypted access to the core mempool engine and the largest capital flow signatures across the ledger.
-               </p>
-               <div className="flex flex-wrap gap-4">
-                  <div className="px-6 py-2.5 bg-[#050505] text-[#FFFFFF] rounded-lg font-black text-[10px] uppercase tracking-[0.2em] shadow-sm">
-                     GENESIS STATUS: ACTIVE
-                  </div>
-                  <div className="px-6 py-3 border border-black/10 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] text-black/40">
-                     OPTIMISM SETTLEMENT
-                  </div>
+               <div className="bg-[#FAF9F6] border border-black/[0.04] p-6 rounded-2xl space-y-6">
+                  <SupplyBar minted={dbStats?.totalClaimed || 0} max={MAX_SUPPLY} />
                </div>
-            </div>
+          </div>
 
-            <div className="bg-black/5 border border-black/[0.04] p-12 rounded-[3rem] space-y-10 shadow-inner">
-               <div className="text-center space-y-2">
-                  <motion.div key={dbStats?.totalClaimed} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-8xl font-black font-mono text-black leading-none tracking-tighter">
-                     {dbStats?.totalClaimed || '000'}
-                  </motion.div>
-                  <p className="text-[12px] font-black uppercase tracking-[0.3em] text-black/20">Genesis Endorsements Issued</p>
-               </div>
-               <SupplyBar minted={dbStats?.totalClaimed || 0} max={MAX_SUPPLY} />
-            </div>
-         </div>
-      </div>
-
-      {/* ── INTERACTIVE MINT SECTION ── */}
-      {!hasTicket && (
-        <div className="grid lg:grid-cols-2 gap-12">
-            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl p-10 shadow-sm h-fit">
-                <h3 className="text-xl font-black uppercase tracking-widest mb-8 text-[#050505]">Endorsement Protocol</h3>
-                <div className="space-y-4">
-                    <div className="flex items-center gap-6 p-5 bg-[#FAF9F6] rounded-xl group hover:bg-[#050505] transition-all cursor-pointer border border-[#E5E5E5] hover:border-[#050505]">
-                        <div className="w-10 h-10 bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg flex items-center justify-center font-black text-sm text-[#050505]">1</div>
-                        <div className="flex flex-col">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] group-hover:text-[#888888]">Identity Binding</span>
-                            <span className="text-xs font-black uppercase text-[#050505] group-hover:text-[#FFFFFF]">Connect Verified Wallet</span>
-                        </div>
-                        <ArrowRight className="ml-auto text-[#888888] group-hover:text-[#FFFFFF] transition-all" />
-                    </div>
-                    <div className="flex items-center gap-6 p-5 bg-[#FAF9F6] rounded-xl group hover:bg-[#050505] transition-all cursor-pointer border border-[#E5E5E5] hover:border-[#050505]">
-                        <div className="w-10 h-10 bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg flex items-center justify-center font-black text-sm text-[#050505]">2</div>
-                        <div className="flex flex-col">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] group-hover:text-[#888888]">Manual Endorsement</span>
-                            <span className="text-xs font-black uppercase text-[#050505] group-hover:text-[#FFFFFF]">Sign the Sovereign Pad</span>
-                        </div>
-                        <ArrowRight className="ml-auto text-[#888888] group-hover:text-[#FFFFFF] transition-all" />
-                    </div>
-                    <div className="flex items-center gap-6 p-5 bg-[#FAF9F6] rounded-xl group hover:bg-[#050505] transition-all cursor-pointer border border-[#E5E5E5] hover:border-[#050505]">
-                        <div className="w-10 h-10 bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg flex items-center justify-center font-black text-sm text-[#050505]">3</div>
-                        <div className="flex flex-col">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] group-hover:text-[#888888]">Network Entry</span>
-                            <span className="text-xs font-black uppercase text-[#050505] group-hover:text-[#FFFFFF]">Mint Permanent Access</span>
-                        </div>
-                        <ArrowRight className="ml-auto text-[#888888] group-hover:text-[#FFFFFF] transition-all" />
-                    </div>
+          {!hasTicket ? (
+            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl p-6 shadow-sm flex flex-col">
+                <div className="flex justify-between items-center mb-2">
+                   <h3 className="text-sm font-black uppercase tracking-widest text-[#050505]">Claim Access</h3>
+                   <span className="text-[9px] text-[#888888] uppercase">Verification</span>
                 </div>
-            </div>
-
-            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-3xl p-10 shadow-sm">
-                <h3 className="text-xl font-black uppercase tracking-widest mb-4 text-center text-[#050505]">Claim Access</h3>
-                <SignaturePad onSignature={setSignatureData} disabled={hasTicket} />
+                <div className="flex-1 max-h-[160px]">
+                   <SignaturePad onSignature={setSignatureData} disabled={hasTicket} />
+                </div>
                 
                 <button 
                   onClick={() => {
@@ -362,26 +313,26 @@ export function GoldTicketPanel() {
                     else if (signatureData.length < 50) toast.error("Signature required on pad");
                     else signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
                   }}
-                  className="w-full mt-10 py-5 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.2em] text-[11px] transition-all"
+                  className="w-full mt-4 py-3 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all"
                 >
                   {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'}
                 </button>
             </div>
-        </div>
-      )}
+          ) : (
+            <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
+               <StatChip label="MEMBER SERIAL" value={dbStats.ticket.serialCode} accent />
+               <StatChip label="IDENTIFICATION" value={truncAddr(address!)} />
+               <StatChip label="ENTRY POINT" value="Optimism L2" />
+               <StatChip label="STATUS" value="VERIFIED SOVEREIGN" />
+            </div>
+          )}
+      </div>
 
-      {/* ── ALREADY HAS TICKET ── */}
-      {hasTicket && (
-        <div className="grid md:grid-cols-2 gap-8">
-            <StatChip label="MEMBER SERIAL" value={dbStats.ticket.serialCode} accent />
-            <StatChip label="IDENTIFICATION" value={truncAddr(address!)} />
-            <StatChip label="ENTRY POINT" value="Optimism L2" />
-            <StatChip label="STATUS" value="VERIFIED SOVEREIGN" />
-        </div>
-      )}
+      {/* ── GLOBAL LEDGER ── */}
+      <div className="flex-1 bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl min-h-0 shadow-sm overflow-hidden flex flex-col">
+         <GlobalLedger feed={dbStats?.feed || []} />
+      </div>
 
-      <GlobalLedger feed={dbStats?.feed || []} />
-        </div>
     </div>
   );
 }

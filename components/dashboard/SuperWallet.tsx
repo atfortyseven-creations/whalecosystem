@@ -208,62 +208,36 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
         return () => {};
     }, [accounts.length]); // Only re-warm if account list changes length
 
-    const handleAddAccount = async () => {
-        const derivedAccounts = accounts.filter(a => a.type === 'DERIVED');
-        const newIndex = derivedAccounts.length + 1;
-        
-        const primaryAccount = accounts.find(a => a.type === 'PRIMARY') || accounts[0];
-        
-        if (!primaryAccount?.address || primaryAccount.address.includes('Virtual')) {
-            alert('Please connect a real wallet first to create accounts.');
-            return;
-        }
-        
-        const baseAddr = primaryAccount.address;
-        const mockAddress = baseAddr.slice(0, -2) + newIndex.toString(16).padStart(2, '0');
-        
-        const newAccount: WalletAccount = {
-            address: mockAddress,
-            name: `Personal Account ${newIndex + 1}`,
-            type: 'DERIVED',
-            index: newIndex,
-            color: getAccountColor(mockAddress)
-        };
-
-        // [PERSISTENCE] Save to premium/watched-wallets for consistency
+    const handleAddAccount = async () => {        
+        // [INSTITUTIONAL GRADE] Erradicación de Mocking. Ya no generamos strings falsos.
+        // Llamada real al backend para generar un nuevo Managed Wallet asociado a este usuario.
         try {
-            // CSRF Handshake
-            const csrfRes = await fetch('/api/auth/csrf', {
-                headers: { 'x-web3-address': hookAddress }
-            });
-            const { token: csrfToken } = await csrfRes.json();
-
-            const res = await fetch('/api/premium/watched-wallets', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-web3-address': hookAddress,
-                    'x-csrf-token': csrfToken
-                },
-                body: JSON.stringify({
-                    address: mockAddress,
-                    label: newAccount.name
-                })
-            });
+            const res = await fetch('/api/wallet/create', { method: 'POST' });
+            if (!res.ok) throw new Error('Failed to create real wallet');
+            
             const data = await res.json();
-            if (data.id) {
-                newAccount.id = data.id;
-                // 🔥 INSTANT GLOBAL SYNC
-                globalMutate();
-            }
-        } catch (e) {
-            console.error("Failed to persist new account to backend", e);
-        }
+            if (!data.address) throw new Error('No address returned');
+            
+            const newAccount: WalletAccount = {
+                address: data.address,
+                name: `Sovereign Vault ${accounts.length + 1}`,
+                type: 'DERIVED',
+                index: accounts.length,
+                color: getAccountColor(data.address)
+            };
 
-        const updated = [...accounts, newAccount];
-        setAccounts(updated);
-        setCurrentAddress(mockAddress);
-        localStorage.setItem('wallet_accounts', JSON.stringify(updated));
+            const updated = [...accounts, newAccount];
+            setAccounts(updated);
+            setCurrentAddress(data.address);
+            localStorage.setItem('wallet_accounts', JSON.stringify(updated));
+            
+            // Force global mutation to align everything
+            globalMutate();
+            mutate('/api/user/wallet');
+        } catch (e) {
+            console.error("[CRITICAL_FAILURE] Failed to provision real managed wallet:", e);
+            alert("No se pudo generar una cartera on-chain real.");
+        }
     };
 
     const handleAddWatchWallet = async (address: string, name?: string) => {

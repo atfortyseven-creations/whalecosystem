@@ -102,7 +102,15 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="h-screen w-full flex flex-col bg-[#FAF9F6] text-[#050505] relative font-sans overflow-hidden">
+    <div 
+      className="fixed inset-0 h-[100dvh] w-screen flex flex-col text-[#050505] font-sans overflow-hidden bg-[#FAF9F6]"
+      style={{
+        backgroundImage: "url('/olas-hokusai-4k.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "bottom",
+        backgroundRepeat: "no-repeat"
+      }}
+    >
       <div className="fixed inset-0 z-0 pointer-events-none">
         <WavePatternOverlay />
       </div>

@@ -175,7 +175,7 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-content w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
+        <div className="flex h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
@@ -271,19 +271,17 @@ export function WhaleProShell({
                     {/* Immersive radial glow overlay */}
                     <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
-                    {/* Height-bounded scroller — NO empty space ever appears below content */}
-                    <div className="absolute inset-0 overflow-y-auto custom-scrollbar scroll-smooth">
-                        <div className="p-6 pb-4 max-w-[1600px] mx-auto w-full relative z-10" style={{ transform: 'translateZ(0)' }}>
+                    {/* Strict Zero-Scroll Bounds for Bento Grid */}
+                    <div className="absolute inset-0 overflow-hidden flex flex-col">
+                        <div className="p-4 md:p-6 w-full h-full flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ 
-                                        duration: 0.3,
-                                        ease: [0.16, 1, 0.3, 1]
-                                    }}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.98 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="w-full h-full flex flex-col"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
                                         {children}

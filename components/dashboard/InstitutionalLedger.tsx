@@ -43,40 +43,20 @@ export default function InstitutionalLedger() {
   const fetchData = async () => {
     setIsSyncing(true);
     try {
-      // Intento de conexión al endpoint real de telemetría BTC
       const res = await fetch('/api/scanner/btc/utxos');
       if (res.ok) {
         const data = await res.json();
         setEntries(data.entries || []);
         setStats(data.stats || null);
       } else {
-        // Fallback Heurístico Institucional en caso de offline
-        generateMockTelemetry();
+        setEntries([]);
       }
     } catch (err) {
-      generateMockTelemetry();
+      setEntries([]);
     } finally {
       setLoading(false);
       setTimeout(() => setIsSyncing(false), 2000);
     }
-  };
-
-  const generateMockTelemetry = () => {
-    const mockEntries: UTXOEntry[] = [
-      { id: '1', txid: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', vout: 0, valueBTC: 50.0, usdValue: 3250000, timestamp: new Date().toISOString(), confirmations: 124, entityName: 'Satoshi Genesis Alpha', category: 'INSTITUTIONAL', status: 'UNSPENT' },
-      { id: '2', txid: 'f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16', vout: 1, valueBTC: 1205.4, usdValue: 78351000, timestamp: new Date(Date.now() - 3600000).toISOString(), confirmations: 12, entityName: 'MicroStrategy Custody', category: 'INSTITUTIONAL', status: 'UNSPENT' },
-      { id: '3', txid: 'b6fcc440cce722a613531b2c455c3c0ce0d24f0c978051756574a44116086f0d', vout: 0, valueBTC: 450.2, usdValue: 29263000, timestamp: new Date(Date.now() - 7200000).toISOString(), confirmations: 45, entityName: 'Binance Cold Wallet 4', category: 'EXCHANGE', status: 'UNSPENT' },
-      { id: '4', txid: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', vout: 12, valueBTC: 89.1, usdValue: 5791500, timestamp: new Date(Date.now() - 10800000).toISOString(), confirmations: 1245, entityName: 'Ancient Whale (2011)', category: 'WHALE', status: 'UNSPENT' },
-    ];
-    setEntries(mockEntries);
-    setStats({
-      totalMonitored: 842105,
-      whaleConcentrationPct: 62.4,
-      dormantSupplyBTC: 4210590,
-      liquidityDelta24h: -1205.4,
-      lastBlockIndex: 842105,
-      activeObservers: 24,
-    });
   };
 
   const filteredEntries = useMemo(() => {
@@ -150,7 +130,7 @@ export default function InstitutionalLedger() {
       </div>
 
       {/* ── LEDGER VIEW ── */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 relative">
         <table className="w-full border-collapse">
           <thead className="sticky top-0 bg-black z-10 border-b border-white/10">
             <tr className="text-[9px] text-white/20 uppercase tracking-[0.3em] text-left">

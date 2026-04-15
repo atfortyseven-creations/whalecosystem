@@ -27,33 +27,7 @@ export function EntityGraphVis() {
         let nodes: any[] = [];
         let links: any[] = [];
 
-        if (isOffline) {
-            setIsHeuristic(true);
-            // HEURISTIC NEURAL MESH GENESIS
-            const nodeCount = 40;
-            nodes = Array.from({ length: nodeCount }, (_, i) => ({
-                id: `entity-${i}`,
-                label: i === 0 ? 'GENESIS_NODE' : `HEX_${Math.random().toString(16).slice(2, 6).toUpperCase()}`,
-                group: i === 0 ? 0 : (Math.random() > 0.8 ? 1 : (Math.random() > 0.5 ? 2 : 3)),
-                size: i === 0 ? 8 : (2 + Math.random() * 4)
-            }));
-
-            for (let i = 1; i < nodeCount; i++) {
-                links.push({
-                    source: nodes[i % 5].id, // Concentrated center
-                    target: nodes[i].id,
-                    value: 1 + Math.random() * 5
-                });
-                if (Math.random() > 0.8) {
-                    links.push({
-                        source: nodes[i].id,
-                        target: nodes[(i + 1) % nodeCount].id,
-                        value: 1
-                    });
-                }
-            }
-        } else {
-            setIsHeuristic(false);
+        if (matrixData?.graph?.nodes) {
             nodes = matrixData.graph.nodes;
             links = matrixData.graph.links;
         }
@@ -133,13 +107,26 @@ export function EntityGraphVis() {
             label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
         });
 
-        return () => { simulation.stop(); };
+        // 50-Year Continuity: Memory/CPU Leak Prevention via Page Visibility API
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                simulation.stop();
+            } else {
+                simulation.alpha(0.3).restart();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => { 
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            simulation.stop(); 
+        };
     }, [matrixData, isOffline]);
 
     return (
-        <div className="w-full flex flex-col items-center p-0 md:p-4 gap-8">
+        <div className="w-full h-full flex flex-col lg:flex-row gap-4 overflow-hidden p-2">
         {/* GRAPH PANEL */}
-        <div className="w-full min-h-[85vh] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-[2rem] font-mono overflow-hidden shadow-sm shrink-0 relative z-10">
+        <div className="flex-[2] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-2xl font-mono overflow-hidden shadow-sm shrink-0 min-h-0 relative z-10">
             {/* ── HEADER ── */}
             <div className="px-8 py-6 border-b border-[#E5E5E5] flex items-center justify-between shrink-0 bg-[#FAF9F6]">
                 <div className="flex items-center gap-4">
@@ -179,7 +166,7 @@ export function EntityGraphVis() {
                         <div className="text-[8px] text-[#888888] uppercase tracking-widest mb-2">Cluster_Statistics</div>
                         <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                             <span className="text-[7px] text-[#888888] uppercase">Total_Nodes:</span>
-                            <span className="text-[8px] text-[#050505] font-bold">{isOffline ? '40 (SYNTH)' : matrixData.graph.nodes.length}</span>
+                            <span className="text-[8px] text-[#050505] font-bold">{isOffline ? '40 (SYNTH)' : (matrixData?.graph?.nodes?.length || 0)}</span>
                             <span className="text-[7px] text-[#888888] uppercase">Avg_Centrality:</span>
                             <span className="text-[8px] text-[#050505] font-bold">0.842</span>
                             <span className="text-[7px] text-[#888888] uppercase">Modularity:</span>
@@ -230,7 +217,7 @@ export function EntityGraphVis() {
         </div>
 
         {/* SEARCH BLOCK & BRC EXPLORER MODULE INJECTION */}
-        <div className="w-full relative z-0">
+        <div className="flex-1 min-w-[350px] bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl overflow-hidden shadow-sm flex flex-col min-h-0 relative z-0">
             <OmniExplorer />
         </div>
         </div>
