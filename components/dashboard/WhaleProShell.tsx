@@ -7,7 +7,7 @@ import {
     TrendingUp, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, ShieldAlert, Newspaper,
-    Star, Rocket, Network, Ticket, Zap
+    Star, Rocket, Network, Ticket, Zap, Menu
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -299,13 +299,13 @@ export function WhaleProShell({
                         { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
                         { id: 'whale-events', icon: <TrendingUp size={20} />, label: 'Radar' },
                         { id: 'portfolio', icon: <Wallet size={20} />, label: 'Vault' },
-                        { id: 'zk-shield', icon: <ShieldAlert size={20} />, label: 'Settings' },
+                        { id: 'menu', icon: <Menu size={20} />, label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
                         return (
                             <button
                                 key={tab.id}
-                                onClick={() => onTabChange(tab.id)}
+                                onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : onTabChange(tab.id)}
                                 className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
                                     isActive ? 'text-black' : 'text-[#888888] hover:text-black'
                                 }`}

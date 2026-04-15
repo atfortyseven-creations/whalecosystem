@@ -37,7 +37,7 @@ export default function WhaleAlertLanding() {
 
   const handleEntry = () => {
     if (address) router.push("/dashboard");
-    else open();
+    else open({ view: 'Connect' });
   };
 
   return (
@@ -57,8 +57,8 @@ export default function WhaleAlertLanding() {
           backgroundImage: `url('${VISUAL_ASSETS.WALLPAPER}')`,
           backgroundSize: "600px",
           backgroundRepeat: "repeat",
-          opacity: 0.25,
-          mixBlendMode: "multiply",
+          opacity: 0.6,
+          mixBlendMode: "normal",
           willChange: "transform"
         }}
         animate={{
@@ -171,6 +171,51 @@ export default function WhaleAlertLanding() {
                   </motion.div>
                 ))}
              </div>
+          </section>
+
+          {/* Academic Architectural Thesis Section */}
+          <section className="pt-32 pb-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/5 to-transparent pointer-events-none" />
+            <div className="relative z-10 flex flex-col gap-24">
+              
+              <div className="text-center">
+                 <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-black/40 mb-3">Tesis Arquitectónica</h2>
+                 <div className="text-3xl font-black uppercase tracking-tight text-black leading-tight">Fundamentación Ontológica <br />e Infraestructura Institucional</div>
+              </div>
+
+              {/* Core Mechanics & Philosophy */}
+              <div className="flex flex-col md:flex-row items-center gap-16">
+                <div className="flex-1 space-y-6">
+                  <h3 className="text-xl font-black uppercase tracking-widest border-b border-black/10 pb-4">Desmantelamiento de la Asimetría Informacional</h3>
+                  <p className="text-[12px] leading-relaxed text-black/70 font-medium text-justify">
+                    El <span className="font-black">Whale Alert Network</span> constituye una infraestructura de inteligencia blockchain de grado institucional, concebida desde los primeros principios de la criptografía aplicada y la teoría de redes descentralizadas. Su propósito categórico reside en erradicar la profunda asimetría de información intrínseca a los mercados de registros distribuidos. Mediante una arquitectura subyacente regida por el <em>"Mandato Zero-Mock"</em> y el <em>"Principio de Soberanía"</em>, el sistema proscribe la dependencia de proxys simulados o servidores de custodia, garantizando un determinismo absoluto en el estado de cada vector de señal originado.
+                  </p>
+                  <p className="text-[12px] leading-relaxed text-black/70 font-medium text-justify">
+                    El motor asíncrono de ingestión intercepta la propagación en la mempool a través de dieciséis topologías EVM y Solana, ejecutando umbrales estadísticos gaussianos (Z-Score) en tiempo real para extraer anomalías de capital sistémico. A través del protocolo matricial <em>Sovereign Mesh</em>, la inteligencia validada criptográficamente converge en el Registro Akáshico —un componente heurístico de inmutabilidad perenne— dotando al analista de un marco predictivo capaz de anticipar desplomes como los eventos de LUNA o FTX horas antes de su materialización en los canales de liquidez pública.
+                  </p>
+                </div>
+                <div className="flex-1 w-full bg-black/5 rounded-[2rem] p-4 border border-black/10 shadow-inner overflow-hidden relative group">
+                  <img src="/api/assets?name=illustration_web3-scaled.jpg" alt="Ecosistema Abstracto Web3" className="w-full h-auto object-cover rounded-xl filter contrast-125 saturate-50 transition-transform duration-1000 group-hover:scale-105" onError={(e) => { e.currentTarget.src = "/api/assets?name=illustration_web3-scaled.png" }} />
+                </div>
+              </div>
+
+              {/* Graph Analysis & Vault Execution */}
+              <div className="flex flex-col md:flex-row-reverse items-center gap-16">
+                <div className="flex-1 space-y-6">
+                  <h3 className="text-xl font-black uppercase tracking-widest border-b border-black/10 pb-4">Análisis de Grafos y Ejecución Criptográfica</h3>
+                  <p className="text-[12px] leading-relaxed text-black/70 font-medium text-justify">
+                    El paradigma de las <em>Transferencias en Masa</em> (Mass Transfer Intelligence) emplea análisis de clústeres topológicos sobre bases de datos de grafos Neo4j. Al mapear relaciones espacio-temporales y proximidad transaccional (co-spend network patterns), la arquitectura devela coreografías de liquidez que los filtros transaccionales asilados ignoran sistemáticamente. Esta síntesis algorítmica transforma datos polimórficos fragmentados en narrativas macroeconómicas de precisión forense.
+                  </p>
+                  <p className="text-[12px] leading-relaxed text-black/70 font-medium text-justify">
+                    Concomitantemente, la bóveda criptográfica de ejecución <em>Sovereign Vault</em> implementa rigurosamente el estándar EIP-1193 de custodia hermética. Salvaguardada por una superestructura Zero-Knowledge (Pruebas de Conocimiento Cero mediante Groth16 en BN254) e identidades anti-Sybil, provee interfaces de agregadores DEX (Li.Fi/1inch) y abstracción de cuentas, otorgando jurisdicción end-to-end e inexpugnable al actor institucional que requiere operar con latencia mínima respondiendo a los estímulos emergentes del tejido global.
+                  </p>
+                </div>
+                <div className="flex-1 w-full bg-black/5 rounded-[2rem] p-4 border border-black/10 shadow-inner overflow-hidden relative group">
+                  <img src="/api/assets?name=peakpx.jpg" alt="Topología Isométrica y Nodos" className="w-full h-auto object-cover rounded-xl filter contrast-125 saturate-50 transition-transform duration-1000 group-hover:scale-105" />
+                </div>
+              </div>
+
+            </div>
           </section>
       </div>
 

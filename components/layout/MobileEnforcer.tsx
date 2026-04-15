@@ -23,14 +23,9 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-            // Detect phone-class devices (not iPads/tablets)
             const isPhone = /android.*mobi|iphone|ipod/i.test(userAgent.toLowerCase());
-            // Detect tablets explicitly: iPad or Android tablets without 'mobi'
-            const isTablet = /ipad/i.test(userAgent.toLowerCase()) ||
-                (/android/i.test(userAgent.toLowerCase()) && !/mobi/i.test(userAgent.toLowerCase()));
-            // Phones in portrait mode are < 768px. Tablets (iPad Air = 820px) are >= 768px.
-            // We treat phones < 768px as mobile UI, tablets always get desktop UI.
-            const mobile = isPhone && window.innerWidth < 768;
+            // Treat devices <= 1024 as mobile so scaling doesn't break routing
+            const mobile = isPhone || window.innerWidth <= 1024;
             setIsMobile(mobile);
         };
 

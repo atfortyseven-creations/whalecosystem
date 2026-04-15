@@ -8,6 +8,11 @@ import { useTheme } from "next-themes";
 const PAGES = [
     { id: "dashboard", label: "Markets Dashboard", icon: <Monitor size={16} /> },
     { id: "watchlist", label: "Watchlist Pro", icon: <DollarSign size={16} /> },
+    { id: "whale-events", label: "Mempool Radar", icon: <Terminal size={16} /> },
+    { id: "gainers", label: "Gainers & Losers", icon: <Terminal size={16} /> },
+    { id: "new-pairs", label: "Token Discovery", icon: <Terminal size={16} /> },
+    { id: "neural-graph", label: "Entity Graph", icon: <Map size={16} /> },
+    { id: "sovereign-intel", label: "Voss Matrix", icon: <Terminal size={16} /> },
     { id: "whale-portfolio", label: "Whale Intelligence", icon: <Terminal size={16} /> },
     { id: "zk-shield", label: "ZK Shield Station", icon: <Shield size={16} /> },
     { id: "omni-explorer", label: "Aztec Explorer", icon: <Map size={16} /> },

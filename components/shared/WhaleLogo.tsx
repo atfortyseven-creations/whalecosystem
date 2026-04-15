@@ -22,7 +22,7 @@ export function WhaleLogo({
     return (
         <div className={`relative flex items-center justify-center ${className}`}>
             <Image
-                src="/api/checkpoint-image?name=official-whale-sovereign.png"
+                src="/official-whale-monochrome.png"
                 alt="Sovereign Whale Alert"
                 fill
                 className="object-contain transition-all duration-300 transform-gpu"

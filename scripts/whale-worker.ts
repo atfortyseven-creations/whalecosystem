@@ -26,8 +26,8 @@ const WHALE_THRESHOLD_USD = Number(process.env.WHALE_THRESHOLD_USD) || 50000;
 
 // Global Exception Handlers for Maximum Stability
 process.on('uncaughtException', (err) => {
-  // Gracefully handle expected third-party WS rejections (403/429) without alarming logs
-  if (err.message && (err.message.includes('403') || err.message.includes('429'))) {
+  // Gracefully handle expected third-party WS rejections (401/402/403/429) without alarming logs
+  if (err.message && (err.message.includes('403') || err.message.includes('429') || err.message.includes('402') || err.message.includes('401') || err.message.includes('Unexpected server response'))) {
     console.warn(`🛡️ [WS-SHIELD] Suppressed external WS rejection: ${err.message}. Connection will auto-heal.`);
     return;
   }
@@ -36,7 +36,7 @@ process.on('uncaughtException', (err) => {
 });
 
 process.on('unhandledRejection', (reason: any, promise) => {
-  if (reason && reason.message && (reason.message.includes('403') || reason.message.includes('429'))) {
+  if (reason && reason.message && (reason.message.includes('403') || reason.message.includes('429') || reason.message.includes('402') || reason.message.includes('401') || reason.message.includes('Unexpected server response'))) {
     console.warn(`🛡️ [WS-SHIELD] Suppressed unhandled WS rejection: ${reason.message}. Connection will auto-heal.`);
     return;
   }

@@ -9,10 +9,22 @@ if (typeof process !== 'undefined' && !(globalThis as any).__WS_PROTECTED) {
     (globalThis as any).__WS_PROTECTED = true;
     process.on('uncaughtException', (err: any) => {
         const msg = err?.message || '';
-        if (msg.includes('Unexpected server response') || msg.includes('WebSocket')) {
-            console.warn(`[WhaleFortress:Resilience] Swallowed lethal WSS handshake drop: ${msg}`);
+        const code = err?.code || '';
+        
+        const lethalWSPatterns = [
+            'Unexpected server response',
+            'WebSocket',
+            '403',
+            '429',
+            'ECONNRESET',
+            'ETIMEDOUT'
+        ];
+
+        if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
+            console.warn(`[WhaleFortress:Resilience] Swallowed lethal network drop: ${msg} (${code})`);
             return;
         }
+        
         console.error('[WhaleFortress:Fatal] Unhandled Exception:', err);
         process.exit(1);
     });

@@ -1,7 +1,15 @@
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import WhaleAlertLanding from '@/components/landing/WhaleAlertLanding';
+import { MobileWhaleLanding } from '@/components/mobile/MobileWhaleLanding';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const headersList = await headers();
+  const userAgent = headersList.get('user-agent') || '';
+  const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+
   return (
     <main>
       <Suspense fallback={
@@ -9,7 +17,7 @@ export default function Home() {
           Synchronizing Genesis Node...
         </div>
       }>
-        <WhaleAlertLanding />
+        {isMobile ? <MobileWhaleLanding /> : <WhaleAlertLanding />}
       </Suspense>
     </main>
   );

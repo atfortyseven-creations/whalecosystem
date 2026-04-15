@@ -16,16 +16,27 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No asset specified" }, { status: 400 });
   }
 
-  // Security: Restrict access to designated high-fidelity assets
-  const allowedAssets = ["peakpx.jpg", "olas-hokusai-4k.png.png"];
+  // Security: Restrict access to designated high-fidelity assets only
+  const allowedAssets = [
+    "peakpx.jpg",
+    "illustration_web3-scaled.jpg",
+    "illustration_web3-scaled.png",
+    "olas-hokusai-4k.png",
+    "patron-cosmico-4k.png",
+  ];
   if (!allowedAssets.includes(name)) {
     return NextResponse.json({ error: "Access Denied" }, { status: 403 });
   }
 
   try {
-    // Definitive path to the .antigravity root
-    const rootPath = "C:\\Users\\admin\\.gemini\\.antigravity";
-    const filePath = path.join(rootPath, name);
+    // Resolve from the Next.js project public directory (portable across environments)
+    const publicDir = path.join(process.cwd(), 'public');
+    const filePath = path.join(publicDir, name);
+
+    // Path traversal guard: ensure resolved path stays within /public
+    if (!filePath.startsWith(publicDir)) {
+      return NextResponse.json({ error: "Invalid path" }, { status: 403 });
+    }
 
     if (!fs.existsSync(filePath)) {
       return NextResponse.json({ error: "Asset not found on disk" }, { status: 404 });
