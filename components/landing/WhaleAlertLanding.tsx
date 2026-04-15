@@ -172,7 +172,6 @@ export default function WhaleAlertLanding() {
                 ))}
              </div>
           </section>
-        </div>
       </div>
 
       <AnimatePresence>
