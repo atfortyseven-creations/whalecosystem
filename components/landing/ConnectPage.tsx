@@ -153,7 +153,7 @@ export default function ConnectPage() {
             <div 
               className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-transparent"
               style={{
-                backgroundImage: "url('/peakpx.jpg')",
+                backgroundImage: "url('/api/assets?name=peakpx.jpg')",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",

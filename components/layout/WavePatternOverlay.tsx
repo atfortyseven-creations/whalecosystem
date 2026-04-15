@@ -73,7 +73,7 @@ export function WavePatternOverlay() {
           WebkitTransform: "translateZ(0)",
           // Responsive height that anchors the wave perfectly
           height: "clamp(100px, 15vh, 220px)",
-          backgroundImage: "url('/api/checkpoint-image?name=olas-hokusai-4k.png')",
+          backgroundImage: "url('/api/assets?name=olas-hokusai-4k.png.png')",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "bottom center",
           // 'Contain' logic ensures every pixel of the wave strip is seen without cropping/zoom on small screens
