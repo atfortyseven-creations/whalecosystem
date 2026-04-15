@@ -25,6 +25,7 @@ import { ZKShieldStation }         from '@/components/dashboard/ZKShieldStation'
 import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
 import { SovereignVault }          from '@/components/dashboard/SovereignVault';
 import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
+import SovereignIntelTab           from '@/components/dashboard/SovereignIntelTab';
 import dynamic from 'next/dynamic';
 import { VirtualizedFirehose }     from '@/components/premium/VirtualizedFirehose';
 
@@ -52,6 +53,7 @@ type TabId =
     | 'zk-shield'
     | 'neural-graph'
     | 'sovereign-vault'
+    | 'sovereign-intel'
     | 'academy'
     | 'support';
 
@@ -74,6 +76,7 @@ export default function WhaleDashboard() {
               : activeTab === 'gainers'              ? <DashboardErrorBoundary key="gainers">        <GainersLosersPanel />   </DashboardErrorBoundary>
               : activeTab === 'new-pairs'            ? <DashboardErrorBoundary key="new-pairs">      <NewPairsTable />        </DashboardErrorBoundary>
               : activeTab === 'neural-graph'         ? <DashboardErrorBoundary key="neural-graph">   <EntityGraphVis />       </DashboardErrorBoundary>
+              : activeTab === 'sovereign-intel'      ? <DashboardErrorBoundary key="sovereign-intel"><SovereignIntelTab />    </DashboardErrorBoundary>
               : activeTab === 'omni-explorer'        ? <DashboardErrorBoundary key="omni-explorer">  <OmniExplorer />         </DashboardErrorBoundary>
               : activeTab === 'brc-explorer'         ? <DashboardErrorBoundary key="brc">            <BRCExplorerShell />     </DashboardErrorBoundary>
               : activeTab === 'portfolio'            ? <DashboardErrorBoundary key="portfolio">      <LivePortfolio />        </DashboardErrorBoundary>
@@ -82,8 +85,8 @@ export default function WhaleDashboard() {
               : activeTab === 'whale-portfolio'      ? <DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio />       </DashboardErrorBoundary>
               : activeTab === 'humanidfi-portfolio'  ? <DashboardErrorBoundary key="human-port">     <PortfolioDashboard />   </DashboardErrorBoundary>
               : activeTab === 'academy'              ? <DashboardErrorBoundary key="academy">        <WhaleAcademy />         </DashboardErrorBoundary>
-               : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
-               : null
+              : activeTab === 'support'              ? <DashboardErrorBoundary key="support">        <WhaleSupport />         </DashboardErrorBoundary>
+              : null
             }
         </WhaleProShell>
     );

@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    LayoutDashboard, BarChart2,
-    TrendingUp, Code, Wallet, Settings,
+    LayoutDashboard,
+    TrendingUp, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
-    Globe, Cpu, Shield, ShieldAlert, Newspaper, LifeBuoy,
-    GraduationCap, Bell, Star, Rocket, Network, Lock, Box, Ticket
+    Globe, Cpu, Shield, ShieldAlert, Newspaper,
+    Star, Rocket, Network, Ticket, Zap
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -37,7 +37,8 @@ const SIDEBAR_ITEMS: NavItem[] = [
     
     // ── Deep Intelligence ──
     { id: 'neural-graph',    label: 'Entity Graph',     icon: <Network size={17}/>, dividerBefore: 'Intelligence' },
-    
+    { id: 'sovereign-intel', label: 'Voss Matrix',      icon: <Zap size={17}/> },
+
     // ── Sovereignty & Vault ──
     { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>, dividerBefore: 'Sovereignty' },
     { id: 'zk-shield',       label: 'ZK Shield',        icon: <ShieldAlert size={17}/> },

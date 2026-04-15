@@ -58,12 +58,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                 <div className="min-h-screen w-full relative z-0 flex flex-col">
                     <div className="flex-none w-full z-50">
                         {/* Institutional Header with precise 68px height enforced */}
+                        {/* SOVEREIGN FIX: /dashboard is excluded here — WhaleProShell
+                         * renders its own sticky top bar. Showing InstitutionalHeader above
+                         * h-[100dvh] shell pushes it below the viewport → page-level scroll.
+                         */}
                         {(
                             pathname === '/network' || 
                             pathname === '/portfolio' || 
                             pathname === '/support' || 
                             pathname === '/academy' || 
-                            pathname === '/dashboard' ||
                             pathname === '/vip' ||
                             pathname === '/' ||
                             pathname.startsWith('/news')
