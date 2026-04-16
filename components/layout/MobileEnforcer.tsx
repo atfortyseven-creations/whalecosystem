@@ -119,8 +119,10 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         // Pre-connection → wallet connect buttons
         // Post-connection → connected state with navigation
         return (
-            {/* @ts-ignore */}
-            <MobileSovereignLanding />
+            <>
+                {/* @ts-ignore */}
+                <MobileSovereignLanding />
+            </>
         );
     }
 
