@@ -192,7 +192,7 @@ export function AlertsPanel() {
     };
 
     return (
-        <div className="h-full flex flex-col bg-black font-mono text-white overflow-hidden">
+        <div className="h-full w-full min-h-0 flex flex-col bg-black font-mono text-white overflow-hidden">
             {showCreate && <CreateAlertModal onClose={() => setShowCreate(false)} onCreate={handleCreate} />}
 
             {/* ── HEADER ── */}

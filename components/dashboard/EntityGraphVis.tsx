@@ -124,7 +124,7 @@ export function EntityGraphVis() {
     }, [matrixData, isOffline]);
 
     return (
-        <div className="w-full h-full flex flex-col lg:flex-row gap-4 overflow-hidden p-2">
+        <div className="w-full h-full min-h-0 flex flex-col lg:flex-row gap-4 overflow-hidden p-2">
         {/* GRAPH PANEL */}
         <div className="flex-[2] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-2xl font-mono overflow-hidden shadow-sm shrink-0 min-h-0 relative z-10">
             {/* ── HEADER ── */}

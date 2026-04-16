@@ -21,7 +21,7 @@ export default function CryptographicID() {
   };
 
   return (
-    <div className="h-full bg-black text-white font-mono flex flex-col p-8 gap-8">
+    <div className="h-full w-full min-h-0 bg-black text-white font-mono flex flex-col p-8 gap-8">
       
       {/* ── ACADEMIC INTRO ── */}
       <div className="border border-white/5 bg-white/[0.01] p-6 flex flex-col gap-4">

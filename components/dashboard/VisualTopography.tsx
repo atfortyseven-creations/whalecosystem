@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Target, Zap, Link } from 'lucide-react';
 
 interface Node {
@@ -39,7 +39,7 @@ export default function VisualTopography() {
     ], []);
 
     return (
-        <div className="p-8 h-full flex flex-col bg-transparent select-none">
+        <div className="p-8 h-full w-full min-h-0 flex flex-col bg-transparent select-none">
             <header className="mb-6 flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-black text-black uppercase tracking-tighter">Visual Topography</h2>

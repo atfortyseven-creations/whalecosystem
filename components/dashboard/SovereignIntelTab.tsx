@@ -80,7 +80,7 @@ const SovereignIntelTab: React.FC = () => {
     );
 
     return (
-        <div className="w-full h-full flex flex-col p-4 overflow-hidden bg-[#FAF9F6]">
+        <div className="w-full h-full min-h-0 flex flex-col p-4 overflow-hidden bg-[#FAF9F6]">
             {/* Header */}
             <div className="px-6 py-5 border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0">
                 <div>

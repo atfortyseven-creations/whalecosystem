@@ -45,7 +45,7 @@ export default function LiveTransactions() {
     }, []);
 
     return (
-        <div className="p-8 h-full flex flex-col bg-transparent font-sans">
+        <div className="p-8 h-full w-full min-h-0 flex flex-col bg-transparent font-sans">
             <header className="mb-10 flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-black text-black uppercase tracking-tighter">Mempool Stream</h2>

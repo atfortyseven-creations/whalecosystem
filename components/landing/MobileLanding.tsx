@@ -85,7 +85,7 @@ export function MobileLanding() {
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-x-hidden font-sans"
+      className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col"
       style={{ backgroundColor: IVORY, color: INK }}
     >
       {/* ── Layer 0: Base ivory ── */}
@@ -151,7 +151,7 @@ export function MobileLanding() {
       </motion.header>
 
       {/* ── Main Content ── */}
-      <main className="relative z-10 flex flex-col items-center px-5 pt-28 pb-48 gap-8 max-w-[440px] mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-12 gap-8 max-w-[440px] w-full mx-auto">
 
         {/* Hero text */}
         <motion.div
@@ -255,7 +255,10 @@ export function MobileLanding() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
-              onClick={() => setShowScanner(true)}
+              onClick={() => {
+                  alert("Please connect your mobile wallet first to establish a Sovereign Session.");
+                  handleConnect();
+              }}
               className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black uppercase tracking-widest border-2 border-dashed border-[#050505]/15 text-[#050505]/50 hover:border-[#050505]/30 hover:text-[#050505] active:scale-[0.97] transition-all"
               style={{ fontSize: "11px" }}
             >
@@ -275,18 +278,15 @@ export function MobileLanding() {
       </main>
 
       {/* ── QR Scanner Modal ── */}
-      <AnimatePresence>
-        {showScanner && (
-          <DynamicQRScannerModal
-            isOpen={showScanner}
-            onClose={() => setShowScanner(false)}
-            onScan={() => {
-              setShowScanner(false);
-              setTimeout(() => router.push("/dashboard"), 500);
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {/* ── QR Scanner Modal ── */}
+      <DynamicQRScannerModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={() => {
+          setShowScanner(false);
+          setTimeout(() => router.push("/dashboard"), 500);
+        }}
+      />
 
       {/* ── Wave Footer ── */}
       <div className="relative w-full min-h-[420px] flex flex-col justify-end overflow-hidden">

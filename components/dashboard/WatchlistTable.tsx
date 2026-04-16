@@ -341,7 +341,7 @@ export function WatchlistTable() {
                 />
             )}
         </AnimatePresence>
-        <div className="w-full h-full flex flex-col p-4 overflow-hidden">
+        <div className="w-full h-full min-h-0 flex flex-col p-4 overflow-hidden">
         <div className="flex flex-col w-full flex-1 min-h-0 bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
 
             {/* ── Toolbar ── */}

@@ -307,7 +307,7 @@ export function WhaleProShell({
                     <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
                     <div className="absolute inset-0 overflow-hidden flex flex-col">
-                        <div className="p-4 md:p-5 w-full h-full flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
+                        <div className="p-4 md:p-5 w-full h-full min-h-0 flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -315,7 +315,7 @@ export function WhaleProShell({
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.98 }}
                                     transition={{ duration: 0.18 }}
-                                    className="w-full h-full flex flex-col"
+                                    className="w-full h-full min-h-0 flex flex-col overflow-hidden"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
                                         {children}

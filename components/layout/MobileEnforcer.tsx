@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
-import { MobileWhaleLanding as MobileSovereignLanding } from '@/components/mobile/MobileWhaleLanding';
+import { MobileLanding as MobileSovereignLanding } from '@/components/landing/MobileLanding';
 import dynamic from 'next/dynamic';
 import { useAccount } from 'wagmi';
+import { usePathname } from 'next/navigation';
 
 // Lazy-load the authenticated mobile news shell
 const MobileNewsShell = dynamic(
@@ -16,6 +17,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [isMobile, setIsMobile] = useState(false);
     const [showNews, setShowNews] = useState(false);
     const { isConnected } = useAccount();
+    const pathname = usePathname();
 
     // Track previous connection state to detect NEW wallet connections
     const prevConnected = useRef<boolean>(false);
@@ -103,6 +105,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
     if (isMobile) {
+        // Allow rendering the dashboard natively on mobile
+        if (isConnected && pathname === '/dashboard') {
+            return <>{children}</>;
+        }
+
         // User EXPLICITLY chose to go to news via the landing page button
         if (showNews && isConnected) {
             return <MobileNewsShell />;
@@ -110,9 +117,10 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
         // Always show the Sovereign Landing:
         // Pre-connection → wallet connect buttons
-        // Post-connection → manifesto + "VER NOTICIAS" + "ENLAZAR PC"
+        // Post-connection → connected state with navigation
         return (
-            <MobileSovereignLanding onEnterNews={() => setShowNews(true)} />
+            {/* @ts-ignore */}
+            <MobileSovereignLanding />
         );
     }
 

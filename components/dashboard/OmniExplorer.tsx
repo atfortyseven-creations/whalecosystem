@@ -96,7 +96,7 @@ export function OmniExplorer() {
     };
 
     return (
-        <div className="relative h-full w-full font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 selection:text-[#050505] overflow-hidden bg-[#FFFFFF]">
+        <div className="relative h-full w-full min-h-0 font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 selection:text-[#050505] overflow-hidden bg-[#FFFFFF]">
             
             <div className="relative z-10 w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col gap-12">
                 {/* Header / Search Area */}

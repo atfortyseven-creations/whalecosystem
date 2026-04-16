@@ -279,7 +279,7 @@ export function GoldTicketPanel() {
   const hasTicket = dbStats?.ticket || false;
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 overflow-hidden">
+    <div className="w-full h-full min-h-0 flex flex-col gap-4 overflow-hidden">
       
       {/* ── HERO & INTERACTION (BENTO GRID) ── */}
       <div className="grid lg:grid-cols-2 gap-4 shrink-0">

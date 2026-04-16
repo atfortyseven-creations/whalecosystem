@@ -102,15 +102,15 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                         </div>
 
                         <div className="relative w-full aspect-square max-w-[320px] bg-white border border-[#050505]/10 rounded-[32px] overflow-hidden shadow-2xl flex items-center justify-center">
-                            {!error ? (
-                                <div id="qr-reader" className="w-full h-full !border-none" />
-                            ) : (
-                                <div className="p-8 text-center space-y-4">
+                            <div id="qr-reader" className={`w-full h-full !border-none ${error ? 'hidden' : ''}`} />
+                            
+                            {error && (
+                                <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center space-y-4">
                                     <Shield size={32} className="mx-auto text-red-500 opacity-50" />
                                     <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">{error}</p>
                                     <button 
                                         onClick={() => setError(null)}
-                                        className="text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 bg-black text-white rounded-full"
+                                        className="text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 bg-black text-white rounded-full mx-auto mt-2"
                                     >
                                         RETRY
                                     </button>

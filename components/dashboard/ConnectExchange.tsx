@@ -32,7 +32,7 @@ export default function ConnectExchange() {
     };
 
     return (
-        <div className="h-full flex flex-col p-6 gap-6 font-sans overflow-y-auto">
+        <div className="h-full w-full min-h-0 flex flex-col p-6 gap-6 font-sans overflow-y-auto">
 
             {/* ── HEADER ── */}
             <div className="rounded-2xl p-7 flex items-center justify-between relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>

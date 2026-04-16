@@ -216,7 +216,7 @@ export function GainersLosersPanel() {
     const hasData = allRows.length > 0;
 
     return (
-        <div className="w-full h-full flex flex-col p-4 space-y-5 overflow-hidden text-[#050505] font-sans">
+        <div className="w-full h-full min-h-0 flex flex-col p-4 space-y-5 overflow-hidden text-[#050505] font-sans">
             {/* ── Summary Cards ── */}
             <div className="grid grid-cols-2 gap-4 shrink-0">
                 {/* Top Gainers */}

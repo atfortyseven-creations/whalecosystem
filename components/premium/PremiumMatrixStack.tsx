@@ -206,7 +206,7 @@ export function PremiumMatrixStack() {
         : PERFECTION_TOKENS.slice(5, 10);
 
     return (
-        <div className="w-full h-full flex flex-col gap-6 p-6 animate-in fade-in duration-700 font-sans overflow-hidden">
+        <div className="w-full h-full min-h-0 flex flex-col gap-6 p-6 animate-in fade-in duration-700 font-sans overflow-hidden">
 
             {/* ─── DRAGGABLE STAT CARDS ─── */}
             <div className="shrink-0 h-[160px]">

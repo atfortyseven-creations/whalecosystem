@@ -440,7 +440,7 @@ export default function AkashicLedger() {
   };
 
   return (
-    <div className="p-8 h-full overflow-y-auto scrollbar-hide">
+    <div className="flex flex-col min-h-0 w-full h-full p-8 overflow-y-auto scrollbar-hide">
       {/* ── Header ── */}
       <div className="mb-8 flex items-start justify-between">
         <div>

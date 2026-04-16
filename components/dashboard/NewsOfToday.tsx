@@ -41,7 +41,7 @@ const DEMO_NEWS: UINewsArticle[] = [
     },
 ];
 
-function timeAgo(iso: string) {
+function timeAgo(iso: string | Date | number) {
     const diff = (Date.now() - new Date(iso).getTime()) / 1000;
     if (diff < 60)    return `Just now`;
     if (diff < 3600)  return `${Math.floor(diff / 60)} min ago`;
@@ -124,7 +124,7 @@ export function NewsOfToday() {
     );
 
     return (
-        <div className="w-full h-full p-6 flex flex-col text-[#050505] font-sans overflow-hidden">
+        <div className="w-full h-full min-h-0 p-6 flex flex-col text-[#050505] font-sans overflow-hidden">
             <div className="flex-1 w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden flex flex-col min-h-0">
                 
                 {/* ── EXCHANGE STATUS TICKER ── */}
