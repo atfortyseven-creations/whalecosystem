@@ -616,4 +616,4 @@ Designed and engineered as a single, coherent system by one independent develope
 The theoretical asymmetry of information in public blockchain markets is not a natural law. It is a solvable engineering problem. This system is the solution.
 
 © 2026 atfortyseven-creations. All rights reserved. Unauthorised reproduction, distribution, or derivative use of this system, its documentation, its signal methodology, or its source code is strictly prohibited.
-\`.toLowerCase();
+`.toLowerCase();
