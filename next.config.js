@@ -71,8 +71,6 @@ const nextConfig = {
 
     experimental: {
         optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber'],
-        reactCompiler: true,
-        esmExternals: 'loose',
         serverActions: {
             bodySizeLimit: '10mb'
         }
