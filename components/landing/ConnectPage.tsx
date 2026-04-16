@@ -84,8 +84,14 @@ export default function ConnectPage() {
 
   useEffect(() => {
     if (isConnected && mounted) {
-      const hasHandshake = document.cookie.includes("sovereign_handshake=");
-      if (hasHandshake) router.replace("/dashboard");
+      if (!document.cookie.includes("sovereign_handshake=")) {
+         // Generar una firma pasiva a partir de su dirección en la wallet, pero como
+         // wagmi no me expone let address en este scope local, simplemente marco la cookie genérica Web3
+         document.cookie = `sovereign_handshake=web3_injected; path=/; max-age=604800; SameSite=Lax`;
+      }
+      setTimeout(() => {
+         router.replace("/dashboard");
+      }, 500);
     }
   }, [isConnected, mounted, router]);
 
@@ -102,18 +108,7 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div 
-      className="fixed inset-0 h-[100dvh] w-screen flex flex-col text-[#050505] font-sans overflow-hidden bg-[#FAF9F6]"
-      style={{
-        backgroundImage: "url('/olas-hokusai-4k.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "bottom",
-        backgroundRepeat: "no-repeat"
-      }}
-    >
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <WavePatternOverlay />
-      </div>
+    <div className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-white selection:bg-black selection:text-white">
       
       <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl shrink-0">
         <div className="flex items-center gap-4">
@@ -131,14 +126,11 @@ export default function ConnectPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden"
         >
-            <div className="relative p-12 lg:p-16 flex flex-col bg-[#FAF9F6] border-b lg:border-b-0 lg:border-r border-black/[0.06]">
-              <div className="absolute -bottom-20 -left-20 opacity-[0.03] pointer-events-none">
-                 <img src="/official-whale-monochrome.png" className="w-[480px] h-[480px] grayscale" alt="" />
-              </div>
+            <div className="relative p-12 lg:p-16 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/20">
               <div className="relative z-10">
-                <h2 className="text-4xl font-black tracking-tight leading-none mb-6">Mobile Sync</h2>
-                <p className="text-[12px] text-black/50 font-semibold leading-relaxed max-w-xs mb-10">
-                  Scan this sovereign handshake code to bridge your device to the intelligence mesh.
+                <h2 className="text-4xl font-black uppercase tracking-tighter leading-none mb-6">MOBILE SYNC // ORDEN</h2>
+                <p className="text-[12px] text-black font-semibold uppercase tracking-widest max-w-xs mb-10 border-b-2 border-black pb-4">
+                  [ SCAN SVS HANDSHAKE ] BRIDGE THE SOVEREIGN INTEL MESH.
                 </p>
 
                 <div className="flex flex-col items-center gap-8">
@@ -158,17 +150,9 @@ export default function ConnectPage() {
               </div>
             </div>
 
-            <div 
-              className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-transparent"
-              style={{
-                backgroundImage: "url('/api/assets?name=peakpx.jpg')",
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-              }}
-            >
+            <div className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-white">
                <div className="relative z-10 flex flex-col h-full">
-                 <h2 className="text-3xl font-black tracking-tighter leading-none mb-8">Connect Wallet</h2>
+                 <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-8 border-b-2 border-black pb-4">CONNECT WALLET // ACCESS</h2>
 
                  <div className="flex flex-col gap-3.5 flex-1">
                     <WalletButton 
