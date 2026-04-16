@@ -855,6 +855,186 @@ In pursuit of the "Institutional Ivory" high-frequency rendering contract, all e
 
 ---
 
+## 27. The Sovereign Master Node (Phase 5 — Local Intelligence Compute)
+
+*This chapter documents the final and most operationally consequential architectural addition to the Whale Alert Network: the Sovereign Master Node. This is not a cloud abstraction or a managed service. It is a dedicated, locally-operated intelligence compute engine running on the developer's own physical machine, bridged directly into the production Railway infrastructure via authenticated TCP proxy channels.*
+
+### 27.1 What the Sovereign Master Node Is
+
+The Sovereign Master Node is the local execution of `scripts/whale-worker.ts` on the developer's personal computer. It is the origin point of all real-time blockchain telemetry ingested by the platform. When the node is running, every whale-scale capital movement detected on Ethereum Mainnet, BNB Smart Chain, Base, Bitcoin, and Solana is captured, classified, persisted to the production PostgreSQL database on Railway, and broadcast to every connected dashboard client via the WebSocket server running on port 3001.
+
+The node is **not optional**. It is the system's heartbeat. Without it, the dashboard consumes only the historical records already committed to PostgreSQL — accurate, but static. With it, the dashboard is a live intelligence operation.
+
+The node is launched with the following command from the project root:
+
+```bash
+npx cross-env NODE_OPTIONS="--expose-gc --max-old-space-size=1048576" npx tsx scripts/whale-worker.ts
+```
+
+The `--expose-gc` flag enables explicit garbage collection calls. The `--max-old-space-size=1048576` allocation grants the Node.js heap 1 terabyte of virtual address space, ensuring that the accumulation of RPC response buffers, WebSocket event queues, and Prisma model caches never triggers an out-of-memory termination under any real-world ingestion volume.
+
+### 27.2 Architecture of the Worker Entry Point
+
+The entry point `scripts/whale-worker.ts` is a fully autonomous, multi-chain orchestration daemon. Its boot sequence executes the following operations in order:
+
+**1. Global Exception Absorption.** Before any blockchain connection is attempted, two process-level exception handlers are registered: `process.on('uncaughtException')` and `process.on('unhandledRejection')`. Both handlers filter incoming errors against the `lethalWSPatterns` array — a set of error message fragments corresponding to network-layer failures that are operational realities rather than application bugs:
+
+```typescript
+const lethalWSPatterns = [
+  'Unexpected server response',   // HTTP 403 during WS upgrade
+  'WebSocket',                    // Generic WS disconnection
+  '403', '429',                   // Rate-limiting and auth rejection
+  'ECONNRESET', 'ETIMEDOUT',      // Network-level interruption
+  '401', '402'                    // Compute unit exhaustion
+];
+```
+
+Any error matching these patterns is silently swallowed and logged as a `[WS-SHIELD]` suppression event. Only genuinely unrecoverable application errors reach the fatal error handler. This architecture ensures that a single expired RPC credential or a momentary network interruption cannot crash the entire monitoring process.
+
+**2. WebSocket Hub Initialisation.** A standalone HTTP server is created and bound to port 3001 (configurable via `WS_PORT`). The `initializeWebSocket` function attaches the Socket.IO server to this HTTP instance, establishing the real-time push channel through which classified whale events are broadcast to all connected dashboard clients. If port 3001 is already in use, the server automatically increments the port number until a free port is found — making the node coexistent with other local services.
+
+**3. Multi-Chain Scanner Activation.** Five parallel scanner processes are started concurrently via non-blocking `.catch()` chains:
+
+| Scanner | Chain | Provider |
+|---|---|---|
+| `startEvmWorker(baseResilientProvider, 'BASE')` | Base (Chain 8453) | ResilientProvider × 6-8 endpoints |
+| `startEvmWorker(ethereumResilientProvider, 'ETHEREUM')` | Ethereum Mainnet (Chain 1) | ResilientProvider × 8-12 endpoints |
+| `startEvmWorker(bscResilientProvider, 'BSC')` | BNB Smart Chain (Chain 56) | ResilientProvider × 8 endpoints |
+| `startBtcWorker()` | Bitcoin Mainnet | GetBlock authenticated RPC |
+| `startSolanaWorker()` | Solana Mainnet | Helius + QuickNode WSS |
+
+Each scanner is isolated in its own async execution chain. A catastrophic failure in the BTC worker does not interrupt the ETH or SOL workers. The node continues providing intelligence on all surviving chains.
+
+### 27.3 The ResilientProvider Multiplexer
+
+The `ResilientProvider` class (`lib/blockchain/ResilientProvider.ts`) is the most technically sophisticated component of the Sovereign Master Node. Its function is to present a single, stable blockchain provider interface to the scanner modules while internally managing a rotating pool of HTTP and WebSocket RPC endpoints with automatic failure detection, exhaustion tracking, and self-healing.
+
+**Endpoint Pool Architecture.** For each monitored chain, the provider maintains two separate pools: an HTTP pool for synchronous query operations and a WebSocket pool for event subscription. For Ethereum Mainnet, the HTTP pool contains up to twelve endpoints from a combination of GetBlock (private), Alchemy, Ankr, 1RPC, LlamaRPC, and Cloudflare:
+
+```typescript
+// Ethereum HTTP pool (abbreviated)
+'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8',
+`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+'https://rpc.ankr.com/eth',
+'https://1rpc.io/eth',
+'https://eth.llamarpc.com',
+'https://cloudflare-eth.com'
+```
+
+**Failure Detection and Blacklisting.** When any endpoint returns HTTP 401 (authentication failure), 402 (compute unit exhausted), or 429 (rate limited), or fails two consecutive requests, `markExhausted()` is called. The endpoint is blacklisted and removed from the active pool. After a 60-second cooldown — reduced from the standard 3-minute cooldown for maximum throughput agility — the endpoint is automatically restored to the active pool and eligible for new requests.
+
+**WebSocket Rotation.** When the active WebSocket provider drops its connection — due to server-side termination, network interruption, or endpoint exhaustion — `reconnectWS()` is called. The current WebSocket provider is destroyed, all listeners are removed, and a 5-second timer schedules connection to the next WSS endpoint in the rotation. All active subscriptions (block listeners, log filters) are automatically re-applied to the new provider via the `subscriptions` registry, ensuring no events are permanently lost during rotation.
+
+**Subscription Persistence.** The ResilientProvider maintains an internal `subscriptions` array. Every call to `provider.on()` registers the subscription in this array before applying it to the current WebSocket provider. When a new WebSocket connection is established after rotation, all subscriptions are replayed against the new provider, restoring the monitoring state without requiring the scanner modules to re-register their listeners.
+
+**Transparent Proxy Interface.** For scanner modules that interact with the provider through the standard `ethers.JsonRpcProvider` API, the `getProvider()` method returns a JavaScript `Proxy` object. The proxy intercepts all standard provider methods (`send`, `call`, `getBalance`, `getLogs`, etc.) and routes them through the `call<T>()` method, which implements the full failover logic. From the scanner module's perspective, it is interacting with a single stable provider. The failover complexity is entirely encapsulated.
+
+### 27.4 The Global WebSocket Crash Shield
+
+A critical production stability mechanism is implemented at the module level in `ResilientProvider.ts`: a global `uncaughtException` handler guarded by the `__WS_PROTECTED` flag on `globalThis`. This guard prevents duplicate handler registration when multiple provider instances are created:
+
+```typescript
+if (typeof process !== 'undefined' && !(globalThis as any).__WS_PROTECTED) {
+    (globalThis as any).__WS_PROTECTED = true;
+    process.on('uncaughtException', (err: any) => {
+        // Swallow all WebSocket and network errors
+        // Only fatal application errors reach process.exit(1)
+    });
+}
+```
+
+The Node.js `ws` library, which underlies `ethers.WebSocketProvider`, emits an unhandled `uncaughtException` when it receives an HTTP 403 during the WebSocket upgrade handshake. Without this shield, a single unauthorised RPC endpoint in the pool would terminate the entire monitoring process. With it, the failure is absorbed, logged as a `[WhaleFortress:Resilience]` event, and the rotation proceeds to the next endpoint.
+
+### 27.5 Production Database Connectivity
+
+When running locally, the Sovereign Master Node connects to the **production Railway PostgreSQL** and **production Railway Redis** instances via their public TCP proxy endpoints. The connection strings are configured in the local `.env` file:
+
+```env
+DATABASE_URL="postgresql://postgres:[PASSWORD]@[RAILWAY_TCP_HOST]:[PORT]/railway?sslmode=require"
+REDIS_URL="redis://default:[PASSWORD]@[RAILWAY_REDIS_HOST]:[PORT]"
+```
+
+This means every whale event detected by the local node is written directly into the same production database consumed by the deployed Railway application. The local machine and the cloud deployment share a single source of truth. There is no staging environment, no data synchronisation step, and no divergence between what the developer sees locally and what users see in production.
+
+### 27.6 CU Optimisation and Active Client Detection
+
+The worker includes an active client detection mechanism that throttles polling frequency when no users are connected to the dashboard. The `getActiveClients()` function reads a Redis counter (`WHALE_MONITOR_CLIENTS`) that the dashboard increments on connection and decrements on disconnection. When no clients are active, the worker can reduce its polling frequency to conserve RPC compute units. This mechanism prevents unnecessary API consumption during periods of zero demand while ensuring full-intensity monitoring resumes the moment a user opens the dashboard.
+
+### 27.7 Operational Ignition Protocol
+
+The complete sequence to bring the Sovereign Master Node online is:
+
+**Step 1 — Environment Verification**
+```bash
+# Verify production database connectivity
+npx prisma db pull --print
+```
+
+**Step 2 — Dependency Verification**
+```bash
+# Ensure ethers and all worker dependencies are installed
+npm install --legacy-peer-deps
+```
+
+**Step 3 — Node Ignition**
+```bash
+# Launch with maximum memory allocation and GC exposure
+npx cross-env NODE_OPTIONS="--expose-gc --max-old-space-size=1048576" npx tsx scripts/whale-worker.ts
+```
+
+**Expected Startup Output:**
+```
+🐋 [Whale Worker] Starting with Elite Resilience & CU Optimization...
+🚀 [Data Hub] WebSocket Server running on port 3001
+[ResilientProvider] 🚀 Booted Multiplexer for chain 1 with 10 HTTP / 5 WSS Endpoints.
+[ResilientProvider] 🚀 Booted Multiplexer for chain 56 with 8 HTTP / 3 WSS Endpoints.
+[ResilientProvider] 🚀 Booted Multiplexer for chain 8453 with 7 HTTP / 3 WSS Endpoints.
+```
+
+**To monitor live telemetry in a separate terminal:**
+```bash
+# The node logs all detected whale events to stdout in real-time
+# Each event includes chain, USD value, tier classification, and tx hash
+```
+
+**Step 4 — Verify Data Ingestion**
+Open the dashboard at `http://localhost:3000` (or the production Railway URL) and navigate to the **Institutional Ledger** tab. Within 30–60 seconds of node ignition, newly ingested blocks will appear with `Finalized / Valid` status.
+
+### 27.8 Sovereign Node Topology Summary
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│               SOVEREIGN MASTER NODE (Local PC)              │
+│                                                             │
+│  whale-worker.ts                                            │
+│  ├── Global WS Crash Shield (process.on uncaughtException)  │
+│  ├── WebSocket Hub (port 3001)                              │
+│  ├── EVM Worker — ETH (ResilientProvider × 10+ endpoints)   │
+│  ├── EVM Worker — BASE (ResilientProvider × 7+ endpoints)   │
+│  ├── EVM Worker — BSC (ResilientProvider × 8+ endpoints)    │
+│  ├── BTC Worker (GetBlock authenticated RPC)                │
+│  └── SOL Worker (Helius + QuickNode WSS)                    │
+│                          │                                  │
+│              Prisma ORM (production DATABASE_URL)           │
+└──────────────────────────┼──────────────────────────────────┘
+                           │ TCP Proxy (Railway)
+              ┌────────────▼────────────┐
+              │   Railway Production    │
+              │  PostgreSQL + Redis     │
+              │  (Shared source of      │
+              │   truth with cloud app) │
+              └────────────────────────┘
+                           │
+              ┌────────────▼────────────┐
+              │  Railway App Container  │
+              │  (Next.js Dashboard)    │
+              │  Reads from same DB     │
+              │  Serves to all users    │
+              └────────────────────────┘
+```
+
+---
+
 <div align="center">
 
 **Whale Alert Network**
