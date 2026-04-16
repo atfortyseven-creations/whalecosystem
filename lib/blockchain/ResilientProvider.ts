@@ -17,7 +17,14 @@ if (typeof process !== 'undefined' && !(globalThis as any).__WS_PROTECTED) {
             '403',
             '429',
             'ECONNRESET',
-            'ETIMEDOUT'
+            'ETIMEDOUT',
+            'ENOTFOUND',       // DNS resolution failure — hostname does not exist
+            'ECONNREFUSED',    // Remote host refused connection
+            'EHOSTUNREACH',    // No route to host
+            'getaddrinfo',     // DNS lookup failure prefix
+            'UNKNOWN_ERROR',   // ethers generic catch-all
+            'connection timeout exceeded',
+            'NETWORK_ERROR'
         ];
 
         if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
@@ -88,12 +95,13 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       ...parseMultiplexKeys(process.env.GETBLOCK_BSC_RPCS),
       'https://go.getblock.io/e264370bb5e047c38d6c87ec0ab42dff',
       'https://go.getblock.us/6aca5a5ffeba4f2f933766e547d4e3a3',
-      'https://binance.llamarpc.com',
+      'https://bsc.llamarpc.com',          // FIX: binance.llamarpc.com is ENOTFOUND — correct host
       'https://1rpc.io/bnb',
       'https://bsc-dataseed1.binance.org',
       'https://bsc-dataseed2.binance.org',
       'https://bsc.meowrpc.com',
-      'https://rpc.ankr.com/bsc'
+      'https://rpc.ankr.com/bsc',
+      'https://bsc.publicnode.com'
     ].filter(Boolean),
     wss: [
       ...parseMultiplexKeys(process.env.GETBLOCK_BSC_WSS),

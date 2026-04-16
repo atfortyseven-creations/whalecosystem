@@ -37,7 +37,14 @@ process.on('uncaughtException', (err: any) => {
     'ECONNRESET',
     'ETIMEDOUT',
     '401',
-    '402'
+    '402',
+    'ENOTFOUND',       // DNS resolution failure
+    'ECONNREFUSED',    // Remote host refused connection
+    'EHOSTUNREACH',    // No route to host
+    'getaddrinfo',     // DNS lookup failure prefix
+    'UNKNOWN_ERROR',   // ethers catch-all
+    'connection timeout exceeded',
+    'NETWORK_ERROR'
   ];
 
   if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
@@ -61,7 +68,14 @@ process.on('unhandledRejection', (reason: any, promise) => {
     'ECONNRESET',
     'ETIMEDOUT',
     '401',
-    '402'
+    '402',
+    'ENOTFOUND',       // DNS resolution failure
+    'ECONNREFUSED',    // Remote host refused connection
+    'EHOSTUNREACH',    // No route to host
+    'getaddrinfo',     // DNS lookup failure prefix
+    'UNKNOWN_ERROR',   // ethers catch-all
+    'connection timeout exceeded',
+    'NETWORK_ERROR'
   ];
 
   if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {

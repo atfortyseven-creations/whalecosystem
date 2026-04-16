@@ -88,60 +88,60 @@ export default function WhaleSniperTerminal() {
   const activeCategory = GENESIS_CATEGORIES.find(c => c.id === activeTab) || GENESIS_CATEGORIES[1];
 
   return (
-    <div className="h-full w-full bg-[#000000] text-[#FFFFFF] font-mono flex flex-col relative overflow-hidden selection:bg-[#fff] selection:text-[#000] transform-gpu perspective-1000 will-change-transform">
+    <div className="h-full w-full min-h-0 bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl text-[#050505] font-sans flex flex-col relative overflow-hidden shadow-sm selection:bg-[#050505] selection:text-[#FFFFFF] transform-gpu will-change-transform">
       
       {/* ── GENESIS STATUS BAR ── */}
-      <header className="h-10 border-b border-white/5 bg-[#000000] flex items-center justify-between px-6 text-[10px] uppercase tracking-widest font-bold z-50">
+      <header className="h-12 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between px-6 text-[10px] uppercase tracking-widest font-black shrink-0 relative z-50">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-white/40">
+          <div className="flex items-center gap-2 text-[#050505]/50">
             <Skull size={12} className={metrics.activeConnection ? "text-emerald-500" : "text-rose-500"} />
             <span>SOVEREIGN_GENESIS_V1</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-white/20">NETWORK:</span>
-              <span className="text-emerald-400">ENCRYPTED</span>
+              <span className="text-[#050505]/30">NETWORK:</span>
+              <span className="text-emerald-600">ENCRYPTED</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-white/20">RPC_POOL:</span>
-              <span className="text-white">ACTIVE_8</span>
+              <span className="text-[#050505]/30">RPC_POOL:</span>
+              <span className="text-[#050505]">ACTIVE_8</span>
             </div>
           </div>
         </div>
         
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-white/20">IDENTITY:</span>
-            <span className={isConnected ? "text-emerald-500" : "text-rose-500"}>
+            <span className="text-[#050505]/30">IDENTITY:</span>
+            <span className={isConnected ? "text-emerald-600" : "text-rose-600"}>
               {isConnected ? "AUTHENTICATED" : "ANONYMOUS"}
             </span>
           </div>
-          <span className="text-white/20">{address ? `${address.slice(0,8)}...` : '0x0000...'}</span>
+          <span className="text-[#050505]/50">{address ? `${address.slice(0,8)}...` : '0x0000...'}</span>
         </div>
       </header>
 
-      <main className={`flex-1 flex overflow-hidden ${isMobile ? 'flex-col' : 'flex-row'}`}>
+      <main className={`flex-1 flex min-h-0 overflow-hidden ${isMobile ? 'flex-col' : 'flex-row'}`}>
         
         {/* ── TACTICAL CATEGORY SIDEBAR (Desktop Only) ── */}
         {!isMobile && (
-          <nav className="w-64 border-r border-white/5 bg-[#050505] flex flex-col overflow-hidden shrink-0">
-            <div className="p-4 border-b border-white/5 bg-black/40 text-[9px] font-black tracking-[0.3em] text-white/40 uppercase">
+          <nav className="w-64 border-r border-[#E5E5E5] bg-[#FAF9F6] flex flex-col min-h-0 shrink-0">
+            <div className="p-4 border-b border-[#E5E5E5] bg-[#E5E5E5]/20 text-[9px] font-black tracking-[0.3em] text-[#050505]/40 uppercase">
               Directory_Index
             </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1">
               {GENESIS_CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => handleTabChange(cat.id)}
-                  className={`w-full text-left px-3 py-2 text-[10px] transition-all border border-transparent ${
+                  className={`w-full text-left px-4 py-3 rounded-xl text-[10px] transition-all border ${
                     activeTab === cat.id 
-                      ? "bg-white/5 border-white/10 text-emerald-400 font-bold" 
-                      : "text-white/20 hover:text-white/60 hover:bg-white/5"
+                      ? "bg-[#050505]/5 border-[#050505]/10 text-[#050505] font-black shadow-sm" 
+                      : "border-transparent text-[#050505]/40 hover:text-[#050505]/80 hover:bg-[#050505]/5"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{cat.label}</span>
-                    {activeTab === cat.id && <div className="w-1 h-1 bg-emerald-400" />}
+                    {activeTab === cat.id && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
                   </div>
                 </button>
               ))}
@@ -150,18 +150,18 @@ export default function WhaleSniperTerminal() {
         )}
 
         {/* ── CONTENT ENGINE ── */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Academic Definition Header */}
-          <div className="px-6 md:px-8 py-4 md:py-6 border-b border-white/5 bg-black/20 shrink-0">
-            <div className="text-[9px] md:text-[10px] text-white/20 uppercase tracking-[0.4em] mb-1 md:mb-2 text-center lg:text-left">Academic_Unit // {activeCategory.id}</div>
-            <h1 className="text-lg md:text-xl font-bold tracking-tight mb-1 md:mb-2 text-white/90 text-center lg:text-left">{activeCategory.label}</h1>
-            <p className="text-[10px] md:text-[11px] leading-relaxed text-white/40 max-w-3xl text-center lg:text-left mx-auto lg:mx-0">
+          <div className="px-6 md:px-8 py-5 border-b border-[#E5E5E5] bg-[#FFFFFF] shrink-0">
+            <div className="text-[9px] md:text-[10px] text-[#050505]/30 uppercase tracking-[0.4em] mb-1 md:mb-2 text-center lg:text-left">Academic_Unit // {activeCategory.id}</div>
+            <h1 className="text-lg md:text-xl font-black tracking-tight mb-1 md:mb-2 text-[#050505] text-center lg:text-left">{activeCategory.label}</h1>
+            <p className="text-[10px] md:text-[11px] leading-relaxed font-medium text-[#050505]/50 max-w-3xl text-center lg:text-left mx-auto lg:mx-0">
               {activeCategory.academic}
             </p>
           </div>
 
           {/* Dynamic Module Rendering - Bounded to Zero-Scroll */}
-          <div className="flex-1 overflow-hidden p-4 md:p-6 flex flex-col relative">
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-6 flex flex-col relative bg-[#FAF9F6]">
             <AnimatePresence mode="wait">
               {tabLoading ? (
                  <motion.div 
@@ -170,9 +170,9 @@ export default function WhaleSniperTerminal() {
                    exit={{ opacity: 0 }}
                    className="h-full flex flex-col space-y-4"
                  >
-                   <div className="h-8 w-1/4 bg-white/5 animate-pulse rounded" />
-                   <div className="flex-1 bg-white/[0.02] border border-white/5 animate-pulse rounded-lg" />
-                   <div className="h-12 w-full bg-white/5 animate-pulse rounded" />
+                   <div className="h-8 w-1/4 bg-[#050505]/5 animate-pulse rounded-lg" />
+                   <div className="flex-1 bg-[#050505]/5 border border-[#E5E5E5] animate-pulse rounded-2xl" />
+                   <div className="h-12 w-full bg-[#050505]/5 animate-pulse rounded-lg" />
                  </motion.div>
               ) : (
                  <motion.div

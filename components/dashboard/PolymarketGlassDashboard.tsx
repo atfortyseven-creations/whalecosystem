@@ -103,34 +103,34 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
             initial="hidden"
             animate="show"
             variants={containerVariants}
-            className={`w-full text-white font-sans selection:bg-indigo-500/30 ${embedded ? '' : 'min-h-screen p-4 md:p-8'}`}
+            className={`w-full h-full min-h-0 text-[#050505] font-sans selection:bg-[#050505]/20 flex flex-col overflow-hidden ${embedded ? '' : 'p-4 md:p-6'}`}
         >
-            <Toaster position="bottom-right" theme="dark" richColors />
+            <Toaster position="bottom-right" theme="light" richColors />
 
             <SendModal isOpen={isSendOpen} onClose={() => setIsSendOpen(false)} />
             <ReceiveModal isOpen={isReceiveOpen} onClose={() => setIsReceiveOpen(false)} />
 
-            {/* A. GLASS HEADER */}
+            {/* A. IVORY HEADER */}
             {!embedded && (
                 <motion.header
                     variants={itemVariants}
-                    className="sticky top-4 z-[999] mb-8 w-full max-w-7xl mx-auto"
+                    className="z-[50] mb-5 w-full shrink-0"
                 >
-                    <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-[#050505]/80 backdrop-blur-xl border border-white/10 shadow-2xl">
+                    <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
                         <div className="flex items-center space-x-4">
                             <NetworkSwitcher />
-                            <div className="hidden md:flex items-center space-x-2 bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/20">
-                                <ActivityIcon size={14} className={isPolygon ? 'text-emerald-500 animate-pulse' : 'text-gray-500'} />
-                                <span className="text-xs font-black tracking-widest text-[#00dda8] uppercase">
+                            <div className="hidden md:flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                                <ActivityIcon size={14} className={isPolygon ? 'text-emerald-600 animate-pulse' : 'text-[#050505]/30'} />
+                                <span className="text-xs font-black tracking-widest text-emerald-700 uppercase">
                                     {isPolygon ? "L1 Connectivity: Native" : "Cross-Chain Relayed"}
                                 </span>
                             </div>
                         </div>
 
                         <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-black/20 border border-white/5">
-                                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                                <span className="text-xs font-mono font-bold text-white/70">
+                            <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#050505]/5 border border-[#050505]/10">
+                                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                <span className="text-xs font-mono font-black text-[#050505]/60">
                                     {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Disconnected Hub"}
                                 </span>
                             </div>
@@ -139,40 +139,41 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                 </motion.header>
             )}
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-2">
 
                 {/* B. PORTFOLIO & DYNAMIC MARKETS AREA */}
-                <motion.div variants={itemVariants} className="lg:col-span-8 space-y-8">
-                    <div className="relative p-8 rounded-[32px] bg-[#050505]/60 backdrop-blur-2xl border border-white/10 shadow-2xl overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
-                            <Globe className="w-32 h-32 text-indigo-500" />
+                <motion.div variants={itemVariants} className="lg:col-span-8 space-y-6">
+                    <div className="relative p-8 rounded-[28px] bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                            <Globe className="w-32 h-32 text-[#050505]" />
                         </div>
 
-                        <h2 className="text-xs uppercase tracking-[0.3em] text-white/50 font-black mb-2">Total Portfolio Value</h2>
+                        <h2 className="text-xs uppercase tracking-[0.3em] text-[#050505]/40 font-black mb-2">Total Portfolio Value</h2>
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-6xl md:text-7xl font-black font-mono tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
+                            <span className="text-5xl md:text-6xl font-black font-mono tracking-tighter text-[#050505]">
                                 ${portfolioValue}
                             </span>
                         </div>
 
-                        <div className="mt-8 flex space-x-8 items-end relative z-10">
+                        <div className="mt-6 flex space-x-8 items-end relative z-10">
                             <div className="flex-1">
-                                <p className="text-[10px] text-emerald-500/50 uppercase tracking-[0.2em] mb-1 font-black">L1 Liquid Capital (USDC)</p>
-                                <p className="text-2xl font-black font-mono text-emerald-400 shadow-sm">${usdcBalance}</p>
+                                <p className="text-[10px] text-emerald-700 uppercase tracking-[0.2em] mb-1 font-black">L1 Liquid Capital (USDC)</p>
+                                <p className="text-2xl font-black font-mono text-emerald-600">${usdcBalance}</p>
                             </div>
 
                             <div className="flex space-x-3">
                                 <button
                                     onClick={() => setIsSendOpen(true)}
-                                    className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center gap-2 font-black uppercase text-[10px] tracking-widest transition-all hover:scale-105"
+                                    className="px-5 py-2.5 rounded-xl bg-[#050505] text-[#FFFFFF] hover:bg-[#050505]/80 border border-[#050505] flex items-center gap-2 font-black uppercase text-[10px] tracking-widest transition-all hover:scale-105"
                                 >
                                     <ArrowUpRight className="w-4 h-4" /> Send
                                 </button>
                                 <button
                                     onClick={() => setIsReceiveOpen(true)}
-                                    className="px-6 py-3 rounded-xl bg-[#111111] hover:bg-[#222222] border border-[#333333] flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-xl transition-all hover:scale-105"
+                                    className="px-5 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FAF9F6] border border-[#E5E5E5] flex items-center gap-2 font-black uppercase text-[10px] tracking-widest shadow-sm transition-all hover:scale-105 text-[#050505]"
                                 >
-                                    <ArrowDownLeft className="w-4 h-4 text-[#00dda8]" /> Receive
+                                    <ArrowDownLeft className="w-4 h-4 text-emerald-600" /> Receive
                                 </button>
                             </div>
                         </div>
@@ -181,17 +182,17 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                     {/* DYNAMIC MARKETS FROM L1 REST API */}
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xs font-black text-white/50 uppercase tracking-[0.25em] flex items-center gap-2">
-                                <Globe size={14} className="text-white/30" />
+                            <h3 className="text-xs font-black text-[#050505]/50 uppercase tracking-[0.25em] flex items-center gap-2">
+                                <Globe size={14} className="text-[#050505]/30" />
                                 L1 Market Terminal
                             </h3>
                             {isMarketsLoading && (
-                                <div className="flex items-center gap-2 text-[#00dda8] text-[9px] uppercase tracking-widest font-black animate-pulse">
+                                <div className="flex items-center gap-2 text-emerald-600 text-[9px] uppercase tracking-widest font-black animate-pulse">
                                     <Loader2 size={12} className="animate-spin" /> Syncing CLOB Nodes...
                                 </div>
                             )}
                             {marketsError && (
-                                <div className="flex items-center gap-2 text-rose-500 text-[10px] uppercase font-black tracking-widest">
+                                <div className="flex items-center gap-2 text-rose-600 text-[10px] uppercase font-black tracking-widest">
                                     <AlertTriangle size={12} /> {marketsError}
                                 </div>
                             )}
@@ -207,31 +208,31 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ delay: i * 0.05 }}
-                                        className={`p-5 rounded-[1.5rem] bg-[#050505] transition-all cursor-pointer group relative overflow-hidden flex flex-col justify-between h-full border ${isSelected ? 'border-[#00dda8] shadow-[0_0_20px_rgba(0,221,168,0.1)]' : 'border-[#222222] hover:border-white/20'}`}
+                                        className={`p-5 rounded-[1.5rem] bg-[#FFFFFF] transition-all cursor-pointer group relative overflow-hidden flex flex-col justify-between h-full border shadow-sm ${isSelected ? 'border-emerald-300 shadow-emerald-50' : 'border-[#E5E5E5] hover:border-[#050505]/20 hover:shadow-md'}`}
                                     >
-                                        <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity">
-                                            <Brain size={48} className="text-white" />
+                                        <div className="absolute top-0 right-0 p-3 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                                            <Brain size={48} className="text-[#050505]" />
                                         </div>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <div className="text-[10px] font-black text-[#888888] uppercase tracking-widest group-hover:text-white/60 transition-colors">
+                                            <div className="text-[10px] font-black text-[#050505]/40 uppercase tracking-widest">
                                                 On-Chain Event //
                                             </div>
-                                            {isSelected && <span className="bg-[#00dda8]/10 text-[#00dda8] px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Active Link</span>}
+                                            {isSelected && <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border border-emerald-100">Active Link</span>}
                                         </div>
-                                        <h4 className="text-sm font-black text-white line-clamp-3 leading-snug group-hover:text-[#00dda8] transition-colors">
+                                        <h4 className="text-sm font-black text-[#050505] line-clamp-3 leading-snug">
                                             {market.question}
                                         </h4>
                                         <div className="mt-4 flex items-center justify-between">
-                                            <div className="text-[9px] font-mono text-[#444444] uppercase">{market.condition_id.slice(0, 10)}...</div>
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${isSelected ? 'border-[#00dda8] bg-[#00dda8]/10' : 'border-[#333333] bg-[#111111] group-hover:border-[#00dda8]/50'}`}>
-                                                <ArrowUpRight size={14} className={isSelected ? 'text-[#00dda8]' : 'text-[#666]'} />
+                                            <div className="text-[9px] font-mono text-[#050505]/30 uppercase">{market.condition_id.slice(0, 10)}...</div>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${isSelected ? 'border-emerald-300 bg-emerald-50' : 'border-[#E5E5E5] bg-[#FAF9F6] group-hover:border-[#050505]/20'}`}>
+                                                <ArrowUpRight size={14} className={isSelected ? 'text-emerald-600' : 'text-[#050505]/40'} />
                                             </div>
                                         </div>
                                     </motion.div>
                                 );
                             })}
                             {!isMarketsLoading && markets.length === 0 && !marketsError && (
-                                <div className="col-span-full py-12 text-center text-[#555555] font-black uppercase tracking-widest text-xs">
+                                <div className="col-span-full py-12 text-center text-[#050505]/30 font-black uppercase tracking-widest text-xs">
                                     No active markets synchronized in the local node currently.
                                 </div>
                             )}
@@ -243,12 +244,12 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                 <motion.div variants={itemVariants} className="lg:col-span-4 space-y-4">
 
                     {!isPolygon ? (
-                        <div className="h-full min-h-[440px] p-8 rounded-[2rem] bg-[#050505]/80 border border-[#222222] backdrop-blur-xl shadow-2xl flex flex-col items-center justify-center text-center space-y-4">
-                            <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+                        <div className="p-8 rounded-[2rem] bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[320px]">
+                            <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
                                 <ActivityIcon className="w-8 h-8 text-rose-500" />
                             </div>
-                            <h3 className="text-xl font-black uppercase text-white tracking-widest">Jurisdictional Halt</h3>
-                            <p className="text-[#888888] font-bold text-xs max-w-[220px] uppercase tracking-wider">
+                            <h3 className="text-xl font-black uppercase text-[#050505] tracking-widest">Jurisdictional Halt</h3>
+                            <p className="text-[#050505]/50 font-bold text-xs max-w-[220px] uppercase tracking-wider">
                                 Orderbook routing restricted. Please switch to Polygon network.
                             </p>
                         </div>
@@ -256,14 +257,14 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                         <div className="space-y-4">
                             {/* PROXY SECURE HANDSHAKE */}
                             {!isProxyEnabled && (
-                                <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 backdrop-blur-md flex items-start space-x-4">
-                                    <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                                <div className="p-5 rounded-2xl bg-amber-50 border border-amber-100 flex items-start space-x-4">
+                                    <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                     <div>
-                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-amber-500 mb-1">Handshake Required</h3>
-                                        <p className="text-[10px] text-white/50 mb-3 font-medium">Asymmetric vault disables injections without EIP-712 Proxy.</p>
+                                        <h3 className="text-[11px] font-black uppercase tracking-widest text-amber-700 mb-1">Handshake Required</h3>
+                                        <p className="text-[10px] text-[#050505]/50 mb-3 font-medium">Asymmetric vault disables injections without EIP-712 Proxy.</p>
                                         <button
                                             onClick={login}
-                                            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-[#050505] text-[10px] font-black uppercase tracking-widest rounded transition-colors"
+                                            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white text-[10px] font-black uppercase tracking-widest rounded transition-colors"
                                         >
                                             Authorize Channel
                                         </button>
@@ -271,70 +272,70 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                                 </div>
                             )}
 
-                            <div className="p-6 rounded-[2rem] bg-[#050505] border border-[#222222] shadow-2xl h-full flex flex-col">
-                                <div className="mb-6 border-b border-[#222] pb-6">
-                                    <h3 className="text-[10px] font-black text-[#555] uppercase tracking-[0.2em] mb-2 flex items-center space-x-2">
-                                        <TrendingUp className="w-4 h-4 text-[#00dda8]" />
+                            <div className="p-6 rounded-[2rem] bg-[#FFFFFF] border border-[#E5E5E5] shadow-sm h-full flex flex-col">
+                                <div className="mb-6 border-b border-[#E5E5E5] pb-6">
+                                    <h3 className="text-[10px] font-black text-[#050505]/50 uppercase tracking-[0.2em] mb-2 flex items-center space-x-2">
+                                        <TrendingUp className="w-4 h-4 text-emerald-600" />
                                         <span>Live Orderbook — CLOB L1</span>
                                     </h3>
-                                    <p className="text-sm font-black text-white leading-tight">
+                                    <p className="text-sm font-black text-[#050505] leading-tight">
                                         {selectedMarket ? selectedMarket.question : "Select market to track liquidity"}
                                     </p>
                                 </div>
 
                                 {/* VISUAL ORDERBOOK MULTIMETRIC */}
-                                <div className="space-y-1 mb-8 font-mono text-[11px] font-bold tracking-tight">
+                                <div className="space-y-1 mb-6 font-mono text-[11px] font-bold tracking-tight">
                                     {(isBookLoading && orderBook.asks.length === 0) && (
-                                        <div className="text-center py-6 text-[#555] uppercase tracking-widest flex items-center justify-center gap-2">
-                                            <Loader2 size={12} className="animate-spin text-[#00dda8]" /> Analyzing block...
+                                        <div className="text-center py-6 text-[#050505]/40 uppercase tracking-widest flex items-center justify-center gap-2">
+                                            <Loader2 size={12} className="animate-spin text-emerald-600" /> Analyzing block...
                                         </div>
                                     )}
 
                                     {/* ASKS (SELLERS) - RED */}
-                                    <div className="space-y-1 p-2 rounded-xl bg-[#111] border border-[#222]">
+                                    <div className="space-y-1 p-2 rounded-xl bg-rose-50 border border-rose-100">
                                         {orderBook.asks.slice(0, 3).reverse().map((ask, i) => (
-                                            <div key={i} className="flex justify-between text-[#ff4d4d] relative items-center h-6 px-2">
+                                            <div key={i} className="flex justify-between text-rose-600 relative items-center h-6 px-2">
                                                 <span className="z-10">{parseFloat(ask.price.toString()).toFixed(2)}¢</span>
-                                                <span className="z-10 text-[#666]">{ask.size.toFixed(0)}</span>
+                                                <span className="z-10 text-rose-400">{ask.size.toFixed(0)}</span>
                                                 <div
-                                                    className="absolute right-0 top-0 h-full bg-[#ff4d4d]/10 rounded"
+                                                    className="absolute right-0 top-0 h-full bg-rose-500/10 rounded"
                                                     style={{ width: `${Math.min((ask.size / 6000) * 100, 100)}%` }}
                                                 />
                                             </div>
                                         ))}
-                                        {orderBook.asks.length === 0 && !isBookLoading && <div className="text-[#333] text-center italic py-2">Empty</div>}
+                                        {orderBook.asks.length === 0 && !isBookLoading && <div className="text-[#050505]/20 text-center italic py-2">Empty</div>}
                                     </div>
 
-                                    <div className="py-2 text-center text-[9px] text-[#444] font-black tracking-[0.3em] uppercase">Mid Spread</div>
+                                    <div className="py-2 text-center text-[9px] text-[#050505]/30 font-black tracking-[0.3em] uppercase">Mid Spread</div>
 
                                     {/* BIDS (BUYERS) - GREEN */}
-                                    <div className="space-y-1 p-2 rounded-xl bg-[#111] border border-[#222]">
+                                    <div className="space-y-1 p-2 rounded-xl bg-emerald-50 border border-emerald-100">
                                         {orderBook.bids.slice(0, 3).map((bid, i) => (
-                                            <div key={i} className="flex justify-between text-[#00dda8] relative items-center h-6 px-2">
+                                            <div key={i} className="flex justify-between text-emerald-600 relative items-center h-6 px-2">
                                                 <span className="z-10">{parseFloat(bid.price.toString()).toFixed(2)}¢</span>
-                                                <span className="z-10 text-[#666]">{bid.size.toFixed(0)}</span>
+                                                <span className="z-10 text-emerald-400">{bid.size.toFixed(0)}</span>
                                                 <div
-                                                    className="absolute left-0 top-0 h-full bg-[#00dda8]/10 rounded"
+                                                    className="absolute left-0 top-0 h-full bg-emerald-500/10 rounded"
                                                     style={{ width: `${Math.min((bid.size / 6000) * 100, 100)}%` }}
                                                 />
                                             </div>
                                         ))}
-                                        {orderBook.bids.length === 0 && !isBookLoading && <div className="text-[#333] text-center italic py-2">Empty</div>}
+                                        {orderBook.bids.length === 0 && !isBookLoading && <div className="text-[#050505]/20 text-center italic py-2">Empty</div>}
                                     </div>
                                 </div>
 
                                 {/* ACTION PANEL */}
                                 <div className="mt-auto">
-                                    <div className="p-1 rounded-xl bg-[#111] border border-[#222] flex mb-6">
+                                    <div className="p-1 rounded-xl bg-[#FAF9F6] border border-[#E5E5E5] flex mb-6">
                                         <button
                                             onClick={() => setSide("YES")}
-                                            className={`flex-1 py-3.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "YES" ? "bg-[#00dda8] text-[#050505] shadow-[0_4px_20px_rgba(0,221,168,0.2)]" : "text-[#555] hover:text-white"}`}
+                                            className={`flex-1 py-3 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "YES" ? "bg-emerald-600 text-white shadow-sm" : "text-[#050505]/40 hover:text-[#050505]"}`}
                                         >
                                             BUY YES
                                         </button>
                                         <button
                                             onClick={() => setSide("NO")}
-                                            className={`flex-1 py-3.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "NO" ? "bg-[#ff4d4d] text-white shadow-[0_4px_20px_rgba(255,77,77,0.2)]" : "text-[#555] hover:text-white"}`}
+                                            className={`flex-1 py-3 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${side === "NO" ? "bg-rose-600 text-white shadow-sm" : "text-[#050505]/40 hover:text-[#050505]"}`}
                                         >
                                             BUY NO
                                         </button>
@@ -342,30 +343,30 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
 
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="text-[10px] text-[#555] uppercase font-black tracking-widest">L1 Allocation (USDC)</label>
+                                            <label className="text-[10px] text-[#050505]/50 uppercase font-black tracking-widest">L1 Allocation (USDC)</label>
                                             <div className="relative mt-2">
                                                 <input
                                                     type="number"
                                                     value={amount}
                                                     onChange={(e) => setAmount(e.target.value)}
                                                     placeholder="0.00"
-                                                    className="w-full bg-[#111] border border-[#333] rounded-xl py-4 pl-4 pr-12 text-2xl font-black font-mono text-white focus:outline-none focus:border-[#00dda8] transition-colors placeholder:text-[#333]"
+                                                    className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl py-4 pl-4 pr-12 text-2xl font-black font-mono text-[#050505] focus:outline-none focus:border-[#050505] transition-colors placeholder:text-[#050505]/20"
                                                 />
                                                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                                    <span className="text-[10px] font-black tracking-widest text-[#555]">USDC</span>
+                                                    <span className="text-[10px] font-black tracking-widest text-[#050505]/40">USDC</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex justify-between text-[11px] py-1 border-t border-[#222] pt-4 font-bold uppercase tracking-widest">
-                                            <span className="text-[#555]">Projected Shares</span>
-                                            <span className="text-white font-mono">{amount ? (parseFloat(amount) / 0.65).toFixed(2) : "0.00"}</span>
+                                        <div className="flex justify-between text-[11px] py-1 border-t border-[#E5E5E5] pt-4 font-bold uppercase tracking-widest">
+                                            <span className="text-[#050505]/40">Projected Shares</span>
+                                            <span className="text-[#050505] font-mono">{amount ? (parseFloat(amount) / 0.65).toFixed(2) : "0.00"}</span>
                                         </div>
 
                                         <button
                                             onClick={handleTrade}
                                             disabled={tradeStatus === "APPROVING" || tradeStatus === "SIGNING" || tradeStatus === "POSTING" || !amount || !selectedMarket}
-                                            className="w-full py-4 rounded-xl bg-white text-[#050505] font-black uppercase tracking-widest text-[11px] transition-all hover:bg-[#eee] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-2"
+                                            className="w-full py-4 rounded-xl bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] transition-all hover:bg-[#050505]/80 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-2"
                                         >
                                             {tradeStatus === "APPROVING" && <><Loader2 className="animate-spin w-4 h-4" /> EIP-2612 Signature...</>}
                                             {tradeStatus === "SIGNING" && <><Loader2 className="animate-spin w-4 h-4" /> ECDSA Handshake...</>}
@@ -379,6 +380,7 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
                         </div>
                     )}
                 </motion.div>
+            </div>
             </div>
         </motion.div>
     );

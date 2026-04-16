@@ -443,10 +443,10 @@ export default function MassTransferIntel() {
   }, [events, actionFilter, tierFilter, sortBy]);
 
   return (
-    <div className="p-8 h-full overflow-y-auto scrollbar-hide">
+    <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
 
       {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between p-6 border-b border-[#E5E5E5] bg-[#FAF9F6] shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <Activity size={24} className="text-black/30" />
@@ -551,6 +551,7 @@ export default function MassTransferIntel() {
         </div>
       </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6">
       {isLoading ? (
         <div className="pt-2">
           <MassTransferSkeleton />
@@ -646,6 +647,7 @@ export default function MassTransferIntel() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }

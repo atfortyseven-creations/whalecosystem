@@ -145,67 +145,67 @@ export default function DeFiYieldPanel() {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 600 }}>
+        <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
             {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, backgroundColor: '#FAF9F6' }}>
                 {[
-                    { label: 'APY MÁXIMO',    value: fmtApy(stats.maxApy),              color: 'var(--az-lime)' },
-                    { label: 'APY PROMEDIO',  value: fmtApy(stats.avgApy),              color: 'var(--az-ink)' },
-                    { label: 'POOLS STABLE',  value: stats.stablePools,                color: 'var(--az-emerald)' },
-                    { label: 'TVL TOTAL',     value: fmtUsd(stats.totalTvl),            color: 'rgba(255, 255, 255, 0.50)' },
+                    { label: 'MAX APY',       value: fmtApy(stats.maxApy),   color: '#16a34a' },
+                    { label: 'AVG APY',       value: fmtApy(stats.avgApy),   color: '#050505' },
+                    { label: 'STABLE POOLS',  value: stats.stablePools,      color: '#0ea5e9' },
+                    { label: 'TOTAL TVL',     value: fmtUsd(stats.totalTvl), color: '#050505' },
                 ].map(s => (
-                    <div key={s.label} className="az-stat-card border-r border-white/5 last:border-0 hover:bg-white/[0.02]">
-                        <div className="az-label text-white/50">{s.label}</div>
-                        <div className="az-value-lg" style={{ color: s.color }}>{s.value}</div>
+                    <div key={s.label} style={{ padding: '16px 20px', borderRight: '1px solid rgba(5,5,5,0.06)' }} className="last:border-0 hover:bg-black/[0.015] transition-colors">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-[#050505]/40 mb-1">{s.label}</div>
+                        <div className="text-xl font-black font-mono" style={{ color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
 
             {/* Filters */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0, flexWrap: 'wrap', background: 'rgba(255,255,255,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, flexWrap: 'wrap', backgroundColor: '#FAF9F6' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={{ accentColor: 'var(--az-lime)' }} />
-                    <span className="az-label text-white/70">STABLE ONLY</span>
+                    <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={{ accentColor: '#050505' }} />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/60">STABLE ONLY</span>
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Filter size={10} color="var(--az-ink-3)" />
-                    <span className="az-label text-white/50">APY MIN:</span>
-                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white font-mono outline-none">
+                    <Filter size={10} color="rgba(5,5,5,0.4)" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">APY MIN:</span>
+                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
                         {[3,5,8,10,15,20,30].map(v => <option key={v} value={v}>{v}%</option>)}
                     </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="az-label text-white/50">CADENA:</span>
-                    <select value={chain} onChange={e => setChain(e.target.value)} className="bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white font-mono outline-none">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">CHAIN:</span>
+                    <select value={chain} onChange={e => setChain(e.target.value)} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
                         {CHAINS.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="az-label text-white/50">RIESGO MAX:</span>
-                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white font-mono outline-none">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">MAX RISK:</span>
+                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
                         {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} — {RISK[v]?.label}</option>)}
                     </select>
                 </div>
-                <button onClick={load} className="az-btn-ghost ml-auto text-white/50 hover:text-white" style={{ padding: '6px 12px', fontSize: 10 }}>
-                    <RefreshCw size={11} className={loading ? 'animate-spin' : ''} /> ACTUALIZAR
+                <button onClick={load} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-[#050505]/50 hover:text-[#050505] hover:bg-black/5 transition-all">
+                    <RefreshCw size={11} className={loading ? 'animate-spin' : ''} /> REFRESH
                 </button>
             </div>
 
             {/* Table */}
-            <div className="flex relative">
-                <div className="custom-scrollbar flex-1 w-full">
+            <div className="flex flex-1 min-h-0 relative overflow-hidden">
+                <div className="custom-scrollbar flex-1 w-full overflow-y-auto">
                     {error && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: 'var(--az-rose)', fontSize: 11 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', color: '#ff3b30', fontSize: 11 }}>
                             <AlertTriangle size={12} /> <span>{error}</span>
                         </div>
                     )}
                     {!loading && pools.length > 0 && (
-                        <div className="az-col-header grid grid-cols-6 gap-8 p-4 border-b border-white/5 sticky top-0 bg-[#050505]/95 backdrop-blur z-10 text-[10px] font-mono tracking-widest text-white/40 uppercase">
-                            <span className="col-span-2">POOL</span>
-                            <span style={{ textAlign: 'right' }}>CADENA</span>
+                        <div className="grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] sticky top-0 bg-[#FAF9F6]/95 backdrop-blur z-10 text-[10px] font-mono tracking-widest text-[#050505]/40 uppercase">
+                            <span className="col-span-2">Pool</span>
+                            <span style={{ textAlign: 'right' }}>Chain</span>
                             <span style={{ textAlign: 'right' }}>APY</span>
                             <span style={{ textAlign: 'right' }}>TVL</span>
-                            <span style={{ textAlign: 'right' }}>RIESGO</span>
+                            <span style={{ textAlign: 'right' }}>Risk</span>
                         </div>
                     )}
                     {loading && <SkeletonRows />}
@@ -217,29 +217,29 @@ export default function DeFiYieldPanel() {
                                 <motion.div
                                     key={p.pool}
                                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15, delay: i * 0.008 }}
-                                    className={`az-data-row grid grid-cols-6 gap-8 p-4 border-b border-white/5 hover:bg-white/[0.03] cursor-pointer transition-colors ${isActive ? 'bg-white/[0.05]' : ''}`}
+                                    className={`grid grid-cols-6 gap-8 p-4 border-b border-[#E5E5E5] cursor-pointer transition-colors ${isActive ? 'bg-[#050505]/[0.02]' : 'hover:bg-[#FAF9F6]'}`}
                                     onClick={() => setSelected(isActive ? null : p)}
                                 >
                                     <div className="col-span-2 overflow-hidden flex flex-col gap-1">
-                                        <span className="text-sm font-bold text-white tracking-tight truncate">{p.symbol}</span>
+                                        <span className="text-sm font-black text-[#050505] tracking-tight truncate">{p.symbol}</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] uppercase text-white/40 tracking-wider truncate">{p.project}</span>
-                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#14f195]/10 text-[#14f195]">STABLE</span>}
+                                            <span className="text-[10px] uppercase text-[#050505]/40 tracking-wider truncate">{p.project}</span>
+                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100">STABLE</span>}
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className={chainCls(p.chainFull || p.chain)}>{p.chain}</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-[#050505]/5 text-[#050505]/60">{p.chain}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-sm font-mono font-bold" style={{ color: p.apy >= 20 ? 'var(--az-lime)' : p.apy >= 10 ? 'var(--az-emerald)' : 'white' }}>
+                                        <span className="text-sm font-mono font-black" style={{ color: p.apy >= 20 ? '#16a34a' : p.apy >= 10 ? '#0ea5e9' : '#050505' }}>
                                             {fmtApy(p.apy)}
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-sm font-mono text-white/70">{fmtUsd(p.tvlUsd)}</span>
+                                        <span className="text-sm font-mono font-black text-[#050505]/70">{fmtUsd(p.tvlUsd)}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-[10px] font-bold tracking-widest px-2 py-1 rounded" style={{ color: risk.color, background: `${risk.color}15` }}>{risk.label}</span>
+                                        <span className="text-[10px] font-black tracking-widest px-2 py-1 rounded-lg" style={{ color: risk.color, background: `${risk.color}15`, border: `1px solid ${risk.color}25` }}>{risk.label}</span>
                                     </div>
                                 </motion.div>
                             );
@@ -255,73 +255,71 @@ export default function DeFiYieldPanel() {
                             animate={{ x: 0, opacity: 1 }} 
                             exit={{ x: 400, opacity: 0 }}
                             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                            className="w-[360px] flex-shrink-0 border-l border-white/10 bg-[#0a0a0a] flex flex-col sticky top-[130px] h-[calc(100vh-130px)] shadow-2xl z-20"
+                            className="w-[340px] flex-shrink-0 border-l border-[#E5E5E5] bg-[#FFFFFF] flex flex-col overflow-hidden shadow-xl z-20"
                         >
-                            <div className="p-6 border-b border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent">
-                                <div className="text-[10px] font-mono tracking-widest text-[#a855f7] mb-2 uppercase flex items-center gap-2 relative">
-                                    <ShieldCheck size={12} /> ON-CHAIN EXECUTION
+                            <div className="p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
+                                <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2 uppercase flex items-center gap-2">
+                                    <ShieldCheck size={12} /> On-Chain Execution
                                 </div>
-                                <div className="text-2xl font-bold font-mono tracking-tight text-white mb-1">{selected.symbol}</div>
-                                <div className="text-xs text-white/40 uppercase">{selected.project} · {selected.chainFull || selected.chain}</div>
+                                <div className="text-xl font-black font-mono tracking-tight text-[#050505] mb-1">{selected.symbol}</div>
+                                <div className="text-xs text-[#050505]/40 uppercase font-mono">{selected.project} · {selected.chainFull || selected.chain}</div>
                             </div>
                             
-                            <div className="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar">
+                            <div className="flex-1 p-6 space-y-5 overflow-y-auto custom-scrollbar">
                                 {/* APY Hero */}
-                                <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 text-center shadow-inner relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#14f195]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <div className="text-[10px] uppercase font-mono tracking-widest text-white/50 mb-2">Total Net APY</div>
-                                    <div className="text-4xl font-black font-mono text-[#14f195] drop-shadow-[0_0_15px_rgba(20,241,149,0.3)]">{fmtApy(selected.apy)}</div>
-                                    <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-white/5">
-                                        <div className="flex flex-col"><span className="text-[9px] text-white/40 uppercase">Base</span> <span className="text-xs font-mono font-bold text-white/90">{fmtApy(selected.apyBase)}</span></div>
-                                        <div className="flex flex-col"><span className="text-[9px] text-white/40 uppercase">Reward</span> <span className="text-xs font-mono font-bold text-white/90">{fmtApy(selected.apyReward)}</span></div>
+                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 text-center">
+                                    <div className="text-[10px] uppercase font-mono tracking-widest text-[#050505]/40 mb-2">Total Net APY</div>
+                                    <div className="text-4xl font-black font-mono text-emerald-600">{fmtApy(selected.apy)}</div>
+                                    <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-[#E5E5E5]">
+                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Base</span> <span className="text-xs font-mono font-black text-[#050505]">{fmtApy(selected.apyBase)}</span></div>
+                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Reward</span> <span className="text-xs font-mono font-black text-[#050505]">{fmtApy(selected.apyReward)}</span></div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
+                                <div className="space-y-1">
                                     {[
-                                        { l: 'TVL',           v: fmtUsd(selected.tvlUsd) },
-                                        { l: 'IL RISK',       v: selected.ilRisk === 'no' ? 'NONE' : selected.ilRisk.toUpperCase() },
-                                        { l: 'RISK SCORE',    v: `${selected.riskScore}/5 — ${RISK[selected.riskScore]?.label}` },
-                                        { l: 'ASSET TYPE',    v: selected.stablecoin ? 'STABLECOIN' : 'VOLATILE' },
+                                        { l: 'TVL',        v: fmtUsd(selected.tvlUsd) },
+                                        { l: 'IL RISK',    v: selected.ilRisk === 'no' ? 'NONE' : selected.ilRisk.toUpperCase() },
+                                        { l: 'RISK',       v: `${selected.riskScore}/5 — ${RISK[selected.riskScore]?.label}` },
+                                        { l: 'ASSET TYPE', v: selected.stablecoin ? 'STABLECOIN' : 'VOLATILE' },
                                     ].map(row => (
-                                        <div key={row.l} className="flex justify-between items-center py-2 border-b border-white/5">
-                                            <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">{row.l}</span>
-                                            <span className="text-sm font-mono font-bold text-white/90">{row.v}</span>
+                                        <div key={row.l} className="flex justify-between items-center py-2.5 border-b border-[#E5E5E5]">
+                                            <span className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest">{row.l}</span>
+                                            <span className="text-sm font-mono font-black text-[#050505]">{row.v}</span>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                                    <div className="text-[10px] font-mono tracking-widest text-white/50 mb-3">DEPOSIT AMOUNT (USDC)</div>
+                                <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#E5E5E5]">
+                                    <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2">DEPOSIT AMOUNT (USDC)</div>
                                     <input 
                                         type="number" 
                                         value={depositAmount} 
                                         onChange={e => setDepositAmount(e.target.value)} 
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg py-3 px-4 text-white font-mono text-xl outline-none focus:border-[#14f195]/50 transition-colors"
+                                        className="w-full bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg py-3 px-4 text-[#050505] font-mono text-xl outline-none focus:border-[#050505] transition-colors"
                                         placeholder="0.00"
                                     />
-                                    <div className="mt-3 text-[10px] font-mono text-white/40">
-                                        ESTIMATE: <span className="text-[#14f195]">+{fmtUsd((Number(depositAmount || 0) * selected.apy) / 100 / 365)} / DAY</span>
+                                    <div className="mt-2 text-[10px] font-mono text-[#050505]/40">
+                                        ESTIMATE: <span className="text-emerald-600">+{fmtUsd((Number(depositAmount || 0) * selected.apy) / 100 / 365)} / DAY</span>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="p-6 border-t border-white/5 bg-[#050505] space-y-3 relative z-10">
+                            <div className="p-5 border-t border-[#E5E5E5] bg-[#FAF9F6] space-y-3">
                                 <button 
                                     onClick={handleOneClickDeposit}
                                     disabled={isDepositing || !depositAmount}
-                                    className="w-full py-4 rounded-xl bg-white text-black font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#14f195] transition-all disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden"
+                                    className="w-full py-4 rounded-xl bg-[#050505] text-white font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#050505]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isDepositing ? (
                                         <Loader2 size={16} className="animate-spin" />
                                     ) : (
                                         <>
-                                            <Zap size={14} className="group-hover:text-black transition-colors" /> DEPOSIT 1-CLICK
+                                            <Zap size={14} /> DEPOSIT 1-CLICK
                                         </>
                                     )}
-                                    <div className="absolute inset-0 bg-white/20 scale-x-0 group-hover:scale-x-100 origin-left transition-transform" />
                                 </button>
-                                <p className="text-[9px] font-mono text-white/30 text-center uppercase tracking-widest">
+                                <p className="text-[9px] font-mono text-[#050505]/30 text-center uppercase tracking-widest">
                                     {isConnected ? 'Executes routing via Whale Smart Contracts' : 'Connect wallet to deposit'}
                                 </p>
                             </div>
@@ -330,7 +328,7 @@ export default function DeFiYieldPanel() {
                 </AnimatePresence>
             </div>
 
-            {ts && <div className="az-label text-white/30" style={{ padding: '6px 16px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>FUENTE: DEFILLAMA API · SYNC: {ts} UTC · Auto-refresh 60s</div>}
+            {ts && <div className="text-[9px] font-mono font-black uppercase tracking-widest text-[#050505]/30" style={{ padding: '6px 16px', borderTop: '1px solid rgba(5,5,5,0.06)', flexShrink: 0 }}>SOURCE: DEFILLAMA API · SYNC: {ts} UTC · Auto-refresh 60s</div>}
         </div>
     );
 }

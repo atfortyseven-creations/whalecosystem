@@ -11,7 +11,7 @@ import { SplashContainer } from '@/components/shared/SplashContainer';
 
 type NavGroup = {
     label: string;
-    links: { href: string; label: string; activePathMatch?: string }[];
+    links: { href: string; label: string; desc: string; activePathMatch?: string }[];
 };
 
 export function InstitutionalHeader() {
@@ -22,34 +22,39 @@ export function InstitutionalHeader() {
         {
             label: "Terminal",
             links: [
-                { href: '/dashboard', label: 'Dashboard' }
+                { href: '/dashboard', label: 'Core Dashboard', desc: 'Centralized telemetry node for institutional oversight.' },
+                { href: '/voss-supremacy', label: 'Voss Supremacy', desc: 'Asymmetric algorithmic tracking and execution protocol.' }
             ]
         },
         {
             label: "Intelligence",
             links: [
-                { href: '/news', label: 'The Whale Post' }
+                { href: '/sovereign-intel', label: 'Sovereign Intel', desc: 'Real-time extraction of latent graph topologies.' },
+                { href: '/ledger', label: 'Institutional Ledger', desc: 'Immutable chronological state of validated macro-events.' },
+                { href: '/predictions', label: 'Prediction Network', desc: 'Decentralized oracle consensus mapping probability vectors.' },
+                { href: '/news', label: 'The Whale Post', desc: 'Global macroeconomic signal aggregation and curation.' }
             ]
         },
         {
             label: "Wealth",
             links: [
-                { href: '/portfolio', label: 'Akashic Vault' }
+                { href: '/portfolio', label: 'Akashic Vault', desc: 'Cryptographic cold storage and cross-chain liquid reconciliation.' },
+                { href: '/gold-registry', label: 'Entity Registry', desc: 'Clearance verification and institutional asset minting.' }
             ]
         },
         {
             label: "Protocol",
             links: [
-                { href: '/academy', label: 'The Library' },
-                { href: '/support', label: 'Support Hub' }
+                { href: '/academy', label: 'The Library', desc: 'Cognitive expansion through structured on-chain curriculum.' },
+                { href: '/support', label: 'Operational Guard', desc: 'Direct secure link to tactical maintenance architecture.' }
             ]
         }
     ];
 
     return (
         <header
-            className="relative flex items-center justify-between px-6 lg:px-10 w-full border-b sticky top-0 z-[100] transition-colors duration-300 bg-white border-black/10 shadow-sm"
-            style={{ minHeight: '68px' }}
+            className="relative flex items-center justify-between px-6 lg:px-10 w-full border-b sticky top-0 z-[100] transition-colors duration-300 shadow-sm"
+            style={{ minHeight: '68px', backgroundColor: '#FAF9F6', borderColor: 'rgba(5,5,5,0.08)' }}
         >
             {/* Paper grain texture overlay */}
             <div className="absolute inset-0 opacity-[0.035] pointer-events-none noise-bg" />
@@ -60,7 +65,8 @@ export function InstitutionalHeader() {
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                        className="relative flex items-center justify-center rounded-xl border border-black/10 bg-black/5 shadow-sm overflow-hidden w-[58px] h-[36px]"
+                        className="relative flex items-center justify-center rounded-xl border overflow-hidden w-[58px] h-[36px]"
+                        style={{ backgroundColor: 'rgba(5,5,5,0.03)', borderColor: 'rgba(5,5,5,0.08)' }}
                     >
                         <SplashContainer className="w-full h-full flex items-center justify-center">
                             <Image
@@ -68,49 +74,59 @@ export function InstitutionalHeader() {
                                 alt="Whale Alert Network Logo"
                                 width={52}
                                 height={32}
-                                className="object-contain w-full h-full p-1"
+                                className="object-contain w-full h-full p-1 opacity-80 mix-blend-multiply"
                                 unoptimized={true}
                             />
                         </SplashContainer>
                     </motion.div>
-                    <div className="flex flex-col leading-none text-black">
+                    <div className="flex flex-col leading-none text-[#050505]">
                         <span className="font-aztec-serif text-[18px] font-black uppercase tracking-tighter leading-none">
                             Whale Alert Network
                         </span>
-                        <span className="font-mono text-[7px] font-bold uppercase tracking-[0.4em] mt-0.5 opacity-40">
+                        <span className="font-mono text-[7px] font-bold uppercase tracking-[0.4em] mt-0.5" style={{ color: 'rgba(5,5,5,0.4)' }}>
                             Terminal
                         </span>
                     </div>
                 </Link>
 
                 {/* Vertical divider */}
-                <div className="hidden lg:block h-8 w-px bg-black/10" />
+                <div className="hidden lg:block h-8 w-px" style={{ backgroundColor: 'rgba(5,5,5,0.08)' }} />
 
                 {/* ─── DESKTOP NAV ─── */}
                 <nav className="hidden xl:flex items-center gap-2">
                     {navGroups.map((group) => (
                         <div key={group.label} className="relative group/nav px-2 py-4 cursor-default">
-                             <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-black/60 group-hover/nav:text-black transition-colors">
+                             <div className="flex items-center gap-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
+                                  style={{ color: 'rgba(5,5,5,0.5)' }}>
                                  {group.label}
                                  <ChevronDown size={12} className="opacity-50" />
                              </div>
                              
-                             {/* DROPDOWN MENU */}
-                             <div className="absolute top-full left-0 mt-0 w-56 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-300 z-50">
-                                 <div className="bg-white/95 border border-black/10 rounded-xl shadow-xl flex flex-col p-2 backdrop-blur-xl">
+                             {/* DROPDOWN MENU - Ivory Standard */}
+                             <div className="absolute top-full left-0 mt-0 opacity-0 translate-y-2 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto transition-all duration-300 z-50">
+                                 <div className="rounded-xl shadow-2xl flex flex-col p-2 backdrop-blur-3xl min-w-[340px]"
+                                      style={{ backgroundColor: 'rgba(250,249,246,0.95)', border: '1px solid rgba(5,5,5,0.08)' }}>
                                      {group.links.map(link => {
                                          const isActive = pathname === link.href;
                                          return (
                                              <Link 
                                                  href={link.href} 
                                                  key={link.label}
-                                                 className={`px-4 py-3 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-all
-                                                    ${isActive 
-                                                        ? 'bg-black/5 text-black' 
-                                                        : 'text-black/60 hover:bg-black/5 hover:text-black'
-                                                    }`}
+                                                 className="flex flex-col gap-1 px-4 py-4 rounded-lg transition-all hover:scale-[1.01]"
+                                                 style={{ 
+                                                     backgroundColor: isActive ? 'rgba(5,5,5,0.03)' : 'transparent',
+                                                 }}
+                                                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(5,5,5,0.03)'}
+                                                 onMouseLeave={(e) => {
+                                                     if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                                                 }}
                                              >
-                                                 {link.label}
+                                                 <span className="text-[12px] font-black uppercase tracking-widest text-[#050505]">
+                                                     {link.label}
+                                                 </span>
+                                                 <span className="text-[10px] font-medium leading-relaxed tracking-wide" style={{ color: 'rgba(5,5,5,0.45)' }}>
+                                                     {link.desc}
+                                                 </span>
                                              </Link>
                                          );
                                      })}
@@ -145,15 +161,16 @@ export function InstitutionalHeader() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 right-0 border-b border-black/10 z-[90] p-6 bg-white shadow-xl"
+                        className="absolute top-full left-0 right-0 z-[90] p-6 shadow-2xl"
+                        style={{ backgroundColor: '#FAF9F6', borderBottom: '1px solid rgba(5,5,5,0.08)' }}
                     >
-                        <div className="grid grid-cols-1 gap-6 mb-5 pb-5 border-b border-black/10">
+                        <div className="grid grid-cols-1 gap-6 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(5,5,5,0.08)' }}>
                             {navGroups.map((group) => (
-                                <div key={group.label} className="flex flex-col gap-2">
-                                     <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black/40 px-2">
+                                <div key={group.label} className="flex flex-col gap-3">
+                                     <span className="text-[9px] font-black uppercase tracking-[0.3em] px-2" style={{ color: 'rgba(5,5,5,0.4)' }}>
                                          {group.label}
                                      </span>
-                                     <div className="grid grid-cols-2 gap-2">
+                                     <div className="flex flex-col gap-2">
                                         {group.links.map(link => {
                                              const isActive = pathname === link.href;
                                              return (
@@ -161,13 +178,18 @@ export function InstitutionalHeader() {
                                                      key={link.href}
                                                      href={link.href}
                                                      onClick={() => setIsMenuOpen(false)}
-                                                     className={`px-4 py-3 rounded-xl text-[9px] font-mono font-black uppercase tracking-wider transition-all border
-                                                        ${isActive 
-                                                            ? 'bg-black/5 border-black/10 text-black' 
-                                                            : 'bg-transparent border-transparent text-black/60 hover:bg-black/5'}
-                                                     `}
+                                                     className="flex flex-col gap-1 px-4 py-3 rounded-xl transition-all border"
+                                                     style={{
+                                                         backgroundColor: isActive ? 'rgba(5,5,5,0.04)' : 'transparent',
+                                                         borderColor: isActive ? 'rgba(5,5,5,0.08)' : 'transparent',
+                                                     }}
                                                  >
-                                                     {link.label}
+                                                     <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">
+                                                         {link.label}
+                                                     </span>
+                                                     <span className="text-[9px] font-medium leading-relaxed" style={{ color: 'rgba(5,5,5,0.45)' }}>
+                                                         {link.desc}
+                                                     </span>
                                                  </Link>
                                              );
                                         })}

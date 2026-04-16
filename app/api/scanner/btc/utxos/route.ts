@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
             take: 100,
             where: {
                 institutional: true,
-                status: { not: 'PENDING' }
+                confirmed: true,
             },
             orderBy: { timestamp: 'desc' }
         });

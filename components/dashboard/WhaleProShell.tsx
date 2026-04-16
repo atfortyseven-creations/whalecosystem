@@ -7,7 +7,10 @@ import {
     TrendingUp, Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, ShieldAlert, Newspaper,
-    Star, Rocket, Network, Ticket, Zap, Menu
+    Star, Rocket, Network, Ticket, Zap, Menu,
+    BookOpen, Database, HeadphonesIcon, BarChart3,
+    Landmark, Layers, FlaskConical, Compass,
+    Activity, Lock, Book
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -25,23 +28,36 @@ interface NavItem {
 
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Command ──
-    { id: 'dashboard',       label: 'The Terminal',     icon: <LayoutDashboard size={17}/>, dividerBefore: 'Command' },
-    { id: 'gold-ticket',     label: 'Ticket Minting',   icon: <Ticket size={17}/> },
-    { id: 'news',            label: 'The Whale Post',   icon: <Newspaper size={17}/> },
-    { id: 'watchlist',       label: 'Watchlist',        icon: <Star size={17}/> },
-    
+    { id: 'dashboard',           label: 'The Terminal',       icon: <LayoutDashboard size={17}/>,  dividerBefore: 'Command' },
+    { id: 'news',                label: 'The Whale Post',      icon: <Newspaper size={17}/> },
+    { id: 'watchlist',           label: 'Watchlist',           icon: <Star size={17}/> },
+    { id: 'gold-ticket',         label: 'Ticket Minting',      icon: <Ticket size={17}/> },
+
     // ── Markets ──
-    { id: 'whale-events',    label: 'Mempool Radar',    icon: <Globe size={17}/>, dividerBefore: 'Markets' },
-    { id: 'gainers',         label: 'Gainers / Losers', icon: <TrendingUp size={17}/> },
-    { id: 'new-pairs',       label: 'Token Discovery',  icon: <Rocket size={17}/> },
-    
-    // ── Deep Intelligence ──
-    { id: 'neural-graph',    label: 'Entity Graph',     icon: <Network size={17}/>, dividerBefore: 'Intelligence' },
-    { id: 'sovereign-intel', label: 'Voss Matrix',      icon: <Zap size={17}/> },
+    { id: 'whale-events',        label: 'Mempool Radar',       icon: <Globe size={17}/>,            dividerBefore: 'Markets' },
+    { id: 'gainers',             label: 'Gainers / Losers',    icon: <TrendingUp size={17}/> },
+    { id: 'new-pairs',           label: 'Token Discovery',     icon: <Rocket size={17}/> },
+    { id: 'omni-explorer',       label: 'Omni Explorer',       icon: <Compass size={17}/> },
+    { id: 'brc-explorer',        label: 'BRC-20 Explorer',     icon: <Layers size={17}/> },
+
+    // ── Intelligence ──
+    { id: 'neural-graph',        label: 'Entity Graph',        icon: <Network size={17}/>,          dividerBefore: 'Intelligence' },
+    { id: 'sovereign-intel',     label: 'Voss Matrix',         icon: <Zap size={17}/> },
+    { id: 'institutional-ledger',label: 'Institutional Ledger',icon: <Landmark size={17}/>,         badge: 'NEW' },
+    { id: 'mass-transfer',       label: 'Mass Transfer',       icon: <Activity size={17}/> },
+    { id: 'defi-yield',          label: 'DeFi Yield',          icon: <FlaskConical size={17}/> },
+    { id: 'polymarket',          label: 'Polymarket',          icon: <BarChart3 size={17}/> },
 
     // ── Sovereignty & Vault ──
-    { id: 'portfolio',       label: 'Akashic Vault',    icon: <Wallet size={17}/>, dividerBefore: 'Sovereignty' },
-    { id: 'zk-shield',       label: 'ZK Shield',        icon: <ShieldAlert size={17}/> },
+    { id: 'portfolio',           label: 'Akashic Vault',       icon: <Wallet size={17}/>,           dividerBefore: 'Sovereignty' },
+    { id: 'sovereign-vault',     label: 'Sovereign Vault',     icon: <Lock size={17}/> },
+    { id: 'zk-shield',           label: 'ZK Shield',           icon: <ShieldAlert size={17}/> },
+    { id: 'whale-portfolio',     label: 'Whale Portfolio',      icon: <Database size={17}/> },
+    { id: 'humanidfi-portfolio', label: 'HumanID Portfolio',   icon: <Shield size={17}/> },
+
+    // ── Learn & Support ──
+    { id: 'academy',             label: 'Whale Academy',       icon: <Book size={17}/>,             dividerBefore: 'Learn' },
+    { id: 'support',             label: 'Support',             icon: <HeadphonesIcon size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -112,7 +128,6 @@ function LiveMarketBand() {
         });
     }
 
-    // Loading skeleton while stream connects
     if (items.length === 0) {
         return (
             <>
@@ -166,7 +181,6 @@ export function WhaleProShell({
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const { setSettingsOpen } = useSettingsStore();
 
-    // Telemetry from context
     const { latency, isConnected, mode } = useMarketStream();
 
     return (
@@ -180,18 +194,34 @@ export function WhaleProShell({
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
-                animate={{ width: isCollapsed ? 64 : 260 }}
+                animate={{ width: isCollapsed ? 64 : 240 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 className="hidden md:flex sticky top-0 h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shrink-0"
             >
+                {/* Logo area */}
+                {!isCollapsed && (
+                    <div className="px-4 pt-4 pb-2 shrink-0">
+                        <div className="flex items-center gap-2.5 px-3 py-2">
+                            <img src="/official-whale-monochrome.png" className="w-6 h-6 shrink-0" alt="WAN" />
+                            <div className="flex flex-col leading-tight">
+                                <span className="text-[11px] font-black uppercase tracking-tighter text-[#050505]">Whale Alert</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/30">Network</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {isCollapsed && <div className="pt-4 pb-2 shrink-0 flex justify-center">
+                    <img src="/official-whale-monochrome.png" className="w-6 h-6" alt="WAN" />
+                </div>}
 
                 {/* Sidebar Navigation */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden pt-0 pb-4 px-3 space-y-0.5 no-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden pt-1 pb-4 px-2 space-y-0.5 no-scrollbar">
                     {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
                         return (
                             <div key={item.id}>
                                 {item.dividerBefore && !isCollapsed && (
-                                    <div className={`px-4 ${index === 0 ? 'pt-3' : 'pt-4'} pb-1`}>
+                                    <div className={`px-3 ${index === 0 ? 'pt-1' : 'pt-4'} pb-1`}>
                                         <span className="text-[8px] font-black text-[#CCCCCC] uppercase tracking-[0.2em]">
                                             {item.dividerBefore}
                                         </span>
@@ -204,17 +234,22 @@ export function WhaleProShell({
                                     onClick={() => onTabChange(item.id)}
                                     title={item.label}
                                     className={`
-                                        w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative
+                                        w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all relative group
                                         ${isActive
                                                 ? 'bg-black/5 text-black shadow-none border border-black/10'
-                                                : 'text-[#888888] hover:text-black hover:bg-black/5'
+                                                : 'text-[#888888] hover:text-black hover:bg-black/[0.04]'
                                         }
                                     `}
                                 >
-                                    <span className={isActive ? 'text-[#050505]' : 'text-[#888888]'}>{item.icon}</span>
+                                    <span className={`shrink-0 ${isActive ? 'text-[#050505]' : 'text-[#888888]'}`}>{item.icon}</span>
                                     {!isCollapsed && (
-                                        <span className={`text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none ${isActive ? 'text-[#050505]' : 'text-[#555555]'}`}>
+                                        <span className={`text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none truncate ${isActive ? 'text-[#050505]' : 'text-[#555555]'}`}>
                                             {item.label}
+                                        </span>
+                                    )}
+                                    {!isCollapsed && item.badge && (
+                                        <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
+                                            {item.badge}
                                         </span>
                                     )}
                                     {isActive && (
@@ -226,7 +261,7 @@ export function WhaleProShell({
                     })}
                 </div>
 
-                <div className="px-3 pb-3 pt-1">
+                <div className="px-2 pb-3 pt-1 shrink-0">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10 text-[#888888] hover:text-black hover:bg-black/5 transition-all"
@@ -240,7 +275,7 @@ export function WhaleProShell({
             <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="sticky top-0 h-[56px] border-b border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
+                <header className="sticky top-0 h-[52px] border-b border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
@@ -269,19 +304,17 @@ export function WhaleProShell({
                 </header>
 
                 <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF] overflow-hidden">
-                    {/* Immersive radial glow overlay */}
                     <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
-                    {/* Strict Zero-Scroll Bounds for Bento Grid */}
                     <div className="absolute inset-0 overflow-hidden flex flex-col">
-                        <div className="p-4 md:p-6 w-full h-full flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
+                        <div className="p-4 md:p-5 w-full h-full flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
                                     initial={{ opacity: 0, scale: 0.98 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.98 }}
-                                    transition={{ duration: 0.2 }}
+                                    transition={{ duration: 0.18 }}
                                     className="w-full h-full flex flex-col"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
@@ -318,7 +351,7 @@ export function WhaleProShell({
                 </nav>
 
                 {/* ─── Status Bar ─── */}
-                <footer className="hidden md:flex h-8 border-t border-black/10 bg-white items-center justify-between px-6 shrink-0 transition-colors duration-300">
+                <footer className="hidden md:flex h-7 border-t border-black/10 bg-white items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 min-w-[120px]">
                             <Globe size={11} /> Global Latency: 

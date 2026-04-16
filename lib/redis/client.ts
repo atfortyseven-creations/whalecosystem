@@ -29,6 +29,11 @@ function createMockRedis(name?: string) {
             memoryStore.delete(k); 
             return r; 
         },
+        psubscribe: async () => {}, // [STUB] Crash-proof fallback
+        punsubscribe: async () => {},
+        subscribe: async () => {},
+        unsubscribe: async () => {},
+        publish: async () => 0,
         status: 'mock',
         __isMock: true
     };

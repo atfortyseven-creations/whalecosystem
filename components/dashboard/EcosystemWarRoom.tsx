@@ -70,30 +70,30 @@ export function EcosystemWarRoom() {
   const totalTvlGlobal = data.reduce((acc, curr) => acc + curr.tvl, 0);
 
   return (
-    <div className="w-full bg-[#050505] p-8 mt-12 rounded-[2rem] border border-white/5 text-white shadow-2xl relative overflow-hidden">
+    <div className="w-full h-full min-h-0 flex flex-col bg-[#FFFFFF] p-8 rounded-2xl border border-[#E5E5E5] text-[#050505] shadow-sm relative overflow-hidden">
       {/* Background Matrix Effect */}
-      <div className="absolute inset-0 opacity-[0.03] pattern-grid-lg" />
+      <div className="absolute inset-0 opacity-[0.03] pattern-grid-lg pointer-events-none filter invert" />
       
-      <header className="relative z-10 flex justify-between items-end mb-10 pb-6 border-b border-white/10">
+      <header className="relative z-10 flex justify-between items-end mb-6 pb-6 border-b border-[#E5E5E5] shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <Server size={18} className="text-indigo-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-400">Live Chain TVL Board</span>
+            <Server size={18} className="text-[#050505]" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#050505]/60">Live Chain TVL Board</span>
           </div>
           <h2 className="text-3xl font-black uppercase tracking-tighter">Ecosystem TVL Rankings</h2>
         </div>
         <div className="text-right">
           <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">Global TVL · Source: DeFiLlama</p>
           <p className="font-mono text-2xl">${(totalTvlGlobal / 1_000_000_000).toFixed(2)}B</p>
-          {lastUpdated && <p className="text-[9px] font-mono opacity-30 mt-1">Updated {lastUpdated}</p>}
+          {lastUpdated && <p className="text-[9px] font-mono text-[#050505]/40 mt-1">Updated {lastUpdated}</p>}
         </div>
       </header>
 
       {/* Global Filter Toggles */}
-      <div className="relative z-10 flex flex-wrap gap-3 mb-8">
+      <div className="relative z-10 flex flex-wrap gap-3 mb-6 shrink-0">
         <button 
           onClick={() => setActiveFilter(null)}
-          className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === null ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
+          className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === null ? 'bg-[#050505] text-[#FFFFFF]' : 'bg-[#FAF9F6] text-[#050505]/60 border border-[#E5E5E5] hover:bg-[#E5E5E5]/40'}`}
         >
           ALL CHAINS
         </button>
@@ -101,14 +101,14 @@ export function EcosystemWarRoom() {
           <button 
             key={chain.chainName}
             onClick={() => setActiveFilter(chain.chainSymbol)}
-            className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === chain.chainSymbol ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
+            className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${activeFilter === chain.chainSymbol ? 'bg-[#050505] text-[#FFFFFF]' : 'bg-[#FAF9F6] text-[#050505]/60 border border-[#E5E5E5] hover:bg-[#E5E5E5]/40'}`}
           >
             {chain.chainName}
           </button>
         ))}
       </div>
 
-      <div className="relative z-10 space-y-4">
+      <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4 pr-2">
         {data
           .filter(c => activeFilter === null || activeFilter === c.chainSymbol)
           .sort((a, b) => b.totalEntities - a.totalEntities)
@@ -117,11 +117,11 @@ export function EcosystemWarRoom() {
             key={chain.chainName}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-center justify-between p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-colors group cursor-crosshair"
+            transition={{ delay: i * 0.05 }}
+            className="flex items-center justify-between p-5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl hover:bg-[#FFFFFF] hover:shadow-md transition-all group cursor-crosshair shrink-0"
           >
             <div className="flex items-center gap-6">
-               <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-80" style={{ backgroundColor: `${chain.color}15` }}>
+               <div className="w-12 h-12 rounded-xl flex items-center justify-center opacity-80 shadow-sm border border-[#E5E5E5]" style={{ backgroundColor: `${chain.color}15` }}>
                   <ShieldCheck size={20} color={chain.color} />
                </div>
                <div>
@@ -135,11 +135,11 @@ export function EcosystemWarRoom() {
 
             <div className="flex gap-12 text-right">
                <div>
-                 <p className="text-[9px] uppercase tracking-widest opacity-40 font-bold mb-1">Ecosystem TVL</p>
+                 <p className="text-[9px] uppercase tracking-widest text-[#050505]/40 font-bold mb-1">Ecosystem TVL</p>
                  <p className="font-mono text-sm">${(chain.tvl / 1000000000).toFixed(2)}B</p>
                </div>
                <div>
-                 <p className="text-[9px] uppercase tracking-widest opacity-40 font-bold mb-1">Volumetric 24H</p>
+                 <p className="text-[9px] uppercase tracking-widest text-[#050505]/40 font-bold mb-1">Volumetric 24H</p>
                  <p className="font-mono text-sm">${(chain.volume24h / 1000000).toFixed(2)}M</p>
                </div>
             </div>

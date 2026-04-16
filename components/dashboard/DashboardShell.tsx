@@ -9,7 +9,9 @@ import {
     Save, Search, Shield, BookOpen, GraduationCap, Link2, Globe,
     Database, Bell, CheckCircle2, AlertCircle, Lock, BarChart2, Newspaper,
     Star, Eye, ArrowUpRight, ArrowDownRight, Flame, Layers,
-    Hash, Activity as ActivityIcon, Clock, Users, DollarSign, LifeBuoy
+    Hash, Activity as ActivityIcon, Clock, Users, DollarSign, LifeBuoy,
+    Crosshair as CrosshairIcon, Target as TargetIcon, Network as NetworkIcon,
+    BarChart as CandlestickIcon, CircleDollarSign as CircleDollarIcon, ShieldCheck as ShieldIcon
 } from 'lucide-react';
 import { SovereignBridge } from '@/components/premium/SovereignBridge';
 import { WhaleLogo } from '../shared/WhaleLogo';
@@ -57,13 +59,20 @@ const PortfolioDashboard = lazy(() => import('./PortfolioDashboard'));
 const ApiTerminal        = lazy(() => import('./ApiTerminal').then(m=>({default:m.ApiTerminal})));
 const AkashicLedger      = lazy(() => import('./AkashicLedger'));
 const MassTransferIntel  = lazy(() => import('./MassTransferIntel'));
+const WhaleSniperTerminal= lazy(() => import('./WhaleSniperTerminal'));
+const PolymarketGlass    = lazy(() => import('./PolymarketGlassDashboard'));
+const ZKShieldStation    = lazy(() => import('./ZKShieldStation').then(m=>({default:m.ZKShieldStation})));
+const EcosystemWarRoom   = lazy(() => import('./EcosystemWarRoom').then(m=>({default:m.EcosystemWarRoom})));
+const DeFiYieldPanel     = lazy(() => import('./DeFiYieldPanel'));
+const TopWhaleEvents     = lazy(() => import('./TopWhaleEvents24h').then(m=>({default:m.TopWhaleEvents24h})));
 
 // ─── Tab type ──────────────────────────────────────────────────────────────────
 type DashboardTab =
     | 'dashboard' | 'watchlist' | 'alerts' | 'live-txs' | 'multicharts'
     | 'new-pairs' | 'gainers-losers' | 'whale-tracker' | 'market-news'
     | 'api' | 'security' | 'visual-graph' | 'vault' | 'block-explorer'
-    | 'portfolio' | 'academy' | 'bitcoin-net' | 'support' | 'exchange' | 'premium' | 'library';
+    | 'portfolio' | 'academy' | 'bitcoin-net' | 'support' | 'exchange' | 'premium' | 'library'
+    | 'sniper' | 'polymarket' | 'zk-shield' | 'war-room' | 'defi-yield' | 'mass-intel' | 'top-whales';
 
 // ─── Sidebar nav data ──────────────────────────────────────────────────────────
 const NAV_GROUPS = [
@@ -74,33 +83,46 @@ const NAV_GROUPS = [
             { id: 'watchlist',     icon: Star,             label: 'Watchlist' },
             { id: 'alerts',        icon: Bell,             label: 'Alerts' },
             { id: 'live-txs',      icon: ActivityIcon,     label: 'Live Transactions' },
+            { id: 'top-whales',    icon: Eye,              label: 'TOP 24H Whales' },
             { id: 'multicharts',   icon: BarChart2,        label: 'Multicharts' },
-            { id: 'new-pairs',     icon: Plus,             label: 'New Pairs' },
+        ],
+    },
+    {
+        label: 'Tactical Recon (VOSS)',
+        items: [
+            { id: 'war-room',      icon: CrosshairIcon,    label: 'War Room' },
+            { id: 'sniper',        icon: TargetIcon,       label: 'Sniper Terminal' },
+            { id: 'mass-intel',    icon: NetworkIcon,      label: 'Mass Transfer Intel' },
+            { id: 'polymarket',    icon: CandlestickIcon,  label: 'Prediction Oracle' },
             { id: 'gainers-losers',icon: TrendingUp,       label: 'Gainers & Losers' },
+            { id: 'new-pairs',     icon: Plus,             label: 'New Pairs' },
         ],
     },
     {
-        label: 'Analysis',
+        label: 'Analysis & Yield',
         items: [
-            { id: 'whale-tracker', icon: Globe,     label: 'Whale Tracker' },
-            { id: 'market-news',   icon: Newspaper, label: 'Market News' },
-            { id: 'api',           icon: Terminal,  label: 'API Access' },
-            { id: 'security',      icon: Shield,    label: 'Security Center' },
-            { id: 'visual-graph',  icon: Layers,    label: 'Visual Graph' },
+            { id: 'whale-tracker', icon: Globe,            label: 'Whale Tracker' },
+            { id: 'defi-yield',    icon: CircleDollarIcon, label: 'DeFi Yield Matrix' },
+            { id: 'visual-graph',  icon: Layers,           label: 'Visual Graph' },
+            { id: 'market-news',   icon: Newspaper,        label: 'Market News' },
         ],
     },
     {
-        label: 'Secure Vault',
+        label: 'Infrastructure & Vault',
         items: [
-            { id: 'vault',         icon: Database, label: 'Secure Vault' },
-            { id: 'block-explorer',icon: Hash,     label: 'Block Explorer' },
-            { id: 'portfolio',     icon: Wallet,   label: 'My Portfolio' },
+            { id: 'vault',         icon: Database,         label: 'Secure Vault' },
+            { id: 'block-explorer',icon: Hash,             label: 'Block Explorer' },
+            { id: 'zk-shield',     icon: ShieldIcon,       label: 'ZK Shield Station' },
+            { id: 'api',           icon: Terminal,         label: 'API Access' },
+            { id: 'security',      icon: Shield,           label: 'Security Center' },
         ],
     },
     {
-        label: 'Premium',
+        label: 'Assets',
         items: [
-            { id: 'premium', icon: Zap, label: 'Premium Pass', gold: true },
+            { id: 'portfolio',     icon: Wallet,           label: 'My Portfolio' },
+            { id: 'academy',       icon: BookOpen,         label: 'Whale Academy' },
+            { id: 'premium',       icon: Zap,              label: 'Premium Pass', gold: true },
         ],
     },
 ];
@@ -514,11 +536,18 @@ function renderTabContent(tab: DashboardTab) {
         case 'block-explorer':return <OmniExplorer />;
         case 'portfolio':     return <PortfolioDashboard />;
         case 'academy':       return <WhaleAcademy />;
-        case 'library':       return <WhaleAcademy />; // Library content handled within Academy framework
+        case 'library':       return <WhaleAcademy />;
         case 'bitcoin-net':   return <BitcoinPrimitives />;
         case 'support':       return <WhaleSupport />;
         case 'exchange':      return <ConnectExchange />;
         case 'premium':       return <GoldTicketPanel />;
+        case 'sniper':        return <WhaleSniperTerminal />;
+        case 'polymarket':    return <PolymarketGlass />;
+        case 'zk-shield':     return <ZKShieldStation />;
+        case 'war-room':      return <EcosystemWarRoom />;
+        case 'defi-yield':    return <DeFiYieldPanel />;
+        case 'mass-intel':    return <MassTransferIntel />;
+        case 'top-whales':    return <TopWhaleEvents />;
         default:
             return (
                 <div className="p-12 text-center text-white/20 uppercase font-black text-[10px] tracking-widest">
@@ -535,7 +564,9 @@ const TAB_LABELS: Record<DashboardTab, string> = {
     'security':'Security Center','visual-graph':'Visual Graph','vault':'Secure Vault',
     'block-explorer':'Block Explorer','portfolio':'My Portfolio','academy':'Academy',
     'bitcoin-net':'Bitcoin Network','support':'Support Hub','exchange':'Connect Exchange','premium':'Premium Pass',
-    'library': 'The Library'
+    'library': 'The Library', 'sniper': 'Sniper Terminal', 'polymarket': 'Prediction Oracle',
+    'zk-shield': 'ZK Shield Station', 'war-room': 'War Room', 'defi-yield': 'DeFi Yield Matrix',
+    'mass-intel': 'Mass Transfer Intel', 'top-whales': 'Top 24H Whales'
 };
 
 // ─── Main Shell ────────────────────────────────────────────────────────────────
