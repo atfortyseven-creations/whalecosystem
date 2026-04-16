@@ -44,14 +44,14 @@ export default function DocLayout({ children, title, description, lastUpdated, c
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-6 py-24">
+            <div className="max-w-4xl mx-auto px-6 pt-16 pb-8">
                 <div className="prose prose-slate prose-lg max-w-none text-[var(--aztec-ink)]">
                     {children}
                 </div>
             </div>
 
             {/* Footer Info */}
-            <div className="border-t border-[var(--aztec-ink)]/5 mt-20 py-12">
+            <div className="border-t border-[var(--aztec-ink)]/5 mt-0 py-8">
                 <div className="max-w-4xl mx-auto px-6 text-center text-[10px] font-aztec-mono uppercase tracking-[0.3em] text-[var(--aztec-ink)]/40">
                     <p>For institutional inquiries, contact <a href="mailto:legal@WhaleAlert.pro" className="text-[var(--aztec-ink)] hover:underline">legal@WhaleAlert.pro</a></p>
                 </div>
