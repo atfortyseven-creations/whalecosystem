@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import SmoothScroll from '@/components/layout/SmoothScroll';
 
 export function ZoomWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -14,14 +13,10 @@ export function ZoomWrapper({ children }: { children: React.ReactNode }) {
         }
     }, [pathname]);
 
-    // NOTE: CSS zoom and transform:scale are intentionally REMOVED.
-    // Both break the HTML5 Canvas coordinate system used by the signature pad:
-    // mouse events are reported in real-screen coords but the canvas context
-    // operates in transformed coords → drawing becomes impossible / offset.
-    // The layout is correct at 100% scale. Adjust font/spacing via CSS if needed.
+    // Native container without Lenis smooth scroll
     return (
-        <SmoothScroll>
+        <>
             {children}
-        </SmoothScroll>
+        </>
     );
 }
