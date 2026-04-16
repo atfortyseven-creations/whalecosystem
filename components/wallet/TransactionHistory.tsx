@@ -202,9 +202,11 @@ export default function TransactionHistory({ authUserId, transactions: propTrans
                             width: '98%',
                             height: ITEM_HEIGHT,
                             transform: `translateY(${offsetY}px)`,
+                            willChange: 'transform',
+                            contain: 'strict'
                         }}
                     >
-                        <TransactionCard transaction={item} />
+                        <MemoizedTransactionCard transaction={item} />
                     </div>
                 ))}
             </div>
@@ -235,8 +237,9 @@ function StatCard({ title, value, icon, color }: { title: string; value: string 
     );
 }
 
-// Transaction Card Component
-function TransactionCard({ transaction }: { transaction: any }) {
+// [RENDERIZADO INHUMANO 2D] Memorización O(1) de nodo para evitar basura en GC durante el virtual scroll.
+const MemoizedTransactionCard = React.memo(
+  function TransactionCard({ transaction }: { transaction: any }) {
   const getTypeIcon = () => {
     switch (transaction.type) {
       case 'SEND':
@@ -340,7 +343,9 @@ function TransactionCard({ transaction }: { transaction: any }) {
       </div>
     </div>
   );
-}
+  },
+  (prev, next) => (prev.transaction.id || prev.transaction.hash) === (next.transaction.id || next.transaction.hash)
+);
 
 function TypeFilterButton({ 
   label, 

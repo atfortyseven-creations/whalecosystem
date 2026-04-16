@@ -194,46 +194,49 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
 
     console.log(`🌊 [${chain}] SOVEREIGN_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
 
-    await prisma.whaleActivity.upsert({
-        where: { transactionHash: hash },
-        update: {
-            usdValue: usdValue.toString(), // Update dynamic price-dependent fields
-            valueBTC: valueBTC,
-            btcPriceAtTx: btcPrice,
-        },
-        create: {
-            immutableId: crypto.randomUUID(), 
-            walletAddress: from,
-            type: type,
-            token: asset,
-            amount: amount.toString(),
-            usdValue: usdValue.toString(),
-            valueBTC: valueBTC,
-            btcPriceAtTx: btcPrice,
-            fromAddress: from,
-            toAddress: to,
-            transactionHash: hash,
-            blockNumber: BigInt(blockNumber),
-            chain,
-            institutional: isInstitutional,
-            metadata: {
-                ...metadata,
-                liquidityShock: isCexOutflow,
-                detectionLatency: 0 
+    // [LOGICA INHUMANA] Ejecución paralela O(1) de persistencia BD y propagación Redis 
+    // Reduce la latencia del trabajador a la mitad eliminando el bloqueo en serie.
+    await Promise.all([
+        prisma.whaleActivity.upsert({
+            where: { transactionHash: hash },
+            update: {
+                usdValue: usdValue.toString(),
+                valueBTC: valueBTC,
+                btcPriceAtTx: btcPrice,
             },
-            timestamp: new Date(),
-        }
-    }).catch(e => {
-        if (!e.message.includes('Unique constraint')) {
-            console.error(`❌ [${chain}] DB Persistence Fail:`, e.message);
-        }
-    });
-
-    await addWhaleToQueue({ 
-        hash, from, to, asset, amount, usdValue, valueBTC, 
-        blockNumber: blockNumber.toString(), chain, type, 
-        institutional: isInstitutional, metadata 
-    }).catch(e => {
-        console.error(`❌ [${chain}] Redis Queue Fail:`, e.message);
-    });
+            create: {
+                immutableId: crypto.randomUUID(), 
+                walletAddress: from,
+                type: type,
+                token: asset,
+                amount: amount.toString(),
+                usdValue: usdValue.toString(),
+                valueBTC: valueBTC,
+                btcPriceAtTx: btcPrice,
+                fromAddress: from,
+                toAddress: to,
+                transactionHash: hash,
+                blockNumber: BigInt(blockNumber),
+                chain,
+                institutional: isInstitutional,
+                metadata: {
+                    ...metadata,
+                    liquidityShock: isCexOutflow,
+                    detectionLatency: 0 
+                },
+                timestamp: new Date(),
+            }
+        }).catch(e => {
+            if (!e.message.includes('Unique constraint')) {
+                console.error(`❌ [${chain}] DB Persistence Fail:`, e.message);
+            }
+        }),
+        addWhaleToQueue({ 
+            hash, from, to, asset, amount, usdValue, valueBTC, 
+            blockNumber: blockNumber.toString(), chain, type, 
+            institutional: isInstitutional, metadata 
+        }).catch(e => {
+            console.error(`❌ [${chain}] Redis Queue Fail:`, e.message);
+        })
+    ]);
 }

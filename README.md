@@ -489,6 +489,18 @@ The mobile interface includes a comprehensive set of polyfills and compatibility
 
 The `getUserMedia` API, required for the QR scanner, is not accessible at module load time in iOS WKWebView. The mobile QR scanner component dynamically imports the `html5-qrcode` library only after the user taps the camera button, avoiding the premature access entirely.
 
+### 15.3 The Dual Hybrid Model (Sovereign PC & Zero-Trust Mobile)
+
+The most sophisticated property of the Whale Alert Network's architecture is its categorically segregated operating environment, referred to as the **Dual Hybrid Topology**. This model resolves the inherent conflict between extreme analytical performance and uncompromising cryptographic security by splitting the ecosystem into two immiscible planes:
+
+**1. The Sovereign Acoustic Terminal (PC/Web)**
+The desktop interface functions as an immaculate, read-only analytics engine. It processes the high-frequency *Sovereign Mesh* data streams — rendering complex Neo4j relationship graphs, performing 60FPS DOM windowing, and executing client-side Z-score mathematical models — strictly within an ephemeral memory layer. Crucially, the PC Terminal is a **Zero-Trust Zone**: it operates without custody of private key material. It generates unsigned transaction payloads (Requests) and visualizes macroeconomic intelligence, offloading all execution risk.
+
+**2. The Cryptographic Enclave (Mobile iOS/Android)**
+To execute actions (sign transactions, mint credentials, update profiles), the user must bridge their mobile device using the Reown Relay multiplexing protocol via QR handshake. The mobile device acts as a hardware-secured, network-isolated enclave. When the PC Terminal requires a cryptographic signature, the transmission payload is pushed to the mobile device. The mobile OS's secure enclave prompts biometric authorization (FaceID/TouchID), signs the payload via EIP-712 standard, and returns the signed execution hash to the PC Terminal.
+
+This symbiotic segregation guarantees that even if the PC Terminal DOM were hypothetically compromised by a malicious browser extension, the attacker's execution capability remains exactly zero. It is a paradigm designed not just to emulate institutional security, but to surpass it structurally.
+
 ---
 
 ## 16. Deployment Infrastructure

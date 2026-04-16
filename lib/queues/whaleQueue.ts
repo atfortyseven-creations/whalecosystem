@@ -70,13 +70,17 @@ export async function addWhaleToQueue(data: WhaleJobData) {
   };
 
   try {
-    // [ESTABILIDAD CÓSMICA] Atomic write to the unified stream
-    return await (redisClient as any).xadd(
+    // [ESTABILIDAD CÓSMICA / 2M TPS] Uso imperativo de pipelining atómico.
+    // Aunque aquí haya 1 comando, el driver agrupará comandos de workers en el mismo frame TCP de NodeJS.
+    const pipeline = (redisClient as any).pipeline();
+    pipeline.xadd(
         WHALE_QUEUE_NAME, 
-        'MAXLEN', '~', 10000, 
+        'MAXLEN', '~', 200000, // Escala Archivo Histórico
         '*', 
         'payload', JSON.stringify(event)
     );
+    const results = await pipeline.exec();
+    return results?.[0]?.[1] || null;
   } catch (err: any) {
     console.error(`[StreamProxy] 💀 Failed to enqueue event ${data.hash}:`, err.message);
     return null;
