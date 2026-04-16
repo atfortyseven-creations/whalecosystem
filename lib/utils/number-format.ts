@@ -30,7 +30,17 @@ export function safeToFixed(
     return fallback;
   }
 
-  return num.toFixed(decimals);
+  if (num === 0) return "0";
+
+  let formatted = num.toFixed(decimals);
+  if (decimals > 2 && formatted.includes('.')) {
+    formatted = formatted.replace(/0+$/, '');
+    if (formatted.endsWith('.')) {
+      formatted = formatted.slice(0, -1);
+    }
+  }
+
+  return formatted;
 }
 
 /**
