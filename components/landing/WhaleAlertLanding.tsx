@@ -1,34 +1,37 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
+
 import { motion } from "framer-motion";
 
-import { MegaReadmeParser } from "./MegaReadmeParser";
-import { MEGA_MANIFESTO_TEXT } from "../../lib/constants/megaReadme";
+import { ARCHITECTURAL_MANIFESTO } from "../../lib/constants/architecturalManifesto";
 
 export default function WhaleAlertLanding() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050505] text-[#FAF9F6] overflow-x-hidden selection:bg-[#00F2EA] selection:text-black font-sans">
+    <div className="relative min-h-screen w-full bg-[#FAF9F6] text-[#050505] overflow-x-hidden selection:bg-black selection:text-white font-sans">
       
       {/* ============================================================== */}
-      {/* FONDO 3D, WAVES Y PARTICULAS (RESTAURADO A MAXIMA GLORIA)    */}
+      {/* FONDO WATERMARK INSTITUCIONAL (IVORY STANDARD)                 */}
       {/* ============================================================== */}
+      
+      {/* BLOQUES ISOMÉTRICOS (WATERMARK INVERTIDO) */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none"
+        className="fixed inset-0 z-0 pointer-events-none opacity-[0.04]"
         style={{
           backgroundImage: "url('/api/assets?name=peakpx.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
-          opacity: 0.8
+          filter: "invert(1) grayscale(1)"
         }}
       />
+      
+      {/* OLAS HOKUSAI (MODO MULTIPLY TRANSPARENTE) */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none mix-blend-screen opacity-10"
+        className="fixed inset-[0_0_-5%_0] z-0 pointer-events-none opacity-[0.15] mix-blend-multiply scale-105 origin-bottom"
         style={{
           backgroundImage: "url('/olas-hokusai-4k.png')",
           backgroundSize: "cover",
@@ -36,56 +39,37 @@ export default function WhaleAlertLanding() {
           backgroundRepeat: "no-repeat"
         }}
       />
-      {/* Gradientes Oscuros 3D */}
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-black/20 via-transparent to-black/80 z-[1]" />
 
-      {/* HEADER ESPACIAL */}
-      <header className="relative z-[100] h-[80px] flex items-center justify-between px-10 border-b border-white/[0.05] bg-black/40 backdrop-blur-2xl">
-        <div className="flex items-center gap-4">
-           <img src="/official-whale-monochrome.png" className="w-8 h-8 invert opacity-80" alt="Whale" />
-           <span className="text-[13px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]">Sovereign Mesh</span>
-        </div>
-        <Link href="/connect" className="bg-[#FAF9F6] text-[#050505] px-6 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest hover:scale-105 transition-transform">
-          ENTER VAULT
-        </Link>
-      </header>
+      {/* Gradientes Claros para Integración Absoluta */}
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-t from-[#FAF9F6]/90 via-transparent to-[#FAF9F6]/30 z-[1]" />
+
+      {/* HEADER ELIMINADO POR ORDEN DE COTA CERO */}
 
       {/* ============================================================== */}
       {/* BOTON BLANCO GIGANTE (200 PAGINAS MEGA MANIFIESTO AZTEC)     */}
       {/* ============================================================== */}
-      <main className="relative z-[50] w-full max-w-6xl mx-auto px-6 py-24 flex flex-col items-center">
+      <main className="relative z-[50] w-full max-w-6xl mx-auto px-4 py-8 flex flex-col items-center">
          
          {mounted && (
          <motion.div 
            initial={{ opacity: 0, y: 50 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-           className="w-full bg-[#FFFFFF] text-[#050505] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] rounded-[40px] overflow-hidden border border-white/20"
+           className="w-full bg-[#FFFFFF] text-[#050505] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] rounded-[40px] overflow-hidden border border-black/[0.04] backdrop-blur-2xl"
          >
-            {/* Cabecera del Boton Blanco */}
-            <div className="bg-[#FAF9F6] border-b border-black/10 p-12 md:p-24 text-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 opacity-[0.02] pointer-events-none">
-                   <img src="/official-whale-monochrome.png" className="w-[800px] h-[800px] grayscale rotate-12 -mt-40 -mr-40" alt="" />
-                </div>
-                <h1 className="relative z-10 text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-black">
-                  LA TESIS <br/>SOVEREIGN.
+            {/* Cabecera del Boton Blanco - ELEGANCIA ABSOLUTA */}
+            <div className="bg-[#FAF9F6] border-b border-black/5 px-8 pt-16 pb-8 md:px-24 md:pt-20 md:pb-12 text-center relative overflow-hidden">
+                <h1 className="relative z-10 text-xl md:text-3xl font-mono tracking-[0.25em] text-black/80 font-light lowercase">
+                  in search of transparent information
                 </h1>
-                <p className="relative z-10 mt-8 text-xs md:text-sm font-mono tracking-widest uppercase font-bold max-w-2xl mx-auto opacity-50">
-                  Desclasificación Técnica / Manifiesto Institucional de Cota Cero
-                </p>
             </div>
 
-            {/* CUERPO MAESTRO - AZTEC NETWORK TYPOGRAPHY */}
-            <div className="p-8 md:p-24 flex flex-col gap-16 font-mono text-sm md:text-base leading-relaxed text-left text-black/90">
-                <MegaReadmeParser content={MEGA_MANIFESTO_TEXT} />
+            {/* CUERPO MAESTRO - AZTEC NETWORK TYPOGRAPHY MINÚSCULA REDUCIDA AL 30% */}
+            <div className="px-8 md:px-24 py-8 md:py-12 flex flex-col gap-6 font-mono text-[10px] md:text-[11px] leading-relaxed text-justify text-black/80 whitespace-pre-wrap break-words">
+                {ARCHITECTURAL_MANIFESTO}
             </div>
 
-            {/* LLAMADO A LA ACCION ADHERIDO AL BOTON BLANCO */}
-            <div className="bg-[#FAF9F6] p-12 border-t border-black/10 flex justify-center">
-                <Link href="/connect" className="bg-[#050505] text-[#FFFFFF] px-12 py-5 text-sm md:text-base font-black uppercase tracking-[0.2em] hover:bg-black/80 transition-colors shadow-2xl">
-                   » DESPLEGAR DASHBOARD INSTITUCIONAL
-                </Link>
-            </div>
+            {/* ZONA DE ABAJO VACIA ELIMINADA POR COMPLETO */}
          </motion.div>
          )}
       </main>

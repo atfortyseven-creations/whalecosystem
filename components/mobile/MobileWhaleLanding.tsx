@@ -2,32 +2,36 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { MegaReadmeParser } from "../landing/MegaReadmeParser";
-import { MEGA_MANIFESTO_TEXT } from "../../lib/constants/megaReadme";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const MobileWhaleLanding = () => {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050505] text-[#FAF9F6] overflow-x-hidden selection:bg-[#00F2EA] selection:text-black font-sans">
+    <div className="relative min-h-screen w-full bg-[#050505] text-[#FAF9F6] overflow-x-hidden selection:bg-[#00F2EA] selection:text-black">
       
-      {/* ============================================================== */}
-      {/* FONDO 3D, WAVES Y PARTICULAS (RESTAURADO A MAXIMA GLORIA)    */}
-      {/* ============================================================== */}
+      {/* 1. LAYER BASE: EL FIRMAMENTO GALÁCTICO ESTÁTICO */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none"
+        className="fixed inset-0 z-[0] pointer-events-none"
         style={{
           backgroundImage: "url('/api/assets?name=peakpx.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
-          opacity: 0.8
+          opacity: 0.95
         }}
       />
+
+      {/* 2. LAYER MEDIO: PARTICULAS Y NIEBLA COSMICA */}
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-t from-[#050505]/95 via-[#050505]/40 to-transparent z-[1]" />
+
+      {/* 3. LAYER DINAMICO: LAS OLAS DE HOKUSAI 4K FLOTANTES */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none mix-blend-screen opacity-20"
+        className="fixed inset-0 z-[2] pointer-events-none mix-blend-screen opacity-25"
         style={{
           backgroundImage: "url('/olas-hokusai-4k.png')",
           backgroundSize: "cover",
@@ -35,76 +39,100 @@ export const MobileWhaleLanding = () => {
           backgroundRepeat: "no-repeat"
         }}
       />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-t from-black via-black/40 to-transparent z-[1]" />
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: [0, 15, 0], opacity: [0.1, 0.3, 0.1] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        className="fixed inset-0 z-[3] pointer-events-none mix-blend-screen"
+        style={{
+          backgroundImage: "url('/olas-hokusai-4k.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "bottom",
+          backgroundRepeat: "no-repeat"
+        }}
+      />
 
-      {/* HEADER ESPACIAL MOVILES */}
-      <header className="relative z-[100] h-[60px] flex items-center justify-between px-6 border-b border-white/[0.05] bg-black/60 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-           <img src="/official-whale-monochrome.png" className="w-6 h-6 invert opacity-90" alt="Whale" />
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FAF9F6]">Sovereign Mesh</span>
-        </div>
-      </header>
+      {/* GRADIENTE SUPERIOR OSCURO PARA MAXIMIZAR CONTRASTE DE UI COLD WALLET */}
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-[#050505]/80 via-transparent to-transparent z-[4]" />
 
-      {/* ============================================================== */}
-      {/* PANEL BLANCO DE TEXTO MASIVO (RESPONSIVE VIEW)               */}
-      {/* ============================================================== */}
-      <main className="relative z-[50] w-full px-4 py-16 flex flex-col items-center">
-         
-         {mounted && (
-         <motion.div 
-           initial={{ opacity: 0, scale: 0.95 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ duration: 0.8 }}
-           className="w-full bg-[#FFFFFF] text-[#050505] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] rounded-3xl overflow-hidden border border-white/10"
-         >
-            {/* Cabecera del Boton Blanco */}
-            <div className="bg-[#FAF9F6] border-b border-black/10 p-8 text-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 opacity-[0.03] pointer-events-none">
-                   <img src="/official-whale-monochrome.png" className="w-[400px] h-[400px] grayscale rotate-[24deg] -mt-20 -mr-20" alt="" />
+
+      {/* ========================================================================= */}
+      {/* ===================== CONTENIDO SUPERIOR: MAJESTUOSO ==================== */}
+      {/* ========================================================================= */}
+      
+      <main className="relative z-[50] w-full min-h-screen flex flex-col items-center justify-between px-6 pt-12 pb-8">
+        
+        <AnimatePresence>
+          {mounted && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center w-full"
+            >
+              {/* LOGO INSTITUCIONAL FLOTANTE */}
+              <motion.div 
+                 animate={{ y: [0, -8, 0] }}
+                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                 className="relative w-32 h-32 mb-8 flex justify-center items-center"
+              >
+                  <div className="absolute inset-0 bg-[#00F2EA]/10 blur-3xl rounded-full" />
+                  <img src="/official-whale-monochrome.png" className="w-full h-full object-contain invert opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] relative z-10" alt="Whale Alert Logo" />
+              </motion.div>
+
+              {/* TITULO Y SUBTITULO MAESTRO */}
+              <div className="text-center w-full max-w-sm mb-12">
+                  <h1 className="text-4xl xs:text-5xl font-black uppercase tracking-tighter leading-[0.9] text-white">
+                     Sovereign<br/>
+                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2EA] to-white/70">
+                       Terminal
+                     </span>
+                  </h1>
+                  <p className="mt-4 text-[10px] font-mono tracking-[0.3em] uppercase text-white/50 border-t border-white/10 pt-4">
+                     P2P Cryptographic Ledger Protocol
+                  </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ========================================================================= */}
+        {/* ====================== BLOQUE DE ACCIÓN INFERIOR ======================== */}
+        {/* ========================================================================= */}
+
+        <AnimatePresence>
+          {mounted && (
+             <motion.div 
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full max-w-sm flex flex-col gap-5 mt-auto"
+             >
+                {/* STATUS INDICATOR */}
+                <div className="flex items-center justify-center gap-3 bg-black/40 backdrop-blur-md rounded-full py-2 px-4 border border-white/5 mx-auto mb-4">
+                   <div className="w-1.5 h-1.5 rounded-full bg-[#00F2EA] animate-pulse shadow-[0_0_8px_#00F2EA]" />
+                   <span className="text-[9px] font-black tracking-widest text-[#00F2EA] uppercase">Secure Connection</span>
                 </div>
-                <h1 className="relative z-10 text-4xl font-black uppercase tracking-tighter leading-[0.9] text-black">
-                  LA TESIS <br/>SOVEREIGN.
-                </h1>
-                <p className="relative z-10 mt-6 text-[10px] font-mono tracking-widest uppercase font-bold text-black/50">
-                  Desclasificación Técnica Institucional
-                </p>
-            </div>
 
-            {/* CUERPO MAESTRO - AZTEC NETWORK TYPOGRAPHY */}
-            <div className="p-4 flex flex-col gap-6 font-mono text-xs leading-relaxed text-left text-black/90">
-                <MegaReadmeParser content={MEGA_MANIFESTO_TEXT} />
-            </div>
-
-            {/* BOTON DE ACCESO */}
-            <div className="bg-[#050505] p-8 border-t border-black/10 flex justify-center">
-                <Link href="/connect" className="bg-[#FFFFFF] text-[#050505] px-8 py-4 text-xs font-black uppercase tracking-[0.2em] shadow-lg w-full text-center">
-                   » ENTRAR AL VAULT
+                {/* BOTON MAESTRO CINETICO CON NEON SUTIL */}
+                <Link href="/connect" className="group relative w-full flex items-center justify-center h-16 rounded-xl overflow-hidden bg-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#FAF9F6] to-[#E0E0E0]" />
+                    <span className="relative z-10 text-[12px] font-black uppercase tracking-widest text-black">
+                      Autenticar Ingreso
+                    </span>
+                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
                 </Link>
-            </div>
-         </motion.div>
-         )}
+
+                {/* BOTON SECUNDARIO APAGADO Y ELEGANTE */}
+                <button className="w-full h-14 flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-lg border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white hover:bg-black/50 transition-colors">
+                  Descargar Nodo Local
+                </button>
+             </motion.div>
+          )}
+        </AnimatePresence>
+        
       </main>
 
-      {/* ============================================================== */}
-      {/* DOWNPAGE EXACTO AL DE /connect PARA MOVILES                    */}
-      {/* ============================================================== */}
-      <footer className="relative z-[100] px-8 py-10 border-t border-white/[0.04] bg-[#FAF9F6] text-[#050505] flex flex-col items-center gap-6 mt-auto">
-         <div className="flex items-center gap-3">
-           <img src="/official-whale-monochrome.png" className="w-5 h-5 opacity-40 grayscale" alt="" />
-           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">© Whale Network</span>
-         </div>
-
-         <div className="flex items-center gap-6">
-            <a href="https://twitter.com/WhaleAlert" className="text-[10px] font-bold text-black/40">TWITTER</a>
-            <div className="w-px h-4 bg-black/10" />
-            <a href="https://github.com" className="text-[10px] font-bold text-black/40">GITHUB</a>
-         </div>
-
-         <div className="flex flex-col items-center mt-2">
-            <span className="text-[9px] font-black uppercase tracking-widest text-black/30">Status: Operational</span>
-            <span className="text-[9px] font-mono text-emerald-600 uppercase tracking-widest font-bold mt-1">L1 / L2 Ingress Active</span>
-         </div>
-      </footer>
     </div>
   );
 };
