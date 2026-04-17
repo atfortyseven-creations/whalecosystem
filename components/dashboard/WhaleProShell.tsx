@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { toast } from 'sonner';
 
 interface NavItem {
@@ -187,7 +187,7 @@ export function WhaleProShell({
     const { openConnectModal } = useUIStore();
 
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
-    const { connector, isConnected: isWalletConnected } = useAccount();
+    const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
 
     const handleTabChange = (id: string) => {
         const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
@@ -200,9 +200,12 @@ export function WhaleProShell({
                 });
                 openConnectModal();
                 return;
-            } else if (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) {
+            } else if (
+                (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) ||
+                (isSovereignHandshake && ['gold-ticket', 'sovereign-vault'].includes(id))
+            ) {
                 toast.error("Execution Clearance Required", {
-                    description: "This module requires EVM signing. Disconnect your Google session and use a native wallet.",
+                    description: "This module requires active EVM signing capabilities. Disconnect your remote session and use a native wallet.",
                     duration: 6000
                 });
                 return;
@@ -218,9 +221,12 @@ export function WhaleProShell({
             if (!isWalletConnected) {
                 onTabChange('dashboard');
                 toast.error("Session Lost", { description: "You have been ejected from the secure perimeter." });
-            } else if (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) {
+            } else if (
+                (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) ||
+                (isSovereignHandshake && ['gold-ticket', 'sovereign-vault'].includes(activeTab))
+            ) {
                 onTabChange('dashboard');
-                toast.error("Clearance Revoked", { description: "Google Sessions cannot reside in execution perimeters." });
+                toast.error("Clearance Revoked", { description: "Remote/Google Sessions cannot reside in execution perimeters." });
             }
         }
     }, [isWalletConnected, connector?.id, activeTab, onTabChange]);

@@ -47,27 +47,7 @@ export function ConnectWalletModal() {
         return () => window.removeEventListener('sovereign:auth_success', handleAuthSuccess);
     }, [closeConnectModal]);
 
-    // Nivel 2: Polling de Seguridad (Respaldo Institucional)
-    useEffect(() => {
-        if (!isPolling || !qrSession) return;
-        // Downgraded to 1.5s as it's now just a fallback for the instant SSE bridge
-        const interval = setInterval(async () => {
-            try {
-                const res = await fetch(`/api/auth/qr-session?id=${qrSession}`);
-                const data = await res.json();
-                if (data.status === 'complete') {
-                    clearInterval(interval);
-                    window.location.href = '/news';
-                } else if (data.status === 'expired' || data.status === 'error') {
-                    clearInterval(interval);
-                    setQrSession(null);
-                    setIsPolling(false);
-                    setView('selection');
-                }
-            } catch (e) {}
-        }, 1500);
-        return () => clearInterval(interval);
-    }, [isPolling, qrSession]);
+    // Nivel 2: Polling de Seguridad descartado. Se usa WebSocket de WalletConnect (AppKit) en su lugar para firmas institucionales.
 
     if (!isConnectModalOpen) return null;
 
@@ -94,18 +74,8 @@ export function ConnectWalletModal() {
     const handleRainbow  = () => connectViaExtension(['rainbow', 'me.rainbow']);
 
     const handleMobileSync = async () => {
-        setView('qr');
-        try {
-            setQrSession(null);
-            const res = await fetch('/api/auth/qr-session', { method: 'POST' });
-            const data = await res.json();
-            if (data.sessionId) {
-                setQrSession(data.sessionId);
-                // Persist for WalletConnectionBridge/SSE verification
-                sessionStorage.setItem('pending_qr_session', data.sessionId);
-                setIsPolling(true);
-            }
-        } catch (e) { setView('selection'); }
+        // Redirigir a AppKit para garantizar un websocket bidireccional que permita firmas EVM en tiempo real.
+        openAppKit({ view: 'Connect' });
     };
 
     const handleLedger = async () => {
@@ -212,8 +182,8 @@ export function ConnectWalletModal() {
                                                 <div className="flex items-center gap-3 text-white">
                                                     <QrCode size={15} />
                                                     <div className="text-left">
-                                                        <div className="text-[11px] font-black uppercase tracking-wide">Direct QR Handshake</div>
-                                                        <div className="text-[8px] text-white/60 font-mono uppercase tracking-widest">Cross-device linking</div>
+                                                        <div className="text-[11px] font-black uppercase tracking-wide">Mobile Bridge (Native)</div>
+                                                        <div className="text-[8px] text-white/60 font-mono uppercase tracking-widest">Full EVM Execution Ready</div>
                                                     </div>
                                                 </div>
                                                 <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse shrink-0" />

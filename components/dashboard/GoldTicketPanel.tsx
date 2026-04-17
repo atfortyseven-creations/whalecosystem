@@ -4,9 +4,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  useAccount, useConnect, useSignMessage,
+  useConnect, useSignMessage,
   useReadContract, useSwitchChain,
 } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { injected } from 'wagmi/connectors';
 import {
   Zap, Users, Lock, ExternalLink,
@@ -239,7 +240,7 @@ function GlobalLedger({ feed }: { feed: any[] }) {
 }
 
 export function GoldTicketPanel() {
-  const { address, isConnected, chainId } = useAccount();
+  const { address, isConnected, chainId, isSovereignHandshake } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
   const { switchChain } = useSwitchChain();
   const { signMessage, isSuccess: isConfirmed, reset: resetTx } = useSignMessage();
@@ -312,6 +313,8 @@ export function GoldTicketPanel() {
                   onClick={() => {
                     if (!isConnected) {
                        openConnectModal();
+                    } else if (isSovereignHandshake) {
+                       toast.error("Execution Clearance Required", { description: "QR Sessions cannot sign transactions. Please connect a native wallet.", duration: 5000 });
                     } else if (signatureData.length < 50) {
                        toast.error("Signature required on pad");
                     } else {
@@ -320,7 +323,7 @@ export function GoldTicketPanel() {
                   }}
                   className="w-full mt-4 py-3 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all"
                 >
-                  {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET TO START'}
+                  {isConnected ? (isSovereignHandshake ? 'READ ONLY SESSION' : 'AUTHORIZE MINT') : 'CONNECT WALLET TO START'}
                 </button>
             </div>
           ) : (

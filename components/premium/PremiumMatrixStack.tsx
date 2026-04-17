@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { useAccount, useBalance } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Activity, Clock, Zap, ArrowUpRight, ArrowDownRight, TrendingUp, GripVertical } from 'lucide-react';
 import { useDragOrder } from '@/hooks/useDragOrder';
 import { useMarketStream } from '@/context/MarketStreamContext';
@@ -195,7 +196,7 @@ const INITIAL_CARDS = [
 ];
 
 export function PremiumMatrixStack() {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected } = useSovereignAccount();
     const { data: balance } = useBalance({ address });
     const [selectedCategory, setSelectedCategory] = useState<'MAJOR' | 'ALT'>('MAJOR');
     const [isRearranging, setIsRearranging] = useState(false);
