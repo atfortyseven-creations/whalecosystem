@@ -11,7 +11,7 @@ export default function WhaleAlertLanding() {
   useEffect(() => { setMounted(true); }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#FAF9F6] text-[#050505] overflow-x-hidden selection:bg-black selection:text-white font-sans">
+    <div className="relative min-h-screen flex flex-col justify-between w-full bg-[#FAF9F6] text-[#050505] overflow-x-hidden selection:bg-black selection:text-white font-sans">
       
       {/* ============================================================== */}
       {/* FONDO WATERMARK INSTITUCIONAL (IVORY STANDARD)                 */}
@@ -48,7 +48,7 @@ export default function WhaleAlertLanding() {
       {/* ============================================================== */}
       {/* BOTON BLANCO GIGANTE (200 PAGINAS MEGA MANIFIESTO AZTEC)     */}
       {/* ============================================================== */}
-      <main className="relative z-[50] w-full max-w-6xl mx-auto px-4 py-8 flex flex-col items-center">
+      <main className="relative z-[50] flex-1 w-full max-w-6xl mx-auto px-4 py-8 flex flex-col items-center justify-center">
          
          {mounted && (
          <motion.div 

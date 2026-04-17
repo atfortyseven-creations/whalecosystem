@@ -190,7 +190,7 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-[100dvh] w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
+        <div className="flex h-full w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
