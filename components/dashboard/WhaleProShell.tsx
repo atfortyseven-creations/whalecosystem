@@ -275,13 +275,26 @@ export function WhaleProShell({
                                 <button
                                     key={item.id}
                                     onClick={() => handleTabChange(item.id)}
-                                    className={`w-full flex items-center justify-between py-2 px-3 rounded-lg group transition-all duration-200 ${
+                                    className={`relative w-full flex items-center justify-between py-2 px-3 rounded-lg group transition-all duration-200 ${
                                         isActive
                                                 ? 'bg-black/5 text-black shadow-none border border-black/10'
                                                 : 'text-[#888888] hover:text-black hover:bg-black/[0.04]'
                                         }
                                     `}
                                 >
+                                    {/* ── Static in-place active indicator — NO layoutId ── */}
+                                    <AnimatePresence>
+                                        {isActive && (
+                                            <motion.div
+                                                key="indicator"
+                                                initial={{ opacity: 0, scaleY: 0.3 }}
+                                                animate={{ opacity: 1, scaleY: 1 }}
+                                                exit={{ opacity: 0, scaleY: 0.3 }}
+                                                transition={{ duration: 0.12, ease: 'easeOut' }}
+                                                className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#050505] rounded-r-full"
+                                            />
+                                        )}
+                                    </AnimatePresence>
                                     <span className={`shrink-0 ${isActive ? 'text-[#050505]' : 'text-[#888888]'}`}>{item.icon}</span>
                                     {!isCollapsed && (
                                         <span className={`text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none truncate ${isActive ? 'text-[#050505]' : 'text-[#555555]'}`}>
@@ -292,9 +305,6 @@ export function WhaleProShell({
                                         <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
                                             {item.badge}
                                         </span>
-                                    )}
-                                    {isActive && (
-                                        <motion.div layoutId="nav-indicator" layout className="absolute left-0 w-1 h-5 bg-[#050505] rounded-r-full" style={{ transform: 'translateZ(0)', willChange: 'transform' }} />
                                     )}
                                 </button>
                             </div>
