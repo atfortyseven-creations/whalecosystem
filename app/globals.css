@@ -25,6 +25,8 @@
 html {
   /* Let the browser handle global scrolling natively */
   overflow-x: hidden;
+  /* ── HARD BOUNDARY: prevents rubber-band bounce and ghost pages ── */
+  overscroll-behavior: none;
 }
 
 body {
@@ -43,7 +45,11 @@ body {
   padding-left:   env(safe-area-inset-left, 0px);
   padding-right:  env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* ── LANDING PAGE BOUNDARY SEAL: no empty space or scroll past footer ── */
+  overscroll-behavior: none;
 }
+
 
 /* iOS Safari: Prevent 16px font auto-zoom on input focus */
 input,

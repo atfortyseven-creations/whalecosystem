@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { Search, Activity, ArrowUpRight, Zap, Target, Lock, LayoutGrid, Terminal } from 'lucide-react';
 import { toast } from 'sonner';

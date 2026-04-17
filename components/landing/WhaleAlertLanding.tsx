@@ -1,133 +1,158 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useUIStore } from '@/lib/store/ui-store';
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 import { MegaReadmeParser } from "./MegaReadmeParser";
-import { Menu, X, ChevronRight } from "lucide-react";
 
-const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+const slugify = (text: string) =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
 export default function WhaleAlertLanding({ readmeContent }: { readmeContent?: string }) {
   const [mounted, setMounted] = useState(false);
-  const [isIndexOpen, setIsIndexOpen] = useState(false);
   const openConnectModal = useUIStore(s => s.openConnectModal);
   const router = useRouter();
   const { isConnected } = useAccount();
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Parse H2 headers from content for the floating index
+  // Extract H2 sections for the inline index at the top
   const sections = useMemo(() => {
     if (!readmeContent) return [];
-    const lines = readmeContent.split('\n');
-    const headers = lines.filter(line => line.startsWith('## ')).map(line => line.replace('## ', '').trim());
-    return headers;
+    return readmeContent
+      .split('\n')
+      .filter(l => l.startsWith('## '))
+      .map(l => l.replace('## ', '').trim());
   }, [readmeContent]);
 
-  const scrollToSection = (id: string) => {
-    setIsIndexOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const topOffset = element.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top: topOffset, behavior: 'smooth' });
-    }
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
   };
 
   if (!mounted) return null;
 
   return (
-    <div className="relative w-full min-h-screen bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#050505] selection:text-[#FAF9F6]">
+    <div className="relative w-full bg-[#FAF9F6] text-[#050505] selection:bg-[#050505] selection:text-[#FAF9F6] overscroll-none">
 
-      {/* Floating Index Button */}
-      <div className="fixed bottom-8 right-8 z-[100]">
-        <AnimatePresence>
-          {isIndexOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="absolute bottom-16 right-0 w-72 max-h-[60vh] overflow-y-auto bg-white border border-[#E5E5E5] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] rounded-2xl p-4 custom-scrollbar flex flex-col gap-1"
-            >
-              <div className="text-[10px] font-black uppercase tracking-widest text-[#888888] mb-2 px-3">
-                Índice de Documentación
-              </div>
-              {sections.map((title, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => scrollToSection(slugify(title))}
-                  className="text-left px-3 py-2 rounded-lg hover:bg-[#FAF9F6] text-xs font-bold text-[#050505] transition-colors flex items-center justify-between group"
-                >
-                  <span className="truncate pr-4">{title}</span>
-                  <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#888888] shrink-0" />
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <button
-          onClick={() => setIsIndexOpen(!isIndexOpen)}
-          className="flex items-center justify-center w-14 h-14 bg-[#050505] text-[#FAF9F6] rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 transition-all"
-        >
-          {isIndexOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* MAIN CONTENT */}
-      <main className="relative z-[50] flex-1 w-full max-w-4xl mx-auto flex flex-col pt-24 pb-48 px-6 md:px-12">
+      {/* ── MAIN CONTENT ── */}
+      <main className="w-full max-w-3xl mx-auto px-6 md:px-0 pt-20">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="flex items-center gap-2 mb-12">
-            <div className="h-px w-8 bg-[#050505]/20" />
-            <span className="text-[9px] font-black uppercase tracking-[0.35em] text-[#050505]/50">Master Architecture</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-[#050505] leading-tight mb-4 uppercase">
-            Sovereign-Grade <br/> Intelligence
-          </h1>
-          
+
+          {/* ── HEADER: manifesto ── */}
+          <header className="mb-16">
+            <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#050505]/30 mb-6">
+              whale alert network · v6.12.0
+            </p>
+            <h1 className="font-mono text-[13px] md:text-[15px] font-normal lowercase text-[#050505] leading-relaxed tracking-tight mb-8">
+              in search of transparency.
+            </h1>
+            <div className="font-mono text-[11px] leading-loose text-[#050505]/60 lowercase space-y-1 max-w-lg">
+              <p>tracking and filtering institutional blockchain movements in real time.</p>
+              <p>all data sourced directly from on-chain state. 100% verifiable. 100% live.</p>
+              <p>protocol v6.12.0 · multi-chain · non-custodial · zero simulation.</p>
+            </div>
+
+            {/* ── STATUS ROW ── */}
+            <div className="flex items-center gap-6 mt-8 font-mono text-[10px] uppercase tracking-widest text-[#050505]/40">
+              <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block animate-pulse" />
+                system nominal
+              </span>
+              <span>l1/l2 ingress active</span>
+              <span>non-custodial</span>
+            </div>
+          </header>
+
+          {/* ── INDEX: inline at the top ── */}
+          {sections.length > 0 && (
+            <nav className="mb-16 border border-[#050505]/08 bg-white/60 rounded-xl p-6">
+              <p className="font-mono text-[9px] uppercase tracking-[0.45em] text-[#050505]/30 mb-4">
+                index
+              </p>
+              <ol className="space-y-1.5">
+                {sections.map((title, i) => (
+                  <li key={i}>
+                    <button
+                      onClick={() => scrollTo(slugify(title))}
+                      className="font-mono text-[11px] lowercase text-[#050505]/60 hover:text-[#050505] transition-colors flex items-baseline gap-3 group text-left w-full"
+                    >
+                      <span className="text-[#050505]/20 group-hover:text-[#050505]/40 transition-colors tabular-nums w-5 shrink-0">
+                        {String(i + 1).padStart(2, '0')}.
+                      </span>
+                      <span className="border-b border-transparent group-hover:border-[#050505]/20 transition-colors">
+                        {title.toLowerCase()}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+
+          {/* ── BODY: full README ── */}
           {readmeContent ? (
             <MegaReadmeParser content={readmeContent} />
           ) : (
-            <div className="text-sm font-mono text-[#888888] my-24">Error: Manifesto data could not be ingested.</div>
+            <p className="font-mono text-[11px] text-[#050505]/30 lowercase my-20">
+              no manifesto data found.
+            </p>
           )}
 
-          {/* CTA SECTION AT THE BOTTOM */}
-          <div className="mt-32 w-full flex flex-col items-center justify-center p-12 bg-white border border-[#E5E5E5] rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-              <h3 className="text-2xl font-black uppercase tracking-tighter text-[#050505] mb-8">
-                  El protocolo te espera.
-              </h3>
+          {/* ── SEPARATOR ── */}
+          <div className="w-full border-t border-[#050505]/08 my-20" />
+
+          {/* ── CONNECT CTA ── */}
+          <div className="flex flex-col gap-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#050505]/30">
+              access
+            </p>
+            <p className="font-mono text-[11px] text-[#050505]/50 lowercase leading-relaxed max-w-md">
+              to proceed, connect your authorized web3 wallet. a single signature grants full access to all sovereign-grade modules.
+            </p>
+            <div className="mt-4">
               {isConnected ? (
                 <button
-                   onClick={() => router.push('/dashboard')}
-                   className="w-full max-w-sm relative px-8 py-5 bg-[#050505] text-[#FAF9F6] border border-[#050505] rounded-xl font-black uppercase tracking-[0.2em] text-[12px] shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] hover:bg-[#FAF9F6] hover:text-[#050505] transition-all duration-300"
+                  onClick={() => router.push('/dashboard')}
+                  className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#FAF9F6] bg-[#050505] px-8 py-4 hover:bg-[#050505]/80 transition-colors"
                 >
-                   <span className="relative z-10 flex items-center justify-center gap-3">
-                       ENTER DASHBOARD 
-                       <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                   </span>
+                  enter dashboard →
                 </button>
               ) : (
                 <button
-                   onClick={(e) => { e.preventDefault(); openConnectModal(); }}
-                   className="w-full max-w-sm relative px-8 py-5 bg-[#050505] text-[#FAF9F6] border border-[#050505] rounded-xl font-black uppercase tracking-[0.2em] text-[12px] shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] hover:bg-[#FAF9F6] hover:text-[#050505] transition-all duration-300 group"
+                  onClick={(e) => { e.preventDefault(); openConnectModal(); }}
+                  className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#FAF9F6] bg-[#050505] px-8 py-4 hover:bg-[#050505]/80 transition-colors"
                 >
-                   <span className="relative z-10 flex items-center justify-center gap-3">
-                       INITIALIZE TERMINAL 
-                       <div className="w-1.5 h-1.5 bg-[#FAF9F6] group-hover:bg-[#050505] rounded-full animate-pulse" />
-                   </span>
+                  initialize terminal →
                 </button>
               )}
+            </div>
           </div>
+
+          {/* ── FOOTER: HARD STOP — nothing rendered beyond this point ── */}
+          <footer className="mt-16 pb-10 pt-8 border-t border-[#050505]/06 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-[#050505]/20">
+              © whale alert network 2026
+            </span>
+            <div className="flex gap-8">
+              <a href="https://twitter.com/WhaleAlert" className="font-mono text-[9px] uppercase tracking-widest text-[#050505]/20 hover:text-[#050505]/60 transition-colors">twitter</a>
+              <a href="https://github.com" className="font-mono text-[9px] uppercase tracking-widest text-[#050505]/20 hover:text-[#050505]/60 transition-colors">github</a>
+            </div>
+          </footer>
+          {/* ╔═══════════════════════════════════════════════════════╗
+               ║   BOUNDARY SEAL — NO CONTENT OR SPACE BEYOND HERE   ║
+               ╚═══════════════════════════════════════════════════════╝ */}
 
         </motion.div>
       </main>
     </div>
   );
 }
+
+
