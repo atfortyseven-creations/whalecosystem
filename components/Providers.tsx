@@ -10,7 +10,6 @@ import { WorldProvider } from "@/src/context/WorldContext";
 import { MarketWebsocketProvider } from "@/src/context/MarketWebsocketProvider";
 
 import { SessionProvider } from "next-auth/react";
-import { ReactLenis } from 'lenis/react';
 import { CWIProvider } from "@/lib/bsv/CWIContext";
 import { useEffect } from "react";
 
@@ -22,7 +21,6 @@ export default function Providers({ children, initialState, cookies }: { childre
     }, []);
 
     return (
-        <ReactLenis root options={{ lerp: 0.08, duration: 1.5, smoothWheel: true }}>
         <SessionProvider>
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
             <AppProvider>
@@ -42,7 +40,6 @@ export default function Providers({ children, initialState, cookies }: { childre
             </AppProvider>
         </ThemeProvider>
         </SessionProvider>
-        </ReactLenis>
     );
 }
 

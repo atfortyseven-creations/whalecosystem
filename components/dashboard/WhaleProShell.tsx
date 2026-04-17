@@ -350,6 +350,7 @@ export function WhaleProShell({
 
                     {/* Scrollable content layer — allows vertical scroll within the tab */}
                     <div
+                        id="main-scroll-container"
                         className="absolute inset-0 overflow-y-auto overflow-x-hidden flex flex-col no-scrollbar"
                         style={{
                             scrollbarWidth: 'none', /* Forzamos ocultar barra en Firefox */
