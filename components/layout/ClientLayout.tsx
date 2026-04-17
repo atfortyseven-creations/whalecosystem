@@ -55,7 +55,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <TitaniumGate>
                 {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
                 
-                <div className="min-h-screen w-full relative z-0 flex flex-col">
+                <div className={pathname.startsWith('/docs') || pathname.startsWith('/privacy') || pathname.startsWith('/terms') || pathname.startsWith('/connect') || pathname === '/'
+                    ? "min-h-screen w-full relative z-0 flex flex-col"
+                    : "fixed inset-0 h-[100dvh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0"}>
                     <div className="flex-none w-full z-50">
                         {/* Institutional Header with precise 68px height enforced */}
                         {/* SOVEREIGN FIX: /dashboard is excluded here — WhaleProShell
@@ -82,7 +84,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                         </div>
                         
                         <ZoomWrapper>
-                            <main className="relative z-10 w-full flex-1 flex flex-col">
+                            <main className="relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden">
                                 {content}
                             </main>
                         </ZoomWrapper>

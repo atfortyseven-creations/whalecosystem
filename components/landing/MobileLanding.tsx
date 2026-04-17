@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { useAppKit } from "@reown/appkit/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useConnect } from "wagmi";
 import { Fingerprint, ArrowRight, ScanLine, Loader2, Scan } from "lucide-react";
 import { useUIStore } from "@/lib/store/ui-store";
@@ -59,8 +59,16 @@ export function MobileLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
-  const { open: openAppKit } = useAppKit();
-  const { connect, connectors } = useConnect();
+  const { openConnectModal: openRainbowModal } = useConnectModal();
+  
+  const { connect, connectors } = useConnect({
+    mutation: {
+      onError: (err) => {
+        console.error("[MobileLanding] Connection explicit error:", err);
+        if (openRainbowModal) openRainbowModal();
+      }
+    }
+  });
 
   const [mounted, setMounted] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -92,20 +100,38 @@ export function MobileLanding() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const hasEthereum = typeof (window as any).ethereum !== 'undefined';
     
-    if (type === 'metamask') {
-        if (isMobile && !hasEthereum) {
-            openAppKit({ view: 'Connect' });
-            return;
+    try {
+        if (type === 'metamask') {
+            const mmConnector = connectors.find(c => {
+                if (c.id === 'metaMaskSDK' || c.id === 'io.metamask') return true;
+                if (c.id === 'injected' && (hasEthereum || !isMobile)) return true;
+                return false;
+            });
+            
+            if (mmConnector) {
+                connect({ connector: mmConnector });
+            } else if (openRainbowModal) {
+                openRainbowModal();
+            } else {
+                openConnectModal(); // Fallback to our Vault
+            }
+        } else if (type === 'coinbase') {
+            const cbConnector = connectors.find(c => c.id === 'coinbaseWalletSDK');
+            if (cbConnector) {
+                connect({ connector: cbConnector });
+            } else if (openRainbowModal) {
+                openRainbowModal();
+            } else {
+                openConnectModal();
+            }
+        } else {
+            // Rainbow or anything else -> Rainbow modal provides best mobile UX flow
+            if (openRainbowModal) openRainbowModal();
+            else openConnectModal();
         }
-        const mmConnector = connectors.find(c => c.id === 'metaMaskSDK' || c.id === 'io.metamask' || c.name.toLowerCase().includes('metamask') || c.id === 'injected');
-        if (mmConnector) connect({ connector: mmConnector });
-        else openAppKit({ view: 'Connect' });
-    } else if (type === 'coinbase') {
-        const cbConnector = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
-        if (cbConnector) connect({ connector: cbConnector });
-        else openAppKit({ view: 'Connect' });
-    } else {
-        openAppKit({ view: 'Connect' });
+    } catch (err) {
+        console.error("Connect block failed:", err);
+        if (openRainbowModal) openRainbowModal();
     }
   };
 
