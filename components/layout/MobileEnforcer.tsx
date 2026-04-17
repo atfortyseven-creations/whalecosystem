@@ -16,7 +16,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showNews, setShowNews] = useState(false);
-    const { isConnected } = useAccount();
+    const { isConnected, address } = useAccount();
     const pathname = usePathname();
 
     // Track previous connection state to detect NEW wallet connections
@@ -69,6 +69,27 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // ─── [AUTO-FULFILL NATIVE SCANS] ───
+    useEffect(() => {
+        if (isConnected && address && mounted) {
+            try {
+                if (typeof sessionStorage !== 'undefined') {
+                    const pendingSession = sessionStorage.getItem('pending_handshake_session');
+                    if (pendingSession) {
+                        console.log('[Handshake] Fulfilling native camera scan session!');
+                        fetch(`/api/auth/qr-session?id=${pendingSession}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ address })
+                        }).then(() => {
+                            sessionStorage.removeItem('pending_handshake_session');
+                        }).catch(e => console.error(e));
+                    }
+                }
+            } catch (e) {}
+        }
+    }, [isConnected, address, mounted]);
 
     // When wallet NEWLY connects → reset to landing so user sees the manifesto + options
     useEffect(() => {

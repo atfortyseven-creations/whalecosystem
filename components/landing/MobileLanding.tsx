@@ -16,6 +16,11 @@ const DynamicQRScannerModal = dynamic(
   { ssr: false }
 );
 
+const DynamicConnectWalletModal = dynamic(
+  () => import("@/components/shared/ConnectWalletModal").then(m => m.ConnectWalletModal),
+  { ssr: false }
+);
+
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const IVORY = "#FAF9F6";
 const INK   = "#050505";
@@ -89,6 +94,9 @@ export function MobileLanding() {
       className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col"
       style={{ backgroundColor: IVORY, color: INK }}
     >
+      {/* ── Sovereign Auth Modal (The Cryptographic Vault) ── */}
+      <DynamicConnectWalletModal />
+
       {/* ── Layer 0: Base ivory ── */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
 
@@ -284,12 +292,12 @@ export function MobileLanding() {
       />
 
       {/* ── Wave Footer ── */}
-      <div className="relative w-full min-h-[420px] flex flex-col justify-end overflow-hidden">
+      <div className="relative w-full min-h-[460px] flex flex-col justify-end overflow-hidden">
         {/* Great Wave */}
         <img
           src="/olas-hokusai-4k.png"
           alt="The Great Wave"
-          className="absolute bottom-0 left-0 w-[130%] -ml-[15%] object-cover object-bottom opacity-90 z-0"
+          className="absolute inset-0 w-full h-full object-cover object-bottom opacity-90 z-0"
           style={{ willChange: "transform", transform: "translateZ(0)" }}
         />
 

@@ -4,7 +4,26 @@ import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function POST() {
+export async function POST(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (id) {
+        try {
+            const body = await request.json();
+            if (body && body.address) {
+                await safeRedisSet(`qr:${id}`, JSON.stringify({ 
+                    status: 'SUCCESS', 
+                    address: body.address 
+                }), 'EX', 120);
+                return NextResponse.json({ success: true });
+            }
+        } catch (e) {
+            console.error('[QR_SESSION_FULFILL_ERROR]', e);
+            return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+        }
+    }
+
     const sessionId = crypto.randomUUID();
     // Valid for 5 minutes
     await safeRedisSet(`qr:${sessionId}`, 'PENDING', 'EX', 300);

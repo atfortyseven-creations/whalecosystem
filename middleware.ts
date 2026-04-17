@@ -23,6 +23,11 @@ function checkEdgeRateLimit(ip: string, tier: PlanTier): { success: boolean, max
   const now = Date.now();
   const windowMs = 10000; // 10 seconds
 
+  // OOM Protection for massive 100M+ scale botnets
+  if (rateLimitMap.size > 50000) {
+      rateLimitMap.clear();
+  }
+
   const record = rateLimitMap.get(ip);
   if (!record || now > record.expiresAt) {
     rateLimitMap.set(ip, { count: 1, expiresAt: now + windowMs });
