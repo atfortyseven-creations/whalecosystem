@@ -116,7 +116,12 @@ function StatChip({ label, value, accent }: { label: string; value: string; acce
   );
 }
 
-function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => void; disabled: boolean }) {
+function SignaturePad({ onSignature, disabled, onMint, mintLabel }: { 
+  onSignature: (d: string) => void; 
+  disabled: boolean;
+  onMint: () => void;
+  mintLabel: string;
+}) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = React.useState(false);
   const [hasDrawn, setHasDrawn] = React.useState(false);
@@ -170,25 +175,36 @@ function SignaturePad({ onSignature, disabled }: { onSignature: (d: string) => v
   };
 
   return (
-    <div className="flex flex-col gap-4 mt-8">
-      <div className="flex items-center justify-between">
-         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">Manual Endorsement</label>
-         {hasDrawn && !disabled && (
-           <button onClick={() => {
-             const ctx = canvasRef.current?.getContext('2d');
-             ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-             setHasDrawn(false);
-             onSignature("");
-           }} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3B30] hover:scale-105 transition-all">Reset Pad</button>
-         )}
+    <div className="flex flex-col gap-3">
+      {/* Header row: label + black AUTHORIZE MINT button */}
+      <div className="flex items-center justify-between gap-3">
+         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30 shrink-0">Manual Endorsement</label>
+         <div className="flex items-center gap-2">
+           {hasDrawn && !disabled && (
+             <button onClick={() => {
+               const ctx = canvasRef.current?.getContext('2d');
+               ctx?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+               setHasDrawn(false);
+               onSignature("");
+             }} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF3B30] hover:scale-105 transition-all whitespace-nowrap">Reset</button>
+           )}
+           <button
+             onClick={onMint}
+             disabled={disabled}
+             className="px-4 py-2 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.15em] text-[9px] transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+           >
+             {mintLabel}
+           </button>
+         </div>
       </div>
 
-      <div className={`relative w-full h-[180px] rounded-[2rem] overflow-hidden border-2 border-dashed transition-all ${hasDrawn ? 'border-[#D4AF37] bg-white shadow-2xl' : 'border-black/10 bg-black/5'}`}>
+      {/* Canvas */}
+      <div className={`relative w-full h-[160px] rounded-[2rem] overflow-hidden border-2 border-dashed transition-all ${hasDrawn ? 'border-[#D4AF37] bg-white shadow-2xl' : 'border-black/10 bg-black/5'}`}>
         <canvas ref={canvasRef} className="w-full h-full cursor-crosshair touch-none" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerLeave={stop} />
         {!hasDrawn && !disabled && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20">
-            <PenTool size={32} className="text-black mb-3" />
-            <p className="text-[11px] font-black uppercase tracking-[0.3em]">Sign Cryptographic Endorsement</p>
+            <PenTool size={28} className="text-black mb-2" />
+            <p className="text-[10px] font-black uppercase tracking-[0.3em]">Sign to Unlock Mint</p>
           </div>
         )}
       </div>
@@ -305,24 +321,22 @@ export function GoldTicketPanel() {
                    <h3 className="text-sm font-black uppercase tracking-widest text-[#050505]">Claim Access</h3>
                    <span className="text-[9px] text-[#888888] uppercase">Verification</span>
                 </div>
-                <div className="flex-1 max-h-[160px]">
-                   <SignaturePad onSignature={setSignatureData} disabled={hasTicket} />
-                </div>
-                
-                <button 
-                  onClick={() => {
-                    if (!isConnected) {
-                       openConnectModal();
-                    } else if (signatureData.length < 50) {
-                       toast.error("Signature required on pad");
-                    } else {
-                       signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
-                    }
-                  }}
-                  className="w-full mt-4 py-3 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all"
-                >
-                   {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET TO START'}
-                </button>
+                 <div className="flex-1">
+                    <SignaturePad 
+                      onSignature={setSignatureData} 
+                      disabled={hasTicket}
+                      onMint={() => {
+                        if (!isConnected) {
+                          openConnectModal();
+                        } else if (signatureData.length < 50) {
+                          toast.error("Sign on the pad first");
+                        } else {
+                          signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
+                        }
+                      }}
+                      mintLabel={isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'}
+                    />
+                 </div>
             </div>
           ) : (
             <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
