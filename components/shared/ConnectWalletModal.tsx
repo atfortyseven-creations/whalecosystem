@@ -165,7 +165,6 @@ export function ConnectWalletModal() {
                                                 { id: 'metamask', name: 'MetaMask', logo: '/wallets/metamask.svg', handler: handleMetaMask },
                                                 { id: 'coinbase', name: 'Coinbase', logo: '/wallets/coinbase.png', handler: handleAppKitConnect },
                                                 { id: 'rainbow', name: 'Rainbow', logo: '/wallets/rainbow.png', handler: handleAppKitConnect },
-                                                { id: 'rabby', name: 'Rabby', logo: '/wallets/rabby.svg', handler: handleMetaMask },
                                             ].map((w) => (
                                                 <button 
                                                     key={w.id}

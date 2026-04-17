@@ -8,6 +8,7 @@ import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useAppKit } from "@reown/appkit/react";
 import { Fingerprint, ArrowRight, ScanLine, Loader2, Scan } from "lucide-react";
+import { useUIStore } from "@/lib/store/ui-store";
 
 // QR Scanner — iOS-safe dynamic import
 const DynamicQRScannerModal = dynamic(
@@ -51,7 +52,7 @@ function WalletOption({
 export function MobileLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
-  const { open } = useAppKit();
+  const { openConnectModal } = useUIStore();
 
   const [mounted, setMounted] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -81,7 +82,7 @@ export function MobileLanding() {
 
   if (!mounted) return null;
 
-  const handleConnect = () => open({ view: "Connect" });
+  const handleConnect = () => openConnectModal();
 
   return (
     <div
@@ -236,13 +237,7 @@ export function MobileLanding() {
               onClick={handleConnect}
               delay={0.2}
             />
-            <WalletOption
-              logo="/wallets/rabby.png"
-              name="Rabby"
-              badge="Advanced EOA"
-              onClick={handleConnect}
-              delay={0.25}
-            />
+
 
             {/* Divider with scanner option */}
             <div className="flex items-center gap-3 mt-2">

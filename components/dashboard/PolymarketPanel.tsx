@@ -168,7 +168,7 @@ export default function PolymarketPanel() {
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-105px)] bg-[#FFFFFF] text-[#111111] font-sans">
+        <div className="flex flex-col flex-1 h-full min-h-0 bg-[#FFFFFF] text-[#111111] font-sans">
             {/* Controls */}
             <div className="flex flex-wrap items-center gap-4 p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
                 <div className="relative flex-1 min-w-[250px] max-w-md">

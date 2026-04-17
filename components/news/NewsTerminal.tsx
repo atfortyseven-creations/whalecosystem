@@ -195,25 +195,19 @@ export function NewsTerminal() {
   // ── Render principal ─────────────────────────────────────────────────────
   return (
     <>
-      {/* Root container — GPU compositing layer to eliminate paint on scroll */}
       <div
+        className="w-full h-full flex-1 relative flex flex-col min-h-0"
         style={{
           background: BG,
           color: TEXT,
-          minHeight: panelH,
-          // Force Chromium/WebKit to promote to a GPU compositing layer
+          // Root optimization
           willChange: 'transform',
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden',
-          // Disable elastic overscroll bounce inside container (iOS safe-area)
           overscrollBehavior: 'none',
         }}
-        className="w-full relative"
       >
-        <div
-          style={{ height: panelH, overflow: 'hidden' }}
-          className="flex w-full"
-        >
+        <div className="flex flex-1 w-full h-full min-h-0 overflow-hidden">
 
           {/* ═══════════════════════════════════════════════════════════════
               PANEL IZQUIERDO — Lista + Archivo
