@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useAppKit } from "@reown/appkit/react";
+import { useConnect } from "wagmi";
 import { Fingerprint, ArrowRight, ScanLine, Loader2, Scan } from "lucide-react";
 import { useUIStore } from "@/lib/store/ui-store";
 
@@ -58,6 +59,8 @@ export function MobileLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
+  const { open: openAppKit } = useAppKit();
+  const { connect, connectors } = useConnect();
 
   const [mounted, setMounted] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -88,6 +91,28 @@ export function MobileLanding() {
   if (!mounted) return null;
 
   const handleConnect = () => openConnectModal();
+
+  const handleSmartConnect = (type: string) => {
+    if (typeof window === 'undefined') return;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const hasEthereum = typeof (window as any).ethereum !== 'undefined';
+    
+    if (type === 'metamask') {
+        if (isMobile && !hasEthereum) {
+            openAppKit({ view: 'Connect' });
+            return;
+        }
+        const mmConnector = connectors.find(c => c.id === 'metaMaskSDK' || c.id === 'io.metamask' || c.name.toLowerCase().includes('metamask') || c.id === 'injected');
+        if (mmConnector) connect({ connector: mmConnector });
+        else openAppKit({ view: 'Connect' });
+    } else if (type === 'coinbase') {
+        const cbConnector = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
+        if (cbConnector) connect({ connector: cbConnector });
+        else openAppKit({ view: 'Connect' });
+    } else {
+        openAppKit({ view: 'Connect' });
+    }
+  };
 
   return (
     <div
@@ -228,21 +253,21 @@ export function MobileLanding() {
               logo="/wallets/metamask.svg"
               name="MetaMask"
               badge="Browser · Injected"
-              onClick={handleConnect}
+              onClick={() => handleSmartConnect('metamask')}
               delay={0.1}
             />
             <WalletOption
               logo="/wallets/coinbase.png"
               name="Coinbase Wallet"
               badge="MPC · Smart Wallet"
-              onClick={handleConnect}
+              onClick={() => handleSmartConnect('coinbase')}
               delay={0.15}
             />
             <WalletOption
               logo="/wallets/rainbow.png"
               name="Rainbow & 550+ Wallets"
               badge="WalletConnect v2"
-              onClick={handleConnect}
+              onClick={() => handleSmartConnect('rainbow')}
               delay={0.2}
             />
 
