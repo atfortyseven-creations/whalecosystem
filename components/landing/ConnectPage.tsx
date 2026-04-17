@@ -74,7 +74,7 @@ export default function ConnectPage() {
           clearInterval(bridge);
           setTimeout(() => {
             document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
-            router.replace("/dashboard");
+            router.replace("/");
           }, 1200);
         }
       } catch (e) {}
@@ -90,7 +90,7 @@ export default function ConnectPage() {
          document.cookie = `sovereign_handshake=web3_injected; path=/; max-age=604800; SameSite=Lax`;
       }
       setTimeout(() => {
-         router.replace("/dashboard");
+         router.replace("/");
       }, 500);
     }
   }, [isConnected, mounted, router]);

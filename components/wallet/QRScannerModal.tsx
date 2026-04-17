@@ -81,8 +81,78 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/95 backdrop-blur-2xl">
-                    
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/95 backdrop-blur-2xl overflow-y-auto py-10">
+                    <style>{`
+                        #qr-reader {
+                            border: none !important;
+                            width: 100% !important;
+                        }
+                        #qr-reader__dashboard_section_csr span {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 10px !important;
+                            align-items: center !important;
+                            margin-bottom: 20px !important;
+                        }
+                        #qr-reader__dashboard_section_swaplink {
+                            text-decoration: none !important;
+                            font-weight: 900 !important;
+                            background: #050505 !important;
+                            color: white !important;
+                            padding: 12px 24px !important;
+                            border-radius: 9999px !important;
+                            text-transform: uppercase !important;
+                            letter-spacing: 2px !important;
+                            font-size: 10px !important;
+                            display: inline-block !important;
+                            margin-bottom: 10px !important;
+                            transition: all 0.2s;
+                        }
+                        #qr-reader__dashboard_section_swaplink:hover {
+                            background: rgba(0,0,0,0.8) !important;
+                        }
+                        #qr-reader__camera_selection {
+                            padding: 10px !important;
+                            border-radius: 8px !important;
+                            border: 1px solid rgba(0,0,0,0.1) !important;
+                            font-family: inherit !important;
+                            font-size: 12px !important;
+                            outline: none !important;
+                            background: white !important;
+                            width: 90% !important;
+                            margin: 10px auto !important;
+                            display: block !important;
+                        }
+                        #qr-reader__camera_permission_button,
+                        #qr-reader__dashboard_section_csr button {
+                            background: #050505 !important;
+                            color: white !important;
+                            font-weight: 800 !important;
+                            text-transform: uppercase !important;
+                            font-size: 10px !important;
+                            padding: 12px 24px !important;
+                            border-radius: 99px !important;
+                            border: none !important;
+                            cursor: pointer !important;
+                            letter-spacing: 1px !important;
+                            margin-top: 10px !important;
+                        }
+                        #qr-reader__dashboard_section_csr button:hover {
+                            background: rgba(0,0,0,0.8) !important;
+                        }
+                        #qr-reader img {
+                            display: none !important;
+                        }
+                        #qr-reader__dashboard_section {
+                            padding: 10px !important;
+                        }
+                        #qr-reader__dashboard_section_csr {
+                            padding-top: 10px !important;
+                        }
+                        #qr-reader video {
+                            border-radius: 16px !important;
+                        }
+                    `}</style>
                     <button 
                         onClick={onClose}
                         className="absolute top-6 right-6 p-4 rounded-full bg-[#050505]/5 text-[#050505] hover:bg-[#050505]/10 transition-all z-50 border border-[#050505]/10"
@@ -101,8 +171,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                              <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">Link Session</h2>
                         </div>
 
-                        <div className="relative w-full aspect-square max-w-[320px] bg-white border border-[#050505]/10 rounded-[32px] overflow-hidden shadow-2xl flex items-center justify-center">
-                            <div id="qr-reader" className={`w-full h-full !border-none ${error ? 'hidden' : ''}`} />
+                        <div className="relative w-full min-h-[400px] max-w-[340px] bg-white border border-[#050505]/10 rounded-[32px] overflow-hidden shadow-2xl flex flex-col items-center justify-start pt-6 px-4">
+                            <div id="qr-reader" className={`w-full !border-none ${error ? 'hidden' : ''}`} />
                             
                             {error && (
                                 <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center space-y-4">
@@ -118,7 +188,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                             )}
 
                             {scanning && !error && (
-                                <div className="absolute inset-0 pointer-events-none">
+                                <div className="absolute inset-0 pointer-events-none md:block hidden">
                                     <div className="absolute inset-x-8 top-1/2 h-[2px] bg-black/10 animate-pulse" />
                                     <div className="absolute inset-4 border-2 border-dashed border-black/5 rounded-2xl" />
                                 </div>

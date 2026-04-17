@@ -276,7 +276,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
     if (typeof document !== 'undefined') {
       const hasHandshake = document.cookie
         .split('; ')
-        .some(row => row.startsWith('sovereign_handshake=0x'));
+        .some(row => row.startsWith('sovereign_handshake='));
       if (hasHandshake) {
         setLinked(true);
       }
@@ -286,6 +286,20 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // ── When wallet connects, show sign step (unless already linked) ─────────
   useEffect(() => {
     if (!isMounted) return;
+
+    // Fast synchronous check to avoid race condition
+    if (typeof document !== 'undefined') {
+      const hasHandshake = document.cookie
+        .split('; ')
+        .some(row => row.startsWith('sovereign_handshake='));
+      
+      if (hasHandshake) {
+        setLinked(true);
+        setShowSignStep(false);
+        return;
+      }
+    }
+
     if (isWalletConnected && !isLinked && !showSignStep) {
       // Check sessionStorage for this specific address (tab-level cache)
       if (address) {
