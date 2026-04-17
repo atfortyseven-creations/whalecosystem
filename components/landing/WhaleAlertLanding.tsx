@@ -5,65 +5,19 @@ import { motion } from "framer-motion";
 import { useUIStore } from '@/lib/store/ui-store';
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
+import type { ManifestoSection } from "@/lib/manifesto-parser";
 
-// ─── Manifesto content — handcrafted, no README dependency ───────────────────
-const SECTIONS = [
-  {
-    id: "the-protocol",
-    title: "the protocol",
-    body: [
-      "whale alert network is a sovereign-grade, non-custodial intelligence terminal designed for institutional-level on-chain analysis. it operates as an independent signal node embedded within the ethereum public ledger, providing unfiltered, verifiable access to blockchain state in real time.",
-      "every data point displayed within this system is sourced directly from ethereum mainnet and layer-2 execution environments. no simulations. no interpolated estimates. no third-party aggregators. the terminal reads the chain exactly as it is — block by block, transaction by transaction.",
-    ],
-  },
-  {
-    id: "architecture",
-    title: "architecture",
-    body: [
-      "the system is built on a hybrid next.js 15 application router over a zero-latency modular ui. the dual-mode data pipeline sustains 99.98% ingestion uptime across sixteen global networks through adaptive rpc multiplexing and automatic failover.",
-      "backend intelligence is processed by whale-worker: a prisma-powered async daemon integrating neo4j graph queries, bullmq distributed task queues, and more than forty archived and live rpc provider endpoints. the node never caches. it streams.",
-    ],
-  },
-  {
-    id: "intelligence-systems",
-    title: "intelligence systems",
-    body: [
-      "the platform aggregates and cross-references seven distinct signal categories: large transfer detection, exchange flow analysis, smart contract interaction mapping, defi liquidity depth monitoring, derivatives open interest deltas, cross-chain bridge activity, and governance vote tracking.",
-      "each signal passes through our voss thermodynamic classification engine — a stochastic model trained on twelve years of ethereum on-chain history — to distinguish institutional accumulation from noise with surgical precision.",
-    ],
-  },
-  {
-    id: "sovereign-access",
-    title: "sovereign access",
-    body: [
-      "access to the terminal is granted through a single cryptographic signature. no personal data is collected. no accounts are created. identity is verified entirely through eip-191 message signing — a protocol-native handshake that leaves no on-chain trace.",
-      "the sovereign handshake generates a session credential bound to your public address, valid for seven days. all sensitive modules are gated behind mandatory wallet signature verification, ensuring that execution-grade intelligence is accessible only to verified participants.",
-    ],
-  },
-  {
-    id: "legal-framework",
-    title: "legal framework",
-    body: [
-      "whale alert network is a data intelligence platform. it does not provide investment advice, financial guidance, or market recommendations of any kind. all signals are informational outputs derived from publicly verifiable on-chain data.",
-      "the platform is expressly not available to residents of the united states or any other jurisdiction where the provision of such services may be restricted. by accessing the terminal, you confirm that you are operating within a permissible legal framework and have read and accepted the master terms of service.",
-    ],
-  },
-];
+interface WhaleAlertLandingProps {
+  sections: ManifestoSection[];
+}
 
-const INDEX = SECTIONS.map((s, i) => ({ id: s.id, title: s.title, n: String(i + 1).padStart(2, "0") }));
-
-export default function WhaleAlertLanding() {
+export default function WhaleAlertLanding({ sections }: WhaleAlertLandingProps) {
   const [mounted, setMounted] = useState(false);
   const openConnectModal = useUIStore(s => s.openConnectModal);
   const router = useRouter();
   const { isConnected } = useAccount();
 
   useEffect(() => { setMounted(true); }, []);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   if (!mounted) return null;
 
@@ -104,7 +58,7 @@ export default function WhaleAlertLanding() {
           <span>l1 / l2 ingress active</span>
         </div>
 
-        {/* ══ WHITE CARD: INDEX + BODY ════════════════════════════════════════ */}
+        {/* ══ WHITE CARD: BODY ════════════════════════════════════════ */}
         <div className="w-full bg-white border border-[#050505]/06 rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.04)] overflow-hidden">
 
           {/* INDEX ─────────────────────────────────────────────────────────── */}
@@ -113,17 +67,20 @@ export default function WhaleAlertLanding() {
               index
             </p>
             <ol className="space-y-2.5">
-              {INDEX.map(({ id, title, n }) => (
-                <li key={id}>
+              {sections.map((section, index) => (
+                <li key={section.id}>
                   <button
-                    onClick={() => scrollTo(id)}
+                    onClick={() => {
+                      const el = document.getElementById(section.id);
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
                     className="font-mono text-[11px] text-[#050505]/50 hover:text-[#050505] transition-colors flex items-baseline gap-4 group text-left w-full"
                   >
                     <span className="text-[#050505]/20 group-hover:text-[#050505]/40 tabular-nums shrink-0 transition-colors">
-                      {n}.
+                      {String(index + 1).padStart(2, "0")}.
                     </span>
-                    <span className="border-b border-transparent group-hover:border-[#050505]/15 transition-colors pb-px">
-                      {title}
+                    <span className="border-b border-transparent group-hover:border-[#050505]/15 transition-colors pb-px leading-[1.6]">
+                      {section.title}
                     </span>
                   </button>
                 </li>
@@ -133,7 +90,7 @@ export default function WhaleAlertLanding() {
 
           {/* BODY SECTIONS ──────────────────────────────────────────────────── */}
           <div className="divide-y divide-[#050505]/05">
-            {SECTIONS.map((section) => (
+            {sections.map((section) => (
               <div
                 key={section.id}
                 id={section.id}
@@ -143,14 +100,31 @@ export default function WhaleAlertLanding() {
                   {section.title}
                 </h2>
                 <div className="space-y-4">
-                  {section.body.map((para, i) => (
-                    <p
-                      key={i}
-                      className="font-mono text-[11px] leading-[1.9] text-[#050505]/55 tracking-tight"
-                    >
-                      {para}
-                    </p>
-                  ))}
+                  {section.body.map((para, i) => {
+                    if (para.startsWith('[SUBTITLE]')) {
+                      return (
+                        <h3 key={i} className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#050505]/70 pt-4 mb-2">
+                          {para.replace('[SUBTITLE]', '')}
+                        </h3>
+                      );
+                    }
+                    if (para.startsWith('[LIST_ITEM]')) {
+                      return (
+                        <div key={i} className="flex gap-4 font-mono text-[11px] leading-[1.9] text-[#050505]/55 tracking-tight border-l cursor-default border-[#050505]/10 pl-4 py-1 hover:border-[#050505]/30 transition-colors">
+                          <span className="shrink-0 text-[#050505]/30 mt-1">—</span>
+                          <span className="flex-1">{para.replace('[LIST_ITEM]', '')}</span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <p
+                        key={i}
+                        className="font-mono text-[11px] leading-[1.9] text-[#050505]/55 tracking-tight"
+                      >
+                        {para}
+                      </p>
+                    );
+                  })}
                 </div>
               </div>
             ))}
