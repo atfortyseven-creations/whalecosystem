@@ -73,18 +73,25 @@ export function ConnectWalletModal() {
 
     const handleAppKitConnect = () => openAppKit({ view: 'Connect' });
 
-    const handleMetaMask = () => {
-        if (typeof window !== 'undefined') {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const hasEthereum = typeof (window as any).ethereum !== 'undefined';
-            if (isMobile && !hasEthereum) { openAppKit({ view: 'Connect' }); return; }
-            const mmConnector = connectors.find(c =>
-                c.id === 'metaMaskSDK' || c.id === 'io.metamask' || c.id === 'metaMask' || c.id === 'injected'
-            );
-            if (mmConnector) connect({ connector: mmConnector });
-            else openAppKit({ view: 'Connect' });
+    // \u2500\u2500 Smart connector detector \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+    // Priority: exact SDK ID > injected window.ethereum > AppKit fallback
+    const connectViaExtension = (ids: string[]) => {
+        if (typeof window === 'undefined') return;
+        const hasEthereum = typeof (window as any).ethereum !== 'undefined';
+        const found = connectors.find(c => ids.includes(c.id));
+        if (found) { connect({ connector: found }); return; }
+        // Try injected if window.ethereum exists (extension active in this tab)
+        if (hasEthereum) {
+            const injected = connectors.find(c => c.id === 'injected');
+            if (injected) { connect({ connector: injected }); return; }
         }
+        // Nothing found locally — fall back to AppKit (QR/WalletConnect flow)
+        openAppKit({ view: 'Connect' });
     };
+
+    const handleMetaMask = () => connectViaExtension(['io.metamask', 'metaMaskSDK', 'metaMask']);
+    const handleCoinbase = () => connectViaExtension(['coinbaseWalletSDK', 'coinbaseWallet']);
+    const handleRainbow  = () => connectViaExtension(['rainbow', 'me.rainbow']);
 
     const handleMobileSync = async () => {
         setView('qr');
@@ -113,7 +120,7 @@ export function ConnectWalletModal() {
     return (
         <AnimatePresence>
             {isConnectModalOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-4 font-sans">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 font-sans">
                 {/* Clean Backdrop */}
                 <motion.div
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -124,7 +131,7 @@ export function ConnectWalletModal() {
                 {/* Modal Container */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.98, y: 15 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98, y: 15 }}
-                    className="relative w-full sm:max-w-[440px] bg-[#FFFFFF] border border-[#050505]/10 rounded-[28px] overflow-hidden flex flex-col shadow-2xl"
+                    className="relative w-full sm:max-w-[440px] max-h-[92dvh] bg-[#FFFFFF] border border-[#050505]/10 rounded-[24px] overflow-hidden flex flex-col shadow-2xl"
                 >
                     {/* Header Bar */}
                     <div className="flex items-center justify-between px-6 py-5 border-b border-[#050505]/10 bg-[#FAF9F6]">
@@ -142,86 +149,84 @@ export function ConnectWalletModal() {
                         </button>
                     </div>
 
-                    {/* Content */}
-                    <div className="px-6 py-8 relative">
+                    {/* Content — scrollable interior so header/footer stay fixed */}
+                    <div className="px-4 py-4 sm:px-6 sm:py-6 relative overflow-y-auto flex-1">
 
                         <AnimatePresence mode="wait">
                             {/* ── SELECTION VIEW ── */}
                             {view === 'selection' && (
                                 <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6 relative z-10">
-                                    <div className="space-y-1.5 text-center px-4">
-                                        <h2 className="text-[22px] font-black text-[#050505] uppercase tracking-tighter">
+                                    <div className="space-y-0.5 text-center px-2">
+                                        <h2 className="text-[18px] sm:text-[22px] font-black text-[#050505] uppercase tracking-tighter">
                                             Select Provider
                                         </h2>
-                                        <p className="text-[11px] text-black/60 font-sans leading-relaxed">
+                                        <p className="text-[10px] sm:text-[11px] text-black/60 font-sans leading-relaxed">
                                             Connect your wallet to access institutional tools and on-chain intelligence.
                                         </p>
                                     </div>
 
-                                    <div className="space-y-4 pt-4">
-                                        {/* QUICK ACCESS GRID */}
-                                        <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-3 pt-2">
+                                        {/* QUICK ACCESS GRID — 3 cols on mobile, compact */}
+                                        <div className="grid grid-cols-3 gap-2">
                                             {[
                                                 { id: 'metamask', name: 'MetaMask', logo: '/wallets/metamask.svg', handler: handleMetaMask },
-                                                { id: 'coinbase', name: 'Coinbase', logo: '/wallets/coinbase.png', handler: handleAppKitConnect },
-                                                { id: 'rainbow', name: 'Rainbow', logo: '/wallets/rainbow.png', handler: handleAppKitConnect },
+                                                { id: 'coinbase', name: 'Coinbase', logo: '/wallets/coinbase.png', handler: handleCoinbase },
+                                                { id: 'rainbow', name: 'Rainbow', logo: '/wallets/rainbow.png', handler: handleRainbow },
                                             ].map((w) => (
                                                 <button 
                                                     key={w.id}
                                                     onClick={w.handler}
-                                                    className="group relative flex flex-col items-center justify-center p-6 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-2xl transition-all shadow-sm shadow-black/5 hover:shadow-md"
+                                                    className="group relative flex flex-col items-center justify-center p-3 sm:p-5 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all shadow-sm shadow-black/5 hover:shadow-md active:scale-[0.96]"
                                                 >
-                                                    <div className="w-10 h-10 mb-3 relative flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
+                                                    <div className="w-8 h-8 sm:w-10 sm:h-10 mb-1.5 sm:mb-2.5 relative flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
                                                         <img 
                                                             src={w.logo} 
                                                             alt={w.name} 
                                                             className="max-w-full max-h-full object-contain"
                                                         />
                                                     </div>
-                                                    <span className="text-[10px] font-black text-[#050505] uppercase tracking-widest transition-colors">
+                                                    <span className="text-[8px] sm:text-[10px] font-black text-[#050505] uppercase tracking-widest transition-colors text-center leading-tight">
                                                         {w.name}
                                                     </span>
                                                 </button>
                                             ))}
                                         </div>
 
-                                        <div className="flex items-center gap-4 my-2 opacity-50">
+                                        <div className="flex items-center gap-3 my-1 opacity-50">
                                             <div className="flex-1 h-[1px] bg-black/10" />
                                             <span className="text-[8px] font-black text-[#050505] uppercase tracking-[0.2em]">OR</span>
                                             <div className="flex-1 h-[1px] bg-black/10" />
                                         </div>
 
-                                        {/* WALLET_CONNECT & LEDGER */}
-                                        <div className="space-y-2">
-                                            <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
-                                                <div className="flex items-center gap-3">
-                                                    <Wallet size={16} className="text-[#050505]" />
-                                                    <span className="text-[12px] font-black text-[#050505] uppercase tracking-wide">All Wallets</span>
+                                        {/* WALLET_CONNECT & LEDGER — compact on mobile */}
+                                        <div className="space-y-1.5">
+                                            <button onClick={handleAppKitConnect} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
+                                                <div className="flex items-center gap-2.5">
+                                                    <Wallet size={14} className="text-[#050505]" />
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wide">All Wallets</span>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <ChevronRight size={14} className="text-black/40 group-hover:text-black" />
-                                                </div>
+                                                <ChevronRight size={13} className="text-black/40 group-hover:text-black" />
                                             </button>
 
-                                            <button onClick={handleMobileSync} className="group w-full flex items-center justify-between p-4 border border-[#050505] bg-[#050505] hover:bg-[#222] rounded-xl transition-all shadow-md">
-                                                <div className="flex items-center gap-4 text-white">
-                                                    <QrCode size={18} />
+                                            <button onClick={handleMobileSync} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505] bg-[#050505] hover:bg-[#222] rounded-xl transition-all shadow-md">
+                                                <div className="flex items-center gap-3 text-white">
+                                                    <QrCode size={15} />
                                                     <div className="text-left">
-                                                        <div className="text-[13px] font-black uppercase tracking-wide">Direct QR Handshake</div>
-                                                        <div className="text-[9px] text-white/70 font-mono uppercase tracking-widest mt-0.5">Secure cross-device linking</div>
+                                                        <div className="text-[11px] font-black uppercase tracking-wide">Direct QR Handshake</div>
+                                                        <div className="text-[8px] text-white/60 font-mono uppercase tracking-widest">Cross-device linking</div>
                                                     </div>
                                                 </div>
-                                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
+                                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse shrink-0" />
                                             </button>
 
-                                            <button onClick={handleLedger} className="group w-full flex items-center justify-between p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
-                                                <div className="flex items-center gap-3">
-                                                    <Shield size={16} className="text-[#050505]" />
-                                                    <span className="text-[12px] font-black text-[#050505] uppercase tracking-wide">Hardware Wallet</span>
+                                            <button onClick={handleLedger} className="group w-full flex items-center justify-between px-3 py-2.5 sm:p-4 border border-[#050505]/10 hover:border-[#050505] bg-[#FAF9F6] rounded-xl transition-all">
+                                                <div className="flex items-center gap-2.5">
+                                                    <Shield size={14} className="text-[#050505]" />
+                                                    <span className="text-[11px] font-black text-[#050505] uppercase tracking-wide">Hardware Wallet</span>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Cold Storage</span>
-                                                    <ChevronRight size={14} className="text-black/40 group-hover:text-black" />
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[8px] font-black text-black/40 uppercase tracking-widest hidden sm:block">Cold Storage</span>
+                                                    <ChevronRight size={13} className="text-black/40 group-hover:text-black" />
                                                 </div>
                                             </button>
                                         </div>

@@ -10,7 +10,6 @@ import { GlobalTokenTicker } from '@/components/shared/GlobalTokenTicker';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { MobileNavBar } from '@/components/layout/MobileNavBar';
-import { useSettings } from '@/src/context/SettingsContext';
 import { ZoomWrapper } from './ZoomWrapper';
 import dynamic from 'next/dynamic';
 
