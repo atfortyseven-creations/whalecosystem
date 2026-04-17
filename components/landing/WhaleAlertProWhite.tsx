@@ -4,11 +4,14 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, useInView } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAccount } from 'wagmi';
+import { useUIStore } from '@/lib/store/ui-store';
 import { 
   Shield, Zap, Globe, Cpu, ArrowRight, Landmark, Activity, 
   TrendingUp, TrendingDown, Clock, Building2, Code2, Layers,
   CheckCircle2, Star, ChevronDown, ExternalLink, Info, Lock, Key, AlertTriangle, Users, Mail, Send, LayoutDashboard,
-  BarChart2, Webhook, Filter, Anchor, LifeBuoy, Menu, X
+  BarChart2, Webhook, Filter, Anchor, LifeBuoy, Menu, X, LogIn
 } from 'lucide-react';
 import { InmersiveConstellations } from '@/components/shared/InmersiveConstellations';
 
@@ -333,13 +336,30 @@ export function WhaleAlertProWhite() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [currentTime, setCurrentTime] = React.useState("");
   const [previewEvents, setPreviewEvents] = React.useState<any[]>([]);
+  const [mounted, setMounted] = React.useState(false);
+
+  // Wallet integration
+  const router = useRouter();
+  const { isConnected } = useAccount();
+  const openConnectModal = useUIStore(s => s.openConnectModal);
+
+  React.useEffect(() => { setMounted(true); }, []);
+
+  // Smart CTA: routes to dashboard if connected, otherwise opens connect modal
+  const handleEnterTerminal = React.useCallback(() => {
+    if (isConnected) {
+      router.push('/dashboard');
+    } else {
+      openConnectModal();
+    }
+  }, [isConnected, router, openConnectModal]);
 
   React.useEffect(() => {
     const update = () => setCurrentTime(new Date().toISOString().slice(11, 19) + " UTC");
     update();
     const t = setInterval(update, 1000);
     
-    // Simulated/Preview events for the landing page
+    // Preview events for the landing page
     setPreviewEvents([
       { token: "ETH", amount: "$14,285,120", direction: "OUTFLOW", wallet: "Coinbase Prime", time: "2m ago", delay: 0 },
       { token: "BTC", amount: "$82,100,000", direction: "INFLOW", wallet: "Binance Hot Wallet", time: "5m ago", delay: 1 },
@@ -384,11 +404,26 @@ export function WhaleAlertProWhite() {
 
           <div className="flex items-center gap-4 sm:gap-8">
             <div className="hidden md:flex items-center gap-8">
-              {['Pricing', 'Security'].map(item => (
-                <Link key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-950 transition-colors">{item}</Link>
+              {[
+                { label: 'Fase 01', href: '#infrastructure' },
+                { label: 'Mercado', href: '#market' },
+                { label: 'Pricing', href: '#pricing' },
+                { label: 'FAQ', href: '#faq' },
+              ].map(item => (
+                <a key={item.label} href={item.href} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-slate-950 transition-colors">{item.label}</a>
               ))}
             </div>
-            <Link href="/vip" className="px-6 sm:px-8 py-3 bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-black transition-all shadow-xl shadow-slate-200">Enter Terminal</Link>
+            {/* Smart CTA: connected → dashboard, disconnected → connect modal */}
+            <button
+              onClick={handleEnterTerminal}
+              className="flex items-center gap-2 px-6 sm:px-8 py-3 bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-black transition-all shadow-xl shadow-slate-200"
+            >
+              {mounted && isConnected ? (
+                <><span>Enter Dashboard</span><div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /></>
+              ) : (
+                <><LogIn size={12} /><span>Enter Terminal</span></>
+              )}
+            </button>
             
             {/* Mobile Menu Toggle */}
             <button 
@@ -575,7 +610,7 @@ export function WhaleAlertProWhite() {
       {/* ─────────────────────────────────────────────────────────────
           WHALE EVENTS PREVIEW (MARKET)
           ───────────────────────────────────────────────────────────── */}
-      <section id="market" className="py-56 px-12 bg-slate-50 relative overflow-hidden wave-surface">
+      <section id="market" className="py-56 px-12 bg-slate-50 relative overflow-hidden wave-surface" aria-label="Live Institutional Matrix">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         <div className="max-w-7xl mx-auto space-y-32">
           <div className="text-center space-y-10">
@@ -616,7 +651,7 @@ export function WhaleAlertProWhite() {
       {/* ─────────────────────────────────────────────────────────────
           TECHNICAL CAPABILITIES GRID
           ───────────────────────────────────────────────────────────── */}
-      <section className="py-40 px-12 relative">
+      <section id="capabilities" className="py-40 px-12 relative" aria-label="Ultimate Infrastructure">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col md:flex-row items-end justify-between mb-32 gap-12">
             <div className="space-y-6 max-w-3xl">
@@ -699,9 +734,53 @@ export function WhaleAlertProWhite() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
+          PRICING SECTION
+          ───────────────────────────────────────────────────────────── */}
+      <section id="pricing" className="py-40 px-12 bg-slate-50 relative overflow-hidden" aria-label="Pricing Tiers">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center space-y-8 mb-24">
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-white border border-slate-100 rounded-full shadow-md">
+              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Sovereign Access Tiers</span>
+            </div>
+            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">Select Your <br /><span className="text-slate-300">Protocol</span></h2>
+            <p className="text-xl font-medium text-slate-500 max-w-3xl mx-auto leading-relaxed">
+              From independent traders to hedge funds — every tier delivers sovereign-grade intelligence.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {PRICING_TIERS.map((tier, i) => (
+              <PricingCard key={i} {...tier} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          FAQ SECTION
+          ───────────────────────────────────────────────────────────── */}
+      <section id="faq" className="py-40 px-12 relative" aria-label="Frequently Asked Questions">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center space-y-8 mb-24">
+            <div className="inline-flex items-center gap-4 px-6 py-2 bg-slate-50 border border-slate-100 rounded-full shadow-md">
+              <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Forensic Intelligence FAQ</span>
+            </div>
+            <h2 className="text-[7vw] font-black text-slate-950 uppercase italic leading-[0.8] tracking-tighter">Sovereign <br /><span className="text-slate-300">Answers</span></h2>
+          </div>
+          <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden p-12">
+            {FAQS_DATA.map((item, i) => (
+              <FAQItem key={i} q={item.q} a={item.a} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
           FINAL ACTION
           ───────────────────────────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center justify-center relative bg-white overflow-hidden py-32 wave-surface wave-surface-strong">
+      <section id="access" className="min-h-screen flex items-center justify-center relative bg-white overflow-hidden py-32 wave-surface wave-surface-strong">
         <div className="absolute inset-0 opacity-20 transition-all duration-1000">
           <Image src={LANDING_ASSETS.intelligence} alt="Intelligence" fill className="object-cover saturate-0 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-b from-white via-white/40 to-white" />
@@ -715,11 +794,27 @@ export function WhaleAlertProWhite() {
           >
             Execute Your <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-indigo-600">Dominance</span>
           </motion.h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-12 pt-10">
-            <Link href="/vip" className="px-16 py-8 bg-slate-950 text-white rounded-[2rem] text-xl font-black uppercase tracking-[0.4em] hover:bg-black hover:scale-105 transition-all shadow-2xl shadow-slate-300 flex items-center gap-8 group">
-              Start Master Execution
-              <ArrowRight className="group-hover:translate-x-4 transition-transform" />
-            </Link>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 pt-10">
+            {/* Primary CTA: smart-routed */}
+            <button
+              onClick={handleEnterTerminal}
+              className="group px-16 py-8 bg-slate-950 text-white rounded-[2rem] text-xl font-black uppercase tracking-[0.4em] hover:bg-black hover:scale-105 transition-all shadow-2xl shadow-slate-300 flex items-center gap-8"
+            >
+              {mounted && isConnected ? (
+                <>
+                  Enter Dashboard
+                  <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+                </>
+              ) : (
+                <>
+                  Initialize Terminal
+                  <ArrowRight className="group-hover:translate-x-4 transition-transform" />
+                </>
+              )}
+            </button>
+            <a href="#pricing" className="px-12 py-6 border-2 border-slate-200 text-slate-500 rounded-[2rem] text-sm font-black uppercase tracking-[0.3em] hover:border-slate-400 hover:text-slate-950 transition-all">
+              View Pricing
+            </a>
           </div>
         </div>
       </section>

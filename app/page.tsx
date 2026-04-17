@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { headers } from 'next/headers';
-import WhaleAlertLanding from '@/components/landing/WhaleAlertLanding';
+import { WhaleAlertProWhite } from '@/components/landing/WhaleAlertProWhite';
 import { MobileLanding } from '@/components/landing/MobileLanding';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export default async function Home() {
           Synchronizing Genesis Node...
         </div>
       }>
-        {isMobile ? <MobileLanding /> : <WhaleAlertLanding />}
+        {isMobile ? <MobileLanding /> : <WhaleAlertProWhite />}
       </Suspense>
     </main>
   );

@@ -1,208 +1,427 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { X, Shield, Camera, Upload, Loader2 } from 'lucide-react';
 import { useAccount } from 'wagmi';
 
 interface QRScannerModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onScan?: (data: string) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onScan?: (data: string) => void;
+}
+
+// ─── css injected once into <head> so it never re-runs ───────────────────────
+const QR_STYLES = `
+  #qr-reader { border: none !important; width: 100% !important; }
+  #qr-reader__header_message { display: none !important; }
+  #qr-reader__dashboard_section_csr span {
+    display: flex !important; flex-direction: column !important;
+    gap: 10px !important; align-items: center !important;
+    margin-bottom: 20px !important;
+  }
+  #qr-reader__dashboard_section_swaplink {
+    text-decoration: none !important; font-weight: 900 !important;
+    background: #050505 !important; color: white !important;
+    padding: 12px 24px !important; border-radius: 9999px !important;
+    text-transform: uppercase !important; letter-spacing: 2px !important;
+    font-size: 10px !important; display: inline-block !important;
+    margin-bottom: 10px !important; transition: all 0.2s;
+  }
+  #qr-reader__dashboard_section_swaplink:hover { background: rgba(0,0,0,0.8) !important; }
+  #qr-reader__camera_selection {
+    padding: 10px !important; border-radius: 8px !important;
+    border: 1px solid rgba(0,0,0,0.1) !important; font-family: inherit !important;
+    font-size: 12px !important; outline: none !important;
+    background: white !important; width: 90% !important;
+    margin: 10px auto !important; display: block !important;
+  }
+  #qr-reader__camera_permission_button,
+  #qr-reader__dashboard_section_csr button {
+    background: #050505 !important; color: white !important;
+    font-weight: 800 !important; text-transform: uppercase !important;
+    font-size: 10px !important; padding: 12px 24px !important;
+    border-radius: 99px !important; border: none !important;
+    cursor: pointer !important; letter-spacing: 1px !important;
+    margin-top: 10px !important;
+  }
+  #qr-reader__dashboard_section_csr button:hover { background: rgba(0,0,0,0.8) !important; }
+  #qr-reader img { display: none !important; }
+  #qr-reader__dashboard_section { padding: 10px !important; }
+  #qr-reader__dashboard_section_csr { padding-top: 10px !important; }
+  #qr-reader video { border-radius: 16px !important; }
+`;
+
+// ── inject styles once ────────────────────────────────────────────────────────
+let stylesInjected = false;
+function injectStyles() {
+  if (stylesInjected || typeof document === 'undefined') return;
+  const style = document.createElement('style');
+  style.textContent = QR_STYLES;
+  document.head.appendChild(style);
+  stylesInjected = true;
+}
+
+// ── File/gallery scanner (fallback for restricted camera environments) ────────
+async function scanFileForQR(file: File): Promise<string> {
+  const { Html5Qrcode } = await import('html5-qrcode');
+  const reader = new Html5Qrcode('qr-reader-file-tmp');
+  try {
+    const result = await reader.scanFile(file, true);
+    return result;
+  } finally {
+    try { reader.clear(); } catch {}
+    const tmp = document.getElementById('qr-reader-file-tmp');
+    if (tmp) tmp.remove();
+  }
 }
 
 export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerModalProps) {
-    const [error, setError] = useState<string | null>(null);
-    const [scanning, setScanning] = useState(false);
-    const { address } = useAccount();
-    const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const { address } = useAccount();
 
-    useEffect(() => {
-        if (isOpen) {
-            setScanning(true);
-            // Wait for DOM to be ready
-            const timer = setTimeout(() => {
-                try {
-                    const scanner = new Html5QrcodeScanner(
-                        "qr-reader",
-                        { fps: 10, qrbox: { width: 250, height: 250 } },
-                        /* verbose= */ false
-                    );
-                    scannerRef.current = scanner;
+  const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
+  const [errMsg, setErrMsg]   = useState('');
+  const [tab, setTab]         = useState<'camera' | 'file'>('camera');
+  const [fileLoading, setFileLoading] = useState(false);
 
-                    scanner.render(async (decodedText) => {
-                        console.log("[QR:Scan] Detected:", decodedText);
-                        try {
-                            const url = new URL(decodedText);
-                            const sessionId = url.searchParams.get("session");
-                            
-                            if (sessionId && address) {
-                                // Execute Handshake
-                                const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ address })
-                                });
+  // ── Stable refs for callbacks — NEVER go into useEffect dep array ──────────
+  const addressRef  = useRef(address);
+  const onCloseRef  = useRef(onClose);
+  const onScanRef   = useRef(onScan);
+  useEffect(() => { addressRef.current = address; },  [address]);
+  useEffect(() => { onCloseRef.current = onClose; },  [onClose]);
+  useEffect(() => { onScanRef.current  = onScan;  },  [onScan]);
 
-                                if (res.ok) {
-                                    scanner.clear().catch(console.error);
-                                    setScanning(false);
-                                    if (onScan) onScan(decodedText);
-                                    setTimeout(() => onClose(), 1000);
-                                } else {
-                                    setError("Handshake failed. Refresh the PC code.");
-                                }
-                            } else if (!address) {
-                                setError("Connect your mobile wallet first.");
-                            }
-                        } catch (e) {
-                            console.error("[QR:Error] Parse failure:", e);
-                        }
-                    }, (err) => {
-                        // Scan errors are noisy, ignore them
-                    });
-                } catch (e) {
-                    console.error("Scanner init error:", e);
-                    setError("Camera access required for Sovereign Sync.");
-                }
-            }, 300);
-            return () => clearTimeout(timer);
+  // ── Scanner instance ref ───────────────────────────────────────────────────
+  const scannerRef    = useRef<any>(null);   // Html5QrcodeScanner instance
+  const initTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInitingRef  = useRef(false);       // guard: prevent double-init
+
+  // ─── Core cleanup: stops camera + destroys instance ───────────────────────
+  const destroyScanner = useCallback(async () => {
+    isInitingRef.current = false;
+    if (initTimerRef.current) {
+      clearTimeout(initTimerRef.current);
+      initTimerRef.current = null;
+    }
+    if (scannerRef.current) {
+      try { await scannerRef.current.clear(); } catch {}
+      scannerRef.current = null;
+    }
+  }, []);
+
+  // ─── Successful scan handler (uses refs, never closures) ──────────────────
+  const handleSuccess = useCallback(async (decodedText: string) => {
+    // Immediately destroy scanner so camera stops
+    await destroyScanner();
+    setStatus('success');
+
+    const addr = addressRef.current;
+    try {
+      const url       = new URL(decodedText);
+      const sessionId = url.searchParams.get('session');
+
+      if (sessionId && addr) {
+        const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ address: addr }),
+        });
+        if (!res.ok) {
+          setErrMsg('Handshake fallido. Refresca el código QR en el PC.');
+          setStatus('error');
+          return;
         }
+      } else if (!addr) {
+        setErrMsg('Conecta tu wallet antes de escanear.');
+        setStatus('error');
+        return;
+      }
+    } catch {
+      // Non-handshake QR — pass through anyway
+    }
 
-        return () => {
-            if (scannerRef.current) {
-                scannerRef.current.clear().catch(console.error);
-                scannerRef.current = null;
-            }
-        };
-    }, [isOpen, address, onClose, onScan]);
+    onScanRef.current?.(decodedText);
+    setTimeout(() => onCloseRef.current(), 1200);
+  }, [destroyScanner]);
 
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/95 backdrop-blur-2xl overflow-y-auto py-10">
-                    <style>{`
-                        #qr-reader {
-                            border: none !important;
-                            width: 100% !important;
-                        }
-                        #qr-reader__dashboard_section_csr span {
-                            display: flex !important;
-                            flex-direction: column !important;
-                            gap: 10px !important;
-                            align-items: center !important;
-                            margin-bottom: 20px !important;
-                        }
-                        #qr-reader__dashboard_section_swaplink {
-                            text-decoration: none !important;
-                            font-weight: 900 !important;
-                            background: #050505 !important;
-                            color: white !important;
-                            padding: 12px 24px !important;
-                            border-radius: 9999px !important;
-                            text-transform: uppercase !important;
-                            letter-spacing: 2px !important;
-                            font-size: 10px !important;
-                            display: inline-block !important;
-                            margin-bottom: 10px !important;
-                            transition: all 0.2s;
-                        }
-                        #qr-reader__dashboard_section_swaplink:hover {
-                            background: rgba(0,0,0,0.8) !important;
-                        }
-                        #qr-reader__camera_selection {
-                            padding: 10px !important;
-                            border-radius: 8px !important;
-                            border: 1px solid rgba(0,0,0,0.1) !important;
-                            font-family: inherit !important;
-                            font-size: 12px !important;
-                            outline: none !important;
-                            background: white !important;
-                            width: 90% !important;
-                            margin: 10px auto !important;
-                            display: block !important;
-                        }
-                        #qr-reader__camera_permission_button,
-                        #qr-reader__dashboard_section_csr button {
-                            background: #050505 !important;
-                            color: white !important;
-                            font-weight: 800 !important;
-                            text-transform: uppercase !important;
-                            font-size: 10px !important;
-                            padding: 12px 24px !important;
-                            border-radius: 99px !important;
-                            border: none !important;
-                            cursor: pointer !important;
-                            letter-spacing: 1px !important;
-                            margin-top: 10px !important;
-                        }
-                        #qr-reader__dashboard_section_csr button:hover {
-                            background: rgba(0,0,0,0.8) !important;
-                        }
-                        #qr-reader img {
-                            display: none !important;
-                        }
-                        #qr-reader__dashboard_section {
-                            padding: 10px !important;
-                        }
-                        #qr-reader__dashboard_section_csr {
-                            padding-top: 10px !important;
-                        }
-                        #qr-reader video {
-                            border-radius: 16px !important;
-                        }
-                    `}</style>
-                    <button 
-                        onClick={onClose}
-                        className="absolute top-6 right-6 p-4 rounded-full bg-[#050505]/5 text-[#050505] hover:bg-[#050505]/10 transition-all z-50 border border-[#050505]/10"
-                    >
-                        <X size={24} />
-                    </button>
+  // ─── Initialize camera scanner ────────────────────────────────────────────
+  const initScanner = useCallback(async () => {
+    if (isInitingRef.current || scannerRef.current) return; // already running
+    isInitingRef.current = true;
 
-                    <motion.div 
-                        initial={{ scale: 0.95, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                        className="w-full max-w-md flex flex-col items-center px-6 relative"
-                    >
-                        <div className="flex items-center gap-3 mb-8">
-                             <img src="/official-whale-monochrome.png" className="w-8 h-8 opacity-90" alt="Whale" />
-                             <h2 className="font-sans text-xl font-black text-[#050505] tracking-tighter uppercase">Link Session</h2>
+    try {
+      const { Html5QrcodeScanner } = await import('html5-qrcode');
+      const scanner = new Html5QrcodeScanner(
+        'qr-reader',
+        { fps: 10, qrbox: { width: 240, height: 240 }, rememberLastUsedCamera: true },
+        false
+      );
+      scannerRef.current = scanner;
+
+      scanner.render(
+        (text: string) => { handleSuccess(text); },
+        (_err: unknown) => { /* scan-frame errors are expected noise — ignore */ }
+      );
+
+      setStatus('scanning');
+    } catch {
+      setErrMsg('Permiso de cámara requerido para el Sovereign Sync.');
+      setStatus('error');
+      isInitingRef.current = false;
+    }
+  }, [handleSuccess]);
+
+  // ─── Single, stable effect: only reacts to isOpen ────────────────────────
+  // This is THE fix — no address/onClose/onScan in deps, they are all refs.
+  useEffect(() => {
+    injectStyles();
+
+    if (!isOpen) {
+      // Modal closed → destroy immediately
+      destroyScanner();
+      setStatus('idle');
+      setErrMsg('');
+      setTab('camera');
+      return;
+    }
+
+    // Modal opened → give DOM a frame to mount, then init
+    setStatus('idle');
+    initTimerRef.current = setTimeout(() => {
+      initScanner();
+    }, 350);
+
+    return () => {
+      // Cleanup when isOpen flips to false OR component unmounts
+      destroyScanner();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // ← ONLY isOpen. Everything else goes through refs.
+
+  // ─── React to tab changes: stop/start camera as user switches tabs ──────────
+  useEffect(() => {
+    if (!isOpen) return;
+    if (tab === 'file') {
+      // User switched to gallery – stop camera immediately
+      destroyScanner();
+      setStatus('idle');
+    } else if (tab === 'camera') {
+      // User switched back to camera – restart cleanly
+      setStatus('idle');
+      initTimerRef.current = setTimeout(() => { initScanner(); }, 300);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]); // isOpen is a stable gate; initScanner/destroyScanner are stable callbacks
+
+  // ─── File/gallery scan handler ────────────────────────────────────────────
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileLoading(true);
+    // Need a hidden div in the DOM for the file scanner
+    let tmp = document.getElementById('qr-reader-file-tmp');
+    if (!tmp) {
+      tmp = document.createElement('div');
+      tmp.id = 'qr-reader-file-tmp';
+      tmp.style.display = 'none';
+      document.body.appendChild(tmp);
+    }
+    try {
+      const decoded = await scanFileForQR(file);
+      await handleSuccess(decoded);
+    } catch {
+      setErrMsg('No se detectó un código QR válido en la imagen.');
+      setStatus('error');
+    } finally {
+      setFileLoading(false);
+      e.target.value = ''; // reset so same file can be selected again
+    }
+  }, [handleSuccess]);
+
+  const handleRetry = useCallback(async () => {
+    await destroyScanner();
+    setErrMsg('');
+    setStatus('idle');
+    initTimerRef.current = setTimeout(() => { initScanner(); }, 300);
+  }, [destroyScanner, initScanner]);
+
+  // ─── JSX ──────────────────────────────────────────────────────────────────
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="qr-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/96 backdrop-blur-2xl overflow-y-auto py-10"
+        >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
+            aria-label="Cerrar scanner"
+          >
+            <X size={22} />
+          </button>
+
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1,    opacity: 1, y: 0  }}
+            exit={{   scale: 0.95, opacity: 0, y: 20  }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-sm flex flex-col items-center px-6 relative"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-6">
+              <img src="/official-whale-monochrome.png" className="w-7 h-7 opacity-90" alt="Whale" />
+              <h2 className="font-sans text-lg font-black text-[#050505] tracking-tighter uppercase">
+                Link Session
+              </h2>
+            </div>
+
+            {/* Tab switcher: Camera | Gallery */}
+            <div className="w-full flex gap-2 mb-4">
+              <button
+                onClick={() => setTab('camera')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                  tab === 'camera'
+                    ? 'bg-[#050505] text-white border-[#050505]'
+                    : 'bg-white text-black/40 border-black/10 hover:border-black/20'
+                }`}
+              >
+                <Camera size={13} /> Cámara
+              </button>
+              <button
+                onClick={() => setTab('file')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                  tab === 'file'
+                    ? 'bg-[#050505] text-white border-[#050505]'
+                    : 'bg-white text-black/40 border-black/10 hover:border-black/20'
+                }`}
+              >
+                <Upload size={13} /> Galería
+              </button>
+            </div>
+
+            {/* Main scanner card */}
+            <div className="relative w-full min-h-[340px] bg-white border border-black/8 rounded-[28px] overflow-hidden shadow-2xl flex flex-col items-center justify-start pt-5 px-4">
+
+              {/* Camera tab */}
+              {tab === 'camera' && (
+                <>
+                  {/* The html5-qrcode library will inject the video element here */}
+                  <div
+                    id="qr-reader"
+                    className="w-full !border-none"
+                    style={{ display: status === 'error' ? 'none' : 'block' }}
+                  />
+
+                  {/* Loading state */}
+                  {status === 'idle' && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 size={28} className="animate-spin text-black/20" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-black/30">
+                          Iniciando cámara…
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success overlay */}
+                  {status === 'success' && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+                      <div className="flex flex-col items-center gap-3 text-center p-8">
+                        <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
                         </div>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">
+                          ✓ Terminal PC Sincronizado
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
-                        <div className="relative w-full min-h-[400px] max-w-[340px] bg-white border border-[#050505]/10 rounded-[32px] overflow-hidden shadow-2xl flex flex-col items-center justify-start pt-6 px-4">
-                            <div id="qr-reader" className={`w-full !border-none ${error ? 'hidden' : ''}`} />
-                            
-                            {error && (
-                                <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center space-y-4">
-                                    <Shield size={32} className="mx-auto text-red-500 opacity-50" />
-                                    <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">{error}</p>
-                                    <button 
-                                        onClick={() => setError(null)}
-                                        className="text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 bg-black text-white rounded-full mx-auto mt-2"
-                                    >
-                                        RETRY
-                                    </button>
-                                </div>
-                            )}
+                  {/* Error overlay */}
+                  {status === 'error' && (
+                    <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center gap-4">
+                      <Shield size={30} className="mx-auto text-red-400 opacity-60" />
+                      <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">
+                        {errMsg}
+                      </p>
+                      <button
+                        onClick={handleRetry}
+                        className="text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2.5 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors"
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
 
-                            {scanning && !error && (
-                                <div className="absolute inset-0 pointer-events-none md:block hidden">
-                                    <div className="absolute inset-x-8 top-1/2 h-[2px] bg-black/10 animate-pulse" />
-                                    <div className="absolute inset-4 border-2 border-dashed border-black/5 rounded-2xl" />
-                                </div>
-                            )}
-                        </div>
+              {/* File/Gallery tab */}
+              {tab === 'file' && (
+                <div className="flex flex-col items-center justify-center w-full h-full min-h-[280px] gap-5 p-6">
+                  <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center">
+                    <Upload size={28} className="text-black/30" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="text-[12px] font-black uppercase tracking-widest text-[#050505]">
+                      Subir imagen QR
+                    </p>
+                    <p className="text-[10px] text-black/40 font-medium leading-relaxed max-w-[200px]">
+                      Selecciona una captura de pantalla del código QR del terminal PC.
+                    </p>
+                  </div>
 
-                        <div className="mt-10 text-center space-y-3">
-                            <p className="text-[12px] text-[#050505]/60 leading-relaxed font-semibold max-w-[280px]">
-                                Point your camera at the QR code displayed on the PC terminal to synchronize instantly.
-                            </p>
-                        </div>
-                    </motion.div>
+                  <label className="relative cursor-pointer">
+                    <span className="flex items-center gap-2 px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-colors">
+                      {fileLoading ? (
+                        <><Loader2 size={13} className="animate-spin" /> Procesando…</>
+                      ) : (
+                        <><Upload size={13} /> Seleccionar Imagen</>
+                      )}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={handleFileChange}
+                      disabled={fileLoading}
+                    />
+                  </label>
+
+                  {status === 'success' && (
+                    <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">
+                      ✓ QR Detectado — Sincronizando…
+                    </p>
+                  )}
+                  {status === 'error' && (
+                    <p className="text-[11px] font-black uppercase tracking-widest text-red-500 text-center">
+                      {errMsg}
+                    </p>
+                  )}
                 </div>
-            )}
-        </AnimatePresence>
-    );
+              )}
+            </div>
+
+            {/* Instructions */}
+            <div className="mt-6 text-center space-y-1">
+              <p className="text-[11px] text-[#050505]/50 leading-relaxed font-semibold max-w-[280px]">
+                {tab === 'camera'
+                  ? 'Apunta la cámara al QR mostrado en el terminal PC para sincronizar al instante.'
+                  : 'Haz una captura del QR en el PC y súbela aquí si la cámara no está disponible.'}
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
