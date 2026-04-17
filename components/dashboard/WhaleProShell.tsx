@@ -215,7 +215,7 @@ export function WhaleProShell({
                 </div>}
 
                 {/* Sidebar Navigation */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden pt-1 pb-4 px-2 space-y-0.5 no-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pt-1 pb-4 px-2 space-y-0.5 no-scrollbar" style={{ contain: 'strict', willChange: 'scroll-position' }}>
                     {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
                         return (

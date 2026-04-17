@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useConnect } from "wagmi";
 import { Fingerprint, ArrowRight, ScanLine, Loader2, Scan } from "lucide-react";
 import { useUIStore } from "@/lib/store/ui-store";
@@ -59,13 +58,12 @@ export function MobileLanding() {
   const router = useRouter();
   const { address } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
-  const { openConnectModal: openRainbowModal } = useConnectModal();
-  
   const { connect, connectors } = useConnect({
     mutation: {
       onError: (err) => {
         console.error("[MobileLanding] Connection explicit error:", err);
-        if (openRainbowModal) openRainbowModal();
+        // Fallback to our sovereign vault modal
+        openConnectModal();
       }
     }
   });
@@ -95,45 +93,91 @@ export function MobileLanding() {
 
   const handleConnect = () => openConnectModal();
 
+  // ── Native Deep-Link Handler (bypasses RainbowKit onboarding modal entirely) ──
   const handleSmartConnect = (type: string) => {
     if (typeof window === 'undefined') return;
+
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isIOS    = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const hasEthereum = typeof (window as any).ethereum !== 'undefined';
-    
-    try {
+
+    // ── DESKTOP: use Wagmi connector directly ──────────────────────────────
+    if (!isMobile) {
+      try {
         if (type === 'metamask') {
-            const mmConnector = connectors.find(c => {
-                if (c.id === 'metaMaskSDK' || c.id === 'io.metamask') return true;
-                if (c.id === 'injected' && (hasEthereum || !isMobile)) return true;
-                return false;
-            });
-            
-            if (mmConnector) {
-                connect({ connector: mmConnector });
-            } else if (openRainbowModal) {
-                openRainbowModal();
-            } else {
-                openConnectModal(); // Fallback to our Vault
-            }
-        } else if (type === 'coinbase') {
-            const cbConnector = connectors.find(c => c.id === 'coinbaseWalletSDK');
-            if (cbConnector) {
-                connect({ connector: cbConnector });
-            } else if (openRainbowModal) {
-                openRainbowModal();
-            } else {
-                openConnectModal();
-            }
-        } else {
-            // Rainbow or anything else -> Rainbow modal provides best mobile UX flow
-            if (openRainbowModal) openRainbowModal();
-            else openConnectModal();
+          const c = connectors.find(x => x.id === 'io.metamask' || x.id === 'metaMaskSDK' || (x.id === 'injected' && hasEthereum));
+          if (c) { connect({ connector: c }); return; }
         }
-    } catch (err) {
-        console.error("Connect block failed:", err);
-        if (openRainbowModal) openRainbowModal();
+        if (type === 'coinbase') {
+          const c = connectors.find(x => x.id === 'coinbaseWalletSDK');
+          if (c) { connect({ connector: c }); return; }
+        }
+      } catch (err) {
+        console.error('[Desktop connect]', err);
+      }
+      // Final desktop fallback
+      openConnectModal();
+      return;
     }
+
+    // ── MOBILE: native URI deep-link — app opens instantly if installed ────
+    // Strategy: set window.location to the deep-link URI. The OS intercepts
+    // it if the app is installed, otherwise nothing happens (no crash).
+    // We also set a timer: if the page is still visible after 1.5s the app
+    // was NOT installed, so we redirect to the App/Play store.
+    const openNativeOrStore = (uri: string, iosStore: string, playStore: string) => {
+      const start = Date.now();
+      window.location.href = uri;
+      const timer = setTimeout(() => {
+        // If the page regained focus quickly, the app wasn't opened
+        if (Date.now() - start < 2000) {
+          window.location.href = isIOS ? iosStore : playStore;
+        }
+      }, 1500);
+      // Cancel store redirect if the user comes back to the tab themselves
+      window.addEventListener('pagehide', () => clearTimeout(timer), { once: true });
+    };
+
+    if (type === 'metamask') {
+      // Try injected first (MetaMask mobile in-app browser)
+      if (hasEthereum) {
+        const c = connectors.find(x => x.id === 'injected' || x.id === 'io.metamask');
+        if (c) { connect({ connector: c }); return; }
+      }
+      openNativeOrStore(
+        `metamask://`,
+        'https://apps.apple.com/app/metamask/id1438144202',
+        'https://play.google.com/store/apps/details?id=io.metamask'
+      );
+      return;
+    }
+
+    if (type === 'coinbase') {
+      if (hasEthereum) {
+        const c = connectors.find(x => x.id === 'coinbaseWalletSDK');
+        if (c) { connect({ connector: c }); return; }
+      }
+      openNativeOrStore(
+        `cbwallet://`,
+        'https://apps.apple.com/app/coinbase-wallet/id1278383455',
+        'https://play.google.com/store/apps/details?id=org.toshi'
+      );
+      return;
+    }
+
+    if (type === 'rainbow') {
+      openNativeOrStore(
+        `rainbow://`,
+        'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021',
+        'https://play.google.com/store/apps/details?id=me.rainbow'
+      );
+      return;
+    }
+
+    // Final fallback: open our sovereign vault modal
+    openConnectModal();
   };
+
 
   return (
     <div
