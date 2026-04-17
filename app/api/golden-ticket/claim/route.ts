@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     try {
       const isValidSig = await verifyMessage({
         address: address as `0x${string}`,
-        message: `I am claiming my Genesis identity for ${address} on Whale Alert Network. Gasless.`,
+        message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}`,
         signature: cryptoSignature as `0x${string}`,
       });
       if (!isValidSig) {

@@ -259,9 +259,10 @@ export function GoldTicketPanel() {
   const { address, isConnected, chainId, isSovereignHandshake } = useSovereignAccount();
   const { openConnectModal } = useUIStore();
   const { switchChain } = useSwitchChain();
-  const { signMessage, isSuccess: isConfirmed, reset: resetTx } = useSignMessage();
+  const { signMessage, isPending: isSigning } = useSignMessage();
   const [dbStats, setDbStats] = useState<any>(null);
   const [signatureData, setSignatureData] = useState<string>("");
+  const [isMinting, setIsMinting] = useState(false);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -278,21 +279,59 @@ export function GoldTicketPanel() {
     return () => clearInterval(id);
   }, [fetchStats]);
 
-  useEffect(() => {
-    if (isConfirmed && address) {
-      const exec = async () => {
-        toast.loading('Encoding Institutional Identity...');
-        await fetch('/api/golden-ticket/claim', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ walletAddress: address, signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() }) })
-        });
-        toast.success('Access Granted ✓');
-        fetchStats();
-      };
-      exec();
+  const handleMint = useCallback(async () => {
+    if (!isConnected) { openConnectModal(); return; }
+    if (signatureData.length < 50) {
+      toast.error('Draw your signature on the pad first');
+      return;
     }
-  }, [isConfirmed, address, signatureData, fetchStats]);
+    if (isMinting || isSigning) return;
+
+    setIsMinting(true);
+    const toastId = toast.loading('Awaiting wallet signature...');
+
+    signMessage(
+      { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
+      {
+        onSuccess: async (cryptoSignature: string) => {
+          toast.dismiss(toastId);
+          const t2 = toast.loading('Encoding Institutional Identity...');
+          try {
+            const res = await fetch('/api/golden-ticket/claim', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                walletAddress: address,
+                cryptoSignature,
+                signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
+              })
+            });
+            toast.dismiss(t2);
+            const json = await res.json();
+            if (res.ok) {
+              toast.success('Access Granted — Welcome to the Genesis Ledger ✓');
+              fetchStats();
+            } else if (res.status === 409) {
+              toast.info('You already hold a Genesis Ticket.');
+              fetchStats();
+            } else {
+              toast.error(`Mint failed: ${json.error || 'Unknown server error'}`);
+            }
+          } catch (e) {
+            toast.dismiss(t2);
+            toast.error('Server error saving your ticket. Try again.');
+          } finally {
+            setIsMinting(false);
+          }
+        },
+        onError: (err: any) => {
+          toast.dismiss(toastId);
+          toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
+          setIsMinting(false);
+        }
+      }
+    );
+  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, openConnectModal, fetchStats]);
 
   const hasTicket = dbStats?.ticket || false;
 
@@ -325,16 +364,11 @@ export function GoldTicketPanel() {
                     <SignaturePad 
                       onSignature={setSignatureData} 
                       disabled={hasTicket}
-                      onMint={() => {
-                        if (!isConnected) {
-                          openConnectModal();
-                        } else if (signatureData.length < 50) {
-                          toast.error("Sign on the pad first");
-                        } else {
-                          signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
-                        }
-                      }}
-                      mintLabel={isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'}
+                      onMint={handleMint}
+                      mintLabel={
+                        isMinting || isSigning ? 'SIGNING...' :
+                        isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'
+                      }
                     />
                  </div>
             </div>
