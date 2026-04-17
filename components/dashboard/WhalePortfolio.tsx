@@ -6,7 +6,7 @@ import {
     Wallet, TrendingUp, ArrowUpRight, ArrowDownRight, RefreshCw,
     Activity, DollarSign, Zap, Search, Clock, AlertCircle
 } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import useSWR from 'swr';
 import { ScrollFloat } from '@/components/ui/ScrollFloat';
 

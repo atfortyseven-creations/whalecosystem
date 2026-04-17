@@ -15,6 +15,7 @@ import { ShortcutVisualizer } from '@/components/ui/ShortcutVisualizer';
 import { WalletConnectionBridge } from '@/components/providers/WalletConnectionBridge';
 import { SovereignVaultBootstrap } from '@/components/providers/SovereignVaultBootstrap';
 import { createAppKit } from '@reown/appkit/react';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 
 // Unified Metadata for High-Fidelity Handshake
 const metadata = {
@@ -71,18 +72,24 @@ const config = getDefaultConfig({
   ssr: true,
 });
 
+// [CRITICAL] Wagmi Adapter required for AppKit Smart Account (Google/Social Auth EVM execution)
+const wagmiAdapter = new WagmiAdapter({
+  networks: [mainnet, base, arbitrum, optimism, polygon],
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
+});
+
 // [CRITICAL FIX] Initialize AppKit (Web3Modal) context.
-// Without this, useAppKit() hooks in LinkedGate and other components 
-// throw a silent error, leading to a white screen.
+// Without proper adapters, Google/Social Auth Smart Accounts have no EVM execution engine.
 createAppKit({
-  adapters: [], // Using existing wagmi config via context
+  adapters: [wagmiAdapter],
   wagmiConfig: config,
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
   metadata,
   features: {
     analytics: true,
-    email: false,
-    socials: ['google'],
+    email: true,        // REQUIRED: Social/Google auth uses email as identity vector
+    socials: ['google', 'github', 'discord', 'x'],
+    emailShowWallets: true,
   }
 });
 

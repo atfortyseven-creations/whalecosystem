@@ -1,6 +1,7 @@
 "use client";
 
-import { useAccount, useBalance } from "wagmi";
+import { useBalance } from "wagmi";
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { Loader2 } from "lucide-react";
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
@@ -20,9 +21,10 @@ export default function BalanceCard() {
                 <div className="mt-2 flex items-baseline space-x-2">
                     {isLoading ? (
                         <Loader2 className="w-8 h-8 text-white/50 animate-spin" />
-                    ) : safeToFixed(<>
+                    ) : ( 
+                        <>
                             <span className="text-4xl font-bold text-white">
-                                {data ? parseFloat(data.formatted, 2) : "0.00"}
+                                {data ? safeToFixed(data.formatted, 2) : "0.00"}
                             </span>
                             <span className="text-lg text-gray-500 font-medium">{data?.symbol}</span>
                         </>

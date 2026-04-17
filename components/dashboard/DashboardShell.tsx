@@ -16,7 +16,7 @@ import {
 import { SovereignBridge } from '@/components/premium/SovereignBridge';
 import { WhaleLogo } from '../shared/WhaleLogo';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { create } from 'zustand';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { toast } from 'sonner';

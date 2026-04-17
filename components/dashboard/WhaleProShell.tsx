@@ -200,15 +200,6 @@ export function WhaleProShell({
                 });
                 openConnectModal();
                 return;
-            } else if (
-                (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) ||
-                (isSovereignHandshake && ['gold-ticket', 'sovereign-vault'].includes(id))
-            ) {
-                toast.error("Execution Clearance Required", {
-                    description: "This module requires active EVM signing capabilities. Disconnect your remote session and use a native wallet.",
-                    duration: 6000
-                });
-                return;
             }
         }
         onTabChange(id);
@@ -221,15 +212,9 @@ export function WhaleProShell({
             if (!isWalletConnected) {
                 onTabChange('dashboard');
                 toast.error("Session Lost", { description: "You have been ejected from the secure perimeter." });
-            } else if (
-                (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) ||
-                (isSovereignHandshake && ['gold-ticket', 'sovereign-vault'].includes(activeTab))
-            ) {
-                onTabChange('dashboard');
-                toast.error("Clearance Revoked", { description: "Remote/Google Sessions cannot reside in execution perimeters." });
             }
         }
-    }, [isWalletConnected, connector?.id, activeTab, onTabChange]);
+    }, [isWalletConnected, activeTab, onTabChange]);
 
     return (
         <>
@@ -365,11 +350,11 @@ export function WhaleProShell({
 
                     {/* Scrollable content layer — allows vertical scroll within the tab */}
                     <div
-                        className="absolute inset-0 overflow-y-auto overflow-x-hidden flex flex-col"
+                        className="absolute inset-0 overflow-y-auto overflow-x-hidden flex flex-col no-scrollbar"
                         style={{
-                            scrollbarWidth: 'thin',
-                            scrollbarColor: 'rgba(0,0,0,0.12) transparent',
-                            overscrollBehavior: 'contain',
+                            scrollbarWidth: 'none', /* Forzamos ocultar barra en Firefox */
+                            msOverflowStyle: 'none', /* Forzamos ocultar barra en old Edge */
+                            overscrollBehavior: 'none', /* Cero rebote elástico */
                         }}
                     >
                         <div className="p-4 md:p-5 w-full flex-1 flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>

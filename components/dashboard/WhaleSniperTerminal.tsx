@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { Activity, Skull, Zap, Crosshair, Database } from 'lucide-react';
 import { useSniperStore } from '@/store/useSniperStore';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,7 +43,7 @@ import { AlertsPanel } from './AlertsPanel';
 import { SovereignVault } from './SovereignVault';
 import { WhalePortfolio } from './WhalePortfolio';
 import { ZKShieldStation } from './ZKShieldStation';
-import { SovereignIntelTab } from './SovereignIntelTab';
+import SovereignIntelTab from './SovereignIntelTab';
 import { ApiTerminal } from './ApiTerminal';
 import { EntityGraphVis } from './EntityGraphVis';
 import { WhaleAcademy } from './WhaleAcademy';
@@ -53,7 +53,7 @@ import GlobalConsensus from './GlobalConsensus';
 import GenesisContracts from './GenesisContracts';
 import CryptographicID from './CryptographicID';
 import BitcoinPrimitives from './BitcoinPrimitives';
-import InstitutionalLedger from './InstitutionalLedger';
+
 import { HeuristicEntropySim, EntityHeuristicSim, ChronoCipherSim, StateProtocolSim, DoctrineSim, ClearanceSim } from './CyberSimulators';
 
 export default function WhaleSniperTerminal() {

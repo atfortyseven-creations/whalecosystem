@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Fingerprint, Key, CheckCircle2, QrCode, Copy, UserCheck } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { toast } from 'sonner';
 
 export default function CryptographicID() {

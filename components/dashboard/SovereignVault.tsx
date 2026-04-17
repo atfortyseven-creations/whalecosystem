@@ -3,7 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import useSWR from 'swr';
 import { Shield, Fingerprint, Lock, ShieldAlert, Activity, CheckCircle2, Clock, UserPlus, Trash2, Users, Zap, AlertTriangle, RefreshCw, ExternalLink } from 'lucide-react';
-import { useAccount, useSendTransaction } from 'wagmi';
+import { useSendTransaction } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { parseEther } from 'viem';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';

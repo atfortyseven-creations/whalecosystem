@@ -15,7 +15,7 @@ const List = dynamic<any>(
 );
 const AutoSizer = dynamic(() => import('react-virtualized-auto-sizer'), { ssr: false });
 import { useMarketStream } from '@/context/MarketStreamContext';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 
 // ── XSS Sanitization ────────────────────────────────────────────────────────────
 // Strips HTML/script injection vectors before any user input touches

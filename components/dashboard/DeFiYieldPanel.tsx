@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, RefreshCw, AlertTriangle, ExternalLink, ShieldCheck, Zap, Loader2 } from 'lucide-react';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useTransactionHandler } from '@/hooks/useTransactionHandler';
 import { toast } from 'sonner';
 

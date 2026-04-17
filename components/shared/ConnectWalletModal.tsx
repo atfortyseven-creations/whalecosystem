@@ -51,7 +51,10 @@ export function ConnectWalletModal() {
 
     if (!isConnectModalOpen) return null;
 
-    const handleAppKitConnect = () => openAppKit({ view: 'Connect' });
+    const handleAppKitConnect = () => {
+        closeConnectModal();
+        setTimeout(() => openAppKit({ view: 'Connect' }), 50);
+    };
 
     // \u2500\u2500 Smart connector detector \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     // Priority: exact SDK ID > injected window.ethereum > AppKit fallback
@@ -74,15 +77,16 @@ export function ConnectWalletModal() {
     const handleRainbow  = () => connectViaExtension(['rainbow', 'me.rainbow']);
 
     const handleMobileSync = async () => {
-        // Redirigir a AppKit para garantizar un websocket bidireccional que permita firmas EVM en tiempo real.
-        openAppKit({ view: 'Connect' });
+        closeConnectModal();
+        setTimeout(() => openAppKit({ view: 'Connect' }), 50);
     };
 
     const handleLedger = async () => {
         setView('ledger');
         setLedgerLoading(true);
         setTimeout(() => {
-            openAppKit({ view: 'Connect' });
+            closeConnectModal();
+            setTimeout(() => openAppKit({ view: 'Connect' }), 50);
             setLedgerLoading(false);
         }, 800);
     };

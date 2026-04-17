@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
 /**
@@ -12,7 +12,7 @@ import { useWalletStore } from '@/lib/store/wallet-store';
  * wallet via the UI, the entire portfolio system recognizes the identity.
  */
 export function WalletConnectionBridge() {
-    const { address, isConnected } = useAccount();
+    const { address, isConnected } = useSovereignAccount();
     const syncAddress = useWalletStore(state => state.syncAddress);
 
     useEffect(() => {

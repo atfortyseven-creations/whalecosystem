@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { IDKitWidget, ISuccessResult, VerificationLevel } from '@worldcoin/idkit';
 import { Vote, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import useSWR from 'swr';
 
 // FIX: World ID app_id moved to env var — hardcoded app IDs in client-side

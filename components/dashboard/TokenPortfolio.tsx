@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, ArrowDownLeft, Copy, X, Send, QrCode } from 'lucide-react';
-import { useAccount, useBalance, useReadContracts, useSendTransaction, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useBalance, useReadContracts, useSendTransaction, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { parseEther, parseUnits, formatEther, formatUnits, erc20Abi, isAddress } from 'viem';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import { getUsdcAddress, WLD_TOKEN_ADDRESS } from '@/config/tokens';

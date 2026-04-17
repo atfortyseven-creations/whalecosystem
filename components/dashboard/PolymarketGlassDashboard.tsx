@@ -13,7 +13,8 @@ import {
     Activity as ActivityIcon,
     Globe
 } from "lucide-react";
-import { useAccount, useChainId } from "wagmi";
+import { useChainId } from "wagmi";
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { polygon } from "wagmi/chains";
 import { useRealWalletData } from "@/hooks/useRealWalletData";
 import { usePolymarketSession } from "@/hooks/usePolymarketSession";

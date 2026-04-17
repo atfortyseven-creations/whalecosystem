@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Search, Banknote, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
-import { useAccount, useSendTransaction, useSwitchChain, useChainId } from 'wagmi';
+import { useSendTransaction, useSwitchChain, useChainId } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { polymarketRouterService } from '@/lib/blockchain/PolymarketRouterService';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { toast } from 'sonner';

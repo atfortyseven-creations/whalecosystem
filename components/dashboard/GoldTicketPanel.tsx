@@ -313,8 +313,6 @@ export function GoldTicketPanel() {
                   onClick={() => {
                     if (!isConnected) {
                        openConnectModal();
-                    } else if (isSovereignHandshake) {
-                       toast.error("Execution Clearance Required", { description: "QR Sessions cannot sign transactions. Please connect a native wallet.", duration: 5000 });
                     } else if (signatureData.length < 50) {
                        toast.error("Signature required on pad");
                     } else {
@@ -323,7 +321,7 @@ export function GoldTicketPanel() {
                   }}
                   className="w-full mt-4 py-3 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all"
                 >
-                  {isConnected ? (isSovereignHandshake ? 'READ ONLY SESSION' : 'AUTHORIZE MINT') : 'CONNECT WALLET TO START'}
+                   {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET TO START'}
                 </button>
             </div>
           ) : (

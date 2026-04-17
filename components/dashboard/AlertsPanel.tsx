@@ -9,7 +9,7 @@ import {
     Activity, Target, Clock, CheckCircle, XCircle, Search, Settings
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAccount } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { useWhaleStream } from '@/context/WhaleStreamContext';
 
 type AlertType = 'PRICE_ABOVE' | 'PRICE_BELOW' | 'VOLUME_SPIKE' | 'WHALE_MOVE' | 'PERCENT_CHANGE';

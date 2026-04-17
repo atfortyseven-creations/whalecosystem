@@ -8,8 +8,17 @@ import { ContextMenu } from './ContextMenu';
 import { TelemetryTerminal } from './TelemetryTerminal';
 import { WhaleSonar } from './WhaleSonar';
 
-import { NodeType, NodeData, EdgeData } from './CanvasEngine';
-import { useAccount } from 'wagmi';
+export type NodeType = 'wallet' | 'bot' | 'contract' | 'api';
+export interface NodeData {
+    id: string;
+    type: NodeType;
+    x: number;
+    y: number;
+    title: string;
+    status: 'active' | 'syncing' | 'error';
+    latency: number;
+}
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 
 export interface EdgeData {
     id: string;

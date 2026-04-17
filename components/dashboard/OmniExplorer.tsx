@@ -5,7 +5,8 @@ import {
     Search, Activity, Box, ArrowRight, Clock, ShieldCheck, 
     AlignLeft, Loader2, AlertCircle, X, ChevronRight, Zap
 } from "lucide-react";
-import { useAccount, usePublicClient, useBlockNumber } from 'wagmi';
+import { usePublicClient, useBlockNumber } from 'wagmi';
+import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { formatEther } from 'viem';
 
 export function OmniExplorer() {
