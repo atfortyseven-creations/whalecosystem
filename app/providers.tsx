@@ -82,7 +82,7 @@ const wagmiAdapter = new WagmiAdapter({
 // Without proper adapters, Google/Social Auth Smart Accounts have no EVM execution engine.
 createAppKit({
   adapters: [wagmiAdapter],
-  wagmiConfig: config,
+  networks: [mainnet, base, arbitrum, optimism, polygon],
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
   metadata,
   features: {

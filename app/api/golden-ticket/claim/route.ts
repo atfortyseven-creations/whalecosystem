@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
     // Verify mathematical signature ownership
     try {
       const isValidSig = await verifyMessage({
-        address: address as `0x${string}`,
-        message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}`,
+        address: walletAddress as `0x${string}`,
+        message: `WHALE ALERT NETWORK GOLD ACCESS: ${walletAddress}`,
         signature: cryptoSignature as `0x${string}`,
       });
       if (!isValidSig) {
