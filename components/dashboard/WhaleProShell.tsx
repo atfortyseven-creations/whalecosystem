@@ -10,7 +10,7 @@ import {
     Star, Rocket, Network, Ticket, Zap, Menu,
     BookOpen, Database, HeadphonesIcon, BarChart3,
     Landmark, Layers, FlaskConical, Compass,
-    Activity, Lock, Book, Search
+    Activity, Lock, Book
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useUIStore } from '@/lib/store/ui-store';
