@@ -81,12 +81,7 @@ export function MobileLanding() {
     }
   }, []);
 
-  // Auto-redirect if already connected
-  useEffect(() => {
-    if (address && mounted) {
-      setTimeout(() => router.push("/dashboard"), 500);
-    }
-  }, [address, mounted, router]);
+  // Auto-redirect removed intentionally to keep mobile users on landing page.
 
   if (!mounted) return null;
 
@@ -306,13 +301,13 @@ export function MobileLanding() {
       </main>
 
       {/* ── QR Scanner Modal ── */}
-      {/* ── QR Scanner Modal ── */}
       <DynamicQRScannerModal
         isOpen={showScanner}
         onClose={() => setShowScanner(false)}
         onScan={() => {
           setShowScanner(false);
-          setTimeout(() => router.push("/dashboard"), 500);
+          // Sync complete, device stays on remote controller mode
+          alert("Handshake Complete. Desktop Terminal Unlocked.");
         }}
       />
 
