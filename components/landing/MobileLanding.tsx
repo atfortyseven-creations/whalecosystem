@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useAccount, useConnect, useSignMessage } from "wagmi";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
+import { useUIStore } from '@/lib/store/ui-store';
+import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail } from "lucide-react";
 
 // QR Scanner — iOS-safe dynamic import
 const DynamicQRScannerModal = dynamic(
@@ -149,11 +150,179 @@ function SigningOverlay({
   );
 }
 
+// ── Live clock hook ───────────────────────────────────────────────────────────
+function useLiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
+// ── Connected Screen ──────────────────────────────────────────────────────────
+function ConnectedScreen({
+  address, onScan, showScanner, onCloseScanner,
+}: {
+  address: string; onScan: () => void;
+  showScanner: boolean; onCloseScanner: () => void;
+}) {
+  const now = useLiveClock();
+  const [connectedAt] = useState(() => new Date()); // frozen at mount time
+
+  const fmtTime   = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const fmtDate   = (d: Date) => d.toLocaleDateString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  const fmtStamp  = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+  return (
+    <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
+      {/* Backgrounds */}
+      <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
+      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute"
+          style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04, mixBlendMode: "multiply" }}
+          animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
+          transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+      <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
+
+      {/* Fixed Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3 rounded-full"
+        style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
+      >
+        <div className="flex items-center gap-2">
+          <WhaleLogo className="w-5 h-5 shrink-0" />
+          <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">LIVE</span>
+        </div>
+      </motion.header>
+
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
+
+        {/* ── Session Identity Card ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full bg-white rounded-[28px] border border-[#E5E5E5] shadow-lg overflow-hidden"
+        >
+          {/* Top bar — live clock */}
+          <div className="bg-[#050505] px-6 py-5 flex items-center justify-between">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Sesión Activa</p>
+              <p className="text-[32px] font-black tracking-tighter text-white leading-none tabular-nums">
+                {fmtTime(now)}
+              </p>
+            </div>
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+              <CheckCircle2 size={28} className="text-emerald-400" />
+            </div>
+          </div>
+
+          {/* Date row */}
+          <div className="px-6 py-4 border-b border-[#F0F0F0]">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/30 mb-1">Fecha</p>
+            <p className="text-[13px] font-black text-[#050505] capitalize">{fmtDate(now)}</p>
+          </div>
+
+          {/* Connection time */}
+          <div className="px-6 py-4 border-b border-[#F0F0F0] flex items-center justify-between">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/30 mb-1">Conectado a las</p>
+              <p className="text-[13px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Verified</span>
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="px-6 py-4">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/30 mb-1">Wallet</p>
+            <p className="text-[12px] font-mono text-[#050505] tracking-tight">
+              {address.slice(0, 12)}<span className="text-[#050505]/30">…</span>{address.slice(-8)}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* ── Permission Badge ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.6 }}
+          className="w-full flex items-center gap-3 px-5 py-4 rounded-2xl bg-white border border-[#E5E5E5]"
+        >
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+            <CheckCircle2 size={18} className="text-emerald-500" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]">Scanner desbloqueado</p>
+            <p className="text-[9px] text-[#050505]/40 font-medium">Puedes usar el scanner para enlazar el terminal PC.</p>
+          </div>
+        </motion.div>
+
+        {/* ── Primary CTA ── */}
+        <motion.button
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.6 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onScan}
+          className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white "
+          style={{ background: INK, fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(5,5,5,0.45)" }}
+        >
+          <Scan size={18} />
+          Abrir Scanner QR · Sync PC
+        </motion.button>
+
+        {/* ── Instruction card ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="w-full flex items-start gap-3 p-4 rounded-2xl bg-white/60 border border-[#E5E5E5]"
+        >
+          <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
+          <p className="text-[9px] text-[#050505]/40 font-medium leading-relaxed">
+            En el Terminal PC haz click en <strong className="text-[#050505]/60 font-black">Direct QR Handshake</strong>, luego escanea el código con este botón para sincronizar tu sesión institucional.
+          </p>
+        </motion.div>
+      </main>
+
+      <DynamicQRScannerModal
+        isOpen={showScanner}
+        onClose={onCloseScanner}
+        onScan={(result: string) => {
+          onCloseScanner();
+          // Handshake confirmation — no alert(), use a subtle toast via DOM
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+          toast.textContent = '✓ Terminal PC Desbloqueado';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3000);
+        }}
+      />
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export function MobileLanding() {
+
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
+  const openConnectModal = useUIStore(s => s.openConnectModal);
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
@@ -302,20 +471,20 @@ export function MobileLanding() {
 
       const deepLink = DEEP_LINK_MAP[walletType];
 
-      // Navigate to deep-link. The OS intercepts it if app installed.
+      // Navigate to deep-link. The OS opens the wallet app if installed.
+      // WalletConnect relay handles session establishment asynchronously —
+      // when the user returns to this page wagmi detects isConnected=true.
+      // DO NOT redirect to the store — that was breaking the return flow.
       window.location.href = deepLink;
 
-      // Fallback: if browser is still here after 2.5s, app wasn't installed → go to store
-      const start = Date.now();
-      const timer = setTimeout(() => {
-        if (Date.now() - start < 3500) {
-          window.location.href = isIOS ? STORE_URLS[walletType].ios : STORE_URLS[walletType].android;
+      // When user comes back from the wallet app, clear the spinner.
+      const onReturn = () => {
+        if (!document.hidden) {
+          setConnecting(null);
+          document.removeEventListener('visibilitychange', onReturn);
         }
-      }, 2500);
-      window.addEventListener('pagehide', () => { clearTimeout(timer); setConnecting(null); }, { once: true });
-      window.addEventListener('visibilitychange', () => {
-        if (!document.hidden) { clearTimeout(timer); setConnecting(null); }
-      }, { once: true });
+      };
+      document.addEventListener('visibilitychange', onReturn);
     };
 
     wcConnector.emitter.on('message', handleMessage);
@@ -353,80 +522,7 @@ export function MobileLanding() {
 
   // ── Render: Connected & signed ──────────────────────────────────────────────
   if (isLinked && address) {
-    return (
-      <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
-        <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
-        <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-          <motion.div
-            className="absolute"
-            style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04, mixBlendMode: "multiply" }}
-            animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
-            transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-        <div className="fixed top-0 left-0 right-0 h-32 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,0.97) 0%, transparent 100%)" }} />
-
-        <motion.header
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between px-5 py-3 rounded-full"
-          style={{ background: "rgba(255,255,255,0.80)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
-        >
-          <div className="flex items-center gap-2.5">
-            <WhaleLogo className="w-6 h-6 shrink-0" />
-            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Connected</span>
-          </div>
-        </motion.header>
-
-        <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-12 gap-6 max-w-[440px] w-full mx-auto">
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.7 }} className="text-center">
-            <div className="w-20 h-20 mx-auto mb-5 rounded-[2rem] bg-white border border-black/8 shadow-lg flex items-center justify-center">
-              <CheckCircle2 size={32} className="text-emerald-500" />
-            </div>
-            <h1 className="text-[2rem] font-black tracking-tight leading-tight mb-2" style={{ color: INK }}>
-              Sesión Activa
-            </h1>
-            <p className="text-[11px] font-mono text-[#050505]/40 uppercase tracking-widest">
-              {address.slice(0, 8)}…{address.slice(-6)}
-            </p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="w-full flex flex-col gap-3">
-            {/* Primary CTA: Scan QR */}
-            <button
-              onClick={() => setShowScanner(true)}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white active:scale-[0.97] transition-all shadow-xl"
-              style={{ background: INK, fontSize: "12px", boxShadow: "0 20px 40px -12px rgba(5,5,5,0.4)" }}
-            >
-              <Scan size={18} />
-              Abrir Scanner · Sync con PC
-            </button>
-
-            {/* Info card */}
-            <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5]">
-              <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
-              <p className="text-[10px] text-[#050505]/40 font-medium leading-relaxed">
-                Escanea el QR del Terminal PC para sincronizar tu sesión en tiempo real.
-              </p>
-            </div>
-          </motion.div>
-        </main>
-
-        <DynamicQRScannerModal
-          isOpen={showScanner}
-          onClose={() => setShowScanner(false)}
-          onScan={() => {
-            setShowScanner(false);
-            alert("Handshake Complete. Desktop Terminal Unlocked.");
-          }}
-        />
-      </div>
-    );
+    return <ConnectedScreen address={address} onScan={() => setShowScanner(true)} showScanner={showScanner} onCloseScanner={() => setShowScanner(false)} />;
   }
 
   // ── Render: Default — Not connected ──────────────────────────────────────────
@@ -520,6 +616,13 @@ export function MobileLanding() {
             loading={connecting === 'rainbow'}
             onClick={() => handleWCDeepLink('rainbow')}
             delay={0.2}
+          />
+          <WalletOption
+            logo="https://authjs.dev/img/providers/google.svg"
+            name="Google & Social Auth"
+            badge="Smart Account (AppKit)"
+            onClick={() => openConnectModal()}
+            delay={0.25}
           />
 
           {/* ECDSA notice */}

@@ -1,4 +1,4 @@
-7echo off
+@echo off
 setlocal EnableDelayedExpansion
 
 :: 🏛️  SOVEREIGN VAULT DAEMON (PRO-ACTIVE MANAGER)
@@ -9,6 +9,9 @@ setlocal EnableDelayedExpansion
 TITLE SOVEREIGN VAULT - ACTIVE MONITOR
 COLOR 0B
 mode con: cols=85 lines=25
+
+:: Change Current Working Directory to the location of this script
+cd /d "%~dp0"
 
 :BANNER
 cls
@@ -64,7 +67,13 @@ set "SOVEREIGN_VAULT_SECRET=%VAULT_SECRET%"
 set "VAULT_PORT=%VAULT_PORT%"
 
 :RUN
-node scripts\vault-daemon.js
+:: Si existe la versión TypeScript, lanzarla con TSX. Si no, lanzar la versión JS nativa.
+if exist "scripts\vault-daemon.ts" (
+    npx tsx scripts\vault-daemon.ts
+) else (
+    node scripts\vault-daemon.js
+)
+
 if %errorlevel% neq 0 (
     echo.
     echo [ALERT] Daemon crashed or connection error. 

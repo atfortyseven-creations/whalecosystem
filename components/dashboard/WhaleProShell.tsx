@@ -10,12 +10,16 @@ import {
     Star, Rocket, Network, Ticket, Zap, Menu,
     BookOpen, Database, HeadphonesIcon, BarChart3,
     Landmark, Layers, FlaskConical, Compass,
-    Activity, Lock, Book
+    Activity, Lock, Book, Search
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
+import { useUIStore } from '@/lib/store/ui-store';
+import { useEffect } from 'react';
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
+import { useAccount } from 'wagmi';
+import { toast } from 'sonner';
 
 interface NavItem {
     id: string;
@@ -28,36 +32,36 @@ interface NavItem {
 
 const SIDEBAR_ITEMS: NavItem[] = [
     // ── Command ──
-    { id: 'dashboard',           label: 'The Terminal',       icon: <LayoutDashboard size={17}/>,  dividerBefore: 'Command' },
-    { id: 'news',                label: 'The Whale Post',      icon: <Newspaper size={17}/> },
-    { id: 'watchlist',           label: 'Watchlist',           icon: <Star size={17}/> },
-    { id: 'gold-ticket',         label: 'Ticket Minting',      icon: <Ticket size={17}/> },
+    { id: 'dashboard',           label: 'Dashboard',          icon: <LayoutDashboard size={17}/>,  dividerBefore: 'Overview' },
+    { id: 'news',                label: 'Whale News',         icon: <Newspaper size={17}/> },
+    { id: 'watchlist',           label: 'Watchlist',          icon: <Star size={17}/> },
+    { id: 'gold-ticket',         label: 'Ticket Mint',        icon: <Ticket size={17}/> },
 
     // ── Markets ──
-    { id: 'whale-events',        label: 'Mempool Radar',       icon: <Globe size={17}/>,            dividerBefore: 'Markets' },
-    { id: 'gainers',             label: 'Gainers / Losers',    icon: <TrendingUp size={17}/> },
-    { id: 'new-pairs',           label: 'Token Discovery',     icon: <Rocket size={17}/> },
-    { id: 'omni-explorer',       label: 'Omni Explorer',       icon: <Compass size={17}/> },
-    { id: 'brc-explorer',        label: 'BRC-20 Explorer',     icon: <Layers size={17}/> },
+    { id: 'whale-events',        label: 'Whale Tracker',      icon: <Globe size={17}/>,            dividerBefore: 'Markets' },
+    { id: 'gainers',             label: 'Gainers / Losers',   icon: <TrendingUp size={17}/> },
+    { id: 'new-pairs',           label: 'New Tokens',         icon: <Rocket size={17}/> },
+    { id: 'omni-explorer',       label: 'Block Explorer',     icon: <Compass size={17}/> },
+    { id: 'brc-explorer',        label: 'BRC-20',             icon: <Layers size={17}/> },
 
     // ── Intelligence ──
-    { id: 'neural-graph',        label: 'Entity Graph',        icon: <Network size={17}/>,          dividerBefore: 'Intelligence' },
-    { id: 'sovereign-intel',     label: 'Voss Matrix',         icon: <Zap size={17}/> },
-    { id: 'institutional-ledger',label: 'Institutional Ledger',icon: <Landmark size={17}/>,         badge: 'NEW' },
-    { id: 'mass-transfer',       label: 'Mass Transfer',       icon: <Activity size={17}/> },
-    { id: 'defi-yield',          label: 'DeFi Yield',          icon: <FlaskConical size={17}/> },
-    { id: 'polymarket',          label: 'Polymarket',          icon: <BarChart3 size={17}/> },
+    { id: 'neural-graph',        label: 'Entity Map',         icon: <Network size={17}/>,          dividerBefore: 'Intelligence' },
+    { id: 'sovereign-intel',     label: 'Smart Signals',      icon: <Zap size={17}/> },
+    { id: 'institutional-ledger',label: 'Event Ledger',       icon: <Landmark size={17}/>,         badge: 'NEW' },
+    { id: 'mass-transfer',       label: 'Mass Transfers',     icon: <Activity size={17}/> },
+    { id: 'defi-yield',          label: 'DeFi Yield',         icon: <FlaskConical size={17}/> },
+    { id: 'polymarket',          label: 'Predictions',        icon: <BarChart3 size={17}/> },
 
-    // ── Sovereignty & Vault ──
-    { id: 'portfolio',           label: 'Akashic Vault',       icon: <Wallet size={17}/>,           dividerBefore: 'Sovereignty' },
-    { id: 'sovereign-vault',     label: 'Sovereign Vault',     icon: <Lock size={17}/> },
-    { id: 'zk-shield',           label: 'ZK Shield',           icon: <ShieldAlert size={17}/> },
-    { id: 'whale-portfolio',     label: 'Whale Portfolio',      icon: <Database size={17}/> },
-    { id: 'humanidfi-portfolio', label: 'HumanID Portfolio',   icon: <Shield size={17}/> },
+    // ── Wallet & Vault ──
+    { id: 'portfolio',           label: 'My Wallet',          icon: <Wallet size={17}/>,           dividerBefore: 'Wallet' },
+    { id: 'sovereign-vault',     label: 'Cold Storage',       icon: <Lock size={17}/> },
+    { id: 'zk-shield',           label: 'ZK Privacy',         icon: <ShieldAlert size={17}/> },
+    { id: 'whale-portfolio',     label: 'Whale Wallets',      icon: <Database size={17}/> },
+    { id: 'humanidfi-portfolio', label: 'HumanID Wallet',     icon: <Shield size={17}/> },
 
     // ── Learn & Support ──
-    { id: 'academy',             label: 'Whale Academy',       icon: <Book size={17}/>,             dividerBefore: 'Learn' },
-    { id: 'support',             label: 'Support',             icon: <HeadphonesIcon size={17}/> },
+    { id: 'academy',             label: 'Academy',            icon: <Book size={17}/>,             dividerBefore: 'Resources' },
+    { id: 'support',             label: 'Support',            icon: <HeadphonesIcon size={17}/> },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -180,8 +184,46 @@ export function WhaleProShell({
     const [searchQuery, setSearchQuery] = useState('');
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const { setSettingsOpen } = useSettingsStore();
+    const { openConnectModal } = useUIStore();
 
     const { latency, isConnected, mode } = useMarketStream();
+    const { connector } = useAccount();
+
+    const handleTabChange = (id: string) => {
+        const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
+        
+        if (restrictedTabs.includes(id)) {
+            if (!isConnected) {
+                toast.error("Sovereign Connection Required", {
+                    description: "You must link a Web3 wallet or authenticate to access restricted modules.",
+                    duration: 4000
+                });
+                openConnectModal();
+                return;
+            } else if (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) {
+                toast.error("Execution Clearance Required", {
+                    description: "This module requires EVM signing. Disconnect your Google session and use a native wallet.",
+                    duration: 6000
+                });
+                return;
+            }
+        }
+        onTabChange(id);
+    };
+
+    // Active clearance ejection monitor
+    useEffect(() => {
+        const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
+        if (restrictedTabs.includes(activeTab)) {
+            if (!isConnected) {
+                onTabChange('dashboard');
+                toast.error("Session Lost", { description: "You have been ejected from the secure perimeter." });
+            } else if (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) {
+                onTabChange('dashboard');
+                toast.error("Clearance Revoked", { description: "Google Sessions cannot reside in execution perimeters." });
+            }
+        }
+    }, [isConnected, connector?.id, activeTab, onTabChange]);
 
     return (
         <>
@@ -231,11 +273,10 @@ export function WhaleProShell({
                                     <div className="my-2 mx-3 h-px bg-black/10"/>
                                 )}
                                 <button
-                                    onClick={() => onTabChange(item.id)}
-                                    title={item.label}
-                                    className={`
-                                        w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all relative group
-                                        ${isActive
+                                    key={item.id}
+                                    onClick={() => handleTabChange(item.id)}
+                                    className={`w-full flex items-center justify-between py-2 px-3 rounded-lg group transition-all duration-200 ${
+                                        isActive
                                                 ? 'bg-black/5 text-black shadow-none border border-black/10'
                                                 : 'text-[#888888] hover:text-black hover:bg-black/[0.04]'
                                         }
@@ -306,8 +347,16 @@ export function WhaleProShell({
                 <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF] overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
-                    <div className="absolute inset-0 overflow-hidden flex flex-col">
-                        <div className="p-4 md:p-5 w-full h-full min-h-0 flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
+                    {/* Scrollable content layer — allows vertical scroll within the tab */}
+                    <div
+                        className="absolute inset-0 overflow-y-auto overflow-x-hidden flex flex-col"
+                        style={{
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: 'rgba(0,0,0,0.12) transparent',
+                            overscrollBehavior: 'contain',
+                        }}
+                    >
+                        <div className="p-4 md:p-5 w-full flex-1 flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -315,7 +364,7 @@ export function WhaleProShell({
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.98 }}
                                     transition={{ duration: 0.18 }}
-                                    className="w-full h-full min-h-0 flex flex-col overflow-hidden"
+                                    className="w-full flex-1 flex flex-col"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
                                         {children}
@@ -338,7 +387,7 @@ export function WhaleProShell({
                         return (
                             <button
                                 key={tab.id}
-                                onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : onTabChange(tab.id)}
+                                onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : handleTabChange(tab.id)}
                                 className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
                                     isActive ? 'text-black' : 'text-[#888888] hover:text-black'
                                 }`}

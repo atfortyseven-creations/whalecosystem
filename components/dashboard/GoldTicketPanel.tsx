@@ -13,6 +13,7 @@ import {
   Clock, CheckCircle2, Flame, PenTool, ShieldCheck, ArrowRight
 } from 'lucide-react';
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
+import { useUIStore } from '@/lib/store/ui-store';
 
 // ── Contract ──────────────────────────────────────────────────────────────────
 const CONTRACT = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
@@ -239,7 +240,7 @@ function GlobalLedger({ feed }: { feed: any[] }) {
 
 export function GoldTicketPanel() {
   const { address, isConnected, chainId } = useAccount();
-  const { connect } = useConnect();
+  const { openConnectModal } = useUIStore();
   const { switchChain } = useSwitchChain();
   const { signMessage, isSuccess: isConfirmed, reset: resetTx } = useSignMessage();
   const [dbStats, setDbStats] = useState<any>(null);
@@ -309,13 +310,17 @@ export function GoldTicketPanel() {
                 
                 <button 
                   onClick={() => {
-                    if (!isConnected) connect({ connector: injected() });
-                    else if (signatureData.length < 50) toast.error("Signature required on pad");
-                    else signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
+                    if (!isConnected) {
+                       openConnectModal();
+                    } else if (signatureData.length < 50) {
+                       toast.error("Signature required on pad");
+                    } else {
+                       signMessage({ message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` });
+                    }
                   }}
                   className="w-full mt-4 py-3 bg-[#050505] border border-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] text-[#FFFFFF] rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all"
                 >
-                  {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'}
+                  {isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET TO START'}
                 </button>
             </div>
           ) : (
