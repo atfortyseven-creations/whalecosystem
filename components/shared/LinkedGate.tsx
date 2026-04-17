@@ -331,7 +331,8 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // ── Redirect unauthenticated users to /connect ────────────────────────────
   useEffect(() => {
     if (!isMounted) return;
-    const isPublic = pathname.startsWith('/connect') ||
+    const isPublic = pathname === '/' ||
+                     pathname.startsWith('/connect') ||
                      pathname.startsWith('/docs') ||
                      pathname.startsWith('/privacy') ||
                      pathname.startsWith('/terms') ||
@@ -354,11 +355,23 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
 
   if (!isMounted) return null;
 
+  // ── Always render the root landing page, let it handle its own UX ──────────
+  if (pathname === '/') {
+    return <>{children}</>;
+  }
+
   // ── Already authenticated: render dashboard ───────────────────────────────
   if (isLinked) return <>{children}</>;
 
-  // ── Wallet connected but not signed: show contract step ───────────────────
+  // ── Public pages: render children ──────────────────────────────────────────
+  const isPublic = pathname.startsWith('/connect') ||
+                   pathname.startsWith('/docs') ||
+                   pathname.startsWith('/privacy') ||
+                   pathname.startsWith('/terms') ||
+                   pathname.startsWith('/developers');
+  if (isPublic) return <>{children}</>;
 
+  // ── Wallet connected but not signed: show contract step ───────────────────
   if (showSignStep) {
     return (
       <div className="fixed inset-0 z-[10000] bg-transparent flex items-center justify-center p-6">
@@ -372,3 +385,4 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
 
   return null;
 }
+

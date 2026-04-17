@@ -69,10 +69,10 @@ export default function WhaleAlertLanding() {
             
             <div className="space-y-4 mb-8 max-w-xl text-[#050505]/70 font-mono text-[11px] md:text-[12px] leading-relaxed text-left border-l-2 border-black/10 pl-6">
               <p>
-                <strong>SOVEREIGN-GRADE INTELLIGENCE.</strong> Constructed on the principles of Zero-Mock Mandate, Akashic Permanence, and Institutional Ivory. Every signal is directly sourced from live blockchain state. 100% Non-Custodial. 100% Trustless.
+                <strong>IN SEARCH OF TRANSPARENCY.</strong> Rastreando y filtrando los movimientos institucionales en tiempo real. Toda nuestra información proviene directamente del estado natural de las Blockchains. 100% Verificable. 100% En Vivo.
               </p>
               <p>
-                The Whale Alert Protocol v6.12.0 monitors institutional transactions, mempool events, and multi-chain liquidity flows in real time. Built exclusively for sovereign identities who demand zero latency, zero censorship, and permanent access to global consensus data. 
+                El protocolo v6.12.0 monitoriza transacciones de ballenas, eventos del mempool y flujos de liquidez cross-chain. Diseñado para ofrecerte herramientas de análisis con cero latencia y total transparencia.
               </p>
               <p className="text-black italic mt-2 opacity-80">
                 To proceed, connect your authorized injected Web3 interface or complete the Mobile-PC Handshake via QR integration.
