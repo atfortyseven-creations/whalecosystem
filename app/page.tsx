@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import { headers } from 'next/headers';
 import WhaleAlertLanding from '@/components/landing/WhaleAlertLanding';
 import { MobileLanding } from '@/components/landing/MobileLanding';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,14 @@ export default async function Home() {
   const userAgent = headersList.get('user-agent') || '';
   const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
 
+  let readmeContent = '';
+  try {
+    const readmePath = path.join(process.cwd(), 'README.md');
+    readmeContent = fs.readFileSync(readmePath, 'utf8');
+  } catch (error) {
+    console.error("Failed to load README content", error);
+  }
+
   return (
     <main>
       <Suspense fallback={
@@ -17,7 +27,7 @@ export default async function Home() {
           Synchronizing Genesis Node...
         </div>
       }>
-        {isMobile ? <MobileLanding /> : <WhaleAlertLanding />}
+        {isMobile ? <MobileLanding /> : <WhaleAlertLanding readmeContent={readmeContent} />}
       </Suspense>
     </main>
   );
