@@ -12,28 +12,56 @@ export function ScrollProgressBar() {
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let scrollTarget: HTMLElement = document.documentElement;
+    let fallbackTimer: NodeJS.Timeout;
     let rafId: number;
 
     const update = () => {
       const bar = barRef.current;
       if (!bar) return;
-      const el = document.documentElement;
-      const scrolled = el.scrollTop;
-      const max = el.scrollHeight - el.clientHeight;
+      
+      const customContainer = document.getElementById("main-scroll-container");
+      // If we haven't designated a recent target and there's a custom container, use it
+      if (customContainer && scrollTarget === document.documentElement) {
+          scrollTarget = customContainer;
+      }
+      
+      const scrolled = scrollTarget.scrollTop;
+      const max = scrollTarget.scrollHeight - scrollTarget.clientHeight;
       const pct = max > 0 ? (scrolled / max) * 100 : 0;
       bar.style.width = `${pct}%`;
     };
 
-    const onScroll = () => {
+    const onScroll = (e: Event) => {
+      if (e.target && e.target instanceof HTMLElement && e.target !== document && e.target !== document.documentElement) {
+          // If we detect an inner scroll container, track it
+          if (e.target.scrollHeight > e.target.clientHeight) {
+              scrollTarget = e.target;
+          }
+      } else {
+          const custom = document.getElementById("main-scroll-container");
+          scrollTarget = custom || document.documentElement;
+      }
+      
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(update);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // Use capture phase to intercept non-bubbling scroll events from inner containers
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    
+    // Fallback sync for dynamic route changes
+    fallbackTimer = setInterval(() => {
+        const custom = document.getElementById("main-scroll-container");
+        if (custom) scrollTarget = custom;
+        update();
+    }, 1000);
+
     update(); // initial
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll, { capture: true } as EventListenerOptions);
       cancelAnimationFrame(rafId);
+      clearInterval(fallbackTimer);
     };
   }, []);
 

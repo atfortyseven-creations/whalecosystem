@@ -168,7 +168,12 @@ export function Web3ModalProvider({ children, cookies }: { children: ReactNode; 
     } catch {
         decodedCookies = cookies;
     }
-    const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, decodedCookies)
+    let initialState: any = undefined;
+    try {
+        initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, decodedCookies);
+    } catch (e) {
+        console.error('[Wagmi] Failed to parse cookie to initial state:', e);
+    }
 
     return (
         <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>

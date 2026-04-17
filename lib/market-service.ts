@@ -1,5 +1,16 @@
 import axios from 'axios';
 
+// ── Crash-hardened JSON parser — returns fallback on any parse failure ──
+function safeJsonParse<T>(raw: unknown, fallback: T): T {
+    if (Array.isArray(raw)) return raw as unknown as T;
+    if (typeof raw !== 'string') return fallback;
+    try {
+        return JSON.parse(raw) as T;
+    } catch {
+        return fallback;
+    }
+}
+
 export interface MarketData {
     id: string;
     question: string;
@@ -39,8 +50,8 @@ export async function searchMarkets(keyword: string): Promise<MarketData | null>
             question: market.question,
             image: event.image,
             slug: event.slug, // used for linking
-            outcomes: JSON.parse(market.outcomes),
-            outcomePrices: JSON.parse(market.outcomePrices),
+            outcomes: safeJsonParse<string[]>(market.outcomes, []),
+            outcomePrices: safeJsonParse<string[]>(market.outcomePrices, []),
             volume: parseFloat(market.volume || '0')
         };
 
