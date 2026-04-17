@@ -186,14 +186,14 @@ export function WhaleProShell({
     const { setSettingsOpen } = useSettingsStore();
     const { openConnectModal } = useUIStore();
 
-    const { latency, isConnected, mode } = useMarketStream();
-    const { connector } = useAccount();
+    const { latency, isConnected: streamConnected, mode } = useMarketStream();
+    const { connector, isConnected: isWalletConnected } = useAccount();
 
     const handleTabChange = (id: string) => {
         const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
         
         if (restrictedTabs.includes(id)) {
-            if (!isConnected) {
+            if (!isWalletConnected) {
                 toast.error("Sovereign Connection Required", {
                     description: "You must link a Web3 wallet or authenticate to access restricted modules.",
                     duration: 4000
@@ -215,7 +215,7 @@ export function WhaleProShell({
     useEffect(() => {
         const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
         if (restrictedTabs.includes(activeTab)) {
-            if (!isConnected) {
+            if (!isWalletConnected) {
                 onTabChange('dashboard');
                 toast.error("Session Lost", { description: "You have been ejected from the secure perimeter." });
             } else if (connector?.id && (connector.id === 'auth' || connector.id.toLowerCase().includes('google') || connector.id === 'w3mAuth')) {
@@ -223,7 +223,7 @@ export function WhaleProShell({
                 toast.error("Clearance Revoked", { description: "Google Sessions cannot reside in execution perimeters." });
             }
         }
-    }, [isConnected, connector?.id, activeTab, onTabChange]);
+    }, [isWalletConnected, connector?.id, activeTab, onTabChange]);
 
     return (
         <>
@@ -232,7 +232,7 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex h-full w-full bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
+        <div className="flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
@@ -402,7 +402,7 @@ export function WhaleProShell({
                 {/* ─── Status Bar ─── */}
                 <footer className="hidden md:flex h-7 border-t border-black/10 bg-white items-center justify-between px-6 shrink-0 transition-colors duration-300">
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5 min-w-[120px]">
+                    <span className="flex items-center gap-1.5 min-w-[120px]">
                             <Globe size={11} /> Global Latency: 
                             <span className={latency > 150 ? 'text-[#FF3B30]' : latency > 0 ? 'text-[#00FF55]' : 'text-[#888888]'}>
                                 {latency > 0 ? `${latency}ms` : 'SYNCING'}
@@ -410,8 +410,8 @@ export function WhaleProShell({
                         </span>
                         <span className="flex items-center gap-1.5">
                             <Cpu size={11} /> Nodes: 
-                            <span className={isConnected ? 'text-[#00FF55]' : 'text-[#FF3B30]'}>
-                                {isConnected ? 'ACTIVE' : 'DEGRADED'}
+                            <span className={streamConnected ? 'text-[#00FF55]' : 'text-[#FF3B30]'}>
+                                {streamConnected ? 'ACTIVE' : 'DEGRADED'}
                             </span>
                             {mode === 'synthetic' && <span className="ml-1 text-[7px] border border-[#FF9500]/50 text-[#FF9500] px-1 rounded-sm">INTERNAL FALLBACK</span>}
                         </span>

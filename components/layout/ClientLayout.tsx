@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import React from 'react';
+import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
-import { SiteNavigationPill } from '@/components/shared/SiteNavigationPill';
-import { SystemsUtilityHeader } from '@/components/shared/SystemsUtilityHeader';
-import { GlobalTokenTicker } from '@/components/shared/GlobalTokenTicker';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { MobileNavBar } from '@/components/layout/MobileNavBar';
@@ -25,7 +22,6 @@ const BillionWhaleNotification = dynamic(
   () => import('@/components/shared/UtilityPanels').then(m => ({ default: m.BillionWhaleNotification })),
   { ssr: false }
 );
-
 const ConnectWalletModal = dynamic(
   () => import('@/components/shared/ConnectWalletModal').then(m => ({ default: m.ConnectWalletModal })),
   { ssr: false }
@@ -35,78 +31,90 @@ const LinkedGate = dynamic(
   { ssr: false }
 );
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Routes that don't need the gate (public / landing)
+// ─────────────────────────────────────────────────────────────────────────────
+const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Routes that must NOT get the legacy black Downhead footer
+// ─────────────────────────────────────────────────────────────────────────────
+const NO_DOWNHEAD_PREFIXES = [
+  '/dashboard', '/portfolio', '/academy', '/support', '/network',
+  '/docs', '/privacy', '/terms', '/ticket', '/news', '/connect',
+  '/voss-supremacy', '/sovereign-intel', '/predictions', '/ledger',
+  '/gold-registry', '/infrastructure', '/directory', '/company',
+  '/vip', '/faq', '/api-marketplace', '/clearance', '/settings',
+  '/login', '/sign-up', '/legal', '/admin', '/developer',
+];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
-    const { isConnected } = useAccount();
-    
-    const isPublicPath = pathname.startsWith('/docs') || pathname.startsWith('/privacy') || pathname.startsWith('/terms') || pathname.startsWith('/connect');
-    const content = !isPublicPath ? (
-        <LinkedGate>
-            {children}
-        </LinkedGate>
-    ) : children;
+  const pathname = usePathname();
 
-    return (
-        <>
-            <ConnectWalletModal />
-            
-            <TitaniumGate>
-                {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
-                
-                <div className={pathname.startsWith('/docs') || pathname.startsWith('/privacy') || pathname.startsWith('/terms') || pathname.startsWith('/connect') || pathname === '/'
-                    ? "min-h-screen w-full relative z-0 flex flex-col"
-                    : "fixed inset-0 h-[100dvh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0"}>
-                    <div className="flex-none w-full z-50">
-                        {/* Institutional Header with precise 68px height enforced */}
-                        {/* SOVEREIGN FIX: /dashboard is excluded here — WhaleProShell
-                         * renders its own sticky top bar. Showing InstitutionalHeader above
-                         * h-[100dvh] shell pushes it below the viewport → page-level scroll.
-                         */}
-                        {(
-                            pathname === '/network' || 
-                            pathname === '/portfolio' || 
-                            pathname === '/support' || 
-                            pathname === '/academy' || 
-                            pathname === '/vip' ||
-                            pathname === '/' ||
-                            pathname.startsWith('/news')
-                        ) && (
-                            <InstitutionalHeader />
-                        )}
-                    </div>
+  const isPublicPath = PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
+  const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
 
-                    <div className="flex-1 flex flex-col relative w-full overflow-hidden">
-                        <div className="relative z-40">
-                          <UtilityPanels />
-                          <BillionWhaleNotification />
-                        </div>
-                        
-                        <ZoomWrapper>
-                            <main className="relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden">
-                                {content}
-                            </main>
-                        </ZoomWrapper>
-                    </div>
+  // ── Layout mode ───────────────────────────────────────────────────────────
+  // DASHBOARD  → fixed inset-0 overflow-hidden  (WhaleProShell owns scroll)
+  // ALL OTHERS → min-h-screen + native scroll   (no invisible void zones)
+  const isDashboard = pathname.startsWith('/dashboard');
 
-                    {!(
-                        pathname === '/' || 
-                        pathname.startsWith('/dashboard') ||
-                        pathname.startsWith('/portfolio') ||
-                        pathname.startsWith('/academy') || 
-                        pathname.startsWith('/support') || 
-                        pathname.startsWith('/network') ||
-                        pathname.startsWith('/docs') ||
-                        pathname.startsWith('/privacy') ||
-                        pathname.startsWith('/terms') ||
-                        pathname.startsWith('/ticket') ||
-                        pathname.startsWith('/news') ||
-                        pathname.startsWith('/connect')
-                    ) && <Downhead />}
-                    
-                    <MobileNavBar />
-                </div>
-            </TitaniumGate>
-        </>
-    );
+  const rootClass = isDashboard
+    ? 'fixed inset-0 h-[100dvh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
+    : 'min-h-screen w-full relative z-0 flex flex-col bg-[#FAF9F6]';
+
+  const innerClass = isDashboard
+    ? 'flex-1 flex flex-col relative w-full overflow-hidden'
+    : 'flex-1 flex flex-col relative w-full';
+
+  const mainClass = isDashboard
+    ? 'relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden'
+    : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
+
+  const showDownhead = pathname !== '/' &&
+    !NO_DOWNHEAD_PREFIXES.some(p => pathname.startsWith(p));
+
+  const showInstitutionalHeader =
+    pathname === '/network' ||
+    pathname === '/portfolio' ||
+    pathname === '/support' ||
+    pathname === '/academy' ||
+    pathname === '/vip' ||
+    pathname === '/' ||
+    pathname.startsWith('/news');
+
+  return (
+    <>
+      <ConnectWalletModal />
+
+      <TitaniumGate>
+        {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}
+
+        <div className={rootClass}>
+          {/* Optional top header for select standalone routes */}
+          <div className="flex-none w-full z-50">
+            {showInstitutionalHeader && <InstitutionalHeader />}
+          </div>
+
+          <div className={innerClass}>
+            <div className="relative z-40">
+              <UtilityPanels />
+              <BillionWhaleNotification />
+            </div>
+
+            <ZoomWrapper>
+              <main className={mainClass}>
+                {content}
+              </main>
+            </ZoomWrapper>
+          </div>
+
+          {/* Legacy dark footer — only on routes that still need it */}
+          {showDownhead && <Downhead />}
+
+          <MobileNavBar />
+        </div>
+      </TitaniumGate>
+    </>
+  );
 }
