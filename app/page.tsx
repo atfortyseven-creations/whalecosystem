@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { headers } from 'next/headers';
 import WhaleAlertLanding from '@/components/landing/WhaleAlertLanding';
 import { MobileLanding } from '@/components/landing/MobileLanding';
+import { parseReadmeToManifesto } from '@/lib/manifesto-parser';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,8 @@ export default async function Home() {
   const userAgent = headersList.get('user-agent') || '';
   const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
 
+  const sections = parseReadmeToManifesto();
+
   return (
     <main>
       <Suspense fallback={
@@ -17,8 +20,9 @@ export default async function Home() {
           synchronizing...
         </div>
       }>
-        {isMobile ? <MobileLanding /> : <WhaleAlertLanding />}
+        {isMobile ? <MobileLanding /> : <WhaleAlertLanding sections={sections} />}
       </Suspense>
     </main>
   );
 }
+

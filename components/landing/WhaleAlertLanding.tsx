@@ -5,13 +5,18 @@ import { motion } from "framer-motion";
 import { useUIStore } from '@/lib/store/ui-store';
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import type { ManifestoSection } from "@/lib/manifesto-parser";
 
-interface WhaleAlertLandingProps {
-  sections: ManifestoSection[];
+export interface ManifestoSection {
+  id: string;
+  title: string;
+  body: string[];
 }
 
-export default function WhaleAlertLanding({ sections }: WhaleAlertLandingProps) {
+interface WhaleAlertLandingProps {
+  sections?: ManifestoSection[];
+}
+
+export default function WhaleAlertLanding({ sections = [] }: WhaleAlertLandingProps) {
   const [mounted, setMounted] = useState(false);
   const openConnectModal = useUIStore(s => s.openConnectModal);
   const router = useRouter();
