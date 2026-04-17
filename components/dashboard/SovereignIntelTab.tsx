@@ -87,11 +87,11 @@ const SovereignIntelTab: React.FC = () => {
                     <div className="flex items-center gap-3 mb-1">
                         <Layers className="text-[#050505]" size={20} />
                         <h1 className="text-xl md:text-2xl font-black tracking-tighter text-[#050505] uppercase">
-                            Sovereign Akashic Ledger
+                            Sovereign Intel
                         </h1>
                     </div>
                     <p className="text-[10px] text-[#888888] uppercase tracking-[0.2em] font-bold">
-                        Institutional Terminal — Protocol Mainframe v3.0.0
+                        Real-time extraction of latent graph topologies
                     </p>
                 </div>
                 

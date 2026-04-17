@@ -140,8 +140,8 @@ export default function InstitutionalLedger() {
           <h1 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">
             Institutional Ledger
           </h1>
-          <p className="text-[10px] text-[#050505]/40 font-medium leading-tight max-w-md">
-            Cryptographically-verified on-chain block record. Each entry is a SHA-256 attested payload from the sovereign ingest layer.
+          <p className="text-[10px] text-[#050505]/40 font-medium leading-tight max-w-md uppercase tracking-[0.2em]">
+            Immutable chronological state of validated macro-events.
           </p>
         </div>
         <div className="flex items-center gap-3">

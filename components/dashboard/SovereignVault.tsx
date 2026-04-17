@@ -297,10 +297,14 @@ export function SovereignVault() {
         <div className="w-full h-full min-h-0 overflow-y-auto msv-hide-scrollbar flex flex-col items-center bg-[#FFFFFF] text-[#050505] font-sans p-4 md:p-8">
             <div className="w-full max-w-5xl mx-auto flex flex-col items-start pt-4 gap-8 shrink-0 pb-10">
 
-                <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter flex items-center gap-4 border-b border-[#E5E5E5] pb-6 w-full">
-                    <ShieldAlert className="text-[#050505]" size={28} />
-                    VAULT <span className="text-[#888888]">PROTOCOL</span>
-                </h1>
+                <div className="shrink-0 pt-2 pb-6 border-b border-[#E5E5E5] w-full bg-white flex flex-col gap-0.5 mb-2">
+                    <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-[#050505]">
+                        Akashic Vault
+                    </h1>
+                    <p className="text-[10px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] leading-tight">
+                        Cryptographic cold storage and cross-chain liquid reconciliation.
+                    </p>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
 

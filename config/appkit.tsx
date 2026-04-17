@@ -126,9 +126,10 @@ try {
             // in our list. Network switching is handled exclusively in Portfolio.
             allowUnsupportedChain: true,
             features: {
-                analytics: false,
-                email: false,
-                socials: [],
+                analytics: true,
+                email: true,
+                socials: ['google', 'github', 'discord', 'x', 'apple'],
+                emailShowWallets: true,
                 swaps: false,
                 onramp: false,
             },

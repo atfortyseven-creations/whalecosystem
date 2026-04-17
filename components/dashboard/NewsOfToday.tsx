@@ -144,31 +144,28 @@ export function NewsOfToday() {
                 </div>
 
                 {/* ── THE POST HEADER ── */}
-                <div className="shrink-0 px-6 md:px-10 py-8 border-b-2 border-[#E5E5E5] flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white shrink-0">
-                    <div className="flex flex-col">
-                        <ScrollFloat 
-                            containerClassName="mb-0"
-                            textClassName="text-3xl md:text-5xl font-black tracking-tight uppercase text-[#050505]"
-                            animationDuration={1.2}
-                            stagger={0.03}
-                        >
-                            The Whale Post
-                        </ScrollFloat>
+                <div className="shrink-0 px-6 pt-5 pb-4 border-b border-[#E5E5E5] flex items-center justify-between bg-white">
+                    <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-3 mb-1">
+                            <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-[#050505]">
+                                The Whale Post
+                            </h1>
+                        </div>
+                        <p className="text-[10px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] leading-tight">
+                            Global macroeconomic signal aggregation and curation.
+                        </p>
                     </div>
                     
-                    <div className="flex flex-col items-start md:items-end gap-3 w-full md:w-auto">
-                        <div className="flex items-center gap-4 w-full md:w-auto">
-                            <input 
-                                value={search} 
-                                onChange={e => setSearch(e.target.value)} 
-                                placeholder="Search publications…"
-                                className="w-full md:w-64 bg-transparent border-b border-[#E5E5E5] text-[#050505] placeholder:text-[#888888] pb-1 font-serif outline-none focus:border-[#050505] transition-all"
-                            />
-                            <button onClick={refresh} disabled={loading} className="p-2 border border-[#E5E5E5] rounded-full hover:bg-[#FAF9F6] text-[#050505] transition-all disabled:opacity-50 group">
-                                <RefreshCw size={14} className={`${loading ? 'animate-spin' : ''}`} />
-                            </button>
-                        </div>
-                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#888888]">Institutional Intelligence Desk</p>
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <input 
+                            value={search} 
+                            onChange={e => setSearch(e.target.value)} 
+                            placeholder="Search publications…"
+                            className="w-full md:w-64 bg-transparent border-b border-[#E5E5E5] text-[11px] font-black uppercase tracking-widest text-[#050505] placeholder:text-[#888888] pb-1 outline-none focus:border-[#050505] transition-all"
+                        />
+                        <button onClick={refresh} disabled={loading} className="p-2 border border-[#E5E5E5] rounded-full hover:bg-[#FAF9F6] text-[#050505] transition-all disabled:opacity-50">
+                            <RefreshCw size={14} className={`${loading ? 'animate-spin' : ''}`} />
+                        </button>
                     </div>
                 </div>
 

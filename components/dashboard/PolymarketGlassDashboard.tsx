@@ -115,26 +115,25 @@ export default function PolymarketGlassDashboard({ embedded = false }: { embedde
             {!embedded && (
                 <motion.header
                     variants={itemVariants}
-                    className="z-[50] mb-5 w-full shrink-0"
+                    className="shrink-0 px-6 pt-5 pb-4 mb-4 flex items-center justify-between border border-[#E5E5E5] rounded-2xl bg-[#FAF9F6] shadow-sm"
                 >
-                    <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-[#FAF9F6] border border-[#E5E5E5] shadow-sm">
-                        <div className="flex items-center space-x-4">
-                            <NetworkSwitcher />
-                            <div className="hidden md:flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                                <ActivityIcon size={14} className={isPolygon ? 'text-emerald-600 animate-pulse' : 'text-[#050505]/30'} />
-                                <span className="text-xs font-black tracking-widest text-emerald-700 uppercase">
-                                    {isPolygon ? "L1 Connectivity: Native" : "Cross-Chain Relayed"}
-                                </span>
-                            </div>
+                    <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-3 mb-1">
+                            <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-[#050505]">
+                                Prediction Network
+                            </h1>
                         </div>
-
-                        <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#050505]/5 border border-[#050505]/10">
-                                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                                <span className="text-xs font-mono font-black text-[#050505]/60">
-                                    {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "Disconnected Hub"}
-                                </span>
-                            </div>
+                        <p className="text-[10px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] leading-tight">
+                            Decentralized oracle consensus mapping probability vectors.
+                        </p>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        <NetworkSwitcher />
+                        <div className="hidden md:flex items-center space-x-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                            <ActivityIcon size={14} className={isPolygon ? 'text-emerald-600 animate-pulse' : 'text-[#050505]/30'} />
+                            <span className="text-xs font-black tracking-widest text-emerald-700 uppercase">
+                                {isPolygon ? "L1 Connectivity: Native" : "Cross-Chain Relayed"}
+                            </span>
                         </div>
                     </div>
                 </motion.header>

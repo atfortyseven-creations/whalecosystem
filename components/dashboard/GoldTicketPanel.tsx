@@ -354,13 +354,14 @@ export function GoldTicketPanel() {
       <div className="grid lg:grid-cols-2 gap-4 shrink-0">
           
           <div className="bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl flex flex-col justify-center p-6 shadow-sm">
-               <div className="flex items-center gap-2 mb-4">
-                  <div className="w-1.5 h-1.5 bg-[#050505] shadow-sm" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#888888]">Institutional Auth Layer</span>
-               </div>
-               <h1 className="text-2xl lg:text-3xl font-black text-[#050505] uppercase tracking-tighter leading-tight mb-4 border-b border-[#E5E5E5] pb-2">
-                  TICKET <span className="text-[#888888]">MINTING</span>
-               </h1>
+               <div className="shrink-0 pt-2 pb-6 border-b border-[#E5E5E5] w-full bg-white flex flex-col gap-0.5 mb-4">
+                    <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-[#050505]">
+                        Entity Registry
+                    </h1>
+                    <p className="text-[10px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] leading-tight">
+                        Clearance verification and institutional asset minting.
+                    </p>
+                </div>
                <div className="bg-[#FAF9F6] border border-black/[0.04] p-6 rounded-2xl space-y-6">
                   <SupplyBar minted={dbStats?.totalClaimed || 0} max={MAX_SUPPLY} />
                </div>
