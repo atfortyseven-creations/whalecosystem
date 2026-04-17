@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   useConnect, useSignMessage,
-  useReadContract, useSwitchChain,
+  useReadContract, useSwitchChain, useAccount,
 } from 'wagmi';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { injected } from 'wagmi/connectors';
@@ -257,6 +257,7 @@ function GlobalLedger({ feed }: { feed: any[] }) {
 
 export function GoldTicketPanel() {
   const { address, isConnected, chainId, isSovereignHandshake } = useSovereignAccount();
+  const { isConnected: isWagmiConnected } = useAccount(); // Real wagmi connector state
   const { openConnectModal } = useUIStore();
   const { switchChain } = useSwitchChain();
   const { signMessage, isPending: isSigning } = useSignMessage();
@@ -281,6 +282,17 @@ export function GoldTicketPanel() {
 
   const handleMint = useCallback(async () => {
     if (!isConnected) { openConnectModal(); return; }
+
+    // If user has only a cookie/QR session, they have no wagmi connector → cannot sign
+    if (!isWagmiConnected) {
+      toast.error('Wallet connection required for signing', {
+        description: 'Your current session cannot sign transactions. Click to connect a Web3 wallet (MetaMask, WalletConnect, or Google Auth).',
+        duration: 6000,
+      });
+      openConnectModal();
+      return;
+    }
+
     if (signatureData.length < 50) {
       toast.error('Draw your signature on the pad first');
       return;
@@ -367,7 +379,7 @@ export function GoldTicketPanel() {
                       onMint={handleMint}
                       mintLabel={
                         isMinting || isSigning ? 'SIGNING...' :
-                        isConnected ? 'AUTHORIZE MINT' : 'CONNECT WALLET'
+                        !isConnected || !isWagmiConnected ? 'CONNECT WALLET' : 'AUTHORIZE MINT'
                       }
                     />
                  </div>
