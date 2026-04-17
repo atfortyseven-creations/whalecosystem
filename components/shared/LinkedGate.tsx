@@ -270,47 +270,59 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const [showSignStep, setShowSignStep] = useState(false);
 
+  // ── Detect already-signed session from cookie ──────────────────────────
   useEffect(() => {
     setIsMounted(true);
-
     if (typeof document !== 'undefined') {
       const hasHandshake = document.cookie
         .split('; ')
         .some(row => row.startsWith('sovereign_handshake=0x'));
       if (hasHandshake) {
         setLinked(true);
-      } else if (!isWalletConnected) {
-        setLinked(false);
       }
     }
-  }, [isWalletConnected, setLinked]);
+  }, [setLinked]);
 
+  // ── When wallet connects, show sign step (unless already linked) ─────────
   useEffect(() => {
     if (!isMounted) return;
-    
-    if (!isLinked && !isWalletConnected) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
+    if (isWalletConnected && !isLinked && !showSignStep) {
+      // Check sessionStorage for this specific address (tab-level cache)
+      if (address) {
+        const alreadySigned = sessionStorage.getItem(`sovereign_signed_${address}`) === 'true';
+        if (alreadySigned) {
+          setLinked(true);
+          return;
+        }
+      }
+      setShowSignStep(true);
     }
+    if (!isWalletConnected && !isLinked) {
+      setShowSignStep(false);
+    }
+  }, [isWalletConnected, isLinked, isMounted, address, showSignStep, setLinked]);
 
+  // ── Body scroll lockdown when gate is active ──────────────────────────────
+  useEffect(() => {
+    if (!isMounted) return;
+    const shouldLock = !isLinked && !isWalletConnected;
+    document.body.style.overflow = shouldLock ? 'hidden' : '';
+    document.documentElement.style.overflow = shouldLock ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
     };
   }, [isLinked, isWalletConnected, isMounted]);
 
+  // ── Redirect unauthenticated users to /connect ────────────────────────────
   useEffect(() => {
     if (!isMounted) return;
-    
-    const isPublic = pathname.startsWith('/connect') || 
-                     pathname.startsWith('/docs') || 
-                     pathname.startsWith('/privacy') || 
+    const isPublic = pathname.startsWith('/connect') ||
+                     pathname.startsWith('/docs') ||
+                     pathname.startsWith('/privacy') ||
                      pathname.startsWith('/terms') ||
                      pathname.startsWith('/developers');
-
+    // Only redirect if NOT connected at all (not just un-signed)
     if (!isLinked && !isWalletConnected && !isPublic) {
       router.replace('/connect');
     }
@@ -327,7 +339,11 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!isMounted) return null;
-  if (isLinked || (isWalletConnected && !showSignStep)) return <>{children}</>;
+
+  // ── Already authenticated: render dashboard ───────────────────────────────
+  if (isLinked) return <>{children}</>;
+
+  // ── Wallet connected but not signed: show contract step ───────────────────
 
   if (showSignStep) {
     return (
