@@ -14,6 +14,8 @@ const DynamicQRScannerModal = dynamic(
   { ssr: false }
 );
 
+import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
+
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const IVORY = "#FAF9F6";
 const INK   = "#050505";
@@ -162,10 +164,11 @@ function useLiveClock() {
 
 // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner,
+  address, onScan, showScanner, onCloseScanner, onBack,
 }: {
   address: string; onScan: () => void;
   showScanner: boolean; onCloseScanner: () => void;
+  onBack?: () => void;
 }) {
   const now = useLiveClock();
   const [connectedAt] = useState(() => new Date()); // frozen at mount time
@@ -197,6 +200,11 @@ function ConnectedScreen({
         style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
       >
         <div className="flex items-center gap-2">
+          {onBack && (
+            <button onClick={onBack} className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer">
+               <ArrowRight size={15} className="rotate-180" />
+            </button>
+          )}
           <WhaleLogo className="w-5 h-5 shrink-0" />
           <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
         </div>
@@ -327,6 +335,7 @@ export function MobileLanding() {
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
   const [isLinked, setIsLinked]         = useState(false);
+  const [showingManifesto, setShowingManifesto] = useState(true);
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
   const [connecting, setConnecting]     = useState<string | null>(null); // wallet type currently connecting
@@ -522,7 +531,25 @@ export function MobileLanding() {
 
   // ── Render: Connected & signed ──────────────────────────────────────────────
   if (isLinked && address) {
-    return <ConnectedScreen address={address} onScan={() => setShowScanner(true)} showScanner={showScanner} onCloseScanner={() => setShowScanner(false)} />;
+    return (
+      <AnimatePresence mode="wait">
+        {showingManifesto ? (
+          <motion.div key="manifesto" initial={{opacity: 0}} animate={{opacity: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FDFCF8]">
+            <ImmersiveManifestoLanding onOpenScanner={() => setShowingManifesto(false)} />
+          </motion.div>
+        ) : (
+          <motion.div key="scanner" initial={{opacity: 0, scale: 0.98}} animate={{opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, scale: 0.98, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FAF9F6]">
+            <ConnectedScreen 
+               address={address} 
+               onScan={() => setShowScanner(true)} 
+               showScanner={showScanner} 
+               onCloseScanner={() => setShowScanner(false)} 
+               onBack={() => setShowingManifesto(true)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
   }
 
   // ── Render: Default — Not connected ──────────────────────────────────────────
