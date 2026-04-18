@@ -1,30 +1,77 @@
 import { NextResponse } from 'next/server';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 /**
  * Lottie file server — resolves files from multiple locations in priority order:
- *  1. public/lotties/  (bundled with build — works on Railway / any server)
- *  2. <project_root>/lotties/  (alternative committed location)
- *  3. C:/Users/admin/Desktop/lottifile  (local dev desktop — Windows only)
  *
- * To make lotties available on Railway: copy the .json files into /public/lotties/
- * before deploying, OR commit them to /lotties/ in the project root.
+ *  1. public/           — files placed directly in /public (current user setup)
+ *  2. public/lotties/   — subfolder inside public
+ *  3. lotties/          — project-root subfolder
+ *  4. C:\Users\admin\Desktop\lottifile\  — original dev desktop path
+ *  5. C:\Users\admin\Downloads\          — common Windows download location
+ *  6. C:\Users\admin\Documents\          — common Windows documents
+ *
+ * IMPORTANT: Next.js serves every file inside /public as a static asset at the
+ * root URL path. That means /public/Ball playing.json is available at
+ * fetch('/Ball%20playing.json'). The OptimizedLocalLottie component already
+ * tries this static path first; this API route is the fallback.
  */
-function resolveLottiePath(safeFilename: string): string | null {
-  const candidates = [
-    // 1. Public bundle — works everywhere
-    join(process.cwd(), 'public', 'lotties', safeFilename),
-    // 2. Project root /lotties/ (gitignored large files)
-    join(process.cwd(), 'lotties', safeFilename),
-    // 3. Local dev desktop (Windows only)
-    join('C:', 'Users', 'admin', 'Desktop', 'lottifile', safeFilename),
-  ];
 
-  for (const candidate of candidates) {
+// Windows: must use 'C:\\' (not 'C:') so path.join produces absolute paths.
+// path.join('C:', 'Users') → 'C:Users' (relative — WRONG)
+// path.join('C:\\', 'Users') → 'C:\Users' (absolute — correct)
+const WIN_DRIVE = 'C:\\';
+
+const SEARCH_DIRS: string[] = [
+  // 1. public root — files dropped directly here
+  join(process.cwd(), 'public'),
+  // 2. public/lotties subfolder
+  join(process.cwd(), 'public', 'lotties'),
+  // 3. project root /lotties
+  join(process.cwd(), 'lotties'),
+  // 4. Desktop root — user reported files are here
+  join(WIN_DRIVE, 'Users', 'admin', 'Desktop'),
+  // 5. Desktop/lottifile subfolder — original path
+  join(WIN_DRIVE, 'Users', 'admin', 'Desktop', 'lottifile'),
+  // 6. Downloads
+  join(WIN_DRIVE, 'Users', 'admin', 'Downloads'),
+  // 7. Documents
+  join(WIN_DRIVE, 'Users', 'admin', 'Documents'),
+];
+
+function resolveLottiePath(safeFilename: string): string | null {
+  for (const dir of SEARCH_DIRS) {
+    const candidate = join(dir, safeFilename);
     if (existsSync(candidate)) return candidate;
   }
   return null;
+}
+
+/** Enumerate every .json file found across all search directories */
+function listAllLottieFiles(): string[] {
+  const found = new Set<string>();
+  for (const dir of SEARCH_DIRS) {
+    try {
+      if (!existsSync(dir)) continue;
+      const entries = readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isFile()) continue;
+        if (!entry.name.endsWith('.json')) continue;
+        // Skip known non-lottie JSON files
+        if (
+          entry.name === 'manifest.json' ||
+          entry.name === 'package.json' ||
+          entry.name === 'tsconfig.json' ||
+          entry.name === 'sample-sovereign-signal.json'
+        ) continue;
+        found.add(entry.name);
+      }
+    } catch {
+      // Directory not accessible — skip silently
+    }
+  }
+  return Array.from(found).sort();
 }
 
 export const dynamic = 'force-dynamic';
@@ -34,11 +81,21 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const filename = searchParams.get('file');
 
+    // Special endpoint: list all available lottie files for debugging
+    if (filename === '__list__') {
+      const files = listAllLottieFiles();
+      return NextResponse.json({
+        files,
+        searchDirs: SEARCH_DIRS,
+        count: files.length,
+      });
+    }
+
     if (!filename) {
       return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
     }
 
-    // Sanitize: strip any directory traversal, keep only the filename
+    // Sanitize: strip any directory traversal, keep only the basename
     const safeFilename = filename.replace(/\\/g, '/').split('/').pop() || '';
     if (!safeFilename.endsWith('.json')) {
       return NextResponse.json({ error: 'Invalid file type' }, { status: 400 });
@@ -47,8 +104,12 @@ export async function GET(req: Request) {
     const filePath = resolveLottiePath(safeFilename);
 
     if (!filePath) {
-      console.error('[LOTTIE] File not found in any search path:', safeFilename);
-      return NextResponse.json({ error: 'File not found' }, { status: 404 });
+      console.error('[LOTTIE API] File not found:', safeFilename);
+      console.error('[LOTTIE API] Searched in:', SEARCH_DIRS.join(', '));
+      return NextResponse.json(
+        { error: 'File not found', file: safeFilename },
+        { status: 404 }
+      );
     }
 
     const data = readFileSync(filePath, 'utf-8');
@@ -56,12 +117,11 @@ export async function GET(req: Request) {
 
     return NextResponse.json(json, {
       headers: {
-        // Cache aggressively — lottie files never change at runtime
         'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
       },
     });
   } catch (error) {
-    console.error('[LOTTIE] Load Error:', error);
+    console.error('[LOTTIE API] Error:', error);
     return NextResponse.json({ error: 'Failed to process Lottie file' }, { status: 500 });
   }
 }
