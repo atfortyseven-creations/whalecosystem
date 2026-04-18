@@ -12,13 +12,13 @@ export async function updatePrivacySettings(
   userAgent?: string
 ) {
   try {
-    const profile = await prisma.userPrivacyProfile.upsert({
+    const profile = await (prisma as any).userPrivacyProfile.upsert({
       where: { userId },
       update: { [field]: value },
       create: { userId, [field]: value },
     });
 
-    await prisma.userSessionLog.create({
+    await (prisma as any).userSessionLog.create({
       data: {
         userId,
         sessionId: "session-" + Math.random().toString(36).substring(7),
@@ -40,7 +40,7 @@ export async function updatePrivacySettings(
 
 export async function fetchPrivacySettings(userId: string) {
   try {
-    const profile = await prisma.userPrivacyProfile.findUnique({
+    const profile = await (prisma as any).userPrivacyProfile.findUnique({
       where: { userId }
     });
     return { success: true, profile };

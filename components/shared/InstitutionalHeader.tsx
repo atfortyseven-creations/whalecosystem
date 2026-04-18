@@ -46,6 +46,7 @@ export function InstitutionalHeader() {
             label: "Protocol",
             links: [
                 { href: '/academy', label: 'The Library', desc: 'Cognitive expansion through structured on-chain curriculum.' },
+                { href: '/developer', label: 'Developer', desc: 'Core system architecture and protocol manifesto.' },
                 { href: '/support', label: 'Operational Guard', desc: 'Direct secure link to tactical maintenance architecture.' }
             ]
         }
