@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { ActiveSessions } from '../settings/ActiveSessions';
 import { CloudSyncManager } from '../settings/CloudSyncManager';
+import { RealPrivacySettings } from '../privacy/RealPrivacySettings';
 import { toast } from 'sonner';
 import { verifyBiometricOwnership } from '@/src/services/security/BiometricService';
 import { revokeTokenAllowance } from '@/src/services/security/RevokeService';
@@ -156,96 +157,7 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
             case 'security':
                 return (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                        {/* Toggles */}
-                        <div className="space-y-1">
-                            <ToggleItem
-                                title="Biometric Authentication"
-                                description="Require TouchID/FaceID to unlock wallet."
-                                active={biometricsEnabled}
-                                onClick={toggleBiometrics}
-                            />
-                            <ToggleItem
-                                title="Strict Mode (Whitelist Only)"
-                                description="Only allow transactions to saved contacts."
-                                active={strictMode}
-                                onClick={toggleStrictMode}
-                            />
-                            <ToggleItem
-                                title="Hide Balances"
-                                description="Mask all balance values with **** for privacy."
-                                active={hideBalances}
-                                onClick={toggleHideBalances}
-                            />
-                            <ToggleItem
-                                title="Strict Privacy Mode"
-                                description="Block third-party trackers and anonymize requests."
-                                active={privacyMode}
-                                onClick={togglePrivacyMode}
-                            />
-                            <ToggleItem
-                                title="Wallet Stealth Mode"
-                                description="Hide wallet connection status and public headers."
-                                active={walletStealthMode}
-                                onClick={toggleWalletStealthMode}
-                            />
-                            <ToggleItem
-                                title="Require Password for Signing"
-                                description="Ask for master password on every transaction."
-                                active={requirePasswordForSigning}
-                                onClick={toggleRequirePasswordForSigning}
-                            />
-                            
-                            <div className="p-4 border border-white/10 rounded-xl bg-black/20">
-                                <label className="text-sm font-medium text-gray-300 block mb-2">Auto-Lock Duration (Minutes)</label>
-                                <input 
-                                    type="number" 
-                                    min={1} 
-                                    max={1440} 
-                                    value={autoLockDuration} 
-                                    onChange={e => setAutoLockDuration(Number(e.target.value))}
-                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#00f2ea]"
-                                />
-                            </div>
-
-                            <ToggleItem
-                                title="Participate in MetaMetrics"
-                                description="Send anonymous usage data to help us improve."
-                                active={humanMetrics}
-                                onClick={toggleHumanMetrics}
-                            />
-                        </div>
-
-                        {/* Revoke Allowance Section */}
-                        <div className="p-5 bg-red-500/5 border border-red-500/20 rounded-2xl space-y-3">
-                            <h4 className="text-red-400 font-bold text-sm flex items-center gap-2">
-                                <Shield className="w-4 h-4" /> Revoke Token Allowances
-                            </h4>
-                            <p className="text-xs text-gray-500">Emergency trigger to reset approval to 0.</p>
-
-                            <input
-                                placeholder="Token Address (0x...)"
-                                value={revokeToken}
-                                onChange={e => setRevokeToken(e.target.value)}
-                                className="w-full bg-black/40 border border-red-500/20 rounded-lg p-2 text-xs text-white outline-none font-mono"
-                            />
-                            <input
-                                placeholder="Spender Address (0x...)"
-                                value={revokeSpender}
-                                onChange={e => setRevokeSpender(e.target.value)}
-                                className="w-full bg-black/40 border border-red-500/20 rounded-lg p-2 text-xs text-white outline-none font-mono"
-                            />
-
-                            <button
-                                onClick={handleRevoke}
-                                disabled={isRevoking || !revokeToken || !revokeSpender}
-                                className="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
-                            >
-                                {isRevoking ? <Loader2 className="animate-spin w-3 h-3" /> : <Shield className="w-3 h-3" />}
-                                {isRevoking ? "REVOKING..." : "REVOKE ALLOWANCE"}
-                            </button>
-                        </div>
-                    </div>
+                    <RealPrivacySettings />
                 );
 
             case 'sessions':

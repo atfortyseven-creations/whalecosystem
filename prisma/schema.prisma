@@ -639,3 +639,41 @@ model Log {
 
   @@index([createdAt(sort: Desc)])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRIVACY & SESSION AUDITING LOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model UserSessionLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  sessionId   String
+  timestamp   DateTime @default(now())
+  action      String   // "PAGE_VIEW", "WALLET_CONNECT", "TAB_CHANGE", "EXPORT"
+  entityType  String?
+  entityId    String?
+  ipAddress   String?
+  userAgent   String?
+  deviceType  String?
+  location    String?
+  metadata    Json?
+  
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([action, timestamp(sort: Desc)])
+  @@index([sessionId])
+  @@index([timestamp(sort: Desc)])
+}
+
+model UserPrivacyProfile {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  logLevel               String   @default("MEDIUM") 
+  dataSharing            Boolean  @default(true)
+  sessionAutoLogout      String   @default("1h")     
+  ipWhitelist            String[] @default([])
+  twoFAEnabled           Boolean  @default(false)
+  sovereignVisibility    String   @default("Public") 
+  exportEncryption       Boolean  @default(false)
+  updatedAt              DateTime @updatedAt
+  createdAt              DateTime @default(now())
+}

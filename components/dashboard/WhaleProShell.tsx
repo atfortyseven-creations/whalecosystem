@@ -10,7 +10,7 @@ import {
     Star, Rocket, Network, Ticket, Zap, Menu,
     BookOpen, Database, HeadphonesIcon, BarChart3,
     Landmark, Layers, FlaskConical, Compass,
-    Activity, Lock, Book
+    Activity, Lock, Book, Code2
 } from 'lucide-react';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useUIStore } from '@/lib/store/ui-store';
@@ -58,9 +58,11 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'zk-shield',           label: 'ZK Privacy',         icon: <ShieldAlert size={17}/> },
     { id: 'whale-portfolio',     label: 'Whale Wallets',      icon: <Database size={17}/> },
     { id: 'humanidfi-portfolio', label: 'HumanID Wallet',     icon: <Shield size={17}/> },
+    { id: 'session-logs',        label: 'Session Logs',       icon: <Activity size={17}/> },
 
     // ── Learn & Support ──
     { id: 'academy',             label: 'Academy',            icon: <Book size={17}/>,             dividerBefore: 'Resources' },
+    { id: 'developer',           label: 'Legacy View',        icon: <Code2 size={17}/> },
     { id: 'support',             label: 'Support',            icon: <HeadphonesIcon size={17}/> },
 ];
 
@@ -190,6 +192,11 @@ export function WhaleProShell({
     const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
 
     const handleTabChange = (id: string) => {
+        if (id === 'developer') {
+            window.location.href = '/developer';
+            return;
+        }
+
         const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
         
         if (restrictedTabs.includes(id)) {
