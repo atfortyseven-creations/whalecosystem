@@ -24,6 +24,7 @@ import InstitutionalLedger         from '@/components/dashboard/InstitutionalLed
 import { MassTransferIntel }       from '@/components/dashboard/MassTransferIntel';
 import { VirtualizedFirehose }     from '@/components/premium/VirtualizedFirehose';
 import { LivePortfolio }           from '@/components/premium/LivePortfolio';
+import { SessionLogsPanel }        from '@/components/dashboard/SessionLogsPanel';
 import dynamic from 'next/dynamic';
 
 // Heavy / SSR-unsafe dynamic imports
@@ -68,7 +69,8 @@ type TabId =
     | 'defi-yield'
     | 'polymarket'
     | 'academy'
-    | 'support';
+    | 'support'
+    | 'session-logs';
 
 export default function WhaleDashboard() {
     const [activeTab, setActiveTab] = useState<TabId>('dashboard');
@@ -100,6 +102,7 @@ export default function WhaleDashboard() {
               : activeTab === 'zk-shield'             ? <DashboardErrorBoundary key="zk-shield">       <ZKShieldStation />              </DashboardErrorBoundary>
               : activeTab === 'whale-portfolio'       ? <DashboardErrorBoundary key="whale-portfolio"> <WhalePortfolio />               </DashboardErrorBoundary>
               : activeTab === 'humanidfi-portfolio'   ? <DashboardErrorBoundary key="human-port">      <PortfolioDashboard />           </DashboardErrorBoundary>
+              : activeTab === 'session-logs'          ? <DashboardErrorBoundary key="session-logs">    <SessionLogsPanel />             </DashboardErrorBoundary>
               : activeTab === 'academy'               ? <DashboardErrorBoundary key="academy">         <WhaleAcademy />                 </DashboardErrorBoundary>
               : activeTab === 'support'               ? <DashboardErrorBoundary key="support">         <WhaleSupport />                 </DashboardErrorBoundary>
               : null

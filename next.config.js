@@ -63,7 +63,7 @@ const nextConfig = {
     compress: true,
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
-    reactStrictMode: true,
+    reactStrictMode: false,
     // swcMinify: REMOVED — always enabled by default in Next.js 15
 
     // Moved from experimental in Next.js 15
