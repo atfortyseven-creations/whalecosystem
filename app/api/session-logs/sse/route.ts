@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       let lastCheckedId = '';
       
       // Get the most recent log first to establish baseline
-      const latest = await prisma.userSessionLog.findFirst({
+      const latest = await (prisma as any).userSessionLog.findFirst({
         orderBy: { timestamp: 'desc' }
       });
       if (latest) {
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
 
       const intervalId = setInterval(async () => {
         try {
-          const newLogs = await prisma.userSessionLog.findMany({
+          const newLogs = await (prisma as any).userSessionLog.findMany({
             where: {
               timestamp: latest ? { gt: latest.timestamp } : undefined,
               id: { not: lastCheckedId }
