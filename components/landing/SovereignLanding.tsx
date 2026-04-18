@@ -10,7 +10,6 @@ import {
   Database, LayoutDashboard, Code2, Wallet, Fingerprint
 } from "lucide-react";
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
-import { SovereignManifesto } from './SovereignManifesto';
 
 // ── Particle Canvas Background ──
 function ParticleBackground() {
@@ -315,10 +314,6 @@ export function SovereignLanding() {
         </aside>
       </div>
       </div>
-
-      {/* ACADEMIC MANIFESTO AND LOTTIES */}
-      <SovereignManifesto />
-
       </div>
     </ReactLenis>
   );

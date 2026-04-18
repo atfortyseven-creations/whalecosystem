@@ -255,7 +255,7 @@ export function WhaleProShell({
                 </div>}
 
                 {/* Sidebar Navigation */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pt-1 pb-4 px-2 space-y-0.5 no-scrollbar" style={{ contain: 'strict', willChange: 'scroll-position' }}>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pt-1 pb-4 px-2 space-y-0.5 no-scrollbar" style={{ overscrollBehavior: 'contain', touchAction: 'pan-y', contain: 'strict' }}>
                     {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
                         return (
@@ -352,20 +352,22 @@ export function WhaleProShell({
                     </div>
                 </header>
 
-                <main className="flex-1 relative flex flex-col transition-colors duration-300 bg-[#EFEFEF] overflow-hidden">
+                <main className="flex-1 flex flex-col min-h-0 transition-colors duration-300 bg-[#EFEFEF] relative">
+                    {/* Background gradient — does NOT create a scroll stacking ctx */}
                     <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_50%_0%,rgba(250,249,246,0.5)_0%,transparent_80%)]" />
 
-                    {/* Scrollable content layer — allows vertical scroll within the tab */}
+                    {/* Scroll container: flex-1 + min-h-0 = bounded by parent, never bleeds to document */}
                     <div
                         id="main-scroll-container"
-                        className="absolute inset-0 overflow-y-auto overflow-x-hidden flex flex-col no-scrollbar"
+                        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col no-scrollbar"
                         style={{
-                            scrollbarWidth: 'none', /* Forzamos ocultar barra en Firefox */
-                            msOverflowStyle: 'none', /* Forzamos ocultar barra en old Edge */
-                            overscrollBehavior: 'none', /* Cero rebote elástico */
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                            overscrollBehavior: 'contain',
+                            touchAction: 'pan-y',
                         }}
                     >
-                        <div className="p-4 md:p-5 w-full flex-1 flex flex-col relative z-10" style={{ transform: 'translateZ(0)' }}>
+                        <div className="p-4 md:p-5 w-full flex-1 flex flex-col relative z-10">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}

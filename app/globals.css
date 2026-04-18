@@ -64,8 +64,10 @@ textarea {
 [class*="overflow-auto"],
 [class*="overflow-scroll"],
 .custom-scrollbar {
-  -webkit-overflow-scrolling: touch !important;
-  transform: translate3d(0,0,0); /* Force GPU layer for scrollable blocks */
+  -webkit-overflow-scrolling: touch;
+  /* NOTE: transform:translate3d removed — it forced ALL scroll containers into
+     separate GPU stacking contexts, which caused the OS native scrollbar to
+     misfire scroll events to the wrong target (document root vs inner container). */
 }
 
   /* UNIVERSAL A11Y FOCUS */
@@ -179,11 +181,8 @@ textarea {
     color: var(--aztec-ink);
   }
 
-   /* === INPUT ZOOM PREVENTION ===
-      iOS Safari zooms in if font-size < 16px.
-      We use 16px explicitly, then scale via CSS transform
-      inside each component if needed.
-   */
+   /* input/select/textarea: iOS auto-zoom prevention (16px minimum)
+      Defined once here — earlier duplicate at line 55-59 removed. */
    input, textarea, select {
      font-size: 16px !important;
      touch-action: manipulation;
