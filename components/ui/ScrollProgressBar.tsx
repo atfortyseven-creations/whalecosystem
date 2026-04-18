@@ -33,7 +33,7 @@ export function ScrollProgressBar() {
     };
 
     const onScroll = (e: Event) => {
-      if (e.target && e.target instanceof HTMLElement && e.target !== document && e.target !== document.documentElement) {
+      if (e.target && e.target instanceof HTMLElement && e.target !== document.documentElement) {
           // If we detect an inner scroll container, track it
           if (e.target.scrollHeight > e.target.clientHeight) {
               scrollTarget = e.target;

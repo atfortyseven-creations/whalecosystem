@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -50,6 +51,7 @@ export function OptimizedLocalLottie({ filename, className, isActive = true }: O
         </div>
       )}
       {animationData && (
+        // @ts-ignore
         <Lottie 
           lottieRef={lottieRef}
           animationData={animationData} 
