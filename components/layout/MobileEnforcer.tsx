@@ -126,8 +126,23 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
     if (isMobile) {
-        // Allow rendering the dashboard natively on mobile
-        if (isConnected && pathname === '/dashboard') {
+        // ─── [DIRECT ACCESS ROUTES] ───────────────────────────────────────────
+        // Routes that must always render their own page regardless of connection
+        // state. Adding /news here is critical: the News Terminal handles its own
+        // auth/paywall internally — the MobileEnforcer must NOT intercept it.
+        const DIRECT_ACCESS_ROUTES = [
+            '/news',
+            '/dashboard',
+            '/connect',
+            '/docs',
+            '/faq',
+            '/ticket',
+            '/privacy',
+            '/terms',
+            '/legal',
+        ];
+        const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
+        if (isDirectAccessRoute) {
             return <>{children}</>;
         }
 
