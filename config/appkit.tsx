@@ -95,14 +95,14 @@ export const config = wagmiAdapter.wagmiConfig
 const queryClient = new QueryClient()
 
 // CRITICAL: URL must match exactly the domain registered in WalletConnect Cloud.
-// Using a fixed production URL prevents auth failures caused by localhost/preview mismatches.
-const APP_URL = 'https://www.humanidfi.com';
+// Using a dynamic URL prevents cross-origin popup blocks for Social Login when testing on localhost.
+const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Sovereign Institutional Intelligence',
     url: APP_URL,
-    icons: [`${APP_URL}/official-whale-legendary.png`],
+    icons: [`https://www.humanidfi.com/official-whale-legendary.png`],
 }
 
 // ── CRITICAL: createAppKit must be called at module level (not inside window check).
