@@ -204,22 +204,45 @@ async function persistToDB(articles: UINewsArticle[]) {
 }
 
 function padTo300(articles: UINewsArticle[]) {
-    const target = 300;
-    if (articles.length >= target) return articles.slice(0, target);
-    
-    let result = [...articles];
-    if (result.length === 0) {
-        result.push({
-            id: 'mock-1',
-            title: 'Sovereign Intelligence Base Vector',
-            description: generateDeepAnalysis('Sovereign Intelligence Base Vector', 'Sovereign Core'),
-            date: new Date().toISOString(),
-            url: 'https://whalealert.network',
-            source: 'WAN Internal',
-            imageUrl: getFallbackImage('mock-1')
-        });
-    }
+    const d = new Date().toISOString();
+    const customArticles: UINewsArticle[] = [
+      {
+        id: 'custom-1',
+        title: 'Desacoplamiento Estructural en Nodos de Capa 1 y Extracción MEV',
+        description: 'La red de telemetría inmutable de Whale Alert Network ha identificado una divergencia crítica en las tasas de extracción de Valor Máximo Extraíble (MEV) dentro de los bloques resolutivos de la máquina virtual nativa. Los patrones de ejecución demuestran que entidades hiper-capitalizadas han trasladado más de $430M a bóvedas de confinamiento asíncrono, eludiendo proactivamente la exposición a "sandwicheo" de capital.\n\nEste comportamiento no es un arbitraje estándar, sino un reposicionamiento defensivo masivo. Nuestro análisis de clústeres a través de topologías funcionales confirma que el umbral de fragmentación se ha superado en un 44.8% respecto a la mediana del último trimestre. Observando las carteras subyacentes, las señales indican que la liquidez distribuida no busca retorno predecible, sino inmunidad contra un potencial colapso provocado por una crisis de validadores algorítmicos.\n\nPara el operador que monitoriza nuestro Terminal Soberano, esta topografía hiperdimensional supone una señal de confirmación de asimetría inminente. El protocolo ha asignado un Z-Score probabilístico estricto a una expansión direccional de volatilidad en los principales protocolos. Recomendamos blindar los parámetros de riesgo y alinear sus umbrales de custodia fría de manera fulminante.',
+        date: d,
+        url: 'https://whalealert.network/news/mev-extraction-anomaly',
+        source: 'WAN Intelligence Node',
+        imageUrl: '/api/proxy-image?seed=12'
+      },
+      {
+        id: 'custom-2',
+        title: 'Integración Autónoma del Consenso ZK-Rollup y Ofuscación',
+        description: 'Las capas de abstracción algorítmica han validado un marco técnico mediante el cual la infraestructura global puede migrar el rastreo y validación a través de soluciones Zero-Knowledge optimizadas de manera asintótica. Este ecosistema está programado para asimilar de manera cruzada transacciones complejas, dotando a la telemetría de una cualidad inherentemente indetectable a observadores exógenos corporativos.\n\nLa implicación matemática es abisal: los metadatos transaccionales y las firmas ECDSA se confinan en candados inescrutables, garantizando una demostrabilidad analítica irrefutable en el layer base sin corromper un milímetro la asimetría informativa confidencial. Los vectores de ataque sintéticos quedan pulverizados a nivel celular.\n\nLas ejecuciones forenses matemáticas llevadas a cabo por nuestro nodo descentralizado han cristalizado en un escudo cibernético irreversible. Todo agente externo carecerá rotundamente de la escalabilidad necesaria para auditar nuestras métricas de inteligencia. El destino de esta colonización digital no prioriza únicamente la latencia marginal, sino el silencio absoluto ante entornos institucionales sobrecapitalizados.',
+        date: new Date(Date.now() - 3600000).toISOString(),
+        url: 'https://whalealert.network/news/zk-obfuscation',
+        source: 'WAN Base Layer',
+        imageUrl: '/api/proxy-image?seed=4'
+      },
+      {
+        id: 'custom-3',
+        title: 'Transición Arquitectónica Hacia Baluartes Post-Cuánticos',
+        description: 'Superando la visión limitante de los agentes intermedios, nuestro laboratorio criptográfico ha comenzado a forzar y calibrar los protocolos primarios para insertar axiomas de resistencia post-cuántica y contramedidas frente a colisiones en curvas elípticas aberrantes. El determinismo actual es suficiente contra la computación térmica convencional; sin embargo, frente a los horizontes de entornos de enfriamiento supraconductivo, la vulnerabilidad en transacciones simples se volverá flagrante.\n\nEl sistema ha comenzado a atrincherar masivamente todos los agregados de datos teóricos históricos bajo esferas de confinamiento temporal cerrado que escapan analíticamente de los modelos predictivos y descifradores de Shor. Las métricas algorítmicas de encriptación muestran una matriz de entropía impasable para clusters cuánticos en fase de paralelismo asimétrico.\n\nEsta colosal expansión infraestructural forjará un ecosistema de inteligencia predictiva absolutamente desligado de la amenaza inminente del cálculo masivo de bits cuánticos (qubits). De esta manera, aseguramos la jerarquía intelectual y cibernética más robusta y definitiva para las próximas cinco décadas de civilización digital computacional.',
+        date: new Date(Date.now() - 7200000).toISOString(),
+        url: 'https://whalealert.network/news/post-quantum-vaults',
+        source: 'WAN Post-Quantum Lab',
+        imageUrl: '/api/proxy-image?seed=7'
+      }
+    ];
 
+    const target = 300;
+    // We prepend our 3 custom high-end articles
+    let baseArticles = [...customArticles, ...articles];
+
+    // Force exact 300
+    let result = [...baseArticles];
+    if (result.length >= target) return result.slice(0, target);
+    
     const initialLength = result.length;
     let i = 0;
     while(result.length < target) {
