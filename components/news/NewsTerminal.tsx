@@ -182,12 +182,8 @@ export function NewsTerminal() {
 
   const panelH = `calc(100vh - ${HEADER_H}px)`;
 
-  // ── Pantalla: Carga ──────────────────────────────────────────────────────
-  if (loading) return (
-    <div style={{ background: BG, minHeight: panelH }}>
-      <WhaleAlertLoader bg={BG} color={TEXT} />
-    </div>
-  );
+  // ── Pantalla: Carga eliminada por petición ──────────────────────────────
+  // if (loading) return null;
 
   // ── Archive dates for sidebar ────────────────────────────────────────────
   const archiveDates = getArchiveDates();
@@ -459,13 +455,16 @@ export function NewsTerminal() {
                   </div>
 
                   {/* ANÁLISIS PRINCIPAL */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-6 max-w-[900px]">
+                  <div className="px-5 md:px-10 xl:px-16 pt-6 pb-12 max-w-[900px] w-full" style={{ overflowX: 'hidden' }}>
                       {/* ── Full content — access is open to all users ── */}
                       <div
-                        className="font-sans font-light tracking-wide leading-[1.9] space-y-5 opacity-85"
+                        lang="es"
+                        className="font-sans font-semibold tracking-wide leading-[1.8] space-y-5 opacity-90 text-[12px] md:text-[13px] text-justify"
                         style={{
-                          fontSize: `${0.82 * fontSize}rem`,
-                          color: 'rgba(10,10,10,0.85)',
+                          color: '#1a1a1a',
+                          wordBreak: 'break-word',
+                          hyphens: 'auto',
+                          WebkitHyphens: 'auto'
                         }}
                       >
                         {selected.description
@@ -473,22 +472,7 @@ export function NewsTerminal() {
                               <p key={i} className="mb-6">{p}</p>
                             ))
                           : (
-                              <div className="space-y-6">
-                                <p className="font-bold uppercase tracking-widest text-[10px] text-black">Technical Abstract & Zero-Mock Paradigm</p>
-                                <p>El ecosistema de activos digitales sufre de una asimetría de información intrínseca. La Network nace como un hub de grado institucional diseñado para absorber el caudal del mempool global, identificar movimientos de altísimo capital (Whales) antes de la resolución del bloque, y propagar una red P2P (mesh network) hacia un enjambre de clientes en milisegundos. Esta infraestructura elimina el retraso artificial y permite una toma de decisiones respaldada por Z-scores criptográficos.</p>
-                                
-                                <p><strong>Mandato Zero-Mock:</strong> Ningún componente de esta arquitectura inyecta visualizaciones falsas o datos simulados. El frontend Next.js se alimenta directamente de Redis Pub/Sub TCP con ECDSA real, garantizando inmutabilidad. Si una ballena transfiere 5,000 ETH en bloque, ese es el dato que llega a este hub en 400ms.</p>
-                                
-                                <p className="font-bold uppercase tracking-widest text-[10px] text-black pt-4">Data Processing & Sub-500ms Execution</p>
-                                <p>Mientras los agregadores clásicos dependen del sondeo o the Graph public queries, este enjambre implementa WebSockets paralelos con BullMQ Redis sobre PostgreSQL 1TB Node. Los workers de Capa 2 (Optimistic y ZK-Rollups) se indexan individualmente para mantener el orden cronológico a nivel de mempool.</p>
-                                
-                                <p><strong>Cryptographic Signature Fallback:</strong> La autenticación institucional móvil que ofrecemos no depende de contraseñas. Depende puramente de una firma criptográfica ECDSA de gas cero generada por la clave privada inyectada en WalletConnect o MetaMask, protegiendo todos los datos del terminal de accesos arbitrarios al aislar a los agentes sin estado.</p>
-                                
-                                <p className="font-bold uppercase tracking-widest text-[10px] text-black pt-4">Global Deployment & 2026 Roadmap</p>
-                                <p>Tras validar las métricas técnicas EIP-4844 de proto-danksharding, la red puede escalar el caudal a picos instantáneos sin requerir sharding de base de datos vertical. Los nodos se sostienen con integraciones directas EigenLayer AVS, dándole un peso económico real a la firma de las alertas antes de que se distribuyan a los clientes VIP.</p>
-
-                                <p>Los operadores de terminales ahora tienen la certeza definitiva de la precisión cronológica de la liquidez. A medida que expandimos la capacidad técnica a 10,000 workers distribuidos mundialmente, la latencia seguirá convergiendo matemáticamente hacia la frontera física de la topología de la fibra óptica internacional.</p>
-                              </div>
+                              <p>Sin contenido.</p>
                             )
                         }
                       </div>

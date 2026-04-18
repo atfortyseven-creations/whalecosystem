@@ -6,53 +6,35 @@ import { Scan } from "lucide-react";
 
 const IMMERSIVE_PAGES = [
   {
-    title: "I. The Sovereign Intelligence Protocol",
+    title: "I. Telemetría de Capa Base y Extracción Determinística",
     paragraphs: [
-      "The Whale Alert Network operates as a decentralized, cryptographic intelligence protocol. We do not rely on third-party APIs or delayed indexers. Instead, the system interfaces directly with the EVM via zero-latency web-sockets, reading the thermodynamic exhaust of every transaction as it is minted into the blockchain.",
-      "Traditional financial markets operate in the dark, where massive liquidity movements are obfuscated by prime brokers and OTC desks. The blockchain, however, is a panopticon of absolute truth. By capturing the state-changes of targeted smart contracts, we expose the underlying strategies of hyper-capitalized entities—the Whales.",
-      "This protocol provides an asymmetric advantage. It parses raw hexadecimal calldata, decrypts router paths, and translates complex decentralized exchange interactions into human-readable tactical alerts. You are no longer trading against the market; you are trading alongside the architectural designers of liquidity itself."
+      "La red opera intrínsecamente como un panóptico descentralizado sobre el protocolo de consenso. Renunciando a dependencias exógenas y a indexadores de alta latencia, el núcleo troncal se amalgama a la base criptográfica de la máquina virtual nativa. Establecemos conexiones en un nivel de zócalo web de latencia cero, absorbiendo cada trazo termodinámico de las transacciones en el preciso instante en que la mempool las consolida. Prescindimos de abstracciones de intermediarios para consumir directamente el calldata crudo codificado en secuencias puramente hexadecimales.",
+      "A través de heurísticas formales de multidimensionalidad algorítmica, nuestro motor deductivo desvela los flujos ofuscados que transitan entre puentes cruzados y bóvedas en la sombra. Esto transciende la simple medición del volumen termodinámico observable; la infraestructura interroga activamente las mutaciones de estado para abstraer la genuina intencionalidad computacional. Correlacionando la entropía geométrica de los sumideros de recepción, dictaminamos la diferencia fundamental entre diversificaciones rutinarias y la consolidación de asedios por entidades hiper-estructuradas.",
+      "Cada exhalación paramétrica que distorsiona nuestros intervalos estáticos genera coeficientes de ponderación inexorables. La evaluación sistémica no consiste en el simple trazado de proyecciones probables, sino en ejecuciones forenses matemáticas de autopsias predictivas, orquestadas y resueltas a ráfagas continuas de doscientos cuarenta nanosegundos analíticos por ciclo métrico del motor base."
     ]
   },
   {
-    title: "II. Algorithmic Topography and Pattern Recognition",
+    title: "II. Validadores de Conocimiento Cero y Árboles Inmutables",
     paragraphs: [
-      "Our heuristics engine does not merely track volume; it tracks intention. By employing a multi-layered behavioral analysis model, the system differentiates between routine wallet structuring and aggressive, market-making accumulation.",
-      "When a targeted entity initiates a transfer exceeding our dynamic thresholds (typically >$10M USD equivalent), the network calculates the velocity and destination entropy. Is the capital moving to cold storage for long-term dormancy, or is it entering a recognized centralized exchange ingest wallet to provide immediate sell pressure?",
-      "The AI layer assigns a confidence score to every movement. A '99.9% MAX' confidence indicates a pattern match with historical market-moving events. This is not predictive text; this is cryptographic forensics happening in real-time, 240 times per second."
+      "El modelo de intercesión algorítmica destierra categóricamente las premisas laxas de los sistemas analíticos públicos, operando en dominios exclusivamente criptográficos. Las atestiguaciones asíncronas exigen una verificación matemática prístina: pruebas integrales de conocimiento cero (ZK-SNARKs). Este paradigma valida proposiciones booleanas y condiciones operativas puras sin vulnerar la opacidad del canal subyacente. Tal infraestructura anula drásticamente la propensión a la corrosión estadística provocada por inyecciones y manipulaciones externas.",
+      "Dentro de este estrato abstracto e inescrutable se aloja el Registro Algorítmico Funcional, un baluarte hermético ensamblado en secuencias de Merkle jerarquizadas. Todas las alteraciones sistémicas, las anomalías topológicas y las trazas asimétricas quedan incrustadas en hashes irrevocables y perpetuamente trazables mediante derivaciones formales algorítmicas. La robustez técnica de nuestra compilación fáctica asegura una infalibilidad criptográfica absoluta.",
+      "Nos desligamos completamente de los mecanismos de confianza tradicionales vulnerables; nuestra garantía de precisión no emana de la reputación humana, sino del determinismo algorítmico distribuido inmutable. Uniendo los protocolos matemáticos más prístinos disponibles, cristalizamos un perímetro de ingestión en la gran red que funciona como un observatorio impenetrable e inmarcesible, absolutamente aislado de la volatilidad emocional."
     ]
   },
   {
-    title: "III. Zero-Knowledge Clearance and The Vault",
+    title: "III. Expansión Autónoma y Soberanía Inter-Cadena",
     paragraphs: [
-      "Access to this telemetry requires sovereign identity. You do not 'sign up' for the Whale Alert Network; you cryptographically prove your authorization. By connecting your Web3 wallet, you are generating a localized signature that the system verifies without ever exposing your private keys.",
-      "Once inside, the Terminal unlocks the 'Event Ledger' and the 'Global Consensus' modules. The Event Ledger acts as an immutable diary of anomalies, while the Global Consul aggregates localized sentiment from other sovereign nodes in the network.",
-      "This architecture guarantees that the intelligence you receive is unfiltered and uncorrupted. Institutional players spend millions to acquire a fraction of the visibility provided by this terminal. You are now wielding the same Panopticon."
+      "La directiva evolutiva concebida en la arquitectura de génesis encamina a la superestructura hacia una hibridación autónoma con frameworks de abstrusión inter-cadena inexplorables. Priorizamos converger paramétricamente con ecosistemas subyacentes de agregación cero, con la intención primordial de ofuscar exhaustivamente cualquier rúbrica operativa generada por la comunicación de los procesos observadores, instaurando invisibilidad técnica con máxima fidelidad determinista.",
+      "Desbordando los horizontes contemporáneos del cálculo polinómico, el cianotipo base de nuestra arquitectura de ingestión está siendo re-instrumentado para integrar primitivas de resistencia post-cuántica y curvas elípticas aberrantes. Codificamos los agregados de datos teóricos bajo dominios de confinamiento temporal asíncrono que son matemáticamente impenetrables frente al descifrado de algoritmos de Shor y a la desfragmentación entrópica ejecutada por topologías supraconductivas.",
+      "A medida que avanzamos hacia este vector, garantizamos implícitamente el axioma fundador de soberanía infraestructural, blindando los cimientos de la red analítica como una fortaleza hiperdimensional a un nivel abisal. El objetivo supremo no descansa en atenuar superficialmente los vectores de ataque contemporáneos, sino en invalidar algorítmicamente la viabilidad misma de la interceptación matemática externa en las inminentes eras del dominio cuántico digital."
     ]
   },
   {
-    title: "IV. Terminal Operation and Tactical Execution",
+    title: "IV. Neuralidad Predictiva Abisal y Filtrado Máximo",
     paragraphs: [
-      "The aesthetic of the terminal is intentionally austere. It is designed for maximum signal-to-noise ratio. There are no distracting gamification elements; only pure data stream and execution vectors. Your Dashboard is a command center for cryptographic warfare.",
-      "Live Telemetry streams the raw pulse of the network. Sovereign Intel filters this pulse into actionable briefings. And Cold Storage provides visibility into the silent fortresses where true wealth is quarantined.",
-      "Verify everything. Trust nothing but the chain. The execution of your sovereign strategy begins the moment you interpret the topography. Welcome to the baseline reality of modern finance."
-    ]
-  },
-  {
-    title: "V. Architectural Synergy & Future Integrations",
-    paragraphs: [
-      "The protocol is autonomously expanding its cryptographic perimeter through Zero-Knowledge Rollup integrations. By interfacing natively with the Aztec Network, the subsequent iteration of our heuristics framework will guarantee absolute transactional obfuscation for client metadata. Your execution vectors will operate under strict privacy shields while preserving mathematical provability on-chain.",
-      "Beyond standard EVM constraints, the intelligence terminal is laying the infrastructural bedrock for Quantum-Resistant cold vaults. Upcoming protocol deployments will embed post-quantum cryptographic primitives, designed to secure our decentralized data streams against theoretical decryption vectors and ensure your institutional edge remains impenetrable.",
-      "Crucially, the aggregation engine is preparing to natively fuse with Decentralized Prediction Markets. By orchestrating a direct on-chain synchronization with Polymarket oracles, the dashboard will continuously cross-reference predictive human sentiment with rigid liquidation algorithms. You will not merely observe where capital is resting, but probabilistically model exactly where the thermodynamic exhaust is destined to flow."
-    ]
-  },
-  {
-    title: "VI. Horizon Protocols & Ecosystem Expansion",
-    paragraphs: [
-      "Intent-Centric Architecture & Sovereign Solvers: Moving beyond direct transactional construction, the intelligence matrix is adapting to ingest intent-based algorithmic flows. By tracking solver competitions across aggregated cross-chain liquidity networks, the system will decipher complex, multi-hop atomic swaps before they finalize on the execution layer, granting unprecedented foresight into institutional cross-chain maneuvers.",
-      "Non-Linear Graph Neural Network Topography: Standard heuristics will be augmented by deploying advanced Graph Neural Networks (GNNs) across state maps. This allows the system to autonomously identify obfuscated dark pools and sybil-managed wallet clusters, extracting deterministic correlations from seemingly chaotic, disconnected token distributions among thousands of ephemeral proxy wallets.",
-      "MEV-Share and Dark Forest Navigation Protocols: To weaponize the terminal against adversarial blockchain dynamics, integration with Maximal Extractable Value (MEV) shielding infrastructure is imminent. Execution vectors will be routed through private mempools and MEV-share networks, immunizing sovereign capital against front-running while programmatically recapturing execution rebates generated by sophisticated searcher operations.",
-      "Restaking Primitives & Sovereign Economic Security: The terminal's consensus mechanisms will natively interface with liquid restaking architectures, particularly within the EigenLayer ecosystem. By tracking Actively Validated Services (AVS) slashing conditions and restaked liquidity flows, the platform will offer profound visibility into the systemic risk and cascading collateralization dynamics underpinning the broader cryptographic economy.",
-      "Hyper-Parallel State Matrix Telemetry: In preparation for next-generation execution environments, the engine is scaling its ingestion node infrastructure to support hyper-parallelized virtual machines like Monad and the SVM. Real-time telemetry will synchronize concurrent state-transitions across millions of parallelized operations, ensuring our sovereign intelligence grid remains absolute and latency-free regardless of underlying computational throughput."
+      "Nuestra concepción topológica final incuba sin retorno un subsistema matricial abisal configurado en torno a arquitecturas de Graph Neural Networks (GNN). Esta inyección arquitectónica habilita autónomamente al núcleo cognitivo para tejer cartografías completas sobre agrupaciones inescrutables de firmas oscuras. Subyugando a las redes de nodos subyacentes e inferiendo su estructura celular original determinista, el ensamblador lógico pulveriza con precisión la entropía de los clusters estocásticos.",
+      "Estando pertrechados y preparados para subsumir la fricción letal de los mecanismos de Valor Máximo Extraíble (MEV), nuestros conductos base canalizan toda la lógica deductiva por subsistemas totalmente apartados del mempool primario. Esta convergencia técnica y asilamiento criptográfico mitiga algorítmicamente la fagocitación parasitaria de datos, estabilizando permanentemente nuestros canales métricos y aislando la asimetría sistémica contra las maquinaciones caníbales de los bots competidores en épocas de distorsión líquida.",
+      "Como manifestación incontestable de trascendencia digital matemática, el pináculo evolutivo disecciona y amalgama sus funciones deductivas con las infraestructuras modulares de validadores fraccionados (Liquid Restaking). Esta hibridación hiperespacial nos confiere, como protocolo maestro, las facultades de desglosar instantáneamente las cascadas regresivas del consenso central de la red global inmutada, consolidando el arma criptográfica analítica incontestable para el futuro."
     ]
   }
 ];
@@ -76,79 +58,100 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
       {/* Top Bar Editorial Style */}
       <div className="sticky top-0 z-50 w-full bg-[#FDFCF8]/90 backdrop-blur-md border-b border-[#e8e5de] py-4 px-8 flex justify-between items-center">
         <div className="font-mono text-[9px] uppercase tracking-[0.3em] font-bold text-black border border-black/20 px-3 py-1 bg-white">
-          Sovereign Clearance Confirmed
+          © 2026 atfortyseven-creations
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden sm:block font-mono text-[10px] tracking-widest text-black/50 uppercase">
             Whale Alert Network // System Architecture Manual
           </div>
-          {onOpenScanner && (
-            <button onClick={onOpenScanner} className="px-4 py-2 bg-[#050505] text-white font-mono text-[10px] uppercase tracking-widest hover:bg-[#222] active:scale-95 transition-all shadow-sm flex items-center gap-2 rounded-lg">
-               <Scan size={13} />
-               Session Log & Scan
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {onOpenScanner && (
+              <button onClick={onOpenScanner} className="px-4 py-2 bg-[#050505] text-white font-mono text-[10px] uppercase tracking-widest hover:bg-[#222] active:scale-95 transition-all shadow-sm flex items-center gap-2 rounded-lg">
+                 <Scan size={13} />
+                 Session Log & Scan
+              </button>
+            )}
+            <a href="https://www.humanidfi.com/news" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-[#F1F0EA] border border-black/10 text-black font-mono text-[10px] uppercase tracking-widest hover:bg-[#e4e2d8] active:scale-95 transition-all shadow-sm flex items-center gap-2 rounded-lg">
+              News Terminal
+            </a>
+          </div>
         </div>
       </div>
 
-      <main className="max-w-[760px] mx-auto px-6 py-24 flex flex-col gap-32">
+      <main className="max-w-[850px] mx-auto px-6 py-24 flex flex-col gap-24">
         
-        <header className="flex flex-col gap-6 text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-serif text-black leading-tight">
-            The Architecture of <br/><span className="italic">Total Visibility</span>
+        <header className="flex flex-col gap-6 text-center mb-8">
+          <h1 className="text-[32px] md:text-[42px] font-serif text-black leading-tight tracking-tight">
+            La Visión Arquitectónica de <br/><span className="italic font-light">Supremacía Algorítmica</span>
           </h1>
-          <p className="font-serif text-lg text-[#555] max-w-lg mx-auto">
-            A comprehensive overview of the cryptographic mechanisms and behavioral heuristics powering the network.
+          <p className="font-serif text-[13px] text-[#444] max-w-xl mx-auto leading-relaxed border-t border-b border-black/10 py-6">
+            Documento fundacional sobre la abstracción matemática pura, los mecanismos criptográficos de 
+            conocimiento cero y los paradigmas heurísticos deterministas que cimentan la infraestructura global inmutable.
           </p>
-          <div className="w-12 h-[1px] bg-black/20 mx-auto mt-6" />
         </header>
 
-        {IMMERSIVE_PAGES.map((page, pageIndex) => (
-          <section key={pageIndex} className="flex flex-col gap-8 relative">
-            <h2 className="text-xl font-bold font-sans tracking-wide uppercase text-black">
-              {page.title}
-            </h2>
-            
-            <div className="flex flex-col gap-6 relative">
-              {page.paragraphs.map((para, pIndex) => {
-                 // Distribute available lotties across the paragraphs
-                 const globalIndex = (pageIndex * 3) + pIndex;
-                 const lottieFile = lotties[globalIndex % Math.max(lotties.length, 1)];
+        <div className="flex flex-col gap-16">
+          {IMMERSIVE_PAGES.map((page, pageIndex) => (
+            <section key={pageIndex} className="flex flex-col relative w-full">
+              <div className="w-full border-b-[1.5px] border-black pb-3 mb-6 flex items-end">
+                <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
+                  {page.title}
+                </h2>
+              </div>
+              
+              {/* Stack Data Grid - Dense and tightly packed */}
+              <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
+                {page.paragraphs.map((para, pIndex) => {
+                   const globalIndex = (pageIndex * 3) + pIndex;
+                   const lottieFile = lotties[globalIndex % Math.max(lotties.length, 1)];
 
-                 return (
-                   <div key={pIndex} className="relative group text-justify leading-relaxed flex flex-col gap-10">
-                     {/* Centered large lottie if available (Unrestricted for maximum immersion) */}
-                     {lottieFile && lotties.length > 0 && (
-                       <div className="w-full flex justify-center py-4">
-                         <div className="w-full max-w-[450px] aspect-square grayscale contrast-125 opacity-80 mix-blend-multiply transition-all duration-700 hover:grayscale-0 hover:opacity-100">
-                           <OptimizedLocalLottie filename={lottieFile} />
-                         </div>
+                   return (
+                     <div key={pIndex} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden">
+                       
+                       {/* Lottie fixed block on the left (solid stack integration) */}
+                       <div className="w-full sm:w-[140px] bg-[#f5f4ef] flex items-center justify-center p-4 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 group-hover:bg-[#f0efe9]">
+                          {lottieFile && lotties.length > 0 && (
+                             <div className="w-[100px] h-[100px] grayscale mix-blend-multiply opacity-85 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
+                                <OptimizedLocalLottie filename={lottieFile} />
+                             </div>
+                          )}
+                          <div className="absolute top-2 left-2 text-[8px] font-mono opacity-20 select-none">
+                            SEC-{pageIndex + 1}.{pIndex + 1}
+                          </div>
                        </div>
-                     )}
-                     
-                     <p className="font-serif text-[17px] text-[#222]">
-                        <span className="font-mono text-[10px] text-[#999] tracking-widest mr-4 select-none">
-                           {String(pageIndex + 1).padStart(2, '0')}.{String(pIndex + 1).padStart(2, '0')}
-                        </span>
-                        {para}
-                     </p>
-                   </div>
-                 );
-              })}
-            </div>
-            
-            {/* Elegant section divider */}
-            <div className="w-full flex justify-center mt-12 opacity-30">
-               <span className="font-mono text-[10px] tracking-[0.5em]">• • •</span>
-            </div>
-          </section>
-        ))}
+                       
+                       {/* Text Content */}
+                       <div className="flex-1 p-6 md:p-8 flex items-start">
+                          <span className="font-mono text-[10px] text-black/30 tracking-widest mr-4 sm:mr-6 select-none flex-shrink-0 mt-[2px]">
+                             [{String(pageIndex + 1).padStart(2, '0')}.{String(pIndex + 1).padStart(2, '0')}]
+                          </span>
+                          <p className="font-serif text-[12px] sm:text-[13px] text-[#222] leading-[1.8] text-justify w-full">
+                             {para}
+                          </p>
+                       </div>
 
-        {/* Floating enter dashboard CTA at the bottom */}
-        <div className="fixed bottom-0 left-0 w-full p-8 flex justify-center pointer-events-none z-50 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/80 to-transparent">
-           <a href="/dashboard" className="pointer-events-auto px-8 py-3 bg-black text-white font-mono text-[11px] uppercase tracking-widest hover:bg-[#222] transition-colors shadow-2xl">
-              Proceed to Command Center
-           </a>
+                     </div>
+                   );
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        {/* Dense geometric footer mark */}
+        <div className="w-full flex flex-col items-center mt-12 mb-32 opacity-80 gap-3">
+           <div className="w-16 h-[1px] bg-black" />
+           <span className="font-mono text-[8px] tracking-[0.4em] uppercase">Fin del Tratado Algorítmico</span>
+        </div>
+
+        {/* Clean, institutional CTA */}
+        <div className="fixed bottom-0 left-0 w-full p-0 flex flex-col pointer-events-none z-50">
+           <div className="h-24 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full" />
+           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-4">
+             <a href="/dashboard" className="pointer-events-auto px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors">
+                Proceder al Nodo de Ejecución
+             </a>
+           </div>
         </div>
       </main>
     </div>
