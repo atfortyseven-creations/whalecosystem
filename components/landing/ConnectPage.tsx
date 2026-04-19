@@ -15,7 +15,7 @@ import {
 import dynamic from "next/dynamic";
 
 // QR code renderer using qrcode.react
-const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), {
+const QRCode = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), {
   ssr: false,
   loading: () => (
     <div className="w-[200px] h-[200px] flex items-center justify-center">
