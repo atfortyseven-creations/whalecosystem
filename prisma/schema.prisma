@@ -719,3 +719,34 @@ model UserPrivacyProfile {
   updatedAt              DateTime @updatedAt
   createdAt              DateTime @default(now())
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AKASHIC COSMIC FORGE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CosmicEntity {
+  id              String   @id @default(uuid())
+  seedHash        String   @unique          // SHA-256 del evento whale origen
+  whaleEventId    String?                   // FK a GlobalWhaleEvent
+  tier            String                    // NARWHAL | KRAKEN | LEVIATHAN | MEGALODON
+  amountUSD       Float
+  chain           String
+  generatorType   String                    // COSMIC_ART | LIVING_MUSIC | AUTO_CONTRACT | WORLD_SIM | BIOTECH_DNA | HIVE_AGENT | RECURSIVE_SUBFORGE
+  status          String   @default("DORMANT") // DORMANT | ACTIVE | HIBERNATING | EXTINCT | MERGED
+  artMetadata     Json?                     // { prompt, style, colorSeed, shaderParams }
+  musicMetadata   Json?                     // { bpm, scale, waveform, key }
+  biotechMetadata Json?                     // { dnaSequence, traits }
+  worldSimMetadata Json?                    // { populationSeed, resources, entropy, gridSize }
+  agentMetadata   Json?                     // { observerMode, targetChains, maxSlippageThreshold }
+  contractAddress String?                   // Solo si se deployó un CosmicSoulERC1155
+  hiveEnergyAtBirth Float  @default(0)
+  evolutionCount  Int      @default(0)
+  parentEntityId  String?                   // Para sub-forges recursivos
+  beneficiaryAddr String?                   // Dead Man's Switch legado
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([tier, amountUSD(sort: Desc)])
+  @@index([chain, createdAt(sort: Desc)])
+}

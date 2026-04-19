@@ -217,11 +217,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
                    const lottieFile = MANIFESTO_LOTTIES[globalIndex % MANIFESTO_LOTTIES.length];
 
                    return (
-                     <div key={pIndex} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden">
+                     <div key={pIndex} tabIndex={0} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden focus:outline-none cursor-pointer">
                        
                        {/* Lottie fixed block on the left (solid stack integration) */}
-                       <div className="w-full sm:w-[240px] bg-[#f5f4ef] flex items-center justify-center p-8 sm:p-6 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 hover:bg-[#f0efe9] sm:group-hover:bg-[#f0efe9]">
-                          <div className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] grayscale mix-blend-multiply opacity-85 transition-transform duration-700 sm:group-hover:grayscale-0 sm:group-hover:opacity-100 sm:group-hover:scale-105">
+                       <div className="w-full sm:w-[240px] bg-[#f5f4ef] flex items-center justify-center p-8 sm:p-6 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 group-hover:bg-[#f0efe9]">
+                          <div className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] grayscale mix-blend-multiply opacity-85 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
                              <OptimizedLocalLottie filename={lottieFile} />
                           </div>
                           <div className="absolute top-3 left-3 text-[9px] font-mono opacity-20 select-none">

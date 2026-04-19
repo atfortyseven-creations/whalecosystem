@@ -44,6 +44,10 @@ const BRCExplorerShell = dynamic(
   () => import('@/components/bsv/BRCExplorerShell'),
   { ssr: false }
 );
+const CosmicForgePanel = dynamic(
+  () => import('@/components/forge/CosmicForgePanel').then(m => m.CosmicForgePanel),
+  { ssr: false }
+);
 
 import "@/app/dashboard/dashboard.css";
 
@@ -70,6 +74,7 @@ type TabId =
     | 'polymarket'
     | 'academy'
     | 'support'
+    | 'cosmic-forge'
     | 'session-logs';
 
 export default function WhaleDashboard() {
@@ -105,6 +110,7 @@ export default function WhaleDashboard() {
               : activeTab === 'session-logs'          ? <DashboardErrorBoundary key="session-logs">    <SessionLogsPanel />             </DashboardErrorBoundary>
               : activeTab === 'academy'               ? <DashboardErrorBoundary key="academy">         <WhaleAcademy />                 </DashboardErrorBoundary>
               : activeTab === 'support'               ? <DashboardErrorBoundary key="support">         <WhaleSupport />                 </DashboardErrorBoundary>
+              : activeTab === 'cosmic-forge'          ? <DashboardErrorBoundary key="cosmic-forge">    <CosmicForgePanel />             </DashboardErrorBoundary>
               : null
             }
         </WhaleProShell>

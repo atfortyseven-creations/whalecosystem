@@ -50,6 +50,18 @@ body {
   overscroll-behavior: none;
 }
 
+/* ── STRICT DESKTOP SCROLL BLEED LOCK ── */
+body.ios-scroll-lock-strict {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
 /* ── BOUNDED VIEWPORT SEAL ────────────────────────────────────────────────────
    When ClientLayout is in "bounded" mode, the root div has h-[100dvh] and the
    main tag is the scroll container. We must ensure nothing inside that tree

@@ -47,6 +47,7 @@ const QR_STYLES = `
   }
   #qr-reader__dashboard_section_csr button:hover { background: rgba(0,0,0,0.8) !important; }
   #qr-reader img { display: none !important; }
+  #qr-reader__scan_region svg { display: none !important; opacity: 0; }
   #qr-reader__dashboard_section { padding: 10px !important; }
   #qr-reader__dashboard_section_csr { padding-top: 10px !important; }
   #qr-reader video { border-radius: 12px !important; }
@@ -101,7 +102,7 @@ function ScanLine({ active }: { active: boolean }) {
       style={{
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, -50%)',
+        transform: 'translate(-50%, calc(-50% - 40px))',
         width: VIEWFINDER_SIZE,
         height: VIEWFINDER_SIZE,
         zIndex: 20,

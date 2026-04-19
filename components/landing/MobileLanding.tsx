@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
@@ -327,6 +328,8 @@ function ConnectedScreen({
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export function MobileLanding() {
+  const searchParams = useSearchParams();
+  const sessionParam = searchParams?.get('session');
 
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
@@ -404,6 +407,29 @@ export function MobileLanding() {
       setIsSigning(false);
     }
   }, [address, signMessageAsync]);
+
+  // ── Auto-fulfill PC terminal session if opened via native camera scan ───────
+  useEffect(() => {
+    if (isLinked && address && sessionParam) {
+      const fulfilledKey = `fulfilled_session_${sessionParam}`;
+      if (sessionStorage.getItem(fulfilledKey)) return;
+
+      fetch(`/api/auth/qr-session?id=${sessionParam}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address })
+      }).then(res => {
+         if(res.ok) {
+           sessionStorage.setItem(fulfilledKey, 'true');
+           const toast = document.createElement('div');
+           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+           toast.textContent = '✓ Terminal PC Desbloqueado';
+           document.body.appendChild(toast);
+           setTimeout(() => toast.remove(), 4000);
+         }
+      }).catch(() => {});
+    }
+  }, [isLinked, address, sessionParam]);
 
   // ── WalletConnect v2 deep-link (THE CRITICAL FIX) ──────────────────────────
   //

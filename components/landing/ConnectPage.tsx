@@ -1,238 +1,430 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useConnect } from "wagmi";
 import { useRouter } from "next/navigation";
-import { 
-  ArrowRight, 
-  Loader2, 
-  Twitter, 
-  Fingerprint, 
-  ChevronRight,
-  Github
+import {
+  ArrowRight,
+  Loader2,
+  Twitter,
+  Fingerprint,
+  Github,
+  CheckCircle,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useAppKit } from "@reown/appkit/react";
-import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 
 // QR code renderer using qrcode.react
-const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), { ssr: false });
+const QRCode = dynamic(() => import("qrcode.react").then((m) => m.QRCodeSVG), {
+  ssr: false,
+  loading: () => (
+    <div className="w-[200px] h-[200px] flex items-center justify-center">
+      <Loader2 size={32} className="animate-spin text-black/10" />
+    </div>
+  ),
+});
 
-function WalletButton({ logo, name, badge, onClick, loading, delay = 0 }: any) {
+// ─── Wallet option button ─────────────────────────────────────────────────────
+function WalletButton({
+  logo,
+  name,
+  badge,
+  onClick,
+  loading = false,
+  delay = 0,
+}: {
+  logo: string;
+  name: string;
+  badge: string;
+  onClick: () => void;
+  loading?: boolean;
+  delay?: number;
+}) {
   return (
     <motion.button
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
+      transition={{ delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       onClick={loading ? undefined : onClick}
-      className="group relative w-full flex items-center gap-4 p-5 bg-[#FAF9F6] hover:bg-white border border-black/[0.03] hover:border-black/10 rounded-[28px] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-0.5 text-[#050505]"
+      disabled={loading}
+      className="group relative w-full flex items-center gap-4 p-5 bg-[#FAF9F6] hover:bg-white border border-black/[0.06] hover:border-black/12 rounded-[24px] transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-0.5 text-[#050505] disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      <div className="w-12 h-12 rounded-2xl bg-white border border-black/5 flex items-center justify-center p-2.5 shadow-sm group-hover:scale-105 transition-transform duration-500">
-        <img src={logo} alt={name} className="w-full h-full object-contain" />
+      <div className="w-11 h-11 rounded-xl bg-white border border-black/5 flex items-center justify-center p-2 shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0">
+        <img
+          src={logo}
+          alt={name}
+          className="w-full h-full object-contain"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
       </div>
-      <div className="flex-1 text-left">
-        <p className="text-[13px] font-black uppercase tracking-tight">{name}</p>
-        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5">{badge}</p>
+      <div className="flex-1 text-left min-w-0">
+        <p className="text-[13px] font-black uppercase tracking-tight truncate">
+          {loading ? "Connecting…" : name}
+        </p>
+        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5 truncate">
+          {badge}
+        </p>
       </div>
-      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
+      {loading ? (
+        <Loader2 size={14} className="animate-spin text-black/30 shrink-0" />
+      ) : (
+        <ArrowRight
+          size={14}
+          className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0"
+        />
+      )}
     </motion.button>
   );
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function ConnectPage() {
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { connect, connectors, isPending } = useConnect();
-  const { open: openAppKit } = useAppKit();
 
   const [mounted, setMounted] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
-  const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">("IDLE");
+  const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">(
+    "IDLE"
+  );
 
-  useEffect(() => { setMounted(true); }, []);
+  // Mount guard
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
+  // ── Generate QR session ───────────────────────────────────────────────────
   const fetchSession = useCallback(async () => {
     try {
       setSyncStatus("AWAITING");
       const res = await fetch("/api/auth/qr-session", { method: "POST" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.sessionId) setQrSession(data.sessionId);
-    } catch (e) { console.error("[AUTH] Handshake Error:", e); }
+    } catch (e) {
+      console.error("[ConnectPage] Handshake fetch error:", e);
+      setSyncStatus("IDLE");
+    }
   }, []);
 
-  useEffect(() => { if (!qrSession) fetchSession(); }, [qrSession, fetchSession]);
+  useEffect(() => {
+    if (!qrSession) fetchSession();
+  }, [qrSession, fetchSession]);
 
+  // ── Poll for QR scan completion ───────────────────────────────────────────
   useEffect(() => {
     if (!qrSession || syncStatus === "SYNCED") return;
     const bridge = setInterval(async () => {
       try {
         const res = await fetch(`/api/auth/qr-session?id=${qrSession}`);
+        if (!res.ok) return;
         const data = await res.json();
-        if (data.status === 'complete' && data.address) {
+        if (data.status === "complete" && data.address) {
           setSyncStatus("SYNCED");
           clearInterval(bridge);
-          setTimeout(() => {
-            document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
-            router.replace("/");
-          }, 1200);
+          document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
+          setTimeout(() => router.replace("/"), 1200);
         }
-      } catch (e) {}
+      } catch {}
     }, 2000);
     return () => clearInterval(bridge);
   }, [qrSession, syncStatus, router]);
 
+  // ── Auto-redirect when wallet connected ──────────────────────────────────
   useEffect(() => {
-    if (isConnected && mounted) {
-      if (!document.cookie.includes("sovereign_handshake=")) {
-         // Generar una firma pasiva a partir de su dirección en la wallet, pero como
-         // wagmi no me expone let address en este scope local, simplemente marco la cookie genérica Web3
-         document.cookie = `sovereign_handshake=web3_injected; path=/; max-age=604800; SameSite=Lax`;
-      }
-      setTimeout(() => {
-         router.replace("/");
-      }, 500);
+    if (!mounted || !isConnected) return;
+    if (!document.cookie.includes("sovereign_handshake=")) {
+      const addrToSave = address || "web3_injected";
+      document.cookie = `sovereign_handshake=${addrToSave}; path=/; max-age=604800; SameSite=Lax`;
     }
-  }, [isConnected, mounted, router]);
+    const t = setTimeout(() => router.replace("/"), 500);
+    return () => clearTimeout(t);
+  }, [isConnected, mounted, router, address]);
 
-  const handleConnector = (id: string) => {
-    const connector = connectors.find(c => c.id === id || c.name.toLowerCase().includes(id));
-    if (connector) connect({ connector });
-    else openAppKit({ view: 'Connect' });
-  };
+  // ── Connector handler — safe, no useAppKit dependency ────────────────────
+  const handleConnector = useCallback(
+    (id: string) => {
+      const connector = connectors.find(
+        (c) => c.id === id || c.name.toLowerCase().includes(id.toLowerCase())
+      );
+      if (connector) {
+        connect({ connector });
+      } else {
+        // Fallback: try first available connector
+        const fallback = connectors[0];
+        if (fallback) connect({ connector: fallback });
+      }
+    },
+    [connect, connectors]
+  );
 
-  const qrUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/connect?session=${qrSession ?? ""}`
-    : "";
+  // Build QR URL — only after mount so window is available
+  const qrUrl =
+    mounted && typeof window !== "undefined"
+      ? `${window.location.origin}/connect?session=${qrSession ?? ""}`
+      : "";
 
-  if (!mounted) return null;
-
+  // ── Render: show a skeleton background whilst mounting ───────────────────
   return (
-    <div className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white">
-      {/* Background Waves - "Hokusai" - Absolute Bottom */}
-      <div 
-        className="fixed bottom-0 left-0 right-0 h-[40vh] pointer-events-none opacity-100 mix-blend-darken z-0"
+    <div
+      className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white"
+      style={{ zIndex: 10 }}
+    >
+      {/* Background — Hokusai wave */}
+      <div
+        className="fixed bottom-0 left-0 right-0 h-[40vh] pointer-events-none z-0"
         style={{
           backgroundImage: "url('/olas-hokusai-4k.png')",
           backgroundSize: "auto 100%",
           backgroundPosition: "bottom center",
-          backgroundRepeat: "repeat-x"
+          backgroundRepeat: "repeat-x",
+          opacity: 0.08,
         }}
       />
-      
-      <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-4">
-           <img src="/official-whale-monochrome.png" className="w-8 h-8" alt="Whale" />
-           <div className="flex flex-col leading-none">
-              <span className="text-[15px] font-black uppercase tracking-tighter">Whale Alert Network</span>
-           </div>
+
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <header className="relative z-[100] h-[64px] flex items-center justify-between px-6 md:px-10 border-b border-black/[0.06] bg-white/80 backdrop-blur-xl shrink-0">
+        <div className="flex items-center gap-3">
+          <img
+            src="/official-whale-monochrome.png"
+            className="w-7 h-7"
+            alt="Whale"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+          <span className="text-[14px] font-black uppercase tracking-tighter">
+            Whale Alert Network
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[8px] font-mono text-black/30 uppercase tracking-widest hidden sm:block">
+            Sovereign Access Protocol
+          </span>
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         </div>
       </header>
 
-      <main className="flex-1 relative z-10 flex items-center justify-center p-6 lg:p-12">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
-          animate={{ opacity: 1, scale: 1.09, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 rounded-[40px] border border-black/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)] overflow-hidden"
+      {/* ── Main content ─────────────────────────────────────────────────── */}
+      <main className="flex-1 relative z-10 flex items-center justify-center p-4 md:p-8 lg:p-12">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 rounded-[36px] border border-black/10 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.10)] overflow-hidden"
         >
-            <div className="relative p-12 lg:p-16 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/20">
-              <div className="relative z-10">
-                <h2 className="text-4xl font-black uppercase tracking-tighter leading-none mb-6">MOBILE SYNC // ORDEN</h2>
-                <p className="text-[12px] text-black font-semibold uppercase tracking-widest max-w-xs mb-10 border-b-2 border-black pb-4">
-                  [ SCAN SVS HANDSHAKE ] BRIDGE THE SOVEREIGN INTEL MESH.
-                </p>
+          {/* ── LEFT: QR Sync ─────────────────────────────────────────── */}
+          <div className="relative p-8 lg:p-12 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/[0.08]">
+            {/* Cosmic pattern background */}
+            <div
+              className="absolute inset-0 pointer-events-none z-0"
+              style={{
+                backgroundImage: "url('/patron-cosmico-4k.png')",
+                backgroundSize: "320px",
+                backgroundRepeat: "repeat",
+                opacity: 0.035,
+                mixBlendMode: "multiply",
+              }}
+            />
+            <div className="relative z-10 flex flex-col h-full">
+              <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-3">
+                Mobile Sync
+              </h2>
+              <p className="text-[10px] text-black/40 font-mono uppercase tracking-widest mb-8 border-b border-black/10 pb-4">
+                Scan QR · Bridge the Sovereign Intel Mesh
+              </p>
 
-                <div className="flex flex-col items-center gap-8">
-                  <div className="p-6 bg-white rounded-[42px] shadow-sm border border-black/5">
-                    {qrSession ? (
-                      <QRCode value={qrUrl} size={200} level="H" bgColor="#FFFFFF" fgColor="#050505" />
+              <div className="flex flex-col items-center gap-6 flex-1 justify-center">
+                {/* QR Code */}
+                <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5">
+                  <AnimatePresence mode="wait">
+                    {qrSession && mounted ? (
+                      <motion.div
+                        key="qr"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <QRCode
+                          value={qrUrl}
+                          size={180}
+                          level="H"
+                          bgColor="#FFFFFF"
+                          fgColor="#050505"
+                        />
+                      </motion.div>
                     ) : (
-                      <div className="w-[200px] h-[200px] flex items-center justify-center">
-                        <Loader2 size={32} className="animate-spin text-black/10" />
-                      </div>
+                      <motion.div
+                        key="loading"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="w-[180px] h-[180px] flex items-center justify-center"
+                      >
+                        <Loader2 size={28} className="animate-spin text-black/10" />
+                      </motion.div>
                     )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${syncStatus === 'SYNCED' ? 'bg-emerald-500' : 'bg-black/20 animate-pulse'}`} />
-                  </div>
+                  </AnimatePresence>
                 </div>
+
+                {/* Sync status */}
+                <div className="flex items-center gap-2.5">
+                  <AnimatePresence mode="wait">
+                    {syncStatus === "SYNCED" ? (
+                      <motion.div
+                        key="synced"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-2"
+                      >
+                        <CheckCircle size={13} className="text-emerald-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                          Synced — Redirecting…
+                        </span>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="waiting"
+                        className="flex items-center gap-2"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-black/20 animate-pulse" />
+                        <span className="text-[10px] font-mono text-black/30 uppercase tracking-widest">
+                          {syncStatus === "AWAITING"
+                            ? "Awaiting scan…"
+                            : "Initializing…"}
+                        </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Refresh QR button */}
+                {qrSession && (
+                  <button
+                    onClick={() => { setQrSession(null); setSyncStatus("IDLE"); }}
+                    className="text-[9px] font-mono text-black/25 hover:text-black/50 uppercase tracking-widest transition-colors"
+                  >
+                    Refresh QR
+                  </button>
+                )}
               </div>
             </div>
+          </div>
 
-            <div className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-white/95 backdrop-blur-md">
-               {/* 3D Blocks Background Pattern Expertly Adjusted */}
-               <div 
-                 className="absolute inset-0 pointer-events-none opacity-40 mix-blend-darken z-0"
-                 style={{
-                   backgroundImage: "url('/patron-cosmico-4k.png')",
-                   backgroundSize: "400px",
-                   backgroundRepeat: "repeat"
-                 }}
-               />
-               <div className="relative z-10 flex flex-col h-full">
-                 <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-8 border-b-2 border-black pb-4">CONNECT WALLET // ACCESS</h2>
+          {/* ── RIGHT: Wallet Connect ─────────────────────────────────── */}
+          <div className="relative p-8 lg:p-12 flex flex-col bg-white/95 backdrop-blur-md">
+            <div className="relative z-10 flex flex-col h-full">
+              <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-3">
+                Connect Wallet
+              </h2>
+              <p className="text-[10px] text-black/40 font-mono uppercase tracking-widest mb-8 border-b border-black/10 pb-4">
+                ECDSA · Zero-Custody · Multi-Chain
+              </p>
 
-                 <div className="flex flex-col gap-3.5 flex-1">
-                    <WalletButton 
-                      logo="/wallets/metamask.svg" 
-                      name="MetaMask" 
-                      badge="Browser Injected" 
-                      onClick={() => handleConnector('injected')} 
-                      loading={isPending} 
+              {!mounted ? (
+                // Skeleton whilst JS hydrates
+                <div className="flex flex-col gap-3 flex-1">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="w-full h-[72px] rounded-[24px] bg-black/[0.03] animate-pulse"
                     />
-                    <WalletButton 
-                      logo="/wallets/coinbase.png" 
-                      name="Coinbase Wallet" 
-                      badge="MPC Smart Wallet" 
-                      onClick={() => handleConnector('coinbase')} 
-                    />
-                    <WalletButton 
-                      logo="/wallets/rainbow.png" 
-                      name="Rainbow (+550 Wallets)" 
-                      badge="WalletConnect" 
-                      onClick={() => openAppKit()} 
-                    />
-                    <WalletButton 
-                      logo="/wallets/rabby.png" 
-                      name="Rabby" 
-                      badge="Advanced EOA" 
-                      onClick={() => handleConnector('rabby')} 
-                    />
-                 </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 flex-1">
+                  <WalletButton
+                    logo="/wallets/metamask.svg"
+                    name="MetaMask"
+                    badge="Browser Injected"
+                    onClick={() => handleConnector("injected")}
+                    loading={isPending}
+                    delay={0}
+                  />
+                  <WalletButton
+                    logo="/wallets/coinbase.png"
+                    name="Coinbase Wallet"
+                    badge="MPC Smart Wallet"
+                    onClick={() => handleConnector("coinbase")}
+                    loading={isPending}
+                    delay={0.06}
+                  />
+                  <WalletButton
+                    logo="/wallets/rainbow.png"
+                    name="Rainbow & 500+ Wallets"
+                    badge="WalletConnect"
+                    onClick={() => handleConnector("walletConnect")}
+                    loading={isPending}
+                    delay={0.12}
+                  />
+                  <WalletButton
+                    logo="/wallets/rabby.png"
+                    name="Rabby"
+                    badge="Advanced EOA"
+                    onClick={() => handleConnector("rabby")}
+                    loading={isPending}
+                    delay={0.18}
+                  />
+                </div>
+              )}
 
-                 <div className="mt-10 p-5 bg-[#FAF9F6]/80 border border-black/5 rounded-3xl backdrop-blur-sm flex items-start gap-3">
-                    <Fingerprint size={16} className="text-black/30 mt-0.5" />
-                    <p className="text-[10px] text-black/40 font-semibold leading-relaxed">
-                      ECDSA Verification. This portal does not hold custody of assets. All interactions are verified on-chain.
-                    </p>
-                 </div>
-               </div>
+              {/* Security note */}
+              <div className="mt-6 p-4 bg-[#FAF9F6]/80 border border-black/[0.06] rounded-2xl flex items-start gap-3">
+                <Fingerprint size={14} className="text-black/25 mt-0.5 shrink-0" />
+                <p className="text-[9px] text-black/35 font-semibold leading-relaxed">
+                  This portal does not hold custody of assets. All interactions
+                  are verified on-chain via ECDSA signature. No username. No
+                  password.
+                </p>
+              </div>
             </div>
+          </div>
         </motion.div>
       </main>
 
-      <footer className="relative z-[100] px-12 py-12 border-t border-black/[0.04] bg-white/50 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-8">
-         <div className="flex flex-col gap-2 relative z-10">
-            <div className="flex items-center gap-3">
-              <img src="/official-whale-monochrome.png" className="w-5 h-5 opacity-40" alt="" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">© 2026 atfortyseven-creations</span>
-            </div>
-         </div>
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      <footer className="relative z-[100] px-8 py-6 border-t border-black/[0.04] bg-white/50 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+        <div className="flex items-center gap-3">
+          <img
+            src="/official-whale-monochrome.png"
+            className="w-4 h-4 opacity-30"
+            alt=""
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          />
+          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/30">
+            © 2026 atfortyseven-creations
+          </span>
+        </div>
 
-         <div className="flex items-center gap-8">
-            <a href="https://twitter.com/WhaleAlert" className="text-black/30 hover:text-black transition-colors"><Twitter size={18} /></a>
-            <a href="https://github.com" className="text-black/30 hover:text-black transition-colors"><Github size={18} /></a>
-            <div className="w-px h-8 bg-black/10 mx-2" />
-            <div className="flex flex-col items-end">
-               <span className="text-[9px] font-black uppercase tracking-widest text-black/40">Status: Operational</span>
-               <span className="text-[8px] font-mono text-emerald-500 uppercase tracking-widest font-bold">L1/L2 Ingress Active</span>
-            </div>
-         </div>
+        <div className="flex items-center gap-6">
+          <a
+            href="https://twitter.com/WhaleAlert"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-black/25 hover:text-black transition-colors"
+          >
+            <Twitter size={16} />
+          </a>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-black/25 hover:text-black transition-colors"
+          >
+            <Github size={16} />
+          </a>
+          <div className="flex flex-col items-end">
+            <span className="text-[8px] font-black uppercase tracking-widest text-black/30">
+              Status: Operational
+            </span>
+            <span className="text-[7px] font-mono text-emerald-500 uppercase tracking-widest font-bold">
+              L1/L2 Ingress Active
+            </span>
+          </div>
+        </div>
       </footer>
     </div>
   );
 }
-
-// [INSTITUTIONAL_SYNC_ID]: f577e582-c211-470c-bb5e-2654795cdc50
-// TRIGGER_CLEAN_BUILD: 2026-04-15T01:37:00Z
