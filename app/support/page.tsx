@@ -384,7 +384,7 @@ function ChannelsSection() {
 export default function SupportPage() {
   return (
     <InstitutionalShell title="Support — Whale Alert Network" badge="SUPPORT" badgeVariant="emerald">
-      <div style={{ background: BG, color: INK, minHeight: '100vh' }}>
+      <div style={{ background: BG, color: INK }}>
         <SupportHero />
         <StatsRow />
 

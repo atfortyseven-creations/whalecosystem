@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Shield, Camera, Upload, Loader2 } from 'lucide-react';
+import { X, Shield, Camera, Upload, Loader2, CheckCircle } from 'lucide-react';
 import { useAccount } from 'wagmi';
 
 interface QRScannerModalProps {
@@ -49,7 +49,7 @@ const QR_STYLES = `
   #qr-reader img { display: none !important; }
   #qr-reader__dashboard_section { padding: 10px !important; }
   #qr-reader__dashboard_section_csr { padding-top: 10px !important; }
-  #qr-reader video { border-radius: 16px !important; }
+  #qr-reader video { border-radius: 12px !important; }
 `;
 
 // ── inject styles once ────────────────────────────────────────────────────────
@@ -76,6 +76,170 @@ async function scanFileForQR(file: File): Promise<string> {
   }
 }
 
+// ─── Perimeter scan-line animation ───────────────────────────────────────────
+// The line travels: right → down → left → up (full perimeter), once per cycle.
+// SIZE: the pixel side length of the viewfinder square.
+const VIEWFINDER_SIZE = 240;
+const STROKE = 3;
+const PERIMETER = VIEWFINDER_SIZE * 4;
+
+function ScanLine({ active }: { active: boolean }) {
+  if (!active) return null;
+
+  // SVG path of the perimeter square (clockwise starting from top-left)
+  const path = `
+    M 0 0
+    L ${VIEWFINDER_SIZE} 0
+    L ${VIEWFINDER_SIZE} ${VIEWFINDER_SIZE}
+    L 0 ${VIEWFINDER_SIZE}
+    Z
+  `.trim();
+
+  return (
+    <svg
+      className="absolute pointer-events-none"
+      style={{
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: VIEWFINDER_SIZE,
+        height: VIEWFINDER_SIZE,
+        zIndex: 20,
+        overflow: 'visible',
+      }}
+      viewBox={`0 0 ${VIEWFINDER_SIZE} ${VIEWFINDER_SIZE}`}
+    >
+      {/* Dim border — always visible when scanning */}
+      <path
+        d={path}
+        fill="none"
+        stroke="rgba(34,197,94,0.18)"
+        strokeWidth={STROKE}
+        strokeLinejoin="round"
+      />
+
+      {/* Animated scan line — travels the full perimeter */}
+      <path
+        d={path}
+        fill="none"
+        stroke="#22c55e"
+        strokeWidth={STROKE}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        strokeDasharray={`${PERIMETER * 0.22} ${PERIMETER * 0.78}`}
+        style={{
+          filter: 'drop-shadow(0 0 6px #22c55e)',
+          animation: `qr-perimeter-scan 1.8s linear infinite`,
+        }}
+      />
+
+      {/* Corner accents */}
+      {[
+        // top-left
+        `M 0 20 L 0 0 L 20 0`,
+        // top-right
+        `M ${VIEWFINDER_SIZE - 20} 0 L ${VIEWFINDER_SIZE} 0 L ${VIEWFINDER_SIZE} 20`,
+        // bottom-right
+        `M ${VIEWFINDER_SIZE} ${VIEWFINDER_SIZE - 20} L ${VIEWFINDER_SIZE} ${VIEWFINDER_SIZE} L ${VIEWFINDER_SIZE - 20} ${VIEWFINDER_SIZE}`,
+        // bottom-left
+        `M 20 ${VIEWFINDER_SIZE} L 0 ${VIEWFINDER_SIZE} L 0 ${VIEWFINDER_SIZE - 20}`,
+      ].map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          fill="none"
+          stroke="#22c55e"
+          strokeWidth={STROKE + 0.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ filter: 'drop-shadow(0 0 4px #22c55ebb)' }}
+        />
+      ))}
+
+      <style>{`
+        @keyframes qr-perimeter-scan {
+          from { stroke-dashoffset: 0; }
+          to   { stroke-dashoffset: -${PERIMETER}; }
+        }
+      `}</style>
+    </svg>
+  );
+}
+
+// ─── Elegant "Scanned!" success overlay ──────────────────────────────────────
+function ScannedOverlay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="absolute inset-0 flex items-center justify-center z-30"
+      style={{ background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)' }}
+    >
+      <motion.div
+        initial={{ scale: 0.7, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.05 }}
+        className="flex flex-col items-center gap-4"
+      >
+        {/* Animated checkmark ring */}
+        <div className="relative flex items-center justify-center">
+          {/* Outer pulse ring */}
+          <motion.div
+            initial={{ scale: 0.6, opacity: 0.6 }}
+            animate={{ scale: 1.35, opacity: 0 }}
+            transition={{ duration: 0.9, repeat: 1, ease: 'easeOut' }}
+            className="absolute w-20 h-20 rounded-full border-2 border-emerald-400"
+          />
+          {/* Check circle */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25, delay: 0.1 }}
+            className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center"
+            style={{ boxShadow: '0 0 0 6px rgba(34,197,94,0.08)' }}
+          >
+            {/* SVG checkmark with draw animation */}
+            <svg
+              viewBox="0 0 24 24"
+              className="w-7 h-7"
+              fill="none"
+              stroke="#16a34a"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <motion.path
+                d="M5 13l4 4L19 7"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
+              />
+            </svg>
+          </motion.div>
+        </div>
+
+        {/* Label */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="text-center space-y-0.5"
+        >
+          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600">
+            ¡ Scanned !
+          </p>
+          <p className="text-[9px] font-medium uppercase tracking-widest text-black/30">
+            Syncing terminal…
+          </p>
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerModalProps) {
   const { address } = useAccount();
 
@@ -93,11 +257,11 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
   useEffect(() => { onScanRef.current  = onScan;  },  [onScan]);
 
   // ── Scanner instance ref ───────────────────────────────────────────────────
-  const scannerRef    = useRef<any>(null);   // Html5QrcodeScanner instance
+  const scannerRef    = useRef<any>(null);
   const initTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isInitingRef  = useRef(false);       // guard: prevent double-init
+  const isInitingRef  = useRef(false);
 
-  // ─── Core cleanup: stops camera + destroys instance ───────────────────────
+  // ─── Core cleanup ─────────────────────────────────────────────────────────
   const destroyScanner = useCallback(async () => {
     isInitingRef.current = false;
     if (initTimerRef.current) {
@@ -110,9 +274,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     }
   }, []);
 
-  // ─── Successful scan handler (uses refs, never closures) ──────────────────
+  // ─── Successful scan handler ───────────────────────────────────────────────
   const handleSuccess = useCallback(async (decodedText: string) => {
-    // Immediately destroy scanner so camera stops
     await destroyScanner();
     setStatus('success');
 
@@ -142,26 +305,26 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     }
 
     onScanRef.current?.(decodedText);
-    setTimeout(() => onCloseRef.current(), 1200);
+    setTimeout(() => onCloseRef.current(), 1400);
   }, [destroyScanner]);
 
   // ─── Initialize camera scanner ────────────────────────────────────────────
   const initScanner = useCallback(async () => {
-    if (isInitingRef.current || scannerRef.current) return; // already running
+    if (isInitingRef.current || scannerRef.current) return;
     isInitingRef.current = true;
 
     try {
       const { Html5QrcodeScanner } = await import('html5-qrcode');
       const scanner = new Html5QrcodeScanner(
         'qr-reader',
-        { fps: 10, qrbox: { width: 240, height: 240 }, rememberLastUsedCamera: true },
+        { fps: 10, qrbox: { width: VIEWFINDER_SIZE, height: VIEWFINDER_SIZE }, rememberLastUsedCamera: true },
         false
       );
       scannerRef.current = scanner;
 
       scanner.render(
         (text: string) => { handleSuccess(text); },
-        (_err: unknown) => { /* scan-frame errors are expected noise — ignore */ }
+        (_err: unknown) => { /* scan-frame errors are expected noise */ }
       );
 
       setStatus('scanning');
@@ -172,13 +335,11 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     }
   }, [handleSuccess]);
 
-  // ─── Single, stable effect: only reacts to isOpen ────────────────────────
-  // This is THE fix — no address/onClose/onScan in deps, they are all refs.
+  // ─── Effect: reacts to isOpen only ───────────────────────────────────────
   useEffect(() => {
     injectStyles();
 
     if (!isOpen) {
-      // Modal closed → destroy immediately
       destroyScanner();
       setStatus('idle');
       setErrMsg('');
@@ -186,40 +347,31 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
       return;
     }
 
-    // Modal opened → give DOM a frame to mount, then init
     setStatus('idle');
-    initTimerRef.current = setTimeout(() => {
-      initScanner();
-    }, 350);
+    initTimerRef.current = setTimeout(() => { initScanner(); }, 350);
 
-    return () => {
-      // Cleanup when isOpen flips to false OR component unmounts
-      destroyScanner();
-    };
+    return () => { destroyScanner(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]); // ← ONLY isOpen. Everything else goes through refs.
+  }, [isOpen]);
 
-  // ─── React to tab changes: stop/start camera as user switches tabs ──────────
+  // ─── Tab switch effect ───────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
     if (tab === 'file') {
-      // User switched to gallery – stop camera immediately
       destroyScanner();
       setStatus('idle');
     } else if (tab === 'camera') {
-      // User switched back to camera – restart cleanly
       setStatus('idle');
       initTimerRef.current = setTimeout(() => { initScanner(); }, 300);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]); // isOpen is a stable gate; initScanner/destroyScanner are stable callbacks
+  }, [tab]);
 
-  // ─── File/gallery scan handler ────────────────────────────────────────────
+  // ─── File scan handler ───────────────────────────────────────────────────
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setFileLoading(true);
-    // Need a hidden div in the DOM for the file scanner
     let tmp = document.getElementById('qr-reader-file-tmp');
     if (!tmp) {
       tmp = document.createElement('div');
@@ -235,7 +387,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
       setStatus('error');
     } finally {
       setFileLoading(false);
-      e.target.value = ''; // reset so same file can be selected again
+      e.target.value = '';
     }
   }, [handleSuccess]);
 
@@ -309,15 +461,18 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
             {/* Main scanner card */}
             <div className="relative w-full min-h-[340px] bg-white border border-black/8 rounded-[28px] overflow-hidden shadow-2xl flex flex-col items-center justify-start pt-5 px-4">
 
-              {/* Camera tab */}
+              {/* ── CAMERA TAB ─────────────────────────────────────────── */}
               {tab === 'camera' && (
                 <>
-                  {/* The html5-qrcode library will inject the video element here */}
+                  {/* The html5-qrcode library injects the video here */}
                   <div
                     id="qr-reader"
-                    className="w-full !border-none"
-                    style={{ display: status === 'error' ? 'none' : 'block' }}
+                    className="w-full !border-none relative"
+                    style={{ display: status === 'error' || status === 'success' ? 'none' : 'block' }}
                   />
+
+                  {/* Animated perimeter scan line — shown while scanning */}
+                  <ScanLine active={status === 'scanning'} />
 
                   {/* Loading state */}
                   {status === 'idle' && (
@@ -332,20 +487,9 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                   )}
 
                   {/* Success overlay */}
-                  {status === 'success' && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-                      <div className="flex flex-col items-center gap-3 text-center p-8">
-                        <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                          <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">
-                          ✓ Terminal PC Sincronizado
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {status === 'success' && <ScannedOverlay />}
+                  </AnimatePresence>
 
                   {/* Error overlay */}
                   {status === 'error' && (
@@ -365,7 +509,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                 </>
               )}
 
-              {/* File/Gallery tab */}
+              {/* ── GALLERY TAB ────────────────────────────────────────── */}
               {tab === 'file' && (
                 <div className="flex flex-col items-center justify-center w-full h-full min-h-[280px] gap-5 p-6">
                   <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center">
@@ -397,11 +541,21 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
                     />
                   </label>
 
-                  {status === 'success' && (
-                    <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">
-                      ✓ QR Detectado — Sincronizando…
-                    </p>
-                  )}
+                  <AnimatePresence>
+                    {status === 'success' && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-2"
+                      >
+                        <CheckCircle size={14} className="text-emerald-500" />
+                        <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600">
+                          ¡ Scanned !
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {status === 'error' && (
                     <p className="text-[11px] font-black uppercase tracking-widest text-red-500 text-center">
                       {errMsg}

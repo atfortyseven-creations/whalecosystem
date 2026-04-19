@@ -21,7 +21,7 @@ export function InteractiveFluidGrid() {
     const CELL_SIZE = 18; // Tamaño de píxel más ajustado a Letta Code
     const BASE_HZ = 144;
     const DAMPING = 0.95; // Los píxeles tardan un poco más en desaparecer para dejar rastro
-    const MOUSE_RADIUS = 160; 
+    const MOUSE_RADIUS = 100;
 
     // Buffer [alpha], un solo valor por celda
     let alphaBuffer: Float32Array;

@@ -19,7 +19,7 @@ export default async function AcademyPage() {
     const isDatabaseSeeded = dbCourses.length > 0;
 
     return (
-        <div className="min-h-[100dvh] bg-[#FDFCF8]">
+        <div className="bg-[#FDFCF8]">
             <AcademyInteractiveEngine 
                 dbCourses={dbCourses} 
                 isSeeded={isDatabaseSeeded}

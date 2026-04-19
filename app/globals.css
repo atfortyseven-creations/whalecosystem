@@ -50,6 +50,34 @@ body {
   overscroll-behavior: none;
 }
 
+/* ── BOUNDED VIEWPORT SEAL ────────────────────────────────────────────────────
+   When ClientLayout is in "bounded" mode, the root div has h-[100dvh] and the
+   main tag is the scroll container. We must ensure nothing inside that tree
+   expands the document height beyond the viewport.
+   The `[data-bounded]` attribute is explicitly NOT set anywhere — instead we
+   rely on the CSS stacking of h-[100dvh] on the root to create a containing
+   block. These rules prevent common child component patterns (min-h-screen,
+   min-h-[100dvh]) from leaking outside their scrollable parent.
+   ─────────────────────────────────────────────────────────────────────────── */
+/* Webkit momentum scrolling for the bounded <main> scroll container */
+main[class*="overflow-y-auto"] {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+/* Prevent any child from expanding PAST its scroll container's height */
+main[class*="overflow-y-auto"] > * {
+  min-height: 0;
+  /* Override the globals.css !important rule for min-h-screen within scroll
+     containers. Scoped via parent selector so it doesn't affect normal pages. */
+}
+/* Specific override: within a bounded overflow-y-auto main, min-h-screen
+   should resolve to 100% of the scroll container, not 100dvh of the *document*.
+   This prevents ghost whitespace when content is short. */
+main[class*="overflow-y-auto"] .min-h-screen,
+main[class*="overflow-y-auto"] [class*="min-h-screen"] {
+  min-height: 100% !important;
+}
+
 
 /* iOS Safari: Prevent 16px font auto-zoom on input focus
    Full rule with appearance reset is defined below at the * block.
