@@ -85,7 +85,7 @@ export async function GET(req: Request) {
     if (filename === '__list__') {
       const files = listAllLottieFiles();
       return NextResponse.json({
-        files,
+        files: files.map(f => f.name),
         searchDirs: SEARCH_DIRS,
         count: files.length,
       });

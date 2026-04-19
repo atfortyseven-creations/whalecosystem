@@ -110,6 +110,18 @@ const LEFT_SIDEBAR_CONTENT = [
   {
     title: "Colapso del Imperio FTX (2022)",
     text: "El cenit global de la opacidad institucional en el siglo XXI. Operando tras una falsa cortina de regulación, la rehipotecación algorítmica del capital de los usuarios mediante 'puertas traseras' en el código base tradicional facilitó la dilapidación abismal de reservas. Esta implosión sistemática purificó el ecosistema, evidenciando que sin herramientas de transparencia on-chain y liquidación determinista, los oráculos humanos caen en depravación."
+  },
+  {
+    title: "La Caída de Celsius Network (2022)",
+    text: "El espejismo del rendimiento perpétuo. La rehipotecación en cascada de activos minoristas en protocolos exóticos sin contingencia de liquidez desembocó en insolvencia matemática inmediata. Evidencia taxativa de que la opacidad del balance off-chain invariablemente enmascara riesgos catastróficos si no hay respaldos deterministas públicamente auditables."
+  },
+  {
+    title: "El Cisma de Tornado Cash (2022)",
+    text: "Intervención a nivel estado en la capa de protocolo. La sanción a contratos inteligentes inmutables por la OFAC demostró la latencia coercitiva de las jurisdicciones fiduciarias sobre desarrolladores de código abierto. Un preludio a la batalla final por la privacidad algorítmica, demostrando que verdaderas redes criptográficas requieren ofuscación irremediablemente cifrada."
+  },
+  {
+    title: "Saturación del Consenso Central (2024)",
+    text: "El monopolio progresivo de la validación. Plataformas dominantes de Liquid Staking aglomeraron cotas críticas del poder confirmatorio de la red principal, evidenciando la inherente vulnerabilidad paulatina del Proof-of-Stake frente a carteles oligopólicos de capitalización. Un recordatorio drástico de que los ecosistemas de élite tienden hacia asimetrías de poder cuasi-feudales de no mediar sistemas de corrección."
   }
 ];
 
@@ -125,27 +137,39 @@ const RIGHT_SIDEBAR_CONTENT = [
   {
     title: "La Fisura de Wormhole (2022)",
     text: "El clímax de vulnerabilidad en la topología poli-cadena (Cross-chain). Mediante la falsificación algorítmica de atestaciones y la elusión de validaciones triviales en los contratos inteligentes de puenteo, la arquitectura sufrió una sustracción inmediata de gran magnitud sin contramedidas reactivas posibles. Concluyendo definitivamente que los vectores poli-cadena elevan la entropía sistémica exponencialmente si no se auditan a prueba de abismos."
+  },
+  {
+    title: "La Anomalía Nomad (2022)",
+    text: "Decadencia técnica en puentes de enrutamiento cross-chain. Una configuración paramétrica nula de variables en la rutina de validación de Merkle permitió el primer saqueo masivo de extracción colectiva descentralizada ('crowdsourced'). Una advertencia draconiana testificando empíricamente que cualquier abstracción superflua en la criptografía transfiere valor infinito directamente al vacío basal."
+  },
+  {
+    title: "Desacoplamiento de USDC (2023)",
+    text: "El contagio residual del mecanismo de reserva fraccionaria clásica. La sobredependencia de tesorería hacia entidades fiduciarias (Silicon Valley Bank) socavó temporalmente la paridad absoluta de la stablecoin hegemónica del ecosistema. Una comprobación taxativa: toda conjunción vinculante, por sutil que fuese, con las fallas de la banca analógica expone a la arquitectura on-chain al caos externo."
+  },
+  {
+    title: "El Vacío de Iron Finance (2021)",
+    text: "La histeria irracional del arbitraje de sobreestabilización colateral. Un diseño tokenómico defectuoso detonó un bucle de retroalimentación puramente entrópico e hiperbólico, hundiendo el capital líquido y diluyendo el token de gobernanza en una deflación precipitada y letal. El suceso cristaliza de nuevo que el capital altamente eficiente es completamente agnóstico ante la narrativa carente de resiliencia empírica probada."
   }
 ];
 
 export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
   
   return (
-    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full max-w-[100vw] overflow-x-hidden"
-         style={{ overflowY: 'auto', scrollBehavior: 'smooth' }}>
+    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full max-w-[100vw] overflow-x-hidden relative"
+         style={{ overscrollBehavior: 'none' }}>
 
       <InteractiveFluidGrid />
 
-      <div className="relative z-10 w-full max-w-[1550px] mx-auto px-5 sm:px-8 flex justify-center pb-48">
+      <div className="relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 pb-48">
         
         {/* Left Academic Column */}
-        <aside className="hidden min-[1350px]:flex flex-col pt-36 pr-12 w-[320px] shrink-0">
+        <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
           <div className="border-b-[1.5px] border-black pb-2 mb-8">
             <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
               Tracto I: Opacidad y Ruina
             </h3>
           </div>
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-24">
             {LEFT_SIDEBAR_CONTENT.map((item, i) => (
               <article key={i} className="flex flex-col relative group">
                 <div className="absolute -left-4 top-1 bottom-0 w-px bg-black/10 group-hover:bg-black transition-colors duration-500" />
@@ -226,13 +250,13 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
         </main>
 
         {/* Right Academic Column */}
-        <aside className="hidden min-[1350px]:flex flex-col pt-36 pl-12 w-[320px] shrink-0">
+        <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
           <div className="border-b-[1.5px] border-black pb-2 mb-8">
             <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
               Tracto II: Entropía Central
             </h3>
           </div>
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-24">
             {RIGHT_SIDEBAR_CONTENT.map((item, i) => (
               <article key={i} className="flex flex-col relative group">
                 <div className="absolute -left-4 top-1 bottom-0 w-px bg-black/10 group-hover:bg-black transition-colors duration-500" />
