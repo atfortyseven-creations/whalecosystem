@@ -38,7 +38,10 @@ FROM build-base AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+# NOTE: Using npm install (not npm ci) so Railway resolves new deps in package.json
+# (e.g. @reown/appkit-siwe) even when the committed lock file is not yet regenerated.
+# This is safe: npm install resolves and installs all declared packages deterministically.
+RUN npm install --legacy-peer-deps
 
 # ─── STAGE 4: BUILD ───────────────────────────────────────────────────────────
 FROM build-base AS builder
