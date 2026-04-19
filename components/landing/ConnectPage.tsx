@@ -111,7 +111,7 @@ export default function ConnectPage() {
     <div className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white">
       {/* Background Waves - "Hokusai" - Absolute Bottom */}
       <div 
-        className="fixed bottom-0 left-0 right-0 h-[35vh] pointer-events-none opacity-40 mix-blend-multiply z-0"
+        className="fixed bottom-0 left-0 right-0 h-[40vh] pointer-events-none opacity-100 mix-blend-darken z-0"
         style={{
           backgroundImage: "url('/olas-hokusai-4k.png')",
           backgroundSize: "auto 100%",
@@ -163,10 +163,10 @@ export default function ConnectPage() {
             <div className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-white/95 backdrop-blur-md">
                {/* 3D Blocks Background Pattern Expertly Adjusted */}
                <div 
-                 className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-multiply z-0"
+                 className="absolute inset-0 pointer-events-none opacity-40 mix-blend-darken z-0"
                  style={{
                    backgroundImage: "url('/patron-cosmico-4k.png')",
-                   backgroundSize: "300px",
+                   backgroundSize: "400px",
                    backgroundRepeat: "repeat"
                  }}
                />
