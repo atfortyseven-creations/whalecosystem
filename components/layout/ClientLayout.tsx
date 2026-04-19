@@ -136,6 +136,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/vip' ||
     pathname === '/';
 
+  const showMobileNavBar = !pathname.startsWith('/news');
+
   return (
     <>
       <ConnectWalletModal />
@@ -175,7 +177,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
           {/* Legacy dark footer — only on routes that still need it */}
           {showDownhead && <Downhead />}
 
-          <MobileNavBar />
+          {showMobileNavBar && <MobileNavBar />}
         </div>
       </TitaniumGate>
     </>
