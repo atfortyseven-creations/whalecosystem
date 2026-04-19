@@ -13,44 +13,12 @@ interface QRScannerModalProps {
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
 const QR_STYLES = `
-  #qr-reader { border: none !important; width: 100% !important; }
-  #qr-reader__header_message { display: none !important; }
-  #qr-reader__dashboard_section_csr span {
-    display: flex !important; flex-direction: column !important;
-    gap: 10px !important; align-items: center !important;
-    margin-bottom: 20px !important;
+  #qr-reader { border: none !important; width: 100% !important; height: 100% !important; background: #000; overflow: hidden; }
+  #qr-reader video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
-  #qr-reader__dashboard_section_swaplink {
-    text-decoration: none !important; font-weight: 900 !important;
-    background: #050505 !important; color: white !important;
-    padding: 12px 24px !important; border-radius: 9999px !important;
-    text-transform: uppercase !important; letter-spacing: 2px !important;
-    font-size: 10px !important; display: inline-block !important;
-    margin-bottom: 10px !important; transition: all 0.2s;
-  }
-  #qr-reader__dashboard_section_swaplink:hover { background: rgba(0,0,0,0.8) !important; }
-  #qr-reader__camera_selection {
-    padding: 10px !important; border-radius: 8px !important;
-    border: 1px solid rgba(0,0,0,0.1) !important; font-family: inherit !important;
-    font-size: 12px !important; outline: none !important;
-    background: white !important; width: 90% !important;
-    margin: 10px auto !important; display: block !important;
-  }
-  #qr-reader__camera_permission_button,
-  #qr-reader__dashboard_section_csr button {
-    background: #050505 !important; color: white !important;
-    font-weight: 800 !important; text-transform: uppercase !important;
-    font-size: 10px !important; padding: 12px 24px !important;
-    border-radius: 99px !important; border: none !important;
-    cursor: pointer !important; letter-spacing: 1px !important;
-    margin-top: 10px !important;
-  }
-  #qr-reader__dashboard_section_csr button:hover { background: rgba(0,0,0,0.8) !important; }
-  #qr-reader img { display: none !important; }
-  #qr-reader__scan_region svg { display: none !important; opacity: 0; }
-  #qr-reader__dashboard_section { padding: 10px !important; }
-  #qr-reader__dashboard_section_csr { padding-top: 10px !important; }
-  #qr-reader video { border-radius: 12px !important; }
 `;
 
 // ── inject styles once ────────────────────────────────────────────────────────
@@ -102,7 +70,7 @@ function ScanLine({ active }: { active: boolean }) {
       style={{
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, calc(-50% - 40px))',
+        transform: 'translate(-50%, -50%)',
         width: VIEWFINDER_SIZE,
         height: VIEWFINDER_SIZE,
         zIndex: 20,
@@ -315,21 +283,32 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     isInitingRef.current = true;
 
     try {
-      const { Html5QrcodeScanner } = await import('html5-qrcode');
-      const scanner = new Html5QrcodeScanner(
-        'qr-reader',
-        { fps: 10, qrbox: { width: VIEWFINDER_SIZE, height: VIEWFINDER_SIZE }, rememberLastUsedCamera: true },
-        false
-      );
+      const { Html5Qrcode } = await import('html5-qrcode');
+      const scanner = new Html5Qrcode('qr-reader');
       scannerRef.current = scanner;
 
-      scanner.render(
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 15 }, // omitted qrbox config parses full frame at maximum performance
         (text: string) => { handleSuccess(text); },
-        (_err: unknown) => { /* scan-frame errors are expected noise */ }
+        (_err: unknown) => { /* frame errors ignored */ }
       );
 
       setStatus('scanning');
     } catch {
+      try {
+        if (scannerRef.current) {
+          await scannerRef.current.start(
+            { facingMode: "user" },
+            { fps: 15 },
+            (text: string) => { handleSuccess(text); },
+            (_err: unknown) => {}
+          );
+          setStatus('scanning');
+          return;
+        }
+      } catch (e2) {}
+
       setErrMsg('Permiso de cámara requerido para el Sovereign Sync.');
       setStatus('error');
       isInitingRef.current = false;
@@ -465,27 +444,27 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
               {/* ── CAMERA TAB ─────────────────────────────────────────── */}
               {tab === 'camera' && (
                 <>
-                  {/* The html5-qrcode library injects the video here */}
-                  <div
-                    id="qr-reader"
-                    className="w-full !border-none relative"
-                    style={{ display: status === 'error' || status === 'success' ? 'none' : 'block' }}
-                  />
+                  <div className="relative w-full h-[320px] rounded-[20px] overflow-hidden bg-black flex items-center justify-center shadow-inner">
+                    {/* The html5-qrcode library injects the video here */}
+                    <div
+                      id="qr-reader"
+                      className="absolute inset-0 w-full h-full"
+                      style={{ display: status === 'error' || status === 'success' ? 'none' : 'block' }}
+                    />
 
-                  {/* Animated perimeter scan line — shown while scanning */}
-                  <ScanLine active={status === 'scanning'} />
+                    {/* Animated perimeter scan line — perfectly centered now */}
+                    <ScanLine active={status === 'scanning'} />
 
-                  {/* Loading state */}
-                  {status === 'idle' && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="flex flex-col items-center gap-3">
-                        <Loader2 size={28} className="animate-spin text-black/20" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-black/30">
+                    {/* Loading state absolute centering */}
+                    {status === 'idle' && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-10">
+                        <Loader2 size={28} className="animate-spin text-white/40 mb-3" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/50">
                           Iniciando cámara…
                         </span>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* Success overlay */}
                   <AnimatePresence>
