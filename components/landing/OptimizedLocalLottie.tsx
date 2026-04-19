@@ -133,8 +133,7 @@ export function OptimizedLocalLottie({
         if (!canvasRef.current) return;
 
         // Determine effective speed: default 1, but reduce on mobile
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const effectiveSpeed = speed ?? (isMobile ? 0.85 : 1);
+        const effectiveSpeed = speed ?? 1;
 
         const instance = new DotLottie({
           canvas: canvasRef.current,

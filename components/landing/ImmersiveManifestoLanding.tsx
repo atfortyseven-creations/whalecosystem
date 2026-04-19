@@ -25,7 +25,17 @@ const MANIFESTO_LOTTIES = [
   "Online Payment.json",
   "Payments.json",
   "website.json",
-  "Share.json"
+  "Share.json",
+  "History.json",
+  "Search for value.json",
+  "Business plan.json",
+  "Business.json",
+  "Virtual Education.json",
+  "Distance Learning.json",
+  "Geography.json",
+  "Bitcoin touch.json",
+  "Invest - Trade - concept.json",
+  "BlockChain.json"
 ];
 
 const IMMERSIVE_PAGES = [
@@ -59,6 +69,31 @@ const IMMERSIVE_PAGES = [
       "Nuestra concepción topológica final incuba sin retorno un subsistema matricial abisal configurado en torno a arquitecturas de Graph Neural Networks (GNN). Esta inyección arquitectónica habilita autónomamente al núcleo cognitivo para tejer cartografías completas sobre agrupaciones inescrutables de firmas oscuras. Subyugando a las redes de nodos subyacentes e inferiendo su estructura celular original determinista, el ensamblador lógico pulveriza con precisión la entropía de los clusters estocásticos.",
       "Estando pertrechados y preparados para subsumir la fricción letal de los mecanismos de Valor Máximo Extraíble (MEV), nuestros conductos base canalizan toda la lógica deductiva por subsistemas totalmente apartados del mempool primario. Esta convergencia técnica y asilamiento criptográfico mitiga algorítmicamente la fagocitación parasitaria de datos, estabilizando permanentemente nuestros canales métricos y aislando la asimetría sistémica contra las maquinaciones caníbales de los bots competidores en épocas de distorsión líquida.",
       "Como manifestación incontestable de trascendencia digital matemática, el pináculo evolutivo disecciona y amalgama sus funciones deductivas con las infraestructuras modulares de validadores fraccionados (Liquid Restaking). Esta hibridación hiperespacial nos confiere, como protocolo maestro, las facultades de desglosar instantáneamente las cascadas regresivas del consenso central de la red global inmutada, consolidando el arma criptográfica analítica incontestable para el futuro."
+    ]
+  },
+  {
+    title: "V. Perspectiva Histórica y Valor Subyacente",
+    paragraphs: [
+      "La cronología de la evolución criptográfica revela un patrón irrefutable: la descentralización no es un mero fenómeno cíclico, sino una reestructuración sistémica de los medios de transferencia fiduciarios hacia reservas puramente algorítmicas, impermeables a la inflación originada por políticas centrales.",
+      "Identificamos que la búsqueda de valor intrínseco en la era digital no descansa en oráculos centralizados, sino en métricas deterministas extraídas de la cadena misma. Las asimetrías de información se disipan cuando la lectura termodinámica de los contratos inteligentes permite auditar el capital sin custodios.",
+      "El diseño de un plan de negocio descentralizado exige la abolición total de jerarquías tradicionales. Al codificar las directivas operacionales en agentes sintéticos, la gobernanza institucional transmuta de una estructura de confianza humana hacia una certidumbre matemática implacable y automatizada.",
+      "Las corporaciones soberanas del mañana no dependerán de fronteras jurisdiccionales tangibles, operando exclusivamente mediante arquitecturas en la red soberana donde la liquidación es instantánea, perpetua y verificada asíncronamente mediante atestiguaciones on-chain."
+    ]
+  },
+  {
+    title: "VI. Formación Algorítmica y Omnipresencia Geográfica",
+    paragraphs: [
+      "El paradigma de la educación virtual aplicado a la infraestructura de capa uno garantiza la formación asimétrica de élites técnicas. La integración académica pura directamente en el entorno de pruebas on-chain cultiva validadores y arquitectos desprovistos del sesgo de los currículos tradicionales.",
+      "El aprendizaje distribuido a través de todo el consenso oblitera las barreras epistemológicas vigentes. Al destilar principios criptográficos en canales de transmisión de conocimiento cero, formamos nodos humanos que piensan y operan a la misma frecuencia de la máquina virtual subyacente.",
+      "Desvinculados del concepto obsoleto de Estado-nación geográfico, la dispersión topológica de nuestro observatorio nos confiere una ubicuidad absoluta. Esta neutralidad espacial blinda nuestro radar contra incursiones regulatorias asimétricas y garantiza resiliencia perpetua ante interrupciones locales."
+    ]
+  },
+  {
+    title: "VII. Acumulación Dinámica y Soberanía Criptográfica",
+    paragraphs: [
+      "El contacto directo con el estrato base criptográfico no es un mero punto de entrada; es la singularidad fundacional. Al observar los movimientos génesis de capital, nuestro rastreador aísla la fuente primordial de volumen, descartando el ruido secundario propagado por mercados derivativos subyacentes.",
+      "El comercio unificado bajo dinámicas de inversión institucionales transmuta de una especulación estocástica hacia ejecuciones paramétricas puras. Evaluamos los flujos cruzados de liquidez con rigor analítico, desconstruyendo portafolios agregados instante por instante mientras navegan redes ofuscadas.",
+      "Finalmente, el propio sustrato del consenso distribuido actúa como el ente verificador supremo. Al adherirnos a su arquitectura modular, certificamos de manera inmutable que todos los procesos de telemetría y recolección analítica permanezcan encriptados, infalsificables y custodiados por el determinismo matemático absoluto."
     ]
   }
 ];

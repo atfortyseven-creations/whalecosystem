@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { readFileSync, existsSync, readdirSync } from 'fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 /**
@@ -48,9 +48,8 @@ function resolveLottiePath(safeFilename: string): string | null {
   return null;
 }
 
-/** Enumerate every .json file found across all search directories */
-function listAllLottieFiles(): string[] {
-  const found = new Set<string>();
+function listAllLottieFiles() {
+  const found = new Map<string, number>();
   for (const dir of SEARCH_DIRS) {
     try {
       if (!existsSync(dir)) continue;
@@ -58,20 +57,21 @@ function listAllLottieFiles(): string[] {
       for (const entry of entries) {
         if (!entry.isFile()) continue;
         if (!entry.name.endsWith('.json')) continue;
-        // Skip known non-lottie JSON files
         if (
           entry.name === 'manifest.json' ||
           entry.name === 'package.json' ||
           entry.name === 'tsconfig.json' ||
           entry.name === 'sample-sovereign-signal.json'
         ) continue;
-        found.add(entry.name);
+        
+        const stats = statSync(join(dir, entry.name));
+        found.set(entry.name, stats.mtimeMs);
       }
     } catch {
       // Directory not accessible — skip silently
     }
   }
-  return Array.from(found).sort();
+  return Array.from(found.entries()).map(([name, mtime]) => ({ name, mtime })).sort((a, b) => b.mtime - a.mtime);
 }
 
 export const dynamic = 'force-dynamic';
