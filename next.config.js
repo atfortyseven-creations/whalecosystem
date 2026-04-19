@@ -111,15 +111,14 @@ const nextConfig = {
             },
             // ── Static asset immutable caching ─────────────────────────────────
             // Images & fonts cached for 1 year — eliminates repeated server hits
-            // for patron-cosmico-4k.png, olas-hokusai-4k.png, and font files.
+            // Explicit paths to bypass Next.js path-to-regexp capturing group errors.
             {
-                source: '/(:path*).(:ext(png|jpg|jpeg|webp|avif|svg|ico|woff|woff2))',
-                headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'public, max-age=31536000, immutable',
-                    },
-                ],
+                source: '/patron-cosmico-4k.png',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+            },
+            {
+                source: '/olas-hokusai-4k.png',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
             },
         ];
     }
