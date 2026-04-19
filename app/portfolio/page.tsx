@@ -12,7 +12,6 @@ import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { mainnet, base, optimism, arbitrum, polygon, worldchain } from 'wagmi/chains';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
@@ -223,7 +222,7 @@ export default function PortfolioPage() {
               Connect Wallet
             </button>
             <div className="scale-90 origin-center">
-              <ConnectButton />
+              <appkit-button />
             </div>
           </div>
 
@@ -281,7 +280,7 @@ export default function PortfolioPage() {
           </button>
 
           <div className="scale-90 origin-right">
-            <ConnectButton accountStatus="avatar" chainStatus="none" showBalance={false} />
+            <appkit-button />
           </div>
         </div>
       </header>

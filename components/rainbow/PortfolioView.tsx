@@ -40,7 +40,6 @@ import {
   X
 } from "lucide-react";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useChainId, useSwitchChain, useAccount } from "wagmi";
 
 import { useState, useEffect, useCallback } from "react";
@@ -278,7 +277,9 @@ function RainbowOnboarding() {
   if (step === "importing") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-8 text-center">
-        <ConnectButton />
+        <div className="scale-90 origin-center">
+            <appkit-button />
+        </div>
         <p className="text-white/30 text-xs hover:text-white/70 transition-colors cursor-pointer" onClick={() => setStep("choosing")}>
           ← Go Back
         </p>
@@ -532,11 +533,7 @@ export default function PortfolioView({
             {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
           <div className="scale-90 origin-right">
-            <ConnectButton
-              accountStatus="avatar"
-              chainStatus="none"
-              showBalance={false}
-            />
+            <appkit-button />
           </div>
         </div>
       </header>

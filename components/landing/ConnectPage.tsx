@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useConnect } from "wagmi";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   ArrowRight,
   Loader2,
@@ -73,13 +74,20 @@ function WalletButton({
 export default function ConnectPage() {
   const router = useRouter();
   const { isConnected, address } = useAccount();
-  const { connect, connectors, isPending } = useConnect();
+  const { connect, connectors, isPending, isError, error } = useConnect();
 
   const [mounted, setMounted] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">(
     "IDLE"
   );
+
+  // Surface wallet connection errors (e.g. user rejected)
+  useEffect(() => {
+    if (isError && error) {
+      toast.error("Connection Failed", { description: error.message });
+    }
+  }, [isError, error]);
 
   // Mount guard
   useEffect(() => {
