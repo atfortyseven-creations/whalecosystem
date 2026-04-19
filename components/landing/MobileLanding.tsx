@@ -142,8 +142,17 @@ function SigningOverlay({
             Reintentar Firma
           </button>
         ) : (
-          <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center gap-3">
-  // ── Connected Screen ──────────────────────────────────────────────────────────
+          <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center justify-center gap-3">
+            <Loader2 size={16} className="animate-spin text-[#050505]/60" />
+            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Aprobando</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
   address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId
 }: {
