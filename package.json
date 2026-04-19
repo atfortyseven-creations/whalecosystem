@@ -3,7 +3,6 @@
   "version": "3.0.2",
   "private": true,
   "scripts": {
-    "postinstall": "prisma generate",
     "dev": "concurrently \"next dev\" \"npm run worker:scanner\"",
     "build": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "build:railway": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
