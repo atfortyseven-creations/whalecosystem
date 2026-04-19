@@ -14,14 +14,15 @@ export const WLD_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_WLD_TOKEN_ADDRESS || '
 // while the intelligence layer watches Mainnet — a catastrophic mismatch.
 export const config = createConfig({
     chains: [mainnet, base, bsc, optimism],
+    multiInjectedProviderDiscovery: true,   // ← EIP-6963: auto-discovers Rabby, Frame, etc.
     connectors: [
         // CRITICAL: injected must be listed FIRST so MetaMask/Rabby are
         // the default connector and contract writes get proper RPC params.
+        // Only one injected() instance — having two causes 'Connector already connected' errors.
         injected({ target: 'metaMask' }),
-        injected(),
         walletConnect({
             projectId,
-            showQrModal: true,
+            showQrModal: false,   // ← false: we manage the QR UI ourselves; true caused double-modal flicker
             metadata: {
                 name: 'WhaleAlert ID.fi',
                 description: 'The Sovereign Identity & Prediction Market Suite',

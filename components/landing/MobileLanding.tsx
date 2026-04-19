@@ -10,6 +10,16 @@ import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X } from "lucide-react";
 
+// ── Live clock hook ───────────────────────────────────────────────────────────
+function useLiveClock(intervalMs = 1000): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
 // QR Scanner — iOS-safe dynamic import
 const DynamicQRScannerModal = dynamic(
   () => import("@/components/wallet/QRScannerModal"),
@@ -459,6 +469,17 @@ export function MobileLanding() {
     }
   }, [mounted, address]);
 
+  // ── Scroll to top when manifesto becomes visible ─────────────────────────────
+  // Prevents the page from appearing mid-scrolled after the sign modal closes.
+  useEffect(() => {
+    if (isLinked && typeof window !== 'undefined') {
+      // Use both methods for cross-browser reliability
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [isLinked]);
+
   // ── Auto-trigger signing once wallet connects ───────────────────────────────
   useEffect(() => {
     if (!mounted || !isConnected || !address || isLinked || signingLock.current) return;
@@ -491,6 +512,12 @@ export function MobileLanding() {
         }).catch(() => {});
 
         setIsLinked(true);
+        // Reset scroll so the manifesto always opens from page top
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        }
       }
     } catch (e: any) {
       const msg = e?.code === 4001 || e?.message?.includes('rejected')
@@ -542,6 +569,12 @@ export function MobileLanding() {
     const isIOS = /iPhone|iPad|iPod/i.test(navigator?.userAgent ?? '');
     const hasEthereum = typeof (window as any).ethereum !== 'undefined';
 
+    // ── If already connected, skip entirely — avoid wagmi 'Connector already connected' error
+    if (isConnected && address) {
+      // Wallet is already linked — nothing to do here
+      return;
+    }
+
     const STORE_URLS = {
       metamask: {
         ios:     'https://apps.apple.com/app/metamask/id1438144202',
@@ -567,7 +600,9 @@ export function MobileLanding() {
       const c = connectors.find(x => ID_MAP[walletType].includes(x.id));
       if (c) {
         setConnecting(walletType);
-        connect({ connector: c });
+        // Suppress 'already connected' error — wagmi throws when the same
+        // connector instance is already active (e.g. user navigated back)
+        try { connect({ connector: c }); } catch { setConnecting(null); }
         return;
       }
     }
@@ -585,9 +620,6 @@ export function MobileLanding() {
 
     setConnecting(walletType);
 
-    // Listen for the WC pairing URI (fired before user approves).
-    // Exact wagmi type: ConnectorEventMap['message'] & { uid: string }
-    // → { type: string; data?: unknown | undefined; uid: string }
     const handleMessage = (event: { type: string; data?: unknown | undefined; uid: string }) => {
       if (event.type !== 'display_uri' || !event.data) return;
       wcConnector.emitter.off('message', handleMessage);
@@ -602,14 +634,8 @@ export function MobileLanding() {
       };
 
       const deepLink = DEEP_LINK_MAP[walletType];
-
-      // Navigate to deep-link. The OS opens the wallet app if installed.
-      // WalletConnect relay handles session establishment asynchronously —
-      // when the user returns to this page wagmi detects isConnected=true.
-      // DO NOT redirect to the store — that was breaking the return flow.
       window.location.href = deepLink;
 
-      // When user comes back from the wallet app, clear the spinner.
       const onReturn = () => {
         if (!document.hidden) {
           setConnecting(null);
@@ -621,9 +647,16 @@ export function MobileLanding() {
 
     wcConnector.emitter.on('message', handleMessage);
 
-    // Kick off the WC pairing — this triggers 'display_uri' emission
-    connect({ connector: wcConnector });
-  }, [connect, connectors]);
+    // Kick off the WC pairing — this triggers 'display_uri' emission.
+    // Catch synchronous 'already connected' error from wagmi.
+    try {
+      connect({ connector: wcConnector });
+    } catch (e: any) {
+      wcConnector.emitter.off('message', handleMessage);
+      setConnecting(null);
+      // Silently ignore duplicate connection attempts
+    }
+  }, [connect, connectors, isConnected, address]);
 
   if (!mounted) return null;
 

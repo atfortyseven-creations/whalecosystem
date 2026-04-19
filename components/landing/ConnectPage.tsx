@@ -141,6 +141,16 @@ export default function ConnectPage() {
     if (!isError || !error) return;
     setPendingId(null);
     const msg = error.message ?? "Unknown error";
+
+    // Suppress false-positive 'Connector already connected' error from wagmi
+    // This fires when the user returns from a mobile wallet app with an active session
+    if (
+      msg.toLowerCase().includes("already connected") ||
+      msg.toLowerCase().includes("connector already")
+    ) {
+      return;
+    }
+
     const isNotFound =
       msg.toLowerCase().includes("provider not found") ||
       msg.toLowerCase().includes("not installed") ||

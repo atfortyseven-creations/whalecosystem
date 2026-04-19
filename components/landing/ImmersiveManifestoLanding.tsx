@@ -329,14 +329,17 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
 
       </div>
 
-      {/* Floating Scanner Panel (Out of flow) */}
+      {/* Floating Scanner Panel - ABOVE MobileNavBar (z-[200] > z-[100]) */}
       {onOpenScanner && (
-        <div className="fixed bottom-0 left-0 w-full p-0 flex flex-col pointer-events-none z-50">
-           <div className="h-24 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
-           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="fixed bottom-0 left-0 w-full flex flex-col pointer-events-none z-[200]">
+           <div className="h-16 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
+           {/* Full dock bar — pointer-events-auto so taps reach the button */}
+           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-3 pointer-events-auto" style={{ paddingBottom: 'max(0.75rem, calc(env(safe-area-inset-bottom) + 64px))' }}>
              <button
+               type="button"
                onClick={onOpenScanner}
-               className="pointer-events-auto px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors flex items-center gap-3"
+               className="px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-3 rounded-none select-none touch-manipulation"
+               style={{ WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
              >
                <Scan size={13} />
                Session Log &amp; Scan
