@@ -76,8 +76,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const isBounded = !isDashboard && pathname !== '/' && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
   const isLanding = pathname === '/';
 
-  const isLanding = pathname === '/';
-
   // Strict body trap for PC/Desktop — completely block document-level scrolling on bounded modules
   React.useEffect(() => {
     if (typeof window === 'undefined') return;

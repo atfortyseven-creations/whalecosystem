@@ -1,6 +1,82 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COSMIC ENTITY TYPE BRIDGE
+// The Prisma client was generated before CosmicEntity was added to the schema.
+// This type declaration makes the TypeScript compiler aware of prisma.cosmicEntity
+// so that all forge services compile correctly right now.
+// Once `npx prisma generate` is run the generated types supersede this cast.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type CosmicEntityRecord = {
+  id: string;
+  seedHash: string;
+  whaleEventId: string | null;
+  tier: string;
+  amountUSD: number;
+  chain: string;
+  generatorType: string;
+  status: string;
+  artMetadata: Prisma.JsonValue | null;
+  musicMetadata: Prisma.JsonValue | null;
+  biotechMetadata: Prisma.JsonValue | null;
+  worldSimMetadata: Prisma.JsonValue | null;
+  agentMetadata: Prisma.JsonValue | null;
+  contractAddress: string | null;
+  hiveEnergyAtBirth: number;
+  evolutionCount: number;
+  parentEntityId: string | null;
+  beneficiaryAddr: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type CosmicEntityWhereInput = Partial<{
+  id: string;
+  seedHash: string;
+  status: string | { in: string[] };
+  tier: string;
+  chain: string;
+  amountUSD: number;
+}>;
+
+type CosmicEntityWhereUniqueInput = { id?: string; seedHash?: string };
+
+type CosmicEntityAggregateArgs = {
+  where?: CosmicEntityWhereInput;
+  _sum?: Partial<Record<'amountUSD' | 'hiveEnergyAtBirth' | 'evolutionCount', boolean>>;
+  _count?: boolean | Partial<Record<keyof CosmicEntityRecord, boolean>>;
+  _avg?: Partial<Record<'amountUSD' | 'hiveEnergyAtBirth', boolean>>;
+};
+
+type CosmicEntityDelegate = {
+  findMany(args?: {
+    where?: CosmicEntityWhereInput;
+    orderBy?: Partial<Record<keyof CosmicEntityRecord, 'asc' | 'desc'>>;
+    take?: number;
+    skip?: number;
+  }): Promise<CosmicEntityRecord[]>;
+  findUnique(args: { where: CosmicEntityWhereUniqueInput }): Promise<CosmicEntityRecord | null>;
+  findFirst(args?: { where?: CosmicEntityWhereInput; orderBy?: Partial<Record<keyof CosmicEntityRecord, 'asc' | 'desc'>> }): Promise<CosmicEntityRecord | null>;
+  create(args: { data: Omit<Partial<CosmicEntityRecord>, 'id' | 'createdAt' | 'updatedAt'> }): Promise<CosmicEntityRecord>;
+  update(args: { where: CosmicEntityWhereUniqueInput; data: Partial<CosmicEntityRecord> }): Promise<CosmicEntityRecord>;
+  updateMany(args: { where?: CosmicEntityWhereInput; data: Partial<CosmicEntityRecord> }): Promise<Prisma.BatchPayload>;
+  delete(args: { where: CosmicEntityWhereUniqueInput }): Promise<CosmicEntityRecord>;
+  deleteMany(args?: { where?: CosmicEntityWhereInput }): Promise<Prisma.BatchPayload>;
+  count(args?: { where?: CosmicEntityWhereInput }): Promise<number>;
+  aggregate(args: CosmicEntityAggregateArgs): Promise<{
+    _sum: { amountUSD: number | null; hiveEnergyAtBirth: number | null; evolutionCount: number | null };
+    _count: { _all: number };
+    _avg: { amountUSD: number | null; hiveEnergyAtBirth: number | null };
+  }>;
+};
+
+/** PrismaClient augmented with the CosmicEntity model accessor */
+type SovereignPrismaClient = PrismaClient & {
+  cosmicEntity: CosmicEntityDelegate;
+};
 
 function getProductionUrl(): string | undefined {
     const rawUrl = process.env.DATABASE_URL;
@@ -51,10 +127,10 @@ function createPrismaClient(): PrismaClient {
     return client;
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknown as SovereignPrismaClient;
 
 if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = prisma;
+    (globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
 }
 
 export default prisma;
