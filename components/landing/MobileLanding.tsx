@@ -281,21 +281,6 @@ function ConnectedScreen({
               {address}
             </p>
           </div>
-        </motion.div> className="text-[13px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Verified</span>
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="px-6 py-4">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/30 mb-1">Wallet</p>
-            <p className="text-[12px] font-mono text-[#050505] tracking-tight">
-              {address.slice(0, 12)}<span className="text-[#050505]/30">…</span>{address.slice(-8)}
-            </p>
-          </div>
         </motion.div>
 
         {/* ── Permission Badge ── */}
