@@ -205,23 +205,6 @@ export function SovereignFooter() {
               {" "}— All rights reserved.
             </span>
 
-            {/* Status pulse */}
-            <span
-              className="flex items-center gap-1.5"
-              style={{
-                fontFamily: '"Inter", monospace',
-                fontSize: "9px",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "rgba(10,10,10,0.22)",
-              }}
-            >
-              <span
-                className="inline-block w-1.5 h-1.5 rounded-full bg-black/25"
-                style={{ animation: "pulse 2.5s ease-in-out infinite" }}
-              />
-              v4.0.0 · Protocol Active
-            </span>
           </div>
         </div>
       </div>

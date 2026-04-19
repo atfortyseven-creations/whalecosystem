@@ -117,6 +117,9 @@ model User {
   alerts          Alert[]
   canvasState     CanvasState?
   progress        UserProgress[]
+  submissions     AcademySubmission[]
+  sentMessages    MentoringMessage[] @relation("SentMessages")
+  receivedMessages MentoringMessage[] @relation("ReceivedMessages")
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
   @@index([tier, lastActive(sort: Desc)])  // Consulta de usuarios activos por tier
@@ -212,6 +215,8 @@ model Lesson {
   isLocked    Boolean  @default(false)
   
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    UserProgress[]
+  submissions AcademySubmission[]
 }
 
 model UserProgress {
@@ -222,8 +227,45 @@ model UserProgress {
   timestamp DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   
   @@unique([userId, lessonId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACADEMY MENTORING & TEACHER VALIDATIONS (MAXIMUM LMS)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AcademySubmission {
+  id          String   @id @default(uuid())
+  userId      String   
+  lessonId    String
+  contentUrl  String?
+  txHash      String?  
+  status      String   @default("PENDING") // PENDING, PASSED, FAILED
+  feedback    String?  @db.Text
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lessonId])
+  @@index([status])
+}
+
+model MentoringMessage {
+  id          String   @id @default(uuid())
+  senderId    String
+  receiverId  String
+  content     String   @db.Text
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([receiverId, read])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

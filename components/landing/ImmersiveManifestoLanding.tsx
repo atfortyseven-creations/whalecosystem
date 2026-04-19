@@ -1,9 +1,32 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
 import { SovereignFooter } from "./SovereignFooter";
+import { InteractiveFluidGrid } from "./InteractiveFluidGrid";
 import { Scan } from "lucide-react";
+
+// Pre-defined list of lottie files matching the narrative sections.
+// This preserves the "zero build-time bloat" since these are just string paths
+// and they are fetched on-demand at runtime by OptimizedLocalLottie.
+const MANIFESTO_LOTTIES = [
+  "Earth globe rotating with Seamless loop animation.json",
+  "DeeWork About Blockchain.json",
+  "Crypto coins.json",
+  "Big Data Analytics.json",
+  "Isometric data analysis.json",
+  "A Female Employee is Reading Financial Statements.json",
+  "enterprice.json",
+  "Manufacturing Industry Working Staff.json",
+  "Business Analysis.json",
+  "Browser Loading.json",
+  "Abstract Isometric Loader #1.json",
+  "Trade.json",
+  "Online Payment.json",
+  "Payments.json",
+  "website.json",
+  "Share.json"
+];
 
 const IMMERSIVE_PAGES = [
   {
@@ -40,25 +63,72 @@ const IMMERSIVE_PAGES = [
   }
 ];
 
-export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
-  const [lotties, setLotties] = useState<string[]>([]);
-  
-  useEffect(() => {
-    // Attempt to dynamically fetch whatever Lotties are available
-    fetch('/api/lottie?file=__list__')
-      .then(r => r.json())
-      .then(d => {
-         if (d.files && d.files.length > 0) setLotties(d.files);
-      }).catch(console.error);
-  }, []);
+const LEFT_SIDEBAR_CONTENT = [
+  {
+    title: "Desfalco de Mt. Gox (2014)",
+    text: "El paroxismo originario de la fragilidad del custodio centralizado. Al delegar la custodia de ochocientas cincuenta mil unidades de Bitcoin a una infraestructura de servidores tradicional con bases de datos SQL mutables, la asimetría de seguridad derivó en la sustracción silente y prolongada del setenta por ciento del volumen global. Postulado fundacional absoluto: la posesión algorítmica fidedigna es inexistente fuera de las claves privadas criptográficas."
+  },
+  {
+    title: "Espiral de Muerte de Terra/LUNA (2022)",
+    text: "La demostración empírica del fracaso matemático de las stablecoins algorítmicas subcolateralizadas. Fomentados por reservas de fe en lugar de inmutabilidad matemática sobredimensionada, los anclajes de valor colapsaron bajo presión hiperbólica, evaporando sesenta mil millones de capital fiduciario en setenta y dos horas. Revela crudamente que la economía cibernética no sobrevive al apalancamiento sin anclas tangibles en capa cero."
+  },
+  {
+    title: "Colapso del Imperio FTX (2022)",
+    text: "El cenit global de la opacidad institucional en el siglo XXI. Operando tras una falsa cortina de regulación, la rehipotecación algorítmica del capital de los usuarios mediante 'puertas traseras' en el código base tradicional facilitó la dilapidación abismal de reservas. Esta implosión sistemática purificó el ecosistema, evidenciando que sin herramientas de transparencia on-chain y liquidación determinista, los oráculos humanos caen en depravación."
+  }
+];
 
+const RIGHT_SIDEBAR_CONTENT = [
+  {
+    title: "Bifurcación de The DAO (2016)",
+    text: "El evento de fisura más profundo en la axiomática del 'Código es Ley'. Tras la recolección masiva de Ether en la naciente Máquina Virtual de Ethereum, un ataque por reentrada de funciones drenó severamente el contrato maestro. La corrección requirió una amputación brutal mediante bifurcación dura (Hard Fork), alterando para siempre la génesis de la red y exponiendo la inmadurez biológica de la lógica computacional inmutable pura."
+  },
+  {
+    title: "Extracción del Ronin Bridge (2022)",
+    text: "El siniestro absoluto por la ilusión de la descentralización. Un puente de escalabilidad cedió más de seiscientos millones de dólares porque su autoridad matemática residía en un esquema M-de-N extremadamente precario (cinco de nueve validadores). Al comprometer las firmas mediante vectores de ataque de ingeniería social corporativa, se desmanteló por completo la narrativa subyacente de seguridad distribuida real."
+  },
+  {
+    title: "La Fisura de Wormhole (2022)",
+    text: "El clímax de vulnerabilidad en la topología poli-cadena (Cross-chain). Mediante la falsificación algorítmica de atestaciones y la elusión de validaciones triviales en los contratos inteligentes de puenteo, la arquitectura sufrió una sustracción inmediata de gran magnitud sin contramedidas reactivas posibles. Concluyendo definitivamente que los vectores poli-cadena elevan la entropía sistémica exponencialmente si no se auditan a prueba de abismos."
+  }
+];
+
+export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
+  
   return (
-    <div className="min-h-screen bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full"
+    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full max-w-[100vw] overflow-x-hidden"
          style={{ overflowY: 'auto', scrollBehavior: 'smooth' }}>
 
-      <main className="max-w-[850px] mx-auto px-6 py-16 flex flex-col gap-24">
+      <InteractiveFluidGrid />
+
+      <div className="relative z-10 w-full max-w-[1550px] mx-auto px-5 sm:px-8 flex justify-center pb-48">
         
-        <header className="flex flex-col gap-6 text-center mb-8">
+        {/* Left Academic Column */}
+        <aside className="hidden min-[1350px]:flex flex-col pt-36 pr-12 w-[320px] shrink-0">
+          <div className="border-b-[1.5px] border-black pb-2 mb-8">
+            <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
+              Tracto I: Opacidad y Ruina
+            </h3>
+          </div>
+          <div className="flex flex-col gap-12">
+            {LEFT_SIDEBAR_CONTENT.map((item, i) => (
+              <article key={i} className="flex flex-col relative group">
+                <div className="absolute -left-4 top-1 bottom-0 w-px bg-black/10 group-hover:bg-black transition-colors duration-500" />
+                <h4 className="font-mono text-[9px] uppercase tracking-widest text-[#222] font-bold mb-3 leading-loose">
+                  [{String(i + 1).padStart(2, '0')}] {item.title}
+                </h4>
+                <p className="font-serif text-[11px] text-[#444] leading-[1.85] text-justify opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+                  {item.text}
+                </p>
+              </article>
+            ))}
+          </div>
+        </aside>
+
+        {/* Central Immersive Manifesto */}
+        <main className="w-full max-w-[850px] shrink-0 py-12 sm:py-16 flex flex-col gap-16 sm:gap-24">
+          
+          <header className="flex flex-col gap-6 text-center mb-8">
           <h1 className="text-[32px] md:text-[42px] font-serif text-black leading-tight tracking-tight">
             En la búsqueda de la <br/><span className="italic font-light">transparencia</span>
           </h1>
@@ -86,26 +156,24 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
               <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
                 {page.paragraphs.map((para, pIndex) => {
                    const globalIndex = (pageIndex * 3) + pIndex;
-                   const lottieFile = lotties[globalIndex % Math.max(lotties.length, 1)];
+                   const lottieFile = MANIFESTO_LOTTIES[globalIndex % MANIFESTO_LOTTIES.length];
 
                    return (
                      <div key={pIndex} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden">
                        
                        {/* Lottie fixed block on the left (solid stack integration) */}
-                       <div className="w-full sm:w-[140px] bg-[#f5f4ef] flex items-center justify-center p-4 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 group-hover:bg-[#f0efe9]">
-                          {lottieFile && lotties.length > 0 && (
-                             <div className="w-[100px] h-[100px] grayscale mix-blend-multiply opacity-85 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
-                                <OptimizedLocalLottie filename={lottieFile} />
-                             </div>
-                          )}
-                          <div className="absolute top-2 left-2 text-[8px] font-mono opacity-20 select-none">
+                       <div className="w-full sm:w-[240px] bg-[#f5f4ef] flex items-center justify-center p-8 sm:p-6 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 hover:bg-[#f0efe9] sm:group-hover:bg-[#f0efe9]">
+                          <div className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] grayscale mix-blend-multiply opacity-85 transition-transform duration-700 sm:group-hover:grayscale-0 sm:group-hover:opacity-100 sm:group-hover:scale-105">
+                             <OptimizedLocalLottie filename={lottieFile} />
+                          </div>
+                          <div className="absolute top-3 left-3 text-[9px] font-mono opacity-20 select-none">
                             SEC-{pageIndex + 1}.{pIndex + 1}
                           </div>
                        </div>
                        
                        {/* Text Content */}
-                       <div className="flex-1 p-6 md:p-8 flex items-start">
-                          <span className="font-mono text-[10px] text-black/30 tracking-widest mr-4 sm:mr-6 select-none flex-shrink-0 mt-[2px]">
+                       <div className="flex-1 p-5 sm:p-6 md:p-8 flex items-start">
+                          <span className="font-mono text-[10px] text-black/30 tracking-widest mr-3 sm:mr-6 select-none flex-shrink-0 mt-[2px]">
                              [{String(pageIndex + 1).padStart(2, '0')}.{String(pIndex + 1).padStart(2, '0')}]
                           </span>
                           <p className="font-serif text-[12px] sm:text-[13px] text-[#222] leading-[1.8] text-justify w-full">
@@ -116,31 +184,56 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
                      </div>
                    );
                 })}
-              </div>
+               </div>
             </section>
           ))}
         </div>
+        </main>
 
-
-
-        {onOpenScanner && (
-          <div className="fixed bottom-0 left-0 w-full p-0 flex flex-col pointer-events-none z-50">
-             <div className="h-20 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/80 to-transparent w-full" />
-             <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-4">
-               <button
-                 onClick={onOpenScanner}
-                 className="pointer-events-auto px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors flex items-center gap-3"
-               >
-                 <Scan size={13} />
-                 Session Log &amp; Scan
-               </button>
-             </div>
+        {/* Right Academic Column */}
+        <aside className="hidden min-[1350px]:flex flex-col pt-36 pl-12 w-[320px] shrink-0">
+          <div className="border-b-[1.5px] border-black pb-2 mb-8">
+            <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
+              Tracto II: Entropía Central
+            </h3>
           </div>
-        )}
-      </main>
+          <div className="flex flex-col gap-12">
+            {RIGHT_SIDEBAR_CONTENT.map((item, i) => (
+              <article key={i} className="flex flex-col relative group">
+                <div className="absolute -left-4 top-1 bottom-0 w-px bg-black/10 group-hover:bg-black transition-colors duration-500" />
+                <h4 className="font-mono text-[9px] uppercase tracking-widest text-[#222] font-bold mb-3 leading-loose">
+                  [{String(i + 4).padStart(2, '0')}] {item.title}
+                </h4>
+                <p className="font-serif text-[11px] text-[#444] leading-[1.85] text-justify opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+                  {item.text}
+                </p>
+              </article>
+            ))}
+          </div>
+        </aside>
+
+      </div>
+
+      {/* Floating Scanner Panel (Out of flow) */}
+      {onOpenScanner && (
+        <div className="fixed bottom-0 left-0 w-full p-0 flex flex-col pointer-events-none z-50">
+           <div className="h-24 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
+           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+             <button
+               onClick={onOpenScanner}
+               className="pointer-events-auto px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors flex items-center gap-3"
+             >
+               <Scan size={13} />
+               Session Log &amp; Scan
+             </button>
+           </div>
+        </div>
+      )}
 
       {/* ─── Sovereign Footer (full-bleed, outside max-width container) ─── */}
-      <SovereignFooter />
+      <div className="relative z-10">
+        <SovereignFooter />
+      </div>
 
     </div>
   );
