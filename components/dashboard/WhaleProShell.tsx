@@ -46,6 +46,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
 
     // ── Intelligence ──
     { id: 'neural-graph',        label: 'Entity Map',         icon: <Network size={17}/>,          dividerBefore: 'Intelligence' },
+    { id: 'cosmic-forge',        label: 'Cosmic Forge',       icon: <FlaskConical size={17}/>,     badge: 'NEW', badgeColor: '#8b5cf6' },
     { id: 'sovereign-intel',     label: 'Smart Signals',      icon: <Zap size={17}/> },
     { id: 'institutional-ledger',label: 'Event Ledger',       icon: <Landmark size={17}/>,         badge: 'NEW' },
     { id: 'mass-transfer',       label: 'Mass Transfers',     icon: <Activity size={17}/> },

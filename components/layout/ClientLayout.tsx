@@ -76,12 +76,41 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const isBounded = !isDashboard && pathname !== '/' && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
   const isLanding = pathname === '/';
 
+  const isLanding = pathname === '/';
+
+  // Strict body trap for PC/Desktop — completely block document-level scrolling on bounded modules
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    if (isDashboard || isBounded) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      // To strictly prevent drag-scroll bleeds on MacOS trackpad:
+      if (document.body.style.position !== 'fixed') {
+        document.body.classList.add('ios-scroll-lock-strict');
+      }
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      document.body.classList.remove('ios-scroll-lock-strict');
+    }
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.classList.remove('ios-scroll-lock-strict');
+    };
+  }, [isDashboard, isBounded]);
+
   // Root container
   const rootClass = isDashboard
-    ? 'fixed inset-0 h-[100dvh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
+    ? 'fixed inset-0 h-[100vh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
     : isBounded
-      ? 'h-[100dvh] w-full overflow-hidden flex flex-col bg-[#FAF9F6] relative z-0'
-      : 'min-h-[100dvh] w-full relative z-0 flex flex-col bg-[#FAF9F6]';
+      ? 'fixed inset-0 h-[100vh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
+      : 'min-h-[100vh] w-full relative z-0 flex flex-col bg-[#FAF9F6] overflow-x-hidden';
 
   // Inner wrapper (below header)
   const innerClass = isDashboard
@@ -107,8 +136,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/support' ||
     pathname === '/academy' ||
     pathname === '/vip' ||
-    pathname === '/' ||
-    pathname.startsWith('/news');
+    pathname === '/';
 
   return (
     <>
