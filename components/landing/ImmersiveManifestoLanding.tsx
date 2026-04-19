@@ -155,12 +155,11 @@ const RIGHT_SIDEBAR_CONTENT = [
 export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
   
   return (
-    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full max-w-[100vw] overflow-x-hidden relative"
-         style={{ overscrollBehavior: 'none' }}>
+    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative">
 
       <InteractiveFluidGrid />
 
-      <div className="relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 pb-48">
+      <div className="relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 pb-16">
         
         {/* Left Academic Column */}
         <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">

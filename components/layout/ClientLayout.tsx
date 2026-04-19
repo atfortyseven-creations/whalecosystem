@@ -48,6 +48,20 @@ const NO_DOWNHEAD_PREFIXES = [
   '/login', '/sign-up', '/legal', '/admin', '/developer',
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Routes that use a bounded-viewport layout (no dead space below content)
+// Everything except the landing page ("/") and the dashboard (managed by
+// WhaleProShell with its own fixed-inset shell) should be fully contained.
+// ─────────────────────────────────────────────────────────────────────────────
+const BOUNDED_PREFIXES = [
+  '/portfolio', '/academy', '/support', '/news', '/network',
+  '/predictions', '/ledger', '/sovereign-intel', '/voss-supremacy',
+  '/gold-registry', '/vip', '/developer', '/developers', '/faq',
+  '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
+  '/connect', '/sign-up', '/login', '/admin', '/clearance',
+  '/api-marketplace', '/directory', '/company', '/infrastructure',
+];
+
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -55,21 +69,34 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
 
   // ── Layout mode ───────────────────────────────────────────────────────────
-  // DASHBOARD  → fixed inset-0 overflow-hidden  (WhaleProShell owns scroll)
-  // ALL OTHERS → min-h-screen + native scroll   (no invisible void zones)
+  // DASHBOARD  → fixed inset-0 overflow-hidden   (WhaleProShell owns scroll)
+  // BOUNDED    → h-[100dvh] overflow-hidden       (header + inner scroll box)
+  // LANDING    → min-h-screen natural document scroll (immersive manifesto)
   const isDashboard = pathname.startsWith('/dashboard');
+  const isBounded = !isDashboard && pathname !== '/' && BOUNDED_PREFIXES.some(p => pathname.startsWith(p));
+  const isLanding = pathname === '/';
 
+  // Root container
   const rootClass = isDashboard
     ? 'fixed inset-0 h-[100dvh] w-[100vw] overflow-hidden flex flex-col bg-[#FAF9F6] z-0'
-    : 'min-h-screen w-full relative z-0 flex flex-col bg-[#FAF9F6]';
+    : isBounded
+      ? 'h-[100dvh] w-full overflow-hidden flex flex-col bg-[#FAF9F6] relative z-0'
+      : 'min-h-[100dvh] w-full relative z-0 flex flex-col bg-[#FAF9F6]';
 
+  // Inner wrapper (below header)
   const innerClass = isDashboard
-    ? 'flex-1 flex flex-col relative w-full overflow-hidden'
-    : 'flex-1 flex flex-col relative w-full';
+    ? 'flex-1 flex flex-col relative w-full overflow-hidden min-h-0'
+    : isBounded
+      ? 'flex-1 flex flex-col relative w-full overflow-hidden min-h-0'
+      : 'flex-1 flex flex-col relative w-full';
 
+  // <main> element
   const mainClass = isDashboard
     ? 'relative z-10 w-full flex-1 flex flex-col min-h-0 overflow-hidden'
-    : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
+    : isBounded
+      // Scroll is fully contained here — no empty page-level void zones
+      ? 'relative z-10 w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain'
+      : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
 
   const showDownhead = pathname !== '/' &&
     !NO_DOWNHEAD_PREFIXES.some(p => pathname.startsWith(p));
@@ -103,7 +130,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <ZoomWrapper>
-              <main className={mainClass}>
+              <main
+                className={mainClass}
+                style={isBounded ? {
+                  // Belt-and-suspenders scroll containment:
+                  // scrollbarWidth and overscroll are set inline as well so
+                  // no CSS cascade issue on any browser engine can break them.
+                  scrollbarWidth: 'thin',
+                  overscrollBehavior: 'contain',
+                  touchAction: 'pan-y',
+                } : undefined}
+              >
                 {content}
               </main>
             </ZoomWrapper>

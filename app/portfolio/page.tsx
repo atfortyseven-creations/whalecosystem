@@ -192,8 +192,8 @@ export default function PortfolioPage() {
   if (!isConnected) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center px-6"
-        style={{ background: BG }}
+        className="flex items-center justify-center px-6"
+        style={{ background: BG, minHeight: '100%' }}
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -236,7 +236,7 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: BG, color: INK }}>
+    <div style={{ background: BG, color: INK }}>
 
       {/* ── HEADER ── */}
       <header
@@ -286,7 +286,7 @@ export default function PortfolioPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 pb-32 pt-8 space-y-5">
+      <main className="max-w-5xl mx-auto px-4 pb-8 pt-8 space-y-5">
 
         {/* ── BALANCE CARD ── */}
         <motion.div
