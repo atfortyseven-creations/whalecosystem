@@ -85,13 +85,16 @@ export function SessionLogsPanel() {
   };
 
   const filteredLogs = React.useMemo(() => {
-    if (!search) return logs;
-    const lower = search.toLowerCase();
-    return logs.filter(l => 
-      l.action.toLowerCase().includes(lower) || 
-      (l.userId && l.userId.toLowerCase().includes(lower)) ||
-      (l.ipAddress && l.ipAddress.toLowerCase().includes(lower))
-    );
+    let result = logs;
+    if (search) {
+      const lower = search.toLowerCase();
+      result = logs.filter(l => 
+        l.action.toLowerCase().includes(lower) || 
+        (l.userId && l.userId.toLowerCase().includes(lower)) ||
+        (l.ipAddress && l.ipAddress.toLowerCase().includes(lower))
+      );
+    }
+    return result.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [logs, search]);
 
   const columns = React.useMemo<ColumnDef<SessionLog>[]>(
@@ -130,10 +133,8 @@ export function SessionLogsPanel() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const { rows } = table.getRowModel();
-
   const rowVirtualizer = useVirtualizer({
-    count: rows.length,
+    count: filteredLogs.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 48,
     overscan: 10,
@@ -173,40 +174,50 @@ export function SessionLogsPanel() {
 
       {/* Table Body (Virtualized) */}
       <div ref={tableContainerRef} className="flex-1 overflow-y-auto no-scrollbar relative min-h-0 bg-white">
-        <table className="w-full text-left border-collapse">
-          <thead className="sticky top-0 z-10 bg-[#f9f9f9] border-b border-black/10 shadow-sm">
-            {table.getHeaderGroups().map((headerGroup: any) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header: any) => (
-                  <th key={header.id} className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50 bg-[#f9f9f9]">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative', display: 'block' }}>
+        <div className="w-full text-left">
+          <div className="sticky top-0 z-10 bg-[#FAF9F6] border-b border-black/10 shadow-sm grid" style={{ gridTemplateColumns: '1.5fr 2fr 3fr 1.5fr' }}>
+              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Timestamp</div>
+              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Action / Event</div>
+              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Sovereign ID</div>
+              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">IP Address</div>
+          </div>
+          <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
             {rowVirtualizer.getVirtualItems().map((virtualRow: any) => {
-              const row = rows[virtualRow.index as number];
+              const logItem = filteredLogs[virtualRow.index];
+              if (!logItem) return null;
               return (
-                <tr 
-                  key={row.id} 
-                  className="absolute w-full border-b border-black/5 hover:bg-[#FDFCF8] transition-colors group flex items-center"
+                <div 
+                  key={logItem.id} 
+                  onClick={() => {
+                      navigator.clipboard.writeText(JSON.stringify(logItem, null, 2));
+                      toast.success("Log session detail copied successfully!");
+                  }}
+                  className="absolute w-full border-b border-black/5 hover:bg-[#FDFCF8] transition-colors group grid items-center cursor-pointer active:bg-black/5"
                   style={{
+                    gridTemplateColumns: '1.5fr 2fr 3fr 1.5fr',
                     height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  {row.getVisibleCells().map((cell: any, i: number) => (
-                    <td key={cell.id} className="p-4 text-[12px]" style={{ width: i === 0 ? '25%' : i === 1 ? '25%' : i === 2 ? '30%' : '20%' }}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
+                    <div className="p-4 text-[11px] font-mono text-black/60 truncate" title={new Date(logItem.timestamp).toLocaleString()}>
+                        {new Date(logItem.timestamp).toLocaleString()}
+                    </div>
+                    <div className="p-4 text-[12px] truncate">
+                        <span className="px-2 py-1 bg-black/5 border border-black/10 rounded text-black text-[9px] uppercase font-black tracking-widest truncate">
+                            {logItem.action}
+                        </span>
+                    </div>
+                    <div className="p-4 text-[11px] font-mono font-black text-black/80 truncate">
+                        {logItem.userId || "Anonymous"}
+                    </div>
+                    <div className="p-4 text-[11px] font-mono text-black/40 truncate">
+                        {logItem.ipAddress || "Hidden"}
+                    </div>
+                </div>
               )
             })}
-          </tbody>
-        </table>
+          </div>
+        </div>
 
         {filteredLogs.length === 0 && (
            <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-40 text-black">

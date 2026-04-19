@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Search, Loader2, ArrowUpRight, ArrowDownRight, RefreshCw, X, Globe, TrendingUp, Zap } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { usePerformanceMode, shouldRenderFrame } from '@/hooks/usePerformanceMode';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 interface BubbleData {
@@ -59,7 +60,12 @@ export default function BubblesView({ limit }: { limit?: number }) {
     const lastTimeRef = useRef<number>(0);
     const animationStartRef = useRef<number>(0);
     const [isSettled, setIsSettled] = useState(false);
+    const lastRenderRef = useRef(0);
     
+    const perfMode = usePerformanceMode();
+    const perfRef = useRef(perfMode);
+    perfRef.current = perfMode;
+
     const mouseRef = useRef({ x: 0, y: 0, active: false, targetNode: null as string | null });
 
     const fetchData = async (signal?: AbortSignal) => {
@@ -153,6 +159,12 @@ export default function BubblesView({ limit }: { limit?: number }) {
     }, [filteredData, timeframe]);
 
     const animate = (time: number) => {
+        requestRef.current = requestAnimationFrame(animate);
+
+        if (!perfRef.current.isVisible) return;
+        if (!shouldRenderFrame(time, lastRenderRef.current, perfRef.current.targetFps)) return;
+        lastRenderRef.current = time;
+
         if (!animationStartRef.current) animationStartRef.current = time;
         if (!lastTimeRef.current) lastTimeRef.current = time;
         
@@ -173,7 +185,20 @@ export default function BubblesView({ limit }: { limit?: number }) {
         const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
         const animationStrength = isAnimating ? (1 - easeOut(progress)) : 0;
 
+        // SKIP PHYSICS IF MINIMAL and SETTLED
+        // When in MINIMAL power mode, we don't need interactive bubbling after it rests.
         let allSettled = true;
+        const skipInteraction = perfRef.current.mode === "MINIMAL" && progress > 0.99;
+
+        if (skipInteraction) {
+           for (let i = 0; i < nodes.length; i++) {
+               const a = nodes[i];
+               a.settled = true; 
+               a.vx = 0; a.vy = 0;
+           }
+           setIsSettled(true);
+           return;
+        }
 
         for (let i = 0; i < nodes.length; i++) {
             const a = nodes[i];
@@ -187,8 +212,8 @@ export default function BubblesView({ limit }: { limit?: number }) {
                 // Slow, ultra-smooth spring following for maximum fluidity
                 const dx = targetX - a.x;
                 const dy = targetY - a.y;
-                const springStrength = 0.08; // Reduced for slower movement
-                const damping = 0.85; // Smooth deceleration
+                const springStrength = 0.08 * deltaTime; // Adjusted delta
+                const damping = Math.pow(0.85, deltaTime); // Smooth deceleration
                 
                 // Smooth velocity interpolation
                 a.vx += dx * springStrength;
@@ -206,10 +231,10 @@ export default function BubblesView({ limit }: { limit?: number }) {
             // PHASE 2: Initial settling animation
             else if (isAnimating && !a.settled) {
                 // Gentle physics during initial animation
-                const damping = 0.92;
-                const repulsion = 0.3 * animationStrength;
-                const edgeForce = 0.08 * animationStrength;
-                const pullToCenter = 0.002 * animationStrength;
+                const damping = Math.pow(0.92, deltaTime);
+                const repulsion = 0.3 * animationStrength * deltaTime;
+                const edgeForce = 0.08 * animationStrength * deltaTime;
+                const pullToCenter = 0.002 * animationStrength * deltaTime;
 
                 // Pull to center
                 a.vx += (width / 2 - a.x) * pullToCenter;
@@ -276,8 +301,6 @@ export default function BubblesView({ limit }: { limit?: number }) {
         if (allSettled && !isSettled) {
             setIsSettled(true);
         }
-
-        requestRef.current = requestAnimationFrame(animate);
     };
 
     useEffect(() => {

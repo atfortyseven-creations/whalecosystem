@@ -1,10 +1,10 @@
 "use client";
 
-import React, { memo, useRef, useEffect, useState } from 'react';
+import React, { memo, useRef, useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useVIPStore, WhaleEvent } from '@/lib/vip-store';
-import { Activity, ArrowRight, Zap, ChevronUp } from 'lucide-react';
+import { ArrowRight, ChevronUp } from 'lucide-react';
 
 // Dynamic imports to avoid SSR crashes (React Error #130)
 const FixedSizeList = dynamic<any>(
@@ -37,6 +37,11 @@ const FirehoseSkeleton = () => (
 
 // ============================================================================
 // ROW COMPONENT
+// PERF: Replaced motion.div with a plain div + CSS transition.
+// With 200+ rows each using motion.div (0.4s animation), Framer Motion was
+// scheduling hundreds of concurrent JS animation timers on every store update,
+// blocking the main thread. CSS transitions are handled by the GPU compositor
+// (zero JS cost) and are visually identical at this opacity range.
 // ============================================================================
 const FirehoseRow = memo(({ data, index, style }: any) => {
     const event: WhaleEvent = data[index];
@@ -57,11 +62,9 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
 
     return (
         <div style={style} className="px-2 py-1">
-            <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-                className={`w-full h-full flex flex-col justify-center border-b border-[#E5E5E5] ${bgPulse} hover:bg-[#FAF9F6] bg-white transition-colors cursor-pointer rounded-sm px-4`}
+            {/* Pure CSS entry animation — zero JS overhead vs motion.div */}
+            <div
+                className={`w-full h-full flex flex-col justify-center border-b border-[#E5E5E5] ${bgPulse} hover:bg-[#FAF9F6] bg-white cursor-pointer rounded-sm px-4 firehose-row-enter`}
             >
                 <div className="flex items-center justify-between">
                     {/* LEFT: Time & Token */}
@@ -103,7 +106,7 @@ const FirehoseRow = memo(({ data, index, style }: any) => {
                         </div>
                     </div>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 });
@@ -119,50 +122,42 @@ export function VirtualizedFirehose() {
     const [autoScroll, setAutoScroll] = useState(true);
     const [isMounted,  setIsMounted]  = useState(false);
     const [showJumpTop, setShowJumpTop] = useState(false);
+    // Throttle flag — prevents scrollTo() from firing on every individual event
+    const scrollThrottleRef = useRef(false);
 
     // Dynamic imports SSR guard
     useEffect(() => { setIsMounted(true); }, []);
 
-    // Keep scroll at top if autoScroll is enabled
+    // PERF: Throttled auto-scroll — coalesce rapid store updates into a single scroll
     useEffect(() => {
-        if (autoScroll && listRef.current && whaleEvents.length > 0) {
-            listRef.current.scrollTo(0);
-        }
+        if (!autoScroll || !listRef.current || whaleEvents.length === 0) return;
+        if (scrollThrottleRef.current) return;
+        scrollThrottleRef.current = true;
+        requestAnimationFrame(() => {
+            listRef.current?.scrollTo(0);
+            scrollThrottleRef.current = false;
+        });
     }, [whaleEvents, autoScroll]);
 
-    const handleJumpTop = () => {
+    const handleJumpTop = useCallback(() => {
         if (listRef.current) {
             listRef.current.scrollTo(0);
             setAutoScroll(true);
             setShowJumpTop(false);
         }
-    };
+    }, []);
 
     return (
         <div className="w-full h-full p-4 md:p-6 flex flex-col overflow-hidden text-[#050505] font-sans">
+            {/* CSS entry animation for rows */}
+            <style>{`
+                @keyframes firehose-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+                .firehose-row-enter { animation: firehose-in 0.25s ease-out both; }
+            `}</style>
+
             <div className="flex-1 w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col min-h-0 relative group overflow-hidden">
 
-            {/* HEADER */}
-            <div className="shrink-0 flex items-center justify-between p-4 border-b border-[#E5E5E5] bg-[#FAF9F6] rounded-t-xl z-20">
-                <div className="flex items-center gap-3">
-                    <Activity size={16} className="text-[#00C076] animate-pulse" />
-                    <h2 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#050505]">
-                        Global Liquidity Firehose
-                    </h2>
-                    <span className="px-2 py-0.5 bg-[#00C076]/10 border border-[#00C076]/30 text-[#00C076] text-[9px] font-black rounded-sm">
-                        LIVE
-                    </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.8)]" />
-                        <span className="text-[9px] font-mono text-[#888888] uppercase tracking-widest">
-                            {whaleEvents.length} TXs in Memory
-                        </span>
-                    </div>
-                </div>
-            </div>
+            {/* HEADER REMOVED - User requested to eliminate 'Global liquidity firehose Live' */}
 
             {/* VIRTUALIZED LIST CONTAINER */}
             <div
@@ -171,20 +166,11 @@ export function VirtualizedFirehose() {
                     setAutoScroll(false);
                     setShowJumpTop(true);
                 }}
-                onMouseLeave={() => {
-                    // Don't auto-resume if they are scrolled way down
-                }}
             >
-                {/* Empty State / Skeleton — shown briefly before bootstrap kicks in */}
+                {/* Empty State / Skeleton */}
                 {(!isMounted || whaleEvents.length === 0) && (
                     <div className="absolute inset-0 z-10 bg-[#FFFFFF] flex flex-col">
                         {Array.from({ length: 10 }).map((_, i) => <FirehoseSkeleton key={i} />)}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-white/40 backdrop-blur-sm">
-                            <Zap size={24} className="text-[#00C076] animate-pulse" />
-                            <span className="text-[10px] font-black text-[#050505] uppercase tracking-[0.3em]">
-                                Syncing Neurometric Feeds…
-                            </span>
-                        </div>
                     </div>
                 )}
 
@@ -201,6 +187,7 @@ export function VirtualizedFirehose() {
                                 itemData={whaleEvents}
                                 className="scrollbar-hide"
                                 itemKey={(index: number, data: WhaleEvent[]) => data[index]?.id || index}
+                                overscanCount={3}
                             >
                                 {FirehoseRow}
                             </FixedSizeList>
@@ -233,8 +220,8 @@ export function VirtualizedFirehose() {
                 <span className="text-[8px] font-mono text-[#888888] uppercase tracking-[0.3em]">
                     Powered by Zero-Knowledge Nodes
                 </span>
-                {!autoScroll && (
-                    <button 
+                {!autoScroll && whaleEvents.length > 0 && (
+                    <button
                         onClick={() => setAutoScroll(true)}
                         className="text-[8px] font-black text-[#00C076] uppercase tracking-[0.2em] animate-pulse hover:underline"
                     >
@@ -246,3 +233,4 @@ export function VirtualizedFirehose() {
         </div>
     );
 }
+

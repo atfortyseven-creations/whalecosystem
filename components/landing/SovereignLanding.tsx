@@ -10,10 +10,14 @@ import {
   Database, LayoutDashboard, Code2, Wallet, Fingerprint
 } from "lucide-react";
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { usePerformanceMode, shouldRenderFrame } from '@/hooks/usePerformanceMode';
 
 // ── Particle Canvas Background ──
 function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const perfMode = usePerformanceMode();
+  const perfRef = useRef(perfMode);
+  perfRef.current = perfMode;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,8 +49,17 @@ function ParticleBackground() {
         });
     }
 
-    const render = () => {
+    let lastRenderDiff = 0;
+
+    const render = (time: number) => {
         if (!isActive) return;
+        animationFrameId = requestAnimationFrame(render);
+
+        if (!perfRef.current.isVisible) return;
+        if (!shouldRenderFrame(time, lastRenderDiff, perfRef.current.targetFps)) return;
+        
+        const delta = lastRenderDiff ? (time - lastRenderDiff) / 16.66 : 1;
+        lastRenderDiff = time;
 
         ctx.fillStyle = '#0a0a0a';
         ctx.fillRect(0, 0, width, height);
@@ -54,8 +67,8 @@ function ParticleBackground() {
         ctx.lineWidth = 0.5;
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
-          p.x += p.vx;
-          p.y += p.vy;
+          p.x += p.vx * delta;
+          p.y += p.vy * delta;
 
           if (p.x < 0 || p.x > width) p.vx *= -1;
           if (p.y < 0 || p.y > height) p.vy *= -1;
@@ -65,27 +78,29 @@ function ParticleBackground() {
           ctx.fillStyle = `rgba(0, 245, 255, ${p.alpha})`; // Cyan neon
           ctx.fill();
 
-          for (let j = i + 1; j < particles.length; j++) {
-              const p2 = particles[j];
-              const dx = p.x - p2.x;
-              const dy = p.y - p2.y;
-              const dist = dx * dx + dy * dy;
-              if (dist < 15000) {
-                  ctx.beginPath();
-                  ctx.moveTo(p.x, p.y);
-                  ctx.lineTo(p2.x, p2.y);
-                  ctx.strokeStyle = `rgba(159, 0, 255, ${(1 - dist / 15000) * 0.15})`; // Purple link
-                  ctx.stroke();
-              }
+          if (!perfRef.current.skipEdges) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dx = p.x - p2.x;
+                const dy = p.y - p2.y;
+                const dist = dx * dx + dy * dy;
+                if (dist < 15000) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = `rgba(159, 0, 255, ${(1 - dist / 15000) * 0.15})`; // Purple link
+                    ctx.stroke();
+                }
+            }
           }
         }
-      animationFrameId = requestAnimationFrame(render);
     };
 
     const observer = new IntersectionObserver(([entry]) => {
        isActive = entry.isIntersecting;
        if (isActive && !animationFrameId) {
-          render(); // Restart the loop 
+          lastRenderDiff = 0;
+          animationFrameId = requestAnimationFrame(render); // Restart the loop 
        } else if (!isActive && animationFrameId) {
           cancelAnimationFrame(animationFrameId);
           animationFrameId = null; // Completely wipe loop from memory stack

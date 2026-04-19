@@ -8,7 +8,7 @@ import { useAccount, useConnect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
-import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail } from "lucide-react";
+import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X } from "lucide-react";
 
 // QR Scanner — iOS-safe dynamic import
 const DynamicQRScannerModal = dynamic(
@@ -143,41 +143,39 @@ function SigningOverlay({
           </button>
         ) : (
           <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center gap-3">
-            <Loader2 size={14} className="text-black/30 animate-spin shrink-0" />
-            <p className="text-[10px] text-black/40 font-mono uppercase tracking-widest text-left">
-              Esperando firma en tu wallet…
-            </p>
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-// ── Live clock hook ───────────────────────────────────────────────────────────
-function useLiveClock() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  return now;
-}
-
-// ── Connected Screen ──────────────────────────────────────────────────────────
+  // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner, onBack,
+  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId
 }: {
   address: string; onScan: () => void;
   showScanner: boolean; onCloseScanner: () => void;
   onBack?: () => void;
+  connectorName?: string;
+  chainId?: number;
 }) {
   const now = useLiveClock();
   const [connectedAt] = useState(() => new Date()); // frozen at mount time
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [userAgentInfo, setUserAgentInfo] = useState('');
+  const [screenRes, setScreenRes] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+       const ua = navigator.userAgent;
+       let os = "Unknown OS";
+       if (ua.indexOf("Win") != -1) os = "Windows";
+       if (ua.indexOf("Mac") != -1) os = "MacOS";
+       if (ua.indexOf("Linux") != -1) os = "Linux";
+       if (ua.indexOf("Android") != -1) os = "Android";
+       if (ua.indexOf("like Mac") != -1) os = "iOS";
+       setUserAgentInfo(`${os} (${navigator.vendor || "Browser"})`);
+       setScreenRes(`${window.screen.width}x${window.screen.height}`);
+    }
+  }, []);
 
   const fmtTime   = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const fmtDate   = (d: Date) => d.toLocaleDateString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  const fmtStamp  = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const fmtStamp  = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
@@ -185,10 +183,10 @@ function ConnectedScreen({
       <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute"
-          style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04, mixBlendMode: "multiply" }}
-          animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
-          transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
+           className="absolute"
+           style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04, mixBlendMode: "multiply" }}
+           animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
+           transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
       <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
@@ -210,26 +208,28 @@ function ConnectedScreen({
           <WhaleLogo className="w-5 h-5 shrink-0" />
           <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">LIVE</span>
-        </div>
+        <button 
+           onClick={() => setShowInfoModal(true)}
+           className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100 transition-colors"
+        >
+          <Info size={14} />
+        </button>
       </motion.header>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
 
         {/* ── Session Identity Card ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full bg-white rounded-[28px] border border-[#E5E5E5] shadow-lg overflow-hidden"
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.05, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+           className="w-full bg-white rounded-[24px] border border-[#E5E5E5] shadow-lg overflow-hidden flex flex-col"
         >
           {/* Top bar — live clock */}
-          <div className="bg-[#050505] px-6 py-5 flex items-center justify-between">
+          <div className="bg-[#050505] px-6 py-6 flex items-center justify-between">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Sesión Activa</p>
-              <p className="text-[32px] font-black tracking-tighter text-white leading-none tabular-nums">
+              <p className="text-[36px] font-black tracking-tighter text-white leading-none tabular-nums">
                 {fmtTime(now)}
               </p>
             </div>
@@ -238,17 +238,50 @@ function ConnectedScreen({
             </div>
           </div>
 
-          {/* Date row */}
-          <div className="px-6 py-4 border-b border-[#F0F0F0]">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/30 mb-1">Fecha</p>
-            <p className="text-[13px] font-black text-[#050505] capitalize">{fmtDate(now)}</p>
+          <div className="grid grid-cols-2 gap-px bg-[#F0F0F0]">
+            <div className="bg-white px-5 py-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Fecha</p>
+              <p className="text-[11px] font-black text-[#050505] capitalize truncate">{fmtDate(now)}</p>
+            </div>
+            <div className="bg-white px-5 py-4">
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Apertura</p>
+               <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-[11px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
+               </div>
+            </div>
           </div>
 
-          {/* Connection time */}
-          <div className="px-6 py-4 border-b border-[#F0F0F0] flex items-center justify-between">
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/30 mb-1">Conectado a las</p>
-              <p className="text-[13px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
+          <div className="grid grid-cols-2 gap-px bg-[#F0F0F0] border-t border-[#F0F0F0]">
+             <div className="bg-white px-5 py-4">
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Provider</p>
+               <p className="text-[11px] font-black text-[#050505] truncate">{connectorName || "Wallet Segura"}</p>
+             </div>
+             <div className="bg-white px-5 py-4">
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Red (Chain ID)</p>
+               <p className="text-[11px] font-mono text-[#050505] truncate">{chainId ? `Chain ${chainId}` : "Mainnet"}</p>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-px bg-[#F0F0F0] border-t border-[#F0F0F0]">
+             <div className="bg-white px-5 py-4">
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Device OS</p>
+               <p className="text-[11px] font-black text-[#050505] truncate">{userAgentInfo || "Detectando..."}</p>
+             </div>
+             <div className="bg-white px-5 py-4">
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Fingerprint</p>
+               <p className="text-[11px] font-mono text-[#050505] truncate">{screenRes || "Secure"}</p>
+             </div>
+          </div>
+
+          {/* Address full length */}
+          <div className="px-5 py-4 bg-white border-t border-[#F0F0F0]">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Billetera Conectada (Absoluta)</p>
+            <p className="text-[12px] font-mono text-[#050505] tracking-tight break-all leading-relaxed">
+              {address}
+            </p>
+          </div>
+        </motion.div> className="text-[13px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -314,7 +347,6 @@ function ConnectedScreen({
         onClose={onCloseScanner}
         onScan={(result: string) => {
           onCloseScanner();
-          // Handshake confirmation — no alert(), use a subtle toast via DOM
           const toast = document.createElement('div');
           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
           toast.textContent = '✓ Terminal PC Desbloqueado';
@@ -322,6 +354,75 @@ function ConnectedScreen({
           setTimeout(() => toast.remove(), 3000);
         }}
       />
+
+      {/* INFO MODAL */}
+      <AnimatePresence>
+        {showInfoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-5"
+          >
+            <motion.div 
+               initial={{ scale: 0.95, opacity: 0, y: 10 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               exit={{ scale: 0.95, opacity: 0, y: 10 }}
+               className="w-full max-w-sm bg-white rounded-[24px] shadow-2xl border border-black/10 overflow-hidden flex flex-col"
+            >
+               <div className="flex items-center justify-between px-6 py-5 border-b border-[#F0F0F0]">
+                 <div className="flex items-center gap-2.5">
+                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                     <Info size={16} />
+                   </div>
+                   <h3 className="text-[14px] font-black uppercase tracking-tight text-[#050505]">Información del Panel</h3>
+                 </div>
+                 <button onClick={() => setShowInfoModal(false)} className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-black/40 hover:text-black">
+                   <X size={16} />
+                 </button>
+               </div>
+               
+               <div className="px-6 py-6 flex flex-col gap-5">
+                  <div className="bg-blue-50/50 p-4 border border-blue-100 rounded-xl">
+                    <p className="text-[11px] text-blue-900 leading-relaxed font-medium">
+                      Estás viendo el panel de control soberano en tu dispositivo móvil. Tu sesión está completamente verificada y asegurada criptográficamente con los datos mostrados en pantalla.
+                    </p>
+                  </div>
+
+                  <div>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]/40 mb-3">Pasos para enlazar el Terminal PC</p>
+                     
+                     <div className="flex flex-col gap-3">
+                       <div className="flex items-start gap-3">
+                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">1</div>
+                         <p className="text-[11px] text-[#050505] leading-snug">Abre la plataforma Whale Alert Network en el navegador de tu computadora de escritorio.</p>
+                       </div>
+                       <div className="flex items-start gap-3">
+                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">2</div>
+                         <p className="text-[11px] text-[#050505] leading-snug">Selecciona la opción <strong className="font-black">Direct QR Handshake</strong> en la pantalla de inicio del PC.</p>
+                       </div>
+                       <div className="flex items-start gap-3">
+                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">3</div>
+                         <p className="text-[11px] text-[#050505] leading-snug">Haz click en el botón negro <strong className="font-black">ABRIR SCANNER QR</strong> en esta pantalla de tu teléfono móvil.</p>
+                       </div>
+                       <div className="flex items-start gap-3">
+                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">4</div>
+                         <p className="text-[11px] text-[#050505] leading-snug">Apunta la cámara al código QR que aparece en tu monitor para transferir tu sesión segura instantáneamente.</p>
+                       </div>
+                     </div>
+                  </div>
+               </div>
+               
+               <div className="p-4 border-t border-[#F0F0F0] bg-[#FAF9F6]">
+                  <button onClick={() => setShowInfoModal(false)} className="w-full py-3.5 rounded-xl bg-black text-white text-[12px] font-black uppercase tracking-widest hover:bg-black/80 transition-colors shadow-lg active:scale-95 duration-200">
+                    Entendido
+                  </button>
+               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
@@ -331,7 +432,7 @@ export function MobileLanding() {
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { open: openAppKitDirect } = useAppKit();
@@ -573,6 +674,8 @@ export function MobileLanding() {
                showScanner={showScanner} 
                onCloseScanner={() => setShowScanner(false)} 
                onBack={() => setShowingManifesto(true)}
+               connectorName={connector?.name}
+               chainId={chainId}
             />
           </motion.div>
         )}
@@ -673,10 +776,10 @@ export function MobileLanding() {
             delay={0.2}
           />
           <WalletOption
-            logo="https://authjs.dev/img/providers/google.svg"
+            logo="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
             name="Google & Social Auth"
             badge="Smart Account · Social Login"
-            onClick={() => openAppKitDirect({ view: 'Connect' })}
+            onClick={() => openAppKitDirect()}
             delay={0.25}
           />
 
@@ -691,7 +794,7 @@ export function MobileLanding() {
       </main>
 
       {/* Wave Footer */}
-      <div className="relative w-full min-h-[380px] flex flex-col justify-end overflow-hidden">
+      <div className="relative w-full min-h-[380px] flex flex-col justify-end overflow-hidden mt-auto">
         <img
           src="/olas-hokusai-4k.png"
           alt=""
@@ -699,7 +802,8 @@ export function MobileLanding() {
           className="absolute inset-0 w-full h-full object-cover object-bottom opacity-85 z-0"
           style={{ willChange: "transform", transform: "translateZ(0)" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF9F6] via-[#FAF9F6]/60 to-transparent z-[1]" />
+        {/* Changed gradient to transparent at the top so pattern is visible, pushing the fade to the bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-[#FAF9F6]/80 to-transparent z-[1]" />
 
         <footer className="relative z-10 w-full pb-10 pt-16 mt-auto">
           <div className="mx-4 flex flex-col items-center gap-5 bg-white/50 backdrop-blur-md rounded-3xl py-7 px-6 border border-white/50 shadow-xl">

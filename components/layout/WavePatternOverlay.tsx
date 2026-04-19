@@ -48,7 +48,10 @@ export function WavePatternOverlay() {
           pointerEvents: "none",
           transform: "translateZ(0)",
           WebkitTransform: "translateZ(0)",
-          backgroundImage: "url('/api/checkpoint-image?name=patron-cosmico-4k.png')",
+          // PERF: Use direct /public static paths, NOT /api/* routes.
+          // API routes hit the Next.js edge function on every CSS background-image repaint.
+          // Static paths are served by the CDN/filesystem cache directly.
+          backgroundImage: "url('/patron-cosmico-4k.png')",
           backgroundRepeat: "repeat",
           backgroundSize: "280px auto", // Balanced texture scale
           backgroundAttachment: "scroll",
@@ -73,7 +76,7 @@ export function WavePatternOverlay() {
           WebkitTransform: "translateZ(0)",
           // Responsive height that anchors the wave perfectly
           height: "clamp(100px, 15vh, 220px)",
-          backgroundImage: "url('/api/assets?name=olas-hokusai-4k.png.png')",
+          backgroundImage: "url('/olas-hokusai-4k.png')",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "bottom center",
           // 'Contain' logic ensures every pixel of the wave strip is seen without cropping/zoom on small screens

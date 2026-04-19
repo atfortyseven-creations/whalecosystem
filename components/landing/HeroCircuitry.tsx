@@ -1,9 +1,13 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
+import { usePerformanceMode, shouldRenderFrame } from '@/hooks/usePerformanceMode';
 
 export function HeroCircuitry() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const perfMode = usePerformanceMode();
+    const perfRef = useRef(perfMode);
+    perfRef.current = perfMode;
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -40,7 +44,15 @@ export function HeroCircuitry() {
             });
         }
 
-        const draw = () => {
+        const draw = (time: number) => {
+            animationFrameId = requestAnimationFrame(draw);
+
+            if (!perfRef.current.isVisible) return;
+            if (!shouldRenderFrame(time, lastRenderRef.current, perfRef.current.targetFps)) return;
+
+            const delta = lastRenderRef.current ? (time - lastRenderRef.current) / 16.6 : 1;
+            lastRenderRef.current = time;
+
             ctx.clearRect(0, 0, width, height);
             
             lines.forEach(line => {
@@ -58,8 +70,8 @@ export function HeroCircuitry() {
                 
                 ctx.stroke();
 
-                // Animation movement
-                line.x += line.speed;
+                // Animation movement scaled by delta
+                line.x += line.speed * delta;
                 if (line.x > width + line.length) {
                     line.x = -line.length;
                     line.y = Math.random() * height;
@@ -83,11 +95,10 @@ export function HeroCircuitry() {
                 ctx.lineTo(width, y);
                 ctx.stroke();
             }
-
-            animationFrameId = requestAnimationFrame(draw);
         };
 
-        draw();
+        const lastRenderRef = { current: 0 };
+        animationFrameId = requestAnimationFrame(draw);
 
         return () => {
             window.removeEventListener('resize', resize);

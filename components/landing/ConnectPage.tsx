@@ -124,8 +124,23 @@ export default function ConnectPage() {
   }, [qrSession, syncStatus, router]);
 
   // ── Auto-redirect when wallet connected ──────────────────────────────────
+  // Guard: if user just disconnected, wagmi may still report isConnected=true
+  // for a brief moment from its internal cache. We skip the redirect on that
+  // first mount so the /connect page actually renders for reconnnection.
   useEffect(() => {
     if (!mounted || !isConnected) return;
+
+    // If we just disconnected (flag set by GlobalSettingsModal), clear it and
+    // stay on /connect so the user can choose a new wallet — no redirect.
+    try {
+      const justDisconnected = sessionStorage.getItem('__disconnected__') === '1';
+      if (justDisconnected) {
+        sessionStorage.removeItem('__disconnected__');
+        return; // ← stays on /connect, shows the wallet buttons
+      }
+    } catch {}
+
+    // Normal case: genuine new connection — set handshake cookie and redirect.
     if (!document.cookie.includes("sovereign_handshake=")) {
       const addrToSave = address || "web3_injected";
       document.cookie = `sovereign_handshake=${addrToSave}; path=/; max-age=604800; SameSite=Lax`;
@@ -157,11 +172,14 @@ export default function ConnectPage() {
       ? `${window.location.origin}/connect?session=${qrSession ?? ""}`
       : "";
 
-  // ── Render: show a skeleton background whilst mounting ───────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
+  // NOTE: Do NOT use `fixed inset-0` here — ConnectPage is already rendered
+  // inside ClientLayout's own `fixed inset-0` container for bounded routes.
+  // Using `fixed` again causes a CSS stacking conflict where the connect page
+  // has zero effective height and renders invisible (blank white screen).
   return (
     <div
-      className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white"
-      style={{ zIndex: 10 }}
+      className="min-h-screen w-full flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white"
     >
       {/* Background — Hokusai wave */}
       <div

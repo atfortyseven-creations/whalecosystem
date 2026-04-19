@@ -9,6 +9,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, Zap, Activity, Radio, BarChart3 } from "lucide-react";
 import { useMempoolStream } from "@/hooks/useMempoolStream";
+import { usePerformanceMode, shouldRenderFrame } from "@/hooks/usePerformanceMode";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -40,23 +41,38 @@ function VelocityCanvas({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const tRef = useRef(0);
+  const lastTimeRef = useRef(0);
+  const lastRenderRef = useRef(0);
 
-  const draw = useCallback(() => {
+  const perfMode = usePerformanceMode();
+  const perfRef = useRef(perfMode);
+  perfRef.current = perfMode;
+
+  const draw = useCallback((time: number) => {
+    animRef.current = requestAnimationFrame(draw);
+
+    if (!perfRef.current.isVisible) return;
+    if (!shouldRenderFrame(time, lastRenderRef.current, perfRef.current.targetFps)) return;
+    lastRenderRef.current = time;
+
+    const delta = lastTimeRef.current ? (time - lastTimeRef.current) / 1000 : 0.016;
+    lastTimeRef.current = time;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false }); // Opaque fallback performance
     if (!ctx) return;
 
     const W = canvas.width;
     const H = canvas.height;
-    tRef.current += 0.016;
+    tRef.current += delta;
     const t = tRef.current;
 
     // Background - Pure White
-    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
 
     if (history.length < 2) {
-      animRef.current = requestAnimationFrame(draw);
       return;
     }
 
@@ -119,12 +135,12 @@ function VelocityCanvas({
     ctx.fill();
 
     // Max label
-    ctx.font = "bold 9px Inter, sans-serif";
-    ctx.fillStyle = "#94a3b8";
-    ctx.textAlign = "right";
-    ctx.fillText(`${maxVal.toFixed(1)} tx/s peak`, W - 12, 18);
-
-    animRef.current = requestAnimationFrame(draw);
+    if (perfRef.current.mode === "HIGH") {
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.fillStyle = "#94a3b8";
+      ctx.textAlign = "right";
+      ctx.fillText(`${maxVal.toFixed(1)} tx/s peak`, W - 12, 18);
+    }
   }, [history, direction]);
 
   useEffect(() => {

@@ -27,12 +27,14 @@ import React, {
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap } from "lucide-react";
 import { useVIPStore, WhaleEvent } from "@/lib/vip-store";
+import { usePerformanceMode, shouldRenderFrame } from "@/hooks/usePerformanceMode";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
 const CFG = {
-  MAX_GRAINS: 320,
+  MAX_GRAINS: 320,        // Runtime-scaled down via particleScale
+  BASE_MAX_GRAINS: 320,   // Baseline (plugged in, HIGH mode)
   GRAVITY: 0.06,             // Slower, more elegant gravity
   FRICTION: 0.94,            // Higher viscosity
   RESTITUTION: 0.15,         // Softer bounces
@@ -180,6 +182,7 @@ function runFrame(
   grains: Grain[],
   t: number,
   dt: number,
+  skipBloom = false,
 ) {
   // ── Geometry constants ────────────────────────────────────────────────────
   const neckX = W / 2;
@@ -299,8 +302,8 @@ function runFrame(
     const effAlpha = clamp(g.alpha, 0, 1);
     const pulse = 0.5 + 0.5 * Math.sin(t * 2.2 + g.glowPulse);
 
-    // ── Bloom rings (additive glow) ───────────────────────────────────────
-    if (g.r > 2 || g.isWhale) {
+    // ── Bloom rings (additive glow) ─────────────────────────────────────
+    if (!skipBloom && (g.r > 2 || g.isWhale)) {
       const bloomCount = g.isWhale ? CFG.BLOOM_LAYERS + 2 : CFG.BLOOM_LAYERS;
       for (let b = bloomCount; b >= 1; b--) {
         const br = g.r + b * (g.isWhale ? 5 : 2.5) * (1 + pulse * 0.3);
@@ -313,8 +316,8 @@ function runFrame(
       }
     }
 
-    // ── Chromatic aberration for whales ───────────────────────────────────
-    if (g.isWhale) {
+    // ── Chromatic aberration for whales (HIGH mode only) ───────────────────
+    if (!skipBloom && g.isWhale) {
       const aberr = 2.5 + pulse * 1.5;
       ctx.beginPath();
       ctx.arc(g.x - aberr, g.y, g.r * 0.9, 0, Math.PI * 2);
@@ -460,9 +463,16 @@ export function DarkPoolCanvas2D() {
   const animRef = useRef<number>(0);
   const grainsRef = useRef<Grain[]>([]);
   const lastFrameRef = useRef<number>(performance.now());
+  const lastRenderRef = useRef<number>(0);
   const tRef = useRef(0);
 
   const { whaleEvents, lastWhaleUpdate } = useVIPStore();
+  const { targetFps, isVisible, particleScale, skipBloom } = usePerformanceMode();
+  const perfRef = useRef({ targetFps, isVisible, particleScale, skipBloom });
+  useEffect(() => {
+    perfRef.current = { targetFps, isVisible, particleScale, skipBloom };
+  }, [targetFps, isVisible, particleScale, skipBloom]);
+
   const [txCount, setTxCount] = useState(0);
   const [whaleEventsList, setWhaleEventsList] = useState<{ label: string; amount: string; id: number }[]>([]);
   const flowBucketRef = useRef<number[]>([]);

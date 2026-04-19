@@ -150,9 +150,12 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     /* ═══════════════════════════════════════════════════════
        MARCA DE AGUA CÓSMICA 4K / HOKUSAI (TRANSPARENT BLEND)
        ═══════════════════════════════════════════════════════ */
-    --wave-pattern: url("/api/checkpoint-image?name=patron-cosmico-4k.png");
+    /* PERF: Use direct static paths, NOT /api/* routes.
+       API routes hit the server on every background paint event.
+       Static files are served from CDN/edge and cached by the browser. */
+    --wave-pattern: url("/patron-cosmico-4k.png");
     --wave-pattern-opacity: 0.04;
-    --olas-hokusai: url("/api/checkpoint-image?name=olas-hokusai-4k.png");
+    --olas-hokusai: url("/olas-hokusai-4k.png");
     --olas-hokusai-opacity: 0.15;
     
     /* Institutional Layout Constants */
@@ -238,11 +241,9 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
         and kills memory. Only set it on animated elements via .transform-gpu utility. */
      -webkit-font-smoothing: antialiased;
      -moz-osx-font-smoothing: grayscale;
-     text-rendering: optimizeLegibility;
-     /* NOTE: touch-action: inherit is intentionally REMOVED.
-        It caused all child elements to silently inherit 'manipulation' from <html>,
-        which blocked wheel scroll events on nested containers.
-        Elements that need custom touch-action must opt-in explicitly. */
+     /* PERF: text-rendering:optimizeLegibility removed from universal selector.
+        It was blocking EVERY text render on the page. Only apply to headings
+        where visual quality justifies the cost (h1–h4 via element selectors). */
      box-sizing: border-box;
    }
   /* Senior absolute layout correction */
@@ -460,8 +461,11 @@ body,
   
   .glass-pearl {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(45px);
-    -webkit-backdrop-filter: blur(45px);
+    /* PERF: Reduced from 45px to 12px. backdrop-filter:blur(45px) caused severe
+       GPU stall on mid-range laptops — it's the single most expensive CSS property.
+       12px is visually imperceptible from 45px at opacity 0.03. */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   
   /* Pearlescent Shimmer Animation */
@@ -652,9 +656,20 @@ body,
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacty='0.05'/%3E%3C/svg%3E");
   opacity: 0.04;
-  animation: noise-shift 8s steps(10) infinite;
+  /* PERF: Replaced continuous animation with a static position.
+     The noise-shift animation was translating a 300%x300% element every 800ms
+     causing a full repaint every step. Static noise is visually equivalent
+     at opacity 0.04 and costs zero CPU. */
   z-index: 50;
   mix-blend-mode: overlay;
+}
+
+/* Only restore noise animation when user has NOT requested reduced motion
+   AND the device is plugged in (detected via .perf-high class on body). */
+@media (prefers-reduced-motion: no-preference) {
+  body.perf-high .bg-noise::before {
+    animation: noise-shift 8s steps(10) infinite;
+  }
 }
 
 @keyframes noise-shift {

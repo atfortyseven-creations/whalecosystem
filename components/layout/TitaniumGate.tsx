@@ -24,11 +24,18 @@ interface TitaniumGateProps {
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
     const { isConnected } = useAccount();
-    const [state, setState] = useState<GateState>('AUTH');
-    const [mounted, setMounted] = useState(false);
-    const [forceVisible, setForceVisible] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
+
+    // Pre-compute isPublicPage synchronously so we can use it as the initial state.
+    // This prevents the loader flash on /connect after disconnect.
+    const initialIsPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers'].some(
+        path => path === pathname || (path !== '/' && pathname?.startsWith(path))
+    );
+
+    const [state, setState] = useState<GateState>(initialIsPublicPage ? 'APP' : 'AUTH');
+    const [mounted, setMounted] = useState(false);
+    const [forceVisible, setForceVisible] = useState(false);
 
     useEffect(() => {
         // [INSTITUTIONAL FAIL-SAFE] 

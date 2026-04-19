@@ -35,19 +35,23 @@ export function GlobalSettingsModal() {
         try { sessionStorage.setItem('__disconnected__', '1'); } catch {}
         try { disconnect(); } catch {}
 
+        // Clear ALL localStorage keys related to auth
         const AUTH_KEYS_TO_REMOVE = [
             'wagmi.store', 'wagmi.cache', 'WCM_VERSION',
             '__WC_MODAL_WEB3MODAL__', 'nextauth.message', 'hasReadDocs',
         ];
         try { AUTH_KEYS_TO_REMOVE.forEach(k => { try { localStorage.removeItem(k); } catch {} }); } catch {}
 
+        // ── CRITICAL: Purge ALL auth cookies including sovereign_handshake ──
+        // Without clearing sovereign_handshake, TitaniumGate keeps the user
+        // "authenticated" and the /connect page never renders after disconnect.
         try {
-            const authCookiePattern = /^(next-auth|session|__Secure|__Host)/;
             document.cookie.split(';').forEach(c => {
                 const name = c.split('=')[0].trim();
-                if (authCookiePattern.test(name)) {
-                    document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/`;
-                }
+                if (!name) return;
+                // Expire the cookie for both root and current-path scopes
+                document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/;SameSite=Lax`;
+                document.cookie = `${name}=;expires=${new Date(0).toUTCString()};path=/;domain=${window.location.hostname};SameSite=Lax`;
             });
         } catch {}
 
@@ -55,7 +59,8 @@ export function GlobalSettingsModal() {
 
         setConfirmDisconnect(false);
         setSettingsOpen(false);
-        window.location.replace('/connect');
+        // Hard-navigate so React tree re-mounts cleanly without wagmi cache
+        window.location.href = '/connect';
     };
 
     return (

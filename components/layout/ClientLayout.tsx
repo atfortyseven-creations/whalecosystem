@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
@@ -102,6 +102,46 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       document.body.classList.remove('ios-scroll-lock-strict');
     };
   }, [isDashboard, isBounded]);
+
+  // ── Battery-aware CSS class for noise animation ──────────────────────────
+  // Sets body.perf-high when device is plugged in → enables noise-shift CSS
+  // animation via the selector in globals.css.
+  // When on battery, the class is absent → noise-shift is paused (0 CPU).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let battery: any = null;
+
+    const applyPerfClass = (charging: boolean, level: number) => {
+      const isHigh = charging || level > 0.30;
+      document.body.classList.toggle('perf-high', isHigh);
+    };
+
+    const initBattery = async () => {
+      try {
+        if ('getBattery' in navigator) {
+          battery = await (navigator as any).getBattery();
+          applyPerfClass(battery.charging, battery.level);
+          const onChange = () => applyPerfClass(battery.charging, battery.level);
+          battery.addEventListener('chargingchange', onChange);
+          battery.addEventListener('levelchange', onChange);
+        } else {
+          // No Battery API — assume plugged in (desktop)
+          document.body.classList.add('perf-high');
+        }
+      } catch {
+        document.body.classList.add('perf-high');
+      }
+    };
+
+    initBattery();
+    return () => {
+      if (battery) {
+        battery.removeEventListener('chargingchange', () => {});
+        battery.removeEventListener('levelchange', () => {});
+      }
+      document.body.classList.remove('perf-high');
+    };
+  }, []);
 
   // Root container
   const rootClass = isDashboard

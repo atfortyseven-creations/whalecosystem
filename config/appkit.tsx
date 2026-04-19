@@ -94,15 +94,14 @@ export const config = wagmiAdapter.wagmiConfig
 
 const queryClient = new QueryClient()
 
-// CRITICAL: URL must match exactly the domain registered in WalletConnect Cloud.
-// Using a dynamic URL prevents cross-origin popup blocks for Social Login when testing on localhost.
-const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidfi.com';
+// CRITICAL: URL must match exactly the domain registered in WalletConnect/Reown Cloud.
+const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Sovereign Institutional Intelligence',
     url: APP_URL,
-    icons: [`https://www.humanidfi.com/official-whale-legendary.png`],
+    icons: [`https://humanidfi.com/official-whale-legendary.png`],
 }
 
 // ── CRITICAL: createAppKit must be called at module level (not inside window check).

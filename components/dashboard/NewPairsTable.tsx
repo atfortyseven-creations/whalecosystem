@@ -102,7 +102,7 @@ export function NewPairsTable() {
                         const newPair = {
                             id:          msg.pool,
                             chain:       'ethereum',
-                            dex:         `Uniswap V3 (${(msg.fee / 10000).toFixed(2)}% fee)`,
+                            dex:         `Uniswap V3 (${typeof msg.fee === 'number' ? (msg.fee / 10000).toFixed(2) : '0'}% fee)`,
                             baseToken: {
                                 symbol: `${msg.token0.slice(2, 6).toUpperCase()}`,
                                 name:   `Token ${msg.token0.slice(2, 8)}`,
@@ -161,7 +161,8 @@ export function NewPairsTable() {
         return () => { es?.close(); };
     }, []);
 
-    const fmt = (n: number) => {
+    const fmt = (n: number | null | undefined) => {
+        if (n == null || isNaN(n)) return '—';
         if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
         if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
         if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
@@ -169,7 +170,10 @@ export function NewPairsTable() {
     };
 
     const pctColor = (v: number) => v >= 0 ? 'text-[#00C076]' : 'text-[#FF3B30]';
-    const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
+    const pctFmt   = (v: number | null | undefined) => {
+        if (v == null || isNaN(v)) return '—';
+        return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
+    };
 
     const getAge = (ms: number) => {
         const diff = Date.now() - ms;

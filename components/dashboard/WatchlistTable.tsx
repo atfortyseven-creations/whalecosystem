@@ -418,14 +418,14 @@ export function WatchlistTable() {
                                                             <div className="px-3 flex items-center gap-2.5">
                                                                 <Star size={12} className="text-[#D4AF37] fill-[#D4AF37] shrink-0" />
                                                                 <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                                                                    style={{ background: CHAIN_COLORS[t.chain] || '#888' }}>
-                                                                    {t.symbol?.[0]}
+                                                                    style={{ background: CHAIN_COLORS[t.chain || 'ethereum'] || '#888' }}>
+                                                                    {t.symbol ? t.symbol.charAt(0) : '?'}
                                                                 </div>
                                                                 <div className="flex flex-col min-w-0">
-                                                                    <span className="text-[11px] font-black text-[#050505] truncate">{t.symbol}</span>
+                                                                    <span className="text-[11px] font-black text-[#050505] truncate">{t.symbol || 'UNK'}</span>
                                                                     <div className="flex items-center gap-1">
-                                                                        <span className="text-[8px] text-[#888888] font-mono truncate">{t.name}</span>
-                                                                        <span className="text-[7px] px-1 py-0.5 rounded border font-bold uppercase" style={{ color: CHAIN_COLORS[t.chain], borderColor: CHAIN_COLORS[t.chain] + '55' }}>{t.chain}</span>
+                                                                        <span className="text-[8px] text-[#888888] font-mono truncate">{t.name || 'Unknown'}</span>
+                                                                        <span className="text-[7px] px-1 py-0.5 rounded border font-bold uppercase" style={{ color: CHAIN_COLORS[t.chain || 'ethereum'] || '#888', borderColor: (CHAIN_COLORS[t.chain || 'ethereum'] || '#888') + '55' }}>{t.chain || 'ethereum'}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -463,7 +463,7 @@ export function WatchlistTable() {
 
                                                             {/* Top10 holders */}
                                                             <div className={`px-3 text-right text-[10px] font-black font-mono ${(md.whaleConcentration ?? 0) > 40 ? 'text-[#FF9500]' : 'text-[#050505]'}`}>
-                                                                {md.whaleConcentration ? `${md.whaleConcentration}%` : '—'}
+                                                                {md.whaleConcentration != null ? `${md.whaleConcentration}%` : '—'}
                                                             </div>
 
                                                             {/* Delete / Save */}
@@ -542,7 +542,7 @@ export function WatchlistTable() {
                                                             <div className="px-3 flex items-center gap-2">
                                                                 <Star size={12} className="text-[#D4AF37] fill-[#D4AF37] shrink-0" />
                                                                 <div className="flex flex-col">
-                                                                    <span className="text-[11px] font-black text-[#050505]">{w.label}</span>
+                                                                    <span className="text-[11px] font-black text-[#050505]">{w.label || 'Unknown Wallet'}</span>
                                                                     <div className="flex gap-1 mt-0.5">
                                                                         {w.isWhale && <span className="text-[7px] px-1 py-0.5 rounded bg-[#627EEA]/10 text-[#627EEA] border border-[#627EEA]/20 font-black uppercase">Whale</span>}
                                                                         {w.isSmart && <span className="text-[7px] px-1 py-0.5 rounded bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20 font-black uppercase">Smart</span>}
@@ -584,7 +584,7 @@ export function WatchlistTable() {
                                                             {/* Alpha Score */}
                                                             <div className="px-3 text-right">
                                                                 <span className={`text-[10px] font-black font-mono flex items-center justify-end gap-1 ${(an.alphaScore ?? 0) > 70 ? 'text-[#D4AF37]' : 'text-[#888888]'}`}>
-                                                                    <Zap size={10}/>{an.alphaScore ?? '—'}
+                                                                    <Zap size={10}/>{an.alphaScore != null ? an.alphaScore : '—'}
                                                                 </span>
                                                             </div>
 
