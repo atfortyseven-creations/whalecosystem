@@ -164,8 +164,9 @@ function ManifestoSection({ title, description, lotties, reverse = false }: { ti
 
        {/* Visual Terminal / Isolated Lottie Viewer */}
        <div className="flex-1 w-full max-w-2xl xl:max-w-full mx-auto relative hidden md:block">
+          {/* Fixed-size terminal box with GPU-composited layer */}
           <div className="w-full aspect-[4/3] rounded-3xl border border-white/10 bg-[#060606] shadow-2xl relative overflow-hidden flex items-center justify-center p-8 lg:p-12"
-               style={{ transform: 'translateZ(0)', willChange: 'transform' }}>
+               style={{ transform: 'translateZ(0)' }}>
              <div className="absolute inset-0 bg-gradient-to-br from-[#00f5ff]/5 to-transparent opacity-50 block pointer-events-none" />
              
              {/* Decorative UI elements for the terminal */}
@@ -177,29 +178,29 @@ function ManifestoSection({ title, description, lotties, reverse = false }: { ti
              <div className="absolute bottom-4 right-4 text-[9px] font-mono text-white/20 uppercase">
                 Vector Rendering Engine | {lotties[activeIndex].file}
              </div>
-             
-             {/* Overlapping Lottie Stack (Pre-caching logic) */}
-             {lotties.map((lottie, index) => {
-                const isActive = activeIndex === index;
-                return (
-                  <div 
-                    key={index} 
-                    className={`absolute inset-8 transition-opacity duration-700 pointer-events-none flex items-center justify-center
-                      ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}
-                    `}
-                    style={{ willChange: 'opacity, transform', contentVisibility: isActive ? 'visible' : 'auto' }}
-                  >
-                      {/* The Lottie viewer itself is restricted slightly dynamically */}
-                      <div className="w-full h-full max-w-[80%] max-h-[80%]">
-                         <OptimizedLocalLottie 
-                             filename={lottie.file} 
-                             className="w-full h-full mix-blend-screen opacity-90"
-                             isActive={isActive}
-                         />
-                      </div>
-                  </div>
-                );
-             })}
+
+             {/* ONLY render the active lottie — not all with opacity:0.
+                 AnimatePresence handles the crossfade transition.
+                 This reduces concurrent Lottie instances from N to 1.
+             */}
+             <AnimatePresence mode="wait">
+               <motion.div
+                 key={`${title}-${activeIndex}`}
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+                 transition={{ duration: 0.4 }}
+                 className="absolute inset-8 flex items-center justify-center"
+               >
+                 <div className="w-full h-full max-w-[80%] max-h-[80%]">
+                   <OptimizedLocalLottie
+                     filename={lotties[activeIndex].file}
+                     className="w-full h-full mix-blend-screen opacity-90"
+                     isActive={true}
+                   />
+                 </div>
+               </motion.div>
+             </AnimatePresence>
 
           </div>
        </div>

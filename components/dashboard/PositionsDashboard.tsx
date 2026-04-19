@@ -15,7 +15,7 @@ export default function PositionsDashboard({ positions, isLoading }: { positions
 
     if (positions.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-64 text-white/30 space-y-2 rounded-3xl bg-black/20 border border-white/5 backdrop-blur-xl">
+            <div className="flex flex-col items-center justify-center h-64 text-black/40 space-y-2 rounded-3xl bg-[#FAF9F6] border border-black/10">
                 <p>No active positions found.</p>
                 <p className="text-xs">Start trading on the News tab.</p>
             </div>
@@ -23,36 +23,36 @@ export default function PositionsDashboard({ positions, isLoading }: { positions
     }
 
     return (
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl">
+        <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-md">
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead>
-                        <tr className="border-b border-white/10 text-white/40 uppercase tracking-wider text-[10px]">
+                        <tr className="border-b border-black/5 text-black/40 uppercase tracking-wider text-[10px]">
                             <th className="px-6 py-4 font-bold">Market</th>
                             <th className="px-6 py-4 font-bold text-right">Avg</th>
                             <th className="px-6 py-4 font-bold text-right">Now</th>
                             <th className="px-6 py-4 font-bold text-right">Bet</th>
                             <th className="px-6 py-4 font-bold text-right">To Win</th>
-                            <th className="px-6 py-4 font-bold text-right text-emerald-400">Value</th>
+                            <th className="px-6 py-4 font-bold text-right text-emerald-600">Value</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-black/5">
                         {positions.map((pos, i) => (
                             <motion.tr
                                 key={i}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.05 }}
-                                className="group hover:bg-white/5 transition-colors"
+                                className="group hover:bg-black/5 transition-colors"
                             >
-                                <td className="px-6 py-4 font-medium text-white max-w-[200px] truncate" title={pos.market}>
+                                <td className="px-6 py-4 font-medium text-black max-w-[200px] truncate" title={pos.market}>
                                     {pos.market}
                                 </td>
-                                <td className="px-6 py-4 text-right text-white/70">{pos.avgPrice}</td>
-                                <td className="px-6 py-4 text-right text-white/70">{pos.currentPrice}</td>
-                                <td className="px-6 py-4 text-right text-white/70">${pos.betAmount}</td>
-                                <td className="px-6 py-4 text-right text-emerald-300">${pos.toWin}</td>
-                                <td className="px-6 py-4 text-right font-bold text-white shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                <td className="px-6 py-4 text-right text-black/70">{pos.avgPrice}</td>
+                                <td className="px-6 py-4 text-right text-black/70">{pos.currentPrice}</td>
+                                <td className="px-6 py-4 text-right text-black/70">${pos.betAmount}</td>
+                                <td className="px-6 py-4 text-right text-emerald-600">${pos.toWin}</td>
+                                <td className="px-6 py-4 text-right font-bold text-black shadow-sm">
                                     ${pos.currentValue}
                                 </td>
                             </motion.tr>

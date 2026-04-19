@@ -99,13 +99,13 @@ export function SessionLogsPanel() {
       {
         accessorKey: "timestamp",
         header: "Timestamp",
-        cell: (info: any) => <span className="font-mono text-white/50">{new Date(info.getValue() as string).toLocaleString()}</span>,
+        cell: (info: any) => <span className="font-mono text-black/60">{new Date(info.getValue() as string).toLocaleString()}</span>,
       },
       {
         accessorKey: "action",
         header: "Action / Event",
         cell: (info: any) => (
-          <span className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[#00f5ff] text-[10px] uppercase font-bold tracking-widest">
+          <span className="px-2 py-1 bg-black/5 border border-black/10 rounded text-black text-[10px] uppercase font-bold tracking-widest">
             {info.getValue() as string}
           </span>
         ),
@@ -113,12 +113,12 @@ export function SessionLogsPanel() {
       {
         accessorKey: "userId",
         header: "Sovereign ID",
-        cell: (info: any) => <span className="font-mono text-white/80">{info.getValue() as string || "Anonymous"}</span>,
+        cell: (info: any) => <span className="font-mono text-black/80">{info.getValue() as string || "Anonymous"}</span>,
       },
       {
         accessorKey: "ipAddress",
         header: "IP Address",
-        cell: (info: any) => <span className="font-mono text-white/40">{info.getValue() as string || "Hidden"}</span>,
+        cell: (info: any) => <span className="font-mono text-black/40">{info.getValue() as string || "Hidden"}</span>,
       },
     ],
     []
@@ -140,34 +140,31 @@ export function SessionLogsPanel() {
   });
 
   return (
-    <div className="h-full flex flex-col bg-[#0a0a0a] text-white overflow-hidden rounded-2xl border border-white/10">
+    <div className="h-full flex flex-col bg-white text-black overflow-hidden rounded-2xl border border-black/10 shadow-sm relative">
       
       {/* Header & Controls */}
-      <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02] shrink-0">
+      <div className="p-6 border-b border-black/10 flex flex-col md:flex-row md:items-center justify-between bg-[#FDFCF8] shrink-0 gap-4">
          <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-black font-sans uppercase tracking-tight text-white flex items-center gap-2">
-              Security Logs <span className="w-2 h-2 rounded-full bg-[#00f5ff] animate-pulse" />
+            <h2 className="text-xl font-black font-sans uppercase tracking-tight text-black flex items-center gap-2">
+              Security Logs
             </h2>
-            <p className="text-[11px] font-mono text-white/40 uppercase tracking-widest">
-              Live Sovereign Action Audit Trail
-            </p>
          </div>
 
          <div className="flex items-center gap-4">
             <div className="relative">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={14} />
+               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40" size={14} />
                <input 
                  type="text" 
                  placeholder="Search action, IP, ID..." 
                  value={search}
                  onChange={e => setSearch(e.target.value)}
-                 className="bg-black border border-white/10 rounded-lg pl-9 pr-4 py-2 text-[12px] font-mono focus:border-[#00f5ff] outline-none text-white w-64"
+                 className="bg-transparent border border-black/10 rounded-lg pl-9 pr-4 py-2 text-[12px] font-mono focus:border-black outline-none text-black w-full md:w-64 transition-colors"
                />
             </div>
             <button 
               onClick={handleExport}
               disabled={isExporting}
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-black/5 border border-black/10 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-colors disabled:opacity-50 text-black shrink-0"
             >
               <Download size={14} /> {isExporting ? "Exporting..." : "Export CSV"}
             </button>
@@ -175,18 +172,13 @@ export function SessionLogsPanel() {
       </div>
 
       {/* Table Body (Virtualized) */}
-      <div ref={tableContainerRef} className="flex-1 overflow-y-auto no-scrollbar relative min-h-0 bg-black/20">
-        <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
-          {/* Table Header Row (absolute positioned so it doesn't scroll with virtual, wait, typical virtual uses sticky or independent header) */}
-          {/* We will just put it inline above, actually standard table semantics are hard with virtualization, we use flex rows */}
-        </div>
-
+      <div ref={tableContainerRef} className="flex-1 overflow-y-auto no-scrollbar relative min-h-0 bg-white">
         <table className="w-full text-left border-collapse">
-          <thead className="sticky top-0 z-10 bg-[#0a0a0a] border-b border-white/10 shadow-sm">
+          <thead className="sticky top-0 z-10 bg-[#f9f9f9] border-b border-black/10 shadow-sm">
             {table.getHeaderGroups().map((headerGroup: any) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header: any) => (
-                  <th key={header.id} className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/50 bg-[#0a0a0a]">
+                  <th key={header.id} className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50 bg-[#f9f9f9]">
                     {flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 ))}
@@ -199,7 +191,7 @@ export function SessionLogsPanel() {
               return (
                 <tr 
                   key={row.id} 
-                  className="absolute w-full border-b border-white/5 hover:bg-white/5 transition-colors group flex items-center"
+                  className="absolute w-full border-b border-black/5 hover:bg-[#FDFCF8] transition-colors group flex items-center"
                   style={{
                     height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
@@ -217,7 +209,7 @@ export function SessionLogsPanel() {
         </table>
 
         {filteredLogs.length === 0 && (
-           <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-50">
+           <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-40 text-black">
               <AlertCircle size={32} />
               <div className="text-[12px] font-mono tracking-widest uppercase">No logs found</div>
            </div>

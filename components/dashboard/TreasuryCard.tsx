@@ -33,7 +33,7 @@ export const TreasuryCard = () => {
     return (
         <motion.div
             whileHover={{ y: -5 }}
-            className="group relative overflow-hidden rounded-3xl bg-[#0a0a0a] border border-amber-100/10 p-6 h-full min-h-[200px]"
+            className="group relative overflow-hidden rounded-3xl bg-white border border-black/10 p-6 h-full min-h-[200px]"
         >
             <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] opacity-20 pointer-events-none" />
 
@@ -50,8 +50,8 @@ export const TreasuryCard = () => {
                     </div>
 
                     <div className="space-y-1">
-                        <div className="text-3xl md:text-4xl font-mono font-bold text-white tracking-tight">
-                            {Math.floor(count).toLocaleString()} <span className="text-lg text-gray-500">HMND</span>
+                        <div className="text-3xl md:text-4xl font-mono font-bold text-[#050505] tracking-tight">
+                            {Math.floor(count).toLocaleString()} <span className="text-lg text-[#050505]/40">HMND</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="relative flex h-2 w-2">
@@ -64,9 +64,9 @@ export const TreasuryCard = () => {
                 </div>
 
                 <div className="mt-6">
-                    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 border border-white/10">
-                        <span className="text-xs font-bold text-gray-300">INSPECT LEDGER</span>
-                        <ArrowRight size={14} className="text-gray-500" />
+                    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                        <span className="text-xs font-bold text-amber-900/60">INSPECT LEDGER</span>
+                        <ArrowRight size={14} className="text-amber-500" />
                     </div>
                 </div>
             </div>

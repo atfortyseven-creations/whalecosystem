@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useAccount, useConnect, useSignMessage } from "wagmi";
+import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail } from "lucide-react";
@@ -330,6 +331,7 @@ export function MobileLanding() {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
+  const { open: openAppKitDirect } = useAppKit();
   const openConnectModal = useUIStore(s => s.openConnectModal);
 
   const [mounted, setMounted]           = useState(false);
@@ -647,8 +649,8 @@ export function MobileLanding() {
           <WalletOption
             logo="https://authjs.dev/img/providers/google.svg"
             name="Google & Social Auth"
-            badge="Smart Account (AppKit)"
-            onClick={() => openConnectModal()}
+            badge="Smart Account · Social Login"
+            onClick={() => openAppKitDirect({ view: 'Connect' })}
             delay={0.25}
           />
 
@@ -701,7 +703,7 @@ export function MobileLanding() {
               ))}
             </div>
             <p className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 text-black text-center">
-              © {new Date().getFullYear()} Whale Alert Network · All rights reserved
+              © 2026 atfortyseven-creations
             </p>
           </div>
         </footer>

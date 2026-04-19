@@ -111,18 +111,18 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
 
     return (
         <div 
-            className={`w-full bg-[#0c0c0c]/80 border border-white/10 rounded-2xl flex flex-col overflow-hidden transition-all duration-300 shadow-[0_20px_40px_rgba(0,0,0,0.5)] z-40 ${isExpanded ? 'h-full min-h-[400px]' : 'h-12'}`}
+            className={`w-full bg-white/90 border border-black/10 rounded-2xl flex flex-col overflow-hidden transition-all duration-300 shadow-sm z-40 ${isExpanded ? 'h-full min-h-[400px]' : 'h-12'}`}
             style={{ backdropFilter: 'var(--mobile-blur, blur(20px))', WebkitBackdropFilter: 'var(--mobile-blur, blur(20px))' }}
         >
             <AnimatePresence>
                 {/* Header / Truncated View */}
                 <div 
-                    className="h-12 flex items-center justify-between px-4 cursor-pointer hover:bg-white/5"
+                    className="h-12 flex items-center justify-between px-4 cursor-pointer hover:bg-black/5"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
                     <div className="flex items-center gap-3 w-full truncate">
-                        <Terminal size={14} className="text-[#e0ff00]" />
-                        <div className="text-xs font-mono text-white/50 truncate">
+                        <Terminal size={14} className="text-emerald-600" />
+                        <div className="text-xs font-mono text-black/50 truncate">
                             {logs.length > 0 ? (
                                 <span className="flex gap-4">
                                     <span>[{logs[logs.length-1].timestamp}]</span>
@@ -133,9 +133,9 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
                             )}
                         </div>
                     </div>
-                    <button className="p-1 hover:bg-white/10 rounded ml-2">
+                    <button className="p-1 hover:bg-black/10 rounded ml-2">
                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
-                            <ChevronsDown size={14} className="text-white/40" />
+                            <ChevronsDown size={14} className="text-black/40" />
                         </motion.div>
                     </button>
                 </div>
@@ -145,16 +145,16 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="flex-1 overflow-y-auto p-4 border-t border-white/5 font-mono text-xs flex flex-col gap-2 terminal-scroll bg-black/50"
+                        className="flex-1 overflow-y-auto p-4 border-t border-black/10 font-mono text-xs flex flex-col gap-2 terminal-scroll bg-black/[0.02]"
                     >
                         {logs.map(log => (
                             <div key={log.id} className="flex gap-4 items-start">
-                                <span className="text-white/30 shrink-0">[{log.timestamp}]</span>
+                                <span className="text-black/40 shrink-0">[{log.timestamp}]</span>
                                 <span className={
-                                    log.type === 'success' ? 'text-white' : 
-                                    log.type === 'error' ? 'text-red-400' : 
-                                    log.type === 'warning' ? 'text-yellow-400/80' : 
-                                    'text-white/70'
+                                    log.type === 'success' ? 'text-black' : 
+                                    log.type === 'error' ? 'text-rose-600' : 
+                                    log.type === 'warning' ? 'text-amber-600' : 
+                                    'text-black/70'
                                 }>
                                     {log.message}
                                 </span>
@@ -173,7 +173,7 @@ export const TelemetryTerminal = React.memo(function TelemetryTerminal({ nodes }
                     background: transparent;
                 }
                 .terminal-scroll::-webkit-scrollbar-thumb {
-                    background: rgba(255,255,255,0.1);
+                    background: rgba(0,0,0,0.1);
                     border-radius: 4px;
                 }
             `}} />

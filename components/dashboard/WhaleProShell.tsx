@@ -367,7 +367,8 @@ export function WhaleProShell({
                             touchAction: 'pan-y',
                         }}
                     >
-                        <div className="p-4 md:p-5 w-full flex-1 flex flex-col relative z-10">
+                        {/* pb-20 on mobile = clears the 64px bottom nav + safe area */}
+                        <div className="p-4 md:p-5 pb-20 md:pb-5 w-full flex-1 flex flex-col relative z-10">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -387,7 +388,7 @@ export function WhaleProShell({
                 </main>
 
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-                <nav className="md:hidden h-16 border-t border-black/10 bg-white flex items-center justify-around px-2 shrink-0 z-50">
+                <nav className="md:hidden h-16 border-t border-black/10 bg-white flex items-center justify-around px-2 shrink-0 z-50" style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
                         { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
                         { id: 'whale-events', icon: <TrendingUp size={20} />, label: 'Radar' },
@@ -399,6 +400,7 @@ export function WhaleProShell({
                             <button
                                 key={tab.id}
                                 onClick={() => tab.id === 'menu' ? setIsPaletteOpen(true) : handleTabChange(tab.id)}
+                                style={{ minHeight: 0, minWidth: 0 }}
                                 className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
                                     isActive ? 'text-black' : 'text-[#888888] hover:text-black'
                                 }`}

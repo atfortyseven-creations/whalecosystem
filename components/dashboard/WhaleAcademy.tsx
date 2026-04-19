@@ -210,7 +210,7 @@ export function WhaleAcademy() {
 
     // ── Main grid ─────────────────────────────────────────────────────
     return (
-        <div className="flex flex-col gap-5">
+        <div className="h-full min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-5 pb-4">
             {/* Header */}
             <div className="shrink-0 px-6 pt-5 pb-4 border-b border-[#E5E5E5] bg-white rounded-2xl shadow-sm flex items-center justify-between">
                 <div className="flex flex-col gap-0.5">

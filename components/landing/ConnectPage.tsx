@@ -108,7 +108,17 @@ export default function ConnectPage() {
   if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-white selection:bg-black selection:text-white">
+    <div className="fixed inset-0 min-h-screen w-screen flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white">
+      {/* Background Waves - "Hokusai" - Absolute Bottom */}
+      <div 
+        className="fixed bottom-0 left-0 right-0 h-[35vh] pointer-events-none opacity-40 mix-blend-multiply z-0"
+        style={{
+          backgroundImage: "url('/olas-hokusai-4k.png')",
+          backgroundSize: "auto 100%",
+          backgroundPosition: "bottom center",
+          backgroundRepeat: "repeat-x"
+        }}
+      />
       
       <header className="relative z-[100] h-[68px] flex items-center justify-between px-8 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl shrink-0">
         <div className="flex items-center gap-4">
@@ -150,7 +160,16 @@ export default function ConnectPage() {
               </div>
             </div>
 
-            <div className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-white">
+            <div className="relative p-12 lg:p-16 flex flex-col overflow-hidden bg-white/95 backdrop-blur-md">
+               {/* 3D Blocks Background Pattern Expertly Adjusted */}
+               <div 
+                 className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-multiply z-0"
+                 style={{
+                   backgroundImage: "url('/patron-cosmico-4k.png')",
+                   backgroundSize: "300px",
+                   backgroundRepeat: "repeat"
+                 }}
+               />
                <div className="relative z-10 flex flex-col h-full">
                  <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-8 border-b-2 border-black pb-4">CONNECT WALLET // ACCESS</h2>
 
@@ -194,10 +213,10 @@ export default function ConnectPage() {
       </main>
 
       <footer className="relative z-[100] px-12 py-12 border-t border-black/[0.04] bg-white/50 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-8">
-         <div className="flex flex-col gap-2">
+         <div className="flex flex-col gap-2 relative z-10">
             <div className="flex items-center gap-3">
               <img src="/official-whale-monochrome.png" className="w-5 h-5 opacity-40" alt="" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">© Whale Alert Network</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/40">© 2026 atfortyseven-creations</span>
             </div>
          </div>
 

@@ -51,11 +51,11 @@ export default function RadarFeed() {
   }, [sseEvents, pushAlert]);
 
   return (
-    <div className="flex flex-col h-full bg-black font-mono">
+    <div className="flex flex-col h-full bg-[#FAF9F6] font-mono">
       {/* ── HEADER ── */}
-      <div className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[8px] font-black uppercase tracking-[0.3em] text-white/30 border-b border-white/5 shrink-0 items-center">
+      <div className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-2 text-[8px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 shrink-0 items-center">
         <span className="flex items-center gap-2">
-          <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-white/10'} animate-pulse`} />
+          <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-black/20'} animate-pulse`} />
           UTC_TIME
         </span>
         <span>SIGNATURE // PROTOCOL</span>
@@ -71,22 +71,22 @@ export default function RadarFeed() {
               key={alert.id}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-3 border-b border-white/[0.02] hover:bg-white/[0.03] transition-colors items-center group cursor-crosshair"
+              className="grid grid-cols-[100px_1fr_120px_80px_60px] gap-4 px-4 py-3 border-b border-black/[0.05] hover:bg-black/[0.03] transition-colors items-center group cursor-crosshair"
             >
               {/* TIME */}
               <div className="flex flex-col">
-                <span className="text-[10px] text-white/60 font-bold tracking-tighter">
+                <span className="text-[10px] text-black/80 font-bold tracking-tighter">
                   {new Date(alert.timestamp).toLocaleTimeString([], { hour12: false })}
                 </span>
-                <span className="text-[7px] text-white/20 uppercase tracking-widest">{alert.chain}</span>
+                <span className="text-[7px] text-black/40 uppercase tracking-widest">{alert.chain}</span>
               </div>
 
               {/* HASH / ROUTE */}
               <div className="flex flex-col overflow-hidden">
-                 <span className="text-[9px] text-white/90 truncate opacity-80 group-hover:opacity-100 transition-opacity">
+                 <span className="text-[9px] text-black truncate opacity-80 group-hover:opacity-100 transition-opacity">
                     {alert.txHash}
                  </span>
-                 <div className="flex items-center gap-2 text-[7px] text-white/20 mt-1 uppercase tracking-widest">
+                 <div className="flex items-center gap-2 text-[7px] text-black/40 mt-1 uppercase tracking-widest">
                     <span>{alert.from.slice(0,6)}</span>
                     <span>→</span>
                     <span>{alert.to.slice(0,6)}</span>
@@ -96,7 +96,7 @@ export default function RadarFeed() {
               {/* VOLUME USD */}
               <div className="text-right">
                 <span className={`text-[10px] font-black tracking-tighter ${
-                  alert.usdValue >= 1000000 ? 'text-emerald-500' : 'text-white/80'
+                  alert.usdValue >= 1000000 ? 'text-emerald-600' : 'text-black/80'
                 }`}>
                   ${(alert.usdValue / 1e3).toFixed(1)}K
                 </span>
@@ -104,19 +104,19 @@ export default function RadarFeed() {
 
               {/* ASSET */}
               <div className="text-right">
-                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+                 <span className="text-[9px] font-black text-black/60 uppercase tracking-widest">
                    {alert.asset}
                  </span>
               </div>
 
               {/* ACTION */}
               <div className="flex justify-end">
-                 <span className={`text-[8px] font-black px-2 py-0.5 border ${
+                 <span className={`text-[8px] font-black px-2 py-0.5 border rounded-md ${
                    alert.action === 'BUY' 
-                     ? 'border-emerald-500/20 text-emerald-500' 
+                     ? 'border-emerald-600/20 text-emerald-700 bg-emerald-50' 
                      : alert.action === 'SELL'
-                     ? 'border-rose-500/20 text-rose-500'
-                     : 'border-white/10 text-white/40'
+                     ? 'border-rose-500/20 text-rose-600 bg-rose-50'
+                     : 'border-black/10 text-black/50 bg-black/5'
                  }`}>
                    {alert.action.slice(0, 4)}
                  </span>
@@ -126,7 +126,7 @@ export default function RadarFeed() {
         </AnimatePresence>
 
         {alerts.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 opacity-20 gap-4">
+          <div className="flex flex-col items-center justify-center py-20 opacity-30 text-black gap-4">
              <Activity size={24} className="animate-pulse" />
              <span className="text-[9px] font-black uppercase tracking-[0.5em]">Awaiting_Network_Synapse...</span>
           </div>

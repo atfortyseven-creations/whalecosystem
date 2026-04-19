@@ -96,9 +96,29 @@ export function NewsTerminal() {
   const [ethEur,      setEthEur]      = useState<number | null>(null);
   // Archive sidebar toggle
   const [showArchive, setShowArchive] = useState(false);
+  const [marketTimes, setMarketTimes] = useState<{name: string, time: string, isOpen: boolean}[]>([]);
 
   const rightRef = useRef<HTMLDivElement>(null);
   const imgRef   = useRef<HTMLImageElement>(null);
+
+  // ── Relojes Bursátiles Globales ─────────────────────────────────────────
+  useEffect(() => {
+    const updateTimes = () => {
+      const now = new Date();
+      const utcHour = now.getUTCHours();
+      const isWeekend = now.getUTCDay() === 0 || now.getUTCDay() === 6;
+      const f = (tz: string) => now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+      
+      setMarketTimes([
+        { name: 'NY', time: f('America/New_York'), isOpen: !isWeekend && (utcHour >= 13 && utcHour < 20) },
+        { name: 'LON', time: f('Europe/London'), isOpen: !isWeekend && (utcHour >= 8 && utcHour < 16) },
+        { name: 'TYO', time: f('Asia/Tokyo'), isOpen: !isWeekend && (utcHour >= 0 && utcHour < 6) },
+      ]);
+    };
+    updateTimes();
+    const intervalId = setInterval(updateTimes, 30000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   // ── Carga de datos ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -226,13 +246,17 @@ export function NewsTerminal() {
               style={{ borderBottom: `1px solid ${DIV}`, background: BG, backdropFilter: 'blur(10px)' }}
               className="sticky top-0 z-10 flex items-center justify-between px-6 py-5"
             >
-              <div>
-                <h2 className="font-black text-xl uppercase tracking-tighter leading-none" style={{ color: TEXT }}>
-                  THE WHALE POST
-                </h2>
-                <p className="font-mono text-[8px] uppercase tracking-[0.3em] mt-0.5" style={{ color: MUTED }}>
-                  {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
-                </p>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3 md:gap-5 flex-wrap">
+                  {marketTimes.map(t => (
+                    <div key={t.name} className="flex items-center gap-1.5 shrink-0">
+                       <div className={`w-1 h-1 rounded-full ${t.isOpen ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30] opacity-50'}`} />
+                       <span className="font-mono text-[9px] font-black uppercase tracking-widest text-[#050505]">
+                         {t.name} <span className="font-normal opacity-50 ml-0.5">{t.time}</span>
+                       </span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="flex items-center gap-1.5">
                 {hasAccess && (

@@ -20,34 +20,34 @@ export function InstitutionalHeader() {
 
     const navGroups: NavGroup[] = [
         {
-            label: "Terminal",
+            label: "Home",
             links: [
-                { href: '/dashboard', label: 'Core Dashboard', desc: 'Centralized telemetry node for institutional oversight.' },
-                { href: '/voss-supremacy', label: 'Voss Supremacy', desc: 'Asymmetric algorithmic tracking and execution protocol.' }
+                { href: '/dashboard', label: 'Dashboard', desc: 'General portfolio overview and balances.' },
+                { href: '/voss-supremacy', label: 'Sniper Trading', desc: 'Automated high-speed execution tools.' }
             ]
         },
         {
-            label: "Intelligence",
+            label: "Analytics",
             links: [
-                { href: '/sovereign-intel', label: 'Sovereign Intel', desc: 'Real-time extraction of latent graph topologies.' },
-                { href: '/ledger', label: 'Institutional Ledger', desc: 'Immutable chronological state of validated macro-events.' },
-                { href: '/predictions', label: 'Prediction Network', desc: 'Decentralized oracle consensus mapping probability vectors.' },
-                { href: '/news', label: 'The Whale Post', desc: 'Global macroeconomic signal aggregation and curation.' }
+                { href: '/sovereign-intel', label: 'Intelligence', desc: 'On-chain analytics and graphing.' },
+                { href: '/ledger', label: 'Transaction History', desc: 'Complete history of all wallet actions.' },
+                { href: '/predictions', label: 'Polymarket', desc: 'Decentralized prediction markets.' },
+                { href: '/news', label: 'Global News', desc: 'Curated market and crypto news.' }
             ]
         },
         {
-            label: "Wealth",
+            label: "Assets",
             links: [
-                { href: '/portfolio', label: 'Akashic Vault', desc: 'Cryptographic cold storage and cross-chain liquid reconciliation.' },
-                { href: '/gold-registry', label: 'Entity Registry', desc: 'Clearance verification and institutional asset minting.' }
+                { href: '/portfolio', label: 'Cold Wallet', desc: 'Secure long-term asset storage.' },
+                { href: '/gold-registry', label: 'Identity Credentials', desc: 'Your verified ID and access passes.' }
             ]
         },
         {
-            label: "Protocol",
+            label: "Ecosystem",
             links: [
-                { href: '/academy', label: 'The Library', desc: 'Cognitive expansion through structured on-chain curriculum.' },
-                { href: '/developer', label: 'Developer', desc: 'Core system architecture and protocol manifesto.' },
-                { href: '/support', label: 'Operational Guard', desc: 'Direct secure link to tactical maintenance architecture.' }
+                { href: '/academy', label: 'Academy', desc: 'Educational courses and articles.' },
+                { href: '/developer', label: 'Developers', desc: 'API links and system architecture.' },
+                { href: '/support', label: 'Support', desc: 'Help center and system status.' }
             ]
         }
     ];

@@ -58,62 +58,62 @@ function CreateAlertModal({ onClose, onCreate }: { onClose: () => void; onCreate
     });
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md px-4" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/10 backdrop-blur-md px-4" onClick={onClose}>
             <motion.div
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-[#050505] border border-white/10 rounded-none p-8 w-full max-w-md font-mono"
+                className="bg-white border border-black/10 rounded-2xl shadow-xl p-8 w-full max-w-md font-mono"
                 onClick={e => e.stopPropagation()}
             >
                 <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-[10px] font-black text-white uppercase tracking-[0.4em] flex items-center gap-2">
-                        <Bell size={14} className="text-emerald-500" /> New_Trigger_Logic
+                    <h2 className="text-[10px] font-black text-black uppercase tracking-[0.4em] flex items-center gap-2">
+                        <Bell size={14} className="text-emerald-600" /> New_Trigger_Logic
                     </h2>
-                    <button onClick={onClose} className="text-white/20 hover:text-white"><XCircle size={14}/></button>
+                    <button onClick={onClose} className="text-black/40 hover:text-black"><XCircle size={14}/></button>
                 </div>
 
-                <div className="space-y-6">
+            <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-[8px] font-black text-white/20 uppercase tracking-widest">Identifier</label>
+                        <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Identifier</label>
                         <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                             placeholder="SYSTEM_ALERT_01"
-                            className="w-full bg-white/[0.02] border border-white/5 px-4 py-3 text-[10px] text-white outline-none focus:border-emerald-500/50 transition-all uppercase"
+                            className="w-full bg-black/[0.02] border border-black/10 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-emerald-500 transition-all uppercase"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[8px] font-black text-white/20 uppercase tracking-widest">Asset_Pair</label>
+                            <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Asset_Pair</label>
                             <select value={form.asset} onChange={e => setForm(f => ({ ...f, asset: e.target.value }))}
-                                className="w-full bg-white/[0.02] border border-white/5 px-4 py-3 text-[10px] text-white outline-none focus:border-emerald-500/50 transition-all bg-black cursor-pointer">
+                                className="w-full bg-black/[0.02] border border-black/10 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-emerald-500 transition-all cursor-pointer">
                                 {['BTC','ETH','SOL','USDC','BASE','WLD'].map(a => <option key={a}>{a}</option>)}
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[8px] font-black text-white/20 uppercase tracking-widest">Trigger_Type</label>
+                            <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Trigger_Type</label>
                             <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as AlertType }))}
-                                className="w-full bg-white/[0.02] border border-white/5 px-4 py-3 text-[10px] text-white outline-none focus:border-emerald-500/50 transition-all bg-black cursor-pointer">
+                                className="w-full bg-black/[0.02] border border-black/10 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-emerald-500 transition-all cursor-pointer">
                                 {Object.entries(TYPE_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                             </select>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[8px] font-black text-white/20 uppercase tracking-widest">Threshold_Value</label>
+                        <label className="text-[8px] font-black text-black/40 uppercase tracking-widest">Threshold_Value</label>
                         <input value={form.threshold} onChange={e => setForm(f => ({ ...f, threshold: e.target.value }))}
                             type="number" placeholder="90000.00"
-                            className="w-full bg-white/[0.02] border border-white/5 px-4 py-3 text-[10px] text-white outline-none focus:border-emerald-500/50 transition-all font-mono"
+                            className="w-full bg-black/[0.02] border border-black/10 rounded-xl px-4 py-3 text-[10px] text-black outline-none focus:border-emerald-500 transition-all font-mono"
                         />
                     </div>
 
                     <div className="pt-4 flex gap-4">
-                        <button onClick={onClose} className="flex-1 py-3 border border-white/5 text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-white hover:bg-white/5 transition-all">Cancel</button>
+                        <button onClick={onClose} className="flex-1 py-3 border border-black/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-black/40 hover:text-black hover:bg-black/5 transition-all">Cancel</button>
                         <button 
                             onClick={() => {
                                 if (!form.name || !form.threshold) return toast.error('Incomplete Parameters');
                                 onCreate({ ...form, id: `rule-${Date.now()}` });
                                 onClose();
                             }} 
-                            className="flex-1 py-3 bg-white text-black text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all"
+                            className="flex-1 py-3 bg-[#050505] rounded-xl text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#050505]/80 transition-all"
                         >
                             Deploy_Trigger
                         </button>
@@ -192,21 +192,21 @@ export function AlertsPanel() {
     };
 
     return (
-        <div className="h-full w-full min-h-0 flex flex-col bg-black font-mono text-white overflow-hidden">
+        <div className="h-full w-full min-h-0 flex flex-col bg-[#FAF9F6] font-mono text-black overflow-hidden">
             {showCreate && <CreateAlertModal onClose={() => setShowCreate(false)} onCreate={handleCreate} />}
 
             {/* ── HEADER ── */}
-            <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between shrink-0">
+            <div className="px-8 py-6 border-b border-black/10 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
-                    <Bell size={18} className="text-emerald-500" />
+                    <Bell size={18} className="text-emerald-600" />
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em]">Network_Triggers</span>
-                        <span className="text-[8px] text-white/20 uppercase tracking-widest mt-1">Autonomous Monitoring Core</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black">Network_Triggers</span>
+                        <span className="text-[8px] text-black/40 uppercase tracking-widest mt-1">Autonomous Monitoring Core</span>
                     </div>
                 </div>
                 <button 
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-2 px-6 py-3 bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all"
+                    className="flex items-center gap-2 rounded-xl px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#050505]/80 transition-all"
                 >
                     <Plus size={14} /> New_Rule
                 </button>
@@ -216,7 +216,7 @@ export function AlertsPanel() {
             <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
                 <div className="grid grid-cols-1 gap-4">
                     {alerts.length === 0 && !loading && (
-                        <div className="py-20 flex flex-col items-center justify-center opacity-10">
+                        <div className="py-20 flex flex-col items-center justify-center opacity-30 text-black">
                             <Bell size={48} className="mb-4" />
                             <span className="text-[10px] font-black tracking-[0.5em]">No_Triggers_Detected</span>
                         </div>
@@ -227,32 +227,32 @@ export function AlertsPanel() {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            className="border border-white/5 bg-white/[0.01] p-6 flex items-center justify-between group hover:border-white/10 transition-all"
+                            className="rounded-2xl border border-black/10 bg-white p-6 flex items-center justify-between group hover:border-[#050505]/20 shadow-sm transition-all"
                         >
                             <div className="flex items-center gap-6">
-                                <div className={`w-10 h-10 flex items-center justify-center border border-white/5 ${alert.status === 'ACTIVE' ? 'text-emerald-500' : 'text-white/20'}`}>
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-black/5 ${alert.status === 'ACTIVE' ? 'text-emerald-600 bg-emerald-50' : 'text-black/30 bg-black/5'}`}>
                                     {TYPE_CONFIG[alert.type]?.icon || <Bell size={14} />}
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-[11px] font-black uppercase tracking-widest">{alert.name}</span>
-                                        <span className={`text-[7px] font-black px-2 py-0.5 border ${
-                                            alert.status === 'ACTIVE' ? 'border-emerald-500/20 text-emerald-500 bg-emerald-500/5' : 'border-white/10 text-white/20'
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">{alert.name}</span>
+                                        <span className={`text-[7px] font-black px-2 py-0.5 rounded-md border ${
+                                            alert.status === 'ACTIVE' ? 'border-emerald-600/20 text-emerald-700 bg-emerald-50' : 'border-black/10 text-black/40'
                                         }`}>
                                             {alert.status}
                                         </span>
                                     </div>
-                                    <div className="text-[9px] text-white/40 mt-2 tracking-widest uppercase">
+                                    <div className="text-[9px] text-[#050505]/50 mt-2 tracking-widest uppercase">
                                         {alert.asset} // {alert.type} // {alert.threshold.toLocaleString()}
                                     </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-6">
                                 <div className="text-right">
-                                    <span className="text-[8px] text-white/10 uppercase tracking-widest block mb-1">Created_At</span>
-                                    <span className="text-white/40 text-[9px] font-mono">{new Date(alert.createdAt).toLocaleDateString()}</span>
+                                    <span className="text-[8px] text-[#050505]/40 uppercase tracking-widest block mb-1">Created_At</span>
+                                    <span className="text-[#050505]/60 text-[9px] font-mono">{new Date(alert.createdAt).toLocaleDateString()}</span>
                                 </div>
-                                <button className="p-3 text-white/10 hover:text-rose-500 transition-colors">
+                                <button className="p-3 text-black/20 hover:text-rose-500 transition-colors">
                                     <Trash2 size={14} />
                                 </button>
                             </div>
@@ -262,15 +262,15 @@ export function AlertsPanel() {
             </div>
 
             {/* ── FOOTER ── */}
-            <div className="px-8 py-3 border-t border-white/5 bg-white/[0.01] flex justify-between items-center shrink-0">
-                <div className="flex items-center gap-4 text-[8px] text-white/20 uppercase tracking-[0.4em]">
+            <div className="px-8 py-3 border-t border-black/10 bg-white flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-4 text-[8px] text-black/40 uppercase tracking-[0.4em]">
                     <div className="flex items-center gap-2">
-                        <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-white/10'}`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${sseConnected ? 'bg-emerald-500' : 'bg-black/20'}`} />
                         <span>Telemetry:_{sseConnected ? 'ENABLED' : 'OFFLINE'}</span>
                     </div>
                     <span>Cluster_Rules:_{alerts.length}</span>
                 </div>
-                <div className="text-[8px] text-white/10 uppercase tracking-[0.5em]">
+                <div className="text-[8px] text-black/30 uppercase tracking-[0.5em]">
                     Institutional_Monitoring_v3.1
                 </div>
             </div>

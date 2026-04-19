@@ -51,12 +51,9 @@ body {
 }
 
 
-/* iOS Safari: Prevent 16px font auto-zoom on input focus */
-input,
-select,
-textarea {
-  font-size: 16px !important;
-}
+/* iOS Safari: Prevent 16px font auto-zoom on input focus
+   Full rule with appearance reset is defined below at the * block.
+   This stub is intentionally kept as a placeholder comment. */
 
 /* iOS-safe momentum scrolling for all scrollable containers */
 [class*="overflow-y-auto"],
@@ -169,11 +166,11 @@ textarea {
      ═══════════════════════════════════════════════════════════ */
   /* body::before removed to prevent GPU compositing storm with WavePatternOverlay */
 
-  /* All direct children of body must stack ABOVE the wave pattern overlay */
-  body > * {
-    position: relative;
-    z-index: 1;
-  }
+  /* NOTE: body > * { z-index: 1 } was REMOVED.
+     It caused every Web3 modal (AppKit, ConnectKit, Reown) to be
+     trapped below the wave pattern overlay z-index, breaking
+     all modal portal rendering. Wave overlay uses z-index: 0
+     on its own element, no global body-child override needed. */
 
 
   ::selection {
@@ -182,7 +179,7 @@ textarea {
   }
 
    /* input/select/textarea: iOS auto-zoom prevention (16px minimum)
-      Defined once here — earlier duplicate at line 55-59 removed. */
+      Canonical definition here — stub comment above kept for orientation. */
    input, textarea, select {
      font-size: 16px !important;
      touch-action: manipulation;

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
+import { SovereignFooter } from "./SovereignFooter";
 import { Scan } from "lucide-react";
 
 const IMMERSIVE_PAGES = [
@@ -54,36 +55,18 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
   return (
     <div className="min-h-screen bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full"
          style={{ overflowY: 'auto', scrollBehavior: 'smooth' }}>
-      
-      {/* Top Bar Editorial Style */}
-      <div className="sticky top-0 z-50 w-full bg-[#FDFCF8]/90 backdrop-blur-md border-b border-[#e8e5de] py-4 px-8 flex justify-between items-center">
-        <div className="font-mono text-[9px] uppercase tracking-[0.3em] font-bold text-black border border-black/20 px-3 py-1 bg-white">
-          © 2026 atfortyseven-creations
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:block font-mono text-[10px] tracking-widest text-black/50 uppercase">
-            Whale Alert Network // System Architecture Manual
-          </div>
-          <div className="flex items-center gap-2">
-            {onOpenScanner && (
-              <button onClick={onOpenScanner} className="px-4 py-2 bg-[#050505] text-white font-mono text-[10px] uppercase tracking-widest hover:bg-[#222] active:scale-95 transition-all shadow-sm flex items-center gap-2 rounded-lg">
-                 <Scan size={13} />
-                 Session Log & Scan
-              </button>
-            )}
-            <a href="https://www.humanidfi.com/news" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-[#F1F0EA] border border-black/10 text-black font-mono text-[10px] uppercase tracking-widest hover:bg-[#e4e2d8] active:scale-95 transition-all shadow-sm flex items-center gap-2 rounded-lg">
-              News Terminal
-            </a>
-          </div>
-        </div>
-      </div>
 
-      <main className="max-w-[850px] mx-auto px-6 py-24 flex flex-col gap-24">
+      <main className="max-w-[850px] mx-auto px-6 py-16 flex flex-col gap-24">
         
         <header className="flex flex-col gap-6 text-center mb-8">
           <h1 className="text-[32px] md:text-[42px] font-serif text-black leading-tight tracking-tight">
-            La Visión Arquitectónica de <br/><span className="italic font-light">Supremacía Algorítmica</span>
+            En la búsqueda de la <br/><span className="italic font-light">transparencia</span>
           </h1>
+          <div className="flex justify-center -mt-2 mb-2">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.3em] text-black/30">
+              © 2026 atfortyseven-creations
+            </span>
+          </div>
           <p className="font-serif text-[13px] text-[#444] max-w-xl mx-auto leading-relaxed border-t border-b border-black/10 py-6">
             Documento fundacional sobre la abstracción matemática pura, los mecanismos criptográficos de 
             conocimiento cero y los paradigmas heurísticos deterministas que cimentan la infraestructura global inmutable.
@@ -138,22 +121,27 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
           ))}
         </div>
 
-        {/* Dense geometric footer mark */}
-        <div className="w-full flex flex-col items-center mt-12 mb-32 opacity-80 gap-3">
-           <div className="w-16 h-[1px] bg-black" />
-           <span className="font-mono text-[8px] tracking-[0.4em] uppercase">Fin del Tratado Algorítmico</span>
-        </div>
 
-        {/* Clean, institutional CTA */}
-        <div className="fixed bottom-0 left-0 w-full p-0 flex flex-col pointer-events-none z-50">
-           <div className="h-24 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full" />
-           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-4">
-             <a href="/dashboard" className="pointer-events-auto px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors">
-                Proceder al Nodo de Ejecución
-             </a>
-           </div>
-        </div>
+
+        {onOpenScanner && (
+          <div className="fixed bottom-0 left-0 w-full p-0 flex flex-col pointer-events-none z-50">
+             <div className="h-20 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/80 to-transparent w-full" />
+             <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-4">
+               <button
+                 onClick={onOpenScanner}
+                 className="pointer-events-auto px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 transition-colors flex items-center gap-3"
+               >
+                 <Scan size={13} />
+                 Session Log &amp; Scan
+               </button>
+             </div>
+          </div>
+        )}
       </main>
+
+      {/* ─── Sovereign Footer (full-bleed, outside max-width container) ─── */}
+      <SovereignFooter />
+
     </div>
   );
 }
