@@ -3,9 +3,22 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { NewsTerminal } from '@/components/news/NewsTerminal';
-import { QrCode } from 'lucide-react';
-import { MobileQRScanner } from '@/components/mobile/MobileWhaleLanding';
-import { useAccount, useSignMessage } from 'wagmi';
+import { QrCode, X } from 'lucide-react';
+
+// Inline fallback scanner — MobileQRScanner no longer lives in MobileWhaleLanding
+function MobileQRScannerFallback({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95">
+      <p className="text-white/60 font-mono text-xs mb-6">QR Scanner — open on desktop</p>
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white text-sm"
+      >
+        <X size={14} /> Close
+      </button>
+    </div>
+  );
+}
 
 // ─── MOBILE AUTHENTICATED SHELL ─────────────────────────────────────────────
 // Shown to mobile users who have completed the QR handshake.
@@ -13,11 +26,9 @@ import { useAccount, useSignMessage } from 'wagmi';
 
 export function MobileNewsShell() {
   const [showScanner, setShowScanner] = useState(false);
-  const { address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
 
   if (showScanner) {
-    return <MobileQRScanner onBack={() => setShowScanner(false)} address={address} signMessageAsync={signMessageAsync} />;
+    return <MobileQRScannerFallback onBack={() => setShowScanner(false)} />;
   }
 
   return (
