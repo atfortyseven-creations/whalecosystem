@@ -12,17 +12,7 @@ import {
   Github,
   CheckCircle,
 } from "lucide-react";
-import dynamic from "next/dynamic";
-
-// QR code renderer using qrcode.react
-const QRCode = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), {
-  ssr: false,
-  loading: () => (
-    <div className="w-[200px] h-[200px] flex items-center justify-center">
-      <Loader2 size={32} className="animate-spin text-black/10" />
-    </div>
-  ),
-});
+import { QRCodeSVG as QRCode } from "qrcode.react";
 
 // ─── Wallet option button ─────────────────────────────────────────────────────
 function WalletButton({
