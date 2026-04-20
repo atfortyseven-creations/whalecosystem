@@ -20,7 +20,7 @@ interface MarketStreamContextType {
 }
 
 const MarketStreamContext = createContext<MarketStreamContextType>({
-    markets: new Map(),
+    markets: buildSyntheticMap(),
     isConnected: false,
     lastUpdate: new Date(),
     latency: 0,

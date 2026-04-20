@@ -62,6 +62,8 @@ export async function GET() {
     const readLatencyMs = (endTime - startTime).toFixed(2);
 
     return NextResponse.json({
+      totalVolumeUSD: totalUsdVolume,
+      topPairs: topEntities.map(e => ({ symbol: e.name })),
       total24hVolume: totalUsdVolume,
       total24hBtc: stats24h._sum.valueBTC || 0,
       transactionCount: records24h.length,
