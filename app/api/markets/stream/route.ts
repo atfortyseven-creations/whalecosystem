@@ -91,34 +91,62 @@ export async function GET(_req: NextRequest) {
     let marketData = await fetchBinanceMarkets();
     let source = 'binance';
 
-    // ── Step 2: Enrich with GetBlock on-chain prices if Binance succeeded ─────
+    // ── Step 2: Fallback or Enrich with GetBlock on-chain prices ─────
+    const onChainPrices = await fetchOnChainPrices();
+
     if (marketData) {
-        try {
-            const onChainPrices = await fetchOnChainPrices();
-            if (Object.keys(onChainPrices).length > 0) {
-                marketData = marketData.map((t: any) => {
-                    const onChain = onChainPrices[t.symbol];
-                    if (onChain && onChain > 0) {
-                        // Validate: if on-chain price deviates >5% from Binance, flag it
-                        const binancePrice = parseFloat(t.lastPrice);
-                        const deviation = Math.abs(onChain - binancePrice) / binancePrice;
-                        return {
-                            ...t,
-                            onChainPrice: onChain.toFixed(2),
-                            onChainValidated: deviation < 0.05,
-                            getblockVerified: true,
-                        };
-                    }
-                    return t;
+        // ENRICH EXISTING DATA
+        if (Object.keys(onChainPrices).length > 0) {
+            marketData = marketData.map((t: any) => {
+                const onChain = onChainPrices[t.symbol];
+                if (onChain && onChain > 0) {
+                    const binancePrice = parseFloat(t.lastPrice);
+                    const deviation = Math.abs(onChain - binancePrice) / binancePrice;
+                    return {
+                        ...t,
+                        onChainPrice: onChain.toFixed(2),
+                        onChainValidated: deviation < 0.05,
+                        getblockVerified: true,
+                    };
+                }
+                return t;
+            });
+            source = 'binance+getblock';
+        }
+    } else {
+        // TRUE ON-CHAIN FALLBACK (Zero-Mock strictness)
+        if (Object.keys(onChainPrices).length > 0) {
+            marketData = [];
+            for (const [symbol, price] of Object.entries(onChainPrices)) {
+                marketData.push({
+                    symbol,
+                    lastPrice: price.toFixed(6),
+                    priceChangePercent: "0.00",
+                    quoteVolume: "0.00",
+                    source: 'getblock-onchain',
+                    getblockVerified: true,
+                    onChainPrice: price.toFixed(6),
+                    onChainValidated: true,
                 });
-                source = 'binance+getblock';
             }
-        } catch {
-            // On-chain enrichment failed — Binance data alone is still valid
+            source = 'getblock-onchain';
+            
+            // Add other priority symbols with 0 data to prevent UI breakage
+            for (const pSym of Array.from(PRIORITY_SYMBOLS)) {
+                 if (!marketData.find(m => m.symbol === pSym)) {
+                     marketData.push({
+                         symbol: pSym,
+                         lastPrice: "0.00",
+                         priceChangePercent: "0.00",
+                         quoteVolume: "0.00",
+                         source: 'getblock-degraded'
+                     });
+                 }
+            }
         }
     }
 
-    // ── Step 3: If Binance and GetBlock failed, enforce fail-fast 503 error ──
+    // ── Step 3: If ALL sources failed, enforce fail-fast 503 error ──
     if (!marketData) {
         return NextResponse.json({ error: 'Data sources unreachable' }, { status: 503 });
     }

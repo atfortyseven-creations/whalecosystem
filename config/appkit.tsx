@@ -101,7 +101,10 @@ const metadata = {
     name: 'Whale Alert Network',
     description: 'Sovereign Institutional Intelligence',
     url: APP_URL,
-    icons: [`https://humanidfi.com/official-whale-legendary.png`],
+    // Dejar vacío previene el fallo del Proxy Explorer de WalletConnect causado por 
+    // bloqueos de Cloudflare o tiempos de espera con PNGs de tamaño excesivo.
+    // AppKit generará automáticamente un Avatar con gradiente nativo inderrotable.
+    icons: [],
 }
 
 // ── 1-Click Auth: SIWE Configuration

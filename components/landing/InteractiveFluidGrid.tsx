@@ -83,8 +83,9 @@ export function InteractiveFluidGrid() {
         mouseY += (targetMouseY - mouseY) * Math.min(1, 0.4 * rate);
       }
 
-      ctx.fillStyle = "#FDFCF8";
-      ctx.fillRect(0, 0, width, height);
+      // En lugar de tapar todo con solid fill #FDFCF8, limpiamos el canvas 
+      // para que el efecto overlay actúe por encima de todos los elementos (mix-blend-multiply)
+      ctx.clearRect(0, 0, width, height);
 
       const dampFactor = Math.pow(DAMPING, rate);
       const rSq = MOUSE_RADIUS * MOUSE_RADIUS;
@@ -140,8 +141,9 @@ export function InteractiveFluidGrid() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
+      className="fixed inset-0 pointer-events-none z-[50] mix-blend-multiply"
       style={{
+           display: "block",
            transform: "translateZ(0)", 
            willChange: "transform",
       }}
