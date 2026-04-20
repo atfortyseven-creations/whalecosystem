@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as ethers from 'ethers';
 
+import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
+
 export const dynamic = 'force-dynamic';
 
 // ── In-memory cache (10s TTL) ─────────────────────────────────────────────────
 let _cachedMarkets: any[] | null = null;
 let _cacheTs = 0;
 const CACHE_TTL_MS = 3_000;
-
-// ── GetBlock ETH RPC Endpoints (user-provided) ────────────────────────────────
-const GETBLOCK_ENDPOINTS = [
-    'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d', // EP1 — primary (.io)
-    'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f', // EP2 — primary (.us)
-    'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', // EP3 — backup 1
-    'https://go.getblock.io/31aef531b4e444f5bde76196502679da', // EP4 — backup 2
-];
 
 // ── Uniswap V3 Pool addresses for on-chain price validation ──────────────────
 // Format: symbol → [poolAddress, token0IsBase, token0Decimals, token1Decimals]
@@ -29,7 +23,9 @@ const SLOT0_ABI = ['function slot0() view returns (uint160 sqrtPriceX96, int24 t
 
 async function fetchOnChainPrices(): Promise<Record<string, number>> {
     const prices: Record<string, number> = {};
-    for (const ep of GETBLOCK_ENDPOINTS) {
+    for (let attempts = 0; attempts < 3; attempts++) {
+        const ep = RpcRelayerManager.getRpcUrl('ETH', 'RPC');
+        if (!ep) break;
         try {
             const provider = new ethers.JsonRpcProvider(ep, 1, { staticNetwork: true });
             const results = await Promise.allSettled(
@@ -45,6 +41,7 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
             // If we got at least one price, the endpoint is healthy
             if (Object.keys(prices).length > 0) break;
         } catch {
+            RpcRelayerManager.reportFailure('ETH', 'RPC', ep);
             continue;
         }
     }
@@ -79,41 +76,7 @@ const PRIORITY_SYMBOLS = new Set([
     'GMXUSDT','SUIUSDT','SEIUSDT','TONUSDT',
 ]);
 
-// ── Hardened Synthetic Fallback (only when BOTH Binance AND on-chain fail) ────
-// FIX Bug 11: All Math.random() removed. Fake price deltas are gone.
-// Static last-known prices are displayed with source='synthetic' so the
-// UI can render a clear warning banner instead of showing junk as live data.
-function getSyntheticMarkets(): any[] {
-    const t = Date.now() / 1000;
-    const BASE: Record<string, [number, string]> = {
-        'BTC': [83500, 'BTCUSDT'], 'ETH': [1610, 'ETHUSDT'],
-        'BNB': [585,   'BNBUSDT'], 'SOL': [122,  'SOLUSDT'],
-        'XRP': [0.53,  'XRPUSDT'], 'ADA': [0.46, 'ADAUSDT'],
-        'DOGE':[0.16,  'DOGEUSDT'],'AVAX':[20.5, 'AVAXUSDT'],
-        'LINK':[11,    'LINKUSDT'],'DOT': [5.2,  'DOTUSDT'],
-    };
-    return Object.entries(BASE).map(([tok, [basePrice, sym]], idx) => {
-        // Multi-oscillator deterministic movement (Idx ensures each asset has a different phase)
-        const wave1 = Math.sin(t / 10 + idx);
-        const wave2 = Math.cos(t / 25 - idx);
-        const fluctuation = (wave1 * 0.008) + (wave2 * 0.004); // Deterministic range
-        
-        const p = basePrice * (1 + fluctuation);
-        const changePercent = (fluctuation * 100).toFixed(2);
-        const quoteVolume = (basePrice * 1000 * (0.9 + (Math.sin(t/100) * 0.1))).toFixed(2);
-
-        return {
-            symbol: sym,
-            lastPrice: p.toFixed(tok === 'BTC' || tok === 'ETH' ? 2 : 4),
-            priceChangePercent: changePercent,
-            quoteVolume: quoteVolume,
-            openPrice:  basePrice.toFixed(2),
-            highPrice:  (basePrice * 1.01).toFixed(2),
-            lowPrice:   (basePrice * 0.99).toFixed(2),
-            source: 'synthetic-sovereign',
-        };
-    });
-}
+// ... synthetic fallback purged ...
 
 export async function GET(_req: NextRequest) {
     // ── Cache hit ─────────────────────────────────────────────────────────────
@@ -155,10 +118,9 @@ export async function GET(_req: NextRequest) {
         }
     }
 
-    // ── Step 3: If Binance failed, use synthetic fallback ────────────────────
+    // ── Step 3: If Binance and GetBlock failed, enforce fail-fast 503 error ──
     if (!marketData) {
-        marketData = getSyntheticMarkets();
-        source = 'synthetic';
+        return NextResponse.json({ error: 'Data sources unreachable' }, { status: 503 });
     }
 
     // ── Filter to priority USDT pairs + sort by volume for top display ────────
