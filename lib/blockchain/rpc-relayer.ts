@@ -64,7 +64,12 @@ export class RpcRelayerManager {
         const cluster = this.endpoints[key];
 
         if (!cluster || cluster.length === 0) {
-            console.warn(`[RpcRelayer] No endpoints configured for ${key}. Check .env`);
+            console.warn(`[RpcRelayer] No endpoints configured in .env for ${key}. Using public fallback.`);
+            if (network === 'ETH' && protocol === 'RPC') return 'https://eth.llamarpc.com';
+            if (network === 'BSC' && protocol === 'RPC') return 'https://bsc-dataseed1.binance.org';
+            if (network === 'POLYGON' && protocol === 'RPC') return 'https://polygon-rpc.com';
+            if (network === 'ARB' && protocol === 'RPC') return 'https://arb1.arbitrum.io/rpc';
+            if (network === 'SOL' && protocol === 'RPC') return 'https://api.mainnet-beta.solana.com';
             return ''; 
         }
 
