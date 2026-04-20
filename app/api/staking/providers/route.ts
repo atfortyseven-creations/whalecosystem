@@ -9,7 +9,7 @@ export async function GET() {
         // [PRODUCTION] In a full implementation, these would be fetched from 
         // LlamaRPC, protocol subgraphs, or a specialized DeFi adapter.
         // Fetch real-time yields from DefiLlama
-        const yieldsRes = await fetch('https://yields.llama.fi/pools', { next: { revalidate: 3600 } });
+        const yieldsRes = await fetch('https://yields.llama.fi/pools', { cache: 'no-store' });
         if (!yieldsRes.ok) throw new Error('Failed to fetch DefiLlama yields');
         
         const { data } = await yieldsRes.json();

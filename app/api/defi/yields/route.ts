@@ -47,7 +47,7 @@ export async function GET(req: Request) {
     try {
         const res = await fetch(LLAMA_YIELDS, {
             headers: { 'Accept': 'application/json' },
-            next: { revalidate: 60 }
+            cache: 'no-store'
         });
 
         if (!res.ok) throw new Error(`DeFiLlama error: ${res.status}`);
