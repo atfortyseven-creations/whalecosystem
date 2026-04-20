@@ -73,22 +73,50 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
     return prices;
 }
 
-// ── Binance REST (primary price feed) ────────────────────────────────────────
-async function fetchBinanceMarkets(): Promise<any[] | null> {
+// ── Centralized Exchanges REST (Primary Price Feeds) ─────────────────────────
+async function fetchCexMarkets(): Promise<any[] | null> {
+    // 1. Try MEXC API (Globally accessible, no strict geographic blocks)
     try {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), 5000);
-        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr', {
+        const controllerMexc = new AbortController();
+        const idMexc = setTimeout(() => controllerMexc.abort(), 4000); // 4s timeout for MEXC
+        
+        const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr', {
             cache: 'no-store',
-            signal: controller.signal,
-        });
-        clearTimeout(id);
-        if (!res.ok) return null;
-        const raw = await res.json();
-        return Array.isArray(raw) && raw.length > 0 ? raw : null;
-    } catch {
-        return null;
+            signal: controllerMexc.signal,
+        }).finally(() => clearTimeout(idMexc));
+        
+        if (res.ok) {
+            const raw = await res.json();
+            if (Array.isArray(raw) && raw.length > 0) {
+                return raw.map(t => ({
+                    ...t,
+                    priceChangePercent: t.priceChangePercent ? (parseFloat(t.priceChangePercent) * 100).toFixed(3) : "0.000"
+                }));
+            }
+        }
+    } catch (e) {
+        console.warn('[API] MEXC fetch failed, falling back to Binance', e);
     }
+
+    // 2. Fallback to Binance
+    try {
+        const controllerBin = new AbortController();
+        const idBin = setTimeout(() => controllerBin.abort(), 4000); // 4s timeout for Binance
+        
+        const resBinance = await fetch('https://api.binance.com/api/v3/ticker/24hr', {
+            cache: 'no-store',
+            signal: controllerBin.signal,
+        }).finally(() => clearTimeout(idBin));
+        
+        if (resBinance.ok) {
+            const rawBinance = await resBinance.json();
+            if (Array.isArray(rawBinance) && rawBinance.length > 0) return rawBinance;
+        }
+    } catch (e) {
+        console.warn('[API] Binance fetch failed', e);
+    }
+    
+    return null;
 }
 
 // ── USDT pairs we want to surface (ordered by priority) ──────────────────────
@@ -112,9 +140,9 @@ export async function GET(_req: NextRequest) {
         );
     }
 
-    // ── Step 1: Fetch Binance (primary) ───────────────────────────────────────
-    let marketData = await fetchBinanceMarkets();
-    let source = 'binance';
+    // ── Step 1: Fetch CEX Data (Primary) ───────────────────────────────────
+    let marketData = await fetchCexMarkets();
+    let source = marketData ? 'live-exchange' : 'degraded-exchange';
 
     // ── Step 2: Fallback or Enrich with GetBlock on-chain prices ─────
     const onChainPrices = await fetchOnChainPrices();
@@ -136,7 +164,7 @@ export async function GET(_req: NextRequest) {
                 }
                 return t;
             });
-            source = 'binance+getblock';
+            source = 'live-exchange+getblock';
         }
     } else {
         // TRUE ON-CHAIN FALLBACK (Zero-Mock strictness)

@@ -104,7 +104,7 @@ const metadata = {
     // Dejar vacío previene el fallo del Proxy Explorer de WalletConnect causado por 
     // bloqueos de Cloudflare o tiempos de espera con PNGs de tamaño excesivo.
     // AppKit generará automáticamente un Avatar con gradiente nativo inderrotable.
-    icons: [],
+    icons: ['https://humanidfi.com/wan-logo-white.svg'],
 }
 
 // ── 1-Click Auth: SIWE Configuration

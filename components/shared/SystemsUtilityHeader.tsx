@@ -67,7 +67,11 @@ export function SystemsUtilityHeader() {
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        setSettingsOpen(true);
+                        if (!isConnected) {
+                            openConnectModal();
+                        } else {
+                            setSettingsOpen(true);
+                        }
                     }}
                     className="flex items-center gap-2.5 pl-3.5 pr-1.5 py-1.5 rounded-full transition-all border cursor-pointer group"
                     style={{

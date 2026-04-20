@@ -30,12 +30,6 @@ html {
 }
 
 body {
-  /* GPU acceleration on body breaks fixed position Web3Modal */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-perspective: 1000px;
-  perspective: 1000px;
-  
   -webkit-text-size-adjust: 100%;     /* Prevent iOS auto text-size increase */
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent; /* Remove tap flash on iOS */

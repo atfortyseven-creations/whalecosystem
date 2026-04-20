@@ -81,7 +81,7 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
                             setLastUpdate(new Date(parsed.timestamp || Date.now()));
                             setIsConnected(true);
                             setLatency(Math.round(end - start));
-                            setMode(parsed.source === 'binance' || parsed.source?.includes('getblock') ? 'live' : 'fallback');
+                            setMode(parsed.source?.includes('live-exchange') || parsed.source?.includes('getblock') ? 'live' : 'fallback');
                         } else {
                             // If empty, revert to synthetic
                             setMarkets(buildSyntheticMap());
