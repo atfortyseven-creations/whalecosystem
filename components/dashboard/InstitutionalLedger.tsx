@@ -78,7 +78,8 @@ export default function InstitutionalLedger() {
   const isSyncing = loading;
 
   const entries: LedgerEntry[] = useMemo(() => {
-    return (rawData?.entries || []).map((e: any, i: number) => ({
+    const safeData = Array.isArray(rawData) ? rawData : (rawData?.entries || []);
+    return safeData.map((e: any, i: number) => ({
       id:                e.id || String(i),
       blockHex:          e.txid ? `0x${parseInt(e.txid.slice(0,8), 16).toString(16).toUpperCase()}` : `0x${e.blockHex || '—'}`,
       verificationLayer: e.chain || e.verificationLayer || 'L1_ETH_MAINNET',

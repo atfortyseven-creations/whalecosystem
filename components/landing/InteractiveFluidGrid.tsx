@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 export function InteractiveFluidGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,7 +23,7 @@ export function InteractiveFluidGrid() {
     const CELL_SIZE = 18; // Tamaño de píxel más ajustado a Letta Code
     const BASE_HZ = 144;
     const DAMPING = 0.95; // Los píxeles tardan un poco más en desaparecer para dejar rastro
-    const MOUSE_RADIUS = 70;
+    const MOUSE_RADIUS = 56; // Reducido un 20% para mayor precisión
 
     // Buffer [alpha], un solo valor por celda
     let alphaBuffer: Float32Array;
@@ -136,7 +138,9 @@ export function InteractiveFluidGrid() {
       window.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname !== "/") return null;
 
   return (
     <canvas
