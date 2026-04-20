@@ -439,7 +439,7 @@ export function MobileLanding() {
   const { address, isConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
-  const { open: openAppKitDirect } = useAppKit();
+  const { open: openAppKitDirect, close: closeAppKit } = useAppKit();
   const openConnectModal = useUIStore(s => s.openConnectModal);
 
   const [mounted, setMounted]           = useState(false);
@@ -512,6 +512,9 @@ export function MobileLanding() {
         }).catch(() => {});
 
         setIsLinked(true);
+        // Force close any stuck WalletConnect modals that leave body blur active
+        try { closeAppKit(); } catch (e) {}
+
         // Reset scroll so the manifesto always opens from page top
         if (typeof window !== 'undefined') {
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -552,6 +555,20 @@ export function MobileLanding() {
       }).catch(() => {});
     }
   }, [isLinked, address, sessionParam]);
+
+  // ── Nuke rogue w3m-modal blur ───────────────────────────────────────────────
+  // A watchdog to completely remove the `<w3m-modal>` if it gets stuck as an empty
+  // blurred backdrop post-connection on mobile deep-links.
+  useEffect(() => {
+    if (isLinked) {
+      try { closeAppKit(); } catch (e) {}
+      const interval = setInterval(() => {
+         const w3m = document.querySelector('w3m-modal');
+         if (w3m) w3m.remove();
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isLinked, closeAppKit]);
 
   // ── WalletConnect v2 deep-link (THE CRITICAL FIX) ──────────────────────────
   //

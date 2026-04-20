@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 export const REGISTRY = {
   MARKET_DATA: {
     watchlist:      "/api/premium/watched-wallets",
-    gainersLosers:  "/api/market/top-movers", // fallback to 503 if missing, avoiding infinite loop
+    gainersLosers:  "/api/markets/stream", // Map directly to the central market stream provider
     newPairs:       "/api/market/new-pairs",
     polymarket:     "/api/polymarket/orders",
   },
@@ -99,7 +99,8 @@ const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
 export function useMarketData(endpointKey: keyof typeof REGISTRY.MARKET_DATA) {
   return useQuery({
     queryKey: ['market', endpointKey],
-    queryFn: () => fetchSovereign(REGISTRY.MARKET_DATA[endpointKey], false),
+    // Force auth for watchlist since it's sharing the vault endpoint
+    queryFn: () => fetchSovereign(REGISTRY.MARKET_DATA[endpointKey], endpointKey === 'watchlist'),
     refetchInterval: 10000, 
   });
 }

@@ -22,7 +22,7 @@ const metadata = {
   name: 'Whale Alert Network',
   description: 'Sovereign Terminal Omniverse',
   url: 'https://humanidfi.com',
-  icons: ['https://humanidfi.com/logo-landingpage.png']
+  icons: [] // Empty defaults to reliable Web3Modal native gradient
 };
 
 // BUG-12 FIX: Do NOT create QueryClient at module level — it leaks state

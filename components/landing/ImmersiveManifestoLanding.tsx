@@ -208,7 +208,7 @@ const RIGHT_SIDEBAR_CONTENT = [
 export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
   
   return (
-    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative">
+    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-clip">
 
       <InteractiveFluidGrid />
 
