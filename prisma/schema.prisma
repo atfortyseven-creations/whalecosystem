@@ -106,8 +106,28 @@ model User {
   theme           String      @default("light")
   currency        String      @default("USD")
   language        String      @default("es-ES")
+  density         String      @default("relaxed") // "relaxed", "compact", "dense"
+
   showBalances    Boolean     @default(true)
+  hiddenAssets    String[]    @default([])
+  defaultTimeframe String     @default("1W") // "1D", "1W", "1M", "ALL"
+  displayUnit     String      @default("FIAT") // "FIAT", "BTC", "ETH"
+
+  gasPreset       String      @default("STANDARD") // "ECONOMY", "STANDARD", "FAST", "INSTANT"
+  customRpcUrl    String?     
+  mevProtection   Boolean     @default(false)
+  maxSlippage     Float       @default(0.5)
+
+  inactivityLockMinutes Int   @default(60)
+  stealthMode     Boolean     @default(false)
+  requireSignForExports Boolean @default(true)
   allowAnalytics  Boolean     @default(true)
+
+  emailAlerts     Boolean     @default(false)
+  telegramAlerts  Boolean     @default(false)
+  whaleAlertThreshold Float   @default(1000000)
+  soundEffects    Boolean     @default(true)
+
   testnetMode     Boolean     @default(false)
   
   clerkId         String?     @unique

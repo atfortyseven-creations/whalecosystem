@@ -1,11 +1,18 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-interface UIState {
+// ─── Persisted subset: only UI preferences survive reloads ───────────────────
+// CRITICAL: isLinked and isConnectModalOpen are intentionally NOT persisted.
+// isLinked is derived fresh on every mount from the live sovereign_handshake cookie
+// to prevent stale auth state after disconnection.
+interface PersistedUIState {
   isStealthMode: boolean;
+  activePanel: 'history' | 'notifications' | 'settings' | 'privacy' | null;
+}
+
+interface UIState extends PersistedUIState {
   isConnectModalOpen: boolean;
   isLinked: boolean;
-  activePanel: 'history' | 'notifications' | 'settings' | 'privacy' | null;
   toggleStealthMode: () => void;
   setStealthMode: (value: boolean) => void;
   openConnectModal: () => void;
@@ -17,20 +24,31 @@ interface UIState {
 export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
+      // ── Persisted preferences ────────────────────────────────────────────
       isStealthMode: false,
+      activePanel: null,
+
+      // ── Runtime-only state (never persisted) ─────────────────────────────
+      // Resets on every page load; correct value is re-derived from cookie in LinkedGate.
       isConnectModalOpen: false,
       isLinked: false,
-      activePanel: null,
+
+      // ── Actions ──────────────────────────────────────────────────────────
       toggleStealthMode: () => set((state) => ({ isStealthMode: !state.isStealthMode })),
-      setStealthMode: (value) => set({ isStealthMode: value }),
+      setStealthMode: (value: boolean) => set({ isStealthMode: value }),
       openConnectModal: () => set({ isConnectModalOpen: true }),
       closeConnectModal: () => set({ isConnectModalOpen: false }),
-      setLinked: (value) => set({ isLinked: value }),
+      setLinked: (value: boolean) => set({ isLinked: value }),
       setActivePanel: (panel) => set({ activePanel: panel }),
     }),
     {
       name: 'human-ui-storage',
+      // Explicitly whitelist only the keys that should persist.
+      // isLinked and isConnectModalOpen are excluded.
+      partialize: (state): PersistedUIState => ({
+        isStealthMode: state.isStealthMode,
+        activePanel: state.activePanel,
+      }),
     }
   )
-)
-
+);

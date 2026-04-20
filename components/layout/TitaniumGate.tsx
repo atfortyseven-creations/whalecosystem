@@ -63,7 +63,9 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, [isPublicPage]);
 
     useEffect(() => {
-        const checkAccess = () => {
+        // Add a short debounce so transient connection states (e.g. wallet just
+        // connected but cookie not yet written) don't trigger a premature redirect.
+        const checkTimer = setTimeout(() => {
             if (!mounted) return;
 
             // Priority 1: Wagmi is connected
@@ -85,13 +87,14 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                 return;
             }
 
-            // Otherwise: Access Denied
+            // Otherwise: Access Denied — redirect to connect
             setState('AUTH');
             if (pathname !== '/connect') router.push('/connect');
-        };
+        }, 300); // 300ms debounce prevents false-positive redirects during connection handshake
 
-        checkAccess();
+        return () => clearTimeout(checkTimer);
     }, [isConnected, isPublicPage, router, mounted, pathname]);
+
 
     // [iOS PERFECTION] We no longer return an invisible div. Instead, we render
     // the provider structure immediately to avoid React Tree mismatch crashes.

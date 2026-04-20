@@ -329,6 +329,9 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   }, [isLinked, isWalletConnected, isMounted]);
 
   // ── Redirect unauthenticated users to /connect ────────────────────────────
+  // SOVEREIGN LAW: 400ms debounce prevents false-positive redirects during the
+  // transient window right after a wallet connects (before the sign step or
+  // sovereign_handshake cookie has been written).
   useEffect(() => {
     if (!isMounted) return;
     const isPublic = pathname === '/' ||
@@ -340,9 +343,11 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      pathname.startsWith('/news');
     // Only redirect if NOT connected at all (not just un-signed)
     if (!isLinked && !isWalletConnected && !isPublic) {
-      router.replace('/connect');
+      const t = setTimeout(() => router.replace('/connect'), 400);
+      return () => clearTimeout(t);
     }
   }, [isLinked, isWalletConnected, isMounted, pathname, router]);
+
 
   const handleSigned = useCallback(() => {
     setShowSignStep(false);
@@ -351,8 +356,10 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
 
   const handleDisconnect = useCallback(() => {
     setShowSignStep(false);
-    window.location.reload();
-  }, []);
+    // Clean router navigation instead of full page reload
+    router.push('/');
+  }, [router]);
+
 
   if (!isMounted) return null;
 
