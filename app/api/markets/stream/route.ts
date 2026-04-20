@@ -27,11 +27,32 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
         const ep = RpcRelayerManager.getRpcUrl('ETH', 'RPC');
         if (!ep) break;
         try {
-            const provider = new ethers.JsonRpcProvider(ep, 1, { staticNetwork: true });
             const results = await Promise.allSettled(
                 Object.entries(UNISWAP_V3_POOLS).map(async ([symbol, [poolAddr, token0IsBase, d0, d1]]) => {
-                    const contract = new ethers.Contract(poolAddr, SLOT0_ABI, provider);
-                    const [sqrtPriceX96] = await contract.slot0();
+                    const res = await fetch(ep, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            jsonrpc: "2.0",
+                            id: 1,
+                            method: "eth_call",
+                            params: [{
+                                to: poolAddr,
+                                data: "0x3850c7bd" // slot0()
+                            }, "latest"]
+                        }),
+                        cache: 'no-store'
+                    });
+                    
+                    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                    const nodeData = await res.json();
+                    if (nodeData.error) throw new Error(nodeData.error.message);
+                    if (!nodeData.result) throw new Error("No result in RPC response");
+                    
+                    // sqrtPriceX96 is the first 32 bytes (64 hex chars + 2 for '0x')
+                    const sqrtPriceX96Hex = "0x" + nodeData.result.substring(2, 66);
+                    const sqrtPriceX96 = BigInt(sqrtPriceX96Hex);
+                    
                     const sqrtPrice = Number(sqrtPriceX96) / (2 ** 96);
                     const rawPrice = sqrtPrice * sqrtPrice * (10 ** d0) / (10 ** d1);
                     const price = token0IsBase ? rawPrice : (rawPrice > 0 ? 1 / rawPrice : 0);
@@ -40,7 +61,11 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
             );
             // If we got at least one price, the endpoint is healthy
             if (Object.keys(prices).length > 0) break;
-        } catch {
+            else {
+                console.warn(`[API] RPC ${ep} returns empty slot0 results.`);
+            }
+        } catch (e) {
+            console.error('[API] Provider exception:', e);
             RpcRelayerManager.reportFailure('ETH', 'RPC', ep);
             continue;
         }

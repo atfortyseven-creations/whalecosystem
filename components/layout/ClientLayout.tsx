@@ -220,7 +220,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
           {showMobileNavBar && <MobileNavBar />}
         </div>
-        <InteractiveFluidGrid />
+        {pathname === '/' && <InteractiveFluidGrid />}
       </TitaniumGate>
     </>
   );
