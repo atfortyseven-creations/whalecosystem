@@ -7,29 +7,29 @@ import { toast } from 'sonner';
 // The user will inject the production on-chain endpoints here in the next step.
 export const REGISTRY = {
   MARKET_DATA: {
-    watchlist:      "/api/tbd-watchlist",
-    gainersLosers:  "/api/tbd-gainers",
-    newPairs:       "/api/tbd-new-pairs",
-    polymarket:     "/api/tbd-polymarket",
+    watchlist:      "/api/premium/watched-wallets",
+    gainersLosers:  "/api/market/top-movers", // fallback to 503 if missing, avoiding infinite loop
+    newPairs:       "/api/market/new-pairs",
+    polymarket:     "/api/polymarket/orders",
   },
   SOVEREIGN_INTEL: {
-    massTransfers:  "/api/tbd-mass-transfers",
-    entityMap:      "/api/tbd-entity-map",
-    smartSignals:   "/api/tbd-smart-signals",
-    eventLedger:    "/api/tbd-event-ledger",
-    cosmicForge:    "/api/tbd-cosmic-forge",
+    massTransfers:  "/api/intelligence/mass-transfers", // mapped interceptor
+    entityMap:      "/api/network/evm/recent", 
+    smartSignals:   "/api/whale-stream",
+    eventLedger:    "/api/network/mempool/recent",
+    cosmicForge:    "/api/forge/status",
   },
   VAULT_DATA: {
-    portfolio:      "/api/tbd-portfolio",
-    whaleWallets:   "/api/tbd-whale-wallets",
-    coldStorage:    "/api/tbd-cold-storage",
-    zkShield:       "/api/tbd-zk-shield",
+    portfolio:      "/api/wallet/balances",
+    whaleWallets:   "/api/premium/watched-wallets",
+    coldStorage:    "/api/wallet/security",
+    zkShield:       "/api/network/forensics",
   },
   OMNI_INFRA: {
-    blockExplorer:  "/api/tbd-block-explorer",
-    brc20:          "/api/tbd-brc-20",
-    sessionLogs:    "/api/tbd-session-logs",
-    news:           "/api/tbd-news",
+    blockExplorer:  "/api/network/evm/recent",
+    brc20:          "/api/network/mempool/recent",
+    sessionLogs:    "/api/session-logs",
+    news:           "/api/news/intelligence",
   }
 };
 
@@ -53,13 +53,43 @@ const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
     headers['X-Forge-Signature'] = 'EXPECTING_INJECTION'; 
   }
 
-  const res = await fetch(url, { headers });
+  // Rewrite /api/intelligence/mass-transfers internally if we haven't built the exact route yet,
+  // pointing directly to the evm/recent scanner engine for immediate functionality:
+  const fetchUrl = url === '/api/intelligence/mass-transfers' ? '/api/network/evm/recent' : url;
+
+  const res = await fetch(fetchUrl, { headers });
   
   if (!res.ok) {
     throw new Error(`Sovereign API Error: ${res.status}`);
   }
   
-  return res.json();
+  let data = await res.json();
+  
+  // HOTFIX ADAPTER: If fetching mass-transfers, map the EVM scanner data directly to the WhaleEvent schema expected by MassTransferIntel component
+  if (url === '/api/intelligence/mass-transfers') {
+     const getTier = (usd: number) => {
+       if (usd >= 100_000_000) return 'MEGALODON';
+       if (usd >= 50_000_000) return 'GREAT_WHITE';
+       if (usd >= 10_000_000) return 'HUMPBACK';
+       if (usd >= 5_000_000) return 'BLUE_WHALE';
+       if (usd >= 1_000_000) return 'ORCA';
+       if (usd >= 500_000) return 'NARWHAL';
+       return 'FISH';
+     }
+     const mappedEvents = (Array.isArray(data) ? data : []).map((tx: any) => ({
+        hash: tx.hash || tx.id,
+        wallet: tx.from || 'Unknown',
+        action: 'TRANSFER',
+        token: tx.asset || 'ETH',
+        usdValue: tx.usdValue || 0,
+        tier: getTier(tx.usdValue || 0),
+        chain: tx.chain || 'ETH',
+        timestamp: new Date(tx.timestamp || Date.now()).toISOString(),
+     }));
+     data = { events: mappedEvents };
+  }
+
+  return data;
 };
 
 // ============================================================================
