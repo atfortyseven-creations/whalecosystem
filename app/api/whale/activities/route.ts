@@ -31,17 +31,41 @@ export async function GET(req: NextRequest) {
         const data = await withCache(
             cacheKey,
             async () => {
-                // Pull real transfers directly from Alchemy — no DB padding
-                const activities = await fetchRealWhaleTransfers(40);
+                // Pull real transfers routing through our High-Availability Rpc Relayer
+                // Completely replacing the dead Alchemy dependency
+                const url = new URL('/api/network/evm/recent', req.url);
+                const response = await fetch(url.toString(), { cache: 'no-store' });
+                
+                let rawActivities = [];
+                if (response.ok) {
+                    rawActivities = await response.json();
+                } else {
+                    console.error('[Whale Activities] Internal RPC Scanner failed:', response.statusText);
+                }
+
+                // Map to legacy WhaleTransfer format for frontend compatibility
+                const activities = rawActivities.map((tx: any) => ({
+                    id: tx.hash,
+                    walletAddress: tx.from,
+                    walletLabel: `Whale ${tx.from.slice(0, 6)}...`,
+                    type: 'TRANSFER',
+                    token: tx.asset,
+                    amount: tx.amount,
+                    usdValue: tx.usdValue,
+                    timestamp: new Date(tx.timestamp).toISOString(),
+                    txHash: tx.hash,
+                    chain: tx.chain,
+                    blockNum: '0'
+                }));
+
                 return {
                     activities,
                     timestamp: Date.now(),
-                    source: 'alchemy_on_chain',
-                    chains: ['ethereum', 'base', 'arbitrum', 'polygon'],
+                    source: 'internal_rpc_relayer_mesh',
+                    chains: ['ethereum', 'base', 'arbitrum', 'polygon', 'bsc'],
                     threshold_usd: 100000,
                 };
             },
-            // 15-second cache to avoid hammering Alchemy; enough for near-real-time
             { ttl: 15 }
         );
 
