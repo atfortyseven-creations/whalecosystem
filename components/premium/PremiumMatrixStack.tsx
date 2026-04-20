@@ -7,6 +7,8 @@ import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { Activity, Clock, Zap, ArrowUpRight, ArrowDownRight, TrendingUp, GripVertical } from 'lucide-react';
 import { useDragOrder } from '@/hooks/useDragOrder';
 import { useMarketStream } from '@/context/MarketStreamContext';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
 
 const PERFECTION_TOKENS = [
     "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "AVAX", "DOGE", "DOT", "LINK"
@@ -48,12 +50,10 @@ function MacroMetricsCard() {
         return () => clearInterval(interval);
     }, []);
 
+    const { formatLargeMoney } = useSovereignFormatter();
+
     const volumeNum = stats?.totalVolumeUSD ? parseFloat(stats.totalVolumeUSD) : 0;
-    const volumeFormatted = volumeNum > 1e9 
-        ? `${(volumeNum / 1e9).toFixed(2)}B` 
-        : volumeNum > 1e6 
-            ? `${(volumeNum / 1e6).toFixed(1)}M`
-            : volumeNum.toLocaleString();
+    const volumeFormatted = formatLargeMoney(volumeNum);
 
     return (
         <div className="bg-white border border-[#E5E5E5] text-[#050505] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-xl relative overflow-hidden group transition-all h-full">
@@ -68,8 +68,8 @@ function MacroMetricsCard() {
                 </div>
             ) : (
                 <>
-                    <h2 className="text-4xl font-mono text-[#00C076] tracking-tighter drop-shadow-sm relative z-10">
-                        ${volumeFormatted}
+                    <h2 className="text-4xl font-mono text-[#00C076] tracking-tighter drop-shadow-sm relative z-10 privacy-sensitive">
+                        {volumeFormatted}
                     </h2>
                     <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mt-2 relative z-10">
                         Institutional Net Flow (24H)
@@ -96,6 +96,7 @@ function MacroMetricsCard() {
 function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
     const { markets } = useMarketStream();
     const [isHovered, setIsHovered] = useState(false);
+    const { formatMoney, formatLargeMoney } = useSovereignFormatter();
     
     // Consume from the global internal stream (bypasses ALL client rate limits)
     const marketData = markets.get(`${symbol}USDT`);
@@ -141,8 +142,8 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FAF9F6] border border-[#E5E5E5] text-[#888888] font-bold uppercase tracking-[0.2em]">PERP</span>
                 </div>
             </td>
-            <td className="py-5 px-6 font-mono text-sm text-[#050505] font-bold">
-                ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+            <td className="py-5 px-6 font-mono text-sm text-[#050505] font-bold privacy-sensitive">
+                {formatMoney(currentPrice, 4)}
             </td>
             <td className={`py-5 px-6 font-mono text-xs font-bold ${isBull ? 'text-[#00C076]' : 'text-[#FF3B30]'}`}>
                 <div className="flex items-center gap-1">
@@ -152,7 +153,7 @@ function ProTokenRow({ symbol, index }: { symbol: string; index: number }) {
             </td>
             <td className="py-5 px-6">
                 <div className="flex flex-col">
-                    <span className="text-xs text-[#050505] font-mono">${(volumeValue / 1e6).toFixed(1)}M</span>
+                    <span className="text-xs text-[#050505] font-mono privacy-sensitive">{formatLargeMoney(volumeValue)}</span>
                     <span className="text-[9px] text-[#888888] uppercase tracking-[0.2em] mt-0.5">24h Vol</span>
                 </div>
             </td>
@@ -201,6 +202,7 @@ export function PremiumMatrixStack() {
     const [selectedCategory, setSelectedCategory] = useState<'MAJOR' | 'ALT'>('MAJOR');
     const [isRearranging, setIsRearranging] = useState(false);
     const [cards, setCards, resetCards] = useDragOrder(INITIAL_CARDS, 'dashboard-widget-order');
+    const { settings } = useSettingsStore();
 
     const displayTokens = selectedCategory === 'MAJOR' 
         ? PERFECTION_TOKENS.slice(0, 5) 
@@ -210,12 +212,12 @@ export function PremiumMatrixStack() {
         <div className="w-full h-full min-h-0 flex flex-col gap-6 p-6 animate-in fade-in duration-700 font-sans overflow-hidden">
 
             {/* ─── DRAGGABLE STAT CARDS ─── */}
-            <div className="shrink-0 h-[160px]">
+            <div className="shrink-0 h-[170px]">
             <Reorder.Group
                 axis="x"
                 values={cards}
                 onReorder={setCards}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto overflow-y-hidden md:overflow-visible no-scrollbar w-full h-full pb-2 md:pb-0 scroll-smooth snap-x"
                 style={{ listStyle: 'none', padding: 0, margin: 0 }}
                 as="div"
             >
@@ -228,7 +230,7 @@ export function PremiumMatrixStack() {
                         whileDrag={{ scale: 1.03, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.4)', zIndex: 50 }}
                         style={{ position: 'relative', cursor: isRearranging ? 'grab' : 'default' }}
                         as="div"
-                        className="relative"
+                        className="relative shrink-0 w-[85vw] sm:w-[320px] md:w-auto h-[150px] md:h-auto snap-center"
                     >
                         {/* Drag handle overlay */}
                         {isRearranging && (
@@ -250,11 +252,11 @@ export function PremiumMatrixStack() {
                                     )}
                                 </div>
                                 <div className="relative z-10">
-                                    <h2 className="text-4xl font-mono text-[#050505] tracking-tighter drop-shadow-sm">
-                                        {isConnected && balance ? `${Number(balance.formatted).toFixed(4)} ${balance.symbol}` : '---'}
+                                    <h2 className="text-4xl font-mono text-[#050505] tracking-tighter drop-shadow-sm privacy-sensitive">
+                                        {settings?.showBalances === false ? '****' : (isConnected && balance ? `${Number(balance.formatted).toFixed(4)} ${balance.symbol}` : '---')}
                                     </h2>
                                     <p className="text-[10px] font-mono text-[#888888] uppercase tracking-widest mt-2 flex items-center gap-2">
-                                        Wallet: <span className="text-[#050505] bg-[#FAF9F6] border border-[#E5E5E5] px-2 py-0.5 rounded font-black">{isConnected && address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
+                                        Wallet: <span className="text-[#050505] bg-[#FAF9F6] border border-[#E5E5E5] px-2 py-0.5 rounded font-black privacy-sensitive">{isConnected && address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
                                     </p>
                                 </div>
                             </div>

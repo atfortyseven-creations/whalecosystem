@@ -213,7 +213,10 @@ export default function ConnectPage() {
     return () => clearInterval(poll);
   }, [qrSession, syncStatus, router]);
 
-  // ── Auto-redirect on connection ───────────────────────────────────────────
+  // ── Auto-handle connection: set cookie, clear pending state ─────────────
+  // SOVEREIGN MANDATE: We do NOT auto-redirect the user after connection.
+  // Navigation is always user-initiated. The cookie is set here for
+  // subsequent protected-route access, but no router.push/replace fires.
   useEffect(() => {
     if (!mounted || !isConnected) return;
     try {
@@ -222,13 +225,15 @@ export default function ConnectPage() {
         return;
       }
     } catch {}
+    // Write the sovereign cookie if not already present
     if (!document.cookie.includes("sovereign_handshake=")) {
       document.cookie = `sovereign_handshake=${address ?? "web3_injected"}; path=/; max-age=604800; SameSite=Lax`;
     }
+    // Clear the pending wallet UI state
     setPendingId(null);
-    const t = setTimeout(() => router.replace("/"), 500);
-    return () => clearTimeout(t);
-  }, [isConnected, mounted, router, address]);
+    // ❌ NO auto-redirect here. User stays on /connect and navigates manually.
+  }, [isConnected, mounted, address]);
+
 
   // ── Desktop handler: EIP-6963 extension lookup ───────────────────────────
   const handleDesktopWallet = useCallback(
@@ -380,8 +385,8 @@ export default function ConnectPage() {
                 Connect Wallet
               </h2>
 
-              {/* Device mode indicator */}
-              {mounted && (
+              {/* Device mode indicator — only visible pre-connection */}
+              {mounted && !isConnected && (
                 <div className="flex items-center gap-1.5 mb-3">
                   {isMobile
                     ? <Smartphone size={9} className="text-emerald-500" />
@@ -400,12 +405,74 @@ export default function ConnectPage() {
                 ECDSA · Zero-Custody · Multi-Chain
               </p>
 
-              {!mounted ? (
+              {/* ─────────────────────────────────────────────────────── */}
+              {/* SOVEREIGN CONNECTED STATE                               */}
+              {/* Zero auto-redirects. User navigates explicitly.         */}
+              {/* ─────────────────────────────────────────────────────── */}
+              {mounted && isConnected ? (
+                <motion.div
+                  key="connected-state"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col gap-5 flex-1"
+                >
+                  {/* Success badge */}
+                  <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-[20px]">
+                    <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                      <CheckCircle size={17} className="text-emerald-600" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700">
+                        Sovereign Identity Verified
+                      </span>
+                      <span className="text-[9px] font-mono text-emerald-500/70 truncate mt-0.5">
+                        {address ? `${address.slice(0, 10)}…${address.slice(-8)}` : 'Connected'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Explicit navigation CTAs — user chooses destination */}
+                  <div className="flex flex-col gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => router.push('/dashboard')}
+                      className="group w-full flex items-center justify-between p-5 bg-[#050505] text-white rounded-[20px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.35)] hover:bg-black transition-all"
+                    >
+                      <div className="flex flex-col text-left">
+                        <span className="text-[13px] font-black uppercase tracking-tight">Enter Terminal</span>
+                        <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest mt-0.5">Sovereign Dashboard</span>
+                      </div>
+                      <ArrowRight size={16} className="text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => router.push('/')}
+                      className="group w-full flex items-center justify-between p-5 bg-[#FAF9F6] border border-black/[0.08] text-[#050505] rounded-[20px] hover:bg-white hover:border-black/15 transition-all"
+                    >
+                      <span className="text-[12px] font-black uppercase tracking-tight">Back to Home</span>
+                      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
+                    </motion.button>
+                  </div>
+
+                  {/* Full address pill */}
+                  <div className="mt-auto p-4 bg-[#FAF9F6]/80 border border-black/[0.06] rounded-2xl flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <p className="text-[9px] text-black/35 font-mono break-all">{address}</p>
+                  </div>
+                </motion.div>
+
+              ) : !mounted ? (
+                /* ── SKELETON ── */
                 <div className="flex flex-col gap-3 flex-1">
                   {[0, 1, 2, 3].map((i) => (
                     <div key={i} className="w-full h-[72px] rounded-[24px] bg-black/[0.03] animate-pulse" />
                   ))}
                 </div>
+
               ) : isMobile ? (
                 /* ── MOBILE: all buttons fire AppKit → WalletConnect deep-link → native app ── */
                 <div className="flex flex-col gap-3 flex-1">
@@ -422,6 +489,7 @@ export default function ConnectPage() {
                     />
                   ))}
                 </div>
+
               ) : (
                 /* ── DESKTOP: EIP-6963 extension first, AppKit modal fallback ── */
                 <div className="flex flex-col gap-3 flex-1">
@@ -439,13 +507,15 @@ export default function ConnectPage() {
                 </div>
               )}
 
-              {/* Security note */}
-              <div className="mt-6 p-4 bg-[#FAF9F6]/80 border border-black/[0.06] rounded-2xl flex items-start gap-3">
-                <Fingerprint size={14} className="text-black/25 mt-0.5 shrink-0" />
-                <p className="text-[9px] text-black/35 font-semibold leading-relaxed">
-                  This portal does not hold custody of assets. All interactions are verified on-chain via ECDSA signature. No username. No password.
-                </p>
-              </div>
+              {/* Security note — only when not yet connected */}
+              {mounted && !isConnected && (
+                <div className="mt-6 p-4 bg-[#FAF9F6]/80 border border-black/[0.06] rounded-2xl flex items-start gap-3">
+                  <Fingerprint size={14} className="text-black/25 mt-0.5 shrink-0" />
+                  <p className="text-[9px] text-black/35 font-semibold leading-relaxed">
+                    This portal does not hold custody of assets. All interactions are verified on-chain via ECDSA signature. No username. No password.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>

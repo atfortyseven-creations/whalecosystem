@@ -9,6 +9,8 @@ import {
 import dynamic from 'next/dynamic';
 import { useMarketData } from '@/lib/api-client';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import { useSovereignFormatter } from '@/hooks/useSovereignFormatter';
 
 const List = dynamic<any>(
     () => import('react-window').then(m => (m as any).FixedSizeList),
@@ -37,10 +39,9 @@ const CHAIN_COLORS: Record<string, string> = {
 
 export function WatchlistTable() {
     // =========================================================================
-    // INJECTED DATA HOOK
-    // Enforcing strict on-chain reality. Waiting for endpoint assignment.
-    // =========================================================================
     const { data: rawData, isLoading, error } = useMarketData('watchlist');
+    const { settings } = useSettingsStore();
+    const { formatMoney, formatLargeMoney } = useSovereignFormatter();
     
     const serverTokens = rawData?.tokens || [];
     const serverWallets = rawData?.wallets || [];
@@ -48,22 +49,38 @@ export function WatchlistTable() {
     const [search, setSearch]   = useState('');
     const [view, setView]       = useState<'TOKENS' | 'WALLETS'>('TOKENS');
 
-    const tokensFiltered = useMemo(() =>
-        serverTokens.filter((t: any) =>
-            t != null &&
-            ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (t.address ?? '').toLowerCase().includes(search.toLowerCase()))
-        ), [serverTokens, search]
-    );
+    const tokensFiltered = useMemo(() => {
+        let hiddenTokens: string[] = [];
+        try {
+            if (typeof settings?.hiddenAssets === 'string') hiddenTokens = JSON.parse(settings.hiddenAssets);
+            else if (Array.isArray(settings?.hiddenAssets)) hiddenTokens = settings.hiddenAssets;
+        } catch(e) {}
 
-    const walletsFiltered = useMemo(() =>
-        serverWallets.filter((w: any) =>
-            w != null &&
-            ((w.label ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (w.address ?? '').toLowerCase().includes(search.toLowerCase()))
-        ), [serverWallets, search]
-    );
+        return serverTokens.filter((t: any) => {
+            if (!t) return false;
+            if (hiddenTokens.includes(t.symbol) || hiddenTokens.includes(t.address)) return false;
+
+            return ((t.symbol ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (t.name ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (t.address ?? '').toLowerCase().includes(search.toLowerCase()));
+        });
+    }, [serverTokens, search, settings?.hiddenAssets]);
+
+    const walletsFiltered = useMemo(() => {
+        let hiddenWallets: string[] = [];
+        try {
+            if (typeof settings?.hiddenAssets === 'string') hiddenWallets = JSON.parse(settings.hiddenAssets);
+            else if (Array.isArray(settings?.hiddenAssets)) hiddenWallets = settings.hiddenAssets;
+        } catch(e) {}
+
+        return serverWallets.filter((w: any) => {
+            if (!w) return false;
+            if (hiddenWallets.includes(w.address) || hiddenWallets.includes(w.label)) return false;
+
+            return ((w.label ?? '').toLowerCase().includes(search.toLowerCase()) ||
+            (w.address ?? '').toLowerCase().includes(search.toLowerCase()));
+        });
+    }, [serverWallets, search, settings?.hiddenAssets]);
 
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-4 overflow-hidden">
@@ -159,7 +176,9 @@ export function WatchlistTable() {
 
                                                             {/* Current Price */}
                                                             <div className="px-3 text-right">
-                                                                <span className="text-[11px] font-black font-mono text-[#050505]">${md.currentPrice?.toFixed(6) ?? '—'}</span>
+                                                                <span className="text-[11px] font-black font-mono text-[#050505] privacy-sensitive">
+                                                                    {md.currentPrice ? formatMoney(md.currentPrice, 6) : '—'}
+                                                                </span>
                                                             </div>
 
                                                             {/* 24h Chg */}
@@ -170,7 +189,9 @@ export function WatchlistTable() {
 
                                                             {/* Entry Price */}
                                                             <div className="px-3 text-right">
-                                                                <span className="text-[10px] font-bold font-mono text-[#888888]">{t.entryPrice ? `$${t.entryPrice.toFixed(6)}` : '—'}</span>
+                                                                <span className="text-[10px] font-bold font-mono text-[#888888] privacy-sensitive">
+                                                                    {t.entryPrice ? formatMoney(t.entryPrice, 6) : '—'}
+                                                                </span>
                                                             </div>
 
                                                             {/* ROI */}
@@ -179,13 +200,13 @@ export function WatchlistTable() {
                                                             </div>
 
                                                             {/* MCap */}
-                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                                {md.mcap ? fmt(md.mcap) : '—'}
+                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] privacy-sensitive">
+                                                                {md.mcap ? formatLargeMoney(md.mcap) : '—'}
                                                             </div>
 
                                                             {/* Vol 24h */}
-                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505]">
-                                                                {md.vol24h ? fmt(md.vol24h) : '—'}
+                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] privacy-sensitive">
+                                                                {md.vol24h ? formatLargeMoney(md.vol24h) : '—'}
                                                             </div>
 
                                                             {/* Top10 holders */}
@@ -278,19 +299,19 @@ export function WatchlistTable() {
 
                                                             {/* Address */}
                                                             <div className="px-3">
-                                                                <span className="text-[9px] font-mono text-[#888888]">
+                                                                <span className="text-[9px] font-mono text-[#888888] privacy-sensitive">
                                                                     {w.address ? `${w.address.slice(0,8)}…${w.address.slice(-6)}` : '—'}
                                                                 </span>
                                                             </div>
 
                                                             {/* Net Worth */}
-                                                            <div className="px-3 text-right text-[10px] font-black font-mono text-[#050505]">
-                                                                {an.netWorthUSD ? fmt(an.netWorthUSD) : '—'}
+                                                            <div className="px-3 text-right text-[10px] font-black font-mono text-[#050505] privacy-sensitive">
+                                                                {an.netWorthUSD ? formatLargeMoney(an.netWorthUSD) : '—'}
                                                             </div>
 
                                                             {/* PnL 30d */}
-                                                            <div className={`px-3 text-right text-[10px] font-black font-mono ${pctColor(an.pnl30d ?? 0)}`}>
-                                                                {an.pnl30d != null ? fmt(Math.abs(an.pnl30d)) : '—'}
+                                                            <div className={`px-3 text-right text-[10px] font-black font-mono privacy-sensitive ${pctColor(an.pnl30d ?? 0)}`}>
+                                                                {an.pnl30d != null ? formatLargeMoney(Math.abs(an.pnl30d)) : '—'}
                                                             </div>
 
                                                             {/* Win Rate */}

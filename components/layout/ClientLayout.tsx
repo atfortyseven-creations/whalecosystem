@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import { useSovereignSessionLock } from '@/hooks/useSovereignSessionLock';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
@@ -64,6 +66,13 @@ const BOUNDED_PREFIXES = [
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { fetchSettings, settings } = useSettingsStore();
+
+  useSovereignSessionLock();
+
+  React.useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const isPublicPath = PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
   const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
@@ -102,6 +111,40 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       document.body.classList.remove('ios-scroll-lock-strict');
     };
   }, [isDashboard, isBounded]);
+
+  // Handle Global Audio Feedback if enabled
+  React.useEffect(() => {
+    if (typeof document === 'undefined' || !settings?.soundEffects) return;
+    
+    // Low-latency AudioContext for UI clicks
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+
+    const playTick = () => {
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+    };
+
+    const handleClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        const clickable = target.closest('button, a, input[type="submit"], [role="button"], .cursor-pointer');
+        if (clickable) playTick();
+    };
+
+    document.addEventListener('mousedown', handleClick, { passive: true });
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [settings?.soundEffects]);
 
   // ── Battery-aware CSS class for noise animation ──────────────────────────
   // Sets body.perf-high when device is plugged in → enables noise-shift CSS

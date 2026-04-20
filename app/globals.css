@@ -141,6 +141,11 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     --background: 45 40% 98%;
     --foreground: 0 0% 10%;
 
+    /* --- SOVEREIGN SETTINGS HOOKS --- */
+    --ui-p-base: 1rem;
+    --ui-text-scale: 1;
+    --stealth-blur: 0px;
+
     /* ═══════════════════════════════════════════════════════
        MARCA DE AGUA CÓSMICA 4K / HOKUSAI (TRANSPARENT BLEND)
        ═══════════════════════════════════════════════════════ */
@@ -427,6 +432,34 @@ body,
   /* MASTER LAYOUT HEIGHTS — Compensates for the 68px header */
   .min-h-content { min-height: calc(100dvh - 68px) !important; }
   .h-content { height: calc(100dvh - 68px) !important; }
+
+  /* ============================================================
+     SOVEREIGN CONFIG: DENSITY & STEALTH MODE (Zero-JS)
+     ============================================================ */
+  
+  html.ui-compact {
+    --ui-p-base: 0.5rem;
+    --ui-text-scale: 0.85;
+  }
+  
+  html.ui-dense {
+    --ui-p-base: 0.25rem;
+    --ui-text-scale: 0.75;
+  }
+
+  html.stealth-active .privacy-sensitive {
+    filter: blur(8px) saturate(0%);
+    opacity: 0.6;
+    pointer-events: none;
+    user-select: none;
+    transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  }
+  
+  /* Opt-out on hover if user explicitly wants to check it securely */
+  html.stealth-active .privacy-sensitive:active {
+    filter: blur(0px) saturate(100%);
+    opacity: 1;
+  }
 
   /* Safe Area / Fallback VP utilities for iOS 15 */
   .min-h-safe {

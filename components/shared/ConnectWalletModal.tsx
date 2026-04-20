@@ -33,21 +33,21 @@ export function ConnectWalletModal() {
         }
     }, [isConnectModalOpen]);
 
-    // ─── [TRIPLE BLINDAJE] ───
-    // Nivel 1: Escucha de Eventos Globales (vía WalletConnectionBridge + SSE)
+    // ─── [SOVEREIGN MANDATE] QR Handshake Completion Listener ───
+    // This event is only fired by WalletConnectionBridge when the SSE
+    // auth-complete event is received (i.e. a QR scan was completed on
+    // a connected mobile device). We close the modal but do NOT force
+    // any navigation — the user stays where they are and navigates manually.
     useEffect(() => {
         const handleAuthSuccess = () => {
-             console.log('[ConnectModal] 10000% Success Signal Received!');
+             console.log('[ConnectModal] Sovereign handshake confirmed. Closing modal.');
              setView('selection');
              closeConnectModal();
-             // Direct navigation to news hub after successful handshake
-             window.location.href = '/news';
+             // ❌ NO forced navigation. The user is in control.
         };
         window.addEventListener('sovereign:auth_success', handleAuthSuccess);
         return () => window.removeEventListener('sovereign:auth_success', handleAuthSuccess);
     }, [closeConnectModal]);
-
-    // Nivel 2: Polling de Seguridad descartado. Se usa WebSocket de WalletConnect (AppKit) en su lugar para firmas institucionales.
 
     if (!isConnectModalOpen) return null;
 

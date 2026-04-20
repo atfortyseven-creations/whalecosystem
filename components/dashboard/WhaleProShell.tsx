@@ -31,40 +31,11 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // ── Command ──
-    { id: 'dashboard',           label: 'Dashboard',          icon: <LayoutDashboard size={17}/>,  dividerBefore: 'Overview' },
-    { id: 'news',                label: 'Whale News',         icon: <Newspaper size={17}/> },
-    { id: 'watchlist',           label: 'Watchlist',          icon: <Star size={17}/> },
-    { id: 'gold-ticket',         label: 'Ticket Mint',        icon: <Ticket size={17}/> },
-
-    // ── Markets ──
-    { id: 'whale-events',        label: 'Whale Tracker',      icon: <Globe size={17}/>,            dividerBefore: 'Markets' },
-    { id: 'gainers',             label: 'Gainers / Losers',   icon: <TrendingUp size={17}/> },
-    { id: 'new-pairs',           label: 'New Tokens',         icon: <Rocket size={17}/> },
-    { id: 'omni-explorer',       label: 'Block Explorer',     icon: <Compass size={17}/> },
-    { id: 'brc-explorer',        label: 'BRC-20',             icon: <Layers size={17}/> },
-
-    // ── Intelligence ──
-    { id: 'neural-graph',        label: 'Entity Map',         icon: <Network size={17}/>,          dividerBefore: 'Intelligence' },
-    { id: 'cosmic-forge',        label: 'Cosmic Forge',       icon: <FlaskConical size={17}/>,     badge: 'NEW', badgeColor: '#8b5cf6' },
-    { id: 'sovereign-intel',     label: 'Smart Signals',      icon: <Zap size={17}/> },
-    { id: 'institutional-ledger',label: 'Event Ledger',       icon: <Landmark size={17}/>,         badge: 'NEW' },
-    { id: 'mass-transfer',       label: 'Mass Transfers',     icon: <Activity size={17}/> },
-    { id: 'defi-yield',          label: 'DeFi Yield',         icon: <FlaskConical size={17}/> },
-    { id: 'polymarket',          label: 'Predictions',        icon: <BarChart3 size={17}/> },
-
-    // ── Wallet & Vault ──
-    { id: 'portfolio',           label: 'My Wallet',          icon: <Wallet size={17}/>,           dividerBefore: 'Wallet' },
-    { id: 'sovereign-vault',     label: 'Cold Storage',       icon: <Lock size={17}/> },
-    { id: 'zk-shield',           label: 'ZK Privacy',         icon: <ShieldAlert size={17}/> },
-    { id: 'whale-portfolio',     label: 'Whale Wallets',      icon: <Database size={17}/> },
-    { id: 'humanidfi-portfolio', label: 'HumanID Wallet',     icon: <Shield size={17}/> },
-    { id: 'session-logs',        label: 'Session Logs',       icon: <Activity size={17}/> },
-
-    // ── Learn & Support ──
-    { id: 'academy',             label: 'Academy',            icon: <Book size={17}/>,             dividerBefore: 'Resources' },
-    { id: 'developer',           label: 'Legacy View',        icon: <Code2 size={17}/> },
-    { id: 'support',             label: 'Support',            icon: <HeadphonesIcon size={17}/> },
+    { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>,  dividerBefore: 'Command Center' },
+    { id: 'markets',      label: 'Markets',          icon: <Globe size={17}/>,            dividerBefore: 'Analytics' },
+    { id: 'intelligence', label: 'Intelligence',     icon: <Cpu size={17}/>,              dividerBefore: 'Forensics', badge: 'PRO', badgeColor: '#8b5cf6' },
+    { id: 'wallet',       label: 'Wallet & Vault',   icon: <Lock size={17}/>,             dividerBefore: 'Execution' },
+    { id: 'resources',    label: 'Resources',        icon: <BookOpen size={17}/>,         dividerBefore: 'Ecosystem' },
 ];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
@@ -198,12 +169,12 @@ export function WhaleProShell({
             return;
         }
 
-        const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
+        const restrictedTabs = ['wallet', 'intelligence'];
         
         if (restrictedTabs.includes(id)) {
             if (!isWalletConnected) {
                 toast.error("Sovereign Connection Required", {
-                    description: "You must link a Web3 wallet or authenticate to access restricted modules.",
+                    description: "You must link a Web3 wallet to access institutional execution layers and forensic intel.",
                     duration: 4000
                 });
                 openConnectModal();
@@ -215,7 +186,7 @@ export function WhaleProShell({
 
     // Active clearance ejection monitor
     useEffect(() => {
-        const restrictedTabs = ['gold-ticket', 'institutional-ledger', 'sovereign-vault'];
+        const restrictedTabs = ['wallet', 'intelligence'];
         if (restrictedTabs.includes(activeTab)) {
             if (!isWalletConnected) {
                 onTabChange('dashboard');
@@ -392,8 +363,8 @@ export function WhaleProShell({
                 <nav className="md:hidden h-16 border-t border-black/10 bg-white flex items-center justify-around px-2 shrink-0 z-50" style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
                         { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
-                        { id: 'whale-events', icon: <TrendingUp size={20} />, label: 'Radar' },
-                        { id: 'portfolio', icon: <Wallet size={20} />, label: 'Vault' },
+                        { id: 'markets', icon: <Globe size={20} />, label: 'Markets' },
+                        { id: 'wallet', icon: <Lock size={20} />, label: 'Vault' },
                         { id: 'menu', icon: <Menu size={20} />, label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
