@@ -46,7 +46,7 @@ export class RpcRelayerManager {
             return;
         }
 
-        const urls = envVar.split(',').map(url => url.trim()).filter(Boolean);
+        const urls = envVar.split(',').map(url => url.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
         this.endpoints[key] = urls.map(url => ({
             url,
             failures: 0,
