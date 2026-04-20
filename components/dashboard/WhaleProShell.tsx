@@ -31,12 +31,38 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>,  dividerBefore: 'Command Center' },
-    { id: 'markets',      label: 'Markets',          icon: <Globe size={17}/>,            dividerBefore: 'Analytics' },
-    { id: 'intelligence', label: 'Intelligence',     icon: <Cpu size={17}/>,              dividerBefore: 'Forensics', badge: 'PRO', badgeColor: '#8b5cf6' },
-    { id: 'wallet',       label: 'Wallet & Vault',   icon: <Lock size={17}/>,             dividerBefore: 'Execution' },
-    { id: 'resources',    label: 'Resources',        icon: <BookOpen size={17}/>,         dividerBefore: 'Ecosystem' },
+    { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>, dividerBefore: 'Overview' },
+    { id: 'watchlist',    label: 'Watchlist',        icon: <Star size={17}/> },
+    { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/> },
+    { id: 'gold',         label: 'Premium Hub',      icon: <Ticket size={17}/> },
+
+    { id: 'markets',      label: 'Top Markets',      icon: <Globe size={17}/>,           dividerBefore: 'Market Data' },
+    { id: 'newpairs',     label: 'New Listings',     icon: <Zap size={17}/> },
+    { id: 'omniexplorer', label: 'Omni Explorer',    icon: <Search size={17}/> },
+    { id: 'brc',          label: 'BRC Explorer',     icon: <Layers size={17}/> },
+
+    { id: 'firehose',     label: 'Whale Firehose',   icon: <Activity size={17}/>,        dividerBefore: 'Pro Analytics', badge: 'PRO' },
+    { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <ShieldAlert size={17}/> },
+    { id: 'inst-ledger',  label: 'Inst. Ledger',     icon: <Book size={17}/> },
+    { id: 'mass-transfer',label: 'Mass Transfers',   icon: <Network size={17}/> },
+    { id: 'graph',        label: 'Entity Graph',     icon: <Compass size={17}/> },
+    { id: 'defi',         label: 'DeFi Yields',      icon: <Landmark size={17}/> },
+    { id: 'polymarket',   label: 'Polymarket',       icon: <BarChart3 size={17}/> },
+    { id: 'forge',        label: 'Cosmic Forge',     icon: <FlaskConical size={17}/> },
+
+    { id: 'portfolio',    label: 'Main Portfolio',   icon: <Wallet size={17}/>,          dividerBefore: 'Execution' },
+    { id: 'live-port',    label: 'Quick Portfolio',  icon: <Activity size={17}/> },
+    { id: 'whale-port',   label: 'Whale Holdings',   icon: <Star size={17}/> },
+    { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/> },
+    { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/> },
+
+    { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>,        dividerBefore: 'System' },
+
+    { id: 'academy',      label: 'Academy',          icon: <BookOpen size={17}/>,        dividerBefore: 'Resources' },
+    { id: 'support',      label: 'Support',          icon: <HeadphonesIcon size={17}/> },
 ];
+
+
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
     const [flash, setFlash] = useState<'up' | 'down' | null>(null);
@@ -169,12 +195,15 @@ export function WhaleProShell({
             return;
         }
 
-        const restrictedTabs = ['wallet', 'intelligence'];
+        const restrictedTabs = [
+            'firehose', 'sov-intel', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
+            'portfolio', 'live-port', 'whale-port', 'vault', 'zk', 'logs'
+        ];
         
         if (restrictedTabs.includes(id)) {
             if (!isWalletConnected) {
-                toast.error("Sovereign Connection Required", {
-                    description: "You must link a Web3 wallet to access institutional execution layers and forensic intel.",
+                toast.error("Connection Required", {
+                    description: "You must connect a wallet to access execution and forensic layers.",
                     duration: 4000
                 });
                 openConnectModal();
@@ -186,14 +215,19 @@ export function WhaleProShell({
 
     // Active clearance ejection monitor
     useEffect(() => {
-        const restrictedTabs = ['wallet', 'intelligence'];
+        const restrictedTabs = [
+            'firehose', 'sov-intel', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
+            'portfolio', 'live-port', 'whale-port', 'vault', 'zk', 'logs'
+        ];
         if (restrictedTabs.includes(activeTab)) {
             if (!isWalletConnected) {
                 onTabChange('dashboard');
-                toast.error("Session Lost", { description: "You have been ejected from the secure perimeter." });
+                toast.error("Session Lost", { description: "You have been disconnected." });
             }
         }
     }, [isWalletConnected, activeTab, onTabChange]);
+
+
 
     return (
         <>
@@ -364,7 +398,7 @@ export function WhaleProShell({
                     {[
                         { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
                         { id: 'markets', icon: <Globe size={20} />, label: 'Markets' },
-                        { id: 'wallet', icon: <Lock size={20} />, label: 'Vault' },
+                        { id: 'portfolio', icon: <Lock size={20} />, label: 'Portfolio' },
                         { id: 'menu', icon: <Menu size={20} />, label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
