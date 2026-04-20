@@ -1,0 +1,83 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NOTICE OF INTELLECTUAL PROPERTY AND PROPRIETARY RIGHTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHALE ALERT NETWORK — INSTITUTIONAL ON-CHAIN INTELLIGENCE TERMINAL
+Copyright (c) 2024–2026 atfortyseven-creations. All Rights Reserved.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OWNERSHIP DECLARATION
+─────────────────────
+This software system and all of its components — including but not limited
+to source code, compiled binaries, architecture design, user interface design,
+database schemas, API contracts, deployment configurations, documentation,
+and all associated trade secrets — are the sole and exclusive property of:
+
+  atfortyseven-creations
+  Platform: https://www.humanidfi.com
+  Repository: https://github.com/atfortyseven-creations/whalecosystem
+  Contact: legal@humanidfi.com
+
+TECHNOLOGY STACK AND INNOVATIONS
+─────────────────────────────────
+The following proprietary innovations are protected by this Notice:
+
+  1. Sovereign Access Protocol (SIWE-native authentication system)
+     — Zero-Clerk, zero-traditional-auth wallet handshake architecture
+     — Custom cookie-based session management without third-party auth
+     — Mobile QR ↔ Desktop session bridging via SSE
+
+  2. Sovereign Settings Architecture
+     — 20-field institutional configuration system (PostgreSQL-backed)
+     — Real-time reactivity via Zustand with optimistic UI updates
+     — Privacy-sensitive data redaction engine (useSovereignFormatter)
+
+  3. Institutional Navigation Flow
+     — Sovereign navigation mandate (zero auto-redirect architecture)
+     — Explicit-CTA-only post-authentication routing
+     — TitaniumGate + LinkedGate dual-layer access control system
+
+  4. WhaleCosystem Live Intelligence Platform
+     — Real-time on-chain whale alert detection engine
+     — Dual-mode market data stream (live/synthetic fallback)
+     — Institutional-grade portfolio and watchlist systems
+
+  5. Mobile Hybrid Architecture
+     — Next.js 15 App Router hybrid iOS WebView integration
+     — Server-side device detection + client-side QR state sync
+     — Deep-link wallet connection bridge to native mobile wallets
+
+THIRD-PARTY COMPONENTS
+──────────────────────
+This software incorporates the following open-source dependencies, each
+governed by their respective licenses:
+
+  — Next.js (MIT License) — Copyright Vercel, Inc.
+  — React (MIT License) — Copyright Meta Platforms, Inc.
+  — Wagmi (MIT License) — Copyright Wevm
+  — Prisma (Apache 2.0) — Copyright Prisma Data, Inc.
+  — Framer Motion (MIT License) — Copyright Framer B.V.
+  — Zustand (MIT License) — Copyright Paul Henschel
+
+Use of third-party components does not grant any rights to the proprietary
+code, architecture, or trade secrets of this Software.
+
+TRADEMARK NOTICE
+────────────────
+"Whale Alert Network", "WhaleCosystem", "Sovereign Access Protocol",
+"Sovereign Intelligence Terminal", and associated logos are trademarks
+and/or service marks of atfortyseven-creations. Unauthorized use is
+strictly prohibited.
+
+ACQUISITION INQUIRIES
+─────────────────────
+This Software is available for acquisition. Interested parties must execute
+a formal Non-Disclosure Agreement (NDA) before any due diligence access
+is granted. Contact: legal@humanidfi.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+© 2024–2026 atfortyseven-creations. All Rights Reserved.
+THIS SOFTWARE IS PROTECTED BY TRADE SECRET AND COPYRIGHT LAW.
+UNAUTHORIZED USE IS A VIOLATION OF LAW AND WILL BE PROSECUTED.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

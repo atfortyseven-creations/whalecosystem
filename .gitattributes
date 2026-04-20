@@ -1,0 +1,67 @@
+# .gitattributes — Export Control & Repository Integrity
+# © 2024–2026 atfortyseven-creations. All Rights Reserved.
+# Proprietary & Confidential.
+#
+# This file enforces export restrictions on archive downloads (git archive,
+# GitHub ZIP downloads). Critical source files are excluded from any
+# automated export. This is a technical measure to prevent bulk copying.
+
+# ─── DEFAULT: All text files use LF line endings ────────────────────────────
+* text=auto eol=lf
+
+# ─── EXPORT RESTRICTIONS ────────────────────────────────────────────────────
+# Files marked export-ignore are excluded from `git archive` and
+# GitHub's "Download ZIP" feature.
+
+# Legal documents — always export (must travel with any distribution)
+LICENSE         export-subst
+NOTICE          export-subst
+
+# Core application source — EXCLUDED from ZIP exports
+/app/**                         export-ignore
+/components/**                  export-ignore
+/hooks/**                       export-ignore
+/lib/**                         export-ignore
+/prisma/**                      export-ignore
+/context/**                     export-ignore
+/pages/**                       export-ignore
+/public/**                      export-ignore
+/styles/**                      export-ignore
+
+# Configuration — EXCLUDED
+next.config.*                   export-ignore
+tailwind.config.*               export-ignore
+tsconfig.json                   export-ignore
+package.json                    export-ignore
+package-lock.json               export-ignore
+.env*                           export-ignore
+Dockerfile*                     export-ignore
+docker-compose*                 export-ignore
+railway.json                    export-ignore
+railway.toml                    export-ignore
+
+# GitHub config — excluded from exports
+.github/**                      export-ignore
+.husky/**                       export-ignore
+
+# ─── BINARY ASSETS ──────────────────────────────────────────────────────────
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.svg   text
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+
+# ─── LINGUIST OVERRIDES ─────────────────────────────────────────────────────
+# Prevents GitHub from showing language statistics that reveal tech stack
+*.tsx   linguist-language=TypeScript
+*.ts    linguist-language=TypeScript
+
+# Prevent GitHub from indexing these in search
+prisma/schema.prisma    linguist-detectable=false
+*.sql                   linguist-detectable=false
