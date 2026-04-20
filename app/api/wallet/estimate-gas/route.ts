@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { ethers } from 'ethers';
 
 const provider = new ethers.AlchemyProvider('mainnet', process.env.ALCHEMY_API_KEY || '');
 
 export async function POST(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = { id: session.userId, email: session.email };
 
         const { to, amount } = await req.json();
 

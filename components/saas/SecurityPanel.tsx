@@ -2,11 +2,10 @@
 
 import { motion } from 'framer-motion';
 import { ShieldAlert, Network, Lock, Info, Server } from 'lucide-react';
-import { PlanTier } from '@prisma/client';
 import { SAAS_PLANS } from '@/lib/saas/plans';
 import { Button } from '@/components/ui/button';
 
-export function SecurityPanel({ tier }: { tier: PlanTier }) {
+export function SecurityPanel({ tier }: { tier: string }) {
     const config = SAAS_PLANS[tier];
     const isPremium = config.features.ipWhitelist || config.features.hmacRequired;
 

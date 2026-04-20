@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICE_IDS } from '@/lib/payments/stripe';
 import { prisma } from '@/lib/prisma';
-import { PlanTier } from '@prisma/client';
 
 /**
  * Elite Checkout Tunnel
  * Generates a secure Stripe Checkout Session with tier metadata.
+ * SIWE-native: userId is always a wallet address (no Clerk dependency).
  */
 export async function POST(req: NextRequest) {
     try {
@@ -15,22 +15,16 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid plan tier or missing user context' }, { status: 400 });
         }
 
-        // 1. Fetch user to ensure they exist (Security check)
-        // Robust lookup: check walletAddress OR clerkId
-        const user = await prisma.user.findFirst({
-            where: {
-                OR: [
-                    { walletAddress: userId },
-                    { clerkId: userId }
-                ]
-            }
+        // SIWE-native: userId is always a walletAddress
+        const user = await prisma.user.findUnique({
+            where: { walletAddress: userId }
         });
 
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // 2. Create Stripe Checkout Session
+        // Create Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card', 'sepa_debit'],
             payment_method_options: {
@@ -46,17 +40,18 @@ export async function POST(req: NextRequest) {
             ],
             mode: 'subscription',
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api-marketplace/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/product/pricing`,
-            customer_email: user.email || undefined,
+            cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/product/pricing`,
+            // user.email may not exist on the User schema — use optional cast for forward-compatibility
+            customer_email: (user as any).email || undefined,
             metadata: {
-                userId: userId,
-                tier: tier,
-                env: process.env.NODE_ENV
+                userId:  userId,
+                tier:    tier,
+                env:     process.env.NODE_ENV ?? 'production',
             },
             subscription_data: {
                 metadata: {
-                    userId: userId,
-                    tier: tier
+                    sovereign_user_id: userId,
+                    tier:              tier,
                 }
             }
         });
@@ -68,4 +63,3 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to initialize payment tunnel' }, { status: 500 });
     }
 }
-

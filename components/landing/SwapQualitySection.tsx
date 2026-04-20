@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { TrendingUp, Zap, Shield, Network, CheckCircle2, Radar } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAccount } from "wagmi";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 /**
@@ -14,7 +14,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 export function SwapQualitySection() {
   const { t } = useLanguage();
   const router = useRouter();
-  const { isSignedIn } = useUser();
+  const { isConnected: isSignedIn } = useAccount();
 
   const handleProbarAhora = () => {
     if (isSignedIn) {

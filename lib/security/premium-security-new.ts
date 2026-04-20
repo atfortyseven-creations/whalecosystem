@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
-import { clerkClient } from '@clerk/nextjs/server';
 
 const OWNER_EMAIL = 'atfortyseven2@gmail.com';
 

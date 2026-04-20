@@ -21,7 +21,7 @@ export async function updatePrivacySettings(
     await (prisma as any).userSessionLog.create({
       data: {
         userId,
-        sessionId: "session-" + Math.random().toString(36).substring(7),
+        sessionId: "session-" + crypto.randomUUID().substring(0, 8),
         action: "PRIVACY_SETTINGS_UPDATE",
         entityType: "setting",
         entityId: field,

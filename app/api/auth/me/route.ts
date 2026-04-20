@@ -1,74 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
+// GET /api/auth/me — Returns the sovereign authenticated user profile
 export async function GET(req: NextRequest) {
   try {
-    const user = await currentUser();
-    
-    if (!user) {
+    const session = await getSession();
+
+    if (!session || !session.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const email = user.primaryEmailAddress?.emailAddress;
-    
+    const email = session.email;
+
     if (!email) {
-      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+      return NextResponse.json({ error: 'Session email not found' }, { status: 400 });
     }
 
-    // Sync Clerk user with AuthUser
+    // Sync SIWE session with AuthUser record
     let authUser: any = null;
     try {
-        authUser = await prisma.authUser.findUnique({
-          where: { clerkId: user.id }
-        });
+      authUser = await prisma.authUser.findUnique({ where: { email } });
 
-        if (!authUser) {
-          // Try to find by email (legacy or newly signed up)
-          authUser = await prisma.authUser.findUnique({
-            where: { email }
-          });
-
-          if (authUser) {
-            // Link clerkId
-            authUser = await prisma.authUser.update({
-              where: { id: authUser.id },
-              data: { clerkId: user.id }
-            });
-          } else {
-            // Create new AuthUser
-            authUser = await prisma.authUser.create({
-              data: {
-                clerkId: user.id,
-                email,
-                passwordHash: '', 
-                name: `${user.firstName || ''} ${user.lastName || ''} `.trim() || null,
-                verified: true,
-              }
-            });
-          }
-        }
-
-        return NextResponse.json({
-          id: authUser.id,
-          email: authUser.email,
-          name: authUser.name,
-          hasPasskey: (await prisma.authenticator.count({ where: { userId: authUser.id } })) > 0
-        });
-    } catch (dbError: any) {
-        console.warn('[AUTH_ME_SYNC] DB Link Failed, returning basic clerk data.', dbError.message);
-        return NextResponse.json({
-            id: user.id,
+      if (!authUser) {
+        // Create a new AuthUser entry on first SIWE login
+        authUser = await prisma.authUser.create({
+          data: {
             email,
-            name: `${user.firstName || ''} ${user.lastName || ''} `.trim() || null,
-            hasPasskey: false, // Fallback
-            isFallback: true,
-            warning: 'Temporary session. Database unreachable.'
+            walletAddress: session.userId, // SIWE userId IS the wallet address
+          }
         });
+      }
+
+      const hasPasskey = (await prisma.authenticator.count({ where: { userId: authUser.id } })) > 0;
+
+      return NextResponse.json({
+        id: authUser.id,
+        email: authUser.email,
+        walletAddress: authUser.walletAddress,
+        hasPasskey,
+      });
+
+    } catch (dbError: any) {
+      console.warn('[AUTH_ME_SYNC] DB Sync Failed, returning basic session data.', dbError.message);
+      return NextResponse.json({
+        id: session.userId,
+        email,
+        walletAddress: session.userId,
+        hasPasskey: false,
+        isFallback: true,
+        warning: 'Temporary session. Database unreachable.'
+      });
     }
+
   } catch (error: any) {
     console.error('Fatal auth error:', error);
     return NextResponse.json({ error: 'Auth service down' }, { status: 503 });
   }
 }
-

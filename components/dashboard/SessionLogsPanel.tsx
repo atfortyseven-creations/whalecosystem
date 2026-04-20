@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,8 +9,9 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Search, Download, AlertCircle } from "lucide-react";
+import { Search, Download, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useOmniInfrastructure } from "@/lib/api-client";
 
 interface SessionLog {
   id: string;
@@ -22,41 +23,16 @@ interface SessionLog {
 }
 
 export function SessionLogsPanel() {
-  const [logs, setLogs] = useState<SessionLog[]>([]);
+  // =========================================================================
+  // INJECTED DATA HOOK — Zero-Mock Mandate
+  // Session logs endpoint injected via REGISTRY.OMNI_INFRA.sessionLogs
+  // =========================================================================
+  const { data: rawData, isLoading } = useOmniInfrastructure('sessionLogs');
+  const logs: SessionLog[] = rawData?.logs || [];
+
   const [search, setSearch] = useState("");
   const [isExporting, setIsExporting] = useState(false);
   const tableContainerRef = useRef<HTMLDivElement>(null);
-
-  // Fetch initial logs
-  useEffect(() => {
-    fetch("/api/session-logs?limit=100")
-      .then(res => res.json())
-      .then(data => {
-        if (data.logs) setLogs(data.logs);
-      })
-      .catch(console.error);
-  }, []);
-
-  // SSE for live updates
-  useEffect(() => {
-    const eventSource = new EventSource("/api/session-logs/sse");
-    
-    eventSource.addEventListener("new_logs", (e) => {
-      try {
-        const newLogs = JSON.parse(e.data);
-        setLogs(prev => {
-          const combined = [...newLogs, ...prev];
-          // deduplicate just in case
-          const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
-          return unique.slice(0, 1000); // keep max 1000
-        });
-      } catch (err) {
-        console.error("SSE parse error", err);
-      }
-    });
-
-    return () => eventSource.close();
-  }, []);
 
   const handleExport = async () => {
     setIsExporting(true);

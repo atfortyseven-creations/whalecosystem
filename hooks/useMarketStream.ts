@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAuth } from '@clerk/nextjs';
+import { useAccount } from 'wagmi';
 import { DisplaySymbol } from '@/lib/bybit/markets';
 
 export interface MarketTicker {
@@ -52,7 +52,7 @@ export interface MarketKline {
 }
 
 export function useMarketStream(symbol: DisplaySymbol = 'BTC/USDT') {
-  const { userId } = useAuth();
+  const { address: userId } = useAccount();
   const [ticker, setTicker] = useState<MarketTicker | null>(null);
   const [orderBook, setOrderBook] = useState<OrderBookData | null>(null);
   const [trades, setTrades] = useState<MarketTrade[]>([]);

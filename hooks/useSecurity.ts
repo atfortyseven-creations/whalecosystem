@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAccount } from 'wagmi';
 
 interface CSRFHook {
   token: string | null;
@@ -11,14 +11,13 @@ interface CSRFHook {
 }
 
 export function useCSRFToken(): CSRFHook {
-  const { user } = useUser();
-  const session = { user };
+  const { address, isConnected } = useAccount();
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchToken = async () => {
-    if (!session?.user?.id) {
+    if (!isConnected || !address) {
       setToken(null);
       setLoading(false);
       return;
@@ -45,7 +44,7 @@ export function useCSRFToken(): CSRFHook {
 
   useEffect(() => {
     fetchToken();
-  }, [session?.user?.id]);
+  }, [address, isConnected]);
 
   return {
     token,
@@ -127,14 +126,13 @@ interface PremiumGuard {
 }
 
 export function usePremiumGuard(): PremiumGuard {
-  const { user } = useUser();
-  const session = { user };
+  const { address, isConnected } = useAccount();
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkPremium = async () => {
-      if (!session?.user?.id) {
+      if (!isConnected || !address) {
         setIsPremium(false);
         setLoading(false);
         return;
@@ -153,7 +151,7 @@ export function usePremiumGuard(): PremiumGuard {
     };
 
     checkPremium();
-  }, [session?.user?.id]);
+  }, [address, isConnected]);
 
   const requireUpgrade = () => {
     window.dispatchEvent(new CustomEvent('show-pricing-modal'));
@@ -253,11 +251,10 @@ export function logUserActivity(action: string) {
 // ============================================
 
 export function useAutoLogout(timeoutMinutes: number = 30) {
-  const { user } = useUser();
-  const session = { user };
+  const { isConnected } = useAccount();
 
   useEffect(() => {
-    if (!session) return;
+    if (!isConnected) return;
 
     let timeout: NodeJS.Timeout;
 
@@ -282,7 +279,7 @@ export function useAutoLogout(timeoutMinutes: number = 30) {
         document.removeEventListener(event, resetTimeout);
       });
     };
-  }, [session, timeoutMinutes]);
+  }, [isConnected, timeoutMinutes]);
 }
 
 // ============================================

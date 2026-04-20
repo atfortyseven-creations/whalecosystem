@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withApiAuth, withRateLimitHeaders } from '@/lib/middleware/apiAuth';
-import { isTokenAllowed } from '@/lib/saas/plans';
-import { PlanTier } from '@prisma/client';
+import { isTokenAllowed, PlanTier } from '@/lib/saas/plans';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. Real Data Query (Phase 6: Logic Eradicated)
-    const candles = await prisma.exchangeCandle.findMany({
+    const candles = await (prisma as any).exchangeCandle.findMany({
         where: { 
             symbol: symbol.endsWith('USDT') ? symbol : `${symbol}USDT`,
             interval: resolution
@@ -51,7 +50,7 @@ export async function GET(request: NextRequest) {
         timestamp: Date.now(),
         provider: 'HumanDeFi Elite Engine (Real-Time)',
         tier,
-        data: candles.map(c => ({
+        data: candles.map((c: any) => ({
             time: Number(c.timestamp),
             open: Number(c.open),
             high: Number(c.high),

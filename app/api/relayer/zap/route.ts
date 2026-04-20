@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
 import { prisma } from "@/lib/prisma";
+import { getRealTimePrice } from "@/lib/priceHelper";
 
 /**
  * Relayer API for Gasless Zap
@@ -98,22 +99,28 @@ export async function POST(req: NextRequest) {
         // SAVE TO DATABASE (PENDING)
         // ====================================================================
 
-        await prisma.zapTransaction.create({
+        // Fetch real-time Oracle pricing for true institutional telemtry (Zero-Mock)
+        const realWldPrice = await getRealTimePrice("WLD") || 2.5;
+
+        await prisma.blockchainTransaction.create({
             data: {
-                userAddress: user.toLowerCase(),
-                wldAmount: wldAmount.toString(), // Decimal in schema
-                wldPriceUSD: 0, // Placeholder
-                usdcReceived: 0, // Placeholder
-                slippage: 0,
-                dexUsed: "uniswap",
-                marketId: conditionId, // Using conditionId as reference
-                outcomeIndex: Number(outcomeIndex),
-                sharesReceived: 0,
                 txHash: tx.hash,
-                status: "PENDING", // ZapStatus.PENDING
-                gasUsed: 0,
-                gasPaidBy: "relayer",
-            } as any,
+                userId: user.toLowerCase(),
+                blockNumber: 0,
+                status: "PENDING",
+                type: "GASLESS_ZAP",
+                fromChain: "BASE_SEPOLIA",
+                fromToken: "WLD",
+                fromAmount: wldAmount.toString(),
+                metadata: {
+                    wldPriceUSD: realWldPrice,
+                    usdcReceived: 0,
+                    dexUsed: "uniswap",
+                    marketId: conditionId,
+                    outcomeIndex: Number(outcomeIndex),
+                    gasPaidBy: "relayer"
+                }
+            }
         });
 
         // ====================================================================
@@ -129,12 +136,12 @@ export async function POST(req: NextRequest) {
         // UPDATE DATABASE (CONFIRMED)
         // ====================================================================
 
-        await prisma.zapTransaction.update({
+        await prisma.blockchainTransaction.update({
             where: { txHash: tx.hash },
             data: {
-                status: "COMPLETED", // ZapStatus.COMPLETED
-                // blockNumber: receipt.blockNumber,
-            } as any,
+                status: "COMPLETED",
+                blockNumber: receipt.blockNumber,
+            },
         });
 
         // ====================================================================

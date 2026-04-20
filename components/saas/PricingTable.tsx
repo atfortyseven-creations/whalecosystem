@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, X, Shield, Zap, Globe, Database, ArrowRight } from 'lucide-react';
 import { SAAS_PLANS } from '@/lib/saas/plans';
-import { PlanTier } from '@prisma/client';
 import { Button } from '@/components/ui/button';
-import { useUser } from '@clerk/nextjs';
+import { useAccount } from 'wagmi';
 
 export function PricingTable() {
-    const { user, isSignedIn } = useUser();
+    const { address, isConnected } = useAccount();
+    const isSignedIn = isConnected;
     const [isAnnual, setIsAnnual] = useState(false);
     const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
@@ -21,9 +21,8 @@ export function PricingTable() {
 
         setLoadingTier(tier);
         try {
-            // Priority: Wallet Address (if linked) > Clerk ID
-            // In this app, many things are keyed by walletAddress.
-            const userId = user.publicMetadata?.walletAddress || user.id;
+            // SIWE-native: userId is the connected wallet address
+            const userId = address;
 
             const response = await fetch('/api/payments/checkout', {
                 method: 'POST',
@@ -47,10 +46,10 @@ export function PricingTable() {
 
     // Get ordered plans skipping FREE
     const plansToShow = [
-        SAAS_PLANS[PlanTier.STANDARD],
-        SAAS_PLANS[PlanTier.STARTER],
-        SAAS_PLANS[PlanTier.PRO],
-        SAAS_PLANS[PlanTier.Elite]
+        SAAS_PLANS['standard'],
+        SAAS_PLANS['starter'],
+        SAAS_PLANS['pro'],
+        SAAS_PLANS['Elite']
     ];
 
     return (
@@ -76,8 +75,8 @@ export function PricingTable() {
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {plansToShow.map((plan, idx) => {
-                    const isPro = plan.tier === PlanTier.PRO;
-                    const isInst = plan.tier === PlanTier.Elite;
+                    const isPro = plan.tier === 'pro';
+                    const isInst = plan.tier === 'Elite';
                     
                     return (
                         <motion.div

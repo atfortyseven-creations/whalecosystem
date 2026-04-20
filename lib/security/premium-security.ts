@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
-import { clerkClient } from '@clerk/nextjs/server';
 
 // ============================================
 // SECURITY LAYER 1: Rate Limiting
@@ -17,7 +16,7 @@ export function rateLimit(
 }
 
 // ============================================
-// SECURITY LAYER 2: Subscription Verification
+// SECURITY LAYER 2: Subscription Verification — NATIVE SOVEREIGN
 // ============================================
 
 export async function verifyPremiumAccess(userId: string): Promise<{
@@ -26,18 +25,7 @@ export async function verifyPremiumAccess(userId: string): Promise<{
   expiresAt?: Date;
 }> {
   try {
-    // 1. ADMIN BYPASS
-    if (process.env.ADMIN_EMAIL) {
-      try {
-        const client = await clerkClient();
-        const user = await client.users.getUser(userId);
-        if (user?.primaryEmailAddress?.emailAddress === process.env.ADMIN_EMAIL) {
-          return { valid: true, tier: 'PREMIUM' };
-        }
-      } catch (e) {}
-    }
-
-    // 2. CHECK LEGENDARY DB TIER (One-time payments)
+    // 1. Native DB TIER check (One-time payments and Sovereign tier)
     const user = await prisma.user.findUnique({
       where: { walletAddress: userId },
       select: { tier: true }
@@ -47,7 +35,7 @@ export async function verifyPremiumAccess(userId: string): Promise<{
        return { valid: true, tier: 'SOVEREIGN' };
     }
 
-    // 3. LEGACY SUBSCRIPTION CHECK (Recurring)
+    // 2. Subscription check from native DB
     const subscription = await prisma.subscription.findFirst({
       where: {
         userId,
@@ -107,9 +95,8 @@ export async function logSecurityEvent(
       data: {
         type: event,
         ipAddress: details.ip || 'unknown',
-        metadata: details || {},
+        details: JSON.stringify(details) || null,
         severity: details.severity || 'INFO',
-        timestamp: new Date(),
       },
     });
   } catch (error) {
@@ -125,16 +112,21 @@ export async function logAuditEvent(log: {
   ip?: string;
   userAgent?: string;
 }): Promise<void> {
+  // AuditLog table does not exist in schema.prisma — log to native Log model
   try {
-    await prisma.auditLog.create({
+    await prisma.log.create({
       data: {
-        userId: log.userId,
-        action: log.action,
-        resource: log.resource,
-        metadata: log.metadata || {},
-        ip: log.ip,
-        userAgent: log.userAgent,
-        timestamp: new Date(),
+        level: 'info',
+        message: `AUDIT: ${log.action} on ${log.resource}`,
+        source: 'premium-security',
+        metadata: {
+          userId: log.userId,
+          action: log.action,
+          resource: log.resource,
+          data: log.metadata || {},
+          ip: log.ip,
+          userAgent: log.userAgent,
+        },
       },
     });
   } catch (error) {
@@ -143,7 +135,7 @@ export async function logAuditEvent(log: {
 }
 
 // ============================================
-// SECURITY LAYER 9: Request Validation
+// SECURITY LAYER 9: Request Validation — SOVEREIGN SIWE
 // ============================================
 
 export async function validateSecureRequest(
@@ -154,31 +146,20 @@ export async function validateSecureRequest(
   userId?: string;
   error?: string;
 }> {
-  const { userId: clerkUserId } = getAuth(req);
+  // SOVEREIGN: Use SIWE session token as primary auth mechanism
+  const session = await getSession();
   const web3Address = req.headers.get('x-web3-address');
   
-  // 🔥 [LEGENDARY IDENTITY FUSION]
-  let userId = clerkUserId;
+  let userId = session?.userId;
   if (!userId && web3Address && /^0x[a-fA-F0-9]{40}$/.test(web3Address)) {
-      userId = web3Address.toLowerCase();
+    userId = web3Address.toLowerCase();
   }
 
-  console.log(`[AUTH-DEBUG] clerkUserId: ${clerkUserId}, web3Address: ${web3Address}, final userId: ${userId}`);
+  console.log(`[AUTH-DEBUG] sessionUserId: ${session?.userId}, web3Address: ${web3Address}, final userId: ${userId}`);
   
   if (!userId) {
     console.warn('[AUTH-DEBUG] No userId found in request');
     return { valid: false, error: 'Unauthorized' };
-  }
-  
-  // Owner Bypass
-  if (clerkUserId && process.env.ADMIN_EMAIL) {
-    try {
-      const client = await clerkClient();
-      const user = await client.users.getUser(clerkUserId);
-      if (user?.primaryEmailAddress?.emailAddress === process.env.ADMIN_EMAIL) {
-        return { valid: true, userId };
-      }
-    } catch (e) {}
   }
 
   if (requiredTier === 'PREMIUM') {
@@ -207,4 +188,3 @@ export function sanitizeInput(input: string): string {
 export function validateWalletAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address) || /^(1|3|bc1)[a-zA-HJ-NP-Z0-9]{25,62}$/.test(address);
 }
-

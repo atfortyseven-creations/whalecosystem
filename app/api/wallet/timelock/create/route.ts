@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { ethers } from 'ethers';
 import crypto from 'crypto';
@@ -31,8 +31,9 @@ function decrypt(encryptedText: string): string {
 
 export async function POST(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = { id: session.userId, email: session.email };
 
         const { amount, unlockDate } = await req.json();
 
@@ -66,8 +67,8 @@ export async function POST(req: Request) {
             }, { status: 400 });
         }
 
-        // 2. Simulate or Interact with Smart Contract
-        let txHash = `mock-tx-${Date.now()}`;
+        // 2. Real Smart Contract Execution (Zero-Mock Mandate)
+        let txHash = '';
         if (process.env.TIMELOCK_CONTRACT_ADDRESS && authUser.encryptedPrivateKey) {
             try {
                 const privateKey = decrypt(authUser.encryptedPrivateKey);
@@ -79,16 +80,22 @@ export async function POST(req: Request) {
                 await tx.wait();
                 txHash = tx.hash;
             } catch (err) {
-                console.error("Contract lock failed, falling back to database lock:", err);
+                console.error("Contract lock failed:", err);
+                return NextResponse.json({ error: 'Smart Contract execution failed on RPC payload.' }, { status: 500 });
             }
+        } else {
+            // Awaiting strictly real RPC variables
+            return NextResponse.json({ 
+                error: 'NOT_IMPLEMENTED', 
+                message: 'PREPARING_GETBLOCK_INTEGRATION: Timelock smart contract variables missing. Synthetic database locks are locked out.' 
+            }, { status: 501 });
         }
 
         // 2. Persist in Database
         const vault = await prisma.timeLockVault.create({
             data: {
-                userId: authUser.id,
-                amount: amount,
-                tokenSymbol: 'ETH',
+                userAddress: authUser.walletAddress || `legacy-${authUser.id}`,
+                amount: parseFloat(amount),
                 unlockDate: new Date(unlockDate),
                 txHash: txHash,
                 status: 'LOCKED',

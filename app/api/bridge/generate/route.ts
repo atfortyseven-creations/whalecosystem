@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import crypto from 'crypto';
 import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
@@ -10,8 +10,8 @@ export async function POST(request: NextRequest) {
     try {
         let sessionId: string;
         try {
-            const { userId } = await auth();
-            sessionId = userId ?? request.headers.get('x-session-id') ?? `anon-${crypto.randomBytes(8).toString('hex')}`;
+            const session = await getSession();
+            sessionId = session?.userId ?? request.headers.get('x-session-id') ?? `anon-${crypto.randomBytes(8).toString('hex')}`;
         } catch {
             sessionId = request.headers.get('x-session-id') ?? `anon-${crypto.randomBytes(8).toString('hex')}`;
         }

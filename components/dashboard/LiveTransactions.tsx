@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ArrowRight, Zap, Shield, Database } from 'lucide-react';
+import { ArrowRight, Database, Loader2, AlertTriangle } from 'lucide-react';
+import { useSovereignIntel } from '@/lib/api-client';
 
 interface Transaction {
     id: string;
@@ -16,33 +17,26 @@ interface Transaction {
     timestamp: string;
 }
 
-const CHAINS = ['ETHEREUM', 'BASE', 'BSC', 'POLYGON', 'SOLANA'];
-const ASSETS = ['ETH', 'USDC', 'WETH', 'USDT', 'SOL', 'BNB'];
-
 export default function LiveTransactions() {
-    const [txs, setTxs] = useState<Transaction[]>([]);
-
-    useEffect(() => {
-        // [INSTITUTIONAL MOCK STREAM] 
-        // Generates high-fidelity simulated traffic for real-time visual stimulus
-        const interval = setInterval(() => {
-            const newTx: Transaction = {
-                id: Math.random().toString(36).substring(7),
-                hash: '0x' + Math.random().toString(16).substring(2, 10).toUpperCase() + '...',
-                from: '0x' + Math.random().toString(16).substring(2, 6) + '...' + Math.random().toString(16).substring(2, 6),
-                to: '0x' + Math.random().toString(16).substring(2, 6) + '...' + Math.random().toString(16).substring(2, 6),
-                value: (Math.random() * 50).toFixed(3),
-                asset: ASSETS[Math.floor(Math.random() * ASSETS.length)],
-                chain: CHAINS[Math.floor(Math.random() * CHAINS.length)],
-                type: Math.random() > 0.8 ? 'SWAP' : 'TRANSFER',
-                timestamp: new Date().toLocaleTimeString()
-            };
-
-            setTxs(prev => [newTx, ...prev].slice(0, 20));
-        }, 1200);
-
-        return () => clearInterval(interval);
-    }, []);
+    // =========================================================================
+    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // MOCK STREAM ERADICATED: No more Math.random() / setInterval fake data.
+    // Mempool endpoint injected via REGISTRY.SOVEREIGN_INTEL.massTransfers
+    // =========================================================================
+    const { data: rawData, isLoading, error } = useSovereignIntel('massTransfers');
+    const txs: Transaction[] = (rawData?.transfers || []).slice(0, 20).map((t: any, i: number) => ({
+        id:        t.id || String(i),
+        hash:      t.hash || t.txHash || '0x—',
+        from:      t.from || t.sender || '—',
+        to:        t.to   || t.receiver || '—',
+        value:     t.value || t.amount || '0',
+        asset:     t.asset || t.token || 'ETH',
+        chain:     (t.chain || t.network || 'ETHEREUM').toUpperCase(),
+        type:      t.type || 'TRANSFER',
+        timestamp: t.timestamp
+            ? new Date(t.timestamp).toLocaleTimeString()
+            : new Date().toLocaleTimeString(),
+    }));
 
     return (
         <div className="p-8 h-full w-full min-h-0 flex flex-col bg-transparent font-sans">
@@ -53,53 +47,71 @@ export default function LiveTransactions() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="px-4 py-2 bg-black text-white text-[9px] font-black uppercase tracking-widest rounded-xl">
-                        {txs.length} Events / Minute
+                        {isLoading ? '— Events / Min' : `${txs.length} Events / Minute`}
                     </div>
                 </div>
             </header>
 
             <div className="flex-1 space-y-2 overflow-y-auto pr-4 scrollbar-hide">
-                <AnimatePresence initial={false}>
-                    {txs.map((tx) => (
-                        <motion.div
-                            key={tx.id}
-                            initial={{ opacity: 0, x: -20, height: 0 }}
-                            animate={{ opacity: 1, x: 0, height: 'auto' }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white border border-black/[0.04] p-4 rounded-2xl flex items-center justify-between group hover:border-black/10 transition-all cursor-crosshair shadow-sm hover:shadow-md"
-                        >
-                            <div className="flex items-center gap-6">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                                    tx.chain === 'ETHEREUM' ? 'bg-blue-50 text-blue-500' :
-                                    tx.chain === 'SOLANA' ? 'bg-purple-50 text-purple-500' :
-                                    'bg-black/5 text-black/40'
-                                }`}>
-                                    <Database size={16} />
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-black uppercase tracking-widest">{tx.chain}</span>
-                                        <div className="w-1 h-1 rounded-full bg-black/10" />
-                                        <span className="text-[10px] font-bold text-black/30 uppercase">{tx.type}</span>
+                {isLoading ? (
+                    <div className="h-full flex flex-col items-center justify-center gap-4 text-black/30">
+                        <Loader2 size={36} className="animate-spin" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.25em]">Waiting for on-chain mempool endpoint</p>
+                        <p className="text-[9px] font-mono opacity-60">Zero-Mock Mandate Active</p>
+                    </div>
+                ) : error ? (
+                    <div className="h-full flex flex-col items-center justify-center gap-4 text-black/20">
+                        <AlertTriangle size={36} />
+                        <p className="text-[10px] font-black uppercase tracking-[0.25em]">Mempool stream unavailable</p>
+                    </div>
+                ) : txs.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center gap-4 text-black/20">
+                        <Database size={36} />
+                        <p className="text-[10px] font-black uppercase tracking-[0.25em]">No transactions in stream</p>
+                    </div>
+                ) : (
+                    <AnimatePresence initial={false}>
+                        {txs.map((tx) => (
+                            <motion.div
+                                key={tx.id}
+                                initial={{ opacity: 0, x: -20, height: 0 }}
+                                animate={{ opacity: 1, x: 0, height: 'auto' }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="bg-white border border-black/[0.04] p-4 rounded-2xl flex items-center justify-between group hover:border-black/10 transition-all cursor-crosshair shadow-sm hover:shadow-md"
+                            >
+                                <div className="flex items-center gap-6">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                        tx.chain === 'ETHEREUM' ? 'bg-blue-50 text-blue-500' :
+                                        tx.chain === 'SOLANA' ? 'bg-purple-50 text-purple-500' :
+                                        'bg-black/5 text-black/40'
+                                    }`}>
+                                        <Database size={16} />
                                     </div>
-                                    <div className="flex items-center gap-3 mt-1.5">
-                                        <span className="text-[11px] font-bold text-black/60">{tx.from}</span>
-                                        <ArrowRight size={10} className="text-black/20" />
-                                        <span className="text-[11px] font-bold text-black/60">{tx.to}</span>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-black text-black uppercase tracking-widest">{tx.chain}</span>
+                                            <div className="w-1 h-1 rounded-full bg-black/10" />
+                                            <span className="text-[10px] font-bold text-black/30 uppercase">{tx.type}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 mt-1.5">
+                                            <span className="text-[11px] font-bold text-black/60">{tx.from}</span>
+                                            <ArrowRight size={10} className="text-black/20" />
+                                            <span className="text-[11px] font-bold text-black/60">{tx.to}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="text-right">
-                                <div className="flex items-center gap-1.5 justify-end">
-                                    <span className="text-sm font-black text-black">{tx.value}</span>
-                                    <span className="text-[9px] font-black text-black/30 uppercase tracking-widest">{tx.asset}</span>
+                                <div className="text-right">
+                                    <div className="flex items-center gap-1.5 justify-end">
+                                        <span className="text-sm font-black text-black">{tx.value}</span>
+                                        <span className="text-[9px] font-black text-black/30 uppercase tracking-widest">{tx.asset}</span>
+                                    </div>
+                                    <span className="text-[9px] font-bold text-black/20 uppercase tracking-widest mt-1 block">{tx.timestamp}</span>
                                 </div>
-                                <span className="text-[9px] font-bold text-black/20 uppercase tracking-widest mt-1 block">{tx.timestamp}</span>
-                            </div>
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                )}
             </div>
         </div>
     );

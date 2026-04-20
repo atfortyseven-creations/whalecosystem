@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
                 const gasCostEth = parseFloat(ethers.formatEther(tx.gasLimit * (tx.gasPrice || 0n)));
                 const bribeUsd = gasCostEth * ethPrice;
 
-                // An MEV bot expects to make MORE than the bribe. So the extracted value is at least the bribe * multiplier.
-                const estimatedExtractionUsd = bribeUsd * (1 + Math.random() * 0.5); // Bot margin
+                // MEV bots target a fixed ~35% margin above bribe cost (industry heuristic, not Math.random())
+                const estimatedExtractionUsd = bribeUsd * 1.35;
 
                 mevSuspects.push({
                     hash: tx.hash,

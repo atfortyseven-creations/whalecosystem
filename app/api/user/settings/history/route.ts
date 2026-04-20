@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { getSession } from '@/lib/session';
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,8 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await currentUser();
-    const email = user?.emailAddresses[0]?.emailAddress;
+    const session = await getSession();
+    const email = session?.email;
 
     if (!email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -33,15 +33,15 @@ export async function GET() {
         const zkBaseProofs = 88.2;
 
         for (let i = 30; i >= 0; i--) {
-            // Add slight "Real World" entropy to the current live metrics
-            const entropy = Math.random() * 2 - 1;
+            // Deterministic entropy derived from day index — no Math.random()
+            const deterministicNoise = Math.sin(i * 1.37) * 1.0; // Pseudo-entropy, fully reproducible
             const dayOffset = i * 24 * 60 * 60 * 1000;
             
             history.push({
                 date: now - dayOffset,
-                l1Settlement: Math.min(100, l1BaseLatency + entropy + (Math.sin(i * 0.2) * 0.5)),
-                l2Compression: Math.min(100, l2BaseCompression + entropy * 2 + (Math.cos(i * 0.4) * 1.5)),
-                zkProofs: Math.min(100, zkBaseProofs + entropy * 5 + (Math.sin(i * 0.1) * 2)),
+                l1Settlement: Math.min(100, l1BaseLatency + deterministicNoise + (Math.sin(i * 0.2) * 0.5)),
+                l2Compression: Math.min(100, l2BaseCompression + deterministicNoise * 2 + (Math.cos(i * 0.4) * 1.5)),
+                zkProofs: Math.min(100, zkBaseProofs + deterministicNoise * 5 + (Math.sin(i * 0.1) * 2)),
             });
         }
 

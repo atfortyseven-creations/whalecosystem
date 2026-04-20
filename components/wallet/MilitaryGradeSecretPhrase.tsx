@@ -155,7 +155,7 @@ Wallet: Whale Alert Network Terminal v4.0
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
                 {Array.from({ length: 12 }).map((_, i) => (
                     <div key={i} className="opacity-50">
-                        {Math.random().toString(36).substring(2)}...[ENTROPY_POOL_#{i}]...{Math.random().toString(16).substring(2)}
+                        [ENTROPY_POOL_#{i}]...[BIP39_KMS_SECURE]...[256BIT_SEEDED]
                     </div>
                 ))}
             </div>

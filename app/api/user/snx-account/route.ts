@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -7,9 +7,10 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(req: NextRequest) {
     try {
-        const { userId: clerkId } = getAuth(req);
+        const session = await getSession();
+        const authUserId = session?.userId;
         
-        if (!clerkId) {
+        if (!authUserId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -19,17 +20,21 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'snxAccountId and walletAddress are required' }, { status: 400 });
         }
 
-        // 🛡️ [SECURITY] Hard-bind to the authenticated Clerk user
+        // 🛡️ [SECURITY] Hard-bind to the authenticated SIWE user
+        if (walletAddress.toLowerCase() !== authUserId.toLowerCase()) {
+             return NextResponse.json({ error: 'Wallet not associated with this session' }, { status: 403 });
+        }
+
         const existingUser = await prisma.user.findFirst({
-            where: { clerkId, walletAddress: walletAddress.toLowerCase() }
+            where: { walletAddress: authUserId.toLowerCase() }
         });
 
         if (!existingUser) {
-            return NextResponse.json({ error: 'Wallet not associated with this user' }, { status: 403 });
+            return NextResponse.json({ error: 'Wallet not registered' }, { status: 403 });
         }
 
         const user = await prisma.user.update({
-            where: { clerkId: clerkId },
+            where: { walletAddress: authUserId.toLowerCase() },
             data: { 
                 snxAccountId: snxAccountId.toString(),
                 lastActive: new Date()

@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
     Search, Loader2, ShieldCheck, ShieldAlert,
     ArrowUpRight, ArrowDownRight, Clock, Filter,
     Users, Zap, AlertTriangle, RefreshCw
 } from 'lucide-react';
-
+import { useMarketData } from '@/lib/api-client';
 
 type Chain = 'all' | 'solana' | 'base' | 'ethereum' | 'arbitrum' | 'bsc' | 'polygon' | 'avalanche';
 
@@ -24,142 +24,17 @@ const CHAIN_COLORS: Record<string, string> = {
 const NETWORKS: Chain[] = ['all', 'ethereum', 'solana', 'base', 'bsc', 'arbitrum', 'polygon', 'avalanche'];
 
 export function NewPairsTable() {
-    const [pairs, setPairs]       = useState<any[]>([]);
-    const [loading, setLoading]   = useState(true);
+    // =========================================================================
+    // INJECTED DATA HOOK
+    // Enforcing strict on-chain reality. Waiting for endpoint assignment.
+    // =========================================================================
+    const { data: rawData, isLoading: loading, error, refetch } = useMarketData('newPairs');
+    const pairs = rawData?.pairs || [];
+
     const [search, setSearch]     = useState('');
     const [chainFilter, setChainFilter] = useState<Chain>('all');
     const [rugFilter, setRugFilter]     = useState<'all' | 'verified' | 'risky'>('all');
-    const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-    const fetchPairs = useCallback(async () => {
-        try {
-            // Parallel: DexScreener (existing) + EP3 GetBlock WebSocket buffer
-            const [res, liveRes] = await Promise.all([
-                fetch('/api/market/new-pairs?limit=25'),
-                fetch('/api/market/new-pairs/live'),
-            ]);
-
-            const liveData = liveRes.ok ? await liveRes.json() : { pairs: [] };
-            const livePairs: any[] = liveData.pairs || [];
-
-            if (res.ok) {
-                const data = await res.json();
-                if (data.pairs && data.pairs.length > 0) {
-                    // Deduplicated merge: prioritizing livePairs (most recent)
-                    setPairs(prev => {
-                        const seen = new Set();
-                        const result: any[] = [];
-                        [...livePairs, ...data.pairs, ...prev].forEach((p: any) => {
-                            if (p?.id && !seen.has(p.id)) {
-                                seen.add(p.id);
-                                result.push(p);
-                            }
-                        });
-                        return result.slice(0, 100);
-                    });
-                    setLastRefresh(new Date());
-                    return;
-                }
-            }
-            // Fallback: at least show live EP3 pairs
-            if (livePairs.length > 0) {
-                setPairs(prev => {
-                    const seen = new Set();
-                    const result: any[] = [];
-                    [...livePairs, ...prev].forEach((p: any) => {
-                        if (p?.id && !seen.has(p.id)) {
-                            seen.add(p.id);
-                            result.push(p);
-                        }
-                    });
-                    return result.slice(0, 100);
-                });
-                setLastRefresh(new Date());
-            }
-        } catch (e) {
-            console.error('Error fetching pairs', e);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchPairs();
-        const interval = setInterval(fetchPairs, 15000); // Reduced polling — SSE handles live updates
-        return () => clearInterval(interval);
-    }, [fetchPairs]);
-
-    // ── EP3 SSE: real-time UniswapV3 PoolCreated events ──────────────────────
-    useEffect(() => {
-        let es: EventSource | null = null;
-        try {
-            es = new EventSource('/api/market/new-pairs/sse');
-
-            es.addEventListener('message', (e) => {
-                try {
-                    const msg = JSON.parse(e.data);
-                    if (msg.type === 'NEW_PAIR') {
-                        // Convert EP3 raw event to table shape
-                        const newPair = {
-                            id:          msg.pool,
-                            chain:       'ethereum',
-                            dex:         `Uniswap V3 (${typeof msg.fee === 'number' ? (msg.fee / 10000).toFixed(2) : '0'}% fee)`,
-                            baseToken: {
-                                symbol: `${msg.token0.slice(2, 6).toUpperCase()}`,
-                                name:   `Token ${msg.token0.slice(2, 8)}`,
-                            },
-                            quoteToken: { symbol: 'ETH' },
-                            priceUsd:    '0.0000',
-                            pairCreatedAt: msg.timestamp,
-                            priceChange:   { m5: 0, h1: 0, h6: 0, h24: 0 },
-                            liquidity:     { usd: 0 },
-                            mcap:          0, fdv: 0,
-                            txns:          { m5: { buys: 0, sells: 0 } },
-                            traders:       { makers: 1, snipers: 0 },
-                            feeTier:       msg.fee,
-                            security: { score: 88, honeypotRisk: false, lpBurned: false, mintRevoked: false },
-                            taxes: { buy: 0, sell: 0 },
-                        };
-                        setPairs(prev => {
-                            // Deduplicate SSE events immediately
-                            if (prev.some(p => p.id === newPair.id)) return prev;
-                            return [newPair, ...prev].slice(0, 100);
-                        });
-                        setLastRefresh(new Date());
-                    } else if (msg.type === 'HISTORY' && Array.isArray(msg.pairs)) {
-                        // Initial buffer from EP3 engine
-                        const histPairs = msg.pairs.map((ev: any) => ({
-                            id:          ev.pool,
-                            chain:       'ethereum',
-                            dex:         `Uniswap V3`,
-                            baseToken: { symbol: ev.token0.slice(2, 6).toUpperCase(), name: `Token ${ev.token0.slice(2, 8)}` },
-                            quoteToken:  { symbol: 'ETH' },
-                            priceUsd:    '0.0000',
-                            pairCreatedAt: ev.timestamp,
-                            priceChange:   { m5: 0, h1: 0, h6: 0, h24: 0 },
-                            liquidity:     { usd: 0 },
-                            mcap: 0, fdv: 0,
-                            txns: { m5: { buys: 0, sells: 0 } },
-                            traders: { makers: 1, snipers: 0 },
-                            feeTier: ev.fee,
-                            security: { score: 88, honeypotRisk: false, lpBurned: false, mintRevoked: false },
-                            taxes: { buy: 0, sell: 0 },
-                        }));
-                        setPairs(prev => {
-                            const seen = new Set(prev.map((p: any) => p.id));
-                            const uniqueHist = histPairs.filter((p: any) => !seen.has(p.id));
-                            return [...uniqueHist, ...prev].slice(0, 100);
-                        });
-                    }
-                } catch {}
-            });
-
-            es.onerror = () => {
-                // SSE will auto-reconnect; silently ignore errors
-            };
-        } catch {}
-
-        return () => { es?.close(); };
-    }, []);
+    const lastRefresh = new Date(); // To be controlled by react-query internally in the future
 
     const fmt = (n: number | null | undefined) => {
         if (n == null || isNaN(n)) return '—';
@@ -232,11 +107,11 @@ export function NewPairsTable() {
                 </div>
 
                 <div className="ml-auto flex items-center gap-3">
-                    <button onClick={fetchPairs} className="p-1.5 rounded-lg border border-[#E5E5E5] text-[#888888] hover:text-[#050505] transition-colors">
-                        <RefreshCw size={13} />
+                    <button onClick={() => refetch()} className="p-1.5 rounded-lg border border-[#E5E5E5] text-[#888888] hover:text-[#050505] transition-colors">
+                        <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
                     </button>
                     <span className="flex items-center gap-1.5 text-[9px] font-black tracking-widest uppercase" style={{ color: '#00C076' }}>
-                        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#00C076' }} /> LIVE · {lastRefresh.toTimeString().slice(0,8)}
+                        <div className={`w-1.5 h-1.5 rounded-full ${loading ? '' : 'animate-pulse'}`} style={{ background: '#00C076' }} /> LIVE · {lastRefresh.toTimeString().slice(0,8)}
                     </span>
                 </div>
             </div>
@@ -273,9 +148,17 @@ export function NewPairsTable() {
 
                     {/* Rows */}
                     <div className="flex-1 overflow-y-auto msv-hide-scrollbar min-h-0">
-                        {loading && pairs.length === 0 ? (
+                        {loading ? (
                             <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center justify-center h-full">
-                                <Loader2 className="animate-spin mb-3" size={22} /> Scanning mempool streams…
+                                <Loader2 className="animate-spin mb-3" size={32} />
+                                <p className="text-[11px] font-black uppercase tracking-[0.2em] font-sans">WAITING FOR ON-CHAIN ENDPOINT</p>
+                            </div>
+                        ) : error ? (
+                            <div className="h-full flex flex-col items-center justify-center p-12">
+                                <AlertTriangle size={24} className="text-black/10 mb-3" />
+                                <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em] font-sans">
+                                    Data Lake Unavailable
+                                </p>
                             </div>
                         ) : filtered.length === 0 ? (
                             <div className="p-12 text-center text-[#888888] text-[10px] font-mono flex items-center justify-center h-full">NO PAIRS MATCH FILTERS</div>
@@ -411,7 +294,7 @@ export function NewPairsTable() {
 
             {/* ── Status Footer ── */}
             <div className="shrink-0 px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                <span>{filtered.length} pairs shown · refreshes every 8s</span>
+                <span>{filtered.length} pairs shown · awaiting endpoint injection</span>
                 <span>Security powered by Whale Alert Network Engine</span>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import axios from 'axios';
+// @ts-ignore
 import qs from 'qs';
 
 // 0x API configuration
@@ -99,14 +100,13 @@ export async function buildSwapTransaction(chainId: number, params: SwapParams) 
 // and rely on the main `getSwapQuote` returning the `allowanceTarget`.
 
 export async function getAllowance(chainId: number, tokenAddress: string, walletAddress: string) {
-    // Placeholder: Frontend should check allowance.
-    return '0';
+    // Zero-Mock: Throw explicitly instead of returning fake '0'
+    throw new Error('AWAITING_GETBLOCK_RPC: Server-side on-chain allowance checks require fully integrated RPC nodes. Perform this check strictly client-side via viem/wagmi for now.');
 }
 
 export async function getApproveTransaction(chainId: number, tokenAddress: string, amount: string) {
-    // Placeholder: Frontend should verify and construct approve tx.
-    // 0x quote response provides 'allowanceTarget' which is the address to approve.
-    return { to: tokenAddress, value: '0', data: '0x' }; // Dummy return
+    // Zero-Mock: Throw explicitly instead of returning dummy '0x' data
+    throw new Error('AWAITING_GETBLOCK_RPC: Server-side TX construction requires integrated RPC. 0x quote provides allowanceTarget directly.');
 }
 
 

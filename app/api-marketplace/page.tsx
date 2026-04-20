@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useUser } from "@clerk/nextjs";
+import { useAccount } from "wagmi";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield, CheckCircle2, Lock, Key, Zap, ArrowRight, Star,
@@ -117,7 +117,9 @@ export default function ApiMarketplacePage() {
 }
 
 function ApiMarketplacePageContent() {
-  const { isSignedIn, isLoaded, user } = useUser();
+  const { address, isConnected, status } = useAccount();
+  const isSignedIn = isConnected;
+  const isLoaded = status !== 'connecting' && status !== 'reconnecting';
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTier = searchParams.get("tier") || "pro";
@@ -148,7 +150,8 @@ function ApiMarketplacePageContent() {
         body: JSON.stringify({
           planId: selectedPlan.id,
           stripePriceId: selectedPlan.stripePriceId,
-          userEmail: user?.emailAddresses?.[0]?.emailAddress,
+          // SIWE: send connected wallet address
+          userEmail: address,
         }),
       });
 

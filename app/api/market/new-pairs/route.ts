@@ -9,7 +9,7 @@ const DS_PROFILES = 'https://api.dexscreener.com/token-profiles/latest/v1';
 const DS_SEARCH   = 'https://api.dexscreener.com/latest/dex/search?q=ETH%2FUSDT';
 
 // ── Map DexScreener pair to standard table shape ───────────────────────────────
-function mapDexPair(p: any) {
+function mapDexPair(p: any, idx = 0) {
     const chainRaw = (p.chainId || p.chain || 'ethereum').toLowerCase();
     const chain =
         chainRaw.includes('solana') ? 'solana' :
@@ -33,7 +33,7 @@ function mapDexPair(p: any) {
     else score = 33; // Risky
 
     return {
-        id:           p.pairAddress || p.tokenAddress || `pair_${Math.random()}`,
+        id:           p.pairAddress || p.tokenAddress || `pair_unknown_${idx}`,
         chain,
         dex:          p.dexId ? p.dexId.charAt(0).toUpperCase() + p.dexId.slice(1) : 'DEX',
         baseToken: {

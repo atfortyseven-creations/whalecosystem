@@ -18,18 +18,15 @@ export async function POST(req: Request) {
         const now = new Date();
         
         // 1. Find all active switches that have expired
-        // Formula: lastPingAt + (inactivityPeriod * 30 days) < now
+        // Formula: lastPing + (inactivityPeriod * 30 days) < now
         const activeSwitches = await prisma.deadMansSwitch.findMany({
             where: {
-                status: 'ACTIVE'
-            },
-            include: {
-                authUser: true
+                active: true
             }
         });
 
         const expiredSwitches = activeSwitches.filter(sw => {
-            const expiryDate = new Date(sw.lastPingAt);
+            const expiryDate = new Date(sw.lastPing);
             expiryDate.setMonth(expiryDate.getMonth() + sw.inactivityPeriod);
             return expiryDate < now;
         });
@@ -39,34 +36,26 @@ export async function POST(req: Request) {
         for (const sw of expiredSwitches) {
             try {
                 // 2. Mark as EXPIRED/EXECUTING
+                // Setting active to false is equivalent to 'TRIGGERED'/'EXECUTING' in this schema
                 await prisma.deadMansSwitch.update({
                     where: { id: sw.id },
-                    data: { status: 'EXECUTING' }
+                    data: { active: false }
                 });
 
-                // 3. Logic to execute the transfer
-                // Note: Real implementation would handle gas, signed tx, etc.
-                // For now, we simulate the 'Trigger' success.
-                const mockExecutionHash = `deadman-exec-${sw.id}-${Date.now()}`;
-
-                await prisma.deadMansSwitch.update({
-                    where: { id: sw.id },
-                    data: { 
-                        status: 'EXECUTED',
-                        executionTxHash: mockExecutionHash
-                    }
-                });
+                // 3. Logic to execute the transfer via GetBlock RPC
+                // We halt the process here while Awaiting GetBlock integration. 
+                // We strictly forbid writing fake 'EXECUTED' statuses or synthetic execution hashes.
 
                 results.push({
-                    userId: sw.userId,
-                    beneficiary: sw.beneficiaryAddress,
-                    status: 'SUCCESS',
-                    txHash: mockExecutionHash
+                    userAddress: sw.userAddress,
+                    beneficiary: sw.beneficiary,
+                    status: 'PENDING_GETBLOCK_EXECUTION',
+                    txHash: null
                 });
 
             } catch (err: any) {
                 results.push({
-                    userId: sw.userId,
+                    userAddress: sw.userAddress,
                     status: 'FAILED',
                     error: err.message
                 });

@@ -205,24 +205,21 @@ export class TransactionService {
         }
 
         // Log the cross-chain or aggregator intent
-        await prisma.zapTransaction.create({
+        await prisma.blockchainTransaction.create({
             data: {
-                userAddress: params.userId,
-                wldAmount: params.amount,
-                wldPriceUSD: 1, // Baseline Index
-                usdcReceived: params.amount * 0.995, // 0.5% protocol fee
-                slippage: 0.005,
-                dexUsed: params.mode === 'bridge' ? 'Li.Fi Bridge' : '1inch Aggregator',
-                marketId: 'EXTERNAL',
-                outcomeIndex: 0,
-                sharesReceived: 0,
                 txHash,
-                blockNumber: 0n,
-                gasUsed: 0n,
-                gasPaidBy: 'USER',
+                userId: params.userId,
+                blockNumber: 0,
                 status: 'COMPLETED',
-                initiatedAt: new Date(),
-                completedAt: new Date()
+                type: params.mode === 'bridge' ? 'BRIDGE' : 'SWAP',
+                metadata: {
+                    wldAmount: params.amount,
+                    wldPriceUSD: 1, // Baseline Index
+                    usdcReceived: params.amount * 0.995, // 0.5% protocol fee
+                    slippage: 0.005,
+                    dexUsed: params.mode === 'bridge' ? 'Li.Fi Bridge' : '1inch Aggregator',
+                    gasPaidBy: 'USER'
+                }
             }
         });
 

@@ -43,12 +43,11 @@ class SovereignMempoolStreamer {
     // NOTE: Requires Alchemy/QuickNode specific WS plans. Using block listener as stable fallback above.
     const unwatchPending = getEthWsClient().watchPendingTransactions({
       onTransactions: async (txHashes: any[]) => {
-        // High-frequency data. 
-        // Stochastic Filter applied to isolate institutional volume.
+        // Deterministic filter: process 1-in-7 hashes (~14%) — no Math.random() per Zero-Mock Mandate.
+        let _idx = 0;
         for(let hash of txHashes) {
-           // We sample only randomly unless we have an Enterprise Alchemy Plan ($3,000/mo) 
-           // that can push 10k TPS. 
-           if (Math.random() < 0.15) { 
+           _idx++;
+           if (_idx % 7 === 0) { 
                this.processStochasticTransaction(hash);
            }
         }
@@ -111,19 +110,12 @@ class SovereignMempoolStreamer {
           // 2. Index to Core DB Data Lake if it's considered Deep Liquidity
           if (baseValue > 250000) {
               await prisma.globalWhaleEvent.upsert({
-                  where: { hash_logIndex: { hash: hash, logIndex: 0 } },
+                  where: { txHash: hash },
                   update: {},
                   create: {
-                      hash: hash,
-                      logIndex: 0,
-                      wallet: `0x${hash.slice(-40)}`,
-                      token: token,
-                      amount: (baseValue / (token === "WBTC" ? 65000 : token === "ETH" ? 3000 : 1)).toFixed(2),
-                      usdValue: baseValue,
-                      action: action,
-                      tier: tier,
-                      dex: dex,
-                      blockNumber: BigInt(Date.now()), // Temp sequence
+                      txHash: hash,
+                      amountUSD: baseValue,
+                      protocol: dex,
                   }
               });
               console.log(`🐋 [Indexer] Deep Liquidity Indexed: $${baseValue.toLocaleString()} on ${dex}`);

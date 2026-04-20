@@ -23,25 +23,8 @@ export async function GET(req: Request) {
       skip: offset,
     });
 
-    // Fallback: If no logs exist, generate some realistic fake logs for the presentation
-    if (logs.length === 0) {
-       const mockActions = ["WALLET_CONNECT", "VIEW_PORTFOLIO", "TAB_CHANGE", "EXPORT_CSV", "SCAN_QR", "SIGN_TYPED_DATA"];
-       const demoLogs = Array.from({ length: 15 }).map((_, i) => ({
-          id: `demo-${i}`,
-          userId: userId || "sovereign_local_user",
-          sessionId: `sess-${Date.now()}`,
-          action: mockActions[Math.floor(Math.random() * mockActions.length)],
-          ipAddress: "192.168.1." + Math.floor(Math.random() * 255),
-          userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-          timestamp: new Date(Date.now() - Math.floor(Math.random() * 86400000 * 3)),
-          deviceType: "Desktop",
-          location: "Unknown",
-          entityType: null,
-          entityId: null,
-          metadata: null
-       }));
-       logs = demoLogs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    }
+    // Zero-Mock Mandate: If no logs exist in DB, return empty — do NOT generate fake data.
+    // The SessionLogsPanel will show the empty state UI until real sessions are recorded.
 
     const total = await prisma.userSessionLog.count({ where });
 

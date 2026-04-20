@@ -1,5 +1,10 @@
-import { useUser } from '@clerk/nextjs';
-import { useSession } from 'next-auth/react';
+'use client';
+import { useAccount } from 'wagmi';
+
+const OWNER_ADDRESSES = [
+  // Map to verified wallet addresses for owner privileges
+  // or use OWNER_EMAILS check via /api/subscription/status
+];
 
 const OWNER_EMAILS = [
   'atfortyseven2@gmail.com',
@@ -7,37 +12,24 @@ const OWNER_EMAILS = [
 ];
 
 export function useAuth() {
-  const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
-  const { data: nextSession, status: nextStatus } = useSession();
+  const { address, isConnected, status } = useAccount();
   
-  const isNextLoaded = nextStatus !== 'loading';
-  const isLoaded = isClerkLoaded && isNextLoaded;
-
-  // Hybrid Auth Detection
-  const isAuthenticated = (isClerkLoaded && !!clerkUser) || (isNextLoaded && !!nextSession);
-  
-  const userEmail = clerkUser?.primaryEmailAddress?.emailAddress || nextSession?.user?.email || '';
-  const isOwner = isLoaded && isAuthenticated && OWNER_EMAILS.includes(userEmail);
-  
-  // A user is premium if they are an owner OR have the isVip flag in metadata
-  const isPremium = isOwner || (isClerkLoaded && clerkUser?.publicMetadata?.isVip === true);
+  const isLoaded = status !== 'connecting' && status !== 'reconnecting';
+  const isAuthenticated = isConnected && !!address;
   
   return {
     isAuthenticated,
-    user: clerkUser || nextSession?.user,
+    user: isAuthenticated ? { id: address, walletAddress: address } : null,
     isLoading: !isLoaded,
     isLoaded,
-    isOwner,
-    isPremium, 
-    trialViews: (clerkUser?.publicMetadata?.trialViews as number) || 0,
-    viewedAddresses: (clerkUser?.publicMetadata?.viewedAddresses as string[]) || [],
-    authSource: clerkUser ? 'clerk' : (nextSession ? 'nextauth' : 'none'),
+    isOwner: false, // Validated server-side via /api/subscription/status
+    isPremium: false, // Validated server-side via /api/subscription/status
+    walletAddress: address || null,
+    authSource: isAuthenticated ? 'siwe' : 'none',
     login: async () => {
-      // Re-trigger auth check or refresh
       if (typeof window !== 'undefined') {
         window.location.reload();
       }
     }
   };
 }
-

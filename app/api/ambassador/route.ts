@@ -147,7 +147,8 @@ export async function POST(req: NextRequest) {
         }
 
         // Generate unique referral code (6 char alphanumeric)
-        const referralCode = `WA${walletAddress.slice(2, 5).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+        const { randomBytes } = await import('crypto');
+        const referralCode = `WA${walletAddress.slice(2, 5).toUpperCase()}${randomBytes(2).toString('hex').toUpperCase()}`;
 
         // Attempt to insert into ambassador table, fall back to notification
         try {

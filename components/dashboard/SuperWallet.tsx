@@ -11,6 +11,7 @@ import WalletAnalyticsPanel from '@/components/premium/WalletAnalyticsPanel';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import ReferralDashboard from '@/components/wallet/ReferralDashboard';
 import useSWR, { mutate } from 'swr';
+import { useOmniInfrastructure } from '@/lib/api-client';
 import AIConcierge from '@/components/wallet/AIConcierge';
 import SecurityVault from '@/components/wallet/SecurityVault';
 import NFCHardware from '@/components/wallet/NFCHardware';
@@ -49,22 +50,13 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const [currentAddress, setCurrentAddress] = useState<string>('');
     const [accountBalances, setAccountBalances] = useState<Record<string, string>>({});
 
-    const [news, setNews] = useState<NewsItem[]>(recentNews);
+    // =========================================================================
+    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // News endpoint injected via REGISTRY.OMNI_INFRA.news
+    // =========================================================================
+    const { data: newsData } = useOmniInfrastructure('news');
+    const news: NewsItem[] = newsData?.news || newsData?.articles || recentNews;
 
-    useEffect(() => {
-        const fetchNews = async () => {
-            try {
-                const res = await fetch('/api/news');
-                const data = await res.json();
-                if (data.news) setNews(data.news);
-            } catch (e) {
-                console.error("Failed to fetch news", e);
-            }
-        };
-        fetchNews();
-        const interval = setInterval(fetchNews, 300000); // 5 mins
-        return () => clearInterval(interval);
-    }, []);
 
     const {
         usdcBalance,

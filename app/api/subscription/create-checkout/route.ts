@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { stripe } from '@/lib/payments/stripe';
 
 export async function POST(req: NextRequest) {
   try {
     console.log('[CHECKOUT] Starting checkout session creation');
-    const user = await currentUser();
+    const session = await getSession();
     
-    if (!user) {
+    if (!session || !session.userId) {
       console.error('[CHECKOUT] Unauthorized - No user found');
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in' },
@@ -15,45 +15,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`[CHECKOUT] User authenticated: ${user.id}`);
-    const { priceId } = await req.json();
+    const authUserId = session.userId;
+    const userEmail = session.email;
 
-    // Get or create Stripe customer
-    let customerId = user.publicMetadata.stripeCustomerId as string | undefined;
-    
-    if (!customerId) {
-      console.log('[CHECKOUT] Creating new Stripe customer');
-      const customer = await stripe.customers.create({
-        email: user.emailAddresses[0]?.emailAddress,
-        metadata: {
-          clerkUserId: user.id,
-        },
-      });
-      customerId = customer.id;
-      console.log(`[CHECKOUT] Stripe customer created: ${customerId}`);
-      
-      // Update Clerk user metadata IMMEDIATELY to avoid duplicates
-      try {
-        const { clerkClient } = await import('@clerk/nextjs/server');
-        const client = await clerkClient();
-        await client.users.updateUserMetadata(user.id, {
-          publicMetadata: {
-            stripeCustomerId: customerId,
-          },
-        });
-        console.log('[CHECKOUT] Clerk metadata updated with Stripe customer ID');
-      } catch (e) {
-        console.warn('[CHECKOUT] Failed to save stripeCustomerId to Clerk, webhook will handle it:', e);
-      }
-    } else {
-      console.log(`[CHECKOUT] Using existing Stripe customer: ${customerId}`);
-    }
+    console.log(`[CHECKOUT] User authenticated natively: ${authUserId}`);
 
     // Create checkout session for one-time payment as per UI "1.50 € / cobro único"
-    console.log('[CHECKOUT] Creating Stripe checkout session for Lifetime VIP');
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
+    console.log('[CHECKOUT] Creating Stripe checkout session for Lifetime VIP via Sovereign Webhook');
+    
+    const sessionParams: any = {
       mode: 'payment', // One-time payment
+      customer_email: userEmail || undefined,
       payment_method_types: ['card'],
       line_items: [
         {
@@ -71,15 +43,17 @@ export async function POST(req: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/vip?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/vip?canceled=true`,
       metadata: {
-        clerkUserId: user.id,
+        walletAddress: authUserId, // Strictly passing natively authenticated SIWE string
         paymentType: 'lifetime_vip',
       },
-    });
+    };
 
-    console.log(`[CHECKOUT] Session created successfully: ${session.id}`);
-    console.log(`[CHECKOUT] Redirect URL: ${session.url}`);
+    const stripeSession = await stripe.checkout.sessions.create(sessionParams);
+
+    console.log(`[CHECKOUT] Session created successfully: ${stripeSession.id}`);
+    console.log(`[CHECKOUT] Redirect URL: ${stripeSession.url}`);
     
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+    return NextResponse.json({ sessionId: stripeSession.id, url: stripeSession.url });
   } catch (error: any) {
     console.error('[CHECKOUT ERROR] Full error:', error);
     console.error('[CHECKOUT ERROR] Error message:', error?.message);

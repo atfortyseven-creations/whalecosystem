@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/payments/stripe';
-import { clerkClient } from '@clerk/nextjs/server';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -79,68 +78,48 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const clerkUserId = session.metadata?.clerkUserId;
-  const customerId = session.customer as string;
+  const walletAddress = session.metadata?.walletAddress;
   const isLifetimeVip = session.metadata?.paymentType === 'lifetime_vip';
 
-  if (!clerkUserId) {
-    console.error('[WEBHOOK] No Clerk user ID in session metadata');
+  if (!walletAddress) {
+    console.error('[WEBHOOK] No valid identity (walletAddress) in session metadata');
     return;
   }
 
+  // 2. Update Prisma Database (Isolated by Address)
   try {
-    const client = await clerkClient();
+    const { prisma } = await import('@/lib/prisma');
     
-    // 1. Update Clerk Metadata
-    await client.users.updateUserMetadata(clerkUserId, {
-      publicMetadata: {
-        stripeCustomerId: customerId,
-        subscriptionStatus: 'active',
-        isVip: true,
-        paymentType: isLifetimeVip ? 'lifetime_vip' : 'subscription',
-      },
-    });
-
-    // 2. Update Prisma Database (Isolated by clerkId)
-    try {
-      const { prisma } = await import('@/lib/prisma');
-      
-      // SECURE: Sync by clerkId to prevent wallet address spoofing or leakage
+    // SECURE: Sync strictly by walletAddress given SIWE architectonic shift.
+    if (walletAddress) {
       await prisma.user.upsert({
-        where: { clerkId: clerkUserId }, 
+        where: { walletAddress: walletAddress }, 
         update: {
           tier: 'SOVEREIGN', // VIP Tier
           lastActive: new Date(),
         },
         create: {
-          clerkId: clerkUserId,
-          walletAddress: `human-${clerkUserId.slice(-8)}`, // Placeholder until wallet is connected
+          walletAddress: walletAddress,
           tier: 'SOVEREIGN',
           lastActive: new Date(),
         },
       });
 
-      // Handle Subscription record - link to the walletAddress which is the User ID in this schema
-      const user = await prisma.user.findUnique({ where: { clerkId: clerkUserId } });
-      if (user) {
-        await prisma.subscription.create({
-          data: {
-            userId: user.walletAddress,
-            status: 'ACTIVE',
-            tier: 'LIFETIME_VIP',
-            expiresAt: new Date('2099-12-31'), // Practically forever
-          },
-        });
-      }
+      // Handle Subscription record
+      await prisma.subscription.create({
+        data: {
+          userId: walletAddress,
+          status: 'ACTIVE',
+          tier: 'LIFETIME_VIP',
+          expiresAt: new Date('2099-12-31'), // Practically forever
+        },
+      });
       
-      console.log(`[WEBHOOK] 🗄️ Database updated for user ${clerkUserId}`);
-    } catch (dbError) {
-      console.warn('[WEBHOOK] Database update failed:', dbError);
+      console.log(`[WEBHOOK] 🗄️ Sovereign database updated for strictly authentic wallet ${walletAddress}`);
     }
 
-    console.log(`[WEBHOOK] ✅ LEGENDARY: Updated Clerk user ${clerkUserId} to VIP status`);
-  } catch (error) {
-    console.error('[WEBHOOK] Failed to update Clerk user metadata:', error);
+  } catch (dbError) {
+    console.warn('[WEBHOOK] Database update failed:', dbError);
   }
 }
 
@@ -148,28 +127,34 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
 
   try {
-    // Get customer to find clerkUserId
     const customer = await stripe.customers.retrieve(customerId);
     if (customer.deleted) return;
 
-    const clerkUserId = customer.metadata.clerkUserId;
-    if (!clerkUserId) {
-       console.error(`[WEBHOOK] No clerkUserId found in metadata for customer ${customerId}`);
+    const walletAddress = customer.metadata.walletAddress;
+    if (!walletAddress) {
+       console.error(`[WEBHOOK] No walletAddress found in metadata for customer ${customerId}`);
        return;
     }
 
-    const client = await clerkClient();
-    await client.users.updateUserMetadata(clerkUserId, {
-      publicMetadata: {
-        stripeCustomerId: customerId,
-        subscriptionStatus: subscription.status,
-        subscriptionId: subscription.id,
-        currentPeriodEnd: (subscription as any).current_period_end,
-        cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+    const { prisma } = await import('@/lib/prisma');
+    
+    // Upsert subscription directly into DB natively
+    await prisma.subscription.upsert({
+      where: { id: subscription.id },
+      update: {
+        status: subscription.status.toUpperCase(),
+        expiresAt: new Date((subscription as any).current_period_end * 1000)
       },
+      create: {
+        id: subscription.id,
+        userId: walletAddress,
+        status: subscription.status.toUpperCase(),
+        tier: 'PRO',
+        expiresAt: new Date((subscription as any).current_period_end * 1000)
+      }
     });
 
-    console.log(`[WEBHOOK] ✅ Updated subscription for user ${clerkUserId}: ${subscription.status}`);
+    console.log(`[WEBHOOK] ✅ Updated Sovereign subscription for user ${walletAddress}: ${subscription.status}`);
   } catch (error) {
     console.error('[WEBHOOK] Failed to update subscription:', error);
   }
@@ -182,18 +167,17 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     const customer = await stripe.customers.retrieve(customerId);
     if (customer.deleted) return;
 
-    const clerkUserId = customer.metadata.clerkUserId;
-    if (!clerkUserId) return;
+    const walletAddress = customer.metadata.walletAddress;
+    if (!walletAddress) return;
 
-    const client = await clerkClient();
-    await client.users.updateUserMetadata(clerkUserId, {
-      publicMetadata: {
-        subscriptionStatus: 'canceled',
-        subscriptionId: null,
-      },
+    const { prisma } = await import('@/lib/prisma');
+    
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: { status: 'CANCELED' }
     });
 
-    console.log(`[WEBHOOK] ✅ Canceled subscription for user ${clerkUserId}`);
+    console.log(`[WEBHOOK] ✅ Canceled Sovereign subscription for user ${walletAddress}`);
   } catch (error) {
     console.error('[WEBHOOK] Failed to cancel subscription:', error);
   }

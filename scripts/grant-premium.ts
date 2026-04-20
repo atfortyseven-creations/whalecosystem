@@ -1,85 +1,69 @@
-import { clerkClient } from '@clerk/nextjs/server';
+/**
+ * [SOVEREIGN ADMIN SCRIPT] grant-premium.ts
+ * ──────────────────────────────────────────
+ * Grants SOVEREIGN tier access to a user by wallet address.
+ * Zero-Clerk: uses native Prisma DB lookups only.
+ *
+ * Usage:
+ *   npx ts-node -e "require('./scripts/grant-premium')"
+ *   OR set TARGET_WALLET env var and run directly.
+ */
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const prisma = new PrismaClient();
 
+// ─── CONFIG ─────────────────────────────────────────────────────────────────
+const TARGET_WALLET = process.env.TARGET_WALLET || '0xYOUR_WALLET_ADDRESS_HERE';
+const TARGET_TIER   = 'SOVEREIGN';
+// ─────────────────────────────────────────────────────────────────────────────
+
 async function grantPremium() {
-  const email = 'reymndbrn15@gmail.com';
-  console.log(`\n🚀 Granting Premium Access to: ${email}`);
+  console.log(`\n🚀 Granting ${TARGET_TIER} Access`);
+  console.log(`   Wallet: ${TARGET_WALLET}`);
   console.log('-------------------------------------------');
 
   try {
-    const client = await clerkClient();
-    
-    // 1. Find User in Clerk
-    console.log('🔍 Searching for user in Clerk...');
-    const clerkUsers = await client.users.getUserList({ emailAddress: [email] });
-    
-    if (clerkUsers.data.length === 0) {
-      console.error(`❌ User with email ${email} not found in Clerk.`);
-      console.log('💡 Tip: Ask the user to register first if they haven\'t.');
-      return;
-    }
-
-    const clerkUser = clerkUsers.data[0];
-    const clerkUserId = clerkUser.id;
-    console.log(`✅ Found Clerk User: ${clerkUserId}`);
-
-    // 2. Update Clerk Metadata
-    console.log('🆙 Updating Clerk public metadata...');
-    await client.users.updateUserMetadata(clerkUserId, {
-      publicMetadata: {
-        subscriptionStatus: 'active',
-        isVip: true,
-        paymentType: 'lifetime_vip',
-        tier: 'SOVEREIGN'
-      },
-    });
-    console.log('✅ Clerk metadata updated.');
-
-    // 3. Update/Create User in Prisma
-    console.log('💾 Synchronizing with Prisma database...');
+    // 1. Upsert User in DB with SOVEREIGN tier
+    console.log('💾 Upserting User in database...');
     const user = await prisma.user.upsert({
-      where: { walletAddress: clerkUserId },
+      where: { walletAddress: TARGET_WALLET.toLowerCase() },
       update: {
-        tier: 'SOVEREIGN',
-        email: email,
+        tier: TARGET_TIER,
+        isPro: true,
       },
       create: {
-        walletAddress: clerkUserId,
-        email: email,
-        tier: 'SOVEREIGN',
+        walletAddress: TARGET_WALLET.toLowerCase(),
+        tier: TARGET_TIER,
+        isPro: true,
       },
     });
-    console.log(`✅ Prisma User record ${user.walletAddress} updated/created with tier SOVEREIGN.`);
+    console.log(`✅ User record saved: ${user.walletAddress} → tier: ${user.tier}`);
 
-    // 4. Create/Update Subscription in Prisma
+    // 2. Upsert Subscription as lifetime
     console.log('📝 Creating/Updating Subscription record...');
+    const existing = await prisma.subscription.findFirst({
+      where: { userId: user.walletAddress }
+    });
+
     const subscription = await prisma.subscription.upsert({
-      where: { 
-        // We don't have a unique ID for subscription if we don't know it, 
-        // so we'll just search for an existing one or create a new one.
-        // Actually, schema doesn't have a unique constraint on userId for Subscription.
-        // Let's check for an active one first.
-        id: (await prisma.subscription.findFirst({ where: { userId: clerkUserId } }))?.id || 'new-sub'
-      },
+      where: { id: existing?.id || 'no-match' },
       update: {
         status: 'ACTIVE',
-        tier: 'PREMIUM',
+        tier: 'SOVEREIGN',
         expiresAt: new Date('2099-12-31'),
       },
       create: {
-        userId: clerkUserId,
+        userId: user.walletAddress,
         status: 'ACTIVE',
-        tier: 'PREMIUM',
+        tier: 'SOVEREIGN',
         expiresAt: new Date('2099-12-31'),
       },
     });
-    console.log(`✅ Subscription record updated: ${subscription.id}`);
+    console.log(`✅ Subscription: ${subscription.id} → status: ${subscription.status}`);
 
-    console.log('\n✨ MISSION ACCOMPLISHED: User successfully granted full platform access.');
+    console.log('\n✨ MISSION ACCOMPLISHED: Full sovereign access granted.');
 
   } catch (error) {
     console.error('❌ Error during grant process:', error);

@@ -1,29 +1,28 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { ethers } from 'ethers';
-import { encrypt, generateSalt, isValidPrivateKey } from '@/lib/wallet/encryption';
+import { encrypt, isValidPrivateKey } from '@/lib/wallet/encryption';
 
 /**
- * LEGENDARY WALLET CREATION ENDPOINT
- * Creates a new Ethereum wallet for authenticated users
- * Encrypts and stores private key securely in database
- * 
+ * SOVEREIGN WALLET CREATION ENDPOINT
+ * Creates a new Ethereum wallet for SIWE-authenticated users.
+ * Encrypts and stores private key securely in the AuthUser database.
+ *
  * POST /api/wallet/create
  * Returns: { address: string, created: boolean }
  */
 
 export async function POST(req: Request) {
     try {
-        // 1. Authenticate user
-        const user = await currentUser();
-        if (!user) {
+        // 1. Authenticate via Sovereign SIWE Session
+        const session = await getSession();
+        if (!session || !session.userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const email = user.emailAddresses[0]?.emailAddress;
+        const email = session.email;
         if (!email) {
-            return NextResponse.json({ error: 'Email not found' }, { status: 400 });
+            return NextResponse.json({ error: 'Session email not found' }, { status: 400 });
         }
 
         // 2. Check if user already has a wallet
@@ -50,51 +49,37 @@ export async function POST(req: Request) {
             throw new Error('Generated invalid private key');
         }
 
-        // 5. Encrypt private key
+        // 5. Encrypt private key using the Sovereign encryption module
         const encryptedPrivateKey = encrypt(privateKey);
-        const walletSalt = generateSalt();
 
-        // 6. Optional: Encrypt mnemonic for recovery
-        const mnemonic = wallet.mnemonic?.phrase;
-        const encryptedMnemonic = mnemonic ? encrypt(mnemonic) : null;
-
-        // 7. Save to database
+        // 6. Persist to AuthUser — only fields that exist in schema.prisma
         await prisma.authUser.upsert({
             where: { email },
             update: {
                 walletAddress: address,
                 encryptedPrivateKey,
-                encryptedMnemonic,
-                walletSalt,
-                updatedAt: new Date()
             },
             create: {
                 email,
-                passwordHash: '', // Will be set during signup
                 walletAddress: address,
                 encryptedPrivateKey,
-                encryptedMnemonic,
-                walletSalt,
-                verified: false
             }
         });
 
-        // 8. Log security event
+        // 7. Log security event — using correct schema field `authUserId`
+        const authUser = await prisma.authUser.findUnique({ where: { email }, select: { id: true } });
         await prisma.securityEvent.create({
             data: {
                 type: 'WALLET_CREATED',
-                userId: email,
+                authUserId: authUser?.id || null,
                 ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
                 userAgent: req.headers.get('user-agent') || undefined,
                 severity: 'INFO',
-                metadata: {
-                    address,
-                    timestamp: new Date().toISOString()
-                }
+                details: JSON.stringify({ address, timestamp: new Date().toISOString() })
             }
         });
 
-        console.log(`✅ Wallet created for ${email}: ${address}`);
+        console.log(`✅ Sovereign wallet created for ${email}: ${address}`);
 
         return NextResponse.json({
             success: true,
@@ -105,19 +90,16 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('❌ Wallet creation error:', error);
-        
-        // Log error event
+
+        // Log error event using correct schema
         try {
             await prisma.securityEvent.create({
                 data: {
                     type: 'WALLET_CREATION_FAILED',
-                    userId: 'unknown',
+                    authUserId: null,
                     ipAddress: 'unknown',
                     severity: 'CRITICAL',
-                    metadata: {
-                        error: error.message,
-                        timestamp: new Date().toISOString()
-                    }
+                    details: JSON.stringify({ error: error.message, timestamp: new Date().toISOString() })
                 }
             });
         } catch (logError) {
@@ -133,18 +115,17 @@ export async function POST(req: Request) {
 
 /**
  * GET /api/wallet/create
- * Check if user has a wallet
+ * Check if the SIWE-authenticated user has a wallet
  */
 export async function GET(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) {
+        const session = await getSession();
+        if (!session || !session.userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const email = user.emailAddresses[0]?.emailAddress;
+        const email = session.email;
         if (!email) {
-            return NextResponse.json({ error: 'Email not found' }, { status: 400 });
+            return NextResponse.json({ error: 'Session email not found' }, { status: 400 });
         }
 
         const authUser = await prisma.authUser.findUnique({
@@ -165,4 +146,3 @@ export async function GET(req: Request) {
         );
     }
 }
-

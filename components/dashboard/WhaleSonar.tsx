@@ -1,51 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame } from 'lucide-react';
+import { Activity, Zap, ShieldAlert, Target, TrendingUp, Flame, Loader2 } from 'lucide-react';
+import { useSovereignIntel } from '@/lib/api-client';
 
 export function WhaleSonar() {
-    const [alerts, setAlerts] = useState<any[]>([]);
-    const [stats, setStats] = useState({ alertCount: 0, totalUsd: 0 });
+    // =========================================================================
+    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // Whale stream endpoint injected via REGISTRY.SOVEREIGN_INTEL.massTransfers
+    // =========================================================================
+    const { data: rawData, isLoading } = useSovereignIntel('massTransfers');
+    const alerts: any[] = rawData?.alerts || rawData?.transfers || [];
+    const stats = useMemo(() => ({
+        alertCount: alerts.length,
+        totalUsd: alerts.reduce((s: number, a: any) => s + (a.usdValue || a.amount || 0), 0),
+    }), [alerts]);
 
-    useEffect(() => {
-        let isMounted = true;
-        let timeoutId: NodeJS.Timeout;
-
-        const fetchAlerts = async () => {
-            if (!isMounted) return;
-            try {
-                const res = await fetch('/api/whales/stream');
-                if (res.ok) {
-                    const payload = await res.json();
-                    if (payload.type === 'HISTORY') {
-                        setAlerts(payload.alerts || []);
-                    } else if (payload.type === 'WHALE') {
-                        setAlerts(prev => {
-                            const next = [payload, ...prev];
-                            if (next.length > 50) return next.slice(0, 50);
-                            return next;
-                        });
-                        setStats(s => ({
-                            alertCount: s.alertCount + 1,
-                            totalUsd: s.totalUsd + (payload.usdValue || 0)
-                        }));
-                    }
-                }
-            } catch (err) {
-                // Silently retry
-            } finally {
-                if (isMounted) {
-                    timeoutId = setTimeout(fetchAlerts, 3000);
-                }
-            }
-        };
-
-        fetchAlerts();
-
-        return () => {
-            isMounted = false;
-            clearTimeout(timeoutId);
-        };
-    }, []);
 
     return (
         <motion.div 

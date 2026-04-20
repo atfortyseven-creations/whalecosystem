@@ -1,86 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 
 // Gamification API - XP and Levels
+// ZERO-MOCK MANDATE: XP data must come from real DB once gamification schema is implemented.
+// For now gate the endpoint with the session check and return 501 for unimplemented reads.
+
 export async function GET(req: NextRequest) {
   try {
-    const user = await currentUser();
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    const session = await getSession();
+
+    if (!session || !session.userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user gamification data
-    // In production, this would fetch from database
-    const gamificationData = {
-      userId: user.id,
-      xp: 2450,
-      level: 12,
-      nextLevelXp: 3000,
-      streak: 7,
-      achievements: [
-        { id: 'first-whale', name: 'First Whale Tracked', unlockedAt: Date.now() - 86400000 },
-        { id: 'week-streak', name: '7 Day Streak', unlockedAt: Date.now() - 3600000 },
-      ],
-      rank: 142,
-      totalUsers: 10000,
-    };
+    // PENDING: XP and level data will be sourced from GamificationRecord model
+    // once the schema is finalized and GetBlock event-sourcing is integrated.
+    return NextResponse.json({
+      error: 'GAMIFICATION_NOT_IMPLEMENTED',
+      message: 'XP and level data pending on-chain event sourcing integration.'
+    }, { status: 501 });
 
-    return NextResponse.json(gamificationData);
   } catch (error) {
     console.error('[API ERROR] Gamification data:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await currentUser();
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    const session = await getSession();
+
+    if (!session || !session.userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { action, amount } = await req.json();
-
-    // Award XP based on action
-    const xpGained = calculateXP(action, amount);
-
-    // In production, update database
-    console.log(`User ${user.id} gained ${xpGained} XP for action: ${action}`);
-
     return NextResponse.json({
-      success: true,
-      xpGained,
-      newTotal: 2450 + xpGained,
-    });
+      error: 'GAMIFICATION_NOT_IMPLEMENTED',
+      message: 'XP award logic pending on-chain event sourcing integration.'
+    }, { status: 501 });
+
   } catch (error) {
     console.error('[API ERROR] Award XP:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-
-function calculateXP(action: string, amount?: number): number {
-  const xpMap: Record<string, number> = {
-    'track_whale': 10,
-    'create_alert': 15,
-    'copy_trade': 50,
-    'daily_login': 5,
-    'share_insight': 20,
-  };
-
-  return xpMap[action] || 0;
-}
-

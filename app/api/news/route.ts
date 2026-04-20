@@ -253,7 +253,7 @@ function padTo300(articles: UINewsArticle[]) {
             id: newId,
             title: base.title + ` [Analysis Node ${result.length}]`,
             imageUrl: getFallbackImage(newId),
-            date: new Date(new Date(base.date).getTime() - Math.random() * 86400000).toISOString()
+            date: new Date(new Date(base.date).getTime() - ((result.length * 3600000) % 86400000)).toISOString()
         });
         i++;
     }

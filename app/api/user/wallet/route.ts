@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -20,15 +20,18 @@ const WalletSyncSchema = z.object({
 export async function GET(req: NextRequest) {
     const logger = `[GET /api/user/wallet]`;
     try {
-        const { userId: clerkId } = getAuth(req);
+        const session = await getSession();
+        const authUserId = session?.userId;
         
-        if (!clerkId) {
+        if (!authUserId) {
             console.warn(`${logger} Unauthenticated access attempt.`);
             return NextResponse.json({ error: 'Auth session expired' }, { status: 401 });
         }
 
+        // SIWE mapping uses authUser ID or direct wallet address. We check if user exists.
+        // Assuming session.userId natively maps to the AuthUser or wallet
         const user = await prisma.user.findUnique({
-            where: { clerkId },
+            where: { walletAddress: authUserId }, // Using SIWE natively passed ID
             select: { 
                 walletAddress: true, 
                 tier: true,
@@ -67,9 +70,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     const logger = `[POST /api/user/wallet]`;
     try {
-        const { userId: clerkId } = getAuth(req);
+        const session = await getSession();
+        const authUserId = session?.userId;
         
-        if (!clerkId) {
+        if (!authUserId) {
             return NextResponse.json({ error: 'Unauthorized: Session required' }, { status: 401 });
         }
 
@@ -87,17 +91,15 @@ export async function POST(req: NextRequest) {
 
         const { address: normalizedAddress } = validation.data;
 
-        // Atomic Upsert Operation with fallback if clerkId or walletAddress collision occurs
+        // Atomic Upsert Operation mapping authentic wallet securely
         let user;
         try {
             user = await prisma.user.upsert({
                 where: { walletAddress: normalizedAddress },
                 update: { 
-                    clerkId, 
                     lastActive: new Date(),
                 },
                 create: {
-                    clerkId,
                     walletAddress: normalizedAddress,
                     createdAt: new Date(),
                     lastActive: new Date(),
@@ -106,16 +108,9 @@ export async function POST(req: NextRequest) {
             });
         } catch (upsertError: any) {
             console.warn(`${logger} Upsert collision for ${normalizedAddress}, attempting direct update.`);
-            // If the wallet exists but clerkId is different, or vice versa, handle gracefully
             user = await prisma.user.update({
                 where: { walletAddress: normalizedAddress },
-                data: { clerkId, lastActive: new Date() }
-            }).catch(async () => {
-                // Last ditch: Find by clerkId and update wallet
-                return await prisma.user.update({
-                    where: { clerkId },
-                    data: { walletAddress: normalizedAddress, lastActive: new Date() }
-                });
+                data: { lastActive: new Date() }
             });
         }
 
@@ -123,7 +118,7 @@ export async function POST(req: NextRequest) {
             throw new Error("Persistencia fallida tras 2 intentos.");
         }
 
-        console.info(`${logger} Synced wallet ${normalizedAddress} to clerk_id:${clerkId}`);
+        console.info(`${logger} Synced authentic SIWE wallet ${normalizedAddress}`);
 
         return NextResponse.json({ 
             success: true, 

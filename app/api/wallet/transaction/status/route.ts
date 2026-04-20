@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -12,10 +12,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = { id: session.userId, email: session.email };
 
         const { searchParams } = new URL(req.url);
         const txHash = searchParams.get('txHash');

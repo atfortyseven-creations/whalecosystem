@@ -88,10 +88,9 @@ export async function stakeETH(
   amount: number,
   walletAddress: string
 ): Promise<{ txHash: string }> {
-  // In a "Senior" app, we'd actually build the transaction here.
-  // For now, we return a "Pending Confirmation" placeholder instead of a fake hash.
+  // Zero-Mock Mandate
   return {
-    txHash: 'PENDING_USER_CONFIRMATION_ON_WALleT',
+    txHash: 'GETBLOCK_RPC_REQUIRED_FOR_STAKING',
   };
 }
 
@@ -99,16 +98,8 @@ export async function stakeETH(
  * Get user's staking positions
  */
 export async function getStakingPositions(walletAddress: string): Promise<StakingPosition[]> {
-  // Mock positions
-  return [
-    {
-      providerId: 'lido',
-      stakedAmount: 1.5,
-      rewardsEarned: 0.023,
-      currentValue: 1.523 * 3000,
-      apy: 3.8,
-    }
-  ];
+  // Zero-Mock: Awaiting Moralis/GetBlock indexer to fetch real on-chain Lido/RocketPool tokens
+  return [];
 }
 
 /**

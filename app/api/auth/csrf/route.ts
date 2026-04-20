@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { generateCSRFToken } from '@/lib/security/premium-security';
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId: clerkUserId } = getAuth(req);
+    // Priority: SIWE Session > Web3 Address header (guest)
+    const session = await getSession();
     const web3Address = req.headers.get('x-web3-address');
-    
-    // Priority: Clerk User (Gmail) > Web3 Address (Guest)
-    const userId = clerkUserId || (web3Address && /^0x[a-fA-F0-9]{40}$/.test(web3Address) ? web3Address.toLowerCase() : null);
+    const userId = session?.userId || (web3Address && /^0x[a-fA-F0-9]{40}$/.test(web3Address) ? web3Address.toLowerCase() : null);
 
     if (!userId) {
       return NextResponse.json(

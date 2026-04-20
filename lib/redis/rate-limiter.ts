@@ -1,5 +1,4 @@
 import { redisClient } from '../redis/client';
-import { PlanTier } from '@prisma/client';
 import { SAAS_PLANS } from '../saas/plans';
 
 export class RedisRateLimiter {
@@ -11,7 +10,7 @@ export class RedisRateLimiter {
    */
   static async check(
     apiKeyId: string, 
-    tier: PlanTier = PlanTier.FREE
+    tier: string = 'FREE'
   ): Promise<{ success: boolean; current: number; limit: number; remaining: number }> {
     
     const config = SAAS_PLANS[tier];

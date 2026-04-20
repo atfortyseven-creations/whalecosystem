@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { ethers } from 'ethers';
 
 export async function POST(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = { id: session.userId, email: session.email };
 
         const { to, amount } = await req.json();
         
-        const email = user.emailAddresses[0]?.emailAddress;
+        const email = session.email;
         const authUser = await prisma.authUser.findUnique({ where: { email } });
         if (!authUser || !authUser.walletAddress) return NextResponse.json({ error: 'User wallet not found' }, { status: 404 });
 
@@ -26,35 +27,14 @@ export async function POST(req: Request) {
             }, { status: 400 });
         }
 
-        // Simulate zkSNARK Privacy Mixing logic
-        // 1. Fee calculation (0.5%)
-        const fee = parseFloat(amount) * 0.005;
-        const netAmount = parseFloat(amount) - fee;
+        // Zero-Mock Mandate: Awaiting GetBlock RPC Relayer Integration
+        // Do not generate synthetic privacy hashes or write fake 'CONFIRMED' records to DB.
         
-        // 2. Track activity (Privacy preserved in UI, but audited in DB for security)
-        // Note: Real mixers use nullifiers and commitments. Here we simulate the effect.
-        const txHash = `privacy-mix-${Math.random().toString(36).substring(7)}`;
-
-        await prisma.transaction.create({
-            data: {
-                authUserId: authUser.id,
-                hash: txHash,
-                chainId: 1, // Mainnet simulation
-                type: 'CONTRACT',
-                status: 'CONFIRMED',
-                from: 'zkSNARK-Pool',
-                to: to,
-                value: netAmount,
-                tokenSymbol: 'ETH',
-                metadata: { mixed: true, protocol: 'v1.0' }
-            }
-        });
-
         return NextResponse.json({ 
-            success: true, 
-            txHash, 
-            message: 'Funds mixed and sent via zkSNARK protocol' 
-        });
+            success: false, 
+            txHash: null, 
+            message: 'PREPARING_GETBLOCK_INTEGRATION: ZkSNARK mixer contract endpoint is currently wiring real RPC relayers. Synthetic mixing is disabled.' 
+        }, { status: 501 });
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });

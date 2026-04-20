@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Key, Plus, Trash2, Shield, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PlanTier } from '@prisma/client';
 import { SAAS_PLANS } from '@/lib/saas/plans';
 
 // Mock types for the UI
@@ -17,7 +16,7 @@ type ApiKey = {
     lastUsedAt: string | null;
 };
 
-export function ApiKeyManager({ tier, keys }: { tier: PlanTier; keys: ApiKey[] }) {
+export function ApiKeyManager({ tier, keys }: { tier: string; keys: ApiKey[] }) {
     const config = SAAS_PLANS[tier];
     const maxKeys = config.limits.maxApiKeys;
     const canCreate = keys.length < maxKeys;

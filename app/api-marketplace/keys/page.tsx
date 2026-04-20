@@ -6,12 +6,11 @@ import { UsageStats } from '@/components/saas/UsageStats';
 import { SecurityPanel } from '@/components/saas/SecurityPanel';
 import { UniversalEliteWallpaper } from '@/components/shared/UniversalEliteWallpaper';
 import { Database, ShieldCheck } from 'lucide-react';
-import { PlanTier } from '@prisma/client';
 
 export default function ApiKeysDashboard() {
     // Mock user state - standard for demo purposes
     // In prod: await auth() -> fetch prisma user -> extract tier & keys
-    const mockTier = PlanTier.PRO;
+    const mockTier = 'PRO'; // Sovereign string tier — no Prisma enum dependency
     
     const mockKeys = [
         {

@@ -9,7 +9,7 @@ import { Toaster, toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAccount } from 'wagmi';
-import { useUser } from '@clerk/nextjs';
+// Sovereign SIWE: WorldGate uses wallet address for identity — no Clerk dependency
 
 const IDKitWidget = dynamic(() => import('@worldcoin/idkit').then((mod) => mod.IDKitWidget), {
     ssr: false,
@@ -24,23 +24,24 @@ const EMAIL_WHITELIST = [
 
 export const WorldGate = ({ children }: { children: React.ReactNode }) => {
     const { isVerified, verifyIdentity, isLoading } = useWorld();
-    const { address } = useAccount();
-    const { user, isLoaded: isUserLoaded } = useUser();
+    const { address, isConnected: isUserLoaded } = useAccount();
     const [showSuccess, setShowSuccess] = useState(false);
 
-    // Check if user email is whitelisted
-    const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-    const isWhitelisted = userEmail ? EMAIL_WHITELIST.includes(userEmail) : false;
+    // Whitelist check by wallet address (SIWE-native identity)
+    const ADDRESS_WHITELIST = [
+        // Add whitelisted wallet addresses here
+    ];
+    const isWhitelisted = address ? ADDRESS_WHITELIST.includes(address.toLowerCase()) : false;
 
     // HARDCODE PARA EVITAR ERRORES DE ENV EN DEPLOY
     const APP_ID = "app_affe7470221b57a8edee20b3ac30c484";
     const ACTION = "whale-alert-terminal";
 
     useEffect(() => {
-        if (isWhitelisted && user) {
-            console.log(`✅ [WHITELIST] User ${userEmail} bypassing World ID verification`);
+        if (isWhitelisted && address) {
+            console.log(`✅ [WHITELIST] Wallet ${address} bypassing World ID verification`);
         }
-    }, [isWhitelisted, userEmail, user]);
+    }, [isWhitelisted, address]);
 
     useEffect(() => {
         const handleTrigger = () => {

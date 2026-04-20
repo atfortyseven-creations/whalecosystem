@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { formatUnits } from 'viem';
 
 const ONEINCH_API = 'https://api.1inch.dev/swap/v6.0/1'; // Ethereum mainnet
 
 export async function POST(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const user = { id: session.userId, email: session.email };
 
         const { fromToken, toToken, amount } = await req.json();
 

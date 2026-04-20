@@ -605,11 +605,64 @@ model AlertRule {
 model WatchedWallet {
   id              String   @id @default(uuid())
   userId          String
-  walletAddress   String
-  label           String?
+  address         String   // Normalized: 0x... or bc1... or SOL pubkey
+  label           String   @default("Anonymous Whale")
+  tags            String[] @default([])
+  lastValue       Float    @default(0)
+  change24h       Float    @default(0)
+  pnl24h          Float    @default(0)
+  txCount         Int      @default(0)
+  riskScore       Float    @default(50)
+  activityScore   Float    @default(0)
+  isWhale         Boolean  @default(false)
+  isSmart         Boolean  @default(false)
+  alertsEnabled   Boolean  @default(false)
+  metadata        Json?    // Stats breakdown cache
+  forensics       Json?    // Forensic analysis result
+  category        String?  // Exchange|Whale|MEV|Fund etc.
+  identityTier    String?  // LEGENDARY|ELITE|SOVEREIGN etc.
+  lastCheck       DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, address])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([address])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OPERATIONAL AUDIT TRAIL (sovereign action log)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String   // WATCH_WALLET_ADDED | WATCH_WALLET_DELETED | SETTINGS_UPDATED etc.
+  resource  String?  // Table/resource name
+  metadata  Json?
+  ipAddress String?
+  timestamp DateTime @default(now())
+
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([action, timestamp(sort: Desc)])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STRIPE PURCHASE INTENT (anti-chargeback evidence)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ApiPurchaseIntent {
+  id              String   @id @default(uuid())
+  userId          String   // Sovereign wallet address (SIWE identity)
+  planId          String
+  stripeSessionId String   @unique
+  ip              String?
+  country         String?
+  userAgent       String?  @db.Text
+  isSuspiciousIp  Boolean  @default(false)
   createdAt       DateTime @default(now())
 
-  @@unique([userId, walletAddress])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model KYCRecord {

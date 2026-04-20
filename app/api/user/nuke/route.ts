@@ -61,10 +61,8 @@ export async function POST(req: Request) {
             await prisma.$transaction(async (tx) => {
                 // Delete core relationship trees (Prisma handles some cascades, but we are explicit)
                 await tx.session.deleteMany({ where: { userId: userAddress } });
-                await tx.nextAuthSession.deleteMany({ where: { userId: userAddress } });
-                await tx.account.deleteMany({ where: { userId: userAddress } });
-                await tx.trade.deleteMany({ where: { userWallet: userAddress } });
-                await tx.zapTransaction.deleteMany({ where: { userAddress: userAddress } });
+                await tx.userSessionLog.deleteMany({ where: { userId: userAddress } });
+                await tx.blockchainTransaction.deleteMany({ where: { userId: userAddress } });
                 
                 // Finally delete the user completely
                 const userExists = await tx.user.findUnique({ where: { walletAddress: userAddress } });
@@ -72,25 +70,20 @@ export async function POST(req: Request) {
                     await tx.user.delete({ where: { walletAddress: userAddress } });
                 }
 
-                // Append the Audit Log
-                await tx.auditLog.create({ 
-                    data: { 
-                        action: "DATA_NUKE", 
-                        address: userAddress, 
-                        timestamp: new Date() 
-                    } 
-                });
-
-                // Record the irreversible cryptographic proof in DeletedUser
+                // Record the irreversible cryptographic proof securely in General Log (Zk-Hash mapped)
                 const salt = process.env.NUKE_SALT || 'WhaleAlert_ZeroG_Salt_777';
                 const addressHash = createHash('sha256').update(userAddress + salt).digest('hex');
-                await tx.deletedUser.upsert({
-                    where: { addressHash },
-                    update: { nukeTimestamp: new Date(), proofSignature: signature },
-                    create: {
-                        addressHash,
-                        nukeTimestamp: new Date(),
-                        proofSignature: signature
+                
+                await tx.log.create({
+                    data: {
+                        level: "alert",
+                        message: "DATA_NUKE",
+                        source: "WhaleFortress Nuke Core",
+                        metadata: {
+                            addressHash,
+                            proofSignature: signature,
+                            resolvedAt: new Date().toISOString()
+                        }
                     }
                 });
             });

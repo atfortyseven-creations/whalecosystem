@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
+import { prisma } from '@/lib/prisma';
 
 const OWNER_EMAILS = [
   'atfortyseven2@gmail.com',
@@ -8,9 +9,9 @@ const OWNER_EMAILS = [
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const session = await getSession();
     
-    if (!userId) {
+    if (!session || !session.userId) {
       return NextResponse.json({
         isPremium: false,
         tier: 'FREE',
@@ -18,11 +19,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const { clerkClient } = await import('@clerk/nextjs/server');
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    const userEmail = user.primaryEmailAddress?.emailAddress;
-    
+    const authUserId = session.userId;
+    const userEmail = session.email;
+
     // 1. Check if user is the owner (unlimited access)
     if (userEmail && OWNER_EMAILS.includes(userEmail)) {
       return NextResponse.json({
@@ -35,16 +34,23 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 2. Check real subscription status from Clerk metadata
-    const status = user.publicMetadata.subscriptionStatus as string;
-    const isPremium = status === 'active' || status === 'trialing';
+    // 2. Check native Sovereign DB instead of Clerk Metadata
+    const dbUser = await prisma.user.findUnique({
+      where: { walletAddress: authUserId },
+    });
+    
+    const activeSub = await prisma.subscription.findFirst({
+        where: { userId: authUserId, status: 'ACTIVE' }
+    });
+
+    const isPremium = !!activeSub || dbUser?.tier === 'SOVEREIGN';
 
     return NextResponse.json({
       isPremium,
-      tier: isPremium ? 'PRO' : 'FREE',
-      subscriptionId: user.publicMetadata.subscriptionId || null,
-      currentPeriodEnd: user.publicMetadata.currentPeriodEnd || null,
-      cancelAtPeriodEnd: user.publicMetadata.cancelAtPeriodEnd || false,
+      tier: isPremium ? (activeSub?.tier || dbUser?.tier || 'PRO') : 'FREE',
+      subscriptionId: activeSub?.id || null,
+      currentPeriodEnd: activeSub?.expiresAt ? new Date(activeSub.expiresAt).getTime() / 1000 : null,
+      cancelAtPeriodEnd: false,
       isOwner: false,
     });
   } catch (error) {

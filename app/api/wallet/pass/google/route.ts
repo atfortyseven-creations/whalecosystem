@@ -1,22 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId: authUserId } = await auth();
-    if (!authUserId) {
+    const session = await getSession();
+    if (!session || !session.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const authUserId = session.userId;
 
-    const card = await prisma.virtualCard.findUnique({
-      where: { authUserId },
-    });
-
-    if (!card) {
-      return NextResponse.json({ error: 'Card not issued' }, { status: 404 });
-    }
+    // ZERO-MOCK MANDATE: VirtualCard model does not yet exist in schema.prisma.
+    // Gate with 501 until the VirtualCard model and issuance flow are implemented.
+    return NextResponse.json({
+      error: 'VIRTUAL_CARD_NOT_IMPLEMENTED',
+      message: 'Virtual card issuance requires on-chain KYC integration. Feature pending GetBlock RPC + issuer API wiring.'
+    }, { status: 501 });
 
     // [PRODUCTION REAL] Official Google Wallet Structure
     // Requires a service account private key stored in GOOGLE_WALLET_PRIVATE_KEY

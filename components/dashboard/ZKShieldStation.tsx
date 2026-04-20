@@ -33,13 +33,9 @@ export function ZKShieldStation() {
                 setLastProof(data.snark);
             } else {
                 toast.error(data.error || "ZK_PROOF_GENERATION_FAILED", { id: tid });
-                // Fallback deterministic proof for demonstration
-                setLastProof({
-                  protocol: "Groth16",
-                  curve: "bn128",
-                  proof: "0x"+Math.random().toString(16).slice(2, 64),
-                  inputs: [targetAddress, "0x01"]
-                });
+                // Zero-Mock Mandate: do NOT display a Math.random() fake proof.
+                // Surface the error to the user instead.
+                setLastProof(null);
             }
         } catch (e) {
             toast.error("PROVER_NETWORK_SYNCHRONIZATION_ERROR", { id: tid });

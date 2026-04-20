@@ -1,13 +1,14 @@
 // components/dashboard/InstitutionalLedger.tsx
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Database, Shield, ExternalLink, Hash, Clock,
   Activity, Search, RefreshCw, CheckCircle2,
   Layers, Cpu, Lock, TrendingUp, AlertTriangle
 } from 'lucide-react';
+import { useOmniInfrastructure } from '@/lib/api-client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface LedgerEntry {
@@ -69,55 +70,38 @@ function StateChip({ state }: { state: LedgerEntry['protocolState'] }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function InstitutionalLedger() {
-  const [entries, setEntries] = useState<LedgerEntry[]>([]);
-  const [stats, setStats]   = useState<LedgerStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isSyncing, setIsSyncing] = useState(false);
+  // =========================================================================
+  // INJECTED DATA HOOK — Zero-Mock Mandate
+  // Block explorer endpoint injected via REGISTRY.OMNI_INFRA.blockExplorer
+  // =========================================================================
+  const { data: rawData, isLoading: loading, refetch } = useOmniInfrastructure('blockExplorer');
+  const isSyncing = loading;
+
+  const entries: LedgerEntry[] = useMemo(() => {
+    return (rawData?.entries || []).map((e: any, i: number) => ({
+      id:                e.id || String(i),
+      blockHex:          e.txid ? `0x${parseInt(e.txid.slice(0,8), 16).toString(16).toUpperCase()}` : `0x${e.blockHex || '—'}`,
+      verificationLayer: e.chain || e.verificationLayer || 'L1_ETH_MAINNET',
+      sha256Hash:        e.txid ? `0x${e.txid}` : (e.sha256Hash || `0x${'0'.repeat(64)}`),
+      payloadMB:         e.payloadMB ?? (e.valueBTC ? parseFloat((e.valueBTC * 0.001).toFixed(3)) : 0),
+      protocolState:     e.status === 'UNSPENT' ? 'Finalized / Valid' : e.status === 'PENDING' ? 'Pending' : (e.protocolState || 'Finalized / Valid'),
+      timestamp:         e.timestamp || new Date().toISOString(),
+      chain:             e.category || e.chain || 'L1_ETH_MAINNET',
+    }));
+  }, [rawData]);
+
+  const stats: LedgerStats | null = useMemo(() => {
+    if (!rawData) return null;
+    return {
+      totalBlocks:     rawData.stats?.totalMonitored ?? entries.length,
+      finalizedPct:    rawData.stats?.finalizedPct ?? rawData.stats?.whaleConcentrationPct ?? 0,
+      avgPayloadMB:    parseFloat((entries.reduce((s, e) => s + e.payloadMB, 0) / Math.max(entries.length, 1)).toFixed(3)),
+      observersActive: rawData.stats?.activeObservers ?? 0,
+    };
+  }, [rawData, entries]);
+
   const [filter, setFilter] = useState('');
   const [selected, setSelected] = useState<LedgerEntry | null>(null);
-
-  // ── Fetch ──────────────────────────────────────────────────────────────────
-  const fetchData = async () => {
-    setIsSyncing(true);
-    try {
-      const res = await fetch('/api/scanner/btc/utxos');
-      if (res.ok) {
-        const raw = await res.json();
-        // Map raw API to LedgerEntry shape
-        const mapped: LedgerEntry[] = (raw.entries || []).map((e: any, i: number) => ({
-          id:                e.id || String(i),
-          blockHex:          e.txid ? `0x${parseInt(e.txid.slice(0,8), 16).toString(16).toUpperCase()}` : `0x17BCBA${(255 - i).toString(16).toUpperCase()}`,
-          verificationLayer: e.chain || 'L1_ETH_MAINNET',
-          sha256Hash:        e.txid ? `0x${e.txid}` : `0x${'0'.repeat(64)}`,
-          payloadMB:         e.valueBTC ? parseFloat((e.valueBTC * 0.001).toFixed(3)) : parseFloat((Math.random() * 0.15 + 0.07).toFixed(3)),
-          protocolState:     e.status === 'UNSPENT' ? 'Finalized / Valid' : e.status === 'PENDING' ? 'Pending' : 'Finalized / Valid',
-          timestamp:         e.timestamp || new Date().toISOString(),
-          chain:             e.category || 'L1_ETH_MAINNET',
-        }));
-
-        setEntries(mapped);
-        setStats({
-          totalBlocks:     raw.stats?.totalMonitored || mapped.length,
-          finalizedPct:    raw.stats?.whaleConcentrationPct || 98.7,
-          avgPayloadMB:    parseFloat((mapped.reduce((s, e) => s + e.payloadMB, 0) / Math.max(mapped.length, 1)).toFixed(3)),
-          observersActive: raw.stats?.activeObservers || 4,
-        });
-      } else {
-        setEntries([]);
-      }
-    } catch {
-      setEntries([]);
-    } finally {
-      setLoading(false);
-      setTimeout(() => setIsSyncing(false), 1500);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-    const iv = setInterval(fetchData, 30_000);
-    return () => clearInterval(iv);
-  }, []);
 
   const filtered = useMemo(() => {
     if (!filter) return entries;
@@ -150,7 +134,7 @@ export default function InstitutionalLedger() {
             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Live Telemetry</span>
           </div>
           <button
-            onClick={fetchData}
+            onClick={() => refetch()}
             className="p-2 rounded-xl border border-[#E5E5E5] hover:bg-white transition-colors text-[#050505]/40 hover:text-[#050505]"
             title="Force sync"
           >

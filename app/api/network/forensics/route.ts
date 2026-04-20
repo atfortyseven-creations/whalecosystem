@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
         const cases = [
             {
-                id: `case-${Math.floor(Math.random() * 9000) + 1000}`,
+                id: `case-eth-${blockNumber}-001`,
                 title: "Anomalous Gas Spike & Contract Deployment",
                 date: new Date().toLocaleDateString(),
                 status: "INVESTIGATING",
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
                 ]
             },
             {
-                id: `case-${Math.floor(Math.random() * 9000) + 1000}`,
+                id: `case-eth-${blockNumber}-002`,
                 title: "Exchange Reserve Drain",
                 date: new Date(Date.now() - 86400000).toLocaleDateString(),
                 status: "CLOSED",

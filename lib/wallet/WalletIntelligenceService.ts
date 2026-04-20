@@ -130,7 +130,7 @@ class WalletIntelligenceService {
    */
   async getFullIntelligence(address: string, forceRefresh = false, deep = false): Promise<WalletIntelligence> {
     if (!address) {
-      return this.getPlaceholderIntelligence(address);
+      return this.getEmptyStateIntelligence(address);
     }
 
     const fetchKey = `${address}:${forceRefresh}:${deep}`;
@@ -161,7 +161,7 @@ class WalletIntelligenceService {
 
     if (!isEVM && !isENS && !isBTC) {
       console.warn(`[INTEL-WARN] Invalid address format: ${address}. Returning placeholder.`);
-      return this.getPlaceholderIntelligence(address);
+      return this.getEmptyStateIntelligence(address);
     }
 
     const addr = address.toLowerCase();
@@ -405,7 +405,7 @@ class WalletIntelligenceService {
           }
       }
 
-      return this.getPlaceholderIntelligence(addr);
+      return this.getEmptyStateIntelligence(addr);
     }
   }
 
@@ -772,7 +772,7 @@ class WalletIntelligenceService {
     return points.reverse();
   }
 
-  private getPlaceholderIntelligence(address: string): WalletIntelligence {
+  private getEmptyStateIntelligence(address: string): WalletIntelligence {
     return {
       address,
       lastUpdated: new Date().toISOString(),

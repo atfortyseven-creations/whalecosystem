@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from '@clerk/nextjs';
+// No Clerk dependency — wallet identity comes from SIWE wagmi
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { 
@@ -32,17 +32,12 @@ const TOKEN_ADDRESSES: Record<number, { USDC: string }> = {
 };
 
 export default function MetaMaskWalletView() {
-    const { user } = useUser();
     const { address: externalAddress } = useAccount();
     const { disconnect } = useDisconnect();
 
-    // internal wallet address from session
-    const rawInternalAddress = (user?.publicMetadata as { walletAddress?: string })?.walletAddress;
-    const internalAddress = rawInternalAddress ? getAddress(rawInternalAddress) : null;
-    
-    // Toggle between internal and external
-    const [useInternal, setUseInternal] = useState(true);
-    const activeAddress = useInternal ? internalAddress : (externalAddress ? getAddress(externalAddress) : null);
+    // SIWE-native: active address is always the connected wagmi wallet
+    const [useInternal, setUseInternal] = useState(false);
+    const activeAddress = externalAddress ? getAddress(externalAddress) : null;
 
     // Real Native Balance (POL/MATIC)
     const { data: nativeBalance, refetch: refetchBalance } = useBalance({ 

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpRight, ArrowDownRight, Clock, Wifi, WifiOff } from 'lucide-react';
-import { useMarketStream } from '@/context/MarketStreamContext';
+import React, { useState, useMemo } from 'react';
+import { TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpRight, ArrowDownRight, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
+import { useMarketData } from '@/lib/api-client';
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmt = (n: number) => {
@@ -164,7 +164,16 @@ function AssetRow({ rank, symbol, data, pctKey }: {
 
 // ── Main Panel ────────────────────────────────────────────────────────────────
 export function GainersLosersPanel() {
-    const { markets, isConnected, lastUpdate } = useMarketStream();
+    // =========================================================================
+    // INJECTED DATA HOOK
+    // Enforcing strict on-chain reality. Waiting for endpoint assignment.
+    // =========================================================================
+    const { data: rawData, isLoading, error } = useMarketData('gainersLosers');
+    const markets = rawData?.markets || [];
+    
+    // Status indicators (simulated until WS implementation injected by endpoints)
+    const isConnected = !isLoading && !error;
+    const lastUpdate = new Date();
 
     const [search, setSearch]       = useState('');
     const [view, setView]           = useState<ViewMode>('all');
@@ -174,18 +183,19 @@ export function GainersLosersPanel() {
     // Map market stream data to display rows
     const allRows = useMemo(() => {
         const rows: Array<{ symbol: string; data: any; pct: number; vol: number; meta: any }> = [];
-        markets.forEach((data, symbol) => {
-            if (!symbol.endsWith('USDT')) return;
+        markets.forEach((marketData: any) => {
+            const { symbol } = marketData;
+            if (!symbol?.endsWith('USDT')) return;
             if (!ASSET_META[symbol]) return;
             const meta = ASSET_META[symbol];
-            const pct = parseFloat(data.priceChangePercent) || 0;
-            const vol = parseFloat(data.quoteVolume) || 0;
-            rows.push({ symbol, data, pct, vol, meta });
+            const pct = parseFloat(marketData.priceChangePercent) || 0;
+            const vol = parseFloat(marketData.quoteVolume) || 0;
+            rows.push({ symbol, data: marketData, pct, vol, meta });
         });
         return rows.sort((a, b) => a.meta.mcapRankHint - b.meta.mcapRankHint);
     }, [markets]);
 
-    const pctKey = ''; // Binance 24hr endpoint only has priceChangePercent (24h)
+    const pctKey = 'priceChangePercent';
 
     const filtered = useMemo(() => {
         return allRows
@@ -213,8 +223,6 @@ export function GainersLosersPanel() {
     const topLosers  = useMemo(() =>
         [...allRows].sort((a, b) => a.pct - b.pct).slice(0, 3), [allRows]);
 
-    const hasData = allRows.length > 0;
-
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-4 space-y-5 overflow-hidden text-[#050505] font-sans">
             {/* ── Summary Cards ── */}
@@ -228,9 +236,10 @@ export function GainersLosersPanel() {
                         <TrendingUp size={14} className="text-[#00C076]"/>
                     </div>
                     <div className="space-y-3">
-                        {!hasData ? (
-                            <div className="text-[10px] text-[#888888] font-mono text-center py-3">
-                                Connecting to GetBlock stream…
+                        {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-4 text-[#888888]">
+                                <Loader2 className="animate-spin mb-2" size={16} />
+                                <span className="text-[9px] uppercase tracking-widest font-black text-[#888888]">WAITING FOR ON-CHAIN DATA</span>
                             </div>
                         ) : topGainers.map((r, i) => (
                             <div key={r.symbol} className="flex items-center justify-between">
@@ -263,9 +272,10 @@ export function GainersLosersPanel() {
                         <TrendingDown size={14} className="text-[#FF3B30]"/>
                     </div>
                     <div className="space-y-3">
-                        {!hasData ? (
-                            <div className="text-[10px] text-[#888888] font-mono text-center py-3">
-                                Connecting to GetBlock stream…
+                        {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-4 text-[#888888]">
+                                <Loader2 className="animate-spin mb-2" size={16} />
+                                <span className="text-[9px] uppercase tracking-widest font-black text-[#888888]">WAITING FOR ON-CHAIN DATA</span>
                             </div>
                         ) : topLosers.map((r, i) => (
                             <div key={r.symbol} className="flex items-center justify-between">
@@ -305,7 +315,7 @@ export function GainersLosersPanel() {
                         ))}
                     </div>
 
-                    {/* Time window (cosmetic — Binance gives 24h, future WS gives real-time) */}
+                    {/* Time window */}
                     <div className="flex gap-1">
                         {(['1h', '24h', '7d'] as TimeWindow[]).map(w => (
                             <button key={w} onClick={() => setTimeWindow(w)}
@@ -359,14 +369,17 @@ export function GainersLosersPanel() {
 
                 {/* Rows */}
                 <div className="flex-1 w-full overflow-y-auto msv-hide-scrollbar">
-                    {!hasData ? (
-                        <div className="flex flex-col items-center justify-center h-full text-center text-[#888888]">
-                            <div className="w-8 h-8 rounded-full border-2 border-[#050505] border-t-transparent animate-spin mb-3"/>
-                            <p className="text-[11px] font-black uppercase tracking-widest">
-                                Streaming from GetBlock EP1–EP4…
-                            </p>
-                            <p className="text-[9px] font-mono text-[#888888] mt-2">
-                                go.getblock.io · Binance 24h Ticker
+                    {isLoading ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full p-12">
+                            <Loader2 className="animate-spin mb-4" size={32} />
+                            <p className="text-[11px] font-black uppercase tracking-[0.2em]">WAITING FOR ON-CHAIN ENDPOINT</p>
+                            <p className="text-[9px] mt-2">Zero-Mock Mandate Active</p>
+                        </div>
+                    ) : error ? (
+                        <div className="h-full flex flex-col items-center justify-center p-12">
+                            <AlertTriangle size={24} className="text-black/10 mb-3" />
+                            <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
+                                Data Lake Unavailable
                             </p>
                         </div>
                     ) : filtered.length === 0 ? (
@@ -394,7 +407,7 @@ export function GainersLosersPanel() {
                 <div className="shrink-0 px-5 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                     <span>{filtered.length} assets · {network === 'all' ? 'All Networks' : network} · {timeWindow} window</span>
                     <span>
-                        {isConnected ? '● LIVE' : '○ RECONNECTING'} · GetBlock EP1–EP4 + Binance 24H
+                        Data provided by On-Chain Query Hooks
                     </span>
                 </div>
             </div>

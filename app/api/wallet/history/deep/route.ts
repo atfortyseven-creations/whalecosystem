@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     // Find the internal user ID associated with this wallet address
     // If none exists, we might need to create a shadow record or use the address as ID
     const user = await prisma.user.findUnique({ where: { walletAddress: address } });
-    const authUserId = user?.clerkId || `shadow_${address}`;
+    const authUserId = user?.id || `shadow_${address}`;
 
     // CHECK SYNC STATUS
     // Logic: If no transactions in DB for this user, trigger full sync
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
         ...tx,
         gasUsed: tx.gasUsed?.toString() || null,
         blockNumber: tx.blockNumber?.toString() || null,
-        value: tx.value.toString(),
+        value: (tx.value || '0').toString(),
     }));
 
     // 🔥 [LEGENDARY AUTOMATIC RECOVERY]: If DB is empty, trigger the blockchain fallback anyway

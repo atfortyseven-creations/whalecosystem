@@ -43,9 +43,9 @@ export function BlocksTreemapView() {
     const processedBlocks = useMemo(() => {
         if (!rawData) return [];
         
-        // 1. Only use real transactions
-        const realTxs: ProcessedTransaction[] = (rawData.recentTxs || []).map((tx: any) => ({
-            hash: tx.txid || tx.hash || `TX_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        // 1. Only use real transactions (Filter out any payloads missing a true on-chain hash)
+        const realTxs: ProcessedTransaction[] = (rawData.recentTxs || []).filter((tx: any) => tx.txid || tx.hash).map((tx: any) => ({
+            hash: tx.txid || tx.hash,
             type: tx.inputs?.length > 10 ? 'consolidation' as const : (tx.vout?.length > 5 ? 'coinjoin' as const : 'normal' as const),
             amount: (tx.value || 0) / 100000000,
             feeRate: tx.fee / tx.vsize || 0,

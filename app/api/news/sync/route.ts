@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
         // Map and prepare for processing
         const rawItems = allArticles.map((item: any) => ({
-            id: item.id?.toString() || Math.random().toString(36).substring(7),
+            id: item.id?.toString() || Buffer.from(item.link || item.title || Date.now().toString()).toString('hex').substring(0, 16),
             title: item.title || 'Untitled Update',
             summary: item.description || item.title || 'No summary available',
             url: item.link || '#',

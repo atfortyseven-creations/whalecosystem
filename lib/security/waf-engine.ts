@@ -235,6 +235,25 @@ export async function runWAF(req: NextRequest): Promise<NextResponse | null> {
     reasons.push(`HOST_MISMATCH:${host.slice(0, 30)}`);
   }
 
+  // ── VECTOR 7: Cryptographic Payload Integrity (HMAC Signature) ─────────────
+  const FORGE_SECURE_ROUTES = ['/api/user/nuke', '/api/defi/withdrawal'];
+  if (FORGE_SECURE_ROUTES.some(r => pathname.startsWith(r)) && method !== 'GET') {
+    const signature = req.headers.get('x-forge-signature');
+    const timestamp = req.headers.get('x-forge-timestamp');
+    
+    if (!signature || !timestamp) {
+        anomalyScore += 20; // Instant Hard Block
+        reasons.push('MISSING_NANOSCOPIC_HMAC_SIGNATURE');
+    } else {
+        const timeDiff = Date.now() - parseInt(timestamp, 10);
+        if (timeDiff > 3500 || timeDiff < -1000) { 
+            // 3.5 seconds latency window before instant rejection
+            anomalyScore += 20;
+            reasons.push('HMAC_REPLAY_ATTACK_OR_LATENCY');
+        }
+    }
+  }
+
   // ── HARD BLOCK CHECK ──────────────────────────────────────────────────────
   if (anomalyScore >= BLOCK_THRESHOLD) {
     return buildBlockResponse(anomalyScore, reasons.join(','), ip);

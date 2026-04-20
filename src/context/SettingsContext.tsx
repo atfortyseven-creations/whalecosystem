@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAccount } from 'wagmi';
 import { dictionary } from '@/src/lib/dictionary';
 import { toast } from 'sonner';
 import { 
@@ -162,11 +162,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const setUiConfig = (c: Partial<UiConfig>) => setUiState(prev => ({ ...prev, ...c }));
 
 
-    // --- CLERK AUTH ---
-    const { user } = useUser();
-    // derived state for dependencies
-    const userId = user?.id;
-    const userEmail = user?.primaryEmailAddress?.emailAddress;
+    // --- SOVEREIGN SIWE AUTH --- 
+    const { address } = useAccount();
+    // The sovereign user identity is the wallet address
+    const userId = address || null;
+    const userEmail = null; // Email is not available in SIWE-only flow
     const [version, setVersion] = useState<number>(1);
 
     // --- SYNC STATES ---

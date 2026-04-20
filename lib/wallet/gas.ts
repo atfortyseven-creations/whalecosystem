@@ -286,7 +286,7 @@ export async function getGasPriceHistory(
     const baseGwei = Number(currentBaseFee) / 1e9;
     return Array.from({ length: 24 }, (_, i) => ({
       timestamp: now - (23 - i) * (hours * 3600000 / 23),
-      gasPrice: baseGwei * (0.9 + Math.random() * 0.2), // Tiny variance for UI feel if RPC fails
+      gasPrice: baseGwei * 0.95, // Deterministic slight reduction rather than Math.random() variance
     }));
   }
 }

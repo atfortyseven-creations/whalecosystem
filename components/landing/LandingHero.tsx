@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Shield, Zap, Sparkles, CheckCircle2, Lock } from 'lucide-react';
-import { SignIn, useUser } from '@clerk/nextjs';
+import { useAccount } from 'wagmi';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +15,9 @@ interface LandingHeroProps {
 
 export function LandingHero({ onStart }: LandingHeroProps) {
     const { t } = useLanguage();
-    const { isSignedIn, isLoaded, user } = useUser();
+    const { isConnected, address, status } = useAccount();
+    const isSignedIn = isConnected;
+    const isLoaded = status !== 'connecting' && status !== 'reconnecting';
     const router = useRouter();
     const searchParams = useSearchParams();
     const [loginSuccess, setLoginSuccess] = useState(false);
@@ -132,7 +134,7 @@ export function LandingHero({ onStart }: LandingHeroProps) {
                                 </div>
                                 <div className="mb-4">
                                     <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">{t.landing.hero.accessGranted}</h3>
-                                    <p className="text-white/40 font-medium">Welcome back, {user?.firstName || 'Sovereign Whale'}.<br/>All systems online.</p>
+                                    <p className="text-white/40 font-medium">Welcome back, {address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Sovereign Whale'}.<br/>All systems online.</p>
                                 </div>
                                 <div className="w-full flex justify-center pb-2">
                                      <button 

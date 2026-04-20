@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Search, Banknote, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import { useSendTransaction, useSwitchChain, useChainId } from 'wagmi';
@@ -9,6 +9,7 @@ import { polymarketRouterService } from '@/lib/blockchain/PolymarketRouterServic
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useMarketData } from '@/lib/api-client';
 
 interface PolyMarket {
     id: string; slug: string; question: string; category: string;
@@ -48,50 +49,35 @@ function Skeleton({ count = 6 }) {
 }
 
 export default function PolymarketPanel() {
-    const [markets, setMarkets] = useState<PolyMarket[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [geoBlocked, setGeoBlocked] = useState(false);
+    // =========================================================================
+    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // Polymarket endpoint injected via REGISTRY.MARKET_DATA.polymarket
+    // =========================================================================
+    const { data: rawData, isLoading: loading, error, refetch } = useMarketData('polymarket');
+    const markets: PolyMarket[] = rawData?.markets || [];
+    const geoBlocked = rawData?.geoBlocked === true;
+    const ts = rawData ? new Date().toLocaleTimeString() : '';
+
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('all');
-    const [ts, setTs] = useState('');
     const [selected, setSelected] = useState<PolyMarket | null>(null);
     const [tradeAmount, setTradeAmount] = useState('100');
     const [isExecuting, setIsExecuting] = useState<'YES' | 'NO' | null>(null);
-
     const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    useEffect(() => { setMounted(true); }, []);
 
     const { isConnected, address } = useAccount();
     const chainId = useChainId();
     const { switchChain, switchChainAsync } = useSwitchChain();
     const { sendTransactionAsync } = useSendTransaction();
     const { usdcBalance } = useLivePortfolio();
-    
+
     const isPolygon = chainId === 137;
 
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            const r = await fetch(`/api/polymarket/markets?category=${category}&limit=50&t=${Date.now()}`);
-            if (r.status === 403) {
-                setGeoBlocked(true);
-                return;
-            }
-            const d = await r.json();
-            if (d.markets) setMarkets(d.markets);
-            setTs(new Date().toLocaleTimeString());
-            setGeoBlocked(false);
-        } catch (e) { console.error("Error loading Polymarket:", e); }
-        finally { setLoading(false); }
-    }, [category]);
-
-    useEffect(() => { load(); }, [load]);
-    useEffect(() => { const i = setInterval(load, 30000); return () => clearInterval(i); }, [load]);
-
-    const filtered = markets.filter(m => m.question.toLowerCase().includes(search.toLowerCase()));
+    const filtered = markets
+        .filter(m => category === 'all' || m.category?.toLowerCase() === category)
+        .filter(m => m.question.toLowerCase().includes(search.toLowerCase()));
 
     const handleTrade = async (direction: 'YES' | 'NO') => {
         if (!isConnected) {
@@ -190,7 +176,7 @@ export default function PolymarketPanel() {
                         </button>
                     ))}
                 </div>
-                <button onClick={load} className="ml-auto text-[#888888] hover:text-[#111111] flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border border-[#E5E5E5] rounded-xl px-4 py-3 bg-[#FFFFFF] shadow-sm hover:border-[#111111]/20 transition-all">
+                <button onClick={() => refetch()} className="ml-auto text-[#888888] hover:text-[#111111] flex items-center gap-2 text-[10px] font-black uppercase tracking-widest border border-[#E5E5E5] rounded-xl px-4 py-3 bg-[#FFFFFF] shadow-sm hover:border-[#111111]/20 transition-all">
                     <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> SYNC
                 </button>
             </div>

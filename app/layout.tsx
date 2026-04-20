@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/nextjs'
+// Sovereign layout — No Clerk provider needed (SIWE-native auth)
 import { headers } from 'next/headers'
 import { Inter, Martel, Roboto_Mono } from 'next/font/google'
 import './globals.css'
@@ -21,6 +21,7 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
+import { AntiTamperCore } from "@/components/security/AntiTamperCore";
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -174,50 +175,49 @@ export default async function RootLayout({
   };
 
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-        <head>
-          {/* Proper viewport already handled by Next.js `viewport` export above */}
-          <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          {/* Prevent iOS Safari from auto-detecting phone numbers as links */}
-          <meta name="format-detection" content="telephone=no" />
-          <meta name="mobile-web-app-capable" content="yes" />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-        </head>
-        <body 
-          className="bg-[#FAF9F6] text-[#050505] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300" 
-          suppressHydrationWarning
-        >
-          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
-            Skip to absolute content
-          </a>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-            <ScrollProgressBar />
-            {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
-            <WavePatternOverlay />
-            <Providers cookies={cookies}>
-              <GlobalErrorBoundary>
-                <MobileEnforcer>
-                  <ClientLayout>
-                    <CookieProvider>
-                      <ErrorSuppressor />
-                      <GoogleTagManager gtmId="GTM-52B9SCRM" />
-                      {children}
-                      <Toaster richColors position="top-right" />
-                      <CookieConsent />
-                      <ClientOverlays />
-                    </CookieProvider>
-                  </ClientLayout>
-                </MobileEnforcer>
-              </GlobalErrorBoundary>
-            </Providers>
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+      <head>
+        {/* Proper viewport already handled by Next.js `viewport` export above */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Prevent iOS Safari from auto-detecting phone numbers as links */}
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body
+        className="bg-[#FAF9F6] text-[#050505] antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300"
+        suppressHydrationWarning
+      >
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-black text-white px-4 py-2 rounded-lg font-bold text-sm">
+          Skip to absolute content
+        </a>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <ScrollProgressBar />
+          {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
+          <WavePatternOverlay />
+          <Providers cookies={cookies}>
+            <GlobalErrorBoundary>
+              <MobileEnforcer>
+                <ClientLayout>
+                  <CookieProvider>
+                    <ErrorSuppressor />
+                    <GoogleTagManager gtmId="GTM-52B9SCRM" />
+                    <AntiTamperCore />
+                    {children}
+                    <Toaster richColors position="top-right" />
+                    <CookieConsent />
+                    <ClientOverlays />
+                  </CookieProvider>
+                </ClientLayout>
+              </MobileEnforcer>
+            </GlobalErrorBoundary>
+          </Providers>
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }

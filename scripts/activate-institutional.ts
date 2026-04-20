@@ -1,4 +1,4 @@
-import { PrismaClient, PlanTier } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -24,13 +24,13 @@ async function main() {
   const subscription = await prisma.subscription.upsert({
     where: { userId: user.walletAddress },
     update: {
-      tier: PlanTier.Elite,
+      tier: 'Elite',
       status: 'ACTIVE',
       updatedAt: new Date()
     },
     create: {
       userId: user.walletAddress,
-      tier: PlanTier.Elite,
+      tier: 'Elite',
       status: 'ACTIVE'
     }
   });

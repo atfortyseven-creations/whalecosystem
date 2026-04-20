@@ -92,12 +92,12 @@ export async function PUT(request: NextRequest) {
 
     // Validate incoming data
     const validation = validatePartialSettings(data);
-    const { clerkClient } = await import('@clerk/nextjs/server');
-    const user = await (await clerkClient()).users.getUser(userId).catch(() => null);
-    const isOwner = OWNER_EMAILS.includes(user?.primaryEmailAddress?.emailAddress || '');
+    // Native owner check: look up email directly from AuthUser by walletAddress
+    const ownerCheck = await prisma.authUser.findFirst({ where: { walletAddress: userId } });
+    const isOwner = OWNER_EMAILS.includes(ownerCheck?.email || '');
 
     if (!validation.success) {
-      console.error(`[SETTINGS-VALIDATION-ERROR] User: ${userId} (${user?.primaryEmailAddress?.emailAddress})`, validation.errors?.issues);
+      console.error(`[SETTINGS-VALIDATION-ERROR] User: ${userId}`, validation.errors?.issues);
       
       // Architect Bypass: Log error but don't block
       if (!isOwner) {
@@ -213,9 +213,9 @@ export async function PATCH(request: NextRequest) {
 
     data = await request.json();
     const validation = validatePartialSettings(data);
-    const { clerkClient } = await import('@clerk/nextjs/server');
-    const user = await (await clerkClient()).users.getUser(userId).catch(() => null);
-    const isOwner = OWNER_EMAILS.includes(user?.primaryEmailAddress?.emailAddress || '');
+    // Native owner check: look up email directly from AuthUser by walletAddress
+    const ownerCheck = await prisma.authUser.findFirst({ where: { walletAddress: userId } });
+    const isOwner = OWNER_EMAILS.includes(ownerCheck?.email || '');
 
     if (!validation.success) {
       console.error(`[SETTINGS-PATCH-VALIDATION] User: ${userId}`, validation.errors?.issues);

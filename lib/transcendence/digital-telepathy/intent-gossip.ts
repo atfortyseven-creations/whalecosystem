@@ -20,30 +20,9 @@ export const useDigitalTelepathy = () => {
      * @param desire - The high-level outcome the user wants.
      */
     const broadcastDesire = async (desire: string, constraints: any) => {
-        console.log("🔮 Digital Telepathy: Broadcasting Desire...", desire);
+        console.log("🔮 Digital Telepathy: Awaiting Anoma Solver Swarm Integration...");
 
-        const intent: Intent = {
-            id: ethers.hexlify(ethers.randomBytes(32)),
-            desire,
-            constraints,
-            signature: "0xSignedByMind" // Placeholder
-        };
-
-        // 1. Gossip the intent to the Solver Swarm (Anoma P2P)
-        // network.gossip(intent);
-        
-        await new Promise(r => setTimeout(r, 800)); // Propagation delay
-
-        console.log("✨ A Solver has accepted your desire.");
-        
-        // 2. The Solver executes the necessary complex transactions.
-        // The user just sees the result.
-        
-        return {
-            status: "FULFILLED",
-            solverAddress: "0xSolver001",
-            executionHash: "0xTxHash..."
-        };
+        throw new Error('AWAITING_GETBLOCK_RPC: The intent mechanism currently lacks connection to the live solver swarm. Synthetic intent execution is disabled.');
     };
 
     return { broadcastDesire };

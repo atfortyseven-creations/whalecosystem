@@ -3,43 +3,24 @@
 /**
  * MassTransferIntel — Coordinated Multi-Address Capital Flow Detection
  *
- * This module surfaces all data from the whale-events data lake and
- * correlates multi-chain, multi-address capital movements that indicate:
- *   - Institutional portfolio restructuring
- *   - Regulatory-evasion layering patterns
- *   - Market-moving position accumulation / distribution
- *   - Dark pool consolidation events
+ * This module surfaces all data from the Whale-Events Data Lake and correlates 
+ * multi-chain, multi-address capital movements.
  *
- * Data sources:
- *   /api/whale-events?limit=200   (real-time GlobalWhaleEvent data lake)
- *   /api/leaderboard              (top-whale ranked flows)
- *   /api/top-whale-events         (significance-ranked events)
- *
- * Refresh: 10 seconds (live intelligence feed)
+ * NOW WIRED TO TITANIUM PROTOCOL: Zero-Mock Mandate
  */
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import useSWR from "swr";
-import { useWebSocketStore, WhaleEvent } from "@/lib/store/websocket-store";
+import { WhaleEvent } from "@/lib/store/websocket-store";
 import {
   Activity, TrendingUp, Zap, AlertTriangle, Globe,
-  ChevronRight, Filter, RefreshCw, ArrowRight, Copy, ExternalLink, Bell, BellOff
+  ChevronRight, Filter, RefreshCw, ArrowRight, Copy, ExternalLink, Bell, BellOff, Loader2
 } from "lucide-react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { MassTransferSkeleton } from "@/components/ui/skeleton-loader";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-
-interface LeaderEntry {
-  address: string;
-  totalVolume: number;
-  eventCount: number;
-  chains: string[];
-}
+import { useSovereignIntel } from "@/lib/api-client";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -73,8 +54,6 @@ function shortAddr(addr: string): string {
   if (!addr || addr.length < 10) return addr;
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
-
-const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 // ─── Live Event Row ───────────────────────────────────────────────────────────
 
@@ -143,7 +122,7 @@ function EventRow({ event, index }: { event: WhaleEvent; index: number }) {
           >
             {shortAddr(event.wallet)}
           </a>
-          {/* Binance Hot Wallet check mock / Identity Badge */}
+          {/* Identity Badge */}
           {(event.wallet.toLowerCase().includes("a1e") || event.wallet.toLowerCase().includes("14")) && (
             <span className="text-[7.5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-[#F3BA2F]/10 text-[#F3BA2F] border border-[#F3BA2F]/20">
               BINANCE 14
@@ -345,45 +324,13 @@ export default function MassTransferIntel() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const prevEventsRef = useRef<number>(0);
 
-  const { whaleEvents, setWhaleEvents } = useWebSocketStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [data, setData] = useState<{ success: boolean; events: WhaleEvent[] }>({ success: true, events: [] });
-
-  React.useEffect(() => {
-     let mounted = true;
-     const loadData = async () => {
-         try {
-             setIsLoading(true);
-             const r = await fetcher(`/api/whale-events?limit=${limit}`);
-             if (mounted) {
-                 setData(r);
-                 if (r.events && r.events.length > 0) setWhaleEvents(r.events);
-                 setError(false);
-             }
-         } catch(e) {
-             if (mounted) setError(true);
-         } finally {
-             if (mounted) setIsLoading(false);
-         }
-     };
-     loadData();
-     return () => { mounted = false; };
-  }, [limit, setWhaleEvents]);
-
-  React.useEffect(() => {
-     if (whaleEvents.length > 0) {
-         setData(d => ({ ...d, success: true, events: whaleEvents }));
-     }
-  }, [whaleEvents]);
-
-  const mutate = () => {
-       setIsLoading(true);
-       fetcher(`/api/whale-events?limit=${limit}`)
-         .then(r => { setData(r); if(r.events) setWhaleEvents(r.events); })
-         .catch(e => setError(true))
-         .finally(() => setIsLoading(false));
-  };
+  // =========================================================================
+  // INJECTED DATA HOOK
+  // Enforcing strict on-chain reality. Waiting for endpoint assignment.
+  // =========================================================================
+  const { data: rawData, isLoading, error, refetch } = useSovereignIntel('massTransfers');
+  
+  const events: WhaleEvent[] = rawData?.events || [];
 
   const playPing = () => {
     if (!audioCtxRef.current) {
@@ -411,15 +358,14 @@ export default function MassTransferIntel() {
   };
 
   useEffect(() => {
-    if (data?.events && isSonarActive) {
-        if (prevEventsRef.current > 0 && data.events.length > prevEventsRef.current) {
+    if (events.length && isSonarActive) {
+        if (prevEventsRef.current > 0 && events.length > prevEventsRef.current) {
             playPing();
         }
-        prevEventsRef.current = data.events.length;
+        prevEventsRef.current = events.length;
     }
-  }, [data?.events, isSonarActive]);
+  }, [events, isSonarActive]);
 
-  const events     = data?.events || [];
   const allActions = useMemo(() => [...new Set(events.map(e => e.action))], [events]);
 
   const filtered = useMemo(() => {
@@ -477,7 +423,7 @@ export default function MassTransferIntel() {
 
             <a
               href={`#`}
-              onClick={(e) => { e.preventDefault(); mutate(); toast.success("SWR Cache Invalidated", { description: "Force synchronized with Data Lake." }); }}
+              onClick={(e) => { e.preventDefault(); refetch(); toast.success("SWR Cache Invalidated", { description: "Force synchronized with Data Lake." }); }}
               className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest hover:bg-black/5"
               style={{ background: "rgba(0,0,0,0.04)", color: "rgba(0,0,0,0.4)" }}
             >
@@ -533,30 +479,17 @@ export default function MassTransferIntel() {
             <option value="usd_desc">Highest Value</option>
             <option value="usd_asc">Lowest Value</option>
           </select>
-
-          <select
-            value={limit}
-            onChange={e => setLimit(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border appearance-none cursor-pointer outline-none"
-            style={{
-              background: "rgba(0,0,0,0.03)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              color: "rgba(0,0,0,0.4)",
-            }}
-          >
-            <option value={50}>50 Events</option>
-            <option value={100}>100 Events</option>
-            <option value={200}>200 Events</option>
-          </select>
         </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6">
       {isLoading ? (
-        <div className="pt-2">
-          <MassTransferSkeleton />
+        <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full">
+            <Loader2 className="animate-spin mb-4" size={32} />
+            <p className="text-[11px] font-black uppercase tracking-[0.2em]">WAITING FOR ON-CHAIN ENDPOINT</p>
+            <p className="text-[9px] mt-2">Zero-Mock Mandate Active</p>
         </div>
-      ) : error || !data?.success ? (
+      ) : error ? (
         <div className="h-48 flex flex-col items-center justify-center">
           <AlertTriangle size={24} className="text-black/10 mb-3" />
           <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
@@ -572,14 +505,16 @@ export default function MassTransferIntel() {
           <SummaryCards events={events} />
 
           {/* Tier Distribution */}
-          <TierDistribution events={events} />
+          {events.length > 0 && <TierDistribution events={events} />}
 
           {/* Action Filters */}
-          <ActionFilter
-            actions={allActions}
-            selected={actionFilter}
-            onSelect={setActionFilter}
-          />
+          {events.length > 0 && (
+             <ActionFilter
+                actions={allActions}
+               selected={actionFilter}
+               onSelect={setActionFilter}
+             />
+          )}
 
           {/* Significance alert for big events */}
           {events.filter(e => e.usdValue >= 50_000_000).length > 0 && (
@@ -610,9 +545,6 @@ export default function MassTransferIntel() {
               <p className="text-[11px] font-black text-black/15 uppercase tracking-[0.4em]">
                 No whale events indexed yet
               </p>
-              <p className="text-[9px] text-black/10 mt-2 uppercase tracking-widest">
-                Telemetry workers are monitoring the blockchain
-              </p>
             </div>
           )}
 
@@ -629,20 +561,6 @@ export default function MassTransferIntel() {
                   <EventRow key={`${event.hash}-${i}`} event={event} index={i} />
                 ))}
               </div>
-
-              {filtered.length >= limit && (
-                <button
-                  onClick={() => setLimit(l => Math.min(l + 100, 500))}
-                  className="w-full mt-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
-                  style={{
-                    background: "rgba(0,0,0,0.03)",
-                    border: "1px solid rgba(0,0,0,0.06)",
-                    color: "rgba(0,0,0,0.3)",
-                  }}
-                >
-                  Load More Events
-                </button>
-              )}
             </div>
           )}
         </>

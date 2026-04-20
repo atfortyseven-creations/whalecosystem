@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 
 /**
  * Deadman's Switch Daily Heartbeat Check
@@ -22,8 +23,8 @@ export async function GET(req: Request) {
   const now = Math.floor(Date.now() / 1000);
 
   try {
-    // Read contract state via public RPC (no wallet needed — pure read)
-    const RPC_URL = process.env.POLYGON_AMOY_RPC || 'https://rpc-amoy.polygon.technology';
+    // Read contract state using Sovereign Cluster Round-Robin
+    const RPC_URL = RpcRelayerManager.getRpcUrl('POLYGON', 'RPC') || 'https://rpc-amoy.polygon.technology';
 
     const response = await fetch(RPC_URL, {
       method: 'POST',
@@ -42,6 +43,11 @@ export async function GET(req: Request) {
         id: 1
       })
     });
+
+    if (response.status === 429 || response.status === 500) {
+      RpcRelayerManager.reportFailure('POLYGON', 'RPC', RPC_URL);
+      console.warn(`[Cron:HeartbeatCheck] RPC ${RPC_URL} rate-limited/down.`);
+    }
 
     const rpcData = await response.json();
     
@@ -68,11 +74,13 @@ export async function GET(req: Request) {
 
     // Audit the check to the database
     if (prisma) {
-      await prisma.auditLog.create({
+      await (prisma as any).auditLog.create({
         data: {
+          userId: null,
           action: 'DEADMAN_HEARTBEAT_CHECK',
-          address: CONTRACT_ADDRESS ?? 'unknown',
-          metadata: { daysLeft, expiresAt, triggered, paused, checkedAt: new Date().toISOString() }
+          resource: CONTRACT_ADDRESS ?? 'unknown',
+          metadata: { daysLeft, expiresAt, triggered, paused, checkedAt: new Date().toISOString() },
+          timestamp: new Date(),
         }
       }).catch(() => {}); // non-blocking
     }

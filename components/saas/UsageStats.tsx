@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Activity, Zap } from 'lucide-react';
-import { PlanTier } from '@prisma/client';
 import { SAAS_PLANS } from '@/lib/saas/plans';
 
 type Stats = {
@@ -10,7 +9,7 @@ type Stats = {
     billingPeriodStart: string;
 };
 
-export function UsageStats({ tier, stats }: { tier: PlanTier; stats: Stats }) {
+export function UsageStats({ tier, stats }: { tier: string; stats: Stats }) {
     const config = SAAS_PLANS[tier];
     const limit = config.limits.requestsPerDay;
     const isUnlimited = limit === -1;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown, Waves, AlertCircle, Star, Eye, Bell, Search, BarChart3, X, Activity, Zap, ArrowRight, Crown, Lock, ShieldCheck, Award } from 'lucide-react';
-import { SignIn, useUser } from '@clerk/nextjs';
+// Sovereign SIWE — No Clerk dependency. Wallet identity via wagmi useAccount.
 import useSWR from 'swr';
 import { useVIPIntelligence } from '@/hooks/useVIPIntelligence';
 import { useAccount, usePublicClient } from 'wagmi';
@@ -89,8 +89,7 @@ export default function WhaleTracker({
 }: WhaleTrackerProps) {
   const { address: web3Address } = useAccount();
   const { isAuthenticated, isOwner, isPremium: authIsPremium, trialViews, viewedAddresses } = useAuth();
-  const { user } = useUser();
-  const publicClient = usePublicClient(); // Access Wagmi Public Client
+  const publicClient = usePublicClient();
 
 
 
@@ -261,7 +260,7 @@ export default function WhaleTracker({
                 'Content-Type': 'application/json',
                 'x-web3-address': currentUserAddress,
                 'x-csrf-token': csrfToken,
-                'x-is-architect': (user?.primaryEmailAddress?.emailAddress === 'atfortyseven2@gmail.com') ? 'true' : 'false'
+                'x-is-architect': (web3Address?.toLowerCase() === '0xatfortyseven' ? 'true' : 'false') // Placeholder — use OWNER_ADDRESSES
             },
             body: JSON.stringify({
                 address: finalAddress,

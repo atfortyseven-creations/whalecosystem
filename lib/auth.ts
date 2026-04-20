@@ -27,7 +27,8 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 
 export function generateVerificationCode(): string {
   // Secure 6-digit numeric pin
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const { randomInt } = require('crypto');
+  return randomInt(100000, 1000000).toString();
 }
 
 /**

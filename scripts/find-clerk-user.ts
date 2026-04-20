@@ -1,28 +1,10 @@
-import { clerkClient } from '@clerk/nextjs/server';
-import dotenv from 'dotenv';
-dotenv.config();
+/**
+ * [DEPRECATED] This file has been replaced by find-user.ts
+ * which uses native Prisma lookups instead of Clerk.
+ * 
+ * To look up a user, run:
+ *   SEARCH_TERM=0xYourWallet npx ts-node scripts/find-user.ts
+ */
 
-async function findUserByEmail() {
-  const email = 'reymndbrn15@gmail.com';
-  console.log(`Searching for user: ${email}`);
-
-  try {
-    const client = await clerkClient();
-    const response = await client.users.getUserList({ emailAddress: [email] });
-    
-    if (response.data.length > 0) {
-      const user = response.data[0];
-      console.log('User found in Clerk:');
-      console.log(`ID: ${user.id}`);
-      console.log(`Name: ${user.firstName} ${user.lastName}`);
-      console.log(`Primary Email: ${user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress}`);
-      console.log('Public Metadata:', user.publicMetadata);
-    } else {
-      console.log('User not found in Clerk.');
-    }
-  } catch (error) {
-    console.error('Error searching Clerk:', error);
-  }
-}
-
-findUserByEmail();
+// This file is intentionally empty — see find-user.ts
+export {};

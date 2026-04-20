@@ -35,10 +35,9 @@ export function GlobalSettingsModal() {
         try { sessionStorage.setItem('__disconnected__', '1'); } catch {}
         try { disconnect(); } catch {}
 
-        // Clear ALL localStorage keys related to auth
+        // Clear minimal auth cookies/status, allowing Wagmi to manage its own store smoothly
         const AUTH_KEYS_TO_REMOVE = [
-            'wagmi.store', 'wagmi.cache', 'WCM_VERSION',
-            '__WC_MODAL_WEB3MODAL__', 'nextauth.message', 'hasReadDocs',
+            'nextauth.message', 'hasReadDocs'
         ];
         try { AUTH_KEYS_TO_REMOVE.forEach(k => { try { localStorage.removeItem(k); } catch {} }); } catch {}
 

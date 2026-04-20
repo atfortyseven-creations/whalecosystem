@@ -3,15 +3,14 @@
 /**
  * TopWhaleEvents24h
  *
- * Panel frontend que consume el endpoint /api/top-whale-events
- * el cual sirve datos del índice Redis pre-computado por el Aggregation Service.
- *
- * Actualización automática cada 30 segundos sin dependencias externas.
+ * Consumes the Sovereign Intel pipeline via the centralized api-client.
+ * Zero-Mock Mandate: no internal fetch loops or static data.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, ExternalLink, Zap, RefreshCw } from 'lucide-react';
+import { TrendingUp, ExternalLink, Zap, Loader2 } from 'lucide-react';
+import { useSovereignIntel } from '@/lib/api-client';
 
 interface WhaleEvent {
     id: string;
@@ -69,8 +68,13 @@ function fmtTime(ts: string): string {
 }
 
 export function TopWhaleEvents24h() {
-    const { data, isLoading, error } = useTopWhaleEvents();
-    const events = data?.data ?? [];
+    // =========================================================================
+    // INJECTED DATA HOOK — Zero-Mock Mandate
+    // Whale events endpoint injected via REGISTRY.SOVEREIGN_INTEL.eventLedger
+    // =========================================================================
+    const { data: rawData, isLoading, error } = useSovereignIntel('eventLedger');
+    const events: WhaleEvent[] = rawData?.data ?? [];
+    const updatedAt: string | undefined = rawData?.updatedAt;
 
     return (
         <div className="flex flex-col h-full bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] overflow-hidden shadow-sm">
@@ -88,19 +92,24 @@ export function TopWhaleEvents24h() {
                 <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
                     <span className="text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        {isLoading ? 'Loading...' : `${events.length} events`}
+                        {isLoading ? 'Awaiting endpoint...' : `${events.length} events`}
                     </span>
                 </div>
             </div>
 
             {/* List */}
             <div className="flex-1 overflow-auto divide-y divide-[#F0F0F0]">
-                {error ? (
+                {isLoading ? (
+                    <div className="p-16 text-center flex flex-col items-center gap-3 text-[#888888]">
+                        <Loader2 size={28} className="animate-spin opacity-40" />
+                        <p className="text-[10px] font-black uppercase tracking-widest">Waiting for on-chain endpoint</p>
+                    </div>
+                ) : error ? (
                     <div className="p-16 text-center text-[#FF3B30]">
                         <Zap size={28} className="mx-auto mb-3 opacity-40" />
                         <p className="text-[10px] font-black uppercase tracking-widest">Stream unavailable</p>
                     </div>
-                ) : events.length === 0 && !isLoading ? (
+                ) : events.length === 0 ? (
                     <div className="p-16 text-center text-[#888888]">
                         <TrendingUp size={28} className="mx-auto mb-3 opacity-20" />
                         <p className="text-[10px] font-black uppercase tracking-widest">No major whale events in the last 24h</p>
@@ -156,9 +165,9 @@ export function TopWhaleEvents24h() {
 
             {/* Footer */}
             <div className="px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] text-[9px] font-black text-[#888888] uppercase tracking-widest flex justify-between">
-                <span>Indexed from 1TB Railway PostgreSQL</span>
-                {data?.updatedAt && (
-                    <span>Updated {fmtTime(data.updatedAt)}</span>
+                <span>Sovereign Intel — Event Ledger</span>
+                {updatedAt && (
+                    <span>Updated {fmtTime(updatedAt)}</span>
                 )}
             </div>
         </div>

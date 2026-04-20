@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/payments/stripe';
 import { prisma } from '@/lib/prisma';
-import { PlanTier } from '@prisma/client';
 import { headers } from 'next/headers';
 
 /**
@@ -30,19 +29,14 @@ export async function POST(req: NextRequest) {
         case 'checkout.session.completed':
             const session = event.data.object as any;
             const userId = session.metadata?.userId;
-            const tier = session.metadata?.tier as PlanTier;
+            const tier = session.metadata?.tier as string;
 
             if (userId && tier) {
                 console.log(`[PAYMENT_SUCCESS] Activating ${tier} for User Identity: ${userId}`);
                 
-                // Find the actual user primary key (walletAddress) if userId is a Clerk ID
-                const userRecord = await prisma.user.findFirst({
-                    where: {
-                        OR: [
-                            { walletAddress: userId },
-                            { clerkId: userId }
-                        ]
-                    }
+                // SIWE-native: userId is always a walletAddress
+                const userRecord = await prisma.user.findUnique({
+                    where: { walletAddress: userId }
                 });
 
                 const finalUserId = userRecord?.walletAddress || userId;
@@ -58,7 +52,8 @@ export async function POST(req: NextRequest) {
                     create: {
                         userId: finalUserId,
                         tier: tier,
-                        status: 'ACTIVE'
+                        status: 'ACTIVE',
+                        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
                     }
                 });
             }

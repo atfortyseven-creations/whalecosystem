@@ -34,10 +34,11 @@ export async function POST() {
   }
 
   try {
-     const dummyEventId = `sim-${Date.now()}`;
-     const dummyUsd = Math.random() * (150_000_000 - 1_000_000) + 1_000_000;
+     const { randomInt, randomBytes } = await import('crypto');
+     const dummyEventId = `sim-${Date.now()}-${randomBytes(4).toString('hex')}`;
      const chains = ['ETHEREUM', 'SOLANA', 'BITCOIN', 'BASE', 'ARBITRUM'];
-     const chain = chains[Math.floor(Math.random() * chains.length)];
+     const dummyUsd = 1_000_000 + randomInt(0, 149_000_000);
+     const chain = chains[randomInt(0, chains.length)];
 
      await WhaleSeedProcessor.tryInjectSeed(dummyEventId, dummyUsd, chain);
 

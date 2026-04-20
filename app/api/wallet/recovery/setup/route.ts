@@ -1,49 +1,53 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { guardians, threshold } = await req.json();
 
-        const email = user.emailAddresses[0]?.emailAddress;
-        const authUser = await prisma.authUser.findUnique({ where: { email } });
+        const email = session.email;
 
-        if (!authUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        if (!email) return NextResponse.json({ error: 'Session email not found' }, { status: 400 });
+        if (!guardians || !Array.isArray(guardians) || guardians.length === 0) {
+            return NextResponse.json({ error: 'Guardians array is required' }, { status: 400 });
+        }
 
-        // Setup Social Recovery
+        // SocialRecovery schema: unique key = `userEmail`, fields = `threshold`, `delayHours`, `active`
+        // (no userId, no totalGuardians, no status field)
         const recovery = await prisma.socialRecovery.upsert({
-            where: { userId: authUser.id },
+            where: { userEmail: email },
             update: {
                 threshold: parseInt(threshold),
-                totalGuardians: guardians.length,
-                status: 'ACTIVE'
+                active: true
             },
             create: {
-                userId: authUser.id,
+                userEmail: email,
                 threshold: parseInt(threshold),
-                totalGuardians: guardians.length,
-                status: 'ACTIVE'
+                active: true
             }
         });
 
-        // Add Guardians
-        for (const gEmail of guardians) {
+        // Guardian schema: `userEmail`, `guardianAddress`, `threshold`, `isActive`
+        // unique: [userEmail, guardianAddress]
+        // No recoveryId, no status, no email field
+        for (const guardianAddress of guardians) {
             await prisma.guardian.upsert({
-                where: { 
-                    recoveryId_email: { 
-                        recoveryId: recovery.id, 
-                        email: gEmail 
-                    } 
+                where: {
+                    userEmail_guardianAddress: {
+                        userEmail: email,
+                        guardianAddress
+                    }
                 },
-                update: { status: 'PENDING' },
+                update: { isActive: true },
                 create: {
-                    recoveryId: recovery.id,
-                    email: gEmail,
-                    status: 'PENDING'
+                    userEmail: email,
+                    guardianAddress,
+                    threshold: parseInt(threshold),
+                    isActive: true
                 }
             });
         }
@@ -54,4 +58,3 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-

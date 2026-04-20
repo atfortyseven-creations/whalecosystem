@@ -1,30 +1,35 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const email = user.emailAddresses[0]?.emailAddress;
-        const authUser = await prisma.authUser.findUnique({
-            where: { email },
-            include: { socialRecovery: { include: { guardians: true } } }
-        }) as any;
+        const email = session.email;
 
-        if (!authUser || !authUser.socialRecovery) {
+        // SocialRecovery unique key is `userEmail`, NO relation from AuthUser to SocialRecovery
+        const recovery = await prisma.socialRecovery.findUnique({
+            where: { userEmail: email }
+        });
+
+        if (!recovery) {
             return NextResponse.json({ guardians: [], threshold: 2 });
         }
 
+        // Guardian: unique by [userEmail, guardianAddress], query by userEmail
+        const guardians = await prisma.guardian.findMany({
+            where: { userEmail: email }
+        });
+
         return NextResponse.json({
-            guardians: authUser.socialRecovery.guardians.map((g: any) => g.email),
-            threshold: authUser.socialRecovery.threshold,
-            status: authUser.socialRecovery.status
+            guardians: guardians.map((g) => g.guardianAddress),
+            threshold: recovery.threshold,
+            active: recovery.active
         });
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-

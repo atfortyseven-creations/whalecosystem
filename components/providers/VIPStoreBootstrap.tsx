@@ -2,31 +2,18 @@
 
 /**
  * VIPStoreBootstrap
- * 
- * Silently hydrates the Zustand VIP store with synthetic whale events
- * on client boot so that VirtualizedFirehose, InstitutionalQuantChart,
- * and other store consumers always render data — even before the real
- * /api/whale-stream SSE connection establishes.
  *
- * This version is hardened with a live Oracle (Binance) to ensure
- * all generated data is scaled to real-world market prices.
+ * Zero-Mock Mandate: All synthetic event generators have been permanently
+ * eradicated. The store is hydrated exclusively via:
+ *   1. Live Oracle prices from Binance (fetchOraclePrices)
+ *   2. Real alpha events from the database (/api/alpha-events)
+ *
+ * No Math.random() mock streams. No synthetic whale events.
  */
 
 import { useEffect, useRef } from 'react';
 import { useVIPStore, WhaleEvent, parseAlphaEvents } from '@/lib/vip-store';
 
-const TOKENS   = ['BTC', 'ETH', 'SOL', 'BNB', 'ARB', 'PEPE', 'LINK', 'AVAX', 'UNI', 'DOGE'];
-const ACTIONS: WhaleEvent['action'][] = ['BUY', 'SELL', 'TRANSFER', 'BUY', 'BUY', 'SELL'];
-const DEXES    = ['Uniswap V3', 'PancakeSwap', 'Curve', 'Balancer', 'GMX', 'dYdX', 'Aevo'];
-const LABELS   = ['Polychain Capital', 'Wintermute', 'Jump Crypto', 'Galaxy Digital', 'Cumberland', 'DRW', 'Amber Group', 'Unknown Alpha Whale'];
-
-function randomAddr() {
-    return '0x' + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-}
-
-function randomHash() {
-    return '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-}
 
 /**
  * VIPStoreBootstrap: The Institutional Oracle Hub
@@ -116,45 +103,3 @@ export function VIPStoreBootstrap() {
     return null;
 }
 
-/**
- * generateSyntheticEvents: Scales USD valuations to real-time oracle prices.
- */
-function generateSyntheticEvents(count = 60, currentPrices: Record<string, number>): WhaleEvent[] {
-    return Array.from({ length: count }, (_, i) => {
-        const token   = TOKENS[Math.floor(Math.random() * TOKENS.length)];
-        const action  = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
-        const usdNum  = Math.floor(500_000 + Math.random() * 49_500_000);
-        
-        // Oracle-driven amount scaling: Eliminate fixed-multiplier artifacts
-        const divisor = currentPrices[token] || (token === 'BTC' ? 83500 : token === 'ETH' ? 1610 : 1);
-        const amount  = (usdNum / divisor).toFixed(2);
-        
-        const hash    = randomHash();
-        const wallet  = randomAddr();
-        const label   = LABELS[Math.floor(Math.random() * LABELS.length)];
-        const dex     = DEXES[Math.floor(Math.random() * DEXES.length)];
-        const ageMs   = Math.floor(Math.random() * 86_400_000);
-        const ts      = Date.now() - ageMs;
-
-        return {
-            id:       hash + i,
-            wallet,
-            label,
-            tier:     usdNum > 10_000_000 ? 'MEGA' : usdNum > 1_000_000 ? 'LARGE' : 'ALPHA',
-            action,
-            token,
-            amount,
-            usdValue: usdNum >= 1_000_000 ? `$${(usdNum / 1_000_000).toFixed(2)}M` : `$${(usdNum / 1000).toFixed(0)}K`,
-            usdNum,
-            dex,
-            winRate:  50 + Math.floor(Math.random() * 45),
-            age:      Math.floor(ageMs / 1000),
-            hash,
-            ts,
-            type:     action === 'SELL' ? 'dump' : 'accumulation',
-            confidence: 60 + Math.floor(Math.random() * 40),
-            gasUsd:   0.5 + Math.random() * 12,
-            blockConfirmations: Math.floor(Math.random() * 100) + 1,
-        };
-    });
-}

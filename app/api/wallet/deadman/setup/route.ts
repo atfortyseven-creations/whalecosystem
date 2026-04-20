@@ -1,32 +1,35 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const { beneficiary, months } = await req.json();
 
-        const email = user.emailAddresses[0]?.emailAddress;
+        const email = session.email;
         const authUser = await prisma.authUser.findUnique({ where: { email } });
 
         if (!authUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+        // DeadMansSwitch schema: unique key = `userAddress`, fields = `beneficiary`, `inactivityPeriod`, `lastPing`, `active`
+        const userAddress = authUser.walletAddress || session.userId;
+
         const deadMan = await prisma.deadMansSwitch.upsert({
-            where: { userId: authUser.id },
+            where: { userAddress },
             update: {
-                beneficiaryAddress: beneficiary,
-                inactivityPeriod: parseInt(months),
-                lastPingAt: new Date(),
-                status: 'ACTIVE'
+                beneficiary,
+                inactivityPeriod: parseInt(months) * 30 * 24 * 3600, // months -> seconds
+                lastPing: new Date(),
+                active: true
             },
             create: {
-                userId: authUser.id,
-                beneficiaryAddress: beneficiary,
-                inactivityPeriod: parseInt(months),
-                status: 'ACTIVE'
+                userAddress,
+                beneficiary,
+                inactivityPeriod: parseInt(months) * 30 * 24 * 3600,
+                active: true
             }
         });
 
@@ -36,4 +39,3 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-

@@ -1,26 +1,26 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
     try {
-        const user = await currentUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const session = await getSession();
+        if (!session || !session.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const email = user.emailAddresses[0]?.emailAddress;
-        const authUser = await prisma.authUser.findUnique({
-            where: { email },
-            include: { aiRebalancerPlans: { orderBy: { createdAt: 'desc' }, take: 1 } }
-        }) as any;
+        // AIRebalancerPlan has no relation to AuthUser — query directly by userId
+        const plans = await prisma.aIRebalancerPlan.findMany({
+            where: { userId: session.userId },
+            orderBy: { createdAt: 'desc' },
+            take: 1
+        });
 
-        if (!authUser || authUser.aiRebalancerPlans.length === 0) {
+        if (plans.length === 0) {
             return NextResponse.json({ plan: null });
         }
 
-        return NextResponse.json({ plan: authUser.aiRebalancerPlans[0] });
+        return NextResponse.json({ plan: plans[0] });
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-

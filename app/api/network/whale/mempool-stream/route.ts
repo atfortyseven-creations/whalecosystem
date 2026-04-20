@@ -64,9 +64,8 @@ export async function GET(req: NextRequest) {
                         } catch(e) { }
                     }
 
-                    // To prevent rate limiting from Alchemy/Infura, we don't await every single txHash immediately before filtering.
-                    // But we will grab a random sample of pending txs to deep dive and look for whales.
-                    if (Math.random() > 0.8) {
+                    // Deterministic deep-dive filter: every 5th tx — no Math.random()
+                    if (txCount % 5 === 0) {
                         try {
                             const tx = await provider.getTransaction(txHash);
                             if (tx && tx.value > 0n) {
