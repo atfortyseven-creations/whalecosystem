@@ -75,7 +75,36 @@ async function fetchOnChainPrices(): Promise<Record<string, number>> {
 
 // ── Centralized Exchanges REST (Primary Price Feeds) ─────────────────────────
 async function fetchCexMarkets(): Promise<any[] | null> {
-    // 1. Try MEXC API (Globally accessible, no strict geographic blocks)
+    // 1. Try KuCoin API (Highly reliable, no US IP geoblocks for Railway/Vercel)
+    try {
+        const controllerKu = new AbortController();
+        const idKu = setTimeout(() => controllerKu.abort(), 6000);
+        
+        const resKu = await fetch('https://api.kucoin.com/api/v1/market/allTickers', {
+            cache: 'no-store',
+            signal: controllerKu.signal,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json'
+            }
+        }).finally(() => clearTimeout(idKu));
+        
+        if (resKu.ok) {
+            const parsedKu = await resKu.json();
+            if (parsedKu?.data?.ticker && Array.isArray(parsedKu.data.ticker)) {
+                return parsedKu.data.ticker.map((t: any) => ({
+                    symbol: t.symbol.replace('-', ''),
+                    lastPrice: t.last,
+                    priceChangePercent: t.changeRate ? (parseFloat(t.changeRate) * 100).toFixed(3) : "0.000",
+                    quoteVolume: t.volValue || "0.00"
+                }));
+            }
+        }
+    } catch (e) {
+        console.warn('[API] KuCoin fetch failed, falling back to MEXC', e);
+    }
+
+    // 2. Try MEXC API (Globally accessible, no strict geographic blocks)
     try {
         const controllerMexc = new AbortController();
         const idMexc = setTimeout(() => controllerMexc.abort(), 6000); // 6s timeout for MEXC

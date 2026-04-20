@@ -81,11 +81,11 @@ export default function InstitutionalLedger() {
     const safeData = Array.isArray(rawData) ? rawData : (rawData?.entries || []);
     return safeData.map((e: any, i: number) => ({
       id:                e.id || String(i),
-      blockHex:          e.txid ? `0x${parseInt(e.txid.slice(0,8), 16).toString(16).toUpperCase()}` : `0x${e.blockHex || '—'}`,
+      blockHex:          e.txid ? `0x${parseInt(e.txid.slice(0,8), 16).toString(16).toUpperCase()}` : (e.hash ? `0x${e.hash.replace('0x', '').slice(0, 8).toUpperCase()}` : `0x${e.blockHex || '—'}`),
       verificationLayer: e.chain || e.verificationLayer || 'L1_ETH_MAINNET',
-      sha256Hash:        e.txid ? `0x${e.txid}` : (e.sha256Hash || `0x${'0'.repeat(64)}`),
-      payloadMB:         e.payloadMB ?? (e.valueBTC ? parseFloat((e.valueBTC * 0.001).toFixed(3)) : 0),
-      protocolState:     e.status === 'UNSPENT' ? 'Finalized / Valid' : e.status === 'PENDING' ? 'Pending' : (e.protocolState || 'Finalized / Valid'),
+      sha256Hash:        e.txid ? `0x${e.txid}` : (e.hash ? e.hash : (e.sha256Hash || `0x${'0'.repeat(64)}`)),
+      payloadMB:         e.usdValue ? parseFloat((e.usdValue / 1_000_000).toFixed(3)) : (e.payloadMB ?? (e.valueBTC ? parseFloat((e.valueBTC * 0.001).toFixed(3)) : 0)),
+      protocolState:     e.status === 'CONFIRMED' || e.status === 'UNSPENT' ? 'Finalized / Valid' : e.status === 'PENDING' ? 'Pending' : (e.protocolState || 'Finalized / Valid'),
       timestamp:         e.timestamp || new Date().toISOString(),
       chain:             e.category || e.chain || 'L1_ETH_MAINNET',
     }));
