@@ -3,7 +3,6 @@
 import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
 import { SovereignFooter } from "./SovereignFooter";
-import { InteractiveFluidGrid } from "./InteractiveFluidGrid";
 import { Scan } from "lucide-react";
 
 // Pre-defined list of lottie files matching the narrative sections.
@@ -209,8 +208,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
   
   return (
     <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-clip">
-
-      <InteractiveFluidGrid />
 
       <div className="relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 pb-16">
         
