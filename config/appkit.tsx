@@ -169,7 +169,7 @@ try {
             networks,
             projectId,
             metadata,
-            siweConfig,
+            // siweConfig disabled to prevent OS passcode crashes on mobile wallets during 1-click auth
             // ── allowUnsupportedChain: prevents AppKit from auto-triggering the
             // "Switch Network" modal when the user's wallet is on a network not
             // in our list. Network switching is handled exclusively in Portfolio.
