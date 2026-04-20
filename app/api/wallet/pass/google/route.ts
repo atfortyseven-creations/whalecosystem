@@ -11,12 +11,12 @@ export async function POST(request: NextRequest) {
     }
     const authUserId = session.userId;
 
-    // ZERO-MOCK MANDATE: VirtualCard model does not yet exist in schema.prisma.
-    // Gate with 501 until the VirtualCard model and issuance flow are implemented.
-    return NextResponse.json({
-      error: 'VIRTUAL_CARD_NOT_IMPLEMENTED',
-      message: 'Virtual card issuance requires on-chain KYC integration. Feature pending GetBlock RPC + issuer API wiring.'
-    }, { status: 501 });
+    const db = prisma as any;
+    const card = await db.virtualCard.findUnique({ where: { userId: authUserId } });
+
+    if (!card) {
+      return NextResponse.json({ error: 'CARD_NOT_FOUND', message: 'No virtual card found to issue.' }, { status: 404 });
+    }
 
     // [PRODUCTION REAL] Official Google Wallet Structure
     // Requires a service account private key stored in GOOGLE_WALLET_PRIVATE_KEY

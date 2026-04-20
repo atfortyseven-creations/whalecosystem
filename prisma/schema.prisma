@@ -803,3 +803,38 @@ model CosmicEntity {
   @@index([tier, amountUSD(sort: Desc)])
   @@index([chain, createdAt(sort: Desc)])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FINTECH & GAMIFICATION (Unleashed Models)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model VirtualCard {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  cardNumber      String   @unique // Encrypted or masked
+  expiryMonth     Int
+  expiryYear      Int
+  cvv             String   // Encrypted
+  cardStatus      String   @default("ACTIVE") // ACTIVE, FROZEN, REVOKED
+  balance         Float    @default(0)
+  kycStatus       String   @default("PENDING") // PENDING, VERIFIED, FAILED
+  providerId      String?  // e.g. Striga/Stripe issuing ID
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model GamificationRecord {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  totalXp         Int      @default(0)
+  level           Int      @default(1)
+  currentTier     String   @default("INITIATE")
+  achievements    String[] @default([])
+  lastEventDate   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
