@@ -11,59 +11,28 @@ const RSS_FEEDS = [
 export async function GET() {
     try {
         // For "Maximum Impolutez", we fetch from multiple institutional sources
-        // and normalize them into our signature IntelligenceItem format.
-        
-        // This is a robust mock-aggregator for the initial implementation 
-        // that simulates the real-time feed behavior with high-fidelity signals.
-        // I'll replace this with real RSS parsing logic once the structural integrity is verified.
+        const apiKeyRow = process.env.CRYPTOPANIC_API_KEYS || '';
+        const token = apiKeyRow.split(',')[0]; // Use the primary key
 
-        const signals = [
-            {
-                id: `sig-${Date.now()}-1`,
-                topic: 'POLITICS',
-                title: "U.S. Strategic Bitcoin Reserve: Treasury Department begins asset reclassification",
-                description: "Internal documents reveal a new grouping for digital assets under the 'Strategic National Stockpile' protocol. Formal transition to begin Q2 2026.",
-                impact: 'MAXIMUM',
-                timestamp: 'Just Now',
-                source: 'Institutional Core'
-            },
-            {
-                id: `sig-${Date.now()}-2`,
-                topic: 'VOLATILITY',
-                title: "Stablecoin Parity: GENIUS Act compliance audits reach 90% completion",
-                description: "Major issuers (Circle, Tether) confirm full liquidity coverage for all USD-backed assets. Institutional confidence in settlement layer reaches all-time high.",
-                impact: 'MAXIMUM',
-                timestamp: '5m ago',
-                source: 'Regulatory Pulse'
-            },
-            {
-                id: `sig-${Date.now()}-3`,
-                topic: 'BLACK_SWAN',
-                title: "Systemic Shift: Global SWIFT network completes first 100% on-chain settlement",
-                description: "A historical milestone for capital markets. Cross-border liquidity displacement detected across major L1 validators.",
-                impact: 'MAXIMUM',
-                timestamp: '12m ago',
-                source: 'Infrastructure Intel'
-            },
-            {
-                id: `sig-${Date.now()}-4`,
-                topic: 'CRYPTO',
-                title: "Ethereum PoS Maturity: Staked ETH exceeds 45% of circulating supply",
-                description: "Drastic reduction in exchange-side liquidity suggests a long-term accumulation phase by institutional treasury desks.",
-                impact: 'HIGH',
-                timestamp: '25m ago',
-                source: 'Chain Pulse'
-            },
-            {
-                id: `sig-${Date.now()}-5`,
-                topic: 'BLOCKCHAIN',
-                title: "DePIN Vanguard: Helium and Solana expand satellite coverage to EU-Agregates",
-                description: "Decentralized connectivity layer infrastructure is now competing with legacy telecommunication providers in 12 major cities.",
-                impact: 'HIGH',
-                timestamp: '45m ago',
-                source: 'Structure Intel'
-            }
-        ];
+        if (!token) {
+            return NextResponse.json({ error: 'News portal missing API credentials' }, { status: 500 });
+        }
+
+        const cpRes = await axios.get(`https://cryptopanic.com/api/v1/posts/?auth_token=${token}&public=true`, {
+            timeout: 5000
+        });
+
+        // Map CryptoPanic data into our IntelligenceItem format
+        const externalData = cpRes.data?.results || [];
+        const signals = externalData.slice(0, 10).map((post: any) => ({
+            id: `sig-${post.id}`,
+            topic: post.kind || 'NEWS',
+            title: post.title,
+            description: `Source: ${post.domain}. ${post.votes?.important > 0 ? 'High relevance.' : ''}`,
+            impact: post.votes?.important > 5 ? 'MAXIMUM' : 'HIGH',
+            timestamp: post.published_at,
+            source: post.source?.title || post.domain
+        }));
 
         return NextResponse.json(signals, {
             headers: {

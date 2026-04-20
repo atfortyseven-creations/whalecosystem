@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
+import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 
 const WHALE_USD_THRESHOLD = 100_000; // $100k minimum for tactical flow
 
@@ -44,26 +45,16 @@ interface ChainConfig {
   priceKey: string;
 }
 
-// ─── POOL DE 6 GETBLOCK ENDPOINTS (rotación automática por failover) ─────────
-const GETBLOCK_POOL = [
-  'https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f',
-  'https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d',
-  'https://go.getblock.us/88747de304e04365ac4c85789ba4fe54',
-  'https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24',
-  'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234',
-  'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d',
-];
+// The GETBLOCK_POOL and hardcoded public RPCs are deleted in favor of the Institutional Multi-Account RpcRelayerManager.
 
 const CHAINS: ChainConfig[] = [
   {
     label: 'ETHEREUM',
     chainId: 1,
     rpcUrls: [
-      ...GETBLOCK_POOL,
-      process.env.ETH_RPC_URL || '',
-      'https://eth.llamarpc.com',
-      'https://cloudflare-eth.com',
-    ].filter(Boolean),
+      RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com',
+      RpcRelayerManager.getRpcUrl('ETH', 'WSS') // Fallback to WebSocket if RPC endpoint stalls
+    ],
     nativeSymbol: 'ETH',
     priceKey: 'ETH',
   },
@@ -71,11 +62,8 @@ const CHAINS: ChainConfig[] = [
     label: 'BASE',
     chainId: 8453,
     rpcUrls: [
-      ...GETBLOCK_POOL,
-      process.env.BASE_MAINNET_RPC_URL || '',
-      'https://mainnet.base.org',
-      'https://base.llamarpc.com',
-    ].filter(Boolean),
+      RpcRelayerManager.getRpcUrl('ARB', 'RPC') || 'https://mainnet.base.org', // Base/L2 general endpoint config
+    ],
     nativeSymbol: 'ETH',
     priceKey: 'ETH',
   },
@@ -83,13 +71,8 @@ const CHAINS: ChainConfig[] = [
     label: 'BSC',
     chainId: 56,
     rpcUrls: [
-      ...GETBLOCK_POOL,
-      process.env.BSC_RPC_URL || '',
-      'https://bsc-dataseed1.binance.org',
-      'https://bsc-dataseed2.binance.org',
-      'https://bsc-dataseed1.defibit.io',
-      'https://bsc-rpc.publicnode.com',
-    ].filter(Boolean),
+      RpcRelayerManager.getRpcUrl('BSC', 'RPC') || 'https://bsc-dataseed1.binance.org',
+    ],
     nativeSymbol: 'BNB',
     priceKey: 'BNB',
   },

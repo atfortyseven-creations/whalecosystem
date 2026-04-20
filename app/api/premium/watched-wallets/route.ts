@@ -126,19 +126,8 @@ export async function POST(req: NextRequest) {
         const isConnError = prismaErr.message?.includes('Can\'t reach database server') || prismaErr.code?.startsWith('P100');
         
         if (isConnError) {
-            console.error(`[PLANET-SCALE-RESILIENCE] Database unreachable. returning Safe Success for UI.`);
-            // Mock the successful result so UI doesn't crash
-            const mockWallet = {
-                id: `temp-${Date.now()}`,
-                address,
-                userId,
-                label: label || 'Anonymous Whale',
-                lastValue: totalValue,
-                tags: body.tags || [],
-                createdAt: new Date().toISOString(),
-                syncStatus: 'DEGRADED'
-            };
-            return NextResponse.json(watermarkData(mockWallet, userId));
+            console.error(`[PLANET-SCALE-RESILIENCE] Database unreachable. Realtime sync degraded.`);
+            return NextResponse.json({ error: 'DB_UNREACHABLE', syncStatus: 'FAILED' }, { status: 503 });
         }
         
         throw prismaErr; // Re-throw if it's a different error
