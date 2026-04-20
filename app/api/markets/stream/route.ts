@@ -78,11 +78,15 @@ async function fetchCexMarkets(): Promise<any[] | null> {
     // 1. Try MEXC API (Globally accessible, no strict geographic blocks)
     try {
         const controllerMexc = new AbortController();
-        const idMexc = setTimeout(() => controllerMexc.abort(), 4000); // 4s timeout for MEXC
+        const idMexc = setTimeout(() => controllerMexc.abort(), 6000); // 6s timeout for MEXC
         
         const res = await fetch('https://api.mexc.com/api/v3/ticker/24hr', {
             cache: 'no-store',
             signal: controllerMexc.signal,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json'
+            }
         }).finally(() => clearTimeout(idMexc));
         
         if (res.ok) {
@@ -101,11 +105,15 @@ async function fetchCexMarkets(): Promise<any[] | null> {
     // 2. Fallback to Binance
     try {
         const controllerBin = new AbortController();
-        const idBin = setTimeout(() => controllerBin.abort(), 4000); // 4s timeout for Binance
+        const idBin = setTimeout(() => controllerBin.abort(), 6000); // 6s timeout for Binance
         
         const resBinance = await fetch('https://api.binance.com/api/v3/ticker/24hr', {
             cache: 'no-store',
             signal: controllerBin.signal,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json'
+            }
         }).finally(() => clearTimeout(idBin));
         
         if (resBinance.ok) {

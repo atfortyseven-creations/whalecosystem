@@ -9,7 +9,6 @@ import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
 import { MobileNavBar } from '@/components/layout/MobileNavBar';
 import { ZoomWrapper } from './ZoomWrapper';
 import dynamic from 'next/dynamic';
-import { InteractiveFluidGrid } from '@/components/landing/InteractiveFluidGrid';
 
 const UniversalEliteWallpaper = dynamic(
   () => import('@/components/shared/UniversalEliteWallpaper').then(m => ({ default: m.UniversalEliteWallpaper })),
@@ -220,7 +219,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
           {showMobileNavBar && <MobileNavBar />}
         </div>
-        {pathname === '/' && <InteractiveFluidGrid />}
       </TitaniumGate>
     </>
   );
