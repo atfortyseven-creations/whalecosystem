@@ -1,7 +1,7 @@
 const isExtension = process.env.EXT_BUILD === 'true';
 
 /** @type {import('next').NextConfig} */
-// Force deployment trigger [INSTITUTIONAL SYNC]: 2026-04-15T01:37:00Z
+// Force deployment trigger [INSTITUTIONAL SYNC]: 2026-04-21T03:45:00Z
 const nextConfig = {
     transpilePackages: [
         'three',
