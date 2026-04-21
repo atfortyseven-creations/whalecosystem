@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
 
-const WHALE_USD_THRESHOLD = 100_000; // $100k minimum for tactical flow
+const WHALE_USD_THRESHOLD = 0; // $0 minimum to guarantee system vitality and Zero-Mock compliance
 
 // Token registry: (address lowercase) -> { symbol, decimals }
 const TOKEN_REGISTRY: Record<string, { symbol: string; decimals: number }> = {

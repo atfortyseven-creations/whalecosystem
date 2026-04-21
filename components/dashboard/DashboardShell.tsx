@@ -47,7 +47,7 @@ const useDashboardStore = create<DashboardState>((set) => ({
 // ─── Lazy Panels ───────────────────────────────────────────────────────────────
 const SovereignIntelTab  = lazy(() => import('./SovereignIntelTab'));
 const OmniExplorer       = lazy(() => import('./OmniExplorer').then(m=>({default:m.OmniExplorer})));
-const GoldTicketPanel    = lazy(() => import('./GoldTicketPanel').then(m=>({default:m.GoldTicketPanel})));
+const VossSupremacyPanel = lazy(() => import('./VossSupremacyPanel').then(m=>({default:m.VossSupremacyPanel})));
 const WhaleAcademy       = lazy(() => import('./WhaleAcademy').then(m=>({default:m.WhaleAcademy})));
 const SecurityScanner    = lazy(() => import('./SecurityScanner'));
 const WhaleSupport       = lazy(() => import('./WhaleSupport').then(m=>({default:m.WhaleSupport})));
@@ -122,7 +122,7 @@ const NAV_GROUPS = [
         items: [
             { id: 'portfolio',     icon: Wallet,           label: 'My Portfolio' },
             { id: 'academy',       icon: BookOpen,         label: 'Whale Academy' },
-            { id: 'premium',       icon: Zap,              label: 'Premium Pass', gold: true },
+            { id: 'premium',       icon: Zap,              label: 'Institutional Clearance', gold: true },
         ],
     },
 ];
@@ -540,7 +540,7 @@ function renderTabContent(tab: DashboardTab) {
         case 'bitcoin-net':   return <BitcoinPrimitives />;
         case 'support':       return <WhaleSupport />;
         case 'exchange':      return <ConnectExchange />;
-        case 'premium':       return <GoldTicketPanel />;
+        case 'premium':       return <VossSupremacyPanel />;
         case 'sniper':        return <WhaleSniperTerminal />;
         case 'polymarket':    return <PolymarketGlass />;
         case 'zk-shield':     return <ZKShieldStation />;
@@ -563,7 +563,7 @@ const TAB_LABELS: Record<DashboardTab, string> = {
     'whale-tracker':'Whale Tracker','market-news':'Market News','api':'API Access',
     'security':'Security Center','visual-graph':'Visual Graph','vault':'Secure Vault',
     'block-explorer':'Block Explorer','portfolio':'My Portfolio','academy':'Academy',
-    'bitcoin-net':'Bitcoin Network','support':'Support Hub','exchange':'Connect Exchange','premium':'Premium Pass',
+    'bitcoin-net':'Bitcoin Network','support':'Support Hub','exchange':'Connect Exchange','premium':'Institutional Clearance',
     'library': 'The Library', 'sniper': 'Sniper Terminal', 'polymarket': 'Prediction Oracle',
     'zk-shield': 'ZK Shield Station', 'war-room': 'War Room', 'defi-yield': 'DeFi Yield Matrix',
     'mass-intel': 'Mass Transfer Intel', 'top-whales': 'Top 24H Whales'
