@@ -58,7 +58,7 @@ const GainersLosersPanel = lazy(() => import('./GainersLosersPanel').then(m=>({d
 const PortfolioDashboard = lazy(() => import('./PortfolioDashboard'));
 const ApiTerminal        = lazy(() => import('./ApiTerminal').then(m=>({default:m.ApiTerminal})));
 const AkashicLedger      = lazy(() => import('./AkashicLedger'));
-const MassTransferIntel  = lazy(() => import('./MassTransferIntel'));
+const MassTransferIntel  = lazy(() => import('./MassTransferIntel').then(m => ({ default: m.MassTransferIntel })));
 const WhaleSniperTerminal= lazy(() => import('./WhaleSniperTerminal'));
 const PolymarketGlass    = lazy(() => import('./PolymarketGlassDashboard'));
 const ZKShieldStation    = lazy(() => import('./ZKShieldStation').then(m=>({default:m.ZKShieldStation})));

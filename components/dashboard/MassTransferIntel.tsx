@@ -206,7 +206,7 @@ function SummaryCards({ events }: { events: any[] }) {
 
 // ─── Main Ledger ───────────────────────────────────────────────────────────
 
-export default function MassTransferIntel() {
+export function MassTransferIntel() {
   const [chainFilter,  setChainFilter]  = useState<string | null>(null);
   const [minUsdFilter, setMinUsdFilter] = useState<number>(0);
   const [sortBy, setSortBy] = useState<'time_desc' | 'usd_desc'>('time_desc');

@@ -16,7 +16,7 @@ import { useUIStore } from '@/lib/store/ui-store';
 const MAX_SUPPLY = 200;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const truncAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+const truncAddr = (a: string) => !a || a.length < 10 ? (a || '—') : `${a.slice(0, 6)}…${a.slice(-4)}`;
 const pct = (a: number, b: number) => Math.min(100, Math.round((a / b) * 100));
 
 // ── Sub-components: Institutional Aesthetic ───────────────────────────────────
@@ -209,20 +209,20 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
 
 const MOCK_LEDGER = [
   {
-    ticketId: "GT-001", userAddress: "0x39a1...4b92", claimedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), networkLaunchEligible: true,
-    twitterHandle: "WhaleSleuth", signatureData: "0xab42...f0a1", badgeColor: "GOLD", serialCode: "WAN-001"
+    ticketId: "GT-001", userAddress: "0x39a1D8a63B4cF6F21E89a3f6b45a4b928cC24f92", claimedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), networkLaunchEligible: true,
+    twitterHandle: "WhaleSleuth", signatureData: "0xab42ef", badgeColor: "GOLD", serialCode: "WAN-001"
   },
   {
-    ticketId: "GT-002", userAddress: "0x11cc...992f", claimedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), networkLaunchEligible: true,
-    twitterHandle: "DefiEagle", signatureData: "0x992c...eeb1", badgeColor: "SILVER", serialCode: "WAN-002"
+    ticketId: "GT-002", userAddress: "0x11ccBb3F9d27E4a12F5E9A3C7B8d4E2A1f992F3c", claimedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), networkLaunchEligible: true,
+    twitterHandle: "DefiEagle", signatureData: "0x992ceeb1", badgeColor: "SILVER", serialCode: "WAN-002"
   },
   {
-    ticketId: "GT-003", userAddress: "0x8fa...ccb0", claimedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), networkLaunchEligible: false,
-    twitterHandle: null, signatureData: "0x12bb...dcf4", badgeColor: "SILVER", serialCode: "WAN-003"
+    ticketId: "GT-003", userAddress: "0x8fa7C1d38a9B4E6Fc2B7D2e8A5C4B3f91ccb0a1", claimedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), networkLaunchEligible: false,
+    twitterHandle: null, signatureData: "0x12bbdcf4", badgeColor: "SILVER", serialCode: "WAN-003"
   },
   {
-    ticketId: "GT-004", userAddress: "0x44d2...11ac", claimedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(), networkLaunchEligible: true,
-    twitterHandle: "AlphaNode", signatureData: "0x4cc2...a2f1", badgeColor: "GOLD", serialCode: "WAN-004"
+    ticketId: "GT-004", userAddress: "0x44d2A9Bc1e3F7D8C5b9E2A4B6C7D0E1F82A11ac", claimedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(), networkLaunchEligible: true,
+    twitterHandle: "AlphaNode", signatureData: "0x4cc2a2f1", badgeColor: "GOLD", serialCode: "WAN-004"
   }
 ];
 
