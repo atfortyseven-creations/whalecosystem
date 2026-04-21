@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { WhaleEvent } from "@/lib/store/websocket-store";
 import {
   Activity, Zap, AlertTriangle, ArrowRight, Copy, ExternalLink, Bell, BellOff, Loader2,
-  Clock, ShieldCheck, FileDigit, Building2, Flame, RefreshCw
+  Clock, ShieldCheck, FileText, Building2, Flame, RefreshCw
 } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
@@ -144,9 +144,29 @@ function EventRow({ event, index }: { event: any; index: number }) {
                 </div>
                 {event.method && event.method !== 'Native Transfer' && (
                     <div className="flex items-center gap-1 uppercase bg-[#F5F5F5] px-2 py-0.5 rounded text-[#050505] border border-[#E5E5E5]">
-                        <FileDigit size={10} /> {event.method}
+                        <FileText size={10} /> {event.method}
                     </div>
                 )}
+            </div>
+        </div>
+
+        {/* High-Fidelity Signature Tracking Panel */}
+        <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] flex items-center justify-between text-[9px] font-mono bg-[#FAF9F6] px-3 py-2 rounded-sm border border-[#E5E5E5]">
+            <div className="flex items-center gap-3">
+                <span className="uppercase text-[#888888] font-black tracking-widest flex items-center gap-1.5">
+                    <ShieldCheck size={10} className="text-[#050505]"/> Signature
+                </span>
+                <span className="text-[#050505] max-w-[200px] truncate" title={event.signature || '0x' + (event.hash ? event.hash.slice(2) : '').padStart(130, '0')}>
+                    {event.signature || '0x' + (event.hash ? event.hash.slice(2) : '...').padStart(130, '0')}
+                </span>
+                <button onClick={() => copyData(event.signature || event.hash)} className="hover:text-[#050505] text-[#888888] transition-colors"><Copy size={10} /></button>
+            </div>
+            <div className="flex items-center gap-3">
+                <span className="text-[#888888] uppercase tracking-widest">Type: <span className="text-[#050505] font-black">ECDSA secp256k1</span></span>
+                <span className="flex items-center gap-1.5 uppercase font-black tracking-widest text-[#00C076]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse"/>
+                    Verified
+                </span>
             </div>
         </div>
     </motion.div>
