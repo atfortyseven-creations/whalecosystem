@@ -97,8 +97,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
                 </div>
                 <div className="space-y-4 max-w-md relative z-10">
-                    <h2 className="text-5xl font-black text-black tracking-tighter uppercase leading-none">
-                        VAULT ACCESS
+                    <h2 className="text-5xl font-bold text-[#050505] tracking-tighter uppercase leading-none">
+                        SECURE TERMINAL
                     </h2>
                     <p className="text-black/40 text-sm leading-relaxed font-bold uppercase tracking-widest">
                         Connect your Web3 identity or generate an encrypted wallet to unlock tier-1 portfolio surveillance.
@@ -131,8 +131,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                         <PieChart size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-black text-black tracking-tight uppercase">Intelligence Dashboard</h2>
-                        <p className="text-[10px] font-bold text-black/30 uppercase tracking-widest">Active Identity Monitoring</p>
+                        <h2 className="text-xl font-bold text-[#050505] tracking-tight uppercase">PORTFOLIO LEDGER</h2>
+                        <p className="text-[10px] font-bold text-[#050505]/40 uppercase tracking-[0.2em]">Active Entity Monitoring</p>
                     </div>
                 </div>
 
@@ -220,8 +220,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 <div className="p-2.5 rounded-xl bg-black/5 border border-black/[0.06]">
                                     <TrendingUp size={16} className="text-black" strokeWidth={2.5} />
                                 </div>
-                                <h3 className="text-[11px] font-black text-black/30 uppercase tracking-[0.3em]">
-                                    DISPOSABLE NET WORTH
+                                <h3 className="text-[11px] font-bold text-black/40 uppercase tracking-[0.2em]">
+                                    LIQUID CAPITAL
                                 </h3>
                             </div>
                             <button 
@@ -237,7 +237,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 key={isEyesOff ? 'hidden' : totalValue}
                                 initial={{ scale: 1.02 }}
                                 animate={{ scale: 1 }}
-                                className="text-8xl font-black text-black tracking-tighter font-mono flex items-center"
+                                className="text-7xl font-bold text-[#050505] tracking-tighter font-mono flex items-center"
                             >
                                 <span className="mr-1 text-[0.8em] text-black/50">$</span>
                                 {isEyesOff ? (
@@ -254,7 +254,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 initial={{ scale: 0.9, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 className={cn(
-                                    "flex items-center gap-2 px-6 py-2 rounded-full font-black text-lg transition-colors",
+                                    "flex items-center gap-2 px-6 py-2 rounded font-bold text-lg transition-colors",
                                     isProfit 
                                         ? "bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20" 
                                         : "bg-[#FF3B30]/10 text-[#FF3B30] border border-[#FF3B30]/20"
@@ -323,7 +323,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-3">
                             <div className="w-1.5 h-4 bg-[#00C076] rounded-full" />
-                            <h4 className="text-xl font-black text-black uppercase tracking-tighter">On-Chain Holdings</h4>
+                            <h4 className="text-lg font-bold text-[050505] uppercase tracking-[0.1em]">ON-CHAIN HOLDINGS</h4>
                         </div>
                     </div>
                     <span className="text-[10px] font-black text-black/20 uppercase tracking-[0.3em]">Institutional Feed // Live</span>

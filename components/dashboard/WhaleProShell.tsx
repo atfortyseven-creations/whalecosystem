@@ -35,7 +35,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     // { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>, dividerBefore: 'Overview' },
     // { id: 'watchlist',    label: 'Watchlist',        icon: <Star size={17}/> },
     { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/>, dividerBefore: 'Overview' },
-    { id: 'gold',         label: 'Premium Hub',      icon: <Ticket size={17}/> },
+    { id: 'gold',         label: 'Ticket Mint',      icon: <Ticket size={17}/> },
 
     { id: 'markets',      label: 'Top Markets',      icon: <Globe size={17}/>,           dividerBefore: 'Market Data' },
     { id: 'newpairs',     label: 'New Listings',     icon: <Zap size={17}/> },
@@ -471,7 +471,7 @@ export function WhaleProShell({
                 initial={{ scale: 0.95, opacity: 0, y: 15 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.95, opacity: 0, y: 15 }}
-                className="w-full max-w-lg bg-[#FAF9F6] rounded-[24px] shadow-2xl overflow-hidden flex flex-col border border-black/10"
+                className="w-full max-w-3xl bg-[#FAF9F6] rounded-[24px] shadow-2xl overflow-hidden flex flex-col border border-black/10"
             >
                 <div className="flex items-center justify-between px-8 py-6 border-b border-black/10 bg-white">
                     <div className="flex items-center gap-3">
@@ -488,10 +488,10 @@ export function WhaleProShell({
                     </button>
                 </div>
                 
-                <div className="px-8 py-8 flex flex-col gap-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
-                    <div className="bg-white p-5 border border-black/10 rounded-xl relative overflow-hidden">
+                <div className="px-8 py-8 flex flex-col gap-6 overflow-y-auto max-h-[75vh] custom-scrollbar">
+                    <div className="bg-white p-6 border border-black/10 rounded-xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rounded-bl-full -z-0 pointer-events-none" />
-                        <p className="text-[12px] text-[#050505] leading-relaxed font-medium relative z-10 text-justify">
+                        <p className="text-[13px] text-[#050505] leading-relaxed font-medium relative z-10 text-justify">
                             {currentExplanation.overview}
                         </p>
                     </div>
@@ -518,9 +518,9 @@ export function WhaleProShell({
                     )}
                 </div>
                 
-                <div className="p-6 border-t border-black/10 bg-white">
-                    <button onClick={() => setShowInfoModal(false)} className="w-full py-4 rounded-xl bg-[#050505] text-[#FAF9F6] text-[13px] font-black uppercase tracking-widest hover:bg-black/80 transition-colors shadow-none active:scale-[0.98] duration-200">
-                        Comprendido a Nivel Óptimo
+                <div className="p-6 border-t border-black/10 bg-white flex justify-end">
+                    <button onClick={() => setShowInfoModal(false)} className="px-8 py-3.5 rounded-xl border border-black/10 bg-white text-[#050505] text-[11px] font-black uppercase tracking-widest hover:bg-black/5 hover:border-black/30 transition-all shadow-none active:scale-[0.98] duration-200">
+                        Volver a la Terminal
                     </button>
                 </div>
             </motion.div>

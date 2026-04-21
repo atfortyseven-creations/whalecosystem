@@ -33,31 +33,31 @@ export default function SniperBrain() {
   };
 
   return (
-    <div className="absolute inset-0 p-4 flex flex-col gap-6 font-mono text-white/80 overflow-y-auto custom-scrollbar">
+    <div className="absolute inset-0 p-4 lg:p-6 flex flex-col gap-6 font-sans text-[#050505] overflow-y-auto custom-scrollbar bg-[#FAF9F6]">
       
       {/* ── MIN VOLUME THRESHOLD ── */}
       <div className="space-y-2">
-        <label className="text-[9px] uppercase font-black text-[#e0ff00] tracking-widest flex items-center gap-2">
-          <Filter size={10} /> MINIMUM USD VOLUME THRESHOLD
+        <label className="text-[9px] uppercase font-bold text-[#888888] tracking-[0.2em] flex items-center gap-2">
+          <Filter size={12} /> Minimum USD Volume Threshold
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">$</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#050505]/40 font-mono text-sm">$</span>
           <input 
             type="text"
             value={localVol}
             onChange={(e) => setLocalVol(e.target.value)}
             onKeyDown={handleVolumeSubmit}
             onBlur={() => updateFilters({ minVolumeUsd: parseInt(localVol.replace(/,/g, '') || '0', 10) })}
-            className="w-full bg-[#080808] border border-white/10 rounded-sm py-2 pl-7 pr-3 text-sm font-black focus:outline-none focus:border-[#e0ff00]/50 transition-colors"
+            className="w-full bg-white border border-[#E5E5E5] rounded-lg py-3 pl-8 pr-4 text-base font-bold focus:outline-none focus:border-[#050505] transition-colors shadow-sm font-mono text-[#050505]"
           />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] text-white/20 uppercase">Press Enter</div>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-[#A0A0A0] uppercase font-bold">Press Enter</div>
         </div>
       </div>
 
       {/* ── TARGET ASSETS ── */}
-      <div className="space-y-2">
-         <label className="text-[9px] uppercase font-black tracking-widest flex items-center gap-2 text-white/50">
-          <Database size={10} /> TACTICAL ASSET POOL
+      <div className="space-y-2 mt-2">
+         <label className="text-[9px] uppercase font-bold tracking-[0.2em] flex items-center gap-2 text-[#888888]">
+          <Database size={12} /> Tactical Asset Pool
         </label>
         <div className="flex flex-wrap gap-2">
           {['BTC', 'ETH', 'SOL', 'USDT', 'USDC'].map((asset) => {
@@ -66,10 +66,10 @@ export default function SniperBrain() {
               <button
                 key={asset}
                 onClick={() => toggleAsset(asset)}
-                className={`px-3 py-1 text-[10px] font-bold rounded-sm border transition-all ${
+                className={`px-4 py-2 text-[10px] font-bold rounded-lg border transition-all ${
                   isActive 
-                    ? 'bg-[#e0ff00]/10 border-[#e0ff00]/40 text-[#e0ff00] drop-shadow-[0_0_8px_rgba(224,255,0,0.4)] ring-1 ring-[#e0ff00]/20' 
-                    : 'bg-transparent text-white/40 border-white/10 hover:border-white/30 hover:text-white/80'
+                    ? 'bg-[#050505] border-[#050505] text-white shadow-sm' 
+                    : 'bg-white text-[#888888] border-[#E5E5E5] hover:border-[#050505]/30 hover:text-[#050505]'
                 }`}
               >
                 {asset}
@@ -79,64 +79,63 @@ export default function SniperBrain() {
         </div>
       </div>
 
-      <div className="h-px bg-white/5 my-2" />
+      <div className="h-px bg-[#E5E5E5] my-2" />
 
       {/* ── EXECUTION PARAMETERS ── */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-[9px] uppercase font-black tracking-widest flex items-center gap-2 text-white/50">
-            <TrendingUp size={10} /> SLIPPAGE TOLERANCE
+          <label className="text-[9px] uppercase font-bold tracking-[0.2em] flex items-center gap-2 text-[#888888]">
+            <TrendingUp size={12} /> Slippage Tolerance
           </label>
           <div className="relative">
             <input 
               type="number"
               value={filters.slippageTolerance}
               onChange={(e) => updateFilters({ slippageTolerance: parseFloat(e.target.value) || 0.5 })}
-              className="w-full bg-[#080808] border border-white/10 rounded-sm py-2 px-3 text-sm font-black focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full bg-white border border-[#E5E5E5] rounded-lg py-3 px-3 text-sm font-bold focus:outline-none focus:border-[#050505] transition-colors shadow-sm font-mono text-[#050505]"
               step="0.1"
               min="0.1"
               max="5.0"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30">%</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#050505]/40 font-bold">%</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-[9px] uppercase font-black tracking-widest flex items-center gap-2 text-white/50">
-            <Settings2 size={10} /> MAX GAS / GWEI
+          <label className="text-[9px] uppercase font-bold tracking-[0.2em] flex items-center gap-2 text-[#888888]">
+            <Settings2 size={12} /> Max Gas / GWEI
           </label>
           <div className="relative">
             <input 
               type="number"
               value={filters.gasLimitGwei}
               onChange={(e) => updateFilters({ gasLimitGwei: parseInt(e.target.value, 10) || 50 })}
-              className="w-full bg-[#080808] border border-white/10 rounded-sm py-2 px-3 text-sm font-black focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full bg-white border border-[#E5E5E5] rounded-lg py-3 px-3 text-sm font-bold focus:outline-none focus:border-[#050505] transition-colors shadow-sm font-mono text-[#050505]"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[8px] text-white/30">GWEI</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-[#050505]/40 font-bold">GWEI</span>
           </div>
         </div>
       </div>
 
-      <div className="h-px bg-white/5 my-2" />
+      <div className="h-px bg-[#E5E5E5] my-2" />
 
       {/* ── TACTICAL HISTORY ── */}
       <div className="flex-1 min-h-[100px] flex flex-col">
-        <label className="text-[9px] uppercase font-black tracking-widest flex items-center gap-2 text-[#e0ff00]/60 mb-2">
-          <History size={10} /> LOCAL DEPLOYMENT HISTORY
+        <label className="text-[9px] uppercase font-bold tracking-[0.2em] flex items-center gap-2 text-[#888888] mb-3">
+          <History size={12} /> Post-Execution Ledger
         </label>
-        <div className="flex-1 bg-[#050505] border border-white/5 rounded-sm p-3 overflow-y-auto custom-scrollbar space-y-2 relative">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-[#e0ff00]/5 blur-xl pointer-events-none" />
+        <div className="flex-1 bg-white border border-[#E5E5E5] rounded-xl p-3 overflow-y-auto custom-scrollbar space-y-2 relative shadow-sm">
           
           {executedTrades.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-[9px] uppercase font-black tracking-widest text-[#e0ff00]/20">
-              NO LETHAL EXECUTIONS RECORDED IN CURRENT SESSION.
+            <div className="h-full flex items-center justify-center text-[10px] uppercase font-bold tracking-widest text-[#888888] text-center p-4">
+              NO SETTLEMENTS RECORDED IN THIS SESSION.
             </div>
           ) : (
             executedTrades.map((trade, idx) => (
-              <div key={`${trade.hash}-${idx}`} className="flex items-center justify-between text-[10px] bg-[#0c0c0c] px-3 py-2 rounded-sm border border-emerald-500/10 group hover:border-[#e0ff00]/20 transition-all">
-                 <span className="text-emerald-400 group-hover:text-[#e0ff00] transition-colors font-mono truncate max-w-[120px]">{trade.hash}</span>
-                 <span className="text-white/30 font-mono">[{new Date(trade.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
-                 <span className="text-white font-black font-mono tracking-tighter">${trade.priceAtExecution.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+              <div key={`${trade.hash}-${idx}`} className="flex items-center justify-between text-[11px] bg-[#FAF9F6] px-3 py-2.5 rounded-lg border border-[#E5E5E5] group hover:border-[#050505]/20 transition-all font-mono">
+                 <span className="text-[#050505] font-bold truncate max-w-[120px]">{trade.hash}</span>
+                 <span className="text-[#888888]">[{new Date(trade.timestamp).toISOString().split('T')[1].slice(0,-1)}]</span>
+                 <span className="text-[#050505] font-bold tracking-tight">${trade.priceAtExecution.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>
             ))
           )}

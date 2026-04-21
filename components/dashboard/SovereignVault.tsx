@@ -41,8 +41,8 @@ function OnChainStatusPanel({ address }: { address?: string }) {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <Zap size={16} className="text-[#050505]" />
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">Live On-Chain Status</h3>
-                    <span className="text-[7px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#888888] px-2 py-0.5 font-black uppercase tracking-widest">BASE</span>
+                    <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">LIVE ON-CHAIN STATUS</h3>
+                    <span className="text-[7px] border border-[#E5E5E5] bg-[#FAF9F6] text-[#A0A0A0] px-2 py-0.5 font-bold uppercase tracking-widest">BASE RPC</span>
                 </div>
                 <button
                     onClick={() => mutate()}
@@ -73,7 +73,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
                                 <span className="text-[9px] text-[#888888] uppercase">Status</span>
-                                <span className={`text-[9px] font-black uppercase ${statusColor(dm.status)}`}>{dm.status}</span>
+                                <span className={`text-[9px] font-bold uppercase ${statusColor(dm.status)}`}>{dm.status}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[9px] text-[#888888] uppercase">Last Ping</span>
@@ -85,7 +85,7 @@ function OnChainStatusPanel({ address }: { address?: string }) {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[9px] text-[#888888] uppercase">Days Remaining</span>
-                                <span className={`text-[9px] font-black ${dm.daysRemaining < 14 ? 'text-[#FF9500]' : 'text-[#00C076]'}`}>{dm.daysRemaining}d</span>
+                                <span className={`text-[9px] font-bold ${dm.daysRemaining < 14 ? 'text-[#FF9500]' : 'text-[#00C076]'}`}>{dm.daysRemaining}d</span>
                             </div>
                             <div className="mt-3 h-1 bg-[#E5E5E5] rounded-full overflow-hidden">
                                 <div
@@ -298,8 +298,8 @@ export function SovereignVault() {
             <div className="w-full max-w-5xl mx-auto flex flex-col items-start pt-4 gap-8 shrink-0 pb-10">
 
                 <div className="shrink-0 pt-2 pb-6 border-b border-[#E5E5E5] w-full bg-white flex flex-col gap-0.5 mb-2">
-                    <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-[#050505]">
-                        Akashic Vault
+                    <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.1em] text-[#050505]">
+                        SOVEREIGN VAULT
                     </h1>
                     <p className="text-[10px] text-[#050505]/40 font-bold uppercase tracking-[0.2em] leading-tight">
                         Cryptographic cold storage and cross-chain liquid reconciliation.
@@ -312,7 +312,7 @@ export function SovereignVault() {
                     <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
                             <Activity size={20} className={vaultData?.deadman ? "text-[#00C076]" : "text-[#888888]"} />
-                            <h2 className="text-sm font-black uppercase tracking-widest">Deadman Switch</h2>
+                            <h2 className="text-sm font-bold uppercase tracking-widest">DEADMAN CACHE</h2>
                         </div>
                         <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
                             Cryptographic failsafe mechanism. Proprietary ownership transfers to beneficiary upon inactivity threshold detection.
@@ -347,7 +347,7 @@ export function SovereignVault() {
                     <div className="border border-[#E5E5E5] bg-[#FAF9F6] flex flex-col p-6 rounded-2xl relative overflow-hidden transition-all shadow-sm">
                         <div className="flex items-center gap-3 mb-6 relative z-10">
                             <Lock size={20} className="text-[#050505]" />
-                            <h2 className="text-sm font-black uppercase tracking-widest">TimeLock Vault</h2>
+                            <h2 className="text-sm font-bold uppercase tracking-widest">LIQUIDITY TIMELOCK</h2>
                         </div>
                         <p className="text-[10px] text-[#888888] uppercase tracking-[0.1em] mb-8 leading-relaxed max-w-xs relative z-10">
                             Deterministic asset locking protocol. Secures capital against volatility via mandatory on-chain temporal constraints.

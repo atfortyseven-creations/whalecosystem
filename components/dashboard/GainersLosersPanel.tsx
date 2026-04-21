@@ -154,9 +154,9 @@ function AssetRow({ rank, symbol, data, pctKey }: {
             {/* Volume */}
             <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505]">{fmt(vol)}</div>
 
-            {/* Perps badge */}
+            {/* Type badge */}
             <div className="px-3 flex justify-center">
-                <span className="text-[8px] px-2 py-0.5 rounded border border-[#E5E5E5] text-[#888888] font-black uppercase">PERP</span>
+                <span className="text-[9px] font-mono text-[#050505]/40 uppercase tracking-widest">PERP</span>
             </div>
         </div>
     );
@@ -228,12 +228,12 @@ export function GainersLosersPanel() {
             {/* ── Summary Cards ── */}
             <div className="grid grid-cols-2 gap-4 shrink-0">
                 {/* Top Gainers */}
-                <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-widest">
-                            Top Gainers — 24h
+                <div className="bg-white border border-[#E5E5E5] rounded p-5">
+                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E5E5E5]">
+                        <span className="text-[10px] font-bold text-[#050505] uppercase tracking-[0.1em]">
+                            24H GAINERS
                         </span>
-                        <TrendingUp size={14} className="text-[#00C076]"/>
+                        <div className="flex items-center gap-1.5 opacity-50"><ArrowUpRight size={12}/></div>
                     </div>
                     <div className="space-y-3">
                         {isLoading ? (
@@ -264,12 +264,12 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Top Losers */}
-                <div className="bg-white border border-[#E5E5E5] rounded-2xl p-5 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-widest">
-                            Top Losers — 24h
+                <div className="bg-white border border-[#E5E5E5] rounded p-5">
+                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E5E5E5]">
+                        <span className="text-[10px] font-bold text-[#050505] uppercase tracking-[0.1em]">
+                            24H LOSERS
                         </span>
-                        <TrendingDown size={14} className="text-[#FF3B30]"/>
+                        <div className="flex items-center gap-1.5 opacity-50"><ArrowDownRight size={12}/></div>
                     </div>
                     <div className="space-y-3">
                         {isLoading ? (
@@ -301,7 +301,7 @@ export function GainersLosersPanel() {
             </div>
 
             {/* ── Full Table ── */}
-            <div className="flex-1 min-h-0 bg-white border border-[#E5E5E5] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden flex flex-col">
+            <div className="flex-1 min-h-0 bg-white border border-[#E5E5E5] rounded overflow-hidden flex flex-col">
 
                 {/* Toolbar Row 1 */}
                 <div className="shrink-0 px-5 py-3 border-b border-[#E5E5E5] bg-[#FAF9F6] flex items-center gap-3 flex-wrap">
@@ -327,17 +327,16 @@ export function GainersLosersPanel() {
 
                     {/* Search */}
                     <div className="relative flex-1 min-w-[140px] max-w-xs">
-                        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888888]"/>
+                        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0A0]"/>
                         <input value={search} onChange={e => setSearch(e.target.value)}
-                            placeholder="Search symbol or name…"
-                            className="w-full bg-white border border-[#E5E5E5] rounded-lg pl-8 pr-3 py-1.5 text-[10px] font-mono text-[#050505] outline-none focus:border-[#050505]"/>
+                            placeholder="SEARCH TICKER..."
+                            className="w-full bg-white border border-[#E5E5E5] rounded pl-8 pr-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#050505] outline-none focus:border-[#050505] transition-colors"/>
                     </div>
 
                     {/* Stream status */}
                     <div className="flex items-center gap-2 ml-auto">
-                        {isConnected ? <Wifi size={13} className="text-[#00C076]"/> : <WifiOff size={13} className="text-[#FF3B30] animate-pulse"/>}
-                        <span className="text-[9px] font-black text-[#888888] uppercase font-mono flex items-center gap-1">
-                            <Clock size={9}/>
+                        <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#050505]' : 'bg-[#FF3B30] animate-pulse'}`} />
+                        <span className="text-[9px] font-mono font-bold text-[#A0A0A0] uppercase tracking-widest flex items-center gap-1 border-l border-[#E5E5E5] pl-2">
                             {lastUpdate instanceof Date && !isNaN(lastUpdate.getTime())
                                 ? lastUpdate.toTimeString().slice(0, 8)
                                 : '—'}
@@ -404,11 +403,9 @@ export function GainersLosersPanel() {
                 </div>
 
                 {/* Footer */}
-                <div className="shrink-0 px-5 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                    <span>{filtered.length} assets · {network === 'all' ? 'All Networks' : network} · {timeWindow} window</span>
-                    <span>
-                        Data provided by On-Chain Query Hooks
-                    </span>
+                <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
+                    <span>{filtered.length} ASSETS · {network === 'all' ? 'ALL NETWORKS' : network.toUpperCase()} · {timeWindow}</span>
+                    <span className="font-mono text-[#050505]/40 tracking-widest">ON-CHAIN HOOKS</span>
                 </div>
             </div>
         </div>

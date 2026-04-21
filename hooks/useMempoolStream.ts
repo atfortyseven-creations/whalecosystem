@@ -40,21 +40,27 @@ export function useMempoolStream(enabled: boolean = true) {
                 
                 if (isMounted && parsed.type === 'stream' && parsed.events) {
                     setIsConnected(true);
-                    parsed.events.forEach((ev: any) => {
-                        currentCount++;
-                        const newTx: MempoolTx = {
-                            hash: ev.hash,
-                            timestamp: ev.timestamp,
-                            value: ev.value || (parseInt(ev.hash.slice(-4), 16) / 100),
-                            type: (ev.value > 10 || parseInt(ev.hash.slice(-2), 16) > 200) ? 'whale' : 'dust',
-                            gasPrice: ev.gasPrice || (parseInt(ev.hash.slice(2, 4), 16) + 10)
-                        };
+                    
+                    setTransactions(prev => {
+                        const existingHashes = new Set(prev.map(tx => tx.hash));
+                        const newTxs: MempoolTx[] = [];
                         
-                        setTransactions(prev => {
-                            const next = [newTx, ...prev];
-                            if (next.length > 150) return next.slice(0, 150);
-                            return next;
+                        parsed.events.forEach((ev: any) => {
+                            if (!existingHashes.has(ev.hash)) {
+                                currentCount++;
+                                newTxs.push({
+                                    hash: ev.hash,
+                                    timestamp: ev.timestamp,
+                                    value: ev.value || 0,
+                                    type: ev.type || 'dust',
+                                    gasPrice: ev.gasPrice || 0
+                                });
+                            }
                         });
+                        
+                        // Sort by newest first and cap array
+                        const combined = [...newTxs, ...prev].sort((a,b) => b.timestamp - a.timestamp);
+                        return combined.slice(0, 150);
                     });
                 }
             } catch (e) {

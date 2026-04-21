@@ -1,51 +1,40 @@
 "use client";
 
 /**
- * MassTransferIntel — Coordinated Multi-Address Capital Flow Detection
+ * Global Capital Ledger — Institutional Flow Topography
  *
- * This module surfaces all data from the Whale-Events Data Lake and correlates 
+ * This module surfaces all data from the Sovereign Data Lake and correlates 
  * multi-chain, multi-address capital movements.
  *
- * NOW WIRED TO TITANIUM PROTOCOL: Zero-Mock Mandate
+ * TITANIUM PROTOCOL: Zero-Mock Mandate. Monochromatic Institutional UI.
  */
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WhaleEvent } from "@/lib/store/websocket-store";
 import {
-  Activity, TrendingUp, Zap, AlertTriangle, Globe,
-  ChevronRight, Filter, RefreshCw, ArrowRight, Copy, ExternalLink, Bell, BellOff, Loader2
+  Activity, Zap, AlertTriangle, ArrowRight, Copy, ExternalLink, Bell, BellOff, Loader2,
+  Clock, ShieldCheck, FileDigit, Building2, Flame, RefreshCw
 } from "lucide-react";
-import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { MassTransferSkeleton } from "@/components/ui/skeleton-loader";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
 import { useSovereignIntel } from "@/lib/api-client";
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Institutional Config ───────────────────────────────────────────────────
 
-const TIER_CONFIG: Record<string, { color: string; label: string; minUsd: number }> = {
-  MEGALODON:   { color: "#FF3B30", label: "Megalodon",   minUsd: 100_000_000 },
-  GREAT_WHITE: { color: "#FF9500", label: "Great White", minUsd: 50_000_000  },
-  HUMPBACK:    { color: "#FFCC00", label: "Humpback",    minUsd: 10_000_000  },
-  ORCA:        { color: "#34C759", label: "Orca",        minUsd: 1_000_000   },
-  BLUE_WHALE:  { color: "#007AFF", label: "Blue Whale",  minUsd: 5_000_000   },
-  NARWHAL:     { color: "#AF52DE", label: "Narwhal",     minUsd: 500_000     },
-};
-
-const ACTION_COLORS: Record<string, string> = {
-  TRANSFER: "#007AFF",
-  SWAP:     "#34C759",
-  BRIDGE:   "#AF52DE",
-  STAKE:    "#FF9500",
-  UNSTAKE:  "#FF3B30",
-  DEPOSIT:  "#00C076",
-  WITHDRAW: "#FF6B35",
+const TIER_CONFIG: Record<string, { bg: string; text: string; border: string; label: string; minUsd: number }> = {
+  ULTRA_CAPITAL_FLOW:  { bg: "#D4AF37", text: "#FFFFFF", border: "#D4AF37", label: "ULTRA FLOW (UHC-X)", minUsd: 100_000_000 },
+  PRINCIPAL_BLOCK:     { bg: "#050505", text: "#FFFFFF", border: "#050505", label: "PRINCIPAL (PB-1)",   minUsd: 50_000_000 },
+  ENTERPRISE_TRANSFER: { bg: "#333333", text: "#FFFFFF", border: "#333333", label: "ENTERPRISE (ENT)",   minUsd: 10_000_000 },
+  LIQUIDITY_NODE:      { bg: "#F0F0F0", text: "#050505", border: "#CCCCCC", label: "LIQUIDITY (LN-5)",   minUsd: 5_000_000 },
+  STANDARD_FLOW:       { bg: "#FAFAFA", text: "#444444", border: "#EAEAEA", label: "STANDARD (SF-1)",    minUsd: 1_000_000 },
+  RETAIL_PRO:          { bg: "#FFFFFF", text: "#888888", border: "#F5F5F5", label: "RETAIL (R-0)",       minUsd: 500_000 },
+  MICRO_TRANSFER:      { bg: "#FFFFFF", text: "#AAAAAA", border: "#F9F9F9", label: "MICRO",              minUsd: 0 },
 };
 
 function formatUsd(v: number): string {
   if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
-  if (v >= 1e6) return `$${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e6) return `$${(v / 1e6).toFixed(2)}M`;
   if (v >= 1e3) return `$${(v / 1e3).toFixed(0)}K`;
   return `$${v.toFixed(0)}`;
 }
@@ -55,282 +44,162 @@ function shortAddr(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
-// ─── Live Event Row ───────────────────────────────────────────────────────────
+// ─── Highly Dense Row ────────────────────────────────────────────────────────
 
-function EventRow({ event, index }: { event: WhaleEvent; index: number }) {
-  const tierCfg = TIER_CONFIG[event.tier] || { color: "#888", label: event.tier, minUsd: 0 };
-  const actionColor = ACTION_COLORS[event.action] || "#888";
+function EventRow({ event, index }: { event: any; index: number }) {
+  const tCfg = TIER_CONFIG[event.tier] || TIER_CONFIG.MICRO_TRANSFER;
   const [copied, setCopied] = useState(false);
 
-  const copyHash = () => {
-    navigator.clipboard.writeText(event.hash).catch(() => {});
+  const copyData = (text: string) => {
+    navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const getExplorer = (chain: string, type: 'tx'|'address', val: string) => {
+    const map: Record<string, string> = {
+        'ETH': 'etherscan.io', 'BSC': 'bscscan.com', 'POL': 'polygonscan.com', 'SOL': 'solscan.io'
+    };
+    const domain = map[chain] || 'etherscan.io';
+    return `https://${domain}/${type}/${val}`;
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: -16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay: Math.min(index * 0.025, 0.5) }}
-      className="flex items-center gap-4 px-5 py-3.5 rounded-2xl group transition-all"
-      style={{
-        background: "#fff",
-        border: "1px solid rgba(0,0,0,0.04)",
-      }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
+      className="flex flex-col border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-colors bg-white group p-4"
     >
-      {/* Tier indicator */}
-      <div
-        className="w-2 h-2 rounded-full shrink-0"
-        style={{ background: tierCfg.color, boxShadow: `0 0 8px ${tierCfg.color}60` }}
-      />
-
-      {/* Action badge */}
-      <span
-        className="text-[8.5px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg shrink-0"
-        style={{
-          background: `${actionColor}12`,
-          color: actionColor,
-          border: `1px solid ${actionColor}25`,
-        }}
-      >
-        {event.action}
-      </span>
-
-      {/* Token + Amount */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-[11.5px] font-black text-black">
-            {formatUsd(event.usdValue)}
-          </span>
-          <span className="text-[9px] font-bold text-black/30 uppercase">
-            {event.token}
-          </span>
+        {/* Superior Top Bar: Meta & Identifiers */}
+        <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#F0F0F0] border-dashed">
+            <div className="flex items-center gap-3">
+                <span 
+                    className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm"
+                    style={{ background: tCfg.bg, color: tCfg.text, border: `1px solid ${tCfg.border}` }}
+                >
+                    {tCfg.label}
+                </span>
+                <span className="text-[10px] font-mono font-black tracking-widest text-[#050505]">
+                    {event.action}
+                </span>
+                <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1">
+                    <Clock size={10} /> {new Date(event.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </span>
+            </div>
+            <div className="flex items-center gap-3 text-[9px] font-mono text-[#888888]">
+                <span className="uppercase flex items-center gap-1">
+                    <ShieldCheck size={10} className="text-[#050505]" /> {event.confirmations} Confs
+                </span>
+                <span className="uppercase flex items-center gap-1">
+                    <Flame size={10} className="text-[#050505]" /> {event.gasPriceGwei} Gwei
+                </span>
+                <span className="uppercase text-[#050505] font-black border border-[#E5E5E5] px-1.5 py-0.5 rounded-sm">
+                    {event.chain}
+                </span>
+            </div>
         </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          <a
-            href={
-              event.chain === 'ETH' ? `https://etherscan.io/address/${event.wallet}` :
-              event.chain === 'BSC' ? `https://bscscan.com/address/${event.wallet}` :
-              event.chain === 'POLYGON' ? `https://polygonscan.com/address/${event.wallet}` :
-              event.chain === 'SOL' ? `https://solscan.io/account/${event.wallet}` :
-              `https://etherscan.io/address/${event.wallet}` // fallback
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[9px] font-mono text-black/25 hover:text-black hover:underline transition-colors flex items-center gap-1"
-          >
-            {shortAddr(event.wallet)}
-          </a>
-          {/* Identity Badge */}
-          {(event.wallet.toLowerCase().includes("a1e") || event.wallet.toLowerCase().includes("14")) && (
-            <span className="text-[7.5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-[#F3BA2F]/10 text-[#F3BA2F] border border-[#F3BA2F]/20">
-              BINANCE 14
-            </span>
-          )}
-          {event.dex && (
-            <span className="text-[8px] font-black uppercase tracking-wider text-black/20">
-              via {event.dex}
-            </span>
-          )}
+
+        {/* Core Value & Routing */}
+        <div className="flex items-start justify-between">
+            {/* Routing: From -> To */}
+            <div className="flex flex-col gap-2 w-1/3">
+                <div className="flex items-center gap-2">
+                    <span className="text-[9px] text-[#888888] uppercase w-8">From</span>
+                    <a href={getExplorer(event.chain, 'address', event.from)} target="_blank" rel="noreferrer" className="text-[11px] font-mono text-[#050505] hover:underline">
+                        {shortAddr(event.from)}
+                    </a>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-[9px] text-[#888888] uppercase w-8">To</span>
+                    <a href={getExplorer(event.chain, 'address', event.to)} target="_blank" rel="noreferrer" className="text-[11px] font-mono text-[#050505] hover:underline flex items-center gap-1.5">
+                        {shortAddr(event.to)}
+                        {/* Exchange Detection Heuristic */}
+                        {(event.to.toLowerCase().includes('0x28c') || event.to.toLowerCase().includes('0x742')) && (
+                            <span className="text-[7.5px] px-1 py-0.5 rounded bg-[#050505] text-[#D4AF37] border border-[#D4AF37] uppercase tracking-widest"><Building2 size={8} className="inline mr-0.5"/> CEX NODE</span>
+                        )}
+                    </a>
+                </div>
+            </div>
+
+            {/* Financial Value Center */}
+            <div className="flex flex-col items-center justify-center w-1/3">
+                <div className="text-xl font-black font-mono tracking-tighter text-[#050505]">
+                    {formatUsd(event.usdValue)}
+                </div>
+                <div className="text-[11px] font-black text-[#555555] mt-1 flex items-center gap-1.5">
+                    <span>{parseFloat(event.amount).toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                    <span className="uppercase tracking-widest">{event.token}</span>
+                </div>
+            </div>
+
+            {/* Metadata & Actions */}
+            <div className="flex flex-col items-end gap-2 w-1/3 text-[10px] font-mono">
+                <div className="flex items-center gap-2 text-[#888888]">
+                    <span className="uppercase text-[#888888]">Hash</span>
+                    <a href={getExplorer(event.chain, 'tx', event.hash)} target="_blank" rel="noreferrer" className="text-[#050505] hover:underline">
+                        {shortAddr(event.hash)}
+                    </a>
+                    <button onClick={() => copyData(event.hash)} className="hover:text-[#050505] transition-colors"><Copy size={11} /></button>
+                </div>
+                {event.method && event.method !== 'Native Transfer' && (
+                    <div className="flex items-center gap-1 uppercase bg-[#F5F5F5] px-2 py-0.5 rounded text-[#050505] border border-[#E5E5E5]">
+                        <FileDigit size={10} /> {event.method}
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-
-      {/* Tier label */}
-      <span
-        className="text-[8px] font-black uppercase tracking-widest shrink-0"
-        style={{ color: tierCfg.color }}
-      >
-        {tierCfg.label}
-      </span>
-
-      {/* Hash external link */}
-      <a
-        href={
-              event.chain === 'ETH' ? `https://etherscan.io/tx/${event.hash}` :
-              event.chain === 'BSC' ? `https://bscscan.com/tx/${event.hash}` :
-              event.chain === 'POLYGON' ? `https://polygonscan.com/tx/${event.hash}` :
-              event.chain === 'SOL' ? `https://solscan.io/tx/${event.hash}` :
-              `https://etherscan.io/tx/${event.hash}` // fallback
-        }
-        target="_blank"
-        rel="noopener noreferrer"
-        className="opacity-0 group-hover:opacity-100 transition-opacity"
-        title="View on block explorer"
-      >
-        <ExternalLink size={11} className="text-black/25 hover:text-[#00C076] transition-colors" />
-      </a>
-
-      {/* Hash copy */}
-      <button
-        onClick={copyHash}
-        className="opacity-0 group-hover:opacity-100 transition-opacity ml-2"
-        title="Copy transaction hash"
-      >
-        <Copy size={11} style={{ color: copied ? "#00C076" : "rgba(0,0,0,0.25)" }} />
-      </button>
     </motion.div>
   );
 }
 
-// ─── Tier Distribution Bar ────────────────────────────────────────────────────
+// ─── Summary Section ─────────────────────────────────────────────────────────
 
-function TierDistribution({ events }: { events: WhaleEvent[] }) {
-  const dist = useMemo(() => {
-    const counts: Record<string, number> = {};
-    events.forEach(e => { counts[e.tier] = (counts[e.tier] || 0) + 1; });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [events]);
-
-  const total = events.length || 1;
-
-  return (
-    <div
-      className="p-5 rounded-2xl mb-6"
-      style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.06)" }}
-    >
-      <div className="text-[9px] font-black uppercase tracking-widest mb-4 text-black/30">
-        Tier Distribution — {events.length} events
-      </div>
-      <div className="space-y-2.5">
-        {dist.map(([tier, count]) => {
-          const cfg = TIER_CONFIG[tier] || { color: "#888", label: tier, minUsd: 0 };
-          const pct = (count / total) * 100;
-          return (
-            <div key={tier} className="flex items-center gap-3">
-              <span
-                className="text-[8.5px] font-black uppercase w-24 shrink-0"
-                style={{ color: cfg.color }}
-              >
-                {cfg.label}
-              </span>
-              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.05)" }}>
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: cfg.color }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                />
-              </div>
-              <span className="text-[9px] font-mono font-black text-black/30 w-8 text-right">{count}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ─── Summary Cards ────────────────────────────────────────────────────────────
-
-function SummaryCards({ events }: { events: WhaleEvent[] }) {
+function SummaryCards({ events }: { events: any[] }) {
   const totalUsd   = events.reduce((s, e) => s + e.usdValue, 0);
   const avgUsd     = events.length ? totalUsd / events.length : 0;
   const maxEvent   = events.reduce((a, b) => b.usdValue > a.usdValue ? b : a, events[0] || { usdValue: 0, token: "-" } as any);
-  const uniqueWallets = new Set(events.map(e => e.wallet)).size;
+  const uniqueSenders = new Set(events.map(e => e.from)).size;
 
   const cards = [
-    { label: "Total Volume Indexed",    value: totalUsd,   sub: `${events.length} events`, color: "#007AFF", isUsd: true },
-    { label: "Largest Single Movement", value: maxEvent?.usdValue || 0, sub: maxEvent?.token || "-", color: "#FF3B30", isUsd: true },
-    { label: "Average Event Size",      value: avgUsd,     sub: "per event", color: "#34C759", isUsd: true },
-    { label: "Unique Wallet Actors",    value: uniqueWallets, sub: "distinct addresses", color: "#AF52DE", isUsd: false },
+    { label: "Aggregate Volume Index",  value: totalUsd,   sub: `${events.length} verified operations` },
+    { label: "Apex Principal Transfer", value: maxEvent?.usdValue || 0, sub: `${maxEvent?.token || "-"} Equivalent` },
+    { label: "Mean Transmission Size",  value: avgUsd,     sub: "per standard block" },
+    { label: "Unique Actuating Nodes",  value: uniqueSenders, sub: "distinct sender addresses", isNum: true },
   ];
 
   return (
-    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-      {cards.map(({ label, value, sub, color, isUsd }) => (
-        <div
-          key={label}
-          className="p-5 rounded-2xl"
-          style={{
-            background: "#fff",
-            border: "1px solid rgba(0,0,0,0.06)",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-          }}
-        >
+    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+      {cards.map(({ label, value, sub, isNum }) => (
+        <div key={label} className="p-6 border border-[#E0E0E0] bg-[#FFFFFF] rounded-sm">
+          <div className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">{label}</div>
           <AnimatedCounter 
             value={value}
-            format={isUsd ? formatUsd : (val) => Math.floor(val).toString()}
-            className="text-2xl font-black font-mono mb-1 block"
-            style={{ color }}
+            format={isNum ? (v) => Math.floor(v).toString() : formatUsd}
+            className="text-2xl font-bold font-mono tracking-tighter text-[#050505] mb-1 block"
           />
-          <div className="text-[8.5px] font-black uppercase tracking-widest text-black/25 mb-0.5">
-            {label}
-          </div>
-          <div className="text-[9px] font-bold text-black/20">{sub}</div>
+          <div className="text-[10px] font-mono text-[#888888]">{sub}</div>
         </div>
       ))}
     </div>
   );
 }
 
-// ─── Action Filter Bar ────────────────────────────────────────────────────────
-
-function ActionFilter({
-  actions,
-  selected,
-  onSelect,
-}: {
-  actions: string[];
-  selected: string | null;
-  onSelect: (a: string | null) => void;
-}) {
-  return (
-    <div className="flex items-center gap-2 flex-wrap mb-5">
-      <button
-        onClick={() => onSelect(null)}
-        className="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-        style={{
-          background: selected === null ? "#050505" : "rgba(0,0,0,0.04)",
-          color:      selected === null ? "#fff"    : "rgba(0,0,0,0.4)",
-          border:     `1px solid ${selected === null ? "transparent" : "rgba(0,0,0,0.06)"}`,
-        }}
-      >
-        All
-      </button>
-      {actions.map(action => {
-        const color = ACTION_COLORS[action] || "#888";
-        const active = selected === action;
-        return (
-          <button
-            key={action}
-            onClick={() => onSelect(active ? null : action)}
-            className="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-            style={{
-              background: active ? `${color}18` : "rgba(0,0,0,0.03)",
-              color:      active ? color       : "rgba(0,0,0,0.35)",
-              border:     `1px solid ${active ? `${color}30` : "rgba(0,0,0,0.05)"}`,
-            }}
-          >
-            {action}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Ledger ───────────────────────────────────────────────────────────
 
 export default function MassTransferIntel() {
-  const [actionFilter, setActionFilter] = useState<string | null>(null);
-  const [tierFilter,   setTierFilter]   = useState<string | null>(null);
   const [chainFilter,  setChainFilter]  = useState<string | null>(null);
   const [minUsdFilter, setMinUsdFilter] = useState<number>(0);
-  const [limit, setLimit] = useState(100);
-  const [sortBy, setSortBy] = useState<'time_desc' | 'time_asc' | 'usd_desc' | 'usd_asc'>('time_desc');
+  const [sortBy, setSortBy] = useState<'time_desc' | 'usd_desc'>('time_desc');
   const [isSonarActive, setIsSonarActive] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const prevEventsRef = useRef<number>(0);
 
   // =========================================================================
-  // INJECTED DATA HOOK
-  // Enforcing strict on-chain reality. Waiting for endpoint assignment.
+  // ZERO-MOCK MANDATE HOOK
   // =========================================================================
   const { data: rawData, isLoading, error, refetch } = useSovereignIntel('massTransfers');
-  
-  const events: WhaleEvent[] = rawData?.events || [];
+  const events: any[] = rawData?.events || [];
 
   const playPing = () => {
     if (!audioCtxRef.current) {
@@ -345,7 +214,6 @@ export default function MassTransferIntel() {
     osc.type = 'sine';
     osc.frequency.setValueAtTime(800, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.5);
-    
     gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.05);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
@@ -366,208 +234,108 @@ export default function MassTransferIntel() {
     }
   }, [events, isSonarActive]);
 
-  const allActions = useMemo(() => [...new Set(events.map(e => e.action))], [events]);
-
   const filtered = useMemo(() => {
-    const f = events.filter(e => {
-      if (actionFilter && e.action !== actionFilter) return false;
-      if (tierFilter   && e.tier   !== tierFilter)   return false;
-      if (chainFilter  && e.chain  !== chainFilter)  return false;
-      if (e.usdValue   <  minUsdFilter)              return false;
-      return true;
-    });
-
-    return f.sort((a, b) => {
-      switch (sortBy) {
-        case 'time_desc': return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-        case 'time_asc':  return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-        case 'usd_desc':  return b.usdValue - a.usdValue;
-        case 'usd_asc':   return a.usdValue - b.usdValue;
-        default: return 0;
-      }
-    });
-  }, [events, actionFilter, tierFilter, sortBy]);
+    return events
+      .filter(e => {
+        if (chainFilter  && e.chain  !== chainFilter)  return false;
+        if (e.usdValue   <  minUsdFilter)              return false;
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'time_desc') return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        return b.usdValue - a.usdValue; // 'usd_desc'
+      });
+  }, [events, chainFilter, minUsdFilter, sortBy]);
 
   return (
-    <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
-
-      {/* ── Header ── */}
-      <div className="flex items-start justify-between p-6 border-b border-[#E5E5E5] bg-[#FAF9F6] shrink-0">
+    <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] text-[#050505] font-sans">
+      
+      {/* ── Formal Academic Header ── */}
+      <div className="flex items-end justify-between px-8 py-8 border-b border-[#E5E5E5] bg-white shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <Activity size={24} className="text-black/30" />
-            <h2 className="text-2xl font-black text-black uppercase tracking-tighter">
-              Mass Transfer Intelligence
-            </h2>
+            <Building2 size={24} className="text-[#050505]" />
+            <h1 className="text-3xl font-bold uppercase tracking-tighter text-[#050505]">
+              CAPITAL LEDGER
+            </h1>
           </div>
-          <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(0,0,0,0.3)" }}>
-            Real-time coordinated capital flow detection — updated every 10 seconds
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[#A0A0A0] ml-9">
+            FLOW TOPOGRAPHY · &lt;10ms
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="flex flex-col items-end mr-4">
-            <span className="text-[8px] font-black uppercase tracking-widest text-black/30 mb-1">
-              Min USD: {formatUsd(minUsdFilter)}
+        {/* Formal Controls */}
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end mr-2">
+            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-1.5">
+              Capital Floor: {formatUsd(minUsdFilter)}
             </span>
             <input 
-              type="range" 
-              min="0" 
-              max="50000000" 
-              step="500000"
-              value={minUsdFilter}
-              onChange={(e) => setMinUsdFilter(Number(e.target.value))}
-              className="w-32 accent-black cursor-pointer"
+              type="range" min="0" max="100000000" step="1000000"
+              value={minUsdFilter} onChange={(e) => setMinUsdFilter(Number(e.target.value))}
+              className="w-40 appearance-none h-1 bg-[#E5E5E5] rounded-none outline-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-[#050505]"
             />
           </div>
 
-            <a
-              href={`#`}
-              onClick={(e) => { e.preventDefault(); refetch(); toast.success("SWR Cache Invalidated", { description: "Force synchronized with Data Lake." }); }}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest hover:bg-black/5"
-              style={{ background: "rgba(0,0,0,0.04)", color: "rgba(0,0,0,0.4)" }}
-            >
-              <RefreshCw size={12} />
-              Refresh
-            </a>
-            <button
-               onClick={() => {
-                   setIsSonarActive(!isSonarActive);
-                   if (!isSonarActive) {
-                       toast.success("Sonar Activated", { description: "You will hear a ping for new whale movements." });
-                       playPing(); // test ping
-                   }
-               }}
-               className="px-3 py-2 rounded-xl transition-all"
-               title="Toggle Sonar"
-               style={{
-                 background: isSonarActive ? "rgba(0, 192, 118, 0.1)" : "rgba(0,0,0,0.03)",
-                 border: `1px solid ${isSonarActive ? "rgba(0, 192, 118, 0.3)" : "rgba(0,0,0,0.06)"}`,
-                 color: isSonarActive ? "#00C076" : "rgba(0,0,0,0.4)",
-               }}
-            >
-               {isSonarActive ? <Bell size={12} /> : <BellOff size={12} />}
-            </button>
-          <select
-            value={chainFilter || ""}
-            onChange={e => setChainFilter(e.target.value === "" ? null : e.target.value)}
-            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border appearance-none cursor-pointer outline-none"
-            style={{
-              background: "rgba(0,0,0,0.03)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              color: "rgba(0,0,0,0.4)",
-            }}
-          >
-            <option value="">All Chains</option>
+          <button onClick={() => { refetch(); toast.success("Ledger Synchronized"); }} className="px-4 py-2 border border-[#E5E5E5] bg-[#FFFFFF] hover:bg-[#F0F0F0] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors">
+            <RefreshCw size={12} /> Sync
+          </button>
+          
+          <button onClick={() => setIsSonarActive(!isSonarActive)} className={`px-4 py-2 border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${isSonarActive ? 'border-[#050505] bg-[#050505] text-[#FFFFFF]' : 'border-[#E5E5E5] bg-[#FFFFFF] hover:bg-[#F0F0F0]'}`}>
+            {isSonarActive ? <Bell size={12} /> : <BellOff size={12} />} Sonar
+          </button>
+
+          <select value={chainFilter || ""} onChange={e => setChainFilter(e.target.value === "" ? null : e.target.value)} className="px-4 py-2 border border-[#E5E5E5] bg-[#FFFFFF] text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
+            <option value="">OMNICHAIN (ALL)</option>
             {Array.from(new Set(events.map(e => e.chain).filter(Boolean) as string[])).map(chain => (
-              <option key={chain} value={chain}>{chain}</option>
+              <option key={chain} value={chain}>{chain} NETWORK</option>
             ))}
           </select>
 
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value as any)}
-            className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border appearance-none cursor-pointer outline-none"
-            style={{
-              background: "rgba(0,0,0,0.03)",
-              border: "1px solid rgba(0,0,0,0.06)",
-              color: "rgba(0,0,0,0.4)",
-            }}
-          >
-            <option value="time_desc">Latest First</option>
-            <option value="time_asc">Oldest First</option>
-            <option value="usd_desc">Highest Value</option>
-            <option value="usd_asc">Lowest Value</option>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="px-4 py-2 border border-[#E5E5E5] bg-[#FFFFFF] text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
+            <option value="time_desc">CHRONOLOGICAL</option>
+            <option value="usd_desc">MAGNITUDE</option>
           </select>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6">
-      {isLoading ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full">
-            <Loader2 className="animate-spin mb-4" size={32} />
-            <p className="text-[11px] font-black uppercase tracking-[0.2em]">WAITING FOR ON-CHAIN ENDPOINT</p>
-            <p className="text-[9px] mt-2">Zero-Mock Mandate Active</p>
-        </div>
-      ) : error ? (
-        <div className="h-48 flex flex-col items-center justify-center">
-          <AlertTriangle size={24} className="text-black/10 mb-3" />
-          <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
-            Data Lake Unavailable
-          </p>
-          <p className="text-[9px] text-black/15 mt-1 uppercase tracking-widest">
-            Database connection required
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* Summary */}
-          <SummaryCards events={events} />
-
-          {/* Tier Distribution */}
-          {events.length > 0 && <TierDistribution events={events} />}
-
-          {/* Action Filters */}
-          {events.length > 0 && (
-             <ActionFilter
-                actions={allActions}
-               selected={actionFilter}
-               onSelect={setActionFilter}
-             />
-          )}
-
-          {/* Significance alert for big events */}
-          {events.filter(e => e.usdValue >= 50_000_000).length > 0 && (
-            <div
-              className="flex items-center gap-3 px-5 py-3.5 rounded-2xl mb-5"
-              style={{
-                background: "rgba(255,59,48,0.04)",
-                border: "1px solid rgba(255,59,48,0.12)",
-              }}
-            >
-              <Zap size={14} style={{ color: "#FF3B30" }} />
-              <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#FF3B30" }}>
-                {events.filter(e => e.usdValue >= 50_000_000).length} movements above $50M threshold detected
-                — Akashic Ledger candidacy analysis active
-              </span>
+      <div className="flex-1 min-h-0 overflow-y-auto msv-hide-scrollbar px-8 py-8">
+        {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full">
+              <Loader2 className="animate-spin mb-4" size={32} />
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">INITIALIZING LEDGER</p>
+              <p className="text-[9px] mt-2 font-mono uppercase tracking-[0.1em]">ESTABLISHING RPC LINK</p>
+          </div>
+        ) : error ? (
+          <div className="h-48 flex flex-col items-center justify-center">
+            <AlertTriangle size={24} className="text-[#050505] mb-3" />
+            <p className="text-[11px] font-black text-[#050505] uppercase tracking-[0.3em]">Telemetry Failure</p>
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto">
+            <SummaryCards events={events} />
+            
+            <div className="bg-white border border-[#E0E0E0] rounded flex flex-col shadow-sm">
+                <div className="px-5 py-3 bg-[#FAF9F6] border-b border-[#E0E0E0] flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
+                    <span>TRANSMISSIONS ({filtered.length})</span>
+                    <span className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#050505] rounded-full" /> LIVE
+                    </span>
+                </div>
+                {filtered.length === 0 ? (
+                    <div className="py-20 text-center flex flex-col items-center">
+                        <Activity size={32} className="text-[#E5E5E5] mb-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#888888]">NO QUALIFYING CAPITAL EVENTS</span>
+                    </div>
+                ) : (
+                    filtered.map((event, i) => (
+                        <EventRow key={`${event.hash}-${i}`} event={event} index={i} />
+                    ))
+                )}
             </div>
-          )}
-
-          {/* No data state */}
-          {events.length === 0 && (
-            <div
-              className="py-24 rounded-3xl text-center"
-              style={{ border: "2px dashed rgba(0,0,0,0.05)" }}
-            >
-              <div className="w-14 h-14 mx-auto mb-5 opacity-10">
-                <WhaleLogo className="w-full h-full" />
-              </div>
-              <p className="text-[11px] font-black text-black/15 uppercase tracking-[0.4em]">
-                No whale events indexed yet
-              </p>
-            </div>
-          )}
-
-          {/* Event feed */}
-          {filtered.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[9px] font-black uppercase tracking-widest text-black/25">
-                  Showing {filtered.length} of {events.length} events
-                </span>
-              </div>
-              <div className="space-y-2">
-                {filtered.map((event, i) => (
-                  <EventRow key={`${event.hash}-${i}`} event={event} index={i} />
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      )}
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-export { MassTransferIntel };

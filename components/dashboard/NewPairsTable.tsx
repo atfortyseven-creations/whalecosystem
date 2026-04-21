@@ -138,10 +138,10 @@ export function NewPairsTable() {
                 <div style={{ minWidth: 1400 }} className="flex-1 flex flex-col min-h-0">
 
                     {/* Column Headers */}
-                    <div className="sticky top-0 z-10 grid bg-[#FAF9F6] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em] shrink-0"
+                    <div className="sticky top-0 z-10 grid bg-white border-b border-[#E5E5E5] text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] shrink-0"
                         style={{ gridTemplateColumns: '2.4fr 1.4fr 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 0.9fr 1fr 1fr 1.4fr' }}
                     >
-                        {['Token / Dex', 'Price USD', 'Age', '5m %', '1h %', '6h %', '24h %', 'Liquidity', 'MCap', 'FDV', 'Makers', 'Security'].map((h, idx) => (
+                        {['ASSET/DEX', 'PRICE', 'AGE', '5M', '1H', '6H', '24H', 'LIQ', 'MCAP', 'FDV', 'VOL/MAKERS', 'SEC/SCORE'].map((h, idx) => (
                             <div key={h} className={`px-3 py-2.5 ${idx > 2 ? 'text-right' : ''}`}>{h}</div>
                         ))}
                     </div>
@@ -151,13 +151,13 @@ export function NewPairsTable() {
                         {loading ? (
                             <div className="p-12 text-center text-[#888888] text-xs font-mono flex flex-col items-center justify-center h-full">
                                 <Loader2 className="animate-spin mb-3" size={32} />
-                                <p className="text-[11px] font-black uppercase tracking-[0.2em] font-sans">WAITING FOR ON-CHAIN ENDPOINT</p>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] font-sans">WAITING FOR ON-CHAIN ENDPOINT</p>
                             </div>
                         ) : error ? (
                             <div className="h-full flex flex-col items-center justify-center p-12">
                                 <AlertTriangle size={24} className="text-black/10 mb-3" />
-                                <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em] font-sans">
-                                    Data Lake Unavailable
+                                <p className="text-[10px] font-bold text-black/40 uppercase tracking-[0.2em] font-sans">
+                                    DATA LAKE SYNC FAILED
                                 </p>
                             </div>
                         ) : filtered.length === 0 ? (
@@ -253,12 +253,12 @@ export function NewPairsTable() {
                                                 {/* Makers */}
                                                 <div className="px-3 text-right">
                                                     <div className="flex flex-col items-end gap-0.5">
-                                                        <span className="text-[10px] font-black font-mono text-[#050505] flex items-center gap-1">
+                                                        <span className="text-[10px] font-bold font-mono text-[#050505] flex items-center gap-1">
                                                             <Users size={9} className="text-[#888888]" />{traders.makers || 0}
                                                         </span>
                                                         {(traders.snipers || 0) > 0 && (
                                                             <span className="text-[8px] font-bold text-[#FF3B30] flex items-center gap-0.5">
-                                                                <Zap size={8}/>{traders.snipers} snipers
+                                                                <Zap size={8}/>{traders.snipers}
                                                             </span>
                                                         )}
                                                     </div>
@@ -293,9 +293,9 @@ export function NewPairsTable() {
             </div>
 
             {/* ── Status Footer ── */}
-            <div className="shrink-0 px-6 py-2 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                <span>{filtered.length} pairs shown · awaiting endpoint injection</span>
-                <span>Security powered by Whale Alert Network Engine</span>
+            <div className="shrink-0 px-5 py-2.5 border-t border-[#E5E5E5] bg-[#FAF9F6] flex items-center justify-between text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em]">
+                <span>{filtered.length} PAIRS · WAITING ON-CHAIN INJECTION</span>
+                <span className="font-mono text-[#050505]/40 tracking-widest">WAN SECURITY ENGINE</span>
             </div>
         </div>
         </div>
