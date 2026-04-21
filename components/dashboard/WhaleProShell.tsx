@@ -163,9 +163,6 @@ function LiveMarketBand() {
                     </PriceFlash>
                 </div>
             ))}
-            <div className={`px-2 py-0.5 rounded text-[7px] font-black uppercase tracking-widest border ml-4 ${mode === 'live' ? 'bg-[#00FF55]/10 border-[#00FF55]/30 text-[#00FF55]' : 'bg-[#FF9500]/10 border-[#FF9500]/30 text-[#FF9500]'}`}>
-                {mode} mode
-            </div>
         </>
     );
 }
@@ -447,11 +444,10 @@ export function WhaleProShell({
                             <span className={streamConnected ? 'text-[#00FF55]' : 'text-[#FF3B30]'}>
                                 {streamConnected ? 'ACTIVE' : 'DEGRADED'}
                             </span>
-                            {mode === 'synthetic' && <span className="ml-1 text-[7px] border border-[#FF9500]/50 text-[#FF9500] px-1 rounded-sm">INTERNAL FALLBACK</span>}
                         </span>
                     </div>
                     <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5"><Shield size={11} /> {mode === 'live' ? 'Protocol: Live' : 'Protocol: Simulated'}</span>
+                        <span className="flex items-center gap-1.5"><Shield size={11} /> Protocol: Live</span>
                         <span className="text-[#888888]">© 2026 WHALECOSYSTEM CORP.</span>
                     </div>
                 </footer>

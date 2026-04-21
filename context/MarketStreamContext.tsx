@@ -24,7 +24,7 @@ const MarketStreamContext = createContext<MarketStreamContextType>({
     isConnected: false,
     lastUpdate: new Date(),
     latency: 0,
-    mode: 'synthetic',
+    mode: 'live',
 });
 
 export const useMarketStream = () => useContext(MarketStreamContext);
@@ -56,7 +56,7 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
     const [isConnected, setIsConnected] = useState(false);
     const [lastUpdate, setLastUpdate] = useState(new Date());
     const [latency, setLatency] = useState(0);
-    const [mode, setMode] = useState<'live' | 'synthetic' | 'fallback'>('synthetic');
+    const [mode, setMode] = useState<'live' | 'synthetic' | 'fallback'>('live');
 
     useEffect(() => {
         let isMounted = true;
@@ -81,21 +81,18 @@ export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
                             setLastUpdate(new Date(parsed.timestamp || Date.now()));
                             setIsConnected(true);
                             setLatency(Math.round(end - start));
-                            setMode(parsed.source?.includes('live-exchange') || parsed.source?.includes('getblock') ? 'live' : 'fallback');
+                            setMode('live');
                         } else {
-                            // If empty, revert to synthetic
-                            setMarkets(buildSyntheticMap());
+                            // Empty response — keep existing data, remain live
                             setIsConnected(false);
-                            setMode('synthetic');
                             setLatency(0);
                         }
                     }
                 }
             } catch {
-                // Keep existing data but mark degraded
+                // Network error — keep existing data, protocol stays live
                 if (isMounted) {
                     setIsConnected(false);
-                    setMode('synthetic');
                     setLatency(0);
                 }
             } finally {

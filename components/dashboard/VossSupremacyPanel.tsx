@@ -304,10 +304,14 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
                         </div>
                         {/* Signature */}
                          <div className="px-6 py-3 flex justify-end">
-                              {displaySig?.startsWith('data:image') && (
+                              {displaySig?.startsWith('data:image') ? (
                                  <div className="bg-white border border-[#050505]/10 rounded overflow-hidden p-1 shadow-sm">
                                     <img src={displaySig} className="h-6 md:h-8 hover:scale-110 object-contain transition-all" style={{ filter: 'brightness(0)' }} alt="Signature" />
                                  </div>
+                              ) : (
+                                 <span className="font-mono text-[9px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
+                                     {displaySig && displaySig.length > 5 ? truncAddr(displaySig) : (displaySig || '—')}
+                                 </span>
                               )}
                          </div>
                     </div>

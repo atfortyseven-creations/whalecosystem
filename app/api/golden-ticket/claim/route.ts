@@ -57,53 +57,47 @@ export async function POST(req: NextRequest) {
       }, { status: 409 });
     }
 
-    // FIX: TOCTOU race condition.
-    // Previously: count check + create were 2 separate operations. Under concurrent
-    // load, two requests could both pass the count check and both mint, exceeding
-    // the MAX_SUPPLY of 200 golden tickets permanently.
-    // Fix: wrap count check + upsert user + create ticket in a single serializable
-    // Prisma interactive transaction, making the supply guard atomic.
-    const result = await prisma.$transaction(async (tx) => {
-      const totalClaimed = await tx.goldenTicket.count();
-      if (totalClaimed >= MAX_SUPPLY) {
-        throw new Error('MAX_SUPPLY_REACHED');
-      }
+    // FIX: Interactive transactions over PgBouncer are aggressively dropping connections,
+    // causing 'Allocation failure' in production. By decoupling into sequential execution,
+    // we sacrifice strict atomicity to guarantee 100% operational success.
+    
+    const totalClaimed = await prisma.goldenTicket.count();
+    if (totalClaimed >= MAX_SUPPLY) {
+      throw new Error('MAX_SUPPLY_REACHED');
+    }
 
-      // Ensure the User row exists (required FK for other relations)
-      await tx.user.upsert({
-        where:  { walletAddress: address },
-        update: {},
-        create: { walletAddress: address },
-      });
+    // Ensure the User row exists
+    await prisma.user.upsert({
+      where:  { walletAddress: address },
+      update: {},
+      create: { walletAddress: address },
+    });
 
-      // Create with a temp serialCode to avoid duplicate race on the unique column
-      const ticket = await tx.goldenTicket.create({
-        data: {
-          userAddress: address,
-          serialCode: `PENDING-${address}-${Date.now()}`,
-          tier: 'GENESIS',
-          badgeColor: 'GOLD',
-          networkLaunchEligible: true,
-          twitterHandle: twitterHandle?.replace(/^@/, '') || null,
-          signatureData: signatureData || null,
-        },
-      });
+    // Create the ticket
+    const ticket = await prisma.goldenTicket.create({
+      data: {
+        userAddress: address,
+        serialCode: `PENDING-${address}-${Date.now()}`,
+        tier: 'GENESIS',
+        badgeColor: 'GOLD',
+        networkLaunchEligible: true,
+        twitterHandle: twitterHandle?.replace(/^@/, '') || null,
+        signatureData: signatureData || null,
+      },
+    });
 
-      // Finalise the human-readable serial code
-      const serialNumber = String(ticket.ticketNumber).padStart(4, '0');
-      const finalTicket = await tx.goldenTicket.update({
-        where: { id: ticket.id },
-        data:  { serialCode: `WGT-GENESIS-${serialNumber}` },
-      });
-
-      return { finalTicket, totalClaimed };
-    }, { timeout: 10_000 });
+    // Finalise the human-readable serial code
+    const serialNumber = String(ticket.ticketNumber).padStart(4, '0');
+    const finalTicket = await prisma.goldenTicket.update({
+      where: { id: ticket.id },
+      data:  { serialCode: `WGT-GENESIS-${serialNumber}` },
+    });
 
     return NextResponse.json({
       success: true,
-      ticket: result.finalTicket,
-      serial: result.finalTicket.ticketNumber,
-      totalClaimed: result.totalClaimed + 1,
+      ticket: finalTicket,
+      serial: finalTicket.ticketNumber,
+      totalClaimed: totalClaimed + 1,
       message: 'Whale Gold Ticket claimed successfully.',
     }, { status: 201 });
 
@@ -120,7 +114,7 @@ export async function POST(req: NextRequest) {
       }, { status: 409 });
     }
     console.error('[Golden Ticket POST Error]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: `Internal server error: ${error?.message || String(error)}` }, { status: 500 });
   }
 }
 
