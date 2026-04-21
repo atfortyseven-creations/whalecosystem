@@ -97,18 +97,18 @@ export function OmniExplorer() {
     };
 
     return (
-        <div className="relative h-full w-full min-h-0 font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 selection:text-[#050505] overflow-hidden bg-[#FFFFFF]">
+        <div className="relative h-full w-full min-h-0 font-sans p-4 md:p-12 flex flex-col selection:bg-[#050505]/20 selection:text-[#050505] overflow-hidden bg-[#FAF9F6]">
             
             <div className="relative z-10 w-full h-full overflow-y-auto msv-hide-scrollbar flex flex-col gap-12">
                 {/* Header / Search Area */}
                 <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto pt-16 pb-12 gap-8">
                     <div className="text-center space-y-4 border-b border-[#E5E5E5] pb-8 w-full">
                         <div className="flex items-center justify-center gap-3 mb-2">
-                             <div className="w-1.5 h-4 bg-[#888888] rounded-full" />
-                             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#888888]">Institutional Global Ledger</span>
+                             <div className="w-1.5 h-4 bg-[#888888] rounded" />
+                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#888888]">OMNI-CHAIN LEDGER SEARCH</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#050505] leading-none">
-                            SEARCH <span className="text-[#888888]">BLOCK</span>
+                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-[0.05em] text-[#050505] leading-none">
+                            GLOBAL SEARCH
                         </h1>
                     </div>
 
@@ -123,35 +123,35 @@ export function OmniExplorer() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            className="w-full bg-[#FAF9F6] border border-[#E5E5E5] focus:border-[#050505] text-[#050505] p-5 pl-14 outline-none transition-all text-xs font-mono uppercase tracking-widest placeholder:text-[#888888] rounded-2xl shadow-sm"
-                            placeholder="SCAN ADDRESS / TX HASH / TOKEN / ENS"
+                            className="w-full bg-white border border-[#E5E5E5] focus:border-[#050505] text-[#050505] p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0] rounded shadow-sm"
+                            placeholder="INPUT ADDRESS / TX HASH / ENS"
                         />
                         <button
                             onClick={handleSearch}
                             disabled={isSearching}
-                            className="absolute inset-y-2 right-2 bg-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] hover:border-[#E5E5E5] border border-transparent text-white px-8 font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+                            className="absolute inset-y-2 right-2 bg-[#050505] hover:bg-[#FAF9F6] hover:text-[#050505] hover:border-[#050505] border border-transparent text-white px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded"
                         >
-                            {isSearching ? 'SCANNING...' : 'SCAN'}
+                            {isSearching ? 'INDEXING...' : 'INITIATE'}
                         </button>
                     </div>
 
                     {/* Search Results / Errors */}
                     {searchError && (
-                        <div className="w-full border border-[#FF3B30]/30 bg-[#FF3B30]/5 p-5 rounded-xl flex items-center gap-4 text-[#FF3B30]">
+                        <div className="w-full border border-[#FF3B30]/30 bg-white p-5 rounded flex items-center gap-4 text-[#FF3B30]">
                             <AlertCircle size={16} className="shrink-0" />
-                            <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{searchError}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.1em]">{searchError}</span>
                         </div>
                     )}
 
                     {searchResults !== null && (
-                        <div className="w-full border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="w-full border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
                             <div className="flex items-center justify-between p-5 bg-[#FAF9F6] border-b border-[#E5E5E5]">
                                 <div className="flex items-center gap-3">
                                     <Zap size={14} className="text-[#050505]" />
-                                    <h2 className="text-[11px] font-black uppercase tracking-widest">QUERY RESULTS</h2>
+                                    <h2 className="text-[10px] font-bold uppercase tracking-[0.1em]">QUERY RESULTS</h2>
                                 </div>
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#888888]">
-                                    {searchResults.length} NODES IDENTIFIED
+                                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">
+                                    {searchResults.length} NODES MATCHED
                                 </span>
                             </div>
                             {searchResults.length === 0 ? (
@@ -189,13 +189,13 @@ export function OmniExplorer() {
                 <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 pb-20">
                     
                     {/* BLOCKS PANEL */}
-                    <div className="border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl overflow-hidden shadow-sm">
+                    <div className="border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm">
                         <div className="flex items-center justify-between p-6 bg-[#FAF9F6] border-b border-[#E5E5E5]">
                             <div className="flex items-center gap-3">
                                 <Box size={14} className="text-[#050505]" />
-                                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">BLOCK TELEMETRY</h2>
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505]">BLOCK TELEMETRY</h2>
                             </div>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#888888]">LIVE STREAMING</span>
+                            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">LIVE STREAMING</span>
                         </div>
 
                         <div className="flex flex-col">
@@ -237,13 +237,13 @@ export function OmniExplorer() {
                     </div>
 
                     {/* TRANSACTIONS PANEL */}
-                    <div className="border border-[#E5E5E5] bg-[#FFFFFF] rounded-2xl overflow-hidden shadow-sm">
+                    <div className="border border-[#E5E5E5] bg-white rounded overflow-hidden shadow-sm">
                         <div className="flex items-center justify-between p-6 bg-[#FAF9F6] border-b border-[#E5E5E5]">
                             <div className="flex items-center gap-3">
                                 <Activity size={14} className="text-[#050505]" />
-                                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#050505]">INSTITUTIONAL FLOWS</h2>
+                                <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505]">TRANSACTION FLOWS</h2>
                             </div>
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#888888]">MEMPOOL STATUS: ACTIVE</span>
+                            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">MEMPOOL MONITOR</span>
                         </div>
 
                         <div className="flex flex-col">
@@ -287,25 +287,24 @@ export function OmniExplorer() {
 
                  {/* INSPECTION MODALS */}
                  {(selectedBlock || selectedTx) && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#FAF9F6]/80 backdrop-blur-3xl">
-                        <div className="w-full max-w-2xl bg-white border border-black/[0.08] rounded-[3.5rem] shadow-2xl overflow-hidden relative">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 backdrop-blur-md">
+                        <div className="w-full max-w-2xl bg-white border border-[#E5E5E5] rounded shadow-xl overflow-hidden relative">
                             <button 
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                className="absolute top-8 right-8 w-12 h-12 bg-black/5 rounded-full flex items-center justify-center text-black/20 hover:text-black hover:bg-black/10 transition-all active:scale-90"
+                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505] hover:bg-[#FAF9F6] transition-all"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
 
-                            <div className="p-12 md:p-16">
-                                <div className="flex items-center gap-6 mb-12">
-                                    <div className="w-16 h-16 bg-[#00F2EA]/10 border border-[#00F2EA]/20 rounded-3xl flex items-center justify-center">
-                                        {selectedBlock ? <Box size={28} className="text-[#00F2EA]" /> : <Activity size={28} className="text-[#00F2EA]" />}
+                            <div className="p-8 md:p-10">
+                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5]">
+                                    <div className="w-12 h-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded flex items-center justify-center">
+                                        {selectedBlock ? <Box size={20} className="text-[#050505]" /> : <Activity size={20} className="text-[#050505]" />}
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-3xl font-black uppercase tracking-tighter text-black">
-                                            {selectedBlock ? 'BLOCK INTELLIGENCE' : 'TX AUDIT LOG'}
+                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505]">
+                                            {selectedBlock ? 'BLOCK DETAILS' : 'TRANSACTION DETAILS'}
                                         </h3>
-                                        <span className="text-[11px] font-black text-black/20 uppercase tracking-[0.4em]">Handshake Protocol // Active</span>
                                     </div>
                                 </div>
 
@@ -325,16 +324,15 @@ export function OmniExplorer() {
                                             <DetailRow label="Target Destination" value={selectedTx.to} copy />
                                             <DetailRow label="Transfer Value" value={selectedTx.value} highlight />
                                             <DetailRow label="Payload Type" value={selectedTx.type} />
-                                            <DetailRow label="Infrastructure" value="HumanId Institutional Verified" green />
                                         </>
                                     )}
                                 </div>
 
                                 <button
                                     onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                    className="w-full mt-12 py-6 bg-black text-white rounded-3xl font-black uppercase tracking-[0.3em] text-[12px] hover:scale-[1.02] active:scale-[0.95] transition-all shadow-2xl shadow-black/20"
+                                    className="w-full mt-10 py-3 bg-[#050505] text-white rounded font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#A0A0A0] transition-colors"
                                 >
-                                    CLOSE INSPECTION
+                                    CLOSE
                                 </button>
                             </div>
                         </div>
@@ -342,12 +340,8 @@ export function OmniExplorer() {
                  )}
 
                  {/* Institutional Footer */}
-                 <div className="text-center pt-12 pb-8">
-                     <div className="flex items-center justify-center gap-4 opacity-10">
-                         <div className="h-[1px] w-20 bg-black" />
-                         <p className="text-[10px] text-black font-black tracking-[0.6em] uppercase">SYSTEM.ZERO.KNOWLEDGE</p>
-                         <div className="h-[1px] w-20 bg-black" />
-                     </div>
+                 <div className="text-center pt-8 pb-4">
+                     <span className="text-[9px] text-[#A0A0A0] font-bold tracking-[0.2em] uppercase">ON-CHAIN VERIFIED DATA LAYER</span>
                  </div>
             </div>
         </div>
@@ -356,10 +350,10 @@ export function OmniExplorer() {
 
 function DetailRow({ label, value, copy, highlight, green }: any) {
     return (
-        <div className="flex items-center justify-between py-5 border-b border-black/[0.04]">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/20">{label}</span>
+        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5]">
+            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888]">{label}</span>
             <div className="flex items-center gap-3">
-                <span className={`text-[15px] font-black ${highlight ? 'text-black' : green ? 'text-[#00C076]' : 'text-black/70'} tracking-tighter`}>
+                <span className={`text-[12px] font-mono ${highlight ? 'text-[#050505] font-bold' : green ? 'text-[#00C076]' : 'text-[#050505]'}`}>
                     {value}
                 </span>
                 {copy && (

@@ -122,8 +122,8 @@ export function SessionLogsPanel() {
       {/* Header & Controls */}
       <div className="p-6 border-b border-black/10 flex flex-col md:flex-row md:items-center justify-between bg-[#FDFCF8] shrink-0 gap-4">
          <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-black font-sans uppercase tracking-tight text-black flex items-center gap-2">
-              Security Logs
+            <h2 className="text-xl font-bold font-sans uppercase tracking-[0.1em] text-[#050505] flex items-center gap-2">
+              SECURITY AUDIT LOGS
             </h2>
          </div>
 
@@ -152,10 +152,10 @@ export function SessionLogsPanel() {
       <div ref={tableContainerRef} className="flex-1 overflow-y-auto no-scrollbar relative min-h-0 bg-white">
         <div className="w-full text-left">
           <div className="sticky top-0 z-10 bg-[#FAF9F6] border-b border-black/10 shadow-sm grid" style={{ gridTemplateColumns: '1.5fr 2fr 3fr 1.5fr' }}>
-              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Timestamp</div>
-              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Action / Event</div>
-              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Sovereign ID</div>
-              <div className="p-4 text-[10px] font-black uppercase tracking-[0.2em] text-black/50">IP Address</div>
+              <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Timestamp</div>
+              <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Action / Event</div>
+              <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">Sovereign ID</div>
+              <div className="p-4 text-[10px] font-bold uppercase tracking-[0.2em] text-black/50">IP Address</div>
           </div>
           <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
             {rowVirtualizer.getVirtualItems().map((virtualRow: any) => {
@@ -179,11 +179,11 @@ export function SessionLogsPanel() {
                         {new Date(logItem.timestamp).toLocaleString()}
                     </div>
                     <div className="p-4 text-[12px] truncate">
-                        <span className="px-2 py-1 bg-black/5 border border-black/10 rounded text-black text-[9px] uppercase font-black tracking-widest truncate">
+                        <span className="px-2 py-1 bg-black/5 border border-black/10 rounded text-black text-[9px] uppercase font-bold tracking-widest truncate">
                             {logItem.action}
                         </span>
                     </div>
-                    <div className="p-4 text-[11px] font-mono font-black text-black/80 truncate">
+                    <div className="p-4 text-[11px] font-mono font-bold text-black/80 truncate">
                         {logItem.userId || "Anonymous"}
                     </div>
                     <div className="p-4 text-[11px] font-mono text-black/40 truncate">

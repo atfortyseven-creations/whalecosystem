@@ -145,7 +145,7 @@ export default function DeFiYieldPanel() {
     };
 
     return (
-        <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
+        <div className="h-full min-h-0 flex flex-col bg-white rounded border border-[#E5E5E5] shadow-sm overflow-hidden">
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, backgroundColor: '#FAF9F6' }}>
                 {[
@@ -155,8 +155,8 @@ export default function DeFiYieldPanel() {
                     { label: 'TOTAL TVL',     value: fmtUsd(stats.totalTvl), color: '#050505' },
                 ].map(s => (
                     <div key={s.label} style={{ padding: '16px 20px', borderRight: '1px solid rgba(5,5,5,0.06)' }} className="last:border-0 hover:bg-black/[0.015] transition-colors">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-[#050505]/40 mb-1">{s.label}</div>
-                        <div className="text-xl font-black font-mono" style={{ color: s.color }}>{s.value}</div>
+                        <div className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/40 mb-1">{s.label}</div>
+                        <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
@@ -165,28 +165,28 @@ export default function DeFiYieldPanel() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: '1px solid rgba(5,5,5,0.06)', flexShrink: 0, flexWrap: 'wrap', backgroundColor: '#FAF9F6' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                     <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={{ accentColor: '#050505' }} />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/60">STABLE ONLY</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/60">STABLE ONLY</span>
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Filter size={10} color="rgba(5,5,5,0.4)" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">APY MIN:</span>
-                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">APY MIN:</span>
+                    <select value={minApy} onChange={e => setMinApy(+e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
                         {[3,5,8,10,15,20,30].map(v => <option key={v} value={v}>{v}%</option>)}
                     </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">CHAIN:</span>
-                    <select value={chain} onChange={e => setChain(e.target.value)} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">CHAIN:</span>
+                    <select value={chain} onChange={e => setChain(e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
                         {CHAINS.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">MAX RISK:</span>
-                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-[#FFFFFF] border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#050505]/50">MAX RISK:</span>
+                    <select value={riskMax} onChange={e => setRiskMax(+e.target.value)} className="bg-white border border-[#E5E5E5] rounded px-2 py-1 text-xs text-[#050505] font-mono outline-none">
                         {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} — {RISK[v]?.label}</option>)}
                     </select>
                 </div>
-                <button onClick={load} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-[#050505]/50 hover:text-[#050505] hover:bg-black/5 transition-all">
+                <button onClick={load} className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded text-[9px] font-bold uppercase tracking-widest text-[#050505]/50 hover:text-[#050505] hover:bg-black/5 transition-all">
                     <RefreshCw size={11} className={loading ? 'animate-spin' : ''} /> REFRESH
                 </button>
             </div>
@@ -221,25 +221,25 @@ export default function DeFiYieldPanel() {
                                     onClick={() => setSelected(isActive ? null : p)}
                                 >
                                     <div className="col-span-2 overflow-hidden flex flex-col gap-1">
-                                        <span className="text-sm font-black text-[#050505] tracking-tight truncate">{p.symbol}</span>
+                                        <span className="text-sm font-bold text-[#050505] tracking-tight truncate">{p.symbol}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px] uppercase text-[#050505]/40 tracking-wider truncate">{p.project}</span>
-                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100">STABLE</span>}
+                                            {p.stablecoin && <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#FAF9F6] border border-[#E5E5E5] text-[#050505]">STABLE</span>}
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-[#050505]/5 text-[#050505]/60">{p.chain}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-white border border-[#E5E5E5] text-[#A0A0A0]">{p.chain}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-sm font-mono font-black" style={{ color: p.apy >= 20 ? '#16a34a' : p.apy >= 10 ? '#0ea5e9' : '#050505' }}>
+                                        <span className="text-sm font-mono font-bold" style={{ color: p.apy >= 20 ? '#16a34a' : p.apy >= 10 ? '#0ea5e9' : '#050505' }}>
                                             {fmtApy(p.apy)}
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-sm font-mono font-black text-[#050505]/70">{fmtUsd(p.tvlUsd)}</span>
+                                        <span className="text-sm font-mono font-bold text-[#050505]/70">{fmtUsd(p.tvlUsd)}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                        <span className="text-[10px] font-black tracking-widest px-2 py-1 rounded-lg" style={{ color: risk.color, background: `${risk.color}15`, border: `1px solid ${risk.color}25` }}>{risk.label}</span>
+                                        <span className="text-[10px] font-bold tracking-widest px-2 py-1 rounded border border-[#E5E5E5] bg-white text-[#050505]">{risk.label}</span>
                                     </div>
                                 </motion.div>
                             );
@@ -259,20 +259,20 @@ export default function DeFiYieldPanel() {
                         >
                             <div className="p-6 border-b border-[#E5E5E5] bg-[#FAF9F6]">
                                 <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2 uppercase flex items-center gap-2">
-                                    <ShieldCheck size={12} /> On-Chain Execution
+                                    <ShieldCheck size={12} /> ON-CHAIN SYNC
                                 </div>
-                                <div className="text-xl font-black font-mono tracking-tight text-[#050505] mb-1">{selected.symbol}</div>
+                                <div className="text-xl font-bold font-mono tracking-tight text-[#050505] mb-1">{selected.symbol}</div>
                                 <div className="text-xs text-[#050505]/40 uppercase font-mono">{selected.project} · {selected.chainFull || selected.chain}</div>
                             </div>
                             
                             <div className="flex-1 p-6 space-y-5 overflow-y-auto custom-scrollbar">
                                 {/* APY Hero */}
-                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded-2xl p-6 text-center">
-                                    <div className="text-[10px] uppercase font-mono tracking-widest text-[#050505]/40 mb-2">Total Net APY</div>
-                                    <div className="text-4xl font-black font-mono text-emerald-600">{fmtApy(selected.apy)}</div>
+                                <div className="bg-[#FAF9F6] border border-[#E5E5E5] rounded p-6 text-center">
+                                    <div className="text-[10px] uppercase font-mono tracking-[0.1em] text-[#050505]/40 mb-2">TOTAL NET YIELD</div>
+                                    <div className="text-4xl font-bold font-mono text-[#00C076]">{fmtApy(selected.apy)}</div>
                                     <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-[#E5E5E5]">
-                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Base</span> <span className="text-xs font-mono font-black text-[#050505]">{fmtApy(selected.apyBase)}</span></div>
-                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Reward</span> <span className="text-xs font-mono font-black text-[#050505]">{fmtApy(selected.apyReward)}</span></div>
+                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Base</span> <span className="text-xs font-mono font-bold text-[#050505]">{fmtApy(selected.apyBase)}</span></div>
+                                        <div className="flex flex-col"><span className="text-[9px] text-[#050505]/40 uppercase">Reward</span> <span className="text-xs font-mono font-bold text-[#050505]">{fmtApy(selected.apyReward)}</span></div>
                                     </div>
                                 </div>
 
@@ -285,22 +285,22 @@ export default function DeFiYieldPanel() {
                                     ].map(row => (
                                         <div key={row.l} className="flex justify-between items-center py-2.5 border-b border-[#E5E5E5]">
                                             <span className="text-[10px] font-mono text-[#050505]/40 uppercase tracking-widest">{row.l}</span>
-                                            <span className="text-sm font-mono font-black text-[#050505]">{row.v}</span>
+                                            <span className="text-sm font-mono font-bold text-[#050505]">{row.v}</span>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="bg-[#FAF9F6] rounded-xl p-4 border border-[#E5E5E5]">
+                                <div className="bg-white rounded p-4 border border-[#E5E5E5]">
                                     <div className="text-[10px] font-mono tracking-widest text-[#050505]/50 mb-2">DEPOSIT AMOUNT (USDC)</div>
                                     <input 
                                         type="number" 
                                         value={depositAmount} 
                                         onChange={e => setDepositAmount(e.target.value)} 
-                                        className="w-full bg-[#FFFFFF] border border-[#E5E5E5] rounded-lg py-3 px-4 text-[#050505] font-mono text-xl outline-none focus:border-[#050505] transition-colors"
+                                        className="w-full bg-[#FAF9F6] border border-[#E5E5E5] rounded py-3 px-4 text-[#050505] font-mono text-xl outline-none focus:border-[#050505] transition-colors"
                                         placeholder="0.00"
                                     />
                                     <div className="mt-2 text-[10px] font-mono text-[#050505]/40">
-                                        ESTIMATE: <span className="text-emerald-600">+{fmtUsd((Number(depositAmount || 0) * selected.apy) / 100 / 365)} / DAY</span>
+                                        ESTIMATE: <span className="text-[#00C076] font-bold">+{fmtUsd((Number(depositAmount || 0) * selected.apy) / 100 / 365)} / DAY</span>
                                     </div>
                                 </div>
                             </div>
@@ -309,18 +309,18 @@ export default function DeFiYieldPanel() {
                                 <button 
                                     onClick={handleOneClickDeposit}
                                     disabled={isDepositing || !depositAmount}
-                                    className="w-full py-4 rounded-xl bg-[#050505] text-white font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#050505]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-4 rounded bg-[#050505] text-white font-bold uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#888888] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isDepositing ? (
                                         <Loader2 size={16} className="animate-spin" />
                                     ) : (
                                         <>
-                                            <Zap size={14} /> DEPOSIT 1-CLICK
+                                            <Zap size={14} /> DEPOSIT
                                         </>
                                     )}
                                 </button>
                                 <p className="text-[9px] font-mono text-[#050505]/30 text-center uppercase tracking-widest">
-                                    {isConnected ? 'Executes routing via Whale Smart Contracts' : 'Connect wallet to deposit'}
+                                    {isConnected ? 'SMART CONTRACT ROUTING' : 'CONNECT WALLET TO DEPOSIT'}
                                 </p>
                             </div>
                         </motion.div>
@@ -328,7 +328,7 @@ export default function DeFiYieldPanel() {
                 </AnimatePresence>
             </div>
 
-            {ts && <div className="text-[9px] font-mono font-black uppercase tracking-widest text-[#050505]/30" style={{ padding: '6px 16px', borderTop: '1px solid rgba(5,5,5,0.06)', flexShrink: 0 }}>SOURCE: DEFILLAMA API · SYNC: {ts} UTC · Auto-refresh 60s</div>}
+            {ts && <div className="text-[9px] font-mono font-bold uppercase tracking-[0.2em] text-[#050505]/30" style={{ padding: '6px 16px', borderTop: '1px solid rgba(5,5,5,0.06)', flexShrink: 0 }}>DATA: DEFILLAMA API · SYNC: {ts} UTC</div>}
         </div>
     );
 }

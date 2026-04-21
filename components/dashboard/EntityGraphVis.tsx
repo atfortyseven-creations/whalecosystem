@@ -130,21 +130,21 @@ export function EntityGraphVis() {
             {/* ── HEADER ── */}
             <div className="px-8 py-6 border-b border-[#E5E5E5] flex items-center justify-between shrink-0 bg-[#FAF9F6]">
                 <div className="flex items-center gap-4">
-                    <Network size={18} className="text-blue-500" />
+                    <Network size={18} className="text-[#050505]" />
                     <div>
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.4em]">Association_Graph</h2>
-                        <span className="text-[8px] text-[#888888] uppercase tracking-widest mt-1">Multi-Entity Relationship Mapping</span>
+                        <h2 className="text-[10px] font-bold uppercase tracking-[0.2em]">ENTITY GRAPH</h2>
+                        <span className="text-[8px] text-[#A0A0A0] uppercase tracking-widest mt-1">Multi-Entity Mapping</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-6">
                     {isHeuristic && (
-                        <div className="flex items-center gap-2 text-[8px] text-rose-500/80 border border-rose-500/20 px-3 py-1 bg-rose-50/50">
+                        <div className="flex items-center gap-2 text-[8px] text-[#FF3B30] border border-[#FF3B30]/30 px-3 py-1 bg-[#FF3B30]/5">
                             <WifiOff size={10} />
-                            <span>HEURISTIC_SYNTHESIS_ACTIVE</span>
+                            <span>HEURISTICS ACTIVE</span>
                         </div>
                     )}
-                    <div className="text-[8px] text-[#888888] uppercase tracking-widest border border-[#E5E5E5] px-3 py-1">
-                        STANDARDS:_{isOffline ? 'SIMULATED' : 'LIVE'}
+                    <div className="text-[8px] text-[#888888] font-bold uppercase tracking-[0.2em] border border-[#E5E5E5] px-3 py-1">
+                        STATE: {isOffline ? 'SYNTHETIC' : 'LIVE'}
                     </div>
                 </div>
             </div>
@@ -153,8 +153,8 @@ export function EntityGraphVis() {
             <div className="flex-1 relative bg-[#FFFFFF]">
                 {isLoading && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-50 bg-white/50 backdrop-blur-sm">
-                        <Loader2 className="animate-spin text-blue-500" size={32} />
-                        <span className="text-[10px] font-black tracking-[0.5em]">CONDUCTING_NEURAL_SWEEP...</span>
+                        <Loader2 className="animate-spin text-[#050505]" size={32} />
+                        <span className="text-[10px] font-bold tracking-[0.2em] text-[#050505]">INDEXING ENTITIES...</span>
                     </div>
                 )}
                 
@@ -162,15 +162,15 @@ export function EntityGraphVis() {
 
                 {/* HUD Overlay */}
                 <div className="absolute bottom-8 left-8 flex flex-col gap-4 pointer-events-none">
-                    <div className="p-4 bg-white/80 border border-[#E5E5E5] backdrop-blur-md rounded-xl">
-                        <div className="text-[8px] text-[#888888] uppercase tracking-widest mb-2">Cluster_Statistics</div>
+                    <div className="p-4 bg-white/80 border border-[#E5E5E5] backdrop-blur-md rounded">
+                        <div className="text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-2">GRAPH METRICS</div>
                         <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                            <span className="text-[7px] text-[#888888] uppercase">Total_Nodes:</span>
-                            <span className="text-[8px] text-[#050505] font-bold">{isOffline ? '40 (SYNTH)' : (matrixData?.graph?.nodes?.length || 0)}</span>
-                            <span className="text-[7px] text-[#888888] uppercase">Avg_Centrality:</span>
+                            <span className="text-[7px] text-[#A0A0A0] uppercase">TOTAL NODES:</span>
+                            <span className="text-[8px] text-[#050505] font-bold">{isOffline ? '40 (SYNTHETIC)' : (matrixData?.graph?.nodes?.length || 0)}</span>
+                            <span className="text-[7px] text-[#A0A0A0] uppercase">AVG CENTRALITY:</span>
                             <span className="text-[8px] text-[#050505] font-bold">0.842</span>
-                            <span className="text-[7px] text-[#888888] uppercase">Modularity:</span>
-                            <span className="text-[8px] text-emerald-500 font-bold">HIGH</span>
+                            <span className="text-[7px] text-[#A0A0A0] uppercase">MODULARITY:</span>
+                            <span className="text-[8px] text-[#00C076] font-bold">HIGH</span>
                         </div>
                     </div>
                 </div>
@@ -182,23 +182,23 @@ export function EntityGraphVis() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="absolute top-8 right-8 w-64 bg-white/90 border border-[#E5E5E5] rounded-2xl p-6 backdrop-blur-xl pointer-events-auto shadow-xl"
+                            className="absolute top-8 right-8 w-64 bg-white/95 border border-[#E5E5E5] rounded p-6 backdrop-blur-md pointer-events-auto shadow-sm"
                         >
                             <div className="flex justify-between items-start mb-6">
-                                <div className="text-[7px] text-[#888888] uppercase tracking-widest">Entity_Data</div>
-                                <XCircle size={12} className="cursor-pointer text-[#888888] hover:text-[#050505]" onClick={() => setSelectedNode(null)} />
+                                <div className="text-[7px] text-[#A0A0A0] font-bold uppercase tracking-[0.1em]">ENTITY DATA</div>
+                                <XCircle size={12} className="cursor-pointer text-[#A0A0A0] hover:text-[#050505]" onClick={() => setSelectedNode(null)} />
                             </div>
                             
-                            <h3 className="text-xs font-black text-[#050505] uppercase tracking-widest mb-4 truncate">{selectedNode.label}</h3>
+                            <h3 className="text-xs font-bold text-[#050505] uppercase tracking-[0.1em] mb-4 truncate">{selectedNode.label}</h3>
                             
                             <div className="space-y-4">
-                                <div className="border-l-2 border-blue-500 pl-3">
-                                    <div className="text-[7px] text-[#888888] uppercase">Classification</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.group === 1 ? 'High Risk Entity' : 'Institutional Protocol'}</div>
+                                <div className="border-l-2 border-[#050505] pl-3">
+                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">LAYER TYPE</div>
+                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.group === 1 ? 'FLAGGED RECIPIENT' : 'INSTITUTIONAL HUB'}</div>
                                 </div>
-                                <div className="border-l-2 border-emerald-500 pl-3">
-                                    <div className="text-[7px] text-[#888888] uppercase">Network Influence</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{(selectedNode.size * 12.5).toFixed(1)}% Weight</div>
+                                <div className="border-l-2 border-[#00C076] pl-3">
+                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">NETWORK WEIGHT</div>
+                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{(selectedNode.size * 12.5).toFixed(1)}% INFLUENCE</div>
                                 </div>
                             </div>
                         </motion.div>
@@ -207,12 +207,12 @@ export function EntityGraphVis() {
             </div>
 
             {/* ── FOOTER ── */}
-            <div className="px-8 py-3 border-t border-[#E5E5E5] bg-[#FAF9F6] flex justify-between items-center text-[8px] text-[#888888] uppercase tracking-[0.5em] shrink-0">
+            <div className="px-8 py-3 border-t border-[#E5E5E5] bg-[#FAF9F6] flex justify-between items-center text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.2em] shrink-0">
                 <div className="flex items-center gap-4">
-                    <span>Protocol:_D3-Force_Directed</span>
-                    <span>Database:_Neo4j_Standalone</span>
+                    <span>RENDER LAYER: D3</span>
+                    <span>DATABASE: NEO4J CLUSTER</span>
                 </div>
-                <span>ASSOCIATION_GRAPH_v3.1_ACTIVE</span>
+                <span>GRAPH VERIFIED</span>
             </div>
         </div>
         </div>

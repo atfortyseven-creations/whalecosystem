@@ -41,15 +41,14 @@ function StatCard({
   icon: React.ReactNode; label: string; value: string; sub?: string; accent?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-[#E5E5E5] p-5 flex flex-col gap-2 shadow-sm">
+    <div className={`bg-white shadow-sm rounded-xl border ${accent ? 'border-emerald-200 shadow-none' : 'border-[#E5E5E5]'} p-5 flex flex-col gap-2`}>
       <div className="flex items-center gap-2">
-        <span className="text-[#050505]/30">{icon}</span>
-        <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#050505]/40">{label}</span>
+        <span className={accent ? 'text-emerald-500' : 'text-[#050505]/30'}>{icon}</span>
+        <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50">{label}</span>
       </div>
-      <span className={`text-2xl font-black font-mono leading-none ${accent ? 'text-emerald-600' : 'text-[#050505]'}`}>
+      <span className={`text-xl md:text-2xl font-black font-mono leading-none ${accent ? 'text-emerald-700' : 'text-[#050505]'}`}>
         {value}
       </span>
-      {sub && <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/25">{sub}</span>}
     </div>
   );
 }
@@ -61,7 +60,7 @@ function StateChip({ state }: { state: LedgerEntry['protocolState'] }) {
     'Orphaned':          { bg: 'bg-rose-50',    border: 'border-rose-200',    text: 'text-rose-700',    dot: 'bg-rose-500' },
   }[state];
   return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${cfg.bg} ${cfg.border} ${cfg.text}`}>
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border text-[9px] font-bold uppercase tracking-widest ${cfg.bg} ${cfg.border} ${cfg.text}`}>
       <div className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {state}
     </div>
@@ -117,26 +116,26 @@ export default function InstitutionalLedger() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] overflow-hidden">
+    <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] overflow-hidden rounded-xl border border-[#E5E5E5]">
 
       {/* ── Page Header ── */}
-      <div className="shrink-0 px-6 pt-5 pb-4 flex items-center justify-between border-b border-[#E5E5E5] bg-[#FAF9F6]">
+      <div className="shrink-0 px-6 pt-5 pb-4 flex items-center justify-between border-b border-[#E5E5E5] bg-white">
         <div className="flex flex-col gap-0.5">
-          <h1 className="text-[13px] font-black uppercase tracking-[0.25em] text-[#050505]">
-            Institutional Ledger
+          <h1 className="text-[13px] font-black uppercase tracking-widest text-[#050505]">
+            INSTITUTIONAL LEDGER
           </h1>
-          <p className="text-[10px] text-[#050505]/40 font-medium leading-tight max-w-md uppercase tracking-[0.2em]">
-            Immutable chronological state of validated macro-events.
+          <p className="text-[10px] text-[#050505]/40 font-bold leading-tight max-w-md uppercase tracking-[0.1em]">
+            Verified chronology of MACRO-ECONOMIC state.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Live Telemetry</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700">Telemetry Active</span>
           </div>
           <button
             onClick={() => refetch()}
-            className="p-2 rounded-xl border border-[#E5E5E5] hover:bg-white transition-colors text-[#050505]/40 hover:text-[#050505]"
+            className="p-2 rounded border border-[#E5E5E5] hover:bg-[#FAF9F6] transition-colors text-[#050505]/40 hover:text-[#050505]"
             title="Force sync"
           >
             <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
@@ -145,48 +144,43 @@ export default function InstitutionalLedger() {
       </div>
 
       {/* ── Stats Row ── */}
-      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-3 px-6 py-4 border-b border-[#E5E5E5]">
+      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4 px-6 py-4 border-b border-[#E5E5E5]">
         <StatCard
           icon={<Layers size={14} />}
-          label="Total Blocks Indexed"
+          label="INDEXED BLOCKS"
           value={stats ? stats.totalBlocks.toLocaleString() : '—'}
-          sub="Sovereign ingest layer"
         />
         <StatCard
           icon={<CheckCircle2 size={14} />}
-          label="Finalization Rate"
+          label="FINALIZATION YIELD"
           value={stats ? `${stats.finalizedPct.toFixed(1)}%` : '—'}
-          sub="Casper FFG consensus"
           accent
         />
         <StatCard
           icon={<Database size={14} />}
-          label="Avg Payload Entropy"
+          label="AVERAGE ENTROPY"
           value={stats ? `${stats.avgPayloadMB} MB` : '—'}
-          sub="per block"
         />
         <StatCard
           icon={<Cpu size={14} />}
-          label="Active Observers"
+          label="ACTIVE OBSERVERS"
           value={stats ? `${stats.observersActive}` : '—'}
-          sub="RPC node operators"
         />
       </div>
 
-      {/* ── Toolbar ── */}
-      <div className="shrink-0 px-6 py-3 border-b border-[#E5E5E5] flex items-center gap-3">
+      <div className="shrink-0 px-6 py-3 border-b border-[#E5E5E5] flex items-center gap-3 bg-[#FAF9F6]">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#050505]/30" size={12} />
           <input
             type="text"
-            placeholder="Filter by block ID, hash, or layer..."
+            placeholder="Filter by hash, layer..."
             value={filter}
             onChange={e => setFilter(e.target.value)}
-            className="w-full bg-white border border-[#E5E5E5] rounded-xl pl-8 pr-4 py-2.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505]/40 transition-colors placeholder:text-[#050505]/25"
+            className="w-full bg-white border border-[#E5E5E5] rounded-lg px-8 py-2 text-[10px] font-mono text-[#050505] outline-none focus:border-[#050505]/40 transition-colors placeholder:text-[#050505]/25"
           />
         </div>
-        <span className="text-[10px] font-black text-[#050505]/30 uppercase tracking-widest">
-          {filtered.length} of {entries.length} entries
+        <span className="text-[9px] font-black text-[#050505]/40 uppercase tracking-widest">
+          {filtered.length} of {entries.length} items
         </span>
       </div>
 
@@ -196,9 +190,9 @@ export default function InstitutionalLedger() {
         {/* List */}
         <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar">
           {/* Column Headers */}
-          <div className="sticky top-0 z-10 bg-[#FAF9F6] border-b border-[#E5E5E5] grid grid-cols-12 gap-4 px-6 py-2.5">
-            {['Ledger Entry', 'Verification Layer', 'SHA-256 Hash Signature', 'Payload (Entropy)', 'Protocol State'].map((h, i) => (
-              <span key={i} className={`text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/35 ${
+          <div className="sticky top-0 z-10 bg-white border-b border-[#E5E5E5] grid grid-cols-12 gap-4 px-6 py-3 shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
+            {['ENTRY ID', 'LAYER', 'SHA-256 SIGNATURE', 'ENTROPY', 'STATE'].map((h, i) => (
+              <span key={i} className={`text-[9px] font-black uppercase tracking-widest text-[#050505]/40 ${
                 i === 0 ? 'col-span-2' : i === 1 ? 'col-span-2' : i === 2 ? 'col-span-4' : i === 3 ? 'col-span-2' : 'col-span-2'
               }`}>
                 {h}
@@ -233,18 +227,18 @@ export default function InstitutionalLedger() {
                   transition={{ duration: 0.12, delay: idx * 0.004 }}
                   onClick={() => setSelected(isActive ? null : entry)}
                   className={`grid grid-cols-12 gap-4 px-6 py-4 border-b border-[#E5E5E5] cursor-pointer transition-colors ${
-                    isActive ? 'bg-[#050505]/[0.02]' : 'hover:bg-white'
+                    isActive ? 'bg-[#FAF9F6]' : 'hover:bg-white'
                   }`}
                 >
                   {/* Block ID */}
                   <div className="col-span-2 flex items-center gap-2">
-                    <Hash size={10} className="text-[#050505]/25 shrink-0" />
+                    <Hash size={10} className="text-[#050505]/20 shrink-0" />
                     <span className="text-[11px] font-black font-mono text-[#050505]">{entry.blockHex}</span>
                   </div>
 
                   {/* Verification Layer */}
                   <div className="col-span-2 flex items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#050505]/50 bg-[#050505]/5 px-2 py-1 rounded-lg">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/50 bg-[#050505]/5 px-2 py-1 rounded">
                       {entry.verificationLayer}
                     </span>
                   </div>
@@ -252,7 +246,7 @@ export default function InstitutionalLedger() {
                   {/* SHA-256 Hash */}
                   <div className="col-span-4 flex items-center gap-2">
                     <Lock size={9} className="text-[#050505]/20 shrink-0" />
-                    <span className="text-[10px] font-mono text-[#050505]/60 truncate">{shortHash(entry.sha256Hash)}</span>
+                    <span className="text-[10px] font-mono text-[#050505]/50 truncate">{shortHash(entry.sha256Hash)}</span>
                     <a
                       href={`https://etherscan.io/block/${parseInt(entry.blockHex, 16)}`}
                       target="_blank"
@@ -353,20 +347,19 @@ export default function InstitutionalLedger() {
         </AnimatePresence>
       </div>
 
-      {/* ── Footer Status ── */}
-      <div className="shrink-0 px-6 py-2.5 border-t border-[#E5E5E5] bg-white flex items-center justify-between">
+      <div className="shrink-0 px-6 py-3 border-t border-[#E5E5E5] bg-white flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/30">
+          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/40">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            L1 Ethereum Mainnet
+            L1 NETWORK ACTIVE
           </div>
-          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/30">
+          <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#050505]/40">
             <Shield size={10} />
-            SHA-256 Integrity Verified
+            STATE VERIFIED
           </div>
         </div>
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#050505]/20">
-          Sovereign Telemetry v3.1
+        <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/20">
+          WAN SYS v3.1
         </span>
       </div>
     </div>

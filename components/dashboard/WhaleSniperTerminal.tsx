@@ -184,30 +184,30 @@ export default function WhaleSniperTerminal() {
                    className="h-full"
                  >
                 {activeTab === 'consensus' && <GlobalConsensus />}
-                {activeTab === 'terminal' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-                    <div className="border border-white/5 bg-white/[0.02] p-6">
-                      <div className="text-[10px] text-white/20 mb-4 tracking-widest uppercase font-black">Telemetric_Flow</div>
-                      <RadarFeed />
-                    </div>
-                    <div className="flex flex-col gap-8">
-                       <div className="flex-1 border border-white/5 bg-white/[0.02] p-6">
-                          <div className="text-[10px] text-white/20 mb-4 tracking-widest uppercase font-black">Tactical_Intelligence</div>
-                          <SniperBrain />
-                       </div>
-                       <div className="h-[250px] border border-white/5 bg-white/[0.02] p-6">
-                          <div className="text-[10px] text-white/20 mb-4 tracking-widest uppercase font-black">Execution_Status</div>
-                          <ExecutionDock />
-                       </div>
-                    </div>
-                  </div>
-                )}
+                 {activeTab === 'terminal' && (
+                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                     <div className="border border-[#E5E5E5] bg-white p-6 rounded-xl shadow-sm">
+                       <div className="text-[10px] text-[#888888] mb-4 tracking-[0.2em] uppercase font-bold">Telemetric Flow</div>
+                       <RadarFeed />
+                     </div>
+                     <div className="flex flex-col gap-8">
+                        <div className="flex-1 border border-[#E5E5E5] bg-white p-6 rounded-xl shadow-sm">
+                           <div className="text-[10px] text-[#888888] mb-4 tracking-[0.2em] uppercase font-bold">Tactical Intelligence</div>
+                           <SniperBrain />
+                        </div>
+                        <div className="h-[250px] border border-[#E5E5E5] bg-white p-6 rounded-xl shadow-sm">
+                           <div className="text-[10px] text-[#888888] mb-4 tracking-[0.2em] uppercase font-bold">Execution Status</div>
+                           <ExecutionDock />
+                        </div>
+                     </div>
+                   </div>
+                 )}
                 {activeTab === 'utxos' && <InstitutionalLedger />}
-                {activeTab === 'triggers' && (
-                  <div className="h-full border border-white/5 bg-white/[0.02] p-6 overflow-hidden">
-                    <AlertsPanel />
-                  </div>
-                )}
+                 {activeTab === 'triggers' && (
+                   <div className="h-full border border-[#E5E5E5] bg-white p-6 overflow-hidden rounded-xl shadow-sm">
+                     <AlertsPanel />
+                   </div>
+                 )}
                 {activeTab === 'mempool' && <TelemetryTerminal nodes={[]} />}
                 {activeTab === 'visuals' && <CanvasEngine />}
                 {activeTab === 'contracts' && <GenesisContracts />}
@@ -228,14 +228,14 @@ export default function WhaleSniperTerminal() {
                 {activeTab === 'vault' && <SovereignVault />}
                 {activeTab === 'clearance' && <ClearanceSim />}
                 
-                {/* Fallback for components in heavy development */}
-                {!['terminal', 'utxos', 'triggers', 'mempool', 'visuals', 'espionage', 'rpc', 'zk_aztec', 'graph', 'capital', 'academy', 'assist', 'vault', 'consensus', 'contracts', 'id', 'primitives'].includes(activeTab) && (
-                   <div className="flex flex-col items-center justify-center h-full opacity-20 filter grayscale">
-                      <Skull size={48} className="mb-4" />
-                      <div className="text-[10px] font-black tracking-widest uppercase text-white/40">Protocol_Layer_Handshake</div>
-                      <div className="text-[8px] mt-1 text-white/20">AWAITING_INDEX_RESPONSE // {activeTab.toUpperCase()}</div>
-                   </div>
-                )}
+                 {/* Fallback for components in heavy development */}
+                 {!['terminal', 'utxos', 'triggers', 'mempool', 'visuals', 'espionage', 'rpc', 'zk_aztec', 'graph', 'capital', 'academy', 'assist', 'vault', 'consensus', 'contracts', 'id', 'primitives'].includes(activeTab) && (
+                    <div className="flex flex-col items-center justify-center h-full opacity-30">
+                       <Database size={48} className="mb-4 text-[#050505]" />
+                       <div className="text-[10px] font-bold tracking-widest uppercase text-[#888888]">Module Under Development</div>
+                       <div className="text-[8px] mt-1 text-[#A0A0A0]">ACTIVE_TAB: {activeTab.toUpperCase()}</div>
+                    </div>
+                 )}
               </motion.div>
               )}
             </AnimatePresence>
@@ -244,15 +244,15 @@ export default function WhaleSniperTerminal() {
 
         {/* ── TACTICAL BOTTOM DOCK (Mobile Only) ── */}
         {isMobile && (
-          <nav className="h-16 border-t border-white/10 bg-[#050505] flex overflow-x-auto custom-scrollbar-hide items-center px-4 gap-2 z-50 shrink-0">
+          <nav className="h-16 border-t border-[#E5E5E5] bg-white flex overflow-x-auto custom-scrollbar-hide items-center px-4 gap-2 z-50 shrink-0">
             {GENESIS_CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => handleTabChange(cat.id)}
                 className={`flex-none px-4 py-2 text-[9px] uppercase tracking-widest transition-all rounded-full border ${
                   activeTab === cat.id 
-                    ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 font-black" 
-                    : "border-white/5 text-white/30"
+                    ? "bg-[#050505]/5 border-[#050505]/20 text-[#050505] font-bold" 
+                    : "border-[#E5E5E5] text-[#888888]"
                 }`}
               >
                 {cat.label}

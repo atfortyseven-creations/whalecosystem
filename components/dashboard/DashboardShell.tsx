@@ -21,12 +21,12 @@ import { create } from 'zustand';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { toast } from 'sonner';
 
-// ─── Color tokens ──────────────────────────────────────────────────────────────
+// ─── Color tokens — VANGUARD INSTITUTIONAL LIGHT MODE ─────────────────────────
 const T = {
-    bg:       '#0B0E11',
-    surface:  'rgba(255,255,255,0.03)',
-    border:   'rgba(255,255,255,0.07)',
-    teal:     '#00F2EA',
+    bg:       '#FAF9F6',
+    surface:  '#FFFFFF',
+    border:   'rgba(0,0,0,0.08)',
+    teal:     '#0070F3',
     green:    '#00C076',
     gold:     '#D4AF37',
     red:      '#FF3B30',
@@ -131,10 +131,10 @@ const NAV_GROUPS = [
 
 function TabLoader() {
     return (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#0B0E11]">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#FAF9F6]">
             <div className="flex flex-col items-center gap-4">
-                <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-[#00F2EA] animate-spin" />
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">
+                <div className="w-8 h-8 rounded-full border-2 border-[#050505]/10 border-t-[#050505] animate-spin" />
+                <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-[#888888]">
                     Loading Module...
                 </p>
             </div>
@@ -149,26 +149,26 @@ function NavItem({ item, active, onClick }: { item: any; active: boolean; onClic
             onClick={onClick}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-bold transition-all duration-150 uppercase tracking-widest group"
             style={{
-                background: active ? 'rgba(0,242,234,0.09)' : 'transparent',
-                color: active ? '#FFFFFF' : 'rgba(255,255,255,0.35)',
-                border: active ? '1px solid rgba(0,242,234,0.18)' : '1px solid transparent',
+                background: active ? 'rgba(0,0,0,0.06)' : 'transparent',
+                color: active ? '#050505' : '#888888',
+                border: active ? '1px solid rgba(0,0,0,0.12)' : '1px solid transparent',
             }}
-            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
+            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.04)'; }}
             onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         >
             <Icon
                 size={14}
-                style={{ color: active ? T.teal : item.gold ? T.gold : 'rgba(255,255,255,0.35)', flexShrink: 0 }}
+                style={{ color: active ? '#050505' : item.gold ? T.gold : '#A0A0A0', flexShrink: 0 }}
             />
             <span className="truncate" style={item.gold ? { color: T.gold } : {}}>{item.label}</span>
-            {active && <ChevronRight size={11} className="ml-auto shrink-0" style={{ color: T.teal, opacity: 0.6 }} />}
+            {active && <ChevronRight size={11} className="ml-auto shrink-0" style={{ color: '#050505', opacity: 0.4 }} />}
         </button>
     );
 }
 
 function CategoryLabel({ label }: { label: string }) {
     return (
-        <div className="px-3 pt-5 pb-1.5 text-[9px] font-black uppercase tracking-[0.3em]" style={{ color: 'rgba(255,255,255,0.18)' }}>
+        <div className="px-3 pt-5 pb-1.5 text-[9px] font-bold uppercase tracking-[0.3em]" style={{ color: 'rgba(0,0,0,0.25)' }}>
             {label}
         </div>
     );
@@ -178,16 +178,16 @@ function CategoryLabel({ label }: { label: string }) {
 function StatCard({ label, value, change, icon: Icon, color = T.teal }: any) {
     const pos = !change || change >= 0;
     return (
-        <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+        <div className="rounded-2xl p-5 flex flex-col gap-3 shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
             <div className="flex items-center justify-between">
-                <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>{label}</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>{label}</span>
                 <Icon size={14} style={{ color, opacity: 0.7 }} />
             </div>
-            <div className="font-black font-mono text-2xl text-white tracking-tighter">{value}</div>
+            <div className="font-bold font-mono text-2xl text-[#050505] tracking-tighter">{value}</div>
             {change !== undefined && (
                 <div className="flex items-center gap-1 text-[11px] font-bold" style={{ color: pos ? T.green : T.red }}>
                     {pos ? <ArrowUpRight size={12}/> : <ArrowDownRight size={12}/>}
-                    {Math.abs(change)}% <span style={{ color: 'rgba(255,255,255,0.25)' }}>24h</span>
+                    {Math.abs(change)}% <span style={{ color: 'rgba(0,0,0,0.3)' }}>24h</span>
                 </div>
             )}
         </div>
@@ -213,24 +213,24 @@ function DashboardOverview() {
     return (
         <div className="p-6 space-y-6">
             <div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Dashboard</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Institutional intelligence overview</p>
+                <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Market Intelligence</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Institutional intelligence overview</p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {stats.map(s => <StatCard key={s.label} {...s} />)}
             </div>
-            <div className="rounded-2xl overflow-hidden" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+            <div className="rounded-2xl overflow-hidden shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                 <div className="px-5 py-3 border-b" style={{ borderColor: T.border }}>
-                    <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Live Intelligence Feed</span>
+                    <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Live Intelligence Feed</span>
                 </div>
                 <div className="divide-y" style={{ borderColor: T.border }}>
                     {feed.map((f, i) => (
-                        <div key={i} className="flex items-center gap-4 px-5 py-3 hover:bg-white/[0.02] transition-colors">
-                            <span className="font-mono text-[10px] shrink-0" style={{ color: 'rgba(255,255,255,0.25)' }}>{f.time}</span>
+                        <div key={i} className="flex items-center gap-4 px-5 py-3 hover:bg-[#FAF9F6] transition-colors">
+                            <span className="font-mono text-[10px] shrink-0" style={{ color: 'rgba(0,0,0,0.3)' }}>{f.time}</span>
                             <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{
                                 background: f.type==='alert'? T.red : f.type==='success'? T.green : f.type==='warning'? T.gold : T.teal
                             }} />
-                            <span className="text-[11px] font-medium text-white/70 leading-tight">{f.msg}</span>
+                            <span className="text-[11px] font-medium text-[#050505]/70 leading-tight">{f.msg}</span>
                         </div>
                     ))}
                 </div>
@@ -252,35 +252,35 @@ function WatchlistPanel() {
         <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Watchlist</h2>
-                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Tracked assets · Real-time</p>
+                    <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Watchlist</h2>
+                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Tracked assets · Real-time</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-[10px] font-black uppercase tracking-widest text-white transition-all"
+                <button className="flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-[10px] font-bold uppercase tracking-widest text-[#050505] transition-all shadow-sm"
                     style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                     <Plus size={12}/> Add Asset
                 </button>
             </div>
-            <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${T.border}` }}>
-                <div className="grid grid-cols-4 px-5 py-3 text-[9px] font-black uppercase tracking-widest border-b" style={{ color: 'rgba(255,255,255,0.2)', borderColor: T.border, background: T.surface }}>
+            <div className="rounded-2xl overflow-hidden shadow-sm" style={{ border: `1px solid ${T.border}` }}>
+                <div className="grid grid-cols-4 px-5 py-3 text-[9px] font-bold uppercase tracking-widest border-b" style={{ color: 'rgba(0,0,0,0.4)', borderColor: T.border, background: '#FAF9F6' }}>
                     <span>Asset</span><span className="text-right">Price</span><span className="text-right">24H</span><span className="text-right">Volume</span>
                 </div>
                 {items.map((item, i) => {
                     const pos = item.change >= 0;
                     return (
-                        <div key={i} className="grid grid-cols-4 px-5 py-4 items-center border-b hover:bg-white/[0.03] transition-colors cursor-pointer" style={{ borderColor: T.border }}>
+                        <div key={i} className="grid grid-cols-4 px-5 py-4 items-center border-b hover:bg-[#FAF9F6] transition-colors cursor-pointer" style={{ borderColor: T.border, background: T.surface }}>
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black" style={{ background: `${T.teal}18`, color: T.teal, border: `1px solid ${T.teal}30` }}>{item.sym.slice(0,3)}</div>
+                                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-bold" style={{ background: `${T.teal}18`, color: T.teal, border: `1px solid ${T.teal}30` }}>{item.sym.slice(0,3)}</div>
                                 <div>
-                                    <div className="font-black text-white text-sm">{item.sym}</div>
-                                    <div className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{item.name}</div>
+                                    <div className="font-bold text-[#050505] text-sm">{item.sym}</div>
+                                    <div className="text-[9px]" style={{ color: 'rgba(0,0,0,0.4)' }}>{item.name}</div>
                                 </div>
                             </div>
-                            <div className="text-right font-mono font-black text-white text-sm">{item.price}</div>
-                            <div className={`text-right font-black text-sm flex items-center justify-end gap-1`} style={{ color: pos ? T.green : T.red }}>
+                            <div className="text-right font-mono font-bold text-[#050505] text-sm">{item.price}</div>
+                            <div className={`text-right font-bold text-sm flex items-center justify-end gap-1`} style={{ color: pos ? T.green : T.red }}>
                                 {pos ? <ArrowUpRight size={12}/> : <ArrowDownRight size={12}/>}
                                 {Math.abs(item.change)}%
                             </div>
-                            <div className="text-right font-mono text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{item.vol}</div>
+                            <div className="text-right font-mono text-sm" style={{ color: 'rgba(0,0,0,0.4)' }}>{item.vol}</div>
                         </div>
                     );
                 })}
@@ -302,31 +302,31 @@ function AlertsPanel() {
     return (
         <div className="p-6 space-y-4">
             <div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Alerts</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Event telemetry · Live infrastructure audit</p>
+                <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">System Alerts</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Event telemetry · Live infrastructure audit</p>
             </div>
             <div className="space-y-2">
                 {alerts.map((a, i) => (
                     <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i*0.05 }}
-                        className="flex items-start gap-4 p-4 rounded-2xl" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+                        className="flex items-start gap-4 p-4 rounded-2xl shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                         <div className="w-2 h-2 rounded-full mt-1.5 shrink-0 animate-pulse" style={{ background: colors[a.type] }} />
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2 mb-1">
-                                <span className="font-black text-white text-[12px] uppercase tracking-tight">{a.title}</span>
-                                <span className="text-[9px] font-mono shrink-0" style={{ color: 'rgba(255,255,255,0.25)' }}>{a.time}</span>
+                                <span className="font-bold text-[#050505] text-[12px] uppercase tracking-tight">{a.title}</span>
+                                <span className="text-[9px] font-mono shrink-0" style={{ color: 'rgba(0,0,0,0.3)' }}>{a.time}</span>
                             </div>
-                            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{a.desc}</p>
+                            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.5)' }}>{a.desc}</p>
                         </div>
-                        <div className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest shrink-0"
-                            style={{ background: `${colors[a.type]}18`, color: colors[a.type], border: `1px solid ${colors[a.type]}30` }}>
+                        <div className="px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shrink-0"
+                            style={{ background: `${colors[a.type]}15`, color: colors[a.type], border: `1px solid ${colors[a.type]}30` }}>
                             {a.type}
                         </div>
                     </motion.div>
                 ))}
                 {logs.map(log => (
-                    <div key={log.id} className="flex gap-4 p-4 rounded-2xl" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-                        <span className="text-[10px] font-bold shrink-0 w-20 font-mono" style={{ color: 'rgba(255,255,255,0.2)' }}>{log.time}</span>
-                        <span className="text-[11px] font-bold text-white/60 leading-relaxed">{log.msg}</span>
+                    <div key={log.id} className="flex gap-4 p-4 rounded-2xl shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+                        <span className="text-[10px] font-bold shrink-0 w-20 font-mono" style={{ color: 'rgba(0,0,0,0.3)' }}>{log.time}</span>
+                        <span className="text-[11px] font-bold text-[#050505]/60 leading-relaxed">{log.msg}</span>
                     </div>
                 ))}
             </div>
@@ -347,33 +347,33 @@ function LiveTransactionsPanel() {
         <div className="p-6 space-y-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Live Transactions</h2>
-                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Mempool capture · Sub-15ms latency</p>
+                    <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Live Transactions</h2>
+                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Mempool capture · Sub-15ms latency</p>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: `${T.green}15`, color: T.green, border: `1px solid ${T.green}30` }}>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest" style={{ background: `${T.green}15`, color: T.green, border: `1px solid ${T.green}30` }}>
                     <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.green }} /> Live
                 </div>
             </div>
-            <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${T.border}` }}>
-                <div className="grid grid-cols-5 px-5 py-3 text-[9px] font-black uppercase tracking-widest border-b" style={{ color: 'rgba(255,255,255,0.2)', borderColor: T.border, background: T.surface }}>
+            <div className="rounded-2xl overflow-hidden shadow-sm" style={{ border: `1px solid ${T.border}` }}>
+                <div className="grid grid-cols-5 px-5 py-3 text-[9px] font-bold uppercase tracking-widest border-b" style={{ color: 'rgba(0,0,0,0.4)', borderColor: T.border, background: '#FAF9F6' }}>
                     <span>Hash</span><span>From → To</span><span className="text-right">Value</span><span className="text-right">Type</span><span className="text-right">Time</span>
                 </div>
                 {txs.map((tx, i) => (
                     <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i*0.07 }}
-                        className="grid grid-cols-5 px-5 py-4 items-center border-b hover:bg-white/[0.03] cursor-pointer transition-colors" style={{ borderColor: T.border }}>
+                        className="grid grid-cols-5 px-5 py-4 items-center border-b hover:bg-[#FAF9F6] cursor-pointer transition-colors" style={{ borderColor: T.border, background: T.surface }}>
                         <span className="font-mono text-[11px]" style={{ color: T.teal }}>{tx.hash}</span>
-                        <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{tx.from.slice(0,8)} → {tx.to.slice(0,8)}</span>
+                        <span className="font-mono text-[10px]" style={{ color: 'rgba(0,0,0,0.4)' }}>{tx.from.slice(0,8)} → {tx.to.slice(0,8)}</span>
                         <div className="text-right">
-                            <div className="font-black text-white text-sm">{tx.value}</div>
-                            <div className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{tx.usd}</div>
+                            <div className="font-bold text-[#050505] text-sm">{tx.value}</div>
+                            <div className="text-[9px] font-mono" style={{ color: 'rgba(0,0,0,0.3)' }}>{tx.usd}</div>
                         </div>
                         <div className="text-right">
-                            <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest"
-                                style={{ background: `${typeColor[tx.type]}18`, color: typeColor[tx.type], border: `1px solid ${typeColor[tx.type]}30` }}>
+                            <span className="px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest"
+                                style={{ background: `${typeColor[tx.type]}15`, color: typeColor[tx.type], border: `1px solid ${typeColor[tx.type]}30` }}>
                                 {tx.type}
                             </span>
                         </div>
-                        <div className="text-right font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>{tx.time}</div>
+                        <div className="text-right font-mono text-[10px]" style={{ color: 'rgba(0,0,0,0.3)' }}>{tx.time}</div>
                     </motion.div>
                 ))}
             </div>
@@ -386,21 +386,21 @@ function MultichartsPanel() {
     return (
         <div className="p-6 space-y-4">
             <div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Multicharts</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Multi-pair analysis · Real-time candlesticks</p>
+                <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Multicharts</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Multi-pair analysis · Real-time candlesticks</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
                 {pairs.map((pair, i) => {
                     const bars = Array.from({length: 24}, (_, j) => ({ h: 30 + Math.random()*60, pos: Math.random()>0.45 }));
                     return (
-                        <div key={pair} className="rounded-2xl overflow-hidden" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-                            <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: T.border }}>
-                                <span className="font-black text-white text-sm uppercase">{pair}</span>
+                        <div key={pair} className="rounded-2xl overflow-hidden shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+                            <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: T.border, background: '#FAF9F6' }}>
+                                <span className="font-bold text-[#050505] text-sm uppercase">{pair}</span>
                                 <span className="text-[10px] font-bold" style={{ color: T.green }}>+{(1+Math.random()*5).toFixed(2)}%</span>
                             </div>
                             <div className="p-4 flex items-end gap-0.5 h-28">
                                 {bars.map((b, j) => (
-                                    <div key={j} className="flex-1 rounded-sm transition-all" style={{ height: `${b.h}%`, background: b.pos ? `${T.green}90` : `${T.red}90` }} />
+                                    <div key={j} className="flex-1 rounded-sm transition-all" style={{ height: `${b.h}%`, background: b.pos ? `${T.green}70` : `${T.red}70` }} />
                                 ))}
                             </div>
                         </div>
@@ -420,23 +420,23 @@ function MarketNewsPanel() {
         { time: '07:20', tag: 'Solana',  headline: 'Solana validators vote on SIMD-0228 — validator rewards overhaul incoming', impact: 'bullish' },
         { time: '06:50', tag: 'Macro',   headline: 'BlackRock ETH ETF records largest single-day inflow: $480M', impact: 'bullish' },
     ];
-    const impactColor: Record<string,string> = { bullish: T.green, bearish: T.red, neutral: 'rgba(255,255,255,0.3)' };
+    const impactColor: Record<string,string> = { bullish: T.green, bearish: T.red, neutral: 'rgba(0,0,0,0.25)' };
     return (
         <div className="p-6 space-y-4">
             <div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Market News</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Institutional intelligence · Curated feed</p>
+                <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Market Intelligence</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Institutional intelligence · Curated feed</p>
             </div>
             <div className="space-y-2">
                 {news.map((n, i) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i*0.06 }}
-                        className="flex gap-4 p-4 rounded-2xl cursor-pointer hover:bg-white/[0.03] transition-colors" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+                        className="flex gap-4 p-4 rounded-2xl cursor-pointer hover:bg-[#FAF9F6] transition-colors shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                         <div className="flex flex-col gap-2 shrink-0 items-end w-14">
-                            <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>{n.time}</span>
-                            <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase" style={{ background: `${T.teal}15`, color: T.teal }}>{n.tag}</span>
+                            <span className="font-mono text-[10px]" style={{ color: 'rgba(0,0,0,0.3)' }}>{n.time}</span>
+                            <span className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase" style={{ background: `${T.teal}15`, color: T.teal }}>{n.tag}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-semibold text-white leading-snug">{n.headline}</p>
+                            <p className="text-[13px] font-semibold text-[#050505] leading-snug">{n.headline}</p>
                         </div>
                         <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: impactColor[n.impact] }} />
                     </motion.div>
@@ -450,28 +450,28 @@ function VisualGraphPanel() {
     return (
         <div className="p-6 space-y-4">
             <div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Visual Graph</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>On-chain topology · Wallet relationship mapping</p>
+                <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Capital Flow Graph</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>On-chain topology · Wallet relationship mapping</p>
             </div>
-            <div className="rounded-3xl flex flex-col items-center justify-center py-24 gap-6" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+            <div className="rounded-3xl flex flex-col items-center justify-center py-24 gap-6 shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                 {/* Mini decorative graph */}
-                <svg width="240" height="140" viewBox="0 0 240 140" className="opacity-60">
-                    <circle cx="120" cy="70" r="20" fill={`${T.teal}30`} stroke={T.teal} strokeWidth="1.5"/>
-                    <circle cx="40"  cy="40" r="14" fill={`${T.blue}30`} stroke={T.blue} strokeWidth="1.5"/>
-                    <circle cx="200" cy="40" r="14" fill={`${T.gold}30`} stroke={T.gold} strokeWidth="1.5"/>
-                    <circle cx="60"  cy="110"r="12" fill={`${T.green}30`}stroke={T.green}strokeWidth="1.5"/>
-                    <circle cx="180" cy="110"r="12" fill={`${T.red}30`}  stroke={T.red}  strokeWidth="1.5"/>
-                    <line x1="120" y1="70" x2="40"  y2="40"  stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-                    <line x1="120" y1="70" x2="200" y2="40"  stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-                    <line x1="120" y1="70" x2="60"  y2="110" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-                    <line x1="120" y1="70" x2="180" y2="110" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                <svg width="240" height="140" viewBox="0 0 240 140" className="opacity-80">
+                    <circle cx="120" cy="70" r="20" fill={`${T.teal}20`} stroke={T.teal} strokeWidth="1.5"/>
+                    <circle cx="40"  cy="40" r="14" fill={`${T.blue}20`} stroke={T.blue} strokeWidth="1.5"/>
+                    <circle cx="200" cy="40" r="14" fill={`${T.gold}20`} stroke={T.gold} strokeWidth="1.5"/>
+                    <circle cx="60"  cy="110"r="12" fill={`${T.green}20`}stroke={T.green}strokeWidth="1.5"/>
+                    <circle cx="180" cy="110"r="12" fill={`${T.red}20`}  stroke={T.red}  strokeWidth="1.5"/>
+                    <line x1="120" y1="70" x2="40"  y2="40"  stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
+                    <line x1="120" y1="70" x2="200" y2="40"  stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
+                    <line x1="120" y1="70" x2="60"  y2="110" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
+                    <line x1="120" y1="70" x2="180" y2="110" stroke="rgba(0,0,0,0.08)" strokeWidth="1"/>
                 </svg>
                 <div className="text-center space-y-2">
-                    <p className="font-black text-white uppercase tracking-widest text-sm">Graph Engine Ready</p>
-                    <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Connect a wallet to map on-chain topology and trace capital flows.</p>
+                    <p className="font-bold text-[#050505] uppercase tracking-widest text-sm">Graph Engine Ready</p>
+                    <p className="text-[11px]" style={{ color: 'rgba(0,0,0,0.4)' }}>Connect a wallet to map on-chain topology and trace capital flows.</p>
                 </div>
-                <button className="px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] text-white transition-all hover:scale-105"
-                    style={{ background: `${T.teal}20`, border: `1px solid ${T.teal}40`, color: T.teal }}>
+                <button className="px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all hover:scale-105 shadow-sm"
+                    style={{ background: `${T.teal}10`, border: `1px solid ${T.teal}40`, color: T.teal }}>
                     Initialize Graph
                 </button>
             </div>
@@ -489,22 +489,22 @@ function AcademyPanel() {
     return (
         <div className="p-6 space-y-4">
             <div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tighter mb-1">Academy</h2>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>Institutional-grade education · On-chain mastery</p>
+                <h2 className="text-xl font-bold text-[#050505] uppercase tracking-tighter mb-1">Research Library</h2>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>Institutional-grade education · On-chain mastery</p>
             </div>
             <div className="grid lg:grid-cols-2 gap-3">
                 {courses.map((c) => (
-                    <div key={c.level} className="p-5 rounded-2xl hover:scale-[1.01] transition-all cursor-pointer" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+                    <div key={c.level} className="p-5 rounded-2xl hover:scale-[1.01] transition-all cursor-pointer shadow-sm" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
                         <div className="flex items-center justify-between mb-3">
-                            <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest"
-                                style={{ background: T.surface, color: T.teal, border: `1px solid ${T.teal}30` }}>
+                            <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
+                                style={{ background: `${T.teal}10`, color: T.teal, border: `1px solid ${T.teal}30` }}>
                                 LVL {c.level}
                             </span>
-                            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>{c.tag}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.35)' }}>{c.tag}</span>
                         </div>
-                        <h3 className="font-black text-white text-[14px] uppercase tracking-tight mb-2">{c.title}</h3>
-                        <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{c.desc}</p>
-                        <div className="mt-4 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest" style={{ color: T.teal }}>
+                        <h3 className="font-bold text-[#050505] text-[14px] uppercase tracking-tight mb-2">{c.title}</h3>
+                        <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.45)' }}>{c.desc}</p>
+                        <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: T.teal }}>
                             Start Module <ArrowUpRight size={11}/>
                         </div>
                     </div>
@@ -550,7 +550,7 @@ function renderTabContent(tab: DashboardTab) {
         case 'top-whales':    return <TopWhaleEvents />;
         default:
             return (
-                <div className="p-12 text-center text-white/20 uppercase font-black text-[10px] tracking-widest">
+                <div className="p-12 text-center text-[#888888] uppercase font-bold text-[10px] tracking-widest">
                     Module Not Found
                 </div>
             );
@@ -616,8 +616,8 @@ export function DashboardShell() {
             style={{ position:'fixed', inset:0, zIndex:100, width:'100vw', height:'100vh', overflow:'hidden', backgroundColor: T.bg }}
         >
             {/* Subtle grid */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-                style={{ backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 60px)' }} />
+            <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
+                style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 60px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 60px)' }} />
 
             {/* Command Palette */}
             <CommandPalette onNavigate={(t) => setTab(t as DashboardTab)} onBridgeOpen={() => setBridgeOpen(true)} />
@@ -629,17 +629,16 @@ export function DashboardShell() {
                     <motion.div
                         initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
                         className="absolute inset-0 z-[999] flex flex-col items-center justify-center text-center"
-                        style={{ background:'rgba(11,14,17,0.92)', backdropFilter:'blur(30px)' }}
+                        style={{ background:'rgba(250,249,246,0.95)', backdropFilter:'blur(30px)' }}
                     >
-                        <Lock size={56} className="mb-6" style={{ color:'rgba(255,255,255,0.6)', strokeWidth:1 }}/>
-                        <h2 className="text-3xl font-black text-white uppercase tracking-[0.2em] mb-3">Session Locked</h2>
-                        <p className="text-[10px] font-bold uppercase tracking-widest mb-8" style={{ color:'rgba(255,255,255,0.3)' }}>
+                        <Lock size={56} className="mb-6" style={{ color:'rgba(0,0,0,0.3)', strokeWidth:1 }}/>
+                        <h2 className="text-3xl font-bold text-[#050505] uppercase tracking-[0.2em] mb-3">Session Locked</h2>
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-8" style={{ color:'rgba(0,0,0,0.4)' }}>
                             Zero-Trust protocol — 10 min inactivity
                         </p>
                         <button
                             onClick={() => { setIsIdle(false); setLastActivity(Date.now()); }}
-                            className="px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] text-black transition-all hover:scale-105 shadow-2xl"
-                            style={{ background:'#fff', boxShadow:'0 20px 60px rgba(255,255,255,0.1)' }}
+                            className="px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-[11px] text-white bg-[#050505] transition-all hover:scale-105 shadow-lg"
                         >
                             <Shield size={14} className="inline mr-2"/> Unlock Terminal
                         </button>
@@ -651,16 +650,16 @@ export function DashboardShell() {
             <div className={`relative z-10 flex w-full h-full overflow-hidden transition-all duration-500 ${isIdle ? 'scale-[0.98] opacity-10 pointer-events-none' : ''}`}>
 
                 {/* ── SIDEBAR ── */}
-                <aside className="w-[220px] shrink-0 flex flex-col overflow-hidden" style={{ borderRight:`1px solid ${T.border}`, background:'rgba(13,16,20,0.95)', backdropFilter:'blur(20px)' }}>
+                <aside className="w-[220px] shrink-0 flex flex-col overflow-hidden" style={{ borderRight:`1px solid ${T.border}`, background:'#FFFFFF' }}>
 
                     {/* Brand */}
                     <div className="px-5 py-5 flex items-center gap-3" style={{ borderBottom:`1px solid ${T.border}` }}>
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background:'#050505', border:`1px solid rgba(255,255,255,0.08)` }}>
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background:'#FAF9F6', border:`1px solid rgba(0,0,0,0.08)` }}>
                             <WhaleLogo className="w-6 h-6" />
                         </div>
                         <div className="min-w-0">
-                            <div className="font-black text-white text-[13px] uppercase tracking-tight leading-none truncate">Whale Alert</div>
-                            <div className="text-[8px] font-black uppercase tracking-[0.3em] mt-1" style={{ color:'rgba(255,255,255,0.2)' }}>Network v4.0</div>
+                            <div className="font-bold text-[#050505] text-[13px] uppercase tracking-tight leading-none truncate">Whale Alert</div>
+                            <div className="text-[8px] font-bold uppercase tracking-[0.3em] mt-1" style={{ color:'rgba(0,0,0,0.35)' }}>Network v4.0</div>
                         </div>
                     </div>
 
@@ -685,11 +684,11 @@ export function DashboardShell() {
                     <div className="p-3" style={{ borderTop:`1px solid ${T.border}` }}>
                         <button
                             onClick={() => setBridgeOpen(!bridgeOpen)}
-                            className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all hover:bg-white/[0.05]"
-                            style={{ background:'rgba(255,255,255,0.03)', color:'rgba(255,255,255,0.3)', border:`1px solid ${T.border}` }}
+                            className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all hover:bg-[#FAF9F6]"
+                            style={{ background:'rgba(0,0,0,0.02)', color:'rgba(0,0,0,0.4)', border:`1px solid ${T.border}` }}
                         >
                             Device Bridge
-                            <QrCode size={13} style={{ color:'rgba(255,255,255,0.2)' }}/>
+                            <QrCode size={13} style={{ color:'rgba(0,0,0,0.3)' }}/>
                         </button>
                     </div>
                 </aside>
@@ -698,18 +697,18 @@ export function DashboardShell() {
                 <main className="flex-1 flex flex-col min-w-0" style={{ background:'transparent' }}>
 
                     {/* Top bar */}
-                    <header className="h-[52px] shrink-0 flex items-center justify-between px-6 py-3" style={{ borderBottom:`1px solid ${T.border}`, background:'rgba(11,14,17,0.7)', backdropFilter:'blur(16px)' }}>
+                    <header className="h-[52px] shrink-0 flex items-center justify-between px-6 py-3" style={{ borderBottom:`1px solid ${T.border}`, background:'rgba(255,255,255,0.9)', backdropFilter:'blur(16px)' }}>
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-black uppercase tracking-[0.3em]" style={{ color:'rgba(255,255,255,0.2)' }}>
+                            <span className="text-[9px] font-bold uppercase tracking-[0.3em]" style={{ color:'rgba(0,0,0,0.3)' }}>
                                 Module //
                             </span>
-                            <span className="font-black text-white uppercase tracking-tight text-[12px]">
+                            <span className="font-bold text-[#050505] uppercase tracking-tight text-[12px]">
                                 {TAB_LABELS[tab] ?? tab}
                             </span>
                         </div>
                         <div className="flex items-center gap-4">
                             {/* Status */}
-                            <div className="hidden md:flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest" style={{ color: T.green }}>
+                            <div className="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest" style={{ color: T.green }}>
                                 <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.green }}/>
                                 System Nominal
                             </div>
@@ -718,10 +717,10 @@ export function DashboardShell() {
                             {/* Notifications */}
                             <div className="relative">
                                 <button onClick={() => setShowNotifications(!showNotifications)}
-                                    className="relative p-2 rounded-xl hover:bg-white/[0.06] transition-all"
-                                    style={{ color:'rgba(255,255,255,0.4)' }}>
+                                    className="relative p-2 rounded-xl hover:bg-[#FAF9F6] transition-all"
+                                    style={{ color:'rgba(0,0,0,0.4)' }}>
                                     <Bell size={16}/>
-                                    <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full" style={{ background: T.teal, boxShadow:`0 0 6px ${T.teal}` }}/>
+                                    <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full" style={{ background: T.teal }}/>
                                 </button>
                                 <AnimatePresence>
                                     {showNotifications && (
@@ -729,29 +728,29 @@ export function DashboardShell() {
                                             initial={{ opacity:0, y:8, scale:0.96 }}
                                             animate={{ opacity:1, y:0, scale:1 }}
                                             exit={{ opacity:0, y:8, scale:0.96 }}
-                                            className="absolute top-full right-0 mt-2 w-80 rounded-2xl overflow-hidden shadow-2xl z-50"
-                                            style={{ background:'#161A1E', border:`1px solid ${T.border}`, boxShadow:'0 25px 60px rgba(0,0,0,0.5)' }}
+                                            className="absolute top-full right-0 mt-2 w-80 rounded-2xl overflow-hidden shadow-xl z-50"
+                                            style={{ background:'#FFFFFF', border:`1px solid ${T.border}`, boxShadow:'0 16px 40px rgba(0,0,0,0.1)' }}
                                         >
                                             <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom:`1px solid ${T.border}` }}>
-                                                <h4 className="text-[11px] font-black uppercase tracking-widest text-white">Notifications</h4>
-                                                <button onClick={() => setShowNotifications(false)} style={{ color:'rgba(255,255,255,0.3)' }}><X size={14}/></button>
+                                                <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#050505]">Notifications</h4>
+                                                <button onClick={() => setShowNotifications(false)} style={{ color:'rgba(0,0,0,0.4)' }}><X size={14}/></button>
                                             </div>
                                             <div className="max-h-64 overflow-y-auto">
                                                 {notifications.map(n => {
                                                     const c = n.type==='success'?T.green:n.type==='alert'?T.red:T.gold;
                                                     return (
-                                                        <div key={n.id} className="flex gap-3 px-5 py-4 hover:bg-white/[0.03] cursor-pointer transition-colors" style={{ borderBottom:`1px solid ${T.border}` }}>
+                                                        <div key={n.id} className="flex gap-3 px-5 py-4 hover:bg-[#FAF9F6] cursor-pointer transition-colors" style={{ borderBottom:`1px solid ${T.border}` }}>
                                                             <div className="w-2 h-2 rounded-full mt-1 shrink-0" style={{ background:c }}/>
                                                             <div>
-                                                                <div className="text-[11px] font-black text-white mb-0.5">{n.title}</div>
-                                                                <div className="text-[10px]" style={{ color:'rgba(255,255,255,0.4)' }}>{n.desc}</div>
-                                                                <div className="text-[9px] font-black uppercase tracking-widest mt-1" style={{ color:'rgba(255,255,255,0.2)' }}>{n.time}</div>
+                                                                <div className="text-[11px] font-bold text-[#050505] mb-0.5">{n.title}</div>
+                                                                <div className="text-[10px]" style={{ color:'rgba(0,0,0,0.45)' }}>{n.desc}</div>
+                                                                <div className="text-[9px] font-bold uppercase tracking-widest mt-1" style={{ color:'rgba(0,0,0,0.25)' }}>{n.time}</div>
                                                             </div>
                                                         </div>
                                                     );
                                                 })}
                                             </div>
-                                            <div className="px-5 py-3 text-center text-[9px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/[0.03] transition-colors" style={{ color:'rgba(255,255,255,0.3)', borderTop:`1px solid ${T.border}` }}>
+                                            <div className="px-5 py-3 text-center text-[9px] font-bold uppercase tracking-widest cursor-pointer hover:bg-[#FAF9F6] transition-colors" style={{ color:'rgba(0,0,0,0.4)', borderTop:`1px solid ${T.border}` }}>
                                                 Mark all as read
                                             </div>
                                         </motion.div>
@@ -762,7 +761,7 @@ export function DashboardShell() {
                             {/* Whale logo badge */}
                             <div className="flex items-center gap-2">
                                 <div className="w-6 h-6"><WhaleLogo className="w-full h-full"/></div>
-                                <span className="text-[9px] font-black uppercase tracking-widest hidden lg:block" style={{ color:'rgba(255,255,255,0.2)' }}>
+                                <span className="text-[9px] font-bold uppercase tracking-widest hidden lg:block" style={{ color:'rgba(0,0,0,0.3)' }}>
                                     Institutional v4.0
                                 </span>
                             </div>
@@ -770,7 +769,7 @@ export function DashboardShell() {
                     </header>
 
                     {/* Tab content */}
-                    <div className="flex-1 overflow-y-auto relative bg-[#0B0E11] scrollbar-hide">
+                    <div className="flex-1 overflow-y-auto relative bg-[#FAF9F6] scrollbar-hide">
                         <Suspense fallback={<TabLoader/>}>
                             <AnimatePresence mode="wait">
                                 <motion.div
@@ -795,11 +794,11 @@ export function DashboardShell() {
                         initial={{ x:'100%' }} animate={{ x:0 }} exit={{ x:'100%' }}
                         transition={{ type:'spring', damping:28, stiffness:220 }}
                         className="absolute right-0 top-0 h-full w-80 z-50 flex flex-col"
-                        style={{ background:'rgba(13,16,20,0.97)', backdropFilter:'blur(40px)', borderLeft:`1px solid ${T.border}` }}
+                        style={{ background:'rgba(255,255,255,0.98)', backdropFilter:'blur(40px)', borderLeft:`1px solid ${T.border}` }}
                     >
                         <div className="p-5 flex items-center justify-between" style={{ borderBottom:`1px solid ${T.border}` }}>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Physical Bridge</span>
-                            <button onClick={() => setBridgeOpen(false)} className="p-1.5 rounded-lg hover:bg-white/[0.08] transition-all" style={{ color:'rgba(255,255,255,0.4)' }}>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#050505]">Physical Bridge</span>
+                            <button onClick={() => setBridgeOpen(false)} className="p-1.5 rounded-lg hover:bg-[#FAF9F6] transition-all" style={{ color:'rgba(0,0,0,0.4)' }}>
                                 <X size={16}/>
                             </button>
                         </div>

@@ -141,6 +141,11 @@ export async function GET(req: NextRequest) {
         userAddress: true,
         claimedAt: true,
         signatureData: true,
+        serialCode: true,
+        tier: true,
+        badgeColor: true,
+        networkLaunchEligible: true,
+        twitterHandle: true,
       },
       orderBy: { claimedAt: 'desc' },
       take: 30, // Top 30 recent mints for the Ledger
