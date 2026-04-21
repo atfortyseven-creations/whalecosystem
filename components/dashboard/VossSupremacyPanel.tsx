@@ -231,10 +231,10 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
               <div className="px-6 py-4 text-right">SIGNATURE</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
-            {feed?.length === 0 ? (
-               <div className="w-full h-full flex flex-col items-center justify-center opacity-30 gap-4">
+            {(!feed || feed.length === 0) ? (
+               <div className="w-full min-h-[250px] flex flex-col items-center justify-center opacity-30 gap-4 py-20">
                    <Focus size={30} className="text-[#A0A0A0]" />
-                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">AWAITING ALLOCATION DATA</span>
+                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">AWAITING ALLOCATION DATA (DATABASE EMPTY)</span>
                </div>
             ) : null}
             {feed?.map((f: any, i: number) => {
