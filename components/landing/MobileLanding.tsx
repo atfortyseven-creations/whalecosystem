@@ -837,49 +837,69 @@ export function MobileLanding() {
         </motion.div>
       </main>
 
-      {/* Wave Footer */}
-      <div className="relative w-full min-h-[380px] flex flex-col justify-end overflow-hidden mt-auto">
-        <img
-          src="/olas-hokusai-4k.png"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-bottom opacity-85 z-0"
-          style={{ willChange: "transform", transform: "translateZ(0)" }}
-        />
-        {/* Changed gradient to transparent at the top so pattern is visible, pushing the fade to the bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-[#FAF9F6]/80 to-transparent z-[1]" />
+      {/* ── Institution-Grade Mobile Footer (Synced with PC Downhead) ── */}
+      <div className="relative w-full overflow-hidden mt-auto bg-[#020202] text-white selection:bg-[#D4AF37]/30 rounded-t-3xl border-t border-white/10">
+        
+        {/* WAVE IMAGE — Full bleed behind content */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <img
+            src="/olas-hokusai-4k.png"
+            alt="Wave pattern"
+            className="w-full h-full object-cover object-bottom"
+          />
+          <div className="absolute inset-0 bg-[#020202]/85" />
+        </div>
 
-        <footer className="relative z-10 w-full pb-10 pt-16 mt-auto">
-          <div className="mx-4 flex flex-col items-center gap-5 bg-white/50 backdrop-blur-md rounded-3xl py-7 px-6 border border-white/50 shadow-xl">
-            <div className="flex items-center justify-center gap-6">
-              <a href="https://twitter.com/WhaleAlertNetwork" target="_blank" rel="noreferrer"
-                className="w-11 h-11 bg-white/60 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: INK, opacity: 0.7 }}>
-                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5 5 9.2 5 9.2c.5.2 1 .3 1.5.3C4.1 7.1 5 1 5 1c1.8 2.2 4.6 3.6 7.6 3.8A4.2 4.2 0 0 1 18.2 2.6c1.2-.2 2.4-.7 3.8-1.5z" />
-                </svg>
-              </a>
-              <div className="w-14 h-14 flex items-center justify-center bg-white/70 rounded-3xl shadow-lg border border-white/60">
-                <img src="/official-whale-monochrome.png" className="w-9 h-9" alt="WAN" />
-              </div>
-              <a href="https://github.com/atfortyseven-creations/whalecosystem" target="_blank" rel="noreferrer"
-                className="w-11 h-11 bg-white/60 border border-black/10 rounded-2xl flex items-center justify-center hover:bg-white transition-all shadow-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: INK, opacity: 0.7 }}>
-                  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-                  <path d="M9 18c-4.51 2-5-2-7-2" />
-                </svg>
-              </a>
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              {[['Privacy', '/docs/privacy-policy'], ['Terms', '/docs/terms-of-service'], ['Risk', '/docs/risk-disclosure'], ['Cookies', '/docs/cookie-policy']].map(([label, href]) => (
-                <a key={label} href={href} className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/50 hover:text-[#050505] transition-colors">
-                  {label}
+        <footer className="relative z-10 w-full px-6 pt-16 pb-12 flex flex-col gap-10">
+          
+          {/* Upper: Branding */}
+          <div className="flex flex-col gap-3 text-center items-center">
+            <h2 className="text-3xl font-light leading-none tracking-tight text-[#FAF9F6]">
+              Whale Alert Network<span className="text-[#D4AF37]">.</span>
+            </h2>
+            <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#8A94A6]">
+              Institutional Terminal Layer
+            </p>
+          </div>
+
+          {/* Middle: Subscription */}
+          <div className="w-full flex flex-col gap-3 z-20">
+             <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#8A94A6]/70 text-center">
+                Establish Academic Correspondence
+             </p>
+             <div className="flex flex-col overflow-hidden rounded border border-white/10 bg-[#050505]/70 w-full max-w-[320px] mx-auto shadow-xl">
+                <input
+                   type="email"
+                   placeholder="ENTER SECURE EMAIL"
+                   className="bg-transparent px-4 py-3 outline-none font-mono text-[10px] tracking-widest text-[#E0E0E0] placeholder:text-[#545F73] text-center"
+                />
+                <button className="px-4 py-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EAEAEA] text-[#0A0A0A] hover:bg-white transition-colors active:scale-95">
+                   Subscribe
+                </button>
+             </div>
+          </div>
+
+          <div className="w-full h-px bg-white/5" />
+
+          {/* Lower: Nav Links + Copyright */}
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-4">
+              {[
+                ['Privacy Policy', '/privacy'], 
+                ['Technical Docs', '/docs'], 
+                ['Terms of Service', '/terms']
+              ].map(([label, href]) => (
+                <a key={label} href={href} className="text-[9px] font-mono uppercase tracking-[0.2em] font-medium text-[#8A94A6] hover:text-[#D4AF37] transition-colors relative z-20 p-2 -m-2">
+                   {label}
                 </a>
               ))}
             </div>
-            <p className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 text-black text-center">
-              © 2026 atfortyseven-creations
+            
+            <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#545F73] text-center">
+              © 2026 Whale Alert Network. Pure Mathematics.
             </p>
           </div>
+
         </footer>
       </div>
     </div>

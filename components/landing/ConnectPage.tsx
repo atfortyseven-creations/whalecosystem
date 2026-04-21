@@ -301,9 +301,6 @@ export default function ConnectPage() {
           <span className="text-[14px] font-black uppercase tracking-tighter">Whale Alert Network</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[8px] font-mono text-black/30 uppercase tracking-widest hidden sm:block">
-            Sovereign Access Protocol
-          </span>
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         </div>
       </header>
@@ -314,9 +311,10 @@ export default function ConnectPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 rounded-[36px] border border-black/10 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.10)] overflow-hidden"
+          className={`w-full ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2'} rounded-[36px] border border-black/10 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.10)] overflow-hidden`}
         >
           {/* ── LEFT: QR panel ── */}
+          {!(mounted && isConnected) && (
           <div className="relative p-8 lg:p-12 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/[0.08]">
             <div className="absolute inset-0 pointer-events-none z-0"
               style={{
@@ -329,9 +327,7 @@ export default function ConnectPage() {
               <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-3">
                 Mobile Sync
               </h2>
-              <p className="text-[10px] text-black/40 font-mono uppercase tracking-widest mb-8 border-b border-black/10 pb-4">
-                Scan QR · Bridge the Sovereign Intel Mesh
-              </p>
+              <div className="mb-8 border-b border-black/10 pb-4" />
 
               <div className="flex flex-col items-center gap-6 flex-1 justify-center">
                 <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5">
@@ -369,13 +365,14 @@ export default function ConnectPage() {
 
                 {qrSession && (
                   <button onClick={() => { setQrSession(null); setSyncStatus("IDLE"); }}
-                    className="text-[9px] font-mono text-black/25 hover:text-black/50 uppercase tracking-widest transition-colors">
+                    className="text-[9px] font-mono text-black/25 hover:text-black/50 uppercase tracking-widest transition-colors mt-4">
                     Refresh QR
                   </button>
                 )}
               </div>
             </div>
           </div>
+          )}
 
           {/* ── RIGHT: Smart wallet connect ── */}
           <div className="relative p-8 lg:p-12 flex flex-col bg-white/95 backdrop-blur-md">
@@ -438,13 +435,13 @@ export default function ConnectPage() {
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => router.push('/dashboard')}
-                      className="group w-full flex items-center justify-between p-5 bg-[#050505] text-white rounded-[20px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.35)] hover:bg-black transition-all"
+                      className="group w-full flex items-center justify-between p-5 bg-[#8B5CF6] text-white rounded-[20px] shadow-[0_20px_40px_-10px_rgba(139,92,246,0.35)] hover:bg-[#7C3AED] transition-all border border-[#8B5CF6]"
                     >
                       <div className="flex flex-col text-left">
-                        <span className="text-[13px] font-black uppercase tracking-tight">Enter Terminal</span>
-                        <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest mt-0.5">Sovereign Dashboard</span>
+                        <span className="text-[13px] font-black uppercase tracking-tight text-white">Join to Whale Alert Network</span>
+                        <span className="text-[9px] font-mono text-white/70 uppercase tracking-widest mt-0.5">Sovereign Dashboard</span>
                       </div>
-                      <ArrowRight size={16} className="text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
+                      <ArrowRight size={16} className="text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
                     </motion.button>
 
                     <motion.button
