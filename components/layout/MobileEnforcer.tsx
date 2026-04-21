@@ -26,8 +26,10 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
             const isPhone = /android.*mobi|iphone|ipod/i.test(userAgent.toLowerCase());
-            // Treat devices <= 1024 as mobile so scaling doesn't break routing
-            const mobile = isPhone || window.innerWidth <= 1024;
+            // Enforce mobile solely based on viewport geometry.
+            // This guarantees 'Request Desktop Site' (which injects a 980px+ viewport) 
+            // will bypass mobile mode entirely, successfully bringing up the desktop sidebar.
+            const mobile = window.innerWidth < 768;
             setIsMobile(mobile);
         };
 

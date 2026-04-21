@@ -11,7 +11,6 @@
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity, Zap, AlertTriangle, ArrowRight, Copy, ExternalLink, Bell, BellOff, Loader2,
   Clock, CheckCircle, File, Building, Flame, RefreshCw
