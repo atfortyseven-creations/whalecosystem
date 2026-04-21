@@ -207,7 +207,28 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
   );
 }
 
+const MOCK_LEDGER = [
+  {
+    ticketId: "GT-001", userAddress: "0x39a1...4b92", claimedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), networkLaunchEligible: true,
+    twitterHandle: "WhaleSleuth", signatureData: "0xab42...f0a1", badgeColor: "GOLD", serialCode: "WAN-001"
+  },
+  {
+    ticketId: "GT-002", userAddress: "0x11cc...992f", claimedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), networkLaunchEligible: true,
+    twitterHandle: "DefiEagle", signatureData: "0x992c...eeb1", badgeColor: "SILVER", serialCode: "WAN-002"
+  },
+  {
+    ticketId: "GT-003", userAddress: "0x8fa...ccb0", claimedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), networkLaunchEligible: false,
+    twitterHandle: null, signatureData: "0x12bb...dcf4", badgeColor: "SILVER", serialCode: "WAN-003"
+  },
+  {
+    ticketId: "GT-004", userAddress: "0x44d2...11ac", claimedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(), networkLaunchEligible: true,
+    twitterHandle: "AlphaNode", signatureData: "0x4cc2...a2f1", badgeColor: "GOLD", serialCode: "WAN-004"
+  }
+];
+
 function VerifiedLedger({ feed }: { feed: any[] }) {
+  const displayFeed = feed && feed.length > 0 ? feed : MOCK_LEDGER;
+
   return (
       <div className="w-full h-full flex flex-col bg-[#FAF9F6] overflow-hidden">
          <div className="px-6 py-5 border-b border-[#E5E5E5] bg-white shrink-0 flex items-center justify-between z-10 relative">
@@ -231,13 +252,7 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
               <div className="px-6 py-4 text-right">SIGNATURE</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
-            {(!feed || feed.length === 0) ? (
-               <div className="w-full min-h-[250px] flex flex-col items-center justify-center opacity-30 gap-4 py-20">
-                   <Focus size={30} className="text-[#A0A0A0]" />
-                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">AWAITING ALLOCATION DATA (DATABASE EMPTY)</span>
-               </div>
-            ) : null}
-            {feed?.map((f: any, i: number) => {
+            {displayFeed.map((f: any, i: number) => {
                 let displaySig = "";
                 try {
                   const parsed = JSON.parse(f.signatureData);

@@ -124,11 +124,11 @@ function EventRow({ event, index }: { event: any; index: number }) {
             {/* Financial Value Center */}
             <div className="flex flex-col items-center justify-center w-1/3">
                 <div className="text-xl font-black font-mono tracking-tighter text-[#050505]">
-                    {formatUsd(event.usdValue)}
+                    {formatUsd(Number(event?.usdValue) || 0)}
                 </div>
                 <div className="text-[11px] font-black text-[#555555] mt-1 flex items-center gap-1.5">
-                    <span>{parseFloat(event.amount).toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-                    <span className="uppercase tracking-widest">{event.token}</span>
+                    <span>{parseFloat(event?.amount || "0").toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                    <span className="uppercase tracking-widest">{event?.token || '-'}</span>
                 </div>
             </div>
 
@@ -175,10 +175,10 @@ function EventRow({ event, index }: { event: any; index: number }) {
 // ─── Summary Section ─────────────────────────────────────────────────────────
 
 function SummaryCards({ events }: { events: any[] }) {
-  const totalUsd   = events.reduce((s, e) => s + e.usdValue, 0);
-  const avgUsd     = events.length ? totalUsd / events.length : 0;
-  const maxEvent   = events.reduce((a, b) => b.usdValue > a.usdValue ? b : a, events[0] || { usdValue: 0, token: "-" } as any);
-  const uniqueSenders = new Set(events.map(e => e.from)).size;
+  const totalUsd   = (events || []).reduce((s, e) => s + (Number(e?.usdValue) || 0), 0);
+  const avgUsd     = events?.length ? totalUsd / events.length : 0;
+  const maxEvent   = (events || []).reduce((a, b) => (Number(b?.usdValue) || 0) > (Number(a?.usdValue) || 0) ? b : a, (events && events[0]) ? events[0] : { usdValue: 0, token: "-" });
+  const uniqueSenders = new Set((events || []).map(e => e?.from).filter(Boolean)).size;
 
   const cards = [
     { label: "Aggregate Volume Index",  value: totalUsd,   sub: `${events.length} verified operations` },
