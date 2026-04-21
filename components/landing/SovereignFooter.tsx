@@ -6,19 +6,15 @@
  * Editorial-grade footer for the ImmersiveManifestoLanding.
  *
  * Design spec:
- *   • Wave background — three GPU-composited SVG wave layers
- *     animated at different speeds (18s / 24s / 30s), uses the
- *     crema-to-black gradient matching the landing palette.
- *   • Whale logo — /official-whale.png, centered, with gentle
- *     float animation.
- *   • Navigation pills — Terms · Privacy · Developer · Docs
- *   • Copyright — © 2026 atfortyseven-creations
- *   • Strictly white/crema/black palette — no color accents.
- *   • GPU contract: transform + opacity only. No filter changes.
+ *   • Immersive 4K Hokusai wave acting as an interactive button/banner.
+ *   • Protruding box with 2rem border radius and heavy shadows.
+ *   • Custom 50% smaller blue tracking cursor inside the banner.
+ *   • Minimalist text layout reflecting pure institutional aesthetics.
  */
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, useSpring } from "framer-motion";
+import Image from "next/image";
 
 // Internal link component
 function FooterLink({
@@ -44,88 +40,93 @@ function FooterLink({
   );
 }
 
-// Wave SVG path — two offsetted versions for seamless tiling
-const WAVE_PATH =
-  "M0,80 C180,120 360,20 540,60 C720,100 900,140 1080,80 C1260,20 1440,100 1440,80 L1440,160 L0,160 Z";
-const WAVE_PATH_2 =
-  "M0,100 C150,60 320,140 480,90 C640,40 800,120 960,85 C1120,50 1300,130 1440,100 L1440,160 L0,160 Z";
-const WAVE_PATH_3 =
-  "M0,60 C200,110 400,30 600,70 C800,110 1000,50 1200,90 C1350,115 1420,80 1440,75 L1440,160 L0,160 Z";
-
 export function SovereignFooter() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  // Framer Motion Springs for smooth cursor tracking
+  const cursorX = useSpring(0, { stiffness: 150, damping: 20 });
+  const cursorY = useSpring(0, { stiffness: 150, damping: 20 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    cursorX.set(e.clientX - rect.left);
+    cursorY.set(e.clientY - rect.top);
+  };
+
   return (
     <footer
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden bg-[#FDFCF8] flex flex-col items-center pb-0"
       style={{ marginTop: "0", paddingTop: 0 }}
     >
-      {/* ═══ Wave Band ═══════════════════════════════════════════════
-          Three offset SVG wave layers at different animation speeds.
-          Each is 200% wide and translates from 0% to -50% for seamless loop.
-          All use crema tones to match the landing background (#FDFCF8).
-      ══════════════════════════════════════════════════════════════ */}
-      <div
-        className="relative w-full overflow-hidden leading-[0]"
-        style={{ height: "180px" }}
-        aria-hidden="true"
-      >
-        {/* Layer 1 — slowest, most opaque */}
-        <motion.svg
-          className="absolute top-0 left-0 h-full"
-          style={{ width: "200%", transform: "translateZ(0)" }}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 160"
-          preserveAspectRatio="none"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
+      {/* ═══ 4K Wave Banner (Interactive Protruding Button) ═══ */}
+      <div className="w-full px-4 md:px-12 lg:px-16 mt-16 mb-4 relative z-10">
+        <motion.div
+           ref={containerRef as React.Ref<HTMLDivElement>}
+           onMouseMove={handleMouseMove}
+           onMouseEnter={() => setIsHovered(true)}
+           onMouseLeave={() => setIsHovered(false)}
+           className="relative w-full h-[200px] md:h-[320px] lg:h-[400px] rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-black/5 cursor-pointer flex items-center justify-center group transition-shadow duration-500 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]"
+           whileHover={{ scale: 1.005 }}
+           whileTap={{ scale: 0.995 }}
         >
-          <path fill="rgba(10,10,10,0.06)" d={WAVE_PATH} />
-          <path fill="rgba(10,10,10,0.06)" d={WAVE_PATH} transform="translate(1440,0)" />
-        </motion.svg>
+          {/* Wave Wallpaper 4K */}
+          <Image
+            src="/olas-hokusai-4k.png"
+            alt="Hokusai Waves 4K"
+            fill
+            className="object-cover object-center pointer-events-none transition-transform duration-1000 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 90vw"
+            quality={90}
+            priority
+          />
 
-        {/* Layer 2 — medium speed */}
-        <motion.svg
-          className="absolute top-0 left-0 h-full"
-          style={{ width: "200%", transform: "translateZ(0)" }}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 160"
-          preserveAspectRatio="none"
-          animate={{ x: ["-50%", "0%"] }}
-          transition={{ repeat: Infinity, duration: 24, ease: "linear" }}
-        >
-          <path fill="rgba(10,10,10,0.05)" d={WAVE_PATH_2} />
-          <path fill="rgba(10,10,10,0.05)" d={WAVE_PATH_2} transform="translate(1440,0)" />
-        </motion.svg>
+          {/* Interactive Blue Cursor (50% smaller than previous purple) */}
+          {!isMobile && (
+            <>
+                <motion.div
+                    className="pointer-events-none absolute w-48 h-48 rounded-full z-20 opacity-0 transition-opacity duration-300"
+                    style={{
+                        x: cursorX,
+                        y: cursorY,
+                        translateX: '-50%',
+                        translateY: '-50%',
+                        opacity: isHovered ? 1 : 0,
+                        background: 'radial-gradient(circle, rgba(0,102,255,0.25) 0%, rgba(0,102,255,0) 70%)',
+                        mixBlendMode: 'multiply'
+                    }}
+                />
+                
+                <motion.div
+                    className="pointer-events-none absolute w-5 h-5 border border-[#0066FF]/30 rounded-full z-30 flex items-center justify-center transition-opacity duration-300"
+                    style={{
+                        x: cursorX,
+                        y: cursorY,
+                        translateX: '-50%',
+                        translateY: '-50%',
+                        opacity: isHovered ? 1 : 0,
+                    }}
+                    animate={{ scale: isHovered ? [1, 1.2, 1] : 1 }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                >
+                    <div className="w-1.5 h-1.5 bg-[#0066FF] rounded-full shadow-[0_0_8px_#0066FF]" />
+                </motion.div>
+            </>
+          )}
 
-        {/* Layer 3 — fastest, subtlest */}
-        <motion.svg
-          className="absolute top-0 left-0 h-full"
-          style={{ width: "200%", transform: "translateZ(0)" }}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 160"
-          preserveAspectRatio="none"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ repeat: Infinity, duration: 18, ease: "linear" }}
-        >
-          <path fill="rgba(10,10,10,0.04)" d={WAVE_PATH_3} />
-          <path fill="rgba(10,10,10,0.04)" d={WAVE_PATH_3} transform="translate(1440,0)" />
-        </motion.svg>
-
-        {/* Gradient fill below the waves — matches body bg */}
-        <div
-          className="absolute bottom-0 left-0 w-full"
-          style={{
-            height: "80px",
-            background: "linear-gradient(to bottom, transparent, #FDFCF8)",
-            pointerEvents: "none",
-          }}
-        />
+          {/* Subtle Inner Shadow to make it look like a physical button */}
+          <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(0,0,0,0.05)] rounded-[2rem] pointer-events-none" />
+        </motion.div>
       </div>
 
       {/* ═══ Footer Body ═════════════════════════════════════════════ */}
-      <div
-        className="w-full bg-[#FDFCF8]"
-        style={{ borderTop: "1px solid rgba(10,10,10,0.08)" }}
-      >
+      <div className="w-full bg-[#FDFCF8] relative z-0">
         <div className="max-w-[850px] mx-auto px-6 py-12 flex flex-col items-center gap-10">
 
           {/* ─── Whale Logo ─────────────────────────────────────────── */}

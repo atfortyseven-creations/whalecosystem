@@ -2,35 +2,38 @@
 
 import React, { useState } from 'react';
 import { 
-  LayoutDashboard, Globe, Cpu, Lock, BookOpen, Star, Newspaper, 
-  Ticket, Zap, Search, Layers, Activity, ShieldAlert, Book, 
-  Network, Compass, Landmark, BarChart3, FlaskConical, 
-  Wallet, Shield, Database, HeadphonesIcon 
+  Globe, Lock, BookOpen, Star, Newspaper, 
+  Ticket, Zap, Search, Layers, Activity, Book,
+  Network, Compass, Landmark, BarChart3, FlaskConical,
+  Wallet, Shield, Database, HeadphonesIcon,
+  LayoutDashboard, ShieldAlert
 } from 'lucide-react';
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
 
-// ── Internal panels ────────────────────────────────────────────────────────────
-import { PremiumMatrixStack }      from '@/components/premium/PremiumMatrixStack';
-import { WatchlistTable }          from '@/components/dashboard/WatchlistTable';
+// ── Active panels (visible to users) ──────────────────────────────────────────
 import { NewPairsTable }           from '@/components/dashboard/NewPairsTable';
 import { GainersLosersPanel }      from '@/components/dashboard/GainersLosersPanel';
 import { NewsOfToday }             from '@/components/dashboard/NewsOfToday';
-import { WhalePortfolio }          from '@/components/dashboard/WhalePortfolio';
 import { OmniExplorer }            from '@/components/dashboard/OmniExplorer';
 import { WhaleAcademy }            from '@/components/dashboard/WhaleAcademy';
 import { GoldTicketPanel }         from '@/components/dashboard/GoldTicketPanel';
-import { ZKShieldStation }         from '@/components/dashboard/ZKShieldStation';
 import { EntityGraphVis }          from '@/components/dashboard/EntityGraphVis';
 import { SovereignVault }          from '@/components/dashboard/SovereignVault';
 import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
-import SovereignIntelTab           from '@/components/dashboard/SovereignIntelTab';
 import InstitutionalLedger         from '@/components/dashboard/InstitutionalLedger';
 import { MassTransferIntel }       from '@/components/dashboard/MassTransferIntel';
-import { VirtualizedFirehose }     from '@/components/premium/VirtualizedFirehose';
-import { LivePortfolio }           from '@/components/premium/LivePortfolio';
 import { SessionLogsPanel }        from '@/components/dashboard/SessionLogsPanel';
+
+// ── Hidden panels (commented out — re-enable with sidebar items) ───────────────
+// import { PremiumMatrixStack }   from '@/components/premium/PremiumMatrixStack';
+// import { WatchlistTable }       from '@/components/dashboard/WatchlistTable';
+// import { WhalePortfolio }       from '@/components/dashboard/WhalePortfolio';
+// import { ZKShieldStation }      from '@/components/dashboard/ZKShieldStation';
+// import SovereignIntelTab        from '@/components/dashboard/SovereignIntelTab';
+// import { VirtualizedFirehose }  from '@/components/premium/VirtualizedFirehose';
+// import { LivePortfolio }        from '@/components/premium/LivePortfolio';
 import dynamic from 'next/dynamic';
 
 // Heavy / SSR-unsafe dynamic imports
@@ -101,15 +104,26 @@ const TelemetryHeader = ({ icon: Icon, title, subtitle, isDark = false, themeCol
 };
 
 export default function WhaleDashboard() {
-    const [activeTab, setActiveTab] = useState<string>('dashboard');
+    const [activeTab, setActiveTab] = useState<string>('news');
 
-    // Centralized Tab Render Function for Maximum Perfection
     const renderTabContent = () => {
         switch (activeTab) {
+            // ── [HIDDEN — re-enable import + sidebar item to restore] ──────────
             case 'dashboard':
-                return <><TelemetryHeader icon={LayoutDashboard} title="Dashboard Overview" subtitle="System Matrix" themeColor="emerald" /><div className="h-[650px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="dashboard"><PremiumMatrixStack /></DashboardErrorBoundary></div></>;
             case 'watchlist':
-                return <><TelemetryHeader icon={Star} title="Institutional Watchlist" subtitle="Market Tracking" themeColor="emerald" /><div className="h-[650px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="watchlist"><WatchlistTable /></DashboardErrorBoundary></div></>;
+            case 'firehose':
+            case 'sov-intel':
+            case 'live-port':
+            case 'whale-port':
+            case 'zk':
+                return (
+                    <div className="flex flex-col items-center justify-center h-[400px] gap-4 text-black/20">
+                        <span className="text-[11px] font-black uppercase tracking-[0.3em]">Module Temporarily Disabled</span>
+                        <span className="text-[9px] font-mono">Contact administrator to re-enable this section</span>
+                    </div>
+                );
+
+            // ── [ACTIVE PANELS] ────────────────────────────────────────────────
             case 'news':
                 return <><TelemetryHeader icon={Newspaper} title="Global News Feed" subtitle="Real-time Briefing" themeColor="emerald" /><div className="h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="news"><NewsOfToday /></DashboardErrorBoundary></div></>;
             case 'gold':
@@ -124,10 +138,6 @@ export default function WhaleDashboard() {
             case 'brc':
                 return <><TelemetryHeader icon={Layers} title="Bitcoin L2" subtitle="BRC Explorer" isDark themeColor="amber" /><div className="flex-1 min-h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="brc"><BRCExplorerShell /></DashboardErrorBoundary></div></>;
 
-            case 'firehose':
-                return <><TelemetryHeader icon={Activity} title="Whale Firehose" subtitle="Live Aggregation" themeColor="purple" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="whale-events"><VirtualizedFirehose /></DashboardErrorBoundary></div></>;
-            case 'sov-intel':
-                return <><TelemetryHeader icon={ShieldAlert} title="Sovereign Intel" subtitle="Forensic Operations" themeColor="purple" /><div className="h-[600px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="sovereign-intel"><SovereignIntelTab /></DashboardErrorBoundary></div></>;
             case 'inst-ledger':
                 return <><TelemetryHeader icon={Book} title="Institutional Ledger" subtitle="Entity Transfers" themeColor="purple" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="inst-ledger"><InstitutionalLedger /></DashboardErrorBoundary></div></>;
             case 'mass-transfer':
@@ -143,14 +153,8 @@ export default function WhaleDashboard() {
 
             case 'portfolio':
                 return <><TelemetryHeader icon={Wallet} title="Main Portfolio" subtitle="Asset Execution Node" themeColor="emerald" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="human-port"><PortfolioDashboard /></DashboardErrorBoundary></div></>;
-            case 'live-port':
-                return <><TelemetryHeader icon={Activity} title="Quick Portfolio" subtitle="Live Net Worth" themeColor="emerald" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="portfolio-live"><LivePortfolio /></DashboardErrorBoundary></div></>;
-            case 'whale-port':
-                return <><TelemetryHeader icon={Star} title="Whale Holdings" subtitle="Tracked Entity Values" themeColor="emerald" /><div className="h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="whale-portfolio"><WhalePortfolio /></DashboardErrorBoundary></div></>;
             case 'vault':
                 return <><TelemetryHeader icon={Lock} title="Sovereign Vault" subtitle="ZK Execution Environment" isDark themeColor="amber" /><div className="h-[650px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="sov-vault"><SovereignVault /></DashboardErrorBoundary></div></>;
-            case 'zk':
-                return <><TelemetryHeader icon={Shield} title="ZK Shield Station" subtitle="Zero-Knowledge Compliance" isDark themeColor="amber" /><div className="h-[600px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="zk-shield"><ZKShieldStation /></DashboardErrorBoundary></div></>;
 
             case 'logs':
                 return <><TelemetryHeader icon={Database} title="Session Logs" subtitle="Terminal Security Events" isDark themeColor="blue" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="session-logs"><SessionLogsPanel /></DashboardErrorBoundary></div></>;

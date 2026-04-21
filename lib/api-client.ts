@@ -20,16 +20,16 @@ export const REGISTRY = {
     cosmicForge:    "/api/forge/status",
   },
   VAULT_DATA: {
-    portfolio:      "/api/wallet/balances",
+    portfolio:      "/api/wallet/portfolio",
     whaleWallets:   "/api/premium/watched-wallets",
-    coldStorage:    "/api/wallet/security",
+    coldStorage:    "/api/wallet/onchain-balances",
     zkShield:       "/api/network/forensics",
   },
   OMNI_INFRA: {
     blockExplorer:  "/api/network/evm/recent",
     brc20:          "/api/network/mempool/recent",
     sessionLogs:    "/api/session-logs",
-    news:           "/api/news/intelligence",
+    news:           "/api/news",
   }
 };
 
@@ -65,7 +65,7 @@ const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
   
   let data = await res.json();
   
-  // HOTFIX ADAPTER: If fetching mass-transfers, map the EVM scanner data directly to the WhaleEvent schema expected by MassTransferIntel component
+  // HOTFIX ADAPTER: If fetching mass-transfers, map the EVM scanner data directly to the WhaleEvent schema expected by MassTransferIntel and LiveTransactions components
   if (url === '/api/intelligence/mass-transfers') {
      const getTier = (usd: number) => {
        if (usd >= 100_000_000) return 'MEGALODON';
@@ -79,14 +79,17 @@ const fetchSovereign = async (url: string, requiresAuth: boolean = false) => {
      const mappedEvents = (Array.isArray(data) ? data : []).map((tx: any) => ({
         hash: tx.hash || tx.id,
         wallet: tx.from || 'Unknown',
-        action: 'TRANSFER',
+        action: tx.type || 'TRANSFER',
         token: tx.asset || 'ETH',
         usdValue: tx.usdValue || 0,
         tier: getTier(tx.usdValue || 0),
-        chain: tx.chain || 'ETH',
+        chain: (tx.chain || 'ETH').substring(0, 3),
+        dex: tx.method || null,
         timestamp: new Date(tx.timestamp || Date.now()).toISOString(),
      }));
-     data = { events: mappedEvents };
+     // Both MassTransferIntel (rawData?.events) and LiveTransactions (rawData?.transfers)
+     // receive the same data under both keys for compatibility:
+     data = { events: mappedEvents, transfers: mappedEvents };
   }
 
   return data;
@@ -126,5 +129,6 @@ export function useOmniInfrastructure(endpointKey: keyof typeof REGISTRY.OMNI_IN
   return useQuery({
     queryKey: ['infra', endpointKey],
     queryFn: () => fetchSovereign(REGISTRY.OMNI_INFRA[endpointKey], false),
+    refetchInterval: endpointKey === 'sessionLogs' ? 2000 : 30000,
   });
 }

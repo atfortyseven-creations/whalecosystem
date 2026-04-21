@@ -74,6 +74,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     fetchSettings();
   }, [fetchSettings]);
 
+  // Log page navigation
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      fetch('/api/session-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: `NAVIGATED_TO: ${pathname || '/'}` })
+      }).catch(() => {});
+    }
+  }, [pathname]);
+
   const isPublicPath = PUBLIC_PREFIXES.some(p => pathname.startsWith(p));
   const content = !isPublicPath ? <LinkedGate>{children}</LinkedGate> : children;
 
@@ -136,15 +147,40 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         osc.stop(ctx.currentTime + 0.05);
     };
 
-    const handleClick = (e: MouseEvent) => {
+    const handleAudioClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         const clickable = target.closest('button, a, input[type="submit"], [role="button"], .cursor-pointer');
         if (clickable) playTick();
     };
 
-    document.addEventListener('mousedown', handleClick, { passive: true });
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('mousedown', handleAudioClick, { passive: true });
+    return () => document.removeEventListener('mousedown', handleAudioClick);
   }, [settings?.soundEffects]);
+
+  // ── Sovereign Interaction Telemetry (independent of sound settings) ─────────
+  // CRITICAL FIX: Previously gated behind soundEffects=true, so if users had
+  // sound disabled, ZERO interactions were ever logged to Session Logs.
+  // Now fires unconditionally for all authenticated sessions.
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const handleInteractionLog = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        const clickable = target.closest('button, a, input[type="submit"], [role="button"], .cursor-pointer');
+        if (clickable) {
+            const actionText = (clickable.textContent || clickable.tagName || 'ELEMENT')
+                .substring(0, 40).trim().replace(/\n/g, ' ');
+            fetch('/api/session-logs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: `INTERACTION: CLICKED ${actionText}` }),
+            }).catch(() => {});
+        }
+    };
+
+    document.addEventListener('mousedown', handleInteractionLog, { passive: true });
+    return () => document.removeEventListener('mousedown', handleInteractionLog);
+  }, []);
 
   // ── Battery-aware CSS class for noise animation ──────────────────────────
   // Sets body.perf-high when device is plugged in → enables noise-shift CSS

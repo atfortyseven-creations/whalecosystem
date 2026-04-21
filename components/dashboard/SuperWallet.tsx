@@ -141,8 +141,8 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                 }
             });
 
-            // Ensure primary is present
-            if (!merged.some(m => m.address.toLowerCase() === hookAddress.toLowerCase())) {
+            // Ensure primary is present, only if we have a real address
+            if (hookAddress && !merged.some(m => m.address.toLowerCase() === hookAddress.toLowerCase())) {
                 merged.unshift({
                     address: hookAddress,
                     name: 'Main Vault (Primary)',

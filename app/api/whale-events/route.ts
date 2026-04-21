@@ -9,37 +9,44 @@ export async function GET(req: Request) {
         const limitParam = searchParams.get('limit');
         const takeLimit = limitParam ? parseInt(limitParam) : 50;
 
-        // Extraction from Data Lake
+        // FIX: The original query selected fields (hash, wallet, token, amount) that
+        // do NOT exist in GlobalWhaleEvent schema. Correct fields are:
+        // txHash, amountUSD, protocol, timestamp
         const whaleEvents = await prisma.globalWhaleEvent.findMany({
             take: takeLimit,
             orderBy: {
                 timestamp: 'desc'
             },
             select: {
-                hash: true,
-                wallet: true,
-                token: true,
-                amount: true,
-                usdValue: true,
-                action: true,
-                dex: true,
-                tier: true,
+                id: true,
+                txHash: true,
+                amountUSD: true,
+                protocol: true,
                 timestamp: true,
             }
         });
 
-        // Convert Decimal types from Prisma and return
+        // Normalize to the schema expected by frontend components
         const formattedEvents = whaleEvents.map(ev => ({
-            ...ev,
-            usdValue: Number(ev.usdValue),
+            hash: ev.txHash,
+            wallet: 'Unknown',           // Not stored in this model — placeholder
+            token: 'ETH',               // Not stored in this model — placeholder
+            amount: String(ev.amountUSD),
+            usdValue: Number(ev.amountUSD),
+            action: 'TRANSFER',
+            dex: ev.protocol,
+            tier: ev.amountUSD >= 1_000_000 ? 'WHALE'
+                : ev.amountUSD >= 250_000 ? 'INSTITUTIONAL'
+                : 'RETAIL',
+            timestamp: ev.timestamp,
         }));
 
         return NextResponse.json({ success: true, events: formattedEvents });
 
     } catch (error) {
-        console.error("Data Lake Retrieval Error:", error);
+        console.error('Data Lake Retrieval Error:', error);
         return NextResponse.json(
-            { success: false, error: "Failed to fetch indexed whale events." },
+            { success: false, events: [], error: 'Failed to fetch indexed whale events.' },
             { status: 500 }
         );
     }

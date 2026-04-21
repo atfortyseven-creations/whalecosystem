@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
-    TrendingUp, Wallet, Settings,
+    Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
-    Globe, Cpu, Shield, ShieldAlert, Newspaper,
-    Star, Rocket, Network, Ticket, Zap, Menu,
-    BookOpen, Database, HeadphonesIcon, BarChart3,
-    Landmark, Layers, FlaskConical, Compass,
-    Activity, Lock, Book, Code2
+    Globe, Cpu, Shield, Newspaper,
+    Network, Ticket, Zap, Menu,
+    BookOpen, Database, HeadphonesIcon,
+    Landmark, Compass,
+    Activity, Lock, Book, Info, X
 } from 'lucide-react';
+import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { useUIStore } from '@/lib/store/ui-store';
 import { useEffect } from 'react';
@@ -31,30 +32,30 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>, dividerBefore: 'Overview' },
-    { id: 'watchlist',    label: 'Watchlist',        icon: <Star size={17}/> },
-    { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/> },
+    // { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>, dividerBefore: 'Overview' },
+    // { id: 'watchlist',    label: 'Watchlist',        icon: <Star size={17}/> },
+    { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/>, dividerBefore: 'Overview' },
     { id: 'gold',         label: 'Premium Hub',      icon: <Ticket size={17}/> },
 
     { id: 'markets',      label: 'Top Markets',      icon: <Globe size={17}/>,           dividerBefore: 'Market Data' },
     { id: 'newpairs',     label: 'New Listings',     icon: <Zap size={17}/> },
     { id: 'omniexplorer', label: 'Omni Explorer',    icon: <Search size={17}/> },
-    { id: 'brc',          label: 'BRC Explorer',     icon: <Layers size={17}/> },
+    // { id: 'brc',          label: 'BRC Explorer',     icon: <Layers size={17}/> },
 
-    { id: 'firehose',     label: 'Whale Firehose',   icon: <Activity size={17}/>,        dividerBefore: 'Pro Analytics', badge: 'PRO' },
-    { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <ShieldAlert size={17}/> },
-    { id: 'inst-ledger',  label: 'Inst. Ledger',     icon: <Book size={17}/> },
+    // { id: 'firehose',     label: 'Whale Firehose',   icon: <Activity size={17}/>,        dividerBefore: 'Pro Analytics', badge: 'PRO' },
+    // { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <ShieldAlert size={17}/> },
+    { id: 'inst-ledger',  label: 'Inst. Ledger',     icon: <Book size={17}/>, dividerBefore: 'Pro Analytics', badge: 'PRO' },
     { id: 'mass-transfer',label: 'Mass Transfers',   icon: <Network size={17}/> },
     { id: 'graph',        label: 'Entity Graph',     icon: <Compass size={17}/> },
     { id: 'defi',         label: 'DeFi Yields',      icon: <Landmark size={17}/> },
-    { id: 'polymarket',   label: 'Polymarket',       icon: <BarChart3 size={17}/> },
-    { id: 'forge',        label: 'Cosmic Forge',     icon: <FlaskConical size={17}/> },
+    // { id: 'polymarket',   label: 'Polymarket',       icon: <BarChart3 size={17}/> },
+    // { id: 'forge',        label: 'Cosmic Forge',     icon: <FlaskConical size={17}/> },
 
     { id: 'portfolio',    label: 'Main Portfolio',   icon: <Wallet size={17}/>,          dividerBefore: 'Execution' },
-    { id: 'live-port',    label: 'Quick Portfolio',  icon: <Activity size={17}/> },
-    { id: 'whale-port',   label: 'Whale Holdings',   icon: <Star size={17}/> },
+    // { id: 'live-port',    label: 'Quick Portfolio',  icon: <Activity size={17}/> },
+    // { id: 'whale-port',   label: 'Whale Holdings',   icon: <Star size={17}/> },
     { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/> },
-    { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/> },
+    // { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/> },
 
     { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>,        dividerBefore: 'System' },
 
@@ -181,10 +182,17 @@ export function WhaleProShell({
     isExternalEmbed?: boolean;
 }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+    const [showInfoModal, setShowInfoModal] = useState(false);
     const { setSettingsOpen } = useSettingsStore();
     const { openConnectModal } = useUIStore();
+
+    const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
+        title: 'MÓDULO EN DESARROLLO',
+        subtitle: 'BETA RELEASE',
+        overview: 'Este módulo está bajo despliegue activo. Las funciones de telemetría y análisis intensivo serán detalladas próximamente al alcanzar el grado de producción.',
+        features: []
+    };
 
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
     const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
@@ -221,7 +229,7 @@ export function WhaleProShell({
         ];
         if (restrictedTabs.includes(activeTab)) {
             if (!isWalletConnected) {
-                onTabChange('dashboard');
+                onTabChange('news');
                 toast.error("Session Lost", { description: "You have been disconnected." });
             }
         }
@@ -349,6 +357,13 @@ export function WhaleProShell({
 
                     <div className="flex items-center gap-2">
                         <button
+                            onClick={() => setShowInfoModal(true)}
+                            title="Module Information"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 text-[#888888] hover:text-black transition-all flex items-center justify-center w-10 h-10"
+                        >
+                            <Info size={18} />
+                        </button>
+                        <button
                             onClick={() => setSettingsOpen(true)}
                             title="Open Settings"
                             className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 text-[#888888] hover:text-black transition-all flex items-center justify-center w-10 h-10"
@@ -396,9 +411,9 @@ export function WhaleProShell({
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
                 <nav className="md:hidden h-16 border-t border-black/10 bg-white flex items-center justify-around px-2 shrink-0 z-50" style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
-                        { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Home' },
+                        { id: 'news', icon: <Newspaper size={20} />, label: 'News' },
                         { id: 'markets', icon: <Globe size={20} />, label: 'Markets' },
-                        { id: 'portfolio', icon: <Lock size={20} />, label: 'Portfolio' },
+                        { id: 'vault', icon: <Lock size={20} />, label: 'Vault' },
                         { id: 'menu', icon: <Menu size={20} />, label: 'Menu' },
                     ].map(tab => {
                         const isActive = activeTab === tab.id;
@@ -442,6 +457,76 @@ export function WhaleProShell({
                 </footer>
             </div>
         </div>
+
+        {/* INFO MODAL ENHANCED MULTIDIMENSIONAL */}
+        <AnimatePresence>
+        {showInfoModal && (
+            <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-md flex items-center justify-center p-5"
+            >
+            <motion.div 
+                initial={{ scale: 0.95, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 15 }}
+                className="w-full max-w-lg bg-[#FAF9F6] rounded-[24px] shadow-2xl overflow-hidden flex flex-col border border-black/10"
+            >
+                <div className="flex items-center justify-between px-8 py-6 border-b border-black/10 bg-white">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-black text-[#FAF9F6] flex items-center justify-center">
+                            <Info size={18} />
+                        </div>
+                        <div>
+                            <h3 className="text-[15px] font-black uppercase tracking-widest text-[#050505] leading-none mb-1">{currentExplanation.title}</h3>
+                            <p className="text-[9px] font-black text-black/40 uppercase tracking-[0.2em]">{currentExplanation.subtitle}</p>
+                        </div>
+                    </div>
+                    <button onClick={() => setShowInfoModal(false)} className="p-2.5 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-black/40 hover:text-black">
+                        <X size={18} />
+                    </button>
+                </div>
+                
+                <div className="px-8 py-8 flex flex-col gap-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
+                    <div className="bg-white p-5 border border-black/10 rounded-xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rounded-bl-full -z-0 pointer-events-none" />
+                        <p className="text-[12px] text-[#050505] leading-relaxed font-medium relative z-10 text-justify">
+                            {currentExplanation.overview}
+                        </p>
+                    </div>
+
+                    {currentExplanation.features.length > 0 && (
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-black/30 mb-4 px-1">Capacidades Técnicas e Implementación</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {currentExplanation.features.map((feat, idx) => (
+                                    <div key={idx} className="bg-white border border-black/10 rounded-xl p-4 flex flex-col gap-2 hover:border-black/30 transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-4 h-4 rounded-full bg-black/5 flex justify-center items-center shrink-0">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-black flex-1 line-clamp-1">{feat.title}</span>
+                                        </div>
+                                        <p className="text-[11px] text-black/60 leading-relaxed font-mono">
+                                            {feat.desc}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                
+                <div className="p-6 border-t border-black/10 bg-white">
+                    <button onClick={() => setShowInfoModal(false)} className="w-full py-4 rounded-xl bg-[#050505] text-[#FAF9F6] text-[13px] font-black uppercase tracking-widest hover:bg-black/80 transition-colors shadow-none active:scale-[0.98] duration-200">
+                        Comprendido a Nivel Óptimo
+                    </button>
+                </div>
+            </motion.div>
+            </motion.div>
+        )}
+        </AnimatePresence>
         </>
     );
 }

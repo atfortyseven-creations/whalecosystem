@@ -17,7 +17,7 @@ export function EntityGraphVis() {
     const [isHeuristic, setIsHeuristic] = useState(false);
 
     const { data: matrixData, isLoading } = useSWR('/api/intelligence/graph', fetcher, { 
-        refreshInterval: 60000, 
+        refreshInterval: 0, // Disabled to prevent graph from resetting zoom and disappearing periodically
         revalidateOnFocus: false 
     });
 
@@ -126,7 +126,7 @@ export function EntityGraphVis() {
     return (
         <div className="w-full h-full min-h-0 flex flex-col lg:flex-row gap-4 overflow-hidden p-2">
         {/* GRAPH PANEL */}
-        <div className="flex-[2] flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-2xl font-mono overflow-hidden shadow-sm shrink-0 min-h-0 relative z-10">
+        <div className="flex-1 w-full flex flex-col bg-[#FFFFFF] !text-[#050505] border border-[#E5E5E5] rounded-2xl font-mono overflow-hidden shadow-sm shrink-0 min-h-0 relative z-10">
             {/* ── HEADER ── */}
             <div className="px-8 py-6 border-b border-[#E5E5E5] flex items-center justify-between shrink-0 bg-[#FAF9F6]">
                 <div className="flex items-center gap-4">
@@ -214,11 +214,6 @@ export function EntityGraphVis() {
                 </div>
                 <span>ASSOCIATION_GRAPH_v3.1_ACTIVE</span>
             </div>
-        </div>
-
-        {/* SEARCH BLOCK & BRC EXPLORER MODULE INJECTION */}
-        <div className="flex-1 min-w-[350px] bg-[#FFFFFF] border border-[#E5E5E5] rounded-2xl overflow-hidden shadow-sm flex flex-col min-h-0 relative z-0">
-            <OmniExplorer />
         </div>
         </div>
     );

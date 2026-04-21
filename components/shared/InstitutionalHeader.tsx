@@ -22,8 +22,8 @@ export function InstitutionalHeader() {
         {
             label: "Home",
             links: [
-                { href: '/dashboard', label: 'Dashboard', desc: 'General portfolio overview and balances.' },
-                { href: '/voss-supremacy', label: 'Sniper Trading', desc: 'Automated high-speed execution tools.' }
+                { href: '/dashboard', label: 'Dashboard', desc: 'General portfolio overview and balances.' }
+                // { href: '/voss-supremacy', label: 'Sniper Trading', desc: 'Automated high-speed execution tools.' }
             ]
         },
         {
@@ -31,15 +31,15 @@ export function InstitutionalHeader() {
             links: [
                 { href: '/sovereign-intel', label: 'Intelligence', desc: 'On-chain analytics and graphing.' },
                 { href: '/ledger', label: 'Transaction History', desc: 'Complete history of all wallet actions.' },
-                { href: '/predictions', label: 'Polymarket', desc: 'Decentralized prediction markets.' },
+                // { href: '/predictions', label: 'Polymarket', desc: 'Decentralized prediction markets.' },
                 { href: '/news', label: 'Global News', desc: 'Curated market and crypto news.' }
             ]
         },
         {
             label: "Assets",
             links: [
-                { href: '/portfolio', label: 'Cold Wallet', desc: 'Secure long-term asset storage.' },
-                { href: '/gold-registry', label: 'Identity Credentials', desc: 'Your verified ID and access passes.' }
+                { href: '/portfolio', label: 'Cold Wallet', desc: 'Secure long-term asset storage.' }
+                // { href: '/gold-registry', label: 'Identity Credentials', desc: 'Your verified ID and access passes.' }
             ]
         },
         {
