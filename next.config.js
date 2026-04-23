@@ -64,6 +64,10 @@ const nextConfig = {
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
     reactStrictMode: false,
+    devIndicators: {
+        buildActivity: false,
+        appIsrStatus: false,
+    },
     // swcMinify: REMOVED — always enabled by default in Next.js 15
 
     // Moved from experimental in Next.js 15

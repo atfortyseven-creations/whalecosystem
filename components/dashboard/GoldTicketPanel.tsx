@@ -220,12 +220,18 @@ function GlobalLedger({ feed }: { feed: any[] }) {
              <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.3em]">Optimism Mainnet</span>
          </div>
          <div className="grid text-[9px] font-black text-black/30 uppercase tracking-[0.2em] bg-white border-b border-black/[0.04] shrink-0"
-              style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-              <div className="px-6 py-3">Verified Sovereign</div>
+              style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
+              <div className="px-6 py-3">Sovereign Entity</div>
+              <div className="px-6 py-3">Identity / Tier</div>
               <div className="px-6 py-3">Temporal Entry</div>
               <div className="px-6 py-3 text-right">Cryptographic Seal</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-black/[0.04]">
+            {feed?.length === 0 && (
+                <div className="p-8 text-center text-xs font-black text-black/20 uppercase tracking-[0.2em]">
+                    Awaiting first Genesis signature...
+                </div>
+            )}
             {feed?.map((f: any, i: number) => {
                 let displaySig = "";
                 try {
@@ -234,17 +240,30 @@ function GlobalLedger({ feed }: { feed: any[] }) {
                 } catch { displaySig = f.signatureData; }
                 
                 return (
-                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr' }}>
-                        <div className="px-6 py-4 flex items-center gap-3">
-                             <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
-                             <span className="text-xs font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
+                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
+                        <div className="px-6 py-4 flex flex-col justify-center">
+                             <div className="flex items-center gap-2 mb-1">
+                                 <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_rgba(0,192,118,0.4)]" />
+                                 <span className="text-xs font-black font-mono text-black">{f.userAddress.slice(0,8)}...{f.userAddress.slice(-6)}</span>
+                             </div>
+                             {f.twitterHandle && (
+                                <span className="text-[9px] font-black text-black/40 uppercase tracking-[0.1em]">@{f.twitterHandle}</span>
+                             )}
                         </div>
-                        <div className="px-6 py-4 text-[9px] font-black font-mono text-black/40 uppercase">
+                        <div className="px-6 py-4 flex flex-col justify-center gap-1">
+                             <span className="text-[10px] font-black uppercase text-[#D4AF37] tracking-[0.1em]">{f.serialCode || 'GENESIS'}</span>
+                             <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.2em]">{f.tier || 'TIER 1'}</span>
+                        </div>
+                        <div className="px-6 py-4 text-[10px] font-black font-mono text-black/60 uppercase">
                              {new Date(f.claimedAt).toLocaleTimeString()}
                         </div>
                          <div className="px-6 py-2 flex justify-end">
-                              {displaySig?.startsWith('data:image') && (
-                                 <img src={displaySig} className="h-6 opacity-70 mix-blend-multiply grayscale hover:grayscale-0 transition-all" alt="Sig" />
+                              {displaySig?.startsWith('data:image') ? (
+                                 <div className="bg-[#FAF9F6] border border-black/5 rounded-lg px-3 py-1 shadow-sm">
+                                     <img src={displaySig} className="h-10 opacity-80 mix-blend-multiply hover:opacity-100 hover:scale-110 transition-all duration-300" alt="Sig" />
+                                 </div>
+                              ) : (
+                                 <span className="text-[8px] font-black text-black/20 uppercase tracking-widest">NO SEAL</span>
                               )}
                          </div>
                     </div>

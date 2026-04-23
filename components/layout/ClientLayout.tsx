@@ -8,7 +8,7 @@ import { useSovereignSessionLock } from '@/hooks/useSovereignSessionLock';
 import { TitaniumGate } from '@/components/layout/TitaniumGate';
 import { Downhead } from '@/components/shared/Downhead';
 import { InstitutionalHeader } from '@/components/shared/InstitutionalHeader';
-import { MobileNavBar } from '@/components/layout/MobileNavBar';
+
 import { ZoomWrapper } from './ZoomWrapper';
 import dynamic from 'next/dynamic';
 
@@ -255,8 +255,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/vip' ||
     pathname === '/';
 
-  const showMobileNavBar = !pathname.startsWith('/news');
-
   return (
     <>
       <ConnectWalletModal />
@@ -295,8 +293,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
           {/* Legacy dark footer — only on routes that still need it */}
           {showDownhead && <Downhead />}
-
-          {showMobileNavBar && <MobileNavBar />}
         </div>
       </TitaniumGate>
     </>

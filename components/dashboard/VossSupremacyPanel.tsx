@@ -242,14 +242,14 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
          </div>
          {/* Formal Academic Header */}
          <div className="grid text-[9px] font-black text-[#888888] uppercase tracking-[0.15em] bg-white border-b border-[#E5E5E5] shrink-0"
-              style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 140px' }}>
+              style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
               <div className="px-6 py-4">INDEX</div>
               <div className="px-6 py-4">WALLET ADDRESS</div>
               <div className="px-6 py-4">TIER</div>
               <div className="px-6 py-4">L2 CLEARANCE</div>
-              <div className="px-6 py-4 text-center">TWITTER VERIFICATION</div>
+              <div className="px-6 py-4 text-center">X VERIFICATION</div>
               <div className="px-6 py-4">TIMESTAMP</div>
-              <div className="px-6 py-4 text-right">SIGNATURE</div>
+              <div className="px-6 py-4 text-right">CRYPTOGRAPHIC SEAL</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
             {displayFeed.map((f: any, i: number) => {
@@ -264,52 +264,52 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
                 const hasTwtr = !!f.twitterHandle;
                 
                 return (
-                    <div key={i} className="grid items-center hover:bg-[#FAF9F6] bg-white border-b border-[#F0F0F0] transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 140px' }}>
+                    <div key={i} className="grid items-center hover:bg-[#FAF9F6] bg-white border-b border-[#F0F0F0] transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
                         {/* Index */}
-                        <div className="px-6 py-5 text-[#888888] font-black font-mono text-[10px]">
+                        <div className="px-6 py-5 text-black font-black font-mono text-[11px]">
                             {String(i+1).padStart(3, '0')}
                         </div>
                         {/* Identity */}
                         <div className="px-6 py-5 flex items-center gap-3">
-                             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex, boxShadow: `0 0 10px ${colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex}80` }} />
-                             <span className="text-[12px] font-black font-mono text-[#050505]">{truncAddr(f.userAddress)}</span>
+                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex, boxShadow: `0 0 10px ${colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex}80` }} />
+                             <span className="text-[13px] font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
                         </div>
                         {/* Clearance */}
                         <div className="px-6 py-5">
-                             <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-[#050505]/5 border border-[#050505]/10 text-[#050505] whitespace-nowrap rounded">
+                             <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] text-[#D4AF37] border border-[#D4AF37]/30 whitespace-nowrap rounded-md shadow-sm">
                                  {tier} {f.serialCode?.split('-').pop() || '0000'}
                              </span>
                         </div>
                         {/* L2 Eligbility */}
                         <div className="px-6 py-5">
-                             <span className={`text-[9px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-[#00C076]' : 'text-[#888888]'}`}>
-                                 {f.networkLaunchEligible ? <CheckCircle2 size={12}/> : <Clock size={12}/>}
+                             <span className={`text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-[#00C076]' : 'text-[#888888]'}`}>
+                                 {f.networkLaunchEligible ? <CheckCircle2 size={14}/> : <Clock size={14}/>}
                                  {f.networkLaunchEligible ? 'WHITELISTED L2' : 'PENDING'}
                              </span>
                         </div>
                         {/* X Intel */}
                         <div className="px-6 py-5 text-center">
                             {hasTwtr ? (
-                               <a href={`https://x.com/${f.twitterHandle}`} target="_blank" rel="noreferrer" className="text-[9px] font-bold text-[#1DA1F2] hover:text-white uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
-                                  @{f.twitterHandle} <ExternalLink size={10} />
+                               <a href={`https://x.com/${f.twitterHandle}`} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-[#1DA1F2] hover:text-blue-600 uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                                  @{f.twitterHandle} <ExternalLink size={12} />
                                </a>
                             ) : (
-                               <span className="text-[9px] font-bold text-[#444444] uppercase tracking-widest">—</span>
+                               <span className="text-[10px] font-bold text-[#444444] uppercase tracking-widest">—</span>
                             )}
                         </div>
                         {/* Temporal Ingestion */}
-                        <div className="px-6 py-5 text-[10px] sm:text-[11px] font-black font-mono flex flex-col gap-0.5">
-                             <span className="text-[#050505]">{new Date(f.claimedAt).toLocaleDateString()}</span>
-                             <span className="text-[9px] text-[#A0A0A0]">{new Date(f.claimedAt).toISOString().split('T')[1].replace('Z', '')}</span>
+                        <div className="px-6 py-5 text-[11px] sm:text-[12px] font-black font-mono flex flex-col gap-0.5">
+                             <span className="text-black">{new Date(f.claimedAt).toLocaleDateString()}</span>
+                             <span className="text-[#888888]">{new Date(f.claimedAt).toISOString().split('T')[1].replace('Z', '')}</span>
                         </div>
                         {/* Signature */}
                          <div className="px-6 py-3 flex justify-end">
                               {displaySig?.startsWith('data:image') ? (
-                                 <div className="bg-white border border-[#050505]/10 rounded overflow-hidden p-1 shadow-sm">
-                                    <img src={displaySig} className="h-6 md:h-8 hover:scale-110 object-contain transition-all" style={{ filter: 'brightness(0)' }} alt="Signature" />
+                                 <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-lg overflow-hidden w-[140px] h-[50px] shadow-[0_0_15px_rgba(212,175,55,0.15)] flex items-center justify-center">
+                                    <img src={displaySig} className="w-full h-full object-cover object-center scale-[1.5] hover:scale-[2] transition-transform duration-300 drop-shadow-[0_0_8px_rgba(212,175,55,1)]" alt="Signature" />
                                  </div>
                               ) : (
-                                 <span className="font-mono text-[9px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
+                                 <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
                                      {displaySig && displaySig.length > 5 ? truncAddr(displaySig) : (displaySig || '—')}
                                  </span>
                               )}
@@ -474,7 +474,7 @@ export function VossSupremacyPanel() {
       </div>
 
       {/* ── MASSIVE LEDGER GRID ── */}
-      <div className="flex-1 bg-white border border-[#E5E5E5] overflow-hidden flex flex-col relative mx-4 md:mx-0 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+      <div className="flex-1 bg-white border border-[#E5E5E5] overflow-hidden flex flex-col relative mx-4 md:mx-0 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] min-h-[400px] mb-6">
          <VerifiedLedger feed={dbStats?.feed || []} />
       </div>
 
