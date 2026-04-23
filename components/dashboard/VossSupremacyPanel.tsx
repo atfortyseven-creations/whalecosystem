@@ -207,27 +207,8 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
   );
 }
 
-const MOCK_LEDGER = [
-  {
-    ticketId: "GT-001", userAddress: "0x39a1D8a63B4cF6F21E89a3f6b45a4b928cC24f92", claimedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(), networkLaunchEligible: true,
-    twitterHandle: "WhaleSleuth", signatureData: "0xab42ef", badgeColor: "GOLD", serialCode: "WAN-001"
-  },
-  {
-    ticketId: "GT-002", userAddress: "0x11ccBb3F9d27E4a12F5E9A3C7B8d4E2A1f992F3c", claimedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), networkLaunchEligible: true,
-    twitterHandle: "DefiEagle", signatureData: "0x992ceeb1", badgeColor: "SILVER", serialCode: "WAN-002"
-  },
-  {
-    ticketId: "GT-003", userAddress: "0x8fa7C1d38a9B4E6Fc2B7D2e8A5C4B3f91ccb0a1", claimedAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), networkLaunchEligible: false,
-    twitterHandle: null, signatureData: "0x12bbdcf4", badgeColor: "SILVER", serialCode: "WAN-003"
-  },
-  {
-    ticketId: "GT-004", userAddress: "0x44d2A9Bc1e3F7D8C5b9E2A4B6C7D0E1F82A11ac", claimedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(), networkLaunchEligible: true,
-    twitterHandle: "AlphaNode", signatureData: "0x4cc2a2f1", badgeColor: "GOLD", serialCode: "WAN-004"
-  }
-];
-
 function VerifiedLedger({ feed }: { feed: any[] }) {
-  const displayFeed = feed && feed.length > 0 ? feed : MOCK_LEDGER;
+  const displayFeed = feed || [];
 
   return (
       <div className="w-full h-full flex flex-col bg-[#FAF9F6] overflow-hidden">
@@ -252,71 +233,79 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
               <div className="px-6 py-4 text-right">CRYPTOGRAPHIC SEAL</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
-            {displayFeed.map((f: any, i: number) => {
-                let displaySig = "";
-                try {
-                  const parsed = JSON.parse(f.signatureData);
-                  displaySig = parsed.signature || f.signatureData;
-                } catch { displaySig = f.signatureData; }
-                
-                const tier = f.tier || 'GENESIS';
-                const colorHex = f.badgeColor === 'GOLD' ? '#D4AF37' : '#FFFFFF';
-                const hasTwtr = !!f.twitterHandle;
-                
-                return (
-                    <div key={i} className="grid items-center hover:bg-[#FAF9F6] bg-white border-b border-[#F0F0F0] transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
-                        {/* Index */}
-                        <div className="px-6 py-5 text-black font-black font-mono text-[11px]">
-                            {String(i+1).padStart(3, '0')}
-                        </div>
-                        {/* Identity */}
-                        <div className="px-6 py-5 flex items-center gap-3">
-                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex, boxShadow: `0 0 10px ${colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex}80` }} />
-                             <span className="text-[13px] font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
-                        </div>
-                        {/* Clearance */}
-                        <div className="px-6 py-5">
-                             <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] text-[#D4AF37] border border-[#D4AF37]/30 whitespace-nowrap rounded-md shadow-sm">
-                                 {tier} {f.serialCode?.split('-').pop() || '0000'}
-                             </span>
-                        </div>
-                        {/* L2 Eligbility */}
-                        <div className="px-6 py-5">
-                             <span className={`text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-[#00C076]' : 'text-[#888888]'}`}>
-                                 {f.networkLaunchEligible ? <CheckCircle2 size={14}/> : <Clock size={14}/>}
-                                 {f.networkLaunchEligible ? 'WHITELISTED L2' : 'PENDING'}
-                             </span>
-                        </div>
-                        {/* X Intel */}
-                        <div className="px-6 py-5 text-center">
-                            {hasTwtr ? (
-                               <a href={`https://x.com/${f.twitterHandle}`} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-[#1DA1F2] hover:text-blue-600 uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
-                                  @{f.twitterHandle} <ExternalLink size={12} />
-                               </a>
-                            ) : (
-                               <span className="text-[10px] font-bold text-[#444444] uppercase tracking-widest">—</span>
-                            )}
-                        </div>
-                        {/* Temporal Ingestion */}
-                        <div className="px-6 py-5 text-[11px] sm:text-[12px] font-black font-mono flex flex-col gap-0.5">
-                             <span className="text-black">{new Date(f.claimedAt).toLocaleDateString()}</span>
-                             <span className="text-[#888888]">{new Date(f.claimedAt).toISOString().split('T')[1].replace('Z', '')}</span>
-                        </div>
-                        {/* Signature */}
-                         <div className="px-6 py-3 flex justify-end">
-                              {displaySig?.startsWith('data:image') ? (
-                                 <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-lg overflow-hidden w-[140px] h-[50px] shadow-[0_0_15px_rgba(212,175,55,0.15)] flex items-center justify-center">
-                                    <img src={displaySig} className="w-full h-full object-cover object-center scale-[1.5] hover:scale-[2] transition-transform duration-300 drop-shadow-[0_0_8px_rgba(212,175,55,1)]" alt="Signature" />
-                                 </div>
-                              ) : (
-                                 <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
-                                     {displaySig && displaySig.length > 5 ? truncAddr(displaySig) : (displaySig || '—')}
+            {displayFeed.length === 0 ? (
+               <div className="w-full h-full min-h-[200px] flex flex-col items-center justify-center text-center p-8">
+                  <ShieldCheck size={32} className="text-[#E5E5E5] mb-4" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888888]">NO INSTITUTIONAL CLEARANCES ISSUED</p>
+                  <p className="text-[9px] text-[#A0A0A0] mt-2 tracking-widest uppercase">Awaiting Genesis Ticket Allocations</p>
+               </div>
+            ) : (
+                displayFeed.map((f: any, i: number) => {
+                    let displaySig = "";
+                    try {
+                      const parsed = JSON.parse(f.signatureData);
+                      displaySig = parsed.signature || f.signatureData;
+                    } catch { displaySig = f.signatureData; }
+                    
+                    const tier = f.tier || 'GENESIS';
+                    const colorHex = f.badgeColor === 'GOLD' ? '#D4AF37' : '#FFFFFF';
+                    const hasTwtr = !!f.twitterHandle;
+                    
+                    return (
+                        <div key={i} className="grid items-center hover:bg-[#FAF9F6] bg-white border-b border-[#F0F0F0] transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
+                            {/* Index */}
+                            <div className="px-6 py-5 text-black font-black font-mono text-[11px]">
+                                {String(i+1).padStart(3, '0')}
+                            </div>
+                            {/* Identity */}
+                            <div className="px-6 py-5 flex items-center gap-3">
+                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex, boxShadow: `0 0 10px ${colorHex === '#FFFFFF' ? '#A0A0A0' : colorHex}80` }} />
+                                 <span className="text-[13px] font-black font-mono text-black">{truncAddr(f.userAddress)}</span>
+                            </div>
+                            {/* Clearance */}
+                            <div className="px-6 py-5">
+                                 <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] text-[#D4AF37] border border-[#D4AF37]/30 whitespace-nowrap rounded-md shadow-sm">
+                                     {tier} {f.serialCode?.split('-').pop() || '0000'}
                                  </span>
-                              )}
-                         </div>
-                    </div>
-                );
-            })}
+                            </div>
+                            {/* L2 Eligbility */}
+                            <div className="px-6 py-5">
+                                 <span className={`text-[10px] font-bold uppercase tracking-[0.1em] flex items-center gap-1.5 ${f.networkLaunchEligible ? 'text-[#00C076]' : 'text-[#888888]'}`}>
+                                     {f.networkLaunchEligible ? <CheckCircle2 size={14}/> : <Clock size={14}/>}
+                                     {f.networkLaunchEligible ? 'WHITELISTED L2' : 'PENDING'}
+                                 </span>
+                            </div>
+                            {/* X Intel */}
+                            <div className="px-6 py-5 text-center">
+                                {hasTwtr ? (
+                                   <a href={`https://x.com/${f.twitterHandle}`} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-[#1DA1F2] hover:text-blue-600 uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                                      @{f.twitterHandle} <ExternalLink size={12} />
+                                   </a>
+                                ) : (
+                                   <span className="text-[10px] font-bold text-[#444444] uppercase tracking-widest">—</span>
+                                )}
+                            </div>
+                            {/* Temporal Ingestion */}
+                            <div className="px-6 py-5 text-[11px] sm:text-[12px] font-black font-mono flex flex-col gap-0.5">
+                                 <span className="text-black">{new Date(f.claimedAt).toLocaleDateString()}</span>
+                                 <span className="text-[#888888]">{new Date(f.claimedAt).toISOString().split('T')[1].replace('Z', '')}</span>
+                            </div>
+                            {/* Signature */}
+                             <div className="px-6 py-3 flex justify-end">
+                                  {displaySig?.startsWith('data:image') ? (
+                                     <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-lg overflow-hidden w-[140px] h-[50px] shadow-[0_0_15px_rgba(212,175,55,0.15)] flex items-center justify-center">
+                                        <img src={displaySig} className="w-full h-full object-cover object-center scale-[1.5] hover:scale-[2] transition-transform duration-300 drop-shadow-[0_0_8px_rgba(212,175,55,1)]" alt="Signature" />
+                                     </div>
+                                  ) : (
+                                     <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
+                                         {displaySig && displaySig.length > 5 ? truncAddr(displaySig) : (displaySig || '—')}
+                                     </span>
+                                  )}
+                             </div>
+                        </div>
+                    );
+                })
+            )}
          </div>
       </div>
   );
