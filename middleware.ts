@@ -70,12 +70,32 @@ const PROTECTED_PATTERNS = [
 ];
 
 const HONEYPOT_PATTERNS = [
+  // CMS/framework scanner probes
   '/wp-admin(.*)',
-  '/.env',
+  '/wp-login(.*)',
+  '/phpMyAdmin(.*)',
+  '/phpmyadmin(.*)',
+  '/.env(.*)',
   '/config(.*)',
   '/admin(.*)',
   '/setup(.*)',
-  '/phpmyadmin(.*)',
+  // API scanner probes — paths legitimate traffic NEVER hits
+  '/api/admin(.*)',
+  '/api/debug(.*)',
+  '/api/env(.*)',
+  '/api/keys(.*)',
+  '/api/secret(.*)',
+  '/api/internal(.*)',
+  '/api/private(.*)',
+  '/api/management(.*)',
+  '/api/v1/admin(.*)',
+  '/api/swagger(.*)',
+  // GraphQL introspection abuse
+  '/api/graphql/introspection(.*)',
+  // Common path traversal probes
+  '/etc/passwd(.*)',
+  '/.git(.*)',
+  '/.svn(.*)',
 ];
 
 const KYC_REQUIRED_PATTERNS = ['/trade(.*)'];

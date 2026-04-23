@@ -81,7 +81,13 @@ const nextConfig = {
     },
 
     compiler: {
-        removeConsole: process.env.NODE_ENV === 'production',
+        // SECURITY: Only remove console.log and console.info in production.
+        // console.warn and console.error MUST be preserved for security event logging:
+        //   - HONEYPOT_HIT, CLAIM_RATE_LIMIT_HIT, INVALID_SIGNATURE, WAF events
+        // Stripping these would make attacks invisible in Railway logs.
+        removeConsole: process.env.NODE_ENV === 'production'
+            ? { exclude: ['error', 'warn'] }
+            : false,
     },
 
     typescript: {
@@ -108,9 +114,25 @@ const nextConfig = {
             {
                 source: '/(.*)',
                 headers: [
-                    { key: 'X-Content-Type-Options', value: 'nosniff' },
-                    { key: 'X-Frame-Options',        value: 'SAMEORIGIN' },
-                    { key: 'X-XSS-Protection',       value: '1; mode=block' },
+                    { key: 'X-Content-Type-Options',     value: 'nosniff' },
+                    { key: 'X-Frame-Options',            value: 'SAMEORIGIN' },
+                    { key: 'X-XSS-Protection',          value: '1; mode=block' },
+                    // HSTS: Force HTTPS for 1 year, including subdomains
+                    { key: 'Strict-Transport-Security',  value: 'max-age=31536000; includeSubDomains; preload' },
+                    // Referrer: Only send origin, never full URL (protects wallet addresses in query strings)
+                    { key: 'Referrer-Policy',            value: 'strict-origin-when-cross-origin' },
+                    // Permissions: disable all sensitive APIs we don't use
+                    { key: 'Permissions-Policy',         value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
+                    // Prevent IE content sniffing
+                    { key: 'X-DNS-Prefetch-Control',     value: 'on' },
+                ]
+            },
+            // ── API routes: never cache sensitive data endpoints ────────────────
+            {
+                source: '/api/(health|akashic|golden-ticket|whale-events|signals|institutional)(.*)',
+                headers: [
+                    { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
+                    { key: 'Pragma',        value: 'no-cache' },
                 ]
             },
             // ── Static asset immutable caching ─────────────────────────────────
