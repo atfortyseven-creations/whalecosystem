@@ -127,7 +127,7 @@ export default function WhaleDashboard() {
             case 'news':
                 return <><TelemetryHeader icon={Newspaper} title="Global News Feed" subtitle="Real-time Briefing" themeColor="emerald" /><div className="h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="news"><NewsOfToday /></DashboardErrorBoundary></div></>;
             case 'gold':
-                return <><TelemetryHeader icon={Ticket} title="Ticket Mint" subtitle="Institutional Clearance" isDark themeColor="amber" /><div className="h-[650px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="gold"><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
+                return <><TelemetryHeader icon={Ticket} title="Ticket Mint" subtitle="Institutional Clearance" isDark themeColor="amber" /><div className="flex-1 min-h-[950px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="gold"><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
             
             case 'markets':
                 return <><TelemetryHeader icon={Globe} title="Market Analytics" subtitle="Top Assets" isDark themeColor="blue" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="gainers"><GainersLosersPanel /></DashboardErrorBoundary></div></>;
