@@ -297,6 +297,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
           ))}
         </div>
 
+        {/* ─── Public Akashic Ledger Zero-Mock Sample ─── */}
+        <PublicAkashicLedgerSample />
+
         {/* ─── 50 Historic Catastrophic Events Chronicle ─── */}
         <CatastropheChronicle />
 
@@ -387,6 +390,81 @@ function CatastropheChronicle() {
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function PublicAkashicLedgerSample() {
+  const [feed, setFeed] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/akashic/verify')
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok && d.results) setFeed(d.results);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <section className="w-full max-w-[850px] shrink-0 pt-12 pb-4 flex flex-col">
+      <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end justify-between">
+        <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black flex items-center gap-2">
+          <Scan size={14} /> Akashic Ledger — Public Audit Sample
+        </h2>
+        <span className="text-[9px] font-mono uppercase tracking-widest text-[#00C076] animate-pulse">
+          Live Feed Active
+        </span>
+      </div>
+      <div className="flex flex-col gap-[1px] bg-black border border-black border-t-0 shadow-sm">
+        {loading ? (
+          <div className="bg-[#fdfbf6] p-8 flex justify-center text-[10px] font-mono uppercase tracking-widest text-black/40">
+            Syncing Sovereign Consensus...
+          </div>
+        ) : feed.length === 0 ? (
+          <div className="bg-[#fdfbf6] p-8 flex justify-center text-[10px] font-mono uppercase tracking-widest text-black/40">
+            Awaiting $50M+ Threshold Crossings
+          </div>
+        ) : (
+          feed.map((entry, i) => (
+            <div key={i} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden hover:bg-[#f5f4ef] transition-colors duration-300">
+              <div className="w-full sm:w-[160px] bg-[#f5f4ef] group-hover:bg-[#eceae3] border-b sm:border-b-0 sm:border-r border-black/10 flex flex-col items-center justify-center p-4 shrink-0 transition-colors duration-300">
+                <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-1">{entry.chain}</span>
+                <span className="font-mono text-[11px] font-black tracking-wider text-black group-hover:text-[#D4AF37] transition-colors duration-300">
+                  ${(entry.amountUsd / 1_000_000).toFixed(1)}M
+                </span>
+              </div>
+              <div className="flex-1 p-5 flex flex-col gap-2 justify-center">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-black/50">
+                    ID: AKASHIC-{entry.id}
+                  </span>
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-[#00C076] flex items-center gap-1">
+                    <Scan size={10} /> Verified
+                  </span>
+                </div>
+                <div className="font-mono text-[8px] sm:text-[9px] text-[#555] break-all leading-relaxed bg-black/5 p-2 border border-black/10 selection:bg-black selection:text-white">
+                  SHA256: {entry.storedHash}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="font-mono text-[8px] uppercase tracking-widest text-black/40">
+                    {new Date(entry.timestamp).toLocaleString()}
+                  </span>
+                  <a 
+                    href={`/status`} 
+                    target="_blank"
+                    className="font-mono text-[8px] uppercase tracking-widest text-black hover:underline"
+                  >
+                    View Infrastructure Status →
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </section>
   );
