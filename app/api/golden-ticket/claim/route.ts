@@ -175,11 +175,15 @@ export async function POST(req: NextRequest) {
         }
 
         // ── Ensure User row exists ────────────────────────────────────────────
-        await (prisma as any).user.upsert({
-            where:  { walletAddress: address },
-            update: {},
-            create: { walletAddress: address },
-        });
+        // NOTE: Using $executeRaw instead of prisma.user.upsert() to avoid
+        // Prisma injecting schema-level defaults (e.g. hiddenAssets[]) for
+        // columns that may not yet exist in the live DB (schema drift).
+        // This raw INSERT is safe: only writes walletAddress, ignores conflicts.
+        await (prisma as any).$executeRaw`
+            INSERT INTO "User" ("id", "walletAddress", "createdAt", "updatedAt")
+            VALUES (gen_random_uuid()::text, ${address}, now(), now())
+            ON CONFLICT ("walletAddress") DO NOTHING
+        `;
 
         // ── Create ticket ─────────────────────────────────────────────────────
         const ticket = await (prisma as any).goldenTicket.create({
