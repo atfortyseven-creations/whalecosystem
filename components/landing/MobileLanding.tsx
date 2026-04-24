@@ -104,7 +104,7 @@ function SigningOverlay({
       className="fixed inset-0 z-[9999] flex items-center justify-center p-6"
       style={{ background: "rgba(250,249,246,0.97)", backdropFilter: "blur(24px)" }}
     >
-      <div className="w-full max-w-sm flex flex-col items-center gap-6 text-center">
+      <div className="w-full max-w-sm flex flex-col items-center gap-5 text-center">
         <div className="w-20 h-20 rounded-[2rem] bg-white border border-black/8 shadow-lg flex items-center justify-center">
           {isSigning ? (
             <RefreshCw size={28} className="text-black/60 animate-spin" />
@@ -123,15 +123,42 @@ function SigningOverlay({
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-[28px] font-black tracking-tighter text-[#050505] leading-none">
-            {isSigning ? "Firmando…" : error ? "Firma rechazada" : "Firma el Contrato"}
+          <h2 className="text-[26px] font-black tracking-tighter text-[#050505] leading-none">
+            {isSigning ? "Revisión Pendiente" : error ? "Firma rechazada" : "Firma el Contrato"}
           </h2>
           <p className="text-[12px] text-[#050505]/50 leading-relaxed">
             {error
               ? "Necesitas firmar el mensaje para acceder al terminal."
+              : isSigning
+              ? "Tu wallet tiene una solicitud de firma pendiente. Abre tu app y acepta."
               : "Confirma tu identidad en tu wallet. No se realiza ninguna transacción."}
           </p>
         </div>
+
+        {/* WalletConnect mobile UX: guide user to open wallet app to sign */}
+        {isSigning && !error && (
+          <div className="w-full flex flex-col gap-2">
+            <p className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/30">
+              Abre tu app de wallet para aprobar:
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { name: 'MetaMask', link: 'metamask://', logo: '/wallets/metamask.svg' },
+                { name: 'Coinbase', link: 'cbwallet://', logo: '/wallets/coinbase.png' },
+                { name: 'Rainbow', link: 'rainbow://', logo: '/wallets/rainbow.png' },
+              ].map(w => (
+                <a
+                  key={w.name}
+                  href={w.link}
+                  className="flex flex-col items-center gap-1.5 p-3 bg-white border border-black/8 rounded-xl active:bg-black/5 transition-colors"
+                >
+                  <img src={w.logo} alt={w.name} className="w-7 h-7 object-contain" />
+                  <span className="text-[8px] font-black uppercase tracking-wider text-black/50">{w.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && (
           <motion.div
@@ -151,12 +178,12 @@ function SigningOverlay({
             <RefreshCw size={16} />
             Reintentar Firma
           </button>
-        ) : (
+        ) : !isSigning ? (
           <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center justify-center gap-3">
             <Loader2 size={16} className="animate-spin text-[#050505]/60" />
-            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Aprobando</span>
+            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Iniciando firma…</span>
           </div>
-        )}
+        ) : null}
       </div>
     </motion.div>
   );
@@ -894,25 +921,25 @@ export function MobileLanding() {
           <WalletOption
             logo="/wallets/metamask.svg"
             name="MetaMask"
-            badge="WalletConnect · Deep Link"
+            badge="AppKit · WalletConnect v2"
             loading={connecting === 'metamask'}
-            onClick={() => handleWCDeepLink('metamask')}
+            onClick={() => { setConnecting('metamask'); openAppKitDirect(); }}
             delay={0.1}
           />
           <WalletOption
             logo="/wallets/coinbase.png"
             name="Coinbase Wallet"
-            badge="WalletConnect · Deep Link"
+            badge="AppKit · WalletConnect v2"
             loading={connecting === 'coinbase'}
-            onClick={() => handleWCDeepLink('coinbase')}
+            onClick={() => { setConnecting('coinbase'); openAppKitDirect(); }}
             delay={0.15}
           />
           <WalletOption
             logo="/wallets/rainbow.png"
             name="Rainbow & 550+ Wallets"
-            badge="WalletConnect · Deep Link"
+            badge="AppKit · WalletConnect v2"
             loading={connecting === 'rainbow'}
-            onClick={() => handleWCDeepLink('rainbow')}
+            onClick={() => { setConnecting('rainbow'); openAppKitDirect(); }}
             delay={0.2}
           />
           <WalletOption
