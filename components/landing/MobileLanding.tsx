@@ -512,16 +512,25 @@ export function MobileLanding() {
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
-  const [isLinked, setIsLinked]         = useState(false);
+  // ── CRITICAL FIX: initialize isLinked from cookie immediately ──────────────
+  // On mobile, wagmi takes 1-3s to reconnect after returning from wallet app.
+  // If we start with `false`, the component renders "Connect Wallet" during that
+  // gap. The cookie is the source of truth for an existing valid session.
+  const [isLinked, setIsLinked]         = useState<boolean>(() => {
+    if (typeof document === 'undefined') return false;
+    return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
+  });
   const [showingManifesto, setShowingManifesto] = useState(true);
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
-  const [connecting, setConnecting]     = useState<string | null>(null); // wallet type currently connecting
-  const signingLock = useRef(false);    // prevent double-sign
+  const [connecting, setConnecting]     = useState<string | null>(null);
+  const signingLock = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
   // ── Check for existing valid session on mount ───────────────────────────────
+  // Secondary check: if cookie already detected by useState init, this is a no-op.
+  // Handles edge case where sessionStorage is available (same tab session).
   useEffect(() => {
     if (!mounted) return;
     if (address) {
@@ -744,6 +753,23 @@ export function MobileLanding() {
   }, [connect, connectors, isConnected, address]);
 
   if (!mounted) return null;
+
+  // ── Render: Session exists but wagmi is still reconnecting ─────────────────
+  // This prevents the "Connect Wallet" flash when the user returns from their
+  // wallet app. The cookie proves identity; wagmi just needs a moment to restore.
+  if (isLinked && !address) {
+    return (
+      <div className="fixed inset-0 bg-[#FDFCF8] flex flex-col items-center justify-center gap-4 z-50">
+        <WhaleLogo className="w-8 h-8 shrink-0 opacity-60" />
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+          <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/40">
+            Restaurando Sesión Soberana...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   // ── Render: Signing step ────────────────────────────────────────────────────
   if (isConnected && address && !isLinked) {
