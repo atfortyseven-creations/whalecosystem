@@ -15,8 +15,9 @@ git commit -m "[INSTITUTIONAL SYNC] The Final Paradigm: Phases 7-14 (Deadman, Me
 echo.
 
 echo [3/3] Desplegando en los servidores de produccion de Railway...
-echo Ejecutando "railway up"...
-railway up --detach
+echo Ejecutando "git push railway main"...
+git push --force origin HEAD:main
+git push --force railway HEAD:main
 
 echo.
 echo ==============================================================
