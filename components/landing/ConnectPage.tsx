@@ -283,13 +283,13 @@ export default function ConnectPage() {
     <div className="min-h-screen w-full flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white">
       {/* Wave bg */}
       <div
-        className="fixed bottom-0 left-0 right-0 h-[40vh] pointer-events-none z-0"
+        className="fixed bottom-0 left-0 right-0 h-[50vh] pointer-events-none z-0"
         style={{
           backgroundImage: "url('/olas-hokusai-4k.png')",
-          backgroundSize: "auto 100%",
+          backgroundSize: "contain",
           backgroundPosition: "bottom center",
           backgroundRepeat: "repeat-x",
-          opacity: 0.08,
+          opacity: 0.25,
         }}
       />
 
@@ -306,12 +306,12 @@ export default function ConnectPage() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 relative z-10 flex items-center justify-center p-4 md:p-8 lg:p-12">
+      <main className="flex-1 relative z-10 flex flex-col justify-center items-center p-4 py-12 md:p-8 lg:p-12">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2'} rounded-[36px] border border-black/10 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.10)] overflow-hidden`}
+          className={`w-full my-auto ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2'} rounded-[36px] border border-black/10 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.10)] overflow-hidden`}
         >
           {/* ── LEFT: QR panel ── */}
           {!(mounted && isConnected) && (
@@ -384,7 +384,7 @@ export default function ConnectPage() {
 
               {/* Device mode indicator — only visible pre-connection */}
               {mounted && !isConnected && (
-                <div className="flex items-center gap-1.5 mb-3">
+                <div className="flex items-center gap-1.5 mb-6 border-b border-black/10 pb-4">
                   {isMobile
                     ? <Smartphone size={9} className="text-emerald-500" />
                     : <Monitor size={9} className="text-sky-500" />
@@ -397,10 +397,6 @@ export default function ConnectPage() {
                   </span>
                 </div>
               )}
-
-              <p className="text-[10px] text-black/40 font-mono uppercase tracking-widest mb-8 border-b border-black/10 pb-4">
-                ECDSA · Zero-Custody · Multi-Chain
-              </p>
 
               {/* ─────────────────────────────────────────────────────── */}
               {/* SOVEREIGN CONNECTED STATE                               */}
@@ -421,7 +417,7 @@ export default function ConnectPage() {
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700">
-                        Sovereign Identity Verified
+                        Identity Verified
                       </span>
                       <span className="text-[9px] font-mono text-emerald-500/70 truncate mt-0.5">
                         {address ? `${address.slice(0, 10)}…${address.slice(-8)}` : 'Connected'}
@@ -439,7 +435,6 @@ export default function ConnectPage() {
                     >
                       <div className="flex flex-col text-left">
                         <span className="text-[13px] font-black uppercase tracking-tight text-white">Join to Whale Alert Network</span>
-                        <span className="text-[9px] font-mono text-white/70 uppercase tracking-widest mt-0.5">Sovereign Dashboard</span>
                       </div>
                       <ArrowRight size={16} className="text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
                     </motion.button>
