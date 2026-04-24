@@ -616,6 +616,17 @@ export function MobileLanding() {
     setSignError(null);
     try {
       const message = buildSovereignMessage(address);
+
+      // Auto-redirect to the wallet app for signing (Mobile Only)
+      if (typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        const wt = sessionStorage.getItem('pending_wallet_type');
+        setTimeout(() => {
+          if (wt === 'metamask') window.location.href = 'metamask://';
+          else if (wt === 'coinbase') window.location.href = 'cbwallet://';
+          else if (wt === 'rainbow') window.location.href = 'rainbow://';
+        }, 500); // give wagmi time to dispatch the request
+      }
+
       const signature = await signMessageAsync({ message });
       if (signature) {
         // Persist session — 7 days cookie + sessionStorage tab cache
@@ -756,6 +767,7 @@ export function MobileLanding() {
     }
 
     setConnecting(walletType);
+    sessionStorage.setItem('pending_wallet_type', walletType);
 
     const handleMessage = (event: { type: string; data?: unknown | undefined; uid: string }) => {
       if (event.type !== 'display_uri' || !event.data) return;
@@ -923,7 +935,7 @@ export function MobileLanding() {
             name="MetaMask"
             badge="AppKit · WalletConnect v2"
             loading={connecting === 'metamask'}
-            onClick={() => { setConnecting('metamask'); openAppKitDirect(); }}
+            onClick={() => handleWCDeepLink('metamask')}
             delay={0.1}
           />
           <WalletOption
@@ -931,7 +943,7 @@ export function MobileLanding() {
             name="Coinbase Wallet"
             badge="AppKit · WalletConnect v2"
             loading={connecting === 'coinbase'}
-            onClick={() => { setConnecting('coinbase'); openAppKitDirect(); }}
+            onClick={() => handleWCDeepLink('coinbase')}
             delay={0.15}
           />
           <WalletOption
@@ -939,14 +951,15 @@ export function MobileLanding() {
             name="Rainbow & 550+ Wallets"
             badge="AppKit · WalletConnect v2"
             loading={connecting === 'rainbow'}
-            onClick={() => { setConnecting('rainbow'); openAppKitDirect(); }}
+            onClick={() => handleWCDeepLink('rainbow')}
             delay={0.2}
           />
           <WalletOption
             logo="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
             name="Google & Social Auth"
             badge="Smart Account · Social Login"
-            onClick={() => openAppKitDirect()}
+            loading={connecting === 'social'}
+            onClick={() => { setConnecting('social'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
             delay={0.25}
           />
 
