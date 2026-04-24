@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run worker:scanner\"",
     "build": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
+    "build:ipfs": "cross-env IPFS_BUILD=true next build",
     "build:railway": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "build:contracts": "npx hardhat compile",
     "deploy:deadman": "npx hardhat run scripts/deploy-deadman-switch.js --network polygonAmoy",
@@ -138,7 +139,6 @@
     "@worldcoin/idkit": "^1.5.0",
     "@xmtp/browser-sdk": "^5.2.0",
     "alchemy-sdk": "^3.6.5",
-    "neo4j-driver": "^5.26.0",
     "autoprefixer": "^10.0.1",
     "axios": "^1.13.3",
     "bcryptjs": "^3.0.3",

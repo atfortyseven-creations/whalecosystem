@@ -129,6 +129,25 @@ function createPrismaClient(): PrismaClient {
 
 export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknown as SovereignPrismaClient;
 
+// Inject Sovereign Telemetry Extension for performance monitoring
+if (!globalForPrisma.prisma) {
+    (prisma as any).$use(async (params: any, next: any) => {
+        const before = Date.now();
+        const result = await next(params);
+        const after = Date.now();
+        const duration = after - before;
+        
+        // Log slow queries (> 500ms) indicating potential Sybil bottlenecks
+        if (duration > 500) {
+            console.warn(`[SovereignDB] ⚠️ SLOW QUERY ALERT: ${params.model}.${params.action} took ${duration}ms`);
+        } else if (process.env.DEBUG_PRISMA === 'true') {
+            console.log(`[SovereignDB] Query: ${params.model}.${params.action} | Time: ${duration}ms`);
+        }
+        
+        return result;
+    });
+}
+
 if (process.env.NODE_ENV !== 'production') {
     (globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
 }

@@ -146,7 +146,7 @@ function SigningOverlay({
         {error ? (
           <button
             onClick={onRetry}
-            className="w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
+            className="w-full py-4 rounded-2xl bg-[#2D0A59] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
           >
             <RefreshCw size={16} />
             Reintentar Firma
@@ -177,6 +177,7 @@ function ConnectedScreen({
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [userAgentInfo, setUserAgentInfo] = useState('');
   const [screenRes, setScreenRes] = useState('');
+  const [sessionHistory, setSessionHistory] = useState<any[]>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -187,10 +188,46 @@ function ConnectedScreen({
        if (ua.indexOf("Linux") != -1) os = "Linux";
        if (ua.indexOf("Android") != -1) os = "Android";
        if (ua.indexOf("like Mac") != -1) os = "iOS";
-       setUserAgentInfo(`${os} (${navigator.vendor || "Browser"})`);
+       const detectedOs = `${os} (${navigator.vendor || "Browser"})`;
+       setUserAgentInfo(detectedOs);
        setScreenRes(`${window.screen.width}x${window.screen.height}`);
+       
+       if (address) {
+         const key = `sovereign_history_${address}`;
+         let existing: any[] = [];
+         try {
+             const stored = localStorage.getItem(key);
+             if (stored) {
+                 const parsed = JSON.parse(stored);
+                 if (Array.isArray(parsed)) existing = parsed;
+             }
+         } catch (e) {
+             console.warn("[Sovereign] LocalStorage parse error, resetting history array.");
+             existing = [];
+         }
+
+         const currentSession = {
+           date: new Date().toLocaleDateString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }),
+           time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+           provider: connectorName || "Wallet Segura",
+           os: detectedOs
+         };
+         
+         const isDuplicate = existing.length > 0 && existing[0].time === currentSession.time && existing[0].date === currentSession.date;
+         let updated = existing;
+         
+         if (!isDuplicate) {
+           updated = [currentSession, ...existing].slice(0, 50); // Hard limit to 50 entries to prevent QuotaExceededError
+           try {
+               localStorage.setItem(key, JSON.stringify(updated));
+           } catch (e) {
+               console.warn("[Sovereign] LocalStorage write error (quota exceeded).");
+           }
+         }
+         setSessionHistory(updated);
+       }
     }
-  }, []);
+  }, [address, connectorName]);
 
   const fmtTime   = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const fmtDate   = (d: Date) => d.toLocaleDateString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
@@ -245,7 +282,7 @@ function ConnectedScreen({
            className="w-full bg-white rounded-[24px] border border-[#E5E5E5] shadow-lg overflow-hidden flex flex-col"
         >
           {/* Top bar — live clock */}
-          <div className="bg-[#050505] px-6 py-6 flex items-center justify-between">
+          <div className="bg-[#2D0A59] px-6 py-6 flex items-center justify-between">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Sesión Activa</p>
               <p className="text-[36px] font-black tracking-tighter text-white leading-none tabular-nums">
@@ -326,7 +363,7 @@ function ConnectedScreen({
           whileTap={{ scale: 0.97 }}
           onClick={onScan}
           className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white "
-          style={{ background: INK, fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(5,5,5,0.45)" }}
+          style={{ background: "#2D0A59", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(45,10,89,0.45)" }}
         >
           <Scan size={18} />
           Abrir Scanner QR · Sync PC
@@ -341,8 +378,39 @@ function ConnectedScreen({
         >
           <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
           <p className="text-[9px] text-[#050505]/40 font-medium leading-relaxed">
-            En el Terminal PC haz click en <strong className="text-[#050505]/60 font-black">Direct QR Handshake</strong>, luego escanea el código con este botón para sincronizar tu sesión institucional.
+            En el Terminal PC haz click en <strong className="text-[#2D0A59]/80 font-black">Direct QR Handshake</strong>, luego escanea el código con este botón para sincronizar tu sesión institucional.
           </p>
+        </motion.div>
+
+        {/* ── Session History Panel ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.6 }}
+          className="w-full bg-white rounded-[24px] border border-[#E5E5E5] overflow-hidden flex flex-col shadow-sm mt-4"
+        >
+          <div className="bg-[#1E073B] px-5 py-4 flex items-center justify-between">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-white/90">Historial de Sesiones</h3>
+            <div className="px-2 py-1 bg-white/10 rounded-full text-[9px] font-black text-white/90">{sessionHistory.length} Registros</div>
+          </div>
+          <div className="flex flex-col max-h-[280px] overflow-y-auto">
+             {sessionHistory.length === 0 ? (
+               <div className="p-6 text-center text-[11px] font-medium text-black/40">No hay registros previos.</div>
+             ) : (
+               sessionHistory.map((s, i) => (
+                 <div key={i} className={`px-5 py-4 flex flex-col gap-1.5 ${i !== sessionHistory.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}>
+                    <div className="flex items-center justify-between">
+                       <span className="text-[11px] font-black text-[#050505] capitalize">{s.date}</span>
+                       <span className="text-[10px] font-mono text-[#050505]/50">{s.time}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                       <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/40">{s.provider}</span>
+                       <span className="text-[9px] font-black uppercase tracking-widest text-[#2D0A59]">{s.os}</span>
+                    </div>
+                 </div>
+               ))
+             )}
+          </div>
         </motion.div>
       </main>
 
@@ -398,19 +466,19 @@ function ConnectedScreen({
                      
                      <div className="flex flex-col gap-3">
                        <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">1</div>
+                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">1</div>
                          <p className="text-[11px] text-[#050505] leading-snug">Abre la plataforma Whale Alert Network en el navegador de tu computadora de escritorio.</p>
                        </div>
                        <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">2</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Selecciona la opción <strong className="font-black">Direct QR Handshake</strong> en la pantalla de inicio del PC.</p>
+                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">2</div>
+                         <p className="text-[11px] text-[#050505] leading-snug">Selecciona la opción <strong className="font-black text-[#2D0A59]">Direct QR Handshake</strong> en la pantalla de inicio del PC.</p>
                        </div>
                        <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">3</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Haz click en el botón negro <strong className="font-black">ABRIR SCANNER QR</strong> en esta pantalla de tu teléfono móvil.</p>
+                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">3</div>
+                         <p className="text-[11px] text-[#050505] leading-snug">Haz click en el botón morado <strong className="font-black text-[#2D0A59]">ABRIR SCANNER QR</strong> en esta pantalla de tu teléfono móvil.</p>
                        </div>
                        <div className="flex items-start gap-3">
-                         <div className="w-5 h-5 rounded-full bg-black text-white text-[10px] font-black flex items-center justify-center shrink-0">4</div>
+                         <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">4</div>
                          <p className="text-[11px] text-[#050505] leading-snug">Apunta la cámara al código QR que aparece en tu monitor para transferir tu sesión segura instantáneamente.</p>
                        </div>
                      </div>
@@ -418,7 +486,7 @@ function ConnectedScreen({
                </div>
                
                <div className="p-4 border-t border-[#F0F0F0] bg-[#FAF9F6]">
-                  <button onClick={() => setShowInfoModal(false)} className="w-full py-3.5 rounded-xl bg-black text-white text-[12px] font-black uppercase tracking-widest hover:bg-black/80 transition-colors shadow-lg active:scale-95 duration-200">
+                  <button onClick={() => setShowInfoModal(false)} className="w-full py-3.5 rounded-xl bg-[#2D0A59] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#1E073B] transition-colors shadow-lg active:scale-95 duration-200">
                     Entendido
                   </button>
                </div>

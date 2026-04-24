@@ -3,6 +3,7 @@ const isExtension = process.env.EXT_BUILD === 'true';
 /** @type {import('next').NextConfig} */
 // Force deployment trigger [INSTITUTIONAL SYNC]: 2026-04-21T04:15:00Z
 const nextConfig = {
+    ...(process.env.IPFS_BUILD === 'true' ? { output: 'export' } : {}),
     transpilePackages: [
         'three',
         '@react-three/fiber',
@@ -95,6 +96,21 @@ const nextConfig = {
     },
     eslint: {
         ignoreDuringBuilds: true
+    },
+
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+                    { key: 'X-XSS-Protection', value: '1; mode=block' },
+                    { key: 'X-Frame-Options', value: 'DENY' },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' }
+                ]
+            }
+        ];
     },
 
     // External packages are defined above in experimental.serverComponentsExternalPackages

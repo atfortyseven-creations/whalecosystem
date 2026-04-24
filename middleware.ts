@@ -10,9 +10,10 @@ enum PlanTier {
   ELITE = 'ELITE',
 }
 
-// Memory-based Edge Rate Limiter (Pod-Level Scope)
+// Memory-based Edge Rate Limiter & Replay Attack Cache
 // At 400M users, this prevents individual container CPU asphyxiation
 const rateLimitMap = new Map<string, { count: number; expiresAt: number }>();
+const replayMap = new Set<string>(); // Tracks used nonces/signatures for 60s
 
 function checkEdgeRateLimit(ip: string, tier: PlanTier): { success: boolean, maxReqs: number } {
   // Free accounts: 30 requests per 10s. Pro/Elite: 100 requests per 10s.
@@ -165,6 +166,34 @@ export default async function middleware(request: NextRequest) {
         }
       } catch (rateLimitErr) {
         console.error('[WhaleFortress:CRITICAL] Rate limiter evaluation block failed.', rateLimitErr);
+      }
+
+      // 2.5 [CRITICAL] Anti-Replay Attack Engine (POST State Mutations)
+      if (request.method === 'POST') {
+        const signatureNonce = request.headers.get('x-sovereign-nonce');
+        const txTimestamp = request.headers.get('x-sovereign-timestamp');
+        
+        // Only enforce on critical mutation endpoints if they opt-in via headers, 
+        // or forcefully block if headers exist but are duplicated/old.
+        if (signatureNonce && txTimestamp) {
+            const txTime = parseInt(txTimestamp, 10);
+            const now = Date.now();
+            
+            // Reject if older than 60 seconds (Replay window expired)
+            if (now - txTime > 60000) {
+               console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Expired payload from IP ${ip}`);
+               return new NextResponse(JSON.stringify({ error: 'PAYLOAD_EXPIRED' }), { status: 401 });
+            }
+            
+            // Reject if nonce was already used in this rolling window
+            if (replayMap.has(signatureNonce)) {
+               console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Duplicated signature from IP ${ip}`);
+               return new NextResponse(JSON.stringify({ error: 'REPLAY_DETECTED' }), { status: 401 });
+            }
+            
+            replayMap.add(signatureNonce);
+            setTimeout(() => replayMap.delete(signatureNonce), 60000); // Clear after validity window
+        }
       }
     }
 

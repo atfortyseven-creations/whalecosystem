@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export interface ManifestoSection {
@@ -14,102 +13,15 @@ interface WhaleAlertLandingProps {
   sections?: ManifestoSection[];
 }
 
-/**
- * Known Lottie filenames — used as the fallback list when the API
- * discovery endpoint is unavailable.
- */
-const FALLBACK_LOTTIE_FILES = [
-  "A Female Employee is Reading Financial Statements.json",
-  "Abstract Isometric Loader #1.json",
-  "Ball playing.json",
-  "Big Data Analytics.json",
-  "Browser Loading.json",
-  "Business Analysis.json",
-  "Business.json",
-  "Crypto coins.json",
-  "DeeWork About Blockchain.json",
-  "Earth globe rotating with Seamless loop animation.json",
-  "File Loading.json",
-  "Interactive Save & Bookmark Button with Dark Mode.json",
-  "Isometric data analysis.json",
-  "Manufacturing Industry Working Staff.json",
-  "Metaverse animations.json",
-  "Online Payment.json",
-  "Payment Success.json",
-  "Payments.json",
-  "Share.json",
-  "Trade.json",
-  "enterprice.json",
-  "successfully.json",
-  "website.json",
-];
-
-/** Fetch the actual list of available Lottie files from the API */
-async function discoverLottieFiles(): Promise<string[]> {
-  try {
-    const res = await fetch('/api/lottie?file=__list__');
-    if (!res.ok) return FALLBACK_LOTTIE_FILES;
-    const data = await res.json();
-    if (Array.isArray(data.files) && data.files.length > 0) return data.files;
-  } catch {
-    // Network error — use fallback
-  }
-  return FALLBACK_LOTTIE_FILES;
-}
-
-/** Attach one Lottie per substantive paragraph (not subtitles or list items). */
-function buildRenderPlan(sections: ManifestoSection[], lottieFiles: string[]) {
-  let counter = 0;
-  const plan: Array<{
-    sectionId: string;
-    paraIndex: number;
-    lottie: string | null;
-  }> = [];
-
-  for (const section of sections) {
-    for (let i = 0; i < section.body.length; i++) {
-      const para = section.body[i];
-      const isStructural =
-        para.startsWith("[SUBTITLE]") || para.startsWith("[LIST_ITEM]");
-      if (!isStructural && counter < lottieFiles.length) {
-        plan.push({
-          sectionId: section.id,
-          paraIndex: i,
-          lottie: lottieFiles[counter],
-        });
-        counter++;
-      } else {
-        plan.push({ sectionId: section.id, paraIndex: i, lottie: null });
-      }
-    }
-  }
-
-  return { plan, usedCount: counter };
-}
-
 export default function WhaleAlertLanding({
   sections = [],
 }: WhaleAlertLandingProps) {
   const [mounted, setMounted] = useState(false);
-  const [lottieFiles, setLottieFiles] = useState<string[]>(FALLBACK_LOTTIE_FILES);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-    // Discover actual files on the filesystem via API
-    discoverLottieFiles().then(setLottieFiles);
   }, []);
-
-  const { plan, usedCount } = useMemo(
-    () => buildRenderPlan(sections, lottieFiles),
-    [sections, lottieFiles]
-  );
-
-  const getLottie = (sectionId: string, paraIndex: number) =>
-    plan.find((p) => p.sectionId === sectionId && p.paraIndex === paraIndex)
-      ?.lottie ?? null;
-
-  const remainingLotties = lottieFiles.slice(usedCount);
 
   if (!mounted) return null;
 
@@ -401,9 +313,6 @@ export default function WhaleAlertLanding({
                   );
                 }
 
-                /* ── Substantive paragraph (may have Lottie) ── */
-                const lottie = getLottie(section.id, i);
-
                 return (
                   <div
                     key={i}
@@ -411,24 +320,6 @@ export default function WhaleAlertLanding({
                       marginBottom: 40,
                     }}
                   >
-                    {/* Lottie floated right on desktop */}
-                    {lottie && (
-                      <div
-                        style={{
-                          float: "right",
-                          width: 180,
-                          height: 180,
-                          marginLeft: 32,
-                          marginBottom: 16,
-                          flexShrink: 0,
-                        }}
-                      >
-                        <OptimizedLocalLottie
-                          filename={lottie}
-                          className="w-full h-full"
-                        />
-                      </div>
-                    )}
                     <p
                       style={{
                         fontFamily: '"Georgia", serif',
@@ -442,9 +333,6 @@ export default function WhaleAlertLanding({
                     >
                       {para}
                     </p>
-                    {lottie && (
-                      <div style={{ clear: "both" }} />
-                    )}
                   </div>
                 );
               })}
@@ -458,35 +346,6 @@ export default function WhaleAlertLanding({
             style={{
               paddingTop: 64,
               borderTop: "1px solid #e8e5de",
-              marginBottom: 80,
-            }}
-          >
-            <p
-              style={{
-                fontFamily: '"Inter", sans-serif',
-                fontSize: 10,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "#999",
-                marginBottom: 32,
-              }}
-            >
-              Additional system illustrations
-            </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-                gap: 24,
-              }}
-            >
-              {remainingLotties.map((lottie, idx) => (
-                <div key={idx} style={{ textAlign: "center" }}>
-                  <div style={{ width: "100%", aspectRatio: "1 / 1" }}>
-                    <OptimizedLocalLottie
-                      filename={lottie}
-                      className="w-full h-full"
-                    />
                   </div>
                   <p
                     style={{

@@ -304,6 +304,14 @@ model GoldenTicket {
   signatureData         String?  @db.Text
   isActive              Boolean  @default(true)
   claimedAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt @default(now())
+
+  // Compound indexes for dashboard query patterns:
+  // /api/golden-ticket GET: WHERE isActive=true ORDER BY claimedAt DESC TAKE 30
+  // /api/akashic hash verification: WHERE userAddress
+  @@index([isActive, claimedAt(sort: Desc)])
+  @@index([tier, claimedAt(sort: Desc)])
+  @@index([ticketNumber])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -465,6 +473,17 @@ model WhaleActivity {
   @@index([institutional])
   @@index([entityName])
   @@index([chain, timestamp(sort: Desc)])
+
+  // ── 🔍 INDEXACIÓN COMPUESTA (query patterns de /api/akashic y /api/institutional)
+  // Pattern 1: Akashic feed — filtrar por chain, ordenar por timestamp, paginar
+  @@index([chain, timestamp(sort: Desc), usdValue])
+  // Pattern 2: Dashboard institucional — movimientos >$1M clasificados como institucionales
+  @@index([institutional, usdValue, timestamp(sort: Desc)])
+  // Pattern 3: Análisis por token — ej. todos los movimientos de USDC en Ethereum
+  @@index([token, chain, timestamp(sort: Desc)])
+  // Pattern 4: Búsqueda por dirección (from/to wallet lookup)
+  @@index([fromAddress, timestamp(sort: Desc)])
+  @@index([toAddress, timestamp(sort: Desc)])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
