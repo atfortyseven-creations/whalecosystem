@@ -73,6 +73,8 @@ export async function GET(req: NextRequest) {
             // Initial heartbeat
             send('connected', { status: 'sovereign', timestamp: new Date().toISOString() });
 
+            const prisma = await getPrismaClient();
+
             // [CATCH-UP] Initial data blast for Total System Visibility
             try {
                 const history = await prisma.whaleActivity.findMany({
@@ -134,7 +136,6 @@ export async function GET(req: NextRequest) {
             });
 
             const redis = await getRedisClient();
-            const prisma = await getPrismaClient();
 
             while (running) {
                 try {
