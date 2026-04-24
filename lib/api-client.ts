@@ -111,7 +111,7 @@ export function useMarketData(endpointKey: keyof typeof REGISTRY.MARKET_DATA) {
     queryKey: ['market', endpointKey],
     // Force auth for watchlist since it's sharing the vault endpoint
     queryFn: () => fetchSovereign(REGISTRY.MARKET_DATA[endpointKey], endpointKey === 'watchlist'),
-    refetchInterval: 10000, 
+    refetchInterval: 60000, 
   });
 }
 
@@ -120,7 +120,7 @@ export function useSovereignIntel(endpointKey: keyof typeof REGISTRY.SOVEREIGN_I
   return useQuery({
     queryKey: ['intel', endpointKey],
     queryFn: () => fetchSovereign(REGISTRY.SOVEREIGN_INTEL[endpointKey], true),
-    refetchInterval: 15000,
+    refetchInterval: 60000,
   });
 }
 
@@ -136,6 +136,6 @@ export function useOmniInfrastructure(endpointKey: keyof typeof REGISTRY.OMNI_IN
   return useQuery({
     queryKey: ['infra', endpointKey],
     queryFn: () => fetchSovereign(REGISTRY.OMNI_INFRA[endpointKey], false),
-    refetchInterval: endpointKey === 'sessionLogs' ? 2000 : 30000,
+    refetchInterval: endpointKey === 'sessionLogs' ? 10000 : 120000,
   });
 }

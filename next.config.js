@@ -65,10 +65,8 @@ const nextConfig = {
     poweredByHeader: false,
     productionBrowserSourceMaps: false,
     reactStrictMode: false,
-    devIndicators: {
-        buildActivity: false,
-        appIsrStatus: false,
-    },
+    // devIndicators removed — buildActivity and appIsrStatus are deprecated in Next.js 15
+
     // swcMinify: REMOVED — always enabled by default in Next.js 15
 
     // Moved from experimental in Next.js 15
