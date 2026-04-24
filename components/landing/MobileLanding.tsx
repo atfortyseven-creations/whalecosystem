@@ -672,111 +672,7 @@ export function MobileLanding() {
     }
   }, [isLinked, closeAppKit]);
 
-  // ── WalletConnect v2 deep-link (THE CRITICAL FIX) ──────────────────────────
-  //
-  //  Problem: metamask:// just opens MetaMask homescreen — no connection.
-  //  Solution: Generate a WalletConnect v2 pairing URI from the wagmi WC connector,
-  //  then encode it into the wallet-specific deep-link:
-  //    metamask://wc?uri=wc%3A...   ← MetaMask sees "connect to this dapp"
-  //    cbwallet://wc?uri=wc%3A...   ← Coinbase
-  //    rainbow://wc?uri=wc%3A...    ← Rainbow
-  //
-  //  After the user approves in their wallet app, the WC session resolves and
-  //  isConnected becomes true → auto-sign fires above.
-  //
-  const handleWCDeepLink = useCallback((walletType: 'metamask' | 'coinbase' | 'rainbow') => {
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator?.userAgent ?? '');
-    const hasEthereum = typeof (window as any).ethereum !== 'undefined';
 
-    // ── If already connected, skip entirely — avoid wagmi 'Connector already connected' error
-    if (isConnected && address) {
-      // Wallet is already linked — nothing to do here
-      return;
-    }
-
-    const STORE_URLS = {
-      metamask: {
-        ios:     'https://apps.apple.com/app/metamask/id1438144202',
-        android: 'https://play.google.com/store/apps/details?id=io.metamask',
-      },
-      coinbase: {
-        ios:     'https://apps.apple.com/app/coinbase-wallet/id1278383455',
-        android: 'https://play.google.com/store/apps/details?id=org.toshi',
-      },
-      rainbow: {
-        ios:     'https://apps.apple.com/app/rainbow-ethereum-wallet/id1457119021',
-        android: 'https://play.google.com/store/apps/details?id=me.rainbow',
-      },
-    };
-
-    // ── Path A: In-app browser (wallet's own browser already injected ethereum) ──
-    if (hasEthereum) {
-      const ID_MAP = {
-        metamask: ['injected', 'io.metamask', 'metaMaskSDK'],
-        coinbase:  ['coinbaseWalletSDK', 'injected'],
-        rainbow:   ['injected'],
-      };
-      const c = connectors.find(x => ID_MAP[walletType].includes(x.id));
-      if (c) {
-        setConnecting(walletType);
-        // Suppress 'already connected' error — wagmi throws when the same
-        // connector instance is already active (e.g. user navigated back)
-        try { connect({ connector: c }); } catch { setConnecting(null); }
-        return;
-      }
-    }
-
-    // ── Path B: External browser on mobile → WC URI deep-link ─────────────────
-    const wcConnector = connectors.find(c =>
-      c.id === 'walletConnect' || c.id === 'walletconnect' || c.id === 'WalletConnect'
-    );
-
-    if (!wcConnector) {
-      // No WC connector found at all — send to store
-      window.location.href = isIOS ? STORE_URLS[walletType].ios : STORE_URLS[walletType].android;
-      return;
-    }
-
-    setConnecting(walletType);
-    sessionStorage.setItem('pending_wallet_type', walletType);
-
-    const handleMessage = (event: { type: string; data?: unknown | undefined; uid: string }) => {
-      if (event.type !== 'display_uri' || !event.data) return;
-      wcConnector.emitter.off('message', handleMessage);
-
-      const wcUri = String(event.data);
-      const encoded = encodeURIComponent(wcUri);
-
-      const DEEP_LINK_MAP = {
-        metamask: `metamask://wc?uri=${encoded}`,
-        coinbase:  `cbwallet://wc?uri=${encoded}`,
-        rainbow:   `rainbow://wc?uri=${encoded}`,
-      };
-
-      const deepLink = DEEP_LINK_MAP[walletType];
-      window.location.href = deepLink;
-
-      const onReturn = () => {
-        if (!document.hidden) {
-          setConnecting(null);
-          document.removeEventListener('visibilitychange', onReturn);
-        }
-      };
-      document.addEventListener('visibilitychange', onReturn);
-    };
-
-    wcConnector.emitter.on('message', handleMessage);
-
-    // Kick off the WC pairing — this triggers 'display_uri' emission.
-    // Catch synchronous 'already connected' error from wagmi.
-    try {
-      connect({ connector: wcConnector });
-    } catch (e: any) {
-      wcConnector.emitter.off('message', handleMessage);
-      setConnecting(null);
-      // Silently ignore duplicate connection attempts
-    }
-  }, [connect, connectors, isConnected, address]);
 
   if (!mounted) return null;
 
@@ -906,7 +802,7 @@ export function MobileLanding() {
             name="MetaMask"
             badge="AppKit · WalletConnect v2"
             loading={connecting === 'metamask'}
-            onClick={() => handleWCDeepLink('metamask')}
+            onClick={() => { setConnecting('metamask'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
             delay={0.1}
           />
           <WalletOption
@@ -914,7 +810,7 @@ export function MobileLanding() {
             name="Coinbase Wallet"
             badge="AppKit · WalletConnect v2"
             loading={connecting === 'coinbase'}
-            onClick={() => handleWCDeepLink('coinbase')}
+            onClick={() => { setConnecting('coinbase'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
             delay={0.15}
           />
           <WalletOption
@@ -922,7 +818,7 @@ export function MobileLanding() {
             name="Rainbow & 550+ Wallets"
             badge="AppKit · WalletConnect v2"
             loading={connecting === 'rainbow'}
-            onClick={() => handleWCDeepLink('rainbow')}
+            onClick={() => { setConnecting('rainbow'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
             delay={0.2}
           />
           <WalletOption
