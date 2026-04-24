@@ -25,12 +25,10 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-            const isPhone = /android.*mobi|iphone|ipod/i.test(userAgent.toLowerCase());
-            // Enforce mobile solely based on viewport geometry.
-            // This guarantees 'Request Desktop Site' (which injects a 980px+ viewport) 
-            // will bypass mobile mode entirely, successfully bringing up the desktop sidebar.
-            const mobile = window.innerWidth < 768;
-            setIsMobile(mobile);
+            // The user explicitly requested that narrowing the window on PC should NOT trigger the mobile app view.
+            // Mobile view should ONLY be shown on actual mobile devices.
+            const isRealMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+            setIsMobile(isRealMobileDevice);
         };
 
         checkMobile();

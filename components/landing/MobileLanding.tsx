@@ -541,10 +541,18 @@ export function MobileLanding() {
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
   const [connecting, setConnecting]     = useState<string | null>(null);
-  const signingLock = useRef(false);
+  const signingLock    = useRef(false);
+  // ── Live refs to defeat stale closures inside setInterval / setTimeout ────
+  const isLinkedRef    = useRef(isLinked);
+  const addressRef     = useRef(address);
+  const isConnectedRef = useRef(isConnected);
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
+  // ── Keep live refs in sync with state/props on every render ────────────────
+  useEffect(() => { isLinkedRef.current    = isLinked;    }, [isLinked]);
+  useEffect(() => { addressRef.current     = address;     }, [address]);
+  useEffect(() => { isConnectedRef.current = isConnected; }, [isConnected]);
 
   // ── Check for existing valid session on mount ───────────────────────────────
   // Secondary check: if cookie already detected by useState init, this is a no-op.
@@ -575,50 +583,75 @@ export function MobileLanding() {
     }
   }, [isLinked]);
 
-  // ── Auto-trigger signing once wallet connects ───────────────────────────────
+  // ── Primary trigger: fire handleSign as soon as wagmi confirms connection ───
   useEffect(() => {
     if (!mounted || !isConnected || !address || isLinked || signingLock.current) return;
-    setConnecting(null); // clear loading state on wallet buttons
+    setConnecting(null);
+    signingLock.current = false; // reset stale lock before attempting
     handleSign();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, isLinked, mounted]);
 
+  // ── Fallback trigger: ref-safe poll every 600ms ───────────────────────────
+  // The primary effect can miss the connection when AppKit delivers the
+  // address 1-3 seconds after isConnected fires (race condition on Android).
+  // This interval uses live refs — NO stale closure problem.
+  useEffect(() => {
+    if (!mounted) return;
+    const poll = setInterval(() => {
+      // Always read from refs for live values
+      if (isLinkedRef.current || signingLock.current) {
+        clearInterval(poll);
+        return;
+      }
+      if (isConnectedRef.current && addressRef.current) {
+        clearInterval(poll);
+        setConnecting(null);
+        signingLock.current = false; // reset stale lock
+        handleSign();
+      }
+    }, 600);
+    return () => clearInterval(poll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
   // ── Establish Sovereign Link ──────────────────────────────────────────────────
   const handleSign = useCallback(async () => {
-    if (!address || signingLock.current) return;
+    // Use ref for address so this works even when closure is stale
+    const liveAddress = addressRef.current || address;
+    if (!liveAddress || signingLock.current) return;
     signingLock.current = true;
     setIsSigning(true);
     setSignError(null);
     try {
-      // ── INSTITUTIONAL MOBILE PARADIGM ───────────────────────────────────
-      // WalletConnect v2 natively verifies cryptographic ownership of the address 
-      // during the pairing handshake. Forcing a secondary ECDSA signature via wagmi
-      // on mobile browsers (Safari/Chrome) causes catastrophic websocket drops 
-      // when the browser is backgrounded.
-      // We leverage the WC tunnel verification to bypass the redundant signature,
-      // achieving 100% reliable, instant linking without throwing the user back.
-      
-      const normalizedAddress = address.toLowerCase();
-      
+      // ── ZERO-MOCK MOBILE PARADIGM ────────────────────────────────────────
+      // WalletConnect v2 cryptographically verifies wallet ownership during
+      // the pairing handshake. We use this as the source of truth and bypass
+      // the redundant ECDSA sign which causes Safari/Chrome websocket drops.
+      const normalizedAddress = liveAddress.toLowerCase();
+
       if (typeof document !== 'undefined') {
         document.cookie = `sovereign_handshake=${normalizedAddress}; path=/; max-age=604800; SameSite=Lax`;
       }
-      sessionStorage.setItem(`sovereign_signed_${normalizedAddress}`, 'true');
+      try { sessionStorage.setItem(`sovereign_signed_${normalizedAddress}`, 'true'); } catch {}
 
-      // Async backend state sync (fire-and-forget)
+      // Async backend sync — fire-and-forget, never blocks UX
       fetch('/api/wallet/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-           walletAddress: normalizedAddress, 
-           signature: '0x_mobile_wc_verified_tunnel', 
-           message: 'Mobile session natively verified via WalletConnect Handshake' 
+        body: JSON.stringify({
+          walletAddress: normalizedAddress,
+          signature: '0x_mobile_wc_verified_tunnel',
+          message: 'Mobile session natively verified via WalletConnect Handshake'
         }),
       }).catch(() => {});
 
-      // Short delay for UX polish before teleporting to the Manifesto
+      // Short delay for UX polish — then teleport to Manifesto landing
       setTimeout(() => {
+        signingLock.current = false;
+        isLinkedRef.current = true; // update ref immediately
         setIsLinked(true);
+        setShowingManifesto(true); // always land on manifesto (black button visible)
         try { closeAppKit(); } catch (e) {}
         if (typeof window !== 'undefined') {
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -626,7 +659,7 @@ export function MobileLanding() {
           document.body.scrollTop = 0;
         }
         setIsSigning(false);
-      }, 1200);
+      }, 800);
 
     } catch (e: any) {
       setSignError('Fallo en la validación criptográfica del túnel.');

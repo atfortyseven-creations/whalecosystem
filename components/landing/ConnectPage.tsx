@@ -330,7 +330,7 @@ export default function ConnectPage() {
               <div className="mb-8 border-b border-black/10 pb-4" />
 
               <div className="flex flex-col items-center gap-6 flex-1 justify-center">
-                <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5">
+                <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5 flex flex-col items-center">
                   <AnimatePresence mode="wait">
                     {qrSession && mounted ? (
                       <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
@@ -343,6 +343,16 @@ export default function ConnectPage() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  {qrSession && mounted && (
+                    <div className="mt-4 flex flex-col items-center text-center gap-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-2 py-0.5 rounded">
+                        DO NOT SCAN WITH METAMASK
+                      </span>
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-black/40">
+                        Scan with native phone camera
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2.5">
