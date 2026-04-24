@@ -1,12 +1,12 @@
 @echo off
 cd /d "%~dp0"
 echo ========================================================
-echo  DESPLIEGUE A RAILWAY: FIX MOBILE FINAL PARADIGM
+echo  DESPLIEGUE A RAILWAY: APPKIT WEBSOCKET RECOVERY FIX
 echo ========================================================
 
 git add components/landing/MobileLanding.tsx
 
-git commit -m "fix(mobile): enforce zero-mock paradigm by bypassing redundant ECDSA signature to prevent Safari websocket drops"
+git commit -m "fix(mobile): revert to AppKit deep-linking to ensure iOS Safari websocket session recovery upon waking up"
 
 :: Haciendo force push a origin y railway
 git push --force origin HEAD:main

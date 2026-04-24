@@ -1,22 +1,23 @@
 @echo off
-echo ================================================================
-echo  WHALE ALERT NETWORK — PUSHING AUTHENTICATION SECURE FRAME FIX
-echo ================================================================
-echo.
+cd /d "%~dp0"
+echo ========================================================
+echo  DESPLIEGUE A RAILWAY: FIX SOVEREIGN AUTH & SYNC
+echo ========================================================
 
-echo 1. Adding Auth config fix...
-git add config/appkit.tsx
+git add app/page.tsx
+git add components/landing/MobileLanding.tsx
+git add components/shared/ConnectWalletModal.tsx
+git add app/api/whale-stream/route.ts
+git add app/api/auth/complete-signup/route.ts
+git add app/api/auth/send-code/route.ts
+git add app/api/auth/qr-session/route.ts
+
+git commit -m "fix(auth): harden sovereign pc-to-mobile sync, enforce pc redirect, and resolve prisma IDE errors"
+
+:: Haciendo force push a origin y railway
+git push --force origin HEAD:main
+git push --force railway HEAD:main
 
 echo.
-echo 2. Committing updates...
-git commit -m "fix(auth): make appkit url dynamic to prevent cross-origin social login blocks"
-
-echo.
-echo 3. Pushing to GitHub (will trigger Railway deployment)...
-git push origin main || git push
-
-echo.
-echo ================================================================
-echo  PUSH COMPLETE. Google & Social Auth frames are now unlocked.
-echo ================================================================
+echo ✅ DESPLIEGUE COMPLETADO — Verifica el progreso en Railway.
 pause
