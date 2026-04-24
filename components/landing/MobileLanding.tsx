@@ -124,14 +124,14 @@ function SigningOverlay({
 
         <div className="space-y-2">
           <h2 className="text-[26px] font-black tracking-tighter text-[#050505] leading-none">
-            {isSigning ? "Túnel Establecido" : error ? "Conexión rechazada" : "Validando Billetera"}
+          {isSigning ? "Tunnel Established" : error ? "Connection Rejected" : "Validating Wallet"}
           </h2>
           <p className="text-[12px] text-[#050505]/50 leading-relaxed">
             {error
-              ? "No se pudo verificar criptográficamente la billetera."
+              ? "Could not cryptographically verify the wallet."
               : isSigning
-              ? "Billetera enlazada con éxito. Validando credenciales de seguridad en el protocolo..."
-              : "Estableciendo túnel encriptado con la red Sovereign..."}
+              ? "Wallet linked successfully. Validating security credentials in the Sovereign Protocol..."
+              : "Establishing encrypted tunnel with the Sovereign Network..."}
           </p>
         </div>
 
@@ -151,12 +151,12 @@ function SigningOverlay({
             className="w-full py-4 rounded-2xl bg-[#2D0A59] text-white font-black uppercase tracking-widest text-[12px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.97] transition-all"
           >
             <RefreshCw size={16} />
-            Reintentar Conexión
+            Retry Connection
           </button>
         ) : !isSigning ? (
           <div className="w-full px-4 py-3 rounded-2xl border border-[#E5E5E5] bg-white flex items-center justify-center gap-3">
             <Loader2 size={16} className="animate-spin text-[#050505]/60" />
-            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Validando…</span>
+            <span className="text-[#050505] font-black uppercase tracking-widest text-[11px]">Validating...</span>
           </div>
         ) : null}
       </div>
@@ -232,9 +232,9 @@ function ConnectedScreen({
     }
   }, [address, connectorName]);
 
-  const fmtTime   = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const fmtDate   = (d: Date) => d.toLocaleDateString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  const fmtStamp  = (d: Date) => d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const fmtTime   = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const fmtDate   = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  const fmtStamp  = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
@@ -292,7 +292,7 @@ function ConnectedScreen({
           {/* Top bar — live clock */}
           <div className="bg-[#2D0A59] px-6 py-6 flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Sesión Activa</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Active Session</p>
               <p className="text-[36px] font-black tracking-tighter text-white leading-none tabular-nums">
                 {fmtTime(now)}
               </p>
@@ -304,11 +304,11 @@ function ConnectedScreen({
 
           <div className="grid grid-cols-2 gap-px bg-[#F0F0F0]">
             <div className="bg-white px-5 py-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Fecha</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Date</p>
               <p className="text-[11px] font-black text-[#050505] capitalize truncate">{fmtDate(now)}</p>
             </div>
             <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Apertura</p>
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Session Open</p>
                <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <p className="text-[11px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
@@ -318,11 +318,11 @@ function ConnectedScreen({
 
           <div className="grid grid-cols-2 gap-px bg-[#F0F0F0] border-t border-[#F0F0F0]">
              <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Provider</p>
-               <p className="text-[11px] font-black text-[#050505] truncate">{connectorName || "Wallet Segura"}</p>
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Wallet Provider</p>
+               <p className="text-[11px] font-black text-[#050505] truncate">{connectorName || "Secure Wallet"}</p>
              </div>
              <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Red (Chain ID)</p>
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Network (Chain ID)</p>
                <p className="text-[11px] font-mono text-[#050505] truncate">{chainId ? `Chain ${chainId}` : "Mainnet"}</p>
              </div>
           </div>
@@ -340,7 +340,7 @@ function ConnectedScreen({
 
           {/* Address full length */}
           <div className="px-5 py-4 bg-white border-t border-[#F0F0F0]">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Billetera Conectada (Absoluta)</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Connected Wallet (Full Address)</p>
             <p className="text-[12px] font-mono text-[#050505] tracking-tight break-all leading-relaxed">
               {address}
             </p>
@@ -358,8 +358,8 @@ function ConnectedScreen({
             <CheckCircle2 size={18} className="text-emerald-500" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]">Scanner desbloqueado</p>
-            <p className="text-[9px] text-[#050505]/40 font-medium">Puedes usar el scanner para enlazar el terminal PC.</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]">Scanner unlocked</p>
+            <p className="text-[9px] text-[#050505]/40 font-medium">You can use the scanner to link the desktop terminal.</p>
           </div>
         </motion.div>
 
@@ -374,7 +374,7 @@ function ConnectedScreen({
           style={{ background: "#2D0A59", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(45,10,89,0.45)" }}
         >
           <Scan size={18} />
-          Abrir Scanner QR · Sync PC
+          Open QR Scanner · Sync Desktop
         </motion.button>
 
         {/* ── Disconnect session button ── */}
@@ -389,7 +389,7 @@ function ConnectedScreen({
             style={{ fontSize: "11px", color: "#dc2626" }}
           >
             <LogOut size={15} />
-            Desconectar Sesión · Cambiar Wallet
+            Disconnect Session · Change Wallet
           </motion.button>
         )}
 
@@ -402,7 +402,7 @@ function ConnectedScreen({
         >
           <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
           <p className="text-[9px] text-[#050505]/40 font-medium leading-relaxed">
-            En el Terminal PC haz click en <strong className="text-[#2D0A59]/80 font-black">Direct QR Handshake</strong>, luego escanea el código con este botón para sincronizar tu sesión institucional.
+            On the Desktop Terminal, click <strong className="text-[#2D0A59]/80 font-black">Direct QR Handshake</strong>, then scan the code with this button to sync your institutional session.
           </p>
         </motion.div>
 
@@ -414,12 +414,12 @@ function ConnectedScreen({
           className="w-full bg-white rounded-[24px] border border-[#E5E5E5] overflow-hidden flex flex-col shadow-sm mt-4"
         >
           <div className="bg-[#1E073B] px-5 py-4 flex items-center justify-between">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-white/90">Historial de Sesiones</h3>
-            <div className="px-2 py-1 bg-white/10 rounded-full text-[9px] font-black text-white/90">{sessionHistory.length} Registros</div>
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-white/90">Session History</h3>
+            <div className="px-2 py-1 bg-white/10 rounded-full text-[9px] font-black text-white/90">{sessionHistory.length} Records</div>
           </div>
           <div className="flex flex-col max-h-[280px] overflow-y-auto">
              {sessionHistory.length === 0 ? (
-               <div className="p-6 text-center text-[11px] font-medium text-black/40">No hay registros previos.</div>
+               <div className="p-6 text-center text-[11px] font-medium text-black/40">No previous records.</div>
              ) : (
                sessionHistory.map((s, i) => (
                  <div key={i} className={`px-5 py-4 flex flex-col gap-1.5 ${i !== sessionHistory.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}>
@@ -725,7 +725,7 @@ export function MobileLanding() {
            sessionStorage.setItem(fulfilledKey, 'true');
            const toast = document.createElement('div');
            toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-           toast.textContent = '✓ Terminal PC Desbloqueado';
+           toast.textContent = '✓ Desktop Terminal Unlocked';
            document.body.appendChild(toast);
            setTimeout(() => toast.remove(), 4000);
          }
@@ -894,7 +894,7 @@ export function MobileLanding() {
             Whale Alert<br />Network
           </h1>
           <p className="text-[12px] font-medium leading-relaxed" style={{ color: MUTED }}>
-            Inteligencia blockchain de grado soberano. Conecta tu wallet para sincronizar tu sesión con el terminal de escritorio.
+            Sovereign-grade blockchain intelligence. Connect your wallet to sync your session with the desktop terminal.
           </p>
           {/* Manual reconnect escape hatch — appears after 8s */}
           {showManualReconnect && (
@@ -925,7 +925,7 @@ export function MobileLanding() {
         >
           <div className="flex items-center gap-3 mb-1">
             <div className="flex-1 h-px bg-[#E5E5E5]" />
-            <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#050505]/30">Conectar Wallet</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#050505]/30">Connect Wallet</span>
             <div className="flex-1 h-px bg-[#E5E5E5]" />
           </div>
 
@@ -966,7 +966,7 @@ export function MobileLanding() {
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
             <Fingerprint size={14} className="text-[#050505]/25 mt-0.5 shrink-0" />
             <p className="text-[10px] text-[#050505]/40 font-medium leading-relaxed">
-              ECDSA Verification · Non-custodial · Las claves privadas nunca salen de tu dispositivo.
+              ECDSA Verification · Non-custodial · Private keys never leave your device.
             </p>
           </div>
         </motion.div>
@@ -1033,6 +1033,37 @@ export function MobileLanding() {
             <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#545F73] text-center">
               © 2026 Whale Alert Network. Pure Mathematics.
             </p>
+
+            {/* ─── Powered By Aztec ─────────────────────────────── */}
+            <div className="flex flex-col items-center gap-2.5 pt-2">
+              <span className="font-mono text-[7px] uppercase tracking-[0.35em] text-[#545F73]/70">
+                Powered by
+              </span>
+              <a
+                href="https://aztec.network"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2.5 opacity-35 hover:opacity-80 transition-all duration-500"
+                aria-label="Built on Aztec Network"
+              >
+                {/* Aztec geometric diamond mark — white for dark bg */}
+                <svg
+                  width="16" height="16"
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="group-hover:scale-110 group-hover:drop-shadow-[0_0_6px_rgba(212,175,55,0.5)] transition-all duration-300"
+                >
+                  <path d="M16 2L30 16L16 30L2 16Z" fill="white" fillOpacity="0.9"/>
+                  <path d="M16 7L25 16L16 25L7 16Z" fill="#020202" fillOpacity="0.85"/>
+                  <path d="M16 11L21 16L16 21L11 16Z" fill="white" fillOpacity="0.7"/>
+                </svg>
+                <span className="font-mono text-[11px] font-black uppercase tracking-[0.22em] text-[#EAEAEA] group-hover:text-[#D4AF37] transition-colors duration-300">
+                  Aztec
+                </span>
+              </a>
+            </div>
+
           </div>
 
         </footer>
