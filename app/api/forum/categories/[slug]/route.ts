@@ -1,0 +1,34 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+
+export async function GET(req: Request, { params }: { params: { slug: string } }) {
+    try {
+        const cookieStore = await cookies();
+        const address = cookieStore.get('sovereign_handshake')?.value;
+        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const slug = params.slug;
+
+        const category = await (prisma as any).forumCategory.findUnique({
+            where: { slug },
+            include: {
+                _count: { select: { topics: true } },
+                topics: {
+                    orderBy: { createdAt: 'desc' },
+                    include: {
+                        author: { select: { walletAddress: true, tier: true, isPro: true } },
+                        _count: { select: { posts: true, likes: true } },
+                        tags: true
+                    }
+                }
+            }
+        });
+
+        if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+
+        return NextResponse.json(category);
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+    }
+}

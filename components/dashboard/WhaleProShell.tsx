@@ -431,7 +431,7 @@ export function WhaleProShell({
 
                     {currentExplanation.features.length > 0 && (
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-black/30 mb-4 px-1">Capacidades Técnicas e Implementación</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-black/30 mb-4 px-1">Technical Capabilities & Implementation</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {currentExplanation.features.map((feat, idx) => (
                                     <div key={idx} className="bg-white border border-black/10 rounded-xl p-4 flex flex-col gap-2 hover:border-black/30 transition-colors">
@@ -453,7 +453,7 @@ export function WhaleProShell({
                 
                 <div className="p-6 border-t border-black/10 bg-white flex justify-end">
                     <button onClick={() => setShowInfoModal(false)} className="px-8 py-3.5 rounded-xl border border-black/10 bg-white text-[#050505] text-[11px] font-black uppercase tracking-widest hover:bg-black/5 hover:border-black/30 transition-all shadow-none active:scale-[0.98] duration-200">
-                        Volver a la Terminal
+                        Return to Terminal
                     </button>
                 </div>
             </motion.div>

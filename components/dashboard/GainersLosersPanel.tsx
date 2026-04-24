@@ -24,43 +24,6 @@ const fmtPrice = (n: number) => {
 const pctColor = (v: number) => (v >= 0 ? '#00C076' : '#FF3B30');
 const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 
-// ── Asset metadata map (Binance symbol → display info) ───────────────────────
-const ASSET_META: Record<string, { name: string; network: string; mcapRankHint: number }> = {
-    BTCUSDT:  { name: 'Bitcoin',         network: 'bitcoin',   mcapRankHint: 1  },
-    ETHUSDT:  { name: 'Ethereum',        network: 'ethereum',  mcapRankHint: 2  },
-    BNBUSDT:  { name: 'BNB',             network: 'bsc',       mcapRankHint: 3  },
-    SOLUSDT:  { name: 'Solana',          network: 'solana',    mcapRankHint: 4  },
-    XRPUSDT:  { name: 'XRP',             network: 'xrp',       mcapRankHint: 5  },
-    ADAUSDT:  { name: 'Cardano',         network: 'cardano',   mcapRankHint: 6  },
-    DOGEUSDT: { name: 'Dogecoin',        network: 'ethereum',  mcapRankHint: 7  },
-    SHIBUSDT: { name: 'Shiba Inu',       network: 'ethereum',  mcapRankHint: 8  },
-    DOTUSDT:  { name: 'Polkadot',        network: 'polkadot',  mcapRankHint: 9  },
-    AVAXUSDT: { name: 'Avalanche',       network: 'avalanche', mcapRankHint: 10 },
-    LINKUSDT: { name: 'Chainlink',       network: 'ethereum',  mcapRankHint: 11 },
-    MATICUSDT:{ name: 'Polygon',         network: 'polygon',   mcapRankHint: 12 },
-    UNIUSDT:  { name: 'Uniswap',         network: 'ethereum',  mcapRankHint: 13 },
-    ARBUSDT:  { name: 'Arbitrum',        network: 'arbitrum',  mcapRankHint: 14 },
-    OPUSDT:   { name: 'Optimism',        network: 'optimism',  mcapRankHint: 15 },
-    APTUSDT:  { name: 'Aptos',           network: 'aptos',     mcapRankHint: 16 },
-    INJUSDT:  { name: 'Injective',       network: 'injective', mcapRankHint: 17 },
-    PEPEUSDT: { name: 'Pepe',            network: 'ethereum',  mcapRankHint: 18 },
-    WIFUSDT:  { name: 'dogwifhat',       network: 'solana',    mcapRankHint: 19 },
-    BONKUSDT: { name: 'Bonk',            network: 'solana',    mcapRankHint: 20 },
-    FLOKIUSDT:{ name: 'Floki Inu',       network: 'bsc',       mcapRankHint: 21 },
-    FETUSDT:  { name: 'Fetch.ai',        network: 'ethereum',  mcapRankHint: 22 },
-    NEARUSDT: { name: 'NEAR Protocol',   network: 'near',      mcapRankHint: 23 },
-    LDOUSDT:  { name: 'Lido DAO',        network: 'ethereum',  mcapRankHint: 24 },
-    WLDUSDT:  { name: 'Worldcoin',       network: 'ethereum',  mcapRankHint: 25 },
-    STRKUSDT: { name: 'StarkNet',        network: 'starknet',  mcapRankHint: 26 },
-    JUPUSDT:  { name: 'Jupiter',         network: 'solana',    mcapRankHint: 27 },
-    PYTHUSDT: { name: 'Pyth Network',    network: 'solana',    mcapRankHint: 28 },
-    TIAUSDT:  { name: 'Celestia',        network: 'celestia',  mcapRankHint: 29 },
-    BLURUSDT: { name: 'Blur',            network: 'ethereum',  mcapRankHint: 30 },
-    GMXUSDT:  { name: 'GMX',             network: 'arbitrum',  mcapRankHint: 31 },
-    SUIUSDT:  { name: 'Sui',             network: 'sui',       mcapRankHint: 32 },
-    SEIUSDT:  { name: 'Sei',             network: 'sei',       mcapRankHint: 33 },
-    TONUSDT:  { name: 'Toncoin',         network: 'ton',       mcapRankHint: 34 },
-};
 
 const NETWORK_COLORS: Record<string, string> = {
     bitcoin: '#F7931A', ethereum: '#627EEA', bsc: '#F0B90B',
@@ -92,7 +55,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, onClick }: {
     eurRate: number;
     onClick: () => void;
 }) {
-    const meta  = ASSET_META[symbol] || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+    const meta  = data.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
     const price = parseFloat(data.lastPrice) || 0;
     const pct   = parseFloat(data[pctKey] || data.priceChangePercent) || 0;
     const vol   = parseFloat(data.quoteVolume) || 0;
@@ -212,7 +175,7 @@ export function GainersLosersPanel() {
     }, []);
 
     const handleRowClick = useCallback((symbol: string, data: any) => {
-        const meta = ASSET_META[symbol] || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+        const meta = data.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
         const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
         setSelectedToken({
             symbol: stripUSDT(symbol),
@@ -233,8 +196,7 @@ export function GainersLosersPanel() {
         markets.forEach((marketData: any) => {
             const { symbol } = marketData;
             if (!symbol?.endsWith('USDT')) return;
-            if (!ASSET_META[symbol]) return;
-            const meta = ASSET_META[symbol];
+            const meta = marketData.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
             const pct = parseFloat(marketData.priceChangePercent) || 0;
             const vol = parseFloat(marketData.quoteVolume) || 0;
             rows.push({ symbol, data: marketData, pct, vol, meta });
@@ -461,6 +423,9 @@ export function GainersLosersPanel() {
                                     symbol={r.symbol}
                                     data={r.data}
                                     pctKey="priceChangePercent"
+                                    currency={currency}
+                                    eurRate={eurRate}
+                                    onClick={() => handleRowClick(r.symbol, r.data)}
                                 />
                             ))}
                         </div>

@@ -123,7 +123,7 @@ export function NewsOfToday() {
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-full gap-3 py-16">
                             <Loader2 size={32} className="animate-spin text-[#E5E5E5]" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888888]">WAITING FOR ON-CHAIN INTEL ENDPOINT</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#888888]">INDEXING INTELLIGENCE SOURCES...</p>
                         </div>
                     ) : filtered.map((a) => {
                         const isExpanded = expandedId === a.id;

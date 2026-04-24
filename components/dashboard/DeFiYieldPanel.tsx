@@ -92,14 +92,14 @@ export default function DeFiYieldPanel() {
 
     const handleOneClickDeposit = async () => {
         if (!isConnected) {
-            toast.error("Wallet no conectada", { description: "Conecta tu wallet para ejecutar depósitos On-Chain." });
+            toast.error("Wallet Not Connected", { description: "Connect a wallet to execute on-chain deposits." });
             return;
         }
         if (!selected) return;
         
         setIsDepositing(true);
         try {
-            toast.loading("Generando calldata óptima...", { id: `dep-${selected.pool}` });
+            toast.loading("Generating optimal calldata...", { id: `dep-${selected.pool}` });
             
             // Send routing intent to Execution Engine (Enso API via Backend)
             const response = await fetch('/api/defi/deposit', {
@@ -115,12 +115,12 @@ export default function DeFiYieldPanel() {
 
             if (!response.ok) {
                 const j = await response.json();
-                throw new Error(j.error || "Execution Engine Falló la Ruta");
+                throw new Error(j.error || "Execution Engine routing failed.");
             }
 
             const { tx } = await response.json();
             
-            toast.loading("Esperando firma en el proveedor web3...", { id: `dep-${selected.pool}` });
+            toast.loading("Awaiting signature from web3 provider...", { id: `dep-${selected.pool}` });
 
             // Ejecutar transacción real On-Chain via wagmi router handler
             await handleExternalTransaction({
@@ -130,12 +130,12 @@ export default function DeFiYieldPanel() {
                 chainId: tx.chainId
             });
             
-            toast.success("Depósito Confirmado On-Chain", { 
+            toast.success("Deposit Confirmed On-Chain", { 
                 id: `dep-${selected.pool}`,
-                description: `Has depositado exitosamente en ${selected.project} en la red ${selected.chainFull || selected.chain}` 
+                description: `Successfully deposited into ${selected.project} on ${selected.chainFull || selected.chain} network.` 
             });
         } catch (e: any) {
-            toast.error("Depósito Fallido", { 
+            toast.error("Deposit Failed", { 
                 id: `dep-${selected.pool}`,
                 description: e.message || "User rejected the transaction or gas estimation failed."
             });

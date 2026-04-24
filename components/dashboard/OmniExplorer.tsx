@@ -27,7 +27,7 @@ export function OmniExplorer() {
 
     // ── On-chain block feed ─────────────────────────────────────────────────
     useEffect(() => {
-        if (!address || !publicClient || !blockNumber) return;
+        if (!publicClient || !blockNumber) return;
 
         const fetchBlock = async () => {
             try {
@@ -73,7 +73,7 @@ export function OmniExplorer() {
         };
 
         fetchBlock();
-    }, [blockNumber, publicClient, address]);
+    }, [blockNumber, publicClient]);
 
     // ── Search handler ──────────────────────────────────────────────────────
     const handleSearch = async () => {

@@ -140,6 +140,13 @@ model User {
   sentMessages    MentoringMessage[] @relation("SentMessages")
   receivedMessages MentoringMessage[] @relation("ReceivedMessages")
 
+  // Forum Relations
+  forumTopics     ForumTopic[]
+  forumPosts      ForumPost[]
+  forumLikes      ForumLike[]
+  forumNotifications ForumNotification[]
+  actorNotifications ForumNotification[] @relation("ActorNotifications")
+
   // ── 🔍 INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
   @@index([tier, lastActive(sort: Desc)])  // Consulta de usuarios activos por tier
   @@index([isPro, createdAt(sort: Desc)])  // Funnel de conversión Pro
@@ -875,4 +882,102 @@ model GamificationRecord {
   updatedAt       DateTime @updatedAt
 
   @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SOVEREIGN FORUM
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ForumCategory {
+  id          String       @id @default(uuid())
+  slug        String       @unique
+  name        String
+  description String?      @db.Text
+  color       String       @default("#888888")
+  orderIndex  Int          @default(0)
+  topics      ForumTopic[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ForumTag {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  topics      ForumTopic[] @relation("TopicTags")
+}
+
+model ForumTopic {
+  id          String       @id @default(uuid())
+  title       String
+  content     String       @db.Text
+  categoryId  String
+  authorId    String
+  views       Int          @default(0)
+  isPinned    Boolean      @default(false)
+  isLocked    Boolean      @default(false)
+  
+  category    ForumCategory @relation(fields: [categoryId], references: [id])
+  author      User          @relation(fields: [authorId], references: [id])
+  posts       ForumPost[]
+  tags        ForumTag[]    @relation("TopicTags")
+  likes       ForumLike[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([categoryId, createdAt(sort: Desc)])
+  @@index([authorId, createdAt(sort: Desc)])
+}
+
+model ForumPost {
+  id          String       @id @default(uuid())
+  content     String       @db.Text
+  topicId     String
+  authorId    String
+  replyToId   String?      // Optional: if replying to a specific post
+  isSolution  Boolean      @default(false)
+
+  topic       ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author      User         @relation(fields: [authorId], references: [id])
+  replyTo     ForumPost?   @relation("Replies", fields: [replyToId], references: [id])
+  replies     ForumPost[]  @relation("Replies")
+  likes       ForumLike[]
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([topicId, createdAt(sort: Asc)])
+}
+
+model ForumLike {
+  id          String       @id @default(uuid())
+  userId      String
+  topicId     String?
+  postId      String?
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic       ForumTopic?  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  post        ForumPost?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime     @default(now())
+
+  @@unique([userId, topicId])
+  @@unique([userId, postId])
+}
+
+model ForumNotification {
+  id          String       @id @default(uuid())
+  userId      String
+  type        String       // "REPLY", "MENTION", "LIKE"
+  actorId     String       // Who triggered it
+  topicId     String?
+  postId      String?
+  isRead      Boolean      @default(false)
+  
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actor       User         @relation("ActorNotifications", fields: [actorId], references: [id])
+  
+  createdAt   DateTime     @default(now())
+
+  @@index([userId, isRead, createdAt(sort: Desc)])
 }

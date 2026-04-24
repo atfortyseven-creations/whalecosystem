@@ -166,6 +166,7 @@ export function SovereignFooter() {
                 <FooterLink href="/docs">Docs</FooterLink>
                 <FooterLink href="/developer">Developer</FooterLink>
                 <FooterLink href="/news">News Terminal</FooterLink>
+                <FooterLink href="/forum">Forum</FooterLink>
               </nav>
             </div>
 

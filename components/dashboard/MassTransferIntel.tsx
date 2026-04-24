@@ -279,7 +279,7 @@ export function MassTransferIntel() {
             </h1>
           </div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-[#A0A0A0] ml-9">
-            FLOW TOPOGRAPHY · &lt;10ms
+            FLOW TOPOGRAPHY · {'<10ms'}
           </p>
         </div>
 

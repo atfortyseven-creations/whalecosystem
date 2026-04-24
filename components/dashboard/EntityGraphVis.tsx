@@ -107,7 +107,7 @@ export function EntityGraphVis() {
             label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
         });
 
-        // 50-Year Continuity: Memory/CPU Leak Prevention via Page Visibility API
+        // Memory/CPU Leak Prevention via Page Visibility API
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 simulation.stop();
@@ -144,7 +144,7 @@ export function EntityGraphVis() {
                         </div>
                     )}
                     <div className="text-[8px] text-[#888888] font-bold uppercase tracking-[0.2em] border border-[#E5E5E5] px-3 py-1">
-                        STATE: {isOffline ? 'SYNTHETIC' : 'LIVE'}
+                        STATE: {isOffline ? 'DEGRADED' : 'LIVE'}
                     </div>
                 </div>
             </div>
@@ -166,15 +166,13 @@ export function EntityGraphVis() {
                         <div className="text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-2">GRAPH METRICS</div>
                         <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                             <span className="text-[7px] text-[#A0A0A0] uppercase">TOTAL NODES:</span>
-                            <span className="text-[8px] text-[#050505] font-bold">{isOffline ? '40 (SYNTHETIC)' : (matrixData?.graph?.nodes?.length || 0)}</span>
-                            <span className="text-[7px] text-[#A0A0A0] uppercase">AVG CENTRALITY:</span>
-                            <span className="text-[8px] text-[#050505] font-bold">0.842</span>
-                            <span className="text-[7px] text-[#A0A0A0] uppercase">MODULARITY:</span>
-                            <span className="text-[8px] text-[#00C076] font-bold">HIGH</span>
+                            <span className="text-[8px] text-[#050505] font-bold">{matrixData?.graph?.nodes?.length || 0}</span>
+                            <span className="text-[7px] text-[#A0A0A0] uppercase">TOTAL EDGES:</span>
+                            <span className="text-[8px] text-[#050505] font-bold">{matrixData?.graph?.links?.length || 0}</span>
                         </div>
                     </div>
 
-                    {/* LEYENDA (Legend) */}
+                    {/* Node Legend */}
                     <div className="p-4 bg-white/80 border border-[#E5E5E5] backdrop-blur-md rounded flex flex-col gap-2 mt-2">
                         <div className="text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-1">NODE LEGEND</div>
                         <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#050505]"></div> Genesis Node</div>
@@ -212,15 +210,15 @@ export function EntityGraphVis() {
                                 </div>
                                 <div className="border-l-2 border-[#0052FF] pl-3">
                                     <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">WALLET ADDRESS</div>
-                                    <div className="text-[9px] font-mono text-[#050505] break-all">{selectedNode.address || `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}`}</div>
+                                    <div className="text-[9px] font-mono text-[#050505] break-all">{selectedNode.address || '—'}</div>
                                 </div>
                                 <div className="border-l-2 border-[#00C076] pl-3">
                                     <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">NETWORK WEIGHT</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{(selectedNode.size * 12.5).toFixed(1)}% INFLUENCE</div>
+                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.weight ?? selectedNode.size ?? '—'}</div>
                                 </div>
                                 <div className="border-l-2 border-[#FF3B30] pl-3">
-                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">EST. CAPITAL PROVENANCE</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">${((selectedNode.size * 3.4) + 1.2).toFixed(2)}M USD</div>
+                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">CONNECTIONS</div>
+                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.connections ?? '—'}</div>
                                 </div>
                             </div>
                         </motion.div>

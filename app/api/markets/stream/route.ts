@@ -156,7 +156,6 @@ async function fetchCexMarkets(): Promise<any[] | null> {
     return null;
 }
 
-// ── USDT pairs we want to surface (ordered by priority) ──────────────────────
 const PRIORITY_SYMBOLS = new Set([
     'BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT',
     'DOGEUSDT','SHIBUSDT','DOTUSDT','AVAXUSDT','LINKUSDT','MATICUSDT',
@@ -165,6 +164,43 @@ const PRIORITY_SYMBOLS = new Set([
     'WLDUSDT','STRKUSDT','JUPUSDT','PYTHUSDT','TIAUSDT','BLURUSDT',
     'GMXUSDT','SUIUSDT','SEIUSDT','TONUSDT',
 ]);
+
+const ASSET_META: Record<string, { name: string; network: string; mcapRankHint: number }> = {
+    BTCUSDT:  { name: 'Bitcoin',         network: 'bitcoin',   mcapRankHint: 1  },
+    ETHUSDT:  { name: 'Ethereum',        network: 'ethereum',  mcapRankHint: 2  },
+    BNBUSDT:  { name: 'BNB',             network: 'bsc',       mcapRankHint: 3  },
+    SOLUSDT:  { name: 'Solana',          network: 'solana',    mcapRankHint: 4  },
+    XRPUSDT:  { name: 'XRP',             network: 'xrp',       mcapRankHint: 5  },
+    ADAUSDT:  { name: 'Cardano',         network: 'cardano',   mcapRankHint: 6  },
+    DOGEUSDT: { name: 'Dogecoin',        network: 'ethereum',  mcapRankHint: 7  },
+    SHIBUSDT: { name: 'Shiba Inu',       network: 'ethereum',  mcapRankHint: 8  },
+    DOTUSDT:  { name: 'Polkadot',        network: 'polkadot',  mcapRankHint: 9  },
+    AVAXUSDT: { name: 'Avalanche',       network: 'avalanche', mcapRankHint: 10 },
+    LINKUSDT: { name: 'Chainlink',       network: 'ethereum',  mcapRankHint: 11 },
+    MATICUSDT:{ name: 'Polygon',         network: 'polygon',   mcapRankHint: 12 },
+    UNIUSDT:  { name: 'Uniswap',         network: 'ethereum',  mcapRankHint: 13 },
+    ARBUSDT:  { name: 'Arbitrum',        network: 'arbitrum',  mcapRankHint: 14 },
+    OPUSDT:   { name: 'Optimism',        network: 'optimism',  mcapRankHint: 15 },
+    APTUSDT:  { name: 'Aptos',           network: 'aptos',     mcapRankHint: 16 },
+    INJUSDT:  { name: 'Injective',       network: 'injective', mcapRankHint: 17 },
+    PEPEUSDT: { name: 'Pepe',            network: 'ethereum',  mcapRankHint: 18 },
+    WIFUSDT:  { name: 'dogwifhat',       network: 'solana',    mcapRankHint: 19 },
+    BONKUSDT: { name: 'Bonk',            network: 'solana',    mcapRankHint: 20 },
+    FLOKIUSDT:{ name: 'Floki Inu',       network: 'bsc',       mcapRankHint: 21 },
+    FETUSDT:  { name: 'Fetch.ai',        network: 'ethereum',  mcapRankHint: 22 },
+    NEARUSDT: { name: 'NEAR Protocol',   network: 'near',      mcapRankHint: 23 },
+    LDOUSDT:  { name: 'Lido DAO',        network: 'ethereum',  mcapRankHint: 24 },
+    WLDUSDT:  { name: 'Worldcoin',       network: 'ethereum',  mcapRankHint: 25 },
+    STRKUSDT: { name: 'StarkNet',        network: 'starknet',  mcapRankHint: 26 },
+    JUPUSDT:  { name: 'Jupiter',         network: 'solana',    mcapRankHint: 27 },
+    PYTHUSDT: { name: 'Pyth Network',    network: 'solana',    mcapRankHint: 28 },
+    TIAUSDT:  { name: 'Celestia',        network: 'celestia',  mcapRankHint: 29 },
+    BLURUSDT: { name: 'Blur',            network: 'ethereum',  mcapRankHint: 30 },
+    GMXUSDT:  { name: 'GMX',             network: 'arbitrum',  mcapRankHint: 31 },
+    SUIUSDT:  { name: 'Sui',             network: 'sui',       mcapRankHint: 32 },
+    SEIUSDT:  { name: 'Sei',             network: 'sei',       mcapRankHint: 33 },
+    TONUSDT:  { name: 'Toncoin',         network: 'ton',       mcapRankHint: 34 },
+};
 
 // ... synthetic fallback purged ...
 
@@ -246,7 +282,10 @@ export async function GET(_req: NextRequest) {
 
     // ── Filter to priority USDT pairs + sort by volume for top display ────────
     const filtered = (marketData as any[]).filter(t => PRIORITY_SYMBOLS.has(t.symbol));
-    const finalData = filtered.length > 0 ? filtered : marketData;
+    const finalData = (filtered.length > 0 ? filtered : marketData).map((t: any) => ({
+        ...t,
+        meta: ASSET_META[t.symbol] || { name: t.symbol, network: 'ethereum', mcapRankHint: 999 }
+    }));
 
     _cachedMarkets = finalData;
     _cacheTs = Date.now();

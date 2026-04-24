@@ -8,7 +8,7 @@ import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
-import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut } from "lucide-react";
+import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
 
 // ── Live clock hook ───────────────────────────────────────────────────────────
 function useLiveClock(intervalMs = 1000): Date {
@@ -376,6 +376,21 @@ function ConnectedScreen({
           <Scan size={18} />
           Open QR Scanner · Sync Desktop
         </motion.button>
+
+        {/* ── Forum CTA ── */}
+        <motion.a
+          href="/forum"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.6 }}
+          whileTap={{ scale: 0.97 }}
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-black uppercase tracking-widest border border-black/10 bg-white hover:bg-[#FAF9F6] active:bg-[#F5F4EF] transition-colors"
+          style={{ fontSize: "12px", color: "#050505" }}
+        >
+          <MessageSquare size={16} />
+          Access Sovereign Forum
+        </motion.a>
+
 
         {/* ── Disconnect session button ── */}
         {onDisconnect && (
