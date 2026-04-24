@@ -181,6 +181,24 @@ export default async function RootLayout({
         {/* Prevent iOS Safari from auto-detecting phone numbers as links */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
+        {/* ── localStorage → sessionStorage polyfill for incognito (iOS/Android) ──
+            Runs BEFORE any script so WalletConnect pairing data can be stored.
+            In iOS Safari Private, localStorage quota is 0 — this patches it
+            with sessionStorage so WC v2 sessions survive within the tab. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){
+  try{
+    window.localStorage.setItem('__sovereign_probe__','1');
+    window.localStorage.removeItem('__sovereign_probe__');
+  }catch(e){
+    try{
+      var _ss=window.sessionStorage;
+      Object.defineProperty(window,'localStorage',{
+        configurable:true,enumerable:true,
+        get:function(){return _ss;}
+      });
+    }catch(e2){}
+  }
+})();` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
