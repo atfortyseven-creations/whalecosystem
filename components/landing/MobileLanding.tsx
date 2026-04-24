@@ -550,8 +550,16 @@ export function MobileLanding() {
 
   // Single ref: prevents concurrent calls only (not cross-render blocking)
   const linkingInProgress = useRef(false);
+  // Live refs — readable from setInterval, visibilitychange, setTimeout without stale closures
+  const isLinkedRef    = useRef(isLinked);
+  const isConnectedRef = useRef(false);
+  const addressRef     = useRef<string | undefined>(undefined);
 
   useEffect(() => { setMounted(true); }, []);
+  // Keep live refs in sync on every render
+  useEffect(() => { isLinkedRef.current    = isLinked;    }, [isLinked]);
+  useEffect(() => { isConnectedRef.current = isConnected; }, [isConnected]);
+  useEffect(() => { addressRef.current     = address;     }, [address]);
 
   // ── Scroll to top whenever manifesto becomes active ─────────────────────
   useEffect(() => {
@@ -562,42 +570,29 @@ export function MobileLanding() {
     }
   }, [isLinked]);
 
-  // ── THE ONE TRUE LINK EFFECT ────────────────────────────────────────
-  // Fires whenever AppKit OR wagmi confirms a connected address.
-  // No locks, no signing, no delays — just write the session and go.
-  useEffect(() => {
-    if (!mounted)      return;
-    if (!isConnected)  return;
-    if (!address)      return;
-    if (isLinked)      return;           // already done
-    if (linkingInProgress.current) return; // prevent double call
-
+  // ── performLink: reads from live refs, safe to call from any async context ──
+  const performLink = useCallback((addr: string) => {
+    if (isLinkedRef.current || linkingInProgress.current) return;
     linkingInProgress.current = true;
-    setConnecting(null); // clear any loading spinner on buttons
+    setConnecting(null);
     setIsSigning(true);
 
-    const norm = address.toLowerCase();
-
-    // 1. Write sovereign session cookie (source of truth)
+    const norm = addr.toLowerCase();
+    // 1. Sovereign session cookie
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-    // 2. Write sessionStorage flag
+    // 2. sessionStorage flag
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-    // 3. Background sync with backend (non-blocking)
+    // 3. Backend sync (fire-and-forget)
     fetch('/api/wallet/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        walletAddress: norm,
-        signature: '0x_mobile_wc_verified_tunnel',
-        message: 'Mobile session natively verified via WalletConnect Handshake',
-      }),
+      body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified_tunnel', message: 'Mobile WalletConnect verified' }),
     }).catch(() => {});
-
-    // 4. Close AppKit modal if still open
+    // 4. Close AppKit modal
     try { closeAppKit(); } catch {}
-
-    // 5. Teleport to Manifesto (short UX delay so user sees the transition)
+    // 5. Teleport to Manifesto
     setTimeout(() => {
+      isLinkedRef.current = true;
       setIsLinked(true);
       setShowingManifesto(true);
       setIsSigning(false);
@@ -608,9 +603,43 @@ export function MobileLanding() {
         document.body.scrollTop = 0;
       }
     }, 400);
+  }, [closeAppKit]);
 
+  // ── Main link effect — fires on any state change that indicates connection ───
+  useEffect(() => {
+    if (!mounted || !isConnected || !address || isLinked) return;
+    performLink(address);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isConnected, address, isLinked]);
+
+  // ── visibilitychange: catches WalletConnect relay delay on return from app ──
+  // Rainbow, Trust, Coinbase, etc. use WalletConnect v2 relay. When the user
+  // approves in the wallet app and returns to Chrome, the relay confirmation
+  // takes ~0.5-2s to arrive. This listener waits and then checks connection.
+  useEffect(() => {
+    if (!mounted) return;
+    const handleVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      // Poll every 300ms for up to 4s waiting for WC relay to confirm
+      let attempts = 0;
+      const check = setInterval(() => {
+        attempts++;
+        const addr = addressRef.current;
+        if (addr && isConnectedRef.current && !isLinkedRef.current) {
+          clearInterval(check);
+          performLink(addr);
+        } else if (attempts > 13 || isLinkedRef.current) {
+          clearInterval(check);
+        }
+      }, 300);
+    };
+    document.addEventListener('visibilitychange', handleVisible);
+    window.addEventListener('focus', handleVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisible);
+      window.removeEventListener('focus', handleVisible);
+    };
+  }, [mounted, performLink]);
 
   // ── Also check sessionStorage on mount (same-tab reconnect) ──────────────
   useEffect(() => {
