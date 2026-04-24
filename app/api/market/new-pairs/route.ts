@@ -113,8 +113,8 @@ export async function GET(req: Request) {
         const searchData = searchRes.ok ? await searchRes.json() : { pairs: [] };
         const searchPairs = (searchData.pairs || []).map(mapDexPair);
 
-        // Step 4: Merge (Enriched Profiles first, then Search)
-        const merged = [...enrichedProfiles, ...searchPairs]
+        // Step 4: Merge (Search pairs first for common tokens, then Enriched Profiles)
+        const merged = [...searchPairs, ...enrichedProfiles]
             .filter((p, i, self) => i === self.findIndex(t => t.id === p.id))
             .slice(0, limit);
 

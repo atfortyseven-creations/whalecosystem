@@ -30,8 +30,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://go.getblock.io/276cfe902ecc4e0d95a8dbe075f074e0',
-      'https://go.getblock.io/34ae04c673824c17968a73fe46d9e2a5',
+      process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
       'https://cloudflare-eth.com',
       'https://rpc.ankr.com/eth',
     ],
@@ -50,8 +49,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       decimals: 18,
     },
     rpcUrls: [
-      'https://go.getblock.us/15d9a6ffbaeb4c7e9033e03d50bfa1bb',
-      'https://go.getblock.io/5a013f7843c74447bb1cd62f03776f0e',
+      process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793',
       'https://bsc-dataseed1.binance.org',
       'https://rpc.ankr.com/bsc',
     ],

@@ -46,18 +46,12 @@ interface RPCEndpoint {
 }
 
 /**
- * ResilientProvider — Pool de 6 GetBlock endpoints con failover automático.
+ * ResilientProvider — GetBlock Dedicated Interstellar Node Provider
  *
- * Cuando un endpoint devuelve 401 (CU agotados), 429 (rate limit),
- * o falla repetidamente, se marca como exhausto y el sistema pasa al siguiente.
- * Después de 3 minutos de cooldown el endpoint se restaura automáticamente.
+ * Pool con endpoints de alta fidelidad.
  *
- * EP1: https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f
- * EP2: https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d
- * EP3: https://go.getblock.us/88747de304e04365ac4c85789ba4fe54
- * EP4: https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24
- * EP5: https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234
- * EP6: https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d
+ * ETH: https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b
+ * BNB: https://go.getblock.us/8405bc34194e4343a10cdc7a76360793
  */
 
 // ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
@@ -67,14 +61,12 @@ const parseMultiplexKeys = (envVal: string | undefined): string[] => {
 };
 
 // Endpoints públicos de fallback (Sexta línea de defensa e inyección web3 masiva)
-const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
+const FALLBACKS: Record<number, { rpc: string[], wss: string[], archive?: string[] }> = {
   1: {
     rpc: [
-      process.env.GETBLOCK_ETH_RPC_1 || '',
-      process.env.GETBLOCK_ETH_RPC_4 || '',
+      process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
       ...parseMultiplexKeys(process.env.GETBLOCK_ETH_RPCS),
       ...parseMultiplexKeys(process.env.ALCHEMY_ETH_RPCS),
-      'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8',
       `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY || 'opt-out'}`,
       'https://rpc.ankr.com/eth',
       'https://1rpc.io/eth',
@@ -82,19 +74,16 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://cloudflare-eth.com'
     ].filter(Boolean),
     wss: [
-      process.env.GETBLOCK_ETH_WS_2 || '',
-      process.env.GETBLOCK_ETH_WS_3 || '',
+      'wss://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
       ...parseMultiplexKeys(process.env.GETBLOCK_ETH_WSS),
-      'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
       'wss://ethereum-rpc.publicnode.com',
       'wss://eth.llamarpc.com'
     ].filter(Boolean)
   },
   56: {
     rpc: [
+      process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793',
       ...parseMultiplexKeys(process.env.GETBLOCK_BSC_RPCS),
-      'https://go.getblock.io/e264370bb5e047c38d6c87ec0ab42dff',
-      'https://go.getblock.us/6aca5a5ffeba4f2f933766e547d4e3a3',
       'https://bsc.llamarpc.com',          // FIX: binance.llamarpc.com is ENOTFOUND — correct host
       'https://1rpc.io/bnb',
       'https://bsc-dataseed1.binance.org',
@@ -104,6 +93,7 @@ const FALLBACKS: Record<number, { rpc: string[], wss: string[] }> = {
       'https://bsc.publicnode.com'
     ].filter(Boolean),
     wss: [
+      'wss://go.getblock.us/8405bc34194e4343a10cdc7a76360793',
       ...parseMultiplexKeys(process.env.GETBLOCK_BSC_WSS),
       'wss://bsc-rpc.publicnode.com',
       'wss://binance.llamarpc.com'
@@ -243,11 +233,6 @@ export class ResilientProvider {
     if (this.chainId === 1 && this.wssUrls.length > 0) {
         this.reconnectWS();
     }
-  }
-
-  public async call(method: string, params: any[]): Promise<any> {
-    const p = await this.getProvider();
-    return p.send(method, params);
   }
 
   /**

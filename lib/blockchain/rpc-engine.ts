@@ -64,15 +64,10 @@ const memoizedFetch = (url: string) => {
 };
 
 // ─── ENDPOINTS PREMIUM DE ÉLITE (Actualizados) ────────────────────────────────
-const ETH_EP1 = 'https://go.getblock.io/276cfe902ecc4e0d95a8dbe075f074e0';
-const ETH_EP2 = 'https://go.getblock.io/34ae04c673824c17968a73fe46d9e2a5';
-const ETH_EP3 = 'https://go.getblock.io/441dd184fb9740e9af094500d43bd0f8';
-const ETH_WSS = 'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343';
+const ETH_EP1 = process.env.ETH_RPC_URL || 'https://go.getblock.us/e0e9fc3bf3f74c4db2759392a55b2a98';
+const ETH_WSS = process.env.GETBLOCK_ETH_WS || 'wss://go.getblock.us/9696e0f1b71f4631a0aeed3f21d64487';
 
-const BNB_EP1 = 'https://go.getblock.us/15d9a6ffbaeb4c7e9033e03d50bfa1bb';
-const BNB_EP2 = 'https://go.getblock.io/5a013f7843c74447bb1cd62f03776f0e';
-const BNB_EP3 = 'https://go.getblock.io/948d1b848a454278b3af75019f53100e';
-const BNB_EP4 = 'https://go.getblock.io/f50c54f114354e23be39384a7dcae400';
+const BNB_EP1 = process.env.BNB_RPC_URL || 'https://go.getblock.us/c39669e8418247d893bb024c0c552950';
 
 // ─── Helper: construye transport con TODOS los endpoints en orden ─────────────
 const makeTransport = (urls: string[]) =>
@@ -96,7 +91,7 @@ const makeTransport = (urls: string[]) =>
 export const mainnetClient = createPublicClient({
   chain: mainnet,
   transport: makeTransport([
-    ETH_EP1, ETH_EP2, ETH_EP3,
+    ETH_EP1,
     `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://cloudflare-eth.com',
     'https://rpc.ankr.com/eth',
@@ -108,7 +103,7 @@ export const mainnetClient = createPublicClient({
 export const marketIntelClient = createPublicClient({
   chain: mainnet,
   transport: makeTransport([
-    ETH_EP2, ETH_EP3, ETH_EP1,
+    ETH_EP1,
     `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
     'https://eth.drpc.org',
   ]),
@@ -118,7 +113,7 @@ export const marketIntelClient = createPublicClient({
 export const bscClient = createPublicClient({
   chain: bsc,
   transport: makeTransport([
-    BNB_EP1, BNB_EP2, BNB_EP3, BNB_EP4,
+    BNB_EP1,
     'https://bsc-dataseed1.binance.org',
     'https://bsc-dataseed2.binance.org',
     'https://rpc.ankr.com/bsc',

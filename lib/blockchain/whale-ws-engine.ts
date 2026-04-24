@@ -7,7 +7,7 @@
 
 import WebSocket from 'ws';
 
-const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS || 'wss://ethereum-rpc.publicnode.com';
+const WS_URL = process.env.GETBLOCK_ETH_WS_2 || process.env.GETBLOCK_ETH_WS || 'wss://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b';
 let backoff = 5000;
 const WHALE_USD_THRESHOLD = parseInt(process.env.WHALE_THRESHOLD_USD || '50000', 10);
 

@@ -91,7 +91,7 @@ async function fetchCexMarkets(): Promise<any[] | null> {
         
         if (resKu.ok) {
             const parsedKu = await resKu.json();
-            if (parsedKu?.data?.ticker && Array.isArray(parsedKu.data.ticker)) {
+            if (parsedKu?.data?.ticker && Array.isArray(parsedKu.data.ticker) && parsedKu.data.ticker.length > 0) {
                 return parsedKu.data.ticker.map((t: any) => ({
                     symbol: t.symbol.replace('-', ''),
                     lastPrice: t.last,
@@ -179,6 +179,9 @@ export async function GET(_req: NextRequest) {
 
     // ── Step 1: Fetch CEX Data (Primary) ───────────────────────────────────
     let marketData = await fetchCexMarkets();
+    if (marketData && marketData.length === 0) {
+        marketData = null; // Treat empty array as failure
+    }
     let source = marketData ? 'live-exchange' : 'degraded-exchange';
 
     // ── Step 2: Fallback or Enrich with GetBlock on-chain prices ─────
