@@ -152,8 +152,8 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         document.cookie = `sovereign_handshake=${address}; path=/; max-age=604800; SameSite=Lax`;
         sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
 
-        toast.success('IDENTIDAD VINCULADA', {
-          description: `Terminal desbloqueado. ${address.slice(0, 6)}...${address.slice(-4)}`,
+        toast.success('IDENTITY LINKED', {
+          description: `Terminal unlocked. ${address.slice(0, 6)}...${address.slice(-4)}`,
           className: 'font-black uppercase tracking-widest',
         });
 
@@ -167,9 +167,9 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
       }
     } catch (e: any) {
       if (e?.code === 4001 || e?.message?.includes('rejected')) {
-        setError('Firma rechazada. Debes firmar para acceder al terminal.');
+        setError('Signature rejected. You must sign to access the terminal.');
       } else {
-        setError('Error inesperado. Inténtalo de nuevo.');
+        setError('Unexpected error. Please try again.');
       }
     } finally {
       setIsSigning(false);
@@ -195,11 +195,11 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
 
       <div className="space-y-2">
         <h3 className="text-4xl font-black tracking-tighter text-[#050505] leading-none">
-          Firma el<br />
-          <span className="italic">Contrato</span>
+          Sign the<br />
+          <span className="italic">Contract</span>
         </h3>
         <p className="text-[12px] font-medium text-[#050505]/40 max-w-[260px] leading-relaxed uppercase tracking-[0.08em]">
-          Firma el mensaje de identidad para autenticarte. No se realiza ninguna transacción on-chain.
+          Sign the identity message to authenticate. No on-chain transaction is made.
         </p>
       </div>
 
@@ -239,7 +239,7 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         {isSigning ? (
           <>
             <RefreshCw size={18} className="animate-spin" />
-            FIRMANDO...
+            SIGNING...
           </>
         ) : (
           <>
@@ -254,7 +254,7 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         onClick={onDisconnect}
         className="text-[10px] font-black text-[#050505]/20 uppercase tracking-[0.4em] hover:text-[#050505]/50 transition-colors"
       >
-        Desconectar Wallet
+        Disconnect Wallet
       </button>
     </motion.div>
   );
