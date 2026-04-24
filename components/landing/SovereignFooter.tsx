@@ -202,7 +202,55 @@ export function SovereignFooter() {
                 {" "}— All rights reserved.
               </span>
             </div>
-            
+
+            {/* ─── Powered By Aztec ─────────────────────────────────── */}
+            <div className="flex flex-col items-center gap-2.5 pt-4 pb-2 z-[99] relative">
+              <span
+                style={{
+                  fontFamily: '"Inter", monospace',
+                  fontSize: "9px",
+                  letterSpacing: "0.35em",
+                  textTransform: "uppercase",
+                  color: "rgba(10,10,10,0.6)",
+                  fontWeight: "bold"
+                }}
+              >
+                Powered by
+              </span>
+              <a
+                href="https://aztec.network"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                aria-label="Built on Aztec Network"
+              >
+                {/* Aztec geometric diamond mark */}
+                <svg
+                  width="18" height="18"
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="group-hover:scale-110 transition-transform duration-300"
+                >
+                  <path d="M16 2L30 16L16 30L2 16Z" fill="#0A0A0A" fillOpacity="0.85"/>
+                  <path d="M16 7L25 16L16 25L7 16Z" fill="white" fillOpacity="0.9"/>
+                  <path d="M16 11L21 16L16 21L11 16Z" fill="#0A0A0A" fillOpacity="0.75"/>
+                </svg>
+                <span
+                  style={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: "11px",
+                    letterSpacing: "0.22em",
+                    textTransform: "uppercase",
+                    fontWeight: "900",
+                    color: "rgba(10,10,10,0.85)",
+                  }}
+                >
+                  Aztec
+                </span>
+              </a>
+            </div>
+
           </div>
           
           {/* Subtle Inner Edge Highlight */}
