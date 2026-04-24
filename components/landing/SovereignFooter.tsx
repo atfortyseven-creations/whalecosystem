@@ -31,11 +31,11 @@ function FooterLink({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group relative font-mono text-[10px] tracking-[0.2em] uppercase text-black/40 hover:text-black transition-colors duration-300"
+      className="group relative font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-black/60 hover:text-black transition-colors duration-300 py-2 px-1"
     >
       {children}
       {/* underline on hover */}
-      <span className="absolute -bottom-px left-0 w-0 group-hover:w-full h-px bg-black/60 transition-all duration-300" />
+      <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[1.5px] bg-black/80 transition-all duration-300" />
     </a>
   );
 }
@@ -79,8 +79,8 @@ export function SovereignFooter() {
             src="/olas-hokusai-4k.png"
             alt="Hokusai Waves 4K"
             fill
-            className="object-cover object-bottom pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
-            sizes="(max-width: 768px) 100vw, 90vw"
+            className="object-cover object-bottom opacity-90 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
+            sizes="100vw"
             quality={100}
             priority
           />
@@ -119,36 +119,34 @@ export function SovereignFooter() {
           )}
 
           {/* Fog gradient to ensure readability of text over waves at the bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#FDFCF8]/95 via-[#FDFCF8]/70 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[85%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/85 to-transparent pointer-events-none z-10" />
 
           {/* ═══ Footer Inner Body ═════════════════════════════════════════════ */}
           <div className="relative z-40 w-full max-w-[850px] mx-auto px-6 pb-12 flex flex-col items-center gap-8">
 
-            {/* ─── Whale Logo (Enlarged) ─────────────────────────────────────────── */}
+            {/* ─── Whale Logo (Enlarged & Unsquished) ─────────────────────────────────────────── */}
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
               style={{ willChange: "transform" }}
-              className="flex flex-col items-center gap-3"
+              className="flex flex-col items-center gap-6 mb-4"
             >
               <img
                 src="/official-whale.png"
                 alt="Whale Alert Network"
-                width={85}
-                height={85}
+                className="w-28 h-28 sm:w-36 sm:h-36 object-contain"
                 style={{
-                  objectFit: "contain",
                   filter: "grayscale(1) contrast(1.2)",
-                  opacity: 0.85,
+                  opacity: 0.9,
                 }}
               />
               <span
                 style={{
                   fontFamily: '"Inter", sans-serif',
-                  fontSize: "10px",
-                  letterSpacing: "0.35em",
+                  fontSize: "11px",
+                  letterSpacing: "0.4em",
                   textTransform: "uppercase",
-                  color: "rgba(10,10,10,0.6)",
+                  color: "rgba(10,10,10,0.8)",
                   fontWeight: "900"
                 }}
               >
@@ -156,17 +154,19 @@ export function SovereignFooter() {
               </span>
             </motion.div>
 
-            {/* ─── Navigation Links ─────────────────────────────────── */}
-            <nav
-              className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 z-50 relative"
-              aria-label="Footer navigation"
-            >
-              <FooterLink href="/terms">Terms</FooterLink>
-              <FooterLink href="/privacy">Privacy</FooterLink>
-              <FooterLink href="/docs">Docs</FooterLink>
-              <FooterLink href="/developer">Developer</FooterLink>
-              <FooterLink href="/news">News Terminal</FooterLink>
-            </nav>
+            {/* ─── Navigation Links (Glassmorphism Pill) ─────────────────────────────────── */}
+            <div className="relative z-50">
+              <nav
+                className="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-12 gap-y-4 px-8 py-4 rounded-full bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                aria-label="Footer navigation"
+              >
+                <FooterLink href="/terms">Terms</FooterLink>
+                <FooterLink href="/privacy">Privacy</FooterLink>
+                <FooterLink href="/docs">Docs</FooterLink>
+                <FooterLink href="/developer">Developer</FooterLink>
+                <FooterLink href="/news">News Terminal</FooterLink>
+              </nav>
+            </div>
 
             {/* ─── Horizontal Rule ──────────────────────────────────── */}
             <div

@@ -748,26 +748,40 @@ export function MobileLanding() {
 
   // ── handleDisconnect: clears session and resets all state ───────────────
   const handleDisconnect = useCallback(() => {
-    // 1. Expire the sovereign_handshake cookie
-    document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
-    // 2. Clear sessionStorage keys for this address
-    const addr = (linkedAddress || address)?.toLowerCase();
-    if (addr) {
-      try { sessionStorage.removeItem(`sovereign_signed_${addr}`); } catch {}
+    // Visual feedback of the nuclear purge
+    const btn = document.getElementById('sovereign-disconnect-btn');
+    if (btn) {
+        btn.innerHTML = '<span class="animate-pulse">NUKING KERNEL STATE...</span>';
+        btn.style.backgroundColor = '#FF0000';
+        btn.style.color = '#FFFFFF';
+        btn.style.pointerEvents = 'none';
     }
-    // 3. Disconnect wagmi / AppKit
-    try { disconnect(); } catch {}
-    try { closeAppKit(); } catch {}
-    // 4. Reset all local state
-    isLinkedRef.current = false;
-    linkingInProgress.current = false;
-    setIsLinked(false);
-    setLinkedAddress(null);
-    setShowingManifesto(true);
-    setIsSigning(false);
-    setSignError(null);
-    setConnecting(null);
-  }, [disconnect, closeAppKit, linkedAddress, address]);
+
+    setTimeout(() => {
+        // 1. Expire the sovereign_handshake cookie
+        document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
+        
+        // 2. Nuke all WalletConnect and Wagmi persistent state to fix Rainbow/Trust bugs
+        try {
+          Object.keys(localStorage).forEach(k => {
+            const lower = k.toLowerCase();
+            if (lower.includes('walletconnect') || lower.includes('wagmi') || lower.includes('wc@2')) {
+              localStorage.removeItem(k);
+            }
+          });
+          sessionStorage.clear();
+        } catch {}
+
+        // 3. Disconnect wagmi / AppKit
+        try { disconnect(); } catch {}
+        try { closeAppKit(); } catch {}
+        
+        // 4. Force a clean window reload to guarantee a pristine state for the next wallet
+        if (typeof window !== 'undefined') {
+          window.location.href = window.location.pathname;
+        }
+    }, 400); // 400ms delay to let the user see the system purge
+  }, [disconnect, closeAppKit]);
 
   if (!mounted) return null;
 
