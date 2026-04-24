@@ -257,12 +257,17 @@ function ConnectedScreen({
       >
         <div className="flex items-center gap-2">
           {onBack && (
-            <button onClick={onBack} title="Ver Landing Page" className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer">
+            <button
+              onClick={onBack}
+              title="Volver al Landing Page"
+              className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer flex items-center gap-1"
+            >
                <ArrowRight size={15} className="rotate-180" />
+               <span className="text-[8px] font-mono uppercase tracking-widest text-black/40">Home</span>
             </button>
           )}
           <WhaleLogo className="w-5 h-5 shrink-0" />
-          <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Scanner · Sync PC</span>
+          <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
         </div>
         <button 
            onClick={() => setShowInfoModal(true)}
@@ -271,7 +276,6 @@ function ConnectedScreen({
           <Info size={14} />
         </button>
       </motion.header>
-
 
       <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
 
@@ -521,7 +525,9 @@ export function MobileLanding() {
     if (typeof document === 'undefined') return false;
     return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
   });
-  const [showingManifesto, setShowingManifesto] = useState(false); // Direct to ConnectedScreen after auth
+  // showingManifesto: false = go directly to ConnectedScreen (scanner menu) after sign
+  // The back arrow in ConnectedScreen takes them to the manifesto if they want to read it
+  const [showingManifesto, setShowingManifesto] = useState(false);
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
   const [connecting, setConnecting]     = useState<string | null>(null);
