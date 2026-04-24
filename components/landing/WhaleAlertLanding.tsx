@@ -346,6 +346,29 @@ export default function WhaleAlertLanding({
             style={{
               paddingTop: 64,
               borderTop: "1px solid #e8e5de",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {remainingLotties.map((lottie, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    backgroundColor: "#f9f9f9",
+                    padding: 24,
+                    borderRadius: 16,
+                  }}
+                >
+                  <div style={{ width: 64, height: 64, opacity: 0.6 }}>
+                    <DotLottiePlayer src={`/lottie/${lottie}`} autoplay loop />
                   </div>
                   <p
                     style={{
