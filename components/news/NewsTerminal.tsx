@@ -413,14 +413,14 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* IMAGEN HERO — GPU composited full-bleed hero */}
-                  <div className="w-full pb-8">
+                  {/* IMAGEN HERO — GPU composited elegant banner */}
+                  <div className="w-full px-6 md:px-10 xl:px-16 pt-6 pb-6">
                     <div
-                      className="w-full overflow-hidden bg-[#F0EFEC]"
+                      className="w-full overflow-hidden bg-[#F0EFEC] rounded-2xl border shadow-sm"
                       style={{
-                        // Mobile: smaller hero to preserve scroll perf on 6" screens
-                        height: `clamp(200px, 45vw, ${Math.round(480 * fontSize)}px)`,
-                        // Hard-composite to GPU layer — prevents texture upload stalls on A-series chips
+                        borderColor: DIV,
+                        // Elegant aspect ratio, max height strictly controlled
+                        height: `clamp(180px, 30vh, ${Math.round(340 * fontSize)}px)`,
                         willChange: 'transform',
                         transform: 'translateZ(0)',
                         backfaceVisibility: 'hidden',
@@ -459,17 +459,17 @@ export function NewsTerminal() {
                   </div>
 
                   {/* ── Contenido del artículo: Fuente + Título ──────────────── */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-4">
+                  <div className="px-6 md:px-10 xl:px-16 pt-2 pb-4">
                     {/* FUENTE + ETIQUETA */}
-                    <p className="font-mono text-[8px] uppercase tracking-[0.4em] mb-4" style={{ color: MUTED }}>
-                      {selected.source} · Análisis Institucional
+                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] mb-4 font-bold" style={{ color: '#0044CC' }}>
+                      {selected.source} <span className="text-black/20 mx-2">|</span> REPORTAJE ANALÍTICO
                     </p>
 
                     {/* TÍTULO PRINCIPAL - Peso medio-alto */}
                     <h1
-                      className="font-sans font-medium tracking-tight leading-[1.04] mb-0 translate-y-[-2px]"
+                      className="font-sans font-semibold tracking-tight leading-[1.1] mb-0"
                       style={{
-                        fontSize: `clamp(2rem, ${3.2 * fontSize}rem, 5rem)`,
+                        fontSize: `clamp(1.5rem, ${2.2 * fontSize}rem, 3.2rem)`,
                         color: TEXT,
                         textWrap: 'balance' as any,
                       }}
@@ -479,13 +479,14 @@ export function NewsTerminal() {
                   </div>
 
                   {/* ANÁLISIS PRINCIPAL */}
-                  <div className="px-5 md:px-10 xl:px-16 pt-6 pb-12 max-w-[900px] w-full" style={{ overflowX: 'hidden' }}>
+                  <div className="px-6 md:px-10 xl:px-16 pt-6 pb-16 max-w-[950px] w-full" style={{ overflowX: 'hidden' }}>
                       {/* ── Full content — access is open to all users ── */}
                       <div
                         lang="es"
-                        className="font-sans font-semibold tracking-wide leading-[1.8] space-y-5 opacity-90 text-[12px] md:text-[13px] text-justify"
+                        className="font-serif font-normal tracking-normal leading-[1.85] space-y-7 opacity-95"
                         style={{
                           color: '#1a1a1a',
+                          fontSize: `clamp(15px, ${17 * fontSize}px, 24px)`,
                           wordBreak: 'break-word',
                           hyphens: 'auto',
                           WebkitHyphens: 'auto'
