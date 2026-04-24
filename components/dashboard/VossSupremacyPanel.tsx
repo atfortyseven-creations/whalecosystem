@@ -264,6 +264,11 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
                     const colorHex = f.badgeColor === 'GOLD' ? '#D4AF37' : '#FFFFFF';
                     const hasTwtr = !!f.twitterHandle;
                     
+                    // The fix for canvas rendering was deployed around 2026-04-24T09:49Z.
+                    // Any JPEG signature generated before this is a black JPEG with gold lines.
+                    // We invert it to match the pristine white aesthetic.
+                    const isOldBlackJpeg = displaySig?.startsWith('data:image/jpeg') && f.claimedAt && new Date(f.claimedAt).getTime() < 1713955000000;
+                    
                     return (
                         <div key={i} className="grid items-center hover:bg-[#FAF9F6] bg-white border-b border-[#F0F0F0] transition-colors" style={{ gridTemplateColumns: '80px 1.2fr 180px 180px 160px 1fr 200px' }}>
                             {/* Index */}
@@ -307,7 +312,12 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
                              <div className="px-6 py-3 flex justify-end">
                                   {displaySig?.startsWith('data:image') ? (
                                      <div className="bg-white border border-[#E5E5E5] rounded-lg overflow-hidden w-[140px] h-[50px] flex items-center justify-center">
-                                        <img src={displaySig} className="w-full h-full object-contain scale-[1.1] transition-transform duration-300" style={{ mixBlendMode: 'darken' }} alt="Signature" />
+                                        <img 
+                                          src={displaySig} 
+                                          className="w-full h-full object-contain scale-[1.1] transition-transform duration-300" 
+                                          style={isOldBlackJpeg ? { filter: 'invert(1) grayscale(1) contrast(1.5) brightness(1.2)' } : { mixBlendMode: 'darken' }} 
+                                          alt="Signature" 
+                                        />
                                      </div>
                                   ) : (
                                      <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
