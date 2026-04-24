@@ -9,6 +9,7 @@ interface QRScannerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onScan?: (data: string) => void;
+  address?: string;
 }
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
@@ -209,7 +210,7 @@ function ScannedOverlay() {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerModalProps) {
+export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress }: QRScannerModalProps) {
   const { address } = useAccount();
 
   const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
@@ -218,10 +219,12 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
   const [fileLoading, setFileLoading] = useState(false);
 
   // ── Stable refs for callbacks — NEVER go into useEffect dep array ──────────
-  const addressRef  = useRef(address);
+  const addressRef  = useRef(address || externalAddress);
+  const extAddrRef  = useRef(externalAddress);
   const onCloseRef  = useRef(onClose);
   const onScanRef   = useRef(onScan);
-  useEffect(() => { addressRef.current = address; },  [address]);
+  useEffect(() => { addressRef.current = address || externalAddress; },  [address, externalAddress]);
+  useEffect(() => { extAddrRef.current = externalAddress; }, [externalAddress]);
   useEffect(() => { onCloseRef.current = onClose; },  [onClose]);
   useEffect(() => { onScanRef.current  = onScan;  },  [onScan]);
 
@@ -248,7 +251,16 @@ export default function QRScannerModal({ isOpen, onClose, onScan }: QRScannerMod
     await destroyScanner();
     setStatus('success');
 
-    const addr = addressRef.current;
+    let addr = addressRef.current || extAddrRef.current;
+    
+    // Cookie fallback
+    if (!addr && typeof document !== 'undefined') {
+      const match = document.cookie.match(new RegExp('(^| )sovereign_session=([^;]+)'));
+      if (match) {
+        try { addr = JSON.parse(decodeURIComponent(match[2])).address; } catch {}
+      }
+    }
+
     try {
       const url       = new URL(decodedText);
       const sessionId = url.searchParams.get('session');
