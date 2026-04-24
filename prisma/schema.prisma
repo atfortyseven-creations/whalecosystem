@@ -106,7 +106,6 @@ model User {
   theme           String      @default("light")
   currency        String      @default("USD")
   language        String      @default("es-ES")
-  density         String      @default("relaxed") // "relaxed", "compact", "dense"
 
   showBalances    Boolean     @default(true)
   hiddenAssets    String[]    @default([])
