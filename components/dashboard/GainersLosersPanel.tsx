@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpRight, ArrowDownRight, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
 import { useMarketData } from '@/lib/api-client';
+import { TokenInfoModal, TokenInfoPayload } from '@/components/ui/TokenInfoModal';
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 const fmt = (n: number) => {
@@ -82,11 +83,14 @@ function stripUSDT(binanceSymbol: string): string {
 }
 
 // ── Row Component ─────────────────────────────────────────────────────────────
-function AssetRow({ rank, symbol, data, pctKey }: {
+function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, onClick }: {
     rank: number;
     symbol: string;
     data: any;
     pctKey: string;
+    currency: 'USD' | 'EUR';
+    eurRate: number;
+    onClick: () => void;
 }) {
     const meta  = ASSET_META[symbol] || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
     const price = parseFloat(data.lastPrice) || 0;
@@ -94,11 +98,32 @@ function AssetRow({ rank, symbol, data, pctKey }: {
     const vol   = parseFloat(data.quoteVolume) || 0;
     const ticker = stripUSDT(symbol);
     const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
+    const rate  = currency === 'EUR' ? eurRate : 1;
+    const sym   = currency === 'EUR' ? '€' : '$';
+
+    const fmtCurrency = (n: number) => {
+        const v = n * rate;
+        if (!v || isNaN(v)) return `${sym}—`;
+        if (v >= 1e12) return `${sym}${(v / 1e12).toFixed(2)}T`;
+        if (v >= 1e9)  return `${sym}${(v / 1e9).toFixed(2)}B`;
+        if (v >= 1e6)  return `${sym}${(v / 1e6).toFixed(2)}M`;
+        if (v >= 1e3)  return `${sym}${(v / 1e3).toFixed(1)}K`;
+        return `${sym}${v.toFixed(2)}`;
+    };
+    const fmtCurrencyPrice = (n: number) => {
+        const v = n * rate;
+        if (!v || isNaN(v)) return `${sym}—`;
+        if (v >= 1000) return `${sym}${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (v >= 1)    return `${sym}${v.toFixed(4)}`;
+        if (v >= 0.01) return `${sym}${v.toFixed(6)}`;
+        return `${sym}${v.toFixed(8)}`;
+    };
 
     return (
         <div
             className="grid border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors items-center cursor-pointer"
             style={{ gridTemplateColumns: '36px 2.8fr 1.8fr 1.1fr 1.1fr 1.5fr 0.9fr' }}
+            onClick={onClick}
         >
             {/* Rank */}
             <div className="px-2 text-[10px] font-black text-[#888888] text-center">{rank}</div>
@@ -132,10 +157,10 @@ function AssetRow({ rank, symbol, data, pctKey }: {
 
             {/* Price */}
             <div className="px-3">
-                <div className="text-[11px] font-black font-mono text-[#050505]">{fmtPrice(price)}</div>
+                <div className="text-[11px] font-black font-mono text-[#050505]">{fmtCurrencyPrice(price)}</div>
                 {(data as any).onChainPrice && (
                     <div className="text-[8px] font-mono text-[#888888] mt-0.5">
-                        On-chain: ${parseFloat((data as any).onChainPrice).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                        On-chain: {fmtCurrencyPrice(parseFloat((data as any).onChainPrice))}
                     </div>
                 )}
             </div>
@@ -152,7 +177,7 @@ function AssetRow({ rank, symbol, data, pctKey }: {
             </div>
 
             {/* Volume */}
-            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505]">{fmt(vol)}</div>
+            <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505]">{fmtCurrency(vol)}</div>
 
             {/* Type badge */}
             <div className="px-3 flex justify-center">
@@ -164,14 +189,9 @@ function AssetRow({ rank, symbol, data, pctKey }: {
 
 // ── Main Panel ────────────────────────────────────────────────────────────────
 export function GainersLosersPanel() {
-    // =========================================================================
-    // INJECTED DATA HOOK
-    // Enforcing strict on-chain reality. Waiting for endpoint assignment.
-    // =========================================================================
     const { data: rawData, isLoading, error } = useMarketData('gainersLosers');
     const markets = Array.isArray(rawData) ? rawData : rawData?.data || [];
-    
-    // Status indicators (simulated until WS implementation injected by endpoints)
+
     const isConnected = !isLoading && !error;
     const lastUpdate = new Date();
 
@@ -179,6 +199,33 @@ export function GainersLosersPanel() {
     const [view, setView]           = useState<ViewMode>('all');
     const [timeWindow, setTimeWindow] = useState<TimeWindow>('24h');
     const [network, setNetwork]     = useState<FilterNetwork>('all');
+    const [currency, setCurrency]   = useState<'USD' | 'EUR'>('USD');
+    const [eurRate, setEurRate]     = useState(0.92);
+    const [selectedToken, setSelectedToken] = useState<TokenInfoPayload | null>(null);
+
+    // Fetch live EUR/USD rate once on mount
+    useEffect(() => {
+        fetch('https://api.exchangerate-api.com/v4/latest/USD')
+            .then(r => r.json())
+            .then(d => { if (d?.rates?.EUR) setEurRate(d.rates.EUR); })
+            .catch(() => {}); // silently use default 0.92
+    }, []);
+
+    const handleRowClick = useCallback((symbol: string, data: any) => {
+        const meta = ASSET_META[symbol] || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+        const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
+        setSelectedToken({
+            symbol: stripUSDT(symbol),
+            name: meta.name,
+            network: meta.network,
+            netColor,
+            price: parseFloat(data.lastPrice) || 0,
+            pct: parseFloat(data.priceChangePercent) || 0,
+            volume: parseFloat(data.quoteVolume) || 0,
+            onChainPrice: data.onChainPrice ? parseFloat(data.onChainPrice) : undefined,
+            getblockVerified: !!data.getblockVerified,
+        });
+    }, []);
 
     // Map market stream data to display rows
     const allRows = useMemo(() => {
@@ -333,14 +380,32 @@ export function GainersLosersPanel() {
                             className="w-full bg-white border border-[#E5E5E5] rounded pl-8 pr-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#050505] outline-none focus:border-[#050505] transition-colors"/>
                     </div>
 
-                    {/* Stream status */}
-                    <div className="flex items-center gap-2 ml-auto">
-                        <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#050505]' : 'bg-[#FF3B30] animate-pulse'}`} />
-                        <span className="text-[9px] font-mono font-bold text-[#A0A0A0] uppercase tracking-widest flex items-center gap-1 border-l border-[#E5E5E5] pl-2">
-                            {lastUpdate instanceof Date && !isNaN(lastUpdate.getTime())
-                                ? lastUpdate.toTimeString().slice(0, 8)
-                                : '—'}
-                        </span>
+                    {/* Currency Toggle */}
+                    <div className="flex items-center gap-1 ml-auto">
+                        <div className="flex border border-[#E5E5E5] rounded-md overflow-hidden">
+                            {(['USD', 'EUR'] as const).map(c => (
+                                <button
+                                    key={c}
+                                    onClick={() => setCurrency(c)}
+                                    className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest transition-all"
+                                    style={currency === c
+                                        ? { background: '#050505', color: '#fff' }
+                                        : { background: 'transparent', color: '#888888' }
+                                    }
+                                >
+                                    {c === 'USD' ? '$' : '€'} {c}
+                                </button>
+                            ))}
+                        </div>
+                        {/* Stream status */}
+                        <div className="flex items-center gap-2 border-l border-[#E5E5E5] pl-2">
+                            <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#050505]' : 'bg-[#FF3B30] animate-pulse'}`} />
+                            <span className="text-[9px] font-mono font-bold text-[#A0A0A0] uppercase tracking-widest">
+                                {lastUpdate instanceof Date && !isNaN(lastUpdate.getTime())
+                                    ? lastUpdate.toTimeString().slice(0, 8)
+                                    : '—'}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -408,6 +473,14 @@ export function GainersLosersPanel() {
                     <span className="font-mono text-[#050505]/40 tracking-widest">ON-CHAIN HOOKS</span>
                 </div>
             </div>
+
+            {/* ── Token Info Modal ── */}
+            <TokenInfoModal
+                token={selectedToken}
+                currency={currency}
+                eurRate={eurRate}
+                onClose={() => setSelectedToken(null)}
+            />
         </div>
     );
 }

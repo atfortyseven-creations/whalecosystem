@@ -47,36 +47,46 @@ interface ChainConfig {
 
 // The GETBLOCK_POOL and hardcoded public RPCs are deleted in favor of the Institutional Multi-Account RpcRelayerManager.
 
-const CHAINS: ChainConfig[] = [
-  {
-    label: 'ETHEREUM',
-    chainId: 1,
-    rpcUrls: [
-      RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com',
-      RpcRelayerManager.getRpcUrl('ETH', 'WSS') // Fallback to WebSocket if RPC endpoint stalls
-    ],
-    nativeSymbol: 'ETH',
-    priceKey: 'ETH',
-  },
-  {
-    label: 'BASE',
-    chainId: 8453,
-    rpcUrls: [
-      RpcRelayerManager.getRpcUrl('ARB', 'RPC') || 'https://mainnet.base.org', // Base/L2 general endpoint config
-    ],
-    nativeSymbol: 'ETH',
-    priceKey: 'ETH',
-  },
-  {
-    label: 'BSC',
-    chainId: 56,
-    rpcUrls: [
-      RpcRelayerManager.getRpcUrl('BSC', 'RPC') || 'https://bsc-dataseed1.binance.org',
-    ],
-    nativeSymbol: 'BNB',
-    priceKey: 'BNB',
-  },
-];
+// Build chain configs lazily at request time so environment variables are
+// guaranteed to be populated (static init runs before .env is injected in
+// some Railway edge cases causing BSC to report "No working RPC").
+function getChains(): ChainConfig[] {
+  return [
+    {
+      label: 'ETHEREUM',
+      chainId: 1,
+      rpcUrls: [
+        RpcRelayerManager.getRpcUrl('ETH', 'RPC') || 'https://cloudflare-eth.com',
+        RpcRelayerManager.getRpcUrl('ETH', 'WSS'),
+      ].filter(Boolean),
+      nativeSymbol: 'ETH',
+      priceKey: 'ETH',
+    },
+    {
+      label: 'BASE',
+      chainId: 8453,
+      rpcUrls: [
+        process.env.BASE_MAINNET_RPC_URL ||
+        RpcRelayerManager.getRpcUrl('ARB', 'RPC') ||
+        'https://mainnet.base.org',
+      ].filter(Boolean),
+      nativeSymbol: 'ETH',
+      priceKey: 'ETH',
+    },
+    {
+      label: 'BSC',
+      chainId: 56,
+      rpcUrls: [
+        RpcRelayerManager.getRpcUrl('BSC', 'RPC') ||
+        process.env.BSC_RPC_URL ||
+        process.env.GETBLOCK_BSC_RPCS?.split(',')[0] ||
+        'https://bsc-dataseed1.binance.org',
+      ].filter(Boolean),
+      nativeSymbol: 'BNB',
+      priceKey: 'BNB',
+    },
+  ];
+}
 
 // In-memory cache to avoid hammering RPCs
 type CacheEntry = { data: any[]; ts: number };
@@ -251,8 +261,8 @@ export async function GET(request: Request) {
     const chainFilter = searchParams.get('chain'); // optional ?chain=ETHEREUM
 
     const chainsToScan = chainFilter
-      ? CHAINS.filter(c => c.label === chainFilter)
-      : CHAINS;
+      ? getChains().filter(c => c.label === chainFilter)
+      : getChains();
 
     const results = await Promise.allSettled(chainsToScan.map(scanChain));
     const txs = results

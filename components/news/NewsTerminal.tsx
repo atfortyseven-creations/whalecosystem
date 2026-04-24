@@ -41,15 +41,15 @@ function getArticleImage(article: NewsArticle): string {
 // ── Formato de fecha legible ──────────────────────────────────────────────────
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('es-ES', {
+  return d.toLocaleDateString('en-US', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  }) + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }) + ' · ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
 function formatShort(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
-    + ' · ' + d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })
+    + ' · ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
 function todayKey(): string {
@@ -413,14 +413,12 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* IMAGEN HERO — GPU composited elegant banner */}
-                  <div className="w-full px-6 md:px-10 xl:px-16 pt-6 pb-6">
+                  {/* IMAGEN HERO — full width, edge-to-edge */}
+                  <div className="w-full pt-4 pb-0">
                     <div
-                      className="w-full overflow-hidden bg-[#F0EFEC] rounded-2xl border shadow-sm"
+                      className="w-full overflow-hidden bg-[#F0EFEC]"
                       style={{
-                        borderColor: DIV,
-                        // Elegant aspect ratio, max height strictly controlled
-                        height: `clamp(180px, 30vh, ${Math.round(340 * fontSize)}px)`,
+                        height: `clamp(200px, 32vh, ${Math.round(360 * fontSize)}px)`,
                         willChange: 'transform',
                         transform: 'translateZ(0)',
                         backfaceVisibility: 'hidden',
@@ -438,11 +436,7 @@ export function NewsTerminal() {
                         loading="eager"
                         decoding="async"
                         fetchPriority="high"
-                        style={{
-                          // Tell engine this image will animate — pre-allocate VRAM tile
-                          willChange: 'opacity, transform',
-                          transform: 'translateZ(0)',
-                        }}
+                        style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           if (target.dataset.errorHandled) return;
@@ -458,14 +452,11 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* ── Contenido del artículo: Fuente + Título ──────────────── */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-2 pb-4">
-                    {/* FUENTE + ETIQUETA */}
+                  {/* ── Title + Source ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pt-5 pb-3">
                     <p className="font-mono text-[10px] uppercase tracking-[0.3em] mb-4 font-bold" style={{ color: '#0044CC' }}>
-                      {selected.source} <span className="text-black/20 mx-2">|</span> REPORTAJE ANALÍTICO
+                      {selected.source} <span className="text-black/20 mx-2">|</span> ANALYTICAL REPORT
                     </p>
-
-                    {/* TÍTULO PRINCIPAL - Peso medio-alto */}
                     <h1
                       className="font-sans font-semibold tracking-tight leading-[1.1] mb-0"
                       style={{
@@ -478,34 +469,30 @@ export function NewsTerminal() {
                     </h1>
                   </div>
 
-                  {/* ANÁLISIS PRINCIPAL */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-6 pb-16 max-w-[950px] w-full" style={{ overflowX: 'hidden' }}>
-                      {/* ── Full content — access is open to all users ── */}
-                      <div
-                        lang="es"
-                        className="font-serif font-normal tracking-normal leading-[1.85] space-y-7 opacity-95"
-                        style={{
-                          color: '#1a1a1a',
-                          fontSize: `clamp(15px, ${17 * fontSize}px, 24px)`,
-                          wordBreak: 'break-word',
-                          hyphens: 'auto',
-                          WebkitHyphens: 'auto'
-                        }}
-                      >
-                        {selected.description
-                          ? selected.description.split(/\n\n+/).map((p, i) => (
-                              <p key={i} className="mb-6">{p}</p>
-                            ))
-                          : (
-                              <p>Sin contenido.</p>
-                            )
-                        }
-                      </div>
+                  {/* ── Full article body — fills remaining space, no blank areas ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pt-4 pb-20 w-full" style={{ overflowX: 'hidden' }}>
+                    <div
+                      lang="en"
+                      className="font-serif font-normal tracking-normal leading-[1.85] space-y-7 opacity-95"
+                      style={{
+                        color: '#1a1a1a',
+                        fontSize: `clamp(15px, ${17 * fontSize}px, 24px)`,
+                        wordBreak: 'break-word',
+                        hyphens: 'auto',
+                        WebkitHyphens: 'auto',
+                      }}
+                    >
+                      {selected.description
+                        ? selected.description.split(/\n\n+/).map((p, i) => (
+                            <p key={i}>{p}</p>
+                          ))
+                        : <p>No content available for this article.</p>
+                      }
+                    </div>
 
-                    {/* FOOTER LEGAL */}
+                    {/* Legal footer */}
                     <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>
-                      <div className="flex justify-between items-center font-mono text-[10px] uppercase tracking-widest font-bold mb-3"
-                           style={{ color: MUTED }}>
+                      <div className="flex justify-between items-center font-mono text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: MUTED }}>
                         <span>Professional Analysis Report</span>
                         <span>Strictly Educational Insights</span>
                       </div>
