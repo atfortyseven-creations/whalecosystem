@@ -15,7 +15,6 @@ import { InmersiveConstellations } from '@/components/shared/InmersiveConstellat
 import { GlobalMarketSessions } from '@/components/premium/GlobalMarketSessions';
 import { EliteIntelligenceNews } from '@/components/premium/EliteIntelligenceNews';
 import { SplashContainer } from '@/components/shared/SplashContainer';
-import AztecMempoolSpace from '@/components/premium/AztecMempoolSpace';
 import Link from 'next/link';
 
 // ─── Universal Explorer Logic ──────────────────────────────────────────
@@ -311,7 +310,7 @@ export function WhaleTrackerDashboard() {
                     <div className="space-y-16">
                         <div className="flex items-center justify-between border-b border-white/10 pb-10">
                             <div className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">
-                                    {['ALL', 'BTC', 'TOKENS', 'AZTEC ZK'].map(tab => (
+                                    {['ALL', 'BTC', 'TOKENS'].map(tab => (
                                         <button
                                             key={tab}
                                             onClick={() => setActiveTab(tab)}
@@ -321,7 +320,7 @@ export function WhaleTrackerDashboard() {
                                                 : 'bg-white/[0.02] text-white/40 border border-white/5 hover:text-white/90 hover:border-white/20'
                                             }`}
                                         >
-                                            {tab === 'AZTEC ZK' ? 'AZTEC L2 (SHIELDED)' : tab}
+                                            {tab}
                                         </button>
                                     ))}
                             </div>
@@ -335,27 +334,15 @@ export function WhaleTrackerDashboard() {
                         </div>
 
                         <AnimatePresence mode="wait">
-                            {activeTab === 'AZTEC ZK' ? (
-                                <motion.div 
-                                    key="aztec-mempool"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="mt-8"
-                                >
-                                    <AztecMempoolSpace />
-                                </motion.div>
-                            ) : (
-                                <motion.div 
-                                    key="tx-list"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] sm:rounded-[5rem] overflow-hidden shadow-2xl relative"
-                                >
-                                    {isLoading && (
+                            <motion.div 
+                                key="tx-list"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-[#0a0a0a] border border-white/10 rounded-[2rem] sm:rounded-[5rem] overflow-hidden shadow-2xl relative"
+                            >
+                                {isLoading && (
                                     <div className="h-[700px] flex flex-col items-center justify-center gap-10">
                                         <div className="w-16 h-16 border-[6px] border-white/5 border-t-white animate-spin rounded-full shadow-lg" />
                                         <div className="text-center space-y-3">
@@ -382,7 +369,6 @@ export function WhaleTrackerDashboard() {
                                     </div>
                                 )}
                             </motion.div>
-                        )}
                         </AnimatePresence>
                     </div>
                 </main>

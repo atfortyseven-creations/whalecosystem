@@ -34,6 +34,7 @@ import { SessionLogsPanel }        from '@/components/dashboard/SessionLogsPanel
 // import SovereignIntelTab        from '@/components/dashboard/SovereignIntelTab';
 // import { VirtualizedFirehose }  from '@/components/premium/VirtualizedFirehose';
 // import { LivePortfolio }        from '@/components/premium/LivePortfolio';
+import AztecMempoolSpace           from '@/components/premium/AztecMempoolSpace';
 import dynamic from 'next/dynamic';
 
 // Heavy / SSR-unsafe dynamic imports
@@ -115,13 +116,15 @@ export default function WhaleDashboard() {
             case 'sov-intel':
             case 'live-port':
             case 'whale-port':
-            case 'zk':
                 return (
                     <div className="flex flex-col items-center justify-center h-[400px] gap-4 text-black/20">
                         <span className="text-[11px] font-black uppercase tracking-[0.3em]">Module Temporarily Disabled</span>
                         <span className="text-[9px] font-mono">Contact administrator to re-enable this section</span>
                     </div>
                 );
+
+            case 'zk':
+                return <><TelemetryHeader icon={Shield} title="Aztec ZK Shield" subtitle="Rollup Pipeline Mempool" isDark themeColor="amber" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="zk-shield"><AztecMempoolSpace /></DashboardErrorBoundary></div></>;
 
             // ── [ACTIVE PANELS] ────────────────────────────────────────────────
             case 'news':
