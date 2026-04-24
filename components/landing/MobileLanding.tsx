@@ -257,12 +257,12 @@ function ConnectedScreen({
       >
         <div className="flex items-center gap-2">
           {onBack && (
-            <button onClick={onBack} className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer">
+            <button onClick={onBack} title="Ver Landing Page" className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer">
                <ArrowRight size={15} className="rotate-180" />
             </button>
           )}
           <WhaleLogo className="w-5 h-5 shrink-0" />
-          <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
+          <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: INK }}>Scanner · Sync PC</span>
         </div>
         <button 
            onClick={() => setShowInfoModal(true)}
@@ -271,6 +271,7 @@ function ConnectedScreen({
           <Info size={14} />
         </button>
       </motion.header>
+
 
       <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
 
@@ -520,11 +521,13 @@ export function MobileLanding() {
     if (typeof document === 'undefined') return false;
     return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
   });
-  const [showingManifesto, setShowingManifesto] = useState(true);
+  const [showingManifesto, setShowingManifesto] = useState(false); // Direct to ConnectedScreen after auth
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
   const [connecting, setConnecting]     = useState<string | null>(null);
   const signingLock = useRef(false);
+  // Timeout ref for the reconnection spinner
+  const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -755,20 +758,54 @@ export function MobileLanding() {
   if (!mounted) return null;
 
   // ── Render: Session exists but wagmi is still reconnecting ─────────────────
-  // This prevents the "Connect Wallet" flash when the user returns from their
-  // wallet app. The cookie proves identity; wagmi just needs a moment to restore.
+  // Timeout: if wagmi doesn't reconnect in 4s, the WalletConnect session has
+  // expired. Clear the stale cookie and return to the connect wallet screen.
   if (isLinked && !address) {
+    // Start the timeout on first render of this state
+    if (!reconnectTimeout.current) {
+      reconnectTimeout.current = setTimeout(() => {
+        // Clear stale session — WalletConnect session expired
+        if (typeof document !== 'undefined') {
+          document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
+        }
+        try { sessionStorage.clear(); } catch (e) {}
+        setIsLinked(false);
+        reconnectTimeout.current = null;
+      }, 4000);
+    }
     return (
-      <div className="fixed inset-0 bg-[#FDFCF8] flex flex-col items-center justify-center gap-4 z-50">
+      <div className="fixed inset-0 bg-[#FDFCF8] flex flex-col items-center justify-center gap-5 z-50 px-8">
         <WhaleLogo className="w-8 h-8 shrink-0 opacity-60" />
-        <div className="flex flex-col items-center gap-1.5">
+        <div className="flex flex-col items-center gap-2">
           <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-          <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/40">
+          <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/40 text-center">
             Restaurando Sesión Soberana...
           </span>
+          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 text-center mt-1">
+            Si tarda, tu sesión WalletConnect ha expirado
+          </span>
         </div>
+        {/* Manual escape hatch — don't make the user wait */}
+        <button
+          onClick={() => {
+            if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+            if (typeof document !== 'undefined') {
+              document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
+            }
+            try { sessionStorage.clear(); } catch (e) {}
+            setIsLinked(false);
+          }}
+          className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40 border border-black/10 px-4 py-2 hover:text-black/70 hover:border-black/30 transition-all"
+        >
+          Volver a Conectar Wallet
+        </button>
       </div>
     );
+  }
+  // Clear any pending timeout if wagmi DID reconnect successfully
+  if (reconnectTimeout.current && address) {
+    clearTimeout(reconnectTimeout.current);
+    reconnectTimeout.current = null;
   }
 
   // ── Render: Signing step ────────────────────────────────────────────────────
