@@ -1035,15 +1035,15 @@ export function MobileLanding() {
             </p>
 
             {/* ─── Powered By Aztec ─────────────────────────────── */}
-            <div className="flex flex-col items-center gap-2.5 pt-2">
-              <span className="font-mono text-[7px] uppercase tracking-[0.35em] text-[#545F73]/70">
+            <div className="flex flex-col items-center gap-2.5 pt-4 relative z-50">
+              <span className="font-mono text-[8px] uppercase tracking-[0.35em] text-[#545F73]/90 font-bold">
                 Powered by
               </span>
               <a
                 href="https://aztec.network"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-2.5 opacity-35 hover:opacity-80 transition-all duration-500"
+                className="group flex items-center gap-2.5 opacity-80 hover:opacity-100 transition-all duration-500 cursor-pointer"
                 aria-label="Built on Aztec Network"
               >
                 {/* Aztec geometric diamond mark — white for dark bg */}
