@@ -171,7 +171,16 @@ function SignaturePad({ onSignature, disabled, onMint, mintLabel }: {
   const stop = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    if (hasDrawn && canvasRef.current) onSignature(canvasRef.current.toDataURL('image/png'));
+    if (!hasDrawn || !canvasRef.current) return;
+    // Export to a small fixed-resolution JPEG to stay well under the 10KB API limit.
+    // High-DPR canvases (Retina/mobile) produce 50-150KB PNGs which the server rejects.
+    const src = canvasRef.current;
+    const thumb = document.createElement('canvas');
+    thumb.width  = 320;
+    thumb.height = 80;
+    const tCtx = thumb.getContext('2d');
+    if (tCtx) tCtx.drawImage(src, 0, 0, 320, 80);
+    onSignature(thumb.toDataURL('image/jpeg', 0.4));
   };
 
   return (

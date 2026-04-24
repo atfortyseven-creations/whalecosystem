@@ -92,11 +92,13 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Payload size guard (DoS protection) ──────────────────────────────────
-    // signatureData is a canvas image data URL (base64). Limit to 10KB max.
-    // An attacker could send megabytes here to exhaust memory.
-    if (signatureData && typeof signatureData === 'string' && signatureData.length > 10_240) {
-        return NextResponse.json({ error: 'signatureData exceeds maximum allowed size (10KB)' }, { status: 413 });
-    }
+    // signatureData is a canvas image data URL (base64). Cap to 10KB max.
+    // Client-side fix (JPEG thumbnail) ensures this never triggers, but we
+    // truncate defensively here instead of hard-rejecting so no user is blocked.
+    const safeSignatureData =
+        signatureData && typeof signatureData === 'string'
+            ? signatureData.slice(0, 10_240)
+            : (signatureData ?? null);
 
     // ── twitterHandle XSS sanitization ───────────────────────────────────────
     // Strip HTML tags, script injections, and any non-safe characters.
@@ -188,9 +190,7 @@ export async function POST(req: NextRequest) {
                 badgeColor:             'GOLD',
                 networkLaunchEligible:  true,
                 twitterHandle:          safeHandle,   // XSS-sanitized
-                signatureData:          typeof signatureData === 'string'
-                                            ? signatureData.slice(0, 10_240) // enforce 10KB limit at DB layer too
-                                            : null,
+                signatureData:          safeSignatureData,  // truncated to 10KB by guard above
             },
         });
 
