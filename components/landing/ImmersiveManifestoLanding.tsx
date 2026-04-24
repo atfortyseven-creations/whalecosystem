@@ -178,7 +178,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
   return (
     <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-clip">
 
-      <div className="relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 pb-16">
+      <div className={`relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 ${onOpenScanner ? 'pb-32' : 'pb-16'}`}>
         
         {/* Left Academic Column */}
         <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
@@ -298,16 +298,16 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
 
       </div>
 
-      {/* Floating Scanner Panel - ABOVE MobileNavBar (z-[200] > z-[100]) */}
+      {/* Floating Scanner Panel - Always visible on mobile when onOpenScanner is provided */}
       {onOpenScanner && (
         <div className="fixed bottom-0 left-0 w-full flex flex-col pointer-events-none z-[200]">
-           <div className="h-16 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
+           <div className="h-12 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
            {/* Full dock bar — pointer-events-auto so taps reach the button */}
-           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-3 pointer-events-auto" style={{ paddingBottom: 'max(0.75rem, calc(env(safe-area-inset-bottom) + 64px))' }}>
+           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-3 pointer-events-auto" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
              <button
                type="button"
                onClick={onOpenScanner}
-               className="px-10 py-3 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-3 rounded-none select-none touch-manipulation"
+               className="px-10 py-3.5 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-3 rounded-none select-none touch-manipulation"
                style={{ WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
              >
                <Scan size={13} />
@@ -316,6 +316,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
            </div>
         </div>
       )}
+
 
       {/* ─── Sovereign Footer (full-bleed, outside max-width container) ─── */}
       <div className="relative z-10">
@@ -440,56 +441,123 @@ function PublicAkashicLedgerSample() {
 }
 
 function ScannerDocumentation() {
+  const steps = [
+    {
+      phase: "01",
+      label: "Generación del Desafío",
+      protocol: "CHALLENGE · secp256k1",
+      detail: "El servidor genera un nonce criptográfico de 256 bits vinculado a la sesión activa del terminal de escritorio. Este desafío tiene una validez máxima de 90 segundos y es matemáticamente único: ningún otro dispositivo puede reutilizarlo ni anticiparlo.",
+    },
+    {
+      phase: "02",
+      label: "Codificación QR Soberana",
+      protocol: "QR · ECC Level H · URI Scheme",
+      detail: "El desafío se codifica en un código QR de alta corrección de errores (nivel H, hasta 30% de recuperación de datos). El URI embebido contiene el ID de sesión, el hash del desafío y el endpoint de resolución. La pantalla del terminal regenera el código cada 60 segundos de forma automática.",
+    },
+    {
+      phase: "03",
+      label: "Firma ECDSA desde el Dispositivo Móvil",
+      protocol: "ECDSA · EIP-191 · personal_sign",
+      detail: "El dispositivo móvil escanea el código con la cámara nativa del sistema operativo. La billetera soberana (MetaMask, Coinbase, Rainbow u otra compatible con WalletConnect v2) solicita al usuario una firma sobre el mensaje de desafío usando su clave privada. La clave privada nunca abandona el dispositivo: solo la firma resultante es transmitida.",
+    },
+    {
+      phase: "04",
+      label: "Verificación On-Chain y Emisión de Sesión",
+      protocol: "ecrecover · SHA3-Keccak · JWT",
+      detail: "El servidor recibe la firma, ejecuta `ecrecover` para derivar la dirección pública del firmante y la compara con la dirección registrada en la base de datos. Si coincide, se emite una cookie de sesión HTTPOnly con duración de 7 días. El terminal de escritorio es notificado por Server-Sent Events y se desbloquea en tiempo real.",
+    },
+  ];
+
+  const specs = [
+    { key: "Algoritmo de Firma", value: "ECDSA · curva secp256k1" },
+    { key: "Hash del Mensaje", value: "Keccak-256 (SHA-3)" },
+    { key: "Estándar", value: "EIP-191 · personal_sign" },
+    { key: "Validez del Nonce", value: "90 segundos (ventana anti-replay)" },
+    { key: "Transporte de Sesión", value: "Cookie HTTPOnly · SameSite=Lax" },
+    { key: "Duración de Sesión", value: "7 días (renovable por re-firma)" },
+    { key: "Canal de Notificación", value: "Server-Sent Events (SSE)" },
+    { key: "Compatibilidad", value: "WalletConnect v2 · EIP-4361 (SIWE)" },
+  ];
+
   return (
     <section className="w-full max-w-[850px] shrink-0 pt-12 pb-16 flex flex-col gap-8">
       <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end">
         <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-          Arquitectura del Escáner y Conexión Soberana
+          Arquitectura del Escáner — Protocolo Direct Handshake
         </h2>
       </div>
-      <div className="flex flex-col gap-6 font-serif text-[13px] text-[#222] leading-relaxed text-justify">
+
+      {/* Intro */}
+      <div className="flex flex-col gap-4 font-serif text-[13px] text-[#222] leading-relaxed text-justify">
         <p>
-          Nuestro escáner de autenticación no es un simple lector de códigos QR; es un puente criptográfico directo (Direct Handshake) entre su dispositivo móvil soberano y la terminal web. Cuando escanea el código, su billetera firma matemáticamente un desafío de sesión único.
+          El sistema de autenticación del Sovereign Terminal no utiliza contraseñas, correos electrónicos ni bases de datos de credenciales. La identidad del operador queda establecida exclusivamente por la posesión demostrable de una clave privada criptográfica. Este mecanismo se denomina <strong>Direct QR Handshake</strong>: un apretón de manos entre el dispositivo móvil soberano y la terminal web de escritorio, mediado por un código QR efímero y firmado con criptografía de curva elíptica.
         </p>
         <p>
-          Este diseño elimina la necesidad de contraseñas, correos electrónicos o bases de datos centralizadas. Toda la autorización ocurre puramente a través de criptografía de curva elíptica (ECDSA), garantizando que solo el poseedor genuino de las llaves privadas pueda acceder al nivel institucional del sistema.
+          A diferencia de los sistemas de autenticación de dos factores convencionales, no existe un tercero de confianza, no existe una base de datos de sesiones remotas y no existe ningún secreto compartido persistente. Cada acceso es una prueba matemática de identidad independiente.
         </p>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 mt-6 border border-black/15 shadow-sm bg-[#f5f4ef]">
-          {/* Mobile Panel */}
-          <div className="flex flex-col border-b border-r border-black/10 bg-[#FDFCF8]">
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Panel Móvil — Dispositivo Soberano</span>
-              <span className="font-mono text-[7px] uppercase tracking-widest text-[#00C076]">● Enclave Activo</span>
+      </div>
+
+      {/* Protocol Steps */}
+      <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
+        {steps.map((step, i) => (
+          <div key={step.phase} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch hover:bg-[#f5f4ef] transition-colors duration-200">
+            <div className="w-full sm:w-[120px] bg-[#f5f4ef] border-b sm:border-b-0 sm:border-r border-black/10 flex flex-col items-center justify-center p-4 shrink-0">
+              <span className="font-mono text-[20px] font-black text-black/20 leading-none">
+                {step.phase}
+              </span>
             </div>
-            <img src="/ios-android-hq.jpg" alt="Panel Móvil iOS/Android del Terminal Soberano" className="w-full h-auto object-cover" style={{aspectRatio:"16/9"}} />
-          </div>
-          {/* Whale Post */}
-          <div className="flex flex-col border-b border-black/10 bg-[#FDFCF8]">
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Señal Whale — Firma Criptográfica</span>
-              <span className="font-mono text-[7px] uppercase tracking-widest text-black/40">ECDSA · secp256k1</span>
+            <div className="flex-1 p-5 flex flex-col gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <span className="font-mono text-[10px] font-black uppercase tracking-widest text-black">
+                  {step.label}
+                </span>
+                <span className="font-mono text-[8px] uppercase tracking-widest text-black/40 bg-black/5 px-2 py-0.5 self-start sm:self-auto">
+                  {step.protocol}
+                </span>
+              </div>
+              <p className="font-serif text-[12px] sm:text-[13px] text-[#333] leading-[1.8] text-justify">
+                {step.detail}
+              </p>
             </div>
-            <img src="/ballena-checkpoint.png" alt="Whale Alert Network — Señal Institucional Verificada" className="w-full h-auto object-contain bg-[#FDFCF8] p-6" style={{aspectRatio:"16/9"}} />
           </div>
-          {/* Verified Ledger */}
-          <div className="flex flex-col border-r border-black/10 bg-[#FDFCF8]">
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Ledger Verificado — Identidad Institucional</span>
-              <span className="font-mono text-[7px] uppercase tracking-widest text-black/40">SHA-256 · Inmutable</span>
-            </div>
-            <img src="/corporate-logo.jpg" alt="Identidad Corporativa Verificada — Whale Alert Network" className="w-full h-auto object-cover" style={{aspectRatio:"16/9"}} />
-          </div>
-          {/* Audit Logs */}
-          <div className="flex flex-col bg-[#FDFCF8]">
-            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Logs de Auditoría — Monitor en Tiempo Real</span>
-              <span className="font-mono text-[7px] uppercase tracking-widest text-[#00C076]">● Live</span>
-            </div>
-            <img src="/downhead-hq.jpg" alt="Audit Logs — Telemetría de Red en Tiempo Real" className="w-full h-auto object-cover" style={{aspectRatio:"16/9"}} />
-          </div>
+        ))}
+      </div>
+
+      {/* Technical Specs */}
+      <div className="flex flex-col gap-0">
+        <div className="border-b border-black pb-2 mb-0">
+          <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/50 font-bold">
+            Parámetros Técnicos del Protocolo
+          </span>
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[1px] bg-black/10 border border-black/10 border-t-0">
+          {specs.map((spec) => (
+            <div key={spec.key} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch">
+              <div className="w-full sm:w-[190px] bg-[#f5f4ef] border-b sm:border-b-0 sm:border-r border-black/8 px-4 py-3 flex items-center shrink-0">
+                <span className="font-mono text-[8px] uppercase tracking-wider text-black/50 font-bold">
+                  {spec.key}
+                </span>
+              </div>
+              <div className="flex-1 px-4 py-3 flex items-center">
+                <span className="font-mono text-[10px] text-black font-black tracking-wide">
+                  {spec.value}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Security Note */}
+      <div className="border-l-2 border-black pl-4 flex flex-col gap-1.5">
+        <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/40 font-bold">
+          Nota de Seguridad
+        </span>
+        <p className="font-serif text-[12px] text-[#444] leading-relaxed text-justify">
+          La firma producida por el dispositivo móvil es verificable públicamente pero no revela información alguna sobre la clave privada del operador. El servidor únicamente almacena la dirección de billetera pública derivada. Cualquier intento de reproducir una sesión antigua es bloqueado automáticamente por el sistema de nonces de un solo uso y la ventana de validez de 90 segundos.
+        </p>
       </div>
     </section>
   );
 }
+
