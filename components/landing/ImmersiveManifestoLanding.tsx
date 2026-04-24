@@ -102,19 +102,21 @@ const HISTORIC_EVENTS = [
   { date: "Mar 2020", code: "BITMEX-034", title: "BitMEX Liquidaciones — $1B en 1 Hora", text: "Durante el crash del COVID, BitMEX procesa $1B en liquidaciones forzadas en menos de 60 minutos, acelerando el colapso del mercado. La plataforma luego es acusada por el DOJ de operar sin licencia AML. El caso paradigmático del riesgo de los exchanges derivativos sin regulación." },
   { date: "May 2010", code: "FLASH-035", title: "Flash Crash de 2010 — 1,000 Puntos en Minutos", text: "El Dow Jones cae casi 1,000 puntos en minutos por algoritmos de HFT en reacción en cadena. El evento expuso la fragilidad sistémica del mercado de valores moderno dominado por trading algorítmico. La SEC implementó circuit breakers tras el evento." },
   { date: "Feb 2021", code: "GAME-036", title: "GameStop Gamma Squeeze — r/WallStreetBets vs Hedge Funds", text: "Pequeños inversores coordinados en Reddit ejecutan un short squeeze masivo contra fondos de cobertura. GameStop sube 2,400% en semanas. Melvin Capital pierde $6.8B. Robinhood suspende las compras, exponiendo cómo la regulación protege al capital institucional frente al minorista." },
-  { date: "Aug 2022", code: "TORNADO-038", title: "Sanción de Tornado Cash por la OFAC", text: "El gobierno de EE.UU. sanciona por primera vez contratos inteligentes inmutables en cadena. El desarrollador Roman Storm fue arrestado. La acción marca el inicio de la era de represalia regulatoria sobre privacidad criptográfica." },
-  { date: "May 2022", code: "BEANSTALK-039", title: "Hack de Beanstalk — $182M por Flash Loan Governance Attack", text: "Un atacante ejecuta un préstamo flash de $1B, adquiere temporalmente el control de la gobernanza del protocolo en una única transacción y drena $182M en activos. El ataque más sofisticado en DeFi hasta la fecha." },
-  { date: "Mar 2022", code: "RONIN-040", title: "Hack del Ronin Bridge — $625M Robados", text: "Hackers vinculados al grupo Lazarus de Corea del Norte comprometen 5 de 9 validadores del puente Ronin de Axie Infinity. $625M en ETH y USDC son robados. El mayor hack de la historia DeFi demostró que la descentralización no es binaria sino espectral." },
-  { date: "Oct 2021", code: "SQUID-041", title: "Squid Game Token — Rug Pull de $3.4M", text: "Un token SQUID basado en la popular serie Netflix colapsa 99.99% en segundos cuando sus creadores ejecutan un rug pull. El token subió 2,400% en horas antes del colapso. El caso más emblemático del ciclo de pump-and-dump alimentado por tendencias culturales virales." },
-  { date: "Dec 2021", code: "JUNO-042", title: "Crisis de Gobernanza de Juno Network", text: "La comunidad de Juno vota confiscar 3.3M tokens de un solo whale wallet sospechoso. La propuesta se ejecuta en blockchain y luego se descubre que afecta en parte a una wallet equivocada. La primera 'censura descentralizada' documentada en la historia del DAO." },
-  { date: "Nov 2022", code: "BINANCE-043", title: "CZ Revela Insolvencia FTX — El Tweet Catalizador", text: "CZ de Binance publica en Twitter la decisión de liquidar las posiciones de FTT. En 24 horas, $6.3B son retirados de FTX. El evento digital más costoso de la historia: un tweet que desencadenó la mayor corrida bancaria crypto jamás registrada." },
-  { date: "Jun 2023", code: "SEC-044", title: "La SEC Demanda a Binance y Coinbase", text: "La SEC presenta cargos contra los dos mayores exchanges del mundo en días consecutivos, calificando docenas de tokens como securities no registrados. El impacto regulatorio borra $100B en capitalización. El inicio del período de mayor presión regulatoria coordinada sobre crypto." },
-  { date: "Aug 2023", code: "XRP-045", title: "XRP No Es Security para Retail — Victoria Parcial", text: "La jueza Analisa Torres dictamina que las ventas de XRP al público no constituyen ofertas de securities bajo la ley Howey. La primera victoria legal de peso de la industria contra la SEC, reabriendo debates sobre la taxonomía regulatoria de activos digitales." },
-  { date: "Dec 2023", code: "BINDEPART-046", title: "CZ Se Declara Culpable — Multa de $4.3B a Binance", text: "Changpeng Zhao se declara culpable de violaciones AML y es sentenciado a 4 meses de prisión. Binance paga la mayor multa de la historia crypto: $4.3B al DOJ/FinCEN. El intercambio de mayor volumen del mundo es forzado a reestructurarse bajo supervisión federal." },
-  { date: "Mar 2024", code: "MEME-047", title: "El Ciclo MEME 2024 — Dogwifhat y BOME", text: "El mercado de los memecoins alcanza $65B de capitalización total. Dogwifhat sube 10,000%. Book of Meme captura $1B de market cap en 48 horas desde su lanzamiento. La mayor burbuja especulativa de activos sin utilidad intrínseca de la historia moderna del trading." },
-  { date: "Oct 2024", code: "EIGEN-048", title: "EigenLayer y el Riesgo Sistémico del Restaking", text: "EigenLayer lanza su token EIGEN con polémicas restricciones de transferibilidad. La promesa del restaking genera $15B en depósitos pero su modelo económico circular genera preocupaciones sistémicas que evocan directamente los CDOs colateralizados de la crisis de 2008." },
-  { date: "Nov 2024", code: "HYPERLIQ-049", title: "$200M Whale Exploit en Hyperliquid", text: "Un operador acumula una posición de $200M en JELLY ejecutando manipulación del precio fundacional y forzando al protocolo a asumir pérdidas sistémicas. El vault HLP pierde millones en horas. Revela la fragilidad de los DEX perpetuos con liquidez insuficiente en vaults primarios." },
-  { date: "Apr 2025", code: "TRUMP-050", title: "Aranceles Trump 2025 — Crypto Pierde $1T en Semanas", text: "El presidente Trump anuncia aranceles del 145% sobre importaciones chinas. El mercado crypto pierde $1T en capitalización en 10 días. Bitcoin cae de $109,000 a $74,000. La primera demostración escala masiva de que los activos digitales son altamente correlados con la geopolítica macroeconómica." },
+  { date: "Aug 2022", code: "TORNADO-037", title: "Sanción de Tornado Cash por la OFAC", text: "El gobierno de EE.UU. sanciona por primera vez contratos inteligentes inmutables en cadena. El desarrollador Roman Storm fue arrestado. La acción marca el inicio de la era de represalia regulatoria sobre privacidad criptográfica." },
+  { date: "May 2022", code: "BEANSTALK-038", title: "Hack de Beanstalk — $182M por Flash Loan Governance Attack", text: "Un atacante ejecuta un préstamo flash de $1B, adquiere temporalmente el control de la gobernanza del protocolo en una única transacción y drena $182M en activos. El ataque más sofisticado en DeFi hasta la fecha." },
+  { date: "Mar 2022", code: "RONIN-039", title: "Hack del Ronin Bridge — $625M Robados", text: "Hackers vinculados al grupo Lazarus de Corea del Norte comprometen 5 de 9 validadores del puente Ronin de Axie Infinity. $625M en ETH y USDC son robados. El mayor hack de la historia DeFi demostró que la descentralización no es binaria sino espectral." },
+  { date: "Oct 2021", code: "SQUID-040", title: "Squid Game Token — Rug Pull de $3.4M", text: "Un token SQUID basado en la popular serie Netflix colapsa 99.99% en segundos cuando sus creadores ejecutan un rug pull. El token subió 2,400% en horas antes del colapso. El caso más emblemático del ciclo de pump-and-dump alimentado por tendencias culturales virales." },
+  { date: "Dec 2021", code: "JUNO-041", title: "Crisis de Gobernanza de Juno Network", text: "La comunidad de Juno vota confiscar 3.3M tokens de un solo whale wallet sospechoso. La propuesta se ejecuta en blockchain y luego se descubre que afecta en parte a una wallet equivocada. La primera 'censura descentralizada' documentada en la historia del DAO." },
+  { date: "Nov 2022", code: "BINANCE-042", title: "CZ Revela Insolvencia FTX — El Tweet Catalizador", text: "CZ de Binance publica en Twitter la decisión de liquidar las posiciones de FTT. En 24 horas, $6.3B son retirados de FTX. El evento digital más costoso de la historia: un tweet que desencadenó la mayor corrida bancaria crypto jamás registrada." },
+  { date: "Jun 2023", code: "SEC-043", title: "La SEC Demanda a Binance y Coinbase", text: "La SEC presenta cargos contra los dos mayores exchanges del mundo en días consecutivos, calificando docenas de tokens como securities no registrados. El impacto regulatorio borra $100B en capitalización. El inicio del período de mayor presión regulatoria coordinada sobre crypto." },
+  { date: "Aug 2023", code: "XRP-044", title: "XRP No Es Security para Retail — Victoria Parcial", text: "La jueza Analisa Torres dictamina que las ventas de XRP al público no constituyen ofertas de securities bajo la ley Howey. La primera victoria legal de peso de la industria contra la SEC, reabriendo debates sobre la taxonomía regulatoria de activos digitales." },
+  { date: "Dec 2023", code: "BINDEPART-045", title: "CZ Se Declara Culpable — Multa de $4.3B a Binance", text: "Changpeng Zhao se declara culpable de violaciones AML y es sentenciado a 4 meses de prisión. Binance paga la mayor multa de la historia crypto: $4.3B al DOJ/FinCEN. El intercambio de mayor volumen del mundo es forzado a reestructurarse bajo supervisión federal." },
+  { date: "Mar 2024", code: "MEME-046", title: "El Ciclo MEME 2024 — Dogwifhat y BOME", text: "El mercado de los memecoins alcanza $65B de capitalización total. Dogwifhat sube 10,000%. Book of Meme captura $1B de market cap en 48 horas desde su lanzamiento. La mayor burbuja especulativa de activos sin utilidad intrínseca de la historia moderna del trading." },
+  { date: "Oct 2024", code: "EIGEN-047", title: "EigenLayer y el Riesgo Sistémico del Restaking", text: "EigenLayer lanza su token EIGEN con polémicas restricciones de transferibilidad. La promesa del restaking genera $15B en depósitos pero su modelo económico circular genera preocupaciones sistémicas que evocan directamente los CDOs colateralizados de la crisis de 2008." },
+  { date: "Nov 2024", code: "HYPERLIQ-048", title: "$200M Whale Exploit en Hyperliquid", text: "Un operador acumula una posición de $200M en JELLY ejecutando manipulación del precio fundacional y forzando al protocolo a asumir pérdidas sistémicas. El vault HLP pierde millones en horas. Revela la fragilidad de los DEX perpetuos con liquidez insuficiente en vaults primarios." },
+  { date: "Apr 2025", code: "TRUMP-049", title: "Aranceles Trump 2025 — Crypto Pierde $1T en Semanas", text: "El presidente Trump anuncia aranceles del 145% sobre importaciones chinas. El mercado crypto pierde $1T en capitalización en 10 días. Bitcoin cae de $109,000 a $74,000. La primera demostración escala masiva de que los activos digitales son altamente correlados con la geopolítica macroeconómica." },
+  { date: "Apr 2025", code: "BYBIT-050", title: "Hack de Bybit — $1.4B Robados por Lazarus Group", text: "El grupo norcoreano Lazarus compromete la infraestructura de firma multi-sig de Bybit, sustrayendo $1.4B en stETH y tokens derivados en una sola transacción. El mayor robo de la historia del crédito digital, superando el hack de Ronin. Demostró que incluso exchanges tier-1 con custodia institucional son vulnerables a ataques de ingeniería social avanzada sobre firmantes humanos." },
+  { date: "Mar 2025", code: "DOGE-051", title: "DOGE Gov Tokenomics — Especulación Política a $95B", text: "La oficialización del 'Departamento de Eficiencia Gubernamental' impulsado por Elon Musk genera una narrativa especulativa que catapulta Dogecoin a una capitalización de $95B sin fundamento técnico. El caso más claro de que el poder geopolítico amplifica activos digitales al margen de sus fundamentos on-chain." },
 ];
 
 const LEFT_SIDEBAR_CONTENT = [
@@ -453,22 +455,38 @@ function ScannerDocumentation() {
           Este diseño elimina la necesidad de contraseñas, correos electrónicos o bases de datos centralizadas. Toda la autorización ocurre puramente a través de criptografía de curva elíptica (ECDSA), garantizando que solo el poseedor genuino de las llaves privadas pueda acceder al nivel institucional del sistema.
         </p>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Mobile Panel</span>
-            <img src="/dashboard-bg.jpg" alt="Mobile Panel" className="w-full h-auto aspect-video object-cover grayscale mix-blend-multiply opacity-80" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 mt-6 border border-black/15 shadow-sm bg-[#f5f4ef]">
+          {/* Mobile Panel */}
+          <div className="flex flex-col border-b border-r border-black/10 bg-[#FDFCF8]">
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
+              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Panel Móvil — Dispositivo Soberano</span>
+              <span className="font-mono text-[7px] uppercase tracking-widest text-[#00C076]">● Enclave Activo</span>
+            </div>
+            <img src="/ios-android-hq.jpg" alt="Panel Móvil iOS/Android del Terminal Soberano" className="w-full h-auto object-cover" style={{aspectRatio:"16/9"}} />
           </div>
-          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Whale Post</span>
-            <img src="/official-whale-vector.png" alt="Whale Post" className="w-full h-auto aspect-video object-contain grayscale mix-blend-multiply opacity-80" />
+          {/* Whale Post */}
+          <div className="flex flex-col border-b border-black/10 bg-[#FDFCF8]">
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
+              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Señal Whale — Firma Criptográfica</span>
+              <span className="font-mono text-[7px] uppercase tracking-widest text-black/40">ECDSA · secp256k1</span>
+            </div>
+            <img src="/ballena-checkpoint.png" alt="Whale Alert Network — Señal Institucional Verificada" className="w-full h-auto object-contain bg-[#FDFCF8] p-6" style={{aspectRatio:"16/9"}} />
           </div>
-          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Verified Ledger</span>
-            <img src="/landing-bg.jpg" alt="Verified Ledger" className="w-full h-auto aspect-video object-cover grayscale mix-blend-multiply opacity-80" />
+          {/* Verified Ledger */}
+          <div className="flex flex-col border-r border-black/10 bg-[#FDFCF8]">
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
+              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Ledger Verificado — Identidad Institucional</span>
+              <span className="font-mono text-[7px] uppercase tracking-widest text-black/40">SHA-256 · Inmutable</span>
+            </div>
+            <img src="/corporate-logo.jpg" alt="Identidad Corporativa Verificada — Whale Alert Network" className="w-full h-auto object-cover" style={{aspectRatio:"16/9"}} />
           </div>
-          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Audit Logs</span>
-            <img src="/peakpx.jpg" alt="Audit Logs" className="w-full h-auto aspect-video object-cover grayscale mix-blend-multiply opacity-80" />
+          {/* Audit Logs */}
+          <div className="flex flex-col bg-[#FDFCF8]">
+            <div className="flex items-center justify-between px-3 py-1.5 border-b border-black/10 bg-[#f5f4ef]">
+              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/50 font-bold">Logs de Auditoría — Monitor en Tiempo Real</span>
+              <span className="font-mono text-[7px] uppercase tracking-widest text-[#00C076]">● Live</span>
+            </div>
+            <img src="/downhead-hq.jpg" alt="Audit Logs — Telemetría de Red en Tiempo Real" className="w-full h-auto object-cover" style={{aspectRatio:"16/9"}} />
           </div>
         </div>
       </div>
