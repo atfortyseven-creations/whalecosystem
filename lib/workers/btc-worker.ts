@@ -1,16 +1,16 @@
 // lib/workers/btc-worker.ts
-// Worker BTC — datos 100% on-chain vía Mempool.space + CoinGecko
-// Inteligencia Institucional Unificada
+// BTC Worker — 100% on-chain data via Mempool.space + CoinGecko
+// Unified Institutional Intelligence
 
 import { db } from '@/lib/db';
 
 const MEMPOOL_API   = 'https://mempool.space/api';
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
-const MIN_USD_VALUE = 50_000_000;   // $50M umbral institucional
-const POLL_INTERVAL = 60_000;       // revisar cada 60s
+const MIN_USD_VALUE = 50_000_000;   // $50M institutional threshold
+const POLL_INTERVAL = 60_000;       // review every 60s
 
-// ─── Mapa de entidades institucionales conocidas ─────────────────────────────
-// ─── Mapa de entidades institucionales conocidas con metadatos de élite ──────
+// ─── Map of known institutional entities ──────────────────────────────
+// ─── Map of known institutional entities with elite metadata ──────
 const INSTITUTIONAL_WALLETS: Record<string, { name: string; sector: string; confirmed: boolean }> = {
   'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh': { name: 'MicroStrategy', sector: 'CORPORATE', confirmed: true },
   '1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ':          { name: 'MicroStrategy', sector: 'CORPORATE', confirmed: true },
@@ -26,7 +26,7 @@ const INSTITUTIONAL_WALLETS: Record<string, { name: string; sector: string; conf
   '3K6m8sc9p68etajv983mqfghst0euhscck':          { name: 'MicroStrategy (Cold)', sector: 'CORPORATE', confirmed: true },
 };
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 interface MempoolTx {
   txid:   string;
   vin:    Array<{ prevout: { scriptpubkey_address: string; value: number } }>;
@@ -48,7 +48,7 @@ async function getBtcPriceUSD(): Promise<number> {
     );
     return data.bitcoin.usd;
   } catch {
-    return 65000; // Fallback razonable
+    return 65000; // Reasonable fallback
   }
 }
 
@@ -57,7 +57,7 @@ async function getLatestBlockHeight(): Promise<number> {
   return parseInt(await res.text(), 10);
 }
 
-// ─── Generador de Sovereign ID determinista ───────────────────────────────────
+// ─── Deterministic Sovereign ID Generator ───────────────────────────────────
 function generateSovereignId(txHash: string): string {
   const seg1 = txHash.slice(0, 4).toUpperCase();
   const seg2 = txHash.slice(4, 8).toUpperCase();
@@ -65,7 +65,7 @@ function generateSovereignId(txHash: string): string {
   return `SOV-${seg1}-${seg2}-${seg3}`;
 }
 
-// ─── Atribución Institucional ────────────────────────────────────────────────
+// ─── Institutional Attribution ────────────────────────────────────────────────
 function attributeTransaction(tx: MempoolTx) {
   const fromAddresses = tx.vin.map(v => v.prevout?.scriptpubkey_address).filter(Boolean);
   const toAddresses   = tx.vout.map(o => o.scriptpubkey_address).filter(Boolean);
@@ -86,7 +86,7 @@ function attributeTransaction(tx: MempoolTx) {
   return { entity: 'Unknown Whale', institutional: false, metadata: { sector: 'RETAIL' } };
 }
 
-// ─── Procesador ───────────────────────────────────────────────────────────────
+// ─── Processor ───────────────────────────────────────────────────────────────
 export async function scanBlock(height: number, btcPrice: number) {
   try {
     const blockHashRes = await fetch(`${MEMPOOL_API}/block-height/${height}`);
@@ -96,7 +96,7 @@ export async function scanBlock(height: number, btcPrice: number) {
     console.log(`[BTC-HISTORIAN] Scanning block ${height} (${txids.length} txns)`);
 
     // Batch processing
-    for (const txid of txids.slice(0, 500)) { // limitamos para no saturar en esta fase
+    for (const txid of txids.slice(0, 500)) { // limit to avoid saturation in this phase
       const tx = await fetchJson<MempoolTx>(`${MEMPOOL_API}/tx/${txid}`);
       const totalSats = tx.vout.reduce((sum, o) => sum + (o.value ?? 0), 0);
       const valueBTC  = totalSats / 1e8;
@@ -159,5 +159,5 @@ export async function initBtcHistorian() {
   };
 
   setInterval(tick, POLL_INTERVAL);
-  tick(); // Ejecución inmediata
+  tick(); // Immediate execution
 }

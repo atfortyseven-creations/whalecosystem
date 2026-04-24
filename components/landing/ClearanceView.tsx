@@ -103,7 +103,7 @@ export function ClearanceView({ onBack }: ClearanceViewProps) {
         whileHover={{ x: -4 }}
       >
         <ChevronLeft size={12} />
-        Regresar al Inicio
+        Return to Home
       </motion.button>
 
       <motion.div

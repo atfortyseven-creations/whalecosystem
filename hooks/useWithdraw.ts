@@ -22,7 +22,7 @@ export function useWithdraw() {
         amount: string     // El monto en texto, ej: "10.5"
     ) => {
         if (!address) throw new Error("No hay wallet conectada");
-        if (!proxyAddress) throw new Error("No se detectó la Proxy Wallet");
+        if (!proxyAddress) throw new Error("Proxy Wallet not detected");
 
         try {
             console.log("Iniciando retiro de:", amount, "USDC");

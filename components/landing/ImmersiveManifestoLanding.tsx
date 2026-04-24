@@ -39,137 +39,137 @@ const MANIFESTO_LOTTIES = [
 
 const IMMERSIVE_PAGES = [
   {
-    title: "I. El Origen del Sistema: Eliminando la Asimetría",
+    title: "I. The Origin of the System: Eliminating Asymmetry",
     paragraphs: [
-      "El ecosistema financiero descentralizado nació con la promesa de la transparencia. Sin embargo, la realidad demostró lo contrario: los grandes capitales operan con una ventaja informativa abrumadora, moviendo millones a través de redes y contratos privados antes de que el mercado minorista pueda reaccionar.",
-      "Para resolver esta disparidad, creamos Sovereign Terminal. Nuestra directiva fundacional fue clara: construir una infraestructura capaz de leer, decodificar y analizar el comportamiento de estos gigantes directamente desde la blockchain, sin depender de servidores centralizados ni oráculos manipulables.",
-      "Comenzamos desarrollando algoritmos de indexación en tiempo real. No nos bastaba con observar el volumen superficial; necesitábamos identificar exactamente la procedencia del capital, sus rotaciones internas y su destino final, capturándolo desde la mempool antes de su ejecución irreversible."
+      "The decentralized financial ecosystem was born with the promise of transparency. However, reality proved otherwise: large capital operates with an overwhelming informational advantage, moving millions through private networks and contracts before the retail market can react.",
+      "To resolve this disparity, we created Sovereign Terminal. Our foundational directive was clear: build an infrastructure capable of reading, decoding, and analyzing the behavior of these giants directly from the blockchain, without relying on centralized servers or manipulable oracles.",
+      "We began by developing real-time indexing algorithms. It was not enough to observe surface volume; we needed to identify exactly the origin of the capital, its internal rotations, and its final destination, capturing it from the mempool before its irreversible execution."
     ]
   },
   {
-    title: "II. Filtrado Estocástico y Privacidad Absoluta",
+    title: "II. Stochastic Filtering and Absolute Privacy",
     paragraphs: [
-      "Las cadenas de bloques generan un volumen masivo de ruido diario. Los exploradores convencionales se limitan a listar transferencias ininteligibles. Nosotros, en cambio, diseñamos un motor de indexación que filtra matemáticamente ese ruido, aislando únicamente las anomalías críticas que impactan la liquidez global.",
-      "Implementamos tecnología de pruebas de Conocimiento Cero (ZK-SNARKs) para garantizar la privacidad matemática pura. Nuestros operadores pueden consultar movimientos y billeteras específicas sin revelar jamás sus estrategias de vigilancia al sistema. Una infraestructura verdaderamente impenetrable.",
-      "Esta arquitectura modular nos permitió expandir nuestro rastreo desde Ethereum hacia redes de escalabilidad (Rollups) y puentes inter-cadena, detectando movimientos tácticos horas antes de que la liquidez consolide su destino."
+      "Blockchains generate a massive volume of daily noise. Conventional explorers merely list unintelligible transfers. We, instead, designed an indexing engine that mathematically filters that noise, isolating only the critical anomalies that impact global liquidity.",
+      "We implemented Zero-Knowledge proof technology (ZK-SNARKs) to guarantee pure mathematical privacy. Our operators can query specific movements and wallets without ever revealing their surveillance strategies to the system. A truly impenetrable infrastructure.",
+      "This modular architecture allowed us to expand our tracking from Ethereum to scalability networks (Rollups) and cross-chain bridges, detecting tactical movements hours before liquidity consolidates its destination."
     ]
   },
   {
-    title: "III. Consolidación de la Red de Inteligencia",
+    title: "III. Consolidation of the Intelligence Network",
     paragraphs: [
-      "Con el núcleo operativo establecido, el siguiente paso fue interpretar los datos. Integramos modelos heurísticos avanzados para desofuscar y etiquetar entidades oscuras. Hoy, nuestro sistema identifica automáticamente miles de plataformas, fondos institucionales y atacantes conocidos.",
-      "Cuando una entidad intenta camuflar su capital fragmentándolo en cientos de billeteras menores, nuestro motor algorítmico agrupa esas transacciones y revela la firma conductual subyacente, exponiendo la magnitud real de la maniobra.",
-      "Sovereign Terminal es hoy el estándar definitivo de inteligencia en cadena. Proveemos la infraestructura necesaria para operar con la misma precisión, velocidad y claridad que las élites financieras globales, asegurando la verdadera soberanía técnica."
+      "With the operational core established, the next step was to interpret the data. We integrated advanced heuristic models to de-obfuscate and label dark entities. Today, our system automatically identifies thousands of platforms, institutional funds, and known attackers.",
+      "When an entity attempts to camouflage its capital by fragmenting it into hundreds of smaller wallets, our algorithmic engine groups those transactions and reveals the underlying behavioral signature, exposing the true magnitude of the maneuver.",
+      "Sovereign Terminal is today the definitive standard of on-chain intelligence. We provide the infrastructure necessary to operate with the same precision, speed, and clarity as global financial elites, ensuring true technical sovereignty."
     ]
   }
 ];
 
 // ── 50 Historic Catastrophic Crypto & Finance Events ──────────────────────
 const HISTORIC_EVENTS = [
-  { date: "Oct 1929", code: "BLACK-001", title: "Crac del 29 — Jueves Negro", text: "La desintegración del 89% del Dow Jones Industrial Average en tres años, evaporando garantías hipotecarias y aniquilando 14 millones de empleos en EE.UU. El mayor colapso bursátil del siglo XX, preludio directo de la Gran Depresión global." },
-  { date: "Aug 1971", code: "NIXON-002", title: "Nixon Shock — Fin del Patrón Oro", text: "Richard Nixon suprime unilateralmente la convertibilidad dólar-oro, destruyendo el sistema Bretton Woods. El orden monetario mundial mutó hacia una flotación libre de monedas fiduciarias sin respaldo intrínseco. El mayor reajuste del poder de compra global del siglo moderno." },
-  { date: "Oct 1987", code: "BLACK-003", title: "Lunes Negro 1987 — Colapso Algorítmico", text: "El Dow Jones cae un 22.6% en un solo día. Los programas de 'portfolio insurance' disparan ventas en cascada por lógica algorítmica. Primer crash causado sistemáticamente por software automatizado, premonición directa de los flash crashes del siglo XXI." },
-  { date: "Sep 1992", code: "SOROS-004", title: "La Ruptura del Sistema Monetario Europeo", text: "George Soros apostó $10B contra la libra esterlina forzando su expulsión del ERM. La devaluación forzosa del Banco de Inglaterra acumuló pérdidas de £3.4B en un solo día. Demostración empírica de que los especuladores privados pueden superar la capacidad de defensa de los bancos centrales soberanos." },
-  { date: "Dec 1994", code: "PESO-005", title: "Crisis del Peso Mexicano — El Error de Diciembre", text: "La devaluación abrupta del peso desencadenó una fuga de capitales salvaje desde los mercados emergentes. El efecto Tequila infectó los mercados de Argentina, Brasil y el Sudeste Asiático. El FMI requirió un rescate de $50B para evitar el default soberano completo." },
-  { date: "Jul 1997", code: "ASIA-006", title: "Crisis Financiera Asiática", text: "El colapso del baht tailandés detonó un contagio que colapsó las monedas de Indonesia, Corea del Sur y Malasia. El FMI impuso ajustes de austeridad que exterminaron clases medias enteras. El PIB de Indonesia cayó un 13.7% en un año: el mayor contracción económica desde la Segunda Guerra Mundial en la región." },
-  { date: "Aug 1998", code: "RUSIA-007", title: "Default Soberano de Rusia", text: "Moscow repudió $40B en deuda gubernamental interna (GKOs), devaluó el rublo y moratorizó los pagos a acreedores privados extranjeros. El colapso arrastró al hedge fund LTCM al borde del abismo sistémico, requiring una operación de rescate coordinada por la Fed de New York para evitar el contagio global." },
-  { date: "Sep 1998", code: "LTCM-008", title: "La Implosión de Long-Term Capital Management", text: "Un fondo con dos premios Nobel en su consejo directivo perdió $4.6B en semanas por el colapso de sus modelos matemáticos de arbitraje. La Fed orquestó un rescate privado de $3.65B de 14 bancos para evitar que su liquidación forzada colapsara los mercados de bonos globales." },
-  { date: "Mar 2000", code: "DOTCOM-009", title: "Estallido de la Burbuja Punto-Com", text: "El NASDAQ pierde el 78% de su valor entre 2000 y 2002. Empresas valoradas en miles de millones sin ingresos reales se evaporan en meses. Webvan, Pets.com y Boo.com queman $2T en capital especulativo. El mayor destructor de riqueza tecnológica del milenio hasta la llegada de las ICOs." },
-  { date: "Sep 2001", code: "911-010", title: "Cierre de la Bolsa de Nueva York Post-11S", text: "La NYSE cierra durante 6 días hábiles consecutivos, el período más largo desde 1933. Al reabrir, el Dow Jones pierde $1.4T en valor de mercado en una sola semana. El primer evento terrorista con consecuencias sistémicas sobre la arquitectura financiera global moderna." },
-  { date: "Sep 2008", code: "LEH-011", title: "Quiebra de Lehman Brothers", text: "La mayor bancarrota corporativa de la historia: $613B en deuda. El colapso del banco de inversión con 158 años de historia congeló el crédito interbancario mundial en cuestión de horas, provocando el mayor rescate financiero gubernamental de la historia: $700B solo en EE.UU." },
-  { date: "Oct 2008", code: "BAIL-012", title: "El Rescate TARP — Socialización de Pérdidas Privadas", text: "El gobierno estadounidense inyecta $700B en bancos privados insolventes con dinero de los contribuyentes. La paradoja fundacional del capitalismo moderno: los beneficios son privados, los colapsos son públicos. El evento que inspiró directamente el Bloque Génesis de Bitcoin con el mensaje de Satoshi." },
-  { date: "Jan 2009", code: "BTC-013", title: "Génesis de Bitcoin — El Bloque 0", text: "Satoshi Nakamoto embute en el primer bloque de la cadena un mensaje periodístico sobre el segundo rescate de los bancos británicos, declarando la guerra a la finanza centralizada. El nacimiento de la primera moneda digital verdaderamente descentralizada, inalterable y sin custodio central." },
-  { date: "May 2010", code: "PIZZA-014", title: "La Pizza de Bitcoin — 10,000 BTC", text: "Laszlo Hanyecz paga 10,000 BTC por dos pizzas, la primera transacción comercial documentada en Bitcoin. Al precio máximo histórico alcanzado en 2024, esa pizza equivaldría a $680 millones. El evento de asignación de valor más mítico en la historia de la economía digital." },
-  { date: "Mar 2013", code: "CYPRUS-015", title: "Crisis Bancaria de Chipre — Corralito Digital", text: "El BCE y el FMI imponen un 'bail-in' sobre los depósitos bancarios chipriotas superiores a €100,000. El gobierno graba con un 9.9% los ahorros de los ciudadanos para salvar los bancos. La demanda de Bitcoin se disparó 300% en Europa en 72 horas." },
-  { date: "Apr 2013", code: "BTC-016", title: "Primer Gran Crash de Bitcoin — $266 a $50", text: "El primer mercado bajista severo de Bitcoin. El precio colapsa desde $266 a $50 en horas tras la sobrecarga del exchange Mt. Gox durante un pico de demanda sin precedentes. El primer crash generado por infraestructura centralizada deficiente en un mercado descentralizado." },
-  { date: "Feb 2014", code: "GOXZERO-017", title: "Mt. Gox Colapsa — 850,000 BTC Robados", text: "El exchange que procesaba el 70% del volumen global de Bitcoin anuncia la pérdida de 850,000 BTC (≈$450M en ese momento). Las claves privadas fueron extraídas durante años sin detección. El evento fundacional que demostró que la custodia centralizada es irreconciliable con la soberanía criptográfica." },
-  { date: "Aug 2015", code: "CHINA-018", title: "Lunes Negro Chino — Flash Crash del Shanghai Composite", text: "El índice bursátil de Shanghái pierde el 8.49% en un día, borrando $3.2T en valor de mercado. El gobierno chino interviene con compras masivas de emergencia. El evento provocó una cadena de colapsos globales que afectó a 19 bolsas en un mismo día." },
-  { date: "Jun 2016", code: "DAO-019", title: "El Ataque al DAO y el Hard Fork de Ethereum", text: "Un atacante drena 3.6 millones de ETH explotando una vulnerabilidad de reentrada en el contrato The DAO. La comunidad de Ethereum decide revertir la cadena mediante hard fork, dividiendo el ecosistema en ETH y ETC. La primera crisis existencial de la gobernanza descentralizada." },
-  { date: "Jan 2018", code: "ICO-020", title: "El Gran Estallido ICO — Fin del Boom", text: "El mercado de ICOs alcanza $6.3B recaudados en 2017 para colapsar un 90%+ en 2018. Proyectos sin productos reales ni equipos verificables evaporan miles de millones. La SEC emite advertencias masivas y cierra operaciones fraudulentas. El eco moderno de la burbuja punto-com." },
-  { date: "Dec 2017", code: "BCASH-021", title: "La Gran Bifurcación de Bitcoin — BCH vs BTC", text: "La guerra civil de Bitcoin culmina en el hard fork que genera Bitcoin Cash. La disputa sobre el tamaño del bloque divide a la comunidad, los mineros y los exchanges. El precio de BTC colapsa 45% en tres semanas, demostrando la fragilidad geopolítica de la gobernanza descentralizada." },
-  { date: "Nov 2018", code: "BCHSV-022", title: "La Guerra de Hashing BCH/BSV", text: "Craig Wright y Roger Ver lanzan una guerra de minería destructiva para imponer su versión del protocolo. El costo de la 'guerra de hash' destruye miles de millones de rentabilidad de mineros, con ambas cadenas sufriendo reorganizaciones y cero confirmaciones durante días." },
-  { date: "Mar 2020", code: "COVIDCRASH-023", title: "Jueves Negro Covid — Bitcoin cae 50% en 24h", text: "El 12 de marzo de 2020, Bitcoin pierde el 50% de su valor en un solo día de trading, cayendo de $8,000 a $4,000. Las liquidaciones en cascada de posiciones apalancadas en derivados destruyeron $1B en menos de una hora. El mayor crash porcentual en un solo día desde 2013." },
-  { date: "Apr 2021", code: "TURKEY-024", title: "Colapso de la Lira Turca — Fuga hacia Crypto", text: "La lira turca pierde el 44% de su valor en 2021 tras la decisión del presidente Erdoğan de despedir al gobernador del banco central. El volumen de trading de USDTRY en exchanges de crypto se dispara 1,200%. La primera hiperinflación soberana donde el refugio masivo fue digital." },
-  { date: "May 2021", code: "CHINABAN-025", title: "China Prohíbe Todas las Transacciones Crypto", text: "Beijing prohíbe a instituciones financieras procesar transacciones de criptomonedas y fuerza el cierre de operaciones de minado. El hashrate global de Bitcoin colapsa un 50%. El mayor choque regulatorio de la historia del mercado, demostrando la resiliencia descentralizada: la red se recuperó en 3 meses." },
-  { date: "May 2022", code: "LUNA-026", title: "El Colapso de Terra/LUNA — $60B Evaporados", text: "El algoritmo de la stablecoin UST colapsa en espiral de muerte. LUNA pasa de $80 a $0.0001 en 72 horas. $60B en capitalización se evaporan, arrastran decenas de fondos de venture capital y causan el contagio más devastador en el ecosistema DeFi de la historia." },
-  { date: "Jun 2022", code: "3AC-027", title: "Insolvencia de Three Arrows Capital", text: "El hedge fund criptográfico más grande del mundo colapsa con $3.5B en deudas. Su exposición masiva a LUNA y a productos de rendimiento estructurado tipo stETH/ETH trigger margin calls imposibles de cubrir. El efecto dominó destruyó a Voyager Digital, BlockFi y Genesis en semanas." },
-  { date: "Jun 2022", code: "CELSIUS-028", title: "Celsius Bloquea los Retiros — 1.7M Usuarios Atrapados", text: "La plataforma de préstamos congela todos los retiros, swaps y transferencias. 1.7 millones de usuarios no pueden acceder a sus fondos durante meses en pleno proceso de bancarrota. La mayor captura de capital minorista de la historia del crédito criptográfico." },
-  { date: "Nov 2022", code: "FTX-029", title: "El Colapso de FTX — El Escándalo Maestro", text: "Sam Bankman-Fried diseña una arquitectura opaca donde Alameda Research accede libremente a los depósitos de clientes de FTX. $8B en fondos de usuarios son utilizados para trading propio. El mayor fraude corporativo desde Enron, terminando con SBF arrestado en las Bahamas." },
-  { date: "Nov 2022", code: "CONTAGIO-030", title: "El Contagio Post-FTX — BlockFi, Genesis, Gemini", text: "La quiebra de FTX inicia una reacción en cadena. BlockFi declara bancarrota con $1.2B de exposición a FTX. Genesis congela retiros. Gemini suspende su producto Earn. El mercado pierde $200B en capitalización en dos semanas. La mayor crisis de confianza sistémica en la historia del ecosistema." },
-  { date: "Mar 2023", code: "SVB-031", title: "Colapso de Silicon Valley Bank — Detonante Bancario", text: "SVB colapsa en 48 horas con $175B en depósitos, la segunda mayor quiebra bancaria en historia americana. Circle (USDC) revela $3.3B atrapados en SVB. USDC desacopla al $0.87, generando pánico en todo DeFi. El contagio financiero tradicional invade el ecosistema descentralizado." },
-  { date: "Jan 2024", code: "ETFBUY-032", title: "Aprobación ETF Bitcoin Spot EE.UU. — El Gran Influx", text: "La SEC aprueba los primeros ETFs de Bitcoin spot en EE.UU. tras años de resistencia. BlackRock, Fidelity y Invesco absorben $12B en los primeros 30 días. El mayor flujo de capital institucional hacia un activo digital en la historia financiera moderna." },
-  { date: "Apr 2024", code: "HALVING-033", title: "Cuarto Halving de Bitcoin — Recompensa a 3.125 BTC", text: "El nuevo halving reduce la emisión de Bitcoin a 3.125 BTC por bloque. Por primera vez, las comisiones de transacción superan la recompensa en bloque durante el período de alta congestión, marcando la transición estructural hacia una economía de fees pura." },
-  { date: "Mar 2020", code: "BITMEX-034", title: "BitMEX Liquidaciones — $1B en 1 Hora", text: "Durante el crash del COVID, BitMEX procesa $1B en liquidaciones forzadas en menos de 60 minutos, acelerando el colapso del mercado. La plataforma luego es acusada por el DOJ de operar sin licencia AML. El caso paradigmático del riesgo de los exchanges derivativos sin regulación." },
-  { date: "May 2010", code: "FLASH-035", title: "Flash Crash de 2010 — 1,000 Puntos en Minutos", text: "El Dow Jones cae casi 1,000 puntos en minutos por algoritmos de HFT en reacción en cadena. El evento expuso la fragilidad sistémica del mercado de valores moderno dominado por trading algorítmico. La SEC implementó circuit breakers tras el evento." },
-  { date: "Feb 2021", code: "GAME-036", title: "GameStop Gamma Squeeze — r/WallStreetBets vs Hedge Funds", text: "Pequeños inversores coordinados en Reddit ejecutan un short squeeze masivo contra fondos de cobertura. GameStop sube 2,400% en semanas. Melvin Capital pierde $6.8B. Robinhood suspende las compras, exponiendo cómo la regulación protege al capital institucional frente al minorista." },
-  { date: "Aug 2022", code: "TORNADO-037", title: "Sanción de Tornado Cash por la OFAC", text: "El gobierno de EE.UU. sanciona por primera vez contratos inteligentes inmutables en cadena. El desarrollador Roman Storm fue arrestado. La acción marca el inicio de la era de represalia regulatoria sobre privacidad criptográfica." },
-  { date: "May 2022", code: "BEANSTALK-038", title: "Hack de Beanstalk — $182M por Flash Loan Governance Attack", text: "Un atacante ejecuta un préstamo flash de $1B, adquiere temporalmente el control de la gobernanza del protocolo en una única transacción y drena $182M en activos. El ataque más sofisticado en DeFi hasta la fecha." },
-  { date: "Mar 2022", code: "RONIN-039", title: "Hack del Ronin Bridge — $625M Robados", text: "Hackers vinculados al grupo Lazarus de Corea del Norte comprometen 5 de 9 validadores del puente Ronin de Axie Infinity. $625M en ETH y USDC son robados. El mayor hack de la historia DeFi demostró que la descentralización no es binaria sino espectral." },
-  { date: "Oct 2021", code: "SQUID-040", title: "Squid Game Token — Rug Pull de $3.4M", text: "Un token SQUID basado en la popular serie Netflix colapsa 99.99% en segundos cuando sus creadores ejecutan un rug pull. El token subió 2,400% en horas antes del colapso. El caso más emblemático del ciclo de pump-and-dump alimentado por tendencias culturales virales." },
-  { date: "Dec 2021", code: "JUNO-041", title: "Crisis de Gobernanza de Juno Network", text: "La comunidad de Juno vota confiscar 3.3M tokens de un solo whale wallet sospechoso. La propuesta se ejecuta en blockchain y luego se descubre que afecta en parte a una wallet equivocada. La primera 'censura descentralizada' documentada en la historia del DAO." },
-  { date: "Nov 2022", code: "BINANCE-042", title: "CZ Revela Insolvencia FTX — El Tweet Catalizador", text: "CZ de Binance publica en Twitter la decisión de liquidar las posiciones de FTT. En 24 horas, $6.3B son retirados de FTX. El evento digital más costoso de la historia: un tweet que desencadenó la mayor corrida bancaria crypto jamás registrada." },
-  { date: "Jun 2023", code: "SEC-043", title: "La SEC Demanda a Binance y Coinbase", text: "La SEC presenta cargos contra los dos mayores exchanges del mundo en días consecutivos, calificando docenas de tokens como securities no registrados. El impacto regulatorio borra $100B en capitalización. El inicio del período de mayor presión regulatoria coordinada sobre crypto." },
-  { date: "Aug 2023", code: "XRP-044", title: "XRP No Es Security para Retail — Victoria Parcial", text: "La jueza Analisa Torres dictamina que las ventas de XRP al público no constituyen ofertas de securities bajo la ley Howey. La primera victoria legal de peso de la industria contra la SEC, reabriendo debates sobre la taxonomía regulatoria de activos digitales." },
-  { date: "Dec 2023", code: "BINDEPART-045", title: "CZ Se Declara Culpable — Multa de $4.3B a Binance", text: "Changpeng Zhao se declara culpable de violaciones AML y es sentenciado a 4 meses de prisión. Binance paga la mayor multa de la historia crypto: $4.3B al DOJ/FinCEN. El intercambio de mayor volumen del mundo es forzado a reestructurarse bajo supervisión federal." },
-  { date: "Mar 2024", code: "MEME-046", title: "El Ciclo MEME 2024 — Dogwifhat y BOME", text: "El mercado de los memecoins alcanza $65B de capitalización total. Dogwifhat sube 10,000%. Book of Meme captura $1B de market cap en 48 horas desde su lanzamiento. La mayor burbuja especulativa de activos sin utilidad intrínseca de la historia moderna del trading." },
-  { date: "Oct 2024", code: "EIGEN-047", title: "EigenLayer y el Riesgo Sistémico del Restaking", text: "EigenLayer lanza su token EIGEN con polémicas restricciones de transferibilidad. La promesa del restaking genera $15B en depósitos pero su modelo económico circular genera preocupaciones sistémicas que evocan directamente los CDOs colateralizados de la crisis de 2008." },
-  { date: "Nov 2024", code: "HYPERLIQ-048", title: "$200M Whale Exploit en Hyperliquid", text: "Un operador acumula una posición de $200M en JELLY ejecutando manipulación del precio fundacional y forzando al protocolo a asumir pérdidas sistémicas. El vault HLP pierde millones en horas. Revela la fragilidad de los DEX perpetuos con liquidez insuficiente en vaults primarios." },
-  { date: "Apr 2025", code: "TRUMP-049", title: "Aranceles Trump 2025 — Crypto Pierde $1T en Semanas", text: "El presidente Trump anuncia aranceles del 145% sobre importaciones chinas. El mercado crypto pierde $1T en capitalización en 10 días. Bitcoin cae de $109,000 a $74,000. La primera demostración escala masiva de que los activos digitales son altamente correlados con la geopolítica macroeconómica." },
-  { date: "Apr 2025", code: "BYBIT-050", title: "Hack de Bybit — $1.4B Robados por Lazarus Group", text: "El grupo norcoreano Lazarus compromete la infraestructura de firma multi-sig de Bybit, sustrayendo $1.4B en stETH y tokens derivados en una sola transacción. El mayor robo de la historia del crédito digital, superando el hack de Ronin. Demostró que incluso exchanges tier-1 con custodia institucional son vulnerables a ataques de ingeniería social avanzada sobre firmantes humanos." },
-  { date: "Mar 2025", code: "DOGE-051", title: "DOGE Gov Tokenomics — Especulación Política a $95B", text: "La oficialización del 'Departamento de Eficiencia Gubernamental' impulsado por Elon Musk genera una narrativa especulativa que catapulta Dogecoin a una capitalización de $95B sin fundamento técnico. El caso más claro de que el poder geopolítico amplifica activos digitales al margen de sus fundamentos on-chain." },
+  { date: "Oct 1929", code: "BLACK-001", title: "Crash of '29 — Black Thursday", text: "The disintegration of 89% of the Dow Jones Industrial Average over three years, evaporating mortgage guarantees and annihilating 14 million jobs in the US. The greatest stock market collapse of the 20th century, a direct prelude to the global Great Depression." },
+  { date: "Aug 1971", code: "NIXON-002", title: "Nixon Shock — End of the Gold Standard", text: "Richard Nixon unilaterally suppresses dollar-gold convertibility, destroying the Bretton Woods system. The global monetary order mutated towards a free float of fiat currencies with no intrinsic backing. The greatest readjustment of global purchasing power in the modern century." },
+  { date: "Oct 1987", code: "BLACK-003", title: "Black Monday 1987 — Algorithmic Collapse", text: "The Dow Jones falls 22.6% in a single day. 'Portfolio insurance' programs trigger cascading sales via algorithmic logic. The first crash systematically caused by automated software, a direct premonition of the flash crashes of the 21st century." },
+  { date: "Sep 1992", code: "SOROS-004", title: "The Breaking of the European Monetary System", text: "George Soros bet $10B against the British pound, forcing its expulsion from the ERM. The forced devaluation of the Bank of England accumulated losses of £3.4B in a single day. Empirical proof that private speculators can overcome the defense capacity of sovereign central banks." },
+  { date: "Dec 1994", code: "PESO-005", title: "Mexican Peso Crisis — The December Mistake", text: "The abrupt devaluation of the peso triggered a savage capital flight from emerging markets. The Tequila effect infected the markets of Argentina, Brazil, and Southeast Asia. The IMF required a $50B bailout to prevent complete sovereign default." },
+  { date: "Jul 1997", code: "ASIA-006", title: "Asian Financial Crisis", text: "The collapse of the Thai baht detonated a contagion that collapsed the currencies of Indonesia, South Korea, and Malaysia. The IMF imposed austerity adjustments that exterminated entire middle classes. Indonesia's GDP fell 13.7% in one year: the largest economic contraction since WWII in the region." },
+  { date: "Aug 1998", code: "RUSSIA-007", title: "Russian Sovereign Default", text: "Moscow repudiated $40B in internal government debt (GKOs), devalued the ruble, and suspended payments to foreign private creditors. The collapse dragged the hedge fund LTCM to the edge of the systemic abyss, requiring a coordinated bailout operation by the NY Fed to prevent global contagion." },
+  { date: "Sep 1998", code: "LTCM-008", title: "The Implosion of Long-Term Capital Management", text: "A fund with two Nobel laureates on its board lost $4.6B in weeks due to the collapse of its mathematical arbitrage models. The Fed orchestrated a $3.65B private bailout from 14 banks to prevent its forced liquidation from collapsing global bond markets." },
+  { date: "Mar 2000", code: "DOTCOM-009", title: "Burst of the Dot-Com Bubble", text: "The NASDAQ loses 78% of its value between 2000 and 2002. Companies valued in the billions with zero real revenue evaporate in months. Webvan, Pets.com, and Boo.com burn $2T in speculative capital. The greatest destroyer of technological wealth of the millennium until the arrival of ICOs." },
+  { date: "Sep 2001", code: "911-010", title: "Closure of the NYSE Post-9/11", text: "The NYSE closes for 6 consecutive business days, the longest period since 1933. Upon reopening, the Dow Jones loses $1.4T in market value in a single week. The first terrorist event with systemic consequences on modern global financial architecture." },
+  { date: "Sep 2008", code: "LEH-011", title: "Bankruptcy of Lehman Brothers", text: "The largest corporate bankruptcy in history: $613B in debt. The collapse of the 158-year-old investment bank froze global interbank credit in a matter of hours, prompting the largest government financial bailout in history: $700B in the US alone." },
+  { date: "Oct 2008", code: "BAIL-012", title: "The TARP Bailout — Socialization of Private Losses", text: "The US government injects $700B into insolvent private banks with taxpayer money. The foundational paradox of modern capitalism: profits are private, collapses are public. The event that directly inspired the Bitcoin Genesis Block with Satoshi's message." },
+  { date: "Jan 2009", code: "BTC-013", title: "Bitcoin Genesis — Block 0", text: "Satoshi Nakamoto embeds a journalistic message about the second bailout of British banks into the first block of the chain, declaring war on centralized finance. The birth of the first truly decentralized, immutable digital currency without a central custodian." },
+  { date: "May 2010", code: "PIZZA-014", title: "The Bitcoin Pizza — 10,000 BTC", text: "Laszlo Hanyecz pays 10,000 BTC for two pizzas, the first documented commercial transaction in Bitcoin. At the all-time high reached in 2024, that pizza would equal $680 million. The most mythical value assignment event in the history of the digital economy." },
+  { date: "Mar 2013", code: "CYPRUS-015", title: "Cyprus Banking Crisis — Digital Corralito", text: "The ECB and the IMF impose a 'bail-in' on Cypriot bank deposits exceeding €100,000. The government taxes citizens' savings at 9.9% to save the banks. Bitcoin demand spiked 300% in Europe in 72 hours." },
+  { date: "Apr 2013", code: "BTC-016", title: "First Major Bitcoin Crash — $266 to $50", text: "The first severe Bitcoin bear market. The price collapses from $266 to $50 in hours following the overload of the Mt. Gox exchange during an unprecedented demand spike. The first crash generated by deficient centralized infrastructure in a decentralized market." },
+  { date: "Feb 2014", code: "GOXZERO-017", title: "Mt. Gox Collapses — 850,000 BTC Stolen", text: "The exchange processing 70% of global Bitcoin volume announces the loss of 850,000 BTC (≈$450M at the time). Private keys were extracted for years without detection. The foundational event proving that centralized custody is irreconcilable with cryptographic sovereignty." },
+  { date: "Aug 2015", code: "CHINA-018", title: "Chinese Black Monday — Shanghai Composite Flash Crash", text: "The Shanghai stock index loses 8.49% in one day, erasing $3.2T in market value. The Chinese government intervenes with massive emergency purchases. The event provoked a chain of global collapses affecting 19 stock exchanges on the same day." },
+  { date: "Jun 2016", code: "DAO-019", title: "The DAO Hack and the Ethereum Hard Fork", text: "An attacker drains 3.6 million ETH exploiting a reentrancy vulnerability in The DAO contract. The Ethereum community decides to revert the chain via hard fork, splitting the ecosystem into ETH and ETC. The first existential crisis of decentralized governance." },
+  { date: "Jan 2018", code: "ICO-020", title: "The Great ICO Burst — End of the Boom", text: "The ICO market reaches $6.3B raised in 2017 only to collapse 90%+ in 2018. Projects with no real products or verifiable teams evaporate billions. The SEC issues massive warnings and shuts down fraudulent operations. The modern echo of the dot-com bubble." },
+  { date: "Dec 2017", code: "BCASH-021", title: "The Great Bitcoin Fork — BCH vs BTC", text: "The Bitcoin civil war culminates in the hard fork generating Bitcoin Cash. The dispute over block size divides the community, miners, and exchanges. BTC price collapses 45% in three weeks, demonstrating the geopolitical fragility of decentralized governance." },
+  { date: "Nov 2018", code: "BCHSV-022", title: "The BCH/BSV Hash War", text: "Craig Wright and Roger Ver launch a destructive mining war to impose their protocol version. The cost of the 'hash war' destroys billions in miner profitability, with both chains suffering reorganizations and zero confirmations for days." },
+  { date: "Mar 2020", code: "COVIDCRASH-023", title: "Covid Black Thursday — Bitcoin Drops 50% in 24h", text: "On March 12, 2020, Bitcoin loses 50% of its value in a single trading day, falling from $8,000 to $4,000. Cascading liquidations of leveraged derivative positions destroyed $1B in less than an hour. The largest single-day percentage crash since 2013." },
+  { date: "Apr 2021", code: "TURKEY-024", title: "Collapse of the Turkish Lira — Flight to Crypto", text: "The Turkish lira loses 44% of its value in 2021 following President Erdoğan's decision to fire the central bank governor. USDTRY trading volume on crypto exchanges spikes 1,200%. The first sovereign hyperinflation where the mass refuge was digital." },
+  { date: "May 2021", code: "CHINABAN-025", title: "China Bans All Crypto Transactions", text: "Beijing prohibits financial institutions from processing cryptocurrency transactions and forces the shutdown of mining operations. Global Bitcoin hashrate collapses 50%. The largest regulatory shock in market history, demonstrating decentralized resilience: the network recovered in 3 months." },
+  { date: "May 2022", code: "LUNA-026", title: "The Terra/LUNA Collapse — $60B Evaporated", text: "The UST stablecoin algorithm collapses in a death spiral. LUNA goes from $80 to $0.0001 in 72 hours. $60B in market cap evaporates, dragging down dozens of venture capital funds and causing the most devastating contagion in DeFi history." },
+  { date: "Jun 2022", code: "3AC-027", title: "Insolvency of Three Arrows Capital", text: "The world's largest crypto hedge fund collapses with $3.5B in debt. Its massive exposure to LUNA and structured yield products like stETH/ETH triggers unmeetable margin calls. The domino effect destroyed Voyager Digital, BlockFi, and Genesis in weeks." },
+  { date: "Jun 2022", code: "CELSIUS-028", title: "Celsius Halts Withdrawals — 1.7M Users Trapped", text: "The lending platform freezes all withdrawals, swaps, and transfers. 1.7 million users are unable to access their funds for months during bankruptcy proceedings. The largest capture of retail capital in crypto credit history." },
+  { date: "Nov 2022", code: "FTX-029", title: "The FTX Collapse — The Master Scandal", text: "Sam Bankman-Fried designs an opaque architecture where Alameda Research freely accesses FTX customer deposits. $8B in user funds are used for proprietary trading. The largest corporate fraud since Enron, ending with SBF arrested in the Bahamas." },
+  { date: "Nov 2022", code: "CONTAGIO-030", title: "Post-FTX Contagion — BlockFi, Genesis, Gemini", text: "The FTX bankruptcy initiates a chain reaction. BlockFi declares bankruptcy with $1.2B exposure to FTX. Genesis freezes withdrawals. Gemini suspends its Earn product. The market loses $200B in market cap in two weeks. The greatest crisis of systemic trust in ecosystem history." },
+  { date: "Mar 2023", code: "SVB-031", title: "Collapse of Silicon Valley Bank — Banking Detonator", text: "SVB collapses in 48 hours with $175B in deposits, the second-largest bank failure in US history. Circle (USDC) reveals $3.3B trapped in SVB. USDC depegs to $0.87, generating panic across DeFi. Traditional financial contagion invades the decentralized ecosystem." },
+  { date: "Jan 2024", code: "ETFBUY-032", title: "US Spot Bitcoin ETF Approval — The Great Influx", text: "The SEC approves the first spot Bitcoin ETFs in the US after years of resistance. BlackRock, Fidelity, and Invesco absorb $12B in the first 30 days. The largest flow of institutional capital into a digital asset in modern financial history." },
+  { date: "Apr 2024", code: "HALVING-033", title: "Fourth Bitcoin Halving — Reward to 3.125 BTC", text: "The new halving reduces Bitcoin issuance to 3.125 BTC per block. For the first time, transaction fees exceed the block reward during a period of high congestion, marking the structural transition towards a pure fee economy." },
+  { date: "Mar 2020", code: "BITMEX-034", title: "BitMEX Liquidations — $1B in 1 Hour", text: "During the COVID crash, BitMEX processes $1B in forced liquidations in less than 60 minutes, accelerating the market collapse. The platform is later accused by the DOJ of operating without an AML license. The paradigmatic case of the risk of unregulated derivative exchanges." },
+  { date: "May 2010", code: "FLASH-035", title: "2010 Flash Crash — 1,000 Points in Minutes", text: "The Dow Jones falls nearly 1,000 points in minutes due to HFT algorithms in a chain reaction. The event exposed the systemic fragility of the modern stock market dominated by algorithmic trading. The SEC implemented circuit breakers following the event." },
+  { date: "Feb 2021", code: "GAME-036", title: "GameStop Gamma Squeeze — r/WallStreetBets vs Hedge Funds", text: "Small investors coordinated on Reddit execute a massive short squeeze against hedge funds. GameStop rises 2,400% in weeks. Melvin Capital loses $6.8B. Robinhood suspends purchases, exposing how regulation protects institutional capital against retail." },
+  { date: "Aug 2022", code: "TORNADO-037", title: "OFAC Sanction of Tornado Cash", text: "The US government sanctions immutable on-chain smart contracts for the first time. Developer Roman Storm was arrested. The action marks the beginning of the era of regulatory retaliation against cryptographic privacy." },
+  { date: "May 2022", code: "BEANSTALK-038", title: "Beanstalk Hack — $182M via Flash Loan Governance Attack", text: "An attacker executes a $1B flash loan, temporarily acquires protocol governance control in a single transaction, and drains $182M in assets. The most sophisticated attack in DeFi to date." },
+  { date: "Mar 2022", code: "RONIN-039", title: "Ronin Bridge Hack — $625M Stolen", text: "Hackers linked to North Korea's Lazarus Group compromise 5 of 9 validators of Axie Infinity's Ronin bridge. $625M in ETH and USDC are stolen. The largest hack in DeFi history proved that decentralization is not binary but spectral." },
+  { date: "Oct 2021", code: "SQUID-040", title: "Squid Game Token — $3.4M Rug Pull", text: "A SQUID token based on the popular Netflix series collapses 99.99% in seconds when its creators execute a rug pull. The token rose 2,400% in hours before collapsing. The most emblematic case of the pump-and-dump cycle fueled by viral cultural trends." },
+  { date: "Dec 2021", code: "JUNO-041", title: "Juno Network Governance Crisis", text: "The Juno community votes to confiscate 3.3M tokens from a single suspicious whale wallet. The proposal is executed on-chain, and it is later discovered that it partially affected the wrong wallet. The first documented 'decentralized censorship' in DAO history." },
+  { date: "Nov 2022", code: "BINANCE-042", title: "CZ Reveals FTX Insolvency — The Catalyst Tweet", text: "Binance's CZ tweets the decision to liquidate FTT positions. In 24 hours, $6.3B is withdrawn from FTX. The most expensive digital event in history: a tweet that triggered the largest crypto bank run ever recorded." },
+  { date: "Jun 2023", code: "SEC-043", title: "The SEC Sues Binance and Coinbase", text: "The SEC files charges against the world's two largest exchanges on consecutive days, classifying dozens of tokens as unregistered securities. The regulatory impact erases $100B in market cap. The beginning of the period of highest coordinated regulatory pressure on crypto." },
+  { date: "Aug 2023", code: "XRP-044", title: "XRP Is Not a Security for Retail — Partial Victory", text: "Judge Analisa Torres rules that XRP sales to the public do not constitute securities offerings under the Howey test. The industry's first major legal victory against the SEC, reopening debates on the regulatory taxonomy of digital assets." },
+  { date: "Dec 2023", code: "BINDEPART-045", title: "CZ Pleads Guilty — $4.3B Fine for Binance", text: "Changpeng Zhao pleads guilty to AML violations and is sentenced to 4 months in prison. Binance pays the largest fine in crypto history: $4.3B to the DOJ/FinCEN. The world's highest-volume exchange is forced to restructure under federal supervision." },
+  { date: "Mar 2024", code: "MEME-046", title: "The 2024 MEME Cycle — Dogwifhat and BOME", text: "The memecoin market reaches a total market cap of $65B. Dogwifhat rises 10,000%. Book of Meme captures $1B in market cap in 48 hours from launch. The largest speculative bubble of assets without intrinsic utility in modern trading history." },
+  { date: "Oct 2024", code: "EIGEN-047", title: "EigenLayer and the Systemic Risk of Restaking", text: "EigenLayer launches its EIGEN token with controversial transferability restrictions. The promise of restaking generates $15B in deposits, but its circular economic model generates systemic concerns directly evoking the collateralized CDOs of the 2008 crisis." },
+  { date: "Nov 2024", code: "HYPERLIQ-048", title: "$200M Whale Exploit on Hyperliquid", text: "A trader accumulates a $200M position in JELLY executing foundational price manipulation and forcing the protocol to assume systemic losses. The HLP vault loses millions in hours. Reveals the fragility of perpetual DEXs with insufficient liquidity in primary vaults." },
+  { date: "Apr 2025", code: "TRUMP-049", title: "2025 Trump Tariffs — Crypto Loses $1T in Weeks", text: "President Trump announces 145% tariffs on Chinese imports. The crypto market loses $1T in market cap in 10 days. Bitcoin falls from $109,000 to $74,000. The first massive-scale demonstration that digital assets are highly correlated with macroeconomic geopolitics." },
+  { date: "Apr 2025", code: "BYBIT-050", title: "Bybit Hack — $1.4B Stolen by Lazarus Group", text: "The North Korean Lazarus group compromises Bybit's multi-sig signing infrastructure, stealing $1.4B in stETH and derivative tokens in a single transaction. The largest theft in digital credit history, surpassing the Ronin hack. Proved that even tier-1 exchanges with institutional custody are vulnerable to advanced social engineering attacks on human signers." },
+  { date: "Mar 2025", code: "DOGE-051", title: "DOGE Gov Tokenomics — Political Speculation to $95B", text: "The officialization of the 'Department of Government Efficiency' promoted by Elon Musk generates a speculative narrative catapulting Dogecoin to a $95B market cap with no technical foundation. The clearest case that geopolitical power amplifies digital assets regardless of their on-chain fundamentals." },
 ];
 
 const LEFT_SIDEBAR_CONTENT = [
   {
-    title: "Desfalco de Mt. Gox (2014)",
-    text: "El paroxismo originario de la fragilidad del custodio centralizado. Al delegar la custodia de ochocientas cincuenta mil unidades de Bitcoin a una infraestructura de servidores tradicional con bases de datos SQL mutables, la asimetría de seguridad derivó en la sustracción silente y prolongada del setenta por ciento del volumen global. Postulado fundacional absoluto: la posesión algorítmica fidedigna es inexistente fuera de las claves privadas criptográficas."
+    title: "Mt. Gox Embezzlement (2014)",
+    text: "The original paroxysm of centralized custodian fragility. By delegating the custody of eight hundred and fifty thousand Bitcoin units to traditional server infrastructure with mutable SQL databases, the security asymmetry led to the silent and prolonged theft of seventy percent of the global volume. Absolute foundational postulate: reliable algorithmic possession is non-existent outside of cryptographic private keys."
   },
   {
-    title: "Espiral de Muerte de Terra/LUNA (2022)",
-    text: "La demostración empírica del fracaso matemático de las stablecoins algorítmicas subcolateralizadas. Fomentados por reservas de fe en lugar de inmutabilidad matemática sobredimensionada, los anclajes de valor colapsaron bajo presión hiperbólica, evaporando sesenta mil millones de capital fiduciario en setenta y dos horas. Revela crudamente que la economía cibernética no sobrevive al apalancamiento sin anclas tangibles en capa cero."
+    title: "Terra/LUNA Death Spiral (2022)",
+    text: "The empirical demonstration of the mathematical failure of undercollateralized algorithmic stablecoins. Fostered by reserves of faith rather than oversized mathematical immutability, the value pegs collapsed under hyperbolic pressure, evaporating sixty billion in fiat capital in seventy-two hours. Crudely reveals that the cyber economy does not survive leverage without tangible anchors at layer zero."
   },
   {
-    title: "Colapso del Imperio FTX (2022)",
-    text: "El cenit global de la opacidad institucional en el siglo XXI. Operando tras una falsa cortina de regulación, la rehipotecación algorítmica del capital de los usuarios mediante 'puertas traseras' en el código base tradicional facilitó la dilapidación abismal de reservas. Esta implosión sistemática purificó el ecosistema, evidenciando que sin herramientas de transparencia on-chain y liquidación determinista, los oráculos humanos caen en depravación."
+    title: "Collapse of the FTX Empire (2022)",
+    text: "The global zenith of institutional opacity in the 21st century. Operating behind a false curtain of regulation, the algorithmic rehypothecation of user capital through 'backdoors' in traditional codebase facilitated the abysmal squandering of reserves. This systematic implosion purified the ecosystem, evidencing that without on-chain transparency tools and deterministic settlement, human oracles fall into depravity."
   },
   {
-    title: "La Caída de Celsius Network (2022)",
-    text: "El espejismo del rendimiento perpétuo. La rehipotecación en cascada de activos minoristas en protocolos exóticos sin contingencia de liquidez desembocó en insolvencia matemática inmediata. Evidencia taxativa de que la opacidad del balance off-chain invariablemente enmascara riesgos catastróficos si no hay respaldos deterministas públicamente auditables."
+    title: "The Fall of Celsius Network (2022)",
+    text: "The mirage of perpetual yield. The cascading rehypothecation of retail assets in exotic protocols with no liquidity contingency resulted in immediate mathematical insolvency. Taxative evidence that off-chain balance sheet opacity invariably masks catastrophic risks if there are no publicly auditable deterministic backings."
   },
   {
-    title: "El Cisma de Tornado Cash (2022)",
-    text: "Intervención a nivel estado en la capa de protocolo. La sanción a contratos inteligentes inmutables por la OFAC demostró la latencia coercitiva de las jurisdicciones fiduciarias sobre desarrolladores de código abierto. Un preludio a la batalla final por la privacidad algorítmica, demostrando que verdaderas redes criptográficas requieren ofuscación irremediablemente cifrada."
+    title: "The Tornado Cash Schism (2022)",
+    text: "State-level intervention at the protocol layer. The OFAC sanction of immutable smart contracts demonstrated the coercive latency of fiat jurisdictions over open-source developers. A prelude to the final battle for algorithmic privacy, proving that true cryptographic networks require irremediably encrypted obfuscation."
   },
   {
-    title: "Saturación del Consenso Central (2024)",
-    text: "El monopolio progresivo de la validación. Plataformas dominantes de Liquid Staking aglomeraron cotas críticas del poder confirmatorio de la red principal, evidenciando la inherente vulnerabilidad paulatina del Proof-of-Stake frente a carteles oligopólicos de capitalización. Un recordatorio drástico de que los ecosistemas de élite tienden hacia asimetrías de poder cuasi-feudales de no mediar sistemas de corrección."
+    title: "Central Consensus Saturation (2024)",
+    text: "The progressive monopoly of validation. Dominant Liquid Staking platforms amassed critical levels of the main network's confirmatory power, evidencing the inherent gradual vulnerability of Proof-of-Stake against oligopolistic capitalization cartels. A drastic reminder that elite ecosystems lean towards quasi-feudal power asymmetries without correction systems."
   }
 ];
 
 const RIGHT_SIDEBAR_CONTENT = [
   {
-    title: "Bifurcación de The DAO (2016)",
-    text: "El evento de fisura más profundo en la axiomática del 'Código es Ley'. Tras la recolección masiva de Ether en la naciente Máquina Virtual de Ethereum, un ataque por reentrada de funciones drenó severamente el contrato maestro. La corrección requirió una amputación brutal mediante bifurcación dura (Hard Fork), alterando para siempre la génesis de la red y exponiendo la inmadurez biológica de la lógica computacional inmutable pura."
+    title: "The DAO Fork (2016)",
+    text: "The deepest fissure event in the 'Code is Law' axiomatic. Following the massive collection of Ether in the nascent Ethereum Virtual Machine, a reentrancy attack severely drained the master contract. The correction required a brutal amputation via Hard Fork, forever altering the genesis of the network and exposing the biological immaturity of pure immutable computational logic."
   },
   {
-    title: "Extracción del Ronin Bridge (2022)",
-    text: "El siniestro absoluto por la ilusión de la descentralización. Un puente de escalabilidad cedió más de seiscientos millones de dólares porque su autoridad matemática residía en un esquema M-de-N extremadamente precario (cinco de nueve validadores). Al comprometer las firmas mediante vectores de ataque de ingeniería social corporativa, se desmanteló por completo la narrativa subyacente de seguridad distribuida real."
+    title: "The Ronin Bridge Extraction (2022)",
+    text: "The absolute disaster caused by the illusion of decentralization. A scalability bridge yielded over six hundred million dollars because its mathematical authority resided in an extremely precarious M-of-N scheme (five of nine validators). By compromising the signatures through corporate social engineering attack vectors, the underlying narrative of true distributed security was completely dismantled."
   },
   {
-    title: "La Fisura de Wormhole (2022)",
-    text: "El clímax de vulnerabilidad en la topología poli-cadena (Cross-chain). Mediante la falsificación algorítmica de atestaciones y la elusión de validaciones triviales en los contratos inteligentes de puenteo, la arquitectura sufrió una sustracción inmediata de gran magnitud sin contramedidas reactivas posibles. Concluyendo definitivamente que los vectores poli-cadena elevan la entropía sistémica exponencialmente si no se auditan a prueba de abismos."
+    title: "The Wormhole Fissure (2022)",
+    text: "The climax of vulnerability in poly-chain (Cross-chain) topology. Through the algorithmic falsification of attestations and the bypass of trivial validations in bridge smart contracts, the architecture suffered an immediate large-scale theft with no reactive countermeasures possible. Definitively concluding that poly-chain vectors elevate systemic entropy exponentially if not audited against the abyss."
   },
   {
-    title: "La Anomalía Nomad (2022)",
-    text: "Decadencia técnica en puentes de enrutamiento cross-chain. Una configuración paramétrica nula de variables en la rutina de validación de Merkle permitió el primer saqueo masivo de extracción colectiva descentralizada ('crowdsourced'). Una advertencia draconiana testificando empíricamente que cualquier abstracción superflua en la criptografía transfiere valor infinito directamente al vacío basal."
+    title: "The Nomad Anomaly (2022)",
+    text: "Technical decay in cross-chain routing bridges. A null parametric configuration of variables in the Merkle validation routine allowed the first massive decentralized crowdsourced extraction. A draconian warning testifying empirically that any superfluous abstraction in cryptography transfers infinite value directly to the basal void."
   },
   {
-    title: "Desacoplamiento de USDC (2023)",
-    text: "El contagio residual del mecanismo de reserva fraccionaria clásica. La sobredependencia de tesorería hacia entidades fiduciarias (Silicon Valley Bank) socavó temporalmente la paridad absoluta de la stablecoin hegemónica del ecosistema. Una comprobación taxativa: toda conjunción vinculante, por sutil que fuese, con las fallas de la banca analógica expone a la arquitectura on-chain al caos externo."
+    title: "USDC Depeg (2023)",
+    text: "The residual contagion of the classic fractional reserve mechanism. The over-reliance of the treasury on fiat entities (Silicon Valley Bank) temporarily undermined the absolute parity of the ecosystem's hegemonic stablecoin. A taxative verification: any binding conjunction, however subtle, with the flaws of analog banking exposes the on-chain architecture to external chaos."
   },
   {
-    title: "El Vacío de Iron Finance (2021)",
-    text: "La histeria irracional del arbitraje de sobreestabilización colateral. Un diseño tokenómico defectuoso detonó un bucle de retroalimentación puramente entrópico e hiperbólico, hundiendo el capital líquido y diluyendo el token de gobernanza en una deflación precipitada y letal. El suceso cristaliza de nuevo que el capital altamente eficiente es completamente agnóstico ante la narrativa carente de resiliencia empírica probada."
+    title: "The Iron Finance Void (2021)",
+    text: "The irrational hysteria of overstabilization collateral arbitrage. A defective tokenomic design detonated a purely entropic and hyperbolic feedback loop, sinking liquid capital and diluting the governance token in a precipitous and lethal deflation. The event crystallizes again that highly efficient capital is completely agnostic to a narrative lacking proven empirical resilience."
   }
 ];
 
@@ -184,7 +184,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
         <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
           <div className="border-b-[1.5px] border-black pb-2 mb-8">
             <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
-              Tracto I: Opacidad y Ruina
+              Tract I: Opacity & Ruin
             </h3>
           </div>
           <div className="flex flex-col gap-24">
@@ -207,7 +207,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
           
           <header className="flex flex-col gap-6 text-center mb-8">
           <h1 className="text-[32px] md:text-[42px] font-serif text-black leading-tight tracking-tight">
-            En la búsqueda de la <br/><span className="italic font-light">transparencia</span>
+            In the pursuit of <br/><span className="italic font-light">transparency</span>
           </h1>
           <div className="flex justify-center -mt-2 mb-2">
             <span className="text-[9px] font-mono font-bold uppercase tracking-[0.3em] text-black/30">
@@ -215,8 +215,8 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
             </span>
           </div>
           <p className="font-serif text-[13px] text-[#444] max-w-xl mx-auto leading-relaxed border-t border-b border-black/10 py-6">
-            Documento fundacional sobre la abstracción matemática pura, los mecanismos criptográficos de 
-            conocimiento cero y los paradigmas heurísticos deterministas que cimentan la infraestructura global inmutable.
+            Foundational document on pure mathematical abstraction, zero-knowledge cryptographic mechanisms, 
+            and deterministic heuristic paradigms that cement the immutable global infrastructure.
           </p>
         </header>
 
@@ -278,7 +278,7 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
         <aside className="hidden min-[1350px]:flex flex-col pt-36 w-[320px] shrink-0 sticky top-0 self-start max-h-screen overflow-y-auto no-scrollbar pb-12">
           <div className="border-b-[1.5px] border-black pb-2 mb-8">
             <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#555]">
-              Tracto II: Entropía Central
+              Tract II: Central Entropy
             </h3>
           </div>
           <div className="flex flex-col gap-24">
@@ -331,11 +331,11 @@ function CatastropheChronicle() {
   return (
     <section
       className="w-full max-w-[850px] shrink-0 pt-12 pb-16 flex flex-col"
-      aria-label="Crónica de Eventos Históricos Catastróficos"
+      aria-label="Chronicle of Historic Catastrophic Events"
     >
       <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end gap-4">
         <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-          CRÓNICA HISTÓRICA — 50 Eventos que Detonaron el Orden Financiero
+          HISTORICAL CHRONICLE — 50 Events that Detonated the Financial Order
         </h2>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-[1px] bg-black border border-black border-t-0 shadow-sm">
@@ -444,56 +444,56 @@ function ScannerDocumentation() {
   const steps = [
     {
       phase: "01",
-      label: "Generación del Desafío",
+      label: "Challenge Generation",
       protocol: "CHALLENGE · secp256k1",
-      detail: "El servidor genera un nonce criptográfico de 256 bits vinculado a la sesión activa del terminal de escritorio. Este desafío tiene una validez máxima de 90 segundos y es matemáticamente único: ningún otro dispositivo puede reutilizarlo ni anticiparlo.",
+      detail: "The server generates a 256-bit cryptographic nonce linked to the active session of the desktop terminal. This challenge has a maximum validity of 90 seconds and is mathematically unique: no other device can reuse or anticipate it.",
     },
     {
       phase: "02",
-      label: "Codificación QR Soberana",
+      label: "Sovereign QR Encoding",
       protocol: "QR · ECC Level H · URI Scheme",
-      detail: "El desafío se codifica en un código QR de alta corrección de errores (nivel H, hasta 30% de recuperación de datos). El URI embebido contiene el ID de sesión, el hash del desafío y el endpoint de resolución. La pantalla del terminal regenera el código cada 60 segundos de forma automática.",
+      detail: "The challenge is encoded in a high error-correction QR code (Level H, up to 30% data recovery). The embedded URI contains the session ID, the challenge hash, and the resolution endpoint. The terminal screen automatically regenerates the code every 60 seconds.",
     },
     {
       phase: "03",
-      label: "Firma ECDSA desde el Dispositivo Móvil",
+      label: "ECDSA Signature from Mobile Device",
       protocol: "ECDSA · EIP-191 · personal_sign",
-      detail: "El dispositivo móvil escanea el código con la cámara nativa del sistema operativo. La billetera soberana (MetaMask, Coinbase, Rainbow u otra compatible con WalletConnect v2) solicita al usuario una firma sobre el mensaje de desafío usando su clave privada. La clave privada nunca abandona el dispositivo: solo la firma resultante es transmitida.",
+      detail: "The mobile device scans the code with the native OS camera. The sovereign wallet (MetaMask, Coinbase, Rainbow, or any WalletConnect v2 compatible) prompts the user for a signature on the challenge message using their private key. The private key never leaves the device: only the resulting signature is transmitted.",
     },
     {
       phase: "04",
-      label: "Verificación On-Chain y Emisión de Sesión",
+      label: "On-Chain Verification & Session Issuance",
       protocol: "ecrecover · SHA3-Keccak · JWT",
-      detail: "El servidor recibe la firma, ejecuta `ecrecover` para derivar la dirección pública del firmante y la compara con la dirección registrada en la base de datos. Si coincide, se emite una cookie de sesión HTTPOnly con duración de 7 días. El terminal de escritorio es notificado por Server-Sent Events y se desbloquea en tiempo real.",
+      detail: "The server receives the signature, executes `ecrecover` to derive the signer's public address, and compares it against the registered database address. If it matches, an HTTPOnly session cookie is issued with a 7-day duration. The desktop terminal is notified via Server-Sent Events and unlocked in real-time.",
     },
   ];
 
   const specs = [
-    { key: "Algoritmo de Firma", value: "ECDSA · curva secp256k1" },
-    { key: "Hash del Mensaje", value: "Keccak-256 (SHA-3)" },
-    { key: "Estándar", value: "EIP-191 · personal_sign" },
-    { key: "Validez del Nonce", value: "90 segundos (ventana anti-replay)" },
-    { key: "Transporte de Sesión", value: "Cookie HTTPOnly · SameSite=Lax" },
-    { key: "Duración de Sesión", value: "7 días (renovable por re-firma)" },
-    { key: "Canal de Notificación", value: "Server-Sent Events (SSE)" },
-    { key: "Compatibilidad", value: "WalletConnect v2 · EIP-4361 (SIWE)" },
+    { key: "Signature Algorithm", value: "ECDSA · secp256k1 curve" },
+    { key: "Message Hash", value: "Keccak-256 (SHA-3)" },
+    { key: "Standard", value: "EIP-191 · personal_sign" },
+    { key: "Nonce Validity", value: "90 seconds (anti-replay window)" },
+    { key: "Session Transport", value: "HTTPOnly Cookie · SameSite=Lax" },
+    { key: "Session Duration", value: "7 days (renewable via re-signature)" },
+    { key: "Notification Channel", value: "Server-Sent Events (SSE)" },
+    { key: "Compatibility", value: "WalletConnect v2 · EIP-4361 (SIWE)" },
   ];
 
   return (
     <section className="w-full max-w-[850px] shrink-0 pt-12 pb-16 flex flex-col gap-8">
       <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end">
         <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-          Arquitectura del Escáner — Protocolo Direct Handshake
+          Scanner Architecture — Direct Handshake Protocol
         </h2>
       </div>
 
       {/* Intro */}
       <div className="flex flex-col gap-4 font-serif text-[13px] text-[#222] leading-relaxed text-justify">
         <p>
-          El sistema de autenticación del Sovereign Terminal no utiliza contraseñas, correos electrónicos ni bases de datos de credenciales. La identidad del operador queda establecida exclusivamente por la posesión demostrable de una clave privada criptográfica. Este mecanismo se denomina <strong>Direct QR Handshake</strong>: un apretón de manos entre el dispositivo móvil soberano y la terminal web de escritorio, mediado por un código QR efímero y firmado con criptografía de curva elíptica.
+          The Sovereign Terminal authentication system uses no passwords, no emails, and no credential databases. The operator's identity is established exclusively by the provable possession of a cryptographic private key. This mechanism is called the <strong>Direct QR Handshake</strong>: a handshake between the sovereign mobile device and the desktop web terminal, mediated by an ephemeral QR code signed with elliptic curve cryptography.
         </p>
         <p>
-          A diferencia de los sistemas de autenticación de dos factores convencionales, no existe un tercero de confianza, no existe una base de datos de sesiones remotas y no existe ningún secreto compartido persistente. Cada acceso es una prueba matemática de identidad independiente.
+          Unlike conventional two-factor authentication systems, there is no trusted third party, no remote session database, and no persistent shared secret. Each access is an independent mathematical proof of identity.
         </p>
       </div>
 
@@ -527,7 +527,7 @@ function ScannerDocumentation() {
       <div className="flex flex-col gap-0">
         <div className="border-b border-black pb-2 mb-0">
           <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/50 font-bold">
-            Parámetros Técnicos del Protocolo
+            Technical Parameters
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-[1px] bg-black/10 border border-black/10 border-t-0">
@@ -551,13 +551,12 @@ function ScannerDocumentation() {
       {/* Security Note */}
       <div className="border-l-2 border-black pl-4 flex flex-col gap-1.5">
         <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-black/40 font-bold">
-          Nota de Seguridad
+          Security Note
         </span>
         <p className="font-serif text-[12px] text-[#444] leading-relaxed text-justify">
-          La firma producida por el dispositivo móvil es verificable públicamente pero no revela información alguna sobre la clave privada del operador. El servidor únicamente almacena la dirección de billetera pública derivada. Cualquier intento de reproducir una sesión antigua es bloqueado automáticamente por el sistema de nonces de un solo uso y la ventana de validez de 90 segundos.
+          The signature produced by the mobile device is publicly verifiable but reveals no information whatsoever about the operator's private key. The server only stores the derived public wallet address. Any attempt to replay an old session is automatically blocked by the single-use nonce system and the 90-second validity window.
         </p>
       </div>
     </section>
   );
 }
-

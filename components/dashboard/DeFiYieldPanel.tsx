@@ -137,7 +137,7 @@ export default function DeFiYieldPanel() {
         } catch (e: any) {
             toast.error("Depósito Fallido", { 
                 id: `dep-${selected.pool}`,
-                description: e.message || "Usuario rechazó la transacción o falló la estimación de gas."
+                description: e.message || "User rejected the transaction or gas estimation failed."
             });
         } finally {
             setIsDepositing(false);

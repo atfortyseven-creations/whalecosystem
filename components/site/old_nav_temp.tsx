@@ -242,7 +242,7 @@ export function DropdownNav() {
                                 {!data ? (
                                     <div className="flex flex-col items-center justify-center h-full text-gray-400">
                                         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-2" />
-                                        Cargando...
+                                        Loading...
                                     </div>
                                 ) : notifications.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full text-gray-400">

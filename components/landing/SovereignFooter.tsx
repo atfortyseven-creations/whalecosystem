@@ -31,11 +31,11 @@ function FooterLink({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group relative font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-black/60 hover:text-black transition-colors duration-300 py-2 px-1"
+      className="group relative font-mono text-[9px] sm:text-[11px] tracking-[0.2em] uppercase text-black/60 hover:text-black transition-colors duration-300 py-2 px-1 whitespace-nowrap"
     >
       {children}
       {/* underline on hover */}
-      <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-[1.5px] bg-black/80 transition-all duration-300" />
+      <span className="absolute bottom-0 left-0 w-0 md:group-hover:w-full h-[1.5px] bg-black/80 transition-all duration-300" />
     </a>
   );
 }
@@ -79,9 +79,10 @@ export function SovereignFooter() {
             src="/olas-hokusai-4k.png"
             alt="Hokusai Waves 4K"
             fill
-            className="object-cover object-bottom opacity-90 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
+            className="object-cover object-bottom opacity-100 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
             sizes="100vw"
             quality={100}
+            unoptimized
             priority
           />
 
@@ -119,7 +120,7 @@ export function SovereignFooter() {
           )}
 
           {/* Fog gradient to ensure readability of text over waves at the bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-[85%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/85 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[60%] sm:h-[75%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/70 to-transparent pointer-events-none z-10" />
 
           {/* ═══ Footer Inner Body ═════════════════════════════════════════════ */}
           <div className="relative z-40 w-full max-w-[850px] mx-auto px-6 pb-12 flex flex-col items-center gap-8">
@@ -155,9 +156,9 @@ export function SovereignFooter() {
             </motion.div>
 
             {/* ─── Navigation Links (Glassmorphism Pill) ─────────────────────────────────── */}
-            <div className="relative z-50">
+            <div className="relative z-50 w-full max-w-lg mx-auto">
               <nav
-                className="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-12 gap-y-4 px-8 py-4 rounded-full bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-12 gap-y-3 px-4 sm:px-8 py-4 sm:py-4 rounded-3xl sm:rounded-full bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
                 aria-label="Footer navigation"
               >
                 <FooterLink href="/terms">Terms</FooterLink>

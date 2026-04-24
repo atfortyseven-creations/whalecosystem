@@ -41,7 +41,7 @@ export function useTransactionHandler() {
 
             const txValue = typeof txData.value === 'string' ? parseEther(txData.value) : txData.value;
 
-            toast.loading("Calculando gas de la transacción...", { id });
+            toast.loading("Calculating transaction gas...", { id });
             // 1. Perform safety estimation first (Elite Grade)
             const gas = await estimateGas(config, {
                 account: address,
@@ -50,7 +50,7 @@ export function useTransactionHandler() {
                 data: txData.data,
             });
 
-            toast.loading("Firma la transacción en tu wallet...", { id });
+            toast.loading("Sign the transaction in your wallet...", { id });
 
             // 2. Send transaction via Wagmi
             const hash = await sendTransaction(config, {
