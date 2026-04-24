@@ -198,7 +198,7 @@ function ScannedOverlay() {
           className="text-center space-y-0.5"
         >
           <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600">
-            ¡ Scanned !
+            Scanned!
           </p>
           <p className="text-[9px] font-medium uppercase tracking-widest text-black/30">
             Syncing terminal…
@@ -272,12 +272,12 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           body:    JSON.stringify({ address: addr }),
         });
         if (!res.ok) {
-          setErrMsg('Handshake fallido. Refresca el código QR en el PC.');
+          setErrMsg('Handshake failed. Refresh the QR code on your desktop terminal.');
           setStatus('error');
           return;
         }
       } else if (!addr) {
-        setErrMsg('Conecta tu wallet antes de escanear.');
+        setErrMsg('Connect your wallet before scanning.');
         setStatus('error');
         return;
       }
@@ -321,7 +321,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         }
       } catch (e2) {}
 
-      setErrMsg('Permiso de cámara requerido para el Sovereign Sync.');
+      setErrMsg('Camera permission required for Sovereign Sync.');
       setStatus('error');
       isInitingRef.current = false;
     }
@@ -375,7 +375,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       const decoded = await scanFileForQR(file);
       await handleSuccess(decoded);
     } catch {
-      setErrMsg('No se detectó un código QR válido en la imagen.');
+      setErrMsg('No valid QR code detected in the image.');
       setStatus('error');
     } finally {
       setFileLoading(false);
@@ -406,7 +406,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           <button
             onClick={onClose}
             className="absolute top-6 right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
-            aria-label="Cerrar scanner"
+            aria-label="Close scanner"
           >
             <X size={22} />
           </button>
@@ -436,7 +436,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                     : 'bg-white text-black/40 border-black/10 hover:border-black/20'
                 }`}
               >
-                <Camera size={13} /> Cámara
+                <Camera size={13} /> Camera
               </button>
               <button
                 onClick={() => setTab('file')}
@@ -446,7 +446,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                     : 'bg-white text-black/40 border-black/10 hover:border-black/20'
                 }`}
               >
-                <Upload size={13} /> Galería
+                <Upload size={13} /> Gallery
               </button>
             </div>
 
@@ -472,7 +472,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-10">
                         <Loader2 size={28} className="animate-spin text-white/40 mb-3" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-white/50">
-                          Iniciando cámara…
+                          Initializing camera...
                         </span>
                       </div>
                     )}
@@ -494,7 +494,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                         onClick={handleRetry}
                         className="text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2.5 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors"
                       >
-                        Reintentar
+                        Retry
                       </button>
                     </div>
                   )}
@@ -509,19 +509,19 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-[12px] font-black uppercase tracking-widest text-[#050505]">
-                      Subir imagen QR
+                      Upload QR Image
                     </p>
                     <p className="text-[10px] text-black/40 font-medium leading-relaxed max-w-[200px]">
-                      Selecciona una captura de pantalla del código QR del terminal PC.
+                      Select a screenshot of the QR code from your desktop terminal.
                     </p>
                   </div>
 
                   <label className="relative cursor-pointer">
                     <span className="flex items-center gap-2 px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-colors">
                       {fileLoading ? (
-                        <><Loader2 size={13} className="animate-spin" /> Procesando…</>
+                        <><Loader2 size={13} className="animate-spin" /> Processing...</>
                       ) : (
-                        <><Upload size={13} /> Seleccionar Imagen</>
+                        <><Upload size={13} /> Select Image</>
                       )}
                     </span>
                     <input
@@ -561,8 +561,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
             <div className="mt-6 text-center space-y-1">
               <p className="text-[11px] text-[#050505]/50 leading-relaxed font-semibold max-w-[280px]">
                 {tab === 'camera'
-                  ? 'Apunta la cámara al QR mostrado en el terminal PC para sincronizar al instante.'
-                  : 'Haz una captura del QR en el PC y súbela aquí si la cámara no está disponible.'}
+                  ? 'Point your camera at the QR code shown on the desktop terminal to sync instantly.'
+                  : 'Take a screenshot of the QR on your PC and upload it here if the camera is unavailable.'}
               </p>
             </div>
           </motion.div>

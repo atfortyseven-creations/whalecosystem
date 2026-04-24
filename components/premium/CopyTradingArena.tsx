@@ -80,7 +80,7 @@ export function CopyTradingArena() {
                 const positions = await fetchHLPositions(trader.address);
                 setTraderPositions(positions);
             } catch {
-                toast.error('No se pudieron cargar las posiciones del trader');
+                toast.error('Failed to load trader positions.');
             } finally {
                 setLoadingPositions(false);
             }
@@ -89,16 +89,16 @@ export function CopyTradingArena() {
 
     const handleCopy = async () => {
         if (!isConnected || !address) {
-            toast.error('Conecta tu wallet para copiar señales.');
+            toast.error('Connect your wallet to copy signals.');
             return;
         }
         if (!selectedTrader || traderPositions.length === 0) {
-            toast.error('Este trader no tiene posiciones abiertas en este momento.');
+            toast.error('This trader has no open positions at this time.');
             return;
         }
 
         setIsCopying(true);
-        const toastId = toast.loading('Firmando autorización de agente con tu wallet...');
+        const toastId = toast.loading('Signing agent authorization with your wallet...');
 
         try {
             // Build EIP-712 typed data for Hyperliquid agent authorisation
@@ -118,7 +118,7 @@ export function CopyTradingArena() {
             );
 
             // Sign the EIP-712 Agent authorization with user's wallet
-            toast.loading('Firma EIP-712 requerida en tu wallet...', { id: toastId });
+            toast.loading('EIP-712 signature required in your wallet...', { id: toastId });
 
             const signature = await signTypedDataAsync({
                 domain: typedData.domain as any,
@@ -127,7 +127,7 @@ export function CopyTradingArena() {
                 message: typedData.message,
             });
 
-            toast.loading('Enviando señal a Hyperliquid L1...', { id: toastId });
+            toast.loading('Routing signal to Hyperliquid L1...', { id: toastId });
 
             // Parse the EIP-712 signature into r, s, v components
             const sig = {
@@ -160,16 +160,16 @@ export function CopyTradingArena() {
                 || result?.response?.data?.statuses?.[0]?.filled?.oid?.toString()
                 || 'submitted';
 
-            toast.success('Señal enrutada a Hyperliquid', {
+            toast.success('Signal routed to Hyperliquid', {
                 id: toastId,
-                description: `Order ID: ${orderId}. Posición replicada en HL L1.`,
+                description: `Order ID: ${orderId}. Position replicated on HL L1.`,
             });
 
             setCopyResult({ orderId, hash: signature.slice(0, 42) });
         } catch (err: any) {
-            toast.error('Ejecución fallida', {
+            toast.error('Execution failed', {
                 id: toastId,
-                description: err.message || 'El usuario rechazó la firma o no hay fondos en Hyperliquid.',
+                description: err.message || 'User rejected the signature or insufficient funds in Hyperliquid.',
             });
         } finally {
             setIsCopying(false);
@@ -180,10 +180,10 @@ export function CopyTradingArena() {
         return (
             <div className="flex flex-col items-center justify-center p-12 bg-[#FAF9F6] border border-[#E5E5E5] rounded-[2rem] shadow-sm max-w-4xl mx-auto mt-8 space-y-4">
                 <AlertTriangle size={48} className="text-[#888888] opacity-50" />
-                <h3 className="text-xl font-black text-[#111111] uppercase tracking-tighter">WALLET NO CONECTADA</h3>
+                <h3 className="text-xl font-black text-[#111111] uppercase tracking-tighter">WALLET NOT CONNECTED</h3>
                 <p className="text-sm font-bold text-[#888888] text-center max-w-sm">
-                    Conecta tu wallet para autenticar la copia de señales de Hyperliquid L1.
-                    Debes tener USDC depositado en Hyperliquid.
+                    Connect your wallet to authenticate Hyperliquid L1 signal copying.
+                    You must have USDC deposited in Hyperliquid.
                 </p>
                 <a
                     href="https://app.hyperliquid.xyz"
@@ -290,9 +290,9 @@ export function CopyTradingArena() {
                             {copyResult ? (
                                 <div className="flex flex-col items-center justify-center py-6 space-y-4">
                                     <CheckCircle size={48} className="text-[#00FFAA]" />
-                                    <h4 className="text-xl font-black text-[#111111] uppercase tracking-tight">SEÑAL ENRUTADA</h4>
+                                    <h4 className="text-xl font-black text-[#111111] uppercase tracking-tight">SIGNAL ROUTED</h4>
                                     <p className="text-xs font-bold text-[#888888] uppercase tracking-widest text-center px-4">
-                                        Posición copiada en Hyperliquid L1. Verifica en la app.
+                                        Position copied on Hyperliquid L1. Verify in the app.
                                     </p>
                                     <div className="bg-[#111111]/[0.02] rounded-xl p-4 w-full border border-[#E5E5E5] space-y-3">
                                         <div>
@@ -310,7 +310,7 @@ export function CopyTradingArena() {
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-5 py-3 bg-[#111111] text-white rounded-xl hover:bg-[#222222] transition-colors w-full justify-center mt-2"
                                     >
-                                        <ExternalLink size={12} /> Ver en Hyperliquid
+                                        <ExternalLink size={12} /> View on Hyperliquid
                                     </a>
                                     <button
                                         onClick={() => { setCopyResult(null); setSelectedTrader(null); }}
@@ -321,19 +321,19 @@ export function CopyTradingArena() {
                                 </div>
                             ) : (
                                 <>
-                                    <h3 className="text-xl font-black text-[#111111] uppercase tracking-tight mb-1">Copiar Señal</h3>
+                                    <h3 className="text-xl font-black text-[#111111] uppercase tracking-tight mb-1">Copy Signal</h3>
                                     <p className="text-xs font-bold text-[#888888] uppercase tracking-widest mb-6">
                                         Trader: <span className="text-[#111111]">{selectedTrader.label}</span>
                                     </p>
 
                                     {/* Real positions from Hyperliquid */}
                                     <div className="mb-6">
-                                        <p className="text-[9px] font-bold text-[#888888] uppercase tracking-widest mb-3">Posiciones Activas Real-Time (Hyperliquid L1)</p>
+                                        <p className="text-[9px] font-bold text-[#888888] uppercase tracking-widest mb-3">Active Positions Real-Time (Hyperliquid L1)</p>
                                         {loadingPositions ? (
-                                            <div className="py-4 text-center text-[#888888] font-mono text-xs">Sincronizando posiciones...</div>
+                                            <div className="py-4 text-center text-[#888888] font-mono text-xs">Syncing positions...</div>
                                         ) : traderPositions.length === 0 ? (
                                             <div className="py-4 text-center text-[#888888] font-mono text-xs bg-[#111111]/[0.02] rounded-xl border border-[#E5E5E5]">
-                                                Sin posiciones abiertas en este momento
+                                                No open positions at this time
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
@@ -362,7 +362,7 @@ export function CopyTradingArena() {
 
                                     {/* Allocation input */}
                                     <div className="space-y-2 mb-6">
-                                        <label className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Asignación (USDC en Hyperliquid)</label>
+                                        <label className="text-[10px] font-bold text-[#888888] uppercase tracking-widest">Allocation (USDC in Hyperliquid)</label>
                                         <input
                                             type="number"
                                             value={allocation}
@@ -375,8 +375,8 @@ export function CopyTradingArena() {
 
                                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
                                         <p className="text-[9px] font-bold text-amber-800 uppercase tracking-widest">
-                                            ⚠ Requiere USDC en Hyperliquid. Si no tienes fondos allí, la orden será rechazada.{' '}
-                                            <a href="https://app.hyperliquid.xyz" target="_blank" rel="noopener noreferrer" className="underline">Depositar aquí →</a>
+                                            ⚠ Requires USDC in Hyperliquid. If you have no funds there, the order will be rejected.{' '}
+                                            <a href="https://app.hyperliquid.xyz" target="_blank" rel="noopener noreferrer" className="underline">Deposit here →</a>
                                         </p>
                                     </div>
 
@@ -386,7 +386,7 @@ export function CopyTradingArena() {
                                         className="w-full bg-[#111111] text-white disabled:bg-[#E5E5E5] disabled:text-[#888888] font-black font-sans uppercase tracking-widest text-[11px] py-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2"
                                     >
                                         {isCopying
-                                            ? <><Zap size={16} className="animate-pulse" /> Firmando EIP-712...</>
+                                            ? <><Zap size={16} className="animate-pulse" /> Signing EIP-712...</>
                                             : <><ShieldCheck size={14} /> CONFIRM API EXECUTION — HL L1</>
                                         }
                                     </button>

@@ -185,33 +185,48 @@ export async function POST(req: NextRequest) {
             ON CONFLICT ("walletAddress") DO NOTHING
         `;
 
-        // ── Create ticket ─────────────────────────────────────────────────────
-        const ticket = await (prisma as any).goldenTicket.create({
-            data: {
-                userAddress:            address,
-                serialCode:             `PENDING-${address}-${Date.now()}`,
-                tier:                   'GENESIS',
-                badgeColor:             'GOLD',
-                networkLaunchEligible:  true,
-                twitterHandle:          safeHandle,   // XSS-sanitized
-                signatureData:          safeSignatureData,  // truncated to 10KB by guard above
-            },
-        });
+        // ── Create ticket (raw SQL — bypasses Prisma @updatedAt injection) ────
+        // goldenTicket.create() and .update() both crash with "column updatedAt
+        // does not exist" because Prisma auto-injects @updatedAt fields.
+        // This raw CTE: INSERTs the row, captures the autoincrement ticketNumber,
+        // immediately finalizes the serialCode, and returns the full row — atomic.
+        const tempSerial = `PENDING-${address}-${Date.now()}`;
+        const rows = await (prisma as any).$queryRaw`
+            WITH inserted AS (
+                INSERT INTO "GoldenTicket"
+                    ("id", "userAddress", "serialCode", "tier", "badgeColor",
+                     "networkLaunchEligible", "twitterHandle", "signatureData",
+                     "isActive", "claimedAt")
+                VALUES (
+                    gen_random_uuid()::text, ${address}, ${tempSerial},
+                    'GENESIS', 'GOLD', true,
+                    ${safeHandle}, ${safeSignatureData},
+                    true, now()
+                )
+                RETURNING id, "ticketNumber", "userAddress", "serialCode",
+                          "tier", "badgeColor", "networkLaunchEligible",
+                          "twitterHandle", "signatureData", "isActive", "claimedAt"
+            )
+            UPDATE "GoldenTicket" gt
+            SET    "serialCode" = 'WGT-GENESIS-' || LPAD(i."ticketNumber"::text, 4, '0')
+            FROM   inserted i
+            WHERE  gt.id = i.id
+            RETURNING gt.id, gt."ticketNumber", gt."userAddress", gt."serialCode",
+                      gt."tier", gt."badgeColor", gt."networkLaunchEligible",
+                      gt."twitterHandle", gt."signatureData", gt."isActive", gt."claimedAt"
+        `;
+        const finalTicket = Array.isArray(rows) ? rows[0] : rows;
+
+        if (!finalTicket) throw new Error('Ticket insert returned no row');
 
         // ── Absolute Atomic Supply Check (Anti-TOCTOU) ────────────────────────
-        // Relies on Postgres native sequence autoincrement for perfect concurrency.
-        if (ticket.ticketNumber > MAX_SUPPLY) {
-            await (prisma as any).goldenTicket.delete({ where: { id: ticket.id } });
-            console.warn(JSON.stringify({ level: 'SECURITY', event: 'OVERMINT_PREVENTED', address, ticketNumber: ticket.ticketNumber }));
+        if (finalTicket.ticketNumber > MAX_SUPPLY) {
+            await (prisma as any).$executeRaw`
+                DELETE FROM "GoldenTicket" WHERE id = ${finalTicket.id}
+            `;
+            console.warn(JSON.stringify({ level: 'SECURITY', event: 'OVERMINT_PREVENTED', address, ticketNumber: finalTicket.ticketNumber }));
             throw new Error('MAX_SUPPLY_REACHED');
         }
-
-        // ── Finalize serial code ──────────────────────────────────────────────
-        const serialNumber = String(ticket.ticketNumber).padStart(4, '0');
-        const finalTicket  = await (prisma as any).goldenTicket.update({
-            where: { id: ticket.id },
-            data:  { serialCode: `WGT-GENESIS-${serialNumber}` },
-        });
 
         console.log(JSON.stringify({
             level: 'INFO', event: 'GOLDEN_TICKET_CLAIMED',
