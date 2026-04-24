@@ -9,8 +9,7 @@
 import WebSocket from 'ws';
 
 const WS_ENDPOINTS = [
-    process.env.GETBLOCK_WS_EP1 || 'wss://go.getblock.io/d20bc88064f545478a74dc464c14a09a',
-    process.env.GETBLOCK_WS_EP2 || 'wss://go.getblock.io/95cb42a5aa444537a068031ce279d343',
+    process.env.GETBLOCK_WS_EP1 || 'wss://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
     process.env.NEXT_PUBLIC_WS_RPC_URL || 'wss://ethereum-rpc.publicnode.com'
 ];
 let currentWsIndex = 0;

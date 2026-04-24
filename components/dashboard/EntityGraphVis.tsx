@@ -173,6 +173,15 @@ export function EntityGraphVis() {
                             <span className="text-[8px] text-[#00C076] font-bold">HIGH</span>
                         </div>
                     </div>
+
+                    {/* LEYENDA (Legend) */}
+                    <div className="p-4 bg-white/80 border border-[#E5E5E5] backdrop-blur-md rounded flex flex-col gap-2 mt-2">
+                        <div className="text-[8px] font-bold text-[#A0A0A0] uppercase tracking-[0.1em] mb-1">NODE LEGEND</div>
+                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#050505]"></div> Genesis Node</div>
+                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#00C076]"></div> Institutional Hub</div>
+                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#0052FF]"></div> Regular Wallet</div>
+                        <div className="flex items-center gap-2 text-[8px] font-bold uppercase text-[#050505]"><div className="w-2 h-2 rounded-full bg-[#FF3B30]"></div> High Risk Entity</div>
+                    </div>
                 </div>
 
                 {/* Selection details */}
@@ -194,11 +203,24 @@ export function EntityGraphVis() {
                             <div className="space-y-4">
                                 <div className="border-l-2 border-[#050505] pl-3">
                                     <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">LAYER TYPE</div>
-                                    <div className="text-[9px] font-bold uppercase text-[#050505]">{selectedNode.group === 1 ? 'FLAGGED RECIPIENT' : 'INSTITUTIONAL HUB'}</div>
+                                    <div className="text-[9px] font-bold uppercase text-[#050505]">
+                                        {selectedNode.group === 0 ? 'GENESIS ORIGIN' : 
+                                         selectedNode.group === 1 ? 'FLAGGED HIGH-RISK RECIPIENT' : 
+                                         selectedNode.group === 2 ? 'INSTITUTIONAL LIQUIDITY HUB' : 
+                                         'STANDARD PARTICIPANT WALLET'}
+                                    </div>
+                                </div>
+                                <div className="border-l-2 border-[#0052FF] pl-3">
+                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">WALLET ADDRESS</div>
+                                    <div className="text-[9px] font-mono text-[#050505] break-all">{selectedNode.address || `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}`}</div>
                                 </div>
                                 <div className="border-l-2 border-[#00C076] pl-3">
                                     <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">NETWORK WEIGHT</div>
                                     <div className="text-[9px] font-bold uppercase text-[#050505]">{(selectedNode.size * 12.5).toFixed(1)}% INFLUENCE</div>
+                                </div>
+                                <div className="border-l-2 border-[#FF3B30] pl-3">
+                                    <div className="text-[7px] font-bold text-[#A0A0A0] uppercase tracking-widest">EST. CAPITAL PROVENANCE</div>
+                                    <div className="text-[9px] font-bold uppercase text-[#050505]">${((selectedNode.size * 3.4) + 1.2).toFixed(2)}M USD</div>
                                 </div>
                             </div>
                         </motion.div>

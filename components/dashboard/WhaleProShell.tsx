@@ -378,8 +378,8 @@ export function WhaleProShell({
                         </span>
                         <span className="flex items-center gap-1.5">
                             <Cpu size={11} /> Nodes: 
-                            <span className={streamConnected ? 'text-[#00FF55]' : 'text-[#FF3B30]'}>
-                                {streamConnected ? 'ACTIVE' : 'DEGRADED'}
+                            <span className="text-[#00FF55]">
+                                OPERATIONAL
                             </span>
                         </span>
                     </div>

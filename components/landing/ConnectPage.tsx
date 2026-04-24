@@ -43,42 +43,11 @@ const DESKTOP_WALLETS = [
     installUrl: "https://metamask.io/download/",
     delay: 0,
   },
-  {
-    id: "coinbase",
-    name: "Coinbase Wallet",
-    badge: "Extension / MPC",
-    logo: "/wallets/coinbase.png",
-    rdns: "com.coinbase.wallet",
-    installUrl: "https://www.coinbase.com/wallet/downloads",
-    delay: 0.06,
-  },
-  {
-    id: "rabby",
-    name: "Rabby",
-    badge: "Advanced EOA",
-    logo: "/wallets/rabby.png",
-    rdns: "io.rabby",
-    installUrl: "https://rabby.io/",
-    delay: 0.12,
-  },
-  {
-    id: "walletconnect",
-    name: "All Wallets",
-    badge: "WalletConnect / QR",
-    logo: "/wallets/rainbow.png",
-    rdns: null, // opens AppKit modal
-    installUrl: null,
-    delay: 0.18,
-  },
 ];
 
 // ─── Mobile wallets (all open AppKit which uses WC deep-links) ───────────────
 const MOBILE_WALLETS = [
   { id: "metamask-mobile",   name: "MetaMask",       badge: "Tap to open app", logo: "/wallets/metamask.svg", delay: 0 },
-  { id: "coinbase-mobile",   name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.png", delay: 0.06 },
-  { id: "rainbow-mobile",    name: "Rainbow",         badge: "Tap to open app", logo: "/wallets/rainbow.png",  delay: 0.12 },
-  { id: "phantom-mobile",    name: "Phantom",         badge: "Tap to open app", logo: "/wallets/phantom.png",  delay: 0.18 },
-  { id: "trustwallet-mobile",name: "Trust Wallet",    badge: "Tap to open app", logo: "/wallets/trust.png",    delay: 0.24 },
 ];
 
 // ─── Wallet button ────────────────────────────────────────────────────────────
@@ -363,12 +332,7 @@ export default function ConnectPage() {
                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Synced — Redirecting…</span>
                       </motion.div>
                     ) : (
-                      <motion.div key="wait" className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-black/20 animate-pulse" />
-                        <span className="text-[10px] font-mono text-black/30 uppercase tracking-widest">
-                          {syncStatus === "AWAITING" ? "Awaiting scan…" : "Initializing…"}
-                        </span>
-                      </motion.div>
+                      null
                     )}
                   </AnimatePresence>
                 </div>

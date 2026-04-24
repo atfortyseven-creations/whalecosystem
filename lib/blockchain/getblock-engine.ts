@@ -1,23 +1,16 @@
 /**
- * GetBlock Engine — 6-Endpoint Rotating Pool with Exhaustion Failover
+ * GetBlock Engine — Dedicated Ethereum Node
  *
- * Pool de 6 endpoints. Cuando un endpoint devuelve 401 (CU agotados),
- * 429 (rate limit), o cualquier HTTP error, se marca como exhausto y
- * el sistema pasa automáticamente al siguiente disponible.
+ * Utilizamos nuestro Interstellar Node dedicado para Ethereum
+ * para resolver consultas de balances de manera confiable.
  *
- * EP1: https://go.getblock.us/0ac57185ddeb447ca7d3e9da9634899f
- * EP2: https://go.getblock.io/1dcc5db2c6f44108a6e1e3a00b9a3f0d
- * EP3: https://go.getblock.us/88747de304e04365ac4c85789ba4fe54
- * EP4: https://go.getblock.us/4ee0dd8f4e8346cbaad50e5a63274b24
- * EP5: https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234
- * EP6: https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d
+ * EP1: https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b
  */
 
 // ── DYNAMIC ENDPOINT LOADING ────────────────────────────────────────────────
 const ALL_ENDPOINTS = [
+  process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b',
   process.env.GETBLOCK_ETH_RPC_1,
-  process.env.GETBLOCK_ETH_RPC_4,
-  process.env.GETBLOCK_BASE_RPC,
 ].filter(Boolean) as string[];
 
 // ── Estado de salud por endpoint ─────────────────────────────────────────────

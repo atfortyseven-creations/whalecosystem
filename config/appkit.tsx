@@ -39,8 +39,8 @@ const dedicatedMainnet = {
     ...mainnet,
     rpcUrls: {
         ...mainnet.rpcUrls,
-        default: { http: ['https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff'] },
-        public: { http: ['https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff'] }
+        default: { http: [process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b'] },
+        public: { http: [process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b'] }
     }
 };
 
@@ -49,8 +49,8 @@ const dedicatedBsc = {
     ...bsc,
     rpcUrls: {
         ...bsc.rpcUrls,
-        default: { http: ['https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517'] },
-        public: { http: ['https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517'] }
+        default: { http: [process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793'] },
+        public: { http: [process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793'] }
     }
 };
 
@@ -81,8 +81,8 @@ export const wagmiAdapter = new WagmiAdapter({
     projectId,
     networks,
     transports: {
-        [mainnet.id]: http('https://go.getblock.us/d9f5f9207ac44e5d9faf8d3017ca9fff'),
-        [bsc.id]: http('https://go.getblock.us/3cdeadc7f4174c23b37daee85bc0d517'),
+        [mainnet.id]: http(process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b'),
+        [bsc.id]: http(process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793'),
         [polygon.id]: http(),
         [base.id]: http(process.env.GETBLOCK_BASE_RPC || base.rpcUrls.default.http[0]),
         [arbitrum.id]: http(),
@@ -112,7 +112,7 @@ const siweConfig = createSIWEConfig({
   getMessageParams: async () => ({
     domain: typeof window !== 'undefined' ? window.location.host : 'humanidfi.com',
     uri: typeof window !== 'undefined' ? window.location.origin : APP_URL,
-    chains: networks.map(n => n.id),
+    chains: networks.map(n => n.id) as number[],
     statement: 'Authenticate into the Whale Alert Sovereign Network. This request will not trigger a blockchain transaction or cost any gas fees.'
   }),
   createMessage: ({ address, ...args }: any) => formatMessage(args, address),

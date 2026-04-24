@@ -169,7 +169,7 @@ export function GainersLosersPanel() {
     // Enforcing strict on-chain reality. Waiting for endpoint assignment.
     // =========================================================================
     const { data: rawData, isLoading, error } = useMarketData('gainersLosers');
-    const markets = rawData?.markets || [];
+    const markets = Array.isArray(rawData) ? rawData : rawData?.data || [];
     
     // Status indicators (simulated until WS implementation injected by endpoints)
     const isConnected = !isLoading && !error;

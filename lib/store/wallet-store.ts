@@ -8,12 +8,12 @@ export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base
 export type ProtocolType = 'RPC' | 'WSS';
 
 export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: string; wss: string; color: string }> = {
-  ethereum: { name: 'Ethereum', currency: 'ETH', rpc: 'https://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', wss: 'wss://go.getblock.io/85f2e6644087439c8b2b0ddc9bc0d234', color: '#627EEA' },
-  polygon: { name: 'Polygon', currency: 'MATIC', rpc: 'https://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d', wss: 'wss://go.getblock.io/a2c976b8451b445b8cd4b2226b9a4e0d', color: '#8247E5' },
-  arbitrum: { name: 'Arbitrum', currency: 'ETH', rpc: 'https://go.getblock.io/ba3a970679734c4cab03806954043510', wss: 'wss://go.getblock.io/ba3a970679734c4cab03806954043510', color: '#28A0F0' },
-  optimism: { name: 'Optimism', currency: 'ETH', rpc: 'https://go.getblock.io/33cf8ac64b98490daefe07af9f59b429', wss: 'wss://go.getblock.io/33cf8ac64b98490daefe07af9f59b429', color: '#FF0420' },
-  base: { name: 'Base', currency: 'ETH', rpc: 'https://go.getblock.io/c6c84d16b3d848d1b7cad00e6998c722', wss: 'wss://go.getblock.io/c6c84d16b3d848d1b7cad00e6998c722', color: '#0052FF' },
-  avalanche: { name: 'Avalanche', currency: 'AVAX', rpc: 'https://go.getblock.io/bb751673d5294b51af168af3fc78e61b', wss: 'wss://go.getblock.io/bb751673d5294b51af168af3fc78e61b', color: '#E84142' },
+  ethereum: { name: 'Ethereum', currency: 'ETH', rpc: process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b', wss: 'wss://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b', color: '#627EEA' },
+  polygon: { name: 'Polygon', currency: 'MATIC', rpc: 'https://polygon-rpc.com', wss: 'wss://polygon-bor-rpc.publicnode.com', color: '#8247E5' },
+  arbitrum: { name: 'Arbitrum', currency: 'ETH', rpc: 'https://arb1.arbitrum.io/rpc', wss: 'wss://ethereum-rpc.publicnode.com', color: '#28A0F0' },
+  optimism: { name: 'Optimism', currency: 'ETH', rpc: 'https://mainnet.optimism.io', wss: 'wss://ethereum-rpc.publicnode.com', color: '#FF0420' },
+  base: { name: 'Base', currency: 'ETH', rpc: process.env.GETBLOCK_BASE_RPC || 'https://mainnet.base.org', wss: 'wss://base-rpc.publicnode.com', color: '#0052FF' },
+  avalanche: { name: 'Avalanche', currency: 'AVAX', rpc: 'https://api.avax.network/ext/bc/C/rpc', wss: 'wss://ethereum-rpc.publicnode.com', color: '#E84142' },
 };
 
 interface WalletAccount {
