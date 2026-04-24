@@ -55,7 +55,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     // { id: 'live-port',    label: 'Quick Portfolio',  icon: <Activity size={17}/> },
     // { id: 'whale-port',   label: 'Whale Holdings',   icon: <Star size={17}/> },
     { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/> },
-    // { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/> },
+    { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/>, badge: 'PRO' },
 
     { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>,        dividerBefore: 'System' },
 
