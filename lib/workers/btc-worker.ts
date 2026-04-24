@@ -2,7 +2,7 @@
 // BTC Worker — 100% on-chain data via Mempool.space + CoinGecko
 // Unified Institutional Intelligence
 
-import { db } from '@/lib/db';
+import db from '@/lib/db';
 
 const MEMPOOL_API   = 'https://mempool.space/api';
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';

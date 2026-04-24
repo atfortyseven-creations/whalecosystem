@@ -215,9 +215,15 @@ export async function POST(req: NextRequest) {
                       gt."tier", gt."badgeColor", gt."networkLaunchEligible",
                       gt."twitterHandle", gt."signatureData", gt."isActive", gt."claimedAt"
         `;
-        const finalTicket = Array.isArray(rows) ? rows[0] : rows;
+        let finalTicket = Array.isArray(rows) ? rows[0] : rows;
 
-        if (!finalTicket) throw new Error('Ticket insert returned no row');
+        if (!finalTicket || !finalTicket.ticketNumber) {
+            // Fallback: If Prisma didn't return the CTE RETURNING rows, fetch it explicitly
+            finalTicket = await (prisma as any).goldenTicket.findUnique({
+                where: { userAddress: address }
+            });
+            if (!finalTicket) throw new Error('Ticket insert failed completely');
+        }
 
         // ── Absolute Atomic Supply Check (Anti-TOCTOU) ────────────────────────
         if (finalTicket.ticketNumber > MAX_SUPPLY) {
