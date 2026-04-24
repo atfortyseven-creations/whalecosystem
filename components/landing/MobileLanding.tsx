@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
@@ -518,21 +518,28 @@ export function MobileLanding() {
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
   // ── CRITICAL FIX: initialize isLinked from cookie immediately ──────────────
-  // On mobile, wagmi takes 1-3s to reconnect after returning from wallet app.
-  // If we start with `false`, the component renders "Connect Wallet" during that
-  // gap. The cookie is the source of truth for an existing valid session.
   const [isLinked, setIsLinked]         = useState<boolean>(() => {
     if (typeof document === 'undefined') return false;
     return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
   });
+  // ── DEFINITIVE FIX: read address from cookie if wagmi hasn't reconnected ───
+  // The cookie value IS the wallet address: sovereign_handshake=0x1234...
+  // This means after signing we NEVER need wagmi to reconnect to show the
+  // ConnectedScreen. Works even if WalletConnect session drops after signing.
+  const cookieAddress = useMemo<string | null>(() => {
+    if (typeof document === 'undefined') return null;
+    const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+    return match?.[1] ?? null;
+  }, [isLinked]); // re-derive if isLinked changes (e.g. after fresh sign)
+  // Effective address: prefer live wagmi address, fall back to cookie address
+  const effectiveAddress = address || cookieAddress || undefined;
+
   // showingManifesto: false = go directly to ConnectedScreen (scanner menu) after sign
-  // The back arrow in ConnectedScreen takes them to the manifesto if they want to read it
   const [showingManifesto, setShowingManifesto] = useState(false);
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
   const [connecting, setConnecting]     = useState<string | null>(null);
   const signingLock = useRef(false);
-  // Timeout ref for the reconnection spinner
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -763,62 +770,39 @@ export function MobileLanding() {
 
   if (!mounted) return null;
 
-  // ── Render: Session exists but wagmi is still reconnecting ─────────────────
-  // Timeout: if wagmi doesn't reconnect in 4s, the WalletConnect session has
-  // expired. Clear the stale cookie and return to the connect wallet screen.
-  if (isLinked && !address) {
-    // Start the timeout on first render of this state
-    if (!reconnectTimeout.current) {
-      reconnectTimeout.current = setTimeout(() => {
-        // Clear stale session — WalletConnect session expired
-        if (typeof document !== 'undefined') {
-          document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
-        }
-        try { sessionStorage.clear(); } catch (e) {}
-        setIsLinked(false);
-        reconnectTimeout.current = null;
-      }, 4000);
-    }
+  // ── Render: Session exists — show immediately using cookie address ──────────
+  // We NEVER wait for wagmi to reconnect. The cookie IS the source of truth.
+  // The cookie value IS the wallet address: sovereign_handshake=0xABCD...
+  // This means after signing we never need wagmi to reconnect to show the
+  // ConnectedScreen. Works even if WalletConnect session drops after signing.
+  if (isLinked && effectiveAddress) {
     return (
-      <div className="fixed inset-0 bg-[#FDFCF8] flex flex-col items-center justify-center gap-5 z-50 px-8">
-        <WhaleLogo className="w-8 h-8 shrink-0 opacity-60" />
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-          <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-black/40 text-center">
-            Restaurando Sesión Soberana...
-          </span>
-          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/25 text-center mt-1">
-            Si tarda, tu sesión WalletConnect ha expirado
-          </span>
-        </div>
-        {/* Manual escape hatch — don't make the user wait */}
-        <button
-          onClick={() => {
-            if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
-            if (typeof document !== 'undefined') {
-              document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
-            }
-            try { sessionStorage.clear(); } catch (e) {}
-            setIsLinked(false);
-          }}
-          className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40 border border-black/10 px-4 py-2 hover:text-black/70 hover:border-black/30 transition-all"
-        >
-          Volver a Conectar Wallet
-        </button>
-      </div>
+      <AnimatePresence mode="wait">
+        {showingManifesto ? (
+          <motion.div key="manifesto" initial={{opacity: 0}} animate={{opacity: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FDFCF8]">
+            <ImmersiveManifestoLanding onOpenScanner={() => setShowingManifesto(false)} />
+          </motion.div>
+        ) : (
+          <motion.div key="scanner" initial={{opacity: 0, scale: 0.98}} animate={{opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, scale: 0.98, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FAF9F6]">
+            <ConnectedScreen 
+               address={effectiveAddress} 
+               onScan={() => setShowScanner(true)} 
+               showScanner={showScanner} 
+               onCloseScanner={() => setShowScanner(false)} 
+               onBack={() => setShowingManifesto(true)}
+               connectorName={connector?.name}
+               chainId={chainId}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     );
   }
-  // Clear any pending timeout if wagmi DID reconnect successfully
-  if (reconnectTimeout.current && address) {
-    clearTimeout(reconnectTimeout.current);
-    reconnectTimeout.current = null;
-  }
 
-  // ── Render: Signing step ────────────────────────────────────────────────────
+  // ── Render: Signing step (new connection, no prior session) ─────────────────
   if (isConnected && address && !isLinked) {
     return (
       <>
-        {/* Background */}
         <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
         <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
           <motion.div
@@ -836,31 +820,6 @@ export function MobileLanding() {
           isSigning={isSigning}
         />
       </>
-    );
-  }
-
-  // ── Render: Connected & signed ──────────────────────────────────────────────
-  if (isLinked && address) {
-    return (
-      <AnimatePresence mode="wait">
-        {showingManifesto ? (
-          <motion.div key="manifesto" initial={{opacity: 0}} animate={{opacity: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FDFCF8]">
-            <ImmersiveManifestoLanding onOpenScanner={() => setShowingManifesto(false)} />
-          </motion.div>
-        ) : (
-          <motion.div key="scanner" initial={{opacity: 0, scale: 0.98}} animate={{opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, scale: 0.98, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FAF9F6]">
-            <ConnectedScreen 
-               address={address} 
-               onScan={() => setShowScanner(true)} 
-               showScanner={showScanner} 
-               onCloseScanner={() => setShowScanner(false)} 
-               onBack={() => setShowingManifesto(true)}
-               connectorName={connector?.name}
-               chainId={chainId}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     );
   }
 
