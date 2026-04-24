@@ -77,8 +77,21 @@ export function ConnectWalletModal() {
     const handleRainbow  = () => connectViaExtension(['rainbow', 'me.rainbow']);
 
     const handleMobileSync = async () => {
-        closeConnectModal();
-        setTimeout(() => openAppKit({ view: 'Connect' }), 50);
+        setView('qr');
+        setIsPolling(true);
+        try {
+            const res = await fetch('/api/auth/qr-session', { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.sessionId) {
+                    setQrSession(data.sessionId);
+                    sessionStorage.setItem('pending_qr_session', data.sessionId);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to get QR session', e);
+            setIsPolling(false);
+        }
     };
 
     const handleLedger = async () => {

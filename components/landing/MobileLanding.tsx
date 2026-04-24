@@ -561,8 +561,8 @@ export function MobileLanding() {
   // Effective address: prefer live wagmi address, fall back to cookie address
   const effectiveAddress = address || cookieAddress || undefined;
 
-  // showingManifesto: false = go directly to ConnectedScreen (scanner menu) after sign
-  const [showingManifesto, setShowingManifesto] = useState(false);
+  // showingManifesto: true = go to manifesto landing first, user clicks black button to open scanner
+  const [showingManifesto, setShowingManifesto] = useState(true);
   const [isSigning, setIsSigning]       = useState(false);
   const [signError, setSignError]       = useState<string | null>(null);
   const [connecting, setConnecting]     = useState<string | null>(null);

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
+import { safeRedisGet, safeRedisSet, redisClient } from '@/lib/redis/client';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -16,6 +16,16 @@ export async function POST(request: Request) {
                     status: 'SUCCESS', 
                     address: body.address 
                 }), 'EX', 120);
+
+                // Publish to the mesh bus so the SSE stream picks it up
+                if (redisClient && typeof redisClient.publish === 'function') {
+                    await redisClient.publish('sovereign_mesh_auth_bus', JSON.stringify({
+                        socketId: id,
+                        address: body.address,
+                        timestamp: Date.now()
+                    })).catch((err: any) => console.error('[MESH:PUBLISH_ERROR]', err));
+                }
+
                 return NextResponse.json({ success: true });
             }
         } catch (e) {

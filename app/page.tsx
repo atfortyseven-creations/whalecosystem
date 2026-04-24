@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { ClientRootRouter } from '@/components/landing/ClientRootRouter';
 import { MobileLanding } from '@/components/landing/MobileLanding';
 
@@ -9,6 +10,14 @@ export default async function Home() {
   const headersList = await headers();
   const userAgent = headersList.get('user-agent') || '';
   const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+  
+  const cookieStore = await cookies();
+  const hasSovereignHandshake = cookieStore.has('sovereign_handshake');
+
+  // Enforce all PC users to pass through /connect if they haven't established a handshake
+  if (!isMobile && !hasSovereignHandshake) {
+    redirect('/connect');
+  }
 
   return (
     <main>
