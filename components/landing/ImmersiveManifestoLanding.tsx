@@ -39,60 +39,27 @@ const MANIFESTO_LOTTIES = [
 
 const IMMERSIVE_PAGES = [
   {
-    title: "I. Telemetría de Capa Base y Extracción Determinística",
+    title: "I. El Origen del Sistema: Eliminando la Asimetría",
     paragraphs: [
-      "La red opera intrínsecamente como un panóptico descentralizado sobre el protocolo de consenso. Renunciando a dependencias exógenas y a indexadores de alta latencia, el núcleo troncal se amalgama a la base criptográfica de la máquina virtual nativa. Establecemos conexiones en un nivel de zócalo web de latencia cero, absorbiendo cada trazo termodinámico de las transacciones en el preciso instante en que la mempool las consolida. Prescindimos de abstracciones de intermediarios para consumir directamente el calldata crudo codificado en secuencias puramente hexadecimales.",
-      "A través de heurísticas formales de multidimensionalidad algorítmica, nuestro motor deductivo desvela los flujos ofuscados que transitan entre puentes cruzados y bóvedas en la sombra. Esto transciende la simple medición del volumen termodinámico observable; la infraestructura interroga activamente las mutaciones de estado para abstraer la genuina intencionalidad computacional. Correlacionando la entropía geométrica de los sumideros de recepción, dictaminamos la diferencia fundamental entre diversificaciones rutinarias y la consolidación de asedios por entidades hiper-estructuradas.",
-      "Cada exhalación paramétrica que distorsiona nuestros intervalos estáticos genera coeficientes de ponderación inexorables. La evaluación sistémica no consiste en el simple trazado de proyecciones probables, sino en ejecuciones forenses matemáticas de autopsias predictivas, orquestadas y resueltas a ráfagas continuas de doscientos cuarenta nanosegundos analíticos por ciclo métrico del motor base."
+      "El ecosistema financiero descentralizado nació con la promesa de la transparencia. Sin embargo, la realidad demostró lo contrario: los grandes capitales operan con una ventaja informativa abrumadora, moviendo millones a través de redes y contratos privados antes de que el mercado minorista pueda reaccionar.",
+      "Para resolver esta disparidad, creamos Sovereign Terminal. Nuestra directiva fundacional fue clara: construir una infraestructura capaz de leer, decodificar y analizar el comportamiento de estos gigantes directamente desde la blockchain, sin depender de servidores centralizados ni oráculos manipulables.",
+      "Comenzamos desarrollando algoritmos de indexación en tiempo real. No nos bastaba con observar el volumen superficial; necesitábamos identificar exactamente la procedencia del capital, sus rotaciones internas y su destino final, capturándolo desde la mempool antes de su ejecución irreversible."
     ]
   },
   {
-    title: "II. Validadores de Conocimiento Cero y Árboles Inmutables",
+    title: "II. Filtrado Estocástico y Privacidad Absoluta",
     paragraphs: [
-      "El modelo de intercesión algorítmica destierra categóricamente las premisas laxas de los sistemas analíticos públicos, operando en dominios exclusivamente criptográficos. Las atestiguaciones asíncronas exigen una verificación matemática prístina: pruebas integrales de conocimiento cero (ZK-SNARKs). Este paradigma valida proposiciones booleanas y condiciones operativas puras sin vulnerar la opacidad del canal subyacente. Tal infraestructura anula drásticamente la propensión a la corrosión estadística provocada por inyecciones y manipulaciones externas.",
-      "Dentro de este estrato abstracto e inescrutable se aloja el Registro Algorítmico Funcional, un baluarte hermético ensamblado en secuencias de Merkle jerarquizadas. Todas las alteraciones sistémicas, las anomalías topológicas y las trazas asimétricas quedan incrustadas en hashes irrevocables y perpetuamente trazables mediante derivaciones formales algorítmicas. La robustez técnica de nuestra compilación fáctica asegura una infalibilidad criptográfica absoluta.",
-      "Nos desligamos completamente de los mecanismos de confianza tradicionales vulnerables; nuestra garantía de precisión no emana de la reputación humana, sino del determinismo algorítmico distribuido inmutable. Uniendo los protocolos matemáticos más prístinos disponibles, cristalizamos un perímetro de ingestión en la gran red que funciona como un observatorio impenetrable e inmarcesible, absolutamente aislado de la volatilidad emocional."
+      "Las cadenas de bloques generan un volumen masivo de ruido diario. Los exploradores convencionales se limitan a listar transferencias ininteligibles. Nosotros, en cambio, diseñamos un motor de indexación que filtra matemáticamente ese ruido, aislando únicamente las anomalías críticas que impactan la liquidez global.",
+      "Implementamos tecnología de pruebas de Conocimiento Cero (ZK-SNARKs) para garantizar la privacidad matemática pura. Nuestros operadores pueden consultar movimientos y billeteras específicas sin revelar jamás sus estrategias de vigilancia al sistema. Una infraestructura verdaderamente impenetrable.",
+      "Esta arquitectura modular nos permitió expandir nuestro rastreo desde Ethereum hacia redes de escalabilidad (Rollups) y puentes inter-cadena, detectando movimientos tácticos horas antes de que la liquidez consolide su destino."
     ]
   },
   {
-    title: "III. Expansión Autónoma y Soberanía Inter-Cadena",
+    title: "III. Consolidación de la Red de Inteligencia",
     paragraphs: [
-      "La directiva evolutiva concebida en la arquitectura de génesis encamina a la superestructura hacia una hibridación autónoma con frameworks de abstrusión inter-cadena inexplorables. Priorizamos converger paramétricamente con ecosistemas subyacentes de agregación cero, con la intención primordial de ofuscar exhaustivamente cualquier rúbrica operativa generada por la comunicación de los procesos observadores, instaurando invisibilidad técnica con máxima fidelidad determinista.",
-      "Desbordando los horizontes contemporáneos del cálculo polinómico, el cianotipo base de nuestra arquitectura de ingestión está siendo re-instrumentado para integrar primitivas de resistencia post-cuántica y curvas elípticas aberrantes. Codificamos los agregados de datos teóricos bajo dominios de confinamiento temporal asíncrono que son matemáticamente impenetrables frente al descifrado de algoritmos de Shor y a la desfragmentación entrópica ejecutada por topologías supraconductivas.",
-      "A medida que avanzamos hacia este vector, garantizamos implícitamente el axioma fundador de soberanía infraestructural, blindando los cimientos de la red analítica como una fortaleza hiperdimensional a un nivel abisal. El objetivo supremo no descansa en atenuar superficialmente los vectores de ataque contemporáneos, sino en invalidar algorítmicamente la viabilidad misma de la interceptación matemática externa en las inminentes eras del dominio cuántico digital."
-    ]
-  },
-  {
-    title: "IV. Neuralidad Predictiva Abisal y Filtrado Máximo",
-    paragraphs: [
-      "Nuestra concepción topológica final incuba sin retorno un subsistema matricial abisal configurado en torno a arquitecturas de Graph Neural Networks (GNN). Esta inyección arquitectónica habilita autónomamente al núcleo cognitivo para tejer cartografías completas sobre agrupaciones inescrutables de firmas oscuras. Subyugando a las redes de nodos subyacentes e inferiendo su estructura celular original determinista, el ensamblador lógico pulveriza con precisión la entropía de los clusters estocásticos.",
-      "Estando pertrechados y preparados para subsumir la fricción letal de los mecanismos de Valor Máximo Extraíble (MEV), nuestros conductos base canalizan toda la lógica deductiva por subsistemas totalmente apartados del mempool primario. Esta convergencia técnica y asilamiento criptográfico mitiga algorítmicamente la fagocitación parasitaria de datos, estabilizando permanentemente nuestros canales métricos y aislando la asimetría sistémica contra las maquinaciones caníbales de los bots competidores en épocas de distorsión líquida.",
-      "Como manifestación incontestable de trascendencia digital matemática, el pináculo evolutivo disecciona y amalgama sus funciones deductivas con las infraestructuras modulares de validadores fraccionados (Liquid Restaking). Esta hibridación hiperespacial nos confiere, como protocolo maestro, las facultades de desglosar instantáneamente las cascadas regresivas del consenso central de la red global inmutada, consolidando el arma criptográfica analítica incontestable para el futuro."
-    ]
-  },
-  {
-    title: "V. Perspectiva Histórica y Valor Subyacente",
-    paragraphs: [
-      "La cronología de la evolución criptográfica revela un patrón irrefutable: la descentralización no es un mero fenómeno cíclico, sino una reestructuración sistémica de los medios de transferencia fiduciarios hacia reservas puramente algorítmicas, impermeables a la inflación originada por políticas centrales.",
-      "Identificamos que la búsqueda de valor intrínseco en la era digital no descansa en oráculos centralizados, sino en métricas deterministas extraídas de la cadena misma. Las asimetrías de información se disipan cuando la lectura termodinámica de los contratos inteligentes permite auditar el capital sin custodios.",
-      "El diseño de un plan de negocio descentralizado exige la abolición total de jerarquías tradicionales. Al codificar las directivas operacionales en agentes sintéticos, la gobernanza institucional transmuta de una estructura de confianza humana hacia una certidumbre matemática implacable y automatizada.",
-      "Las corporaciones soberanas del mañana no dependerán de fronteras jurisdiccionales tangibles, operando exclusivamente mediante arquitecturas en la red soberana donde la liquidación es instantánea, perpetua y verificada asíncronamente mediante atestiguaciones on-chain."
-    ]
-  },
-  {
-    title: "VI. Formación Algorítmica y Omnipresencia Geográfica",
-    paragraphs: [
-      "El paradigma de la educación virtual aplicado a la infraestructura de capa uno garantiza la formación asimétrica de élites técnicas. La integración académica pura directamente en el entorno de pruebas on-chain cultiva validadores y arquitectos desprovistos del sesgo de los currículos tradicionales.",
-      "El aprendizaje distribuido a través de todo el consenso oblitera las barreras epistemológicas vigentes. Al destilar principios criptográficos en canales de transmisión de conocimiento cero, formamos nodos humanos que piensan y operan a la misma frecuencia de la máquina virtual subyacente.",
-      "Desvinculados del concepto obsoleto de Estado-nación geográfico, la dispersión topológica de nuestro observatorio nos confiere una ubicuidad absoluta. Esta neutralidad espacial blinda nuestro radar contra incursiones regulatorias asimétricas y garantiza resiliencia perpetua ante interrupciones locales."
-    ]
-  },
-  {
-    title: "VII. Acumulación Dinámica y Soberanía Criptográfica",
-    paragraphs: [
-      "El contacto directo con el estrato base criptográfico no es un mero punto de entrada; es la singularidad fundacional. Al observar los movimientos génesis de capital, nuestro rastreador aísla la fuente primordial de volumen, descartando el ruido secundario propagado por mercados derivativos subyacentes.",
-      "El comercio unificado bajo dinámicas de inversión institucionales transmuta de una especulación estocástica hacia ejecuciones paramétricas puras. Evaluamos los flujos cruzados de liquidez con rigor analítico, desconstruyendo portafolios agregados instante por instante mientras navegan redes ofuscadas.",
-      "Finalmente, el propio sustrato del consenso distribuido actúa como el ente verificador supremo. Al adherirnos a su arquitectura modular, certificamos de manera inmutable que todos los procesos de telemetría y recolección analítica permanezcan encriptados, infalsificables y custodiados por el determinismo matemático absoluto."
+      "Con el núcleo operativo establecido, el siguiente paso fue interpretar los datos. Integramos modelos heurísticos avanzados para desofuscar y etiquetar entidades oscuras. Hoy, nuestro sistema identifica automáticamente miles de plataformas, fondos institucionales y atacantes conocidos.",
+      "Cuando una entidad intenta camuflar su capital fragmentándolo en cientos de billeteras menores, nuestro motor algorítmico agrupa esas transacciones y revela la firma conductual subyacente, exponiendo la magnitud real de la maniobra.",
+      "Sovereign Terminal es hoy el estándar definitivo de inteligencia en cadena. Proveemos la infraestructura necesaria para operar con la misma precisión, velocidad y claridad que las élites financieras globales, asegurando la verdadera soberanía técnica."
     ]
   }
 ];
@@ -270,12 +237,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
                      <div key={pIndex} tabIndex={0} className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden focus:outline-none cursor-pointer">
                        
                        {/* Lottie fixed block on the left (solid stack integration) */}
-                       <div className="w-full sm:w-[240px] bg-[#f5f4ef] flex items-center justify-center p-8 sm:p-6 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 group-hover:bg-[#f0efe9]">
-                          <div className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] grayscale mix-blend-multiply opacity-85 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
+                       <div className="w-full sm:w-[320px] bg-[#f5f4ef] flex items-center justify-center p-8 sm:p-6 border-b sm:border-b-0 sm:border-r border-black/10 shrink-0 relative overflow-hidden transition-colors duration-500 group-hover:bg-[#f0efe9]">
+                          <div className="w-[180px] h-[180px] sm:w-[240px] sm:h-[240px] grayscale mix-blend-multiply opacity-85 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
                              <OptimizedLocalLottie filename={lottieFile} />
-                          </div>
-                          <div className="absolute top-3 left-3 text-[9px] font-mono opacity-20 select-none">
-                            SEC-{pageIndex + 1}.{pIndex + 1}
                           </div>
                        </div>
                        
@@ -299,6 +263,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
 
         {/* ─── Public Akashic Ledger Zero-Mock Sample ─── */}
         <PublicAkashicLedgerSample />
+
+        {/* ─── Scanner Direct Handshake Documentation ─── */}
+        <ScannerDocumentation />
 
         {/* ─── 50 Historic Catastrophic Events Chronicle ─── */}
         <CatastropheChronicle />
@@ -368,7 +335,7 @@ function CatastropheChronicle() {
           CRÓNICA HISTÓRICA — 50 Eventos que Detonaron el Orden Financiero
         </h2>
       </div>
-      <div className="flex flex-col gap-[1px] bg-black border border-black border-t-0 shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[1px] bg-black border border-black border-t-0 shadow-sm">
         {HISTORIC_EVENTS.map((ev, i) => (
           <div
             key={ev.code}
@@ -465,6 +432,45 @@ function PublicAkashicLedgerSample() {
             </div>
           ))
         )}
+      </div>
+    </section>
+  );
+}
+
+function ScannerDocumentation() {
+  return (
+    <section className="w-full max-w-[850px] shrink-0 pt-12 pb-16 flex flex-col gap-8">
+      <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end">
+        <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
+          Arquitectura del Escáner y Conexión Soberana
+        </h2>
+      </div>
+      <div className="flex flex-col gap-6 font-serif text-[13px] text-[#222] leading-relaxed text-justify">
+        <p>
+          Nuestro escáner de autenticación no es un simple lector de códigos QR; es un puente criptográfico directo (Direct Handshake) entre su dispositivo móvil soberano y la terminal web. Cuando escanea el código, su billetera firma matemáticamente un desafío de sesión único.
+        </p>
+        <p>
+          Este diseño elimina la necesidad de contraseñas, correos electrónicos o bases de datos centralizadas. Toda la autorización ocurre puramente a través de criptografía de curva elíptica (ECDSA), garantizando que solo el poseedor genuino de las llaves privadas pueda acceder al nivel institucional del sistema.
+        </p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Mobile Panel</span>
+            <img src="/dashboard-bg.jpg" alt="Mobile Panel" className="w-full h-auto aspect-video object-cover grayscale mix-blend-multiply opacity-80" />
+          </div>
+          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Whale Post</span>
+            <img src="/official-whale-vector.png" alt="Whale Post" className="w-full h-auto aspect-video object-contain grayscale mix-blend-multiply opacity-80" />
+          </div>
+          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Verified Ledger</span>
+            <img src="/landing-bg.jpg" alt="Verified Ledger" className="w-full h-auto aspect-video object-cover grayscale mix-blend-multiply opacity-80" />
+          </div>
+          <div className="flex flex-col border border-black/10 bg-white p-2 shadow-sm">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mb-2 border-b border-black/10 pb-1">Audit Logs</span>
+            <img src="/peakpx.jpg" alt="Audit Logs" className="w-full h-auto aspect-video object-cover grayscale mix-blend-multiply opacity-80" />
+          </div>
+        </div>
       </div>
     </section>
   );

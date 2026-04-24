@@ -15,7 +15,6 @@ export async function GET(req: Request) {
                 theme: true,
                 currency: true,
                 language: true,
-                density: true,
                 showBalances: true,
                 hiddenAssets: true,
                 defaultTimeframe: true,
@@ -53,7 +52,7 @@ export async function PATCH(req: Request) {
 
         // Whitelist allowed fields to prevent arbitrary mass-assignment
         const allowedSettings = [
-            'theme', 'currency', 'language', 'density', 
+            'theme', 'currency', 'language', 
             'showBalances', 'hiddenAssets', 'defaultTimeframe', 'displayUnit',
             'gasPreset', 'customRpcUrl', 'mevProtection', 'maxSlippage',
             'inactivityLockMinutes', 'stealthMode', 'requireSignForExports', 'allowAnalytics',
