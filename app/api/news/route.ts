@@ -68,7 +68,10 @@ function decodeHTMLEntities(text: string): string {
  */
 function generateDeepAnalysis(title: string, domain: string): string {
   let hash = 0;
-    const templates: string[][] = [
+  for (let i = 0; i < title.length; i++) hash = title.charCodeAt(i) + ((hash << 5) - hash);
+  const idx = Math.abs(hash) % 4;
+
+  const templates: string[][] = [
     [
       `Nuestro nodo de telemetría institucional monitoreando ${domain} ha detectado una señal direccional asimétrica en relación a “${title}”. Al cruzar los flujos de la mempool (mempool throughput), la velocidad de emisión de stablecoins y el interés abierto (open interest) en los mercados de derivados, observamos una desviación estadísticamente significativa de las bandas de volatilidad base de 30 días. Este comportamiento es fuertemente indicativo de una fase de acumulación o distribución institucional.`,
       `Los participantes de Nivel 1 (Tier-1) —definidos heurísticamente como entidades que gestionan más de $10 millones en activos digitales— están ejecutando rebalanceos calibrados a través de plataformas de custodia (OTC) y libros de órdenes centralizados. Los datos en cadena (on-chain) evidencian salidas netas desde mercados spot hacia clústeres de almacenamiento en frío (cold storage), un patrón que históricamente ha precedido expansiones de volatilidad direccional del 15% al 35% dentro de las siguientes 72 horas. Cabe destacar que las transferencias en bloque superiores al umbral de $2.5M han repuntado un 18.4% durante la última ventana de negociación.`,
@@ -89,8 +92,6 @@ function generateDeepAnalysis(title: string, domain: string): string {
       `Los datos de flujos netos en los intercambios (exchange net flows) corroboran la tesis direccional. Los principales CEX registraron salidas netas masivas desde sus carteras calientes (hot wallets), mientras que, paradójicamente, el interés abierto en los contratos de futuros listados en el CME se incrementó. Esta divergencia dinámica —salida de liquidez spot combinada con entrada en futuros— es fuertemente característica del despliegue de una operación de base (basis trade) institucional, una estrategia que suele resolver con una continuación de tendencia en el mercado spot a medio plazo.`,
       `La mesa de inteligencia ha elevado la clasificación de prioridad de este evento debido a las repercusiones asimétricas en la liquidez disponible. Los feeds de WebSocket en tiempo real continúan monitorizando la profundidad del libro de órdenes (order book depth) en los activos de mayor capitalización. Se aconseja a los operadores evitar posiciones apalancadas excesivamente expuestas y mantener la disciplina de gestión de riesgos hasta que los patrones primarios de distribución macroeconómica se hayan completado o neutralizado formalmente.`
     ]
-  ];echanically amplifies directional moves and could produce self-reinforcing price action if key technical support levels are breached. Maintain tight risk parameters and pre-define exit criteria before entering new positions.`,
-    ],
   ];
 
   return templates[idx].join('\n\n');

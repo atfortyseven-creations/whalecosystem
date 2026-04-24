@@ -124,7 +124,7 @@ export default function WhaleDashboard() {
                 );
 
             case 'zk':
-                return <><TelemetryHeader icon={Shield} title="Aztec ZK Shield" subtitle="Rollup Pipeline Mempool" isDark themeColor="amber" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="zk-shield"><AztecMempoolSpace /></DashboardErrorBoundary></div></>;
+                return <><TelemetryHeader icon={Shield} title="Aztec ZK Shield" subtitle="Rollup Pipeline Mempool" themeColor="purple" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="zk-shield"><AztecMempoolSpace /></DashboardErrorBoundary></div></>;
 
             // ── [ACTIVE PANELS] ────────────────────────────────────────────────
             case 'news':

@@ -2,14 +2,8 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, EyeOff, Zap, Lock, Database, Server, Clock, Activity, Cpu, Box, Hash, ChevronRight } from 'lucide-react';
-
-/**
- * ╔══════════════════════════════════════════════════════════════════════╗
- * ║   AZTEC NETWORK MEMPOOL — ZK-Rollup Visualizer                       ║
- * ║   Whale Alert Network Pro · Institutional Grade Privacy Monitoring   ║
- * ╚══════════════════════════════════════════════════════════════════════╝
- */
+import { Shield, EyeOff, Server, Activity, Hash, CheckCircle, Database, Box } from 'lucide-react';
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 
 interface ZkTransaction {
     id: string;
@@ -45,7 +39,6 @@ export default function AztecMempoolSpace() {
     useEffect(() => {
         let blockIdCounter = 10452;
 
-        // Init blocks
         const initialBlocks: SequencerBlock[] = [
             { id: blockIdCounter++, txs: [], status: 'FINALIZED', totalFee: 1.2, fillPercentage: 98 },
             { id: blockIdCounter++, txs: [], status: 'SUBMITTING', totalFee: 0.9, fillPercentage: 100 },
@@ -63,9 +56,8 @@ export default function AztecMempoolSpace() {
                 timestamp: Date.now(),
                 sizeKb: Math.floor(Math.random() * 4) + 1
             };
-
             setTransactions(prev => [newTx, ...prev].slice(0, 50));
-        }, 800); // 1.25 TPS avg
+        }, 800);
 
         const pipelineInterval = setInterval(() => {
             setTransactions(prev => prev.map(tx => {
@@ -76,7 +68,6 @@ export default function AztecMempoolSpace() {
                 return tx;
             }));
 
-            // Block mechanics
             setBlocks(prev => {
                 const newBlocks = [...prev];
                 const buildingBlock = newBlocks.find(b => b.status === 'BUILDING');
@@ -98,16 +89,14 @@ export default function AztecMempoolSpace() {
                     }
                 }
 
-                // Advance other blocks
                 newBlocks.forEach(b => {
                     if (b.status === 'PROVING' && Math.random() > 0.9) b.status = 'SUBMITTING';
                     else if (b.status === 'SUBMITTING' && Math.random() > 0.95) b.status = 'FINALIZED';
                 });
 
-                return newBlocks.slice(-5); // Keep last 5
+                return newBlocks.slice(-5);
             });
 
-            // Stats update
             setGlobalStats(prev => ({
                 tps: 1 + Math.random() * 2,
                 avgFeeJuice: 0.02 + Math.random() * 0.01,
@@ -123,87 +112,82 @@ export default function AztecMempoolSpace() {
         };
     }, []);
 
-    // ── Render Helpers ──────────────────────────────────────────────
     const getStageColor = (stage: string) => {
         switch (stage) {
-            case 'PXE_GENERATING': return 'text-slate-500 bg-slate-500/10 border-slate-500/30';
-            case 'KERNEL_PROOF': return 'text-blue-500 bg-blue-500/10 border-blue-500/30';
-            case 'SEQUENCER_QUEUE': return 'text-amber-500 bg-amber-500/10 border-amber-500/30';
-            case 'ROLLUP_BATCH': return 'text-purple-500 bg-purple-500/10 border-purple-500/30';
-            case 'L1_SETTLED': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30';
-            default: return 'text-gray-500';
+            case 'PXE_GENERATING': return 'bg-[#F5F5F5] text-[#888888] border-[#E5E5E5]';
+            case 'KERNEL_PROOF': return 'bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]';
+            case 'SEQUENCER_QUEUE': return 'bg-[#FFF8E1] text-[#FFA000] border-[#FFECB3]';
+            case 'ROLLUP_BATCH': return 'bg-[#F3E5F5] text-[#7B1FA2] border-[#E1BEE7]';
+            case 'L1_SETTLED': return 'bg-[#E8F5E9] text-[#388E3C] border-[#C8E6C9]';
+            default: return 'bg-[#F0F0F0] text-[#888888] border-[#CCCCCC]';
         }
     };
 
     const getStageLabel = (stage: string) => stage.replace('_', ' ');
 
     return (
-        <div className="w-full bg-[#050505] min-h-[800px] border border-white/10 rounded-[3rem] overflow-hidden relative font-sans text-white shadow-2xl flex flex-col">
-            {/* Background Grid & Blur */}
-            <div className="absolute inset-0 bg-[url('/patron-cosmico-4k.png')] opacity-5 mix-blend-screen pointer-events-none" />
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
-
-            {/* Header */}
-            <div className="p-8 border-b border-white/5 relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-900/30">
-                        <EyeOff size={28} className="text-white" />
+        <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] text-[#050505] font-sans">
+            {/* ── Formal Academic Header ── */}
+            <div className="flex items-end justify-between px-8 py-8 border-b border-[#E5E5E5] bg-white shrink-0">
+                <div>
+                    <div className="flex items-center gap-3 mb-2">
+                        <EyeOff size={24} className="text-[#050505]" />
+                        <h1 className="text-3xl font-bold uppercase tracking-tighter text-[#050505]">
+                            AZTEC NETWORK SPACE
+                        </h1>
                     </div>
-                    <div>
-                        <h2 className="text-3xl font-black tracking-tighter uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                            Aztec Network Space
-                        </h2>
-                        <div className="flex items-center gap-3 mt-1">
-                            <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                                <Shield size={10} /> Fully Shielded
-                            </span>
-                            <span className="text-[10px] text-gray-500 font-mono tracking-wider">L2 ZK-ROLLUP MEMPOOL</span>
-                        </div>
+                    <div className="flex items-center gap-3 ml-9">
+                        <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#050505] bg-[#F0F0F0] px-2 py-0.5 rounded-sm border border-[#CCCCCC]">
+                            <Shield size={10} /> Fully Shielded
+                        </span>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-[#A0A0A0]">
+                            L2 ZK-ROLLUP MEMPOOL
+                        </p>
                     </div>
                 </div>
 
                 {/* Global Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full lg:w-auto">
+                <div className="flex items-center gap-4">
                     {[
-                        { label: 'Network TPS', val: `${globalStats.tps.toFixed(2)}`, unit: 'tx/s', color: 'text-blue-400' },
-                        { label: 'Avg Fee Juice', val: `${globalStats.avgFeeJuice.toFixed(4)}`, unit: 'FEE', color: 'text-amber-400' },
-                        { label: 'Anonymity Set', val: globalStats.anonymitySetSize.toLocaleString(), unit: 'addrs', color: 'text-purple-400' },
-                        { label: 'Shielded TVL', val: `$${(globalStats.totalShieldedVol / 1000000).toFixed(1)}`, unit: 'M', color: 'text-emerald-400' },
+                        { label: 'Network TPS', val: globalStats.tps, unit: 'tx/s', isNum: true },
+                        { label: 'Avg Fee Juice', val: globalStats.avgFeeJuice, unit: 'FEE', isNum: true, format: (v: number) => v.toFixed(4) },
+                        { label: 'Anonymity Set', val: globalStats.anonymitySetSize, unit: 'addrs', isNum: true },
+                        { label: 'Shielded TVL', val: globalStats.totalShieldedVol, unit: 'M', isNum: true, format: (v: number) => `$${(v / 1000000).toFixed(1)}M` },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col justify-center min-w-[120px]">
-                            <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">{stat.label}</span>
+                        <div key={i} className="flex flex-col items-end mr-4">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-1.5">{stat.label}</span>
                             <div className="flex items-end gap-1">
-                                <span className={`text-lg font-black font-mono leading-none ${stat.color}`}>{stat.val}</span>
-                                <span className="text-[9px] text-gray-600 font-bold uppercase mb-[2px]">{stat.unit}</span>
+                                <AnimatedCounter 
+                                    value={stat.val}
+                                    format={stat.format ? stat.format : (v) => Math.floor(v).toString()}
+                                    className="text-2xl font-bold font-mono tracking-tighter text-[#050505] leading-none"
+                                />
+                                <span className="text-[9px] text-[#A0A0A0] font-bold uppercase mb-[2px]">{stat.unit}</span>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <div className="flex-1 grid grid-cols-1 xl:grid-cols-12 relative z-10 divide-y xl:divide-y-0 xl:divide-x divide-white/5">
-                
+            <div className="flex-1 flex overflow-hidden">
                 {/* LEFT: Sequencer Blocks (The "Space") */}
-                <div className="xl:col-span-8 p-8 flex flex-col">
+                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] bg-[#FAF9F6]">
                     <div className="flex items-center gap-3 mb-8">
-                        <Server size={18} className="text-purple-500" />
-                        <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Sequencer Block Pipeline</h3>
+                        <Server size={18} className="text-[#050505]" />
+                        <h3 className="text-sm font-black text-[#050505] uppercase tracking-[0.2em]">Sequencer Block Pipeline</h3>
                     </div>
 
-                    <div className="flex-1 flex items-center justify-end gap-4 overflow-x-auto no-scrollbar py-10 px-4">
+                    <div className="flex-1 flex items-center justify-end gap-4 overflow-x-auto no-scrollbar py-4 px-4">
                         <AnimatePresence mode="popLayout">
-                            {blocks.map((block, idx) => {
+                            {blocks.map((block) => {
                                 const isBuilding = block.status === 'BUILDING';
                                 const isFinalized = block.status === 'FINALIZED';
                                 
-                                // Color logic based on status
-                                let borderColor = 'border-white/10';
-                                let glow = '';
-                                if (isBuilding) { borderColor = 'border-amber-500/50'; glow = 'shadow-[0_0_40px_rgba(245,158,11,0.15)]'; }
-                                if (block.status === 'PROVING') { borderColor = 'border-purple-500/50'; glow = 'shadow-[0_0_40px_rgba(168,85,247,0.15)]'; }
-                                if (block.status === 'SUBMITTING') { borderColor = 'border-blue-500/50'; glow = 'shadow-[0_0_40px_rgba(59,130,246,0.15)]'; }
-                                if (isFinalized) { borderColor = 'border-emerald-500/50'; glow = 'shadow-[0_0_40px_rgba(16,185,129,0.1)]'; }
+                                let borderColor = 'border-[#E5E5E5]';
+                                if (isBuilding) borderColor = 'border-[#D4AF37]';
+                                if (block.status === 'PROVING') borderColor = 'border-[#7B1FA2]';
+                                if (block.status === 'SUBMITTING') borderColor = 'border-[#1976D2]';
+                                if (isFinalized) borderColor = 'border-[#388E3C]';
 
                                 return (
                                     <motion.div
@@ -212,60 +196,55 @@ export default function AztecMempoolSpace() {
                                         initial={{ opacity: 0, x: 50, scale: 0.9 }}
                                         animate={{ opacity: 1, x: 0, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.8 }}
-                                        className={`shrink-0 w-64 h-80 rounded-[2rem] bg-black/40 border-2 ${borderColor} ${glow} flex flex-col overflow-hidden relative group`}
+                                        className={`shrink-0 w-64 h-80 bg-white border ${borderColor} rounded-sm flex flex-col overflow-hidden relative shadow-sm`}
                                     >
                                         {/* Block Background Fill for Building */}
                                         {isBuilding && (
                                             <div 
-                                                className="absolute bottom-0 left-0 right-0 bg-amber-500/10 transition-all duration-1000 ease-linear"
+                                                className="absolute bottom-0 left-0 right-0 bg-[#FFF8E1] transition-all duration-1000 ease-linear"
                                                 style={{ height: `${block.fillPercentage}%` }}
                                             />
                                         )}
-                                        {block.status === 'PROVING' && (
-                                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay animate-pulse" />
-                                        )}
 
-                                        <div className="p-5 border-b border-white/10 relative z-10 bg-black/60 backdrop-blur-md">
+                                        <div className="p-4 border-b border-[#E5E5E5] relative z-10 bg-white/90 backdrop-blur-sm">
                                             <div className="flex justify-between items-center mb-2">
-                                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Block #{block.id}</span>
-                                                <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${
-                                                    isBuilding ? 'bg-amber-500/20 text-amber-400' :
-                                                    block.status === 'PROVING' ? 'bg-purple-500/20 text-purple-400' :
-                                                    block.status === 'SUBMITTING' ? 'bg-blue-500/20 text-blue-400' :
-                                                    'bg-emerald-500/20 text-emerald-400'
+                                                <span className="text-[10px] font-black text-[#888888] uppercase tracking-widest">Block #{block.id}</span>
+                                                <span className={`text-[8px] px-2 py-0.5 rounded-sm border font-black uppercase tracking-widest ${
+                                                    isBuilding ? 'bg-[#FFF8E1] text-[#D4AF37] border-[#FFECB3]' :
+                                                    block.status === 'PROVING' ? 'bg-[#F3E5F5] text-[#7B1FA2] border-[#E1BEE7]' :
+                                                    block.status === 'SUBMITTING' ? 'bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]' :
+                                                    'bg-[#E8F5E9] text-[#388E3C] border-[#C8E6C9]'
                                                 }`}>
                                                     {block.status}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-end">
                                                 <div>
-                                                    <span className="text-2xl font-black font-mono text-white">{block.totalFee.toFixed(3)}</span>
-                                                    <span className="text-[10px] text-gray-500 ml-1 font-bold">FEE</span>
+                                                    <span className="text-2xl font-black font-mono text-[#050505]">{block.totalFee.toFixed(3)}</span>
+                                                    <span className="text-[10px] text-[#A0A0A0] ml-1 font-bold">FEE</span>
                                                 </div>
-                                                {isBuilding && <span className="text-xs font-mono text-amber-400">{Math.floor(block.fillPercentage)}%</span>}
+                                                {isBuilding && <span className="text-[10px] font-mono font-black text-[#050505]">{Math.floor(block.fillPercentage)}%</span>}
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 p-4 relative z-10 grid grid-cols-6 gap-1 content-start">
-                                            {/* Simulate ZK proofs inside block */}
+                                        <div className="flex-1 p-4 relative z-10 grid grid-cols-6 gap-1.5 content-start">
                                             {Array.from({ length: isBuilding ? Math.floor(block.fillPercentage / 2) : 50 }).map((_, i) => (
                                                 <motion.div 
                                                     key={i}
                                                     initial={{ opacity: 0, scale: 0.5 }}
                                                     animate={{ opacity: 1, scale: 1 }}
-                                                    className={`w-full aspect-square rounded-[4px] shadow-sm ${
-                                                        isBuilding ? 'bg-amber-500/50 shadow-amber-500/20' : 
-                                                        block.status === 'PROVING' ? 'bg-purple-500/50 shadow-purple-500/20 animate-pulse' :
-                                                        block.status === 'SUBMITTING' ? 'bg-blue-500/50 shadow-blue-500/20' :
-                                                        'bg-emerald-500/50 shadow-emerald-500/20'
+                                                    className={`w-full aspect-square rounded-[2px] border ${
+                                                        isBuilding ? 'bg-[#FFF8E1] border-[#FFECB3]' : 
+                                                        block.status === 'PROVING' ? 'bg-[#F3E5F5] border-[#E1BEE7] animate-pulse' :
+                                                        block.status === 'SUBMITTING' ? 'bg-[#E3F2FD] border-[#BBDEFB]' :
+                                                        'bg-[#E8F5E9] border-[#C8E6C9]'
                                                     }`}
                                                 />
                                             ))}
                                         </div>
                                         
-                                        {/* Status Footer */}
-                                        <div className="p-3 bg-black/80 backdrop-blur-md text-center border-t border-white/5 relative z-10">
-                                            <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
+                                        <div className="p-3 bg-[#FAFAFA] text-center border-t border-[#E5E5E5] relative z-10">
+                                            <p className="text-[9px] text-[#888888] uppercase tracking-widest font-black">
                                                 {block.status === 'BUILDING' ? 'Aggregating Kernels' :
                                                  block.status === 'PROVING' ? 'Generating Rollup Proof' :
                                                  block.status === 'SUBMITTING' ? 'Broadcasting to L1' :
@@ -279,23 +258,20 @@ export default function AztecMempoolSpace() {
                     </div>
                 </div>
 
-                {/* RIGHT: Live Mempool Feed (ZK Pipeline) */}
-                <div className="xl:col-span-4 bg-white/[0.02] p-8 flex flex-col h-full min-h-[800px] relative">
-                    <div className="flex items-center justify-between mb-6">
+                {/* RIGHT: Live Mempool Feed */}
+                <div className="w-1/3 p-8 flex flex-col bg-white">
+                    <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E5E5E5]">
                         <div className="flex items-center gap-3">
-                            <Activity size={18} className="text-purple-500" />
-                            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Live ZK Pipeline</h3>
+                            <Activity size={18} className="text-[#050505]" />
+                            <h3 className="text-sm font-black text-[#050505] uppercase tracking-[0.2em]">Live ZK Pipeline</h3>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] text-emerald-500 font-mono tracking-widest uppercase">Syncing</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#388E3C] animate-pulse" />
+                            <span className="text-[9px] text-[#A0A0A0] font-bold uppercase tracking-widest">Syncing</span>
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto no-scrollbar pr-2 space-y-3 relative flex flex-col">
-                        {/* Fading top mask */}
-                        <div className="sticky top-0 left-0 right-0 h-10 bg-gradient-to-b from-[#0A0A0A] to-transparent z-20 pointer-events-none shrink-0 -mb-10" />
-                        
+                    <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3">
                         <AnimatePresence>
                             {transactions.map(tx => {
                                 const stageStyle = getStageColor(tx.stage);
@@ -303,40 +279,31 @@ export default function AztecMempoolSpace() {
                                     <motion.div
                                         key={tx.id}
                                         layout
-                                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                                        className="bg-black/40 border border-white/5 rounded-2xl p-4 hover:bg-white/5 transition-colors group"
+                                        className="bg-[#FAFAFA] border border-[#E5E5E5] rounded-sm p-4 hover:bg-[#F0F0F0] transition-colors group"
                                     >
-                                        <div className="flex justify-between items-start mb-3">
+                                        <div className="flex justify-between items-start mb-3 border-b border-[#E5E5E5] border-dashed pb-2">
                                             <div className="flex items-center gap-2">
-                                                <Hash size={14} className="text-gray-600" />
-                                                <span className="text-xs font-mono text-gray-300 group-hover:text-white transition-colors">{tx.pxeHash.slice(0,14)}...</span>
+                                                <Hash size={12} className="text-[#A0A0A0]" />
+                                                <span className="text-[11px] font-mono text-[#050505]">{tx.pxeHash.slice(0,14)}...</span>
                                             </div>
-                                            <span className="text-xs font-mono text-amber-400 font-bold">{tx.feeJuice.toFixed(4)} FJ</span>
+                                            <span className="text-[10px] font-mono text-[#050505] font-black">{tx.feeJuice.toFixed(4)} FJ</span>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
-                                            <div className={`px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest w-fit ${stageStyle}`}>
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className={`px-2 py-0.5 rounded-sm border text-[8px] font-black uppercase tracking-widest ${stageStyle}`}>
                                                 {getStageLabel(tx.stage)}
                                             </div>
-                                            <div className="h-[1px] flex-1 bg-white/5 relative">
-                                                <motion.div 
-                                                    className={`absolute top-0 bottom-0 left-0 bg-current opacity-50 ${stageStyle.split(' ')[0]}`} 
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: '100%' }}
-                                                    transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
-                                                />
-                                            </div>
-                                            <span className="text-[10px] font-mono text-gray-500">{tx.sizeKb}kb</span>
+                                            <span className="text-[10px] font-mono text-[#A0A0A0] flex items-center gap-1">
+                                                <Database size={10} /> {tx.sizeKb}kb
+                                            </span>
                                         </div>
                                     </motion.div>
                                 );
                             })}
                         </AnimatePresence>
-
-                        {/* Fading bottom mask */}
-                        <div className="sticky bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#0A0A0A] to-transparent z-20 pointer-events-none shrink-0 mt-auto -mb-3" />
                     </div>
                 </div>
             </div>
