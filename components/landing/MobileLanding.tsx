@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage } from "wagmi";
-import { useAppKit } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X } from "lucide-react";
@@ -511,164 +511,118 @@ export function MobileLanding() {
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
-  const { address, isConnected, connector, chainId } = useAccount();
+  // ── AppKit is the PRIMARY source on Android ────────────────────────────
+  // useAppKitAccount updates synchronously when AppKit's modal closes.
+  // wagmi's useAccount can lag 1-3s on Android (adapter round-trip delay).
+  const { address: akAddress, isConnected: akConnected } = useAppKitAccount();
+  const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { open: openAppKitDirect, close: closeAppKit } = useAppKit();
   const openConnectModal = useUIStore(s => s.openConnectModal);
 
+  // Merge: prefer AppKit (faster on mobile), fall back to wagmi
+  const isConnected = akConnected || wagmiConnected;
+  const address     = akAddress   || wagmiAddress;
+
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
-  // ── CRITICAL FIX: initialize isLinked from cookie immediately ──────────────
-  const [isLinked, setIsLinked]         = useState<boolean>(() => {
+
+  // Init isLinked from cookie immediately — no flash
+  const [isLinked, setIsLinked] = useState<boolean>(() => {
     if (typeof document === 'undefined') return false;
     return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
   });
-  // ── DEFINITIVE FIX: read address from cookie if wagmi hasn't reconnected ───
-  // The cookie value IS the wallet address: sovereign_handshake=0x1234...
-  // This means after signing we NEVER need wagmi to reconnect to show the
-  // ConnectedScreen. Works even if WalletConnect session drops after signing.
+
+  // Cookie address fallback (when wagmi hasn't reconnected yet)
   const cookieAddress = useMemo<string | null>(() => {
     if (typeof document === 'undefined') return null;
     const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
     return match?.[1] ?? null;
-  }, [isLinked]); // re-derive if isLinked changes (e.g. after fresh sign)
-  // Effective address: prefer live wagmi address, fall back to cookie address
+  }, [isLinked]);
+
   const effectiveAddress = address || cookieAddress || undefined;
 
-  // showingManifesto: true = go to manifesto landing first, user clicks black button to open scanner
   const [showingManifesto, setShowingManifesto] = useState(true);
-  const [isSigning, setIsSigning]       = useState(false);
-  const [signError, setSignError]       = useState<string | null>(null);
-  const [connecting, setConnecting]     = useState<string | null>(null);
-  const signingLock    = useRef(false);
-  // ── Live refs to defeat stale closures inside setInterval / setTimeout ────
-  const isLinkedRef    = useRef(isLinked);
-  const addressRef     = useRef(address);
-  const isConnectedRef = useRef(isConnected);
-  const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isSigning, setIsSigning]   = useState(false);
+  const [signError, setSignError]   = useState<string | null>(null);
+  const [connecting, setConnecting] = useState<string | null>(null);
+
+  // Single ref: prevents concurrent calls only (not cross-render blocking)
+  const linkingInProgress = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
-  // ── Keep live refs in sync with state/props on every render ────────────────
-  useEffect(() => { isLinkedRef.current    = isLinked;    }, [isLinked]);
-  useEffect(() => { addressRef.current     = address;     }, [address]);
-  useEffect(() => { isConnectedRef.current = isConnected; }, [isConnected]);
 
-  // ── Check for existing valid session on mount ───────────────────────────────
-  // Secondary check: if cookie already detected by useState init, this is a no-op.
-  // Handles edge case where sessionStorage is available (same tab session).
-  useEffect(() => {
-    if (!mounted) return;
-    if (address) {
-      const sessionSigned = typeof sessionStorage !== 'undefined'
-        ? sessionStorage.getItem(`sovereign_signed_${address}`) === 'true'
-        : false;
-      const hasCookie = typeof document !== 'undefined'
-        ? document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'))
-        : false;
-      if (sessionSigned || hasCookie) {
-        setIsLinked(true);
-      }
-    }
-  }, [mounted, address]);
-
-  // ── Scroll to top when manifesto becomes visible ─────────────────────────────
-  // Prevents the page from appearing mid-scrolled after the sign modal closes.
+  // ── Scroll to top whenever manifesto becomes active ─────────────────────
   useEffect(() => {
     if (isLinked && typeof window !== 'undefined') {
-      // Use both methods for cross-browser reliability
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     }
   }, [isLinked]);
 
-  // ── Primary trigger: fire handleSign as soon as wagmi confirms connection ───
+  // ── THE ONE TRUE LINK EFFECT ────────────────────────────────────────
+  // Fires whenever AppKit OR wagmi confirms a connected address.
+  // No locks, no signing, no delays — just write the session and go.
   useEffect(() => {
-    if (!mounted || !isConnected || !address || isLinked || signingLock.current) return;
-    setConnecting(null);
-    signingLock.current = false; // reset stale lock before attempting
-    handleSign();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isLinked, mounted]);
+    if (!mounted)      return;
+    if (!isConnected)  return;
+    if (!address)      return;
+    if (isLinked)      return;           // already done
+    if (linkingInProgress.current) return; // prevent double call
 
-  // ── Fallback trigger: ref-safe poll every 600ms ───────────────────────────
-  // The primary effect can miss the connection when AppKit delivers the
-  // address 1-3 seconds after isConnected fires (race condition on Android).
-  // This interval uses live refs — NO stale closure problem.
-  useEffect(() => {
-    if (!mounted) return;
-    const poll = setInterval(() => {
-      // Always read from refs for live values
-      if (isLinkedRef.current || signingLock.current) {
-        clearInterval(poll);
-        return;
-      }
-      if (isConnectedRef.current && addressRef.current) {
-        clearInterval(poll);
-        setConnecting(null);
-        signingLock.current = false; // reset stale lock
-        handleSign();
-      }
-    }, 600);
-    return () => clearInterval(poll);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted]);
-
-  // ── Establish Sovereign Link ──────────────────────────────────────────────────
-  const handleSign = useCallback(async () => {
-    // Use ref for address so this works even when closure is stale
-    const liveAddress = addressRef.current || address;
-    if (!liveAddress || signingLock.current) return;
-    signingLock.current = true;
+    linkingInProgress.current = true;
+    setConnecting(null); // clear any loading spinner on buttons
     setIsSigning(true);
-    setSignError(null);
-    try {
-      // ── ZERO-MOCK MOBILE PARADIGM ────────────────────────────────────────
-      // WalletConnect v2 cryptographically verifies wallet ownership during
-      // the pairing handshake. We use this as the source of truth and bypass
-      // the redundant ECDSA sign which causes Safari/Chrome websocket drops.
-      const normalizedAddress = liveAddress.toLowerCase();
 
-      if (typeof document !== 'undefined') {
-        document.cookie = `sovereign_handshake=${normalizedAddress}; path=/; max-age=604800; SameSite=Lax`;
-      }
-      try { sessionStorage.setItem(`sovereign_signed_${normalizedAddress}`, 'true'); } catch {}
+    const norm = address.toLowerCase();
 
-      // Async backend sync — fire-and-forget, never blocks UX
-      fetch('/api/wallet/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: normalizedAddress,
-          signature: '0x_mobile_wc_verified_tunnel',
-          message: 'Mobile session natively verified via WalletConnect Handshake'
-        }),
-      }).catch(() => {});
+    // 1. Write sovereign session cookie (source of truth)
+    document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+    // 2. Write sessionStorage flag
+    try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
+    // 3. Background sync with backend (non-blocking)
+    fetch('/api/wallet/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        walletAddress: norm,
+        signature: '0x_mobile_wc_verified_tunnel',
+        message: 'Mobile session natively verified via WalletConnect Handshake',
+      }),
+    }).catch(() => {});
 
-      // Short delay for UX polish — then teleport to Manifesto landing
-      setTimeout(() => {
-        signingLock.current = false;
-        isLinkedRef.current = true; // update ref immediately
-        setIsLinked(true);
-        setShowingManifesto(true); // always land on manifesto (black button visible)
-        try { closeAppKit(); } catch (e) {}
-        if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
-        }
-        setIsSigning(false);
-      }, 800);
+    // 4. Close AppKit modal if still open
+    try { closeAppKit(); } catch {}
 
-    } catch (e: any) {
-      setSignError('Fallo en la validación criptográfica del túnel.');
-      signingLock.current = false;
+    // 5. Teleport to Manifesto (short UX delay so user sees the transition)
+    setTimeout(() => {
+      setIsLinked(true);
+      setShowingManifesto(true);
       setIsSigning(false);
-    }
-  }, [address, closeAppKit]);
+      linkingInProgress.current = false;
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+    }, 400);
 
-  // ── Auto-fulfill PC terminal session if opened via native camera scan ───────
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, isConnected, address, isLinked]);
+
+  // ── Also check sessionStorage on mount (same-tab reconnect) ──────────────
+  useEffect(() => {
+    if (!mounted || !address || isLinked) return;
+    try {
+      if (sessionStorage.getItem(`sovereign_signed_${address.toLowerCase()}`) === 'true') {
+        setIsLinked(true);
+      }
+    } catch {}
+  }, [mounted, address, isLinked]);
+
+  // ── Fulfill PC QR session if opened via native camera scan ─────────────
   useEffect(() => {
     if (isLinked && address && sessionParam) {
       const fulfilledKey = `fulfilled_session_${sessionParam}`;
@@ -738,7 +692,7 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Signing step (new connection, no prior session) ─────────────────
+  // ── Render: Linking in progress (wallet just connected, writing session) ────
   if (isConnected && address && !isLinked) {
     return (
       <>
@@ -754,7 +708,10 @@ export function MobileLanding() {
         <SigningOverlay
           address={address}
           onSigned={() => setIsLinked(true)}
-          onRetry={() => { signingLock.current = false; handleSign(); }}
+          onRetry={() => {
+            linkingInProgress.current = false;
+            setIsSigning(false);
+          }}
           error={signError}
           isSigning={isSigning}
         />
