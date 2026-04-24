@@ -441,6 +441,7 @@ function ConnectedScreen({
       <DynamicQRScannerModal
         isOpen={showScanner}
         onClose={onCloseScanner}
+        address={address}
         onScan={(result: string) => {
           onCloseScanner();
           const toast = document.createElement('div');

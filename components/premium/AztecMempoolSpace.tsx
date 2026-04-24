@@ -126,7 +126,7 @@ export default function AztecMempoolSpace() {
     const getStageLabel = (stage: string) => stage.replace('_', ' ');
 
     return (
-        <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] text-[#050505] font-sans">
+        <div className="absolute inset-0 flex flex-col bg-[#FAF9F6] text-[#050505] font-sans overflow-hidden">
             {/* ── Formal Academic Header ── */}
             <div className="flex items-end justify-between px-8 py-8 border-b border-[#E5E5E5] bg-white shrink-0">
                 <div>
@@ -171,13 +171,13 @@ export default function AztecMempoolSpace() {
 
             <div className="flex-1 flex overflow-hidden">
                 {/* LEFT: Sequencer Blocks (The "Space") */}
-                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] bg-[#FAF9F6]">
-                    <div className="flex items-center gap-3 mb-8">
+                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] bg-[#FAF9F6] relative">
+                    <div className="flex items-center gap-3 mb-8 shrink-0">
                         <Server size={18} className="text-[#050505]" />
                         <h3 className="text-sm font-black text-[#050505] uppercase tracking-[0.2em]">Sequencer Block Pipeline</h3>
                     </div>
 
-                    <div className="flex-1 flex items-center justify-end gap-4 overflow-x-auto no-scrollbar py-4 px-4">
+                    <div className="absolute bottom-12 left-8 right-8 flex items-end justify-end gap-6 overflow-visible">
                         <AnimatePresence mode="popLayout">
                             {blocks.map((block) => {
                                 const isBuilding = block.status === 'BUILDING';
@@ -193,49 +193,60 @@ export default function AztecMempoolSpace() {
                                     <motion.div
                                         key={block.id}
                                         layout
-                                        initial={{ opacity: 0, x: 50, scale: 0.9 }}
-                                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                                        initial={{ opacity: 0, x: 50, y: 20, scale: 0.9 }}
+                                        animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.8 }}
-                                        className={`shrink-0 w-64 h-80 bg-white border ${borderColor} rounded-sm flex flex-col overflow-hidden relative shadow-sm`}
+                                        className={`shrink-0 w-64 h-80 bg-white border-2 ${borderColor} rounded-xl flex flex-col overflow-hidden relative shadow-md hover:shadow-xl transition-shadow ${block.status === 'PROVING' ? 'shadow-purple-500/20' : ''}`}
                                     >
+                                        {/* Animation: Mined pulse effect if finalized */}
+                                        {isFinalized && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: [0, 1, 0], scale: [0.8, 1.1, 1] }}
+                                                transition={{ duration: 1.5, ease: "easeOut" }}
+                                                className="absolute inset-0 bg-[#E8F5E9] z-0 pointer-events-none"
+                                            />
+                                        )}
+
                                         {/* Block Background Fill for Building */}
                                         {isBuilding && (
                                             <div 
-                                                className="absolute bottom-0 left-0 right-0 bg-[#FFF8E1] transition-all duration-1000 ease-linear"
+                                                className="absolute bottom-0 left-0 right-0 bg-[#FFF8E1] transition-all duration-1000 ease-linear z-0"
                                                 style={{ height: `${block.fillPercentage}%` }}
                                             />
                                         )}
 
-                                        <div className="p-4 border-b border-[#E5E5E5] relative z-10 bg-white/90 backdrop-blur-sm">
-                                            <div className="flex justify-between items-center mb-2">
+                                        <div className="p-4 border-b border-[#E5E5E5] relative z-10 bg-white/95 backdrop-blur-sm shadow-sm">
+                                            <div className="flex justify-between items-center mb-3">
                                                 <span className="text-[10px] font-black text-[#888888] uppercase tracking-widest">Block #{block.id}</span>
-                                                <span className={`text-[8px] px-2 py-0.5 rounded-sm border font-black uppercase tracking-widest ${
-                                                    isBuilding ? 'bg-[#FFF8E1] text-[#D4AF37] border-[#FFECB3]' :
-                                                    block.status === 'PROVING' ? 'bg-[#F3E5F5] text-[#7B1FA2] border-[#E1BEE7]' :
-                                                    block.status === 'SUBMITTING' ? 'bg-[#E3F2FD] text-[#1976D2] border-[#BBDEFB]' :
-                                                    'bg-[#E8F5E9] text-[#388E3C] border-[#C8E6C9]'
+                                                <span className={`text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest ${
+                                                    isBuilding ? 'bg-[#FFF8E1] text-[#FFA000]' :
+                                                    block.status === 'PROVING' ? 'bg-[#F3E5F5] text-[#7B1FA2] animate-pulse' :
+                                                    block.status === 'SUBMITTING' ? 'bg-[#E3F2FD] text-[#1976D2]' :
+                                                    'bg-[#E8F5E9] text-[#388E3C]'
                                                 }`}>
                                                     {block.status}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-end">
                                                 <div>
-                                                    <span className="text-2xl font-black font-mono text-[#050505]">{block.totalFee.toFixed(3)}</span>
-                                                    <span className="text-[10px] text-[#A0A0A0] ml-1 font-bold">FEE</span>
+                                                    <span className="text-2xl font-black font-mono text-[#050505] tracking-tighter">{block.totalFee.toFixed(3)}</span>
+                                                    <span className="text-[10px] text-[#888888] ml-1 font-bold">FEE</span>
                                                 </div>
-                                                {isBuilding && <span className="text-[10px] font-mono font-black text-[#050505]">{Math.floor(block.fillPercentage)}%</span>}
+                                                {isBuilding && <span className="text-[11px] font-mono font-black text-[#FFA000]">{Math.floor(block.fillPercentage)}%</span>}
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 p-4 relative z-10 grid grid-cols-6 gap-1.5 content-start">
+                                        <div className="flex-1 p-4 relative z-10 grid grid-cols-6 gap-2 content-start overflow-hidden">
                                             {Array.from({ length: isBuilding ? Math.floor(block.fillPercentage / 2) : 50 }).map((_, i) => (
                                                 <motion.div 
                                                     key={i}
                                                     initial={{ opacity: 0, scale: 0.5 }}
                                                     animate={{ opacity: 1, scale: 1 }}
-                                                    className={`w-full aspect-square rounded-[2px] border ${
+                                                    transition={{ delay: isBuilding ? 0 : i * 0.01 }}
+                                                    className={`w-full aspect-square rounded-[3px] border ${
                                                         isBuilding ? 'bg-[#FFF8E1] border-[#FFECB3]' : 
-                                                        block.status === 'PROVING' ? 'bg-[#F3E5F5] border-[#E1BEE7] animate-pulse' :
+                                                        block.status === 'PROVING' ? 'bg-[#F3E5F5] border-[#E1BEE7] shadow-[0_0_8px_rgba(123,31,162,0.3)] animate-pulse' :
                                                         block.status === 'SUBMITTING' ? 'bg-[#E3F2FD] border-[#BBDEFB]' :
                                                         'bg-[#E8F5E9] border-[#C8E6C9]'
                                                     }`}
@@ -243,8 +254,13 @@ export default function AztecMempoolSpace() {
                                             ))}
                                         </div>
                                         
-                                        <div className="p-3 bg-[#FAFAFA] text-center border-t border-[#E5E5E5] relative z-10">
-                                            <p className="text-[9px] text-[#888888] uppercase tracking-widest font-black">
+                                        <div className={`p-3 text-center border-t border-[#E5E5E5] relative z-10 ${isBuilding ? 'bg-white/80' : 'bg-[#FAFAFA]'}`}>
+                                            <p className={`text-[9px] uppercase tracking-widest font-black ${
+                                                 block.status === 'BUILDING' ? 'text-[#FFA000]' :
+                                                 block.status === 'PROVING' ? 'text-[#7B1FA2]' :
+                                                 block.status === 'SUBMITTING' ? 'text-[#1976D2]' :
+                                                 'text-[#388E3C]'
+                                            }`}>
                                                 {block.status === 'BUILDING' ? 'Aggregating Kernels' :
                                                  block.status === 'PROVING' ? 'Generating Rollup Proof' :
                                                  block.status === 'SUBMITTING' ? 'Broadcasting to L1' :
