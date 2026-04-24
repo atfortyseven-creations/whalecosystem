@@ -142,12 +142,12 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
     if (!ctx) return;
     const pos = getPos(e);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = '#FFFFFF';
+    ctx.strokeStyle = '#000000'; // Black ink for clear visibility on white background
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.shadowColor = '#D4AF37';
-    ctx.shadowBlur = 5;
+    ctx.shadowColor = 'rgba(0,0,0,0.1)';
+    ctx.shadowBlur = 2;
     ctx.stroke();
     setHasDrawn(true);
   };
@@ -163,8 +163,12 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
     thumb.width  = 320;
     thumb.height = 80;
     const tCtx = thumb.getContext('2d');
-    if (tCtx) tCtx.drawImage(src, 0, 0, 320, 80);
-    onSignature(thumb.toDataURL('image/jpeg', 0.4));
+    if (tCtx) {
+      tCtx.fillStyle = '#FFFFFF';
+      tCtx.fillRect(0, 0, 320, 80);
+      tCtx.drawImage(src, 0, 0, 320, 80);
+    }
+    onSignature(thumb.toDataURL('image/jpeg', 0.8));
   };
 
   return (
@@ -274,7 +278,7 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
                             {/* Clearance */}
                             <div className="px-6 py-5">
                                  <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-[#111111] text-[#D4AF37] border border-[#D4AF37]/30 whitespace-nowrap rounded-md shadow-sm">
-                                     {tier} {f.serialCode?.split('-').pop() || '0000'}
+                                     {tier} {(f.serialCode?.split('-').pop() || '0000').slice(-4)}
                                  </span>
                             </div>
                             {/* L2 Eligbility */}
@@ -302,8 +306,8 @@ function VerifiedLedger({ feed }: { feed: any[] }) {
                             {/* Signature */}
                              <div className="px-6 py-3 flex justify-end">
                                   {displaySig?.startsWith('data:image') ? (
-                                     <div className="bg-[#111111] border border-[#D4AF37]/30 rounded-lg overflow-hidden w-[140px] h-[50px] shadow-[0_0_15px_rgba(212,175,55,0.15)] flex items-center justify-center">
-                                        <img src={displaySig} className="w-full h-full object-cover object-center scale-[1.5] hover:scale-[2] transition-transform duration-300 drop-shadow-[0_0_8px_rgba(212,175,55,1)]" alt="Signature" />
+                                     <div className="bg-white border border-[#E5E5E5] rounded-lg overflow-hidden w-[140px] h-[50px] flex items-center justify-center">
+                                        <img src={displaySig} className="w-full h-full object-contain scale-[1.1] transition-transform duration-300" style={{ mixBlendMode: 'darken' }} alt="Signature" />
                                      </div>
                                   ) : (
                                      <span className="font-mono text-[10px] font-black text-[#A0A0A0] bg-[#050505]/5 px-2 py-1 rounded">
