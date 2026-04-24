@@ -7,10 +7,10 @@ import {
     Wallet, Settings,
     ChevronLeft, ChevronRight, Search,
     Globe, Cpu, Shield, Newspaper,
-    Network, Ticket, Zap, Menu,
-    BookOpen, Database, HeadphonesIcon,
+    Network, Ticket, Flame, Menu,
+    BookOpen, Database, MessageSquare,
     Landmark, Compass,
-    Activity, Lock, Book, Info, X
+    LineChart, Lock, Book, Info, X
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/settings-store';
@@ -38,11 +38,11 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold',         label: 'Ticket Mint',      icon: <Ticket size={17}/> },
 
     { id: 'markets',      label: 'Top Markets',      icon: <Globe size={17}/>,           dividerBefore: 'Market Data' },
-    { id: 'newpairs',     label: 'New Listings',     icon: <Zap size={17}/> },
+    { id: 'newpairs',     label: 'New Listings',     icon: <Flame size={17}/> },
     { id: 'omniexplorer', label: 'Omni Explorer',    icon: <Search size={17}/> },
     // { id: 'brc',          label: 'BRC Explorer',     icon: <Layers size={17}/> },
 
-    // { id: 'firehose',     label: 'Whale Firehose',   icon: <Activity size={17}/>,        dividerBefore: 'Pro Analytics', badge: 'PRO' },
+    // { id: 'firehose',     label: 'Whale Firehose',   icon: <LineChart size={17}/>,        dividerBefore: 'Pro Analytics', badge: 'PRO' },
     // { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <ShieldAlert size={17}/> },
     { id: 'inst-ledger',  label: 'Inst. Ledger',     icon: <Book size={17}/>, dividerBefore: 'Pro Analytics', badge: 'PRO' },
     { id: 'mass-transfer',label: 'Mass Transfers',   icon: <Network size={17}/> },
@@ -52,7 +52,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     // { id: 'forge',        label: 'Cosmic Forge',     icon: <FlaskConical size={17}/> },
 
     { id: 'portfolio',    label: 'Main Portfolio',   icon: <Wallet size={17}/>,          dividerBefore: 'Execution' },
-    // { id: 'live-port',    label: 'Quick Portfolio',  icon: <Activity size={17}/> },
+    // { id: 'live-port',    label: 'Quick Portfolio',  icon: <LineChart size={17}/> },
     // { id: 'whale-port',   label: 'Whale Holdings',   icon: <Star size={17}/> },
     { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/> },
     { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/>, badge: 'PRO' },
@@ -60,7 +60,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>,        dividerBefore: 'System' },
 
     { id: 'academy',      label: 'Academy',          icon: <BookOpen size={17}/>,        dividerBefore: 'Resources' },
-    { id: 'support',      label: 'Support',          icon: <HeadphonesIcon size={17}/> },
+    { id: 'support',      label: 'Support',          icon: <MessageSquare size={17}/> },
 ];
 
 
@@ -102,70 +102,7 @@ function PriceFlash({ value, children }: { value: string | number; children: Rea
     );
 }
 
-function LiveMarketBand() {
-    const { markets, isConnected: streamConnected, mode } = useMarketStream();
 
-    const btc = markets.get('BTCUSDT');
-    const eth = markets.get('ETHUSDT');
-
-    interface StatItem { label: string; value: string; chg: string | null; up: boolean; rawValue: number; }
-
-    const items: StatItem[] = [];
-
-    if (btc) {
-        const chgPct = parseFloat(btc.priceChangePercent || '0');
-        items.push({
-            label: 'BTC',
-            value: '$' + parseInt(btc.lastPrice || '0').toLocaleString(),
-            chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(1) + '%',
-            up: chgPct >= 0,
-            rawValue: parseFloat(btc.lastPrice || '0'),
-        });
-    }
-    if (eth) {
-        const chgPct = parseFloat(eth.priceChangePercent || '0');
-        items.push({
-            label: 'ETH',
-            value: '$' + parseInt(eth.lastPrice || '0').toLocaleString(),
-            chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(1) + '%',
-            up: chgPct >= 0,
-            rawValue: parseFloat(eth.lastPrice || '0'),
-        });
-    }
-
-    if (items.length === 0) {
-        return (
-            <>
-                {['BTC', 'ETH'].map(label => (
-                    <div key={label} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
-                        <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{label}</span>
-                        <div className="h-3 w-14 bg-white/10 rounded animate-pulse" />
-                    </div>
-                ))}
-            </>
-        );
-    }
-
-    return (
-        <>
-            {items.map((item, i) => (
-                <div key={i} className="flex flex-col px-3 py-1 min-w-0 shrink-0">
-                    <span className="text-[7.5px] font-black text-[#888888] uppercase tracking-[0.15em] leading-none mb-0.5">{item.label}</span>
-                    <PriceFlash value={item.rawValue}>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-[10px] font-black font-mono text-white truncate">{item.value}</span>
-                            {item.chg && (
-                                <span className={`text-[8px] font-black leading-none ${item.up ? 'text-[#00FF55]' : 'text-[#FF3B30]'}`}>
-                                    {item.chg}
-                                </span>
-                            )}
-                        </div>
-                    </PriceFlash>
-                </div>
-            ))}
-        </>
-    );
-}
 
 export function WhaleProShell({ 
     children, 
@@ -349,7 +286,7 @@ export function WhaleProShell({
                     </div>
 
                     <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 flex-1 mx-6 overflow-hidden">
-                        <LiveMarketBand />
+                        {/* Removed LiveMarketBand */}
                     </div>
 
                     <div className="flex items-center gap-2">

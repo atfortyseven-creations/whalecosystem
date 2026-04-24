@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { 
   Globe, Lock, BookOpen, Star, Newspaper, 
-  Ticket, Zap, Search, Layers, Activity, Book,
+  Ticket, Flame, Search, Layers, LineChart, Book,
   Network, Compass, Landmark, BarChart3, FlaskConical,
-  Wallet, Shield, Database, HeadphonesIcon,
+  Wallet, Shield, Database, MessageSquare,
   LayoutDashboard, ShieldAlert
 } from 'lucide-react';
 
@@ -84,10 +84,9 @@ const TelemetryHeader = ({ icon: Icon, title, subtitle, isDark = false, themeCol
 
     return (
         <div className={`shrink-0 h-24 border rounded-xl flex items-center justify-between px-6 shadow-sm relative overflow-hidden ${isDark ? 'bg-[#050505] border-white/10' : 'bg-white border-[#E5E5E5]'}`}>
-            <div className={`absolute top-0 right-0 w-64 h-64 ${selBg}/10 blur-[80px] rounded-full pointer-events-none transition-all duration-700`} />
             <div className="z-10 flex items-center gap-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDark ? 'bg-white/5' : 'bg-[#FAF9F6] border border-[#E5E5E5]'}`}>
-                    <Icon size={18} className={selText} />
+                    <Icon size={18} className={isDark ? 'text-white' : 'text-[#050505]'} />
                 </div>
                 <div>
                    <h2 className={`text-[13px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#050505]'}`}>
@@ -135,7 +134,7 @@ export default function WhaleDashboard() {
             case 'markets':
                 return <><TelemetryHeader icon={Globe} title="Market Analytics" subtitle="Top Assets" isDark themeColor="blue" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="gainers"><GainersLosersPanel /></DashboardErrorBoundary></div></>;
             case 'newpairs':
-                return <><TelemetryHeader icon={Zap} title="Discovery Engine" subtitle="New Token Pairs" isDark themeColor="blue" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="new-pairs"><NewPairsTable /></DashboardErrorBoundary></div></>;
+                return <><TelemetryHeader icon={Flame} title="Discovery Engine" subtitle="New Token Pairs" isDark themeColor="blue" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="new-pairs"><NewPairsTable /></DashboardErrorBoundary></div></>;
             case 'omniexplorer':
                 return <><TelemetryHeader icon={Search} title="Omni Explorer" subtitle="Cross-chain Verification" isDark themeColor="blue" /><div className="flex-1 min-h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="omni-explorer"><OmniExplorer /></DashboardErrorBoundary></div></>;
             case 'brc':
@@ -165,7 +164,7 @@ export default function WhaleDashboard() {
             case 'academy':
                 return <><TelemetryHeader icon={BookOpen} title="Sovereign Academy" subtitle="Knowledge Architecture" isDark themeColor="blue" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="academy"><WhaleAcademy /></DashboardErrorBoundary></div></>;
             case 'support':
-                return <><TelemetryHeader icon={HeadphonesIcon} title="Whale Support" subtitle="Direct Channel" isDark themeColor="blue" /><div className="flex-1 min-h-[800px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="support"><WhaleSupport /></DashboardErrorBoundary></div></>;
+                return <><TelemetryHeader icon={MessageSquare} title="Whale Support" subtitle="Direct Channel" isDark themeColor="blue" /><div className="flex-1 min-h-[800px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="support"><WhaleSupport /></DashboardErrorBoundary></div></>;
 
             default:
                 return null;

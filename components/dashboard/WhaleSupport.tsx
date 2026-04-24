@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HeadphonesIcon, MessageCircle, ChevronDown, ChevronUp, Send, CheckCircle } from 'lucide-react';
+import { MessageSquare, MessageCircle, ChevronDown, ChevronUp, Send, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Ticket {

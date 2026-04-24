@@ -62,7 +62,7 @@ function AllocationTelemetryBar({ minted, max }: { minted: number; max: number }
 
       <div className="flex flex-wrap items-center justify-between text-[10px] font-bold uppercase tracking-[0.1em] pt-1 pt-2">
         <span className="text-[#A0A0A0] flex items-center gap-2">
-          <Activity size={12} className="text-[#D4AF37]" /> CAPACITY REACHED <span className="text-[#FAF9F6] font-mono font-medium">{fill}%</span>
+          CAPACITY REACHED <span className="text-[#FAF9F6] font-mono font-medium">{fill}%</span>
         </span>
         {isAlmostFull ? (
           <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }} className="flex items-center gap-2 text-[#FF3B30] font-bold">
