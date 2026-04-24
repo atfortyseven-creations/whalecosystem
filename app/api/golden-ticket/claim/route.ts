@@ -16,22 +16,34 @@ const CLAIM_RATE_LIMIT = 3;    // Max 3 claim attempts per IP per hour
 const RATE_WINDOW_SEC  = 3600; // 1 hour TTL
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Redis-backed rate limiter
-// Prevents brute-force and automated minting attacks.
-// Falls back gracefully if Redis is unavailable (allows request, logs warning).
+// Redis-backed Rate Limiter & Heuristic Anomaly Detection (Zero-Trust)
+// Prevents brute-force and automated sybil minting attacks.
 // ─────────────────────────────────────────────────────────────────────────────
-async function checkClaimRateLimit(ip: string): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
+async function checkClaimRateLimit(ip: string, walletAddress: string): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
     try {
         const { redisClient } = await import('@/lib/redis/client');
         if (!redisClient || (redisClient as any).__isMock) {
             return { allowed: true, remaining: CLAIM_RATE_LIMIT, resetAt: 0 };
         }
-        const key     = `rl:claim:${ip}`;
-        const current = await redisClient.incr(key);
-        if (current === 1) {
-            await redisClient.expire(key, RATE_WINDOW_SEC);
+        
+        // 1. Standard IP-based Rate Limiter
+        const ipKey   = `rl:claim:ip:${ip}`;
+        const current = await redisClient.incr(ipKey);
+        if (current === 1) await redisClient.expire(ipKey, RATE_WINDOW_SEC);
+        
+        // 2. Anomaly Detection (Subnet / Farm protection)
+        // Detects if the same IP is trying to claim with multiple different wallets rapidly.
+        const velocityKey = `rl:anomaly:velocity:${ip}`;
+        await redisClient.sadd(velocityKey, walletAddress);
+        await redisClient.expire(velocityKey, 3600); // Track unique wallets per IP per hour
+        const uniqueWallets = await redisClient.scard(velocityKey);
+
+        if (uniqueWallets > 2) {
+             console.warn(`[Security] Sybil Farm detected from IP ${ip}. Attempted ${uniqueWallets} unique wallet claims.`);
+             return { allowed: false, remaining: 0, resetAt: Date.now() + 3600000 };
         }
-        const ttl = await redisClient.ttl(key);
+
+        const ttl = await redisClient.ttl(ipKey);
         return {
             allowed:   current <= CLAIM_RATE_LIMIT,
             remaining: Math.max(0, CLAIM_RATE_LIMIT - current),
@@ -96,9 +108,9 @@ export async function POST(req: NextRequest) {
         .slice(0, 50);               // max 50 chars (Twitter max is 15, we're generous)
     const safeHandle = cleanHandle.length > 0 ? cleanHandle : null;
 
-    // ── Redis-backed rate limit ───────────────────────────────────────────────
+    // ── Redis-backed rate limit & Anomaly Detection ──────────────────────────
     try {
-        const rateCheck = await checkClaimRateLimit(ip);
+        const rateCheck = await checkClaimRateLimit(ip, address);
         if (!rateCheck.allowed) {
             console.warn(JSON.stringify({
                 level: 'SECURITY', event: 'CLAIM_RATE_LIMIT_HIT',
