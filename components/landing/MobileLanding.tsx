@@ -545,6 +545,7 @@ export function MobileLanding() {
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
+  const [showManualReconnect, setShowManualReconnect] = useState(false);
 
   // Init isLinked from cookie immediately — no flash
   const [isLinked, setIsLinked] = useState<boolean>(() => {
@@ -642,6 +643,25 @@ export function MobileLanding() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isConnected, address, isLinked]);
 
+  // ── Mount-time poll: catches pre-existing AppKit session (incognito fast path) ──
+  // On iOS, after returning from wallet app, AppKit may have already resolved
+  // the address by the time visibilitychange fires. This catches it immediately.
+  useEffect(() => {
+    if (!mounted || isLinked) return;
+    let attempts = 0;
+    const check = setInterval(() => {
+      attempts++;
+      const addr = addressRef.current;
+      if (addr && isConnectedRef.current && !isLinkedRef.current) {
+        clearInterval(check);
+        performLink(addr);
+      } else if (attempts > 30 || isLinkedRef.current) {
+        clearInterval(check);
+      }
+    }, 300);
+    return () => clearInterval(check);
+  }, [mounted, isLinked, performLink]);
+
   // ── visibilitychange: catches WalletConnect relay delay on return from app ──
   // Rainbow, Trust, Coinbase, etc. use WalletConnect v2 relay. When the user
   // approves in the wallet app and returns to Chrome, the relay confirmation
@@ -650,7 +670,8 @@ export function MobileLanding() {
     if (!mounted) return;
     const handleVisible = () => {
       if (document.visibilityState !== 'visible') return;
-      // Poll every 300ms for up to 4s waiting for WC relay to confirm
+      // Poll every 200ms for up to 20s waiting for WC relay to confirm
+      // (extended from 4s to cover slow mobile relays and incognito cold starts)
       let attempts = 0;
       const check = setInterval(() => {
         attempts++;
@@ -658,10 +679,10 @@ export function MobileLanding() {
         if (addr && isConnectedRef.current && !isLinkedRef.current) {
           clearInterval(check);
           performLink(addr);
-        } else if (attempts > 13 || isLinkedRef.current) {
+        } else if (attempts > 100 || isLinkedRef.current) {
           clearInterval(check);
         }
-      }, 300);
+      }, 200);
     };
     document.addEventListener('visibilitychange', handleVisible);
     window.addEventListener('focus', handleVisible);
@@ -670,6 +691,13 @@ export function MobileLanding() {
       window.removeEventListener('focus', handleVisible);
     };
   }, [mounted, performLink]);
+
+  // ── Show manual reconnect button after 8s if still not linked ──────────────
+  useEffect(() => {
+    if (!mounted || isLinked) return;
+    const t = setTimeout(() => setShowManualReconnect(true), 8000);
+    return () => clearTimeout(t);
+  }, [mounted, isLinked]);
 
   // ── Also check sessionStorage on mount (same-tab reconnect) ──────────────
   useEffect(() => {
@@ -853,6 +881,19 @@ export function MobileLanding() {
           <p className="text-[12px] font-medium leading-relaxed" style={{ color: MUTED }}>
             Inteligencia blockchain de grado soberano. Conecta tu wallet para sincronizar tu sesión con el terminal de escritorio.
           </p>
+          {/* Manual reconnect escape hatch — appears after 8s */}
+          {showManualReconnect && (
+            <motion.button
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              onClick={() => { setShowManualReconnect(false); openAppKitDirect(); }}
+              className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#2D0A59]/20 bg-[#2D0A59]/5 text-[#2D0A59] font-black uppercase tracking-widest text-[10px] active:scale-[0.97] transition-all"
+            >
+              <RefreshCw size={13} />
+              Ya conecté mi wallet &mdash; Verificar sesión
+            </motion.button>
+          )}
         </motion.div>
 
         {/* Wallet Buttons */}
