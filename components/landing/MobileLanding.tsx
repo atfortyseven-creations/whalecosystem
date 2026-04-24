@@ -4,11 +4,11 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useAccount, useConnect, useSignMessage } from "wagmi";
+import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
-import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X } from "lucide-react";
+import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut } from "lucide-react";
 
 // ── Live clock hook ───────────────────────────────────────────────────────────
 function useLiveClock(intervalMs = 1000): Date {
@@ -166,13 +166,14 @@ function SigningOverlay({
 
 // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId
+  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect
 }: {
   address: string; onScan: () => void;
   showScanner: boolean; onCloseScanner: () => void;
   onBack?: () => void;
   connectorName?: string;
   chainId?: number;
+  onDisconnect?: () => void;
 }) {
   const now = useLiveClock();
   const [connectedAt] = useState(() => new Date()); // frozen at mount time
@@ -369,12 +370,28 @@ function ConnectedScreen({
           transition={{ delay: 0.22, duration: 0.6 }}
           whileTap={{ scale: 0.97 }}
           onClick={onScan}
-          className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white "
+          className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white"
           style={{ background: "#2D0A59", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(45,10,89,0.45)" }}
         >
           <Scan size={18} />
           Abrir Scanner QR · Sync PC
         </motion.button>
+
+        {/* ── Disconnect session button ── */}
+        {onDisconnect && (
+          <motion.button
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.27, duration: 0.5 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onDisconnect}
+            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-black uppercase tracking-widest border border-red-200/80 bg-red-50/60 hover:bg-red-100/80 active:bg-red-100 transition-colors"
+            style={{ fontSize: "11px", color: "#dc2626" }}
+          >
+            <LogOut size={15} />
+            Desconectar Sesión · Cambiar Wallet
+          </motion.button>
+        )}
 
         {/* ── Instruction card ── */}
         <motion.div
@@ -518,6 +535,7 @@ export function MobileLanding() {
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
+  const { disconnect } = useDisconnect();
   const { open: openAppKitDirect, close: closeAppKit } = useAppKit();
   const openConnectModal = useUIStore(s => s.openConnectModal);
 
@@ -534,6 +552,15 @@ export function MobileLanding() {
     return document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
   });
 
+  // linkedAddress: set synchronously in performLink so effectiveAddress
+  // is NEVER null after connection — critical for incognito mode where
+  // wagmi/appkit re-hydration is delayed and cookieAddress memo lags.
+  const [linkedAddress, setLinkedAddress] = useState<string | null>(() => {
+    if (typeof document === 'undefined') return null;
+    const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+    return match?.[1] ?? null;
+  });
+
   // Cookie address fallback (when wagmi hasn't reconnected yet)
   const cookieAddress = useMemo<string | null>(() => {
     if (typeof document === 'undefined') return null;
@@ -541,7 +568,8 @@ export function MobileLanding() {
     return match?.[1] ?? null;
   }, [isLinked]);
 
-  const effectiveAddress = address || cookieAddress || undefined;
+  // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
+  const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
   const [showingManifesto, setShowingManifesto] = useState(true);
   const [isSigning, setIsSigning]   = useState(false);
@@ -590,9 +618,11 @@ export function MobileLanding() {
     }).catch(() => {});
     // 4. Close AppKit modal
     try { closeAppKit(); } catch {}
-    // 5. Teleport to Manifesto
+    // 5. Teleport to Manifesto — set linkedAddress FIRST so effectiveAddress
+    //    is never null even in incognito where wagmi/cookie reads lag.
     setTimeout(() => {
       isLinkedRef.current = true;
+      setLinkedAddress(norm);   // ← atomic address guarantee for incognito
       setIsLinked(true);
       setShowingManifesto(true);
       setIsSigning(false);
@@ -688,7 +718,28 @@ export function MobileLanding() {
     }
   }, [isLinked, closeAppKit]);
 
-
+  // ── handleDisconnect: clears session and resets all state ───────────────
+  const handleDisconnect = useCallback(() => {
+    // 1. Expire the sovereign_handshake cookie
+    document.cookie = 'sovereign_handshake=; path=/; max-age=0; SameSite=Lax';
+    // 2. Clear sessionStorage keys for this address
+    const addr = (linkedAddress || address)?.toLowerCase();
+    if (addr) {
+      try { sessionStorage.removeItem(`sovereign_signed_${addr}`); } catch {}
+    }
+    // 3. Disconnect wagmi / AppKit
+    try { disconnect(); } catch {}
+    try { closeAppKit(); } catch {}
+    // 4. Reset all local state
+    isLinkedRef.current = false;
+    linkingInProgress.current = false;
+    setIsLinked(false);
+    setLinkedAddress(null);
+    setShowingManifesto(true);
+    setIsSigning(false);
+    setSignError(null);
+    setConnecting(null);
+  }, [disconnect, closeAppKit, linkedAddress, address]);
 
   if (!mounted) return null;
 
@@ -714,6 +765,7 @@ export function MobileLanding() {
                onBack={() => setShowingManifesto(true)}
                connectorName={connector?.name}
                chainId={chainId}
+               onDisconnect={handleDisconnect}
             />
           </motion.div>
         )}
