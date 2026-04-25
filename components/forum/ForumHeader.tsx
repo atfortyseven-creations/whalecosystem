@@ -54,22 +54,22 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
               <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <AlignJustify size={16} className="text-gray-500" /> Topics
               </Link>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum/users" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <User size={16} className="text-gray-500" /> Users
               </Link>
               <button onClick={() => { setProfileOpen(true); setMenuOpen(false); }} className="flex w-full items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] text-left">
                 <Settings size={16} className="text-gray-500" /> Profile
               </button>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum/guidelines" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Shield size={16} className="text-gray-500" /> Guidelines
               </Link>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum/badges" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Award size={16} className="text-gray-500" /> Badges
               </Link>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum/anniversaries" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Cake size={16} className="text-gray-500" /> Anniversaries
               </Link>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum/groups" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Users size={16} className="text-gray-500" /> Groups
               </Link>
             </div>

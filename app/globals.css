@@ -404,12 +404,35 @@ body,
  }
 
 /* Hide scrollbar while maintaining functionality */
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+.no-scrollbar,
+.hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ── FORUM RENDER CONTAINMENT ─────────────────────────────────────────────
+   The forum is a plain text list — it must NOT participate in the GPU
+   compositor storm triggered by the landing page animations.
+   `contain: layout paint` tells the browser this subtree is independent:
+   changes inside it never trigger layout/paint outside it (zero jank).
+   This is the #1 fix for forum scroll lag on mid-range mobile devices.
+   ──────────────────────────────────────────────────────────────────────── */
+.forum-container {
+  contain: layout paint;
+  /* Momentum scroll on iOS without JavaScript */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent hover CSS from triggering repaint layers on touch devices */
+@media (hover: none) {
+  .forum-container button:hover,
+  .forum-container a:hover {
+    background-color: transparent !important;
+  }
 }
 
   .font-aztec-serif {

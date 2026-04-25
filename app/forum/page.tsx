@@ -28,31 +28,31 @@ export default function ForumHomePage() {
     <div className="flex flex-col gap-0 w-full">
       
       {/* ── Discourse Sub-Navigation ── */}
-      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
-        <div className="flex items-center gap-4 sm:gap-6 text-[14px] overflow-x-auto pb-1 sm:pb-0">
-          <Link href="/forum" className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200">
+      {/* PERF: flex-col on mobile prevents element stacking. md:flex-row aligns on desktop. */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3 w-full">
+        <div className="flex items-center gap-2 sm:gap-4 text-[14px] w-full overflow-x-auto pb-1 hide-scrollbar">
+          <Link href="/forum" className="flex shrink-0 items-center gap-1.5 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-2.5 py-1.5 rounded-md border border-gray-200 text-[13px]">
             <span>Categories</span>
-            <ChevronDown size={14} />
+            <ChevronDown size={13} />
           </Link>
-          <Link href="/forum" className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200">
+          <Link href="/forum" className="flex shrink-0 items-center gap-1.5 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-2.5 py-1.5 rounded-md border border-gray-200 text-[13px]">
             <span>Tags</span>
-            <ChevronDown size={14} />
+            <ChevronDown size={13} />
           </Link>
           
-          <div className="flex items-center gap-4 sm:gap-5 ml-2 font-semibold whitespace-nowrap">
+          <div className="flex items-center gap-3 sm:gap-5 ml-1 font-semibold whitespace-nowrap shrink-0 text-[13px]">
             <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">Categories</Link>
-            <Link href="/forum" className="text-blue-500 border-b-2 border-blue-500 pb-1">Latest</Link>
+            <Link href="/forum" className="text-blue-500 border-b-2 border-blue-500 pb-0.5">Latest</Link>
             <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">New</Link>
-            <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">Unread</Link>
             <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">Top</Link>
           </div>
         </div>
 
         <Link 
           href="/forum/new" 
-          className="flex items-center gap-1.5 bg-[#0088CC] hover:bg-[#0077B3] text-white px-4 py-2 rounded shadow-sm text-[14px] font-medium transition-colors"
+          className="flex shrink-0 self-start md:self-auto items-center gap-1.5 bg-[#0088CC] hover:bg-[#0077B3] text-white px-4 py-2 rounded shadow-sm text-[13px] font-medium"
         >
-          <Plus size={16} />
+          <Plus size={15} />
           New Topic
         </Link>
       </div>

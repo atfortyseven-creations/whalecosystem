@@ -32,7 +32,8 @@ export default async function ForumLayout({
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 
       {/* ─── Data Container ─── */}
-      <main className="flex-1 w-full max-w-[1110px] mx-auto px-4 sm:px-6 py-8">
+      {/* forum-container applies CSS paint containment: zero GPU leak from landing page animations */}
+      <main className="forum-container flex-1 w-full max-w-[1110px] mx-auto px-4 sm:px-6 py-6">
         {children}
       </main>
       

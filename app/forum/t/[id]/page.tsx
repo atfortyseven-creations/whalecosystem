@@ -132,7 +132,7 @@ export default function TopicPage() {
           </div>
 
           {/* ── Reply Composer ── */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div id="reply-composer" className="mt-4 pt-4 border-t border-gray-200">
             <h3 className="text-gray-700 font-semibold mb-3">Reply to this topic</h3>
             <textarea 
               value={replyContent}
@@ -237,29 +237,29 @@ function PayloadBlock({ entity, type, onLike, isLast }: { entity: any, type: 'to
            {entity.content}
          </div>
          
-         {/* Actions Row (Post level) */}
-         <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity justify-end">
+         {/* Actions Row — no opacity/transition: prevents GPU repaint on mobile scroll */}
+         <div className="flex items-center gap-1 justify-end mt-2">
            <button 
              onClick={handleLike}
-             className={`flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-100 rounded transition-colors ${liked ? 'text-red-500 bg-red-50' : 'text-gray-600'}`}
+             className={`flex items-center gap-1.5 px-2.5 py-1 hover:bg-gray-100 rounded text-[13px] ${liked ? 'text-red-500 bg-red-50' : 'text-gray-500'}`}
              title="Like this post"
            >
-             <Heart size={16} className={liked || entity._count?.likes > 0 ? "fill-current" : ""} />
-             {entity._count?.likes > 0 && <span className="text-[13px] font-medium">{entity._count.likes}</span>}
+             <Heart size={14} className={liked || entity._count?.likes > 0 ? "fill-current" : ""} />
+             {entity._count?.likes > 0 && <span className="font-medium">{entity._count.likes}</span>}
            </button>
            <button 
              onClick={() => navigator.clipboard.writeText(window.location.href)}
-             className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-100 text-gray-600 rounded transition-colors"
-             title="Share a link to this post"
+             className="flex items-center gap-1.5 px-2.5 py-1 hover:bg-gray-100 text-gray-500 rounded text-[13px]"
+             title="Copy link"
            >
-             <LinkIcon size={16} />
+             <LinkIcon size={14} />
            </button>
            <button 
-             onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-             className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-100 text-gray-600 rounded transition-colors"
+             onClick={() => document.getElementById('reply-composer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+             className="flex items-center gap-1.5 px-2.5 py-1 hover:bg-gray-100 text-gray-500 rounded text-[13px]"
            >
-             <Reply size={16} />
-             <span className="text-[13px] font-medium">Reply</span>
+             <Reply size={14} />
+             <span className="font-medium">Reply</span>
            </button>
          </div>
       </div>
