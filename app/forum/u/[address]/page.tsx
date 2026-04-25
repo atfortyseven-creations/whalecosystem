@@ -13,7 +13,6 @@ export default function UserProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [summary, setSummary] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'SUMMARY' | 'ACTIVITY' | 'BADGES'>('SUMMARY');
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // We hit the new Summary API which aggregates all the data
@@ -26,20 +25,12 @@ export default function UserProfilePage() {
         } else {
           setProfile({ error: true });
         }
-        setLoading(false);
       })
       .catch((e) => {
         console.error(e);
         setProfile({ error: true });
-        setLoading(false);
       });
   }, [address]);
-
-  if (loading) return (
-    <div className="py-20 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/30">
-      [ SYNCING NODE DATA... ]
-    </div>
-  );
 
   if (!profile || profile.error) return (
     <div className="py-20 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/30">

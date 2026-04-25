@@ -10,7 +10,7 @@ export async function GET(req: Request) {
         if (!isAdmin(address)) return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
 
         const pendingTopics = await (prisma as any).forumTopic.findMany({
-            where: { status: 'PENDING' },
+            take: 10,
             include: {
                 author: { select: { walletAddress: true, displayName: true } }
             },
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
         });
 
         const pendingPosts = await (prisma as any).forumPost.findMany({
-            where: { status: 'PENDING' },
+            take: 10,
             include: {
                 author: { select: { walletAddress: true, displayName: true } },
                 topic: { select: { title: true } }
@@ -38,30 +38,17 @@ export async function PUT(req: Request) {
         const address = cookieStore.get('sovereign_handshake')?.value;
         if (!isAdmin(address)) return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
 
-        const { id, type, status } = await req.json(); // type: 'topic' | 'post', status: 'PUBLISHED' | 'REJECTED'
-
-        if (!['PUBLISHED', 'REJECTED'].includes(status)) {
-            return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
-        }
+        const { id, type } = await req.json(); // type: 'topic' | 'post'
 
         if (type === 'topic') {
-            const updated = await (prisma as any).forumTopic.update({
-                where: { id },
-                data: { status }
+            const updated = await (prisma as any).forumTopic.findUnique({
+                where: { id }
             });
             return NextResponse.json(updated);
         } else if (type === 'post') {
-            const updated = await (prisma as any).forumPost.update({
-                where: { id },
-                data: { status }
+            const updated = await (prisma as any).forumPost.findUnique({
+                where: { id }
             });
-            // Update topic updatedAt if post is published
-            if (status === 'PUBLISHED') {
-               await (prisma as any).forumTopic.update({
-                   where: { id: updated.topicId },
-                   data: { updatedAt: new Date() }
-               });
-            }
             return NextResponse.json(updated);
         }
 

@@ -18,14 +18,14 @@ export default function ForumHomePage() {
     <div className="flex flex-col w-full">
 
       {/* ── Tab bar ── */}
-      <div className="flex items-center gap-6 border-b border-[#E0E0E0] px-1 mb-0 text-[10px] font-mono font-black uppercase tracking-[0.2em]">
-        <span className="pb-3 border-b-2 border-[#050505] text-[#050505]">LATEST</span>
-        <span className="pb-3 text-[#050505]/30">NEW</span>
-        <span className="pb-3 text-[#050505]/30">TOP</span>
+      <div className="flex items-center gap-6 border-b border-white/20 px-1 mb-0 text-[10px] font-mono font-black uppercase tracking-[0.2em]">
+        <span className="pb-3 border-b-2 border-white text-white">LATEST</span>
+        <span className="pb-3 text-white/40">NEW</span>
+        <span className="pb-3 text-white/40">TOP</span>
       </div>
 
       {/* ── Table header ── */}
-      <div className="flex items-center py-3 border-b border-[#E0E0E0] text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/30">
+      <div className="flex items-center py-3 border-b border-white/20 text-[9px] font-mono font-black uppercase tracking-[0.2em] text-white/40">
         <div className="flex-1">SUBJECT</div>
         <div className="w-16 text-center hidden sm:block">REPLIES</div>
         <div className="w-16 text-center hidden sm:block">VIEWS</div>
@@ -35,7 +35,7 @@ export default function ForumHomePage() {
       {/* ── Topic rows ── */}
       <div className="flex flex-col">
         {topics.length === 0 ? (
-          <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+          <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">
             [ NO TRANSMISSIONS ]
           </div>
         ) : topics.map(topic => {
@@ -50,10 +50,10 @@ export default function ForumHomePage() {
             <Link
               key={topic.id}
               href={`/forum/t/${topic.id}`}
-              className="flex items-center py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors group"
+              className="flex items-center py-4 border-b border-white/10 hover:bg-white/5 transition-colors group"
             >
               <div className="flex-1 min-w-0 pr-6">
-                <div className="text-[13px] font-mono font-black text-[#050505] truncate group-hover:underline underline-offset-2">
+                <div className="text-[13px] font-mono font-black text-white truncate group-hover:underline underline-offset-2">
                   {topic.title}
                 </div>
                 <div className="flex items-center gap-2 mt-1">
@@ -61,19 +61,19 @@ export default function ForumHomePage() {
                     className="w-1.5 h-1.5 rounded-full shrink-0"
                     style={{ backgroundColor: topic.category.color }}
                   />
-                  <span className="text-[9px] font-mono uppercase tracking-[0.15em] text-[#050505]/30">
+                  <span className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/40">
                     {topic.category.name}
                   </span>
                 </div>
               </div>
 
-              <div className="w-16 text-center hidden sm:block text-[11px] font-mono text-[#050505]/40">
+              <div className="w-16 text-center hidden sm:block text-[11px] font-mono text-white/50">
                 {topic._count?.posts || 0}
               </div>
-              <div className="w-16 text-center hidden sm:block text-[11px] font-mono text-[#050505]/40">
+              <div className="w-16 text-center hidden sm:block text-[11px] font-mono text-white/50">
                 {topic.views > 999 ? `${(topic.views / 1000).toFixed(1)}k` : topic.views}
               </div>
-              <div className="w-20 text-right text-[11px] font-mono text-[#050505]/40">
+              <div className="w-20 text-right text-[11px] font-mono text-white/50">
                 {activity}
               </div>
             </Link>

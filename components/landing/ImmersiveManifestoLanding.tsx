@@ -2,7 +2,6 @@
 
 import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
-import { SovereignFooter } from "./SovereignFooter";
 import { Scan } from "lucide-react";
 
 // Pre-defined list of lottie files matching the narrative sections.
@@ -317,11 +316,6 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
         </div>
       )}
 
-
-      {/* ─── Sovereign Footer (full-bleed, outside max-width container) ─── */}
-      <div className="relative z-10">
-        <SovereignFooter />
-      </div>
 
     </div>
   );

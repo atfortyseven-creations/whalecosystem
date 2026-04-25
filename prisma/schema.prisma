@@ -918,7 +918,6 @@ model ForumTopic {
   views       Int          @default(0)
   isPinned    Boolean      @default(false)
   isLocked    Boolean      @default(false)
-  status      String       @default("PENDING") // PENDING, PUBLISHED, REJECTED
   
   category    ForumCategory @relation(fields: [categoryId], references: [id])
   author      User          @relation(fields: [authorId], references: [id])
@@ -931,7 +930,6 @@ model ForumTopic {
 
   @@index([categoryId, createdAt(sort: Desc)])
   @@index([authorId, createdAt(sort: Desc)])
-  @@index([status, createdAt(sort: Desc)])
 }
 
 model ForumPost {
@@ -941,7 +939,6 @@ model ForumPost {
   authorId    String
   replyToId   String?      // Optional: if replying to a specific post
   isSolution  Boolean      @default(false)
-  status      String       @default("PENDING") // PENDING, PUBLISHED, REJECTED
 
   topic       ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
   author      User         @relation(fields: [authorId], references: [id])
@@ -953,7 +950,6 @@ model ForumPost {
   updatedAt   DateTime     @updatedAt
 
   @@index([topicId, createdAt(sort: Asc)])
-  @@index([status, createdAt(sort: Desc)])
 }
 
 model ForumLike {

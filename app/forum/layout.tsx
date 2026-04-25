@@ -27,12 +27,11 @@ export default async function ForumLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#050505] flex flex-col">
+    <div className="min-h-screen flex flex-col text-white">
       <TelemetryTracker />
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 
       {/* ─── Data Container ─── */}
-      {/* forum-container applies CSS paint containment: zero GPU leak from landing page animations */}
       <main className="forum-container flex-1 w-full max-w-[920px] mx-auto px-6 py-6">
         {children}
       </main>
