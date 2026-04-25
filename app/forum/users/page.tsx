@@ -45,24 +45,29 @@ export default async function ForumUsersPage() {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
-      <div className="mb-8 pb-6 border-b border-white/20">
-        <h1 className="text-[16px] font-aztec-h2 font-black uppercase tracking-tight text-white leading-snug">
-          Institutional Leaderboard
-        </h1>
-        <div className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#00f2ea] mt-2">
-          PRESTIGE & INFLUENCE RANKING
+    <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
+      {/* Breadcrumb & Header */}
+      <div className="mb-8 pb-4 border-b border-white/5">
+        <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold text-white/40">
+          <Link href="/forum" className="hover:text-white transition-colors">Forum</Link>
+          <span>/</span>
+          <span className="text-white/80">Users</span>
+        </div>
+        <div className="flex items-center justify-between">
+            <h1 className="text-[28px] font-sans font-bold text-white tracking-tight">
+              Leaderboard
+            </h1>
         </div>
       </div>
 
       {/* ── Table header ── */}
-      <div className="flex items-center py-3 border-b border-white/20 text-[9px] font-mono font-black uppercase tracking-[0.2em] text-white/40 mb-4">
-        <div className="w-12 text-center">RANK</div>
-        <div className="flex-1">OPERATIVE</div>
-        <div className="w-20 text-center hidden sm:block">TOPICS</div>
-        <div className="w-20 text-center hidden sm:block">TRANSMISSIONS</div>
-        <div className="w-20 text-center hidden sm:block">REPUTATION</div>
-        <div className="w-24 text-right text-[#00f2ea]">PRESTIGE</div>
+      <div className="flex items-center pb-3 border-b border-white/10 text-[12px] font-sans font-bold uppercase text-white/40 mb-4 px-2">
+        <div className="w-12 text-center">Rank</div>
+        <div className="flex-1">User</div>
+        <div className="w-20 text-center hidden sm:block">Topics</div>
+        <div className="w-20 text-center hidden sm:block">Posts</div>
+        <div className="w-20 text-center hidden sm:block">Likes</div>
+        <div className="w-24 text-right">Score</div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -71,54 +76,54 @@ export default async function ForumUsersPage() {
             <Link 
               href={`/forum/u/${u.walletAddress}`} 
               key={u.id} 
-              className="flex items-center py-4 border border-white/5 bg-black/20 hover:bg-white/5 transition-colors group px-2"
+              className="flex items-center py-4 border border-white/5 bg-white/[0.02] hover:bg-[#1a112a] hover:border-[#6366f1]/50 rounded-sm transition-all duration-200 px-2 group"
             >
-              <div className="w-12 text-center text-[14px] font-aztec-h2 font-black text-white/40 group-hover:text-white transition-colors">
+              <div className="w-12 text-center text-[16px] font-sans font-bold text-white/40 group-hover:text-white transition-colors">
                 #{i + 1}
               </div>
               
               <div className="flex-1 min-w-0 flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex items-center justify-center shrink-0 border border-white/20 group-hover:border-[#00f2ea] transition-colors">
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex items-center justify-center shrink-0 border border-white/10 group-hover:border-[#6366f1]/50 transition-colors">
                   {u.avatarUrl ? (
                     <img src={u.avatarUrl} alt={u.displayName || ''} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-[10px] font-mono font-black text-white uppercase">
-                       {u.walletAddress ? u.walletAddress.slice(2,3) : '?'}
+                    <span className="text-[14px] font-sans font-bold text-white">
+                       {u.walletAddress ? u.walletAddress.slice(2,3).toUpperCase() : '?'}
                     </span>
                   )}
                 </div>
                 <div className="flex flex-col">
-                  <div className="text-[12px] font-mono font-black text-white uppercase tracking-widest group-hover:text-[#00f2ea] transition-colors">
-                    {u.displayName || (u.walletAddress ? `${u.walletAddress.slice(0,6)}…${u.walletAddress.slice(-4)}` : "ANONYMOUS WHALE")}
+                  <div className="text-[15px] font-sans font-bold text-white transition-colors">
+                    {u.displayName || (u.walletAddress ? `${u.walletAddress.slice(0,6)}…${u.walletAddress.slice(-4)}` : "Anonymous")}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#D4AF37]">
-                      {u.tier === 'basic' ? 'INITIATE' : u.tier}
+                    <span className="text-[11px] font-sans font-bold text-[#919191]">
+                      {u.tier === 'basic' ? 'Initiate' : u.tier}
                     </span>
                     {u.isPro && (
-                      <span className="text-[8px] font-black bg-[#D4AF37] text-black px-1 uppercase tracking-widest">PRO</span>
+                      <span className="text-[10px] font-sans font-bold bg-[#D4AF37] text-black px-1.5 py-0.5 rounded-sm">PRO</span>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="w-20 text-center hidden sm:block text-[11px] font-mono text-white/50">
+              <div className="w-20 text-center hidden sm:block text-[14px] font-sans text-[#919191]">
                 {u.stats.topics}
               </div>
-              <div className="w-20 text-center hidden sm:block text-[11px] font-mono text-white/50">
+              <div className="w-20 text-center hidden sm:block text-[14px] font-sans text-[#919191]">
                 {u.stats.posts}
               </div>
-              <div className="w-20 text-center hidden sm:block text-[11px] font-mono text-white/50">
+              <div className="w-20 text-center hidden sm:block text-[14px] font-sans text-[#919191]">
                 {u.stats.likes}
               </div>
-              <div className="w-24 text-right text-[14px] font-aztec-h2 font-black text-[#00f2ea]">
+              <div className="w-24 text-right text-[16px] font-sans font-bold text-white">
                 {u.prestigeScore}
               </div>
             </Link>
           ))
         ) : (
-          <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">
-            [ NO INTEL TRANSMITTED YET ]
+          <div className="py-16 text-center text-[13px] font-sans text-white/30">
+            No active users found.
           </div>
         )}
       </div>
