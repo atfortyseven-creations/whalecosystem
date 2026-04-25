@@ -200,12 +200,16 @@ function PayloadBlock({ entity, type, onLike, isLast }: { entity: any, type: 'to
       {/* Avatar Column */}
       <div className="w-12 shrink-0 flex flex-col items-center relative group-hover:z-10">
         <Link href={`/forum/u/${authorAddress}`}>
-          <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center text-[18px] text-white font-bold shadow-sm"
-            style={{ backgroundColor: avatarColor }}
-          >
-            {authorAddress.slice(2,3).toUpperCase()}
-          </div>
+          {entity.author.avatarUrl ? (
+             <img src={entity.author.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full object-cover shadow-sm border border-gray-100" />
+          ) : (
+             <div 
+               className="w-12 h-12 rounded-full flex items-center justify-center text-[18px] text-white font-bold shadow-sm"
+               style={{ backgroundColor: avatarColor }}
+             >
+               {authorAddress.slice(2,3).toUpperCase()}
+             </div>
+          )}
         </Link>
       </div>
 
@@ -215,7 +219,7 @@ function PayloadBlock({ entity, type, onLike, isLast }: { entity: any, type: 'to
          <div className="flex items-center justify-between mb-2">
            <div className="flex items-center gap-2">
              <Link href={`/forum/u/${authorAddress}`} className="text-[15px] font-bold text-[#222222] hover:underline">
-               {authorAddress.slice(0,6)}…{authorAddress.slice(-4)}
+               {entity.author.displayName || `${authorAddress.slice(0,6)}…${authorAddress.slice(-4)}`}
              </Link>
              {entity.author.isPro && (
                <span className="text-[10px] uppercase font-bold text-[#D4AF37] border border-[#D4AF37] px-1 rounded-sm">

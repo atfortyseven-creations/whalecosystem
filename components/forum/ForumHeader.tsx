@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Menu, User, X, AlignJustify, Users, Shield, Award, Cake, UsersRound, Tag, Hash } from 'lucide-react';
 
-export function ForumHeader({ address }: { address: string }) {
+export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUrl?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -108,7 +108,11 @@ export function ForumHeader({ address }: { address: string }) {
 
         {address ? (
           <Link href={`/forum/u/${address}`} className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0">
-            <User size={18} className="text-blue-500" />
+            {avatarUrl ? (
+               <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
+            ) : (
+               <User size={18} className="text-blue-500" />
+            )}
           </Link>
         ) : (
           <Link href="/connect" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0" title="Log In">
