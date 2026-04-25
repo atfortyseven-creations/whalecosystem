@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { ForumRadar } from '@/components/forum/ForumRadar';
 
 export default function ForumHomePage() {
   const [topics, setTopics] = useState<any[]>([]);
@@ -15,10 +16,14 @@ export default function ForumHomePage() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full gap-8">
+      
+      {/* ── Intelligence Radar ── */}
+      <ForumRadar />
 
       {/* ── Tab bar ── */}
-      <div className="flex items-center gap-6 border-b border-white/20 px-1 mb-0 text-[10px] font-mono font-black uppercase tracking-[0.2em]">
+      <div className="flex flex-col w-full">
+        <div className="flex items-center gap-6 border-b border-white/20 px-1 mb-0 text-[10px] font-mono font-black uppercase tracking-[0.2em]">
         <span className="pb-3 border-b-2 border-white text-white">LATEST</span>
         <span className="pb-3 text-white/40">NEW</span>
         <span className="pb-3 text-white/40">TOP</span>
@@ -79,6 +84,7 @@ export default function ForumHomePage() {
             </Link>
           );
         })}
+      </div>
       </div>
     </div>
   );

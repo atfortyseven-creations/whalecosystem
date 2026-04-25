@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 
-export async function PUT(req: Request, { params }: { params: { address: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ address: string }> }) {
     try {
+        const { address } = await params;
         const cookieStore = await cookies();
         const sessionAddress = cookieStore.get('sovereign_handshake')?.value;
-        if (!sessionAddress || sessionAddress.toLowerCase() !== params.address.toLowerCase()) {
+        if (!sessionAddress || sessionAddress.toLowerCase() !== address.toLowerCase()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

@@ -7,7 +7,18 @@ import { UserProfileModal } from '@/components/ui/UserProfileModal';
 export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUrl?: string }) {
   const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (address) {
+      fetch('/api/forum/notifications')
+        .then(r => r.json())
+        .then(data => {
+          if (data.unreadCount) setUnreadCount(data.unreadCount);
+        }).catch(() => {});
+    }
+  }, [address]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -31,12 +42,20 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
       <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 px-6 h-[52px] flex items-center justify-between">
 
         {/* Wordmark */}
-        <Link
-          href="/forum"
-          className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-white hover:opacity-60 transition-opacity"
-        >
-          FORUM
-        </Link>
+        <div className="flex items-baseline gap-2">
+          <Link
+            href="/forum"
+            className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-white hover:opacity-60 transition-opacity"
+          >
+            FORUM
+          </Link>
+          <span className="text-[14px] font-aztec-h2 font-black uppercase tracking-tight text-white ml-2">
+            Whale Alert Network
+          </span>
+          <span className="text-[9px] font-mono uppercase tracking-widest text-[#00f2ea] ml-2 opacity-80">
+            powered by Aztec Network
+          </span>
+        </div>
 
         {/* Right controls */}
         <div className="flex items-center gap-5" ref={menuRef}>
@@ -76,15 +95,25 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
 
           {/* Avatar / connect */}
           {address ? (
-            <button
-              onClick={() => setProfileOpen(true)}
-              className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center text-[10px] font-mono font-black text-white hover:border-white transition-colors shrink-0"
-            >
-              {avatarUrl
-                ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
-                : address.slice(2, 4).toUpperCase()
-              }
-            </button>
+            <div className="flex items-center gap-4">
+              <Link href="/forum/notifications" className="relative group">
+                <span className="text-[14px] opacity-70 group-hover:opacity-100 transition-opacity">🔔</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#00f2ea] rounded-full text-[7px] font-black text-black flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Link>
+              <button
+                onClick={() => setProfileOpen(true)}
+                className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center text-[10px] font-mono font-black text-white hover:border-white transition-colors shrink-0"
+              >
+                {avatarUrl
+                  ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                  : address.slice(2, 4).toUpperCase()
+                }
+              </button>
+            </div>
           ) : (
             <Link
               href="/connect"

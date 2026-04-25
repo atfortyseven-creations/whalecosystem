@@ -2,31 +2,69 @@
 
 import React, { useEffect, useState } from "react";
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
+import { DownheadSection } from "./DownheadSection";
+import { SovereignFooter } from "./SovereignFooter";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
+import Link from "next/link";
 
 export function ClientRootRouter() {
   const { isConnected } = useSovereignAccount();
-  const [hasValidSession, setHasValidSession] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
 
-  // Once connected, verify the sovereign_handshake cookie exists.
-  // We track this internally but do NOT navigate — the user is sovereign
-  // and chooses their own destination via CTAs on the /connect page.
   useEffect(() => {
+    // Check for sovereign session cookie synchronously
+    const check = () => {
+      if (
+        typeof document !== "undefined" &&
+        (document.cookie.includes("sovereign_handshake=") ||
+          document.cookie.includes("siwe_session="))
+      ) {
+        setHasSession(true);
+      }
+    };
+    check();
     if (isConnected) {
-      const checkSiwe = setInterval(() => {
-        if (
-          typeof document !== "undefined" &&
-          (document.cookie.includes("sovereign_handshake=") ||
-            document.cookie.includes("siwe_session="))
-        ) {
-          clearInterval(checkSiwe);
-          setHasValidSession(true);
-        }
-      }, 500);
-      return () => clearInterval(checkSiwe);
+      const interval = setInterval(() => { check(); }, 500);
+      return () => clearInterval(interval);
     }
   }, [isConnected]);
 
-  // The Immersive Manifesto is the universal public face of the platform.
-  return <ImmersiveManifestoLanding />;
+  return (
+    <div className="flex flex-col w-full">
+      {/* ── Authenticated Session Banner ── */}
+      {hasSession && (
+        <div className="w-full bg-[#050505] border-b border-white/5 px-8 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00f2ea] animate-pulse" />
+            <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/40">
+              SOVEREIGN SESSION ACTIVE
+            </span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/manifesto"
+              className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/30 hover:text-white transition-colors"
+            >
+              DASHBOARD
+            </Link>
+            <Link
+              href="/forum"
+              className="text-[9px] font-mono uppercase tracking-[0.25em] text-[#00f2ea] hover:text-white transition-colors"
+            >
+              FORUM →
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* ── Main Manifesto Landing ── */}
+      <ImmersiveManifestoLanding />
+
+      {/* ── Downhead Architecture Section ── */}
+      <DownheadSection />
+
+      {/* ── Footer ── */}
+      <SovereignFooter />
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
 
 const DEFAULT_CATEGORIES = [
     { name: 'Announcements',   slug: 'announcements', description: 'Official network updates and protocol changes.', color: '#2D0A59', orderIndex: 1 },
@@ -16,12 +17,8 @@ async function ensureDefaultCategories() {
     }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
-        const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
         // Auto-seed on first access if no categories exist
         await ensureDefaultCategories();
 

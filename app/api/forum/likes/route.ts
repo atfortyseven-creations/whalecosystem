@@ -45,9 +45,42 @@ export async function POST(req: Request) {
                 }
             });
 
-            // Create notification if liked someone else's post/topic
-            // (Skipped full notification logic here for brevity, but model is ready)
-            
+            // Create Telemetry Event
+            try {
+                await (prisma as any).forumTelemetry.create({
+                    data: {
+                        userId: user.id,
+                        action: 'CLICK_LIKE',
+                        ipAddress: req.headers.get('x-forwarded-for') || '127.0.0.1',
+                        metadata: { topicId, postId }
+                    }
+                });
+
+                // Fetch owner to notify
+                let targetUserId = null;
+                if (postId) {
+                    const p = await (prisma as any).forumPost.findUnique({ where: { id: postId }, select: { authorId: true } });
+                    if (p) targetUserId = p.authorId;
+                } else if (topicId) {
+                    const t = await (prisma as any).forumTopic.findUnique({ where: { id: topicId }, select: { authorId: true } });
+                    if (t) targetUserId = t.authorId;
+                }
+
+                // Create notification if liked someone else's post/topic
+                if (targetUserId && targetUserId !== user.id) {
+                    await (prisma as any).forumNotification.create({
+                        data: {
+                            userId: targetUserId,
+                            type: 'LIKE',
+                            actorId: user.id,
+                            topicId: topicId || null,
+                            postId: postId || null
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn("Telemetry/Notification for like failed:", e);
+            }
             return NextResponse.json({ success: true, action: 'liked' });
         }
     } catch (e: any) {
