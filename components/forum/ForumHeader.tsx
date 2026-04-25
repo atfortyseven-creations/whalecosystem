@@ -2,10 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Menu, User, X, AlignJustify, Users, Shield, Award, Cake, UsersRound, Tag, Hash } from 'lucide-react';
+import { Search, Menu, User, X, AlignJustify, Users, Shield, Award, Cake, UsersRound, Tag, Hash, Settings } from 'lucide-react';
+import { UserProfileModal } from '@/components/ui/UserProfileModal';
 
 export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUrl?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,6 +21,7 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
   }, []);
 
   return (
+    <>
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 sm:px-6 h-[60px] flex items-center justify-between">
       <div className="flex items-center gap-4 h-full">
         <Link href="/forum" className="flex items-center gap-2 text-black hover:opacity-80 transition-opacity">
@@ -54,6 +57,9 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
               <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <User size={16} className="text-gray-500" /> Users
               </Link>
+              <button onClick={() => { setProfileOpen(true); setMenuOpen(false); }} className="flex w-full items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] text-left">
+                <Settings size={16} className="text-gray-500" /> Profile
+              </button>
               <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Shield size={16} className="text-gray-500" /> Guidelines
               </Link>
@@ -107,13 +113,13 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
         )}
 
         {address ? (
-          <Link href={`/forum/u/${address}`} className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0">
+          <button onClick={() => setProfileOpen(true)} className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0">
             {avatarUrl ? (
                <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
             ) : (
                <User size={18} className="text-blue-500" />
             )}
-          </Link>
+          </button>
         ) : (
           <Link href="/connect" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0" title="Log In">
             <User size={18} className="text-gray-400" />
@@ -121,5 +127,8 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
         )}
       </div>
     </header>
+    
+    <UserProfileModal isOpen={profileOpen} onClose={() => { setProfileOpen(false); window.location.reload(); }} />
+    </>
   );
 }

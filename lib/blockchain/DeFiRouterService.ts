@@ -20,7 +20,7 @@ export interface RouteResponse {
  */
 export class DeFiRouterService {
     private readonly ENSO_URL = 'https://api.enso.finance/api/v1/shortcuts/route';
-    private readonly BEARER_ENSO = '1e02632d-6feb-4a75-a157-something'; // Enso public default or user's specific key
+    private readonly BEARER_ENSO = '1e02632d-6feb-4a75-a157-370898734c40'; // Enso Public API Key
 
     /**
      * Map DeFiLlama chains to Chain IDs

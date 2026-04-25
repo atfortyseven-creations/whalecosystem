@@ -23,6 +23,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
                 category: { select: { name: true, color: true, slug: true } },
                 tags: true,
                 posts: {
+                    where: { status: 'PUBLISHED' },
                     orderBy: { createdAt: 'asc' },
                     include: {
                         author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } },

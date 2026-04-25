@@ -1,30 +1,41 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 export async function GET(req: Request) {
     try {
-        const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-        const url = new URL(req.url);
-        const categoryId = url.searchParams.get('categoryId');
-        const limit = parseInt(url.searchParams.get('limit') || '50', 10);
-        const latest = url.searchParams.get('latest') === 'true';
-
-        const whereClause = categoryId ? { categoryId } : {};
+        const { searchParams } = new URL(req.url);
+        const categorySlug = searchParams.get('category');
+        const tag = searchParams.get('tag');
+        const limit = parseInt(searchParams.get('limit') || '30');
 
         const topics = await (prisma as any).forumTopic.findMany({
-            where: whereClause,
-            orderBy: { createdAt: 'desc' },
-            take: limit,
+            where: {
+                status: 'PUBLISHED',
+                ...(categorySlug ? { category: { slug: categorySlug } } : {}),
+                ...(tag ? { tags: { some: { name: tag } } } : {})
+            },
             include: {
-                author: { select: { walletAddress: true, tier: true, isPro: true } },
-                category: { select: { name: true, color: true, slug: true } },
-                _count: { select: { posts: true, likes: true } },
-                tags: true
-            }
+                category: true,
+                tags: true,
+                author: {
+                    select: {
+                        walletAddress: true,
+                        tier: true,
+                        isPro: true,
+                        displayName: true,
+                        avatarUrl: true
+                    }
+                },
+                _count: {
+                    select: { posts: true }
+                }
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            },
+            take: limit
         });
 
         return NextResponse.json(topics);
@@ -39,7 +50,6 @@ export async function POST(req: Request) {
         const address = cookieStore.get('sovereign_handshake')?.value;
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // FIX: Explicitly select only 'id' to prevent Prisma crashes due to missing schema columns like 'hiddenAssets' on remote DB
         const user = await prisma.user.findUnique({ 
             where: { walletAddress: address },
             select: { id: true }
@@ -53,17 +63,19 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        const isUserAdmin = isAdmin(address);
+
         const newTopic = await (prisma as any).forumTopic.create({
             data: {
                 title,
                 content,
                 categoryId,
                 authorId: user.id,
-                // Handle tags if they are provided. For simplicity, connect or create.
-                tags: tags && tags.length > 0 ? {
+                status: isUserAdmin ? 'PUBLISHED' : 'PENDING',
+                tags: tags?.length ? {
                     connectOrCreate: tags.map((t: string) => ({
-                        where: { name: t.toLowerCase() },
-                        create: { name: t.toLowerCase() }
+                        where: { name: t },
+                        create: { name: t }
                     }))
                 } : undefined
             }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 export async function POST(req: Request) {
     try {
@@ -22,12 +23,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        const isUserAdmin = isAdmin(address);
+
         const newPost = await (prisma as any).forumPost.create({
             data: {
                 content,
                 topicId,
                 authorId: user.id,
-                replyToId: replyToId || undefined
+                replyToId: replyToId || undefined,
+                status: isUserAdmin ? 'PUBLISHED' : 'PENDING'
             },
             include: {
                 author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } }

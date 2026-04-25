@@ -918,6 +918,7 @@ model ForumTopic {
   views       Int          @default(0)
   isPinned    Boolean      @default(false)
   isLocked    Boolean      @default(false)
+  status      String       @default("PENDING") // PENDING, PUBLISHED, REJECTED
   
   category    ForumCategory @relation(fields: [categoryId], references: [id])
   author      User          @relation(fields: [authorId], references: [id])
@@ -930,6 +931,7 @@ model ForumTopic {
 
   @@index([categoryId, createdAt(sort: Desc)])
   @@index([authorId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model ForumPost {
@@ -939,6 +941,7 @@ model ForumPost {
   authorId    String
   replyToId   String?      // Optional: if replying to a specific post
   isSolution  Boolean      @default(false)
+  status      String       @default("PENDING") // PENDING, PUBLISHED, REJECTED
 
   topic       ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
   author      User         @relation(fields: [authorId], references: [id])
@@ -950,6 +953,7 @@ model ForumPost {
   updatedAt   DateTime     @updatedAt
 
   @@index([topicId, createdAt(sort: Asc)])
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model ForumLike {
@@ -983,4 +987,17 @@ model ForumNotification {
   createdAt   DateTime     @default(now())
 
   @@index([userId, isRead, createdAt(sort: Desc)])
+}
+
+model ForumTelemetry {
+  id          String       @id @default(uuid())
+  userId      String?      // Optional: anonymous users can be tracked
+  action      String       // E.g., "VIEW_TOPIC", "DRAFT_POST", "CLICK_LIKE"
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?        // Detailed payload (topicId, durationMs, etc)
+  createdAt   DateTime     @default(now())
+
+  @@index([action, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
 }

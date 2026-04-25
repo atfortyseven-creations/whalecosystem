@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { ForumHeader } from '@/components/forum/ForumHeader';
 
 import { prisma } from '@/lib/prisma';
+import { TelemetryTracker } from '@/components/forum/TelemetryTracker';
 
 export default async function ForumLayout({
   children,
@@ -23,6 +24,7 @@ export default async function ForumLayout({
 
   return (
     <div className="min-h-screen bg-white text-[#222222] font-sans flex flex-col">
+      <TelemetryTracker />
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 
       {/* ─── Data Container ─── */}
