@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { formatDistanceToNowStrict } from 'date-fns';
+import { ChevronRight, Plus } from 'lucide-react';
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -17,91 +19,104 @@ export default function CategoryPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  if (loading) return <div className="flex items-center justify-center h-64 font-mono text-[10px] uppercase tracking-widest text-[#050505]/30">[ DECRYPTING_VECTOR ]</div>;
-  if (!category || category.error) return <div className="flex items-center justify-center h-64 font-mono text-[10px] uppercase tracking-widest text-red-500">[ VECTOR_NOT_FOUND ]</div>;
+  if (loading) return <div className="p-12 text-center text-gray-500 text-sm">Loading category...</div>;
+  if (!category || category.error) return <div className="p-12 text-center text-red-500 text-sm">Category not found.</div>;
 
   return (
-    <div className="flex flex-col w-full max-w-5xl mx-auto">
-
-      {/* ── Breadcrumb ── */}
-      <div className="flex items-center gap-3 mb-10">
-        <Link href="/forum" className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#050505]/30 hover:text-[#050505] transition-colors">
-          Global_Ledger
-        </Link>
-        <span className="font-mono text-[8px] text-[#050505]/20">—</span>
-        <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-sm inline-block" style={{ backgroundColor: category.color }} />
-          {category.slug}
-        </span>
-        <div className="ml-auto">
-          <Link
-            href={`/forum/new?category=${category.id}`}
-            className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#050505]/50 hover:text-[#050505] transition-colors border-b border-transparent hover:border-[#050505] pb-0.5"
-          >
-            [ + Initialize_Vector ]
-          </Link>
+    <div className="flex flex-col gap-0 w-full">
+      
+      {/* ── Discourse Breadcrumb & Controls ── */}
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+        <div className="flex items-center gap-2 text-[14px]">
+          <Link href="/forum" className="text-gray-500 hover:text-black">Categories</Link>
+          <ChevronRight size={14} className="text-gray-400" />
+          <div className="flex items-center gap-1.5 bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200 cursor-default">
+            <span 
+              className="w-2.5 h-2.5 rounded-sm" 
+              style={{ backgroundColor: category.color }} 
+            />
+            <span className="font-semibold text-gray-700">{category.name}</span>
+          </div>
         </div>
+
+        <Link 
+          href={`/forum/new?category=${category.id}`} 
+          className="flex items-center gap-1.5 bg-[#0088CC] hover:bg-[#0077B3] text-white px-4 py-2 rounded shadow-sm text-[14px] font-medium transition-colors"
+        >
+          <Plus size={16} />
+          New Topic
+        </Link>
       </div>
 
-      {/* ── Category Descriptor ── */}
-      <div className="mb-10 flex flex-col gap-2">
-        <p className="font-serif text-[16px] text-[#050505]/50 leading-relaxed max-w-2xl">
+      {/* Category Description */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-100 border-l-4" style={{ borderLeftColor: category.color }}>
+        <p className="text-[14px] text-gray-600">
           {category.description}
         </p>
-        <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#050505]/30">
-          {category._count?.topics || 0} transmissions indexed
-        </span>
       </div>
 
-      {/* ── Table Header ── */}
-      <div className="flex items-center px-2 pb-4 border-b-[0.5px] border-black/10 select-none">
-        <div className="w-14 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40">Hash</div>
-        <div className="flex-1 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40 pl-4">Payload</div>
-        <div className="w-20 text-right font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40">SNR</div>
-        <div className="w-20 text-right font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40">Velocity</div>
-      </div>
+      <div className="w-full">
+        {/* ── Table Header ── */}
+        <div className="flex items-center py-2 border-b border-gray-300 text-[13px] text-gray-500 font-normal">
+           <div className="flex-1">Topic</div>
+           <div className="w-20 text-center hidden sm:block">Replies</div>
+           <div className="w-16 text-center hidden sm:block">Views</div>
+           <div className="w-20 text-right">Activity</div>
+        </div>
 
-      {/* ── Topic Rows ── */}
-      <div className="flex flex-col">
-        {!category.topics?.length ? (
-          <div className="py-12 text-center font-mono text-[9px] uppercase tracking-widest text-[#050505]/20">[ NULL_DATA_IN_VECTOR ]</div>
-        ) : category.topics.map((topic: any) => {
-          const hashId = `0x${topic.id.slice(0, 4)}…`;
-          const snrRaw = topic.views > 0 ? (((topic._count?.posts || 0) + (topic._count?.likes || 0) * 2) / topic.views) * 100 : 0;
-          const snr = Math.min(100, snrRaw).toFixed(1);
-          const hoursActive = Math.max(1, (new Date().getTime() - new Date(topic.createdAt).getTime()) / 3600000);
-          const velocity = (topic.views / hoursActive).toFixed(1);
+        {/* ── Topic List ── */}
+        <div className="flex flex-col">
+          {!category.topics?.length ? (
+            <div className="py-12 text-center text-gray-500 text-sm">
+              No topics in this category yet. Be the first to start a discussion!
+            </div>
+          ) : category.topics.map((topic: any) => {
+            const lastActivity = topic.updatedAt || topic.createdAt;
+            const activityText = formatDistanceToNowStrict(new Date(lastActivity), { addSuffix: false });
+            const avatarColor = `#${topic.author?.walletAddress.slice(2, 8)}`;
 
-          return (
-            <Link
-              key={topic.id}
-              href={`/forum/t/${topic.id}`}
-              className="flex items-center px-2 py-5 border-b-[0.5px] border-black/5 hover:bg-black/[0.02] transition-colors group relative"
-            >
-              <div
-                className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: `linear-gradient(to bottom, transparent, ${category.color}, transparent)` }}
-              />
-              <div className="w-14 font-mono text-[9px] text-[#050505]/30 group-hover:text-[#050505]/60 transition-colors">{hashId}</div>
-              <div className="flex-1 flex flex-col gap-1 pl-4 min-w-0">
-                <span className="font-serif text-[15px] text-[#050505] truncate">{topic.title}</span>
-                <span className="font-mono text-[8px] uppercase tracking-widest text-[#050505]/40">
-                  op_{topic.author?.walletAddress.slice(0, 6)}
-                  {topic.author?.isPro && <span className="ml-2 text-[#D4AF37]">•</span>}
-                </span>
-              </div>
-              <div className="w-20 text-right font-mono text-[10px] text-[#050505]/70">{snr}%</div>
-              <div className="w-20 text-right font-mono text-[10px] text-[#050505]/70">
-                {velocity} <span className="text-[7px] text-[#050505]/30">v/h</span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+            return (
+              <Link 
+                key={topic.id} 
+                href={`/forum/t/${topic.id}`}
+                className="flex items-center py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors"
+              >
+                {/* Topic Title */}
+                <div className="flex-1 min-w-0 pr-4">
+                  <h3 className="text-[15px] text-[#222222] font-semibold truncate leading-snug">
+                    {topic.title}
+                  </h3>
+                </div>
 
-      <div className="mt-10 text-center">
-        <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#050505]/20 select-none">END_OF_VECTOR</span>
+                {/* Avatar */}
+                <div className="w-20 hidden md:flex items-center justify-start gap-1">
+                   <div 
+                     className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold"
+                     style={{ backgroundColor: avatarColor }}
+                   >
+                     {topic.author?.walletAddress.slice(2,3).toUpperCase()}
+                   </div>
+                </div>
+
+                {/* Stats */}
+                <div className="w-16 text-center hidden sm:block text-[13px] text-gray-500">
+                  {topic._count?.posts || 0}
+                </div>
+                
+                <div className="w-16 text-center hidden sm:block text-[13px] text-gray-500">
+                  {topic.views > 999 ? `${(topic.views / 1000).toFixed(1)}k` : topic.views}
+                </div>
+
+                {/* Activity */}
+                <div className="w-20 text-right text-[13px] text-gray-500">
+                  {activityText.replace(' minutes', 'm').replace(' hours', 'h').replace(' days', 'd').replace(' months', 'mo')}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
+

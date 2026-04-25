@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { formatDistanceToNowStrict, format } from 'date-fns';
+import { Heart, Reply, Link as LinkIcon, MoreHorizontal, Bookmark, Bell } from 'lucide-react';
 
 export default function TopicPage() {
   const { id } = useParams();
@@ -43,65 +45,139 @@ export default function TopicPage() {
     }
   };
 
-  if (loading) return <div className="p-12 text-center font-mono text-[9px] uppercase tracking-widest text-black/20">[ DECRYPTING_PAYLOAD ]</div>;
-  if (!topic || topic.error) return <div className="p-12 text-center font-mono text-[9px] uppercase tracking-widest text-red-500">[ PAYLOAD_CORRUPT ]</div>;
+  if (loading) return <div className="p-12 text-center text-gray-500">Loading topic...</div>;
+  if (!topic || topic.error) return <div className="p-12 text-center text-red-500">Topic not found or deleted.</div>;
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto">
+    <div className="flex flex-col w-full max-w-[1110px] mx-auto">
       
-      {/* ── Metadata Header ── */}
-      <div className="mb-12 border-b-[0.5px] border-black/10 pb-6 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+      {/* ── Topic Header ── */}
+      <div className="mb-6 flex flex-col gap-2">
+        <h1 className="text-[26px] font-semibold text-[#222222] leading-tight">{topic.title}</h1>
+        <div className="flex items-center gap-1.5">
           <span 
-            className="font-mono text-[8px] font-black uppercase tracking-[0.2em] px-1.5 py-0.5 rounded-sm"
-            style={{ color: topic.category.color, border: `0.5px solid ${topic.category.color}40` }}
-          >
-            {topic.category.slug}
-          </span>
-          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#050505]/30">
-            Hash: 0x{topic.id.replace(/-/g, '')}
+            className="w-2.5 h-2.5 rounded-sm" 
+            style={{ backgroundColor: topic.category.color }} 
+          />
+          <span className="text-[13px] text-gray-600 font-medium">
+            {topic.category.name}
           </span>
         </div>
-        <h1 className="text-[28px] font-serif font-black text-[#050505] leading-[1.1] tracking-tight">{topic.title}</h1>
       </div>
 
-      <div className="flex flex-col gap-12 relative">
-        <PayloadBlock entity={topic} type="topic" onLike={fetchTopic} />
+      <div className="flex flex-col lg:flex-row gap-8 relative">
+        {/* ── Posts Column ── */}
+        <div className="flex-1 flex flex-col">
+          <PayloadBlock entity={topic} type="topic" onLike={fetchTopic} isLast={!topic.posts?.length} />
 
-        {topic.posts?.map((post: any) => (
-          <PayloadBlock key={post.id} entity={post} type="post" onLike={fetchTopic} />
-        ))}
-      </div>
+          {topic.posts?.map((post: any, i: number) => (
+            <PayloadBlock key={post.id} entity={post} type="post" onLike={fetchTopic} isLast={i === topic.posts.length - 1} />
+          ))}
 
-      {/* ── Minimalist Reply Injector ── */}
-      <div className="mt-16 pt-8 border-t-[0.5px] border-black/10">
-        <span className="block font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-4">
-          [ INJECT_RESPONSE_PAYLOAD ]
-        </span>
-        <textarea 
-          value={replyContent}
-          onChange={(e) => setReplyContent(e.target.value)}
-          className="w-full bg-transparent border-[0.5px] border-black/20 p-4 font-serif text-[14px] text-[#050505] focus:outline-none focus:border-black/50 min-h-[120px] resize-none"
-          placeholder="Formulate intelligence..."
-        />
-        <div className="flex justify-end mt-4">
-          <button 
-            onClick={submitReply}
-            disabled={submitting || !replyContent.trim()}
-            className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-[#050505] border-[0.5px] border-black px-6 py-2 hover:bg-[#050505] hover:text-[#FDFCF8] transition-colors disabled:opacity-30"
-          >
-            {submitting ? 'EXECUTING...' : 'TRANSMIT'}
-          </button>
+          {/* ── Post Footer Actions ── */}
+          <div className="mt-4 flex flex-col gap-4">
+             <div className="flex items-center gap-2">
+               <button className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                 <LinkIcon size={14} />
+                 Share
+               </button>
+               <button className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                 <Bookmark size={14} />
+                 Bookmark
+               </button>
+               <button 
+                 onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                 className="flex items-center gap-1.5 bg-[#0088CC] hover:bg-[#0077B3] text-white px-4 py-1.5 rounded text-[13px] font-medium transition-colors"
+               >
+                 <Reply size={14} />
+                 Reply
+               </button>
+             </div>
+             
+             <div className="flex items-center gap-2 text-[13px] text-gray-500 bg-gray-50/50 p-2 rounded border border-gray-100">
+               <span className="flex items-center gap-1 text-gray-700 font-medium bg-white border border-gray-200 px-2 py-0.5 rounded shadow-sm">
+                 <Bell size={12} /> Normal
+               </span>
+               You will be notified if someone mentions your @name or replies to you.
+             </div>
+          </div>
+
+          {/* ── Related Topics ── */}
+          <div className="mt-10 mb-6">
+            <h3 className="text-[16px] font-semibold text-[#222222] flex items-center gap-2 mb-4">
+              <span className="text-gray-400">✦</span> Related topics
+            </h3>
+            <div className="flex items-center py-2 border-b border-gray-300 text-[12px] text-gray-500 font-normal">
+               <div className="flex-1">Topic</div>
+               <div className="w-16 text-center">Replies</div>
+               <div className="w-16 text-center">Views</div>
+               <div className="w-20 text-right">Activity</div>
+            </div>
+            
+            {/* Mock Related Topic */}
+            <div className="flex items-center py-3 border-b border-gray-100">
+               <div className="flex-1 min-w-0 pr-4">
+                 <div className="text-[14px] text-[#222222] font-semibold truncate leading-snug">
+                   Request for Comments: Protocol Upgrades
+                 </div>
+                 <div className="flex items-center gap-1 mt-1">
+                   <span className="w-2 h-2 rounded-sm bg-purple-500" />
+                   <span className="text-[11px] text-gray-500">Governance</span>
+                 </div>
+               </div>
+               <div className="w-16 text-center text-[13px] text-gray-500">22</div>
+               <div className="w-16 text-center text-[13px] text-gray-500">854</div>
+               <div className="w-20 text-right text-[13px] text-gray-500">Oct 2025</div>
+            </div>
+          </div>
+
+          {/* ── Reply Composer ── */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <h3 className="text-gray-700 font-semibold mb-3">Reply to this topic</h3>
+            <textarea 
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              className="w-full bg-white border border-gray-300 rounded-md p-4 text-[15px] text-[#222222] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[150px] resize-y shadow-sm"
+              placeholder="Type your reply here..."
+            />
+            <div className="flex justify-start mt-4">
+              <button 
+                onClick={submitReply}
+                disabled={submitting || !replyContent.trim()}
+                className="bg-[#0088CC] hover:bg-[#0077B3] text-white px-6 py-2.5 rounded shadow-sm text-[15px] font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                <Reply size={18} />
+                {submitting ? 'Replying...' : 'Reply'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Discourse Timeline Sidebar ── */}
+        <div className="hidden lg:block w-36 shrink-0 relative">
+          <div className="sticky top-24 flex flex-col items-center">
+            <div className="text-[12px] text-gray-400 font-medium mb-2">{format(new Date(topic.createdAt), "MMM yyyy")}</div>
+            <div className="flex gap-2 w-full text-[12px] font-medium text-[#0088CC] mb-2 px-2">
+              <span className="flex-1 text-right">{topic.posts?.length ? topic.posts.length + 1 : 1}</span>
+              <span className="text-gray-300">/</span>
+              <span className="flex-1">{topic.posts?.length ? topic.posts.length + 1 : 1}</span>
+            </div>
+            <div className="w-1 h-32 bg-gray-200 rounded-full relative">
+               <div className="absolute top-0 w-full h-1/3 bg-[#0088CC] rounded-full"></div>
+            </div>
+            <div className="text-[12px] text-gray-400 font-medium mt-2">{format(new Date(topic.updatedAt || topic.createdAt), "MMM yyyy")}</div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function PayloadBlock({ entity, type, onLike }: { entity: any, type: 'topic' | 'post', onLike: () => void }) {
+function PayloadBlock({ entity, type, onLike, isLast }: { entity: any, type: 'topic' | 'post', onLike: () => void, isLast: boolean }) {
   const [liked, setLiked] = useState(false);
   const authorAddress = entity.author.walletAddress;
-
+  const avatarColor = `#${authorAddress.slice(2, 8)}`;
+  
   const handleLike = async () => {
     try {
        const res = await fetch('/api/forum/likes', {
@@ -116,52 +192,74 @@ function PayloadBlock({ entity, type, onLike }: { entity: any, type: 'topic' | '
     } catch (e) {}
   };
 
+  const formattedDate = formatDistanceToNowStrict(new Date(entity.createdAt), { addSuffix: true });
+
   return (
-    <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 group">
+    <div className={`flex gap-4 py-6 group ${!isLast ? 'border-b border-gray-200' : ''}`}>
       
-      {/* Entity Signature Column */}
-      <div className="w-full sm:w-40 shrink-0 flex flex-col gap-2">
-         <Link href={`/forum/u/${authorAddress}`} className="font-mono text-[11px] font-black uppercase tracking-widest text-[#050505] hover:underline truncate block">
-           {authorAddress.slice(0,8)}…
-         </Link>
-         <div className="flex flex-wrap items-center gap-2">
-            {entity.author.isPro ? (
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#D4AF37] border border-[#D4AF37]/50 px-1">
-                POSG_PRO
-              </span>
-            ) : (
-              <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#050505]/40 border border-black/10 px-1">
-                T_{entity.author.tier}
-              </span>
-            )}
-         </div>
-         <span className="font-mono text-[8px] text-[#050505]/30 uppercase tracking-[0.1em] mt-2 block">
-           t={new Date(entity.createdAt).getTime()}
-         </span>
+      {/* Avatar Column */}
+      <div className="w-12 shrink-0 flex flex-col items-center relative group-hover:z-10">
+        <Link href={`/forum/u/${authorAddress}`}>
+          <div 
+            className="w-12 h-12 rounded-full flex items-center justify-center text-[18px] text-white font-bold shadow-sm"
+            style={{ backgroundColor: avatarColor }}
+          >
+            {authorAddress.slice(2,3).toUpperCase()}
+          </div>
+        </Link>
       </div>
 
-      {/* Intelligence Data Column */}
+      {/* Content Column */}
       <div className="flex-1 min-w-0">
-         <div className="font-serif text-[15px] leading-relaxed text-[#050505]/90 whitespace-pre-wrap">
+         {/* User Meta Row */}
+         <div className="flex items-center justify-between mb-2">
+           <div className="flex items-center gap-2">
+             <Link href={`/forum/u/${authorAddress}`} className="text-[15px] font-bold text-[#222222] hover:underline">
+               {authorAddress.slice(0,6)}…{authorAddress.slice(-4)}
+             </Link>
+             {entity.author.isPro && (
+               <span className="text-[10px] uppercase font-bold text-[#D4AF37] border border-[#D4AF37] px-1 rounded-sm">
+                 Pro
+               </span>
+             )}
+           </div>
+           <span className="text-[13px] text-gray-500">
+             {formattedDate}
+           </span>
+         </div>
+
+         {/* Body */}
+         <div className="text-[15px] leading-relaxed text-[#222222] whitespace-pre-wrap mb-4">
            {entity.content}
          </div>
          
-         {/* Mathematical Actions */}
-         <div className="mt-6 flex items-center gap-4 opacity-40 group-hover:opacity-100 transition-opacity">
+         {/* Actions Row (Post level) */}
+         <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity justify-end">
            <button 
              onClick={handleLike}
-             className={`font-mono text-[9px] font-black tracking-[0.2em] transition-colors ${liked ? 'text-red-600' : 'text-[#050505] hover:text-red-600'}`}
+             className={`flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-100 rounded transition-colors ${liked ? 'text-red-500 bg-red-50' : 'text-gray-600'}`}
+             title="Like this post"
            >
-             [ {liked ? '++' : '+'} ] {entity._count?.likes > 0 && `v=${entity._count.likes}`}
+             <Heart size={16} className={liked || entity._count?.likes > 0 ? "fill-current" : ""} />
+             {entity._count?.likes > 0 && <span className="text-[13px] font-medium">{entity._count.likes}</span>}
            </button>
            <button 
              onClick={() => navigator.clipboard.writeText(window.location.href)}
-             className="font-mono text-[9px] font-black tracking-[0.2em] text-[#050505] hover:text-blue-600 transition-colors"
+             className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-100 text-gray-600 rounded transition-colors"
+             title="Share a link to this post"
            >
-             [ COPY_HASH ]
+             <LinkIcon size={16} />
+           </button>
+           <button 
+             onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+             className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-100 text-gray-600 rounded transition-colors"
+           >
+             <Reply size={16} />
+             <span className="text-[13px] font-medium">Reply</span>
            </button>
          </div>
       </div>
     </div>
   );
 }
+
