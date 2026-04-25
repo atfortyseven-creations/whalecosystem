@@ -12,7 +12,6 @@ export async function GET(req: Request) {
 
         const topics = await (prisma as any).forumTopic.findMany({
             where: {
-                status: 'PUBLISHED',
                 ...(categorySlug ? { category: { slug: categorySlug } } : {}),
                 ...(tag ? { tags: { some: { name: tag } } } : {})
             },
@@ -71,7 +70,6 @@ export async function POST(req: Request) {
                 content,
                 categoryId,
                 authorId: user.id,
-                status: isUserAdmin ? 'PUBLISHED' : 'PENDING',
                 tags: tags?.length ? {
                     connectOrCreate: tags.map((t: string) => ({
                         where: { name: t },

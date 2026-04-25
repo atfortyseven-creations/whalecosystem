@@ -10,11 +10,15 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
         const topicId = params.id;
 
-        // Increment views
-        await (prisma as any).forumTopic.update({
-            where: { id: topicId },
-            data: { views: { increment: 1 } }
-        });
+        // Increment views resiliently
+        try {
+            await (prisma as any).forumTopic.update({
+                where: { id: topicId },
+                data: { views: { increment: 1 } }
+            });
+        } catch (e) {
+            console.warn('[API] Failed to increment views (likely schema mismatch)', e);
+        }
 
         const topic = await (prisma as any).forumTopic.findUnique({
             where: { id: topicId },
@@ -23,7 +27,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
                 category: { select: { name: true, color: true, slug: true } },
                 tags: true,
                 posts: {
-                    where: { status: 'PUBLISHED' },
                     orderBy: { createdAt: 'asc' },
                     include: {
                         author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } },

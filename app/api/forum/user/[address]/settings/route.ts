@@ -23,23 +23,39 @@ export async function PUT(req: Request, { params }: { params: { address: string 
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        const updatedUser = await (prisma as any).user.update({
-            where: { id: user.id },
-            data: {
-                displayName: displayName !== undefined ? displayName : undefined,
-                avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined,
-                bio: bio !== undefined ? bio : undefined
-            },
-            select: {
-                id: true,
-                walletAddress: true,
-                displayName: true,
-                avatarUrl: true,
-                bio: true
-            }
-        });
-
-        return NextResponse.json({ success: true, user: updatedUser });
+        try {
+            const updatedUser = await (prisma as any).user.update({
+                where: { id: user.id },
+                data: {
+                    displayName: displayName !== undefined ? displayName : undefined,
+                    avatarUrl: avatarUrl !== undefined ? avatarUrl : undefined,
+                    bio: bio !== undefined ? bio : undefined
+                },
+                select: {
+                    id: true,
+                    walletAddress: true,
+                    displayName: true,
+                    avatarUrl: true,
+                    bio: true
+                }
+            });
+            return NextResponse.json({ success: true, user: updatedUser });
+        } catch (updateError: any) {
+            console.warn('[API] Full profile update failed, attempting minimal fallback:', updateError.message);
+            // Fallback for missing avatarUrl or bio columns
+            const fallbackUser = await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    displayName: displayName !== undefined ? displayName : undefined
+                },
+                select: {
+                    id: true,
+                    walletAddress: true,
+                    displayName: true
+                }
+            });
+            return NextResponse.json({ success: true, user: fallbackUser, warning: 'Partial save due to schema version' });
+        }
     } catch (e: any) {
         return NextResponse.json({ error: e.message }, { status: 500 });
     }

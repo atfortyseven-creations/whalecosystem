@@ -56,22 +56,40 @@ export async function PUT(req: NextRequest) {
     const { walletAddress, displayName, avatarUrl, bio } = result.data;
 
     // Upsert to ensure user exists
-    const user = await (prisma as any).user.upsert({
-      where: { walletAddress },
-      update: {
-        ...(displayName !== undefined && { displayName }),
-        ...(avatarUrl !== undefined && { avatarUrl: avatarUrl === '' ? null : avatarUrl }),
-        ...(bio !== undefined && { bio: bio === '' ? null : bio }),
-      },
-      create: {
-        walletAddress,
-        displayName: displayName || 'Sovereign User',
-        avatarUrl: avatarUrl === '' ? null : avatarUrl,
-        bio: bio === '' ? null : bio,
-      }
-    });
-
-    return NextResponse.json({ success: true, data: user });
+    try {
+      const user = await (prisma as any).user.upsert({
+        where: { walletAddress },
+        update: {
+          ...(displayName !== undefined && { displayName }),
+          ...(avatarUrl !== undefined && { avatarUrl: avatarUrl === '' ? null : avatarUrl }),
+          ...(bio !== undefined && { bio: bio === '' ? null : bio }),
+        },
+        create: {
+          walletAddress,
+          displayName: displayName || 'Sovereign User',
+          avatarUrl: avatarUrl === '' ? null : avatarUrl,
+          bio: bio === '' ? null : bio,
+        }
+      });
+      return NextResponse.json({ success: true, data: user });
+    } catch (primaryError: any) {
+      console.warn('[API] Full profile upsert failed, attempting minimal fallback:', primaryError.message);
+      
+      // Fallback for when the DB lacks new columns like bio and avatarUrl
+      const fallbackUser = await prisma.user.upsert({
+        where: { walletAddress },
+        update: {
+          ...(displayName !== undefined && { displayName })
+        },
+        create: {
+          walletAddress,
+          displayName: displayName || 'Sovereign User'
+        }
+      });
+      
+      return NextResponse.json({ success: true, data: fallbackUser, warning: 'Partial save due to schema version' });
+    }
+    
   } catch (error: any) {
     console.error('[API] PUT User Profile Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

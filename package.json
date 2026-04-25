@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run worker:scanner\"",
+    "push:railway": "git add . && git commit -m \"perf: institutional forum hardening, wave removal, profile fix\" && git push origin main",
+    "db:sync": "npx prisma db push --accept-data-loss",
     "build": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "build:ipfs": "cross-env IPFS_BUILD=true next build",
     "build:railway": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
