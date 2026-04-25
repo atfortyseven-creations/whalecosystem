@@ -8,6 +8,7 @@ import { useSettings } from '@/src/context/SettingsContext';
 import useSWR from 'swr';
 import { useVIPStore, VIPStoreState, WhaleEvent } from '@/lib/vip-store'; 
 import { useAccount } from 'wagmi';
+import { useOmniInfrastructure } from "@/lib/api-client";
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -26,8 +27,8 @@ export function UtilityPanels() {
     } = useSettings();
 
     // Data Fetching
-    const { data: sessionData, isLoading: sessionsLoading } = useSWR('/api/user/sessions', fetcher);
-    const sessions = sessionData?.sessions || [];
+    const { data: sessionData, isLoading: sessionsLoading } = useOmniInfrastructure('sessionLogs');
+    const sessions = sessionData?.logs?.slice(0, 15) || []; // Show top 15 latest session logs
 
     const { data: txData, isLoading: txLoading } = useSWR(address ? `/api/wallet/transactions?authUserId=${address}` : null, fetcher);
     const transactions = txData?.transactions || [];
@@ -46,33 +47,29 @@ export function UtilityPanels() {
                 </div>
                 
                 <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                    {sessions.map((session: any) => (
-                        <div key={session.id} className={`p-4 border rounded-2xl transition-all group ${session.current ? 'bg-[var(--aztec-orchid)]/10 border-[var(--aztec-orchid)]' : 'bg-white/5 border-white/5 hover:border-[var(--aztec-orchid)]/30'}`}>
+                    {sessions.map((log: any) => (
+                        <div key={log.id} className="p-4 border rounded-2xl transition-all group bg-white/5 border-white/5 hover:border-[var(--aztec-orchid)]/30">
                             <div className="flex items-center justify-between mb-2">
-                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter ${session.current ? 'bg-[var(--aztec-orchid)] text-white shadow-[0_0_10px_var(--aztec-orchid)]' : 'bg-white/10 text-white/50'}`}>
-                                    {session.current ? 'ACTIVE SESSION' : 'VERIFIED LOG'}
+                                <span className="text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter bg-white/10 text-white/50">
+                                    {log.action}
                                 </span>
                                 <span className="text-[9px] font-mono font-bold text-[var(--aztec-parchment)]/30">
-                                    {new Date(session.lastActive).toLocaleDateString([], { day: '2-digit', month: 'short' })}
+                                    {new Date(log.timestamp).toLocaleDateString([], { day: '2-digit', month: 'short' })}
                                 </span>
                             </div>
 
                             <div className="flex items-start gap-3">
-                                <div className={`p-2 rounded-xl ${session.current ? 'bg-[var(--aztec-orchid)]/20 text-[var(--aztec-orchid)]' : 'bg-black/50 text-[var(--aztec-parchment)]/40'}`}>
-                                    {session.device.toLowerCase().includes('mobile') ? <Smartphone size={14} /> : <Laptop size={14} />}
+                                <div className="p-2 rounded-xl bg-black/50 text-[var(--aztec-parchment)]/40">
+                                    <ShieldAlert size={14} />
                                 </div>
                                 <div className="space-y-1">
-                                    <h4 className="text-xs font-black text-[var(--aztec-parchment)] leading-tight">
-                                        {session.device} • {session.browser}
+                                    <h4 className="text-[11px] font-mono font-bold text-[var(--aztec-parchment)] leading-tight truncate w-[200px]">
+                                        {log.userId || "Anonymous"}
                                     </h4>
                                     <div className="flex flex-col gap-0.5">
                                         <div className="flex items-center gap-1">
-                                            <MapPin size={10} className="text-[var(--aztec-parchment)]/40" />
-                                            <span className="text-[10px] font-bold text-[var(--aztec-parchment)]/60">{session.location}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
                                             <Globe size={10} className="text-[var(--aztec-parchment)]/40" />
-                                            <span className="text-[10px] font-mono font-bold text-[var(--aztec-orchid)]">{session.ip}</span>
+                                            <span className="text-[10px] font-mono font-bold text-[var(--aztec-orchid)] truncate max-w-[150px]">{log.ipAddress || "Hidden"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -82,7 +79,7 @@ export function UtilityPanels() {
                                 <div className="flex items-center gap-1">
                                     <Clock size={10} className="text-[var(--aztec-parchment)]/40" />
                                     <span className="text-[9px] font-black text-[var(--aztec-parchment)]/40 uppercase tracking-widest font-mono">
-                                        {new Date(session.lastActive).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                        {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                     </span>
                                 </div>
                                 <Shield size={12} className="text-[var(--aztec-chartreuse)]" />
@@ -93,7 +90,7 @@ export function UtilityPanels() {
                     {!sessionsLoading && sessions.length === 0 && (
                         <div className="py-20 text-center">
                             <Zap size={24} className="mx-auto text-[var(--aztec-parchment)]/20 mb-4 animate-pulse" />
-                            <p className="text-[10px] font-black uppercase text-[var(--aztec-parchment)]/30 tracking-widest">No Active Connections</p>
+                            <p className="text-[10px] font-black uppercase text-[var(--aztec-parchment)]/30 tracking-widest">No Security Audit Logs</p>
                         </div>
                     )}
                 </div>

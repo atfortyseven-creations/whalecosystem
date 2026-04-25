@@ -21,9 +21,9 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo Empaquetando arquitectura Zero-Mock e Integridad Prisma...
+echo Empaquetando actualizacion de Telemetria (Bell Icon -> Session Logs)...
 git add .
-git commit -m "feat(core): Vanguard Institutional Hardening (Zero-Mock, Cascade Deletes, State Unification)"
+git commit -m "feat(ui): connect global bell notification icon to omni security audit logs endpoint"
 
 echo.
 echo Iniciando despliegue en produccion (Railway)...
