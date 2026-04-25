@@ -28,12 +28,12 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-[#E0E0E0] px-6 h-[52px] flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 px-6 h-[52px] flex items-center justify-between">
 
         {/* Wordmark */}
         <Link
           href="/forum"
-          className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-[#050505] hover:opacity-60 transition-opacity"
+          className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-white hover:opacity-60 transition-opacity"
         >
           FORUM
         </Link>
@@ -44,7 +44,7 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           {/* New Topic */}
           <Link
             href="/forum/new"
-            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white bg-[#050505] px-4 py-2 hover:bg-[#333333] transition-colors"
+            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-black bg-white px-4 py-2 hover:bg-white/80 transition-colors"
           >
             + NEW
           </Link>
@@ -52,7 +52,7 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           {/* Menu toggle */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/50 hover:text-[#050505] transition-colors"
+            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors"
             aria-label="Navigation menu"
           >
             {menuOpen ? 'CLOSE' : 'MENU'}
@@ -60,13 +60,13 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
 
           {/* Popover */}
           {menuOpen && (
-            <div className="absolute top-[52px] right-0 w-[220px] bg-white border border-[#E0E0E0] shadow-sm z-50 flex flex-col overflow-hidden">
+            <div className="absolute top-[52px] right-0 w-[220px] bg-[#1a052b] border border-white/10 shadow-lg z-50 flex flex-col overflow-hidden">
               {navLinks.map(l => (
                 <Link
                   key={l.href}
                   href={l.href}
                   onClick={() => setMenuOpen(false)}
-                  className="px-5 py-3.5 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/50 hover:text-[#050505] hover:bg-[#FAF9F6] border-b border-[#F0F0F0] last:border-0 transition-colors"
+                  className="px-5 py-3.5 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white/50 hover:text-white hover:bg-white/5 border-b border-white/10 last:border-0 transition-colors"
                 >
                   {l.label}
                 </Link>
@@ -78,7 +78,7 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           {address ? (
             <button
               onClick={() => setProfileOpen(true)}
-              className="w-7 h-7 rounded-full overflow-hidden border border-[#E0E0E0] bg-[#F0F0F0] flex items-center justify-center text-[10px] font-mono font-black text-[#050505] hover:border-[#050505] transition-colors shrink-0"
+              className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center text-[10px] font-mono font-black text-white hover:border-white transition-colors shrink-0"
             >
               {avatarUrl
                 ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
@@ -88,7 +88,7 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           ) : (
             <Link
               href="/connect"
-              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors"
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors"
             >
               CONNECT
             </Link>
