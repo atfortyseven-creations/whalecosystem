@@ -61,43 +61,67 @@ const CosmicForgePanel = dynamic(
 
 import "@/app/dashboard/dashboard.css";
 
-// Reusable Top Header Component for Perfect Consistency
+// Reusable Top Header Component for Perfect Consistency - Institutional Grade Vanguard Aesthetic
 const TelemetryHeader = ({ icon: Icon, title, subtitle, isDark = false, themeColor = 'emerald' }: { icon: any, title: string, subtitle: string, isDark?: boolean, themeColor?: string }) => {
-    const bgColors = {
-        emerald: 'bg-emerald-500',
-        amber: 'bg-amber-500',
-        purple: 'bg-purple-500',
-        blue: 'bg-[#00f5ff]',
-        red: 'bg-rose-500'
-    };
-    
-    const textColors = {
-        emerald: 'text-emerald-500',
-        amber: 'text-amber-500',
-        purple: 'text-purple-500',
-        blue: 'text-[#00f5ff]',
-        red: 'text-rose-500'
+    const themeMap = {
+        emerald: { text: 'text-[#00C076]', bg: 'bg-[#00C076]', glow: 'shadow-[#00C076]/30', border: 'border-[#00C076]/20' },
+        amber:   { text: 'text-[#D4AF37]', bg: 'bg-[#D4AF37]', glow: 'shadow-[#D4AF37]/30', border: 'border-[#D4AF37]/20' },
+        purple:  { text: 'text-[#9945FF]', bg: 'bg-[#9945FF]', glow: 'shadow-[#9945FF]/30', border: 'border-[#9945FF]/20' },
+        blue:    { text: 'text-[#0052FF]', bg: 'bg-[#0052FF]', glow: 'shadow-[#0052FF]/30', border: 'border-[#0052FF]/20' },
+        red:     { text: 'text-[#FF3B30]', bg: 'bg-[#FF3B30]', glow: 'shadow-[#FF3B30]/30', border: 'border-[#FF3B30]/20' }
     };
 
-    const selBg = bgColors[themeColor as keyof typeof bgColors] || 'bg-emerald-500';
-    const selText = textColors[themeColor as keyof typeof textColors] || 'text-emerald-500';
+    const sel = themeMap[themeColor as keyof typeof themeMap] || themeMap.emerald;
 
     return (
-        <div className={`shrink-0 h-24 border rounded-xl flex items-center justify-between px-6 shadow-sm relative overflow-hidden ${isDark ? 'bg-[#050505] border-white/10' : 'bg-white border-[#E5E5E5]'}`}>
-            <div className="z-10 flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDark ? 'bg-white/5' : 'bg-[#FAF9F6] border border-[#E5E5E5]'}`}>
-                    <Icon size={18} className={isDark ? 'text-white' : 'text-[#050505]'} />
+        <div className={`group shrink-0 h-16 mb-4 flex items-center justify-between px-2 relative overflow-hidden transition-all duration-500`}>
+            
+            {/* Animated Bottom Border Accent */}
+            <div className={`absolute bottom-0 left-0 w-full h-[1px] ${isDark ? 'bg-white/10' : 'bg-black/5'}`}>
+                <div className={`absolute top-0 left-0 h-full w-1/3 ${sel.bg} opacity-50 group-hover:opacity-100 transition-all duration-1000 group-hover:w-2/3 ease-in-out`} />
+            </div>
+
+            <div className="z-10 flex items-center gap-5">
+                {/* Minimalist Icon Container */}
+                <div className={`relative flex items-center justify-center w-9 h-9 rounded-[4px] border ${isDark ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-[#E5E5E5] shadow-sm'}`}>
+                    <div className={`absolute inset-0 rounded-[4px] blur-sm opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${sel.bg}`} />
+                    <Icon size={14} className={`relative z-10 ${isDark ? 'text-white' : 'text-[#050505]'}`} strokeWidth={1.5} />
                 </div>
-                <div>
-                   <h2 className={`text-[13px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-white' : 'text-[#050505]'}`}>
-                     {title}
-                   </h2>
-                   <p className={`text-[10px] uppercase tracking-[0.2em] mt-1 font-medium ${isDark ? 'text-white/50' : 'text-[#888888]'}`}>{subtitle}</p>
+                
+                <div className="flex flex-col justify-center gap-1">
+                   <div className="flex items-baseline gap-3">
+                       <h2 className={`text-[12px] font-black uppercase tracking-[0.25em] ${isDark ? 'text-white' : 'text-[#050505]'}`}>
+                         {title}
+                       </h2>
+                   </div>
+                   <div className="flex items-center gap-2">
+                       <span className={`text-[8.5px] font-mono font-bold uppercase tracking-[0.2em] ${sel.text}`}>
+                           {subtitle}
+                       </span>
+                       <div className={`h-[1px] w-4 ${isDark ? 'bg-white/20' : 'bg-black/10'}`} />
+                       <span className={`text-[7px] font-mono uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
+                           SYS.OP.NORMAL
+                       </span>
+                   </div>
                 </div>
             </div>
-            <div className="z-10 hidden md:flex flex-col text-right">
-                <span className={`text-[8px] uppercase font-black tracking-widest mb-1 ${isDark ? 'text-white/30' : 'text-[#888888]'}`}>Telemetry Node</span>
-                <span className={`text-[12px] font-mono font-black ${selText}`}>ACTIVE</span>
+
+            <div className="z-10 hidden md:flex items-center gap-6 text-right">
+                {/* Tech grid aesthetic element */}
+                <div className="flex gap-[3px]">
+                    {[0.15, 0.4, 0.7, 0.3, 0.1].map((op, i) => (
+                        <div key={i} className={`w-[2px] h-3 ${isDark ? 'bg-white' : 'bg-black'} transition-opacity duration-500`} style={{ opacity: op }} />
+                    ))}
+                </div>
+                
+                <div className="flex flex-col items-end gap-1.5">
+                    <div className="flex items-center gap-2 px-2.5 py-1 rounded-[3px] border bg-transparent" style={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${sel.bg} animate-pulse shadow-[0_0_8px_rgba(0,0,0,0.5)] ${sel.glow}`} />
+                        <span className={`text-[8.5px] font-mono font-bold uppercase tracking-widest ${isDark ? 'text-white/80' : 'text-[#050505]'}`}>
+                            SYNCED
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     );

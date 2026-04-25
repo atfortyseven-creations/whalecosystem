@@ -16,8 +16,8 @@ const rateLimitMap = new Map<string, { count: number; expiresAt: number }>();
 const replayMap = new Set<string>(); // Tracks used nonces/signatures for 60s
 
 function checkEdgeRateLimit(ip: string, tier: PlanTier): { success: boolean, maxReqs: number } {
-  // Free accounts: 30 requests per 10s. Pro/Elite: 100 requests per 10s.
-  const maxReqs = tier === PlanTier.PRO || tier === PlanTier.ELITE ? 100 : 30;
+  // Free accounts: 100 requests per 10s. Pro/Elite: 300 requests per 10s.
+  const maxReqs = tier === PlanTier.PRO || tier === PlanTier.ELITE ? 300 : 100;
   const now = Date.now();
   const windowMs = 10000; // 10 seconds
 

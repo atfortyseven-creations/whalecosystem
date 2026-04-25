@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSettingsStore } from '@/lib/store/settings-store';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { signOut } from 'next-auth/react';
 import { 
     X, LogOut, AlertTriangle, EyeOff, Volume2, Box, Cpu, HardDrive,

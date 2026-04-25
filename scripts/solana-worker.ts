@@ -164,4 +164,8 @@ async function interceptThermodynamicAnomalies() {
     }, 'processed');
 }
 
-interceptThermodynamicAnomalies().catch(console.error);
+interceptThermodynamicAnomalies().catch(err => {
+    const errStr = String(err);
+    if (errStr.includes('-32005') || errStr.includes('Rate Limit') || errStr.includes('429')) return;
+    console.error(err);
+});

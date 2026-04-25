@@ -6,7 +6,7 @@ import { Bell, Eye, User } from 'lucide-react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useDisconnect } from 'wagmi';
 import { useUIStore } from '@/lib/store/ui-store';
-import { useSettingsStore } from '@/lib/store/settings-store';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { CurrencySwitcher } from './CurrencySwitcher';
 
 // ─── IVORY SYSTEMS UTILITY HEADER ───

@@ -45,40 +45,40 @@ export default function SovereignAdminPanel() {
   if (error) return (
     <div className="flex flex-col items-center justify-center h-[60vh]">
        <ShieldAlert size={64} className="text-red-500 mb-4" />
-       <h1 className="text-2xl font-bold text-[#222222]">ACCESS DENIED</h1>
-       <p className="text-gray-500 mt-2">Only the Sovereign Administrator can access this terminal.</p>
+       <h1 className="text-2xl font-bold" style={{ color: 'var(--forum-text)' }}>ACCESS DENIED</h1>
+       <p className="mt-2" style={{ color: 'var(--forum-text-muted)' }}>Only the Sovereign Administrator can access this terminal.</p>
     </div>
   );
 
   return (
     <div className="w-full max-w-[1110px] mx-auto py-8">
-      <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-200">
+      <div className="flex items-center gap-3 mb-8 pb-4 border-b" style={{ borderColor: 'var(--forum-border)' }}>
          <ShieldCheck size={32} className="text-green-600" />
          <div>
-           <h1 className="text-[24px] font-bold text-[#222222]">Sovereign Gatekeeper</h1>
-           <p className="text-[14px] text-gray-500">Global Moderation Queue. All standard user submissions land here as PENDING.</p>
+           <h1 className="text-[24px] font-bold" style={{ color: 'var(--forum-text)' }}>Sovereign Gatekeeper</h1>
+           <p className="text-[14px]" style={{ color: 'var(--forum-text-muted)' }}>Global Moderation Queue. All standard user submissions land here as PENDING.</p>
          </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
          {/* Pending Topics */}
          <div className="flex-1 flex flex-col">
-            <h2 className="text-[18px] font-semibold mb-4 text-[#222222]">Pending Topics ({queue.topics.length})</h2>
+            <h2 className="text-[18px] font-semibold mb-4" style={{ color: 'var(--forum-text)' }}>Pending Topics ({queue.topics.length})</h2>
             <div className="flex flex-col gap-4">
               {queue.topics.length === 0 ? (
-                <div className="p-6 bg-gray-50 border border-gray-100 rounded text-center text-gray-500 text-sm">
+                <div className="p-6 border rounded text-center text-sm" style={{ backgroundColor: 'var(--forum-surface)', borderColor: 'var(--forum-border)', color: 'var(--forum-text-muted)' }}>
                   No pending topics.
                 </div>
               ) : queue.topics.map(topic => (
-                <div key={topic.id} className="p-4 bg-white border border-yellow-200 shadow-sm rounded flex flex-col gap-3">
+                <div key={topic.id} className="p-4 border shadow-sm rounded flex flex-col gap-3" style={{ backgroundColor: 'var(--forum-surface)', borderColor: 'var(--forum-border)' }}>
                    <div className="flex items-center justify-between">
-                      <div className="font-semibold text-[15px]">{topic.title}</div>
-                      <div className="text-[12px] text-gray-500">{formatDistanceToNowStrict(new Date(topic.createdAt), { addSuffix: true })}</div>
+                      <div className="font-semibold text-[15px]" style={{ color: 'var(--forum-text)' }}>{topic.title}</div>
+                      <div className="text-[12px]" style={{ color: 'var(--forum-text-muted)' }}>{formatDistanceToNowStrict(new Date(topic.createdAt), { addSuffix: true })}</div>
                    </div>
-                   <div className="text-[13px] text-gray-500">
-                     By: <span className="font-mono text-black">{topic.author.displayName || topic.author.walletAddress.slice(0,8)}</span>
+                   <div className="text-[13px]" style={{ color: 'var(--forum-text-muted)' }}>
+                     By: <span className="font-mono" style={{ color: 'var(--forum-text)' }}>{topic.author.displayName || topic.author.walletAddress.slice(0,8)}</span>
                    </div>
-                   <div className="p-3 bg-gray-50 text-[14px] text-gray-700 whitespace-pre-wrap rounded">
+                   <div className="p-3 text-[14px] whitespace-pre-wrap rounded" style={{ backgroundColor: 'var(--forum-hover)', color: 'var(--forum-text)' }}>
                      {topic.content}
                    </div>
                    <div className="flex justify-end gap-2 mt-2">
@@ -102,24 +102,24 @@ export default function SovereignAdminPanel() {
 
          {/* Pending Posts */}
          <div className="flex-1 flex flex-col">
-            <h2 className="text-[18px] font-semibold mb-4 text-[#222222]">Pending Replies ({queue.posts.length})</h2>
+            <h2 className="text-[18px] font-semibold mb-4" style={{ color: 'var(--forum-text)' }}>Pending Replies ({queue.posts.length})</h2>
             <div className="flex flex-col gap-4">
               {queue.posts.length === 0 ? (
-                <div className="p-6 bg-gray-50 border border-gray-100 rounded text-center text-gray-500 text-sm">
+                <div className="p-6 border rounded text-center text-sm" style={{ backgroundColor: 'var(--forum-surface)', borderColor: 'var(--forum-border)', color: 'var(--forum-text-muted)' }}>
                   No pending replies.
                 </div>
               ) : queue.posts.map(post => (
-                <div key={post.id} className="p-4 bg-white border border-yellow-200 shadow-sm rounded flex flex-col gap-3">
+                <div key={post.id} className="p-4 border shadow-sm rounded flex flex-col gap-3" style={{ backgroundColor: 'var(--forum-surface)', borderColor: 'var(--forum-border)' }}>
                    <div className="flex items-center justify-between">
-                      <div className="text-[13px] text-gray-500">
-                        Reply to: <span className="font-semibold text-black">{post.topic.title}</span>
+                      <div className="text-[13px]" style={{ color: 'var(--forum-text-muted)' }}>
+                        Reply to: <span className="font-semibold" style={{ color: 'var(--forum-text)' }}>{post.topic.title}</span>
                       </div>
-                      <div className="text-[12px] text-gray-500">{formatDistanceToNowStrict(new Date(post.createdAt), { addSuffix: true })}</div>
+                      <div className="text-[12px]" style={{ color: 'var(--forum-text-muted)' }}>{formatDistanceToNowStrict(new Date(post.createdAt), { addSuffix: true })}</div>
                    </div>
-                   <div className="text-[13px] text-gray-500">
-                     By: <span className="font-mono text-black">{post.author.displayName || post.author.walletAddress.slice(0,8)}</span>
+                   <div className="text-[13px]" style={{ color: 'var(--forum-text-muted)' }}>
+                     By: <span className="font-mono" style={{ color: 'var(--forum-text)' }}>{post.author.displayName || post.author.walletAddress.slice(0,8)}</span>
                    </div>
-                   <div className="p-3 bg-gray-50 text-[14px] text-gray-700 whitespace-pre-wrap rounded">
+                   <div className="p-3 text-[14px] whitespace-pre-wrap rounded" style={{ backgroundColor: 'var(--forum-hover)', color: 'var(--forum-text)' }}>
                      {post.content}
                    </div>
                    <div className="flex justify-end gap-2 mt-2">

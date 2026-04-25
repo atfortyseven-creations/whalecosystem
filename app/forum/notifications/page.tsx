@@ -24,7 +24,7 @@ export default function NotificationsPage() {
 
   if (loading) {
     return (
-      <div className="py-20 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">
+      <div className="py-20 text-center text-[10px] font-mono uppercase tracking-[0.2em]" style={{ color: 'var(--forum-text-muted)' }}>
         [ RETRIEVING SECURE COMMS ]
       </div>
     );
@@ -32,18 +32,18 @@ export default function NotificationsPage() {
 
   return (
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
-      <div className="mb-8 pb-6 border-b border-white/20">
-        <h1 className="text-[16px] font-aztec-h2 font-black uppercase tracking-tight text-white leading-snug">
+      <div className="mb-8 pb-6 border-b" style={{ borderColor: 'var(--forum-border)' }}>
+        <h1 className="text-[16px] font-aztec-h2 font-black uppercase tracking-tight leading-snug" style={{ color: 'var(--forum-text)' }}>
           Intelligence Alerts
         </h1>
-        <div className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#00f2ea] mt-2">
+        <div className="text-[9px] font-mono uppercase tracking-[0.2em] mt-2" style={{ color: 'var(--forum-button-bg)' }}>
           SOVEREIGN NOTIFICATION CENTER
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
         {notifications.length === 0 ? (
-          <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">
+          <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em]" style={{ color: 'var(--forum-text-muted)' }}>
             [ NO NEW ALERTS ]
           </div>
         ) : (
@@ -62,29 +62,31 @@ export default function NotificationsPage() {
               <Link
                 key={n.id}
                 href={linkHref}
-                className={`flex items-start gap-4 p-4 border transition-colors ${
-                  isUnread ? 'bg-white/10 border-white/30 hover:bg-white/20' : 'bg-transparent border-white/5 hover:bg-white/5'
-                }`}
+                className="flex items-start gap-4 p-4 border transition-colors group hover:opacity-90"
+                style={{ 
+                  backgroundColor: isUnread ? 'var(--forum-surface)' : 'transparent',
+                  borderColor: isUnread ? 'var(--forum-border)' : 'transparent',
+                }}
               >
-                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-white/10 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 flex items-center justify-center" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
                   {n.actor?.avatarUrl ? (
                      <img src={n.actor.avatarUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
-                     <span className="text-[10px] font-mono font-black text-white">{actorName.charAt(0).toUpperCase()}</span>
+                     <span className="text-[10px] font-mono font-black" style={{ color: 'var(--forum-text)' }}>{actorName.charAt(0).toUpperCase()}</span>
                   )}
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <div className="text-[12px] font-mono text-white/90">
-                    <span className="font-black text-[#00f2ea]">{actorName}</span> {message}
+                  <div className="text-[12px] font-mono" style={{ color: 'var(--forum-text)' }}>
+                    <span className="font-black" style={{ color: 'var(--forum-button-bg)' }}>{actorName}</span> {message}
                   </div>
-                  <div className="text-[9px] font-mono uppercase tracking-widest text-white/40 mt-1.5">
+                  <div className="text-[9px] font-mono uppercase tracking-widest mt-1.5" style={{ color: 'var(--forum-text-muted)' }}>
                     {formatDistanceToNowStrict(new Date(n.createdAt))} ago
                   </div>
                 </div>
                 
                 {isUnread && (
-                  <div className="w-2 h-2 rounded-full bg-[#00f2ea] shadow-[0_0_8px_#00f2ea] shrink-0 mt-2" />
+                  <div className="w-2 h-2 rounded-full shrink-0 mt-2" style={{ backgroundColor: 'var(--forum-button-bg)' }} />
                 )}
               </Link>
             );

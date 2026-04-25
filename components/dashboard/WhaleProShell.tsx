@@ -13,7 +13,7 @@ import {
     LineChart, Lock, Book, Info, X
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
-import { useSettingsStore } from '@/lib/store/settings-store';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useUIStore } from '@/lib/store/ui-store';
 import { useEffect } from 'react';
 import { useMarketStream } from '@/context/MarketStreamContext';

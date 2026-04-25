@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { useSearchParams } from 'next/navigation';
 
-export default function ForumHomePage() {
+function ForumHomeContent() {
   const [topics, setTopics] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const searchParams = useSearchParams();
+  const filter = searchParams.get('filter') || 'latest';
 
   useEffect(() => {
-    fetch('/api/forum/topics?limit=30')
+    fetch(`/api/forum/topics?limit=30&filter=${filter}`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setTopics(data); })
       .catch(console.error);
@@ -18,7 +21,7 @@ export default function ForumHomePage() {
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setCategories(data); })
       .catch(console.error);
-  }, []);
+  }, [filter]);
 
   return (
     <div className="w-full max-w-[1110px] mx-auto pt-10 pb-20 px-4">
@@ -30,7 +33,7 @@ export default function ForumHomePage() {
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-white/30 font-sans">Loading categories...</div>
           ) : categories.map(cat => (
-            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 transform-gpu" style={{ borderBottom: '1px solid var(--forum-border)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--forum-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 transform-gpu hover:bg-[var(--forum-hover)]" style={{ borderBottom: '1px solid var(--forum-border)' }}>
               <div className="w-1 h-10 rounded-sm mr-4 mt-1" style={{ backgroundColor: cat.color || '#6366f1' }}></div>
               <div className="flex flex-col">
                 <span className="text-[18.4px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>{cat.name}</span>
@@ -43,7 +46,7 @@ export default function ForumHomePage() {
         {/* Right Column: Latest Activity (65% -> col-span-8) */}
         <div className="lg:col-span-8 flex flex-col">
           <div className="flex items-center justify-between pb-2 mb-4" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-            <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>Latest</h2>
+            <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest capitalize" style={{ color: 'var(--forum-text-muted)' }}>{filter}</h2>
           </div>
 
           <div className="flex flex-col">
@@ -63,10 +66,8 @@ export default function ForumHomePage() {
                 <Link
                   key={topic.id}
                   href={`/forum/t/${topic.id}`}
-                  className="flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 group transform-gpu"
+                  className="flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 group transform-gpu hover:bg-[var(--forum-hover)]"
                   style={{ borderBottom: '1px solid var(--forum-border)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--forum-hover)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   {/* Avatar */}
                   <div className="w-[45px] shrink-0 pt-1">
@@ -108,5 +109,13 @@ export default function ForumHomePage() {
 
       </div>
     </div>
+  );
+}
+
+export default function ForumHomePage() {
+  return (
+    <Suspense fallback={<div className="w-full pt-10 px-4 text-center text-gray-500">Loading forum...</div>}>
+      <ForumHomeContent />
+    </Suspense>
   );
 }

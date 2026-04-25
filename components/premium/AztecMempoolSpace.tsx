@@ -88,7 +88,7 @@ export default function AztecMempoolSpace() {
 
                     // Prepend the active pipeline blocks
                     const pipeline = [
-                        { ...newSequencerBlock, id: newSequencerBlock.id + 2, status: 'BUILDING', fillPercentage: Math.random() * 60 + 20, totalFee: totalFeeEther * 0.4 },
+                        { ...newSequencerBlock, id: newSequencerBlock.id + 2, status: 'BUILDING', fillPercentage: 20 + ((newSequencerBlock.id * 17) % 60), totalFee: totalFeeEther * 0.4 },
                         { ...newSequencerBlock, id: newSequencerBlock.id + 1, status: 'PROVING', fillPercentage: 100, totalFee: totalFeeEther * 0.9 },
                         ...historic
                     ] as SequencerBlock[];
@@ -105,14 +105,17 @@ export default function AztecMempoolSpace() {
                 if (valTxs.length > 0) {
                     const newZkTxs: ZkTransaction[] = valTxs.map(t => {
                         const stages: ZkTransaction['stage'][] = ['PXE_GENERATING', 'KERNEL_PROOF', 'SEQUENCER_QUEUE', 'ROLLUP_BATCH'];
-                        const randomStage = stages[Math.floor(Math.random() * stages.length)];
+                        const hashNum = parseInt(t.hash.slice(2, 10), 16);
+                        const deterministicStage = stages[hashNum % stages.length];
+                        const deterministicSize = (hashNum % 4) + 1;
+                        
                         return {
                             id: t.hash,
                             pxeHash: t.hash,
                             feeJuice: Number(formatEther(t.gasPrice || t.maxFeePerGas || 0n)) * 1000000,
-                            stage: randomStage,
+                            stage: deterministicStage,
                             timestamp: Date.now(),
-                            sizeKb: Math.floor(Math.random() * 4) + 1,
+                            sizeKb: deterministicSize,
                             from: t.from,
                             to: t.to || 'Contract',
                             type: 'SHIELDED_TRANSFER'

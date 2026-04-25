@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 
 export default function NewTopicPage() {
   const router = useRouter();
@@ -87,7 +88,7 @@ export default function NewTopicPage() {
 
         {/* ── Category + Tags ── */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <select
               value={categoryId}
               onChange={e => setCategoryId(e.target.value)}
@@ -101,6 +102,7 @@ export default function NewTopicPage() {
                 <option key={cat.id} value={cat.id} style={{ backgroundColor: 'var(--forum-bg)', color: 'var(--forum-text)' }}>{cat.name}</option>
               ))}
             </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" size={16} style={{ color: 'var(--forum-text-muted)' }} />
           </div>
           <div className="flex-1">
             <input

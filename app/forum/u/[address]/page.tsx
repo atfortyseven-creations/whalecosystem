@@ -139,10 +139,8 @@ function ActivityItem({ item }: { item: any }) {
   return (
     <Link
       href={href}
-      className="flex items-start gap-4 py-4 transition-all rounded-sm -mx-2 px-2"
+      className="flex items-start gap-4 py-4 transition-all rounded-sm -mx-2 px-2 hover:bg-[var(--forum-hover)]"
       style={{ borderBottom: '1px solid var(--forum-border)' }}
-      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
     >
       {/* Type badge */}
       <div className="shrink-0 mt-0.5">

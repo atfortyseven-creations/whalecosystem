@@ -113,13 +113,9 @@ export function InstitutionalHeader() {
                                              <Link 
                                                  href={link.href} 
                                                  key={link.label}
-                                                 className="flex flex-col gap-1 px-4 py-4 rounded-lg transition-all hover:scale-[1.01]"
+                                                 className="flex flex-col gap-1 px-4 py-4 rounded-lg transition-all hover:scale-[1.01] hover:bg-[rgba(5,5,5,0.03)]"
                                                  style={{ 
-                                                     backgroundColor: isActive ? 'rgba(5,5,5,0.03)' : 'transparent',
-                                                 }}
-                                                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(5,5,5,0.03)'}
-                                                 onMouseLeave={(e) => {
-                                                     if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                                                     backgroundColor: isActive ? 'rgba(5,5,5,0.03)' : undefined,
                                                  }}
                                              >
                                                  <span className="text-[12px] font-black uppercase tracking-widest text-[#050505]">

@@ -11,6 +11,12 @@ export async function GET(req: Request) {
         const categorySlug = searchParams.get('category');
         const tag = searchParams.get('tag');
         const limit = parseInt(searchParams.get('limit') || '30');
+        const filter = searchParams.get('filter') || 'latest';
+
+        let orderBy: any = { updatedAt: 'desc' };
+        if (filter === 'new') orderBy = { createdAt: 'desc' };
+        if (filter === 'top') orderBy = { views: 'desc' };
+        if (filter === 'unread') orderBy = { views: 'asc' };
 
         const topics = await (prisma as any).forumTopic.findMany({
             where: {
@@ -29,9 +35,7 @@ export async function GET(req: Request) {
                     select: { posts: true }
                 }
             },
-            orderBy: {
-                updatedAt: 'desc'
-            },
+            orderBy,
             take: limit
         });
 

@@ -30,10 +30,8 @@ export default function ForumBadgesPage() {
          {badges.map(b => (
            <div
              key={b.id}
-             className="flex items-center py-4 px-4 rounded-sm transition-all duration-200"
+             className="flex items-center py-4 px-4 rounded-sm transition-all duration-200 hover:bg-[var(--forum-hover)] hover:border-[#6366f1]"
              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}
-             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; e.currentTarget.style.borderColor = '#6366f1'; }}
-             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; e.currentTarget.style.borderColor = 'var(--forum-border)'; }}
            >
              <div className="flex-1 min-w-0">
                <div className="text-[16px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>

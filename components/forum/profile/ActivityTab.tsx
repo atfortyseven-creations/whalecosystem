@@ -5,7 +5,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 export function ActivityTab({ items }: { items: any[] }) {
   if (items.length === 0) {
     return (
-      <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+      <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em]" style={{ color: 'var(--forum-text-muted)' }}>
         [ NO TRANSMISSIONS ]
       </div>
     );
@@ -26,15 +26,16 @@ export function ActivityTab({ items }: { items: any[] }) {
           <Link
             key={i}
             href={href}
-            className="flex items-center gap-4 py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors group"
+            className="flex items-center gap-4 py-4 border-b transition-colors group hover:bg-[var(--forum-hover)]"
+            style={{ borderColor: 'var(--forum-border)' }}
           >
-            <span className="text-[9px] font-mono font-black text-[#050505]/20 w-14 shrink-0 uppercase">
+            <span className="text-[9px] font-mono font-black w-14 shrink-0 uppercase" style={{ color: 'var(--forum-text-muted)' }}>
               {item._type}
             </span>
-            <span className="flex-1 text-[12px] font-mono text-[#050505] truncate group-hover:underline underline-offset-2">
+            <span className="flex-1 text-[12px] font-mono truncate group-hover:underline underline-offset-2" style={{ color: 'var(--forum-text)' }}>
               {label}
             </span>
-            <span className="text-[10px] font-mono text-[#050505]/30 whitespace-nowrap">
+            <span className="text-[10px] font-mono whitespace-nowrap" style={{ color: 'var(--forum-text-muted)' }}>
               {time.replace(' minutes', 'm').replace(' hours', 'h').replace(' days', 'd')}
             </span>
           </Link>

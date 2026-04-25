@@ -44,7 +44,10 @@ process.on('uncaughtException', (err: any) => {
     'getaddrinfo',     // DNS lookup failure prefix
     'UNKNOWN_ERROR',   // ethers catch-all
     'connection timeout exceeded',
-    'NETWORK_ERROR'
+    'NETWORK_ERROR',
+    '-32005',          // RPC Quota Exhaustion
+    'rate limit',      // RPC Rate Limiting
+    'quota'            // RPC Quota Limit
   ];
 
   if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {
@@ -75,7 +78,10 @@ process.on('unhandledRejection', (reason: any, promise) => {
     'getaddrinfo',     // DNS lookup failure prefix
     'UNKNOWN_ERROR',   // ethers catch-all
     'connection timeout exceeded',
-    'NETWORK_ERROR'
+    'NETWORK_ERROR',
+    '-32005',          // RPC Quota Exhaustion
+    'rate limit',      // RPC Rate Limiting
+    'quota'            // RPC Quota Limit
   ];
 
   if (lethalWSPatterns.some(p => msg.includes(p) || code.includes(p))) {

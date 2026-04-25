@@ -27,20 +27,21 @@ export default function CategoryPage() {
       {/* ── Discourse Breadcrumb & Controls ── */}
       <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2 text-[14px]">
-          <Link href="/forum" className="text-gray-500 hover:text-black">Categories</Link>
-          <ChevronRight size={14} className="text-gray-400" />
-          <div className="flex items-center gap-1.5 bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200 cursor-default">
+          <Link href="/forum" className="transition-colors" style={{ color: 'var(--forum-text-muted)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--forum-text)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--forum-text-muted)'}>Categories</Link>
+          <ChevronRight size={14} style={{ color: 'var(--forum-text-muted)', opacity: 0.5 }} />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border cursor-default" style={{ backgroundColor: 'var(--forum-surface)', borderColor: 'var(--forum-border)' }}>
             <span 
               className="w-2.5 h-2.5 rounded-sm" 
               style={{ backgroundColor: category.color }} 
             />
-            <span className="font-semibold text-gray-700">{category.name}</span>
+            <span className="font-semibold" style={{ color: 'var(--forum-text)' }}>{category.name}</span>
           </div>
         </div>
 
         <Link 
           href={`/forum/new?category=${category.id}`} 
-          className="flex items-center gap-1.5 bg-[#0088CC] hover:bg-[#0077B3] text-white px-4 py-2 rounded shadow-sm text-[14px] font-medium transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 rounded shadow-sm text-[14px] font-medium transition-opacity hover:opacity-80"
+          style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
         >
           <Plus size={16} />
           New Topic
@@ -48,15 +49,15 @@ export default function CategoryPage() {
       </div>
 
       {/* Category Description */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-100 border-l-4" style={{ borderLeftColor: category.color }}>
-        <p className="text-[14px] text-gray-600">
+      <div className="mb-6 p-4 rounded-md border border-l-4" style={{ backgroundColor: 'var(--forum-surface)', borderColor: 'var(--forum-border)', borderLeftColor: category.color }}>
+        <p className="text-[14px]" style={{ color: 'var(--forum-text-muted)' }}>
           {category.description}
         </p>
       </div>
 
       <div className="w-full">
         {/* ── Table Header ── */}
-        <div className="flex items-center py-2 border-b border-gray-300 text-[13px] text-gray-500 font-normal">
+        <div className="flex items-center py-2 border-b text-[13px] font-normal" style={{ borderColor: 'var(--forum-border)', color: 'var(--forum-text-muted)' }}>
            <div className="flex-1">Topic</div>
            <div className="w-20 text-center hidden sm:block">Replies</div>
            <div className="w-16 text-center hidden sm:block">Views</div>
@@ -66,7 +67,7 @@ export default function CategoryPage() {
         {/* ── Topic List ── */}
         <div className="flex flex-col">
           {!category.topics?.length ? (
-            <div className="py-12 text-center text-gray-500 text-sm">
+            <div className="py-12 text-center text-sm" style={{ color: 'var(--forum-text-muted)' }}>
               No topics in this category yet. Be the first to start a discussion!
             </div>
           ) : category.topics.map((topic: any) => {
@@ -78,11 +79,12 @@ export default function CategoryPage() {
               <Link 
                 key={topic.id} 
                 href={`/forum/t/${topic.id}`}
-                className="flex items-center py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors"
+                className="flex items-center py-3 border-b hover:bg-[var(--forum-hover)] transition-colors"
+                style={{ borderColor: 'var(--forum-border)' }}
               >
                 {/* Topic Title */}
                 <div className="flex-1 min-w-0 pr-4">
-                  <h3 className="text-[15px] text-[#222222] font-semibold truncate leading-snug">
+                  <h3 className="text-[15px] font-semibold truncate leading-snug" style={{ color: 'var(--forum-text)' }}>
                     {topic.title}
                   </h3>
                 </div>
@@ -98,16 +100,16 @@ export default function CategoryPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="w-16 text-center hidden sm:block text-[13px] text-gray-500">
+                <div className="w-16 text-center hidden sm:block text-[13px]" style={{ color: 'var(--forum-text-muted)' }}>
                   {topic._count?.posts || 0}
                 </div>
                 
-                <div className="w-16 text-center hidden sm:block text-[13px] text-gray-500">
+                <div className="w-16 text-center hidden sm:block text-[13px]" style={{ color: 'var(--forum-text-muted)' }}>
                   {topic.views > 999 ? `${(topic.views / 1000).toFixed(1)}k` : topic.views}
                 </div>
 
                 {/* Activity */}
-                <div className="w-20 text-right text-[13px] text-gray-500">
+                <div className="w-20 text-right text-[13px]" style={{ color: 'var(--forum-text-muted)' }}>
                   {activityText.replace(' minutes', 'm').replace(' hours', 'h').replace(' days', 'd').replace(' months', 'mo')}
                 </div>
               </Link>

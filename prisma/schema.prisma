@@ -21,19 +21,19 @@ model Article {
   id          String   @id @default(uuid())
   title       String
   content     String   @db.Text
-  sentiment   Float    // AI Score 0-100 indicating sentiment
-  bias        String   // "Bullish", "Bearish", "Neutral"
-  category    String   // "Macro", "Regulation", "DeFi", "Hacks"
+  sentiment   Float // AI Score 0-100 indicating sentiment
+  bias        String // "Bullish", "Bearish", "Neutral"
+  category    String // "Macro", "Regulation", "DeFi", "Hacks"
   publishedAt DateTime @default(now())
   sectorId    String?
   author      String
 
-  sector      Sector?  @relation(fields: [sectorId], references: [id])
+  sector Sector? @relation(fields: [sectorId], references: [id])
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Articulación para texto completo e informes temporales
-  @@index([category, publishedAt(sort: Desc)])  // Filtrado rápido por categoría + cronología
-  @@index([bias, sentiment])                    // Análisis de polaridad institucional
-  @@index([sectorId, publishedAt(sort: Desc)])  // Drill-down por sector en dashboards
+  @@index([category, publishedAt(sort: Desc)]) // Filtrado rápido por categoría + cronología
+  @@index([bias, sentiment]) // Análisis de polaridad institucional
+  @@index([sectorId, publishedAt(sort: Desc)]) // Drill-down por sector en dashboards
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,11 +47,11 @@ model Sector {
   description String?   @db.Text
   totalTvl    Float     @default(0.0)
   volume24h   Float     @default(0.0)
-  zScore      Float     // Custom Whale Rotation Score
+  zScore      Float // Custom Whale Rotation Score
   articles    Article[]
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Rendimiento y ordenamiento dinámico
-  @@index([zScore(sort: Desc)])   // Top Sectors by Whale Rotation Score
+  @@index([zScore(sort: Desc)]) // Top Sectors by Whale Rotation Score
   @@index([totalTvl(sort: Desc)]) // Ranking por TVL en tiempo real
 }
 
@@ -60,18 +60,18 @@ model Sector {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model GoldRegistryAudit {
-  id                 String   @id @default(uuid())
+  id                 String  @id @default(uuid())
   platformName       String
-  slug               String   @unique
-  type               String   // "Casino", "Wallet", "Exchange", "PredictionMarket"
-  isVerifiedOnChain  Boolean  @default(false)
-  smartContractRef   String?  // Contract validated by local/Polygon ping
-  solvencyStatus     String   // "Confirmed", "Suspicious", "Unknown"
-  sovereignBridgeUrl String   // E.g., The dark-pool routed affiliate bridge
-  
+  slug               String  @unique
+  type               String // "Casino", "Wallet", "Exchange", "PredictionMarket"
+  isVerifiedOnChain  Boolean @default(false)
+  smartContractRef   String? // Contract validated by local/Polygon ping
+  solvencyStatus     String // "Confirmed", "Suspicious", "Unknown"
+  sovereignBridgeUrl String // E.g., The dark-pool routed affiliate bridge
+
   // High-performance metrics tailored to CryptoSlate's taxonomies
-  features           String[] // ["No KYC", "Instant Withdrawal", "Cold Storage"]
-  supportedChains    String[] // ["Ethereum", "Solana", "Base"]
+  features        String[] // ["No KYC", "Instant Withdrawal", "Cold Storage"]
+  supportedChains String[] // ["Ethereum", "Solana", "Base"]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -79,12 +79,12 @@ model GoldRegistryAudit {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model EcosystemWarRoomData {
-  id          String   @id @default(uuid())
-  chainName   String   @unique
-  chainSymbol String
+  id            String @id @default(uuid())
+  chainName     String @unique
+  chainSymbol   String
   totalEntities Int    @default(0)
-  tvl         Float    @default(0.0)
-  volume24h   Float    @default(0.0)
+  tvl           Float  @default(0.0)
+  volume24h     Float  @default(0.0)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -92,68 +92,68 @@ model EcosystemWarRoomData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model User {
-  id              String      @id @default(uuid())
-  walletAddress   String      @unique
-  displayName     String?
-  avatarUrl       String?     @db.Text
-  bio             String?     @db.Text
-  isPro           Boolean     @default(false)
-  tier            String      @default("basic")
-  lastActive      DateTime    @default(now())
+  id                String   @id @default(uuid())
+  walletAddress     String   @unique
+  displayName       String?
+  avatarUrl         String?  @db.Text
+  bio               String?  @db.Text
+  isPro             Boolean  @default(false)
+  tier              String   @default("basic")
+  lastActive        DateTime @default(now())
   goldTicketTokenId String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   worldIdNullifierHash String? @unique
-  
-  theme           String      @default("light")
-  currency        String      @default("USD")
-  language        String      @default("es-ES")
 
-  showBalances    Boolean     @default(true)
-  hiddenAssets    String[]    @default([])
-  defaultTimeframe String     @default("1W") // "1D", "1W", "1M", "ALL"
-  displayUnit     String      @default("FIAT") // "FIAT", "BTC", "ETH"
+  theme    String @default("light")
+  currency String @default("USD")
+  language String @default("es-ES")
 
-  gasPreset       String      @default("STANDARD") // "ECONOMY", "STANDARD", "FAST", "INSTANT"
-  customRpcUrl    String?     
-  mevProtection   Boolean     @default(false)
-  maxSlippage     Float       @default(0.5)
+  showBalances     Boolean  @default(true)
+  hiddenAssets     String[] @default([])
+  defaultTimeframe String   @default("1W") // "1D", "1W", "1M", "ALL"
+  displayUnit      String   @default("FIAT") // "FIAT", "BTC", "ETH"
 
-  inactivityLockMinutes Int   @default(60)
-  stealthMode     Boolean     @default(false)
+  gasPreset     String  @default("STANDARD") // "ECONOMY", "STANDARD", "FAST", "INSTANT"
+  customRpcUrl  String?
+  mevProtection Boolean @default(false)
+  maxSlippage   Float   @default(0.5)
+
+  inactivityLockMinutes Int     @default(60)
+  stealthMode           Boolean @default(false)
   requireSignForExports Boolean @default(true)
-  allowAnalytics  Boolean     @default(true)
+  allowAnalytics        Boolean @default(true)
 
-  emailAlerts     Boolean     @default(false)
-  telegramAlerts  Boolean     @default(false)
+  emailAlerts         Boolean @default(false)
+  telegramAlerts      Boolean @default(false)
   whaleAlertThreshold Float   @default(1000000)
-  soundEffects    Boolean     @default(true)
+  soundEffects        Boolean @default(true)
 
-  testnetMode     Boolean     @default(false)
-  
-  clerkId         String?     @unique
-  snxAccountId    String?     @unique
-  
-  watchlists      Watchlist[]
-  alerts          Alert[]
-  canvasState     CanvasState?
-  progress        UserProgress[]
-  submissions     AcademySubmission[]
-  sentMessages    MentoringMessage[] @relation("SentMessages")
-  receivedMessages MentoringMessage[] @relation("ReceivedMessages")
+  testnetMode Boolean @default(false)
+
+  clerkId      String? @unique
+  snxAccountId String? @unique
+
+  watchlists       Watchlist[]
+  alerts           Alert[]
+  canvasState      CanvasState?
+  progress         UserProgress[]
+  submissions      AcademySubmission[]
+  sentMessages     MentoringMessage[]  @relation("SentMessages")
+  receivedMessages MentoringMessage[]  @relation("ReceivedMessages")
 
   // Forum Relations
-  forumTopics     ForumTopic[]
-  forumPosts      ForumPost[]
-  forumLikes      ForumLike[]
+  forumTopics        ForumTopic[]
+  forumPosts         ForumPost[]
+  forumLikes         ForumLike[]
   forumNotifications ForumNotification[]
   actorNotifications ForumNotification[] @relation("ActorNotifications")
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Segmentación de usuarios para analytics y acceso a nivel Pro
-  @@index([tier, lastActive(sort: Desc)])  // Consulta de usuarios activos por tier
-  @@index([isPro, createdAt(sort: Desc)])  // Funnel de conversión Pro
-  @@index([createdAt(sort: Desc)])         // Registro cronológico general
+  @@index([tier, lastActive(sort: Desc)]) // Consulta de usuarios activos por tier
+  @@index([isPro, createdAt(sort: Desc)]) // Funnel de conversión Pro
+  @@index([createdAt(sort: Desc)]) // Registro cronológico general
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -163,48 +163,47 @@ model User {
 model Subscription {
   id        String   @id @default(uuid())
   userId    String   @unique // Maps to User.walletAddress typically
-  status    String   // 'ACTIVE', 'CANCELED', 'PAST_DUE'
-  tier      String   // 'LIFETIME_VIP', 'PRO_MONTHLY', etc.
+  status    String // 'ACTIVE', 'CANCELED', 'PAST_DUE'
+  tier      String // 'LIFETIME_VIP', 'PRO_MONTHLY', etc.
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
 model Watchlist {
-  id          String   @id @default(uuid())
-  userId      String
-  symbol      String   // E.g., "BTCUSDT" or a contract address
-  chain       String   @default("multi")
-  addedAt     DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String   @id @default(uuid())
+  userId  String
+  symbol  String // E.g., "BTCUSDT" or a contract address
+  chain   String   @default("multi")
+  addedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, symbol, chain])
 }
 
 model Alert {
-  id          String   @id @default(uuid())
-  userId      String
-  targetType  String   // "PRICE", "GAS", "WHALE_TX", "LIQUIDATION"
-  condition   String   // "ABOVE", "BELOW", "EQUALS"
-  threshold   Float
-  metric      String   // e.g., "BTC", "ETH_GAS"
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  userId     String
+  targetType String // "PRICE", "GAS", "WHALE_TX", "LIQUIDATION"
+  condition  String // "ABOVE", "BELOW", "EQUALS"
+  threshold  Float
+  metric     String // e.g., "BTC", "ETH_GAS"
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CanvasState {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  nodes       Json     // Institutional Node Topography
-  edges       Json     // Connection Matrices
-  pan         Json?    // Navigation Coordinates
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  nodes        Json // Institutional Node Topography
+  edges        Json // Connection Matrices
+  pan          Json? // Navigation Coordinates
   lastSyncedAt DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -234,16 +233,16 @@ model Course {
 }
 
 model Lesson {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   courseId    String
   title       String
   duration    String
   level       String
-  description String   @db.Text
+  description String  @db.Text
   orderIndex  Int
-  isLocked    Boolean  @default(false)
-  
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  isLocked    Boolean @default(false)
+
+  course      Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   progress    UserProgress[]
   submissions AcademySubmission[]
 }
@@ -255,9 +254,9 @@ model UserProgress {
   completed Boolean  @default(true)
   timestamp DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
   @@unique([userId, lessonId])
 }
 
@@ -267,32 +266,32 @@ model UserProgress {
 
 model AcademySubmission {
   id          String   @id @default(uuid())
-  userId      String   
+  userId      String
   lessonId    String
   contentUrl  String?
-  txHash      String?  
+  txHash      String?
   status      String   @default("PENDING") // PENDING, PASSED, FAILED
   feedback    String?  @db.Text
   submittedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@index([userId, lessonId])
   @@index([status])
 }
 
 model MentoringMessage {
-  id          String   @id @default(uuid())
-  senderId    String
-  receiverId  String
-  content     String   @db.Text
-  read        Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  content    String   @db.Text
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
 
-  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@index([receiverId, read])
 }
@@ -313,7 +312,7 @@ model GoldenTicket {
   signatureData         String?  @db.Text
   isActive              Boolean  @default(true)
   claimedAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt @default(now())
+  updatedAt             DateTime @default(now()) @updatedAt
 
   // Compound indexes for dashboard query patterns:
   // /api/golden-ticket GET: WHERE isActive=true ORDER BY claimedAt DESC TAKE 30
@@ -343,44 +342,44 @@ model IntelItem {
 }
 
 model NewsArticle {
-  id               String   @id @default(uuid())
-  externalId       String?  @unique
-  title            String
-  summary          String   @db.Text
-  url              String   @unique
-  source           String
-  imageUrl         String?
-  category         String   @default("crypto")
-  publishedAt      DateTime @default(now())
-  
+  id          String   @id @default(uuid())
+  externalId  String?  @unique
+  title       String
+  summary     String   @db.Text
+  url         String   @unique
+  source      String
+  imageUrl    String?
+  category    String   @default("crypto")
+  publishedAt DateTime @default(now())
+
   // Forensic Analysis
-  veracityScore    Int      @default(0)
-  veracityAnalysis String?  @db.Text
-  isFake           Boolean  @default(false)
-  sentiment        String   @default("neutral") // bullish, bearish, neutral
-  
-  tokens           String[] @default([]) // Referenced in UI
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  veracityScore    Int     @default(0)
+  veracityAnalysis String? @db.Text
+  isFake           Boolean @default(false)
+  sentiment        String  @default("neutral") // bullish, bearish, neutral
+
+  tokens String[] @default([]) // Referenced in UI
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([publishedAt(sort: Desc)])
   @@index([source])
 }
 
 model OnChainEntity {
-  id              String   @id @default(uuid())
-  address         String   @unique
-  label           String?  // The identity of the entity
-  category        String?  // Exchange, Whale, MEV, Fund
-  isZkShielded    Boolean  @default(false)
-  neo4jNodeId     String?  @unique // Reference to local graph DB node
-  totalVolumeUSD  Float    @default(0.0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  lastActive      DateTime @default(now())
-  
-  labels          EntityLabel[]
+  id             String   @id @default(uuid())
+  address        String   @unique
+  label          String? // The identity of the entity
+  category       String? // Exchange, Whale, MEV, Fund
+  isZkShielded   Boolean  @default(false)
+  neo4jNodeId    String?  @unique // Reference to local graph DB node
+  totalVolumeUSD Float    @default(0.0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lastActive     DateTime @default(now())
+
+  labels EntityLabel[]
 }
 
 model EntityLabel {
@@ -388,21 +387,21 @@ model EntityLabel {
   entityId        String
   labelName       String
   confidenceScore Float    @default(1.0)
-  source          String   // "NeuralAgent", "UserDefined", "TeranodeStream"
+  source          String // "NeuralAgent", "UserDefined", "TeranodeStream"
   createdAt       DateTime @default(now())
-  
-  entity          OnChainEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  entity OnChainEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
 }
 
 model NeuralAgentConfig {
-  id                  String   @id @default(uuid())
-  agentId             String   @unique
-  mode                String   @default("OBSERVER") // OBSERVER, EXECUTION, HFT
-  maxSlippage         Float    @default(0.5)
-  targetChains        String[] // E.g., ["Ethereum", "Solana", "EVM"]
-  isActive            Boolean  @default(true)
-  autoTradeThreshold  Float?
-  lastPingAt          DateTime @default(now())
+  id                 String   @id @default(uuid())
+  agentId            String   @unique
+  mode               String   @default("OBSERVER") // OBSERVER, EXECUTION, HFT
+  maxSlippage        Float    @default(0.5)
+  targetChains       String[] // E.g., ["Ethereum", "Solana", "EVM"]
+  isActive           Boolean  @default(true)
+  autoTradeThreshold Float?
+  lastPingAt         DateTime @default(now())
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -423,30 +422,29 @@ model DeadMansSwitch {
   id               String   @id @default(uuid())
   userAddress      String   @unique
   beneficiary      String
-  inactivityPeriod Int      // En segundos
+  inactivityPeriod Int // En segundos
   lastPing         DateTime @default(now())
   active           Boolean  @default(true)
   txHash           String?
 }
 
 model Guardian {
-  id              String   @id @default(uuid())
+  id              String  @id @default(uuid())
   userEmail       String
   guardianAddress String
-  threshold       Int      @default(3) // Firmas requeridas
-  isActive        Boolean  @default(true)
-  
+  threshold       Int     @default(3) // Firmas requeridas
+  isActive        Boolean @default(true)
+
   @@unique([userEmail, guardianAddress])
 }
 
 model PrivacyDonation {
-  id          String   @id @default(uuid())
-  amount      Float
-  nullifier   String   @unique
-  commitment  String   @unique
-  timestamp   DateTime @default(now())
+  id         String   @id @default(uuid())
+  amount     Float
+  nullifier  String   @unique
+  commitment String   @unique
+  timestamp  DateTime @default(now())
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // WHALE TELEMETRY & ACTIVITY
@@ -455,20 +453,20 @@ model PrivacyDonation {
 model WhaleActivity {
   id              String   @id @default(uuid())
   immutableId     String?  @unique(map: "sov_whale_identity_idx_v3") // Reconciliación institucional de índice
-  walletAddress   String?                        // Opcional para BTC (usar toAddress)
-  type            String   @default("TRANSFER")  // 'TRANSFER', 'SWAP', 'MINT', 'BURN'
+  walletAddress   String? // Opcional para BTC (usar toAddress)
+  type            String   @default("TRANSFER") // 'TRANSFER', 'SWAP', 'MINT', 'BURN'
   token           String   @default("BTC")
   amount          String   @default("0")
   usdValue        String   @default("0")
-  valueBTC        Float    @default(0)           // Valor real en satoshis/btc
-  btcPriceAtTx    Float    @default(0)           // Precio histórico capturado
+  valueBTC        Float    @default(0) // Valor real en satoshis/btc
+  btcPriceAtTx    Float    @default(0) // Precio histórico capturado
   fromAddress     String
   toAddress       String
   transactionHash String   @unique
   blockNumber     BigInt?
-  blockHeight     Int?                           // Altura del bloque BTC
+  blockHeight     Int? // Altura del bloque BTC
   chain           String   @default("BTC")
-  entityName      String   @default("Unknown")    // MicroStrategy, BlackRock, etc.
+  entityName      String   @default("Unknown") // MicroStrategy, BlackRock, etc.
   institutional   Boolean  @default(false)
   confirmed       Boolean  @default(true)
   metadata        Json?
@@ -482,7 +480,6 @@ model WhaleActivity {
   @@index([institutional])
   @@index([entityName])
   @@index([chain, timestamp(sort: Desc)])
-
   // ── 🔍 INDEXACIÓN COMPUESTA (query patterns de /api/akashic y /api/institutional)
   // Pattern 1: Akashic feed — filtrar por chain, ordenar por timestamp, paginar
   @@index([chain, timestamp(sort: Desc), usdValue])
@@ -500,18 +497,18 @@ model WhaleActivity {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model BRCStandard {
-  id              String   @id @default(uuid())
-  brcNumber       Int      @unique
-  title           String
-  author          String   @default("Unknown")
-  status          String   @default("Draft")
-  type            String   @default("Standard")
-  created         DateTime?
-  updated         DateTime?
-  summary         String?  @db.Text
-  content         String?  @db.Text
-  githubUrl       String?
-  lastSyncAt      DateTime @default(now())
+  id         String    @id @default(uuid())
+  brcNumber  Int       @unique
+  title      String
+  author     String    @default("Unknown")
+  status     String    @default("Draft")
+  type       String    @default("Standard")
+  created    DateTime?
+  updated    DateTime?
+  summary    String?   @db.Text
+  content    String?   @db.Text
+  githubUrl  String?
+  lastSyncAt DateTime  @default(now())
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -561,117 +558,117 @@ model TelegramAlert {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model AuthUser {
-  id              String   @id @default(uuid())
-  email           String   @unique
-  walletAddress   String?  @unique
-  recoveryEmail   String?
+  id                  String   @id @default(uuid())
+  email               String   @unique
+  walletAddress       String?  @unique
+  recoveryEmail       String?
   encryptedPrivateKey String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  securityEvents  SecurityEvent[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  securityEvents SecurityEvent[]
 }
 
 model SecurityEvent {
-  id              String   @id @default(uuid())
-  authUserId      String?
-  type            String
-  severity        String   @default("INFO")
-  details         String?  @db.Text
-  ipAddress       String?
-  userAgent       String?
-  location        String?
-  timestamp       DateTime @default(now())
+  id         String   @id @default(uuid())
+  authUserId String?
+  type       String
+  severity   String   @default("INFO")
+  details    String?  @db.Text
+  ipAddress  String?
+  userAgent  String?
+  location   String?
+  timestamp  DateTime @default(now())
 
-  authUser        AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+  authUser AuthUser? @relation(fields: [authUserId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
-  id              String   @id @default(uuid())
-  txHash          String   @unique
-  status          String   @default("PENDING")
-  type            String   // SEND, RECEIVE, REBALANCE
-  amount          Float
-  token           String
-  fromAddress     String
-  toAddress       String
-  timestamp       DateTime @default(now())
-  authUserId      String?
+  id          String   @id @default(uuid())
+  txHash      String   @unique
+  status      String   @default("PENDING")
+  type        String // SEND, RECEIVE, REBALANCE
+  amount      Float
+  token       String
+  fromAddress String
+  toAddress   String
+  timestamp   DateTime @default(now())
+  authUserId  String?
 
-  chainId         Int      @default(1)
-  value           String?
-  tokenSymbol     String?
-  blockNumber     BigInt?  @default(0)
-  gasUsed         BigInt?  @default(0)
-  metadata        Json?    @default("{}")
+  chainId     Int     @default(1)
+  value       String?
+  tokenSymbol String?
+  blockNumber BigInt? @default(0)
+  gasUsed     BigInt? @default(0)
+  metadata    Json?   @default("{}")
 
   @@index([authUserId])
 }
 
 model SocialRecovery {
-  id              String   @id @default(uuid())
-  userEmail       String   @unique
-  threshold       Int      @default(3)
-  delayHours      Int      @default(48)
-  active          Boolean  @default(true)
+  id         String  @id @default(uuid())
+  userEmail  String  @unique
+  threshold  Int     @default(3)
+  delayHours Int     @default(48)
+  active     Boolean @default(true)
 }
 
 model AIRebalancerPlan {
-  id              String   @id @default(uuid())
-  userId          String
-  strategy        String
-  payload         Json
-  executed        Boolean  @default(false)
-  executedAt      DateTime?
-  txHashes        String[]
-  expectedPnl     Float?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          String    @id @default(uuid())
+  userId      String
+  strategy    String
+  payload     Json
+  executed    Boolean   @default(false)
+  executedAt  DateTime?
+  txHashes    String[]
+  expectedPnl Float?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model GlobalWhaleEvent {
-  id              String   @id @default(uuid())
-  txHash          String   @unique
-  amountUSD       Float
-  protocol        String
-  timestamp       DateTime @default(now())
+  id        String   @id @default(uuid())
+  txHash    String   @unique
+  amountUSD Float
+  protocol  String
+  timestamp DateTime @default(now())
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Eventos Macro para pantalla de liderazgo institucional
-  @@index([protocol, timestamp(sort: Desc)])  // Filtrado por protocolo en tiempo real
-  @@index([amountUSD(sort: Desc)])            // Ranking de mayores transacciones
-  @@index([timestamp(sort: Desc)])            // Vista cronológica global
+  @@index([protocol, timestamp(sort: Desc)]) // Filtrado por protocolo en tiempo real
+  @@index([amountUSD(sort: Desc)]) // Ranking de mayores transacciones
+  @@index([timestamp(sort: Desc)]) // Vista cronológica global
 }
 
 model AlertRule {
-  id              String   @id @default(uuid())
-  userId          String
-  condition       String
-  threshold       Float
-  isActive        Boolean  @default(true)
+  id        String  @id @default(uuid())
+  userId    String
+  condition String
+  threshold Float
+  isActive  Boolean @default(true)
 }
 
 model WatchedWallet {
-  id              String   @id @default(uuid())
-  userId          String
-  address         String   // Normalized: 0x... or bc1... or SOL pubkey
-  label           String   @default("Anonymous Whale")
-  tags            String[] @default([])
-  lastValue       Float    @default(0)
-  change24h       Float    @default(0)
-  pnl24h          Float    @default(0)
-  txCount         Int      @default(0)
-  riskScore       Float    @default(50)
-  activityScore   Float    @default(0)
-  isWhale         Boolean  @default(false)
-  isSmart         Boolean  @default(false)
-  alertsEnabled   Boolean  @default(false)
-  metadata        Json?    // Stats breakdown cache
-  forensics       Json?    // Forensic analysis result
-  category        String?  // Exchange|Whale|MEV|Fund etc.
-  identityTier    String?  // LEGENDARY|ELITE|SOVEREIGN etc.
-  lastCheck       DateTime @default(now())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String
+  address       String // Normalized: 0x... or bc1... or SOL pubkey
+  label         String   @default("Anonymous Whale")
+  tags          String[] @default([])
+  lastValue     Float    @default(0)
+  change24h     Float    @default(0)
+  pnl24h        Float    @default(0)
+  txCount       Int      @default(0)
+  riskScore     Float    @default(50)
+  activityScore Float    @default(0)
+  isWhale       Boolean  @default(false)
+  isSmart       Boolean  @default(false)
+  alertsEnabled Boolean  @default(false)
+  metadata      Json? // Stats breakdown cache
+  forensics     Json? // Forensic analysis result
+  category      String? // Exchange|Whale|MEV|Fund etc.
+  identityTier  String? // LEGENDARY|ELITE|SOVEREIGN etc.
+  lastCheck     DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([userId, address])
   @@index([userId, createdAt(sort: Desc)])
@@ -685,8 +682,8 @@ model WatchedWallet {
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String?
-  action    String   // WATCH_WALLET_ADDED | WATCH_WALLET_DELETED | SETTINGS_UPDATED etc.
-  resource  String?  // Table/resource name
+  action    String // WATCH_WALLET_ADDED | WATCH_WALLET_DELETED | SETTINGS_UPDATED etc.
+  resource  String? // Table/resource name
   metadata  Json?
   ipAddress String?
   timestamp DateTime @default(now())
@@ -701,7 +698,7 @@ model AuditLog {
 
 model ApiPurchaseIntent {
   id              String   @id @default(uuid())
-  userId          String   // Sovereign wallet address (SIWE identity)
+  userId          String // Sovereign wallet address (SIWE identity)
   planId          String
   stripeSessionId String   @unique
   ip              String?
@@ -714,42 +711,42 @@ model ApiPurchaseIntent {
 }
 
 model KYCRecord {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  status          String   // 'PENDING', 'APPROVED', 'REJECTED'
-  applicantId     String?
-  documentType    String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  status       String // 'PENDING', 'APPROVED', 'REJECTED'
+  applicantId  String?
+  documentType String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model BlockchainTransaction {
-  id              String   @id @default(uuid())
-  txHash          String   @unique
-  userId          String?  // Relates to User.walletAddress or AuthUser.id
-  blockNumber     Int
-  status          String
-  type            String   @default("SWAP")
-  fromChain       String?
-  toChain         String?
-  fromToken       String?
-  toToken         String?
-  fromAmount      String?
-  metadata        Json     @default("{}")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          String   @id @default(uuid())
+  txHash      String   @unique
+  userId      String? // Relates to User.walletAddress or AuthUser.id
+  blockNumber Int
+  status      String
+  type        String   @default("SWAP")
+  fromChain   String?
+  toChain     String?
+  fromToken   String?
+  toToken     String?
+  fromAmount  String?
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // ── 🔍 INDEXACIÓN CÓSMICA: Estado de transacciones para reconciliación ultra-rápida
-  @@index([userId])                          // Lookup de historial por usuario
-  @@index([status, createdAt(sort: Desc)])   // Monitoreo de pendientes en tiempo real
-  @@index([blockNumber(sort: Desc)])         // Lookup por bloque
+  @@index([userId]) // Lookup de historial por usuario
+  @@index([status, createdAt(sort: Desc)]) // Monitoreo de pendientes en tiempo real
+  @@index([blockNumber(sort: Desc)]) // Lookup por bloque
 }
 
 // FIX: Session polyfill for JWT verification route fallback
 model Session {
   id           String   @id @default(uuid())
   sessionToken String   @unique
-  userId       String   
+  userId       String
   expiresAt    DateTime
   ipAddress    String?
   createdAt    DateTime @default(now())
@@ -788,19 +785,19 @@ model Log {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model UserSessionLog {
-  id          String   @id @default(uuid())
-  userId      String?
-  sessionId   String
-  timestamp   DateTime @default(now())
-  action      String   // "PAGE_VIEW", "WALLET_CONNECT", "TAB_CHANGE", "EXPORT"
-  entityType  String?
-  entityId    String?
-  ipAddress   String?
-  userAgent   String?
-  deviceType  String?
-  location    String?
-  metadata    Json?
-  
+  id         String   @id @default(uuid())
+  userId     String?
+  sessionId  String
+  timestamp  DateTime @default(now())
+  action     String // "PAGE_VIEW", "WALLET_CONNECT", "TAB_CHANGE", "EXPORT"
+  entityType String?
+  entityId   String?
+  ipAddress  String?
+  userAgent  String?
+  deviceType String?
+  location   String?
+  metadata   Json?
+
   @@index([userId, timestamp(sort: Desc)])
   @@index([action, timestamp(sort: Desc)])
   @@index([sessionId])
@@ -808,17 +805,17 @@ model UserSessionLog {
 }
 
 model UserPrivacyProfile {
-  id                     String   @id @default(uuid())
-  userId                 String   @unique
-  logLevel               String   @default("MEDIUM") 
-  dataSharing            Boolean  @default(true)
-  sessionAutoLogout      String   @default("1h")     
-  ipWhitelist            String[] @default([])
-  twoFAEnabled           Boolean  @default(false)
-  sovereignVisibility    String   @default("Public") 
-  exportEncryption       Boolean  @default(false)
-  updatedAt              DateTime @updatedAt
-  createdAt              DateTime @default(now())
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  logLevel            String   @default("MEDIUM")
+  dataSharing         Boolean  @default(true)
+  sessionAutoLogout   String   @default("1h")
+  ipWhitelist         String[] @default([])
+  twoFAEnabled        Boolean  @default(false)
+  sovereignVisibility String   @default("Public")
+  exportEncryption    Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+  createdAt           DateTime @default(now())
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -826,26 +823,26 @@ model UserPrivacyProfile {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model CosmicEntity {
-  id              String   @id @default(uuid())
-  seedHash        String   @unique          // SHA-256 del evento whale origen
-  whaleEventId    String?                   // FK a GlobalWhaleEvent
-  tier            String                    // NARWHAL | KRAKEN | LEVIATHAN | MEGALODON
-  amountUSD       Float
-  chain           String
-  generatorType   String                    // COSMIC_ART | LIVING_MUSIC | AUTO_CONTRACT | WORLD_SIM | BIOTECH_DNA | HIVE_AGENT | RECURSIVE_SUBFORGE
-  status          String   @default("DORMANT") // DORMANT | ACTIVE | HIBERNATING | EXTINCT | MERGED
-  artMetadata     Json?                     // { prompt, style, colorSeed, shaderParams }
-  musicMetadata   Json?                     // { bpm, scale, waveform, key }
-  biotechMetadata Json?                     // { dnaSequence, traits }
-  worldSimMetadata Json?                    // { populationSeed, resources, entropy, gridSize }
-  agentMetadata   Json?                     // { observerMode, targetChains, maxSlippageThreshold }
-  contractAddress String?                   // Solo si se deployó un CosmicSoulERC1155
-  hiveEnergyAtBirth Float  @default(0)
-  evolutionCount  Int      @default(0)
-  parentEntityId  String?                   // Para sub-forges recursivos
-  beneficiaryAddr String?                   // Dead Man's Switch legado
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String   @id @default(uuid())
+  seedHash          String   @unique // SHA-256 del evento whale origen
+  whaleEventId      String? // FK a GlobalWhaleEvent
+  tier              String // NARWHAL | KRAKEN | LEVIATHAN | MEGALODON
+  amountUSD         Float
+  chain             String
+  generatorType     String // COSMIC_ART | LIVING_MUSIC | AUTO_CONTRACT | WORLD_SIM | BIOTECH_DNA | HIVE_AGENT | RECURSIVE_SUBFORGE
+  status            String   @default("DORMANT") // DORMANT | ACTIVE | HIBERNATING | EXTINCT | MERGED
+  artMetadata       Json? // { prompt, style, colorSeed, shaderParams }
+  musicMetadata     Json? // { bpm, scale, waveform, key }
+  biotechMetadata   Json? // { dnaSequence, traits }
+  worldSimMetadata  Json? // { populationSeed, resources, entropy, gridSize }
+  agentMetadata     Json? // { observerMode, targetChains, maxSlippageThreshold }
+  contractAddress   String? // Solo si se deployó un CosmicSoulERC1155
+  hiveEnergyAtBirth Float    @default(0)
+  evolutionCount    Int      @default(0)
+  parentEntityId    String? // Para sub-forges recursivos
+  beneficiaryAddr   String? // Dead Man's Switch legado
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@index([status, createdAt(sort: Desc)])
   @@index([tier, amountUSD(sort: Desc)])
@@ -857,32 +854,32 @@ model CosmicEntity {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model VirtualCard {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  cardNumber      String   @unique // Encrypted or masked
-  expiryMonth     Int
-  expiryYear      Int
-  cvv             String   // Encrypted
-  cardStatus      String   @default("ACTIVE") // ACTIVE, FROZEN, REVOKED
-  balance         Float    @default(0)
-  kycStatus       String   @default("PENDING") // PENDING, VERIFIED, FAILED
-  providerId      String?  // e.g. Striga/Stripe issuing ID
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  cardNumber  String   @unique // Encrypted or masked
+  expiryMonth Int
+  expiryYear  Int
+  cvv         String // Encrypted
+  cardStatus  String   @default("ACTIVE") // ACTIVE, FROZEN, REVOKED
+  balance     Float    @default(0)
+  kycStatus   String   @default("PENDING") // PENDING, VERIFIED, FAILED
+  providerId  String? // e.g. Striga/Stripe issuing ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([userId])
 }
 
 model GamificationRecord {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  totalXp         Int      @default(0)
-  level           Int      @default(1)
-  currentTier     String   @default("INITIATE")
-  achievements    String[] @default([])
-  lastEventDate   DateTime @default(now())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  totalXp       Int      @default(0)
+  level         Int      @default(1)
+  currentTier   String   @default("INITIATE")
+  achievements  String[] @default([])
+  lastEventDate DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([userId])
 }
@@ -904,95 +901,99 @@ model ForumCategory {
 }
 
 model ForumTag {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  topics      ForumTopic[] @relation("TopicTags")
+  id     String       @id @default(uuid())
+  name   String       @unique
+  topics ForumTopic[] @relation("TopicTags")
 }
 
 model ForumTopic {
-  id          String       @id @default(uuid())
-  title       String
-  content     String       @db.Text
-  categoryId  String
-  authorId    String
-  views       Int          @default(0)
-  isPinned    Boolean      @default(false)
-  isLocked    Boolean      @default(false)
-  
-  category    ForumCategory @relation(fields: [categoryId], references: [id])
-  author      User          @relation(fields: [authorId], references: [id])
-  posts       ForumPost[]
-  tags        ForumTag[]    @relation("TopicTags")
-  likes       ForumLike[]
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id         String  @id @default(uuid())
+  title      String
+  content    String  @db.Text
+  categoryId String
+  authorId   String
+  views      Int     @default(0)
+  isPinned   Boolean @default(false)
+  isLocked   Boolean @default(false)
+
+  category      ForumCategory       @relation(fields: [categoryId], references: [id])
+  author        User                @relation(fields: [authorId], references: [id])
+  posts         ForumPost[]
+  tags          ForumTag[]          @relation("TopicTags")
+  likes         ForumLike[]
+  notifications ForumNotification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId, createdAt(sort: Desc)])
   @@index([authorId, createdAt(sort: Desc)])
 }
 
 model ForumPost {
-  id          String       @id @default(uuid())
-  content     String       @db.Text
-  topicId     String
-  authorId    String
-  replyToId   String?      // Optional: if replying to a specific post
-  isSolution  Boolean      @default(false)
+  id         String  @id @default(uuid())
+  content    String  @db.Text
+  topicId    String
+  authorId   String
+  replyToId  String? // Optional: if replying to a specific post
+  isSolution Boolean @default(false)
 
-  topic       ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  author      User         @relation(fields: [authorId], references: [id])
-  replyTo     ForumPost?   @relation("Replies", fields: [replyToId], references: [id])
-  replies     ForumPost[]  @relation("Replies")
-  likes       ForumLike[]
-  
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  topic         ForumTopic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author        User                @relation(fields: [authorId], references: [id])
+  replyTo       ForumPost?          @relation("Replies", fields: [replyToId], references: [id], onDelete: Cascade)
+  replies       ForumPost[]         @relation("Replies")
+  likes         ForumLike[]
+  notifications ForumNotification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([topicId, createdAt(sort: Asc)])
 }
 
 model ForumLike {
-  id          String       @id @default(uuid())
-  userId      String
-  topicId     String?
-  postId      String?
+  id      String  @id @default(uuid())
+  userId  String
+  topicId String?
+  postId  String?
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  topic       ForumTopic?  @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  post        ForumPost?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic ForumTopic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  post  ForumPost?  @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime     @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([userId, topicId])
   @@unique([userId, postId])
 }
 
 model ForumNotification {
-  id          String       @id @default(uuid())
-  userId      String
-  type        String       // "REPLY", "MENTION", "LIKE"
-  actorId     String       // Who triggered it
-  topicId     String?
-  postId      String?
-  isRead      Boolean      @default(false)
-  
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  actor       User         @relation("ActorNotifications", fields: [actorId], references: [id])
-  
-  createdAt   DateTime     @default(now())
+  id      String  @id @default(uuid())
+  userId  String
+  type    String // "REPLY", "MENTION", "LIKE"
+  actorId String // Who triggered it
+  topicId String?
+  postId  String?
+  isRead  Boolean @default(false)
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actor User        @relation("ActorNotifications", fields: [actorId], references: [id], onDelete: Cascade)
+  topic ForumTopic? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  post  ForumPost?  @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 
   @@index([userId, isRead, createdAt(sort: Desc)])
 }
 
 model ForumTelemetry {
-  id          String       @id @default(uuid())
-  userId      String?      // Optional: anonymous users can be tracked
-  action      String       // E.g., "VIEW_TOPIC", "DRAFT_POST", "CLICK_LIKE"
-  ipAddress   String?
-  userAgent   String?
-  metadata    Json?        // Detailed payload (topicId, durationMs, etc)
-  createdAt   DateTime     @default(now())
+  id        String   @id @default(uuid())
+  userId    String? // Optional: anonymous users can be tracked
+  action    String // E.g., "VIEW_TOPIC", "DRAFT_POST", "CLICK_LIKE"
+  ipAddress String?
+  userAgent String?
+  metadata  Json? // Detailed payload (topicId, durationMs, etc)
+  createdAt DateTime @default(now())
 
   @@index([action, createdAt(sort: Desc)])
   @@index([userId, createdAt(sort: Desc)])

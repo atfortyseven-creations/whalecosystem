@@ -65,10 +65,8 @@ export default async function ForumAnniversariesPage() {
           <Link
             key={i}
             href={`/forum/u/${addr}`}
-            className="flex items-center py-4 transition-colors"
+            className="flex items-center py-4 transition-colors hover:bg-[var(--forum-hover)]"
             style={{ borderBottom: '1px solid var(--forum-border)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
           >
             <div className="flex-1 min-w-0">
               <div className="text-[15px] font-sans font-bold truncate" style={{ color: 'var(--forum-text)' }}>

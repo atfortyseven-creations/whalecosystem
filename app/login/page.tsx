@@ -206,19 +206,10 @@ function ConnectPanel() {
           ) : (
             <button
               onClick={() => openConnectModal?.()}
-              className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-3 group"
+              className="w-full h-16 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-3 group shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)] hover:scale-[1.02]"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(230,230,230,0.9) 100%)",
                 color: "#050505",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.02)";
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 16px 48px rgba(0,0,0,0.4)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)";
               }}
             >
               <Wallet size={18} />

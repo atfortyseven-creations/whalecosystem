@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useSettingsStore } from '@/lib/store/settings-store';
+import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { motion, AnimatePresence } from 'framer-motion';

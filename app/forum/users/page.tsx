@@ -87,10 +87,8 @@ export default async function ForumUsersPage() {
             <Link
               href={`/forum/u/${u.walletAddress}`}
               key={u.id}
-              className="flex items-center py-4 rounded-sm transition-all duration-200 px-2"
+              className="flex items-center py-4 rounded-sm transition-all duration-200 px-2 hover:bg-[var(--forum-hover)] hover:border-[#6366f1]"
               style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; e.currentTarget.style.borderColor = '#6366f1'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; e.currentTarget.style.borderColor = 'var(--forum-border)'; }}
             >
               <div className="w-12 text-center text-[16px] font-sans font-bold" style={{ color: 'var(--forum-text-muted)' }}>#{i + 1}</div>
 
