@@ -15,11 +15,15 @@ export default async function ForumLayout({
 
   let avatarUrl = undefined;
   if (address) {
-    const user = await (prisma as any).user.findUnique({
-      where: { walletAddress: address },
-      select: { avatarUrl: true }
-    });
-    if (user && user.avatarUrl) avatarUrl = user.avatarUrl;
+    try {
+      const user = await (prisma as any).user.findUnique({
+        where: { walletAddress: address },
+        select: { avatarUrl: true }
+      });
+      if (user && user.avatarUrl) avatarUrl = user.avatarUrl;
+    } catch (e) {
+      console.error("[Layout] Failed to fetch user avatar:", e);
+    }
   }
 
   return (

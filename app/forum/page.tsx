@@ -12,7 +12,14 @@ export default function ForumHomePage() {
   useEffect(() => {
     fetch('/api/forum/topics?limit=30')
       .then(r => r.json())
-      .then(data => setTopics(data || []))
+      .then(data => {
+          if (Array.isArray(data)) {
+              setTopics(data);
+          } else {
+              console.error("API returned error:", data);
+              setTopics([]);
+          }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
