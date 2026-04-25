@@ -32,7 +32,7 @@ export default async function ForumLayout({
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 
       {/* ─── Data Container ─── */}
-      <main className="forum-container flex-1 w-full max-w-[920px] mx-auto px-6 py-6">
+      <main className="forum-container flex-1 w-full mx-auto px-2 sm:px-6 py-6 overflow-x-hidden">
         {children}
       </main>
       

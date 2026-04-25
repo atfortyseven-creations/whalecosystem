@@ -30,7 +30,7 @@ export default function ForumHomePage() {
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-white/30 font-sans">Loading categories...</div>
           ) : categories.map(cat => (
-            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 border-b border-white/5 hover:bg-[#1a112a] transition-all duration-200 ease-in-out px-2 rounded-sm -mx-2">
+            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 border-b border-white/5 hover:bg-[#1a112a] transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 transform-gpu">
               <div className="w-1 h-10 rounded-sm mr-4 mt-1" style={{ backgroundColor: cat.color || '#6366f1' }}></div>
               <div className="flex flex-col">
                 <span className="text-[18.4px] font-sans font-bold text-white group-hover:text-white transition-colors">{cat.name}</span>
@@ -63,7 +63,7 @@ export default function ForumHomePage() {
                 <Link
                   key={topic.id}
                   href={`/forum/t/${topic.id}`}
-                  className="flex items-start py-4 border-b border-white/5 hover:bg-[#1a112a] transition-all duration-200 ease-in-out px-2 rounded-sm -mx-2 group"
+                  className="flex items-start py-4 border-b border-white/5 hover:bg-[#1a112a] transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 group transform-gpu"
                 >
                   {/* Avatar */}
                   <div className="w-[45px] shrink-0 pt-1">
