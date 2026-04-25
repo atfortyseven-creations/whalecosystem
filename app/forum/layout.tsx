@@ -10,10 +10,6 @@ export default async function ForumLayout({
   const cookieStore = await cookies();
   const address = cookieStore.get('sovereign_handshake')?.value;
 
-  if (!address) {
-    redirect('/connect');
-  }
-
   return (
     <div className="min-h-screen bg-white text-[#222222] font-sans flex flex-col">
       <ForumHeader address={address} />

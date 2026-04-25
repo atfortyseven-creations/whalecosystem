@@ -72,7 +72,7 @@ export function SovereignFooter() {
            onMouseMove={handleMouseMove}
            onMouseEnter={() => setIsHovered(true)}
            onMouseLeave={() => setIsHovered(false)}
-           className="relative w-full h-[420px] sm:h-[450px] md:h-[500px] lg:h-[560px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#E5E5E5] flex flex-col items-center justify-end group transition-shadow duration-700 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]"
+           className="relative w-full h-[520px] sm:h-[450px] md:h-[500px] lg:h-[560px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#E5E5E5] flex flex-col items-center justify-end group transition-shadow duration-700 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]"
         >
           {/* Wave Wallpaper 4K */}
           <Image
@@ -120,22 +120,22 @@ export function SovereignFooter() {
           )}
 
           {/* Fog gradient to ensure readability of text over waves at the bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-[45%] sm:h-[55%] bg-gradient-to-t from-[#FDFCF8]/90 via-[#FDFCF8]/40 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[45%] sm:h-[55%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/60 to-transparent pointer-events-none z-10" />
 
           {/* ═══ Footer Inner Body ═════════════════════════════════════════════ */}
-          <div className="relative z-40 w-full max-w-[850px] mx-auto px-6 pb-12 flex flex-col items-center gap-8">
+          <div className="relative z-40 w-full max-w-[850px] mx-auto px-4 pb-8 flex flex-col items-center gap-6 sm:gap-8">
 
             {/* ─── Whale Logo (Enlarged & Unsquished) ─────────────────────────────────────────── */}
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
               style={{ willChange: "transform" }}
-              className="flex flex-col items-center gap-6 mb-4"
+              className="flex flex-col items-center gap-4 sm:gap-6 mb-2"
             >
               <img
                 src="/official-whale.png"
                 alt="Whale Alert Network"
-                className="w-28 h-28 sm:w-36 sm:h-36 object-contain"
+                className="w-24 h-24 sm:w-36 sm:h-36 object-contain"
                 style={{
                   filter: "grayscale(1) contrast(1.2)",
                   opacity: 0.9,
@@ -158,7 +158,7 @@ export function SovereignFooter() {
             {/* ─── Navigation Links (Glassmorphism Pill) ─────────────────────────────────── */}
             <div className="relative z-50 w-full max-w-lg mx-auto">
               <nav
-                className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-1 sm:gap-y-3 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl sm:rounded-full bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-3 px-6 py-4 rounded-[2rem] sm:rounded-full bg-white/60 backdrop-blur-md border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
                 aria-label="Footer navigation"
               >
                 <FooterLink href="/terms">Terms</FooterLink>

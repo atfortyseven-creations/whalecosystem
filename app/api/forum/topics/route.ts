@@ -39,7 +39,11 @@ export async function POST(req: Request) {
         const address = cookieStore.get('sovereign_handshake')?.value;
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const user = await prisma.user.findUnique({ where: { walletAddress: address } });
+        // FIX: Explicitly select only 'id' to prevent Prisma crashes due to missing schema columns like 'hiddenAssets' on remote DB
+        const user = await prisma.user.findUnique({ 
+            where: { walletAddress: address },
+            select: { id: true }
+        });
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
         const body = await req.json();
