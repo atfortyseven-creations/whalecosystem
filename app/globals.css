@@ -693,6 +693,48 @@ body,
   }
 }
 
+/* ============================================================
+   FORUM LIGHT/DARK MODE ARCHITECTURE (AZTEC PERFECTION)
+   ============================================================ */
+:root {
+  /* Default: Dark/Purple Mode */
+  --forum-bg: #9A7BB5;
+  --forum-text: #ffffff;
+  --forum-text-muted: rgba(255, 255, 255, 0.6);
+  --forum-border: rgba(255, 255, 255, 0.05);
+  --forum-surface: rgba(255, 255, 255, 0.02);
+  --forum-hover: #1a112a;
+  --forum-header-bg: rgba(0, 0, 0, 0.2);
+  --forum-subnav-bg: #110b1a;
+  --forum-button-bg: #ffffff;
+  --forum-button-text: #000000;
+}
+
+html.forum-light-mode {
+  /* Light Mode Overrides */
+  --forum-bg: #f4f4f5; /* Zinc 100 */
+  --forum-text: #18181b; /* Zinc 900 */
+  --forum-text-muted: #71717a; /* Zinc 500 */
+  --forum-border: rgba(0, 0, 0, 0.1);
+  --forum-surface: #ffffff;
+  --forum-hover: #fcfcfc;
+  --forum-header-bg: rgba(255, 255, 255, 0.8);
+  --forum-subnav-bg: #ffffff;
+  --forum-button-bg: #18181b;
+  --forum-button-text: #ffffff;
+}
+
+.forum-theme-root {
+  background-color: var(--forum-bg);
+  color: var(--forum-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.forum-theme-root a:hover, .forum-theme-root button:hover {
+  /* Ensure hover transitions are smooth across themes */
+  transition-duration: 0.2s;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    JAPANESE WAVE SURFACE UTILITIES
    Apply to any white/cream/slate-50 element in any component.

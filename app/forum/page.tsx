@@ -25,16 +25,16 @@ export default function ForumHomePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-[40px]">
         
         {/* Left Column: Categories (35% -> col-span-4) */}
-        <div className="lg:col-span-4 flex flex-col gap-0 border-t border-white/5 pt-4">
-          <h2 className="text-[13px] font-sans font-bold text-white/40 uppercase tracking-widest mb-6">Categories</h2>
+        <div className="lg:col-span-4 flex flex-col gap-0 pt-4" style={{ borderTop: '1px solid var(--forum-border)' }}>
+          <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest mb-6" style={{ color: 'var(--forum-text-muted)' }}>Categories</h2>
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-white/30 font-sans">Loading categories...</div>
           ) : categories.map(cat => (
-            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 border-b border-white/5 hover:bg-[#1a112a] transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 transform-gpu">
+            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 transform-gpu" style={{ borderBottom: '1px solid var(--forum-border)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--forum-hover)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
               <div className="w-1 h-10 rounded-sm mr-4 mt-1" style={{ backgroundColor: cat.color || '#6366f1' }}></div>
               <div className="flex flex-col">
-                <span className="text-[18.4px] font-sans font-bold text-white group-hover:text-white transition-colors">{cat.name}</span>
-                <span className="text-[13px] text-[#919191] mt-1 leading-[1.4] line-clamp-2">{cat.description || "Discuss topics related to " + cat.name}</span>
+                <span className="text-[18.4px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>{cat.name}</span>
+                <span className="text-[13px] mt-1 leading-[1.4] line-clamp-2" style={{ color: 'var(--forum-text-muted)' }}>{cat.description || "Discuss topics related to " + cat.name}</span>
               </div>
             </Link>
           ))}
@@ -42,8 +42,8 @@ export default function ForumHomePage() {
 
         {/* Right Column: Latest Activity (65% -> col-span-8) */}
         <div className="lg:col-span-8 flex flex-col">
-          <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-4">
-            <h2 className="text-[13px] font-sans font-bold text-white/40 uppercase tracking-widest">Latest</h2>
+          <div className="flex items-center justify-between pb-2 mb-4" style={{ borderBottom: '1px solid var(--forum-border)' }}>
+            <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>Latest</h2>
           </div>
 
           <div className="flex flex-col">
@@ -63,29 +63,32 @@ export default function ForumHomePage() {
                 <Link
                   key={topic.id}
                   href={`/forum/t/${topic.id}`}
-                  className="flex items-start py-4 border-b border-white/5 hover:bg-[#1a112a] transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 group transform-gpu"
+                  className="flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 group transform-gpu"
+                  style={{ borderBottom: '1px solid var(--forum-border)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--forum-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   {/* Avatar */}
                   <div className="w-[45px] shrink-0 pt-1">
-                    <div className="w-[32px] h-[32px] rounded-full bg-white/10 flex items-center justify-center text-[10px] font-mono text-white/50 border border-white/10">
+                    <div className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[10px] font-mono" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}>
                       {topic.author?.walletAddress?.slice(2, 4).toUpperCase() || 'A'}
                     </div>
                   </div>
 
                   {/* Title & Badges */}
                   <div className="flex-1 flex flex-col pr-4 min-w-0">
-                    <span className="font-sans font-semibold text-[20px] leading-[1.4] tracking-[-0.01em] text-white break-words">
+                    <span className="font-sans font-semibold text-[20px] leading-[1.4] tracking-[-0.01em] break-words" style={{ color: 'var(--forum-text)' }}>
                       {topic.title}
                     </span>
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
                       {topic.category && (
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-white/5 border border-white/5">
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[2px]" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
                           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: topic.category.color || '#6366f1' }} />
-                          <span className="text-[12px] font-sans font-bold text-white/80">{topic.category.name}</span>
+                          <span className="text-[12px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>{topic.category.name}</span>
                         </div>
                       )}
                       {topic.tags?.map((t: any) => (
-                        <span key={t.id} className="text-[12px] font-sans text-[#919191] before:content-['#'] before:mr-[1px] hover:text-white transition-colors">
+                        <span key={t.id} className="text-[12px] font-sans before:content-['#'] before:mr-[1px] transition-colors" style={{ color: 'var(--forum-text-muted)' }}>
                           {t.name}
                         </span>
                       ))}
@@ -94,8 +97,8 @@ export default function ForumHomePage() {
 
                   {/* Stats */}
                   <div className="w-[60px] flex flex-col items-end shrink-0 gap-1 pt-1">
-                    <span className="text-[14px] font-sans text-white/60">{topic._count?.posts || 0}</span>
-                    <span className="text-[14px] font-sans text-[#919191]">{activity}</span>
+                    <span className="text-[14px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>{topic._count?.posts || 0}</span>
+                    <span className="text-[14px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>{activity}</span>
                   </div>
                 </Link>
               );

@@ -39,46 +39,54 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 px-6 h-[52px] flex items-center justify-between">
+      <header className="sticky top-0 z-50 px-6 h-[52px] flex items-center justify-between" style={{ backgroundColor: 'var(--forum-header-bg)', borderBottom: '1px solid var(--forum-border)', backdropFilter: 'blur(12px)' }}>
 
-        {/* Wordmark */}
-        <div className="flex items-center gap-0">
+        {/* Wordmark & Date */}
+        <div className="flex items-center gap-6">
           <Link
             href="/forum"
-            className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-white hover:opacity-60 transition-opacity"
+            className="text-[20px] font-sans font-black tracking-tight hover:opacity-80 transition-opacity"
+            style={{ color: 'var(--forum-text)' }}
           >
             FORUM
           </Link>
-          <span className="text-white/20 mx-2 text-[11px] font-mono">/</span>
-          <span className="text-[15px] font-aztec-h2 font-black uppercase tracking-tight text-white">
-            Whale Alert Network
-          </span>
-          <div className="flex flex-col ml-4 justify-center items-start opacity-90 hover:opacity-100 transition-opacity">
-            <span className="text-[6.5px] font-mono font-bold uppercase tracking-[0.3em] text-black leading-none mb-[2px]">
-              powered by
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
+            <span className="text-[12px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>System Date:</span>
+            <span className="text-[12px] font-sans font-bold tracking-wide" style={{ color: 'var(--forum-text)' }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })}
             </span>
-            <div className="flex items-baseline text-black">
-              <span className="text-[18px] font-aztec-logo leading-none">A</span>
-              <span className="text-[10px] font-serif font-black uppercase tracking-[0.15em] leading-none ml-[1px]">ztec</span>
-            </div>
           </div>
         </div>
 
         {/* Right controls */}
-        <div className="flex items-center gap-5" ref={menuRef}>
+        <div className="flex items-center gap-4" ref={menuRef}>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={() => document.documentElement.classList.toggle('forum-light-mode')}
+            className="w-8 h-8 flex items-center justify-center rounded-sm transition-colors"
+            style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}
+            title="Toggle Light/Dark Mode"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
 
           {/* New Topic */}
           <Link
             href="/forum/new"
-            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-black bg-white px-4 py-2 hover:bg-white/80 transition-colors"
+            className="text-[12px] font-sans font-bold tracking-wide px-4 py-1.5 rounded-sm hover:opacity-80 transition-colors"
+            style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
           >
-            + NEW
+            + New Topic
           </Link>
 
           {/* Menu toggle */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors"
+            className="text-[12px] font-sans font-bold tracking-wide hover:opacity-100 transition-colors ml-2"
+            style={{ color: 'var(--forum-text-muted)' }}
             aria-label="Navigation menu"
           >
             {menuOpen ? 'CLOSE' : 'MENU'}
@@ -133,21 +141,21 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
       </header>
 
       {/* Secondary Discourse Sub-Nav */}
-      <div className="w-full bg-[#110b1a] border-b border-white/5 shadow-sm">
+      <div className="w-full shadow-sm" style={{ backgroundColor: 'var(--forum-subnav-bg)', borderBottom: '1px solid var(--forum-border)' }}>
         <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[48px] gap-6">
-          <Link href="/forum" className="text-[13px] font-sans font-bold text-white tracking-wide border-b-2 border-white/20 hover:border-white/60 h-full flex items-center transition-colors">
+          <Link href="/forum" className="text-[13px] font-sans font-bold h-full flex items-center transition-colors" style={{ color: 'var(--forum-text)', borderBottom: '2px solid var(--forum-border)' }}>
             Categories
           </Link>
-          <Link href="/forum?filter=latest" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+          <Link href="/forum?filter=latest" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
             Latest
           </Link>
-          <Link href="/forum?filter=new" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+          <Link href="/forum?filter=new" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
             New
           </Link>
-          <Link href="/forum?filter=unread" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+          <Link href="/forum?filter=unread" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
             Unread
           </Link>
-          <Link href="/forum?filter=top" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+          <Link href="/forum?filter=top" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
             Top
           </Link>
         </div>

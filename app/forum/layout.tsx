@@ -27,7 +27,7 @@ export default async function ForumLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col text-white" style={{ backgroundColor: '#9A7BB5' }}>
+    <div className="min-h-screen flex flex-col forum-theme-root">
       <TelemetryTracker />
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 
@@ -36,6 +36,16 @@ export default async function ForumLayout({
         {children}
       </main>
       
+      {/* ─── Footer ─── */}
+      <footer className="w-full py-8 mt-auto border-t border-white/5 flex flex-col items-center justify-center opacity-60 hover:opacity-100 transition-opacity">
+        <span className="text-[9px] font-sans font-bold uppercase tracking-[0.2em] text-white/50 mb-1">
+          powered by
+        </span>
+        <div className="flex items-baseline text-white">
+          <span className="text-[24px] font-aztec-logo leading-none">A</span>
+          <span className="text-[14px] font-serif font-black uppercase tracking-[0.15em] leading-none ml-[2px]">ztec</span>
+        </div>
+      </footer>
     </div>
   );
 }
