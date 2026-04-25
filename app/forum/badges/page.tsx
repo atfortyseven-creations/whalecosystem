@@ -1,73 +1,46 @@
 import React from 'react';
-import { Award, Star, Zap, ShieldCheck } from 'lucide-react';
 
 export default function ForumBadgesPage() {
   const badges = [
-    {
-      id: 1,
-      name: 'Genesis Founder',
-      description: 'Awarded to early adopters who minted the first 10,000 Golden Tickets.',
-      icon: <Award className="text-yellow-500 w-8 h-8" />,
-      color: 'bg-yellow-50 border-yellow-200',
-      rarity: 'Legendary'
-    },
-    {
-      id: 2,
-      name: 'Institutional Pro',
-      description: 'Active Sovereign Terminal Pro subscribers with access to advanced telemetry.',
-      icon: <Star className="text-blue-500 w-8 h-8" />,
-      color: 'bg-blue-50 border-blue-200',
-      rarity: 'Epic'
-    },
-    {
-      id: 3,
-      name: 'Verified Human',
-      description: 'Cryptographically verified via World ID or strictly passing KYC screening.',
-      icon: <ShieldCheck className="text-green-500 w-8 h-8" />,
-      color: 'bg-green-50 border-green-200',
-      rarity: 'Common'
-    },
-    {
-      id: 4,
-      name: 'Signal Provider',
-      description: 'Users whose forum topics have reached over 100 upvotes from the community.',
-      icon: <Zap className="text-purple-500 w-8 h-8" />,
-      color: 'bg-purple-50 border-purple-200',
-      rarity: 'Rare'
-    }
+    { id: 'genesis',      label: 'GENESIS FOUNDER',    sub: 'First 10,000 protocol participants',    rarity: 'LEGENDARY' },
+    { id: 'pro',          label: 'INSTITUTIONAL PRO',  sub: 'Active Sovereign Terminal subscribers',  rarity: 'EPIC'      },
+    { id: 'human',        label: 'VERIFIED HUMAN',      sub: 'World ID or KYC verified identity',      rarity: 'STANDARD'  },
+    { id: 'signal',       label: 'SIGNAL PROVIDER',     sub: 'Topics exceeding 100 community votes',   rarity: 'RARE'      },
   ];
 
   return (
-    <div className="flex flex-col w-full max-w-[1110px] mx-auto pb-20">
-      <div className="mb-6 border-b border-gray-200 pb-4">
-        <h1 className="text-[24px] font-bold text-[#222222]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          Platform Badges
+    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
+
+      {/* Header */}
+      <div className="mb-8 pb-6 border-b border-[#E0E0E0]">
+        <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#050505]/30 mb-2">FORUM / BADGES</div>
+        <h1 className="text-[13px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]">
+          CRYPTOGRAPHIC ACHIEVEMENTS
         </h1>
-        <p className="text-gray-500 text-[14px] mt-1">
-          Cryptographic achievements and institutional tiers within the Sovereign Network.
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {badges.map((badge) => (
-          <div key={badge.id} className={`flex items-start gap-4 p-5 rounded-md border shadow-sm ${badge.color}`}>
-            <div className="shrink-0 p-3 bg-white rounded-full shadow-sm border border-black/5">
-              {badge.icon}
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-bold text-[16px] text-[#222222]">{badge.name}</h3>
-                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-white border border-black/10 font-bold text-gray-600">
-                  {badge.rarity}
-                </span>
-              </div>
-              <p className="text-[14px] text-gray-700 leading-relaxed">
-                {badge.description}
-              </p>
-            </div>
-          </div>
-        ))}
+      {/* Table header */}
+      <div className="flex items-center pb-3 border-b border-[#E0E0E0] text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/30">
+        <div className="flex-1">DESIGNATION</div>
+        <div className="w-28 text-right">TIER</div>
       </div>
+
+      {badges.map(b => (
+        <div
+          key={b.id}
+          className="flex items-center py-5 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors"
+        >
+          <div className="flex-1 min-w-0">
+            <div className="text-[12px] font-mono font-black uppercase tracking-widest text-[#050505]">
+              {b.label}
+            </div>
+            <div className="text-[10px] font-mono text-[#050505]/40 mt-1">{b.sub}</div>
+          </div>
+          <div className="w-28 text-right text-[9px] font-mono font-black uppercase tracking-[0.15em] text-[#050505]/40">
+            {b.rarity}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

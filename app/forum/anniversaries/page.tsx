@@ -1,100 +1,76 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { Cake, CalendarDays, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+export const dynamic   = 'force-dynamic';
 export const revalidate = 60;
 
 export default async function ForumAnniversariesPage() {
   const currentMonth = new Date().getMonth();
-  
-  let celebratingUsers: any[] = [];
+  const monthNames   = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+
+  let users: any[] = [];
   try {
-    const allUsers = await (prisma as any).user.findMany({
-      select: {
-        walletAddress: true,
-        displayName: true,
-        avatarUrl: true,
-        createdAt: true,
-        tier: true
-      }
+    const all = await (prisma as any).user.findMany({
+      select: { walletAddress: true, displayName: true, avatarUrl: true, createdAt: true },
     });
-
-    celebratingUsers = allUsers.filter((u: any) => {
-      if (!u.createdAt) return false;
-      const date = new Date(u.createdAt);
-      // Solo usuarios que se unieron este mes pero en años pasados (o este año para celebrar el mes 0)
-      return date.getMonth() === currentMonth;
-    }).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
+    users = all
+      .filter((u: any) => u.createdAt && new Date(u.createdAt).getMonth() === currentMonth)
+      .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   } catch (e) {
-    console.error("Failed to fetch anniversaries:", e);
+    console.error('Failed to fetch anniversaries:', e);
   }
 
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const currentMonthName = monthNames[currentMonth];
-
   return (
-    <div className="flex flex-col w-full max-w-[900px] mx-auto pb-20">
-      <div className="mb-8 border-b border-gray-200 pb-6 flex items-center gap-3">
-        <Cake size={32} className="text-pink-500" />
-        <div>
-          <h1 className="text-[28px] font-bold text-[#222222]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Anniversaries in {currentMonthName}
-          </h1>
-          <p className="text-gray-500 text-[15px] mt-1">
-            Celebrating the institutional users who joined the Sovereign Network during this month.
-          </p>
+    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
+
+      <div className="mb-8 pb-6 border-b border-[#E0E0E0]">
+        <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#050505]/30 mb-2">FORUM / ANNIVERSARIES</div>
+        <h1 className="text-[13px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]">
+          {monthNames[currentMonth]}
+        </h1>
+        <div className="text-[10px] font-mono text-[#050505]/30 mt-1">
+          JOINED THIS MONTH
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
-        {celebratingUsers.length > 0 ? (
-          <ul className="divide-y divide-gray-100">
-            {celebratingUsers.map((u, i) => {
-              const joinedYear = new Date(u.createdAt).getFullYear();
-              const currentYear = new Date().getFullYear();
-              const years = currentYear - joinedYear;
-              
-              return (
-                <li key={i} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
-                      {u.avatarUrl ? (
-                        <img src={u.avatarUrl} alt={u.displayName} className="w-full h-full object-cover" />
-                      ) : (
-                        <UserIcon size={20} className="text-gray-400" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-[16px] text-[#222222]">
-                          {u.displayName || "Anonymous Whale"}
-                        </span>
-                        {years > 0 && (
-                          <span className="text-[10px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full font-bold uppercase">
-                            {years} {years === 1 ? 'Year' : 'Years'}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[12px] text-gray-500 mt-0.5">
-                        <CalendarDays size={12} />
-                        Joined {monthNames[new Date(u.createdAt).getMonth()]} {joinedYear}
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <div className="p-12 text-center text-gray-500 flex flex-col items-center">
-            <Cake size={48} className="text-gray-300 mb-4" />
-            <p>No user anniversaries recorded for {currentMonthName} yet.</p>
-          </div>
-        )}
+      {/* Table header */}
+      <div className="flex items-center pb-3 border-b border-[#E0E0E0] text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/30">
+        <div className="flex-1">NODE</div>
+        <div className="w-24 text-right">EPOCH</div>
+        <div className="w-16 text-right">YRS</div>
       </div>
+
+      {users.length === 0 ? (
+        <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+          [ NO ENTRIES FOR {monthNames[currentMonth]} ]
+        </div>
+      ) : users.map((u, i) => {
+        const joined = new Date(u.createdAt);
+        const years  = new Date().getFullYear() - joined.getFullYear();
+        const addr   = u.walletAddress;
+        const label  = u.displayName || `${addr.slice(0,6)}…${addr.slice(-4)}`;
+
+        return (
+          <Link
+            key={i}
+            href={`/forum/u/${addr}`}
+            className="flex items-center py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors"
+          >
+            <div className="flex-1 min-w-0">
+              <div className="text-[12px] font-mono font-black uppercase tracking-widest text-[#050505] truncate">
+                {label}
+              </div>
+            </div>
+            <div className="w-24 text-right text-[10px] font-mono text-[#050505]/40 uppercase">
+              {monthNames[joined.getMonth()].slice(0,3)} {joined.getFullYear()}
+            </div>
+            <div className="w-16 text-right text-[11px] font-mono font-black text-[#050505]">
+              {years > 0 ? `+${years}Y` : '—'}
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

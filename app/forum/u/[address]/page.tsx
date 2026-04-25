@@ -3,89 +3,95 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { formatDistanceToNowStrict, format } from 'date-fns';
+import { formatDistanceToNowStrict } from 'date-fns';
 
 export default function UserProfilePage() {
-  const { address } = useParams();
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('Activity');
+  const { address }                     = useParams();
+  const [profile, setProfile]           = useState<any>(null);
+  const [activeTab, setActiveTab]       = useState<'ACTIVITY' | 'TOPICS' | 'REPLIES'>('ACTIVITY');
 
   useEffect(() => {
     fetch(`/api/forum/user/${address}`)
       .then(r => r.json())
       .then(data => setProfile(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch(console.error);
   }, [address]);
 
-  if (loading) return <div className="p-12 text-center text-gray-500 text-sm">Loading user profile...</div>;
-  if (!profile || profile.error) return <div className="p-12 text-center text-red-500 text-sm">User not found.</div>;
+  if (!profile) return null;
+  if (profile.error) return (
+    <div className="py-20 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/30">
+      [ NODE NOT FOUND ]
+    </div>
+  );
 
   const addrStr = typeof address === 'string' ? address : address[0];
   const avatarColor = `#${addrStr.slice(2, 8)}`;
-  
-  // Combine topics and posts for an activity feed
-  const combinedActivity = [
-    ...(profile.forumTopics || []).map((t: any) => ({ ...t, type: 'topic' })),
-    ...(profile.forumPosts || []).map((p: any) => ({ ...p, type: 'post' }))
+
+  const activity = [
+    ...(profile.forumTopics || []).map((t: any) => ({ ...t, _type: 'TOPIC' })),
+    ...(profile.forumPosts  || []).map((p: any) => ({ ...p, _type: 'REPLY' })),
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  return (
-    <div className="flex flex-col w-full max-w-[1110px] mx-auto pb-12">
+  const filtered = activeTab === 'ACTIVITY'
+    ? activity
+    : activity.filter(i => i._type === (activeTab === 'TOPICS' ? 'TOPIC' : 'REPLY'));
 
-      {/* ── Profile Header ── */}
-      <div className="flex flex-col gap-6 mb-8 pt-4">
-        <div className="flex items-center gap-6">
-          {profile.avatarUrl ? (
-             <img src={profile.avatarUrl} alt="Avatar" className="w-[120px] h-[120px] rounded-full object-cover shadow-md border border-gray-200 shrink-0" />
-          ) : (
-             <div 
-               className="w-[120px] h-[120px] shrink-0 rounded-full flex items-center justify-center text-[48px] text-white font-bold shadow-md"
-               style={{ backgroundColor: avatarColor }}
-             >
-               {addrStr.slice(2,3).toUpperCase()}
-             </div>
-          )}
-          <div className="flex flex-col gap-1">
-            <h1 className="text-[28px] font-bold text-[#222222]">
-              {profile.displayName || `${addrStr.slice(0, 12)}…${addrStr.slice(-4)}`}
-            </h1>
-            <span className="text-[16px] text-gray-500">{profile.displayName ? addrStr.slice(0, 6) : ''}</span>
-            
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-[13px] text-gray-500">
-                Joined {format(new Date(profile.createdAt), 'MMM d, yyyy')}
+  return (
+    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
+
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 mb-8 text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/30">
+        <Link href="/forum" className="hover:text-[#050505] transition-colors">FORUM</Link>
+        <span>/</span>
+        <span className="text-[#050505]">NODE</span>
+      </div>
+
+      {/* Profile block */}
+      <div className="flex items-center gap-6 mb-8 pb-8 border-b border-[#E0E0E0]">
+        <div
+          className="w-14 h-14 shrink-0 rounded-full flex items-center justify-center text-[18px] font-mono font-black text-white overflow-hidden border border-[#E0E0E0]"
+          style={{ backgroundColor: avatarColor }}
+        >
+          {profile.avatarUrl
+            ? <img src={profile.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+            : addrStr.slice(2, 3).toUpperCase()
+          }
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3">
+            <span className="text-[14px] font-mono font-black uppercase tracking-widest text-[#050505]">
+              {profile.displayName || `${addrStr.slice(0, 8)}…${addrStr.slice(-4)}`}
+            </span>
+            {profile.isPro && (
+              <span className="text-[9px] font-mono font-black uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37] px-1.5 py-0.5">
+                PRO
               </span>
-              {profile.isPro && (
-                <span className="ml-2 text-[11px] uppercase font-bold text-[#D4AF37] border border-[#D4AF37] px-1.5 py-0.5 rounded-sm">
-                  Pro Member
-                </span>
-              )}
-            </div>
-            {profile.bio && (
-               <p className="text-[14px] text-gray-700 mt-3 max-w-lg whitespace-pre-wrap">{profile.bio}</p>
             )}
           </div>
-          
-          <div className="ml-auto self-start">
-             <button className="bg-white border border-gray-300 hover:bg-gray-50 text-[#222222] px-4 py-1.5 rounded shadow-sm text-[14px] font-medium transition-colors">
-               Expand
-             </button>
+          <div className="text-[10px] font-mono text-[#050505]/30 uppercase tracking-widest">
+            {addrStr.slice(0, 10)}…{addrStr.slice(-6)}
+          </div>
+          <div className="flex items-center gap-4 mt-1 text-[10px] font-mono text-[#050505]/40 uppercase tracking-[0.15em]">
+            <span>{(profile.forumTopics || []).length} TOPICS</span>
+            <span>·</span>
+            <span>{(profile.forumPosts  || []).length} REPLIES</span>
+            <span>·</span>
+            <span>{profile.tier || 'FREE'}</span>
           </div>
         </div>
       </div>
 
-      {/* ── Horizontal Tabs ── */}
-      <div className="flex border-b border-gray-200 mb-6 text-[15px]">
-        {['Summary', 'Activity', 'Notifications', 'Preferences'].map(tab => (
+      {/* Tabs */}
+      <div className="flex items-center gap-6 border-b border-[#E0E0E0] mb-0 text-[10px] font-mono font-black uppercase tracking-[0.2em]">
+        {(['ACTIVITY', 'TOPICS', 'REPLIES'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
-              activeTab === tab 
-                ? 'border-blue-500 text-[#222222]' 
-                : 'border-transparent text-gray-500 hover:text-black'
+            className={`pb-3 border-b-2 transition-colors ${
+              activeTab === tab
+                ? 'border-[#050505] text-[#050505]'
+                : 'border-transparent text-[#050505]/30 hover:text-[#050505]'
             }`}
           >
             {tab}
@@ -93,142 +99,39 @@ export default function UserProfilePage() {
         ))}
       </div>
 
-      {/* ── Sub Tabs (If Activity is selected) ── */}
-      {activeTab === 'Activity' && (
-        <div className="flex gap-4 border-b border-gray-200 mb-6 text-[14px] pb-2 text-gray-500">
-          <span className="font-semibold text-gray-800">All</span>
-          <span className="hover:text-black cursor-pointer">Topics</span>
-          <span className="hover:text-black cursor-pointer">Replies</span>
-          <span className="hover:text-black cursor-pointer">Likes</span>
-          <span className="hover:text-black cursor-pointer">Bookmarks</span>
-        </div>
-      )}
-
-      {/* ── Tab Content ── */}
+      {/* Feed */}
       <div className="flex flex-col">
-        {activeTab === 'Preferences' ? (
-          <div className="max-w-2xl py-4 flex flex-col gap-6">
-            <div>
-              <h2 className="text-[18px] font-bold text-[#222222] mb-1">Profile Picture</h2>
-              <p className="text-[13px] text-gray-500 mb-4">Upload a custom avatar (max 1MB). It will be resized automatically.</p>
-              <div className="flex items-center gap-4">
-                {profile.avatarUrl ? (
-                   <img src={profile.avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover shadow-sm border border-gray-200" />
-                ) : (
-                   <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center text-[32px] text-white font-bold shadow-sm" style={{ backgroundColor: avatarColor }}>
-                     {addrStr.slice(2,3).toUpperCase()}
-                   </div>
-                )}
-                <div>
-                  <input 
-                    type="file" 
-                    accept="image/png, image/jpeg, image/webp" 
-                    className="text-[13px]"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 1024 * 1024) return alert("File too large. Max 1MB.");
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setProfile({ ...profile, avatarUrl: reader.result });
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-[18px] font-bold text-[#222222] mb-1">Display Name</h2>
-              <p className="text-[13px] text-gray-500 mb-2">Optional. Your public name on the forum.</p>
-              <input 
-                type="text" 
-                value={profile.displayName || ''} 
-                onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
-                className="w-full max-w-sm border border-gray-300 rounded px-3 py-2 text-[14px] focus:outline-none focus:border-blue-500" 
-                placeholder="e.g. Satoshi Nakamoto"
-              />
-            </div>
-
-            <div>
-              <h2 className="text-[18px] font-bold text-[#222222] mb-1">Bio</h2>
-              <p className="text-[13px] text-gray-500 mb-2">A short description about yourself.</p>
-              <textarea 
-                value={profile.bio || ''} 
-                onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                className="w-full max-w-lg border border-gray-300 rounded px-3 py-2 text-[14px] focus:outline-none focus:border-blue-500 resize-none h-[100px]" 
-                placeholder="Tell us about your interests..."
-              />
-            </div>
-
-            <div className="pt-4 border-t border-gray-100">
-              <button 
-                onClick={async () => {
-                  try {
-                    const res = await fetch(`/api/forum/user/${address}/settings`, {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        displayName: profile.displayName,
-                        avatarUrl: profile.avatarUrl,
-                        bio: profile.bio
-                      })
-                    });
-                    if (res.ok) alert('Profile updated successfully!');
-                    else alert('Failed to update profile.');
-                  } catch(e) {
-                    alert('Error updating profile.');
-                  }
-                }}
-                className="bg-[#0088CC] hover:bg-[#006699] text-white px-5 py-2 rounded text-[14px] font-semibold transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
+        {filtered.length === 0 ? (
+          <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+            [ NO TRANSMISSIONS ]
           </div>
-        ) : activeTab === 'Activity' ? (
-          combinedActivity.length === 0 ? (
-            <div className="py-12 text-center text-gray-500 text-sm">No activity found for this user.</div>
-          ) : (
-            combinedActivity.map((item: any) => {
-              const dateStr = formatDistanceToNowStrict(new Date(item.createdAt), { addSuffix: true });
-              if (item.type === 'topic') {
-                return (
-                  <div key={`t-${item.id}`} className="py-4 border-b border-gray-100 flex gap-4">
-                    <div className="w-10 h-10 shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                    </div>
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="text-[13px] text-gray-500">Created a topic · {dateStr}</div>
-                      <Link href={`/forum/t/${item.id}`} className="text-[15px] font-semibold text-[#0088CC] hover:underline">
-                        {item.title}
-                      </Link>
-                    </div>
-                  </div>
-                );
-              } else {
-                return (
-                  <div key={`p-${item.id}`} className="py-4 border-b border-gray-100 flex gap-4">
-                    <div className="w-10 h-10 shrink-0 bg-green-100 rounded-full flex items-center justify-center text-green-500">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
-                    </div>
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="text-[13px] text-gray-500">Replied in topic · {dateStr}</div>
-                      <Link href={`/forum/t/${item.topic?.id}`} className="text-[15px] font-semibold text-[#0088CC] hover:underline">
-                        {item.topic?.title || 'Unknown Topic'}
-                      </Link>
-                      <p className="text-[14px] text-gray-700 mt-1 line-clamp-2">{item.content}</p>
-                    </div>
-                  </div>
-                );
-              }
-            })
-          )
-        ) : (
-           <div className="py-12 text-center text-gray-500 text-sm">Content for {activeTab} is empty.</div>
-        )}
+        ) : filtered.map((item, i) => {
+          const time = formatDistanceToNowStrict(new Date(item.createdAt), { addSuffix: false });
+          const href = item._type === 'TOPIC'
+            ? `/forum/t/${item.id}`
+            : `/forum/t/${item.topicId}`;
+          const label = item._type === 'TOPIC'
+            ? (item.title || 'Untitled')
+            : (item.content?.slice(0, 80) || '—');
+
+          return (
+            <Link
+              key={i}
+              href={href}
+              className="flex items-center gap-4 py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors group"
+            >
+              <span className="text-[9px] font-mono font-black text-[#050505]/20 w-14 shrink-0 uppercase">
+                {item._type}
+              </span>
+              <span className="flex-1 text-[12px] font-mono text-[#050505] truncate group-hover:underline underline-offset-2">
+                {label}
+              </span>
+              <span className="text-[10px] font-mono text-[#050505]/30 whitespace-nowrap">
+                {time.replace(' minutes', 'm').replace(' hours', 'h').replace(' days', 'd')}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

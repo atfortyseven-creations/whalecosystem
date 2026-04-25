@@ -5,73 +5,75 @@ import Link from 'next/link';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/forum/notifications')
       .then(r => r.json())
       .then(data => { if (!data.error) setNotifications(data); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch(console.error);
   }, []);
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-64 font-mono text-[10px] uppercase tracking-widest text-[#050505]/30">[ SCANNING_SIGNAL_LOGS ]</div>;
-  }
-
-  const typeMap: Record<string, { label: string; color: string }> = {
-    LIKE:    { label: '[ + ]', color: '#ef4444' },
-    REPLY:   { label: '[ ↳ ]', color: '#059669' },
-    MENTION: { label: '[ @ ]', color: '#2563eb' },
+  const typeLabel: Record<string, string> = {
+    LIKE:    '[ + ]',
+    REPLY:   '[ ↳ ]',
+    MENTION: '[ @ ]',
+  };
+  const typeMsg = (n: any): string => {
+    const actor = n.actor ? `${n.actor.walletAddress.slice(0, 8)}` : 'SYSTEM';
+    const map: Record<string, string> = {
+      LIKE:    `${actor} RESONATED WITH YOUR PAYLOAD`,
+      REPLY:   `${actor} APPENDED TO YOUR TRANSMISSION`,
+      MENTION: `${actor} FLAGGED YOUR ENTITY`,
+    };
+    return map[n.type] || 'SYSTEM EVENT DETECTED';
   };
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto">
+    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
-      {/* ── Table Header ── */}
-      <div className="flex items-center px-2 pb-4 border-b-[0.5px] border-black/10 select-none">
-        <div className="w-12 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40">Sig</div>
-        <div className="flex-1 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40 pl-4">Event_Log</div>
-        <div className="w-28 text-right font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40">Unix_Epoch</div>
+      <div className="mb-8 pb-6 border-b border-[#E0E0E0]">
+        <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#050505]/30 mb-2">FORUM / NOTIFICATIONS</div>
+        <h1 className="text-[13px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]">
+          SIGNAL LOG
+        </h1>
       </div>
 
-      <div className="flex flex-col">
-        {notifications.length === 0 ? (
-          <div className="py-12 text-center font-mono text-[9px] uppercase tracking-widest text-[#050505]/20">[ NO_ACTIVE_SIGNALS ]</div>
-        ) : notifications.map(n => {
-          const meta = typeMap[n.type] || { label: '[ · ]', color: '#050505' };
-          const actor = n.actor ? `op_${n.actor.walletAddress.slice(0, 6)}` : 'system';
-          const labelMap: Record<string, string> = {
-            LIKE:    `${actor} resonated with your payload`,
-            REPLY:   `${actor} appended to your transmission`,
-            MENTION: `${actor} flagged your entity in a log`,
-          };
-          const message = labelMap[n.type] || 'system event detected';
-          const unixEpoch = Math.floor(new Date(n.createdAt).getTime() / 1000);
-
-          return (
-            <Link
-              key={n.id}
-              href={n.topicId ? `/forum/t/${n.topicId}` : '#'}
-              className={`flex items-center px-2 py-5 border-b-[0.5px] border-black/5 hover:bg-black/[0.02] transition-colors group ${!n.isRead ? 'bg-black/[0.015]' : ''}`}
-            >
-              <div className="w-12">
-                <span className="font-mono text-[11px] font-black" style={{ color: meta.color }}>{meta.label}</span>
-              </div>
-              <div className="flex-1 pl-4 flex flex-col gap-1 min-w-0">
-                <span className="font-mono text-[11px] uppercase tracking-widest text-[#050505]">{message}</span>
-                {!n.isRead && <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />}
-              </div>
-              <div className="w-28 text-right font-mono text-[9px] text-[#050505]/30">
-                t={unixEpoch}
-              </div>
-            </Link>
-          );
-        })}
+      {/* Table header */}
+      <div className="flex items-center pb-3 border-b border-[#E0E0E0] text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/30">
+        <div className="w-10">SIG</div>
+        <div className="flex-1 pl-4">EVENT</div>
+        <div className="w-20 text-right">EPOCH</div>
       </div>
 
-      <div className="mt-10 text-center">
-        <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#050505]/20 select-none">END_OF_SIGNAL_LOG</span>
+      {notifications.length === 0 ? (
+        <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+          [ NO ACTIVE SIGNALS ]
+        </div>
+      ) : notifications.map(n => (
+        <Link
+          key={n.id}
+          href={n.topicId ? `/forum/t/${n.topicId}` : '#'}
+          className={`flex items-center py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors ${!n.isRead ? 'bg-[#FAF9F6]' : ''}`}
+        >
+          <div className="w-10 text-[11px] font-mono font-black text-[#050505]">
+            {typeLabel[n.type] || '[ · ]'}
+          </div>
+          <div className="flex-1 pl-4 flex items-center gap-3 min-w-0">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-[#050505] truncate">
+              {typeMsg(n)}
+            </span>
+            {!n.isRead && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#050505] shrink-0" />
+            )}
+          </div>
+          <div className="w-20 text-right text-[10px] font-mono text-[#050505]/30">
+            t={Math.floor(new Date(n.createdAt).getTime() / 1000)}
+          </div>
+        </Link>
+      ))}
+
+      <div className="mt-10 text-center text-[9px] font-mono uppercase tracking-[0.3em] text-[#050505]/15">
+        END_OF_SIGNAL_LOG
       </div>
     </div>
   );
