@@ -29,7 +29,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     // Pre-compute isPublicPage synchronously so we can use it as the initial state.
     // This prevents the loader flash on /connect after disconnect.
-    const initialIsPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/'].some(
+    const initialIsPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/', '/forum'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -49,7 +49,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, []);
     
     // Strict Whitelist: ONLY connect, docs, terms, privacy, and developers are visible to unauthenticated users.
-    const isPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/'].some(
+    const isPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/', '/forum'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -114,27 +114,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                     </div>
                 ) : (
                     /* THE SKELETON / LOADING ENGINE */
-                    <motion.div
-                        key="gate-loader"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[1000] bg-[#FAF9F6] flex flex-col items-center justify-center p-8"
-                    >
-                         <WhaleAlertLoader />
-                         <div className="mt-8 flex flex-col items-center gap-2">
-                             <div className="w-48 h-[1px] bg-black/5 relative overflow-hidden">
-                                 <motion.div 
-                                     className="absolute inset-0 bg-black/20"
-                                     animate={{ x: ['-100%', '100%'] }}
-                                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                 />
-                             </div>
-                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
-                                 Sovereign Identity Resuming
-                             </span>
-                         </div>
-                    </motion.div>
+                    null
                 )}
             </AnimatePresence>
         </GateStateContext.Provider>

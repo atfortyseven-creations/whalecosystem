@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-    try {
-        const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export const dynamic = 'force-dynamic';
 
-        const topicId = params.id;
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const { id: topicId } = await params;
 
         // Increment views resiliently
         try {

@@ -52,11 +52,39 @@ export async function POST(req: Request) {
             console.warn("AuditLog creation failed (table missing?):", auditErr);
         }
 
-        // Update topic updated at
-        await (prisma as any).forumTopic.update({
-            where: { id: topicId },
-            data: { updatedAt: new Date() }
-        });
+        // Update topic updated at and notify author
+        try {
+            const topic = await (prisma as any).forumTopic.update({
+                where: { id: topicId },
+                data: { updatedAt: new Date() },
+                select: { authorId: true }
+            });
+
+            // Create notification for topic author
+            if (topic.authorId !== user.id) {
+                await (prisma as any).forumNotification.create({
+                    data: {
+                        userId: topic.authorId,
+                        type: 'REPLY',
+                        actorId: user.id,
+                        topicId,
+                        postId: newPost.id
+                    }
+                });
+            }
+
+            // Create Telemetry Event
+            await (prisma as any).forumTelemetry.create({
+                data: {
+                    userId: user.id,
+                    action: 'REPLY_POST',
+                    ipAddress: req.headers.get('x-forwarded-for') || '127.0.0.1',
+                    metadata: { topicId, postId: newPost.id }
+                }
+            });
+        } catch (e) {
+            console.warn("Topic update or notification failed:", e);
+        }
 
         return NextResponse.json(newPost);
     } catch (e: any) {

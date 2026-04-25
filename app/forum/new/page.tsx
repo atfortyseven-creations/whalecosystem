@@ -10,18 +10,18 @@ export default function NewTopicPage() {
   const preselectedCategory = searchParams.get('category');
 
   const [categories, setCategories] = useState<any[]>([]);
-  const [title, setTitle]       = useState('');
-  const [content, setContent]   = useState('');
+  const [title, setTitle]           = useState('');
+  const [content, setContent]       = useState('');
   const [categoryId, setCategoryId] = useState(preselectedCategory || '');
-  const [tags, setTags]         = useState('');
+  const [tags, setTags]             = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]       = useState('');
+  const [error, setError]           = useState('');
 
   useEffect(() => {
     fetch('/api/forum/categories')
       .then(r => r.json())
       .then(data => {
-        if (!data.error) {
+        if (Array.isArray(data)) {
           setCategories(data);
           if (!categoryId && data.length > 0) setCategoryId(data[0].id);
         }
@@ -52,7 +52,7 @@ export default function NewTopicPage() {
         router.push(`/forum/t/${topic.id}`);
       } else {
         const err = await res.json();
-        setError(err.error?.toUpperCase() || 'SUBMISSION FAILED');
+        setError(err.error?.toUpperCase() || 'SUBMISSION FAILED — ARE YOU AUTHENTICATED?');
       }
     } catch {
       setError('NETWORK ERROR — RETRY');
@@ -65,36 +65,36 @@ export default function NewTopicPage() {
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
       {/* ── Breadcrumb ── */}
-      <div className="flex items-center gap-2 mb-8 text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/30">
-        <Link href="/forum" className="hover:text-[#050505] transition-colors">FORUM</Link>
+      <div className="flex items-center gap-2 mb-8 text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
+        <Link href="/forum" className="hover:text-white transition-colors">FORUM</Link>
         <span>/</span>
-        <span className="text-[#050505]">NEW TRANSMISSION</span>
+        <span className="text-white">NEW TRANSMISSION</span>
       </div>
 
-      <div className="flex flex-col gap-0 border border-[#E0E0E0] bg-white">
+      <div className="flex flex-col gap-0 border border-white/20 bg-black/20 backdrop-blur-sm">
 
         {/* ── Title ── */}
-        <div className="border-b border-[#E0E0E0]">
+        <div className="border-b border-white/10">
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="SUBJECT LINE"
-            className="w-full px-6 py-5 text-[15px] font-mono font-black uppercase tracking-widest text-[#050505] placeholder-[#CCCCCC] bg-white focus:outline-none"
+            className="w-full px-6 py-5 text-[15px] font-mono font-black uppercase tracking-widest text-white placeholder-white/20 bg-transparent focus:outline-none"
           />
         </div>
 
         {/* ── Category + Tags ── */}
-        <div className="flex flex-col sm:flex-row border-b border-[#E0E0E0]">
-          <div className="flex-1 border-b sm:border-b-0 sm:border-r border-[#E0E0E0]">
+        <div className="flex flex-col sm:flex-row border-b border-white/10">
+          <div className="flex-1 border-b sm:border-b-0 sm:border-r border-white/10">
             <select
               value={categoryId}
               onChange={e => setCategoryId(e.target.value)}
-              className="w-full px-6 py-4 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505] bg-white focus:outline-none cursor-pointer"
+              className="w-full px-6 py-4 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white bg-transparent focus:outline-none cursor-pointer"
             >
-              <option value="" disabled>SELECT CATEGORY</option>
+              <option value="" disabled className="bg-[#2D0A59]">SELECT CHANNEL</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name.toUpperCase()}</option>
+                <option key={cat.id} value={cat.id} className="bg-[#2D0A59]">{cat.name.toUpperCase()}</option>
               ))}
             </select>
           </div>
@@ -103,42 +103,42 @@ export default function NewTopicPage() {
               type="text"
               value={tags}
               onChange={e => setTags(e.target.value)}
-              placeholder="TAGS (COMMA SEPARATED)"
-              className="w-full px-6 py-4 text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505] placeholder-[#CCCCCC] bg-white focus:outline-none"
+              placeholder="SIGNAL TAGS (COMMA SEPARATED)"
+              className="w-full px-6 py-4 text-[10px] font-mono uppercase tracking-[0.2em] text-white placeholder-white/20 bg-transparent focus:outline-none"
             />
           </div>
         </div>
 
         {/* ── Body ── */}
-        <div className="border-b border-[#E0E0E0]">
+        <div className="border-b border-white/10">
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            placeholder="TRANSMISSION BODY"
-            className="w-full px-6 py-5 text-[14px] font-mono text-[#050505] placeholder-[#CCCCCC] bg-white focus:outline-none resize-none min-h-[320px] leading-relaxed"
+            placeholder="TRANSMISSION BODY..."
+            className="w-full px-6 py-5 text-[14px] font-mono text-white placeholder-white/20 bg-transparent focus:outline-none resize-none min-h-[320px] leading-relaxed"
           />
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#FAF9F6]">
+        <div className="flex items-center justify-between px-6 py-4 bg-black/10">
           <div className="flex items-center gap-6">
             <button
               onClick={submit}
               disabled={submitting}
-              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white bg-[#050505] px-6 py-3 hover:bg-[#333333] transition-colors disabled:opacity-40"
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-black bg-white px-6 py-3 hover:bg-white/80 transition-colors disabled:opacity-40"
             >
-              {submitting ? 'TRANSMITTING…' : 'TRANSMIT'}
+              {submitting ? 'TRANSMITTING…' : '⬆ TRANSMIT'}
             </button>
             <Link
               href="/forum"
-              className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors"
+              className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors"
             >
               DISCARD
             </Link>
           </div>
           {error && (
-            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-red-500">
-              {error}
+            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-red-400">
+              ⚠ {error}
             </span>
           )}
         </div>
