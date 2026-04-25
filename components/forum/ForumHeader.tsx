@@ -42,19 +42,25 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
       <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 px-6 h-[52px] flex items-center justify-between">
 
         {/* Wordmark */}
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-center gap-0">
           <Link
             href="/forum"
             className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-white hover:opacity-60 transition-opacity"
           >
             FORUM
           </Link>
-          <span className="text-[14px] font-aztec-h2 font-black uppercase tracking-tight text-white ml-2">
+          <span className="text-white/20 mx-2 text-[11px] font-mono">/</span>
+          <span className="text-[15px] font-aztec-h2 font-black uppercase tracking-tight text-white">
             Whale Alert Network
           </span>
-          <span className="text-[9px] font-mono uppercase tracking-widest text-[#00f2ea] ml-2 opacity-80">
-            powered by Aztec Network
-          </span>
+          <div className="flex flex-col ml-3 justify-center">
+            <span className="text-[8px] font-aztec-mono uppercase tracking-widest text-[#00f2ea] leading-tight">
+              powered by
+            </span>
+            <span className="text-[9px] font-aztec-h2 uppercase tracking-widest text-[#00f2ea] leading-tight">
+              Aztec Network
+            </span>
+          </div>
         </div>
 
         {/* Right controls */}
