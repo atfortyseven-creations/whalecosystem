@@ -27,7 +27,7 @@ export default async function ForumLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col text-white">
+    <div className="min-h-screen flex flex-col text-white" style={{ backgroundColor: '#9A7BB5' }}>
       <TelemetryTracker />
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 

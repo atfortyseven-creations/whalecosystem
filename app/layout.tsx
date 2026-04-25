@@ -207,13 +207,7 @@ export default async function RootLayout({
         className="bg-[#0a001a] text-white antialiased selection:bg-[#D4AF37] selection:text-white transition-colors duration-300"
         suppressHydrationWarning
       >
-        {/* PREMIUM MAXIMUM DPI PURPLE WALLPAPER */}
-        <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#4a156b] via-[#1a052b] to-[#080012]" />
-          <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
-          <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#7c22b8] rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob" />
-          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#500e82] rounded-full mix-blend-screen filter blur-[120px] opacity-40 animate-blob animation-delay-2000" />
-        </div>
+
 
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] bg-white text-black px-4 py-2 rounded-lg font-bold text-sm">
           Skip to absolute content

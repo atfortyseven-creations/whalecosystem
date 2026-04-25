@@ -37,16 +37,20 @@ export async function POST(req: Request) {
             }
         });
 
-        // Add to audit log
-        await prisma.auditLog.create({
-            data: {
-                userId: user.id,
-                action: 'FORUM_POST_CREATED',
-                resource: 'ForumPost',
-                metadata: { postId: newPost.id, topicId },
-                ipAddress: req.headers.get('x-forwarded-for') || '127.0.0.1',
-            }
-        });
+        // Add to audit log (graceful failure if table missing)
+        try {
+            await prisma.auditLog.create({
+                data: {
+                    userId: user.id,
+                    action: 'FORUM_POST_CREATED',
+                    resource: 'ForumPost',
+                    metadata: { postId: newPost.id, topicId },
+                    ipAddress: req.headers.get('x-forwarded-for') || '127.0.0.1',
+                }
+            });
+        } catch (auditErr) {
+            console.warn("AuditLog creation failed (table missing?):", auditErr);
+        }
 
         // Update topic updated at
         await (prisma as any).forumTopic.update({
