@@ -40,22 +40,6 @@ export function ClientRootRouter() {
           <div className="max-w-[1750px] mx-auto px-6 sm:px-10 h-[44px] flex items-center justify-between">
             {/* Left — identity signal */}
             <div className="flex items-center gap-3">
-              <div
-                className="w-[5px] h-[5px] rounded-full"
-                style={{ backgroundColor: "#00C076" }}
-              />
-              <span
-                className="font-mono text-[8px] uppercase tracking-[0.4em]"
-                style={{ color: "rgba(10,10,10,0.35)" }}
-              >
-                Sovereign Session
-              </span>
-              <span
-                className="font-mono text-[8px] uppercase tracking-[0.4em]"
-                style={{ color: "rgba(10,10,10,0.15)" }}
-              >
-                ·
-              </span>
               <span
                 className="font-mono text-[8px] uppercase tracking-[0.35em]"
                 style={{ color: "rgba(10,10,10,0.25)" }}

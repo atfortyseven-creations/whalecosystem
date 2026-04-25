@@ -34,7 +34,7 @@ export async function POST(req: Request) {
                 replyToId: replyToId || undefined
             },
             include: {
-                author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } }
+                author: { select: { walletAddress: true } }
             }
         });
 

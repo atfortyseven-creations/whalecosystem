@@ -22,11 +22,7 @@ export async function GET(req: Request) {
                 tags: true,
                 author: {
                     select: {
-                        walletAddress: true,
-                        tier: true,
-                        isPro: true,
-                        displayName: true,
-                        avatarUrl: true
+                        walletAddress: true
                     }
                 },
                 _count: {

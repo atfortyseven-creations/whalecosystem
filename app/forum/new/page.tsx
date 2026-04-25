@@ -32,7 +32,7 @@ export default function NewTopicPage() {
   const submit = async () => {
     setError('');
     if (!title.trim() || !content.trim() || !categoryId) {
-      setError('TITLE, CATEGORY AND CONTENT ARE REQUIRED');
+      setError('Title, category, and content are required.');
       return;
     }
     setSubmitting(true);
@@ -52,49 +52,47 @@ export default function NewTopicPage() {
         router.push(`/forum/t/${topic.id}`);
       } else {
         const err = await res.json();
-        setError(err.error?.toUpperCase() || 'SUBMISSION FAILED — ARE YOU AUTHENTICATED?');
+        setError(err.error || 'Submission failed. Are you authenticated?');
       }
     } catch {
-      setError('NETWORK ERROR — RETRY');
+      setError('Network error. Please retry.');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
+    <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
 
-      {/* ── Breadcrumb ── */}
-      <div className="flex items-center gap-2 mb-8 text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
-        <Link href="/forum" className="hover:text-white transition-colors">FORUM</Link>
-        <span>/</span>
-        <span className="text-white">NEW TRANSMISSION</span>
+      {/* ── Header ── */}
+      <div className="mb-8">
+        <h1 className="text-[24px] font-sans font-bold text-white tracking-tight">Create a New Topic</h1>
       </div>
 
-      <div className="flex flex-col gap-0 border border-white/20 bg-black/20 backdrop-blur-sm">
+      <div className="flex flex-col gap-6">
 
         {/* ── Title ── */}
-        <div className="border-b border-white/10">
+        <div>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="SUBJECT LINE"
-            className="w-full px-6 py-5 text-[15px] font-mono font-black uppercase tracking-widest text-white placeholder-white/20 bg-transparent focus:outline-none"
+            placeholder="Type title, or paste a link here"
+            className="w-full px-4 py-3 text-[18px] font-sans font-bold text-white placeholder-white/30 bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none transition-colors"
           />
         </div>
 
         {/* ── Category + Tags ── */}
-        <div className="flex flex-col sm:flex-row border-b border-white/10">
-          <div className="flex-1 border-b sm:border-b-0 sm:border-r border-white/10">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             <select
               value={categoryId}
               onChange={e => setCategoryId(e.target.value)}
-              className="w-full px-6 py-4 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white bg-transparent focus:outline-none cursor-pointer"
+              className="w-full px-4 py-3 text-[14px] font-sans font-bold text-white bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none transition-colors cursor-pointer appearance-none"
             >
-              <option value="" disabled className="bg-[#2D0A59]">SELECT CHANNEL</option>
+              <option value="" disabled className="bg-[#111]">Select a category</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-[#2D0A59]">{cat.name.toUpperCase()}</option>
+                <option key={cat.id} value={cat.id} className="bg-[#111]">{cat.name}</option>
               ))}
             </select>
           </div>
@@ -103,42 +101,40 @@ export default function NewTopicPage() {
               type="text"
               value={tags}
               onChange={e => setTags(e.target.value)}
-              placeholder="SIGNAL TAGS (COMMA SEPARATED)"
-              className="w-full px-6 py-4 text-[10px] font-mono uppercase tracking-[0.2em] text-white placeholder-white/20 bg-transparent focus:outline-none"
+              placeholder="optional tags (comma separated)"
+              className="w-full px-4 py-3 text-[14px] font-sans text-white placeholder-white/30 bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none transition-colors"
             />
           </div>
         </div>
 
         {/* ── Body ── */}
-        <div className="border-b border-white/10">
+        <div>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            placeholder="TRANSMISSION BODY..."
-            className="w-full px-6 py-5 text-[14px] font-mono text-white placeholder-white/20 bg-transparent focus:outline-none resize-none min-h-[320px] leading-relaxed"
+            placeholder="Type here. Use Markdown, BBCode, or HTML to format."
+            className="w-full px-5 py-4 text-[15px] font-sans text-white placeholder-white/30 bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none resize-none min-h-[320px] leading-relaxed transition-colors"
           />
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center justify-between px-6 py-4 bg-black/10">
-          <div className="flex items-center gap-6">
-            <button
-              onClick={submit}
-              disabled={submitting}
-              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-black bg-white px-6 py-3 hover:bg-white/80 transition-colors disabled:opacity-40"
-            >
-              {submitting ? 'TRANSMITTING…' : '⬆ TRANSMIT'}
-            </button>
-            <Link
-              href="/forum"
-              className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors"
-            >
-              DISCARD
-            </Link>
-          </div>
+        <div className="flex items-center gap-6 mt-2">
+          <button
+            onClick={submit}
+            disabled={submitting}
+            className="text-[14px] font-sans font-bold text-black bg-[#6366f1] px-6 py-2.5 rounded-sm hover:bg-[#4f46e5] transition-colors disabled:opacity-40"
+          >
+            {submitting ? 'Creating Topic...' : '+ Create Topic'}
+          </button>
+          <Link
+            href="/forum"
+            className="text-[14px] font-sans font-bold text-white/40 hover:text-white transition-colors"
+          >
+            Cancel
+          </Link>
           {error && (
-            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-red-400">
-              ⚠ {error}
+            <span className="text-[13px] font-sans font-bold text-red-400 ml-auto">
+              {error}
             </span>
           )}
         </div>
