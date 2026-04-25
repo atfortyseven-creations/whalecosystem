@@ -30,8 +30,7 @@ export async function POST(req: Request) {
                 content,
                 topicId,
                 authorId: user.id,
-                replyToId: replyToId || undefined,
-                status: isUserAdmin ? 'PUBLISHED' : 'PENDING'
+                replyToId: replyToId || undefined
             },
             include: {
                 author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } }

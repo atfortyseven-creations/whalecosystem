@@ -19,7 +19,6 @@ import { ReactNode } from "react";
 import { MobileEnforcer } from "@/components/layout/MobileEnforcer";
 import { ClientOverlays } from "@/components/layout/ClientOverlays";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
-import { WavePatternOverlay } from "@/components/layout/WavePatternOverlay";
 import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { AntiTamperCore } from "@/components/security/AntiTamperCore";
@@ -213,8 +212,6 @@ export default async function RootLayout({
         </a>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <ScrollProgressBar />
-          {/* WAVE PATTERN — DOM element beats body::before on iOS/Android WebKit */}
-          <WavePatternOverlay />
           <Providers cookies={cookies}>
             <GlobalErrorBoundary>
               <MobileEnforcer>
