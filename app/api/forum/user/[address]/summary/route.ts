@@ -3,240 +3,118 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request, { params }: { params: { address: string } }) {
+/** Safely fetch a user using only the guaranteed base columns,
+ *  then try to add extended profile columns if they exist in the DB. */
+async function fetchUserSafe(walletAddress: string) {
+    // 1. Try full fetch (extended schema)
     try {
-        const userAddress = params.address.toLowerCase();
-
-        // 1. Fetch User Base Data (Fault-Tolerant)
-        let user: any = null;
-        try {
-            user = await (prisma as any).user.findUnique({
-                where: { walletAddress: userAddress },
-                select: {
-                    id: true,
-                    walletAddress: true,
-                    displayName: true,
-                    avatarUrl: true,
-                    bio: true,
-                    tier: true,
-                    isPro: true,
-                    createdAt: true,
-                    _count: { select: { forumTopics: true, forumPosts: true, forumLikes: true } }
+        const user = await (prisma as any).user.findUnique({
+            where: { walletAddress },
+            select: {
+                id: true, walletAddress: true, displayName: true,
+                avatarUrl: true, bio: true, tier: true, isPro: true,
+                createdAt: true,
+                _count: { select: { forumTopics: true, forumPosts: true, forumLikes: true } },
+                forumTopics: {
+                    orderBy: { createdAt: 'desc' }, take: 30,
+                    select: { id: true, title: true, content: true, createdAt: true,
+                        category: { select: { name: true, color: true, slug: true } },
+                        _count: { select: { posts: true, likes: true } }
+                    }
+                },
+                forumPosts: {
+                    orderBy: { createdAt: 'desc' }, take: 30,
+                    select: { id: true, content: true, createdAt: true, topicId: true,
+                        topic: { select: { id: true, title: true } },
+                        _count: { select: { likes: true } }
+                    }
                 }
-            });
-        } catch (e) {
-            console.warn('[Summary API] Full user fetch failed, trying minimal fallback', e);
-            user = await prisma.user.findUnique({
-                where: { walletAddress: userAddress },
-                select: {
-                    id: true,
-                    walletAddress: true,
-                    displayName: true,
-                    tier: true,
-                    isPro: true,
-                    createdAt: true,
-                    _count: { select: { forumTopics: true, forumPosts: true, forumLikes: true } }
-                }
-            });
-        }
+            }
+        });
+        return user;
+    } catch {}
 
-        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    // 2. Fallback: base columns only (no extended profile fields)
+    try {
+        const user = await prisma.user.findUnique({
+            where: { walletAddress },
+            select: { id: true, walletAddress: true, createdAt: true }
+        });
+        if (!user) return null;
 
-        // 2. Fallback resilient fetching for complex relations
-        // To avoid crashes on missing columns like `views` or `status`, we carefully select only safe columns
-        let topTopics: any[] = [];
-        let topReplies: any[] = [];
-        let topCategories: any[] = [];
-        let mostLikedBy: any[] = [];
-        let mostLiked: any[] = [];
-
+        // Fetch topics and posts separately (they don't touch User columns)
+        let forumTopics: any[] = [];
+        let forumPosts: any[] = [];
         try {
-            // Top Topics: Sorted by views if possible, otherwise by reply count
-            topTopics = await (prisma as any).forumTopic.findMany({
-                where: { authorId: user.id },
-                orderBy: { createdAt: 'desc' }, // Safe fallback, views might not exist
-                take: 5,
-                select: {
-                    id: true,
-                    title: true,
-                    createdAt: true,
-                    category: { select: { name: true, color: true } },
+            forumTopics = await (prisma as any).forumTopic.findMany({
+                where: { authorId: (user as any).id },
+                orderBy: { createdAt: 'desc' }, take: 30,
+                select: { id: true, title: true, content: true, createdAt: true,
+                    category: { select: { name: true, color: true, slug: true } },
                     _count: { select: { posts: true, likes: true } }
                 }
             });
-            // Try sorting by likes in memory since views column might fail
-            topTopics.sort((a, b) => b._count.likes - a._count.likes);
-        } catch (e) {
-            console.warn('[Summary API] Failed to fetch top topics', e);
-        }
-
+        } catch {}
         try {
-            // Top Replies (Posts)
-            topReplies = await (prisma as any).forumPost.findMany({
-                where: { authorId: user.id },
-                orderBy: { createdAt: 'desc' },
-                take: 20, // Fetch more to sort by likes
-                select: {
-                    id: true,
-                    content: true,
-                    createdAt: true,
-                    topic: { select: { id: true, title: true, category: { select: { color: true } } } },
+            forumPosts = await (prisma as any).forumPost.findMany({
+                where: { authorId: (user as any).id },
+                orderBy: { createdAt: 'desc' }, take: 30,
+                select: { id: true, content: true, createdAt: true, topicId: true,
+                    topic: { select: { id: true, title: true } },
                     _count: { select: { likes: true } }
                 }
             });
-            topReplies.sort((a, b) => b._count.likes - a._count.likes);
-            topReplies = topReplies.slice(0, 5);
-        } catch (e) {
-            console.warn('[Summary API] Failed to fetch top replies', e);
-        }
+        } catch {}
 
-        try {
-            // Top Categories (aggregate topics)
-            const categories = await (prisma as any).forumCategory.findMany({
-                include: {
-                    _count: {
-                        select: {
-                            topics: { where: { authorId: user.id } }
-                        }
-                    }
-                }
-            });
-            topCategories = categories
-                .filter((c: any) => c._count.topics > 0)
-                .map((c: any) => ({
-                    name: c.name,
-                    color: c.color,
-                    topics: c._count.topics,
-                    replies: 0 // Cannot easily aggregate nested post counts per category without complex joins, leaving 0 for resilient fallback
-                }))
-                .sort((a: any, b: any) => b.topics - a.topics)
-                .slice(0, 5);
-        } catch (e) {
-            console.warn('[Summary API] Failed to fetch top categories', e);
-        }
+        return {
+            ...user,
+            displayName: null, avatarUrl: null, bio: null,
+            tier: 'basic', isPro: false,
+            _count: { forumTopics: forumTopics.length, forumPosts: forumPosts.length, forumLikes: 0 },
+            forumTopics, forumPosts
+        };
+    } catch { return null; }
+}
 
-        try {
-            // Likes Received (Most Liked By)
-            let likesReceived: any[] = [];
-            try {
-                likesReceived = await (prisma as any).forumLike.findMany({
-                    where: { OR: [{ topic: { authorId: user.id } }, { post: { authorId: user.id } }] },
-                    include: { user: { select: { displayName: true, walletAddress: true, avatarUrl: true } } }
-                });
-            } catch (e) {
-                // Fallback without avatarUrl
-                likesReceived = await (prisma as any).forumLike.findMany({
-                    where: { OR: [{ topic: { authorId: user.id } }, { post: { authorId: user.id } }] },
-                    include: { user: { select: { displayName: true, walletAddress: true } } }
-                });
-            }
+export async function GET(req: Request, { params }: { params: { address: string } }) {
+    try {
+        const userAddress = params.address.toLowerCase();
+        const user = await fetchUserSafe(userAddress);
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-            const likedByMap = new Map();
-            likesReceived.forEach((like: any) => {
-                if (like.user.walletAddress === user.walletAddress) return; // ignore self likes
-                const count = likedByMap.get(like.user.walletAddress)?.count || 0;
-                likedByMap.set(like.user.walletAddress, { ...like.user, count: count + 1 });
-            });
-            mostLikedBy = Array.from(likedByMap.values()).sort((a, b) => b.count - a.count).slice(0, 6);
+        // Stats
+        const accountAgeDays = Math.max(1, Math.floor(
+            (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+        ));
+        const topicCount = user._count?.forumTopics || user.forumTopics?.length || 0;
+        const postCount  = user._count?.forumPosts  || user.forumPosts?.length  || 0;
+        const activityMultiplier = Math.max(1, (topicCount + postCount) * 1.5);
 
-            // Likes Given (Most Liked)
-            let likesGiven: any[] = [];
-            try {
-                likesGiven = await (prisma as any).forumLike.findMany({
-                    where: { userId: user.id },
-                    include: {
-                        topic: { select: { author: { select: { displayName: true, walletAddress: true, avatarUrl: true } } } },
-                        post: { select: { author: { select: { displayName: true, walletAddress: true, avatarUrl: true } } } }
-                    }
-                });
-            } catch (e) {
-                // Fallback without avatarUrl
-                likesGiven = await (prisma as any).forumLike.findMany({
-                    where: { userId: user.id },
-                    include: {
-                        topic: { select: { author: { select: { displayName: true, walletAddress: true } } } },
-                        post: { select: { author: { select: { displayName: true, walletAddress: true } } } }
-                    }
-                });
-            }
-
-            const likedMap = new Map();
-            likesGiven.forEach((like: any) => {
-                const targetUser = like.topic?.author || like.post?.author;
-                if (!targetUser || targetUser.walletAddress === user.walletAddress) return;
-                const count = likedMap.get(targetUser.walletAddress)?.count || 0;
-                likedMap.set(targetUser.walletAddress, { ...targetUser, count: count + 1 });
-            });
-            mostLiked = Array.from(likedMap.values()).sort((a, b) => b.count - a.count).slice(0, 6);
-
-        } catch (e) {
-            console.warn('[Summary API] Failed to fetch network likes', e);
-        }
-
-        // 3. Deterministic Stats (Discourse Parity)
-        // Since we don't have read logs, we algorithmically generate realistic stats based on post count and age
-        const accountAgeDays = Math.max(1, Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)));
-        const activityMultiplier = Math.max(1, (user._count.forumTopics + user._count.forumPosts) * 1.5);
-        
         const stats = {
-            daysVisited: Math.min(accountAgeDays, Math.floor(accountAgeDays * 0.4 + activityMultiplier)),
-            readTimeHours: Math.floor(activityMultiplier * 0.8),
-            recentReadTimeHours: Math.floor((activityMultiplier * 0.8) / 10),
-            topicsViewed: Math.floor(activityMultiplier * 15),
-            postsRead: Math.floor(activityMultiplier * 45),
-            likesGiven: mostLiked.reduce((acc, u) => acc + u.count, 0),
-            likesReceived: mostLikedBy.reduce((acc, u) => acc + u.count, 0),
-            topicsCreated: user._count.forumTopics,
-            postsCreated: user._count.forumPosts
+            daysVisited:          Math.min(accountAgeDays, Math.floor(accountAgeDays * 0.4 + activityMultiplier)),
+            readTimeHours:        Math.floor(activityMultiplier * 0.8),
+            recentReadTimeHours:  Math.floor((activityMultiplier * 0.8) / 10),
+            topicsViewed:         Math.floor(activityMultiplier * 15),
+            postsRead:            Math.floor(activityMultiplier * 45),
+            likesGiven:           0,
+            likesReceived:        user._count?.forumLikes || 0,
+            topicsCreated:        topicCount,
+            postsCreated:         postCount,
         };
 
-        // 4. Deterministic Badge Evaluation
-        const badges = [];
-        
-        // Basic / Member
-        badges.push({ id: 'basic', name: 'Basic', description: 'Granted all essential community functions', icon: 'User', type: 'bronze' });
-        if (stats.daysVisited > 5) {
-            badges.push({ id: 'member', name: 'Member', description: 'Granted invitations, group messaging, more likes', icon: 'Users', type: 'silver' });
-        }
-        
-        // Autobiographer
-        if (user.bio || user.displayName !== 'Sovereign User') {
-            badges.push({ id: 'autobiographer', name: 'Autobiographer', description: 'Filled out profile information', icon: 'PenLine', type: 'bronze' });
-        }
-
-        // First Like / Receive
-        if (stats.likesGiven > 0) badges.push({ id: 'first_like', name: 'First Like', description: 'Liked a post', icon: 'Heart', type: 'bronze' });
+        // Badges
+        const badges = [
+            { id: 'basic', name: 'Basic', description: 'Granted essential community functions', icon: 'User', type: 'bronze' }
+        ];
+        if (stats.daysVisited > 5) badges.push({ id: 'member', name: 'Member', description: 'Active community member', icon: 'Users', type: 'silver' });
+        if (user.bio || user.displayName) badges.push({ id: 'autobiographer', name: 'Autobiographer', description: 'Filled out profile', icon: 'PenLine', type: 'bronze' });
         if (stats.likesReceived > 0) badges.push({ id: 'welcome', name: 'Welcome', description: 'Received a like', icon: 'Heart', type: 'bronze' });
-        if (stats.likesReceived > 9) badges.push({ id: 'nice_topic', name: 'Nice Topic', description: 'Received 10 likes on a topic', icon: 'Award', type: 'bronze' });
+        if (user.isPro) badges.push({ id: 'leader', name: 'Leader', description: 'Institutional Pro access', icon: 'Shield', type: 'gold' });
+        if (topicCount > 0) badges.push({ id: 'first_topic', name: 'First Topic', description: 'Created a topic', icon: 'FileText', type: 'bronze' });
+        if (postCount > 0) badges.push({ id: 'first_reply', name: 'First Reply', description: 'Replied to a topic', icon: 'MessageSquare', type: 'bronze' });
+        if (accountAgeDays > 365) badges.push({ id: 'anniversary', name: 'Anniversary', description: 'Member for 1 year', icon: 'Calendar', type: 'silver' });
 
-        // Leader / Trust Levels
-        if (user.isPro) {
-            badges.push({ id: 'leader', name: 'Leader', description: 'Granted global edit, pin, close, archive, split and merge', icon: 'Shield', type: 'gold' });
-        } else if (user._count.forumTopics > 5) {
-            badges.push({ id: 'regular', name: 'Regular', description: 'Granted recategorize, rename, followed links', icon: 'Shield', type: 'silver' });
-        }
-
-        // Anniversary
-        if (accountAgeDays > 365) {
-            badges.push({ id: 'anniversary', name: 'Anniversary', description: 'Active member for a year, posted at least once', icon: 'Calendar', type: 'silver' });
-        }
-
-        // First Post/Topic
-        if (user._count.forumPosts > 0) badges.push({ id: 'first_reply', name: 'First Reply', description: 'Replied to a topic', icon: 'MessageSquare', type: 'bronze' });
-        if (user._count.forumTopics > 0) badges.push({ id: 'first_topic', name: 'First Topic', description: 'Created a topic', icon: 'FileText', type: 'bronze' });
-
-
-        return NextResponse.json({
-            user,
-            stats,
-            topTopics,
-            topReplies,
-            topCategories,
-            mostLikedBy,
-            mostLiked,
-            badges
-        });
-
+        return NextResponse.json({ user, stats, badges, topTopics: user.forumTopics || [], topReplies: user.forumPosts || [] });
     } catch (e: any) {
         console.error('[API] Forum Summary Error:', e);
         return NextResponse.json({ error: e.message }, { status: 500 });

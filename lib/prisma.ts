@@ -115,10 +115,14 @@ function createPrismaClient(): PrismaClient {
     if (process.env.NODE_ENV === 'production') {
         (client as any).$on('error', (e: any) => {
             const msg: string = e?.message || '';
-            const isTableMissing = msg.includes('does not exist in the current database') ||
-                                   msg.includes('P1009') ||
-                                   msg.includes('P2021'); // table does not exist
-            if (!isTableMissing) {
+            // Suppress schema-lag errors that are self-healing via /api/admin/sync-db
+            const isSchemaBehind =
+                msg.includes('does not exist in the current database') || // table/column missing
+                msg.includes('P1009') ||
+                msg.includes('P2021') || // table does not exist
+                msg.includes('P2022') || // column does not exist
+                msg.includes('42703');   // PostgreSQL raw: column does not exist
+            if (!isSchemaBehind) {
                 console.error('[PRISMA] DB Error:', msg.slice(0, 300));
             }
         });

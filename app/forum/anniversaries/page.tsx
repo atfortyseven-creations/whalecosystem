@@ -11,38 +11,48 @@ export default async function ForumAnniversariesPage() {
 
   let users: any[] = [];
   try {
+    // Try with displayName (extended schema)
     const all = await (prisma as any).user.findMany({
-      select: { walletAddress: true, displayName: true, avatarUrl: true, createdAt: true },
+      select: { walletAddress: true, displayName: true, createdAt: true },
     });
     users = all
       .filter((u: any) => u.createdAt && new Date(u.createdAt).getMonth() === currentMonth)
       .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-  } catch (e) {
-    console.error('Failed to fetch anniversaries:', e);
+  } catch {
+    // Fallback: base columns only
+    try {
+      const all = await prisma.user.findMany({
+        select: { walletAddress: true, createdAt: true },
+      });
+      users = (all as any[])
+        .filter((u: any) => u.createdAt && new Date(u.createdAt).getMonth() === currentMonth)
+        .map(u => ({ ...u, displayName: null }))
+        .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    } catch (e) {
+      console.warn('Failed to fetch anniversaries:', e);
+    }
   }
 
   return (
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
-      <div className="mb-8 pb-6 border-b border-[#E0E0E0]">
-        <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#050505]/30 mb-2">FORUM / ANNIVERSARIES</div>
-        <h1 className="text-[13px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]">
+      <div className="mb-8 pb-6" style={{ borderBottom: '1px solid var(--forum-border)' }}>
+        <div className="text-[12px] font-sans font-bold mb-2" style={{ color: 'var(--forum-text-muted)' }}>FORUM / ANNIVERSARIES</div>
+        <h1 className="text-[28px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
           {monthNames[currentMonth]}
         </h1>
-        <div className="text-[10px] font-mono text-[#050505]/30 mt-1">
-          JOINED THIS MONTH
-        </div>
+        <div className="text-[14px] font-sans mt-1" style={{ color: 'var(--forum-text-muted)' }}>JOINED THIS MONTH</div>
       </div>
 
       {/* Table header */}
-      <div className="flex items-center pb-3 border-b border-[#E0E0E0] text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/30">
+      <div className="flex items-center pb-3 text-[12px] font-sans font-bold uppercase" style={{ borderBottom: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}>
         <div className="flex-1">NODE</div>
         <div className="w-24 text-right">EPOCH</div>
         <div className="w-16 text-right">YRS</div>
       </div>
 
       {users.length === 0 ? (
-        <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+        <div className="py-16 text-center text-[13px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>
           [ NO ENTRIES FOR {monthNames[currentMonth]} ]
         </div>
       ) : users.map((u, i) => {
@@ -55,17 +65,20 @@ export default async function ForumAnniversariesPage() {
           <Link
             key={i}
             href={`/forum/u/${addr}`}
-            className="flex items-center py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors"
+            className="flex items-center py-4 transition-colors"
+            style={{ borderBottom: '1px solid var(--forum-border)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
           >
             <div className="flex-1 min-w-0">
-              <div className="text-[12px] font-mono font-black uppercase tracking-widest text-[#050505] truncate">
+              <div className="text-[15px] font-sans font-bold truncate" style={{ color: 'var(--forum-text)' }}>
                 {label}
               </div>
             </div>
-            <div className="w-24 text-right text-[10px] font-mono text-[#050505]/40 uppercase">
+            <div className="w-24 text-right text-[12px] font-sans uppercase" style={{ color: 'var(--forum-text-muted)' }}>
               {monthNames[joined.getMonth()].slice(0,3)} {joined.getFullYear()}
             </div>
-            <div className="w-16 text-right text-[11px] font-mono font-black text-[#050505]">
+            <div className="w-16 text-right text-[14px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>
               {years > 0 ? `+${years}Y` : '—'}
             </div>
           </Link>

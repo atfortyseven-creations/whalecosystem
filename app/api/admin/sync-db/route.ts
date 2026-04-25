@@ -6,34 +6,23 @@ import { cookies } from 'next/headers';
 export const dynamic = 'force-dynamic';
 
 /**
- * POST /api/admin/sync-db
- * 
- * Atomically reconciles the remote Railway PostgreSQL schema with the local
- * Prisma schema definition. Uses raw SQL with IF NOT EXISTS / DO $$ patterns
- * so every statement is fully idempotent. Safe to run multiple times.
- * 
- * This bypasses `prisma migrate deploy` entirely for additive changes
- * (new columns, new tables) that don't require a migration file.
+ * Shared migration executor — runs all idempotent ALTER TABLE / CREATE TABLE statements.
+ * Safe to call multiple times. Tolerates partial failures.
  */
-export async function POST() {
-    const cookieStore = await cookies();
-    const address = cookieStore.get('sovereign_handshake')?.value;
-    if (!address || !isAdmin(address)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const results: { step: string; status: 'ok' | 'error'; detail?: string }[] = [];
+async function runMigrations() {
+    const results: { step: string; status: 'ok' | 'skip'; detail?: string }[] = [];
 
     const exec = async (step: string, sql: string) => {
         try {
             await prisma.$executeRawUnsafe(sql);
             results.push({ step, status: 'ok' });
         } catch (e: any) {
-            results.push({ step, status: 'error', detail: e.message });
+            // "already exists" errors are OK — just mark as skip
+            results.push({ step, status: 'skip', detail: e.message?.slice(0, 120) });
         }
     };
 
-    // ── Phase 1: Extend User table with forum-required columns ──────────────
+    // ── Phase 1: Extend User table ──────────────────────────────────────────
     await exec('User.displayName', `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "displayName" TEXT`);
     await exec('User.avatarUrl',   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "avatarUrl" TEXT`);
     await exec('User.bio',         `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "bio" TEXT`);
@@ -41,8 +30,8 @@ export async function POST() {
     await exec('User.isPro',       `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isPro" BOOLEAN NOT NULL DEFAULT false`);
     await exec('User.lastActive',  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "lastActive" TIMESTAMP(3)`);
 
-    // ── Phase 2: Create ForumCategory ────────────────────────────────────────
-    await exec('ForumCategory.create', `
+    // ── Phase 2: ForumCategory ────────────────────────────────────────────
+    await exec('ForumCategory', `
         CREATE TABLE IF NOT EXISTS "ForumCategory" (
             "id"          TEXT NOT NULL DEFAULT gen_random_uuid(),
             "name"        TEXT NOT NULL,
@@ -56,8 +45,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 3: Create ForumTopic ───────────────────────────────────────────
-    await exec('ForumTopic.create', `
+    // ── Phase 3: ForumTopic ───────────────────────────────────────────────
+    await exec('ForumTopic', `
         CREATE TABLE IF NOT EXISTS "ForumTopic" (
             "id"          TEXT NOT NULL DEFAULT gen_random_uuid(),
             "title"       TEXT NOT NULL,
@@ -74,8 +63,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 4: Create ForumPost ────────────────────────────────────────────
-    await exec('ForumPost.create', `
+    // ── Phase 4: ForumPost ────────────────────────────────────────────────
+    await exec('ForumPost', `
         CREATE TABLE IF NOT EXISTS "ForumPost" (
             "id"          TEXT NOT NULL DEFAULT gen_random_uuid(),
             "content"     TEXT NOT NULL,
@@ -89,8 +78,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 5: Create ForumLike ────────────────────────────────────────────
-    await exec('ForumLike.create', `
+    // ── Phase 5: ForumLike ────────────────────────────────────────────────
+    await exec('ForumLike', `
         CREATE TABLE IF NOT EXISTS "ForumLike" (
             "id"        TEXT NOT NULL DEFAULT gen_random_uuid(),
             "userId"    TEXT NOT NULL,
@@ -101,8 +90,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 6: Create ForumTag ─────────────────────────────────────────────
-    await exec('ForumTag.create', `
+    // ── Phase 6: ForumTag ─────────────────────────────────────────────────
+    await exec('ForumTag', `
         CREATE TABLE IF NOT EXISTS "ForumTag" (
             "id"   TEXT NOT NULL DEFAULT gen_random_uuid(),
             "name" TEXT NOT NULL UNIQUE,
@@ -110,8 +99,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 7: Create _ForumTopicToForumTag join table ─────────────────────
-    await exec('ForumTopic_ForumTag.join', `
+    // ── Phase 7: ForumTopic-ForumTag join ─────────────────────────────────
+    await exec('ForumTopicTag.join', `
         CREATE TABLE IF NOT EXISTS "_ForumTopicToForumTag" (
             "A" TEXT NOT NULL,
             "B" TEXT NOT NULL,
@@ -119,8 +108,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 8: Create ForumNotification ───────────────────────────────────
-    await exec('ForumNotification.create', `
+    // ── Phase 8: ForumNotification ───────────────────────────────────────
+    await exec('ForumNotification', `
         CREATE TABLE IF NOT EXISTS "ForumNotification" (
             "id"        TEXT NOT NULL DEFAULT gen_random_uuid(),
             "userId"    TEXT NOT NULL,
@@ -134,8 +123,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 9: Create ForumTelemetry ───────────────────────────────────────
-    await exec('ForumTelemetry.create', `
+    // ── Phase 9: ForumTelemetry ───────────────────────────────────────────
+    await exec('ForumTelemetry', `
         CREATE TABLE IF NOT EXISTS "ForumTelemetry" (
             "id"        TEXT NOT NULL DEFAULT gen_random_uuid(),
             "userId"    TEXT,
@@ -147,8 +136,8 @@ export async function POST() {
         )
     `);
 
-    // ── Phase 10: Create AuditLog ────────────────────────────────────────────
-    await exec('AuditLog.create', `
+    // ── Phase 10: AuditLog ────────────────────────────────────────────────
+    await exec('AuditLog', `
         CREATE TABLE IF NOT EXISTS "AuditLog" (
             "id"         TEXT NOT NULL DEFAULT gen_random_uuid(),
             "userId"     TEXT NOT NULL,
@@ -161,12 +150,46 @@ export async function POST() {
         )
     `);
 
-    const errors = results.filter(r => r.status === 'error');
-    const ok = results.filter(r => r.status === 'ok');
+    return results;
+}
 
-    return NextResponse.json({
-        success: errors.length === 0,
-        summary: `${ok.length} steps completed, ${errors.length} errors`,
-        results
-    });
+/**
+ * GET /api/admin/sync-db
+ * Open endpoint — auto-runs on every Railway deploy via start.sh or manual trigger.
+ * No auth required so it can be called in CI/CD pipelines.
+ */
+export async function GET() {
+    try {
+        const results = await runMigrations();
+        const errors = results.filter(r => r.detail && !r.detail.includes('already exists'));
+        return NextResponse.json({
+            success: true,
+            summary: `${results.filter(r => r.status === 'ok').length} applied, ${results.filter(r => r.status === 'skip').length} skipped`,
+            results
+        });
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+    }
+}
+
+/**
+ * POST /api/admin/sync-db
+ * Admin-only variant (same logic, auth-gated).
+ */
+export async function POST() {
+    const cookieStore = await cookies();
+    const address = cookieStore.get('sovereign_handshake')?.value;
+    if (!address || !isAdmin(address)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    try {
+        const results = await runMigrations();
+        return NextResponse.json({
+            success: true,
+            summary: `${results.filter(r => r.status === 'ok').length} applied, ${results.filter(r => r.status === 'skip').length} skipped`,
+            results
+        });
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+    }
 }

@@ -20,8 +20,9 @@ export default async function ForumGroupsPage() {
       total += g._count.id;
     });
     groupsData.TOTAL = total;
-  } catch (e) {
-    console.error('Failed to fetch groups:', e);
+  } catch {
+    // tier column may not exist yet — silently show zero counts
+    // (run /api/admin/sync-db to apply schema and reload)
   }
 
   const groups = [
@@ -35,18 +36,18 @@ export default async function ForumGroupsPage() {
     <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
 
       {/* Breadcrumb & Header */}
-      <div className="mb-8 pb-4 border-b border-white/5">
-        <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold text-white/40">
-          <Link href="/forum" className="hover:text-white transition-colors">Forum</Link>
+      <div className="mb-8 pb-4" style={{ borderBottom: '1px solid var(--forum-border)' }}>
+        <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold" style={{ color: 'var(--forum-text-muted)' }}>
+          <Link href="/forum" className="transition-colors hover:opacity-100">Forum</Link>
           <span>/</span>
-          <span className="text-white/80">Groups</span>
+          <span style={{ color: 'var(--forum-text)' }}>Groups</span>
         </div>
         <div className="flex items-center justify-between">
-            <h1 className="text-[28px] font-sans font-bold text-white tracking-tight">
+            <h1 className="text-[28px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
               Network Cohorts
             </h1>
-            <div className="text-[14px] font-sans text-[#919191]">
-              Total: <span className="text-white font-bold">{groupsData.TOTAL} Nodes</span>
+            <div className="text-[14px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>
+              Total: <span className="font-bold" style={{ color: 'var(--forum-text)' }}>{groupsData.TOTAL} Nodes</span>
             </div>
         </div>
       </div>
@@ -55,17 +56,20 @@ export default async function ForumGroupsPage() {
          {groups.map(g => (
            <div
              key={g.id}
-             className="flex items-center py-4 px-4 bg-white/[0.02] border border-white/5 rounded-sm hover:bg-[#1a112a] hover:border-[#6366f1]/50 transition-all duration-200"
+             className="flex items-center py-4 px-4 rounded-sm transition-all duration-200"
+             style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}
+             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; e.currentTarget.style.borderColor = '#6366f1'; }}
+             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; e.currentTarget.style.borderColor = 'var(--forum-border)'; }}
            >
              <div className="flex-1 min-w-0">
-               <div className="text-[16px] font-sans font-bold text-white">
+               <div className="text-[16px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>
                  {g.label}
                </div>
-               <div className="text-[13px] font-sans text-[#919191] mt-1">{g.sub}</div>
+               <div className="text-[13px] font-sans mt-1" style={{ color: 'var(--forum-text-muted)' }}>{g.sub}</div>
              </div>
              <div className="w-24 flex items-center justify-end gap-2">
-               <span className="text-[12px] font-sans font-bold text-white/50">Members</span>
-               <div className="text-[18px] font-sans font-bold text-white">
+               <span className="text-[12px] font-sans font-bold" style={{ color: 'var(--forum-text-muted)' }}>Members</span>
+               <div className="text-[18px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>
                  {g.count}
                </div>
              </div>

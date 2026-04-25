@@ -51,9 +51,9 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
             FORUM
           </Link>
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
-            <span className="text-[12px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>System Date:</span>
-            <span className="text-[12px] font-sans font-bold tracking-wide" style={{ color: 'var(--forum-text)' }}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' })}
+            <span className="text-[10px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>SYS.DATE:</span>
+            <span className="text-[11px] font-mono font-black uppercase tracking-widest" style={{ color: 'var(--forum-text)' }}>
+              {new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, '')}
             </span>
           </div>
         </div>
@@ -64,13 +64,11 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           {/* Theme Toggle */}
           <button
             onClick={() => document.documentElement.classList.toggle('forum-light-mode')}
-            className="w-8 h-8 flex items-center justify-center rounded-sm transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-300 ease-in-out hover:scale-105"
             style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}
             title="Toggle Light/Dark Mode"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
+            <span className="text-[14px] font-serif leading-none mt-[1px]">☼</span>
           </button>
 
           {/* New Topic */}
@@ -94,13 +92,16 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
 
           {/* Popover */}
           {menuOpen && (
-            <div className="absolute top-[52px] right-0 w-[220px] bg-[#1a052b] border border-white/10 shadow-lg z-50 flex flex-col overflow-hidden">
+            <div className="absolute top-[52px] right-0 w-[220px] shadow-lg z-50 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--forum-bg)', border: '1px solid var(--forum-border)', borderTop: 'none' }}>
               {navLinks.map(l => (
                 <Link
                   key={l.href}
                   href={l.href}
                   onClick={() => setMenuOpen(false)}
-                  className="px-5 py-3.5 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white/50 hover:text-white hover:bg-white/5 border-b border-white/10 last:border-0 transition-colors"
+                  className="px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors"
+                  style={{ color: 'var(--forum-text-muted)', borderBottom: '1px solid var(--forum-border)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--forum-text)'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--forum-text-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                 >
                   {l.label}
                 </Link>
@@ -112,16 +113,17 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           {address ? (
             <div className="flex items-center gap-4">
               <Link href="/forum/notifications" className="relative group">
-                <span className="text-[14px] opacity-70 group-hover:opacity-100 transition-opacity">🔔</span>
+                <span className="text-[14px] transition-opacity" style={{ color: 'var(--forum-text)' }}>🔔</span>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#00f2ea] rounded-full text-[7px] font-black text-black flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full text-[7px] font-black text-black flex items-center justify-center" style={{ backgroundColor: 'var(--forum-text)' }}>
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </Link>
               <button
                 onClick={() => setProfileOpen(true)}
-                className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center text-[10px] font-mono font-black text-white hover:border-white transition-colors shrink-0"
+                className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors"
+                style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
               >
                 {avatarUrl
                   ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
@@ -132,7 +134,8 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           ) : (
             <Link
               href="/connect"
-              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors"
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] transition-colors hover:opacity-100"
+              style={{ color: 'var(--forum-text-muted)' }}
             >
               CONNECT
             </Link>

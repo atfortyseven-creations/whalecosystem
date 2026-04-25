@@ -42,3 +42,45 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const cookieStore = await cookies();
+        const address = cookieStore.get('sovereign_handshake')?.value;
+        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { id: topicId } = await params;
+
+        const user = await prisma.user.findUnique({
+            where: { walletAddress: address },
+            select: { id: true },
+        });
+        if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+        const topic = await (prisma as any).forumTopic.findUnique({
+            where: { id: topicId },
+            select: { id: true, authorId: true },
+        });
+        if (!topic) return NextResponse.json({ error: 'Topic not found' }, { status: 404 });
+        if (topic.authorId !== user.id) {
+            return NextResponse.json({ error: 'Forbidden — not the author' }, { status: 403 });
+        }
+
+        // Cascade: delete likes on posts → posts → topic likes → notifications → topic
+        const posts = await (prisma as any).forumPost.findMany({
+            where: { topicId },
+            select: { id: true },
+        });
+        const postIds = posts.map((p: any) => p.id);
+
+        await (prisma as any).forumLike.deleteMany({ where: { postId: { in: postIds } } });
+        await (prisma as any).forumPost.deleteMany({ where: { topicId } });
+        await (prisma as any).forumLike.deleteMany({ where: { topicId } });
+        try { await (prisma as any).forumNotification.deleteMany({ where: { topicId } }); } catch {}
+        await (prisma as any).forumTopic.delete({ where: { id: topicId } });
+
+        return NextResponse.json({ success: true });
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+    }
+}

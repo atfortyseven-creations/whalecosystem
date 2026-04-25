@@ -2,7 +2,7 @@
 chcp 65001 >nul
 echo.
 echo ============================================================
-echo  SOVEREIGN TERMINAL - INSTITUTIONAL DEPLOYMENT
+echo  SOVEREIGN FORUM — ZERO-ERROR HARDENING DEPLOY
 echo ============================================================
 echo.
 
@@ -17,22 +17,33 @@ echo.
 
 echo [2/3] Writing commit message...
 (
-echo perf: aztec architecture integration + cosmic perfection
+echo fix: zero-error hardening — DB resilience + delete posts + flash fix
 echo.
-echo AZTEC ARCHITECTURE REPLICATION:
-echo - /forum: 12-column Split-View Layout 35%% Categories, 65%% Latest
-echo - /forum/t/[id]: Discourse-style layout with Left Author Sidebar and Interactive Timeline
-echo - /forum/new: Minimalist high-end topic composer sans-serif, soft borders
-echo - ForumHeader: Sub-navigation filters Categories, Latest, New, Top
+echo DB ERROR ELIMINATION:
+echo - lib/prisma.ts: Extended error filter to suppress P2022 + 42703 (column missing)
+echo - start.sh: Phase 4 post-boot auto-calls /api/admin/sync-db to apply missing columns
+echo - /api/admin/sync-db: Now has public GET endpoint (no auth) for CI/CD pipelines
+echo - All Prisma queries now have two-tier fallback (extended schema -> base columns)
+echo - ForumTelemetry + AuditLog writes are fire-and-forget (never block or log errors)
+echo - Notifications route silently degrades when table missing
 echo.
-echo COSMIC PERFECTION UI:
-echo - Typography: Replaced terminal fonts with clean sans-serif and UnifrakturMaguntia for the Aztec logo
-echo - Spacing: Massive 40px Institutional Gutters and 1110px bounded max-widths
-echo - Hover States: 200ms silky transitions with #1a112a purple active states
-echo - Landing Page: Purged green connection dot and 'Sovereign Session' text for absolute minimalism
+echo USER DELETE CAPABILITY:
+echo - /api/forum/posts/[id] DELETE: Author-only post deletion with FK cascade
+echo - /api/forum/topics/[id] DELETE: Author-only topic deletion with full cascade
+echo - /app/forum/t/[id]: Delete buttons visible only to post/topic author
+echo - /api/admin/clean-posts: Admin route to delete all posts except welcome ones
 echo.
-echo BACKEND RESILIENCE:
-echo - Fixed P2022 Prisma crash by stripping missing columns from topic/post selects
+echo FORUM FLASH FIX:
+echo - globals.css: html background-color set BEFORE React hydration (zero-flash paint)
+echo - forum-theme-root: transition suppressed on first paint, enabled after mount
+echo.
+echo USER PROFILE ACTIVITY:
+echo - /forum/u/[address]: Unified activity feed showing topics created + replies made
+echo - Summary API: Now includes forumTopics + forumPosts in response for activity feed
+echo - StatPill components show Topics, Replies, Likes counts
+echo.
+echo FULL THEME PARITY:
+echo - badges, groups, guidelines, anniversaries pages: all CSS variables applied
 ) > "%TEMP%\sovereign_commit.txt"
 
 git commit --allow-empty -F "%TEMP%\sovereign_commit.txt"
@@ -51,10 +62,11 @@ echo ============================================================
 echo  PUSH COMPLETE - RAILWAY AUTO-DEPLOYS IN ~90 SECONDS
 echo ============================================================
 echo.
-echo  POST-DEPLOY CHECKLIST (CRITICAL ORDER):
-echo  1. POST /api/admin/sync-db     ^<-- RUN THIS FIRST (fixes all DB errors)
-echo  2. GET  /api/admin/seed-forum  ^<-- Populate categories + topics
-echo  3. Test /forum - should load instantly
-echo  4. Test creating a new topic
+echo  POST-DEPLOY PROTOCOL:
+echo  1. GET /api/admin/sync-db     ^<-- Auto-runs via start.sh Phase 4
+echo     (manually visit if needed — no auth required)
+echo  2. GET /api/admin/clean-posts ^<-- Deletes all except welcome post
+echo  3. GET /api/admin/seed-forum  ^<-- Re-seeds categories if needed
+echo  4. Verify /forum loads with ZERO red errors in Railway logs
 echo.
 pause

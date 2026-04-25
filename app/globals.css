@@ -696,6 +696,18 @@ body,
 /* ============================================================
    FORUM LIGHT/DARK MODE ARCHITECTURE (AZTEC PERFECTION)
    ============================================================ */
+
+/* ── CRITICAL: Zero-flash paint — set background BEFORE React hydrates ──
+   This ensures html/body never briefly shows white or a different color.
+   The :root vars below feed .forum-theme-root; the html direct rule
+   prevents any gap between server paint and client hydration. */
+html:not(.forum-light-mode) {
+  background-color: #9A7BB5 !important;
+}
+html.forum-light-mode {
+  background-color: #f4f4f5 !important;
+}
+
 :root {
   /* Default: Dark/Purple Mode */
   --forum-bg: #9A7BB5;
@@ -712,9 +724,9 @@ body,
 
 html.forum-light-mode {
   /* Light Mode Overrides */
-  --forum-bg: #f4f4f5; /* Zinc 100 */
-  --forum-text: #18181b; /* Zinc 900 */
-  --forum-text-muted: #71717a; /* Zinc 500 */
+  --forum-bg: #f4f4f5;
+  --forum-text: #18181b;
+  --forum-text-muted: #71717a;
   --forum-border: rgba(0, 0, 0, 0.1);
   --forum-surface: #ffffff;
   --forum-hover: #fcfcfc;
@@ -727,11 +739,16 @@ html.forum-light-mode {
 .forum-theme-root {
   background-color: var(--forum-bg);
   color: var(--forum-text);
+  /* Disable transition on initial load to prevent flash — JS adds class later */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Prevent the transition firing on first paint (added by JS after mount) */
+.forum-theme-root.theme-ready {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .forum-theme-root a:hover, .forum-theme-root button:hover {
-  /* Ensure hover transitions are smooth across themes */
   transition-duration: 0.2s;
 }
 

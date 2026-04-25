@@ -66,7 +66,7 @@ export default function NewTopicPage() {
 
       {/* ── Header ── */}
       <div className="mb-8">
-        <h1 className="text-[24px] font-sans font-bold text-white tracking-tight">Create a New Topic</h1>
+        <h1 className="text-[24px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>Create a New Topic</h1>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -78,7 +78,10 @@ export default function NewTopicPage() {
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Type title, or paste a link here"
-            className="w-full px-4 py-3 text-[18px] font-sans font-bold text-white placeholder-white/30 bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none transition-colors"
+            className="w-full px-4 py-3 text-[18px] font-sans font-bold rounded-sm outline-none transition-colors"
+            style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
           />
         </div>
 
@@ -88,11 +91,14 @@ export default function NewTopicPage() {
             <select
               value={categoryId}
               onChange={e => setCategoryId(e.target.value)}
-              className="w-full px-4 py-3 text-[14px] font-sans font-bold text-white bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none transition-colors cursor-pointer appearance-none"
+              className="w-full px-4 py-3 text-[14px] font-sans font-bold rounded-sm outline-none transition-colors cursor-pointer appearance-none"
+              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
             >
-              <option value="" disabled className="bg-[#111]">Select a category</option>
+              <option value="" disabled style={{ backgroundColor: 'var(--forum-bg)', color: 'var(--forum-text-muted)' }}>Select a category</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-[#111]">{cat.name}</option>
+                <option key={cat.id} value={cat.id} style={{ backgroundColor: 'var(--forum-bg)', color: 'var(--forum-text)' }}>{cat.name}</option>
               ))}
             </select>
           </div>
@@ -102,7 +108,10 @@ export default function NewTopicPage() {
               value={tags}
               onChange={e => setTags(e.target.value)}
               placeholder="optional tags (comma separated)"
-              className="w-full px-4 py-3 text-[14px] font-sans text-white placeholder-white/30 bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none transition-colors"
+              className="w-full px-4 py-3 text-[14px] font-sans rounded-sm outline-none transition-colors"
+              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
             />
           </div>
         </div>
@@ -113,7 +122,10 @@ export default function NewTopicPage() {
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="Type here. Use Markdown, BBCode, or HTML to format."
-            className="w-full px-5 py-4 text-[15px] font-sans text-white placeholder-white/30 bg-black/20 border border-white/10 rounded-sm focus:border-[#6366f1] focus:bg-[#1a112a] outline-none resize-none min-h-[320px] leading-relaxed transition-colors"
+            className="w-full px-5 py-4 text-[15px] font-sans rounded-sm outline-none resize-none min-h-[320px] leading-relaxed transition-colors"
+            style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
           />
         </div>
 
@@ -122,13 +134,15 @@ export default function NewTopicPage() {
           <button
             onClick={submit}
             disabled={submitting}
-            className="text-[14px] font-sans font-bold text-black bg-[#6366f1] px-6 py-2.5 rounded-sm hover:bg-[#4f46e5] transition-colors disabled:opacity-40"
+            className="text-[14px] font-sans font-bold px-6 py-2.5 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
+            style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
           >
             {submitting ? 'Creating Topic...' : '+ Create Topic'}
           </button>
           <Link
             href="/forum"
-            className="text-[14px] font-sans font-bold text-white/40 hover:text-white transition-colors"
+            className="text-[14px] font-sans font-bold transition-opacity hover:opacity-100"
+            style={{ color: 'var(--forum-text-muted)' }}
           >
             Cancel
           </Link>
