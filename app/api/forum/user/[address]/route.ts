@@ -15,6 +15,9 @@ export async function GET(req: Request, { params }: { params: { address: string 
             select: {
                 id: true,
                 walletAddress: true,
+                displayName: true,
+                avatarUrl: true,
+                bio: true,
                 tier: true,
                 isPro: true,
                 createdAt: true,

@@ -19,13 +19,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         const topic = await (prisma as any).forumTopic.findUnique({
             where: { id: topicId },
             include: {
-                author: { select: { walletAddress: true, tier: true, isPro: true } },
+                author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } },
                 category: { select: { name: true, color: true, slug: true } },
                 tags: true,
                 posts: {
                     orderBy: { createdAt: 'asc' },
                     include: {
-                        author: { select: { walletAddress: true, tier: true, isPro: true } },
+                        author: { select: { walletAddress: true, tier: true, isPro: true, displayName: true, avatarUrl: true } },
                         likes: { select: { userId: true } }
                     }
                 },

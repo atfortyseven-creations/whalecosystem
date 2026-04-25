@@ -102,12 +102,16 @@ export default function ForumHomePage() {
 
                   {/* Avatars (Discourse style shows recent participants, we show author for now) */}
                   <div className="w-20 hidden md:flex items-center justify-start gap-1">
-                     <div 
-                       className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold"
-                       style={{ backgroundColor: avatarColor }}
-                     >
-                       {topic.author.walletAddress.slice(2,3).toUpperCase()}
-                     </div>
+                     {topic.author.avatarUrl ? (
+                        <img src={topic.author.avatarUrl} alt="Avatar" className="w-6 h-6 rounded-full object-cover shadow-sm border border-gray-100" />
+                     ) : (
+                        <div 
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold"
+                          style={{ backgroundColor: avatarColor }}
+                        >
+                          {topic.author.walletAddress.slice(2,3).toUpperCase()}
+                        </div>
+                     )}
                   </div>
 
                   {/* Stats */}

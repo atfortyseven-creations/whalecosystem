@@ -94,6 +94,9 @@ model EcosystemWarRoomData {
 model User {
   id              String      @id @default(uuid())
   walletAddress   String      @unique
+  displayName     String?
+  avatarUrl       String?     @db.Text
+  bio             String?     @db.Text
   isPro           Boolean     @default(false)
   tier            String      @default("basic")
   lastActive      DateTime    @default(now())

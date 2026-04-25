@@ -37,17 +37,21 @@ export default function UserProfilePage() {
       {/* ── Profile Header ── */}
       <div className="flex flex-col gap-6 mb-8 pt-4">
         <div className="flex items-center gap-6">
-          <div 
-            className="w-[120px] h-[120px] rounded-full flex items-center justify-center text-[48px] text-white font-bold shadow-md"
-            style={{ backgroundColor: avatarColor }}
-          >
-            {addrStr.slice(2,3).toUpperCase()}
-          </div>
+          {profile.avatarUrl ? (
+             <img src={profile.avatarUrl} alt="Avatar" className="w-[120px] h-[120px] rounded-full object-cover shadow-md border border-gray-200 shrink-0" />
+          ) : (
+             <div 
+               className="w-[120px] h-[120px] shrink-0 rounded-full flex items-center justify-center text-[48px] text-white font-bold shadow-md"
+               style={{ backgroundColor: avatarColor }}
+             >
+               {addrStr.slice(2,3).toUpperCase()}
+             </div>
+          )}
           <div className="flex flex-col gap-1">
             <h1 className="text-[28px] font-bold text-[#222222]">
-              {addrStr.slice(0, 12)}…{addrStr.slice(-4)}
+              {profile.displayName || `${addrStr.slice(0, 12)}…${addrStr.slice(-4)}`}
             </h1>
-            <span className="text-[16px] text-gray-500">{addrStr.slice(0, 6)}</span>
+            <span className="text-[16px] text-gray-500">{profile.displayName ? addrStr.slice(0, 6) : ''}</span>
             
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[13px] text-gray-500">
@@ -59,6 +63,9 @@ export default function UserProfilePage() {
                 </span>
               )}
             </div>
+            {profile.bio && (
+               <p className="text-[14px] text-gray-700 mt-3 max-w-lg whitespace-pre-wrap">{profile.bio}</p>
+            )}
           </div>
           
           <div className="ml-auto self-start">
@@ -99,42 +106,128 @@ export default function UserProfilePage() {
 
       {/* ── Tab Content ── */}
       <div className="flex flex-col">
-        {combinedActivity.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 text-sm">No activity found for this user.</div>
+        {activeTab === 'Preferences' ? (
+          <div className="max-w-2xl py-4 flex flex-col gap-6">
+            <div>
+              <h2 className="text-[18px] font-bold text-[#222222] mb-1">Profile Picture</h2>
+              <p className="text-[13px] text-gray-500 mb-4">Upload a custom avatar (max 1MB). It will be resized automatically.</p>
+              <div className="flex items-center gap-4">
+                {profile.avatarUrl ? (
+                   <img src={profile.avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover shadow-sm border border-gray-200" />
+                ) : (
+                   <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center text-[32px] text-white font-bold shadow-sm" style={{ backgroundColor: avatarColor }}>
+                     {addrStr.slice(2,3).toUpperCase()}
+                   </div>
+                )}
+                <div>
+                  <input 
+                    type="file" 
+                    accept="image/png, image/jpeg, image/webp" 
+                    className="text-[13px]"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 1024 * 1024) return alert("File too large. Max 1MB.");
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setProfile({ ...profile, avatarUrl: reader.result });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-[18px] font-bold text-[#222222] mb-1">Display Name</h2>
+              <p className="text-[13px] text-gray-500 mb-2">Optional. Your public name on the forum.</p>
+              <input 
+                type="text" 
+                value={profile.displayName || ''} 
+                onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
+                className="w-full max-w-sm border border-gray-300 rounded px-3 py-2 text-[14px] focus:outline-none focus:border-blue-500" 
+                placeholder="e.g. Satoshi Nakamoto"
+              />
+            </div>
+
+            <div>
+              <h2 className="text-[18px] font-bold text-[#222222] mb-1">Bio</h2>
+              <p className="text-[13px] text-gray-500 mb-2">A short description about yourself.</p>
+              <textarea 
+                value={profile.bio || ''} 
+                onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                className="w-full max-w-lg border border-gray-300 rounded px-3 py-2 text-[14px] focus:outline-none focus:border-blue-500 resize-none h-[100px]" 
+                placeholder="Tell us about your interests..."
+              />
+            </div>
+
+            <div className="pt-4 border-t border-gray-100">
+              <button 
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`/api/forum/user/${address}/settings`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        displayName: profile.displayName,
+                        avatarUrl: profile.avatarUrl,
+                        bio: profile.bio
+                      })
+                    });
+                    if (res.ok) alert('Profile updated successfully!');
+                    else alert('Failed to update profile.');
+                  } catch(e) {
+                    alert('Error updating profile.');
+                  }
+                }}
+                className="bg-[#0088CC] hover:bg-[#006699] text-white px-5 py-2 rounded text-[14px] font-semibold transition-colors"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        ) : activeTab === 'Activity' ? (
+          combinedActivity.length === 0 ? (
+            <div className="py-12 text-center text-gray-500 text-sm">No activity found for this user.</div>
+          ) : (
+            combinedActivity.map((item: any) => {
+              const dateStr = formatDistanceToNowStrict(new Date(item.createdAt), { addSuffix: true });
+              if (item.type === 'topic') {
+                return (
+                  <div key={`t-${item.id}`} className="py-4 border-b border-gray-100 flex gap-4">
+                    <div className="w-10 h-10 shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </div>
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="text-[13px] text-gray-500">Created a topic · {dateStr}</div>
+                      <Link href={`/forum/t/${item.id}`} className="text-[15px] font-semibold text-[#0088CC] hover:underline">
+                        {item.title}
+                      </Link>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={`p-${item.id}`} className="py-4 border-b border-gray-100 flex gap-4">
+                    <div className="w-10 h-10 shrink-0 bg-green-100 rounded-full flex items-center justify-center text-green-500">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+                    </div>
+                    <div className="flex-1 flex flex-col gap-1">
+                      <div className="text-[13px] text-gray-500">Replied in topic · {dateStr}</div>
+                      <Link href={`/forum/t/${item.topic?.id}`} className="text-[15px] font-semibold text-[#0088CC] hover:underline">
+                        {item.topic?.title || 'Unknown Topic'}
+                      </Link>
+                      <p className="text-[14px] text-gray-700 mt-1 line-clamp-2">{item.content}</p>
+                    </div>
+                  </div>
+                );
+              }
+            })
+          )
         ) : (
-          combinedActivity.map((item: any) => {
-            const dateStr = formatDistanceToNowStrict(new Date(item.createdAt), { addSuffix: true });
-            if (item.type === 'topic') {
-              return (
-                <div key={`t-${item.id}`} className="py-4 border-b border-gray-100 flex gap-4">
-                  <div className="w-10 h-10 shrink-0 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  </div>
-                  <div className="flex-1 flex flex-col gap-1">
-                    <div className="text-[13px] text-gray-500">Created a topic · {dateStr}</div>
-                    <Link href={`/forum/t/${item.id}`} className="text-[15px] font-semibold text-[#0088CC] hover:underline">
-                      {item.title}
-                    </Link>
-                  </div>
-                </div>
-              );
-            } else {
-              return (
-                <div key={`p-${item.id}`} className="py-4 border-b border-gray-100 flex gap-4">
-                  <div className="w-10 h-10 shrink-0 bg-green-100 rounded-full flex items-center justify-center text-green-500">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
-                  </div>
-                  <div className="flex-1 flex flex-col gap-1">
-                    <div className="text-[13px] text-gray-500">Replied in topic · {dateStr}</div>
-                    <Link href={`/forum/t/${item.topic?.id}`} className="text-[15px] font-semibold text-[#0088CC] hover:underline">
-                      {item.topic?.title || 'Unknown Topic'}
-                    </Link>
-                    <p className="text-[14px] text-gray-700 mt-1 line-clamp-2">{item.content}</p>
-                  </div>
-                </div>
-              );
-            }
-          })
+           <div className="py-12 text-center text-gray-500 text-sm">Content for {activeTab} is empty.</div>
         )}
       </div>
     </div>
