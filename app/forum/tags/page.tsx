@@ -4,61 +4,65 @@ import React, { useEffect, useState } from 'react';
 
 export default function TagsPage() {
   const [tags, setTags] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/forum/tags')
       .then(r => r.json())
       .then(data => { if (!data.error) setTags(data); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch(console.error);
   }, []);
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-64 font-mono text-[10px] uppercase tracking-widest text-[#050505]/30">[ INDEXING_VECTORS ]</div>;
-  }
-
-  const maxTopics = tags.reduce((max, t) => Math.max(max, t._count?.topics || 0), 1);
+  const maxTopics = tags.reduce((m, t) => Math.max(m, t._count?.topics || 0), 1);
 
   return (
-    <div className="flex flex-col w-full max-w-5xl mx-auto gap-10">
+    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
-      {/* ── Table Header ── */}
-      <div className="flex items-center px-2 pb-4 border-b-[0.5px] border-black/10 select-none">
-        <div className="flex-1 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40">Vector_Tag</div>
-        <div className="w-32 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40 text-right">Frequency</div>
-        <div className="w-48 font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#050505]/40 text-right hidden sm:block">Signal_Mass</div>
+      <div className="mb-8 pb-6 border-b border-[#E0E0E0]">
+        <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#050505]/30 mb-2">FORUM / TAGS</div>
+        <h1 className="text-[13px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]">
+          VECTOR INDEX
+        </h1>
+      </div>
+
+      {/* Table header */}
+      <div className="flex items-center pb-3 border-b border-[#E0E0E0] text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/30">
+        <div className="flex-1">TAG</div>
+        <div className="w-48 hidden sm:block">SIGNAL MASS</div>
+        <div className="w-16 text-right">COUNT</div>
       </div>
 
       {tags.length === 0 ? (
-        <div className="py-12 text-center font-mono text-[9px] uppercase tracking-widest text-[#050505]/20">[ NULL_VECTORS ]</div>
-      ) : (
-        <div className="flex flex-col">
-          {tags.map(tag => {
-            const freq = tag._count?.topics || 0;
-            const signalPct = Math.round((freq / maxTopics) * 100);
-
-            return (
-              <div key={tag.id} className="flex items-center px-2 py-5 border-b-[0.5px] border-black/5 hover:bg-black/[0.02] transition-colors group">
-                <div className="flex-1 min-w-0">
-                  <span className="font-mono text-[13px] font-black uppercase tracking-widest text-[#050505] group-hover:underline">#{tag.name}</span>
-                </div>
-                <div className="w-32 text-right font-mono text-[10px] text-[#050505]/70">{freq}</div>
-                <div className="w-48 hidden sm:flex justify-end items-center gap-2 pl-4">
-                  <div className="flex-1 h-[2px] bg-black/5">
-                    <div className="h-full bg-black/30 group-hover:bg-black transition-all duration-500" style={{ width: `${signalPct}%` }} />
-                  </div>
-                  <span className="font-mono text-[7px] text-[#050505]/30 uppercase tracking-widest w-8 text-right">{signalPct}%</span>
-                </div>
-              </div>
-            );
-          })}
+        <div className="py-16 text-center text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/20">
+          [ NULL VECTORS ]
         </div>
-      )}
-
-      <div className="mt-4 text-center">
-        <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#050505]/20 select-none">END_OF_VECTOR_INDEX</span>
-      </div>
+      ) : tags.map(tag => {
+        const freq = tag._count?.topics || 0;
+        const pct  = Math.round((freq / maxTopics) * 100);
+        return (
+          <div
+            key={tag.id}
+            className="flex items-center py-4 border-b border-[#F0F0F0] hover:bg-[#FAF9F6] transition-colors group"
+          >
+            <div className="flex-1 min-w-0">
+              <span className="text-[12px] font-mono font-black uppercase tracking-widest text-[#050505] group-hover:underline underline-offset-2">
+                #{tag.name}
+              </span>
+            </div>
+            <div className="w-48 hidden sm:flex items-center gap-3 pr-4">
+              <div className="flex-1 h-px bg-[#E0E0E0]">
+                <div
+                  className="h-full bg-[#050505] transition-all duration-500"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              <span className="text-[9px] font-mono text-[#050505]/30 w-8 text-right">{pct}%</span>
+            </div>
+            <div className="w-16 text-right text-[11px] font-mono font-black text-[#050505]">
+              {freq}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

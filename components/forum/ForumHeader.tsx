@@ -2,133 +2,101 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Menu, User, X, AlignJustify, Users, Shield, Award, Cake, UsersRound, Tag, Hash, Settings } from 'lucide-react';
 import { UserProfileModal } from '@/components/ui/UserProfileModal';
 
 export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUrl?: string }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  const navLinks = [
+    { href: '/forum',               label: 'TOPICS'       },
+    { href: '/forum/users',         label: 'USERS'        },
+    { href: '/forum/badges',        label: 'BADGES'       },
+    { href: '/forum/groups',        label: 'GROUPS'       },
+    { href: '/forum/guidelines',    label: 'GUIDELINES'   },
+    { href: '/forum/anniversaries', label: 'ANNIVERSARIES'},
+  ];
 
   return (
     <>
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 sm:px-6 h-[60px] flex items-center justify-between">
-      <div className="flex items-center gap-4 h-full">
-        <Link href="/forum" className="flex items-center gap-2 text-black hover:opacity-80 transition-opacity">
-          <span 
-            className="text-[24px] sm:text-[28px] text-[#222222]" 
-            style={{ fontFamily: "'Old English Text MT', 'UnifrakturMaguntia', 'Cinzel', serif", fontWeight: 900, letterSpacing: '-0.02em' }}
-          >
-            Humanity Ledger
-          </span>
-        </Link>
-      </div>
+      <header className="sticky top-0 z-50 bg-white border-b border-[#E0E0E0] px-6 h-[52px] flex items-center justify-between">
 
-      <div className="flex items-center gap-2 sm:gap-5 text-[#919191] relative" ref={menuRef}>
-        <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label="Search">
-          <Search size={20} />
-        </button>
-        
-        <button 
-          className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" 
-          aria-label="Menu"
-          onClick={() => setMenuOpen(!menuOpen)}
+        {/* Wordmark */}
+        <Link
+          href="/forum"
+          className="text-[11px] font-mono font-black uppercase tracking-[0.3em] text-[#050505] hover:opacity-60 transition-opacity"
         >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+          FORUM
+        </Link>
 
-        {/* ── Aztec/Discourse Style Hamburger Popover ── */}
-        {menuOpen && (
-          <div className="absolute top-[50px] right-0 sm:right-0 w-[280px] sm:w-[320px] bg-white border border-gray-200 shadow-xl rounded-md z-50 flex flex-col overflow-hidden text-[#222222]">
-            <div className="grid grid-cols-2 p-3 pb-1 border-b border-gray-100 gap-y-2">
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                <AlignJustify size={16} className="text-gray-500" /> Topics
-              </Link>
-              <Link href="/forum/users" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                <User size={16} className="text-gray-500" /> Users
-              </Link>
-              <button onClick={() => { setProfileOpen(true); setMenuOpen(false); }} className="flex w-full items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] text-left">
-                <Settings size={16} className="text-gray-500" /> Profile
-              </button>
-              <Link href="/forum/guidelines" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                <Shield size={16} className="text-gray-500" /> Guidelines
-              </Link>
-              <Link href="/forum/badges" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                <Award size={16} className="text-gray-500" /> Badges
-              </Link>
-              <Link href="/forum/anniversaries" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                <Cake size={16} className="text-gray-500" /> Anniversaries
-              </Link>
-              <Link href="/forum/groups" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                <Users size={16} className="text-gray-500" /> Groups
-              </Link>
-            </div>
+        {/* Right controls */}
+        <div className="flex items-center gap-5" ref={menuRef}>
 
-            <div className="flex flex-col p-3 border-b border-gray-100">
-              <div className="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Categories</div>
-              <div className="grid grid-cols-2 gap-y-1">
-                 <Link href="/forum/c/aztec" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] truncate">
-                   <span className="w-2.5 h-2.5 bg-green-500 rounded-sm shrink-0"></span> Aztec
-                 </Link>
-                 <Link href="/forum/c/general" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] truncate">
-                   <span className="w-2.5 h-2.5 bg-blue-500 rounded-sm shrink-0"></span> General
-                 </Link>
-                 <Link href="/forum/c/noir" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] truncate">
-                   <span className="w-2.5 h-2.5 bg-black rounded-sm shrink-0"></span> Noir
-                 </Link>
-                 <Link href="/forum/c/site-feedback" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] truncate">
-                   <span className="w-2.5 h-2.5 bg-gray-500 rounded-sm shrink-0"></span> Site Feedback
-                 </Link>
-              </div>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] mt-1 text-gray-600">
-                <AlignJustify size={16} className="text-gray-400" /> All categories
-              </Link>
-            </div>
-
-            <div className="flex flex-col p-3 bg-gray-50/50">
-              <div className="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Tags</div>
-              <div className="grid grid-cols-2 gap-y-1">
-                 <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                   <Tag size={16} className="text-yellow-600" /> noir
-                 </Link>
-                 <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
-                   <Tag size={16} className="text-yellow-600" /> specs
-                 </Link>
-              </div>
-              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] mt-1 text-gray-600">
-                <AlignJustify size={16} className="text-gray-400" /> All tags
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {address ? (
-          <button onClick={() => setProfileOpen(true)} className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0">
-            {avatarUrl ? (
-               <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
-            ) : (
-               <User size={18} className="text-blue-500" />
-            )}
-          </button>
-        ) : (
-          <Link href="/connect" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 ml-1 transition-transform hover:scale-105 shrink-0" title="Log In">
-            <User size={18} className="text-gray-400" />
+          {/* New Topic */}
+          <Link
+            href="/forum/new"
+            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white bg-[#050505] px-4 py-2 hover:bg-[#333333] transition-colors"
+          >
+            + NEW
           </Link>
-        )}
-      </div>
-    </header>
-    
-    <UserProfileModal isOpen={profileOpen} onClose={() => { setProfileOpen(false); window.location.reload(); }} />
+
+          {/* Menu toggle */}
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/50 hover:text-[#050505] transition-colors"
+            aria-label="Navigation menu"
+          >
+            {menuOpen ? 'CLOSE' : 'MENU'}
+          </button>
+
+          {/* Popover */}
+          {menuOpen && (
+            <div className="absolute top-[52px] right-0 w-[220px] bg-white border border-[#E0E0E0] shadow-sm z-50 flex flex-col overflow-hidden">
+              {navLinks.map(l => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="px-5 py-3.5 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/50 hover:text-[#050505] hover:bg-[#FAF9F6] border-b border-[#F0F0F0] last:border-0 transition-colors"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Avatar / connect */}
+          {address ? (
+            <button
+              onClick={() => setProfileOpen(true)}
+              className="w-7 h-7 rounded-full overflow-hidden border border-[#E0E0E0] bg-[#F0F0F0] flex items-center justify-center text-[10px] font-mono font-black text-[#050505] hover:border-[#050505] transition-colors shrink-0"
+            >
+              {avatarUrl
+                ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                : address.slice(2, 4).toUpperCase()
+              }
+            </button>
+          ) : (
+            <Link
+              href="/connect"
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors"
+            >
+              CONNECT
+            </Link>
+          )}
+        </div>
+      </header>
+
+      <UserProfileModal isOpen={profileOpen} onClose={() => { setProfileOpen(false); window.location.reload(); }} />
     </>
   );
 }

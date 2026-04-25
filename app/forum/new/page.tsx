@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Bold, Italic, Link as LinkIcon, Quote, Code, List, Image as ImageIcon, Smile, Plus } from 'lucide-react';
 
 export default function NewTopicPage() {
   const router = useRouter();
@@ -11,23 +10,21 @@ export default function NewTopicPage() {
   const preselectedCategory = searchParams.get('category');
 
   const [categories, setCategories] = useState<any[]>([]);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle]       = useState('');
+  const [content, setContent]   = useState('');
   const [categoryId, setCategoryId] = useState(preselectedCategory || '');
-  const [tags, setTags] = useState('');
+  const [tags, setTags]         = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError]       = useState('');
 
   useEffect(() => {
     fetch('/api/forum/categories')
       .then(r => r.json())
-      .then(data => { 
+      .then(data => {
         if (!data.error) {
           setCategories(data);
-          if (!categoryId && data.length > 0) {
-            setCategoryId(data[0].id); // Auto-select first category
-          }
-        } 
+          if (!categoryId && data.length > 0) setCategoryId(data[0].id);
+        }
       })
       .catch(console.error);
   }, []);
@@ -35,7 +32,7 @@ export default function NewTopicPage() {
   const submit = async () => {
     setError('');
     if (!title.trim() || !content.trim() || !categoryId) {
-      setError('Title, category, and content are required.');
+      setError('TITLE, CATEGORY AND CONTENT ARE REQUIRED');
       return;
     }
     setSubmitting(true);
@@ -47,122 +44,105 @@ export default function NewTopicPage() {
           title,
           content,
           categoryId,
-          tags: tags.split(',').map(t => t.trim()).filter(Boolean)
-        })
+          tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+        }),
       });
       if (res.ok) {
         const topic = await res.json();
         router.push(`/forum/t/${topic.id}`);
       } else {
         const err = await res.json();
-        setError(`Error: ${err.error}`);
+        setError(err.error?.toUpperCase() || 'SUBMISSION FAILED');
       }
-    } catch (e) {
-      setError('Network error. Please try again.');
+    } catch {
+      setError('NETWORK ERROR — RETRY');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const selectedCategory = categories.find(c => c.id === categoryId);
-
   return (
-    <div className="flex flex-col w-full max-w-[1110px] mx-auto pb-20">
-      
-      <div className="mb-4">
-        <h1 className="text-[18px] font-semibold text-[#222222]">Create a new topic</h1>
+    <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
+
+      {/* ── Breadcrumb ── */}
+      <div className="flex items-center gap-2 mb-8 text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/30">
+        <Link href="/forum" className="hover:text-[#050505] transition-colors">FORUM</Link>
+        <span>/</span>
+        <span className="text-[#050505]">NEW TRANSMISSION</span>
       </div>
 
-      <div className="bg-white border border-gray-300 rounded shadow-sm overflow-hidden flex flex-col">
-        
-        {/* ── Title Input ── */}
-        <div className="p-3 border-b border-gray-200">
+      <div className="flex flex-col gap-0 border border-[#E0E0E0] bg-white">
+
+        {/* ── Title ── */}
+        <div className="border-b border-[#E0E0E0]">
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="What is this discussion about in one brief sentence?"
-            className="w-full text-[15px] text-[#222222] font-semibold placeholder-gray-400 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            placeholder="SUBJECT LINE"
+            className="w-full px-6 py-5 text-[15px] font-mono font-black uppercase tracking-widest text-[#050505] placeholder-[#CCCCCC] bg-white focus:outline-none"
           />
         </div>
 
-        {/* ── Category & Tags Row ── */}
-        <div className="flex flex-col sm:flex-row gap-3 p-3 border-b border-gray-200 bg-gray-50/50">
-          <div className="relative flex-1 sm:max-w-xs">
+        {/* ── Category + Tags ── */}
+        <div className="flex flex-col sm:flex-row border-b border-[#E0E0E0]">
+          <div className="flex-1 border-b sm:border-b-0 sm:border-r border-[#E0E0E0]">
             <select
               value={categoryId}
               onChange={e => setCategoryId(e.target.value)}
-              className="w-full appearance-none bg-white border border-gray-300 rounded px-3 py-2 text-[14px] text-[#222222] focus:outline-none focus:border-blue-500"
+              className="w-full px-6 py-4 text-[10px] font-mono font-black uppercase tracking-[0.2em] text-[#050505] bg-white focus:outline-none cursor-pointer"
             >
-              <option value="" disabled>Select a category...</option>
+              <option value="" disabled>SELECT CATEGORY</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                <option key={cat.id} value={cat.id}>{cat.name.toUpperCase()}</option>
               ))}
             </select>
-            {selectedCategory && (
-              <div 
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-sm pointer-events-none" 
-                style={{ backgroundColor: selectedCategory.color }} 
-              />
-            )}
-            {/* Indent text to make room for the color dot if selected */}
-            <style jsx>{`
-              select { padding-left: ${selectedCategory ? '1.5rem' : '0.75rem'}; }
-            `}</style>
           </div>
-          <div className="flex-1 sm:max-w-xs">
+          <div className="flex-1">
             <input
               type="text"
               value={tags}
               onChange={e => setTags(e.target.value)}
-              placeholder="optional tags"
-              className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-[14px] text-[#222222] placeholder-gray-400 focus:outline-none focus:border-blue-500"
+              placeholder="TAGS (COMMA SEPARATED)"
+              className="w-full px-6 py-4 text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505] placeholder-[#CCCCCC] bg-white focus:outline-none"
             />
           </div>
         </div>
 
-        {/* ── Formatting Toolbar ── */}
-        <div className="flex items-center gap-1 p-2 border-b border-gray-200 bg-gray-50/30 overflow-x-auto text-gray-500">
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Bold"><Bold size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Italic"><Italic size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Link"><LinkIcon size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Blockquote"><Quote size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Preformatted text"><Code size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Bulleted List"><List size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Upload Image"><ImageIcon size={16} /></button>
-          <button className="p-1.5 hover:bg-gray-200 hover:text-black rounded" title="Emoji"><Smile size={16} /></button>
-        </div>
-
-        {/* ── Editor Area ── */}
-        <div className="flex-1 flex flex-col">
+        {/* ── Body ── */}
+        <div className="border-b border-[#E0E0E0]">
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            placeholder="Type here. Use the toolbar or Markdown for formatting."
-            className="w-full flex-1 p-4 text-[15px] text-[#222222] bg-white placeholder-gray-400 resize-none focus:outline-none min-h-[250px]"
+            placeholder="TRANSMISSION BODY"
+            className="w-full px-6 py-5 text-[14px] font-mono text-[#050505] placeholder-[#CCCCCC] bg-white focus:outline-none resize-none min-h-[320px] leading-relaxed"
           />
         </div>
 
-        {/* ── Footer Actions ── */}
-        <div className="p-3 border-t border-gray-200 bg-gray-50/50 flex items-center gap-4">
-          <button
-            onClick={submit}
-            disabled={submitting}
-            className="flex items-center gap-1.5 bg-[#0088CC] hover:bg-[#0077B3] text-white px-5 py-2 rounded shadow-sm text-[14px] font-medium transition-colors disabled:opacity-50"
-          >
-            <Plus size={16} />
-            {submitting ? 'Creating...' : 'Create Topic'}
-          </button>
-          <Link href="/forum" className="text-[14px] text-[#0088CC] hover:underline">
-            Discard
-          </Link>
+        {/* ── Footer ── */}
+        <div className="flex items-center justify-between px-6 py-4 bg-[#FAF9F6]">
+          <div className="flex items-center gap-6">
+            <button
+              onClick={submit}
+              disabled={submitting}
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] text-white bg-[#050505] px-6 py-3 hover:bg-[#333333] transition-colors disabled:opacity-40"
+            >
+              {submitting ? 'TRANSMITTING…' : 'TRANSMIT'}
+            </button>
+            <Link
+              href="/forum"
+              className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors"
+            >
+              DISCARD
+            </Link>
+          </div>
           {error && (
-            <span className="text-[13px] text-red-500 ml-auto">{error}</span>
+            <span className="text-[10px] font-mono font-black uppercase tracking-widest text-red-500">
+              {error}
+            </span>
           )}
         </div>
-
       </div>
     </div>
   );
 }
-

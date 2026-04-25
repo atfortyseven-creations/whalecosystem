@@ -9,18 +9,17 @@ import { ChevronRight, Plus } from 'lucide-react';
 export default function CategoryPage() {
   const { slug } = useParams();
   const [category, setCategory] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     fetch(`/api/forum/categories/${slug}`)
       .then(r => r.json())
       .then(data => setCategory(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch(console.error);
   }, [slug]);
 
-  if (loading) return <div className="p-12 text-center text-gray-500 text-sm">Loading category...</div>;
-  if (!category || category.error) return <div className="p-12 text-center text-red-500 text-sm">Category not found.</div>;
+  if (!category) return null;
+  if (category.error) return <div className="p-12 text-center text-red-500 text-sm">Category not found.</div>;
 
   return (
     <div className="flex flex-col gap-0 w-full">

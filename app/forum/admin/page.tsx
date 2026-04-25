@@ -6,7 +6,7 @@ import { ShieldCheck, ShieldAlert, Check, X } from 'lucide-react';
 
 export default function SovereignAdminPanel() {
   const [queue, setQueue] = useState<{ topics: any[], posts: any[] }>({ topics: [], posts: [] });
-  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
 
   const fetchQueue = () => {
@@ -16,8 +16,7 @@ export default function SovereignAdminPanel() {
         return r.json();
       })
       .then(data => setQueue(data))
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch(e => setError(e.message));
   };
 
   useEffect(() => {
@@ -41,7 +40,7 @@ export default function SovereignAdminPanel() {
     }
   };
 
-  if (loading) return <div className="p-12 text-center text-gray-500">Decrypting Gatekeeper feeds...</div>;
+
   
   if (error) return (
     <div className="flex flex-col items-center justify-center h-[60vh]">

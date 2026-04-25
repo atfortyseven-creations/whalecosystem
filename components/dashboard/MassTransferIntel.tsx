@@ -1,35 +1,36 @@
 "use client";
 
-/**
- * Global Capital Ledger — Institutional Flow Topography
- *
- * This module surfaces all data from the Sovereign Data Lake and correlates 
- * multi-chain, multi-address capital movements.
- *
- * TITANIUM PROTOCOL: Zero-Mock Mandate. Monochromatic Institutional UI.
- */
-
-import React, { useState, useMemo, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import {
-  Activity, Zap, AlertTriangle, ArrowRight, Copy, ExternalLink, Bell, BellOff, Loader2,
+  Activity, AlertTriangle, Copy, Bell, BellOff, Loader2,
   Clock, CheckCircle, File, Building, Flame, RefreshCw
 } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSovereignIntel } from "@/lib/api-client";
 
-// ─── Institutional Config ───────────────────────────────────────────────────
+// ─── Config ──────────────────────────────────────────────────────────────────
 
-const TIER_CONFIG: Record<string, { bg: string; text: string; border: string; label: string; minUsd: number }> = {
-  ULTRA_CAPITAL_FLOW:  { bg: "#D4AF37", text: "#FFFFFF", border: "#D4AF37", label: "ULTRA FLOW (UHC-X)", minUsd: 100_000_000 },
-  PRINCIPAL_BLOCK:     { bg: "#050505", text: "#FFFFFF", border: "#050505", label: "PRINCIPAL (PB-1)",   minUsd: 50_000_000 },
-  ENTERPRISE_TRANSFER: { bg: "#333333", text: "#FFFFFF", border: "#333333", label: "ENTERPRISE (ENT)",   minUsd: 10_000_000 },
-  LIQUIDITY_NODE:      { bg: "#F0F0F0", text: "#050505", border: "#CCCCCC", label: "LIQUIDITY (LN-5)",   minUsd: 5_000_000 },
-  STANDARD_FLOW:       { bg: "#FAFAFA", text: "#444444", border: "#EAEAEA", label: "STANDARD (SF-1)",    minUsd: 1_000_000 },
-  RETAIL_PRO:          { bg: "#FFFFFF", text: "#888888", border: "#F5F5F5", label: "RETAIL (R-0)",       minUsd: 500_000 },
-  MICRO_TRANSFER:      { bg: "#FFFFFF", text: "#AAAAAA", border: "#F9F9F9", label: "MICRO",              minUsd: 0 },
+const TIER_CONFIG: Record<string, { bg: string; text: string; border: string; label: string }> = {
+  ULTRA_CAPITAL_FLOW:  { bg: "#D4AF37", text: "#FFFFFF", border: "#D4AF37", label: "ULTRA FLOW"    },
+  PRINCIPAL_BLOCK:     { bg: "#050505", text: "#FFFFFF", border: "#050505", label: "PRINCIPAL"     },
+  ENTERPRISE_TRANSFER: { bg: "#333333", text: "#FFFFFF", border: "#333333", label: "ENTERPRISE"    },
+  LIQUIDITY_NODE:      { bg: "#F0F0F0", text: "#050505", border: "#CCCCCC", label: "LIQUIDITY"     },
+  STANDARD_FLOW:       { bg: "#FAFAFA", text: "#444444", border: "#EAEAEA", label: "STANDARD FLOW" },
+  RETAIL_PRO:          { bg: "#FFFFFF", text: "#888888", border: "#E5E5E5", label: "RETAIL"        },
+  MICRO_TRANSFER:      { bg: "#FFFFFF", text: "#AAAAAA", border: "#F5F5F5", label: "MICRO"         },
 };
+
+const FLOOR_PRESETS = [
+  { label: "ALL",   value: 0 },
+  { label: "$100K", value: 100_000 },
+  { label: "$500K", value: 500_000 },
+  { label: "$1M",   value: 1_000_000 },
+  { label: "$5M",   value: 5_000_000 },
+  { label: "$10M",  value: 10_000_000 },
+  { label: "$50M",  value: 50_000_000 },
+];
 
 function formatUsd(v: number): string {
   if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
@@ -40,151 +41,153 @@ function formatUsd(v: number): string {
 
 function shortAddr(addr: string): string {
   if (!addr || addr.length < 10) return addr;
-  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
-// ─── Highly Dense Row ────────────────────────────────────────────────────────
+function getExplorer(chain: string, type: "tx" | "address", val: string): string {
+  const map: Record<string, string> = {
+    ETH: "etherscan.io", BSC: "bscscan.com", BASE: "basescan.org",
+    POL: "polygonscan.com", SOL: "solscan.io",
+  };
+  return `https://${map[chain] || "etherscan.io"}/${type}/${val}`;
+}
 
-function EventRow({ event, index }: { event: any; index: number }) {
+// ─── EventRow (no animation — pure render) ────────────────────────────────────
+
+function EventRow({ event }: { event: any }) {
   const tCfg = TIER_CONFIG[event.tier] || TIER_CONFIG.MICRO_TRANSFER;
   const [copied, setCopied] = useState(false);
 
-  const copyData = (text: string) => {
+  const copy = (text: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const getExplorer = (chain: string, type: 'tx'|'address', val: string) => {
-    const map: Record<string, string> = {
-        'ETH': 'etherscan.io', 'BSC': 'bscscan.com', 'POL': 'polygonscan.com', 'SOL': 'solscan.io'
-    };
-    const domain = map[chain] || 'etherscan.io';
-    return `https://${domain}/${type}/${val}`;
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
-      className="flex flex-col border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-colors bg-white group p-4"
-    >
-        {/* Superior Top Bar: Meta & Identifiers */}
-        <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#F0F0F0] border-dashed">
-            <div className="flex items-center gap-3">
-                <span 
-                    className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm"
-                    style={{ background: tCfg.bg, color: tCfg.text, border: `1px solid ${tCfg.border}` }}
-                >
-                    {tCfg.label}
-                </span>
-                <span className="text-[10px] font-mono font-black tracking-widest text-[#050505]">
-                    {event.action}
-                </span>
-                <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1">
-                    <Clock size={10} /> {new Date(event.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </span>
-            </div>
-            <div className="flex items-center gap-3 text-[9px] font-mono text-[#888888]">
-                <span className="uppercase flex items-center gap-1">
-                    <CheckCircle size={10} className="text-[#050505]" /> {event.confirmations} Confs
-                </span>
-                <span className="uppercase flex items-center gap-1">
-                    <Flame size={10} className="text-[#050505]" /> {event.gasPriceGwei} Gwei
-                </span>
-                <span className="uppercase text-[#050505] font-black border border-[#E5E5E5] px-1.5 py-0.5 rounded-sm">
-                    {event.chain}
-                </span>
-            </div>
+    <div className="flex flex-col border-b border-[#E5E5E5] hover:bg-[#FAF9F6] transition-colors bg-white group p-4">
+      {/* Top bar */}
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-dashed border-[#F0F0F0]">
+        <div className="flex items-center gap-3">
+          <span
+            className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm"
+            style={{ background: tCfg.bg, color: tCfg.text, border: `1px solid ${tCfg.border}` }}
+          >
+            {tCfg.label}
+          </span>
+          <span className="text-[10px] font-mono font-black tracking-widest text-[#050505]">
+            {event.action}
+          </span>
+          <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1">
+            <Clock size={10} />
+            {new Date(event.timestamp).toLocaleTimeString("en-US", { hour12: false })}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 text-[9px] font-mono text-[#888888]">
+          <span className="uppercase flex items-center gap-1">
+            <CheckCircle size={10} className="text-[#050505]" /> {event.confirmations} Confs
+          </span>
+          <span className="uppercase flex items-center gap-1">
+            <Flame size={10} className="text-[#050505]" /> {event.gasPriceGwei} Gwei
+          </span>
+          <span className="uppercase text-[#050505] font-black border border-[#E5E5E5] px-1.5 py-0.5 rounded-sm">
+            {event.chain}
+          </span>
+        </div>
+      </div>
+
+      {/* Core data */}
+      <div className="flex items-start justify-between">
+        {/* Routing */}
+        <div className="flex flex-col gap-2 w-1/3">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-[#888888] uppercase w-8">From</span>
+            <a href={getExplorer(event.chain, "address", event.from)} target="_blank" rel="noreferrer"
+              className="text-[11px] font-mono text-[#050505] hover:underline">
+              {shortAddr(event.from)}
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-[#888888] uppercase w-8">To</span>
+            <a href={getExplorer(event.chain, "address", event.to)} target="_blank" rel="noreferrer"
+              className="text-[11px] font-mono text-[#050505] hover:underline">
+              {shortAddr(event.to)}
+            </a>
+          </div>
         </div>
 
-        {/* Core Value & Routing */}
-        <div className="flex items-start justify-between">
-            {/* Routing: From -> To */}
-            <div className="flex flex-col gap-2 w-1/3">
-                <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-[#888888] uppercase w-8">From</span>
-                    <a href={getExplorer(event.chain, 'address', event.from)} target="_blank" rel="noreferrer" className="text-[11px] font-mono text-[#050505] hover:underline">
-                        {shortAddr(event.from)}
-                    </a>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-[#888888] uppercase w-8">To</span>
-                    <a href={getExplorer(event.chain, 'address', event.to)} target="_blank" rel="noreferrer" className="text-[11px] font-mono text-[#050505] hover:underline flex items-center gap-1.5">
-                        {shortAddr(event.to)}
-                        {/* Exchange Detection Heuristic */}
-                        {(event.to.toLowerCase().includes('0x28c') || event.to.toLowerCase().includes('0x742')) && (
-                            <span className="text-[7.5px] px-1 py-0.5 rounded bg-[#050505] text-[#D4AF37] border border-[#D4AF37] uppercase tracking-widest"><Building size={8} className="inline mr-0.5"/> CEX NODE</span>
-                        )}
-                    </a>
-                </div>
-            </div>
-
-            {/* Financial Value Center */}
-            <div className="flex flex-col items-center justify-center w-1/3">
-                <div className="text-xl font-black font-mono tracking-tighter text-[#050505]">
-                    {formatUsd(Number(event?.usdValue) || 0)}
-                </div>
-                <div className="text-[11px] font-black text-[#555555] mt-1 flex items-center gap-1.5">
-                    <span>{parseFloat(event?.amount || "0").toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-                    <span className="uppercase tracking-widest">{event?.token || '-'}</span>
-                </div>
-            </div>
-
-            {/* Metadata & Actions */}
-            <div className="flex flex-col items-end gap-2 w-1/3 text-[10px] font-mono">
-                <div className="flex items-center gap-2 text-[#888888]">
-                    <span className="uppercase text-[#888888]">Hash</span>
-                    <a href={getExplorer(event.chain, 'tx', event.hash)} target="_blank" rel="noreferrer" className="text-[#050505] hover:underline">
-                        {shortAddr(event.hash)}
-                    </a>
-                    <button onClick={() => copyData(event.hash)} className="hover:text-[#050505] transition-colors"><Copy size={11} /></button>
-                </div>
-                {event.method && event.method !== 'Native Transfer' && (
-                    <div className="flex items-center gap-1 uppercase bg-[#F5F5F5] px-2 py-0.5 rounded text-[#050505] border border-[#E5E5E5]">
-                        <File size={10} /> {event.method}
-                    </div>
-                )}
-            </div>
+        {/* Value */}
+        <div className="flex flex-col items-center justify-center w-1/3">
+          <div className="text-xl font-black font-mono tracking-tighter text-[#050505]">
+            {formatUsd(Number(event.usdValue) || 0)}
+          </div>
+          <div className="text-[11px] font-black text-[#555555] mt-1 flex items-center gap-1.5">
+            <span>{parseFloat(event.amount || "0").toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+            <span className="uppercase tracking-widest">{event.token || "—"}</span>
+          </div>
         </div>
 
-        {/* High-Fidelity Signature Tracking Panel */}
-        <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] flex items-center justify-between text-[9px] font-mono bg-[#FAF9F6] px-3 py-2 rounded-sm border border-[#E5E5E5]">
-            <div className="flex items-center gap-3">
-                <span className="uppercase text-[#888888] font-black tracking-widest flex items-center gap-1.5">
-                    <CheckCircle size={10} className="text-[#050505]"/> Signature
-                </span>
-                <span className="text-[#050505] max-w-[200px] truncate" title={event.signature || '0x' + (event.hash ? event.hash.slice(2) : '').padStart(130, '0')}>
-                    {event.signature || '0x' + (event.hash ? event.hash.slice(2) : '...').padStart(130, '0')}
-                </span>
-                <button onClick={() => copyData(event.signature || event.hash)} className="hover:text-[#050505] text-[#888888] transition-colors"><Copy size={10} /></button>
+        {/* Hash + Method */}
+        <div className="flex flex-col items-end gap-2 w-1/3 text-[10px] font-mono">
+          <div className="flex items-center gap-2 text-[#888888]">
+            <span className="uppercase">Hash</span>
+            <a href={getExplorer(event.chain, "tx", event.hash)} target="_blank" rel="noreferrer"
+              className="text-[#050505] hover:underline">
+              {shortAddr(event.hash)}
+            </a>
+            <button onClick={() => copy(event.hash)} className="hover:text-[#050505] transition-colors" title="Copy hash">
+              <Copy size={11} />
+            </button>
+          </div>
+          {event.method && event.method !== "Native Transfer" && (
+            <div className="flex items-center gap-1 uppercase bg-[#F5F5F5] px-2 py-0.5 rounded text-[#050505] border border-[#E5E5E5]">
+              <File size={10} /> {event.method}
             </div>
-            <div className="flex items-center gap-3">
-                <span className="text-[#888888] uppercase tracking-widest">Type: <span className="text-[#050505] font-black">ECDSA secp256k1</span></span>
-                <span className="flex items-center gap-1.5 uppercase font-black tracking-widest text-[#00C076]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse"/>
-                    Verified
-                </span>
-            </div>
+          )}
         </div>
-    </motion.div>
+      </div>
+
+      {/* TX Hash strip */}
+      <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] flex items-center justify-between text-[9px] font-mono bg-[#FAF9F6] px-3 py-2 rounded-sm border border-[#E5E5E5]">
+        <div className="flex items-center gap-3">
+          <span className="uppercase text-[#888888] font-black tracking-widest flex items-center gap-1.5">
+            <CheckCircle size={10} className="text-[#050505]" /> TX Hash
+          </span>
+          <span className="text-[#050505] max-w-[240px] truncate" title={event.hash}>
+            {event.hash}
+          </span>
+          <button onClick={() => copy(event.hash)} className="hover:text-[#050505] text-[#888888] transition-colors">
+            <Copy size={10} />
+          </button>
+          {copied && <span className="text-[#00C076] font-black">COPIED</span>}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-[#888888] uppercase tracking-widest">
+            Type: <span className="text-[#050505] font-black">ECDSA secp256k1</span>
+          </span>
+          <span className="flex items-center gap-1.5 uppercase font-black tracking-widest text-[#00C076]">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+            Verified
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }
 
-// ─── Summary Section ─────────────────────────────────────────────────────────
+// ─── Summary Cards ─────────────────────────────────────────────────────────────
 
 function SummaryCards({ events }: { events: any[] }) {
-  const totalUsd   = (events || []).reduce((s, e) => s + (Number(e?.usdValue) || 0), 0);
-  const avgUsd     = events?.length ? totalUsd / events.length : 0;
-  const maxEvent   = (events || []).reduce((a, b) => (Number(b?.usdValue) || 0) > (Number(a?.usdValue) || 0) ? b : a, (events && events[0]) ? events[0] : { usdValue: 0, token: "-" });
-  const uniqueSenders = new Set((events || []).map(e => e?.from).filter(Boolean)).size;
+  const totalUsd       = events.reduce((s, e) => s + (Number(e.usdValue) || 0), 0);
+  const avgUsd         = events.length ? totalUsd / events.length : 0;
+  const maxEvent       = events.reduce((a, b) => (Number(b.usdValue) || 0) > (Number(a.usdValue) || 0) ? b : a, events[0] || { usdValue: 0, token: "—" });
+  const uniqueSenders  = new Set(events.map(e => e.from).filter(Boolean)).size;
 
   const cards = [
-    { label: "Aggregate Volume Index",  value: totalUsd,   sub: `${events.length} verified operations` },
-    { label: "Apex Principal Transfer", value: maxEvent?.usdValue || 0, sub: `${maxEvent?.token || "-"} Equivalent` },
-    { label: "Mean Transmission Size",  value: avgUsd,     sub: "per standard block" },
-    { label: "Unique Actuating Nodes",  value: uniqueSenders, sub: "distinct sender addresses", isNum: true },
+    { label: "Aggregate Volume",    value: totalUsd,              sub: `${events.length} verified operations` },
+    { label: "Apex Transfer",       value: maxEvent?.usdValue||0, sub: `${maxEvent?.token || "—"} Equivalent` },
+    { label: "Mean Transmission",   value: avgUsd,                sub: "per standard block" },
+    { label: "Unique Nodes",        value: uniqueSenders,         sub: "distinct sender addresses", isNum: true },
   ];
 
   return (
@@ -192,7 +195,7 @@ function SummaryCards({ events }: { events: any[] }) {
       {cards.map(({ label, value, sub, isNum }) => (
         <div key={label} className="p-6 border border-[#E0E0E0] bg-[#FFFFFF] rounded-sm">
           <div className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">{label}</div>
-          <AnimatedCounter 
+          <AnimatedCounter
             value={value}
             format={isNum ? (v) => Math.floor(v).toString() : formatUsd}
             className="text-2xl font-bold font-mono tracking-tighter text-[#050505] mb-1 block"
@@ -204,153 +207,235 @@ function SummaryCards({ events }: { events: any[] }) {
   );
 }
 
-// ─── Main Ledger ───────────────────────────────────────────────────────────
+// ─── Main Ledger ───────────────────────────────────────────────────────────────
 
 export function MassTransferIntel() {
+  const queryClient    = useQueryClient();
   const [chainFilter,  setChainFilter]  = useState<string | null>(null);
-  const [minUsdFilter, setMinUsdFilter] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<'time_desc' | 'usd_desc'>('time_desc');
+  const [floorPreset,  setFloorPreset]  = useState<number>(0);
+  const [sortBy,       setSortBy]       = useState<"time_desc" | "usd_desc">("time_desc");
   const [isSonarActive, setIsSonarActive] = useState(false);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const prevEventsRef = useRef<number>(0);
+  const [syncing,      setSyncing]      = useState(false);
+  const audioCtxRef    = useRef<AudioContext | null>(null);
+  const prevCountRef   = useRef<number>(0);
 
-  // =========================================================================
-  // ZERO-MOCK MANDATE HOOK
-  // =========================================================================
-  const { data: rawData, isLoading, error, refetch } = useSovereignIntel('massTransfers');
+  const { data: rawData, isLoading, error, refetch } = useSovereignIntel("massTransfers");
   const events: any[] = rawData?.events || [];
 
-  const playPing = () => {
-    if (!audioCtxRef.current) {
+  // ── Sonar ping ─────────────────────────────────────────────────────────────
+  const playPing = useCallback(() => {
+    try {
+      if (!audioCtxRef.current)
         audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    const ctx = audioCtxRef.current;
-    if (ctx.state === 'suspended') ctx.resume();
-    
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.5);
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.05);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    
-    osc.start();
-    osc.stop(ctx.currentTime + 0.5);
-  };
+      const ctx  = audioCtxRef.current;
+      if (ctx.state === "suspended") ctx.resume();
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } catch {}
+  }, []);
 
   useEffect(() => {
-    if (events.length && isSonarActive) {
-        if (prevEventsRef.current > 0 && events.length > prevEventsRef.current) {
-            playPing();
-        }
-        prevEventsRef.current = events.length;
+    if (isSonarActive && prevCountRef.current > 0 && events.length > prevCountRef.current) {
+      playPing();
     }
-  }, [events, isSonarActive]);
+    prevCountRef.current = events.length;
+  }, [events.length, isSonarActive, playPing]);
+
+  // ── Sync handler — bypasses server cache with ?bust=1 ──────────────────────
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      // Force-fetch bypassing the 30s server cache
+      await fetch("/api/intelligence/mass-transfers?bust=1");
+      // Then invalidate React Query cache so the hook re-fetches fresh
+      await queryClient.invalidateQueries({ queryKey: ["intel", "massTransfers"] });
+      await refetch();
+      toast.success("Ledger synchronized");
+    } catch {
+      toast.error("Sync failed — RPC unreachable");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // ── Filter + sort ──────────────────────────────────────────────────────────
+  const availableChains = useMemo(
+    () => Array.from(new Set(events.map(e => e.chain).filter(Boolean))),
+    [events]
+  );
 
   const filtered = useMemo(() => {
     return events
       .filter(e => {
-        if (chainFilter  && e.chain  !== chainFilter)  return false;
-        if (e.usdValue   <  minUsdFilter)              return false;
+        if (chainFilter && e.chain !== chainFilter) return false;
+        if ((Number(e.usdValue) || 0) < floorPreset)  return false;
         return true;
       })
-      .sort((a, b) => {
-        if (sortBy === 'time_desc') return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-        return b.usdValue - a.usdValue; // 'usd_desc'
-      });
-  }, [events, chainFilter, minUsdFilter, sortBy]);
+      .sort((a, b) =>
+        sortBy === "time_desc"
+          ? new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          : (Number(b.usdValue) || 0) - (Number(a.usdValue) || 0)
+      );
+  }, [events, chainFilter, floorPreset, sortBy]);
 
   return (
     <div className="h-full min-h-0 flex flex-col bg-[#FAF9F6] text-[#050505] font-sans">
-      
-      {/* ── Formal Academic Header ── */}
-      <div className="flex items-end justify-between px-8 py-8 border-b border-[#E5E5E5] bg-white shrink-0">
+
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5] bg-white gap-4 shrink-0">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Building size={24} className="text-[#050505]" />
-            <h1 className="text-3xl font-bold uppercase tracking-tighter text-[#050505]">
+          <div className="flex items-center gap-3 mb-1">
+            <Building size={22} className="text-[#050505]" />
+            <h1 className="text-2xl font-bold uppercase tracking-tighter text-[#050505]">
               CAPITAL LEDGER
             </h1>
+            {/* Live indicator */}
+            <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-[#00C076]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+              LIVE
+            </span>
           </div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[#A0A0A0] ml-9">
-            FLOW TOPOGRAPHY · {'<10ms'}
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#A0A0A0] ml-9">
+            FLOW TOPOGRAPHY · {'<10ms'} · {events.length} EVENTS
           </p>
         </div>
 
-        {/* Formal Controls */}
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col items-end mr-2">
-            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-1.5">
-              Capital Floor: {formatUsd(minUsdFilter)}
-            </span>
-            <input 
-              type="range" min="0" max="100000000" step="1000000"
-              value={minUsdFilter} onChange={(e) => setMinUsdFilter(Number(e.target.value))}
-              className="w-40 appearance-none h-1 bg-[#E5E5E5] rounded-none outline-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-[#050505]"
-            />
+        {/* Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+
+          {/* Capital Floor preset pills */}
+          <div className="flex items-center gap-1">
+            {FLOOR_PRESETS.map(p => (
+              <button
+                key={p.value}
+                onClick={() => setFloorPreset(p.value)}
+                className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-widest border transition-colors rounded-sm ${
+                  floorPreset === p.value
+                    ? "bg-[#050505] text-white border-[#050505]"
+                    : "bg-white text-[#888888] border-[#E5E5E5] hover:border-[#050505] hover:text-[#050505]"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
 
-          <button onClick={() => { refetch(); toast.success("Ledger Synchronized"); }} className="px-4 py-2 border border-[#E5E5E5] bg-[#FFFFFF] hover:bg-[#F0F0F0] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors">
-            <RefreshCw size={12} /> Sync
+          {/* Sync */}
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="px-4 py-2 border border-[#E5E5E5] bg-white hover:bg-[#F0F0F0] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
+            {syncing ? "Syncing…" : "Sync"}
           </button>
-          
-          <button onClick={() => setIsSonarActive(!isSonarActive)} className={`px-4 py-2 border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${isSonarActive ? 'border-[#050505] bg-[#050505] text-[#FFFFFF]' : 'border-[#E5E5E5] bg-[#FFFFFF] hover:bg-[#F0F0F0]'}`}>
+
+          {/* Sonar */}
+          <button
+            onClick={() => setIsSonarActive(p => !p)}
+            className={`px-4 py-2 border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${
+              isSonarActive
+                ? "border-[#050505] bg-[#050505] text-white"
+                : "border-[#E5E5E5] bg-white hover:bg-[#F0F0F0] text-[#050505]"
+            }`}
+          >
             {isSonarActive ? <Bell size={12} /> : <BellOff size={12} />} Sonar
           </button>
 
-          <select value={chainFilter || ""} onChange={e => setChainFilter(e.target.value === "" ? null : e.target.value)} className="px-4 py-2 border border-[#E5E5E5] bg-[#FFFFFF] text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
+          {/* Chain filter */}
+          <select
+            value={chainFilter || ""}
+            onChange={e => setChainFilter(e.target.value === "" ? null : e.target.value)}
+            className="px-4 py-2 border border-[#E5E5E5] bg-white text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
+          >
             <option value="">OMNICHAIN (ALL)</option>
-            {Array.from(new Set(events.map(e => e.chain).filter(Boolean) as string[])).map(chain => (
+            {availableChains.map(chain => (
               <option key={chain} value={chain}>{chain} NETWORK</option>
             ))}
           </select>
 
-          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="px-4 py-2 border border-[#E5E5E5] bg-[#FFFFFF] text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer">
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as any)}
+            className="px-4 py-2 border border-[#E5E5E5] bg-white text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
+          >
             <option value="time_desc">CHRONOLOGICAL</option>
             <option value="usd_desc">MAGNITUDE</option>
           </select>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto msv-hide-scrollbar px-8 py-8">
+      {/* ── Body ─────────────────────────────────────────────────────────────── */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-8 py-8">
         {isLoading ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-[#888888] h-full">
-              <Loader2 className="animate-spin mb-4" size={32} />
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">INITIALIZING LEDGER</p>
-              <p className="text-[9px] mt-2 font-mono uppercase tracking-[0.1em]">ESTABLISHING RPC LINK</p>
+          <div className="flex flex-col items-center justify-center h-full text-[#888888] gap-4">
+            <Loader2 className="animate-spin" size={32} />
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505]">INITIALIZING LEDGER</p>
+            <p className="text-[9px] font-mono uppercase tracking-[0.1em]">ESTABLISHING RPC LINK</p>
           </div>
         ) : error ? (
-          <div className="h-48 flex flex-col items-center justify-center">
-            <AlertTriangle size={24} className="text-[#050505] mb-3" />
+          <div className="h-48 flex flex-col items-center justify-center gap-3">
+            <AlertTriangle size={24} className="text-[#050505]" />
             <p className="text-[11px] font-black text-[#050505] uppercase tracking-[0.3em]">Telemetry Failure</p>
+            <button onClick={handleSync} className="text-[10px] font-black uppercase tracking-widest underline text-[#050505]">
+              Retry
+            </button>
           </div>
         ) : (
           <div className="max-w-7xl mx-auto">
             <SummaryCards events={events} />
-            
+
             <div className="bg-white border border-[#E0E0E0] rounded flex flex-col shadow-sm">
-                <div className="px-5 py-3 bg-[#FAF9F6] border-b border-[#E0E0E0] flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
-                    <span>TRANSMISSIONS ({filtered.length})</span>
-                    <span className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#050505] rounded-full" /> LIVE
+              {/* Table header */}
+              <div className="px-5 py-3 bg-[#FAF9F6] border-b border-[#E0E0E0] flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
+                <span>TRANSMISSIONS ({filtered.length})</span>
+                <div className="flex items-center gap-3">
+                  {floorPreset > 0 && (
+                    <span className="text-[#050505] font-black">
+                      FLOOR: {formatUsd(floorPreset)}
                     </span>
+                  )}
+                  {chainFilter && (
+                    <span className="text-[#050505] font-black">{chainFilter}</span>
+                  )}
+                  <span className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-[#00C076] rounded-full animate-pulse" />
+                    LIVE
+                  </span>
                 </div>
-                {filtered.length === 0 ? (
-                    <div className="py-20 text-center flex flex-col items-center">
-                        <Activity size={32} className="text-[#E5E5E5] mb-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#888888]">NO QUALIFYING CAPITAL EVENTS</span>
-                    </div>
-                ) : (
-                    filtered.map((event, i) => (
-                        <EventRow key={`${event.hash}-${i}`} event={event} index={i} />
-                    ))
-                )}
+              </div>
+
+              {filtered.length === 0 ? (
+                <div className="py-20 text-center flex flex-col items-center gap-4">
+                  <Activity size={32} className="text-[#E5E5E5]" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#888888]">
+                    NO QUALIFYING CAPITAL EVENTS
+                  </span>
+                  {floorPreset > 0 && (
+                    <button
+                      onClick={() => setFloorPreset(0)}
+                      className="text-[9px] font-black uppercase tracking-widest text-[#050505] underline"
+                    >
+                      Clear floor filter
+                    </button>
+                  )}
+                </div>
+              ) : (
+                filtered.map((event, i) => (
+                  <EventRow key={`${event.hash}-${i}`} event={event} />
+                ))
+              )}
             </div>
           </div>
         )}
