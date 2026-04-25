@@ -8,7 +8,10 @@ export async function GET(req: Request) {
         const address = cookieStore.get('sovereign_handshake')?.value;
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const user = await prisma.user.findUnique({ where: { walletAddress: address } });
+        const user = await prisma.user.findUnique({ 
+            where: { walletAddress: address },
+            select: { id: true }
+        });
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
         const notifications = await (prisma as any).forumNotification.findMany({

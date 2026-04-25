@@ -51,19 +51,19 @@ export function ForumHeader({ address }: { address: string }) {
               <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <AlignJustify size={16} className="text-gray-500" /> Topics
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <User size={16} className="text-gray-500" /> Users
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Shield size={16} className="text-gray-500" /> Guidelines
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Award size={16} className="text-gray-500" /> Badges
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Cake size={16} className="text-gray-500" /> Anniversaries
               </Link>
-              <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                 <Users size={16} className="text-gray-500" /> Groups
               </Link>
             </div>
@@ -92,14 +92,14 @@ export function ForumHeader({ address }: { address: string }) {
             <div className="flex flex-col p-3 bg-gray-50/50">
               <div className="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wide">Tags</div>
               <div className="grid grid-cols-2 gap-y-1">
-                 <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+                 <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                    <Tag size={16} className="text-yellow-600" /> noir
                  </Link>
-                 <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
+                 <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px]">
                    <Tag size={16} className="text-yellow-600" /> specs
                  </Link>
               </div>
-              <Link href="#" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] mt-1 text-gray-600">
+              <Link href="/forum" className="flex items-center gap-2.5 hover:bg-gray-100 p-2 rounded text-[14px] mt-1 text-gray-600">
                 <AlignJustify size={16} className="text-gray-400" /> All tags
               </Link>
             </div>

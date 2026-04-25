@@ -23,21 +23,21 @@ export default function ForumHomePage() {
       {/* ── Discourse Sub-Navigation ── */}
       <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-4 sm:gap-6 text-[14px] overflow-x-auto pb-1 sm:pb-0">
-          <div className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200">
+          <Link href="/forum" className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200">
             <span>Categories</span>
             <ChevronDown size={14} />
-          </div>
-          <div className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200">
+          </Link>
+          <Link href="/forum" className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer bg-gray-100/50 px-3 py-1.5 rounded-md border border-gray-200">
             <span>Tags</span>
             <ChevronDown size={14} />
-          </div>
+          </Link>
           
-          <div className="flex items-center gap-4 sm:gap-5 ml-2 font-semibold">
-            <span className="text-gray-500 hover:text-black cursor-pointer">Categories</span>
-            <span className="text-blue-500 border-b-2 border-blue-500 pb-1 cursor-pointer">Latest</span>
-            <span className="text-gray-500 hover:text-black cursor-pointer">New</span>
-            <span className="text-gray-500 hover:text-black cursor-pointer">Unread</span>
-            <span className="text-gray-500 hover:text-black cursor-pointer">Top</span>
+          <div className="flex items-center gap-4 sm:gap-5 ml-2 font-semibold whitespace-nowrap">
+            <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">Categories</Link>
+            <Link href="/forum" className="text-blue-500 border-b-2 border-blue-500 pb-1">Latest</Link>
+            <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">New</Link>
+            <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">Unread</Link>
+            <Link href="/forum" className="text-gray-500 hover:text-black transition-colors">Top</Link>
           </div>
         </div>
 

@@ -139,7 +139,7 @@ export default function NewTopicPage() {
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="Type here. Use the toolbar or Markdown for formatting."
-            className="w-full flex-1 p-4 text-[15px] text-[#222222] placeholder-gray-400 resize-none focus:outline-none min-h-[250px]"
+            className="w-full flex-1 p-4 text-[15px] text-[#222222] bg-white placeholder-gray-400 resize-none focus:outline-none min-h-[250px]"
           />
         </div>
 

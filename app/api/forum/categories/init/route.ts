@@ -9,7 +9,10 @@ export async function POST(req: Request) {
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         // Ensure user is Pro or special admin (using isPro as basic check here)
-        const user = await prisma.user.findUnique({ where: { walletAddress: address } });
+        const user = await prisma.user.findUnique({ 
+            where: { walletAddress: address },
+            select: { id: true, isPro: true }
+        });
         if (!user?.isPro) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
         const currentCount = await (prisma as any).forumCategory.count();
