@@ -66,20 +66,20 @@ export function SovereignFooter() {
       style={{ marginTop: "0", paddingTop: 0 }}
     >
       {/* ═══ 4K Wave Banner (Interactive Protruding Button) ═══ */}
-      <div className="w-full px-4 md:px-12 lg:px-16 mt-32 mb-12 relative z-10 font-sans">
+      <div className="w-full px-4 md:px-12 lg:px-16 mt-6 md:mt-16 mb-0 relative z-10 font-sans">
         <motion.div
            ref={containerRef as React.Ref<HTMLDivElement>}
            onMouseMove={handleMouseMove}
            onMouseEnter={() => setIsHovered(true)}
            onMouseLeave={() => setIsHovered(false)}
-           className="relative w-full h-[350px] md:h-[450px] lg:h-[550px] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#E5E5E5] flex flex-col items-center justify-end group transition-shadow duration-700 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]"
+           className="relative w-full h-[420px] sm:h-[450px] md:h-[500px] lg:h-[560px] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#E5E5E5] flex flex-col items-center justify-end group transition-shadow duration-700 hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]"
         >
           {/* Wave Wallpaper 4K */}
           <Image
             src="/olas-hokusai-4k.png"
             alt="Hokusai Waves 4K"
             fill
-            className="object-cover object-bottom opacity-100 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
+            className="object-cover object-center sm:object-bottom opacity-100 pointer-events-none transition-transform duration-1000 group-hover:scale-[1.02]"
             sizes="100vw"
             quality={100}
             unoptimized
@@ -120,7 +120,7 @@ export function SovereignFooter() {
           )}
 
           {/* Fog gradient to ensure readability of text over waves at the bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-[60%] sm:h-[75%] bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/70 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-[45%] sm:h-[55%] bg-gradient-to-t from-[#FDFCF8]/90 via-[#FDFCF8]/40 to-transparent pointer-events-none z-10" />
 
           {/* ═══ Footer Inner Body ═════════════════════════════════════════════ */}
           <div className="relative z-40 w-full max-w-[850px] mx-auto px-6 pb-12 flex flex-col items-center gap-8">
@@ -158,7 +158,7 @@ export function SovereignFooter() {
             {/* ─── Navigation Links (Glassmorphism Pill) ─────────────────────────────────── */}
             <div className="relative z-50 w-full max-w-lg mx-auto">
               <nav
-                className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-12 gap-y-3 px-4 sm:px-8 py-4 sm:py-4 rounded-3xl sm:rounded-full bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-1 sm:gap-y-3 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl sm:rounded-full bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
                 aria-label="Footer navigation"
               >
                 <FooterLink href="/terms">Terms</FooterLink>

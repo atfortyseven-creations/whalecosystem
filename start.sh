@@ -13,8 +13,7 @@ npx prisma generate || echo "[Sovereign] WARNING: prisma generate failed — con
 echo "[Sovereign] ═══════════════════════════════════════════════"
 echo "[Sovereign] Phase 2: Database migration..."
 echo "[Sovereign] ═══════════════════════════════════════════════"
-npx prisma migrate deploy || echo "[Sovereign] WARNING: migrate deploy failed — continuing to db push"
-npx prisma db push --accept-data-loss || echo "[Sovereign] WARNING: db push failed — DB may already be at latest schema"
+npx prisma migrate deploy || echo "[Sovereign] WARNING: migrate deploy failed — DB may be at latest schema"
 
 
 echo "[Sovereign] ═══════════════════════════════════════════════"
