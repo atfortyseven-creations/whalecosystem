@@ -140,6 +140,7 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/privacy',
             '/terms',
             '/legal',
+            '/forum',
         ];
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
         if (isDirectAccessRoute) {
