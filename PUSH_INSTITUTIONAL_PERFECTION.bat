@@ -17,36 +17,25 @@ echo.
 
 echo [2/3] Writing commit message...
 (
-echo perf: schema hardening + forum fixes + aztec academic section
+echo perf: aztec architecture integration + cosmic perfection
 echo.
-echo CRITICAL SCHEMA FIXES:
-echo - /api/admin/sync-db: idempotent SQL endpoint creates all missing
-echo   tables and columns like avatarUrl, displayName, bio, tier, isPro,
-echo   ForumTelemetry, AuditLog, ForumNotification with IF NOT EXISTS
-echo - forum/layout.tsx: raw SQL query for avatarUrl to avoid P2022
-echo - posts and topics routes: removed lastActive upsert
+echo AZTEC ARCHITECTURE REPLICATION:
+echo - /forum: 12-column Split-View Layout 35%% Categories, 65%% Latest
+echo - /forum/t/[id]: Discourse-style layout with Left Author Sidebar and Interactive Timeline
+echo - /forum/new: Minimalist high-end topic composer sans-serif, soft borders
+echo - ForumHeader: Sub-navigation filters Categories, Latest, New, Top
 echo.
-echo FORUM ZERO-MOCK FIXES:
-echo - TitaniumGate: /forum added to public whitelist
-echo - /api/forum/categories: removed auth wall
-echo - /api/forum/topics GET: removed auth wall
-echo - /api/forum/topics/[id] GET: removed auth wall
-echo - posts and topics POST: resilient upsert instead of findUnique
-echo - forum/new/page.tsx: complete rewrite with purple styles
-echo - forum/t/[id]/page.tsx: rewrite with error messages
-echo - ForumRadar: deleted from forum home
+echo COSMIC PERFECTION UI:
+echo - Typography: Replaced terminal fonts with clean sans-serif and UnifrakturMaguntia for the Aztec logo
+echo - Spacing: Massive 40px Institutional Gutters and 1110px bounded max-widths
+echo - Hover States: 200ms silky transitions with #1a112a purple active states
+echo - Landing Page: Purged green connection dot and 'Sovereign Session' text for absolute minimalism
 echo.
-echo LANDING PAGE:
-echo - ClientRootRouter: DownheadSection replaced with AztecArchitectureSection
-echo - AztecArchitectureSection: 6 academic pillars + parameter reference
-echo - Session bar: redesigned 44px minimal strip
-echo - page.tsx: removed forced redirect
-echo.
-echo FORUM HEADER:
-echo - powered by Aztec Network now uses font-aztec-mono and font-aztec-h2
+echo BACKEND RESILIENCE:
+echo - Fixed P2022 Prisma crash by stripping missing columns from topic/post selects
 ) > "%TEMP%\sovereign_commit.txt"
 
-git commit -F "%TEMP%\sovereign_commit.txt"
+git commit --allow-empty -F "%TEMP%\sovereign_commit.txt"
 del "%TEMP%\sovereign_commit.txt" 2>nul
 
 echo.

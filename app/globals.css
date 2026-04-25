@@ -2,6 +2,14 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+
+@layer utilities {
+  .font-aztec-logo {
+    font-family: 'UnifrakturMaguntia', 'Old English Text MT', serif;
+  }
+}
+
 /* ──────────────────────────────────────────────────────────────────────────
    A11Y GLOBAL REDUCED MOTION SUPPORT (Audit A11y & Motion Compliance)
    ────────────────────────────────────────────────────────────────────────── */

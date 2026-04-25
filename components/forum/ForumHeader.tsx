@@ -53,13 +53,14 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           <span className="text-[15px] font-aztec-h2 font-black uppercase tracking-tight text-white">
             Whale Alert Network
           </span>
-          <div className="flex flex-col ml-3 justify-center">
-            <span className="text-[8px] font-aztec-mono uppercase tracking-widest text-[#00f2ea] leading-tight">
+          <div className="flex flex-col ml-4 justify-center items-start opacity-90 hover:opacity-100 transition-opacity">
+            <span className="text-[6.5px] font-mono font-bold uppercase tracking-[0.3em] text-black leading-none mb-[2px]">
               powered by
             </span>
-            <span className="text-[9px] font-aztec-h2 uppercase tracking-widest text-[#00f2ea] leading-tight">
-              Aztec Network
-            </span>
+            <div className="flex items-baseline text-black">
+              <span className="text-[18px] font-aztec-logo leading-none">A</span>
+              <span className="text-[10px] font-serif font-black uppercase tracking-[0.15em] leading-none ml-[1px]">ztec</span>
+            </div>
           </div>
         </div>
 
@@ -130,6 +131,27 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           )}
         </div>
       </header>
+
+      {/* Secondary Discourse Sub-Nav */}
+      <div className="w-full bg-[#110b1a] border-b border-white/5 shadow-sm">
+        <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[48px] gap-6">
+          <Link href="/forum" className="text-[13px] font-sans font-bold text-white tracking-wide border-b-2 border-white/20 hover:border-white/60 h-full flex items-center transition-colors">
+            Categories
+          </Link>
+          <Link href="/forum?filter=latest" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+            Latest
+          </Link>
+          <Link href="/forum?filter=new" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+            New
+          </Link>
+          <Link href="/forum?filter=unread" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+            Unread
+          </Link>
+          <Link href="/forum?filter=top" className="text-[13px] font-sans font-bold text-white/50 hover:text-white transition-colors h-full flex items-center">
+            Top
+          </Link>
+        </div>
+      </div>
 
       <UserProfileModal isOpen={profileOpen} onClose={() => { setProfileOpen(false); window.location.reload(); }} />
     </>
