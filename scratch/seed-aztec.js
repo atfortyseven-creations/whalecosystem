@@ -6,12 +6,23 @@ async function main() {
     await prisma.forumPost.deleteMany({});
     await prisma.forumTopic.deleteMany({});
     
-    // Find a general or announcements category
+    // Find or create a category
     let category = await prisma.forumCategory.findFirst({
         where: { slug: 'announcements' }
     });
     if (!category) {
         category = await prisma.forumCategory.findFirst();
+    }
+    if (!category) {
+        console.log("No categories found, creating default 'Announcements' category...");
+        category = await prisma.forumCategory.create({
+            data: {
+                name: 'Announcements',
+                slug: 'announcements',
+                description: 'Official system transmissions and updates.',
+                color: '#6366f1'
+            }
+        });
     }
     
     // Create an official admin user representing the system
