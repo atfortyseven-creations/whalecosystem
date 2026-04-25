@@ -16,13 +16,13 @@ export default async function ForumLayout({
   let avatarUrl = undefined;
   if (address) {
     try {
-      const user = await (prisma as any).user.findUnique({
-        where: { walletAddress: address },
-        select: { avatarUrl: true }
-      });
-      if (user && user.avatarUrl) avatarUrl = user.avatarUrl;
-    } catch (e) {
-      console.error("[Layout] Failed to fetch user avatar:", e);
+      // Use raw SQL to avoid Prisma schema mismatch on columns not yet in remote DB
+      const rows = await prisma.$queryRaw<{ avatarUrl: string | null }[]>`
+        SELECT "avatarUrl" FROM "User" WHERE "walletAddress" = ${address} LIMIT 1
+      `;
+      if (rows.length > 0 && rows[0].avatarUrl) avatarUrl = rows[0].avatarUrl;
+    } catch {
+      // Column not yet in remote DB — silently ignore, avatar will be initials
     }
   }
 

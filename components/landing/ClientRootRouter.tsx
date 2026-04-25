@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
-import { DownheadSection } from "./DownheadSection";
+import { AztecArchitectureSection } from "./AztecArchitectureSection";
 import { SovereignFooter } from "./SovereignFooter";
 import { useSovereignAccount } from "@/hooks/useSovereignAccount";
 import Link from "next/link";
@@ -12,7 +12,6 @@ export function ClientRootRouter() {
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    // Check for sovereign session cookie synchronously
     const check = () => {
       if (
         typeof document !== "undefined" &&
@@ -24,35 +23,76 @@ export function ClientRootRouter() {
     };
     check();
     if (isConnected) {
-      const interval = setInterval(() => { check(); }, 500);
+      const interval = setInterval(check, 500);
       return () => clearInterval(interval);
     }
   }, [isConnected]);
 
   return (
     <div className="flex flex-col w-full">
-      {/* ── Authenticated Session Banner ── */}
+
+      {/* ── Session Navigation Bar ── */}
       {hasSession && (
-        <div className="w-full bg-[#050505] border-b border-white/5 px-8 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00f2ea] animate-pulse" />
-            <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/40">
-              SOVEREIGN SESSION ACTIVE
-            </span>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/manifesto"
-              className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/30 hover:text-white transition-colors"
-            >
-              DASHBOARD
-            </Link>
-            <Link
-              href="/forum"
-              className="text-[9px] font-mono uppercase tracking-[0.25em] text-[#00f2ea] hover:text-white transition-colors"
-            >
-              FORUM →
-            </Link>
+        <div
+          className="w-full border-b border-black/8"
+          style={{ backgroundColor: "#FDFCF8" }}
+        >
+          <div className="max-w-[1750px] mx-auto px-6 sm:px-10 h-[44px] flex items-center justify-between">
+            {/* Left — identity signal */}
+            <div className="flex items-center gap-3">
+              <div
+                className="w-[5px] h-[5px] rounded-full"
+                style={{ backgroundColor: "#00C076" }}
+              />
+              <span
+                className="font-mono text-[8px] uppercase tracking-[0.4em]"
+                style={{ color: "rgba(10,10,10,0.35)" }}
+              >
+                Sovereign Session
+              </span>
+              <span
+                className="font-mono text-[8px] uppercase tracking-[0.4em]"
+                style={{ color: "rgba(10,10,10,0.15)" }}
+              >
+                ·
+              </span>
+              <span
+                className="font-mono text-[8px] uppercase tracking-[0.35em]"
+                style={{ color: "rgba(10,10,10,0.25)" }}
+              >
+                Authenticated
+              </span>
+            </div>
+
+            {/* Right — navigation */}
+            <nav className="flex items-center gap-8">
+              <Link
+                href="/manifesto"
+                className="group relative font-mono text-[8px] uppercase tracking-[0.35em] transition-colors duration-300"
+                style={{ color: "rgba(10,10,10,0.35)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "rgba(10,10,10,0.9)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(10,10,10,0.35)")}
+              >
+                Dashboard
+              </Link>
+              <div
+                className="w-px h-3"
+                style={{ backgroundColor: "rgba(10,10,10,0.1)" }}
+              />
+              <Link
+                href="/forum"
+                className="font-mono text-[8px] uppercase tracking-[0.35em] transition-colors duration-300 flex items-center gap-2"
+                style={{ color: "rgba(10,10,10,0.85)" }}
+              >
+                <span>Forum</span>
+                <span
+                  className="font-mono text-[8px]"
+                  style={{ color: "rgba(10,10,10,0.3)" }}
+                >
+                  →
+                </span>
+              </Link>
+            </nav>
           </div>
         </div>
       )}
@@ -60,8 +100,8 @@ export function ClientRootRouter() {
       {/* ── Main Manifesto Landing ── */}
       <ImmersiveManifestoLanding />
 
-      {/* ── Downhead Architecture Section ── */}
-      <DownheadSection />
+      {/* ── Aztec Architecture Academic Section ── */}
+      <AztecArchitectureSection />
 
       {/* ── Footer ── */}
       <SovereignFooter />

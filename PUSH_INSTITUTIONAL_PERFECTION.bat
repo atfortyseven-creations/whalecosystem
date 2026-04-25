@@ -17,41 +17,33 @@ echo.
 
 echo [2/3] Writing commit message...
 (
-echo perf: forum web3 redesign + capital ledger hardening + DPI wave fix
+echo perf: schema hardening + forum fixes + aztec academic section
 echo.
-echo FORUM - ZERO-LOAD ARCHITECTURE:
-echo - Removed framer-motion from template.tsx (instant tab navigation)
-echo - Removed all blocking loading guards from all forum pages
+echo CRITICAL SCHEMA FIXES:
+echo - /api/admin/sync-db: idempotent SQL endpoint creates all missing
+echo   tables and columns like avatarUrl, displayName, bio, tier, isPro,
+echo   ForumTelemetry, AuditLog, ForumNotification with IF NOT EXISTS
+echo - forum/layout.tsx: raw SQL query for avatarUrl to avoid P2022
+echo - posts and topics routes: removed lastActive upsert
 echo.
-echo FORUM - WEB3 MINIMALIST REDESIGN:
-echo - ForumHeader: removed Old English logotype + lucide icons, mono text nav
-echo - forum/page.tsx: clean tab bar + topic list, client-side fetch
-echo - forum/new/page.tsx: fixed style-jsx App Router bug, mono composer
-echo - t/[id]/page.tsx: removed sidebar, blue colors, icons; PostRow mono
-echo - u/[address]/page.tsx: tabs ACTIVITY/TOPICS/REPLIES, mono feed
-echo - tags/page.tsx: monochrome bar chart, no Tag icons
-echo - notifications/page.tsx: signal log table, no colored icons
-echo - badges/page.tsx: plain text table, no Award/Star/Zap icons
-echo - groups/page.tsx: cohort table with live Prisma counts
-echo - guidelines/page.tsx: numbered rules mono, no Shield icons
-echo - anniversaries/page.tsx: epoch table, no Cake icon
-echo - forum/layout.tsx: bg #FAF9F6, text #050505, max-w 920px
+echo FORUM ZERO-MOCK FIXES:
+echo - TitaniumGate: /forum added to public whitelist
+echo - /api/forum/categories: removed auth wall
+echo - /api/forum/topics GET: removed auth wall
+echo - /api/forum/topics/[id] GET: removed auth wall
+echo - posts and topics POST: resilient upsert instead of findUnique
+echo - forum/new/page.tsx: complete rewrite with purple styles
+echo - forum/t/[id]/page.tsx: rewrite with error messages
+echo - ForumRadar: deleted from forum home
 echo.
-echo CAPITAL LEDGER - HARDENING:
-echo - New route /api/intelligence/mass-transfers (ETH+BSC+BASE)
-echo - api-client.ts: direct fetch, 30s refetch / 25s stale
-echo - MassTransferIntel.tsx: floor pills ALL/$100K to $50M
-echo - Real Sync button with bust cache + queryClient invalidate
-echo - Removed ArrowUpDown unused import and framer-motion
+echo LANDING PAGE:
+echo - ClientRootRouter: DownheadSection replaced with AztecArchitectureSection
+echo - AztecArchitectureSection: 6 academic pillars + parameter reference
+echo - Session bar: redesigned 44px minimal strip
+echo - page.tsx: removed forced redirect
 echo.
-echo WAVE PATTERN - MAX DPI FIX:
-echo - WavePatternOverlay reads devicePixelRatio on mount
-echo - Patron Cosmico: 280px/DPR CSS = same physical px on all screens
-echo - Hokusai wave: 100%% auto replaced with cover (no mobile zoom)
-echo.
-echo FORUM SEED - 50 INSTITUTIONAL NODES:
-echo - /api/admin/seed-forum: 50 users, 10 topics, 48 replies
-echo - Topics: ZK-SNARKs, MEV, Noir, DeFi yields, RWA, whale clustering
+echo FORUM HEADER:
+echo - powered by Aztec Network now uses font-aztec-mono and font-aztec-h2
 ) > "%TEMP%\sovereign_commit.txt"
 
 git commit -F "%TEMP%\sovereign_commit.txt"
@@ -70,9 +62,10 @@ echo ============================================================
 echo  PUSH COMPLETE - RAILWAY AUTO-DEPLOYS IN ~90 SECONDS
 echo ============================================================
 echo.
-echo  POST-DEPLOY CHECKLIST:
-echo  1. GET /api/admin/seed-forum  (populate 50 users + topics)
-echo  2. Check Capital Ledger tab   (floor pills + LIVE indicator)
-echo  3. Open on iPhone/Android     (wave should be crisp at any DPI)
+echo  POST-DEPLOY CHECKLIST (CRITICAL ORDER):
+echo  1. POST /api/admin/sync-db     ^<-- RUN THIS FIRST (fixes all DB errors)
+echo  2. GET  /api/admin/seed-forum  ^<-- Populate categories + topics
+echo  3. Test /forum - should load instantly
+echo  4. Test creating a new topic
 echo.
 pause
