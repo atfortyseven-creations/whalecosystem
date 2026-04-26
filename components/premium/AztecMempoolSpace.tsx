@@ -112,7 +112,7 @@ export default function AztecMempoolSpace() {
                         return {
                             id: t.hash,
                             pxeHash: t.hash,
-                            feeJuice: Number(formatEther(t.gasPrice || t.maxFeePerGas || 0n)) * 1000000,
+                            feeJuice: Number((t.gasPrice || t.maxFeePerGas || 0n)) / 1e9, // Gas price in Gwei = Fee Juice proxy
                             stage: deterministicStage,
                             timestamp: Date.now(),
                             sizeKb: deterministicSize,
@@ -140,7 +140,7 @@ export default function AztecMempoolSpace() {
                 // Update Stats
                 setGlobalStats(prev => ({
                     tps: rawTxs.length / 12, // approx block time
-                    avgFeeJuice: totalFeeEther / (rawTxs.length || 1),
+                    avgFeeJuice: Number(block.baseFeePerGas || 0n) / 1e9, // Base fee in Gwei
                     anonymitySetSize: prev.anonymitySetSize + valTxs.length,
                     totalShieldedVol: prev.totalShieldedVol + valTxs.reduce((acc, t) => acc + Number(formatEther(t.value)), 0) * 3000
                 }));

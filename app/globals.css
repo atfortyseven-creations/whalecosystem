@@ -422,10 +422,7 @@ body,
   scrollbar-width: none;
 }
 
-.forum-container {
-  /* Scroll containment is now natively handled by ClientLayout's bounded <main> element.
-     contain: layout paint removed to prevent black rendering artifacts during rapid mobile scroll. */
-}
+/* Forum scroll containment is handled natively by ClientLayout's bounded <main> viewport */
 
 /* Prevent hover CSS from triggering repaint layers on touch devices */
 @media (hover: none) {
@@ -1151,8 +1148,6 @@ html.ui-compact .row-gap                         { gap: 0.5rem; }
 html.ui-compact .table-row                       { padding-top: 0.4rem; padding-bottom: 0.4rem; }
 html.ui-compact table td,
 html.ui-compact table th                         { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
-html.ui-compact .text-[11px]                     { font-size: 10px; }
-html.ui-compact .text-[12px]                     { font-size: 10.5px; }
 html.ui-compact .p-4                             { padding: 0.65rem !important; }
 html.ui-compact .p-5                             { padding: 0.75rem !important; }
 html.ui-compact .gap-4                           { gap: 0.625rem !important; }
@@ -1166,8 +1161,6 @@ html.ui-dense .row-gap                           { gap: 0.25rem; }
 html.ui-dense .table-row                         { padding-top: 0.2rem; padding-bottom: 0.2rem; }
 html.ui-dense table td,
 html.ui-dense table th                           { padding-top: 0.2rem !important; padding-bottom: 0.2rem !important; }
-html.ui-dense .text-[11px]                       { font-size: 9.5px; }
-html.ui-dense .text-[12px]                       { font-size: 10px; }
 html.ui-dense .p-4                               { padding: 0.4rem !important; }
 html.ui-dense .p-5                               { padding: 0.5rem !important; }
 html.ui-dense .gap-4                             { gap: 0.35rem !important; }
