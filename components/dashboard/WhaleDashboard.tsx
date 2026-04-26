@@ -61,68 +61,60 @@ const CosmicForgePanel = dynamic(
 
 import "@/app/dashboard/dashboard.css";
 
-// Reusable Top Header Component for Perfect Consistency - Institutional Grade Vanguard Aesthetic
-const TelemetryHeader = ({ icon: Icon, title, subtitle, isDark = false, themeColor = 'emerald' }: { icon: any, title: string, subtitle: string, isDark?: boolean, themeColor?: string }) => {
-    const themeMap = {
-        emerald: { text: 'text-[#00C076]', bg: 'bg-[#00C076]', glow: 'shadow-[#00C076]/30', border: 'border-[#00C076]/20' },
-        amber:   { text: 'text-[#D4AF37]', bg: 'bg-[#D4AF37]', glow: 'shadow-[#D4AF37]/30', border: 'border-[#D4AF37]/20' },
-        purple:  { text: 'text-[#9945FF]', bg: 'bg-[#9945FF]', glow: 'shadow-[#9945FF]/30', border: 'border-[#9945FF]/20' },
-        blue:    { text: 'text-[#0052FF]', bg: 'bg-[#0052FF]', glow: 'shadow-[#0052FF]/30', border: 'border-[#0052FF]/20' },
-        red:     { text: 'text-[#FF3B30]', bg: 'bg-[#FF3B30]', glow: 'shadow-[#FF3B30]/30', border: 'border-[#FF3B30]/20' }
-    };
-
-    const sel = themeMap[themeColor as keyof typeof themeMap] || themeMap.emerald;
-
+// ── Minimal Aztec-style panel header with hover description ───────────────────
+const PanelHeader = ({
+    icon: Icon,
+    title,
+    description,
+    accent = '#050505',
+}: {
+    icon: any;
+    title: string;
+    description: string;
+    accent?: string;
+}) => {
+    const [hovered, setHovered] = React.useState(false);
     return (
-        <div className={`group shrink-0 h-16 mb-4 flex items-center justify-between px-2 relative overflow-hidden transition-all duration-500`}>
-            
-            {/* Animated Bottom Border Accent */}
-            <div className={`absolute bottom-0 left-0 w-full h-[1px] ${isDark ? 'bg-white/10' : 'bg-black/5'}`}>
-                <div className={`absolute top-0 left-0 h-full w-1/3 ${sel.bg} opacity-50 group-hover:opacity-100 transition-all duration-1000 group-hover:w-2/3 ease-in-out`} />
-            </div>
-
-            <div className="z-10 flex items-center gap-5">
-                {/* Minimalist Icon Container */}
-                <div className={`relative flex items-center justify-center w-9 h-9 rounded-[4px] border ${isDark ? 'bg-[#0A0A0A] border-white/10' : 'bg-white border-[#E5E5E5] shadow-sm'}`}>
-                    <div className={`absolute inset-0 rounded-[4px] blur-sm opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${sel.bg}`} />
-                    <Icon size={14} className={`relative z-10 ${isDark ? 'text-white' : 'text-[#050505]'}`} strokeWidth={1.5} />
+        <div
+            className="relative shrink-0 flex items-center justify-between mb-6 pb-5 border-b border-black/[0.07] cursor-default select-none"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+        >
+            {/* Left */}
+            <div className="flex items-start gap-4">
+                <div
+                    className="w-8 h-8 rounded-[3px] flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-300"
+                    style={{
+                        background: `${accent}0D`,
+                        border: `1px solid ${accent}20`,
+                        transform: hovered ? 'scale(1.08)' : 'scale(1)',
+                    }}
+                >
+                    <Icon size={13} strokeWidth={1.6} style={{ color: accent }} />
                 </div>
-                
-                <div className="flex flex-col justify-center gap-1">
-                   <div className="flex items-baseline gap-3">
-                       <h2 className={`text-[12px] font-black uppercase tracking-[0.25em] ${isDark ? 'text-white' : 'text-[#050505]'}`}>
-                         {title}
-                       </h2>
-                   </div>
-                   <div className="flex items-center gap-2">
-                       <span className={`text-[8.5px] font-mono font-bold uppercase tracking-[0.2em] ${sel.text}`}>
-                           {subtitle}
-                       </span>
-                       <div className={`h-[1px] w-4 ${isDark ? 'bg-white/20' : 'bg-black/10'}`} />
-                       <span className={`text-[7px] font-mono uppercase tracking-widest ${isDark ? 'text-white/30' : 'text-black/30'}`}>
-                           SYS.OP.NORMAL
-                       </span>
-                   </div>
-                </div>
-            </div>
-
-            <div className="z-10 hidden md:flex items-center gap-6 text-right">
-                {/* Tech grid aesthetic element */}
-                <div className="flex gap-[3px]">
-                    {[0.15, 0.4, 0.7, 0.3, 0.1].map((op, i) => (
-                        <div key={i} className={`w-[2px] h-3 ${isDark ? 'bg-white' : 'bg-black'} transition-opacity duration-500`} style={{ opacity: op }} />
-                    ))}
-                </div>
-                
-                <div className="flex flex-col items-end gap-1.5">
-                    <div className="flex items-center gap-2 px-2.5 py-1 rounded-[3px] border bg-transparent" style={{ borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${sel.bg} animate-pulse shadow-[0_0_8px_rgba(0,0,0,0.5)] ${sel.glow}`} />
-                        <span className={`text-[8.5px] font-mono font-bold uppercase tracking-widest ${isDark ? 'text-white/80' : 'text-[#050505]'}`}>
-                            SYNCED
-                        </span>
+                <div className="flex flex-col gap-1 min-w-0">
+                    <h2
+                        className="text-[12px] font-black uppercase text-[#050505] leading-none tracking-[0.28em]"
+                        style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}
+                    >
+                        {title}
+                    </h2>
+                    <div
+                        className="overflow-hidden transition-all duration-300 ease-out"
+                        style={{ maxHeight: hovered ? '48px' : '0px', opacity: hovered ? 1 : 0 }}
+                    >
+                        <p className="text-[10.5px] text-black/45 font-normal leading-snug max-w-[520px] pt-0.5">
+                            {description}
+                        </p>
                     </div>
                 </div>
             </div>
+
+            {/* Right accent line */}
+            <div
+                className="hidden md:block h-px flex-1 ml-8 transition-all duration-500"
+                style={{ background: hovered ? `linear-gradient(to right, ${accent}40, transparent)` : `linear-gradient(to right, rgba(0,0,0,0.06), transparent)` }}
+            />
         </div>
     );
 };
@@ -132,7 +124,6 @@ export default function WhaleDashboard() {
 
     const renderTabContent = () => {
         switch (activeTab) {
-            // ── [HIDDEN — re-enable import + sidebar item to restore] ──────────
             case 'dashboard':
             case 'watchlist':
             case 'firehose':
@@ -147,48 +138,58 @@ export default function WhaleDashboard() {
                 );
 
             case 'zk':
-                return <><TelemetryHeader icon={Shield} title="Aztec ZK Shield" subtitle="Rollup Pipeline Mempool" themeColor="purple" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="zk-shield"><AztecMempoolSpace /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Shield} title="ZK Shield" description="Monitor Aztec Network's zero-knowledge rollup pipeline. Visualise pending proofs and mempool activity." accent="#9945FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key="zk-shield"><AztecMempoolSpace /></DashboardErrorBoundary></div></>;
 
-            // ── [ACTIVE PANELS] ────────────────────────────────────────────────
             case 'news':
-                return <><TelemetryHeader icon={Newspaper} title="Global News Feed" subtitle="Real-time Briefing" themeColor="emerald" /><div className="h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="news"><NewsOfToday /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Newspaper} title="News" description="The latest news and market analysis curated from key sources in crypto and global finance." accent="#050505" /><div className="h-[750px] shrink-0"><DashboardErrorBoundary key="news"><NewsOfToday /></DashboardErrorBoundary></div></>;
+
             case 'gold':
-                return <><TelemetryHeader icon={Ticket} title="Ticket Mint" subtitle="Institutional Clearance" isDark themeColor="amber" /><div className="flex-1 min-h-[950px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="gold"><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
-            
+                return <><PanelHeader icon={Ticket} title="Access Pass" description="Mint your institutional clearance pass to unlock advanced analytics, private data feeds, and exclusive platform features." accent="#D4AF37" /><div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key="gold"><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
+
             case 'markets':
-                return <><TelemetryHeader icon={Globe} title="Market Analytics" subtitle="Top Assets" isDark themeColor="blue" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="gainers"><GainersLosersPanel /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Globe} title="Markets" description="Top performing and worst performing crypto assets. Price changes, volume, and market capitalisation at a glance." accent="#0052FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key="gainers"><GainersLosersPanel /></DashboardErrorBoundary></div></>;
+
             case 'newpairs':
-                return <><TelemetryHeader icon={Flame} title="Discovery Engine" subtitle="New Token Pairs" isDark themeColor="blue" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="new-pairs"><NewPairsTable /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Flame} title="New Listings" description="Tokens listed on decentralised exchanges in the last 24 hours. Be among the first to spot new trading opportunities." accent="#FF6B35" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key="new-pairs"><NewPairsTable /></DashboardErrorBoundary></div></>;
+
             case 'omniexplorer':
-                return <><TelemetryHeader icon={Search} title="Omni Explorer" subtitle="Cross-chain Verification" isDark themeColor="blue" /><div className="flex-1 min-h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="omni-explorer"><OmniExplorer /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Search} title="Block Explorer" description="Search any wallet address, transaction, or block across multiple blockchains. Verify on-chain activity instantly." accent="#050505" /><div className="flex-1 min-h-[750px] shrink-0"><DashboardErrorBoundary key="omni-explorer"><OmniExplorer /></DashboardErrorBoundary></div></>;
+
             case 'brc':
-                return <><TelemetryHeader icon={Layers} title="Bitcoin L2" subtitle="BRC Explorer" isDark themeColor="amber" /><div className="flex-1 min-h-[750px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="brc"><BRCExplorerShell /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Layers} title="Bitcoin Layer 2" description="Explore inscriptions, BRC-20 tokens, and Bitcoin Layer 2 activity. Track ordinals and emerging Bitcoin-native protocols." accent="#F7931A" /><div className="flex-1 min-h-[750px] shrink-0"><DashboardErrorBoundary key="brc"><BRCExplorerShell /></DashboardErrorBoundary></div></>;
 
             case 'inst-ledger':
-                return <><TelemetryHeader icon={Book} title="Institutional Ledger" subtitle="Entity Transfers" themeColor="purple" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="inst-ledger"><InstitutionalLedger /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Book} title="Whale Ledger" description="Large-value transfers made by institutional wallets and known entities. Understand where significant capital is moving." accent="#9945FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key="inst-ledger"><InstitutionalLedger /></DashboardErrorBoundary></div></>;
+
             case 'mass-transfer':
-                return <><TelemetryHeader icon={Network} title="Mass Transfers" subtitle="Anomaly Detection" themeColor="purple" /><div className="h-[700px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="mass-transfer"><MassTransferIntel /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Network} title="Mass Transfers" description="Coordinated or unusually large token movements across multiple wallets. Spot potential market-moving events early." accent="#9945FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key="mass-transfer"><MassTransferIntel /></DashboardErrorBoundary></div></>;
+
             case 'graph':
-                return <><TelemetryHeader icon={Compass} title="Entity Graph" subtitle="Neural Topography Map" themeColor="purple" /><div className="flex-1 min-h-[900px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="neural-graph"><EntityGraphVis /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Compass} title="Entity Graph" description="The connections between wallets and entities as an interactive network map. Understand relationships and fund flows visually." accent="#9945FF" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key="neural-graph"><EntityGraphVis /></DashboardErrorBoundary></div></>;
+
             case 'defi':
-                return <><TelemetryHeader icon={Landmark} title="DeFi Yields" subtitle="Protocol Margins" themeColor="purple" /><div className="flex-1 min-h-[800px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="defi-yield"><DeFiYieldPanel /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Landmark} title="DeFi Yields" description="Interest rates and returns across decentralised finance protocols. Find the best places to put your assets to work." accent="#00C076" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key="defi-yield"><DeFiYieldPanel /></DashboardErrorBoundary></div></>;
+
             case 'polymarket':
-                return <><TelemetryHeader icon={BarChart3} title="Polymarket Dashboard" subtitle="Prediction Markets" themeColor="purple" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="polymarket"><PolymarketGlassDashboard /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={BarChart3} title="Prediction Markets" description="Open prediction markets and their current probabilities. See what the crowd believes will happen in politics, crypto, and world events." accent="#9945FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key="polymarket"><PolymarketGlassDashboard /></DashboardErrorBoundary></div></>;
+
             case 'forge':
-                return <><TelemetryHeader icon={FlaskConical} title="Cosmic Forge" subtitle="Smart Contract Sandbox" themeColor="purple" /><div className="flex-1 min-h-[800px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="cosmic-forge"><CosmicForgePanel /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={FlaskConical} title="Contract Sandbox" description="Deploy and test smart contracts in a safe environment. Experiment with on-chain logic without risk before going to mainnet." accent="#9945FF" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key="cosmic-forge"><CosmicForgePanel /></DashboardErrorBoundary></div></>;
 
             case 'portfolio':
-                return <><TelemetryHeader icon={Wallet} title="Main Portfolio" subtitle="Asset Execution Node" themeColor="emerald" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="human-port"><PortfolioDashboard /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Wallet} title="My Portfolio" description="The complete balance and value of all tokens in your connected wallet across every supported blockchain." accent="#00C076" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key="human-port"><PortfolioDashboard /></DashboardErrorBoundary></div></>;
+
             case 'vault':
-                return <><TelemetryHeader icon={Lock} title="Sovereign Vault" subtitle="ZK Execution Environment" isDark themeColor="amber" /><div className="h-[650px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="sov-vault"><SovereignVault /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Lock} title="Secure Vault" description="Store sensitive data and private notes in an encrypted environment. Only your wallet signature can unlock what you save here." accent="#D4AF37" /><div className="h-[650px] shrink-0"><DashboardErrorBoundary key="sov-vault"><SovereignVault /></DashboardErrorBoundary></div></>;
 
             case 'logs':
-                return <><TelemetryHeader icon={Database} title="Session Logs" subtitle="Terminal Security Events" isDark themeColor="blue" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="session-logs"><SessionLogsPanel /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={Database} title="Activity Log" description="A complete history of all actions taken during your session. Useful for auditing and reviewing your on-chain interactions." accent="#0052FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key="session-logs"><SessionLogsPanel /></DashboardErrorBoundary></div></>;
 
             case 'academy':
-                return <><TelemetryHeader icon={BookOpen} title="Sovereign Academy" subtitle="Knowledge Architecture" isDark themeColor="blue" /><div className="flex-1 min-h-[850px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="academy"><WhaleAcademy /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={BookOpen} title="Academy" description="Learn how blockchain, DeFi, and on-chain analytics work through structured guides written for all experience levels." accent="#050505" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key="academy"><WhaleAcademy /></DashboardErrorBoundary></div></>;
+
             case 'support':
-                return <><TelemetryHeader icon={MessageSquare} title="Whale Support" subtitle="Direct Channel" isDark themeColor="blue" /><div className="flex-1 min-h-[800px] shrink-0 drop-shadow-sm"><DashboardErrorBoundary key="support"><WhaleSupport /></DashboardErrorBoundary></div></>;
+                return <><PanelHeader icon={MessageSquare} title="Support" description="Contact the team directly, report a problem, or ask a question. We respond as quickly as possible to every request." accent="#050505" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key="support"><WhaleSupport /></DashboardErrorBoundary></div></>;
 
             default:
                 return null;
@@ -201,7 +202,7 @@ export default function WhaleDashboard() {
             onTabChange={(id: string) => setActiveTab(id)}
             isExternalEmbed={false}
         >
-            <div className="flex flex-col gap-6 w-full max-w-[1400px] mx-auto pb-12 h-full">
+            <div className="flex flex-col gap-6 w-full pb-12 h-full">
                 {renderTabContent()}
             </div>
         </WhaleProShell>

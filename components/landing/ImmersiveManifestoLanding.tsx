@@ -175,7 +175,7 @@ const RIGHT_SIDEBAR_CONTENT = [
 export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
   
   return (
-    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-clip">
+    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-hidden">
 
       <div className={`relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 ${onOpenScanner ? 'pb-32' : 'pb-16'}`}>
         

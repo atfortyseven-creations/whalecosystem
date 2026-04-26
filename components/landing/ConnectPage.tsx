@@ -43,11 +43,31 @@ const DESKTOP_WALLETS = [
     installUrl: "https://metamask.io/download/",
     delay: 0,
   },
+  {
+    id: "coinbase",
+    name: "Coinbase Wallet",
+    badge: "Browser Extension",
+    logo: "/wallets/coinbase.svg",
+    rdns: "com.coinbase.wallet",
+    installUrl: "https://www.coinbase.com/wallet",
+    delay: 0.1,
+  },
+  {
+    id: "rainbow",
+    name: "Rainbow",
+    badge: "Browser Extension",
+    logo: "/wallets/rainbow.svg",
+    rdns: "me.rainbow",
+    installUrl: "https://rainbow.me/extension",
+    delay: 0.2,
+  },
 ];
 
 // ─── Mobile wallets (all open AppKit which uses WC deep-links) ───────────────
 const MOBILE_WALLETS = [
   { id: "metamask-mobile",   name: "MetaMask",       badge: "Tap to open app", logo: "/wallets/metamask.svg", delay: 0 },
+  { id: "coinbase-mobile",   name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.svg", delay: 0.1 },
+  { id: "rainbow-mobile",    name: "Rainbow",        badge: "Tap to open app", logo: "/wallets/rainbow.svg", delay: 0.2 },
 ];
 
 // ─── Wallet button ────────────────────────────────────────────────────────────
@@ -284,18 +304,25 @@ export default function ConnectPage() {
         >
           {/* ── LEFT: QR panel ── */}
           {!(mounted && isConnected) && (
-          <div className="relative p-8 lg:p-12 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/[0.08]">
+          <div className="relative p-8 lg:p-12 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/[0.08] overflow-hidden">
             <div className="absolute inset-0 pointer-events-none z-0"
               style={{
-                backgroundImage: "url('/patron-cosmico-4k.png')",
-                backgroundSize: "320px", backgroundRepeat: "repeat",
-                opacity: 0.035, mixBlendMode: "multiply",
+                backgroundImage: "url('/blue-cubes.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                opacity: 1,
+                mixBlendMode: "normal",
+                transform: "scale(1.01)", // Prevents edge bleed for max DPI
+                imageRendering: "high-quality" // Max DPI quality
               }}
             />
             <div className="relative z-10 flex flex-col h-full">
-              <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-3">
-                Mobile Sync
-              </h2>
+              <div className="inline-flex bg-white/90 backdrop-blur-md self-start px-5 py-3 rounded-2xl mb-3 border border-black/5 shadow-sm">
+                <h2 className="text-3xl font-black uppercase tracking-tighter leading-none">
+                  Mobile Sync
+                </h2>
+              </div>
               <div className="mb-8 border-b border-black/10 pb-4" />
 
               <div className="flex flex-col items-center gap-6 flex-1 justify-center">
@@ -320,6 +347,30 @@ export default function ConnectPage() {
                       <span className="text-[9px] font-mono uppercase tracking-widest text-black/40">
                         Scan with native phone camera
                       </span>
+                      
+                      <div className="mt-5 flex flex-col items-start text-left gap-3.5 w-full max-w-[280px]">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#050505] border-b border-black/10 w-full pb-1 mb-1">
+                          Authentication Protocol
+                        </span>
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] px-1.5 py-0.5 rounded mt-0.5">1</span>
+                          <span className="text-[11px] font-medium leading-relaxed text-black/70">
+                            Activate your native mobile camera application or integrated secure scanner.
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] px-1.5 py-0.5 rounded mt-0.5">2</span>
+                          <span className="text-[11px] font-medium leading-relaxed text-black/70">
+                            Align the viewfinder precisely with the cryptographic QR matrix presented above.
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] px-1.5 py-0.5 rounded mt-0.5">3</span>
+                          <span className="text-[11px] font-medium leading-relaxed text-black/70">
+                            Acknowledge the subsequent secure deep-link prompt to finalize the session handshake.
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
