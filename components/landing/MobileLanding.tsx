@@ -615,41 +615,28 @@ export function MobileLanding() {
     }
   }, [isLinked]);
 
-  // ── performLink: reads from live refs, safe to call from any async context ──
+  // ── performLink: cookie-write + reload — bulletproof on all mobile browsers ──
+  // On reload the isLinked useState lazy initializer reads the cookie synchronously
+  // before any render, so the landing page shows instantly with zero race conditions.
   const performLink = useCallback((addr: string) => {
     if (isLinkedRef.current || linkingInProgress.current) return;
     linkingInProgress.current = true;
-    setConnecting(false);
-    setIsSigning(true);
 
     const norm = addr.toLowerCase();
-    // 1. Sovereign session cookie
+    // 1. Write sovereign session cookie FIRST
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-    // 2. sessionStorage flag
+    // 2. sessionStorage flag for same-tab soft-nav
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-    // 3. Backend sync (fire-and-forget)
+    // 3. Backend sync (fire-and-forget — does not block redirect)
     fetch('/api/wallet/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified_tunnel', message: 'Mobile WalletConnect verified' }),
     }).catch(() => {});
-    // 4. Close AppKit modal
+    // 4. Close AppKit modal silently
     try { closeAppKit(); } catch {}
-    // 5. Teleport to Manifesto — set linkedAddress FIRST so effectiveAddress
-    //    is never null even in incognito where wagmi/cookie reads lag.
-    setTimeout(() => {
-      isLinkedRef.current = true;
-      setLinkedAddress(norm);   // ← atomic address guarantee for incognito
-      setIsLinked(true);
-      setShowingManifesto(true);
-      setIsSigning(false);
-      linkingInProgress.current = false;
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-      }
-    }, 400);
+    // 5. Reload — cookie is now set; on reload isLinked=true → landing page immediately
+    window.location.reload();
   }, [closeAppKit]);
 
   // ── Main link effect — fires on any state change that indicates connection ───
