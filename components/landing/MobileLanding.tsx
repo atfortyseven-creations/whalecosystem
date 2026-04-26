@@ -371,7 +371,7 @@ function ConnectedScreen({
           whileTap={{ scale: 0.97 }}
           onClick={onScan}
           className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white"
-          style={{ background: "#2D0A59", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(45,10,89,0.45)" }}
+          style={{ background: "#050505", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(5,5,5,0.45)" }}
         >
           <Scan size={18} />
           Open QR Scanner · Sync Desktop
@@ -588,7 +588,7 @@ export function MobileLanding() {
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
-  const [showingManifesto, setShowingManifesto] = useState(true);
+  const [showingManifesto, setShowingManifesto] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -610,7 +610,7 @@ export function MobileLanding() {
 
     setLinkedAddress(norm);
     setIsLinked(true);
-    setShowingManifesto(true);
+    setShowingManifesto(false);
     setConnecting(null);
   }, [isLinked, closeAppKit]);
 
