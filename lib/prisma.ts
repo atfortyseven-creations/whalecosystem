@@ -87,12 +87,14 @@ function getProductionUrl(): string | undefined {
         if (urlObj.protocol === 'postgresql:' || urlObj.protocol === 'postgres:') {
             // Force PgBouncer
             urlObj.searchParams.set('pgbouncer', 'true');
-            // Strict Institutional limit: Max 3 connection out of 500 total pool per container
-            urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '3');
+            // Safe Institutional limit: 10 connections per instance prevents starvation
+            urlObj.searchParams.set('connection_limit', process.env.DATABASE_CONNECTION_LIMIT || '10');
             // Aggressive TCP timeout
             urlObj.searchParams.set('connect_timeout', '10');
             // Max time a connection can be held in the pool
             urlObj.searchParams.set('pool_timeout', '15');
+            // Kill queries taking longer than 8s to prevent total DB lockup
+            urlObj.searchParams.set('statement_timeout', '8000');
         }
         return urlObj.toString();
     } catch {
@@ -133,8 +135,7 @@ function createPrismaClient(): PrismaClient {
 
 export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknown as SovereignPrismaClient;
 
-if (process.env.NODE_ENV !== 'production') {
-    (globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
-}
+// Always store the singleton globally, even in production, to prevent Serverless/Edge connection explosions
+(globalForPrisma as unknown as { prisma: SovereignPrismaClient }).prisma = prisma;
 
 export default prisma;

@@ -128,6 +128,12 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/terms',
             '/legal',
             '/forum',
+            '/portfolio',
+            '/whalepost',
+            '/settings',
+            '/sovereign-intel',
+            '/predictions',
+            '/vip',
         ];
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
         if (isDirectAccessRoute) {

@@ -69,15 +69,27 @@ export async function GET() {
                 },
             });
         } catch {
-            // New columns not yet in schema — fall back to base columns
-            user = await prisma.user.findUnique({
-                where: { walletAddress: address },
-                select: {
-                    theme: true, currency: true, language: true,
-                    showBalances: true, stealthMode: true, allowAnalytics: true,
-                    mevProtection: true, testnetMode: true,
-                },
-            });
+            // Extended columns not yet in schema — try with core settings columns only
+            try {
+                user = await prisma.user.findUnique({
+                    where: { walletAddress: address },
+                    select: {
+                        theme: true, currency: true, language: true,
+                        showBalances: true, stealthMode: true,
+                        allowAnalytics: true, mevProtection: true,
+                    },
+                });
+            } catch {
+                // Absolute minimum — original schema guaranteed columns only
+                user = await prisma.user.findUnique({
+                    where: { walletAddress: address },
+                    select: {
+                        theme: true,
+                        currency: true,
+                        language: true,
+                    },
+                });
+            }
         }
 
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });

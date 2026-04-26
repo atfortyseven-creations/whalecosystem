@@ -2,43 +2,27 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Download, Mail, X, ChevronDown, ChevronUp, Calendar, Lock, ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Download, Mail, X, Calendar, ChevronLeft, ArrowRight, Clock, BookOpen } from 'lucide-react';
 import { useNewsStore, NewsArticle } from '@/lib/store/news-store';
 import { useAccount } from 'wagmi';
-import { WhaleAlertLoader } from '@/components/ui/WhaleAlertLoader';
 import { CryptoCheckoutModal } from './CryptoCheckoutModal';
 
-// ── Altura del InstitutionalHeader global ─────────────────────────────────────
 const HEADER_H = 68;
 
-// ── Fallback de imagen determinista por nuestro proxy ─
-const FALLBACK_BGS = [
-  "/api/proxy-image?seed=1",
-  "/api/proxy-image?seed=2",
-  "/api/proxy-image?seed=3",
-  "/api/proxy-image?seed=4",
-  "/api/proxy-image?seed=5",
-  "/api/proxy-image?seed=6",
-  "/api/proxy-image?seed=7",
-  "/api/proxy-image?seed=8",
-  "/api/proxy-image?seed=9",
-  "/api/proxy-image?seed=10"
-];
+const FALLBACK_BGS = Array.from({ length: 10 }, (_, i) => `/api/proxy-image?seed=${i + 1}`);
 
 function getArticleImage(article: NewsArticle): string {
   if (article.imageUrl && article.imageUrl.startsWith('http')) {
     return `/api/proxy-image?url=${encodeURIComponent(article.imageUrl)}`;
   }
-  
   let hash = 0;
   for (let i = 0; i < article.id.length; i++) {
     hash = article.id.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const index = Math.abs(hash) % FALLBACK_BGS.length;
-  return FALLBACK_BGS[index];
+  return FALLBACK_BGS[Math.abs(hash) % FALLBACK_BGS.length];
 }
 
-// ── Formato de fecha legible ──────────────────────────────────────────────────
 function formatDate(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleDateString('en-US', {
@@ -56,7 +40,10 @@ function todayKey(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-// Fetches EUR equivalent for 0.015 ETH
+function estimateReadTime(text: string): number {
+  return Math.max(1, Math.ceil((text ?? '').split(/\s+/).length / 220));
+}
+
 async function fetchEthEur(): Promise<number | null> {
   try {
     const controller = new AbortController();
@@ -78,107 +65,87 @@ async function fetchEthEur(): Promise<number | null> {
 export function NewsTerminal() {
   const { isNewsSubscribed, lastBackupDate, setLastBackupDate, archive, upsertDayArticles, getArchiveDates } = useNewsStore();
   const { address } = useAccount();
+  const router = useRouter();
 
-  // ── Access is FREE for all users — paywall disabled ────────────────────
-  // To re-enable, restore: const hasAccess = isNewsSubscribed || IS_WHITELISTED;
   const hasAccess = true;
 
-  const [articles,    setArticles]    = useState<NewsArticle[]>([]);
-  const [loading,     setLoading]     = useState(true);
-  const [selected,    setSelected]    = useState<NewsArticle | null>(null);
-  const [fontSize,    setFontSize]    = useState(1);
-  const [checkoutOpen,setCheckoutOpen]= useState(false);
-  const [shareOpen,   setShareOpen]   = useState(false);
-  const [shareEmail,  setShareEmail]  = useState('');
-  const [shareNote,   setShareNote]   = useState('');
-  const [isSending,   setIsSending]   = useState(false);
-  const [shareSent,   setShareSent]   = useState(false);
-  const [ethEur,      setEthEur]      = useState<number | null>(null);
-  // Archive sidebar toggle
-  const [showArchive, setShowArchive] = useState(false);
-  const [marketTimes, setMarketTimes] = useState<{name: string, time: string, isOpen: boolean}[]>([]);
+  const [articles,     setArticles]     = useState<NewsArticle[]>([]);
+  const [loading,      setLoading]      = useState(true);
+  const [selected,     setSelected]     = useState<NewsArticle | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [shareOpen,    setShareOpen]    = useState(false);
+  const [shareEmail,   setShareEmail]   = useState('');
+  const [shareNote,    setShareNote]    = useState('');
+  const [isSending,    setIsSending]    = useState(false);
+  const [shareSent,    setShareSent]    = useState(false);
+  const [ethEur,       setEthEur]       = useState<number | null>(null);
+  const [showArchive,  setShowArchive]  = useState(false);
+  const [marketTimes,  setMarketTimes]  = useState<{name: string, time: string, isOpen: boolean}[]>([]);
+  const [imgError,     setImgError]     = useState(false);
 
   const rightRef = useRef<HTMLDivElement>(null);
-  const imgRef   = useRef<HTMLImageElement>(null);
 
-  // ── Relojes Bursátiles Globales ─────────────────────────────────────────
+  // ── Market clocks ──────────────────────────────────────────────────────────
   useEffect(() => {
-    const updateTimes = () => {
+    const update = () => {
       const now = new Date();
       const utcHour = now.getUTCHours();
       const isWeekend = now.getUTCDay() === 0 || now.getUTCDay() === 6;
       const f = (tz: string) => now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
-      
       setMarketTimes([
-        { name: 'NY', time: f('America/New_York'), isOpen: !isWeekend && (utcHour >= 13 && utcHour < 20) },
-        { name: 'LON', time: f('Europe/London'), isOpen: !isWeekend && (utcHour >= 8 && utcHour < 16) },
-        { name: 'TYO', time: f('Asia/Tokyo'), isOpen: !isWeekend && (utcHour >= 0 && utcHour < 6) },
+        { name: 'NY',  time: f('America/New_York'), isOpen: !isWeekend && (utcHour >= 13 && utcHour < 20) },
+        { name: 'LON', time: f('Europe/London'),    isOpen: !isWeekend && (utcHour >= 8  && utcHour < 16) },
+        { name: 'TYO', time: f('Asia/Tokyo'),       isOpen: !isWeekend && (utcHour >= 0  && utcHour < 6)  },
       ]);
     };
-    updateTimes();
-    const intervalId = setInterval(updateTimes, 30000);
-    return () => clearInterval(intervalId);
+    update();
+    const id = setInterval(update, 30000);
+    return () => clearInterval(id);
   }, []);
 
-  // ── Carga de datos ───────────────────────────────────────────────────────
+  // ── Load data ──────────────────────────────────────────────────────────────
   useEffect(() => {
-    // Load ETH→EUR rate
     fetchEthEur().then(setEthEur);
-
-    // Check 1-Time share token
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const token  = params.get('share_token');
-      if (token && !hasAccess) {
-        try {
-          const decoded = JSON.parse(atob(token));
-          const key = `has_read_${decoded.id}`;
-          if (localStorage.getItem(key)) { setLoading(false); return; }
-          localStorage.setItem(key, '1');
-          window.history.replaceState({}, '', '/news');
-        } catch { /* token corrupto */ }
-      }
-    }
 
     fetch('/api/news', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         const items: NewsArticle[] = data.articles ?? [];
         setArticles(items);
-        if (items.length > 0) setSelected(items[0]);
-        // Persist into today's archive bucket
         if (items.length > 0) {
+          setSelected(items[0]);
           upsertDayArticles(todayKey(), items);
         }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [hasAccess, upsertDayArticles]);
+  }, [upsertDayArticles]);
 
   // Auto-scroll to top when article changes
   useEffect(() => {
     rightRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    setImgError(false);
   }, [selected?.id]);
 
-  // ── Descarga JSON al disco ───────────────────────────────────────────────
+  // ── Download JSON ──────────────────────────────────────────────────────────
   const handleDownload = useCallback(async () => {
     const today = todayKey();
-    const blob  = new Blob([JSON.stringify({ date: today, articles }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ date: today, articles }, null, 2)], { type: 'application/json' });
     if ('showSaveFilePicker' in window) {
       try {
-        const handle   = await (window as any).showSaveFilePicker({ suggestedName: `${today}_WhaleNews.json`, types: [{ accept: { 'application/json': ['.json'] } }] });
+        const handle = await (window as any).showSaveFilePicker({ suggestedName: `${today}_WhaleNews.json`, types: [{ accept: { 'application/json': ['.json'] } }] });
         const writable = await handle.createWritable();
         await writable.write(blob); await writable.close();
         setLastBackupDate(today); return;
       } catch (e: any) { if (e.name === 'AbortError') return; }
     }
     const url = URL.createObjectURL(blob);
-    const a   = Object.assign(document.createElement('a'), { href: url, download: `${today}_WhaleNews.json` });
+    const a = Object.assign(document.createElement('a'), { href: url, download: `${today}_WhaleNews.json` });
     a.click(); URL.revokeObjectURL(url);
     setLastBackupDate(today);
   }, [articles, setLastBackupDate]);
 
-  // ── Compartir por email ──────────────────────────────────────────────────
+  // ── Share by email ─────────────────────────────────────────────────────────
   const handleShare = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected || !shareEmail) return;
@@ -193,81 +160,59 @@ export function NewsTerminal() {
     } finally { setIsSending(false); }
   };
 
-  // ── Paleta institucional pura ─────────────────────────────────────────────
-  const BG    = '#FAF9F6';
-  const TEXT  = '#0A0A0A';
-  const DIV   = 'rgba(0,0,0,0.08)';
-  const MUTED = 'rgba(0,0,0,0.4)';
+  // Navigate to full report
+  const openFullReport = () => {
+    if (!selected) return;
+    router.push(`/whalepost/full-report?id=${encodeURIComponent(selected.id)}`);
+  };
+
+  const BG      = '#FAF9F6';
+  const TEXT    = '#0A0A0A';
+  const DIV     = 'rgba(0,0,0,0.08)';
+  const MUTED   = 'rgba(0,0,0,0.4)';
   const ACTIVE_BG = 'rgba(0,0,0,0.04)';
 
-  const panelH = `calc(100vh - ${HEADER_H}px)`;
-
-  // ── Pantalla: Carga eliminada por petición ──────────────────────────────
-  // if (loading) return null;
-
-  // ── Archive dates for sidebar ────────────────────────────────────────────
   const archiveDates = getArchiveDates();
 
-  // ── Render principal ─────────────────────────────────────────────────────
   return (
     <>
       <div
         className="w-full h-full flex-1 relative flex flex-col min-h-0"
-        style={{
-          background: BG,
-          color: TEXT,
-          // Root optimization
-          willChange: 'transform',
-          transform: 'translateZ(0)',
-          backfaceVisibility: 'hidden',
-          overscrollBehavior: 'none',
-        }}
+        style={{ background: BG, color: TEXT, willChange: 'transform', transform: 'translateZ(0)', backfaceVisibility: 'hidden', overscrollBehavior: 'none' }}
       >
         <div className="flex flex-1 w-full h-full min-h-0 overflow-hidden">
 
-          {/* ═══════════════════════════════════════════════════════════════
-              PANEL IZQUIERDO — Lista + Archivo
-              ═══════════════════════════════════════════════════════════ */}
+          {/* ═══════════════════════════════════════════════
+              LEFT PANEL — Article list
+          ══════════════════════════════════════════════ */}
           <div
-            style={{
-              borderRight: `1px solid ${DIV}`,
-              background: BG,
-              overflowY: 'auto',
-              height: '100%',
-              WebkitOverflowScrolling: 'touch',
-              willChange: 'transform',
-              transform: 'translateZ(0)',
-              backfaceVisibility: 'hidden',
-            }}
+            style={{ borderRight: `1px solid ${DIV}`, background: BG, overflowY: 'auto', height: '100%', WebkitOverflowScrolling: 'touch', willChange: 'transform', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}
             className={`flex-col shrink-0 w-full md:w-[28%] md:min-w-[320px] lg:min-w-[360px] ${selected ? 'hidden md:flex' : 'flex'}`}
           >
-            {/* Cabecera sticky */}
-            <div
-              style={{ borderBottom: `1px solid ${DIV}`, background: BG, backdropFilter: 'blur(10px)' }}
-              className="sticky top-0 z-10 flex items-center justify-between px-6 py-5"
-            >
+            {/* Sticky header */}
+            <div style={{ borderBottom: `1px solid ${DIV}`, background: BG, backdropFilter: 'blur(10px)' }}
+                 className="sticky top-0 z-10 flex items-center justify-between px-6 py-5">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3 md:gap-5 flex-wrap">
                   {marketTimes.map(t => (
                     <div key={t.name} className="flex items-center gap-1.5 shrink-0">
-                       <div className={`w-1 h-1 rounded-full ${t.isOpen ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30] opacity-50'}`} />
-                       <span className="font-mono text-[9px] font-black uppercase tracking-widest text-[#050505]">
-                         {t.name} <span className="font-normal opacity-50 ml-0.5">{t.time}</span>
-                       </span>
+                      <div className={`w-1 h-1 rounded-full ${t.isOpen ? 'bg-[#00C076] shadow-[0_0_8px_#00C076]' : 'bg-[#FF3B30] opacity-50'}`} />
+                      <span className="font-mono text-[9px] font-black uppercase tracking-widest text-[#050505]">
+                        {t.name} <span className="font-normal opacity-50 ml-0.5">{t.time}</span>
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
                 {hasAccess && (
-                  <button onClick={handleDownload} title="Guardar en disco"
+                  <button onClick={handleDownload} title="Save to disk"
                           className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
                           style={{ borderColor: DIV }}>
                     <Download size={13} color={MUTED} />
                   </button>
                 )}
-                {/* Archivo por fecha */}
-                <button onClick={() => setShowArchive(v => !v)} title="Archivo de noticias"
+                <button onClick={() => setShowArchive(v => !v)} title="News archive"
                         className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
                         style={{ borderColor: DIV, background: showArchive ? TEXT : 'transparent' }}>
                   <Calendar size={13} color={showArchive ? BG : MUTED} />
@@ -279,28 +224,22 @@ export function NewsTerminal() {
             {showArchive && archiveDates.length > 0 && (
               <div style={{ borderBottom: `2px solid ${TEXT}`, background: 'rgba(0,0,0,0.02)' }}>
                 <p className="px-6 pt-4 pb-2 font-mono text-[8px] uppercase tracking-[0.35em] font-black" style={{ color: MUTED }}>
-                  Archivo — {archiveDates.length} días
+                  Archive — {archiveDates.length} days
                 </p>
                 {archiveDates.map(date => {
                   const count = archive[date]?.length ?? 0;
                   const isToday = date === todayKey();
                   return (
-                    <button
-                      key={date}
+                    <button key={date}
                       onClick={() => {
                         const dayArticles = archive[date];
-                        if (dayArticles?.length) {
-                          setArticles(dayArticles);
-                          setSelected(dayArticles[0]);
-                          setShowArchive(false);
-                        }
+                        if (dayArticles?.length) { setArticles(dayArticles); setSelected(dayArticles[0]); setShowArchive(false); }
                       }}
                       className="w-full text-left px-6 py-3 flex items-center justify-between border-b transition-colors hover:opacity-70"
-                      style={{ borderColor: DIV }}
-                    >
+                      style={{ borderColor: DIV }}>
                       <span className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: isToday ? TEXT : MUTED }}>
-                        {new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        {isToday && <span className="ml-2 text-[7px]">· HOY</span>}
+                        {new Date(date + 'T12:00:00').toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {isToday && <span className="ml-2 text-[7px]">· TODAY</span>}
                       </span>
                       <span className="font-mono text-[9px] font-black" style={{ color: MUTED }}>{count}</span>
                     </button>
@@ -309,31 +248,16 @@ export function NewsTerminal() {
               </div>
             )}
 
-            {/* Lista de artículos (Culling Activo: Máximo 50 Nodos en DOM para evitar Memory Saturation) */}
+            {/* Article list */}
             <div className="flex flex-col">
               {articles.slice(0, 50).map(art => {
                 const isActive = selected?.id === art.id;
                 return (
-                  <button
-                    key={art.id}
-                    onClick={() => setSelected(art)}
+                  <button key={art.id} onClick={() => setSelected(art)}
                     className="text-left w-full px-6 py-5 border-b relative group"
-                    style={{
-                      borderColor: DIV,
-                      background: isActive ? ACTIVE_BG : 'transparent',
-                      color: TEXT,
-                      // GPU promote each row: eliminates scroll jank on 120/240Hz iOS
-                      WebkitTapHighlightColor: 'transparent',
-                      touchAction: 'manipulation',
-                      WebkitFontSmoothing: 'antialiased',
-                      transition: 'background 0.1s ease',
-                    }}
-                  >
-                    {isActive && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: TEXT }} />
-                    )}
-                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] font-bold mb-2 transition-colors"
-                       style={{ color: isActive ? TEXT : MUTED }}>
+                    style={{ borderColor: DIV, background: isActive ? ACTIVE_BG : 'transparent', color: TEXT, WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation', transition: 'background 0.1s ease' }}>
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ background: TEXT }} />}
+                    <p className="font-mono text-[8px] uppercase tracking-[0.2em] font-bold mb-2 transition-colors" style={{ color: isActive ? TEXT : MUTED }}>
                       {formatShort(art.date)}
                     </p>
                     <p className="font-sans font-black leading-tight text-[13px] group-hover:opacity-80 transition-opacity">{art.title}</p>
@@ -341,68 +265,46 @@ export function NewsTerminal() {
                 );
               })}
               {articles.length === 0 && (
-                <p className="p-6 font-mono text-xs uppercase" style={{ color: MUTED }}>Sin noticias disponibles.</p>
+                <p className="p-6 font-mono text-xs uppercase" style={{ color: MUTED }}>No articles available.</p>
               )}
             </div>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════
-              PANEL DERECHO — Lectura institucional
-              ═══════════════════════════════════════════════════════════ */}
-          <div 
-             ref={rightRef} 
-             style={{ 
-               flex: 1, 
-               height: '100%', 
-               overflowY: 'auto', 
-               background: BG,
-               WebkitOverflowScrolling: 'touch',
-               willChange: 'transform',
-               transform: 'translateZ(0)',
-             }}
-             className={`${selected ? 'flex' : 'hidden md:flex'} flex-col w-full md:w-auto relative`}
+          {/* ═══════════════════════════════════════════════
+              RIGHT PANEL — Article reader
+          ══════════════════════════════════════════════ */}
+          <div
+            ref={rightRef}
+            style={{ flex: 1, height: '100%', overflowY: 'auto', background: BG, WebkitOverflowScrolling: 'touch', willChange: 'transform', transform: 'translateZ(0)' }}
+            className={`${selected ? 'flex' : 'hidden md:flex'} flex-col w-full md:w-auto relative`}
           >
-
             <AnimatePresence mode="wait">
               {selected && (
                 <motion.article key={selected.id}
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   transition={{ duration: 0.18 }}>
 
-                  {/* ── Barra de controles ─────────────────────────────── */}
-                  <div className="flex items-center justify-between px-6 md:px-10 xl:px-16 py-5 border-b"
-                       style={{ borderColor: DIV }}>
+                  {/* ── Top control bar ── */}
+                  <div className="flex items-center justify-between px-6 md:px-10 xl:px-16 py-4 border-b sticky top-0 z-10"
+                       style={{ borderColor: DIV, background: 'rgba(250,249,246,0.94)', backdropFilter: 'blur(12px)' }}>
                     <div className="flex items-center gap-3">
-                      <button 
+                      <button
                         onClick={() => setSelected(null)}
                         className="md:hidden flex items-center justify-center p-1 -ml-2 rounded-full border transition-all"
-                        style={{ borderColor: DIV, background: 'rgba(0,0,0,0.03)' }}
-                      >
-                         <ChevronLeft size={16} color={MUTED} />
+                        style={{ borderColor: DIV, background: 'rgba(0,0,0,0.03)' }}>
+                        <ChevronLeft size={16} color={MUTED} />
                       </button>
-                      <span className="font-mono text-[8px] uppercase tracking-[0.3em] font-medium" style={{ color: MUTED }}>
+                      <span className="font-mono text-[8px] uppercase tracking-[0.3em] font-medium hidden sm:block" style={{ color: MUTED }}>
                         {formatDate(selected.date)}
                       </span>
                     </div>
+
                     <div className="flex items-center gap-2">
-                      {/* EUR conversion */}
                       {ethEur && (
-                        <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 border" style={{ borderColor: DIV, color: MUTED }}>
-                          1 ETH ≈ {ethEur.toLocaleString('es-ES')} €
+                        <span className="font-mono text-[8px] uppercase tracking-widest px-2 py-1 border hidden sm:block" style={{ borderColor: DIV, color: MUTED }}>
+                          1 ETH ≈ {ethEur.toLocaleString('en-US')} €
                         </span>
                       )}
-                      {/* Tamaño tipográfico */}
-                      <div className="flex border" style={{ borderColor: DIV }}>
-                        <button onClick={() => setFontSize(f => Math.max(0.85, +(f - 0.1).toFixed(1)))}
-                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
-                                style={{ color: MUTED }}>A−</button>
-                        <button onClick={() => setFontSize(1)}
-                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity border-x"
-                                style={{ color: MUTED, borderColor: DIV }}>A</button>
-                        <button onClick={() => setFontSize(f => Math.min(1.6, +(f + 0.1).toFixed(1)))}
-                                className="px-2.5 py-1.5 font-mono text-[10px] font-bold hover:opacity-60 transition-opacity"
-                                style={{ color: MUTED }}>A+</button>
-                      </div>
                       {hasAccess && (
                         <button onClick={() => setShareOpen(true)}
                                 className="w-8 h-8 flex items-center justify-center border transition-opacity hover:opacity-60"
@@ -413,94 +315,112 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* IMAGEN HERO — full width, edge-to-edge */}
-                  <div className="w-full pt-4 pb-0">
-                    <div
-                      className="w-full overflow-hidden bg-[#F0EFEC]"
-                      style={{
-                        height: `clamp(200px, 32vh, ${Math.round(360 * fontSize)}px)`,
-                        willChange: 'transform',
-                        transform: 'translateZ(0)',
-                        backfaceVisibility: 'hidden',
-                      }}
-                    >
+                  {/* ── Hero image — wide, not cramped ── */}
+                  <div className="w-full">
+                    <div className="w-full overflow-hidden bg-[#F0EFEC]"
+                         style={{ height: 'clamp(220px, 38vh, 480px)', willChange: 'transform', transform: 'translateZ(0)' }}>
                       <motion.img
                         key={selected.id}
                         initial={{ opacity: 0, scale: 1.04 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        ref={imgRef}
-                        src={getArticleImage(selected)}
+                        src={imgError ? FALLBACK_BGS[0] : getArticleImage(selected)}
                         alt={selected.title}
                         className="w-full h-full object-cover"
                         loading="eager"
                         decoding="async"
-                        fetchPriority="high"
-                        style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          if (target.dataset.errorHandled) return;
-                          target.dataset.errorHandled = 'true';
-                          let hash = 0;
-                          for (let i = 0; i < selected.id.length; i++) {
-                            hash = selected.id.charCodeAt(i) + ((hash << 5) - hash);
-                          }
-                          const index = (Math.abs(hash) + 1) % FALLBACK_BGS.length;
-                          target.src = FALLBACK_BGS[index];
-                        }}
+                        onError={() => setImgError(true)}
                       />
                     </div>
                   </div>
 
-                  {/* ── Title + Source ── */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-5 pb-3">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] mb-4 font-bold" style={{ color: '#0044CC' }}>
-                      {selected.source} <span className="text-black/20 mx-2">|</span> ANALYTICAL REPORT
+                  {/* ── Article header ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-0 max-w-[860px]">
+                    {/* Source + category */}
+                    <p className="font-mono text-[9px] uppercase tracking-[0.3em] mb-3 font-bold flex items-center gap-2" style={{ color: '#0044CC' }}>
+                      {selected.source}
+                      <span className="text-black/20">|</span>
+                      <span style={{ color: MUTED }}>Analytical Report</span>
                     </p>
-                    <h1
-                      className="font-sans font-semibold tracking-tight leading-[1.1] mb-0"
-                      style={{
-                        fontSize: `clamp(1.5rem, ${2.2 * fontSize}rem, 3.2rem)`,
-                        color: TEXT,
-                        textWrap: 'balance' as any,
-                      }}
-                    >
+
+                    {/* Title */}
+                    <h1 className="font-sans font-semibold tracking-tight leading-[1.1] mb-5"
+                        style={{ fontSize: 'clamp(1.6rem, 3vw, 2.8rem)', color: TEXT, textWrap: 'balance' as any }}>
                       {selected.title}
                     </h1>
+
+                    {/* Meta row */}
+                    <div className="flex items-center gap-3 flex-wrap pb-6 border-b" style={{ borderColor: DIV }}>
+                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] flex items-center gap-1.5" style={{ color: MUTED }}>
+                        <Clock size={10} />
+                        {formatDate(selected.date)}
+                      </span>
+                      <span className="w-1 h-1 rounded-full" style={{ background: DIV }} />
+                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] flex items-center gap-1.5" style={{ color: MUTED }}>
+                        <BookOpen size={10} />
+                        {estimateReadTime(selected.description ?? '')} min read
+                      </span>
+                    </div>
                   </div>
 
-                  {/* ── Full article body — fills remaining space, no blank areas ── */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-4 pb-20 w-full" style={{ overflowX: 'hidden' }}>
-                    <div
-                      lang="en"
-                      className="font-serif font-normal tracking-normal leading-[1.85] space-y-7 opacity-95"
-                      style={{
-                        color: '#1a1a1a',
-                        fontSize: `clamp(15px, ${17 * fontSize}px, 24px)`,
-                        wordBreak: 'break-word',
-                        hyphens: 'auto',
-                        WebkitHyphens: 'auto',
-                      }}
-                    >
+                  {/* ── Article body — perfectly spaced ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-6 max-w-[860px]">
+                    <div className="space-y-6" lang="en"
+                         style={{ color: '#1a1a1a', fontSize: 'clamp(15px, 1.05vw, 18px)', fontFamily: 'Georgia, serif', lineHeight: '1.9', letterSpacing: '0.008em' }}>
                       {selected.description
-                        ? selected.description.split(/\n\n+/).map((p, i) => (
-                            <p key={i}>{p}</p>
-                          ))
-                        : <p>No content available for this article.</p>
+                        ? selected.description.split(/\n\n+/).map((para, i) => {
+                            const trimmed = para.trim();
+                            if (!trimmed) return null;
+                            // Sub-heading detection
+                            if (trimmed.startsWith('## ')) {
+                              return (
+                                <h2 key={i} style={{ fontFamily: 'inherit', fontSize: 'clamp(1rem, 1.2vw, 1.15rem)', fontWeight: 800, letterSpacing: '-0.01em', color: TEXT, marginTop: '2rem', marginBottom: '0.25rem', paddingLeft: '0.75rem', borderLeft: `3px solid ${TEXT}` }}>
+                                  {trimmed.replace(/^##\s+/, '')}
+                                </h2>
+                              );
+                            }
+                            return (
+                              <p key={i} style={{ fontFamily: 'Georgia, serif', fontSize: i === 0 ? 'clamp(16px, 1.1vw, 19px)' : undefined, fontWeight: i === 0 ? 400 : 400, color: i === 0 ? '#111111' : '#1a1a1a' }}>
+                                {trimmed}
+                              </p>
+                            );
+                          })
+                        : <p style={{ color: MUTED, fontFamily: 'Georgia, serif' }}>No content available for this article.</p>
                       }
                     </div>
+                  </div>
 
-                    {/* Legal footer */}
-                    <div className="mt-20 pt-8 border-t" style={{ borderColor: DIV }}>
-                      <div className="flex justify-between items-center font-mono text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: MUTED }}>
+                  {/* ── Full Report CTA ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pb-8 max-w-[860px]">
+                    <div className="pt-6 border-t" style={{ borderColor: DIV }}>
+                      <button
+                        onClick={openFullReport}
+                        className="group inline-flex items-center gap-3 px-6 py-4 border-2 transition-all hover:bg-[#0A0A0A] hover:border-[#0A0A0A]"
+                        style={{ borderColor: TEXT, background: 'transparent' }}>
+                        <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] transition-colors group-hover:text-[#FAF9F6]" style={{ color: TEXT }}>
+                          Full Report
+                        </span>
+                        <ArrowRight size={13} className="transition-colors group-hover:text-[#FAF9F6]" style={{ color: TEXT }} />
+                      </button>
+                      <p className="mt-3 font-mono text-[8px] uppercase tracking-[0.15em]" style={{ color: MUTED }}>
+                        Maximum expansion · Structured analysis
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* ── Legal footer ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pb-20 max-w-[860px]">
+                    <div className="pt-6 border-t" style={{ borderColor: DIV }}>
+                      <div className="flex justify-between items-center font-mono text-[9px] uppercase tracking-widest font-bold mb-3" style={{ color: MUTED }}>
                         <span>Professional Analysis Report</span>
                         <span>Strictly Educational Insights</span>
                       </div>
-                      <p className="font-mono text-xs leading-relaxed uppercase tracking-wide opacity-50" style={{ color: MUTED }}>
+                      <p className="font-mono text-[10px] leading-relaxed uppercase tracking-wide opacity-50" style={{ color: MUTED }}>
                         The analytical material provided herein is solely for educational purposes and should not be construed as investment, financial, or legal advice. Trading and interacting with digital assets inherently involves substantial risk, and full capital loss is possible. Information provided reflects market states at the time of publication.
                       </p>
                     </div>
                   </div>
+
                 </motion.article>
               )}
             </AnimatePresence>
@@ -508,9 +428,7 @@ export function NewsTerminal() {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          MODALES
-          ═══════════════════════════════════════════════════════════ */}
+      {/* ── Modals ── */}
       <CryptoCheckoutModal isOpen={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
 
       <AnimatePresence>
@@ -520,40 +438,39 @@ export function NewsTerminal() {
                       style={{ background: 'rgba(0,0,0,0.82)' }}>
             <motion.div initial={{ scale: 0.97, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.97 }}
                         className="w-full max-w-md relative"
-                        style={{ background: BG, color: TEXT, border: `2px solid ${TEXT}` }}>
-              <div className="flex items-center justify-between px-7 py-5 border-b" style={{ borderColor: DIV }}>
+                        style={{ background: '#FAF9F6', color: '#0A0A0A', border: '2px solid #0A0A0A' }}>
+              <div className="flex items-center justify-between px-7 py-5 border-b" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
                 <div className="flex items-center gap-3">
                   <Mail size={18} />
-                  <span className="font-black text-lg uppercase tracking-tight">Compartir Intel</span>
+                  <span className="font-black text-lg uppercase tracking-tight">Share Intel</span>
                 </div>
                 <button onClick={() => setShareOpen(false)} className="opacity-50 hover:opacity-100 transition-opacity">
                   <X size={18} />
                 </button>
               </div>
-
               {shareSent ? (
-                <div className="p-16 text-center font-mono text-sm font-black uppercase tracking-widest">Transmisión Completada ✓</div>
+                <div className="p-16 text-center font-mono text-sm font-black uppercase tracking-widest">Transmission Complete ✓</div>
               ) : (
                 <form onSubmit={handleShare} className="p-7 space-y-7">
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: MUTED }}>Destinatario</label>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: 'rgba(0,0,0,0.4)' }}>Recipient</label>
                     <input type="email" required value={shareEmail} onChange={e => setShareEmail(e.target.value)}
                            className="w-full bg-transparent outline-none border-b py-2 font-mono text-sm"
-                           style={{ borderColor: DIV, color: TEXT }} placeholder="correo@dominio.com" />
+                           style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#0A0A0A' }} placeholder="email@domain.com" />
                   </div>
                   <div>
-                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: MUTED }}>Nota (Opcional)</label>
+                    <label className="block font-mono text-[9px] uppercase tracking-widest font-bold mb-2" style={{ color: 'rgba(0,0,0,0.4)' }}>Note (Optional)</label>
                     <textarea value={shareNote} onChange={e => setShareNote(e.target.value)} rows={3}
                               className="w-full bg-transparent outline-none border p-3 font-serif text-sm resize-none"
-                              style={{ borderColor: DIV, color: TEXT }} />
+                              style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#0A0A0A' }} />
                   </div>
                   <button type="submit" disabled={isSending}
                           className="w-full py-4 font-mono text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
-                          style={{ background: TEXT, color: BG }}>
-                    {isSending ? 'Enviando...' : 'Transmitir Acceso Único (1-Time)'}
+                          style={{ background: '#0A0A0A', color: '#FAF9F6' }}>
+                    {isSending ? 'Sending...' : 'Transmit One-Time Access'}
                   </button>
-                  <p className="text-center font-mono text-[8px] uppercase tracking-widest" style={{ color: MUTED }}>
-                    El destinatario solo podrá leer esta noticia una vez.
+                  <p className="text-center font-mono text-[8px] uppercase tracking-widest" style={{ color: 'rgba(0,0,0,0.4)' }}>
+                    The recipient can read this article only once.
                   </p>
                 </form>
               )}

@@ -725,6 +725,40 @@ export function MobileLanding() {
     } catch {}
   }, [mounted, address, isLinked]);
 
+  // ── FAST BOOT: aggressive 100ms poll for 10s right after mount ───────────
+  // Catches edge case where wagmi reconnects AFTER the 300ms poll window above
+  // has already given up (e.g. slow 3G, iOS background throttling, MetaMask deeplink).
+  useEffect(() => {
+    if (!mounted || isLinked) return;
+    let attempts = 0;
+    const poll = setInterval(() => {
+      attempts++;
+      const addr = addressRef.current;
+      if (addr && isConnectedRef.current && !isLinkedRef.current) {
+        clearInterval(poll);
+        performLink(addr);
+        return;
+      }
+      // Also try cookie fallback — if sovereign_handshake cookie is set
+      // from a previous session and wagmi hasn't reconnected yet
+      if (!isLinkedRef.current) {
+        try {
+          const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+          const cookieAddr = match?.[1];
+          if (cookieAddr) {
+            clearInterval(poll);
+            setLinkedAddress(cookieAddr);
+            setIsLinked(true);
+            return;
+          }
+        } catch {}
+      }
+      if (attempts > 100 || isLinkedRef.current) clearInterval(poll);
+    }, 100);
+    return () => clearInterval(poll);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
   // ── Fulfill PC QR session if opened via native camera scan ─────────────
   useEffect(() => {
     if (isLinked && address && sessionParam) {
@@ -911,28 +945,61 @@ export function MobileLanding() {
           <p className="text-[12px] font-medium leading-relaxed" style={{ color: MUTED }}>
             Sovereign-grade blockchain intelligence. Connect your wallet to sync your session with the desktop terminal.
           </p>
-          {/* Manual reconnect escape hatch — appears after 8s */}
+          {/* Manual reconnect escape hatch — appears after 3s */}
           {showManualReconnect && (
-            <motion.button
+            <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              onClick={() => { 
-                setShowManualReconnect(false);
-                // Try to link immediately using whatever address we have right now
-                const currentAddr = addressRef.current;
-                if (currentAddr && isConnectedRef.current && !isLinkedRef.current) {
-                  performLink(currentAddr);
-                } else {
-                  // No address yet — force wagmi reconnect via reload as last resort
-                  window.location.reload();
-                }
-              }}
-              className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#2D0A59]/20 bg-[#2D0A59]/5 text-[#2D0A59] font-black uppercase tracking-widest text-[10px] active:scale-[0.97] transition-all"
+              className="mt-3 w-full flex flex-col gap-2"
             >
-              <RefreshCw size={13} />
-              Ya conecté mi wallet &mdash; Sincronizar
-            </motion.button>
+              {/* Primary: use cookie address or live address immediately */}
+              <button
+                onClick={() => {
+                  // 1. Try live wagmi/AppKit address
+                  const liveAddr = addressRef.current;
+                  if (liveAddr && isConnectedRef.current && !isLinkedRef.current) {
+                    performLink(liveAddr);
+                    return;
+                  }
+                  // 2. Try cookie address (persisted from previous session)
+                  try {
+                    const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+                    const cookieAddr = match?.[1];
+                    if (cookieAddr && !isLinkedRef.current) {
+                      setLinkedAddress(cookieAddr);
+                      setIsLinked(true);
+                      return;
+                    }
+                  } catch {}
+                  // 3. Try sessionStorage signed flag
+                  try {
+                    const allKeys = Object.keys(sessionStorage);
+                    const signedKey = allKeys.find(k => k.startsWith('sovereign_signed_0x'));
+                    if (signedKey) {
+                      const addr = signedKey.replace('sovereign_signed_', '');
+                      setLinkedAddress(addr);
+                      setIsLinked(true);
+                      return;
+                    }
+                  } catch {}
+                  // 4. Last resort: open AppKit so user can reconnect
+                  openAppKitDirect();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-[#2D0A59]/30 bg-[#2D0A59]/8 text-[#2D0A59] font-black uppercase tracking-widest text-[10px] active:scale-[0.97] transition-all"
+              >
+                <RefreshCw size={13} />
+                Ya conecté mi wallet — Entrar
+              </button>
+              {/* Secondary: open AppKit to reconnect from scratch */}
+              <button
+                onClick={() => openAppKitDirect()}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-black/10 bg-white text-black/50 font-black uppercase tracking-widest text-[9px] active:scale-[0.97] transition-all"
+              >
+                <ScanLine size={12} />
+                Reconectar wallet
+              </button>
+            </motion.div>
           )}
         </motion.div>
 

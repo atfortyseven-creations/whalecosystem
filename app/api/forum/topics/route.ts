@@ -10,8 +10,10 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const categorySlug = searchParams.get('category');
         const tag = searchParams.get('tag');
-        const limit = parseInt(searchParams.get('limit') || '30');
+        const rawLimit = parseInt(searchParams.get('limit') || '30');
+        const limit = Math.min(rawLimit, 50); // Hard cap at 50 to prevent DoS
         const filter = searchParams.get('filter') || 'latest';
+        const cursor = searchParams.get('cursor');
 
         let orderBy: any = { updatedAt: 'desc' };
         if (filter === 'new') orderBy = { createdAt: 'desc' };
@@ -36,7 +38,8 @@ export async function GET(req: Request) {
                 }
             },
             orderBy,
-            take: limit
+            take: limit,
+            ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
         });
 
         return NextResponse.json(topics);
@@ -64,6 +67,18 @@ export async function POST(req: Request) {
 
         if (!title || !content || !categoryId) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+        
+        if (title.length > 300) {
+            return NextResponse.json({ error: 'Title is too long (max 300 chars)' }, { status: 400 });
+        }
+        
+        if (content.length > 50000) {
+            return NextResponse.json({ error: 'Content is too long (max 50,000 chars)' }, { status: 400 });
+        }
+        
+        if (tags && Array.isArray(tags) && tags.length > 10) {
+            return NextResponse.json({ error: 'Too many tags (max 10)' }, { status: 400 });
         }
 
         const isUserAdmin = isAdmin(address);

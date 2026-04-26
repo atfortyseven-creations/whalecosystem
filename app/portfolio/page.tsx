@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
 import { useAppKit, useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
-import { useAccount } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
@@ -153,8 +153,8 @@ export default function PortfolioPage() {
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
   const { address: userAddress, isConnected } = useAppKitAccount();
   const { chain } = useAccount();
-  const { switchNetwork, caipNetwork } = useAppKitNetwork();
-  const [isSwitching, setIsSwitching] = useState(false);
+  const { caipNetwork } = useAppKitNetwork();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { connect } = useConnect();
   const { open } = useAppKit();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -392,21 +392,19 @@ export default function PortfolioPage() {
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {SUPPORTED_CHAINS.map(({ caipId, name, color, symbol, id }) => {
-                  const isActive = caipNetwork?.id === id;
+                  const isActive = caipNetwork?.id === id || chain?.id === id;
                   return (
                     <button
                       key={id}
                       onClick={async () => {
                         if (isActive) return;
-                        setIsSwitching(true);
                         toast.info(`Switching to ${name}...`);
                         try {
-                          await switchNetwork(caipId as any);
+                          await switchChain({ chainId: id });
                           toast.success(`Connected to ${name}`);
                         } catch (e: any) {
-                          toast.error(`Switch failed: ${e?.message ?? 'rejected'}`);
-                        } finally {
-                          setIsSwitching(false);
+                          // Fallback: open AppKit Networks modal
+                          open({ view: 'Networks' });
                         }
                       }}
                       disabled={isActive || isSwitching}

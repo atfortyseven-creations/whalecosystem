@@ -21,6 +21,12 @@ export async function GET(request: NextRequest) {
     targetUrl = FALLBACKS[Math.abs(h) % FALLBACKS.length];
   }
 
+  // SSRF Protection: Restrict to known safe image hosts
+  const ALLOWED_HOSTS = /^https?:\/\/(images\.(pexels|unsplash|coindesk|decrypt|cointelegraph|reuters|bloomberg)\.com|.*\.coinmarketcap\.com|.*\.coingecko\.com|upload\.wikimedia\.org)/i;
+  if (!ALLOWED_HOSTS.test(targetUrl)) {
+    return NextResponse.json({ error: 'Blocked: Unauthorized image host' }, { status: 403 });
+  }
+
   try {
     const res = await fetch(targetUrl, {
       headers: {

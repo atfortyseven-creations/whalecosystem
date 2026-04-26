@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { RpcRelayerManager } from '@/lib/blockchain/rpc-relayer';
+import { getPriceCached } from '@/lib/price-cache';
 
 const WHALE_USD_THRESHOLD = 0; // $0 minimum to guarantee system vitality and Zero-Mock compliance
 
@@ -77,11 +78,22 @@ function getChains(): ChainConfig[] {
       label: 'BSC',
       chainId: 56,
       rpcUrls: [
-        RpcRelayerManager.getRpcUrl('BSC', 'RPC') ||
-        process.env.BSC_RPC_URL ||
-        process.env.GETBLOCK_BSC_RPCS?.split(',')[0] ||
+        // Priority 1: institutional GetBlock endpoint (keyed, highest reliability)
+        process.env.GETBLOCK_BSC_RPC
+          ? `https://go.getblock.io/${process.env.GETBLOCK_BSC_RPC}/bsc/mainnet/`
+          : null,
+        // Priority 2: env override
+        process.env.BSC_RPC_URL || null,
+        // Priority 3: RpcRelayerManager (multi-account rotation)
+        RpcRelayerManager.getRpcUrl('BSC', 'RPC') || null,
+        // Priority 4–7: public fallback cascade
+        'https://bsc.publicnode.com',
+        'https://bsc-rpc.publicnode.com',
         'https://bsc-dataseed1.binance.org',
-      ].filter(Boolean),
+        'https://bsc-dataseed2.binance.org',
+        'https://bsc-dataseed3.binance.org',
+        'https://bsc-dataseed4.binance.org',
+      ].filter(Boolean) as string[],
       nativeSymbol: 'BNB',
       priceKey: 'BNB',
     },
@@ -93,14 +105,7 @@ type CacheEntry = { data: any[]; ts: number };
 const cache: Record<string, CacheEntry> = {};
 const CACHE_TTL = 30_000; // 30 seconds
 
-// Simple token price cache
-const priceCache: Record<string, { price: number; ts: number }> = {};
-
 async function getPrice(symbol: string): Promise<number> {
-  const PRICE_TTL = 60_000;
-  const cached = priceCache[symbol];
-  if (cached && Date.now() - cached.ts < PRICE_TTL) return cached.price;
-
   const idMap: Record<string, string> = {
     ETH: 'ethereum', BNB: 'binancecoin', BTC: 'bitcoin',
     USDT: 'tether', USDC: 'usd-coin', DAI: 'dai',
@@ -109,23 +114,9 @@ async function getPrice(symbol: string): Promise<number> {
   };
   const coinId = idMap[symbol];
   if (!coinId || ['USDT', 'USDC', 'DAI', 'BUSD'].includes(symbol)) {
-    priceCache[symbol] = { price: 1, ts: Date.now() };
     return 1;
   }
-
-  try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
-      { signal: AbortSignal.timeout(3000) }
-    );
-    const json = await res.json();
-    const price = json[coinId]?.usd || 0;
-    priceCache[symbol] = { price, ts: Date.now() };
-    return price;
-  } catch {
-    const fallbacks: Record<string, number> = { ETH: 3300, BNB: 600, BTC: 86000, SOL: 145, MATIC: 0.7, LINK: 18 };
-    return fallbacks[symbol] || 0;
-  }
+  return getPriceCached(coinId, symbol);
 }
 
 async function scanChain(chain: ChainConfig): Promise<any[]> {
