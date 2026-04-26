@@ -877,10 +877,52 @@ export function MobileLanding() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  // ── Priority 1: wagmi/AppKit already has the address in memory ──
+                  if (address) {
+                    establishSession(address);
+                    return;
+                  }
+
+                  // ── Priority 2: Scan localStorage for any WalletConnect session ──
+                  try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                      const key = localStorage.key(i);
+                      if (!key) continue;
+                      if (
+                        key.includes('@w3m/') ||
+                        key.includes('wagmi') ||
+                        key.includes('wc@2') ||
+                        key.includes('walletconnect')
+                      ) {
+                        const val = localStorage.getItem(key);
+                        if (val) {
+                          const match = val.match(/0x[a-fA-F0-9]{40}/i);
+                          if (match?.[0]) {
+                            establishSession(match[0]);
+                            return;
+                          }
+                        }
+                      }
+                    }
+                  } catch {}
+
+                  // ── Priority 3: Cookie fallback — address already in cookie ──
+                  try {
+                    const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+                    if (cookieMatch?.[1]) {
+                      // Cookie already set → just refresh to trigger isLinked render
+                      window.location.reload();
+                      return;
+                    }
+                  } catch {}
+
+                  // ── Priority 4: Last resort reload (wagmi will reconnect on load) ──
+                  window.location.reload();
+                }}
                 className="mt-6 w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3"
               >
-                <RefreshCw size={16} className="animate-spin-slow" />
+                <RefreshCw size={16} />
                 Continuar si ya conecté
               </motion.button>
             )}
