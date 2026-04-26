@@ -34,10 +34,13 @@ function extractAddressFromAppKit(value: string): string | null {
       const addr = accounts[0].split(':')[2];
       if (addr?.match(/^0x[a-fA-F0-9]{40}$/i)) return addr;
     }
-    // Generic fallback — last resort
-    const match = value.match(/0x[a-fA-F0-9]{40}/i);
-    return match ? match[0] : null;
-  } catch { return null; }
+  } catch { 
+    // Ignore JSON parse errors, proceed to fallback
+  }
+
+  // Generic fallback — last resort
+  const match = value.match(/0x[a-fA-F0-9]{40}/i);
+  return match ? match[0] : null;
 }
 
 // ── Live clock hook ───────────────────────────────────────────────────────────
@@ -625,7 +628,8 @@ export function MobileLanding() {
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
-  const [showingManifesto, setShowingManifesto] = useState(false);
+  // Default to showing the manifesto upon connection as explicitly requested by the user
+  const [showingManifesto, setShowingManifesto] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
   // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
@@ -660,13 +664,13 @@ export function MobileLanding() {
 
     setLinkedAddress(norm);
     setIsLinked(true);
-    setShowingManifesto(false);
+    setShowingManifesto(true);
     setConnecting(null);
     setShowFallbackBtn(false);
 
     // ATOMIC REDIRECT TO TERMINAL (LANDING PAGE)
     if (typeof window !== 'undefined') {
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     }
   }, [isLinked, closeAppKit]);
 
