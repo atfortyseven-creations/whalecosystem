@@ -47,7 +47,7 @@ const DESKTOP_WALLETS = [
     id: "coinbase",
     name: "Coinbase Wallet",
     badge: "Browser Extension",
-    logo: "/wallets/coinbase.svg",
+    logo: "/wallets/coinbase.png",
     rdns: "com.coinbase.wallet",
     installUrl: "https://www.coinbase.com/wallet",
     delay: 0.1,
@@ -56,7 +56,7 @@ const DESKTOP_WALLETS = [
     id: "rainbow",
     name: "Rainbow",
     badge: "Browser Extension",
-    logo: "/wallets/rainbow.svg",
+    logo: "/wallets/rainbow.png",
     rdns: "me.rainbow",
     installUrl: "https://rainbow.me/extension",
     delay: 0.2,
@@ -65,9 +65,9 @@ const DESKTOP_WALLETS = [
 
 // ─── Mobile wallets (all open AppKit which uses WC deep-links) ───────────────
 const MOBILE_WALLETS = [
-  { id: "metamask-mobile",   name: "MetaMask",       badge: "Tap to open app", logo: "/wallets/metamask.svg", delay: 0 },
-  { id: "coinbase-mobile",   name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.svg", delay: 0.1 },
-  { id: "rainbow-mobile",    name: "Rainbow",        badge: "Tap to open app", logo: "/wallets/rainbow.svg", delay: 0.2 },
+  { id: "metamask-mobile",   name: "MetaMask",       badge: "Tap to open app", logo: "/wallets/metamask.svg",  delay: 0 },
+  { id: "coinbase-mobile",   name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.png",  delay: 0.1 },
+  { id: "rainbow-mobile",    name: "Rainbow",        badge: "Tap to open app", logo: "/wallets/rainbow.png",   delay: 0.2 },
 ];
 
 // ─── Wallet button ────────────────────────────────────────────────────────────
