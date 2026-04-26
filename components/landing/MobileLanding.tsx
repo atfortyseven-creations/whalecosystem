@@ -667,11 +667,10 @@ export function MobileLanding() {
     setShowingManifesto(true);
     setConnecting(null);
     setShowFallbackBtn(false);
-
-    // ATOMIC REDIRECT TO TERMINAL (LANDING PAGE)
-    if (typeof window !== 'undefined') {
-      window.location.href = '/';
-    }
+    // NO REDIRECT: We stay on /connect which already renders MobileLanding.
+    // Redirecting to "/" triggers SSR User-Agent detection which can send a
+    // desktop layout to mobile browsers with "Desktop site" enabled.
+    // The ConnectedScreen / ImmersiveManifestoLanding renders in-place here.
   }, [isLinked, closeAppKit]);
 
   useEffect(() => {
