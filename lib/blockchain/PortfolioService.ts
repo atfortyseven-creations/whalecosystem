@@ -574,9 +574,8 @@ export class PortfolioService {
 
     const activeChainIds = new Set(activeChainsData.active_chains.map((c: any) => parseInt(c.chain_id)));
     
-    // Filter target chains to only those that actually have assets (plus Mainnet/Base as defaults)
-    const essentialChains = [ChainId.MAINNET, ChainId.BASE];
-    const chainsToQuery = targetChains.filter(id => activeChainIds.has(id) || essentialChains.includes(id));
+    // Always query all requested chains — each will at minimum show native 0.0000 balance
+    const chainsToQuery = targetChains;
 
     console.log(`[Portfolio-SPEED] Querying ${chainsToQuery.length}/${targetChains.length} active chains in parallel...`);
 
@@ -665,9 +664,16 @@ export class PortfolioService {
         // We don't recurse here to avoid infinite loops, but we can do a quick extra check
     }
     
-    // Sort tokens by value across ALL chains
+    // Sort tokens by value across ALL chains, deduplicating native tokens per chain
+    const seen = new Set<string>();
     const allTokens = validResults
       .flatMap(r => r.tokens)
+      .filter(t => {
+        const key = `${t.chainId}:${t.address}:${t.symbol}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .sort((a, b) => b.valueUsd - a.valueUsd);
 
     // 4. Removed Phantom Exchange PnL to strictly enforce On-Chain data
