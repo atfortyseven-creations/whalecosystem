@@ -79,15 +79,7 @@ export const wagmiAdapter = new WagmiAdapter({
     }),
     ssr: true,
     projectId,
-    networks,
-    transports: {
-        [mainnet.id]: http(process.env.ETH_RPC_URL || 'https://go.getblock.us/81ed63d96d704589999ff99c9a1ff64b'),
-        [bsc.id]: http(process.env.BNB_RPC_URL || 'https://go.getblock.us/8405bc34194e4343a10cdc7a76360793'),
-        [polygon.id]: http(),
-        [base.id]: http(process.env.GETBLOCK_BASE_RPC || base.rpcUrls.default.http[0]),
-        [arbitrum.id]: http(),
-        [optimism.id]: http()
-    }
+    networks
 })
 
 export const config = wagmiAdapter.wagmiConfig
