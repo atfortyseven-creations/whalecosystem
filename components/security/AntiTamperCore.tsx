@@ -22,42 +22,8 @@ export function AntiTamperCore() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // ── DevTools Probe ──────────────────────────────────────────────────────
-        const protectIntegrity = () => {
-            const timeStart = performance.now();
-            debugger; 
-            const timeEnd = performance.now();
-            if (timeEnd - timeStart > 100) {
-                console.warn('[WhaleFortress] 🚨 DEVTOOLS ENVIRONMENT DETECTED! Context isolation triggered.');
-            }
-        };
+        // ── Removed DevTools Probe and MutationObserver to prevent mobile freezes ──
 
-        const interval = setInterval(protectIntegrity, 2500);
-
-        // ── Mutation Observer ───────────────────────────────────────────────────
-        const mutationObserver = new MutationObserver((mutations) => {
-            for (const mutation of mutations) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                    const el = mutation.target as HTMLElement;
-                    if (el.id === 'kyc-shield' && el.style.display === 'none') {
-                        hasTampered.current = true;
-                    }
-                }
-            }
-
-            if (hasTampered.current) {
-                console.error('[WhaleFortress:Critical] 🛡️ NANOSCOPIC TAMPERING DETECTED.');
-                mutationObserver.disconnect();
-                window.location.href = '/'; 
-            }
-        });
-
-        mutationObserver.observe(document.documentElement, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['style'],
-        });
 
         // ── Right-Click / Context Menu Block ───────────────────────────────────
         const blockContextMenu = (e: MouseEvent) => {
@@ -96,8 +62,6 @@ export function AntiTamperCore() {
         document.addEventListener('dragstart', blockDrag);
 
         return () => {
-            mutationObserver.disconnect();
-            clearInterval(interval);
             document.removeEventListener('contextmenu', blockContextMenu);
             document.removeEventListener('keydown', blockKeyboard);
             document.removeEventListener('dragstart', blockDrag);

@@ -7,18 +7,7 @@ import { UserProfileModal } from '@/components/ui/UserProfileModal';
 export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUrl?: string }) {
   const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (address) {
-      fetch('/api/forum/notifications')
-        .then(r => r.json())
-        .then(data => {
-          if (data.unreadCount) setUnreadCount(data.unreadCount);
-        }).catch(() => {});
-    }
-  }, [address]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -112,14 +101,6 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           {/* Avatar / connect */}
           {address ? (
             <div className="flex items-center gap-4">
-              <Link href="/forum/notifications" className="relative group">
-                <span className="text-[14px] transition-opacity" style={{ color: 'var(--forum-text)' }}>🔔</span>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full text-[7px] font-black text-black flex items-center justify-center" style={{ backgroundColor: 'var(--forum-text)' }}>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </Link>
               <button
                 onClick={() => setProfileOpen(true)}
                 className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors"
