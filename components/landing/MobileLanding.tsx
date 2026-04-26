@@ -663,6 +663,11 @@ export function MobileLanding() {
     setShowingManifesto(false);
     setConnecting(null);
     setShowFallbackBtn(false);
+
+    // ATOMIC REDIRECT TO TERMINAL (LANDING PAGE)
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   }, [isLinked, closeAppKit]);
 
   useEffect(() => {
@@ -989,8 +994,11 @@ export function MobileLanding() {
               setConnecting('metamask');
               setShowManualReconnect(true);
               setShowFallbackBtn(false);
+              const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
               const injectedConn = connectors.find(c => c.id === 'injected');
-              if (injectedConn) {
+              // Only use injected if window.ethereum actually exists (i.e. MetaMask in-app browser).
+              // Otherwise (e.g. Chrome mobile), fallback to AppKit WalletConnect deep linking.
+              if (hasEthereum && injectedConn) {
                 connect({ connector: injectedConn });
               } else {
                 openAppKitDirect();
@@ -1011,8 +1019,9 @@ export function MobileLanding() {
               setConnecting('coinbase');
               setShowManualReconnect(true);
               setShowFallbackBtn(false);
+              const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
               const injectedConn = connectors.find(c => c.id === 'injected');
-              if (injectedConn) {
+              if (hasEthereum && injectedConn) {
                 connect({ connector: injectedConn });
               } else {
                 openAppKitDirect();
