@@ -47,7 +47,7 @@ const NO_DOWNHEAD_PREFIXES = [
   '/voss-supremacy', '/sovereign-intel', '/predictions', '/ledger',
   '/gold-registry', '/infrastructure', '/directory', '/company',
   '/vip', '/faq', '/api-marketplace', '/clearance', '/settings',
-  '/login', '/sign-up', '/legal', '/admin', '/developer',
+  '/login', '/sign-up', '/legal', '/admin', '/developer', '/forum',
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,6 +62,7 @@ const BOUNDED_PREFIXES = [
   '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
   '/api-marketplace', '/directory', '/company', '/infrastructure',
+  '/forum',
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
