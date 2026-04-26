@@ -877,9 +877,12 @@ export function MobileLanding() {
             loading={connecting === 'metamask'}
             onClick={() => {
               setConnecting('metamask');
-              const mm = connectors.find(c => c.name.toLowerCase().includes('metamask') || c.id === 'metaMaskSDK' || c.id === 'injected');
-              if (mm) connect({ connector: mm });
-              else openAppKitDirect();
+              const injectedConn = connectors.find(c => c.id === 'injected');
+              if (injectedConn) {
+                connect({ connector: injectedConn });
+              } else {
+                openAppKitDirect();
+              }
               setTimeout(() => setConnecting(null), 3000);
             }}
             delay={0.1}
@@ -893,9 +896,12 @@ export function MobileLanding() {
             loading={connecting === 'coinbase'}
             onClick={() => {
               setConnecting('coinbase');
-              const cb = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
-              if (cb) connect({ connector: cb });
-              else openAppKitDirect();
+              const injectedConn = connectors.find(c => c.id === 'injected');
+              if (injectedConn) {
+                connect({ connector: injectedConn });
+              } else {
+                openAppKitDirect();
+              }
               setTimeout(() => setConnecting(null), 3000);
             }}
             delay={0.15}
