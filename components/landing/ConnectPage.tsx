@@ -210,17 +210,49 @@ export default function ConnectPage() {
         return;
       }
     } catch {}
-    // Write the sovereign cookie if not already present
-    if (!document.cookie.includes("sovereign_handshake=")) {
-      document.cookie = `sovereign_handshake=${address ?? "web3_injected"}; path=/; max-age=604800; SameSite=Lax`;
+
+    let redirectInterval: NodeJS.Timeout;
+
+    const enforceRedirect = () => {
+      if (!document.cookie.includes("sovereign_handshake=")) {
+        document.cookie = `sovereign_handshake=${address ?? "web3_injected"}; path=/; max-age=604800; SameSite=Lax`;
+      }
+      setPendingId(null);
+      
+      // Layer 1: Next.js Client-Side Routing (Fastest)
+      router.replace("/");
+      
+      // Layer 2: Aggressive Polling for Hard Redirect (Unkillable iOS/Android fallback)
+      redirectInterval = setInterval(() => {
+        if (window.location.pathname !== "/") {
+          window.location.href = "/";
+        }
+      }, 500);
+    };
+
+    // iOS/Android Chrome Background Suspension Fix
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          enforceRedirect();
+          document.removeEventListener("visibilitychange", handleVisibilityChange);
+        }
+      };
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      
+      // Timeout fallback just in case
+      setTimeout(enforceRedirect, 2000);
+      
+      return () => {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        if (redirectInterval) clearInterval(redirectInterval);
+      };
+    } else {
+      enforceRedirect();
+      return () => {
+        if (redirectInterval) clearInterval(redirectInterval);
+      };
     }
-    // Clear the pending wallet UI state
-    setPendingId(null);
-    
-    // Auto-redirect to landing page upon connection
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 500);
   }, [isConnected, mounted, address, router]);
 
 
@@ -314,7 +346,7 @@ export default function ConnectPage() {
                 opacity: 1,
                 mixBlendMode: "normal",
                 transform: "scale(1.01)", // Prevents edge bleed for max DPI
-                imageRendering: "high-quality" // Max DPI quality
+                imageRendering: "high-quality" as any // Max DPI quality
               }}
             />
             <div className="relative z-10 flex flex-col h-full">
@@ -425,60 +457,51 @@ export default function ConnectPage() {
 
               {/* ─────────────────────────────────────────────────────── */}
               {/* SOVEREIGN CONNECTED STATE                               */}
-              {/* Zero auto-redirects. User navigates explicitly.         */}
+              {/* AGGRESSIVE AUTO-REDIRECT ENFORCEMENT                    */}
               {/* ─────────────────────────────────────────────────────── */}
               {mounted && isConnected ? (
                 <motion.div
                   key="connected-state"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col gap-5 flex-1"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col items-center justify-center gap-6 flex-1 py-12"
                 >
-                  {/* Success badge */}
-                  <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-[20px]">
-                    <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <CheckCircle size={17} className="text-emerald-600" />
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-emerald-700">
-                        Identity Verified
-                      </span>
-                      <span className="text-[9px] font-mono text-emerald-500/70 truncate mt-0.5">
-                        {address ? `${address.slice(0, 10)}…${address.slice(-8)}` : 'Connected'}
-                      </span>
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20" />
+                    <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-lg relative z-10">
+                      <CheckCircle size={36} className="text-emerald-500" />
                     </div>
                   </div>
-
-                  {/* Explicit navigation CTAs — user chooses destination */}
-                  <div className="flex flex-col gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => router.push('/dashboard')}
-                      className="group w-full flex items-center justify-between p-5 bg-[#8B5CF6] text-white rounded-[20px] shadow-[0_20px_40px_-10px_rgba(139,92,246,0.35)] hover:bg-[#7C3AED] transition-all border border-[#8B5CF6]"
-                    >
-                      <div className="flex flex-col text-left">
-                        <span className="text-[13px] font-black uppercase tracking-tight text-white">Join to Whale Alert Network</span>
-                      </div>
-                      <ArrowRight size={16} className="text-white/80 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => router.push('/')}
-                      className="group w-full flex items-center justify-between p-5 bg-[#FAF9F6] border border-black/[0.08] text-[#050505] rounded-[20px] hover:bg-white hover:border-black/15 transition-all"
-                    >
-                      <span className="text-[12px] font-black uppercase tracking-tight">Back to Home</span>
-                      <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
-                    </motion.button>
+                  
+                  <div className="flex flex-col items-center text-center max-w-[280px]">
+                    <span className="text-[14px] font-black uppercase tracking-widest text-emerald-700">
+                      Identity Verified
+                    </span>
+                    <span className="text-[10px] font-mono text-emerald-600/60 break-all mt-2 px-4 py-2 bg-emerald-50/50 rounded-xl border border-emerald-100/50">
+                      {address}
+                    </span>
                   </div>
 
-                  {/* Full address pill */}
-                  <div className="mt-auto p-4 bg-[#FAF9F6]/80 border border-black/[0.06] rounded-2xl flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                    <p className="text-[9px] text-black/35 font-mono break-all">{address}</p>
+                  <div className="flex flex-col items-center gap-3 mt-4">
+                    <Loader2 size={24} className="animate-spin text-black/20" />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-black/40 animate-pulse">
+                      Redirecting to Terminal...
+                    </span>
+                  </div>
+
+                  {/* Absolute Failsafe: Hardcoded Anchor Link */}
+                  <div className="mt-8">
+                    <a 
+                      href="/" 
+                      className="text-[9px] font-black uppercase tracking-widest text-black/20 hover:text-black/60 underline decoration-dotted underline-offset-4 transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = "/";
+                      }}
+                    >
+                      Click here if not redirected automatically
+                    </a>
                   </div>
                 </motion.div>
 
