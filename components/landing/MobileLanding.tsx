@@ -561,7 +561,13 @@ export function MobileLanding() {
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
-  const [showManualReconnect, setShowManualReconnect] = useState(false);
+  // Always false on SSR. Reads from sessionStorage after mount to survive Chrome
+  // tab freeze/restore (which resets React state when user returns from Rainbow).
+  const [showManualReconnect, setShowManualReconnectRaw] = useState(false);
+  const setShowManualReconnect = (val: boolean) => {
+    try { sessionStorage.setItem('sovereign_show_reconnect', val ? '1' : '0'); } catch {}
+    setShowManualReconnectRaw(val);
+  };
 
   // Init isLinked from cookie immediately — no flash
   const [isLinked, setIsLinked] = useState<boolean>(() => {
@@ -591,7 +597,15 @@ export function MobileLanding() {
   const [showingManifesto, setShowingManifesto] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    // Restore button state from sessionStorage (survives Chrome tab freeze/restore)
+    try {
+      if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
+        setShowManualReconnectRaw(true);
+      }
+    } catch {}
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // SINGLE SOURCE OF TRUTH: if wagmi/AppKit says connected → land immediately
@@ -601,6 +615,9 @@ export function MobileLanding() {
     const norm = addr.toLowerCase();
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
+    // Clear the reconnect button — session is now established
+    try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
+    setShowManualReconnectRaw(false);
     fetch('/api/wallet/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

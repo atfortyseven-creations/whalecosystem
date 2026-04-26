@@ -94,10 +94,10 @@ const metadata = {
     name: 'Whale Alert Network',
     description: 'Sovereign Institutional Intelligence',
     url: APP_URL,
-    // Dejar vacío previene el fallo del Proxy Explorer de WalletConnect causado por 
-    // bloqueos de Cloudflare o tiempos de espera con PNGs de tamaño excesivo.
-    // AppKit generará automáticamente un Avatar con gradiente nativo inderrotable.
-    icons: ['https://humanidfi.com/wan-logo-white.svg'],
+    // Empty icons array: prevents WalletConnect relay from fetching a potentially
+    // slow/blocked icon URL during the mobile handshake (root cause of Rainbow
+    // "Connection failed" error). AppKit renders a native gradient avatar instead.
+    icons: [],
 }
 
 // ── 1-Click Auth: SIWE Configuration
