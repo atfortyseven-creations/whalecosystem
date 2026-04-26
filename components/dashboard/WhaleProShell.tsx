@@ -15,12 +15,13 @@ import {
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { useUIStore } from '@/lib/store/ui-store';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
 import { InstitutionalErrorBoundary } from '@/components/ui/InstitutionalErrorBoundary';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { toast } from 'sonner';
+import { useDisconnect } from 'wagmi';
 
 interface NavItem {
     id: string;
@@ -104,6 +105,14 @@ function PriceFlash({ value, children }: { value: string | number; children: Rea
 
 
 
+// Convert autoDisconnectTimer setting string to milliseconds
+function timerToMs(t: '15m' | '1h' | '24h' | 'never'): number | null {
+    if (t === '15m')   return 15  * 60 * 1000;
+    if (t === '1h')    return 60  * 60 * 1000;
+    if (t === '24h')   return 24  * 60 * 60 * 1000;
+    return null; // 'never'
+}
+
 export function WhaleProShell({ 
     children, 
     activeTab, 
@@ -118,18 +127,49 @@ export function WhaleProShell({
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isPaletteOpen, setIsPaletteOpen] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
-    const { setSettingsOpen } = useSettingsStore();
+    const [isSessionLocked, setIsSessionLocked] = useState(false);
+    const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const { setSettingsOpen, autoDisconnectTimer, stealthMode } = useSettingsStore();
     const { openConnectModal } = useUIStore();
+    const { disconnect } = useDisconnect();
 
     const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
-        title: 'MÓDULO EN DESARROLLO',
+        title: 'MODULE IN DEVELOPMENT',
         subtitle: 'BETA RELEASE',
-        overview: 'Este módulo está bajo despliegue activo. Las funciones de telemetría y análisis intensivo serán detalladas próximamente al alcanzar el grado de producción.',
+        overview: 'This module is under active deployment. Full telemetry and analytical functions will be detailed once production-grade stability is achieved.',
         features: []
     };
 
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
     const { connector, isConnected: isWalletConnected, isSovereignHandshake } = useSovereignAccount();
+
+    // ── Inactivity Session Lock — driven by autoDisconnectTimer from settings ──
+    useEffect(() => {
+        const ms = timerToMs(autoDisconnectTimer);
+        if (!ms) return; // 'never' — no timer
+
+        const reset = () => {
+            if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+            idleTimerRef.current = setTimeout(() => {
+                setIsSessionLocked(true);
+            }, ms);
+        };
+
+        const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+        events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+        reset(); // start timer
+
+        return () => {
+            if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+            events.forEach(e => window.removeEventListener(e, reset));
+        };
+    }, [autoDisconnectTimer]);
+
+    const unlockSession = () => {
+        setIsSessionLocked(false);
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
 
     const handleTabChange = (id: string) => {
         if (id === 'developer') {
@@ -178,7 +218,35 @@ export function WhaleProShell({
             setIsOpen={setIsPaletteOpen}
             onTabChange={onTabChange}
         />
-        <div className="flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden">
+
+        {/* ─── Session Lock Overlay ─── */}
+        <AnimatePresence>
+            {isSessionLocked && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[9999] flex flex-col items-center justify-center text-center"
+                    style={{ background: 'rgba(250,249,246,0.97)', backdropFilter: 'blur(24px)' }}
+                >
+                    <Lock size={48} className="mb-6 text-black/20" strokeWidth={1} />
+                    <h2 className="text-2xl font-black uppercase tracking-[0.2em] text-[#050505] mb-2">Session Locked</h2>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-8">
+                        Auto-lock after {autoDisconnectTimer} of inactivity
+                    </p>
+                    <button
+                        onClick={unlockSession}
+                        className="px-8 py-3.5 bg-[#050505] text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-all active:scale-[0.98]"
+                    >
+                        <Shield size={13} className="inline mr-2 mb-0.5" />
+                        Resume Session
+                    </button>
+                </motion.div>
+            )}
+        </AnimatePresence>
+
+        <div className={`flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] opacity-5 pointer-events-none' : ''}`}>
+
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
             <motion.aside 
