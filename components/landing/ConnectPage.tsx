@@ -202,10 +202,6 @@ export default function ConnectPage() {
     return () => clearInterval(poll);
   }, [qrSession, syncStatus, router]);
 
-  // ── Auto-handle connection: set cookie, clear pending state ─────────────
-  // SOVEREIGN MANDATE: We do NOT auto-redirect the user after connection.
-  // Navigation is always user-initiated. The cookie is set here for
-  // subsequent protected-route access, but no router.push/replace fires.
   useEffect(() => {
     if (!mounted || !isConnected) return;
     try {
@@ -220,8 +216,10 @@ export default function ConnectPage() {
     }
     // Clear the pending wallet UI state
     setPendingId(null);
-    // ❌ NO auto-redirect here. User stays on /connect and navigates manually.
-  }, [isConnected, mounted, address]);
+    
+    // Auto-redirect to landing page upon connection
+    router.replace("/");
+  }, [isConnected, mounted, address, router]);
 
 
   // ── Desktop handler: EIP-6963 extension lookup ───────────────────────────
