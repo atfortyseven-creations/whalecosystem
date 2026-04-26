@@ -2,8 +2,14 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { GlassCard } from "./GlassCard";
 import { X, Copy, Check, QrCode } from "lucide-react";
+
+// ── Design Tokens (Ivory Model) ────────────────────────────────────────────────
+const BG     = "#FAF9F6";
+const INK    = "#050505";
+const MUTED  = "rgba(5,5,5,0.45)";
+const BORDER = "rgba(5,5,5,0.08)";
+const CARD   = "#FFFFFF";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -23,68 +29,72 @@ export function DepositModal({ isOpen, onClose, address }: DepositModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 backdrop-blur-md"
+            style={{ background: "rgba(250,249,246,0.8)" }}
           />
 
           {/* Modal */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-md"
+            initial={{ scale: 0.98, opacity: 0, y: 15 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.98, opacity: 0, y: 15 }}
+            className="relative w-full max-w-sm"
           >
-            <GlassCard className="p-8 border-white/20">
+            <div className="border rounded-3xl overflow-hidden shadow-2xl p-8" style={{ borderColor: BORDER, background: BG }}>
               <button 
                 onClick={onClose}
-                className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+                className="absolute top-6 right-6 transition-colors hover:bg-black/5 p-2 rounded-full"
+                style={{ color: MUTED }}
               >
-                <X size={24} />
+                <X size={20} />
               </button>
 
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-black mb-2">Deposit Funds</h2>
-                <p className="text-white/50 text-sm">Send ETH or USDT to your secure vault.</p>
+              <div className="text-center mb-8 mt-2">
+                <h2 className="text-2xl font-black mb-1 uppercase tracking-tighter" style={{ color: INK }}>Receive</h2>
+                <p className="text-xs uppercase tracking-widest font-mono" style={{ color: MUTED }}>On-chain Deposit</p>
               </div>
 
-              {/* QR Code Placeholder */}
+              {/* QR Code */}
               <div className="flex justify-center mb-8">
-                <div className="w-48 h-48 bg-white rounded-2xl flex items-center justify-center relative overflow-hidden group">
-                     <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 opacity-20 group-hover:opacity-0 transition-opacity" />
-                     <QrCode size={100} className="text-black opacity-80" />
-                     {/* In a real app, use 'react-qr-code' here with user's address */}
+                <div className="w-48 h-48 rounded-3xl flex items-center justify-center border shadow-sm p-4" style={{ borderColor: BORDER, background: CARD }}>
+                  {address ? (
+                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${address}&color=050505&bgcolor=FFFFFF`} alt="Wallet QR Code" className="w-full h-full object-contain" />
+                  ) : (
+                    <QrCode size={100} style={{ color: MUTED }} />
+                  )}
                 </div>
               </div>
 
               {/* Address Box */}
               <div 
                 onClick={copyToClipboard}
-                className="bg-black/50 border border-white/10 rounded-xl p-4 flex items-center justify-between gap-4 cursor-pointer hover:border-white/30 transition-colors group"
+                className="border rounded-2xl p-4 flex items-center justify-between gap-4 cursor-pointer hover:bg-black/[0.02] transition-colors active:scale-[0.98]"
+                style={{ borderColor: BORDER, background: CARD }}
               >
                 <div className="flex flex-col overflow-hidden">
-                    <span className="text-xs text-white/40 font-bold uppercase mb-1">Your ETH Address</span>
-                    <span className="font-mono text-sm text-white/90 truncate">{address}</span>
+                    <span className="text-[9px] font-mono font-black uppercase tracking-widest mb-1" style={{ color: MUTED }}>Your Address</span>
+                    <span className="font-mono text-xs truncate font-bold" style={{ color: INK }}>{address || "Not connected"}</span>
                 </div>
-                <div className="p-2 bg-white/5 rounded-lg text-white/60 group-hover:text-white transition-colors">
-                    {copied ? <Check size={20} className="text-green-400" /> : <Copy size={20} />}
+                <div className="p-2 rounded-xl border transition-colors" style={{ borderColor: BORDER, background: BG, color: copied ? "#10B981" : MUTED }}>
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
                 </div>
               </div>
 
-              <div className="mt-6 text-center">
-                  <p className="text-xs text-white/30">
-                      Only send assets on Ethereum Mainnet or Polygon. <br/>
-                      Deposits usually credit within 12 confirmations.
+              <div className="mt-8 text-center">
+                  <p className="text-[10px] uppercase font-mono tracking-widest leading-relaxed" style={{ color: MUTED }}>
+                      Supported Networks:<br/>
+                      <span className="font-bold">Ethereum, Base, Optimism, Polygon</span>
                   </p>
               </div>
 
-            </GlassCard>
+            </div>
           </motion.div>
         </div>
       )}

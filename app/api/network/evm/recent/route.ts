@@ -241,7 +241,7 @@ async function scanChain(chain: ChainConfig): Promise<any[]> {
         }
       }
     } catch (e: any) {
-      console.warn(`[EVM Scan] Log scan failed for ${chain.label}:`, e.message);
+      console.log(`[EVM Scan] Log scan failed for ${chain.label}:`, e.message);
     }
 
     cache[cacheKey] = { data: results, ts: Date.now() };

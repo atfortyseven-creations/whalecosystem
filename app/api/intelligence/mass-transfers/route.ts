@@ -261,7 +261,7 @@ async function scanChain(chain: ChainDef, bustCache = false): Promise<any[]> {
         }
       }
     } catch (e: any) {
-      console.warn(`[MassTransfers] Log scan failed for ${chain.label}:`, e.message);
+      console.log(`[MassTransfers] Log scan failed for ${chain.label}:`, e.message);
     }
 
     serverCache[cacheKey] = { data: results, ts: Date.now() };

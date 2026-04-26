@@ -355,8 +355,9 @@ export default function PortfolioPage() {
           <div className="text-[9px] font-mono font-black uppercase tracking-[0.3em] mb-6" style={{ color: MUTED }}>
             Wallet
           </div>
-          <div className="flex justify-around gap-2">
+          <div className="flex flex-wrap justify-around gap-2">
             <WalletAction icon={ArrowUpRight}   label="Send"   onClick={() => openMode("send")}   />
+            <WalletAction icon={ArrowDownLeft}  label="Receive" onClick={() => setIsDepositOpen(true)} />
             <WalletAction icon={Repeat}         label="Swap"   onClick={() => openMode("swap")}   />
             <WalletAction icon={Globe}          label="Bridge" onClick={() => openMode("bridge")} />
             <WalletAction icon={CreditCard}     label="Buy"    onClick={() => openMode("buy")}    />

@@ -650,7 +650,7 @@ model AlertRule {
 model WatchedWallet {
   id            String   @id @default(uuid())
   userId        String
-  address       String // Normalized: 0x... or bc1... or SOL pubkey
+  address       String   @default("") // Normalized: 0x... or bc1... or SOL pubkey
   label         String   @default("Anonymous Whale")
   tags          String[] @default([])
   lastValue     Float    @default(0)
@@ -668,7 +668,7 @@ model WatchedWallet {
   identityTier  String? // LEGENDARY|ELITE|SOVEREIGN etc.
   lastCheck     DateTime @default(now())
   createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  updatedAt     DateTime @default(now()) @updatedAt
 
   @@unique([userId, address])
   @@index([userId, createdAt(sort: Desc)])
