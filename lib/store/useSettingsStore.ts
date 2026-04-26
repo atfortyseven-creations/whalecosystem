@@ -81,17 +81,35 @@ export interface SettingsState extends SovereignSettings {
 const applyDOMClasses = (state: Partial<SovereignSettings>) => {
     if (typeof document === 'undefined') return;
     const html = document.documentElement;
+
+    // ── UI Density ──────────────────────────────────────────────────────────
     if (state.layoutDensity || state.density) {
         const d = state.layoutDensity || state.density;
-        html.classList.remove('ui-compact', 'ui-dense');
+        html.classList.remove('ui-relaxed', 'ui-compact', 'ui-dense');
         if (d === 'compact') html.classList.add('ui-compact');
-        if (d === 'dense') html.classList.add('ui-dense');
+        else if (d === 'dense') html.classList.add('ui-dense');
+        else html.classList.add('ui-relaxed');
     }
+
+    // ── Stealth Mode: blur all [data-balance] elements ──────────────────────
     if (state.stealthMode !== undefined) {
         if (state.stealthMode) html.classList.add('stealth-active');
         else html.classList.remove('stealth-active');
     }
+
+    // ── Show Balances: hide-balances class when showBalances is false ────────
+    if (state.showBalances !== undefined) {
+        if (!state.showBalances) html.classList.add('hide-balances');
+        else html.classList.remove('hide-balances');
+    }
+
+    // ── Hardware Acceleration: disable GPU compositing hints when off ────────
+    if (state.hardwareAcceleration !== undefined) {
+        if (!state.hardwareAcceleration) html.classList.add('no-hw-accel');
+        else html.classList.remove('no-hw-accel');
+    }
 };
+
 
 export const useSettingsStore = create<SettingsState>()(
     persist(

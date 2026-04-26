@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { signOut } from 'next-auth/react';
+import { toast } from 'sonner';
 import { 
     X, LogOut, AlertTriangle, EyeOff, Volume2, Box, Cpu, HardDrive,
     Landmark, Monitor, Zap, Network, Shield, Fingerprint, Lock, 
-    ActivitySquare, Crosshair, BarChart2, Radio
+    ActivitySquare, Crosshair, BarChart2, Radio, Server, CheckCircle
 } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
 
@@ -27,6 +28,12 @@ export function GlobalSettingsModal() {
         setMempoolSniffer, setMaxGasFee, setMevProtection,
         setPortfolioGraphDefault, setHardwareAcceleration, setSettingsOpen, clearAppData
     } = useSettingsStore();
+
+    // Wrapped setters that also fire a confirmation toast
+    const set = <T,>(fn: (v: T) => void, label: string) => (v: T) => {
+        fn(v);
+        toast.success(`${label} updated`, { duration: 1800, position: 'bottom-right' });
+    };
 
     const { disconnect } = useDisconnect();
     const [mounted, setMounted] = useState(false);
@@ -123,17 +130,17 @@ export function GlobalSettingsModal() {
                                                     {/* 2 */}
                                                     <div className="flex-1 p-4 bg-white border border-[#E5E5E5] rounded-xl">
                                                         <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">2. Base Currency</label>
-                                                        <SelectBox value={currency} onChange={(e) => setCurrency(e.target.value as any)}>
-                                                            <option value="USD">USD - US Dollar</option>
-                                                            <option value="EUR">EUR - Euro</option>
-                                                            <option value="GBP">GBP - British Pound</option>
-                                                            <option value="CHF">CHF - Swiss Franc</option>
+                                                         <SelectBox value={currency} onChange={(e) => set(setCurrency, 'Currency')(e.target.value as any)}>
+                                                            <option value="USD">USD — US Dollar</option>
+                                                            <option value="EUR">EUR — Euro</option>
+                                                            <option value="GBP">GBP — British Pound</option>
+                                                            <option value="CHF">CHF — Swiss Franc</option>
                                                         </SelectBox>
                                                     </div>
                                                     {/* 3 */}
                                                     <div className="flex-1 p-4 bg-white border border-[#E5E5E5] rounded-xl">
                                                         <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">3. Terminal Language</label>
-                                                        <SelectBox value={language} onChange={(e) => setLanguage(e.target.value as any)}>
+                                                        <SelectBox value={language} onChange={(e) => set(setLanguage, 'Language')(e.target.value as any)}>
                                                             <option value="en-US">English (US)</option>
                                                             <option value="es-ES">Español (ES)</option>
                                                             <option value="zh-CN">Chinese (Mandarin)</option>
@@ -151,7 +158,7 @@ export function GlobalSettingsModal() {
                                                     </div>
                                                     <div className="flex bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg p-1">
                                                         {(['relaxed', 'compact', 'dense'] as const).map(d => (
-                                                            <button key={d} onClick={() => setLayoutDensity(d)} className={`px-3 py-1 rounded text-[9px] font-black uppercase transition-all ${layoutDensity === d ? 'bg-black text-white shadow' : 'text-[#888888] hover:text-black'}`}>{d}</button>
+                                                            <button key={d} onClick={() => { setLayoutDensity(d); toast.success(`Density: ${d}`, { duration: 1600, position: 'bottom-right' }); }} className={`px-3 py-1 rounded text-[9px] font-black uppercase transition-all ${layoutDensity === d ? 'bg-black text-white shadow' : 'text-[#888888] hover:text-black'}`}>{d}</button>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -165,31 +172,31 @@ export function GlobalSettingsModal() {
                                             <div className="space-y-4">
                                                 {/* 5 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
-                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">5. RPC Data Node</label>
+                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block flex items-center gap-2">5. RPC Data Node <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">REQUIRES RELOAD</span></label>
                                                     <div className="space-y-2">
-                                                        <RadioOption group="rpc" id="sovereign_local" checked={rpcNode === 'sovereign_local'} onChange={() => setRpcNode('sovereign_local')} label="Sovereign Local Node" subtitle="Zero-latency WebSocket stream" />
-                                                        <RadioOption group="rpc" id="infura_premium" checked={rpcNode === 'infura_premium'} onChange={() => setRpcNode('infura_premium')} label="Infura Premium" subtitle="Standard WSS fallback" />
-                                                        <RadioOption group="rpc" id="alchemy_mainnet" checked={rpcNode === 'alchemy_mainnet'} onChange={() => setRpcNode('alchemy_mainnet')} label="Alchemy Mainnet" subtitle="Mempool extraction layer" />
+                                                        <RadioOption group="rpc" id="sovereign_local" checked={rpcNode === 'sovereign_local'} onChange={() => { setRpcNode('sovereign_local'); toast.success('RPC: Sovereign Local — reload to apply', { duration: 3000, position: 'bottom-right' }); }} label="Sovereign Local Node" subtitle="Zero-latency WebSocket stream" />
+                                                        <RadioOption group="rpc" id="infura_premium" checked={rpcNode === 'infura_premium'} onChange={() => { setRpcNode('infura_premium'); toast.success('RPC: Infura Premium — reload to apply', { duration: 3000, position: 'bottom-right' }); }} label="Infura Premium" subtitle="Standard WSS fallback" />
+                                                        <RadioOption group="rpc" id="alchemy_mainnet" checked={rpcNode === 'alchemy_mainnet'} onChange={() => { setRpcNode('alchemy_mainnet'); toast.success('RPC: Alchemy Mainnet — reload to apply', { duration: 3000, position: 'bottom-right' }); }} label="Alchemy Mainnet" subtitle="Mempool extraction layer" />
                                                     </div>
                                                 </div>
                                                 {/* 6 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div>
-                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">6. Testnet Analytics</span>
+                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">6. Testnet Analytics <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
                                                         <span className="text-[10px] text-[#888888] block mt-1">Index Sepolia/Goerli</span>
                                                     </div>
-                                                    <Toggle enabled={testnetMode} setEnabled={setTestnetMode} />
+                                                    <Toggle enabled={testnetMode} setEnabled={(v) => { setTestnetMode(v); toast.success(`Testnet mode ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 3000, position: 'bottom-right' }); }} />
                                                 </div>
                                                 {/* 7 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                        <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Radio size={14}/></div>
                                                        <div>
-                                                          <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">7. WebSocket Keepalive</span>
+                                                          <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">7. WebSocket Keepalive <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
                                                           <span className="text-[10px] text-[#888888] block mt-1">Send ping layer to prevent drops</span>
                                                        </div>
                                                     </div>
-                                                    <Toggle enabled={websocketHealthPing} setEnabled={setWebsocketHealthPing} />
+                                                    <Toggle enabled={websocketHealthPing} setEnabled={(v) => { setWebsocketHealthPing(v); toast.success(`WS keepalive ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 2500, position: 'bottom-right' }); }} />
                                                 </div>
                                             </div>
                                         </TabContentWrapper>
@@ -216,7 +223,7 @@ export function GlobalSettingsModal() {
                                                            <span className="text-[10px] text-[#888888] block mt-1">Play beep on trigger</span>
                                                        </div>
                                                     </div>
-                                                    <Toggle enabled={audioAlerts} setEnabled={setAudioAlerts} />
+                                                    <Toggle enabled={audioAlerts} setEnabled={(v) => { setAudioAlerts(v); toast.success(`Audio alerts ${v ? 'enabled' : 'muted'}`, { duration: 1800, position: 'bottom-right' }); }} />
                                                 </div>
                                                 {/* 10 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
@@ -241,17 +248,17 @@ export function GlobalSettingsModal() {
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <div className="p-2 bg-black rounded"><EyeOff size={14} className="text-white" /></div>
-                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">11. Stealth Mode</span><span className="text-[10px] text-[#888888] block mt-1">Obfuscate all global balances</span></div>
+                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">11. Stealth Mode</span><span className="text-[10px] text-[#888888] block mt-1">Blur all balance values (hover to reveal)</span></div>
                                                     </div>
-                                                    <Toggle enabled={stealthMode} setEnabled={setStealthMode} />
+                                                    <Toggle enabled={stealthMode} setEnabled={(v) => { setStealthMode(v); toast.success(`Stealth mode ${v ? 'on — balances blurred' : 'off'}`, { duration: 2000, position: 'bottom-right' }); }} />
                                                 </div>
                                                 {/* 12 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <div className="p-2 border border-[#E5E5E5] rounded"><LogOut size={14} className="text-black" /></div>
-                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">12. Default Visibility</span><span className="text-[10px] text-[#888888] block mt-1">Show balances on load</span></div>
+                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">12. Show Balances</span><span className="text-[10px] text-[#888888] block mt-1">Display balances on load</span></div>
                                                     </div>
-                                                    <Toggle enabled={showBalances} setEnabled={setShowBalances} />
+                                                    <Toggle enabled={showBalances} setEnabled={(v) => { setShowBalances(v); toast.success(`Balances ${v ? 'visible' : 'hidden'}`, { duration: 1800, position: 'bottom-right' }); }} />
                                                 </div>
                                                 {/* 13 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
@@ -289,16 +296,16 @@ export function GlobalSettingsModal() {
                                                     <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">16. Auto-Disconnect Security</label>
                                                     <div className="flex bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg p-1 w-full text-center">
                                                         {(['15m', '1h', '24h', 'never'] as const).map(d => (
-                                                            <button key={d} onClick={() => setAutoDisconnectTimer(d)} className={`flex-1 py-2 rounded text-[10px] font-black uppercase transition-all ${autoDisconnectTimer === d ? 'bg-black text-white shadow' : 'text-[#888888] hover:text-black'}`}>{d}</button>
+                                                            <button key={d} onClick={() => { setAutoDisconnectTimer(d); toast.success(`Auto-lock: ${d}`, { duration: 1800, position: 'bottom-right' }); }} className={`flex-1 py-2 rounded text-[10px] font-black uppercase transition-all ${autoDisconnectTimer === d ? 'bg-black text-white shadow' : 'text-[#888888] hover:text-black'}`}>{d}</button>
                                                         ))}
                                                     </div>
                                                 </div>
                                                 {/* 17 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Network size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">17. Mempool Sniffer</span><span className="text-[10px] text-[#888888] block mt-1">Scan unconfirmed TXNs</span></div>
+                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Network size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">17. Mempool Sniffer <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span><span className="text-[10px] text-[#888888] block mt-1">Scan unconfirmed TXNs</span></div>
                                                     </div>
-                                                    <Toggle enabled={mempoolSniffer} setEnabled={setMempoolSniffer} />
+                                                    <Toggle enabled={mempoolSniffer} setEnabled={(v) => { setMempoolSniffer(v); toast.success(`Mempool sniffer ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 3000, position: 'bottom-right' }); }} />
                                                 </div>
                                                 {/* 18 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">

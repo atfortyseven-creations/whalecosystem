@@ -1133,3 +1133,75 @@ html.forum-light-mode {
   image-rendering: -webkit-optimize-contrast;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   SOVEREIGN SETTINGS — CSS FUNCTIONAL LAYER
+   These classes are applied to <html> by applyDOMClasses() in useSettingsStore.
+   Every toggle/selection in Settings has a real visual effect here.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── STEALTH MODE: blur & hide any element tagged [data-balance] ─────────────
+   Usage: add data-balance attribute to any span/div showing wallet balances.
+   Example: <span data-balance>${portfolio.total}</span>
+   ─────────────────────────────────────────────────────────────────────────── */
+html.stealth-active [data-balance] {
+  filter: blur(8px);
+  user-select: none;
+  transition: filter 0.3s ease;
+}
+html.stealth-active [data-balance]:hover {
+  filter: blur(0px); /* Reveal on hover — intentional UX */
+}
+
+/* ── SHOW BALANCES: when showBalances is OFF, hide [data-balance] fully ──────
+   The class hide-balances is applied when showBalances === false.
+   ─────────────────────────────────────────────────────────────────────────── */
+html.hide-balances [data-balance] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── UI DENSITY — RELAXED (default) ─────────────────────────────────────────*/
+html:not(.ui-compact):not(.ui-dense) .card-pad   { padding: 1.5rem; }
+html:not(.ui-compact):not(.ui-dense) .row-gap    { gap: 1rem; }
+html:not(.ui-compact):not(.ui-dense) .table-row  { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+/* ── UI DENSITY — COMPACT ────────────────────────────────────────────────── */
+html.ui-compact .card-pad                        { padding: 0.875rem; }
+html.ui-compact .row-gap                         { gap: 0.5rem; }
+html.ui-compact .table-row                       { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+html.ui-compact table td,
+html.ui-compact table th                         { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+html.ui-compact .text-[11px]                     { font-size: 10px; }
+html.ui-compact .text-[12px]                     { font-size: 10.5px; }
+html.ui-compact .p-4                             { padding: 0.65rem !important; }
+html.ui-compact .p-5                             { padding: 0.75rem !important; }
+html.ui-compact .gap-4                           { gap: 0.625rem !important; }
+html.ui-compact .gap-6                           { gap: 0.875rem !important; }
+html.ui-compact .mb-4                            { margin-bottom: 0.5rem !important; }
+html.ui-compact .mb-6                            { margin-bottom: 0.75rem !important; }
+
+/* ── UI DENSITY — DENSE ──────────────────────────────────────────────────── */
+html.ui-dense .card-pad                          { padding: 0.5rem; }
+html.ui-dense .row-gap                           { gap: 0.25rem; }
+html.ui-dense .table-row                         { padding-top: 0.2rem; padding-bottom: 0.2rem; }
+html.ui-dense table td,
+html.ui-dense table th                           { padding-top: 0.2rem !important; padding-bottom: 0.2rem !important; }
+html.ui-dense .text-[11px]                       { font-size: 9.5px; }
+html.ui-dense .text-[12px]                       { font-size: 10px; }
+html.ui-dense .p-4                               { padding: 0.4rem !important; }
+html.ui-dense .p-5                               { padding: 0.5rem !important; }
+html.ui-dense .gap-4                             { gap: 0.35rem !important; }
+html.ui-dense .gap-6                             { gap: 0.5rem !important; }
+html.ui-dense .mb-4                              { margin-bottom: 0.25rem !important; }
+html.ui-dense .mb-6                              { margin-bottom: 0.4rem !important; }
+html.ui-dense .h-16                              { height: 3.25rem !important; }
+html.ui-dense .h-\[52px\]                        { height: 44px !important; }
+
+/* ── HARDWARE ACCELERATION OFF: disable GPU compositing hints ────────────── */
+html.no-hw-accel * {
+  will-change: auto !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+}
+/* Note: animations still work — we just remove GPU layer hints to save VRAM */
+
