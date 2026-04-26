@@ -396,9 +396,9 @@ export function LegendaryTransactionModal({
             className="relative w-full max-w-lg"
           >
             <InstitutionalErrorBoundary moduleName="Wallet">
-              <div className="p-0 border rounded-3xl overflow-hidden shadow-2xl" style={{ borderColor: BORDER, background: BG }}>
+              <div className="p-0 border rounded-3xl shadow-2xl" style={{ borderColor: BORDER, background: BG }}>
                 
-                <div className="p-6 border-b" style={{ borderColor: BORDER, background: CARD }}>
+                <div className="p-6 border-b rounded-t-3xl" style={{ borderColor: BORDER, background: CARD }}>
                   <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
                           <div className="w-10 h-10 border rounded-xl flex items-center justify-center" style={{ borderColor: BORDER, background: BG }}>
@@ -444,7 +444,7 @@ export function LegendaryTransactionModal({
                 {/* ── BUY CRYPTO MODE ── */}
                 {mode === 'buy' ? (
                       <div className="space-y-6">
-                        <div className="border rounded-2xl p-6 relative overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+                        <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
                            <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>Spend ({subMode})</label>
@@ -524,7 +524,7 @@ export function LegendaryTransactionModal({
                         )}
 
                         {/* ── FROM INPUT ── */}
-                        <div className="border rounded-2xl p-6 relative overflow-hidden" style={{ borderColor: BORDER, background: CARD }}>
+                        <div className="border rounded-2xl p-6 relative" style={{ borderColor: BORDER, background: CARD }}>
                             <div className="flex justify-between items-end mb-4">
                                 <div className="flex-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: MUTED }}>{mode === 'send' ? 'Amount' : 'Selling'}</label>
