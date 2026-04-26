@@ -853,7 +853,21 @@ export function MobileLanding() {
           <p className="text-[12px] font-medium leading-relaxed" style={{ color: MUTED }}>
             Sovereign-grade blockchain intelligence. Connect your wallet to sync your session with the desktop terminal.
           </p>
-          {/* Manual reconnect escape hatch removed per user request */}
+          {/* Manual reconnect escape hatch restored per user request */}
+          <AnimatePresence>
+            {showManualReconnect && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                onClick={() => window.location.reload()}
+                className="mt-6 w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3"
+              >
+                <RefreshCw size={16} className="animate-spin-slow" />
+                Continuar si ya conecté
+              </motion.button>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Wallet Buttons */}
@@ -877,6 +891,7 @@ export function MobileLanding() {
             loading={connecting === 'metamask'}
             onClick={() => {
               setConnecting('metamask');
+              setShowManualReconnect(true);
               const injectedConn = connectors.find(c => c.id === 'injected');
               if (injectedConn) {
                 connect({ connector: injectedConn });
@@ -896,6 +911,7 @@ export function MobileLanding() {
             loading={connecting === 'coinbase'}
             onClick={() => {
               setConnecting('coinbase');
+              setShowManualReconnect(true);
               const injectedConn = connectors.find(c => c.id === 'injected');
               if (injectedConn) {
                 connect({ connector: injectedConn });
@@ -915,6 +931,7 @@ export function MobileLanding() {
             loading={connecting === 'wc'}
             onClick={() => {
               setConnecting('wc');
+              setShowManualReconnect(true);
               openAppKitDirect();
               setTimeout(() => setConnecting(null), 3000);
             }}
