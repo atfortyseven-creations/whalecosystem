@@ -37,6 +37,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     // Preferences
     const [theme, setTheme] = useState('light');
     const [currency, setCurrency] = useState('USD');
+    const [language, setLanguage] = useState('en-US');
     const [displayUnit, setDisplayUnit] = useState('FIAT');
     
     // Security / Trading
@@ -226,7 +227,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                             value={avatarUrl}
                                                             onChange={(e) => setAvatarUrl(e.target.value)}
                                                             placeholder="https://example.com/avatar.png"
-                                                            className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] font-mono focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
+                                                            className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-mono focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
                                                         />
                                                     </div>
                                                 </div>
@@ -239,7 +240,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                         onChange={(e) => setDisplayName(e.target.value)}
                                                         placeholder="Sovereign Identity"
                                                         maxLength={50}
-                                                        className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[14px] font-bold focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
+                                                        className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[14px] text-[#050505] font-bold focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
                                                     />
                                                 </div>
                                                 <div>
@@ -249,7 +250,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                         onChange={(e) => setBio(e.target.value)}
                                                         placeholder="Enter your cryptographic status..."
                                                         maxLength={250}
-                                                        className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] font-mono h-24 resize-none focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
+                                                        className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-mono h-24 resize-none focus:border-black focus:bg-white focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-[#BBBBBB]"
                                                     />
                                                 </div>
                                             </div>
@@ -261,7 +262,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div>
                                                         <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] mb-2">Theme</label>
-                                                        <select value={theme} onChange={e => setTheme(e.target.value)} className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] font-bold focus:border-black outline-none appearance-none cursor-pointer">
+                                                        <select value={theme} onChange={e => setTheme(e.target.value)} className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-bold focus:border-black outline-none appearance-none cursor-pointer">
                                                             <option value="light">Light (Ivory)</option>
                                                             <option value="dark">Dark (Ink)</option>
                                                             <option value="system">System Default</option>
@@ -271,7 +272,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                         <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] mb-2">Language</label>
                                                         <div className="relative">
                                                             <Globe size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
-                                                            <select value={language} onChange={e => setLanguage(e.target.value)} className="w-full p-3.5 pl-10 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] font-bold focus:border-black outline-none appearance-none cursor-pointer">
+                                                            <select value={language} onChange={e => setLanguage(e.target.value)} className="w-full p-3.5 pl-10 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-bold focus:border-black outline-none appearance-none cursor-pointer">
                                                                 <option value="en-US">English (US)</option>
                                                                 <option value="es-ES">Español (ES)</option>
                                                             </select>
@@ -284,7 +285,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                         <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] mb-2">Base Currency</label>
                                                         <div className="relative">
                                                             <DollarSign size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
-                                                            <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full p-3.5 pl-10 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] font-bold focus:border-black outline-none appearance-none cursor-pointer">
+                                                            <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full p-3.5 pl-10 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-bold focus:border-black outline-none appearance-none cursor-pointer">
                                                                 <option value="USD">USD ($)</option>
                                                                 <option value="EUR">EUR (€)</option>
                                                                 <option value="GBP">GBP (£)</option>
@@ -293,7 +294,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                                     </div>
                                                     <div>
                                                         <label className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#888888] mb-2">Display Unit</label>
-                                                        <select value={displayUnit} onChange={e => setDisplayUnit(e.target.value)} className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] font-bold focus:border-black outline-none appearance-none cursor-pointer">
+                                                        <select value={displayUnit} onChange={e => setDisplayUnit(e.target.value)} className="w-full p-3.5 bg-[#FAF9F6] border border-[#E5E5E5] rounded-xl text-[13px] text-[#050505] font-bold focus:border-black outline-none appearance-none cursor-pointer">
                                                             <option value="FIAT">Fiat (USD)</option>
                                                             <option value="BTC">Bitcoin (BTC)</option>
                                                             <option value="ETH">Ethereum (ETH)</option>
