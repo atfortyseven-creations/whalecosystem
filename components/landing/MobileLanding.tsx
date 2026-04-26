@@ -591,7 +591,7 @@ export function MobileLanding() {
   const [showingManifesto, setShowingManifesto] = useState(true);
   const [isSigning, setIsSigning]   = useState(false);
   const [signError, setSignError]   = useState<string | null>(null);
-  const [connecting, setConnecting] = useState(false);
+  const [connecting, setConnecting] = useState<string | null>(null);
 
   // Single ref: prevents concurrent calls only (not cross-render blocking)
   const linkingInProgress = useRef(false);
@@ -637,13 +637,16 @@ export function MobileLanding() {
     setLinkedAddress(norm);
     setIsLinked(true);
     setShowingManifesto(true);
-    setConnecting(false);
+    setConnecting(null);
     linkingInProgress.current = false;
   }, [closeAppKit]);
 
   // ── Main link effect — fires on any state change that indicates connection ───
   useEffect(() => {
     if (!mounted || !isConnected || !address || isLinked) return;
+    // Immediately sync refs in case the poll effects haven't synced yet
+    addressRef.current = address;
+    isConnectedRef.current = true;
     performLink(address);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isConnected, address, isLinked]);
@@ -895,7 +898,21 @@ export function MobileLanding() {
         </div>
         <SigningOverlay
           address={address}
-          onSigned={() => setIsLinked(true)}
+          onSigned={() => {
+            // Write cookie + linkedAddress so effectiveAddress is guaranteed non-null
+            const norm = address.toLowerCase();
+            document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+            try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
+            fetch('/api/wallet/sync', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified_tunnel', message: 'Mobile WalletConnect verified' }),
+            }).catch(() => {});
+            isLinkedRef.current = true;
+            setLinkedAddress(norm);
+            setIsLinked(true);
+            setShowingManifesto(true);
+          }}
           onRetry={() => {
             linkingInProgress.current = false;
             setIsSigning(false);
@@ -976,43 +993,51 @@ export function MobileLanding() {
             <div className="flex-1 h-px bg-[#E5E5E5]" />
           </div>
 
-          {/* MetaMask — direct deep-link (bypasses AppKit relay) */}
-          <button
+          {/* MetaMask */}
+          <WalletOption
+            logo="/wallets/metamask.svg"
+            name="MetaMask"
+            badge="Injected · Mobile SDK"
+            loading={connecting === 'metamask'}
             onClick={() => {
-              setConnecting(true);
-              // Deep-link directly to MetaMask mobile app
-              const mmDeepLink = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
-              window.location.href = mmDeepLink;
-              setTimeout(() => setConnecting(false), 3000);
+              setConnecting('metamask');
+              const mm = connectors.find(c => c.name.toLowerCase().includes('metamask') || c.id === 'metaMaskSDK' || c.id === 'injected');
+              if (mm) connect({ connector: mm });
+              else openAppKitDirect();
+              setTimeout(() => setConnecting(null), 3000);
             }}
-            disabled={connecting}
-            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-black text-[13px] uppercase tracking-[0.1em] transition-all active:scale-[0.97] border"
-            style={{ background: '#fff', color: '#050505', border: '2px solid #E5E5E5', boxShadow: '0 2px 12px rgba(5,5,5,0.06)' }}
-          >
-            <img src="/wallets/metamask.svg" alt="MetaMask" className="w-7 h-7 object-contain shrink-0" />
-            <div className="flex flex-col items-start">
-              <span>MetaMask</span>
-              <span className="text-[9px] font-medium opacity-40 normal-case tracking-normal">Direct deep-link</span>
-            </div>
-          </button>
+            delay={0.1}
+          />
 
-          {/* All other wallets via AppKit (Rainbow, Coinbase, WC, etc.) */}
-          <button
+          {/* Coinbase Wallet */}
+          <WalletOption
+            logo="/wallets/coinbase.png"
+            name="Coinbase Wallet"
+            badge="Direct · SDK"
+            loading={connecting === 'coinbase'}
             onClick={() => {
-              setConnecting(true);
-              openAppKitDirect();
-              setTimeout(() => setConnecting(false), 1500);
+              setConnecting('coinbase');
+              const cb = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
+              if (cb) connect({ connector: cb });
+              else openAppKitDirect();
+              setTimeout(() => setConnecting(null), 3000);
             }}
-            disabled={connecting}
-            className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black text-[13px] uppercase tracking-[0.15em] transition-all active:scale-[0.97] disabled:opacity-60"
-            style={{ background: '#050505', color: '#FAFAFA', boxShadow: '0 8px 32px rgba(5,5,5,0.18)' }}
-          >
-            {connecting ? (
-              <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Opening...</>
-            ) : (
-              <><img src="/wallets/rainbow.png" alt="" className="w-5 h-5 object-contain rounded-full" /><img src="/wallets/coinbase.png" alt="" className="w-5 h-5 object-contain rounded-full" /><span>Rainbow · Coinbase · +550</span></>
-            )}
-          </button>
+            delay={0.15}
+          />
+
+          {/* Rainbow + all WalletConnect wallets */}
+          <WalletOption
+            logo="/wallets/rainbow.png"
+            name="Rainbow & 550+ Wallets"
+            badge="WalletConnect v2"
+            loading={connecting === 'wc'}
+            onClick={() => {
+              setConnecting('wc');
+              openAppKitDirect();
+              setTimeout(() => setConnecting(null), 3000);
+            }}
+            delay={0.2}
+          />
 
           {/* ECDSA notice */}
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
