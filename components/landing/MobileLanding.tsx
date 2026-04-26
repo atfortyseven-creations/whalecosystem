@@ -945,62 +945,7 @@ export function MobileLanding() {
           <p className="text-[12px] font-medium leading-relaxed" style={{ color: MUTED }}>
             Sovereign-grade blockchain intelligence. Connect your wallet to sync your session with the desktop terminal.
           </p>
-          {/* Manual reconnect escape hatch — appears after 3s */}
-          {showManualReconnect && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="mt-3 w-full flex flex-col gap-2"
-            >
-              {/* Primary: use cookie address or live address immediately */}
-              <button
-                onClick={() => {
-                  // 1. Try live wagmi/AppKit address
-                  const liveAddr = addressRef.current;
-                  if (liveAddr && isConnectedRef.current && !isLinkedRef.current) {
-                    performLink(liveAddr);
-                    return;
-                  }
-                  // 2. Try cookie address (persisted from previous session)
-                  try {
-                    const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
-                    const cookieAddr = match?.[1];
-                    if (cookieAddr && !isLinkedRef.current) {
-                      setLinkedAddress(cookieAddr);
-                      setIsLinked(true);
-                      return;
-                    }
-                  } catch {}
-                  // 3. Try sessionStorage signed flag
-                  try {
-                    const allKeys = Object.keys(sessionStorage);
-                    const signedKey = allKeys.find(k => k.startsWith('sovereign_signed_0x'));
-                    if (signedKey) {
-                      const addr = signedKey.replace('sovereign_signed_', '');
-                      setLinkedAddress(addr);
-                      setIsLinked(true);
-                      return;
-                    }
-                  } catch {}
-                  // 4. Last resort: open AppKit so user can reconnect
-                  openAppKitDirect();
-                }}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-[#2D0A59]/30 bg-[#2D0A59]/8 text-[#2D0A59] font-black uppercase tracking-widest text-[10px] active:scale-[0.97] transition-all"
-              >
-                <RefreshCw size={13} />
-                Ya conecté mi wallet — Entrar
-              </button>
-              {/* Secondary: open AppKit to reconnect from scratch */}
-              <button
-                onClick={() => openAppKitDirect()}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-black/10 bg-white text-black/50 font-black uppercase tracking-widest text-[9px] active:scale-[0.97] transition-all"
-              >
-                <ScanLine size={12} />
-                Reconectar wallet
-              </button>
-            </motion.div>
-          )}
+          {/* Manual reconnect escape hatch removed per user request */}
         </motion.div>
 
         {/* Wallet Buttons */}
@@ -1019,34 +964,42 @@ export function MobileLanding() {
           <WalletOption
             logo="/wallets/metamask.svg"
             name="MetaMask"
-            badge="AppKit · WalletConnect v2"
+            badge="Direct · Injected"
             loading={connecting === 'metamask'}
-            onClick={() => { setConnecting('metamask'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
+            onClick={() => { 
+              setConnecting('metamask'); 
+              const mm = connectors.find(c => c.name.toLowerCase().includes('metamask') || c.id === 'metaMaskSDK' || c.id === 'injected');
+              if (mm) connect({ connector: mm });
+              else openAppKitDirect();
+              setTimeout(()=>setConnecting(null), 2000); 
+            }}
             delay={0.1}
           />
           <WalletOption
             logo="/wallets/coinbase.png"
             name="Coinbase Wallet"
-            badge="AppKit · WalletConnect v2"
+            badge="Direct · SDK"
             loading={connecting === 'coinbase'}
-            onClick={() => { setConnecting('coinbase'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
+            onClick={() => { 
+              setConnecting('coinbase'); 
+              const cb = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
+              if (cb) connect({ connector: cb });
+              else openAppKitDirect();
+              setTimeout(()=>setConnecting(null), 2000); 
+            }}
             delay={0.15}
           />
           <WalletOption
             logo="/wallets/rainbow.png"
             name="Rainbow & 550+ Wallets"
-            badge="AppKit · WalletConnect v2"
+            badge="WalletConnect v2"
             loading={connecting === 'rainbow'}
-            onClick={() => { setConnecting('rainbow'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
+            onClick={() => { 
+              setConnecting('rainbow'); 
+              openAppKitDirect(); // WalletConnect requires the modal or deep linking
+              setTimeout(()=>setConnecting(null), 1000); 
+            }}
             delay={0.2}
-          />
-          <WalletOption
-            logo="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-            name="Google & Social Auth"
-            badge="Smart Account · Social Login"
-            loading={connecting === 'social'}
-            onClick={() => { setConnecting('social'); openAppKitDirect(); setTimeout(()=>setConnecting(null), 1000); }}
-            delay={0.25}
           />
 
           {/* ECDSA notice */}

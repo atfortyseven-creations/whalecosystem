@@ -87,7 +87,8 @@ export const config = wagmiAdapter.wagmiConfig
 const queryClient = new QueryClient()
 
 // CRITICAL: URL must match exactly the domain registered in WalletConnect/Reown Cloud.
-const APP_URL = 'https://humanidfi.com';
+// Using window.location.origin fixes local/Railway testing mismatches.
+const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
@@ -168,9 +169,9 @@ try {
             allowUnsupportedChain: true,
             features: {
                 analytics: true,
-                email: true,
-                socials: ['google', 'github', 'discord', 'x', 'apple'],
-                emailShowWallets: true,
+                email: false,
+                socials: [],
+                emailShowWallets: false,
                 swaps: false,
                 onramp: false,
             },

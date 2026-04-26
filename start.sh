@@ -29,7 +29,7 @@ p.\$executeRawUnsafe(\`
  .catch(e => { console.log('[Sovereign] Dedup skipped (table may not exist yet): ' + e.message); return p.\$disconnect(); });
 " || echo "[Sovereign] Dedup step skipped"
 
-npx prisma db push --accept-data-loss || echo "[Sovereign] WARNING: db push failed — DB may be at latest schema"
+npx prisma db push || echo "[Sovereign] WARNING: db push failed — DB may be at latest schema or locked by another instance"
 
 echo "[Sovereign] ═══════════════════════════════════════════════"
 echo "[Sovereign] Phase 3: Launching PM2 process mesh..."
