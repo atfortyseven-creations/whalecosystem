@@ -9,15 +9,16 @@ import {
   Check, Loader2, ShieldCheck, ExternalLink
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
-import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { useAccount, useSwitchChain } from 'wagmi';
-import { mainnet, base, optimism, arbitrum, polygon, worldchain } from 'wagmi/chains';
+import { useAppKit, useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
+import { useAccount } from 'wagmi';
+import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
 import { coinbaseWallet } from 'wagmi/connectors';
 import { useConnect } from 'wagmi';
 import { toast } from 'sonner';
+import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const BG   = "#FAF9F6";
@@ -35,12 +36,12 @@ const CHAIN_COLORS: Record<string, string> = {
 
 // ── Supported networks for Switch Network ────────────────────────────────────
 const SUPPORTED_CHAINS = [
-  { chain: mainnet,    name: "Ethereum",    color: "#627EEA", symbol: "ETH" },
-  { chain: base,       name: "Base",        color: "#0052FF", symbol: "ETH" },
-  { chain: optimism,   name: "Optimism",    color: "#FF0420", symbol: "ETH" },
-  { chain: arbitrum,   name: "Arbitrum",    color: "#12AAFF", symbol: "ETH" },
-  { chain: polygon,    name: "Polygon",     color: "#8247E5", symbol: "POL" },
-  { chain: worldchain, name: "World Chain", color: "#000000", symbol: "WLD" },
+  { caipId: "eip155:1",     name: "Ethereum",    color: "#627EEA", symbol: "ETH",  id: 1 },
+  { caipId: "eip155:8453",  name: "Base",        color: "#0052FF", symbol: "ETH",  id: 8453 },
+  { caipId: "eip155:10",    name: "Optimism",    color: "#FF0420", symbol: "ETH",  id: 10 },
+  { caipId: "eip155:42161", name: "Arbitrum",    color: "#12AAFF", symbol: "ETH",  id: 42161 },
+  { caipId: "eip155:137",   name: "Polygon",     color: "#8247E5", symbol: "POL",  id: 137 },
+  { caipId: "eip155:480",   name: "World Chain", color: "#000000", symbol: "WLD",  id: 480 },
 ];
 
 function formatUSD(val: number) {
@@ -152,7 +153,8 @@ export default function PortfolioPage() {
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
   const { address: userAddress, isConnected } = useAppKitAccount();
   const { chain } = useAccount();
-  const { switchChain, isPending: isSwitching } = useSwitchChain();
+  const { switchNetwork, caipNetwork } = useAppKitNetwork();
+  const [isSwitching, setIsSwitching] = useState(false);
   const { connect } = useConnect();
   const { open } = useAppKit();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -389,14 +391,23 @@ export default function PortfolioPage() {
                 <button onClick={() => setShowNetworkSwitch(false)} style={{ color: MUTED }} className="text-[10px] font-mono font-black uppercase tracking-widest hover:opacity-100 opacity-50 transition-opacity">Close</button>
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {SUPPORTED_CHAINS.map(({ chain: c, name, color, symbol }) => {
-                  const isActive = chain?.id === c.id;
+                {SUPPORTED_CHAINS.map(({ caipId, name, color, symbol, id }) => {
+                  const isActive = caipNetwork?.id === id;
                   return (
                     <button
-                      key={c.id}
-                      onClick={() => {
-                        switchChain({ chainId: c.id });
+                      key={id}
+                      onClick={async () => {
+                        if (isActive) return;
+                        setIsSwitching(true);
                         toast.info(`Switching to ${name}...`);
+                        try {
+                          await switchNetwork(caipId as any);
+                          toast.success(`Connected to ${name}`);
+                        } catch (e: any) {
+                          toast.error(`Switch failed: ${e?.message ?? 'rejected'}`);
+                        } finally {
+                          setIsSwitching(false);
+                        }
                       }}
                       disabled={isActive || isSwitching}
                       className="flex items-center gap-3 p-4 rounded-2xl border transition-all hover:shadow-sm group disabled:cursor-default"
@@ -637,6 +648,17 @@ export default function PortfolioPage() {
                 );
               })}
             </div>
+          </motion.div>
+        )}
+
+        {/* ── CHAIN ACTIVITY (Uniswap-style on-chain history) ── */}
+        {userAddress && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.26 }}
+          >
+            <ChainActivityPanel address={userAddress} />
           </motion.div>
         )}
       </main>
