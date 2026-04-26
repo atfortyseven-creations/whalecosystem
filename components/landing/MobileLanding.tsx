@@ -591,9 +591,7 @@ export function MobileLanding() {
   const [showingManifesto, setShowingManifesto] = useState(true);
   const [isSigning, setIsSigning]   = useState(false);
   const [signError, setSignError]   = useState<string | null>(null);
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [isAwaitingSync, setIsAwaitingSync] = useState(false);
-  const [hasInitiatedConnection, setHasInitiatedConnection] = useState(false);
+  const [connecting, setConnecting] = useState(false);
 
   // Single ref: prevents concurrent calls only (not cross-render blocking)
   const linkingInProgress = useRef(false);
@@ -621,7 +619,7 @@ export function MobileLanding() {
   const performLink = useCallback((addr: string) => {
     if (isLinkedRef.current || linkingInProgress.current) return;
     linkingInProgress.current = true;
-    setConnecting(null);
+    setConnecting(false);
     setIsSigning(true);
 
     const norm = addr.toLowerCase();
@@ -695,38 +693,20 @@ export function MobileLanding() {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (!key) continue;
-          
           if (key.includes('@w3m/') || key.includes('wagmi') || key.includes('wc@2')) {
             const val = localStorage.getItem(key);
             if (val) {
                const match = val.match(/0x[a-fA-F0-9]{40}/i);
                if (match && match[0] && !isLinkedRef.current) {
-                 console.log('[Sovereign] Aggressive memory scrape successful:', match[0]);
                  performLink(match[0]);
                  return;
                }
             }
           }
         }
-      } catch (e) {
-        console.warn('[Sovereign] Scrape bypass failed', e);
-      }
+      } catch {}
 
-      // Show psychological loading screen to mask WC relay delay
-      if (hasInitiatedConnection) {
-        setIsAwaitingSync(true);
-        // Force a hard reload if the relay is dead. IndexedDB will resurrect the session on load.
-        setTimeout(() => {
-          if (!isLinkedRef.current && !isConnectedRef.current) {
-            window.location.reload();
-          } else {
-            setIsAwaitingSync(false);
-            setHasInitiatedConnection(false);
-          }
-        }, 4500);
-      }
-
-      // 2. Poll every 200ms for up to 20s waiting for WC relay to confirm
+      // 2. Poll every 200ms for up to 20s for the WC relay to confirm — silent, no spinner
       let attempts = 0;
       const check = setInterval(() => {
         attempts++;
@@ -750,7 +730,7 @@ export function MobileLanding() {
       document.removeEventListener('visibilitychange', handleVisible);
       window.removeEventListener('focus', handleVisible);
     };
-  }, [mounted, performLink, hasInitiatedConnection]);
+  }, [mounted, performLink]);
 
   // ── Show manual reconnect button after 3s if still not linked ──────────────
   useEffect(() => {
@@ -909,20 +889,7 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Awaiting Sync (masking WC relay delay) ──────────────────────────
-  if (isAwaitingSync && !isLinked) {
-    return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#FAF9F6]">
-         <Loader2 size={36} className="animate-spin text-[#050505] mb-6" />
-         <h2 className="text-[14px] font-black uppercase tracking-[0.25em] text-[#050505]">
-           Synchronizing Wallet
-         </h2>
-         <p className="text-[10px] text-[#050505]/40 font-medium uppercase tracking-widest mt-3 text-center px-8">
-           Establishing secure tunnel...<br/>This may take a few seconds.
-         </p>
-      </div>
-    );
-  }
+  // ── Render: Awaiting Sync — REMOVED (no spinners, silent redirect)
 
   // ── Render: Linking in progress (wallet just connected, writing session) ────
   if (isConnected && address && !isLinked) {
@@ -1020,49 +987,49 @@ export function MobileLanding() {
             <div className="flex-1 h-px bg-[#E5E5E5]" />
           </div>
 
-          <WalletOption
-            logo="/wallets/metamask.svg"
-            name="MetaMask"
-            badge="Direct · Injected"
-            loading={connecting === 'metamask'}
-            onClick={() => { 
-              setConnecting('metamask'); 
-              setHasInitiatedConnection(true);
-              const mm = connectors.find(c => c.name.toLowerCase().includes('metamask') || c.id === 'metaMaskSDK' || c.id === 'injected');
-              if (mm) connect({ connector: mm });
-              else openAppKitDirect();
-              setTimeout(()=>setConnecting(null), 2000); 
+          {/* Single Connect Button — opens AppKit modal which deep-links to native wallet */}
+          <button
+            onClick={() => {
+              setConnecting(true);
+              openAppKitDirect();
+              // Reset loading state after modal opens (AppKit takes over)
+              setTimeout(() => setConnecting(false), 1500);
             }}
-            delay={0.1}
-          />
-          <WalletOption
-            logo="/wallets/coinbase.png"
-            name="Coinbase Wallet"
-            badge="Direct · SDK"
-            loading={connecting === 'coinbase'}
-            onClick={() => { 
-              setConnecting('coinbase'); 
-              setHasInitiatedConnection(true);
-              const cb = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
-              if (cb) connect({ connector: cb });
-              else openAppKitDirect();
-              setTimeout(()=>setConnecting(null), 2000); 
+            disabled={connecting}
+            className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black text-[13px] uppercase tracking-[0.15em] transition-all active:scale-[0.97] disabled:opacity-60"
+            style={{
+              background: connecting ? '#1a1a1a' : '#050505',
+              color: '#FAFAFA',
+              boxShadow: '0 8px 32px rgba(5,5,5,0.18)',
             }}
-            delay={0.15}
-          />
-          <WalletOption
-            logo="/wallets/rainbow.png"
-            name="Rainbow & 550+ Wallets"
-            badge="WalletConnect v2"
-            loading={connecting === 'rainbow'}
-            onClick={() => { 
-              setConnecting('rainbow'); 
-              setHasInitiatedConnection(true);
-              openAppKitDirect(); // WalletConnect requires the modal or deep linking
-              setTimeout(()=>setConnecting(null), 1000); 
-            }}
-            delay={0.2}
-          />
+          >
+            {connecting ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                Opening Wallet...
+              </>
+            ) : (
+              <>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+                  <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+                  <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+                </svg>
+                Connect Wallet
+              </>
+            )}
+          </button>
+
+          {/* Wallet logos row */}
+          <div className="flex items-center justify-center gap-4 mt-1 opacity-40">
+            <img src="/wallets/metamask.svg" alt="MetaMask" className="w-6 h-6 object-contain" />
+            <img src="/wallets/coinbase.png" alt="Coinbase" className="w-6 h-6 object-contain rounded-full" />
+            <img src="/wallets/rainbow.png" alt="Rainbow" className="w-6 h-6 object-contain rounded-full" />
+            <span className="text-[9px] font-bold tracking-widest text-[#050505]/40 uppercase">+550</span>
+          </div>
 
           {/* ECDSA notice */}
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
