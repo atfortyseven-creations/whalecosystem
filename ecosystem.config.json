@@ -6,8 +6,8 @@
       "args": "start",
       "cwd": "/app",
       "interpreter": "node",
-      "instances": "max",
-      "exec_mode": "cluster",
+      "instances": 1,
+      "exec_mode": "fork",
       "env": {
         "NODE_ENV": "production",
         "HOSTNAME": "0.0.0.0",
