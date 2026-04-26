@@ -708,10 +708,10 @@ export function MobileLanding() {
     };
   }, [mounted, performLink]);
 
-  // ── Show manual reconnect button after 10s if still not linked ──────────────
+  // ── Show manual reconnect button after 3s if still not linked ──────────────
   useEffect(() => {
     if (!mounted || isLinked) return;
-    const t = setTimeout(() => setShowManualReconnect(true), 10000);
+    const t = setTimeout(() => setShowManualReconnect(true), 3000);
     return () => clearTimeout(t);
   }, [mounted, isLinked]);
 
@@ -918,10 +918,15 @@ export function MobileLanding() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               onClick={() => { 
-                setShowManualReconnect(false); 
-                // WalletConnect v2 mobile bug: WS drops when browser is backgrounded.
-                // A hard reload forces Wagmi to read the approved session from localStorage.
-                window.location.reload(); 
+                setShowManualReconnect(false);
+                // Try to link immediately using whatever address we have right now
+                const currentAddr = addressRef.current;
+                if (currentAddr && isConnectedRef.current && !isLinkedRef.current) {
+                  performLink(currentAddr);
+                } else {
+                  // No address yet — force wagmi reconnect via reload as last resort
+                  window.location.reload();
+                }
               }}
               className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-[#2D0A59]/20 bg-[#2D0A59]/5 text-[#2D0A59] font-black uppercase tracking-widest text-[10px] active:scale-[0.97] transition-all"
             >

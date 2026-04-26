@@ -91,22 +91,10 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         }
     }, [isConnected, address, mounted]);
 
-    // When wallet NEWLY connects → reset to landing so user sees the manifesto + options
+    // When wallet disconnects → reset showNews so landing returns to initial state
     useEffect(() => {
         if (!mounted) return;
-
-        if (isConnected && !prevConnected.current) {
-            // New connection — always show landing, never auto-enter news
-            try {
-                if (typeof sessionStorage !== 'undefined') {
-                    sessionStorage.removeItem('mobile_news_bypass');
-                }
-            } catch (e) {}
-            setShowNews(false);
-        }
-
         if (!isConnected && prevConnected.current) {
-            // Disconnected — also reset to landing
             setShowNews(false);
             try {
                 if (typeof sessionStorage !== 'undefined') {
@@ -114,7 +102,6 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
                 }
             } catch (e) {}
         }
-
         prevConnected.current = isConnected;
     }, [isConnected, mounted]);
 
