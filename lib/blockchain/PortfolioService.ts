@@ -106,7 +106,16 @@ export class PortfolioService {
             const decimals = parseInt(t.decimals || '18', 10);
             const balRaw = t.balance ? ethers.formatUnits(t.balance, decimals) : (t.balance_formatted || '0');
             const bal = parseFloat(balRaw);
-            // Show any real balance, regardless of USD pricing from Moralis
+            const price = parseFloat(t.usd_price || '0');
+            
+            // Show any real balance, regardless of USD pricing from Moralis, 
+            // BUT filter out obvious spam (massive balance with 0 price)
+            if (bal > 1000000 && price === 0) return false;
+            
+            // Filter out fake native tokens (e.g., ERC20 token named ETH with 0 price)
+            const isFakeNative = (t.symbol === 'ETH' || t.symbol === 'MATIC' || t.symbol === 'WLD' || t.symbol === 'BNB' || t.symbol === 'AVAX' || t.symbol === 'SOL') && price === 0 && t.token_address;
+            if (isFakeNative) return false;
+
             return bal > 0.000001;
         })
         .map(async (t: any) => {
@@ -170,17 +179,17 @@ export class PortfolioService {
       }
 
       // Add native token
-      if (nativeBalanceFormatted > 0) {
+      if (nativeBalanceFormatted >= 0) {
         enrichedTokens.unshift({
           address: 'native',
           balance: nativeBalance.toString(),
           balanceNumeric: nativeBalanceFormatted,
-          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }),
+          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }) || '0.0000',
           name: chainId === ChainId.MAINNET ? 'Ethereum' : `${nativeSymbol} Native`,
           symbol: nativeSymbol,
           decimals: 18,
           logo: null,
-          price: nativeValueUsd / nativeBalanceFormatted || 0,
+          price: nativeValueUsd / (nativeBalanceFormatted || 1) || 0,
           valueUsd: nativeValueUsd,
           change24h: 0,
           chainId,
@@ -269,7 +278,7 @@ export class PortfolioService {
           const filteredTokens = tokensWithPrices.filter(t => t !== null);
 
           // Add native
-          if (nativeBalanceFormatted > 0) {
+          if (nativeBalanceFormatted >= 0) {
               const nativePrice = await PriceService.getBulkPrices([{
                   symbol: nativeSymbol,
                   address: 'native',
@@ -281,7 +290,7 @@ export class PortfolioService {
                   address: 'native',
                   balance: rpcResult.nativeBalance,
                   balanceNumeric: nativeBalanceFormatted,
-                  balanceFormatted: safeToLocaleString(nativeBalanceFormatted),
+                  balanceFormatted: safeToLocaleString(nativeBalanceFormatted) || '0.0000',
                   name: nativeSymbol,
                   symbol: nativeSymbol,
                   decimals: 18,

@@ -146,6 +146,17 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     })) || [];
 
     // Assets processing (Mapped from Elite service)
+    const CHAIN_ID_TO_NETWORK: Record<number, string> = {
+        1: 'Ethereum',
+        137: 'Polygon',
+        8453: 'Base',
+        10: 'OP Mainnet',
+        42161: 'Arbitrum One',
+        43114: 'Avalanche',
+        56: 'BNB Smart Chain',
+        480: 'World Chain'
+    };
+
     const assets: Asset[] = (assetsData?.tokens || []).map((t: any) => ({
         symbol: t.symbol,
         name: t.name,
@@ -156,6 +167,7 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         valueUSD: t.valueUsd || t.valueUSD || 0,
         logoURI: t.logo || t.logoURI,
         chainId: t.chainId,
+        network: CHAIN_ID_TO_NETWORK[t.chainId] || 'Unknown',
         change24h: t.change24h || 0
     }));
 
