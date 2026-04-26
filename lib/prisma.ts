@@ -123,9 +123,10 @@ function createPrismaClient(): PrismaClient {
                 msg.includes('P1009') ||
                 msg.includes('P2021') || // table does not exist
                 msg.includes('P2022') || // column does not exist
-                msg.includes('42703');   // PostgreSQL raw: column does not exist
+                msg.includes('42703') || // PostgreSQL raw: column does not exist
+                msg.includes('Invalid `prisma.'); // Validation error thrown during try/catch fallbacks
             if (!isSchemaBehind) {
-                console.error('[PRISMA] DB Error:', msg.slice(0, 300));
+                console.error('[PRISMA] DB Error:', msg.length > 500 ? msg.slice(0, 500) + '...' : msg);
             }
         });
     }

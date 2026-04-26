@@ -43,8 +43,7 @@ function mapDbToStore(data: Record<string, any>): Record<string, any> {
 
 // ── Safe columns guaranteed to exist in every DB schema version ──────────────
 const SAFE_COLUMNS = [
-    'theme', 'currency', 'language', 'showBalances', 'stealthMode',
-    'allowAnalytics', 'mevProtection', 'testnetMode', 'soundEffects', 'whaleAlertThreshold',
+    'theme', 'currency', 'language'
 ];
 
 export async function GET() {
