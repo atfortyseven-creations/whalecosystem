@@ -658,16 +658,17 @@ export function MobileLanding() {
     }).catch(() => {});
     try { closeAppKit(); } catch {}
 
+    // ATOMIC REDIRECT TO TERMINAL (LANDING PAGE)
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+      return; // Stop execution to ensure browser navigation takes priority
+    }
+
     setLinkedAddress(norm);
     setIsLinked(true);
     setShowingManifesto(false);
     setConnecting(null);
     setShowFallbackBtn(false);
-
-    // ATOMIC REDIRECT TO TERMINAL (LANDING PAGE)
-    if (typeof window !== 'undefined') {
-      window.location.href = '/';
-    }
   }, [isLinked, closeAppKit]);
 
   useEffect(() => {

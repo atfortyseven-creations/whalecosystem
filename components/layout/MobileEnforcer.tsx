@@ -25,10 +25,18 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-            // The user explicitly requested that narrowing the window on PC should NOT trigger the mobile app view.
-            // Mobile view should ONLY be shown on actual mobile devices.
-            const isRealMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-            setIsMobile(isRealMobileDevice);
+            const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+            
+            const isTouchDevice = (
+              'ontouchstart' in window ||
+              navigator.maxTouchPoints > 0 ||
+              (navigator as any).msMaxTouchPoints > 0
+            );
+            
+            const minDimension = Math.min(window.screen.width, window.screen.height);
+            const isSpoofedMobile = isTouchDevice && minDimension <= 768;
+
+            setIsMobile(isUaMobile || isSpoofedMobile);
         };
 
         checkMobile();
