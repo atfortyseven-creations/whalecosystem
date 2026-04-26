@@ -682,12 +682,33 @@ export function MobileLanding() {
   // Rainbow, Trust, Coinbase, etc. use WalletConnect v2 relay. When the user
   // approves in the wallet app and returns to Chrome, the relay confirmation
   // takes ~0.5-2s to arrive. This listener waits and then checks connection.
+  // We also directly read wagmi.store from localStorage to bypass React state lag.
   useEffect(() => {
     if (!mounted) return;
     const handleVisible = () => {
       if (document.visibilityState !== 'visible') return;
-      // Poll every 200ms for up to 20s waiting for WC relay to confirm
-      // (extended from 4s to cover slow mobile relays and incognito cold starts)
+      
+      // 1. Instant raw localStorage bypass (solves mobile React state freeze)
+      try {
+        const rawWagmi = localStorage.getItem('wagmi.store');
+        if (rawWagmi) {
+          const parsed = JSON.parse(rawWagmi);
+          // Look for connections map array: [[hash, { accounts: ['0x...'] }]]
+          const connections = parsed?.state?.connections?.value;
+          if (Array.isArray(connections) && connections.length > 0) {
+            const rawAddress = connections[0]?.[1]?.accounts?.[0];
+            if (rawAddress && !isLinkedRef.current) {
+              console.log('[Sovereign] Instant Wagmi bypass successful:', rawAddress);
+              performLink(rawAddress);
+              return; // Successfully bypassed
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[Sovereign] Wagmi bypass failed', e);
+      }
+
+      // 2. Poll every 200ms for up to 20s waiting for WC relay to confirm
       let attempts = 0;
       const check = setInterval(() => {
         attempts++;
@@ -700,8 +721,13 @@ export function MobileLanding() {
         }
       }, 200);
     };
+    
     document.addEventListener('visibilitychange', handleVisible);
     window.addEventListener('focus', handleVisible);
+    
+    // Also trigger it once on mount just in case we missed the focus event
+    handleVisible();
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisible);
       window.removeEventListener('focus', handleVisible);
