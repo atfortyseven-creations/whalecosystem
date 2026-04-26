@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Camera, Save, User, Fingerprint, Loader2 } from 'lucide-react';
-import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { toast } from 'sonner';
 
 interface UserProfileModalProps {
@@ -12,8 +11,18 @@ interface UserProfileModalProps {
 }
 
 export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
-    const { isConnected, address } = useAccount();
-    
+    // Read address from sovereign cookie — same source of truth as the forum.
+    // wagmi's useAccount may not have reconnected yet, but the cookie is always set.
+    const [address, setAddress] = useState<string | null>(null);
+    const [isConnected, setIsConnected] = useState(false);
+
+    useEffect(() => {
+        const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+        const addr = match?.[1]?.toLowerCase() ?? null;
+        setAddress(addr);
+        setIsConnected(!!addr);
+    }, [isOpen]);
+
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [displayName, setDisplayName] = useState('');
