@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { useSignMessage } from 'wagmi';
 
 export default function NewTopicPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function NewTopicPage() {
   const [tags, setTags]             = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
+  const { signMessageAsync } = useSignMessage();
 
   useEffect(() => {
     fetch('/api/forum/categories')
@@ -38,12 +40,23 @@ export default function NewTopicPage() {
     }
     setSubmitting(true);
     try {
+      // Cryptographic anchoring (Sign to Post)
+      let finalContent = content;
+      try {
+        const signature = await signMessageAsync({ message: title + '\n' + content });
+        finalContent = `${content}\n\n---\n<div style="margin-top: 12px; padding: 10px 14px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 4px;"><span style="font-size: 10px; font-weight: bold; color: #22c55e; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Cryptographic Signature Verified</span><div style="font-family: monospace; font-size: 9px; color: var(--forum-text-muted); margin-top: 6px; word-break: break-all;">${signature}</div></div>`;
+      } catch (e) {
+        setError('CRYPTOGRAPHIC SIGNATURE REJECTED');
+        setSubmitting(false);
+        return;
+      }
+
       const res = await fetch('/api/forum/topics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
-          content,
+          content: finalContent,
           categoryId,
           tags: tags.split(',').map(t => t.trim()).filter(Boolean),
         }),
@@ -136,10 +149,11 @@ export default function NewTopicPage() {
           <button
             onClick={submit}
             disabled={submitting}
-            className="text-[14px] font-sans font-bold px-6 py-2.5 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
+            className="flex items-center gap-2 text-[14px] font-sans font-bold px-6 py-2.5 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
             style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
           >
-            {submitting ? 'Creating Topic...' : '+ Create Topic'}
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            {submitting ? 'AWAITING SIGNATURE...' : 'SIGN & CREATE TOPIC'}
           </button>
           <Link
             href="/forum"

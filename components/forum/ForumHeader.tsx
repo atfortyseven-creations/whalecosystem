@@ -3,8 +3,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { UserProfileModal } from '@/components/ui/UserProfileModal';
+import { useAccount, useEnsName, useEnsAvatar } from 'wagmi';
+import { mainnet } from 'wagmi/chains';
 
-export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUrl?: string }) {
+export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: { address?: string; avatarUrl?: string }) {
+  const { address: wagmiAddress } = useAccount();
+  const address = wagmiAddress || serverAddress;
   const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -16,6 +20,15 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  const [mountedDate, setMountedDate] = useState('');
+  useEffect(() => {
+    setMountedDate(new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, ''));
+  }, []);
+
+  const { data: ensName } = useEnsName({ address: address as `0x${string}`, chainId: mainnet.id });
+  const { data: ensAvatar } = useEnsAvatar({ name: ensName || undefined, chainId: mainnet.id });
+  const finalAvatar = ensAvatar || dbAvatarUrl;
 
   const navLinks = [
     { href: '/forum',               label: 'TOPICS'       },
@@ -42,7 +55,7 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>SYS.DATE:</span>
             <span className="text-[11px] font-mono font-black uppercase tracking-widest" style={{ color: 'var(--forum-text)' }}>
-              {new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/,/g, '')}
+              {mountedDate || '---'}
             </span>
           </div>
         </div>
@@ -105,21 +118,21 @@ export function ForumHeader({ address, avatarUrl }: { address?: string; avatarUr
                 onClick={() => setProfileOpen(true)}
                 className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors"
                 style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
+                title={ensName || address}
               >
-                {avatarUrl
-                  ? <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
-                  : address.slice(2, 4).toUpperCase()
+                {finalAvatar
+                  ? <img src={finalAvatar} alt="avatar" className="w-full h-full object-cover" />
+                  : <div className="w-full h-full" style={{ background: `linear-gradient(135deg, #${address.slice(2,8)}, #${address.slice(-6)})` }} />
                 }
               </button>
             </div>
           ) : (
-            <Link
-              href="/connect"
-              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] transition-colors hover:opacity-100"
-              style={{ color: 'var(--forum-text-muted)' }}
+            <div
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] px-2 py-1 rounded-sm"
+              style={{ color: 'var(--forum-text-muted)', border: '1px dashed var(--forum-border)' }}
             >
-              CONNECT
-            </Link>
+              [ READ-ONLY ]
+            </div>
           )}
         </div>
       </header>

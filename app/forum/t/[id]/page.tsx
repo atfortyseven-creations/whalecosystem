@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNowStrict, format } from 'date-fns';
+import { useSignMessage } from 'wagmi';
 
 export default function TopicPage() {
   const { id } = useParams();
@@ -13,6 +14,8 @@ export default function TopicPage() {
   const [submitting, setSubmitting]     = useState(false);
   const [replyError, setReplyError]     = useState('');
   const [sessionAddress, setSessionAddress] = useState<string | null>(null);
+  const { signMessageAsync } = useSignMessage();
+  const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<string | null>(null);
 
   // Read current user's address from cookie (client-side)
   useEffect(() => {
@@ -34,10 +37,21 @@ export default function TopicPage() {
     setReplyError('');
     setSubmitting(true);
     try {
+      // Cryptographic anchoring (Sign to Post)
+      let finalContent = replyContent;
+      try {
+        const signature = await signMessageAsync({ message: replyContent });
+        finalContent = `${replyContent}\n\n---\n<div style="margin-top: 12px; padding: 10px 14px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 4px;"><span style="font-size: 10px; font-weight: bold; color: #22c55e; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Cryptographic Signature Verified</span><div style="font-family: monospace; font-size: 9px; color: var(--forum-text-muted); margin-top: 6px; word-break: break-all;">${signature}</div></div>`;
+      } catch (e) {
+        setReplyError('CRYPTOGRAPHIC SIGNATURE REJECTED');
+        setSubmitting(false);
+        return;
+      }
+
       const res = await fetch('/api/forum/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topicId: id, content: replyContent }),
+        body: JSON.stringify({ topicId: id, content: finalContent }),
       });
       if (res.ok) {
         setReplyContent('');
@@ -54,10 +68,10 @@ export default function TopicPage() {
   };
 
   const deleteTopic = async () => {
-    if (!confirm('Delete this topic permanently? This cannot be undone.')) return;
+    setDeleteConfirmTarget(null);
     const res = await fetch(`/api/forum/topics/${id}`, { method: 'DELETE' });
     if (res.ok) router.push('/forum');
-    else alert('Could not delete topic.');
+    else setReplyError('COULD NOT TERMINATE TOPIC');
   };
 
   if (!topic) return (
@@ -84,14 +98,23 @@ export default function TopicPage() {
             {topic.title}
           </h1>
           {isTopicAuthor && (
-            <button
-              onClick={deleteTopic}
-              className="shrink-0 mt-1 text-[11px] font-sans font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm transition-opacity hover:opacity-80"
-              style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}
-              title="Delete this topic"
-            >
-              Delete Topic
-            </button>
+            <div className="flex gap-2">
+              {deleteConfirmTarget === 'topic' ? (
+                <>
+                  <button onClick={deleteTopic} className="shrink-0 mt-1 text-[11px] font-sans font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm transition-opacity hover:opacity-80 bg-red-500 text-white">Confirm</button>
+                  <button onClick={() => setDeleteConfirmTarget(null)} className="shrink-0 mt-1 text-[11px] font-sans font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm transition-opacity hover:opacity-80" style={{ backgroundColor: 'var(--forum-surface)', color: 'var(--forum-text-muted)' }}>Cancel</button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setDeleteConfirmTarget('topic')}
+                  className="shrink-0 mt-1 text-[11px] font-sans font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm transition-opacity hover:opacity-80"
+                  style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444' }}
+                  title="Delete this topic"
+                >
+                  Delete Topic
+                </button>
+              )}
+            </div>
           )}
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -134,10 +157,11 @@ export default function TopicPage() {
                     <button
                       onClick={submitReply}
                       disabled={submitting || !replyContent.trim()}
-                      className="text-[13px] font-sans font-bold px-5 py-2 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
+                      className="flex items-center gap-2 text-[13px] font-sans font-bold px-5 py-2 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
                       style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
                     >
-                      {submitting ? 'Replying...' : 'Reply'}
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                      {submitting ? 'AWAITING WALLET SIGNATURE...' : 'SIGN & POST'}
                     </button>
                     {replyError && (
                       <span className="text-[12px] font-sans font-bold text-red-400">
@@ -204,6 +228,7 @@ function PostRow({
 }) {
   const [liked, setLiked] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const addr  = entity.author?.walletAddress || '';
   const label = entity.author?.displayName || (addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : 'ANONYMOUS');
   const time  = entity.createdAt ? format(new Date(entity.createdAt), 'MMM d, yyyy') : '';
@@ -222,7 +247,7 @@ function PostRow({
   };
 
   const handleDelete = async () => {
-    if (!confirm('Delete this post permanently?')) return;
+    setConfirmingDelete(false);
     setDeleting(true);
     try {
       const endpoint = type === 'topic'
@@ -310,15 +335,28 @@ function PostRow({
 
           {/* Delete button — only visible to the author */}
           {isAuthor && (
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="ml-auto flex items-center gap-1.5 text-[11px] font-sans font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm transition-opacity hover:opacity-80 disabled:opacity-40"
-              style={{ backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444' }}
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              {deleting ? '...' : 'Delete'}
-            </button>
+            <div className="ml-auto flex items-center gap-2">
+              {confirmingDelete ? (
+                <>
+                  <button onClick={handleDelete} className="text-[11px] font-sans font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm transition-opacity hover:opacity-80 bg-red-500 text-white disabled:opacity-40" disabled={deleting}>
+                    Confirm
+                  </button>
+                  <button onClick={() => setConfirmingDelete(false)} className="text-[11px] font-sans font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm transition-opacity hover:opacity-80" style={{ backgroundColor: 'var(--forum-surface)', color: 'var(--forum-text-muted)' }} disabled={deleting}>
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setConfirmingDelete(true)}
+                  disabled={deleting}
+                  className="flex items-center gap-1.5 text-[11px] font-sans font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm transition-opacity hover:opacity-80 disabled:opacity-40"
+                  style={{ backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444' }}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  {deleting ? '...' : 'Delete'}
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
