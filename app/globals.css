@@ -422,17 +422,9 @@ body,
   scrollbar-width: none;
 }
 
-/* ── FORUM RENDER CONTAINMENT ─────────────────────────────────────────────
-   The forum is a plain text list — it must NOT participate in the GPU
-   compositor storm triggered by the landing page animations.
-   `contain: layout paint` tells the browser this subtree is independent:
-   changes inside it never trigger layout/paint outside it (zero jank).
-   This is the #1 fix for forum scroll lag on mid-range mobile devices.
-   ──────────────────────────────────────────────────────────────────────── */
 .forum-container {
-  contain: layout paint;
-  /* Momentum scroll on iOS without JavaScript */
-  -webkit-overflow-scrolling: touch;
+  /* Scroll containment is now natively handled by ClientLayout's bounded <main> element.
+     contain: layout paint removed to prevent black rendering artifacts during rapid mobile scroll. */
 }
 
 /* Prevent hover CSS from triggering repaint layers on touch devices */
@@ -454,12 +446,7 @@ body,
     scroll-behavior: smooth !important;
   }
 
-  /* Force hardware acceleration on main structural elements */
-  .lg\:col-span-8, .lg\:col-span-9, .lg\:col-span-12 {
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
+  /* Hardware acceleration removed from massive columns to prevent GPU texture memory overflow (black squares on scroll) */
 
   /* Disable absolutely all expensive backdrop-filters on mobile.
      This is the #1 cause of 60fps drops on mobile WebKit. */
@@ -697,13 +684,6 @@ body,
    FORUM LIGHT/DARK MODE ARCHITECTURE (AZTEC PERFECTION)
    ============================================================ */
 
-/* ── CRITICAL: Zero-flash paint — set background BEFORE React hydrates ──
-   This ensures html/body never briefly shows white or a different color.
-   The :root vars below feed .forum-theme-root; the html direct rule
-   prevents any gap between server paint and client hydration. */
-html:not(.forum-light-mode) {
-  background-color: #9A7BB5 !important;
-}
 html.forum-light-mode {
   background-color: #f4f4f5 !important;
 }
