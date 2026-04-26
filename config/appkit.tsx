@@ -98,6 +98,12 @@ const metadata = {
     // slow/blocked icon URL during the mobile handshake (root cause of Rainbow
     // "Connection failed" error). AppKit renders a native gradient avatar instead.
     icons: [],
+    // ── Mobile deeplink return URL (Grok fix Capa 0) ─────────────────────────
+    // Without this, wallets don't know which Chrome URL to return to after signing.
+    redirect: {
+        native: '',
+        universal: 'https://www.humanidfi.com/connect',
+    },
 }
 
 // ── 1-Click Auth: SIWE Configuration
