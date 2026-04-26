@@ -589,228 +589,116 @@ export function MobileLanding() {
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
   const [showingManifesto, setShowingManifesto] = useState(true);
-  const [isSigning, setIsSigning]   = useState(false);
-  const [signError, setSignError]   = useState<string | null>(null);
   const [connecting, setConnecting] = useState<string | null>(null);
 
-  // Single ref: prevents concurrent calls only (not cross-render blocking)
-  const linkingInProgress = useRef(false);
-  // Live refs — readable from setInterval, visibilitychange, setTimeout without stale closures
-  const isLinkedRef    = useRef(isLinked);
-  const isConnectedRef = useRef(false);
-  const addressRef     = useRef<string | undefined>(undefined);
-
   useEffect(() => { setMounted(true); }, []);
-  // Keep live refs in sync on every render
-  useEffect(() => { isLinkedRef.current    = isLinked;    }, [isLinked]);
-  useEffect(() => { isConnectedRef.current = isConnected; }, [isConnected]);
-  useEffect(() => { addressRef.current     = address;     }, [address]);
 
-  // ── Scroll to top whenever manifesto becomes active ─────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
+  // SINGLE SOURCE OF TRUTH: if wagmi/AppKit says connected → land immediately
+  // ─────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (isLinked && typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }
-  }, [isLinked]);
+    if (!mounted) return;
+    if (isLinked) return;          // already on landing page
+    if (!isConnected || !address) return; // not connected yet
 
-  // ── performLink: synchronous React state — no timeout, no reload ──
-  const performLink = useCallback((addr: string) => {
-    if (isLinkedRef.current || linkingInProgress.current) return;
-    linkingInProgress.current = true;
-
-    const norm = addr.toLowerCase();
-    // 1. Cookie + sessionStorage
+    // Write sovereign session
+    const norm = address.toLowerCase();
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-    // 2. Backend sync (fire-and-forget)
     fetch('/api/wallet/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified_tunnel', message: 'Mobile WalletConnect verified' }),
+      body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified', message: 'Mobile WalletConnect verified' }),
     }).catch(() => {});
-    // 3. Close modal
     try { closeAppKit(); } catch {}
-    // 4. Synchronous state — React 18 batches these into one render
-    isLinkedRef.current = true;
+
+    // Navigate to landing page
     setLinkedAddress(norm);
     setIsLinked(true);
     setShowingManifesto(true);
     setConnecting(null);
-    linkingInProgress.current = false;
-  }, [closeAppKit]);
+  }, [mounted, isConnected, address, isLinked, closeAppKit]);
 
-  // ── Main link effect — fires on any state change that indicates connection ───
-  useEffect(() => {
-    if (!mounted || !isConnected || !address || isLinked) return;
-    // Immediately sync refs in case the poll effects haven't synced yet
-    addressRef.current = address;
-    isConnectedRef.current = true;
-    performLink(address);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, isConnected, address, isLinked]);
-
-  // ── Mount-time poll: catches pre-existing AppKit session (incognito fast path) ──
-  // On iOS, after returning from wallet app, AppKit may have already resolved
-  // the address by the time visibilitychange fires. This catches it immediately.
-  useEffect(() => {
-    if (!mounted || isLinked) return;
-    let attempts = 0;
-    const check = setInterval(() => {
-      attempts++;
-      const addr = addressRef.current;
-      if (addr && isConnectedRef.current && !isLinkedRef.current) {
-        clearInterval(check);
-        performLink(addr);
-      } else if (attempts > 30 || isLinkedRef.current) {
-        clearInterval(check);
-      }
-    }, 300);
-    return () => clearInterval(check);
-  }, [mounted, isLinked, performLink]);
-
-  // ── visibilitychange: catches WalletConnect relay delay on return from app ──
-  // Rainbow, Trust, Coinbase, etc. use WalletConnect v2 relay. When the user
-  // approves in the wallet app and returns to Chrome, the relay confirmation
-  // takes ~0.5-2s to arrive. This listener waits and then checks connection.
-  // We also directly read wagmi.store from localStorage to bypass React state lag.
+  // ── On return from native wallet app: wait for WalletConnect relay then check ──
   useEffect(() => {
     if (!mounted) return;
-    const handleVisible = () => {
+    const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
-      
-      // 1. Extreme aggressive localStorage scanning for ANY AppKit/WalletConnect session
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (!key) continue;
-          if (key.includes('@w3m/') || key.includes('wagmi') || key.includes('wc@2')) {
-            const val = localStorage.getItem(key);
-            if (val) {
-               const match = val.match(/0x[a-fA-F0-9]{40}/i);
-               if (match && match[0] && !isLinkedRef.current) {
-                 performLink(match[0]);
-                 return;
-               }
-            }
-          }
-        }
-      } catch {}
-
-      // 2. Poll every 200ms for up to 20s for the WC relay to confirm — silent, no spinner
+      if (isLinked) return;
+      // Poll for up to 8 seconds after returning from the wallet app
       let attempts = 0;
-      const check = setInterval(() => {
+      const poll = setInterval(() => {
         attempts++;
-        const addr = addressRef.current;
-        if (addr && isConnectedRef.current && !isLinkedRef.current) {
-          clearInterval(check);
-          performLink(addr);
-        } else if (attempts > 100 || isLinkedRef.current) {
-          clearInterval(check);
+        const a = akAddress || wagmiAddress;
+        const c = akConnected || wagmiConnected;
+        if (a && c) {
+          clearInterval(poll);
+          const norm = a.toLowerCase();
+          document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+          try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
+          fetch('/api/wallet/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified', message: 'Mobile WalletConnect verified' }),
+          }).catch(() => {});
+          try { closeAppKit(); } catch {}
+          setLinkedAddress(norm);
+          setIsLinked(true);
+          setShowingManifesto(true);
+          setConnecting(null);
+        } else if (attempts > 40) { // 8s max
+          clearInterval(poll);
         }
       }, 200);
     };
-    
-    document.addEventListener('visibilitychange', handleVisible);
-    window.addEventListener('focus', handleVisible);
-    
-    // Also trigger it once on mount just in case we missed the focus event
-    handleVisible();
-    
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
     return () => {
-      document.removeEventListener('visibilitychange', handleVisible);
-      window.removeEventListener('focus', handleVisible);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
     };
-  }, [mounted, performLink]);
+  }, [mounted, isLinked, akAddress, wagmiAddress, akConnected, wagmiConnected, closeAppKit]);
 
-  // ── Show manual reconnect button after 3s if still not linked ──────────────
+  // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
-    if (!mounted || isLinked) return;
-    const t = setTimeout(() => setShowManualReconnect(true), 3000);
-    return () => clearTimeout(t);
-  }, [mounted, isLinked]);
+    if (!isLinked) return;
+    try { closeAppKit(); } catch {}
+    const id = setInterval(() => {
+      const el = document.querySelector('w3m-modal');
+      if (el) el.remove();
+    }, 400);
+    return () => clearInterval(id);
+  }, [isLinked, closeAppKit]);
 
-  // ── Also check sessionStorage on mount (same-tab reconnect) ──────────────
+  // ── Scroll to top on landing ─────────────────────────────────────────────────
   useEffect(() => {
-    if (!mounted || !address || isLinked) return;
-    try {
-      if (sessionStorage.getItem(`sovereign_signed_${address.toLowerCase()}`) === 'true') {
-        setIsLinked(true);
-      }
-    } catch {}
-  }, [mounted, address, isLinked]);
-
-  // ── FAST BOOT: aggressive 100ms poll for 10s right after mount ───────────
-  // Catches edge case where wagmi reconnects AFTER the 300ms poll window above
-  // has already given up (e.g. slow 3G, iOS background throttling, MetaMask deeplink).
-  useEffect(() => {
-    if (!mounted || isLinked) return;
-    let attempts = 0;
-    const poll = setInterval(() => {
-      attempts++;
-      const addr = addressRef.current;
-      if (addr && isConnectedRef.current && !isLinkedRef.current) {
-        clearInterval(poll);
-        performLink(addr);
-        return;
-      }
-      // Also try cookie fallback — if sovereign_handshake cookie is set
-      // from a previous session and wagmi hasn't reconnected yet
-      if (!isLinkedRef.current) {
-        try {
-          const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
-          const cookieAddr = match?.[1];
-          if (cookieAddr) {
-            clearInterval(poll);
-            setLinkedAddress(cookieAddr);
-            setIsLinked(true);
-            return;
-          }
-        } catch {}
-      }
-      if (attempts > 100 || isLinkedRef.current) clearInterval(poll);
-    }, 100);
-    return () => clearInterval(poll);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted]);
-
-  // ── Fulfill PC QR session if opened via native camera scan ─────────────
-  useEffect(() => {
-    if (isLinked && address && sessionParam) {
-      const fulfilledKey = `fulfilled_session_${sessionParam}`;
-      if (sessionStorage.getItem(fulfilledKey)) return;
-
-      fetch(`/api/auth/qr-session?id=${sessionParam}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address })
-      }).then(res => {
-         if(res.ok) {
-           sessionStorage.setItem(fulfilledKey, 'true');
-           const toast = document.createElement('div');
-           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-           toast.textContent = '✓ Desktop Terminal Unlocked';
-           document.body.appendChild(toast);
-           setTimeout(() => toast.remove(), 4000);
-         }
-      }).catch(() => {});
+    if (isLinked && typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
+  }, [isLinked]);
+
+  // ── QR session fulfillment (desktop scan) ────────────────────────────────────
+  useEffect(() => {
+    if (!isLinked || !address || !sessionParam) return;
+    const key = `fulfilled_session_${sessionParam}`;
+    if (sessionStorage.getItem(key)) return;
+    fetch(`/api/auth/qr-session?id=${sessionParam}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+    }).then(res => {
+      if (res.ok) {
+        sessionStorage.setItem(key, 'true');
+        const t = document.createElement('div');
+        t.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+        t.textContent = '✓ Desktop Terminal Unlocked';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+      }
+    }).catch(() => {});
   }, [isLinked, address, sessionParam]);
 
-  // ── Nuke rogue w3m-modal blur ───────────────────────────────────────────────
-  // A watchdog to completely remove the `<w3m-modal>` if it gets stuck as an empty
-  // blurred backdrop post-connection on mobile deep-links.
-  useEffect(() => {
-    if (isLinked) {
-      try { closeAppKit(); } catch (e) {}
-      const interval = setInterval(() => {
-         const w3m = document.querySelector('w3m-modal');
-         if (w3m) w3m.remove();
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  }, [isLinked, closeAppKit]);
+
 
   // ── handleDisconnect: clears session and resets all state ───────────────
   const handleDisconnect = useCallback(() => {
@@ -881,46 +769,14 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Awaiting Sync — REMOVED (no spinners, silent redirect)
-
-  // ── Render: Linking in progress (wallet just connected, writing session) ────
+  // ── Render: Wallet connected, session being written (brief) ─────────────────
+  // This render is typically invisible — the useEffect above fires setIsLinked
+  // in the same React batch. Shown only for a fraction of a second max.
   if (isConnected && address && !isLinked) {
     return (
-      <>
-        <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
-        <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-          <motion.div
-            className="absolute"
-            style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04 }}
-            animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
-            transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-        <SigningOverlay
-          address={address}
-          onSigned={() => {
-            // Write cookie + linkedAddress so effectiveAddress is guaranteed non-null
-            const norm = address.toLowerCase();
-            document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-            try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-            fetch('/api/wallet/sync', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified_tunnel', message: 'Mobile WalletConnect verified' }),
-            }).catch(() => {});
-            isLinkedRef.current = true;
-            setLinkedAddress(norm);
-            setIsLinked(true);
-            setShowingManifesto(true);
-          }}
-          onRetry={() => {
-            linkingInProgress.current = false;
-            setIsSigning(false);
-          }}
-          error={signError}
-          isSigning={isSigning}
-        />
-      </>
+      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-[#050505]/30" />
+      </div>
     );
   }
 
