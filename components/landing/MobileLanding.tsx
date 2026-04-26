@@ -592,6 +592,8 @@ export function MobileLanding() {
   const [isSigning, setIsSigning]   = useState(false);
   const [signError, setSignError]   = useState<string | null>(null);
   const [connecting, setConnecting] = useState<string | null>(null);
+  const [isAwaitingSync, setIsAwaitingSync] = useState(false);
+  const [hasInitiatedConnection, setHasInitiatedConnection] = useState(false);
 
   // Single ref: prevents concurrent calls only (not cross-render blocking)
   const linkingInProgress = useRef(false);
@@ -708,6 +710,15 @@ export function MobileLanding() {
         console.warn('[Sovereign] Wagmi bypass failed', e);
       }
 
+      // Show psychological loading screen to mask WC relay delay
+      if (hasInitiatedConnection) {
+        setIsAwaitingSync(true);
+        setTimeout(() => {
+          setIsAwaitingSync(false);
+          setHasInitiatedConnection(false);
+        }, 4000);
+      }
+
       // 2. Poll every 200ms for up to 20s waiting for WC relay to confirm
       let attempts = 0;
       const check = setInterval(() => {
@@ -732,7 +743,7 @@ export function MobileLanding() {
       document.removeEventListener('visibilitychange', handleVisible);
       window.removeEventListener('focus', handleVisible);
     };
-  }, [mounted, performLink]);
+  }, [mounted, performLink, hasInitiatedConnection]);
 
   // ── Show manual reconnect button after 3s if still not linked ──────────────
   useEffect(() => {
@@ -891,6 +902,21 @@ export function MobileLanding() {
     );
   }
 
+  // ── Render: Awaiting Sync (masking WC relay delay) ──────────────────────────
+  if (isAwaitingSync && !isLinked) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#FAF9F6]">
+         <Loader2 size={36} className="animate-spin text-[#050505] mb-6" />
+         <h2 className="text-[14px] font-black uppercase tracking-[0.25em] text-[#050505]">
+           Synchronizing Wallet
+         </h2>
+         <p className="text-[10px] text-[#050505]/40 font-medium uppercase tracking-widest mt-3 text-center px-8">
+           Establishing secure tunnel...<br/>This may take a few seconds.
+         </p>
+      </div>
+    );
+  }
+
   // ── Render: Linking in progress (wallet just connected, writing session) ────
   if (isConnected && address && !isLinked) {
     return (
@@ -994,6 +1020,7 @@ export function MobileLanding() {
             loading={connecting === 'metamask'}
             onClick={() => { 
               setConnecting('metamask'); 
+              setHasInitiatedConnection(true);
               const mm = connectors.find(c => c.name.toLowerCase().includes('metamask') || c.id === 'metaMaskSDK' || c.id === 'injected');
               if (mm) connect({ connector: mm });
               else openAppKitDirect();
@@ -1008,6 +1035,7 @@ export function MobileLanding() {
             loading={connecting === 'coinbase'}
             onClick={() => { 
               setConnecting('coinbase'); 
+              setHasInitiatedConnection(true);
               const cb = connectors.find(c => c.id === 'coinbaseWalletSDK' || c.name.toLowerCase().includes('coinbase'));
               if (cb) connect({ connector: cb });
               else openAppKitDirect();
@@ -1022,6 +1050,7 @@ export function MobileLanding() {
             loading={connecting === 'rainbow'}
             onClick={() => { 
               setConnecting('rainbow'); 
+              setHasInitiatedConnection(true);
               openAppKitDirect(); // WalletConnect requires the modal or deep linking
               setTimeout(()=>setConnecting(null), 1000); 
             }}
