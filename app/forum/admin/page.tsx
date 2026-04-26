@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { ShieldCheck, ShieldAlert, Check, X } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Check, X, Trash2, AlertTriangle } from 'lucide-react';
 
 export default function SovereignAdminPanel() {
   const [queue, setQueue] = useState<{ topics: any[], posts: any[] }>({ topics: [], posts: [] });
-
   const [error, setError] = useState<string | null>(null);
+  const [purgeStep, setPurgeStep] = useState<0 | 1 | 2>(0); // 0=idle, 1=confirm, 2=done
+  const [purging, setPurging] = useState(false);
+  const [purgeResult, setPurgeResult] = useState<{ posts: number; topics: number } | null>(null);
 
   const fetchQueue = () => {
     fetch('/api/forum/admin/queue')
@@ -19,9 +21,7 @@ export default function SovereignAdminPanel() {
       .catch(e => setError(e.message));
   };
 
-  useEffect(() => {
-    fetchQueue();
-  }, []);
+  useEffect(() => { fetchQueue(); }, []);
 
   const handleAction = async (id: string, type: 'topic' | 'post', status: 'PUBLISHED' | 'REJECTED') => {
     try {
@@ -30,16 +30,35 @@ export default function SovereignAdminPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, type, status })
       });
-      if (res.ok) {
-        fetchQueue();
-      } else {
-         alert("Failed to update status.");
-      }
-    } catch (e) {
-      console.error(e);
-    }
+      if (res.ok) fetchQueue();
+      else alert('Failed to update status.');
+    } catch (e) { console.error(e); }
   };
 
+  const handlePurge = async () => {
+    setPurging(true);
+    try {
+      const res = await fetch('/api/admin/purge-forum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPurgeResult(data.deleted);
+        setPurgeStep(2);
+        fetchQueue();
+      } else {
+        alert('Purge failed: ' + (data.error || 'Unknown error'));
+        setPurgeStep(0);
+      }
+    } catch {
+      alert('Network error during purge.');
+      setPurgeStep(0);
+    } finally {
+      setPurging(false);
+    }
+  };
 
   
   if (error) return (
@@ -60,6 +79,53 @@ export default function SovereignAdminPanel() {
          </div>
       </div>
 
+      {/* ── DANGER ZONE: Purge All Forum Content ── */}
+      <div className="mb-10 p-5 rounded-xl border-2 border-red-200 bg-red-50">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-3">
+            <Trash2 size={20} className="text-red-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-black text-[14px] text-red-700 uppercase tracking-wider">Purge All Forum Content</p>
+              <p className="text-[12px] text-red-500 mt-0.5">Permanently deletes every topic and reply. This action cannot be undone.</p>
+            </div>
+          </div>
+
+          {purgeStep === 0 && (
+            <button
+              onClick={() => setPurgeStep(1)}
+              className="shrink-0 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-[12px] font-black uppercase tracking-widest rounded-lg transition-all"
+            >
+              Delete All Posts
+            </button>
+          )}
+
+          {purgeStep === 1 && (
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 text-red-700 text-[12px] font-bold">
+                <AlertTriangle size={14} />
+                Are you absolutely sure? This is irreversible.
+              </div>
+              <button onClick={() => setPurgeStep(0)} className="px-4 py-2 border border-red-300 text-red-600 text-[12px] font-bold rounded-lg hover:bg-red-100 transition-all">
+                Cancel
+              </button>
+              <button
+                onClick={handlePurge}
+                disabled={purging}
+                className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white text-[12px] font-black uppercase rounded-lg transition-all disabled:opacity-60"
+              >
+                {purging ? 'Purging…' : 'Yes, Delete Everything'}
+              </button>
+            </div>
+          )}
+
+          {purgeStep === 2 && purgeResult && (
+            <div className="flex items-center gap-2 text-green-700 text-[12px] font-bold">
+              <Check size={14} />
+              Done — {purgeResult.topics} topics and {purgeResult.posts} posts deleted. Forum is now empty.
+            </div>
+          )}
+        </div>
+      </div>
       <div className="flex flex-col lg:flex-row gap-8">
          {/* Pending Topics */}
          <div className="flex-1 flex flex-col">
