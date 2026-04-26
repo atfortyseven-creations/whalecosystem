@@ -127,7 +127,13 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                     <div className="relative group cursor-pointer">
                                         <div className="w-24 h-24 rounded-full border border-[#E5E5E5] overflow-hidden bg-[#FAF9F6] flex items-center justify-center">
                                             {avatarUrl ? (
-                                                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                                <img 
+                                                    src={avatarUrl} 
+                                                    alt="Avatar" 
+                                                    className="w-full h-full object-cover" 
+                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                    onLoad={(e) => { e.currentTarget.style.display = 'block'; }}
+                                                />
                                             ) : (
                                                 <User size={32} className="text-[#888888]" />
                                             )}

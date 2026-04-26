@@ -41,7 +41,7 @@ export default function TopicPage() {
       let finalContent = replyContent;
       try {
         const signature = await signMessageAsync({ message: replyContent });
-        finalContent = `${replyContent}\n\n---\n<div style="margin-top: 12px; padding: 10px 14px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 4px;"><span style="font-size: 10px; font-weight: bold; color: #22c55e; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Cryptographic Signature Verified</span><div style="font-family: monospace; font-size: 9px; color: var(--forum-text-muted); margin-top: 6px; word-break: break-all;">${signature}</div></div>`;
+        finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
       } catch (e) {
         setReplyError('CRYPTOGRAPHIC SIGNATURE REJECTED');
         setSubmitting(false);
@@ -216,6 +216,47 @@ export default function TopicPage() {
   );
 }
 
+function RenderContent({ content }: { content: string }) {
+  if (!content) return null;
+  
+  let text = content;
+  let signature: string | null = null;
+  
+  // 1. Check for the new token format
+  const tokenMatch = text.match(/\[SIGNATURE:(0x[a-fA-F0-9]+)\]/i);
+  if (tokenMatch) {
+    signature = tokenMatch[1];
+    text = text.replace(tokenMatch[0], '').trim();
+  }
+  
+  // 2. Check for the old raw HTML format (to clean up the screenshot bug)
+  if (text.includes('<div style="margin-top: 12px;') && text.includes('Cryptographic Signature Verified')) {
+    const htmlMatch = text.match(/word-break:\s*break-all;">(0x[a-fA-F0-9]+)<\/div>/i);
+    if (htmlMatch) {
+      signature = htmlMatch[1];
+    }
+    // Remove everything after the ---
+    text = text.split('\n\n---')[0].trim();
+  }
+
+  return (
+    <>
+      <div className="whitespace-pre-wrap">{text}</div>
+      {signature && (
+        <div className="mt-5 p-3.5 rounded-sm" style={{ background: 'rgba(34, 197, 94, 0.05)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+          <span className="text-[10px] font-black text-green-500 tracking-[0.1em] uppercase flex items-center gap-1.5 mb-1.5">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+            Cryptographic Signature Verified
+          </span>
+          <div className="font-mono text-[9px] break-all" style={{ color: 'var(--forum-text-muted)' }}>
+            {signature}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function PostRow({
   entity, type, onLike, index, sessionAddress, onDeleted
 }: {
@@ -229,6 +270,7 @@ function PostRow({
   const [liked, setLiked] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const addr  = entity.author?.walletAddress || '';
   const label = entity.author?.displayName || (addr ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : 'ANONYMOUS');
   const time  = entity.createdAt ? format(new Date(entity.createdAt), 'MMM d, yyyy') : '';
@@ -275,8 +317,13 @@ function PostRow({
             className="w-[45px] h-[45px] rounded-full flex items-center justify-center text-[14px] font-sans font-bold overflow-hidden"
             style={{ backgroundColor: 'var(--forum-surface)', color: 'var(--forum-text)' }}
           >
-            {entity.author?.avatarUrl
-              ? <img src={entity.author.avatarUrl} alt="" className="w-full h-full object-cover" />
+            {!imgError && entity.author?.avatarUrl
+              ? <img 
+                  src={entity.author.avatarUrl} 
+                  alt="" 
+                  className="w-full h-full object-cover" 
+                  onError={() => setImgError(true)}
+                />
               : addr.slice(2, 3).toUpperCase()
             }
           </div>
@@ -296,6 +343,11 @@ function PostRow({
             {type === 'topic' && (
               <span className="text-[10px] font-sans font-bold bg-[#6366f1]/20 text-[#6366f1] px-1.5 py-0.5 rounded-sm">OP</span>
             )}
+            {entity.author?.bio && (
+              <span className="text-[11px] font-sans ml-1" style={{ color: 'var(--forum-text-muted)' }}>
+                 • {entity.author.bio}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
              <span className="text-[12px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>{time}</span>
@@ -303,8 +355,8 @@ function PostRow({
           </div>
         </div>
 
-        <div className="text-[15px] font-sans leading-[1.6] whitespace-pre-wrap mb-4" style={{ color: 'var(--forum-text)' }}>
-          {entity.content}
+        <div className="text-[15px] font-sans leading-[1.6] mb-4" style={{ color: 'var(--forum-text)' }}>
+          <RenderContent content={entity.content} />
         </div>
 
         {/* Action Buttons */}

@@ -44,7 +44,7 @@ export default function NewTopicPage() {
       let finalContent = content;
       try {
         const signature = await signMessageAsync({ message: title + '\n' + content });
-        finalContent = `${content}\n\n---\n<div style="margin-top: 12px; padding: 10px 14px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 4px;"><span style="font-size: 10px; font-weight: bold; color: #22c55e; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Cryptographic Signature Verified</span><div style="font-family: monospace; font-size: 9px; color: var(--forum-text-muted); margin-top: 6px; word-break: break-all;">${signature}</div></div>`;
+        finalContent = `${content}\n\n[SIGNATURE:${signature}]`;
       } catch (e) {
         setError('CRYPTOGRAPHIC SIGNATURE REJECTED');
         setSubmitting(false);

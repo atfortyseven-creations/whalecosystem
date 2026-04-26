@@ -30,7 +30,11 @@ export async function GET(req: Request) {
                 tags: true,
                 author: {
                     select: {
-                        walletAddress: true
+                        walletAddress: true,
+                        displayName: true,
+                        avatarUrl: true,
+                        bio: true,
+                        isPro: true
                     }
                 },
                 _count: {
