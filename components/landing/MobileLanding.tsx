@@ -5,10 +5,40 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
-import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useAppKitEvents } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { useUIStore } from '@/lib/store/ui-store';
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
+
+// ── Reown AppKit v1 localStorage key patterns (Grok fix) ───────────────────
+// These are the actual keys AppKit v1 (2025-2026) writes to localStorage.
+const APPKIT_STORAGE_KEYS = [
+  'reown-appkit',   // nueva clave principal Reown v1
+  'appkit',
+  '@reown/appkit',
+  'W3M_STATE',      // legacy Web3Modal
+  '@w3m/',
+  'wagmi',
+  'wc@2',
+  'walletconnect',
+];
+
+// Extracts the user's wallet address from AppKit's nested localStorage structure.
+// The address lives at: sessions[0].namespaces.eip155.accounts[0] = "eip155:1:0x..."
+function extractAddressFromAppKit(value: string): string | null {
+  try {
+    const parsed = JSON.parse(value);
+    // Official Reown AppKit v1 session path
+    const accounts = parsed?.sessions?.[0]?.namespaces?.eip155?.accounts;
+    if (accounts?.[0]) {
+      const addr = accounts[0].split(':')[2];
+      if (addr?.match(/^0x[a-fA-F0-9]{40}$/i)) return addr;
+    }
+    // Generic fallback — last resort
+    const match = value.match(/0x[a-fA-F0-9]{40}/i);
+    return match ? match[0] : null;
+  } catch { return null; }
+}
 
 // ── Live clock hook ───────────────────────────────────────────────────────────
 function useLiveClock(intervalMs = 1000): Date {
@@ -554,6 +584,7 @@ export function MobileLanding() {
   const { disconnect } = useDisconnect();
   const { open: openAppKitDirect, close: closeAppKit } = useAppKit();
   const openConnectModal = useUIStore(s => s.openConnectModal);
+  const events = useAppKitEvents();
 
   // Merge: prefer AppKit (faster on mobile), fall back to wagmi
   const isConnected = akConnected || wagmiConnected;
@@ -596,6 +627,8 @@ export function MobileLanding() {
 
   const [showingManifesto, setShowingManifesto] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
+  // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
+  const [showFallbackBtn, setShowFallbackBtn] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -629,6 +662,7 @@ export function MobileLanding() {
     setIsLinked(true);
     setShowingManifesto(false);
     setConnecting(null);
+    setShowFallbackBtn(false);
   }, [isLinked, closeAppKit]);
 
   useEffect(() => {
@@ -638,63 +672,77 @@ export function MobileLanding() {
     }
   }, [mounted, isConnected, address, isLinked, establishSession]);
 
-  // ── On return from native wallet app: wait for WalletConnect relay then check ──
+  // ── On return from native wallet app: Reown AppKit v1 hardened handler ───────
+  // Fix by Grok: correct keys + 600ms delay + 24s poll + AppKit event bus.
   useEffect(() => {
     if (!mounted) return;
-    const onVisible = () => {
-      if (document.visibilityState !== 'visible') return;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+
+    const onFocusRecheck = () => {
       if (isLinked) return;
-      
-      // 1. Extreme aggressive localStorage scanning for ANY AppKit/WalletConnect session
-      // This bypasses wagmi React state lag which can be 1-3s on iOS
-      const scanStorage = () => {
-        try {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (!key) continue;
-            if (key.includes('@w3m/') || key.includes('wagmi') || key.includes('wc@2')) {
-              const val = localStorage.getItem(key);
-              if (val) {
-                 const match = val.match(/0x[a-fA-F0-9]{40}/i);
-                 if (match && match[0]) return match[0];
+
+      // Priority 1: AppKit/wagmi hooks already have the address in React state
+      if (akAddress) { establishSession(akAddress); return; }
+      if (wagmiAddress) { establishSession(wagmiAddress); return; }
+
+      // Priority 2: localStorage scan — delayed 600ms so AppKit can write session
+      // (AppKit needs 400-800ms to process WalletConnect relay message on return)
+      setTimeout(() => {
+        if (pollInterval) clearInterval(pollInterval);
+        let attempts = 0;
+        pollInterval = setInterval(() => {
+          attempts++;
+          // Re-check React state on every tick (fastest path if hooks updated)
+          if (akAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(akAddress); return; }
+          if (wagmiAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddress); return; }
+          // Scan localStorage with correct Reown AppKit v1 key patterns
+          for (const key of Object.keys(localStorage)) {
+            if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+              const raw = localStorage.getItem(key);
+              if (!raw) continue;
+              const addr = extractAddressFromAppKit(raw);
+              if (addr) {
+                clearInterval(pollInterval!); pollInterval = null;
+                establishSession(addr);
+                return;
               }
             }
           }
-        } catch {}
-        return null;
-      };
-
-      const immediateAddr = scanStorage();
-      if (immediateAddr) {
-        establishSession(immediateAddr);
-        return;
-      }
-
-      // 2. Poll for up to 8 seconds after returning from the wallet app
-      let attempts = 0;
-      const poll = setInterval(() => {
-        attempts++;
-        const foundAddr = scanStorage();
-        if (foundAddr) {
-          clearInterval(poll);
-          establishSession(foundAddr);
-        } else if (attempts > 40) { // 8s max
-          clearInterval(poll);
-        }
-      }, 200);
+          if (attempts >= 120) { clearInterval(pollInterval!); pollInterval = null; } // 24s max
+        }, 200);
+      }, 600); // ← critical delay: AppKit needs ~400-800ms to write session after deeplink return
     };
-    
-    document.addEventListener('visibilitychange', onVisible);
-    window.addEventListener('focus', onVisible);
-    
-    // Also trigger it once on mount just in case we missed the focus event
-    onVisible();
-    
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') onFocusRecheck();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', onFocusRecheck);
+    onFocusRecheck(); // trigger on mount for suspended-tab recovery
+
     return () => {
-      document.removeEventListener('visibilitychange', onVisible);
-      window.removeEventListener('focus', onVisible);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', onFocusRecheck);
+      if (pollInterval) clearInterval(pollInterval);
     };
-  }, [mounted, isLinked, establishSession]);
+  }, [mounted, akAddress, wagmiAddress, isLinked, establishSession]);
+
+  // ── AppKit event bus: instant session detection (Grok fix — corrected API) ───
+  // useAppKitEvents() returns REACTIVE STATE (not an event emitter).
+  // The hook re-renders the component when a new AppKit event fires.
+  // We simply watch `events` as a dependency — no .subscribe() needed.
+  const appKitEventType = (events as any)?.data?.event ?? (events as any)?.type ?? '';
+  useEffect(() => {
+    if (!mounted || !appKitEventType) return;
+    if (['CONNECT_SUCCESS', 'SESSION_UPDATE', 'connect', 'session_update'].includes(appKitEventType)) {
+      // 400ms grace period for wagmi/AppKit React state to settle after the event
+      setTimeout(() => {
+        if (akAddress) establishSession(akAddress);
+        else if (wagmiAddress) establishSession(wagmiAddress);
+      }, 400);
+    }
+  }, [mounted, appKitEventType, akAddress, wagmiAddress, establishSession]);
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
@@ -872,7 +920,7 @@ export function MobileLanding() {
           </p>
           {/* Manual reconnect escape hatch restored per user request */}
           <AnimatePresence>
-            {showManualReconnect && (
+            {(showManualReconnect || showFallbackBtn) && (
               <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -884,25 +932,14 @@ export function MobileLanding() {
                     return;
                   }
 
-                  // ── Priority 2: Scan localStorage for any WalletConnect session ──
+                  // ── Priority 2: Scan localStorage with Reown AppKit v1 key patterns ──
                   try {
-                    for (let i = 0; i < localStorage.length; i++) {
-                      const key = localStorage.key(i);
-                      if (!key) continue;
-                      if (
-                        key.includes('@w3m/') ||
-                        key.includes('wagmi') ||
-                        key.includes('wc@2') ||
-                        key.includes('walletconnect')
-                      ) {
-                        const val = localStorage.getItem(key);
-                        if (val) {
-                          const match = val.match(/0x[a-fA-F0-9]{40}/i);
-                          if (match?.[0]) {
-                            establishSession(match[0]);
-                            return;
-                          }
-                        }
+                    for (const key of Object.keys(localStorage)) {
+                      if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+                        const raw = localStorage.getItem(key);
+                        if (!raw) continue;
+                        const addr = extractAddressFromAppKit(raw);
+                        if (addr) { establishSession(addr); return; }
                       }
                     }
                   } catch {}
@@ -951,6 +988,7 @@ export function MobileLanding() {
             onClick={() => {
               setConnecting('metamask');
               setShowManualReconnect(true);
+              setShowFallbackBtn(false);
               const injectedConn = connectors.find(c => c.id === 'injected');
               if (injectedConn) {
                 connect({ connector: injectedConn });
@@ -958,6 +996,7 @@ export function MobileLanding() {
                 openAppKitDirect();
               }
               setTimeout(() => setConnecting(null), 3000);
+              setTimeout(() => setShowFallbackBtn(true), 3500);
             }}
             delay={0.1}
           />
@@ -971,6 +1010,7 @@ export function MobileLanding() {
             onClick={() => {
               setConnecting('coinbase');
               setShowManualReconnect(true);
+              setShowFallbackBtn(false);
               const injectedConn = connectors.find(c => c.id === 'injected');
               if (injectedConn) {
                 connect({ connector: injectedConn });
@@ -978,6 +1018,7 @@ export function MobileLanding() {
                 openAppKitDirect();
               }
               setTimeout(() => setConnecting(null), 3000);
+              setTimeout(() => setShowFallbackBtn(true), 3500);
             }}
             delay={0.15}
           />
@@ -991,8 +1032,10 @@ export function MobileLanding() {
             onClick={() => {
               setConnecting('wc');
               setShowManualReconnect(true);
+              setShowFallbackBtn(false);
               openAppKitDirect();
               setTimeout(() => setConnecting(null), 3000);
+              setTimeout(() => setShowFallbackBtn(true), 3500);
             }}
             delay={0.2}
           />
