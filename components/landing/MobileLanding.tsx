@@ -615,28 +615,30 @@ export function MobileLanding() {
     }
   }, [isLinked]);
 
-  // ── performLink: cookie-write + reload — bulletproof on all mobile browsers ──
-  // On reload the isLinked useState lazy initializer reads the cookie synchronously
-  // before any render, so the landing page shows instantly with zero race conditions.
+  // ── performLink: synchronous React state — no timeout, no reload ──
   const performLink = useCallback((addr: string) => {
     if (isLinkedRef.current || linkingInProgress.current) return;
     linkingInProgress.current = true;
 
     const norm = addr.toLowerCase();
-    // 1. Write sovereign session cookie FIRST
+    // 1. Cookie + sessionStorage
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-    // 2. sessionStorage flag for same-tab soft-nav
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-    // 3. Backend sync (fire-and-forget — does not block redirect)
+    // 2. Backend sync (fire-and-forget)
     fetch('/api/wallet/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified_tunnel', message: 'Mobile WalletConnect verified' }),
     }).catch(() => {});
-    // 4. Close AppKit modal silently
+    // 3. Close modal
     try { closeAppKit(); } catch {}
-    // 5. Reload — cookie is now set; on reload isLinked=true → landing page immediately
-    window.location.reload();
+    // 4. Synchronous state — React 18 batches these into one render
+    isLinkedRef.current = true;
+    setLinkedAddress(norm);
+    setIsLinked(true);
+    setShowingManifesto(true);
+    setConnecting(false);
+    linkingInProgress.current = false;
   }, [closeAppKit]);
 
   // ── Main link effect — fires on any state change that indicates connection ───
@@ -974,49 +976,43 @@ export function MobileLanding() {
             <div className="flex-1 h-px bg-[#E5E5E5]" />
           </div>
 
-          {/* Single Connect Button — opens AppKit modal which deep-links to native wallet */}
+          {/* MetaMask — direct deep-link (bypasses AppKit relay) */}
+          <button
+            onClick={() => {
+              setConnecting(true);
+              // Deep-link directly to MetaMask mobile app
+              const mmDeepLink = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+              window.location.href = mmDeepLink;
+              setTimeout(() => setConnecting(false), 3000);
+            }}
+            disabled={connecting}
+            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-black text-[13px] uppercase tracking-[0.1em] transition-all active:scale-[0.97] border"
+            style={{ background: '#fff', color: '#050505', border: '2px solid #E5E5E5', boxShadow: '0 2px 12px rgba(5,5,5,0.06)' }}
+          >
+            <img src="/wallets/metamask.svg" alt="MetaMask" className="w-7 h-7 object-contain shrink-0" />
+            <div className="flex flex-col items-start">
+              <span>MetaMask</span>
+              <span className="text-[9px] font-medium opacity-40 normal-case tracking-normal">Direct deep-link</span>
+            </div>
+          </button>
+
+          {/* All other wallets via AppKit (Rainbow, Coinbase, WC, etc.) */}
           <button
             onClick={() => {
               setConnecting(true);
               openAppKitDirect();
-              // Reset loading state after modal opens (AppKit takes over)
               setTimeout(() => setConnecting(false), 1500);
             }}
             disabled={connecting}
             className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black text-[13px] uppercase tracking-[0.15em] transition-all active:scale-[0.97] disabled:opacity-60"
-            style={{
-              background: connecting ? '#1a1a1a' : '#050505',
-              color: '#FAFAFA',
-              boxShadow: '0 8px 32px rgba(5,5,5,0.18)',
-            }}
+            style={{ background: '#050505', color: '#FAFAFA', boxShadow: '0 8px 32px rgba(5,5,5,0.18)' }}
           >
             {connecting ? (
-              <>
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                Opening Wallet...
-              </>
+              <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Opening...</>
             ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
-                  <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
-                  <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
-                </svg>
-                Connect Wallet
-              </>
+              <><img src="/wallets/rainbow.png" alt="" className="w-5 h-5 object-contain rounded-full" /><img src="/wallets/coinbase.png" alt="" className="w-5 h-5 object-contain rounded-full" /><span>Rainbow · Coinbase · +550</span></>
             )}
           </button>
-
-          {/* Wallet logos row */}
-          <div className="flex items-center justify-center gap-4 mt-1 opacity-40">
-            <img src="/wallets/metamask.svg" alt="MetaMask" className="w-6 h-6 object-contain" />
-            <img src="/wallets/coinbase.png" alt="Coinbase" className="w-6 h-6 object-contain rounded-full" />
-            <img src="/wallets/rainbow.png" alt="Rainbow" className="w-6 h-6 object-contain rounded-full" />
-            <span className="text-[9px] font-bold tracking-widest text-[#050505]/40 uppercase">+550</span>
-          </div>
 
           {/* ECDSA notice */}
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
