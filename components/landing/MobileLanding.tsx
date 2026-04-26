@@ -596,13 +596,9 @@ export function MobileLanding() {
   // ─────────────────────────────────────────────────────────────────────────────
   // SINGLE SOURCE OF TRUTH: if wagmi/AppKit says connected → land immediately
   // ─────────────────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!mounted) return;
-    if (isLinked) return;          // already on landing page
-    if (!isConnected || !address) return; // not connected yet
-
-    // Write sovereign session
-    const norm = address.toLowerCase();
+  const establishSession = useCallback((addr: string) => {
+    if (isLinked) return;
+    const norm = addr.toLowerCase();
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
     fetch('/api/wallet/sync', {
@@ -612,12 +608,18 @@ export function MobileLanding() {
     }).catch(() => {});
     try { closeAppKit(); } catch {}
 
-    // Navigate to landing page
     setLinkedAddress(norm);
     setIsLinked(true);
     setShowingManifesto(true);
     setConnecting(null);
-  }, [mounted, isConnected, address, isLinked, closeAppKit]);
+  }, [isLinked, closeAppKit]);
+
+  useEffect(() => {
+    if (!mounted || isLinked) return;
+    if (isConnected && address) {
+      establishSession(address);
+    }
+  }, [mounted, isConnected, address, isLinked, establishSession]);
 
   // ── On return from native wallet app: wait for WalletConnect relay then check ──
   useEffect(() => {
@@ -625,39 +627,57 @@ export function MobileLanding() {
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
       if (isLinked) return;
-      // Poll for up to 8 seconds after returning from the wallet app
+      
+      // 1. Extreme aggressive localStorage scanning for ANY AppKit/WalletConnect session
+      // This bypasses wagmi React state lag which can be 1-3s on iOS
+      const scanStorage = () => {
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key) continue;
+            if (key.includes('@w3m/') || key.includes('wagmi') || key.includes('wc@2')) {
+              const val = localStorage.getItem(key);
+              if (val) {
+                 const match = val.match(/0x[a-fA-F0-9]{40}/i);
+                 if (match && match[0]) return match[0];
+              }
+            }
+          }
+        } catch {}
+        return null;
+      };
+
+      const immediateAddr = scanStorage();
+      if (immediateAddr) {
+        establishSession(immediateAddr);
+        return;
+      }
+
+      // 2. Poll for up to 8 seconds after returning from the wallet app
       let attempts = 0;
       const poll = setInterval(() => {
         attempts++;
-        const a = akAddress || wagmiAddress;
-        const c = akConnected || wagmiConnected;
-        if (a && c) {
+        const foundAddr = scanStorage();
+        if (foundAddr) {
           clearInterval(poll);
-          const norm = a.toLowerCase();
-          document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-          try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-          fetch('/api/wallet/sync', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified', message: 'Mobile WalletConnect verified' }),
-          }).catch(() => {});
-          try { closeAppKit(); } catch {}
-          setLinkedAddress(norm);
-          setIsLinked(true);
-          setShowingManifesto(true);
-          setConnecting(null);
+          establishSession(foundAddr);
         } else if (attempts > 40) { // 8s max
           clearInterval(poll);
         }
       }, 200);
     };
+    
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('focus', onVisible);
+    
+    // Also trigger it once on mount just in case we missed the focus event
+    onVisible();
+    
     return () => {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
     };
-  }, [mounted, isLinked, akAddress, wagmiAddress, akConnected, wagmiConnected, closeAppKit]);
+  }, [mounted, isLinked, establishSession]);
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
