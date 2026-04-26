@@ -218,7 +218,9 @@ export default function ConnectPage() {
     setPendingId(null);
     
     // Auto-redirect to landing page upon connection
-    router.replace("/");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 500);
   }, [isConnected, mounted, address, router]);
 
 
