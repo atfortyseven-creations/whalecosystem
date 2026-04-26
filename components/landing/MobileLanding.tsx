@@ -690,33 +690,40 @@ export function MobileLanding() {
     const handleVisible = () => {
       if (document.visibilityState !== 'visible') return;
       
-      // 1. Instant raw localStorage bypass (solves mobile React state freeze)
+      // 1. Extreme aggressive localStorage scanning for ANY AppKit/WalletConnect session
       try {
-        const rawWagmi = localStorage.getItem('wagmi.store');
-        if (rawWagmi) {
-          const parsed = JSON.parse(rawWagmi);
-          // Look for connections map array: [[hash, { accounts: ['0x...'] }]]
-          const connections = parsed?.state?.connections?.value;
-          if (Array.isArray(connections) && connections.length > 0) {
-            const rawAddress = connections[0]?.[1]?.accounts?.[0];
-            if (rawAddress && !isLinkedRef.current) {
-              console.log('[Sovereign] Instant Wagmi bypass successful:', rawAddress);
-              performLink(rawAddress);
-              return; // Successfully bypassed
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key) continue;
+          
+          if (key.includes('@w3m/') || key.includes('wagmi') || key.includes('wc@2')) {
+            const val = localStorage.getItem(key);
+            if (val) {
+               const match = val.match(/0x[a-fA-F0-9]{40}/i);
+               if (match && match[0] && !isLinkedRef.current) {
+                 console.log('[Sovereign] Aggressive memory scrape successful:', match[0]);
+                 performLink(match[0]);
+                 return;
+               }
             }
           }
         }
       } catch (e) {
-        console.warn('[Sovereign] Wagmi bypass failed', e);
+        console.warn('[Sovereign] Scrape bypass failed', e);
       }
 
       // Show psychological loading screen to mask WC relay delay
       if (hasInitiatedConnection) {
         setIsAwaitingSync(true);
+        // Force a hard reload if the relay is dead. IndexedDB will resurrect the session on load.
         setTimeout(() => {
-          setIsAwaitingSync(false);
-          setHasInitiatedConnection(false);
-        }, 4000);
+          if (!isLinkedRef.current && !isConnectedRef.current) {
+            window.location.reload();
+          } else {
+            setIsAwaitingSync(false);
+            setHasInitiatedConnection(false);
+          }
+        }, 4500);
       }
 
       // 2. Poll every 200ms for up to 20s waiting for WC relay to confirm
