@@ -71,66 +71,53 @@ export function OptimizedLocalLottie({
   const lottieRef = useRef<any>(null);
   const [data, setData] = useState<any>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [isVisible, setIsVisible] = useState(false);
 
   // Lazy load using native IntersectionObserver
   useEffect(() => {
-    if (!containerRef.current || status !== 'idle') return;
+    if (!containerRef.current) return;
     
     const obs = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        setStatus('loading');
-        loadLottieJSON(filename).then((json) => {
-          if (json) {
-            setData(json);
-            setStatus('ready');
-          } else {
-            setStatus('error');
-          }
-        });
-        obs.disconnect();
+        setIsVisible(true);
+        if (status === 'idle') {
+          setStatus('loading');
+          loadLottieJSON(filename).then((json) => {
+            if (json) {
+              setData(json);
+              setStatus('ready');
+            } else {
+              setStatus('error');
+            }
+          });
+        }
+      } else {
+        // Strict unmount to release RAM on iOS
+        setIsVisible(false);
       }
-    }, { rootMargin: '800px' });
+    }, { threshold: 0, rootMargin: '400px' });
     
     obs.observe(containerRef.current);
     return () => obs.disconnect();
   }, [filename, status]);
 
-  // Viewport freezing
+  // Speed and pause control when visible
   useEffect(() => {
-    if (!containerRef.current || status !== 'ready' || !isActive) return;
-    
-    const obs = new IntersectionObserver(([entry]) => {
-      const instance = lottieRef.current;
-      if (!instance) return;
-      if (entry.isIntersecting) {
-        instance.play();
-      } else {
-        instance.pause();
-      }
-    }, { threshold: 0, rootMargin: '100px' });
-    
-    obs.observe(containerRef.current);
-    return () => obs.disconnect();
-  }, [status, isActive]);
-
-  useEffect(() => {
-    if (lottieRef.current && status === 'ready') {
+    if (lottieRef.current && status === 'ready' && isVisible) {
       lottieRef.current.setSpeed(speed);
       if (!isActive) lottieRef.current.pause();
     }
-  }, [speed, isActive, status]);
+  }, [speed, isActive, status, isVisible]);
 
   return (
     <div
       ref={containerRef}
       className={`relative flex items-center justify-center ${className ?? ''}`}
       style={{
-         // Hardware acceleration hint
-         transform: 'translateZ(0)',
-         willChange: 'transform',
+         // Austerity mode: removed translateZ to prevent excessive VRAM allocation
       }}
     >
-      {status === 'ready' && data && (
+      {status === 'ready' && data && isVisible && (
         <Lottie
           lottieRef={lottieRef}
           animationData={data}

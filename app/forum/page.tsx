@@ -33,7 +33,7 @@ function ForumHomeContent() {
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-white/30 font-sans">Loading categories...</div>
           ) : categories.map(cat => (
-            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 transform-gpu hover:bg-[var(--forum-hover)]" style={{ borderBottom: '1px solid var(--forum-border)' }}>
+            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 transition-colors duration-150 ease-in-out px-2 rounded-sm sm:-mx-2 hover:bg-[var(--forum-hover)]" style={{ borderBottom: '1px solid var(--forum-border)' }}>
               <div className="w-1 h-10 rounded-sm mr-4 mt-1" style={{ backgroundColor: cat.color || '#6366f1' }}></div>
               <div className="flex flex-col">
                 <span className="text-[18.4px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>{cat.name}</span>
@@ -66,7 +66,7 @@ function ForumHomeContent() {
                 <Link
                   key={topic.id}
                   href={`/forum/t/${topic.id}`}
-                  className="flex items-start py-4 transition-all duration-200 ease-in-out px-2 rounded-sm sm:-mx-2 group transform-gpu hover:bg-[var(--forum-hover)]"
+                  className="flex items-start py-4 transition-colors duration-150 ease-in-out px-2 rounded-sm sm:-mx-2 group hover:bg-[var(--forum-hover)]"
                   style={{ borderBottom: '1px solid var(--forum-border)' }}
                 >
                   {/* Avatar */}

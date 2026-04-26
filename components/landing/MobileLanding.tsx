@@ -243,7 +243,7 @@ function ConnectedScreen({
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
         <motion.div
            className="absolute"
-           style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04, mixBlendMode: "multiply" }}
+           style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04 }}
            animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
            transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -899,7 +899,7 @@ export function MobileLanding() {
         <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
           <motion.div
             className="absolute"
-            style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04, mixBlendMode: "multiply" }}
+            style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04 }}
             animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
             transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -929,7 +929,7 @@ export function MobileLanding() {
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
         <motion.div
           className="absolute"
-          style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.045, mixBlendMode: "multiply", willChange: "transform" }}
+          style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.045 }}
           animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
           transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
         />

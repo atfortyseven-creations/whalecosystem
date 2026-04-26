@@ -98,7 +98,6 @@ function ScanLine({ active }: { active: boolean }) {
         strokeLinecap="round"
         strokeDasharray={`${PERIMETER * 0.22} ${PERIMETER * 0.78}`}
         style={{
-          filter: 'drop-shadow(0 0 6px #22c55e)',
           animation: `qr-perimeter-scan 1.8s linear infinite`,
         }}
       />
@@ -122,7 +121,6 @@ function ScanLine({ active }: { active: boolean }) {
           strokeWidth={STROKE + 0.5}
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ filter: 'drop-shadow(0 0 4px #22c55ebb)' }}
         />
       ))}
 
@@ -301,7 +299,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
 
       await scanner.start(
         { facingMode: "environment" },
-        { fps: 15 }, // omitted qrbox config parses full frame at maximum performance
+        { fps: 4 }, // optimized for CPU thermal throttling
         (text: string) => { handleSuccess(text); },
         (_err: unknown) => { /* frame errors ignored */ }
       );
@@ -312,7 +310,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
         if (scannerRef.current) {
           await scannerRef.current.start(
             { facingMode: "user" },
-            { fps: 15 },
+            { fps: 4 }, // optimized for CPU thermal throttling
             (text: string) => { handleSuccess(text); },
             (_err: unknown) => {}
           );
