@@ -37,15 +37,17 @@ export default function TopicPage() {
     setReplyError('');
     setSubmitting(true);
     try {
-      // Cryptographic anchoring (Sign to Post)
+      // Cryptographic anchoring (Sign to Post) — OPTIONAL, graceful fallback.
+      // The sovereign_handshake cookie is the primary auth gate on the server.
+      // If the user is in Chrome mobile (wagmi not reconnected yet) or rejects
+      // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
       try {
         const signature = await signMessageAsync({ message: replyContent });
         finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
-      } catch (e) {
-        setReplyError('CRYPTOGRAPHIC SIGNATURE REJECTED');
-        setSubmitting(false);
-        return;
+      } catch (e: any) {
+        // Signature skipped — continue posting without cryptographic anchor.
+        console.warn('[Forum] Reply signature skipped:', e?.message || e);
       }
 
       const res = await fetch('/api/forum/posts', {
