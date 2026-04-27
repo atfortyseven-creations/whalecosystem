@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
@@ -590,6 +590,7 @@ export function MobileLanding() {
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
+  const { reconnect } = useReconnect();
   const { open: rkOpenModal } = useAppKit();
 
   // ── Ref: always holds the latest wagmiAddress for use inside setInterval closures ──
@@ -983,10 +984,13 @@ export function MobileLanding() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 disabled={fallbackStatus === 'checking'}
-                onClick={() => {
+                onClick={async () => {
                   setFallbackStatus('checking');
                   
                   const checkSession = () => {
+                    // Priority 0: Force wagmi to reconnect underlying SDKs (IndexedDB for WalletConnect)
+                    try { reconnect(); } catch {}
+
                     // Priority 1: wagmi ref (always live — avoids stale closure)
                     if (wagmiAddressRef.current) return wagmiAddressRef.current;
                     // Priority 2: wagmi React state (re-rendered value)
