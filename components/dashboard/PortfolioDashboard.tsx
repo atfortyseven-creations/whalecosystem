@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { PortfolioSkeleton } from '@/components/ui/skeleton-loader';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
+import { useRealWalletData } from '@/hooks/useRealWalletData';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
@@ -32,18 +33,14 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const effectiveAddress = walletAddress || web3Address || sovereignAddress;
     const isConnected = !!effectiveAddress;
 
-    const { 
-        getPortfolio, 
-        fetchPortfolio 
-    } = usePortfolioStore();
+    const {
+        assets = [],
+        totalBalance: totalValueStr,
+        change24hUSD: totalChange24h = 0,
+        isLoading
+    } = useRealWalletData([], effectiveAddress ?? undefined);
 
-    // Select state based on current address
-    const { 
-        assets, 
-        totalValue, 
-        totalChange24h, 
-        isLoading 
-    } = getPortfolio(effectiveAddress || '');
+    const totalValue = parseFloat(totalValueStr || '0');
 
     const [previousAssets, setPreviousAssets] = useState<string[]>([]);
     const [newAssetIds, setNewAssetIds] = useState<Set<string>>(new Set());
@@ -52,15 +49,6 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
     const [isEyesOff, setIsEyesOff] = useState(false);
 
     useEffect(() => { setMounted(true); }, []);
-
-    // 1. SYNC DATA
-    useEffect(() => {
-        if (effectiveAddress) {
-            fetchPortfolio(effectiveAddress);
-            const interval = setInterval(() => fetchPortfolio(effectiveAddress), 30000); 
-            return () => clearInterval(interval);
-        }
-    }, [effectiveAddress, fetchPortfolio]);
 
     // 2. DETECT NEW ASSETS
     useEffect(() => {
@@ -309,7 +297,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     </div>
 
                     <button
-                        onClick={() => effectiveAddress && fetchPortfolio(effectiveAddress)}
+                        onClick={() => window.location.reload()}
                         className="p-5 hover:bg-black/5 rounded-[1.5rem] transition-all text-black/20 hover:text-black border border-transparent hover:border-black/[0.06] group"
                     >
                         <RefreshCcw size={24} className={cn(isLoading && "animate-spin")} strokeWidth={2.5} />
@@ -362,10 +350,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     
                                     <div className="text-right mx-10 relative z-10">
                                         <div className="text-black font-mono font-black text-3xl tracking-tighter">
-                                            {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                            {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.valueUSD || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                         </div>
                                         <div className="text-[10px] text-black/30 font-bold uppercase tracking-widest mt-1">
-                                            {isEyesOff ? "**" : safeToFixed(asset.balance, 6)} {asset.symbol}
+                                            {isEyesOff ? "**" : safeToFixed(asset.balanceNumeric || asset.balance || 0, 6)} {asset.symbol}
                                         </div>
                                     </div>
 

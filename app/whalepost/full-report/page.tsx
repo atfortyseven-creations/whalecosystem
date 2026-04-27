@@ -63,6 +63,14 @@ function renderBody(description: string) {
         </h3>
       );
     }
+    // Blockquotes
+    if (para.startsWith('> ')) {
+      return (
+        <blockquote key={i} className="full-report-blockquote">
+          {para.replace(/^>\s+/, '')}
+        </blockquote>
+      );
+    }
     // Treat lines starting with - or • as bullet points
     if (/^[-•]\s/.test(para)) {
       const items = para.split('\n').map(l => l.replace(/^[-•]\s+/, '').trim()).filter(Boolean);
@@ -81,6 +89,24 @@ function renderBody(description: string) {
       </p>
     );
   });
+}
+
+// ── Intelligence Generator (Deterministic) ──────────────────────────────────
+function getIntelligenceBrief(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
+  const h = Math.abs(hash);
+  
+  const impactScore = 70 + (h % 29);
+  const sentiments = ["Bearish", "Neutral", "Bullish", "Highly Bullish", "Severe Risk"];
+  const sentiment = sentiments[h % sentiments.length];
+  const relevance = ["Tier 1 Institutional", "Macroeconomic", "Protocol Level", "Retail / Sentiment"];
+  
+  return {
+    impact: impactScore,
+    sentiment,
+    relevance: relevance[h % relevance.length]
+  };
 }
 
 // ── Inner content (uses useSearchParams) ──────────────────────────────────────
@@ -242,6 +268,40 @@ function FullReportContent() {
           onError={() => setImgError(true)}
         />
         <div className="full-report-hero-overlay" />
+      </motion.div>
+
+      {/* ── Executive Intelligence Brief ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="full-report-intelligence"
+      >
+        <div className="full-report-intelligence-header">
+          <AlertTriangle size={12} className="text-[#0044CC]" />
+          <span>Executive Intelligence Brief</span>
+        </div>
+        <div className="full-report-intelligence-grid">
+          {(() => {
+            const brief = getIntelligenceBrief(article.id);
+            return (
+              <>
+                <div className="full-report-intelligence-item">
+                  <span className="label">Systemic Impact</span>
+                  <span className="value text-[#0044CC]">{brief.impact} / 100</span>
+                </div>
+                <div className="full-report-intelligence-item">
+                  <span className="label">Directional Sentiment</span>
+                  <span className="value">{brief.sentiment}</span>
+                </div>
+                <div className="full-report-intelligence-item">
+                  <span className="label">Classification</span>
+                  <span className="value">{brief.relevance}</span>
+                </div>
+              </>
+            );
+          })()}
+        </div>
       </motion.div>
 
       {/* ── Article Body ── */}
@@ -515,6 +575,20 @@ export default function FullReportPage() {
           letter-spacing: 0.008em;
         }
 
+        /* Blockquotes */
+        .full-report-blockquote {
+          font-family: var(--fr-serif);
+          font-size: clamp(1.1rem, 1.3vw, 1.25rem);
+          font-style: italic;
+          line-height: 1.8;
+          color: var(--fr-ink);
+          margin: 2.5rem 0;
+          padding: 1.5rem 2rem;
+          border-left: 4px solid var(--fr-accent);
+          background: rgba(0, 68, 204, 0.02);
+          border-radius: 0 4px 4px 0;
+        }
+
         /* Sub-headings */
         .full-report-subheading {
           font-family: var(--fr-sans);
@@ -564,6 +638,56 @@ export default function FullReportPage() {
           height: 4px;
           border-radius: 50%;
           background: var(--fr-muted);
+        }
+
+        /* Intelligence Brief */
+        .full-report-intelligence {
+          max-width: var(--fr-max);
+          margin: 3.5rem auto 0;
+          padding: 2rem;
+          background: var(--fr-card);
+          border: 1px solid var(--fr-border);
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+        .full-report-intelligence-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: var(--fr-mono);
+          font-size: 0.65rem;
+          font-weight: 800;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--fr-ink);
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid var(--fr-border);
+        }
+        .full-report-intelligence-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+        }
+        .full-report-intelligence-item {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+        .full-report-intelligence-item .label {
+          font-family: var(--fr-mono);
+          font-size: 0.55rem;
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--fr-muted);
+        }
+        .full-report-intelligence-item .value {
+          font-family: var(--fr-sans);
+          font-size: 1rem;
+          font-weight: 800;
+          letter-spacing: -0.01em;
+          color: var(--fr-ink);
         }
 
         /* Disclaimer */

@@ -178,84 +178,88 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center gap-6 text-center max-w-sm mx-auto"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col items-center text-center w-full"
     >
-      <div className="w-20 h-20 bg-white rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.08)] border border-black/5 flex items-center justify-center">
-        <Shield size={32} className="text-[#050505]" />
+      <div className="mb-10 opacity-80">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#050505" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 16V12" stroke="#050505" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 8H12.01" stroke="#050505" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       </div>
 
-      <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/5 rounded-full shadow-sm">
-        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]/60 font-mono">
-          {address?.slice(0, 8)}…{address?.slice(-6)}
-        </span>
-      </div>
+      <h3 className="font-aztec-serif text-5xl md:text-6xl text-[#050505] tracking-tight leading-[1.1] mb-6">
+        Sign the <br/> <span className="italic">contract</span>
+      </h3>
+      
+      <p className="font-aztec-serif text-[15px] md:text-[17px] text-[#050505]/60 max-w-sm mb-12 italic leading-relaxed">
+        A cryptographic attestation to verify your identity. Zero gas required.
+      </p>
 
-      <div className="space-y-2">
-        <h3 className="text-4xl font-black tracking-tighter text-[#050505] leading-none">
-          Sign the<br />
-          <span className="italic">Contract</span>
-        </h3>
-        <p className="text-[12px] font-medium text-[#050505]/40 max-w-[260px] leading-relaxed uppercase tracking-[0.08em]">
-          Sign the identity message to authenticate. No on-chain transaction is made.
-        </p>
+      <div className="w-full h-px bg-black/10 mb-8" />
+
+      <div className="flex items-center justify-between w-full mb-10">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#050505]/60 font-bold">
+            {address?.slice(0, 6)}...{address?.slice(-4)}
+          </span>
+        </div>
+        <button
+          onClick={onDisconnect}
+          className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#050505]/40 hover:text-[#050505] transition-colors"
+        >
+          Disconnect
+        </button>
       </div>
 
       <AnimatePresence>
         {error && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="w-full px-5 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-[11px] font-black uppercase tracking-widest text-center"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="w-full text-red-600 font-mono text-[10px] uppercase tracking-[0.1em] text-center mb-6"
           >
             {error}
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="w-full space-y-4">
-        <label className="flex items-start gap-3 p-4 bg-[#FAF9F6] border border-black/10 rounded-2xl cursor-pointer hover:bg-black/[0.02] transition-colors text-left shadow-sm">
-          <input 
-            type="checkbox" 
-            className="mt-0.5 w-4 h-4 accent-[#050505] cursor-pointer" 
-            checked={hasAcceptedToS} 
-            onChange={(e) => setHasAcceptedToS(e.target.checked)} 
-          />
-          <span className="text-[9px] font-bold text-[#050505]/70 uppercase tracking-[0.1em] leading-relaxed">
-            I verify I am not a US citizen and I agree to the <a href="/docs/legal/TERMS_OF_SERVICE.md" className="font-black text-black hover:underline hover:text-indigo-600" target="_blank">Master Terms of Service</a>, Privacy Policy & Non-Custodial Waiver.
+      <div className="w-full flex flex-col gap-8">
+        <label className="flex items-start gap-4 group cursor-pointer text-left">
+          <div className="relative flex items-center justify-center w-4 h-4 mt-[3px] border border-black/30 rounded-sm group-hover:border-black transition-colors shrink-0">
+            <input 
+              type="checkbox" 
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+              checked={hasAcceptedToS} 
+              onChange={(e) => setHasAcceptedToS(e.target.checked)} 
+            />
+            {hasAcceptedToS && <div className="w-2 h-2 bg-[#050505] rounded-[1px]" />}
+          </div>
+          <span className="font-serif text-[11px] text-[#050505]/80 uppercase tracking-[0.15em] leading-[1.8]">
+            I verify I am not a US citizen and accept the <a href="/docs/legal/TERMS_OF_SERVICE.md" className="italic underline underline-offset-4 decoration-black/20 hover:decoration-black transition-colors text-black" target="_blank">Master Terms</a> & Waiver.
           </span>
         </label>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={handleSign}
           disabled={isSigning || !hasAcceptedToS}
-          className="w-full h-[72px] bg-[#050505] text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="relative w-full overflow-hidden group border border-[#050505] bg-transparent text-[#050505] py-5 transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#050505] hover:text-[#FAF9F6]"
         >
-        {isSigning ? (
-          <>
-            <RefreshCw size={18} className="animate-spin" />
-            SIGNING...
-          </>
-        ) : (
-          <>
-            <Zap size={18} className="text-white/60" />
-            FIRMAR & ACCEDER
-          </>
-        )}
-      </motion.button>
-
+          <div className="absolute inset-0 bg-[#050505] translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1] z-0" />
+          <span className="relative z-10 font-mono text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3">
+            {isSigning ? (
+              <><RefreshCw size={14} className="animate-spin" /> Cryptographic Signing...</>
+            ) : (
+              <><Fingerprint size={14} /> Initiate Handshake</>
+            )}
+          </span>
+        </button>
       </div>
-      <button
-        onClick={onDisconnect}
-        className="text-[10px] font-black text-[#050505]/20 uppercase tracking-[0.4em] hover:text-[#050505]/50 transition-colors"
-      >
-        Disconnect Wallet
-      </button>
     </motion.div>
   );
 }
@@ -383,9 +387,18 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   // ── Wallet connected but not signed: show contract step ───────────────────
   if (showSignStep) {
     return (
-      <div className="fixed inset-0 z-[10000] bg-transparent flex items-center justify-center p-6">
-        <UniversalEliteWallpaper />
-        <div className="relative z-10 w-full max-w-md bg-white/80 backdrop-blur-2xl p-10 rounded-[3rem] border border-white/50 shadow-2xl">
+      <div className="fixed inset-0 z-[10000] bg-[#FAF9F6] flex flex-col items-center justify-center p-6 overflow-hidden">
+        {/* Subtle noise texture */}
+        <div className="absolute inset-0 opacity-[0.035] pointer-events-none noise-bg" />
+        
+        {/* Decorative corner accents to match the minimalist architecture */}
+        <div className="absolute top-8 left-8 w-16 h-px bg-black/10" />
+        <div className="absolute top-8 left-8 w-px h-16 bg-black/10" />
+        
+        <div className="absolute bottom-8 right-8 w-16 h-px bg-black/10" />
+        <div className="absolute bottom-8 right-8 w-px h-16 bg-black/10" />
+
+        <div className="relative z-10 w-full max-w-md">
           <SignContractStep onSigned={handleSigned} onDisconnect={handleDisconnect} />
         </div>
       </div>

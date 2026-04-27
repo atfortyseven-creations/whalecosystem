@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAppKitAccount, useAppKitEvents } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
 
@@ -579,20 +578,14 @@ export function MobileLanding() {
 
   // ── RainbowKit ConnectButton.Custom is the PRIMARY connector ────────────────
   // ConnectButton.Custom always provides a valid openConnectModal regardless of
-  // any stale wagmi/AppKit session — unlike useConnectModal which returns
-  // undefined when isConnected=true (stale session from AppKit in localStorage).
-  // AppKit account is a secondary signal: it fires when AppKit resolves a session
-  // from an existing WalletConnect pairing. Kept for fallback polling.
-  const { address: akAddress, isConnected: akConnected } = useAppKitAccount();
+  // any stale session. We removed AppKit hooks to prevent context crashes.
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
-  const events = useAppKitEvents();
 
-  // Merge: prefer AppKit (faster on mobile), fall back to wagmi
-  const isConnected = akConnected || wagmiConnected;
-  const address     = akAddress   || wagmiAddress;
+  const isConnected = wagmiConnected;
+  const address     = wagmiAddress;
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
@@ -689,19 +682,16 @@ export function MobileLanding() {
     const onFocusRecheck = () => {
       if (isLinked) return;
 
-      // Priority 1: AppKit/wagmi hooks already have the address in React state
-      if (akAddress) { establishSession(akAddress); return; }
+      // Priority 1: wagmi hooks already have the address in React state
       if (wagmiAddress) { establishSession(wagmiAddress); return; }
 
-      // Priority 2: localStorage scan — delayed 600ms so AppKit can write session
-      // (AppKit needs 400-800ms to process WalletConnect relay message on return)
+      // Priority 2: localStorage scan — delayed 600ms so wagmi can write session
       setTimeout(() => {
         if (pollInterval) clearInterval(pollInterval);
         let attempts = 0;
         pollInterval = setInterval(() => {
           attempts++;
           // Re-check React state on every tick (fastest path if hooks updated)
-          if (akAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(akAddress); return; }
           if (wagmiAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddress); return; }
           // Scan localStorage with correct Reown AppKit v1 key patterns
           for (const key of Object.keys(localStorage)) {
@@ -718,7 +708,7 @@ export function MobileLanding() {
           }
           if (attempts >= 120) { clearInterval(pollInterval!); pollInterval = null; } // 24s max
         }, 200);
-      }, 600); // ← critical delay: AppKit needs ~400-800ms to write session after deeplink return
+      }, 600); // ← critical delay
     };
 
     const handleVisibility = () => {
@@ -734,23 +724,7 @@ export function MobileLanding() {
       window.removeEventListener('focus', onFocusRecheck);
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, [mounted, akAddress, wagmiAddress, isLinked, establishSession]);
-
-  // ── AppKit event bus: instant session detection (Grok fix — corrected API) ───
-  // useAppKitEvents() returns REACTIVE STATE (not an event emitter).
-  // The hook re-renders the component when a new AppKit event fires.
-  // We simply watch `events` as a dependency — no .subscribe() needed.
-  const appKitEventType = (events as any)?.data?.event ?? (events as any)?.type ?? '';
-  useEffect(() => {
-    if (!mounted || !appKitEventType) return;
-    if (['CONNECT_SUCCESS', 'SESSION_UPDATE', 'connect', 'session_update'].includes(appKitEventType)) {
-      // 400ms grace period for wagmi/AppKit React state to settle after the event
-      setTimeout(() => {
-        if (akAddress) establishSession(akAddress);
-        else if (wagmiAddress) establishSession(wagmiAddress);
-      }, 400);
-    }
-  }, [mounted, appKitEventType, akAddress, wagmiAddress, establishSession]);
+  }, [mounted, wagmiAddress, isLinked, establishSession]);
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
@@ -1020,7 +994,7 @@ export function MobileLanding() {
 
                 // Pre-flight: if wagmi thinks it's connected (stale session),
                 // disconnect first so the modal isn't blocked, then open.
-                if (wagmiConnected || akConnected) {
+                if (wagmiConnected) {
                   try { disconnect(); } catch {}
                   // Small delay for wagmi state to settle after disconnect
                   setTimeout(doOpen, 300);

@@ -132,6 +132,11 @@ model User {
 
   testnetMode Boolean @default(false)
 
+  // Forum-specific settings
+  isAdmin          Boolean @default(false)
+  notifyOnReply    Boolean @default(true)
+  notifyOnMention  Boolean @default(true)
+
   clerkId      String? @unique
   snxAccountId String? @unique
 
@@ -763,6 +768,8 @@ model ExchangeBalance {
   free      Float    @default(0.0)
   locked    Float    @default(0.0)
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, asset])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

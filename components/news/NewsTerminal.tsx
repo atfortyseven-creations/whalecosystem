@@ -363,15 +363,14 @@ export function NewsTerminal() {
                     </div>
                   </div>
 
-                  {/* ── Article body — perfectly spaced ── */}
-                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-6 max-w-[860px]">
+                  {/* ── Article body — Preview Mode ── */}
+                  <div className="px-6 md:px-10 xl:px-16 pt-8 pb-0 max-w-[860px] relative">
                     <div className="space-y-6" lang="en"
                          style={{ color: '#1a1a1a', fontSize: 'clamp(15px, 1.05vw, 18px)', fontFamily: 'Georgia, serif', lineHeight: '1.9', letterSpacing: '0.008em' }}>
                       {selected.description
-                        ? selected.description.split(/\n\n+/).map((para, i) => {
+                        ? selected.description.split(/\n\n+/).slice(0, 2).map((para, i) => {
                             const trimmed = para.trim();
                             if (!trimmed) return null;
-                            // Sub-heading detection
                             if (trimmed.startsWith('## ')) {
                               return (
                                 <h2 key={i} style={{ fontFamily: 'inherit', fontSize: 'clamp(1rem, 1.2vw, 1.15rem)', fontWeight: 800, letterSpacing: '-0.01em', color: TEXT, marginTop: '2rem', marginBottom: '0.25rem', paddingLeft: '0.75rem', borderLeft: `3px solid ${TEXT}` }}>
@@ -388,6 +387,8 @@ export function NewsTerminal() {
                         : <p style={{ color: MUTED, fontFamily: 'Georgia, serif' }}>No content available for this article.</p>
                       }
                     </div>
+                    {/* Fade out gradient for preview */}
+                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FAF9F6] to-transparent pointer-events-none" />
                   </div>
 
                   {/* ── Full Report CTA ── */}

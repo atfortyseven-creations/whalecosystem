@@ -13,19 +13,21 @@ export function ClientRootRouter() {
 
   useEffect(() => {
     const check = () => {
-      if (
-        typeof document !== "undefined" &&
+      const hasCookie = typeof document !== "undefined" &&
         (document.cookie.includes("sovereign_handshake=") ||
-          document.cookie.includes("siwe_session="))
-      ) {
+         document.cookie.includes("siwe_session="));
+      
+      if (isConnected || hasCookie) {
         setHasSession(true);
+      } else {
+        setHasSession(false);
       }
     };
     check();
-    if (isConnected) {
-      const interval = setInterval(check, 500);
-      return () => clearInterval(interval);
-    }
+    
+    // Poll to catch any external cookie updates
+    const interval = setInterval(check, 500);
+    return () => clearInterval(interval);
   }, [isConnected]);
 
   return (
@@ -51,7 +53,7 @@ export function ClientRootRouter() {
             {/* Right — navigation */}
             <nav className="flex items-center gap-8">
               <Link
-                href="/manifesto"
+                href="/dashboard"
                 className="group relative font-mono text-[8px] uppercase tracking-[0.35em] transition-colors duration-300"
                 style={{ color: "rgba(10,10,10,0.35)" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "rgba(10,10,10,0.9)")}

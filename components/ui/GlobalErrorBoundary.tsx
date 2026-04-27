@@ -84,8 +84,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               </div>
 
               <div className="mt-10 pt-8 border-t border-black/5 dark:border-white/5 w-full">
-                <p className="font-mono text-[8px] text-black/20 dark:text-white/20 uppercase tracking-[0.4em] font-black">
-                    Error Integrity: {this.state.error?.name || "Unknown"}
+                <p className="font-mono text-[8px] text-black/40 dark:text-white/40 uppercase tracking-[0.4em] font-black break-all">
+                    Error Integrity: {this.state.error?.message || "Unknown"}
                 </p>
               </div>
             </div>
