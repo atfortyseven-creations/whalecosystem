@@ -603,6 +603,8 @@ export function MobileLanding() {
 
   const [mounted, setMounted]           = useState(false);
   const [showScanner, setShowScanner]   = useState(false);
+  const [showDebug, setShowDebug]       = useState(false);  // secret debug panel
+  const [debugTaps, setDebugTaps]       = useState(0);
   // Always false on SSR. Reads from sessionStorage after mount to survive Chrome
   // tab freeze/restore (which resets React state when user returns from Rainbow).
   const [showManualReconnect, setShowManualReconnectRaw] = useState(false);
@@ -913,13 +915,49 @@ export function MobileLanding() {
         style={{ background: "rgba(255,255,255,0.80)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
       >
         <div className="flex items-center gap-2.5">
-          <WhaleLogo className="w-6 h-6 shrink-0" />
+          <div
+            className="w-6 h-6 shrink-0 cursor-pointer select-none"
+            onClick={() => {
+              const next = debugTaps + 1;
+              setDebugTaps(next);
+              if (next >= 5) { setShowDebug(s => !s); setDebugTaps(0); }
+            }}
+          >
+            <WhaleLogo className="w-6 h-6" />
+          </div>
           <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
         </div>
         <div className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/40">
           Not Connected
         </div>
       </motion.header>
+
+      {/* ── DEBUG PANEL (tap logo 5x to open) ── */}
+      {showDebug && (
+        <div className="fixed inset-0 z-[99999] bg-black/95 overflow-auto p-4 font-mono text-[10px] text-green-400">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-yellow-400 font-bold text-[11px]">SOVEREIGN DEBUG</span>
+            <button onClick={() => setShowDebug(false)} className="text-red-400 font-bold px-3 py-1 border border-red-400 rounded">CLOSE</button>
+          </div>
+          <div className="space-y-2">
+            <p>wagmi connected: <span className="text-white">{String(wagmiConnected)}</span></p>
+            <p>wagmi address: <span className="text-white">{wagmiAddress ?? 'undefined'}</span></p>
+            <p>wagmiAddressRef: <span className="text-white">{wagmiAddressRef.current ?? 'undefined'}</span></p>
+            <p>isLinked: <span className="text-white">{String(isLinked)}</span></p>
+            <p>connectors: <span className="text-white">{connectors.map(c=>c.id).join(', ') || 'none'}</span></p>
+            <hr className="border-green-900 my-2" />
+            <p className="text-yellow-400">COOKIES:</p>
+            {document.cookie.split('; ').filter(Boolean).map((c,i) => (
+              <p key={i} className="break-all text-white/80">{c.substring(0, 120)}</p>
+            ))}
+            <hr className="border-green-900 my-2" />
+            <p className="text-yellow-400">LOCALSTORAGE KEYS:</p>
+            {Object.keys(localStorage).map((k,i) => (
+              <p key={i} className="break-all">{k}: <span className="text-white/70">{(localStorage.getItem(k)||'').substring(0,80)}</span></p>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-12 gap-8 max-w-[440px] w-full mx-auto">
@@ -949,28 +987,33 @@ export function MobileLanding() {
                   setFallbackStatus('checking');
                   
                   const checkSession = () => {
-                    // Priority 1: wagmi address
+                    // Priority 1: wagmi ref (always live — avoids stale closure)
+                    if (wagmiAddressRef.current) return wagmiAddressRef.current;
+                    // Priority 2: wagmi React state (re-rendered value)
                     if (address) return address;
-                    // Priority 1.5: Scan Wagmi Cookie Storage
+                    // Priority 3: Scan ALL cookies for any 0x address.
+                    // WagmiAdapter with cookieStorage may write to keys other than 'wagmi.store='.
+                    // We scan every cookie value and extract any valid 0x address.
                     try {
-                      const cookies = document.cookie.split('; ');
-                      for (const cookie of cookies) {
-                        if (cookie.startsWith('wagmi.store=')) {
-                          const raw = decodeURIComponent(cookie.substring('wagmi.store='.length));
-                          const addr = extractAddressFromAppKit(raw);
+                      const allCookies = document.cookie.split('; ');
+                      for (const cookie of allCookies) {
+                        const eqIdx = cookie.indexOf('=');
+                        if (eqIdx === -1) continue;
+                        try {
+                          const val = decodeURIComponent(cookie.substring(eqIdx + 1));
+                          const addr = extractAddressFromAppKit(val);
                           if (addr) return addr;
-                        }
+                        } catch {}
                       }
                     } catch {}
-                    // Priority 2: Scan localStorage
+                    // Priority 4: Scan ALL localStorage values for any 0x address.
+                    // WalletConnect v2 stores session data under 'wc@2:...' keys — scan all.
                     try {
                       for (const key of Object.keys(localStorage)) {
-                        if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
-                          const raw = localStorage.getItem(key);
-                          if (!raw) continue;
-                          const addr = extractAddressFromAppKit(raw);
-                          if (addr) return addr;
-                        }
+                        const raw = localStorage.getItem(key);
+                        if (!raw || raw.length < 42) continue;
+                        const addr = extractAddressFromAppKit(raw);
+                        if (addr) return addr;
                       }
                     } catch {}
                     // Priority 3: Cookie fallback
@@ -996,7 +1039,7 @@ export function MobileLanding() {
                       clearInterval(poll);
                       establishSession(foundAddr);
                       setFallbackStatus('idle');
-                    } else if (attempts >= 100) { // 20 segundos (200ms * 100)
+                    } else if (attempts >= 150) { // 30s (200ms × 150) — WC relay needs time to reconnect
                       clearInterval(poll);
                       setFallbackStatus('failed');
                       setTimeout(() => setFallbackStatus('idle'), 3000);
