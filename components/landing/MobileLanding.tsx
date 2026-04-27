@@ -623,12 +623,13 @@ export function MobileLanding() {
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
-  // After wallet connection the user lands directly on the ConnectedScreen (scanner).
-  // The ImmersiveManifestoLanding is discovery content for unauthenticated visitors.
-  const [showingManifesto, setShowingManifesto] = useState(false);
+  // After wallet connection the user lands directly on the ImmersiveManifestoLanding.
+  // This matches the requested behavior for mobile flow.
+  const [showingManifesto, setShowingManifesto] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
   // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
+  const [fallbackStatus, setFallbackStatus] = useState<'idle' | 'checking' | 'failed'>('idle');
 
   useEffect(() => {
     setMounted(true);
@@ -684,19 +685,20 @@ export function MobileLanding() {
       // Priority 1: wagmi hooks already have the address in React state
       if (wagmiAddress) { establishSession(wagmiAddress); return; }
 
-      // Priority 2: localStorage scan — delayed 600ms so wagmi can write session
-      setTimeout(() => {
-        if (pollInterval) clearInterval(pollInterval);
-        let attempts = 0;
-        pollInterval = setInterval(() => {
-          attempts++;
-          // Re-check React state on every tick (fastest path if hooks updated)
-          if (wagmiAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddress); return; }
-          // Scan localStorage with correct Reown AppKit v1 key patterns
-          for (const key of Object.keys(localStorage)) {
-            if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
-              const raw = localStorage.getItem(key);
-              if (!raw) continue;
+      // Start polling immediately with an ultra-fast 50ms tick to match Scroll.io's zero-latency UX
+      if (pollInterval) clearInterval(pollInterval);
+      let attempts = 0;
+      pollInterval = setInterval(() => {
+        attempts++;
+        // Re-check React state on every tick (fastest path if hooks updated)
+        if (wagmiAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddress); return; }
+        
+        // Scan Wagmi cookie storage (primary)
+        try {
+          const cookies = document.cookie.split('; ');
+          for (const cookie of cookies) {
+            if (cookie.startsWith('wagmi.store=')) {
+              const raw = decodeURIComponent(cookie.substring('wagmi.store='.length));
               const addr = extractAddressFromAppKit(raw);
               if (addr) {
                 clearInterval(pollInterval!); pollInterval = null;
@@ -705,9 +707,23 @@ export function MobileLanding() {
               }
             }
           }
-          if (attempts >= 120) { clearInterval(pollInterval!); pollInterval = null; } // 24s max
-        }, 200);
-      }, 600); // ← critical delay
+        } catch {}
+
+        // Scan localStorage with correct Reown AppKit v1 key patterns (fallback)
+        for (const key of Object.keys(localStorage)) {
+          if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            const addr = extractAddressFromAppKit(raw);
+            if (addr) {
+              clearInterval(pollInterval!); pollInterval = null;
+              establishSession(addr);
+              return;
+            }
+          }
+        }
+        if (attempts >= 480) { clearInterval(pollInterval!); pollInterval = null; } // 24s max at 50ms per tick
+      }, 50);
     };
 
     const handleVisibility = () => {
@@ -907,42 +923,83 @@ export function MobileLanding() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
+                disabled={fallbackStatus === 'checking'}
                 onClick={() => {
-                  // ── Priority 1: wagmi/AppKit already has the address in memory ──
-                  if (address) {
-                    establishSession(address);
+                  setFallbackStatus('checking');
+                  
+                  const checkSession = () => {
+                    // Priority 1: wagmi address
+                    if (address) return address;
+                    // Priority 1.5: Scan Wagmi Cookie Storage
+                    try {
+                      const cookies = document.cookie.split('; ');
+                      for (const cookie of cookies) {
+                        if (cookie.startsWith('wagmi.store=')) {
+                          const raw = decodeURIComponent(cookie.substring('wagmi.store='.length));
+                          const addr = extractAddressFromAppKit(raw);
+                          if (addr) return addr;
+                        }
+                      }
+                    } catch {}
+                    // Priority 2: Scan localStorage
+                    try {
+                      for (const key of Object.keys(localStorage)) {
+                        if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+                          const raw = localStorage.getItem(key);
+                          if (!raw) continue;
+                          const addr = extractAddressFromAppKit(raw);
+                          if (addr) return addr;
+                        }
+                      }
+                    } catch {}
+                    // Priority 3: Cookie fallback
+                    try {
+                      const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+                      if (cookieMatch?.[1]) return cookieMatch[1];
+                    } catch {}
+                    return null;
+                  };
+
+                  let foundAddr = checkSession();
+                  if (foundAddr) {
+                    establishSession(foundAddr);
+                    setFallbackStatus('idle');
                     return;
                   }
 
-                  // ── Priority 2: Scan localStorage with Reown AppKit v1 key patterns ──
-                  try {
-                    for (const key of Object.keys(localStorage)) {
-                      if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
-                        const raw = localStorage.getItem(key);
-                        if (!raw) continue;
-                        const addr = extractAddressFromAppKit(raw);
-                        if (addr) { establishSession(addr); return; }
-                      }
+                  let attempts = 0;
+                  const poll = setInterval(() => {
+                    attempts++;
+                    foundAddr = checkSession();
+                    if (foundAddr) {
+                      clearInterval(poll);
+                      establishSession(foundAddr);
+                      setFallbackStatus('idle');
+                    } else if (attempts >= 40) { // 8 segundos (200ms * 40)
+                      clearInterval(poll);
+                      setFallbackStatus('failed');
+                      setTimeout(() => setFallbackStatus('idle'), 3000);
                     }
-                  } catch {}
-
-                  // ── Priority 3: Cookie fallback — address already in cookie ──
-                  try {
-                    const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
-                    if (cookieMatch?.[1]) {
-                      // Cookie already set → just refresh to trigger isLinked render
-                      window.location.reload();
-                      return;
-                    }
-                  } catch {}
-
-                  // ── Priority 4: Last resort reload (wagmi will reconnect on load) ──
-                  window.location.reload();
+                  }, 200);
                 }}
-                className="mt-6 w-full py-4 rounded-2xl bg-[#050505] text-white font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3"
+                className={`mt-6 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 disabled:opacity-90 ${fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-[#050505] text-white'}`}
               >
-                <RefreshCw size={16} />
-                Continuar si ya conecté
+                {fallbackStatus === 'checking' ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-white/70" />
+                    Sincronizando túnel...
+                  </>
+                ) : fallbackStatus === 'failed' ? (
+                  <>
+                    <AlertCircle size={16} className="text-white" />
+                    Conexión no detectada
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw size={16} />
+                    Continuar si ya conecté
+                  </>
+                )}
               </motion.button>
             )}
           </AnimatePresence>
@@ -997,8 +1054,8 @@ export function MobileLanding() {
                   doOpen();
                 }
 
-                setTimeout(() => setConnecting(null), 5000);
-                setTimeout(() => setShowFallbackBtn(true), 5500);
+                setTimeout(() => setConnecting(null), 3000);
+                setTimeout(() => setShowFallbackBtn(true), 1200);
               };
 
               return (
