@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
-import { useAppKit, useAppKitAccount, useAppKitEvents } from "@reown/appkit/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKitAccount, useAppKitEvents } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { useUIStore } from '@/lib/store/ui-store';
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
 
 // ── Reown AppKit v1 localStorage key patterns (Grok fix) ───────────────────
@@ -577,16 +577,17 @@ export function MobileLanding() {
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
-  // ── AppKit is the PRIMARY source on Android ────────────────────────────
-  // useAppKitAccount updates synchronously when AppKit's modal closes.
-  // wagmi's useAccount can lag 1-3s on Android (adapter round-trip delay).
+  // ── RainbowKit is the PRIMARY connector (like Scroll.io) ──────────────────
+  // useConnectModal opens the native RainbowKit wallet grid which generates
+  // correct WalletConnect v2 deep links → Android shows the "Open with" dialog.
+  const { openConnectModal } = useConnectModal();
+  // AppKit account is a secondary signal: it fires when AppKit resolves a session
+  // from an existing WalletConnect pairing. Kept for fallback polling.
   const { address: akAddress, isConnected: akConnected } = useAppKitAccount();
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
-  const { open: openAppKitDirect, close: closeAppKit } = useAppKit();
-  const openConnectModal = useUIStore(s => s.openConnectModal);
   const events = useAppKitEvents();
 
   // Merge: prefer AppKit (faster on mobile), fall back to wagmi
@@ -660,7 +661,6 @@ export function MobileLanding() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified', message: 'Mobile WalletConnect verified' }),
     }).catch(() => {});
-    try { closeAppKit(); } catch {}
 
     setLinkedAddress(norm);
     setIsLinked(true);
@@ -670,8 +670,8 @@ export function MobileLanding() {
     // NO REDIRECT: We stay on /connect which already renders MobileLanding.
     // Redirecting to "/" triggers SSR User-Agent detection which can send a
     // desktop layout to mobile browsers with "Desktop site" enabled.
-    // The ConnectedScreen / ImmersiveManifestoLanding renders in-place here.
-  }, [isLinked, closeAppKit]);
+    // The ImmersiveManifestoLanding renders in-place here after connection.
+  }, [isLinked]);
 
   useEffect(() => {
     if (!mounted || isLinked) return;
@@ -755,13 +755,15 @@ export function MobileLanding() {
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
     if (!isLinked) return;
-    try { closeAppKit(); } catch {}
     const id = setInterval(() => {
-      const el = document.querySelector('w3m-modal');
-      if (el) el.remove();
+      // Remove any lingering AppKit/WalletConnect modal backdrop
+      const el = document.querySelector('w3m-modal, [data-rk]');
+      // Only remove w3m-modal, not the RainbowKit overlay [data-rk] which we need
+      const w3m = document.querySelector('w3m-modal');
+      if (w3m) w3m.remove();
     }, 400);
     return () => clearInterval(id);
-  }, [isLinked, closeAppKit]);
+  }, [isLinked]);
 
   // ── Scroll to top on landing ─────────────────────────────────────────────────
   useEffect(() => {
@@ -819,16 +821,15 @@ export function MobileLanding() {
           sessionStorage.clear();
         } catch {}
 
-        // 3. Disconnect wagmi / AppKit
+        // 3. Disconnect wagmi
         try { disconnect(); } catch {}
-        try { closeAppKit(); } catch {}
         
         // 4. Force a clean window reload to guarantee a pristine state for the next wallet
         if (typeof window !== 'undefined') {
           window.location.href = window.location.pathname;
         }
     }, 400); // 400ms delay to let the user see the system purge
-  }, [disconnect, closeAppKit]);
+  }, [disconnect]);
 
   if (!mounted) return null;
 
@@ -987,24 +988,32 @@ export function MobileLanding() {
             <div className="flex-1 h-px bg-[#E5E5E5]" />
           </div>
 
+          {/* ──────────────────────────────────────────────────────────────────
+              WALLET BUTTONS — All three open the RainbowKit ConnectModal.
+              RainbowKit generates correct WalletConnect v2 deep links that
+              trigger Android's native "Open with" dialog (like Scroll.io).
+              ────────────────────────────────────────────────────────────────── */}
+
           {/* MetaMask */}
           <WalletOption
             logo="/wallets/metamask.svg"
             name="MetaMask"
-            badge="Injected · Mobile SDK"
+            badge="Mobile · WalletConnect v2"
             loading={connecting === 'metamask'}
             onClick={() => {
               setConnecting('metamask');
               setShowManualReconnect(true);
               setShowFallbackBtn(false);
+              // If already inside MetaMask's in-app browser, injected provider is available
               const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
               const injectedConn = connectors.find(c => c.id === 'injected');
-              // Only use injected if window.ethereum actually exists (i.e. MetaMask in-app browser).
-              // Otherwise (e.g. Chrome mobile), fallback to AppKit WalletConnect deep linking.
               if (hasEthereum && injectedConn) {
+                // Inside MetaMask browser — connect directly, no modal needed
                 connect({ connector: injectedConn });
               } else {
-                openAppKitDirect();
+                // External browser — open RainbowKit modal → WalletConnect deep link
+                // → Android shows "Open with" → MetaMask opens
+                openConnectModal?.();
               }
               setTimeout(() => setConnecting(null), 3000);
               setTimeout(() => setShowFallbackBtn(true), 3500);
@@ -1016,36 +1025,32 @@ export function MobileLanding() {
           <WalletOption
             logo="/wallets/coinbase.png"
             name="Coinbase Wallet"
-            badge="Direct · SDK"
+            badge="Mobile · WalletConnect v2"
             loading={connecting === 'coinbase'}
             onClick={() => {
               setConnecting('coinbase');
               setShowManualReconnect(true);
               setShowFallbackBtn(false);
-              const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
-              const injectedConn = connectors.find(c => c.id === 'injected');
-              if (hasEthereum && injectedConn) {
-                connect({ connector: injectedConn });
-              } else {
-                openAppKitDirect();
-              }
+              // RainbowKit modal → WalletConnect deep link → Android "Open with" → Coinbase
+              openConnectModal?.();
               setTimeout(() => setConnecting(null), 3000);
               setTimeout(() => setShowFallbackBtn(true), 3500);
             }}
             delay={0.15}
           />
 
-          {/* Rainbow + all WalletConnect wallets */}
+          {/* Rainbow + all 550+ WalletConnect wallets */}
           <WalletOption
             logo="/wallets/rainbow.png"
             name="Rainbow & 550+ Wallets"
-            badge="WalletConnect v2"
+            badge="WalletConnect v2 · All Wallets"
             loading={connecting === 'wc'}
             onClick={() => {
               setConnecting('wc');
               setShowManualReconnect(true);
               setShowFallbackBtn(false);
-              openAppKitDirect();
+              // RainbowKit modal shows the full wallet grid (like Scroll.io)
+              openConnectModal?.();
               setTimeout(() => setConnecting(null), 3000);
               setTimeout(() => setShowFallbackBtn(true), 3500);
             }}
