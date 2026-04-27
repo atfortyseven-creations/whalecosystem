@@ -106,7 +106,7 @@ const metadata = {
     // CORRECT: root URL → SmartLandingRouter reads the wagmi session → shows app.
     redirect: {
         native: '',
-        universal: 'https://www.humanidfi.com',
+        universal: APP_URL,  // Same origin as metadata.url — WalletConnect validates domain match
     },
 }
 
