@@ -1,9 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { CreateConnectorFn, WagmiProvider, cookieToInitialState } from 'wagmi';
+import { CreateConnectorFn, WagmiProvider } from 'wagmi';
 import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism } from "@reown/appkit/networks";
-import { cookieStorage, createStorage, http } from '@wagmi/core'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { createAppKit } from '@reown/appkit/react'
 import { ReactNode } from "react";
@@ -74,10 +73,7 @@ import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors'
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [dedicatedMainnet, dedicatedBsc, polygon, dedicatedBase, arbitrum, optimism, worldchain];
 
 export const wagmiAdapter = new WagmiAdapter({
-    storage: createStorage({
-        storage: cookieStorage
-    }),
-    ssr: true,
+    ssr: false,
     projectId,
     networks
 })
@@ -208,33 +204,8 @@ try {
 }
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
-    let initialState: any = undefined;
-    try {
-        if (cookies) {
-            // The full HTTP Cookie header is passed here (e.g. "a=1; b=2; wagmi_store={...}").
-            // cookieToInitialState expects the RAW cookie string.
-            // We must safely decode it to avoid JSON.parse SyntaxError on
-            // percent-encoded wallet addresses (0x chars inside JSON values).
-            let safeCookies = cookies;
-
-            // Attempt 1: standard URL decode
-            try { safeCookies = decodeURIComponent(cookies); } catch {}
-
-            // Attempt 2: strip any null bytes or non-printable ASCII that corrupt JSON
-            safeCookies = safeCookies.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-
-            initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, safeCookies);
-        }
-    } catch (e) {
-        // Silently discard — wagmi will start with empty state.
-        // This is 100% safe: the client will reconnect from localStorage on first render.
-        if (process.env.NODE_ENV === 'development') {
-            console.warn('[Wagmi] Cookie parse skipped — starting with empty state:', (e as Error).message);
-        }
-    }
-
     return (
-        <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>
+        <WagmiProvider config={wagmiAdapter.wagmiConfig as any}>
             <QueryClientProvider client={queryClient}>
                 {children}
             </QueryClientProvider>
