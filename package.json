@@ -16,6 +16,7 @@
     "start": "npx prisma db push --accept-data-loss && next start",
     "start:prod": "npx prisma generate && npx prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" npx next start -p ${PORT:-3000} -H 0.0.0.0",
     "start:gateway": "npx tsx services/gateway/server.ts",
+    "start:railway-worker": "cross-env NODE_ENV=production npx tsx scripts/whale-worker.ts",
     "start:scanner": "npx tsx services/scanner/index.ts",
     "start:alerts": "npx tsx scripts/alert-worker.ts",
     "start:solana": "npx tsx scripts/solana-worker.ts",
