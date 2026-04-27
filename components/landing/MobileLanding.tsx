@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
 
@@ -576,13 +576,14 @@ export function MobileLanding() {
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
-  // ── RainbowKit ConnectButton.Custom is the PRIMARY connector ────────────────
-  // ConnectButton.Custom always provides a valid openConnectModal regardless of
-  // any stale session. We removed AppKit hooks to prevent context crashes.
+  // ── Reown AppKit is the PRIMARY connector ────────────────
+  // Replaced RainbowKit ConnectButton.Custom with AppKit's useAppKit to fix
+  // the missing RainbowKitProvider error (Critical Node Failure).
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
+  const { open: rkOpenModal } = useAppKit();
 
   const isConnected = wagmiConnected;
   const address     = wagmiAddress;
@@ -961,14 +962,12 @@ export function MobileLanding() {
           </div>
 
           {/* ──────────────────────────────────────────────────────────────────
-              WALLET BUTTONS — Wrapped in ConnectButton.Custom so RainbowKit
-              ALWAYS provides a valid openConnectModal (unlike useConnectModal
-              which silently returns undefined when wagmi has a stale session).
-              Flow: click → pre-flight disconnect → RainbowKit modal opens →
+              WALLET BUTTONS — Using Reown AppKit's useAppKit hook.
+              Flow: click → pre-flight disconnect → AppKit modal opens →
               user picks wallet → WC v2 deep link → Android "Open with" dialog.
               ────────────────────────────────────────────────────────────────── */}
-          <ConnectButton.Custom>
-            {({ openConnectModal: rkOpenModal, authenticationStatus, mounted: rkMounted }) => {
+          <div className="w-full flex flex-col gap-3">
+            {(() => {
               // Helper: clear any stale wagmi/AppKit session then open the modal
               const openWalletModal = (walletId: string) => {
                 setConnecting(walletId);
@@ -983,9 +982,7 @@ export function MobileLanding() {
                     // Inside wallet's own browser — connect directly without modal
                     connect({ connector: injectedConn });
                   } else {
-                    // External browser: open RainbowKit modal.
-                    // This is GUARANTEED to work because it comes from ConnectButton.Custom.
-                    // → WalletConnect v2 deep link → Android "Open with" → wallet app opens
+                    // External browser: open AppKit modal.
                     rkOpenModal();
                   }
                 };
@@ -1026,7 +1023,7 @@ export function MobileLanding() {
                     delay={0.15}
                   />
 
-                  {/* Rainbow + all 550+ WalletConnect wallets */}
+                  {/* Rainbow & All Wallets */}
                   <WalletOption
                     logo="/wallets/rainbow.png"
                     name="Rainbow & 550+ Wallets"
@@ -1037,8 +1034,8 @@ export function MobileLanding() {
                   />
                 </>
               );
-            }}
-          </ConnectButton.Custom>
+            })()}
+          </div>
 
           {/* ECDSA notice */}
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
