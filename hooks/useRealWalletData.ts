@@ -7,8 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
-// Dirección de Bridged USDC en Polygon
-const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 
 export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?: string) => {
     const { address: web3Address, isConnected: isWeb3Connected } = useAccount();
@@ -45,14 +43,14 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     // [DEBUG] Monitor address resolution changes
     // console.log('[useRealWalletData] Address Resolution:', { effectiveAddress, isConnected, isAuthenticated, isWeb3Connected, handshakeAddressFromCookie });
 
-    // 1. On-Chain Balance (Wagmi ya maneja su propio caché/reactividad)
+    // 1. On-Chain Native Balance (Wagmi v2 — no 'token' param, that's deprecated)
+    // ERC-20 USDC balance is already fetched by the portfolio assets API below.
     const { data: balanceData, isLoading: isBalanceLoading } = useBalance({
-        address: effectiveAddress,
-        token: USDC_ADDRESS,
-        chainId: 137, // Polygon
+        address: effectiveAddress as `0x${string}` | undefined,
+        chainId: 1, // Ethereum mainnet native balance
         query: {
             enabled: !!effectiveAddress,
-            refetchInterval: 10000, // Sync on-chain balance every 10s
+            refetchInterval: 10000,
         }
     });
 
