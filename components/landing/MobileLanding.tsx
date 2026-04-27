@@ -703,126 +703,105 @@ export function MobileLanding() {
     }
   }, [mounted, isConnected, address, isLinked, establishSession]);
 
-  // ── On return from native wallet app: Reown AppKit v1 hardened handler ───────
-  // Fix by Grok: correct keys + 600ms delay + 24s poll + AppKit event bus.
-  // [COSMIC UPGRADE]: Atomic Wake-Sync Daemon. Bypasses React latency by injecting directly into WalletConnect IndexedDB.
+  // ── On return from native wallet app: Hardened Sovereign Wake-Sync Engine ────
+  // ARCHITECTURE NOTE: We deliberately do NOT call connectAsync() here.
+  // Reason: wagmi automatically initiates its own reconnection to WalletConnect
+  // when the page wakes up. Calling connectAsync() concurrently creates two
+  // competing connection attempts that BOTH fail with a "Already connecting"
+  // or "Connector not found" error, producing the exact deadlock the user sees.
+  //
+  // The correct strategy: fire reconnect() once to wake wagmi's internal state
+  // machine, then poll wagmiAddressRef (which updates automatically when wagmi
+  // resolves) and the storage layer as a direct disk fallback.
   useEffect(() => {
     if (!mounted) return;
     let pollInterval: ReturnType<typeof setInterval> | null = null;
 
+    const stopPolling = () => {
+      if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+    };
+
     const onFocusRecheck = () => {
       if (isLinked) return;
 
-      // Priority 1: wagmi hooks already have the address in React state
+      // Priority 1: wagmi already has the address (fastest path)
       if (wagmiAddressRef.current) { establishSession(wagmiAddressRef.current); return; }
 
-      // Start polling immediately with an ultra-fast 50ms tick to match Scroll.io's zero-latency UX
-      if (pollInterval) clearInterval(pollInterval);
+      stopPolling();
       let attempts = 0;
+
       pollInterval = setInterval(() => {
         attempts++;
-        // Re-check React state via ref (avoids stale closure — ref always has latest value)
-        if (wagmiAddressRef.current) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddressRef.current); return; }
-        
-        // Scan Wagmi cookie storage (primary)
+
+        // Check 1: wagmi ref (updated by the useEffect([wagmiAddress]) above)
+        if (wagmiAddressRef.current) {
+          stopPolling();
+          establishSession(wagmiAddressRef.current);
+          return;
+        }
+
+        // Check 2: Wagmi cookie (WagmiAdapter with cookieStorage)
         try {
-          const cookies = document.cookie.split('; ');
-          for (const cookie of cookies) {
+          for (const cookie of document.cookie.split('; ')) {
             if (cookie.startsWith('wagmi.store=')) {
-              const raw = decodeURIComponent(cookie.substring('wagmi.store='.length));
-              const addr = extractAddressFromAppKit(raw);
-              if (addr) {
-                clearInterval(pollInterval!); pollInterval = null;
-                establishSession(addr);
-                return;
-              }
+              const addr = extractAddressFromAppKit(decodeURIComponent(cookie.slice('wagmi.store='.length)));
+              if (addr) { stopPolling(); establishSession(addr); return; }
             }
           }
         } catch {}
 
-        // Scan localStorage with correct Reown AppKit v1 key patterns (fallback)
-        for (const key of Object.keys(localStorage)) {
-          if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
-            const raw = localStorage.getItem(key);
-            if (!raw) continue;
-            const addr = extractAddressFromAppKit(raw);
-            if (addr) {
-              clearInterval(pollInterval!); pollInterval = null;
-              establishSession(addr);
-              return;
+        // Check 3: All localStorage keys (WalletConnect IndexedDB mirror)
+        try {
+          for (const key of Object.keys(localStorage)) {
+            if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+              const raw = localStorage.getItem(key);
+              if (!raw) continue;
+              const addr = extractAddressFromAppKit(raw);
+              if (addr) { stopPolling(); establishSession(addr); return; }
             }
           }
-        }
-        
-        // [COSMIC PERFECTION FIX]: Hard 15s timeout to prevent permanent bricking if WalletConnect relay drops the packet.
-        if (attempts >= 300) { 
-          clearInterval(pollInterval!); 
-          pollInterval = null; 
+        } catch {}
+
+        // Hard 15s timeout — unblock UI if WalletConnect relay is completely dead
+        if (attempts >= 300) {
+          stopPolling();
           setFallbackStatus('failed');
-          setTimeout(() => {
-            setShowManualReconnect(false);
-            setFallbackStatus('idle');
-          }, 2500);
+          setTimeout(() => { setShowManualReconnect(false); setFallbackStatus('idle'); }, 2500);
         }
       }, 50);
     };
 
-    const handleVisibility = async () => {
-      if (document.visibilityState === 'visible') {
-        try {
-          if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
-            const w3m = document.querySelector('w3m-modal');
-            if (w3m) w3m.remove();
+    const handleVisibility = () => {
+      if (document.visibilityState !== 'visible') return;
+      // Remove lingering AppKit modal backdrop that Chrome leaves open after deep-link
+      try { document.querySelector('w3m-modal')?.remove(); } catch {}
 
-            // ─── [ATOMIC WAKE-SYNC DAEMON] ───
-            // Immediately upon returning from the wallet app (Chrome tab un-freezes),
-            // we aggressively force Wagmi to re-read the WalletConnect session from IndexedDB.
-            setFallbackStatus('checking');
-            try {
-              reconnect(); // Force global re-hydration
-              const wcConnector = connectors.find(c => c.id === 'walletConnect' || c.id === 'appkit');
-              if (wcConnector && !wagmiAddressRef.current) {
-                // Bypass UI and force raw connector handshake
-                const result = await connectAsync({ connector: wcConnector });
-                if (result?.accounts?.[0]) {
-                  establishSession(result.accounts[0]);
-                  setFallbackStatus('idle');
-                  return; // Perfect atomic sync achieved.
-                }
-              }
-            } catch (e: any) {
-              console.warn('[Sovereign Protocol] Aggressive IndexedDB read failed.', e);
-              
-              // [COSMIC PERFECTION FIX]: Detect if the user pressed "Cancel/Reject" in Rainbow/MetaMask.
-              // If they rejected, WalletConnect throws an error immediately upon return.
-              // We catch it and abort the polling sequence instantly to unblock the UI.
-              if (e?.message?.toLowerCase().includes('reject') || e?.name === 'UserRejectedRequestError') {
-                setFallbackStatus('failed');
-                setTimeout(() => {
-                   setShowManualReconnect(false);
-                   setFallbackStatus('idle');
-                }, 2000);
-                return; // Abort matrix
-              }
-            }
-          }
-        } catch {}
-        
-        // If atomic sync fails or takes too long, deploy the disk polling matrix
+      if (isLinked) return;
+
+      // If the user had clicked a wallet button before leaving, kick wagmi's reconnect engine.
+      // We call reconnect() ONCE — this is a lightweight signal to wagmi to re-read IndexedDB.
+      // We do NOT call connectAsync() because wagmi is already doing that internally.
+      if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
+        setFallbackStatus('checking');
+        try { reconnect(); } catch {}
+        // Give wagmi 800ms to hydrate from IndexedDB before we start polling storage directly
+        setTimeout(onFocusRecheck, 800);
+      } else {
         onFocusRecheck();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('focus', handleVisibility);
-    onFocusRecheck(); // trigger on mount for suspended-tab recovery
+    // Run on mount to handle the case where the page was fully reloaded by iOS/Android
+    onFocusRecheck();
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleVisibility);
-      if (pollInterval) clearInterval(pollInterval);
+      stopPolling();
     };
-  }, [mounted, isLinked, establishSession, reconnect, connectAsync, connectors]);
+  }, [mounted, isLinked, establishSession, reconnect]);
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
@@ -910,6 +889,10 @@ export function MobileLanding() {
   // to sessionStorage so it survives the WalletConnect deep-link page reload.
   // We show a fullscreen reconnecting overlay instead of the wallet-button screen
   // to prevent the user from accidentally clicking a wallet button again (redirect loop).
+  // BUG FIX: isLinked must be checked FIRST. Without this guard, when wagmi resolves
+  // the session and setIsLinked(true) fires, the reconnect overlay would remain on
+  // screen because showManualReconnect is still true in that render cycle,
+  // permanently blocking the ConnectedScreen from being displayed.
   if (showManualReconnect && !isLinked) {
     return (
       <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex flex-col items-center justify-center gap-8 p-8">
