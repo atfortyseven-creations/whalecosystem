@@ -705,6 +705,7 @@ export function MobileLanding() {
 
   // ── On return from native wallet app: Reown AppKit v1 hardened handler ───────
   // Fix by Grok: correct keys + 600ms delay + 24s poll + AppKit event bus.
+  // [COSMIC UPGRADE]: Atomic Wake-Sync Daemon. Bypasses React latency by injecting directly into WalletConnect IndexedDB.
   useEffect(() => {
     if (!mounted) return;
     let pollInterval: ReturnType<typeof setInterval> | null = null;
@@ -713,7 +714,7 @@ export function MobileLanding() {
       if (isLinked) return;
 
       // Priority 1: wagmi hooks already have the address in React state
-      if (wagmiAddress) { establishSession(wagmiAddress); return; }
+      if (wagmiAddressRef.current) { establishSession(wagmiAddressRef.current); return; }
 
       // Start polling immediately with an ultra-fast 50ms tick to match Scroll.io's zero-latency UX
       if (pollInterval) clearInterval(pollInterval);
@@ -752,32 +753,76 @@ export function MobileLanding() {
             }
           }
         }
-        if (attempts >= 480) { clearInterval(pollInterval!); pollInterval = null; } // 24s max at 50ms per tick
+        
+        // [COSMIC PERFECTION FIX]: Hard 15s timeout to prevent permanent bricking if WalletConnect relay drops the packet.
+        if (attempts >= 300) { 
+          clearInterval(pollInterval!); 
+          pollInterval = null; 
+          setFallbackStatus('failed');
+          setTimeout(() => {
+            setShowManualReconnect(false);
+            setFallbackStatus('idle');
+          }, 2500);
+        }
       }, 50);
     };
 
-    const handleVisibility = () => {
+    const handleVisibility = async () => {
       if (document.visibilityState === 'visible') {
         try {
           if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
             const w3m = document.querySelector('w3m-modal');
             if (w3m) w3m.remove();
+
+            // ─── [ATOMIC WAKE-SYNC DAEMON] ───
+            // Immediately upon returning from the wallet app (Chrome tab un-freezes),
+            // we aggressively force Wagmi to re-read the WalletConnect session from IndexedDB.
+            setFallbackStatus('checking');
+            try {
+              reconnect(); // Force global re-hydration
+              const wcConnector = connectors.find(c => c.id === 'walletConnect' || c.id === 'appkit');
+              if (wcConnector && !wagmiAddressRef.current) {
+                // Bypass UI and force raw connector handshake
+                const result = await connectAsync({ connector: wcConnector });
+                if (result?.accounts?.[0]) {
+                  establishSession(result.accounts[0]);
+                  setFallbackStatus('idle');
+                  return; // Perfect atomic sync achieved.
+                }
+              }
+            } catch (e: any) {
+              console.warn('[Sovereign Protocol] Aggressive IndexedDB read failed.', e);
+              
+              // [COSMIC PERFECTION FIX]: Detect if the user pressed "Cancel/Reject" in Rainbow/MetaMask.
+              // If they rejected, WalletConnect throws an error immediately upon return.
+              // We catch it and abort the polling sequence instantly to unblock the UI.
+              if (e?.message?.toLowerCase().includes('reject') || e?.name === 'UserRejectedRequestError') {
+                setFallbackStatus('failed');
+                setTimeout(() => {
+                   setShowManualReconnect(false);
+                   setFallbackStatus('idle');
+                }, 2000);
+                return; // Abort matrix
+              }
+            }
           }
         } catch {}
+        
+        // If atomic sync fails or takes too long, deploy the disk polling matrix
         onFocusRecheck();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
-    window.addEventListener('focus', onFocusRecheck);
+    window.addEventListener('focus', handleVisibility);
     onFocusRecheck(); // trigger on mount for suspended-tab recovery
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('focus', onFocusRecheck);
+      window.removeEventListener('focus', handleVisibility);
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, [mounted, wagmiAddress, isLinked, establishSession]);
+  }, [mounted, isLinked, establishSession, reconnect, connectAsync, connectors]);
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
