@@ -1099,6 +1099,15 @@ export function MobileLanding() {
                 setShowFallbackBtn(false);
 
                 const doOpen = () => {
+                  // Clear stale AppKit state that blocks reconnection.
+                  // @appkit/connection_status='disconnected' prevents AppKit from
+                  // accepting new sessions. @appkit/disconnected_connector_ids with
+                  // empty strings silently blocks the walletConnect connector.
+                  try {
+                    localStorage.removeItem('@appkit/connection_status');
+                    localStorage.removeItem('@appkit/disconnected_connector_ids');
+                  } catch {}
+
                   // In-app wallet browser (MetaMask, Coinbase app, Rainbow app)
                   // window.ethereum is injected — connect directly, no modal needed.
                   const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;

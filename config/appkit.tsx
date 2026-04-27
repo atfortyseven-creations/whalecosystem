@@ -86,9 +86,14 @@ export const config = wagmiAdapter.wagmiConfig
 
 const queryClient = new QueryClient()
 
-// CRITICAL: URL must match exactly the domain registered in WalletConnect/Reown Cloud.
-// Using window.location.origin fixes local/Railway testing mismatches.
-const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
+// CRITICAL: metadata.url MUST match a domain registered in WalletConnect/Reown Cloud.
+// If the user accesses via 'humanidfi.com' (no www) but Reown only has 'www.humanidfi.com',
+// WalletConnect silently rejects the connection. Force www for production.
+const APP_URL = typeof window !== 'undefined'
+    ? (window.location.hostname.endsWith('humanidfi.com')
+        ? 'https://www.humanidfi.com'          // always www — matches Reown allowlist
+        : window.location.origin)              // localhost / staging — use as-is
+    : 'https://www.humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
