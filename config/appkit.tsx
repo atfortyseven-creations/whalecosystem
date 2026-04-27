@@ -98,11 +98,15 @@ const metadata = {
     // slow/blocked icon URL during the mobile handshake (root cause of Rainbow
     // "Connection failed" error). AppKit renders a native gradient avatar instead.
     icons: [],
-    // ── Mobile deeplink return URL (Grok fix Capa 0) ─────────────────────────
-    // Without this, wallets don't know which Chrome URL to return to after signing.
+    // ── Mobile deeplink return URL ──────────────────────────────────────────────
+    // After the user approves the connection in MetaMask/Rainbow, the wallet app
+    // calls this URL to return the user to the browser. It MUST point to the root
+    // (or /connect) where the wagmi session is read and the cookie is written.
+    // WRONG: '/connect' → user sees the login page again even after connecting.
+    // CORRECT: root URL → SmartLandingRouter reads the wagmi session → shows app.
     redirect: {
         native: '',
-        universal: 'https://www.humanidfi.com/connect',
+        universal: 'https://www.humanidfi.com',
     },
 }
 
