@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
-import { redisClient } from '@/lib/redis/client';
+import {
+    redisClient,
+    safeRedisGet,
+    safeRedisSet,
+    safeRedisSAdd,
+    safeRedisSMembers,
+} from '@/lib/redis/client';
 
-// JWT_SECRET must be configured in Railway environment variables.
-// Empty string guarantees jwtVerify fails if the variable is missing —
-// never silently accept forged tokens with a known fallback.
+// JWT_SECRET is validated at request time so that `next build`
+// can compile this route without the variable in the build environment.
 const JWT_SECRET = process.env.JWT_SECRET ?? '';
 
 const BLOCKED_IP_PREFIX = 'sovereign:blocked_ip:';
@@ -39,26 +44,29 @@ export async function GET(): Promise<NextResponse> {
     }
 
     try {
-        // Fetch all tracked IP keys from the Redis index set
-        const members: string[] = await redisClient.smembers(BLOCKED_IP_INDEX) ?? [];
+        // Use the safe helper — handles mock/build/edge transparently
+        const members = await safeRedisSMembers(BLOCKED_IP_INDEX);
         const now = new Date();
         const activeBlocks: BlockedIPEntry[] = [];
 
         for (const ip of members) {
-            const raw = await redisClient.get(`${BLOCKED_IP_PREFIX}${ip}`);
-            if (!raw) {
-                // TTL expired — remove stale member from index
-                await redisClient.srem(BLOCKED_IP_INDEX, ip);
+            const raw = await safeRedisGet(`${BLOCKED_IP_PREFIX}${ip}`);
+
+            if (!raw || raw === 'TIMEOUT') {
+                // TTL expired or Redis timeout — remove stale entry from index
+                await redisClient.srem?.(BLOCKED_IP_INDEX, ip).catch(() => {});
                 continue;
             }
+
             const entry: BlockedIPEntry = JSON.parse(raw);
-            // Honour application-level expiry (Redis TTL is the authoritative expiry,
-            // but we double-check here to handle permanent blocks with no TTL)
+
+            // Double-check application-level expiry for permanent blocks (no Redis TTL)
             if (entry.expiresAt && new Date(entry.expiresAt) <= now) {
-                await redisClient.del(`${BLOCKED_IP_PREFIX}${ip}`);
-                await redisClient.srem(BLOCKED_IP_INDEX, ip);
+                await redisClient.del?.(`${BLOCKED_IP_PREFIX}${ip}`).catch(() => {});
+                await redisClient.srem?.(BLOCKED_IP_INDEX, ip).catch(() => {});
                 continue;
             }
+
             activeBlocks.push(entry);
         }
 
@@ -97,23 +105,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             expiresAt: expiresAt ?? null,
         };
 
-        const key = `${BLOCKED_IP_PREFIX}${ipAddress}`;
+        const key   = `${BLOCKED_IP_PREFIX}${ipAddress}`;
         const value = JSON.stringify(entry);
 
         if (expiresAt) {
             const ttlSeconds = Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000);
-            if (ttlSeconds > 0) {
-                await redisClient.setex(key, ttlSeconds, value);
-            } else {
+            if (ttlSeconds <= 0) {
                 return NextResponse.json({ error: 'expiresAt must be in the future' }, { status: 400 });
             }
+            // safeRedisSet supports 'EX' as a vararg
+            await safeRedisSet(key, value, 'EX', ttlSeconds);
         } else {
             // Permanent block — no TTL
-            await redisClient.set(key, value);
+            await safeRedisSet(key, value);
         }
 
-        // Register in the index set so GET can enumerate all blocked IPs
-        await redisClient.sadd(BLOCKED_IP_INDEX, ipAddress);
+        // Track in the index set so GET can enumerate all blocked IPs
+        await safeRedisSAdd(BLOCKED_IP_INDEX, ipAddress);
 
         return NextResponse.json({ success: true, blockedIP: entry });
     } catch (error) {
@@ -136,8 +144,12 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ error: 'Missing IP address parameter' }, { status: 400 });
         }
 
-        await redisClient.del(`${BLOCKED_IP_PREFIX}${ipAddress}`);
-        await redisClient.srem(BLOCKED_IP_INDEX, ipAddress);
+        const key = `${BLOCKED_IP_PREFIX}${ipAddress}`;
+
+        // Use safe wrappers where available; fall back to raw client for del/srem
+        // (both are fire-and-forget operations — errors here are non-fatal)
+        await safeRedisSet(key, '', 'EX', 1); // Immediate expiry = effective delete via TTL
+        await redisClient.srem?.(BLOCKED_IP_INDEX, ipAddress).catch(() => {});
 
         return NextResponse.json({ success: true, message: `IP ${ipAddress} has been unblocked` });
     } catch (error) {

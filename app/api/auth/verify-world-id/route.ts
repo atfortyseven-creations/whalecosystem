@@ -4,15 +4,22 @@ import { verifyWorldIDProof } from "@/lib/worldid";
 import { cookies } from "next/headers";
 import { SignJWT } from "jose";
 
-// JWT signing secret — must be set as an environment variable.
-// A missing secret is a critical misconfiguration: fail loudly rather than silently
-// using a publicly-known fallback that would allow anyone to forge session tokens.
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-    throw new Error('[FATAL] JWT_SECRET environment variable is not set. The World ID verification endpoint cannot operate securely without it. Set JWT_SECRET in your Railway Variables dashboard.');
-}
+// JWT_SECRET is validated at request time (inside the handler), not at module
+// initialisation, so that `next build` can compile this route without the
+// variable being present in the build environment.
 
 export async function POST(request: NextRequest) {
+    // Guard: fail fast at request time if the secret is missing.
+    // Never use a known fallback — that would allow anyone with the source code to forge tokens.
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+        console.error('[FATAL] JWT_SECRET is not set. World ID verification endpoint is misconfigured.');
+        return NextResponse.json(
+            { error: 'Server misconfiguration: authentication secret is not configured.', verified: false },
+            { status: 500 }
+        );
+    }
+
     try {
         const body = await request.json();
         const { proof, walletAddress } = body;
@@ -145,7 +152,7 @@ export async function POST(request: NextRequest) {
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
             .setExpirationTime('24h')
-            .sign(new TextEncoder().encode(JWT_SECRET));
+            .sign(new TextEncoder().encode(jwtSecret));
 
         const cookieStore = await cookies();
         cookieStore.set("auth_token", token, {
