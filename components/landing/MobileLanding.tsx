@@ -586,13 +586,17 @@ export function MobileLanding() {
   const sessionParam = searchParams?.get('session');
 
   // ── Reown AppKit is the PRIMARY connector ────────────────
-  // Replaced RainbowKit ConnectButton.Custom with AppKit's useAppKit to fix
-  // the missing RainbowKitProvider error (Critical Node Failure).
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
   const { connect, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
   const { open: rkOpenModal } = useAppKit();
+
+  // ── Ref: always holds the latest wagmiAddress for use inside setInterval closures ──
+  // setInterval captures variables at creation time (stale closure). Without a ref,
+  // the poll would never see wagmiAddress updating when wagmi hydrates from cookies.
+  const wagmiAddressRef = useRef<string | undefined>(undefined);
+  useEffect(() => { wagmiAddressRef.current = wagmiAddress; }, [wagmiAddress]);
 
   const isConnected = wagmiConnected;
   const address     = wagmiAddress;
@@ -699,8 +703,8 @@ export function MobileLanding() {
       let attempts = 0;
       pollInterval = setInterval(() => {
         attempts++;
-        // Re-check React state on every tick (fastest path if hooks updated)
-        if (wagmiAddress) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddress); return; }
+        // Re-check React state via ref (avoids stale closure — ref always has latest value)
+        if (wagmiAddressRef.current) { clearInterval(pollInterval!); pollInterval = null; establishSession(wagmiAddressRef.current); return; }
         
         // Scan Wagmi cookie storage (primary)
         try {
@@ -1044,20 +1048,16 @@ export function MobileLanding() {
             {(() => {
               // Helper: clear any stale wagmi/AppKit session then open the modal
               const openWalletModal = (walletId: string) => {
-                // If already authenticated (cookie + isLinked), do NOT open a new modal.
-                // This handles the case where the user clicks a button while already logged in
-                // (e.g. after returning from wallet app with an active session).
-                if (isLinked) {
-                  establishSession(effectiveAddress || '');
-                  return;
-                }
+                // Guard: if already linked, nothing to do
+                if (isLinked && effectiveAddress) return;
 
                 setConnecting(walletId);
                 setShowManualReconnect(true);
                 setShowFallbackBtn(false);
 
                 const doOpen = () => {
-                  // Priority 1: injected provider (inside wallet's own browser)
+                  // In-app wallet browser (MetaMask, Coinbase app, Rainbow app)
+                  // window.ethereum is injected — connect directly, no modal needed.
                   const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
                   const injectedConn = connectors.find(c => c.id === 'injected');
                   if (hasEthereum && injectedConn) {
@@ -1065,24 +1065,13 @@ export function MobileLanding() {
                     return;
                   }
 
-                  // Priority 2: WalletConnect connector from wagmi (works with MetaMask, Rainbow, etc.)
-                  // This avoids the AppKit ↔ RainbowKit dual-system conflict.
-                  const wcConn =
-                    connectors.find(c => c.id === 'walletConnect') ||
-                    connectors.find(c => c.id === 'walletConnectLegacy') ||
-                    connectors.find(c => (c as any).type === 'walletConnect');
-
-                  if (wcConn) {
-                    connect({ connector: wcConn });
-                    return;
-                  }
-
-                  // Priority 3: Fallback to AppKit modal (if somehow no WC connector found)
+                  // External browser (Chrome, Safari) — open AppKit modal.
+                  // AppKit handles WalletConnect deep-links to MetaMask, Rainbow, etc.
                   rkOpenModal();
                 };
 
-                // Pre-flight: only disconnect a STALE wagmi session (i.e. user is not linked
-                // but wagmi thinks connected). This prevents killing an active valid session.
+                // Only disconnect a STALE session (wagmi thinks connected but user is NOT linked).
+                // This prevents killing a valid active session before opening the modal.
                 if (wagmiConnected && !isLinked) {
                   try { disconnect(); } catch {}
                   setTimeout(doOpen, 300);
@@ -1091,7 +1080,7 @@ export function MobileLanding() {
                 }
 
                 setTimeout(() => setConnecting(null), 3000);
-                // 400ms: deep-link returns focus before 1.2s on most Android devices
+                // 400ms: deep-link returns before 1.2s on most Android devices
                 setTimeout(() => setShowFallbackBtn(true), 400);
               };
 
