@@ -63,8 +63,11 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, [isPublicPage]);
 
     useEffect(() => {
-        // Add a short debounce so transient connection states (e.g. wallet just
-        // connected but cookie not yet written) don't trigger a premature redirect.
+        // Increased debounce: 300ms was too short — on first mobile connection,
+        // establishSession() writes the cookie AFTER wagmi reconnects (~200-400ms).
+        // 1500ms gives wagmi + cookie-write time to complete before we gate.
+        // With ssr:true + cookieStorage in appkit.tsx, reconnect is now synchronous
+        // on return visits, so this guard only fires on the first-ever connect.
         const checkTimer = setTimeout(() => {
             if (!mounted) return;
 
@@ -74,14 +77,17 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                 return;
             }
 
-            // Priority 2: Public Page
+            // Priority 2: Public Page (/, /connect, /docs, etc.)
             if (isPublicPage) {
                 setState('APP');
                 return;
             }
 
-            // Priority 3: Sovereign Handshake (Cookie)
-            const hasHandshake = typeof document !== 'undefined' && document.cookie.includes('sovereign_handshake=');
+            // Priority 3: Sovereign Handshake (Cookie — must have real 0x address)
+            // Using includes('sovereign_handshake=') alone matches the expired
+            // blank cookie written by handleDisconnect(), causing a false positive.
+            const hasHandshake = typeof document !== 'undefined'
+                && document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
             if (hasHandshake) {
                 setState('APP');
                 return;
@@ -90,7 +96,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // Otherwise: Access Denied — redirect to connect
             setState('AUTH');
             if (pathname !== '/connect') router.push('/connect');
-        }, 300); // 300ms debounce prevents false-positive redirects during connection handshake
+        }, 1500); // was 300ms — increased to survive first-connect cookie-write race
 
         return () => clearTimeout(checkTimer);
     }, [isConnected, isPublicPage, router, mounted, pathname]);

@@ -33,8 +33,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             // the actual hardware and cannot be faked by this setting.
             const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
             const isSmallScreen  = window.screen.width < 768;
-            // Mobile = UA says mobile OR device is physically a touch/small-screen device
-            setIsMobile(isUaMobile || isTouchScreen || isSmallScreen);
+            // Mobile = UA says mobile OR (touch device AND small screen).
+            // Using touch || screen alone causes false positives on touch laptops (Surface Pro etc.).
+            // The AND condition for physical checks ensures only real phones/tablets are routed
+            // to MobileLanding, consistent with SmartLandingRouter logic.
+            setIsMobile(isUaMobile || (isTouchScreen && isSmallScreen));
         };
 
         checkMobile();
@@ -66,8 +69,10 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             console.warn('[Safety] iOS Private Mode restricted sessionStorage read.');
         }
 
+        // CRITICAL: check for '0x' prefix so an expired cookie ('sovereign_handshake=; max-age=0')
+        // does not falsely register as authenticated.
         const hasSovereignCookie = typeof document !== 'undefined'
-            && (document.cookie.includes('sovereign_handshake=') || document.cookie.includes('wallet-auth='));
+            && (document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x')) || document.cookie.includes('wallet-auth='));
 
         if (bypassActive && hasSovereignCookie) {
             setShowNews(true);

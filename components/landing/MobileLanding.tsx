@@ -846,6 +846,86 @@ export function MobileLanding() {
 
   if (!mounted) return null;
 
+  // ── Render: Reconnecting — user returned from wallet app, wagmi not yet hydrated ──
+  // showManualReconnect is set to true when a wallet button is clicked and persisted
+  // to sessionStorage so it survives the WalletConnect deep-link page reload.
+  // We show a fullscreen reconnecting overlay instead of the wallet-button screen
+  // to prevent the user from accidentally clicking a wallet button again (redirect loop).
+  if (showManualReconnect && !isLinked) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex flex-col items-center justify-center gap-8 p-8">
+        <div className="w-20 h-20 rounded-[2rem] bg-white border border-black/8 shadow-lg flex items-center justify-center">
+          <Loader2 size={30} className="animate-spin text-[#050505]/40" />
+        </div>
+        <div className="text-center space-y-2 max-w-xs">
+          <h2 className="text-[22px] font-black tracking-tighter text-[#050505] leading-none">Reconnecting…</h2>
+          <p className="text-[12px] text-[#050505]/50 leading-relaxed">
+            Verifying your wallet session. This takes a few seconds after returning from your wallet app.
+          </p>
+        </div>
+        {/* Manual override — lets the user force-check the session */}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 3.5 }}
+          disabled={fallbackStatus === 'checking'}
+          onClick={async () => {
+            setFallbackStatus('checking');
+            const checkNow = async (): Promise<string | null> => {
+              if (wagmiAddressRef.current) return wagmiAddressRef.current;
+              if (address) return address;
+              try {
+                for (const cookie of document.cookie.split('; ')) {
+                  const eqIdx = cookie.indexOf('=');
+                  if (eqIdx === -1) continue;
+                  try { const addr = extractAddressFromAppKit(decodeURIComponent(cookie.substring(eqIdx + 1))); if (addr) return addr; } catch {}
+                }
+              } catch {}
+              try {
+                for (const key of Object.keys(localStorage)) {
+                  const raw = localStorage.getItem(key);
+                  if (!raw || raw.length < 42) continue;
+                  const addr = extractAddressFromAppKit(raw);
+                  if (addr) return addr;
+                }
+              } catch {}
+              return null;
+            };
+            const found = await checkNow();
+            if (found) { establishSession(found); setFallbackStatus('idle'); return; }
+            // If not found yet, keep trying for 10s then give up
+            let tries = 0;
+            const retry = setInterval(() => {
+              tries++;
+              void (async () => {
+                const addr = await checkNow();
+                if (addr) { clearInterval(retry); establishSession(addr); setFallbackStatus('idle'); }
+                else if (tries >= 50) {
+                  clearInterval(retry);
+                  setFallbackStatus('failed');
+                  // Reset showManualReconnect so user can try again from scratch
+                  setShowManualReconnect(false);
+                  setTimeout(() => setFallbackStatus('idle'), 2000);
+                }
+              })();
+            }, 200);
+          }}
+          className={`w-full max-w-xs py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 ${
+            fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-[#050505] text-white'
+          }`}
+        >
+          {fallbackStatus === 'checking' ? (
+            <><Loader2 size={16} className="animate-spin text-white/70" />Sincronizando túnel...</>
+          ) : fallbackStatus === 'failed' ? (
+            <><AlertCircle size={16} className="text-white" />Conexión no detectada — Volver</>
+          ) : (
+            <><RefreshCw size={16} />Ya conecté · Continuar</>
+          )}
+        </motion.button>
+      </div>
+    );
+  }
+
   // ── Render: Session exists — show immediately using cookie address ──────────
   // We NEVER wait for wagmi to reconnect. The cookie IS the source of truth.
   // The cookie value IS the wallet address: sovereign_handshake=0xABCD...
@@ -1040,7 +1120,9 @@ export function MobileLanding() {
                     return null;
                   };
 
-                  let foundAddr = checkSession();
+                  // CRITICAL: checkSession is async — must await to get the actual address,
+                  // not a Promise object (which is always truthy and breaks establishSession).
+                  let foundAddr = await checkSession();
                   if (foundAddr) {
                     establishSession(foundAddr);
                     setFallbackStatus('idle');
@@ -1050,16 +1132,19 @@ export function MobileLanding() {
                   let attempts = 0;
                   const poll = setInterval(() => {
                     attempts++;
-                    foundAddr = checkSession();
-                    if (foundAddr) {
-                      clearInterval(poll);
-                      establishSession(foundAddr);
-                      setFallbackStatus('idle');
-                    } else if (attempts >= 150) { // 30s (200ms × 150) — WC relay needs time to reconnect
-                      clearInterval(poll);
-                      setFallbackStatus('failed');
-                      setTimeout(() => setFallbackStatus('idle'), 3000);
-                    }
+                    // setInterval callbacks cannot be async top-level — use void async IIFE.
+                    void (async () => {
+                      const addr = await checkSession();
+                      if (addr) {
+                        clearInterval(poll);
+                        establishSession(addr);
+                        setFallbackStatus('idle');
+                      } else if (attempts >= 150) { // 30s (200ms × 150) — WC relay needs time to reconnect
+                        clearInterval(poll);
+                        setFallbackStatus('failed');
+                        setTimeout(() => setFallbackStatus('idle'), 3000);
+                      }
+                    })();
                   }, 200);
                 }}
                 className={`mt-6 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 disabled:opacity-90 ${fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-[#050505] text-white'}`}

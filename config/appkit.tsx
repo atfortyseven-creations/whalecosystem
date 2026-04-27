@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { CreateConnectorFn, WagmiProvider } from 'wagmi';
 import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism } from "@reown/appkit/networks";
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { cookieToInitialState } from 'wagmi'
 import { createAppKit } from '@reown/appkit/react'
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -73,9 +74,14 @@ import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors'
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [dedicatedMainnet, dedicatedBsc, polygon, dedicatedBase, arbitrum, optimism, worldchain];
 
 export const wagmiAdapter = new WagmiAdapter({
-    ssr: false,
+    // ssr:true enables cookie-based session persistence.
+    // WagmiAdapter internally uses cookieStorage when ssr:true, writing the wagmi
+    // state to an HTTP cookie so it is available synchronously on the first server
+    // render — eliminating the 1-3s IndexedDB reconnect window during which all
+    // session guards (MobileLanding, TitaniumGate) incorrectly see the user as disconnected.
+    ssr: true,
     projectId,
-    networks
+    networks,
 })
 
 export const config = wagmiAdapter.wagmiConfig
@@ -204,8 +210,12 @@ try {
 }
 
 export function Web3ModalProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
+    // initialState: parse the wagmi cookie so the WagmiProvider can hydrate
+    // synchronously on the server. Without this, wagmi starts in an empty state
+    // on every page load and has to reconnect async from IndexedDB (1-3s delay).
+    const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies);
     return (
-        <WagmiProvider config={wagmiAdapter.wagmiConfig as any}>
+        <WagmiProvider config={wagmiAdapter.wagmiConfig as any} initialState={initialState}>
             <QueryClientProvider client={queryClient}>
                 {children}
             </QueryClientProvider>

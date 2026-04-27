@@ -29,6 +29,16 @@ function RealDeviceRouter() {
   const [view, setView] = useState<'loading' | 'mobile' | 'desktop'>('loading');
 
   useEffect(() => {
+    // If already authenticated, redirect to root immediately — no connect needed.
+    // This prevents authenticated users from seeing the wallet-connect portal
+    // when TitaniumGate or any other mechanism sends them to /connect.
+    const isAlreadyLinked = document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
+    if (isAlreadyLinked) {
+      window.location.replace('/');
+      return;
+    }
+
+    const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
     const isTouchDevice = (
       'ontouchstart' in window ||
       navigator.maxTouchPoints > 0 ||
@@ -37,7 +47,7 @@ function RealDeviceRouter() {
     );
     const isNarrowScreen = window.screen.width < 768;
 
-    setView(isTouchDevice || isNarrowScreen ? 'mobile' : 'desktop');
+    setView(isUaMobile || (isTouchDevice && isNarrowScreen) ? 'mobile' : 'desktop');
   }, []);
 
   if (view === 'loading') {

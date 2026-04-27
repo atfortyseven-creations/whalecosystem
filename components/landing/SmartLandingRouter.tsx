@@ -21,10 +21,11 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
         //   touch screen (maxTouchPoints > 0) → physical mobile / tablet
         //   screen.width < 768px              → physically small screen
         //   Either condition → show mobile UI
+        const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
         const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
         const isSmallScreen  = window.screen.width < 768;
 
-        setIsPhysicallyMobile(isTouchScreen || isSmallScreen);
+        setIsPhysicallyMobile(isUaMobile || (isTouchScreen && isSmallScreen));
         setMounted(true);
     }, []);
 
