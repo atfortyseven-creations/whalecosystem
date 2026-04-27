@@ -29,28 +29,10 @@ const metadata = {
 // between server-rendered requests in Railway multi-replica environments.
 // Must be created per-component instance using useState.
 
-// Sovereign AppKit Configuration — ALL CHAINS ENABLED
-const config = getDefaultConfig({
-  appName: 'Sovereign Terminal Omniverse',
+// [CRITICAL] Wagmi Adapter required for AppKit Smart Account (Google/Social Auth EVM execution)
+const wagmiAdapter = new WagmiAdapter({
+  networks: [mainnet, base, arbitrum, optimism, polygon, bsc, avalanche, zksync, linea, scroll, celo, mantle, fantom, blast, gnosis, moonbeam],
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
-  chains: [
-    mainnet,
-    base,
-    arbitrum,
-    optimism,
-    polygon,
-    bsc,
-    avalanche,
-    zksync,
-    linea,
-    scroll,
-    celo,
-    mantle,
-    fantom,
-    blast,
-    gnosis,
-    moonbeam,
-  ],
   transports: {
     [mainnet.id]:  http(),
     [base.id]:     http(),
@@ -72,17 +54,11 @@ const config = getDefaultConfig({
   ssr: true,
 });
 
-// [CRITICAL] Wagmi Adapter required for AppKit Smart Account (Google/Social Auth EVM execution)
-const wagmiAdapter = new WagmiAdapter({
-  networks: [mainnet, base, arbitrum, optimism, polygon],
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
-});
-
 // [CRITICAL FIX] Initialize AppKit (Web3Modal) context.
 // Without proper adapters, Google/Social Auth Smart Accounts have no EVM execution engine.
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: [mainnet, base, arbitrum, optimism, polygon],
+  networks: [mainnet, base, arbitrum, optimism, polygon, bsc, avalanche, zksync, linea, scroll, celo, mantle, fantom, blast, gnosis, moonbeam],
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '093232b25784a0694c642ad54a6331fa',
   metadata,
   features: {
@@ -131,7 +107,7 @@ export function Web3SovereignProvider({ children }: { children: ReactNode }) {
   }));
 
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitAuthenticationProvider
           adapter={authenticationAdapter}

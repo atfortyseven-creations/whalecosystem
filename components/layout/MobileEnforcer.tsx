@@ -25,10 +25,16 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const checkMobile = () => {
             const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-            // The user explicitly requested that narrowing the window on PC should NOT trigger the mobile app view.
-            // Mobile view should ONLY be shown on actual mobile devices. We rely purely on UA so users can bypass via "Desktop Site".
+            // UA-based detection — works for standard mobile browsers
             const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-            setIsMobile(isUaMobile);
+            // Physical device detection — survives "Desktop site" UA spoofing in Chrome.
+            // When a user enables "Request Desktop Site", Chrome changes the UA string
+            // to remove mobile markers. But maxTouchPoints and screen.width reflect
+            // the actual hardware and cannot be faked by this setting.
+            const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
+            const isSmallScreen  = window.screen.width < 768;
+            // Mobile = UA says mobile OR device is physically a touch/small-screen device
+            setIsMobile(isUaMobile || isTouchScreen || isSmallScreen);
         };
 
         checkMobile();

@@ -9,17 +9,26 @@ import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
 
-// ── Reown AppKit v1 localStorage key patterns (Grok fix) ───────────────────
-// These are the actual keys AppKit v1 (2025-2026) writes to localStorage.
+// ── Reown AppKit + WagmiAdapter localStorage key patterns ─────────────────
+// These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
+// to localStorage (2025-2026). We scan ALL of them when recovering a session.
 const APPKIT_STORAGE_KEYS = [
-  'reown-appkit',   // nueva clave principal Reown v1
+  // Reown AppKit v2 (2025-2026) — primary keys written by WagmiAdapter
+  '@wagmi/core',
+  'wagmi.store',
+  'wagmi.connected',
+  // Reown AppKit v1 keys
+  'reown-appkit',
   'appkit',
   '@reown/appkit',
-  'W3M_STATE',      // legacy Web3Modal
+  // Legacy Web3Modal / WalletConnect v2
+  'W3M_STATE',
   '@w3m/',
-  'wagmi',
+  'wc@2:',
   'wc@2',
   'walletconnect',
+  // Generic wagmi
+  'wagmi',
 ];
 
 // Extracts the user's wallet address from AppKit's nested localStorage structure.
@@ -727,7 +736,15 @@ export function MobileLanding() {
     };
 
     const handleVisibility = () => {
-      if (document.visibilityState === 'visible') onFocusRecheck();
+      if (document.visibilityState === 'visible') {
+        try {
+          if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
+            const w3m = document.querySelector('w3m-modal');
+            if (w3m) w3m.remove();
+          }
+        } catch {}
+        onFocusRecheck();
+      }
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
@@ -975,7 +992,7 @@ export function MobileLanding() {
                       clearInterval(poll);
                       establishSession(foundAddr);
                       setFallbackStatus('idle');
-                    } else if (attempts >= 40) { // 8 segundos (200ms * 40)
+                    } else if (attempts >= 100) { // 20 segundos (200ms * 100)
                       clearInterval(poll);
                       setFallbackStatus('failed');
                       setTimeout(() => setFallbackStatus('idle'), 3000);
@@ -1055,7 +1072,9 @@ export function MobileLanding() {
                 }
 
                 setTimeout(() => setConnecting(null), 3000);
-                setTimeout(() => setShowFallbackBtn(true), 1200);
+                // 400ms: the deep-link to the wallet app returns focus before 1.2s on
+                // most Android devices. The button must be visible when they come back.
+                setTimeout(() => setShowFallbackBtn(true), 400);
               };
 
               return (

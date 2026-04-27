@@ -211,23 +211,42 @@ export default function ConnectPage() {
       }
     } catch {}
 
-    let redirectInterval: NodeJS.Timeout;
+    // ─── HARD REDIRECT: use window.location.replace, NOT router.replace ────
+    // router.replace is a client-side navigation — the server never sees the
+    // new sovereign_handshake cookie we just set. window.location.replace
+    // forces a full HTTP round-trip so SSR can read the cookie and serve the
+    // correct authenticated layout immediately.
+    const doHardRedirect = (addr: string | undefined) => {
+      setPendingId(null);
+      // Write cookie with the REAL address. Never fall back to a placeholder.
+      const cookieAddr = addr?.startsWith('0x') ? addr.toLowerCase() : null;
+      if (cookieAddr) {
+        document.cookie = `sovereign_handshake=${cookieAddr}; path=/; max-age=604800; SameSite=Lax`;
+      }
+      // Full page reload so the server reads the fresh cookie.
+      window.location.replace("/");
+    };
 
     const enforceRedirect = () => {
-      if (!document.cookie.includes("sovereign_handshake=")) {
-        document.cookie = `sovereign_handshake=${address ?? "web3_injected"}; path=/; max-age=604800; SameSite=Lax`;
+      if (address?.startsWith('0x')) {
+        // Address is ready: redirect immediately.
+        doHardRedirect(address);
+      } else {
+        // Address not yet in React state (wagmi hydrating). Poll up to 3s.
+        let attempts = 0;
+        const waitForAddress = setInterval(() => {
+          attempts++;
+          const currentAddress = (window as any).__wagmiAddress__ ?? address;
+          if (currentAddress?.startsWith('0x')) {
+            clearInterval(waitForAddress);
+            doHardRedirect(currentAddress);
+          } else if (attempts >= 15) {
+            // 3s timeout: redirect anyway, the '/' page will read the wagmi store
+            clearInterval(waitForAddress);
+            window.location.replace("/");
+          }
+        }, 200);
       }
-      setPendingId(null);
-      
-      // Layer 1: Next.js Client-Side Routing (Fastest)
-      router.replace("/");
-      
-      // Layer 2: Aggressive Polling for Hard Redirect (Unkillable iOS/Android fallback)
-      redirectInterval = setInterval(() => {
-        if (window.location.pathname !== "/") {
-          window.location.href = "/";
-        }
-      }, 500);
     };
 
     // iOS/Android Chrome Background Suspension Fix
@@ -239,21 +258,12 @@ export default function ConnectPage() {
         }
       };
       document.addEventListener("visibilitychange", handleVisibilityChange);
-      
-      // Timeout fallback just in case
       setTimeout(enforceRedirect, 2000);
-      
-      return () => {
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
-        if (redirectInterval) clearInterval(redirectInterval);
-      };
+      return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
     } else {
       enforceRedirect();
-      return () => {
-        if (redirectInterval) clearInterval(redirectInterval);
-      };
     }
-  }, [isConnected, mounted, address, router]);
+  }, [isConnected, mounted, address]);
 
 
   // ── Desktop handler: EIP-6963 extension lookup ───────────────────────────

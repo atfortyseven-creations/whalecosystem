@@ -6,15 +6,29 @@ import { ClientMobileLanding } from '@/components/landing/ClientMobileLanding';
 
 export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: boolean }) {
     const [mounted, setMounted] = useState(false);
-    const [isWeb3Browser, setIsWeb3Browser] = useState(false);
+    // Initialise with server-provided UA hint so there is no layout shift on real mobile
+    const [isPhysicallyMobile, setIsPhysicallyMobile] = useState(isMobileUserAgent);
 
     useEffect(() => {
-        setIsWeb3Browser(typeof window !== 'undefined' && (!!window.ethereum || !!(window as any).web3));
+        // ── Physical device detection ────────────────────────────────────────
+        // This is the ONLY reliable way to detect a real mobile device.
+        // navigator.userAgent CAN be spoofed when the user enables "Desktop site"
+        // in Chrome mobile — the UA strips the "Android" marker.
+        // maxTouchPoints and screen.width CANNOT be spoofed — they reflect
+        // actual hardware, not the UA string.
+        //
+        // Rules:
+        //   touch screen (maxTouchPoints > 0) → physical mobile / tablet
+        //   screen.width < 768px              → physically small screen
+        //   Either condition → show mobile UI
+        const isTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
+        const isSmallScreen  = window.screen.width < 768;
+
+        setIsPhysicallyMobile(isTouchScreen || isSmallScreen);
         setMounted(true);
     }, []);
 
     if (!mounted) {
-        // Render a simple fallback while we determine the browser type
         return (
             <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-black/20">
                 INITIALIZING...
@@ -22,11 +36,14 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
         );
     }
 
-    // If they are on a mobile device BUT they are inside a Web3 Wallet (MetaMask, Rainbow),
-    // they want to use the DApp directly, NOT the QR scanner page.
-    if (isMobileUserAgent && !isWeb3Browser) {
+    // Any physical mobile/tablet → always MobileLanding, covering ALL cases:
+    //   • Standard Chrome Android  (UA contains "android")
+    //   • Chrome "Desktop site" enabled (UA spoofed — but touch screen detected)
+    //   • MetaMask / Coinbase in-app browser (window.ethereum + touch screen)
+    if (isPhysicallyMobile) {
         return <ClientMobileLanding />;
     }
 
+    // Only real desktops/laptops reach here (no touch, wide screen).
     return <ClientRootRouter />;
 }
