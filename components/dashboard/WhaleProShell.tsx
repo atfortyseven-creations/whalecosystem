@@ -289,10 +289,10 @@ export function WhaleProShell({
                                 <button
                                     key={item.id}
                                     onClick={() => handleTabChange(item.id)}
-                                    className={`relative w-full flex items-center justify-between py-2 px-3 rounded-lg group transition-all duration-200 ${
+                                    className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group transition-all duration-300 ease-out ${
                                         isActive
-                                                ? 'bg-black/5 text-black shadow-none border border-black/10'
-                                                : 'text-[#888888] hover:text-black hover:bg-black/[0.04]'
+                                                ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/[0.06] transform scale-[1.02]'
+                                                : 'text-[#888888] hover:text-[#050505] hover:bg-black/[0.03] hover:scale-[1.01]'
                                         }
                                     `}
                                 >
@@ -316,7 +316,7 @@ export function WhaleProShell({
                                         </span>
                                     )}
                                     {!isCollapsed && item.badge && (
-                                        <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
+                                        <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border shrink-0 transition-colors ${isActive ? 'bg-emerald-500 text-white border-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
                                             {item.badge}
                                         </span>
                                     )}
@@ -340,7 +340,7 @@ export function WhaleProShell({
             <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
                 {/* ─── Top Master Bar ─── */}
-                <header className="sticky top-0 h-[52px] border-b border-black/10 bg-white/90 backdrop-blur-md flex items-center justify-between px-6 z-40 shrink-0 shadow-none transition-colors duration-300">
+                <header className="sticky top-0 h-[56px] border-b border-black/[0.06] bg-white/70 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300">
                     <div className="relative w-52 shrink-0">
                         <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
                         <input
@@ -361,14 +361,14 @@ export function WhaleProShell({
                         <button
                             onClick={() => setShowInfoModal(true)}
                             title="Module Information"
-                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 text-[#888888] hover:text-black transition-all flex items-center justify-center w-10 h-10"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10"
                         >
                             <Info size={18} />
                         </button>
                         <button
                             onClick={() => setSettingsOpen(true)}
                             title="Open Settings"
-                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 text-[#888888] hover:text-black transition-all flex items-center justify-center w-10 h-10"
+                            className="shrink-0 p-2.5 rounded-full border border-black/10 hover:bg-black/5 hover:scale-105 hover:shadow-sm text-[#888888] hover:text-[#050505] transition-all flex items-center justify-center w-10 h-10"
                         >
                             <Settings size={18} />
                         </button>
@@ -395,10 +395,10 @@ export function WhaleProShell({
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, scale: 0.98 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.98 }}
-                                    transition={{ duration: 0.18 }}
+                                    initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                    exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                     className="w-full flex-1 flex flex-col"
                                 >
                                     <InstitutionalErrorBoundary moduleName="Processing Execution Node">
