@@ -498,13 +498,27 @@ function ConnectedScreen({
         isOpen={showScanner}
         onClose={onCloseScanner}
         address={address}
-        onScan={(result: string) => {
+        onScan={async (result: string) => {
           onCloseScanner();
-          const toast = document.createElement('div');
-          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-          toast.textContent = '✓ Terminal PC Desbloqueado';
-          document.body.appendChild(toast);
-          setTimeout(() => toast.remove(), 3000);
+          try {
+            const url = new URL(result);
+            const sessionId = url.searchParams.get('session');
+            if (sessionId && address) {
+              await fetch(`/api/auth/qr-session?id=${sessionId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: address }),
+              });
+              
+              const toast = document.createElement('div');
+              toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+              toast.textContent = '✓ Terminal PC Desbloqueado';
+              document.body.appendChild(toast);
+              setTimeout(() => toast.remove(), 3000);
+            }
+          } catch(e) {
+            console.error('Invalid QR URL', e);
+          }
         }}
       />
 
@@ -1209,12 +1223,24 @@ export function MobileLanding() {
                     localStorage.removeItem('@appkit/disconnected_connector_ids');
                   } catch {}
 
-                  // In-app wallet browser (MetaMask, Coinbase app, Rainbow app)
-                  // window.ethereum is injected — connect directly, no modal needed.
+                  // In-app wallet browser detection
                   const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
-                  const injectedConn = connectors.find(c => c.id === 'injected');
-                  if (hasEthereum && injectedConn) {
-                    connect({ connector: injectedConn });
+                  
+                  // Prioritized injected provider detection based on selected wallet
+                  let targetIds: string[] = [];
+                  if (walletId === 'metamask') {
+                    targetIds = ['io.metamask', 'metaMaskSDK', 'metaMask', 'injected'];
+                  } else if (walletId === 'coinbase') {
+                    targetIds = ['coinbaseWalletSDK', 'coinbaseWallet', 'injected'];
+                  } else {
+                    targetIds = ['injected'];
+                  }
+
+                  // Find the exact matching connector
+                  const specificConn = connectors.find(c => targetIds.includes(c.id));
+                  
+                  if (hasEthereum && specificConn) {
+                    connect({ connector: specificConn });
                     return;
                   }
 

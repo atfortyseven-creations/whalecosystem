@@ -43,12 +43,15 @@ export default function NewTopicPage() {
       // Cryptographic anchoring (Sign to Post) — optional, graceful fallback
       let finalContent = content;
       try {
-        const signature = await signMessageAsync({ message: title + '\n' + content });
+        const signature = await Promise.race([
+          signMessageAsync({ message: title + '\n' + content }),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('SIGNATURE_TIMEOUT')), 10000))
+        ]);
         finalContent = `${content}\n\n[SIGNATURE:${signature}]`;
       } catch (e: any) {
-        // If user has no wallet connected or rejects, continue without signature.
+        // If user has no wallet connected, rejects, or mobile wallet times out, continue without signature.
         // The sovereign_handshake cookie is the primary auth gate on the server.
-        console.warn('[Forum] Signature skipped:', e?.message || e);
+        console.warn('[Forum] Signature skipped or timed out:', e?.message || e);
       }
 
       const res = await fetch('/api/forum/topics', {
