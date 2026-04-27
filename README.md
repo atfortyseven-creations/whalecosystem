@@ -8,7 +8,7 @@ Dear user, researcher, and/or technical auditor (with profound deference to **Si
 
 ---
 
-## 🗂️ Comprehensive Thematic Index (29 Architectural Axioms)
+## Comprehensive Thematic Index (29 Architectural Axioms)
 
 ### Phase I: Architectural Foundations & Design Philosophy
 1. [Abstract and Institutional Overview](#1-abstract-and-institutional-overview)
@@ -55,7 +55,7 @@ Dear user, researcher, and/or technical auditor (with profound deference to **Si
 
 ---
 
-## 🏛️ Phase I: Architectural Foundations & Design Philosophy
+## Phase I: Architectural Foundations & Design Philosophy
 
 ### 1. Abstract and Institutional Overview
 Modern Web3 infrastructure is regrettably plagued by ephemeral states, conflicting injected providers, and architectures that fail in silence. The **Sovereign** ecosystem is born from the absolute imperative to master this algorithmic chaos, transmuting network uncertainty into mathematically provable cryptographic assertions. 
@@ -193,7 +193,7 @@ graph TD
 
 ---
 
-## ⚡ Phase III: Resolution of Recent Implementations (State-of-the-Art)
+## Phase III: Resolution of Recent Implementations (State-of-the-Art)
 
 ### 10. Eradication of SSR Wagmi vs. WalletConnect Collisions
 We have harmonized the destructive dichotomy between server-side hydration (React SSR) and client-side asynchronous injection (Wagmi). Persistence is now evaluated algorithmically, proactively circumventing white screens of death or inconsistent rendering states (`Hydration Mismatch`).
@@ -261,7 +261,7 @@ flowchart TD
 
 ---
 
-## 🐋 Phase IV: High-Frequency Intelligence Engine (Whale Network)
+## Phase IV: High-Frequency Intelligence Engine (Whale Network)
 
 ### 15. High-Frequency Intelligence Core Engine
 Our Worker ceaselessly excavates pending transactions from the Mempool alongside consolidated blocks. The parsing and correlation of metrics (volume, contracts, flows) manifest entirely disjoint from the primary Event Loop.
@@ -376,7 +376,7 @@ graph LR
 
 ---
 
-## 🌐 Phase VI: Distributed Communications Network
+## Phase VI: Distributed Communications Network
 
 ### 23. The Sovereign Forum
 A digital agora for P2P communication, fundamentally devoid of centralized user databases. Moderation and identity derivation are inextricably linked to the cryptographically proven ownership of the *wallet*.
