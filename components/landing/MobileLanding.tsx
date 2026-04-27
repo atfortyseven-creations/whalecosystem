@@ -622,8 +622,9 @@ export function MobileLanding() {
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
-  // Default to showing the manifesto upon connection as explicitly requested by the user
-  const [showingManifesto, setShowingManifesto] = useState(true);
+  // After wallet connection the user lands directly on the ConnectedScreen (scanner).
+  // The ImmersiveManifestoLanding is discovery content for unauthenticated visitors.
+  const [showingManifesto, setShowingManifesto] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
   // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
@@ -657,13 +658,10 @@ export function MobileLanding() {
 
     setLinkedAddress(norm);
     setIsLinked(true);
-    setShowingManifesto(true);
     setConnecting(null);
     setShowFallbackBtn(false);
-    // NO REDIRECT: We stay on /connect which already renders MobileLanding.
-    // Redirecting to "/" triggers SSR User-Agent detection which can send a
-    // desktop layout to mobile browsers with "Desktop site" enabled.
-    // The ImmersiveManifestoLanding renders in-place here after connection.
+    // Stay on ConnectedScreen (scanner) after connection — do NOT redirect to manifesto.
+    // Redirecting to "/" triggers SSR User-Agent detection which can serve the wrong layout.
   }, [isLinked]);
 
   useEffect(() => {
