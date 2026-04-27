@@ -87,13 +87,10 @@ export const config = wagmiAdapter.wagmiConfig
 const queryClient = new QueryClient()
 
 // CRITICAL: metadata.url MUST match a domain registered in WalletConnect/Reown Cloud.
-// If the user accesses via 'humanidfi.com' (no www) but Reown only has 'www.humanidfi.com',
-// WalletConnect silently rejects the connection. Force www for production.
-const APP_URL = typeof window !== 'undefined'
-    ? (window.location.hostname.endsWith('humanidfi.com')
-        ? 'https://www.humanidfi.com'          // always www — matches Reown allowlist
-        : window.location.origin)              // localhost / staging — use as-is
-    : 'https://www.humanidfi.com';
+// We must use window.location.origin EXACTLY. If the user is on humanidfi.com (no www),
+// redirecting them to www.humanidfi.com breaks the WalletConnect connection because
+// IndexedDB/localStorage pairing sessions are isolated per subdomain.
+const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
