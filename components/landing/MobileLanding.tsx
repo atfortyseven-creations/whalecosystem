@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useAccount, useConnect, useSignMessage, useDisconnect } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAppKitAccount, useAppKitEvents } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
@@ -577,10 +577,10 @@ export function MobileLanding() {
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
-  // ── RainbowKit is the PRIMARY connector (like Scroll.io) ──────────────────
-  // useConnectModal opens the native RainbowKit wallet grid which generates
-  // correct WalletConnect v2 deep links → Android shows the "Open with" dialog.
-  const { openConnectModal } = useConnectModal();
+  // ── RainbowKit ConnectButton.Custom is the PRIMARY connector ────────────────
+  // ConnectButton.Custom always provides a valid openConnectModal regardless of
+  // any stale wagmi/AppKit session — unlike useConnectModal which returns
+  // undefined when isConnected=true (stale session from AppKit in localStorage).
   // AppKit account is a secondary signal: it fires when AppKit resolves a session
   // from an existing WalletConnect pairing. Kept for fallback polling.
   const { address: akAddress, isConnected: akConnected } = useAppKitAccount();
@@ -989,73 +989,84 @@ export function MobileLanding() {
           </div>
 
           {/* ──────────────────────────────────────────────────────────────────
-              WALLET BUTTONS — All three open the RainbowKit ConnectModal.
-              RainbowKit generates correct WalletConnect v2 deep links that
-              trigger Android's native "Open with" dialog (like Scroll.io).
+              WALLET BUTTONS — Wrapped in ConnectButton.Custom so RainbowKit
+              ALWAYS provides a valid openConnectModal (unlike useConnectModal
+              which silently returns undefined when wagmi has a stale session).
+              Flow: click → pre-flight disconnect → RainbowKit modal opens →
+              user picks wallet → WC v2 deep link → Android "Open with" dialog.
               ────────────────────────────────────────────────────────────────── */}
+          <ConnectButton.Custom>
+            {({ openConnectModal: rkOpenModal, authenticationStatus, mounted: rkMounted }) => {
+              // Helper: clear any stale wagmi/AppKit session then open the modal
+              const openWalletModal = (walletId: string) => {
+                setConnecting(walletId);
+                setShowManualReconnect(true);
+                setShowFallbackBtn(false);
 
-          {/* MetaMask */}
-          <WalletOption
-            logo="/wallets/metamask.svg"
-            name="MetaMask"
-            badge="Mobile · WalletConnect v2"
-            loading={connecting === 'metamask'}
-            onClick={() => {
-              setConnecting('metamask');
-              setShowManualReconnect(true);
-              setShowFallbackBtn(false);
-              // If already inside MetaMask's in-app browser, injected provider is available
-              const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
-              const injectedConn = connectors.find(c => c.id === 'injected');
-              if (hasEthereum && injectedConn) {
-                // Inside MetaMask browser — connect directly, no modal needed
-                connect({ connector: injectedConn });
-              } else {
-                // External browser — open RainbowKit modal → WalletConnect deep link
-                // → Android shows "Open with" → MetaMask opens
-                openConnectModal?.();
-              }
-              setTimeout(() => setConnecting(null), 3000);
-              setTimeout(() => setShowFallbackBtn(true), 3500);
-            }}
-            delay={0.1}
-          />
+                const doOpen = () => {
+                  // Check for injected provider first (in-app wallet browser)
+                  const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
+                  const injectedConn = connectors.find(c => c.id === 'injected');
+                  if (hasEthereum && injectedConn && walletId !== 'wc') {
+                    // Inside wallet's own browser — connect directly without modal
+                    connect({ connector: injectedConn });
+                  } else {
+                    // External browser: open RainbowKit modal.
+                    // This is GUARANTEED to work because it comes from ConnectButton.Custom.
+                    // → WalletConnect v2 deep link → Android "Open with" → wallet app opens
+                    rkOpenModal();
+                  }
+                };
 
-          {/* Coinbase Wallet */}
-          <WalletOption
-            logo="/wallets/coinbase.png"
-            name="Coinbase Wallet"
-            badge="Mobile · WalletConnect v2"
-            loading={connecting === 'coinbase'}
-            onClick={() => {
-              setConnecting('coinbase');
-              setShowManualReconnect(true);
-              setShowFallbackBtn(false);
-              // RainbowKit modal → WalletConnect deep link → Android "Open with" → Coinbase
-              openConnectModal?.();
-              setTimeout(() => setConnecting(null), 3000);
-              setTimeout(() => setShowFallbackBtn(true), 3500);
-            }}
-            delay={0.15}
-          />
+                // Pre-flight: if wagmi thinks it's connected (stale session),
+                // disconnect first so the modal isn't blocked, then open.
+                if (wagmiConnected || akConnected) {
+                  try { disconnect(); } catch {}
+                  // Small delay for wagmi state to settle after disconnect
+                  setTimeout(doOpen, 300);
+                } else {
+                  doOpen();
+                }
 
-          {/* Rainbow + all 550+ WalletConnect wallets */}
-          <WalletOption
-            logo="/wallets/rainbow.png"
-            name="Rainbow & 550+ Wallets"
-            badge="WalletConnect v2 · All Wallets"
-            loading={connecting === 'wc'}
-            onClick={() => {
-              setConnecting('wc');
-              setShowManualReconnect(true);
-              setShowFallbackBtn(false);
-              // RainbowKit modal shows the full wallet grid (like Scroll.io)
-              openConnectModal?.();
-              setTimeout(() => setConnecting(null), 3000);
-              setTimeout(() => setShowFallbackBtn(true), 3500);
+                setTimeout(() => setConnecting(null), 5000);
+                setTimeout(() => setShowFallbackBtn(true), 5500);
+              };
+
+              return (
+                <>
+                  {/* MetaMask */}
+                  <WalletOption
+                    logo="/wallets/metamask.svg"
+                    name="MetaMask"
+                    badge="Mobile · WalletConnect v2"
+                    loading={connecting === 'metamask'}
+                    onClick={() => openWalletModal('metamask')}
+                    delay={0.1}
+                  />
+
+                  {/* Coinbase Wallet */}
+                  <WalletOption
+                    logo="/wallets/coinbase.png"
+                    name="Coinbase Wallet"
+                    badge="Mobile · WalletConnect v2"
+                    loading={connecting === 'coinbase'}
+                    onClick={() => openWalletModal('coinbase')}
+                    delay={0.15}
+                  />
+
+                  {/* Rainbow + all 550+ WalletConnect wallets */}
+                  <WalletOption
+                    logo="/wallets/rainbow.png"
+                    name="Rainbow & 550+ Wallets"
+                    badge="WalletConnect v2 · All Wallets"
+                    loading={connecting === 'wc'}
+                    onClick={() => openWalletModal('wc')}
+                    delay={0.2}
+                  />
+                </>
+              );
             }}
-            delay={0.2}
-          />
+          </ConnectButton.Custom>
 
           {/* ECDSA notice */}
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
