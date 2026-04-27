@@ -151,10 +151,14 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         // Pre-connection → wallet connect buttons
         // Post-connection → connected state with navigation
         return (
-            <>
+            <React.Suspense fallback={
+                <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center font-mono text-[10px] uppercase tracking-widest text-[#050505]/40">
+                    INITIALIZING SOVEREIGN...
+                </div>
+            }>
                 {/* @ts-ignore */}
                 <MobileSovereignLanding />
-            </>
+            </React.Suspense>
         );
     }
 
