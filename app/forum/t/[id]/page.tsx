@@ -43,11 +43,14 @@ export default function TopicPage() {
       // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
       try {
-        const signature = await signMessageAsync({ message: replyContent });
+        const signature = await Promise.race([
+          signMessageAsync({ message: replyContent }),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('SIGNATURE_TIMEOUT')), 10000))
+        ]);
         finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
       } catch (e: any) {
-        // Signature skipped — continue posting without cryptographic anchor.
-        console.warn('[Forum] Reply signature skipped:', e?.message || e);
+        // Signature skipped or timed out — continue posting without cryptographic anchor.
+        console.warn('[Forum] Reply signature skipped or timed out:', e?.message || e);
       }
 
       const res = await fetch('/api/forum/posts', {
