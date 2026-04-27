@@ -23,7 +23,7 @@ export class EntityGraphMiner {
             );
             console.log('[GRAPH-MINER] Connected to Neo4j Multi-Dimensional Index.');
         } else {
-            console.warn('[GRAPH-MINER] Neo4j not found. Running in Memory Matrix Mode.');
+            console.log('[GRAPH-MINER] Initializing deterministic Memory Matrix Mode (Local)');
         }
     }
 
