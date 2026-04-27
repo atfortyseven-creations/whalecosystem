@@ -4,8 +4,13 @@ import { verifyWorldIDProof } from "@/lib/worldid";
 import { cookies } from "next/headers";
 import { SignJWT } from "jose";
 
-// Secret para JWT
-const JWT_SECRET = process.env.JWT_SECRET || "super-secret-jwt-key-change-in-prod";
+// JWT signing secret — must be set as an environment variable.
+// A missing secret is a critical misconfiguration: fail loudly rather than silently
+// using a publicly-known fallback that would allow anyone to forge session tokens.
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    throw new Error('[FATAL] JWT_SECRET environment variable is not set. The World ID verification endpoint cannot operate securely without it. Set JWT_SECRET in your Railway Variables dashboard.');
+}
 
 export async function POST(request: NextRequest) {
     try {

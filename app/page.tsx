@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { headers } from 'next/headers';
-import { ClientRootRouter } from '@/components/landing/ClientRootRouter';
-import { ClientMobileLanding } from '@/components/landing/ClientMobileLanding';
+import { SmartLandingRouter } from '@/components/landing/SmartLandingRouter';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +16,7 @@ export default async function Home() {
           INITIALIZING...
         </div>
       }>
-        {isMobile ? <ClientMobileLanding /> : <ClientRootRouter />}
+        <SmartLandingRouter isMobileUserAgent={isMobile} />
       </Suspense>
     </main>
   );

@@ -35,20 +35,10 @@ export function useKnowledgeGraph() {
         setLoading(true);
         setError(null);
         
+        // Contract not deployed yet — return null honestly rather than serving fabricated intelligence.
         if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-             await new Promise(r => setTimeout(r, 600));
-             const isKnown = parseInt(address.slice(-1), 16) % 3 !== 0 || address.length < 10;
-             if (!isKnown) { setLoading(false); return null; }
-             const risk = (address.length * 7) % 100;
-             setLoading(false);
-             return {
-                 name: address.includes("binance") ? "Binance Hot Wallet" : (address.includes("ftx") ? "FTX Drainer (Hacker)" : "Elite Vault"),
-                 category: risk > 80 ? "DUMP_RISK" : (risk < 30 ? "LONG_TERM_HOLDER" : "MEV_BOT"),
-                 riskScore: risk,
-                 confidence: 85 + (risk % 15),
-                 lastUpdated: Date.now() - (Math.random() * 86400000),
-                 exists: true
-             };
+            setLoading(false);
+            return null;
         }
 
         try {

@@ -14,32 +14,44 @@ export interface RouteResponse {
 }
 
 /**
- * Universal DeFi Router Service using Enso Finance Intent-Based API
- * Generates exact calldata to deposit the user's base asset (USDC or ETH)
- * into ANY major DeFi protocol vault listed on DeFiLlama.
+ * Universal DeFi Router Service — powered by the Li.Fi API.
+ *
+ * Li.Fi is a cross-chain swap & bridge aggregator that also handles
+ * vault deposits via its /quote endpoint. It is completely free to
+ * use with no account or API key required. The optional `x-lifi-api-key`
+ * header only increases rate limits and is not needed for production
+ * at normal user volumes.
+ *
+ * API docs: https://docs.li.fi/
  */
 export class DeFiRouterService {
-    private readonly ENSO_URL = 'https://api.enso.finance/api/v1/shortcuts/route';
-    private readonly BEARER_ENSO = '1e02632d-6feb-4a75-a157-370898734c40'; // Enso Public API Key
+
+    private readonly LIFI_QUOTE_URL = 'https://li.quest/v1/quote';
 
     /**
-     * Map DeFiLlama chains to Chain IDs
+     * Map DeFiLlama chain names to EVM chain IDs.
      */
     public resolveChainId(chainName: string): number {
         const MAP: Record<string, number> = {
-            'Ethereum': 1, 'Arbitrum': 42161, 'Base': 8453,
-            'Optimism': 10, 'Polygon': 137, 'BSC': 56,
-            'Avalanche': 43114, 'Fantom': 250
+            'Ethereum': 1,
+            'Arbitrum': 42161,
+            'Base': 8453,
+            'Optimism': 10,
+            'Polygon': 137,
+            'BSC': 56,
+            'Avalanche': 43114,
+            'Fantom': 250,
         };
         return MAP[chainName] || 1;
     }
 
     /**
-     * Gets the deposit calldata (USDC -> Vault)
-     * @param chainName Name of chain from DeFiLlama
-     * @param vaultAddress The pool ID/contract from DeFiLlama
-     * @param amountHuman Amount in human readable (e.g. "100")
-     * @param userAddress The EVM address executing the intent
+     * Builds the on-chain deposit calldata for USDC → Vault using Li.Fi.
+     *
+     * @param chainName   Chain name as returned by DeFiLlama (e.g. "Ethereum")
+     * @param vaultAddress The vault/pool contract address from DeFiLlama
+     * @param amountHuman  Amount in human-readable form (e.g. "100" for 100 USDC)
+     * @param userAddress  The wallet address that will execute the transaction
      */
     public async buildDepositTransaction(
         chainName: string,
@@ -50,53 +62,63 @@ export class DeFiRouterService {
         try {
             const chainId = this.resolveChainId(chainName);
 
-            // Intent fallback: default depositing USDC. 
-            // Most DeFiLlama stable pools accept native chain USDC.
-            const usdcAddress = getUsdcAddress(chainId as ChainId);
-            
-            // Format amount (USDC 6 decimals standard)
+            // USDC is the universal input token for DeFiLlama stable vaults.
+            const usdcAddress = getUsdcAddress(chainId as ChainId)
+                ?? '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'; // Mainnet USDC fallback
+
+            // USDC uses 6 decimals.
             const amountWei = parseUnits(amountHuman, 6).toString();
 
+            // Li.Fi /quote parameters
             const params = new URLSearchParams({
-                chainId: chainId.toString(),
-                fromAddress: userAddress,
-                receiver: userAddress, // User receives vault receipt token
-                spender: userAddress,
-                tokenIn: (usdcAddress || '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48') as string, // The user inputs USDC
-                tokenOut: vaultAddress, // The output is the Vault Receipt Token (DeFiLlama's "pool")
-                amountIn: amountWei,
-                routingStrategy: 'router', 
-                slippage: '300' // 3% max slippage for vault entering via dex swaps if needed
+                fromChain:    chainId.toString(),
+                toChain:      chainId.toString(),   // Same-chain vault deposit
+                fromToken:    usdcAddress,
+                toToken:      vaultAddress,          // Vault receipt token = output
+                fromAmount:   amountWei,
+                fromAddress:  userAddress,
+                toAddress:    userAddress,
+                slippage:     '0.03',                // 3% max slippage
+                integrator:   'humanidfi',           // Identifies this dApp to Li.Fi
+                order:        'RECOMMENDED',
             });
 
-            console.log(`[DeFiRouter] Building route via Enso: ${this.ENSO_URL}?${params.toString()}`);
+            console.log(`[DeFiRouter] Requesting Li.Fi quote → ${this.LIFI_QUOTE_URL}?${params}`);
 
-            const response = await fetch(`${this.ENSO_URL}?${params.toString()}`, {
+            const response = await fetch(`${this.LIFI_QUOTE_URL}?${params}`, {
                 headers: {
-                    'Authorization': `Bearer ${this.BEARER_ENSO}`,
-                }
+                    'Accept': 'application/json',
+                    // No API key required. Add x-lifi-api-key here if rate limits
+                    // become a concern at scale.
+                },
             });
 
             if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Enso API Error: ${text}`);
+                const errorText = await response.text();
+                throw new Error(`Li.Fi API Error (${response.status}): ${errorText}`);
             }
 
             const data = await response.json();
-            
+
+            // Li.Fi returns transactionRequest for direct on-chain execution.
+            const txRequest = data.transactionRequest;
+            if (!txRequest) {
+                throw new Error('Li.Fi returned a valid route but no transactionRequest. The vault token may not be supported.');
+            }
+
             return {
                 tx: {
-                    to: data.tx.to,
-                    data: data.tx.data,
-                    value: data.tx.value || "0",
-                    chainId
+                    to:      txRequest.to,
+                    data:    txRequest.data,
+                    value:   txRequest.value ?? '0x0',
+                    chainId,
                 },
-                gas: data.gas || 0,
-                expectedOutput: data.amountOut || "0"
+                gas:            parseInt(txRequest.gasLimit ?? '0', 16),
+                expectedOutput: data.estimate?.toAmount ?? '0',
             };
-            
+
         } catch (error: any) {
-            console.error('[DeFiRouterService] Deposit Tx Gen failed:', error.message);
+            console.error('[DeFiRouterService] Deposit Tx construction failed:', error.message);
             throw new Error(`Execution Engine Error: ${error.message}`);
         }
     }
