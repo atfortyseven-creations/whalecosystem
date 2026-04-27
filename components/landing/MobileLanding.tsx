@@ -587,7 +587,7 @@ export function MobileLanding() {
 
   // ── Reown AppKit is the PRIMARY connector ────────────────
   const { address: wagmiAddress, isConnected: wagmiConnected, connector, chainId } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connect, connectAsync, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
@@ -987,9 +987,21 @@ export function MobileLanding() {
                 onClick={async () => {
                   setFallbackStatus('checking');
                   
-                  const checkSession = () => {
+                  const checkSession = async () => {
                     // Priority 0: Force wagmi to reconnect underlying SDKs (IndexedDB for WalletConnect)
-                    try { reconnect(); } catch {}
+                    try { 
+                      reconnect(); 
+                      // [INSTITUTIONAL AGGRESSIVE RECOVERY]
+                      // If Wagmi wiped its store because of the deep-link reload, reconnect() does nothing.
+                      // We MUST force the walletConnect connector to initialize and read IndexedDB.
+                      const wcConnector = connectors.find(c => c.id === 'walletConnect' || c.id === 'appkit');
+                      if (wcConnector && !wagmiConnected) {
+                        const result = await connectAsync({ connector: wcConnector });
+                        if (result?.accounts?.[0]) return result.accounts[0];
+                      }
+                    } catch (e) {
+                      console.warn('[Sovereign] Aggressive recovery attempt failed:', e);
+                    }
 
                     // Priority 1: wagmi ref (always live — avoids stale closure)
                     if (wagmiAddressRef.current) return wagmiAddressRef.current;
