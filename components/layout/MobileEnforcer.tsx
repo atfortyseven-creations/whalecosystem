@@ -142,9 +142,8 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/vip',
         ];
         const isDirectAccessRoute = DIRECT_ACCESS_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
-        const isWeb3Browser = typeof window !== 'undefined' && (!!window.ethereum || !!(window as any).web3);
 
-        if (isDirectAccessRoute || isWeb3Browser) {
+        if (isDirectAccessRoute) {
             return <>{children}</>;
         }
 

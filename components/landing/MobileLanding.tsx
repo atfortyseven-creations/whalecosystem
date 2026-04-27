@@ -1044,36 +1044,54 @@ export function MobileLanding() {
             {(() => {
               // Helper: clear any stale wagmi/AppKit session then open the modal
               const openWalletModal = (walletId: string) => {
+                // If already authenticated (cookie + isLinked), do NOT open a new modal.
+                // This handles the case where the user clicks a button while already logged in
+                // (e.g. after returning from wallet app with an active session).
+                if (isLinked) {
+                  establishSession(effectiveAddress || '');
+                  return;
+                }
+
                 setConnecting(walletId);
                 setShowManualReconnect(true);
                 setShowFallbackBtn(false);
 
                 const doOpen = () => {
-                  // Check for injected provider first (in-app wallet browser)
+                  // Priority 1: injected provider (inside wallet's own browser)
                   const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
                   const injectedConn = connectors.find(c => c.id === 'injected');
-                  if (hasEthereum && injectedConn && walletId !== 'wc') {
-                    // Inside wallet's own browser — connect directly without modal
+                  if (hasEthereum && injectedConn) {
                     connect({ connector: injectedConn });
-                  } else {
-                    // External browser: open AppKit modal.
-                    rkOpenModal();
+                    return;
                   }
+
+                  // Priority 2: WalletConnect connector from wagmi (works with MetaMask, Rainbow, etc.)
+                  // This avoids the AppKit ↔ RainbowKit dual-system conflict.
+                  const wcConn =
+                    connectors.find(c => c.id === 'walletConnect') ||
+                    connectors.find(c => c.id === 'walletConnectLegacy') ||
+                    connectors.find(c => (c as any).type === 'walletConnect');
+
+                  if (wcConn) {
+                    connect({ connector: wcConn });
+                    return;
+                  }
+
+                  // Priority 3: Fallback to AppKit modal (if somehow no WC connector found)
+                  rkOpenModal();
                 };
 
-                // Pre-flight: if wagmi thinks it's connected (stale session),
-                // disconnect first so the modal isn't blocked, then open.
-                if (wagmiConnected) {
+                // Pre-flight: only disconnect a STALE wagmi session (i.e. user is not linked
+                // but wagmi thinks connected). This prevents killing an active valid session.
+                if (wagmiConnected && !isLinked) {
                   try { disconnect(); } catch {}
-                  // Small delay for wagmi state to settle after disconnect
                   setTimeout(doOpen, 300);
                 } else {
                   doOpen();
                 }
 
                 setTimeout(() => setConnecting(null), 3000);
-                // 400ms: the deep-link to the wallet app returns focus before 1.2s on
-                // most Android devices. The button must be visible when they come back.
+                // 400ms: deep-link returns focus before 1.2s on most Android devices
                 setTimeout(() => setShowFallbackBtn(true), 400);
               };
 
