@@ -37,6 +37,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
     { href: '/forum/groups',        label: 'GROUPS'       },
     { href: '/forum/guidelines',    label: 'GUIDELINES'   },
     { href: '/forum/anniversaries', label: 'ANNIVERSARIES'},
+    { href: '/forum/settings',      label: 'SETTINGS'     },
   ];
 
   return (

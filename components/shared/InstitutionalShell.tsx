@@ -67,11 +67,11 @@ export function InstitutionalShell({
           }}
         />
 
-        {/* Layer B: Hokusai blue waves — responsive scaling */}
+        {/* Layer B: Hokusai blue waves — responsive scaling without quality loss */}
         <div
-          className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-no-repeat"
+          className="absolute inset-0 z-[1] pointer-events-none select-none bg-[url('/olas-hokusai-4k.png')] bg-bottom bg-repeat-x"
           style={{
-            backgroundSize: 'clamp(140%, 60vw + 100%, 100%)',
+            backgroundSize: 'auto 100%',
             opacity: 0.90,
             transform: 'translateZ(0)',
             willChange: 'transform',

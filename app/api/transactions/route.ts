@@ -63,7 +63,12 @@ export async function GET(req: Request) {
         // Ya no consultamos una sola tabla; usamos el motor de unificación.
         const transactions = await getTransactionHistory(userId, { limit: 50 });
 
-        return NextResponse.json(transactions);
+        // Serialize BigInt to string to prevent JSON stringify crashes
+        const safeTransactions = JSON.parse(JSON.stringify(transactions, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value
+        ));
+
+        return NextResponse.json(safeTransactions);
     } catch (error: any) {
         console.warn('[TransactionsAPI] Unified sync failed, returning empty list.', error.message);
         return NextResponse.json([]); 

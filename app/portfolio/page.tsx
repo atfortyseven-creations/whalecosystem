@@ -9,9 +9,9 @@ import {
   Check, Loader2, ShieldCheck, ExternalLink
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
-import { useAppKit, useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
@@ -151,12 +151,9 @@ export default function PortfolioPage() {
   const [accountCreated, setAccountCreated] = useState(false);
 
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
-  const { address: userAddress, isConnected } = useAppKitAccount();
-  const { chain } = useAccount();
-  const { caipNetwork } = useAppKitNetwork();
+  const { address: userAddress, isConnected, chain } = useAccount();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { connect } = useConnect();
-  const { open } = useAppKit();
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
 
@@ -216,15 +213,8 @@ export default function PortfolioPage() {
           </div>
 
           <div className="flex flex-col items-center gap-3">
-            <button
-              onClick={() => open()}
-              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] transition-all hover:opacity-80 shadow-lg"
-              style={{ background: "#0052FF", color: "#FFFFFF" }}
-            >
-              Connect Wallet
-            </button>
-            <div className="scale-90 origin-center">
-              <appkit-button />
+            <div className="scale-[0.85] origin-center">
+              <ConnectButton />
             </div>
           </div>
 
@@ -282,7 +272,7 @@ export default function PortfolioPage() {
           </button>
 
           <div className="scale-90 origin-right">
-            <appkit-button />
+            <ConnectButton accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }} showBalance={false} />
           </div>
         </div>
       </header>
@@ -392,7 +382,7 @@ export default function PortfolioPage() {
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {SUPPORTED_CHAINS.map(({ caipId, name, color, symbol, id }) => {
-                  const isActive = caipNetwork?.id === id || chain?.id === id;
+                  const isActive = chain?.id === id;
                   return (
                     <button
                       key={id}
@@ -403,8 +393,7 @@ export default function PortfolioPage() {
                           await switchChain({ chainId: id });
                           toast.success(`Connected to ${name}`);
                         } catch (e: any) {
-                          // Fallback: open AppKit Networks modal
-                          open({ view: 'Networks' });
+                          toast.error("Failed to switch network");
                         }
                       }}
                       disabled={isActive || isSwitching}
@@ -483,7 +472,7 @@ export default function PortfolioPage() {
                         </button>
                       </div>
 
-                      {/* AppKit Universal */}
+                      {/* Universal Connect */}
                       <div className="rounded-2xl border p-5 flex flex-col justify-between hover:shadow-md transition-shadow" style={{ borderColor: BORDER, background: CARD }}>
                         <div className="flex items-start gap-4 mb-6">
                           <div className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0" style={{ borderColor: BORDER, background: "#FAF9F6" }}>
@@ -495,13 +484,9 @@ export default function PortfolioPage() {
                             <p className="text-[11px] mt-2 leading-relaxed" style={{ color: MUTED }}>Connect or create a new account using any supported Web3 provider via WalletConnect.</p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => open()}
-                          className="w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:bg-black/5 flex items-center justify-center gap-2 border shadow-sm"
-                          style={{ borderColor: BORDER, background: "#FAF9F6", color: INK }}
-                        >
-                          <ExternalLink size={14} /> Open Browser
-                        </button>
+                        <div className="w-full flex justify-center scale-90">
+                           <ConnectButton />
+                        </div>
                       </div>
                     </div>
 
