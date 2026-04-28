@@ -732,8 +732,9 @@ export function MobileLanding() {
     setShowFallbackBtn(false);
     // Clear the pending wakeup flag — session is now established.
     try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-    // Stay on ConnectedScreen (scanner) after connection — do NOT redirect to manifesto.
-    // Redirecting to "/" triggers SSR User-Agent detection which can serve the wrong layout.
+    
+    // Redirect to the root domain as requested by the user
+    window.location.replace('/');
   }, [isLinked]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
@@ -836,7 +837,6 @@ export function MobileLanding() {
       if (isLinked) return;
       if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
         setFallbackStatus('checking');
-        try { reconnect(); } catch {}
         setTimeout(onFocusRecheck, 800);
       } else {
         onFocusRecheck();
@@ -868,7 +868,6 @@ export function MobileLanding() {
     setFallbackStatus('checking');
 
     const doRecovery = () => {
-      try { reconnect(); } catch {}
       setTimeout(() => onFocusRecheck(), 400);
     };
     doRecovery();

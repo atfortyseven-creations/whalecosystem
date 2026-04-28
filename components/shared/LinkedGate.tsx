@@ -368,7 +368,8 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      pathname.startsWith('/privacy') ||
                      pathname.startsWith('/terms') ||
                      pathname.startsWith('/developers') ||
-                     pathname.startsWith('/news');
+                     pathname.startsWith('/news') ||
+                     pathname.startsWith('/forum');
     // Only redirect if NOT connected at all (not just un-signed)
     if (!isLinked && !isWalletConnected && !isPublic) {
       const t = setTimeout(() => router.replace('/connect'), 400);
@@ -405,7 +406,8 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                    pathname.startsWith('/privacy') ||
                    pathname.startsWith('/terms') ||
                    pathname.startsWith('/developers') ||
-                   pathname.startsWith('/news');
+                   pathname.startsWith('/news') ||
+                   pathname.startsWith('/forum');
   if (isPublic) return <>{children}</>;
 
   // ── Wallet connected but not signed: show contract step ───────────────────

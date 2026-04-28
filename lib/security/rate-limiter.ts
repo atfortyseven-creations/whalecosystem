@@ -318,6 +318,8 @@ export interface DistributedRateLimitResult {
   tier: RateLimitTier;
 }
 
+let _upstashWarned = false;
+
 /**
  * Distributed rate limit check (Upstash). Fails OPEN on errors.
  * Use this in middleware.ts for Edge Runtime compatibility.
@@ -337,7 +339,10 @@ export async function checkRateLimit(
   try {
     const limiter = getDistributedLimiter(tier);
     if (!limiter) {
-      console.warn('[RateLimiter] Upstash not configured — failing open. Set UPSTASH_REDIS_REST_URL + TOKEN.');
+      if (!_upstashWarned) {
+        console.warn('[RateLimiter] Upstash not configured — failing open. Set UPSTASH_REDIS_REST_URL + TOKEN. (This warning will only be logged once to prevent log spam)');
+        _upstashWarned = true;
+      }
       return allow;
     }
     const result = await limiter.limit(ip);
