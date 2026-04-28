@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useUIStore } from '@/lib/store/ui-store';
 import { QRCodeSVG } from 'qrcode.react';
-import { useAccount, useConnect, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useSignMessage, useReconnect, useChainId, useSwitchChain, useDisconnect } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
@@ -120,9 +120,15 @@ const PC_WALLETS: PCWallet[] = [
 function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; onDisconnect: () => void }) {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { reconnect } = useReconnect();
+  const { switchChain } = useSwitchChain();
+  const chainId = useChainId();
   const [isSigning, setIsSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasAcceptedToS, setHasAcceptedToS] = useState(false);
+
+  // Check if current chain is supported
+  const isSupportedChain = [1, 10, 56, 137, 42161, 8453, 480].includes(chainId);
 
   const handleSign = async () => {
     if (!address) return;
@@ -130,27 +136,29 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
     setError(null);
     try {
       const message = [
-        '═══════════════════════════════',
-        '  Whale Alert Network',
-        '  SOVEREIGN ACCESS PROTOCOL',
-        '═══════════════════════════════',
+        '╔══════════════════════════════════════╗',
+        '║       WHALE ALERT NETWORK            ║',
+        '║    SOVEREIGN IDENTITY PROTOCOL       ║',
+        '╚══════════════════════════════════════╝',
         '',
-        `Identity: ${address}`,
-        `Nonce: ${Date.now()}`,
-        `Network: WHALE_TERMINAL_V4`,
+        `ADDRESS: ${address}`,
+        `NONCE:   ${Date.now()}`,
+        `ACCESS:  INSTITUTIONAL_TERMINAL_V4`,
         '',
-        'By signing you confirm that',
-        'you are the sole owner of this',
-        'address and authorize access',
-        'to the institutional terminal.',
-        '═══════════════════════════════',
+        'BY SIGNING, YOU CONFIRM OWNERSHIP OF',
+        'THIS IDENTITY AND ACCEPT THE MASTER',
+        'TERMS FOR CRYPTOGRAPHIC ACCESS.',
+        '',
+        'NO GAS OR TRANSACTION FEES REQUIRED.',
+        '════════════════════════════════════════',
       ].join('\n');
 
       const signature = await signMessageAsync({ message });
 
       if (signature) {
-        document.cookie = `sovereign_handshake=${address}; path=/; max-age=604800; SameSite=Lax`;
-        sessionStorage.setItem(`sovereign_signed_${address}`, 'true');
+        const norm = address.toLowerCase();
+        document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+        sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
 
         toast.success('IDENTITY LINKED', {
           description: `Terminal unlocked. ${address.slice(0, 6)}...${address.slice(-4)}`,
@@ -166,10 +174,13 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
         onSigned();
       }
     } catch (e: any) {
+      console.error('[LinkedGate] Sign error:', e);
       if (e?.code === 4001 || e?.message?.includes('rejected')) {
         setError('Signature rejected. You must sign to access the terminal.');
       } else {
-        setError('Unexpected error. Please try again.');
+        // Fallback: try to reconnect the provider and show the actual error
+        try { reconnect(); } catch {}
+        setError(e?.message || 'Unexpected error. Please try again.');
       }
     } finally {
       setIsSigning(false);
@@ -230,6 +241,18 @@ function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; on
       </AnimatePresence>
 
       <div className="w-full flex flex-col gap-8">
+        {!isSupportedChain && (
+          <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl text-center">
+            <p className="text-amber-600 font-mono text-[9px] uppercase tracking-wider mb-3">Unsupported Network Detection</p>
+            <button 
+              onClick={() => switchChain?.({ chainId: 1 })}
+              className="font-mono text-[10px] underline uppercase tracking-widest text-amber-700 font-bold"
+            >
+              Switch to Ethereum Mainnet
+            </button>
+          </div>
+        )}
+
         <label className="flex items-start gap-4 group cursor-pointer text-left">
           <div className="relative flex items-center justify-center w-4 h-4 mt-[3px] border border-black/30 rounded-sm group-hover:border-black transition-colors shrink-0">
             <input 
@@ -270,6 +293,7 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isLinked, setLinked } = useUIStore();
   const { isConnected: isWalletConnected, address } = useAccount();
+  const { disconnect } = useDisconnect();
   
   const [isMounted, setIsMounted] = useState(false);
   const [showSignStep, setShowSignStep] = useState(false);
@@ -359,10 +383,10 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   }, [setLinked]);
 
   const handleDisconnect = useCallback(() => {
+    try { disconnect(); } catch {}
     setShowSignStep(false);
-    // Clean router navigation instead of full page reload
     router.push('/');
-  }, [router]);
+  }, [router, disconnect]);
 
 
   if (!isMounted) return null;

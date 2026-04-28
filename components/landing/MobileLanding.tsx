@@ -13,22 +13,22 @@ import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCi
 // These are ALL the keys that Reown AppKit v1/v2 and its WagmiAdapter write
 // to localStorage (2025-2026). We scan ALL of them when recovering a session.
 const APPKIT_STORAGE_KEYS = [
-  // Reown AppKit v2 (2025-2026) — primary keys written by WagmiAdapter
   '@wagmi/core',
   'wagmi.store',
   'wagmi.connected',
-  // Reown AppKit v1 keys
   'reown-appkit',
   'appkit',
   '@reown/appkit',
-  // Legacy Web3Modal / WalletConnect v2
   'W3M_STATE',
   '@w3m/',
   'wc@2:',
   'wc@2',
   'walletconnect',
-  // Generic wagmi
   'wagmi',
+  'rainbow',
+  'metamask',
+  'coinbase',
+  'session'
 ];
 
 function extractAddressFromAppKit(value: string): string | null {
@@ -744,31 +744,38 @@ export function MobileLanding() {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         establishSession(wagmiAddressRef.current); return;
       }
-      // Check 2: wagmi.store cookie (explicit cookieStorage)
+      // Check 2: All cookies
       try {
-        for (const cookie of document.cookie.split('; ')) {
-          if (cookie.startsWith('wagmi.store=')) {
-            const addr = extractAddressFromAppKit(decodeURIComponent(cookie.slice('wagmi.store='.length)));
+        const cookies = document.cookie.split('; ');
+        for (const cookie of cookies) {
+          const val = decodeURIComponent(cookie.split('=')[1] || '');
+          if (val) {
+            const addr = extractAddressFromAppKit(val);
             if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
           }
         }
       } catch {}
-      // Check 3: All localStorage keys (WalletConnect IndexedDB mirror)
+      // Check 3: All localStorage + sessionStorage keys
       try {
-        for (const key of Object.keys(localStorage)) {
-          if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
-            const raw = localStorage.getItem(key);
-            if (!raw) continue;
-            const addr = extractAddressFromAppKit(raw);
-            if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
+        const storages = [localStorage, sessionStorage];
+        for (const storage of storages) {
+          for (let i = 0; i < storage.length; i++) {
+            const key = storage.key(i);
+            if (!key) continue;
+            const lowerKey = key.toLowerCase();
+            if (APPKIT_STORAGE_KEYS.some(k => lowerKey.includes(k)) || lowerKey.includes('store')) {
+              const raw = storage.getItem(key);
+              if (!raw) continue;
+              const addr = extractAddressFromAppKit(raw);
+              if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
+            }
           }
         }
       } catch {}
-      // Hard 15s timeout
-      if (attempts >= 300) {
+      // Hard 30s timeout (increased from 15s for slow mobile networks/relays)
+      if (attempts >= 600) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         setFallbackStatus('failed');
-        setTimeout(() => { setShowManualReconnect(false); setFallbackStatus('idle'); }, 2500);
       }
     }, 50);
   }, [isLinked, establishSession]);
@@ -991,11 +998,11 @@ export function MobileLanding() {
           }`}
         >
           {fallbackStatus === 'checking' ? (
-            <><Loader2 size={16} className="animate-spin text-white/70" />Syncing session...</>
+            <><Loader2 size={16} className="animate-spin text-white/70" />Sincronizando sesión...</>
           ) : fallbackStatus === 'failed' ? (
-            <><AlertCircle size={16} className="text-white" />Session not detected — Go back</>
+            <><AlertCircle size={16} className="text-white" />Sesión no detectada — Reintentar</>
           ) : (
-            <><RefreshCw size={16} />Retry Polling</>
+            <><RefreshCw size={16} />Ya conecté · Continuar</>
           )}
         </motion.button>
       </div>

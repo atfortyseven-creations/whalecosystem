@@ -23,7 +23,7 @@ interface TitaniumGateProps {
 }
 
 export function TitaniumGate({ children }: TitaniumGateProps) {
-    const { isConnected } = useAccount();
+    const { isConnected, isConnecting, isReconnecting } = useAccount();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -71,6 +71,10 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         const checkTimer = setTimeout(() => {
             if (!mounted) return;
 
+            // Failsafe: if we are in the middle of connecting/reconnecting, WAIT.
+            // This prevents aggressive redirects while the wallet modal is open.
+            if (isConnecting || isReconnecting) return;
+
             // Priority 1: Wagmi is connected
             if (isConnected) {
                 setState('APP');
@@ -84,8 +88,6 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             }
 
             // Priority 3: Sovereign Handshake (Cookie — must have real 0x address)
-            // Using includes('sovereign_handshake=') alone matches the expired
-            // blank cookie written by handleDisconnect(), causing a false positive.
             const hasHandshake = typeof document !== 'undefined'
                 && document.cookie.split('; ').some(r => r.startsWith('sovereign_handshake=0x'));
             if (hasHandshake) {
@@ -96,10 +98,10 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // Otherwise: Access Denied — redirect to connect
             setState('AUTH');
             if (pathname !== '/connect') router.push('/connect');
-        }, 1500); // was 300ms — increased to survive first-connect cookie-write race
+        }, 1500);
 
         return () => clearTimeout(checkTimer);
-    }, [isConnected, isPublicPage, router, mounted, pathname]);
+    }, [isConnected, isConnecting, isReconnecting, isPublicPage, router, mounted, pathname]);
 
 
     // [iOS PERFECTION] We no longer return an invisible div. Instead, we render
