@@ -13,15 +13,39 @@ export default function TopicPage() {
   const [replyContent, setReplyContent] = useState('');
   const [submitting, setSubmitting]     = useState(false);
   const [replyError, setReplyError]     = useState('');
+  const [replyDraftSaved, setReplyDraftSaved] = useState(false);
   const [sessionAddress, setSessionAddress] = useState<string | null>(null);
   const { signMessageAsync } = useSignMessage();
   const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<string | null>(null);
+
+  // Draft persistence key is scoped per topic so different threads have independent drafts
+  const replyDraftKey = id ? `forum_draft_reply_${id}` : null;
 
   // Read current user's address from cookie (client-side)
   useEffect(() => {
     const match = document.cookie.match(/sovereign_handshake=([^;]+)/);
     if (match) setSessionAddress(match[1].toLowerCase());
   }, []);
+
+  // Restore reply draft on mount (after topic id is known)
+  useEffect(() => {
+    if (!replyDraftKey) return;
+    try {
+      const saved = localStorage.getItem(replyDraftKey);
+      if (saved) setReplyContent(saved);
+    } catch {}
+  }, [replyDraftKey]);
+
+  // Auto-save reply draft on every keystroke
+  useEffect(() => {
+    if (!replyDraftKey || !replyContent) return;
+    try {
+      localStorage.setItem(replyDraftKey, replyContent);
+      setReplyDraftSaved(true);
+      const t = setTimeout(() => setReplyDraftSaved(false), 1500);
+      return () => clearTimeout(t);
+    } catch {}
+  }, [replyContent, replyDraftKey]);
 
   const fetchTopic = () => {
     fetch(`/api/forum/topics/${id}`)
@@ -59,6 +83,8 @@ export default function TopicPage() {
         body: JSON.stringify({ topicId: id, content: finalContent }),
       });
       if (res.ok) {
+        // Clear reply draft after successful submit
+        try { if (replyDraftKey) localStorage.removeItem(replyDraftKey); } catch {}
         setReplyContent('');
         fetchTopic();
       } else {
@@ -159,15 +185,23 @@ export default function TopicPage() {
                     style={{ color: 'var(--forum-text)' }}
                   />
                   <div className="flex items-center justify-between px-5 py-3" style={{ borderTop: '1px solid var(--forum-border)', backgroundColor: 'var(--forum-header-bg)' }}>
-                    <button
-                      onClick={submitReply}
-                      disabled={submitting || !replyContent.trim()}
-                      className="flex items-center gap-2 text-[13px] font-sans font-bold px-5 py-2 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
-                      style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                      {submitting ? 'AWAITING WALLET SIGNATURE...' : 'SIGN & POST'}
-                    </button>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={submitReply}
+                        disabled={submitting || !replyContent.trim()}
+                        className="flex items-center gap-2 text-[13px] font-sans font-bold px-5 py-2 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
+                        style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+                      >
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        {submitting ? 'AWAITING WALLET SIGNATURE...' : 'SIGN & POST'}
+                      </button>
+                      {replyDraftSaved && (
+                        <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-1">
+                          <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                          Draft saved
+                        </span>
+                      )}
+                    </div>
                     {replyError && (
                       <span className="text-[12px] font-sans font-bold text-red-400">
                         {replyError}

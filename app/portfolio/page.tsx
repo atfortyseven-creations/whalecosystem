@@ -9,14 +9,12 @@ import {
   Check, Loader2, ShieldCheck, ExternalLink
 } from 'lucide-react';
 import { useLivePortfolio } from '@/hooks/useLivePortfolio';
-import { useAccount, useSwitchChain } from 'wagmi';
+import { useAccount, useSwitchChain, useConnect } from 'wagmi';
 import { mainnet, base, optimism, arbitrum, polygon } from 'wagmi/chains';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAppKit } from '@reown/appkit/react';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 import { LegendaryTransactionModal } from '@/components/rainbow/LegendaryTransactionModal';
 import { DepositModal } from '@/components/rainbow/DepositModal';
-import { coinbaseWallet } from 'wagmi/connectors';
-import { useConnect } from 'wagmi';
 import { toast } from 'sonner';
 import { ChainActivityPanel } from '@/components/portfolio/ChainActivityPanel';
 
@@ -154,7 +152,8 @@ export default function PortfolioPage() {
   const { totalPnl, assets, change24hUSD, change24hPercent, isLoading } = useLivePortfolio();
   const { address: userAddress, isConnected, chain } = useAccount();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
-  const { connect } = useConnect();
+  const { open: openAppKit } = useAppKit();
+  const { connect, connectors } = useConnect();
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey(k => k + 1);
 
@@ -176,12 +175,12 @@ export default function PortfolioPage() {
   const handleCreateOnChainAccount = async () => {
     setCreatingAccount(true);
     try {
-      // Coinbase Smart Wallet — creates a new on-chain account for the user
-      connect({ connector: coinbaseWallet({ preference: 'smartWalletOnly' }) });
-      toast.success("Smart Wallet initiated", { description: "Follow the prompts to create your on-chain account." });
+      // Open AppKit modal — user picks Coinbase Smart Wallet from the list
+      openAppKit();
+      toast.success('Wallet modal opened', { description: 'Select Coinbase Smart Wallet to create your on-chain account.' });
       setAccountCreated(true);
     } catch (e: any) {
-      toast.error("Account creation failed", { description: e.message });
+      toast.error('Account creation failed', { description: e.message });
     } finally {
       setCreatingAccount(false);
     }
@@ -214,9 +213,13 @@ export default function PortfolioPage() {
           </div>
 
           <div className="flex flex-col items-center gap-3">
-            <div className="scale-[0.85] origin-center">
-              <ConnectButton />
-            </div>
+            <button
+              onClick={() => openAppKit()}
+              className="px-8 py-3 rounded-2xl font-black text-[13px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95 shadow-lg"
+              style={{ background: INK, color: '#fff' }}
+            >
+              Connect Wallet
+            </button>
           </div>
 
           <p className="text-[10px] uppercase tracking-widest" style={{ color: MUTED }}>
@@ -253,9 +256,9 @@ export default function PortfolioPage() {
         <div className="flex items-center gap-3">
           {/* Address badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 border rounded-full" style={{ borderColor: BORDER, background: CARD }}>
-            <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : "—"}</span>
+            <span className="font-mono text-[10px]" style={{ color: MUTED }}>{userAddress ? formatAddr(userAddress) : '—'}</span>
             <button
-              onClick={() => { navigator.clipboard.writeText(userAddress ?? ""); toast.success("Copied!"); }}
+              onClick={() => { navigator.clipboard.writeText(userAddress ?? ''); toast.success('Copied!'); }}
               style={{ color: MUTED }}
               className="hover:opacity-100 transition-opacity opacity-50"
             >
@@ -269,12 +272,16 @@ export default function PortfolioPage() {
             className="p-2 rounded-xl border transition-all hover:bg-black/5"
             style={{ borderColor: BORDER, background: CARD, color: MUTED }}
           >
-            <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
           </button>
 
-          <div className="scale-90 origin-right">
-            <ConnectButton accountStatus={{ smallScreen: 'avatar', largeScreen: 'full' }} showBalance={false} />
-          </div>
+          <button
+            onClick={() => openAppKit()}
+            className="px-4 py-2 rounded-xl border font-mono text-[10px] font-black uppercase tracking-widest transition-all hover:bg-black/5"
+            style={{ borderColor: BORDER, background: CARD, color: MUTED }}
+          >
+            {userAddress ? formatAddr(userAddress) : 'Connect'}
+          </button>
         </div>
       </header>
 
@@ -486,7 +493,13 @@ export default function PortfolioPage() {
                           </div>
                         </div>
                         <div className="w-full flex justify-center scale-90">
-                           <ConnectButton />
+                           <button
+                             onClick={() => openAppKit()}
+                             className="px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.15em] transition-all hover:opacity-80 shadow-sm"
+                             style={{ background: INK, color: '#fff' }}
+                           >
+                             Connect Wallet
+                           </button>
                         </div>
                       </div>
                     </div>
