@@ -68,6 +68,7 @@ const DynamicQRScannerModal = dynamic(
 );
 
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
+import { WorldMapBackground } from "./WorldMapBackground";
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const IVORY = "#FAF9F6";
@@ -281,6 +282,7 @@ function ConnectedScreen({
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
       {/* Backgrounds */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
+      <WorldMapBackground />
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
         <motion.div
            className="absolute"
@@ -656,6 +658,7 @@ export function MobileLanding() {
   // After wallet connection the user lands directly on the ImmersiveManifestoLanding.
   // This matches the requested behavior for mobile flow.
   const [showingManifesto, setShowingManifesto] = useState(true);
+  const [showConnectOverlay, setShowConnectOverlay] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
   // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
@@ -1010,6 +1013,43 @@ export function MobileLanding() {
   }
 
   // ── Render: Default — Not connected ──────────────────────────────────────────
+  if (!showConnectOverlay) {
+    return (
+      <div className="w-full min-h-screen bg-[#FDFCF8] relative">
+        <motion.header
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed top-4 left-4 right-4 z-[999] flex items-center justify-between px-5 py-3 rounded-full"
+          style={{ background: "rgba(255,255,255,0.80)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: `1px solid ${FAINT}`, boxShadow: "0 4px 24px rgba(5,5,5,0.07)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-6 h-6 shrink-0 cursor-pointer select-none"
+              onClick={() => {
+                const next = debugTaps + 1;
+                setDebugTaps(next);
+                if (next >= 5) { setShowDebug(s => !s); setDebugTaps(0); }
+              }}
+            >
+              <WhaleLogo className="w-6 h-6" />
+            </div>
+            <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
+          </div>
+          <button 
+            onClick={() => setShowConnectOverlay(true)}
+            className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/60 hover:text-black hover:bg-black/5 transition-colors"
+          >
+            Not Connected
+          </button>
+        </motion.header>
+
+        <ImmersiveManifestoLanding />
+      </div>
+    );
+  }
+
+  // ── Render: Connect Overlay ────────────────────────────────────────────────
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
 
@@ -1050,9 +1090,12 @@ export function MobileLanding() {
           </div>
           <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
         </div>
-        <div className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/40">
-          Not Connected
-        </div>
+        <button 
+          onClick={() => setShowConnectOverlay(false)}
+          className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/60 hover:bg-black/5 transition-colors"
+        >
+          Cancel
+        </button>
       </motion.header>
 
       {/* ── DEBUG PANEL (tap logo 5x to open) ── */}

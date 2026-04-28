@@ -18,6 +18,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
+import { WorldMapBackground } from "./WorldMapBackground";
 
 // ─── Detect mobile/tablet via UA ─────────────────────────────────────────────
 function useIsMobile() {
@@ -312,6 +313,7 @@ export default function ConnectPage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white">
+      <WorldMapBackground />
       {/* Wave bg */}
       <div
         className="fixed bottom-0 left-0 right-0 h-[50vh] pointer-events-none z-0"

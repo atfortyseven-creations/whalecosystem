@@ -28,6 +28,17 @@ export default async function ForumLayout({
 
   return (
     <div className="min-h-screen flex flex-col forum-theme-root">
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              if (localStorage.getItem('forum-theme') === 'light') {
+                document.documentElement.classList.add('forum-light-mode');
+              }
+            } catch (e) {}
+          `,
+        }}
+      />
       <TelemetryTracker />
       <ForumHeader address={address} avatarUrl={avatarUrl} />
 

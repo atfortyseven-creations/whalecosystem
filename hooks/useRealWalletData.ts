@@ -104,15 +104,15 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     const positions: Position[] = (Array.isArray(positionsRaw) ? positionsRaw : []).map((pos: any) => {
         // Fix for crash reported by user: outcomePrices might be undefined
         const prices = pos.market?.outcomePrices;
-        const currentPrice = prices ? parseFloat(prices[pos.outcomeIndex]) : 0;
-        const avgPrice = parseFloat(pos.avgPrice) || currentPrice;
-        const size = parseFloat(pos.size);
+        const currentPrice = Array.isArray(prices) && prices[pos.outcomeIndex] ? parseFloat(prices[pos.outcomeIndex]) : 0;
+        const avgPrice = parseFloat(pos.avgPrice) || currentPrice || 0;
+        const size = parseFloat(pos.size) || 0;
 
         // Cálculo PnL
         const value = size * currentPrice;
         const cost = size * avgPrice;
-        const pnl = value - cost;
-        const pnlPercent = cost > 0 ? (pnl / cost) * 100 : 0;
+        const pnl = isNaN(value - cost) ? 0 : (value - cost);
+        const pnlPercent = cost > 0 && !isNaN(pnl) ? (pnl / cost) * 100 : 0;
 
         // News Matching
         const newsContext = matchNewsToMarket(pos.market?.question || "", recentNews);
@@ -159,8 +159,8 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
         symbol: t.symbol,
         name: t.name,
         balance: t.balance,
-        balanceNumeric: t.balanceNumeric,
-        balanceFormatted: t.balanceFormatted || t.balanceNumeric?.toLocaleString(undefined, { maximumFractionDigits: 6 }) || "0",
+        balanceNumeric: typeof t.balanceNumeric === 'number' ? t.balanceNumeric : 0,
+        balanceFormatted: t.balanceFormatted || (typeof t.balanceNumeric === 'number' ? t.balanceNumeric.toLocaleString(undefined, { maximumFractionDigits: 6 }) : "0"),
         price: t.price || t.priceUSD || 0,
         valueUSD: t.valueUsd || t.valueUSD || 0,
         logoURI: t.logo || t.logoURI,
@@ -170,9 +170,9 @@ export const useRealWalletData = (recentNews: NewsItem[] = [], overrideAddress?:
     }));
 
     // Totals
-    const portfolioValue = positions.reduce((acc: number, curr: any) => acc + curr.value, 0);
+    const portfolioValue = positions.reduce((acc: number, curr: any) => acc + (isNaN(curr.value) ? 0 : curr.value), 0);
     const multiChainBalance = assetsData?.totalValueUsd || 0;
-    const usdcBalance = parseFloat(balanceData?.formatted || '0');
+    const usdcBalance = parseFloat(balanceData?.formatted || '0') || 0;
     
     // For "Rainbow" feel, we use the unified balance from the portfolio API
     // which already includes tokens, perps, and predictions.

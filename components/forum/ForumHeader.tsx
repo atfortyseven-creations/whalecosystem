@@ -11,6 +11,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
   const address = wagmiAddress || serverAddress;
   const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,6 +20,11 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Sync icon state with real DOM class on first render
+  useEffect(() => {
+    setIsLightMode(document.documentElement.classList.contains('forum-light-mode'));
   }, []);
 
   const [mountedDate, setMountedDate] = useState('');
@@ -48,10 +54,12 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
         <div className="flex items-center gap-6">
           <Link
             href="/forum"
-            className="text-[20px] font-sans font-black tracking-tight hover:opacity-80 transition-opacity"
+            className="text-[20px] font-sans font-black tracking-tight hover:opacity-80 transition-opacity flex items-center gap-3"
             style={{ color: 'var(--forum-text)' }}
           >
-            FORUM
+            <span>FORUM</span>
+            <span className="text-[12px] font-mono tracking-[0.2em] px-2 py-0.5 rounded border opacity-70" style={{ borderColor: 'var(--forum-border)' }}>P2P</span>
+            <span className="text-[14px] font-serif tracking-normal opacity-90">Humanity Ledger®</span>
           </Link>
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>SYS.DATE:</span>
@@ -66,12 +74,16 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
           {/* Theme Toggle */}
           <button
-            onClick={() => document.documentElement.classList.toggle('forum-light-mode')}
+            onClick={() => {
+              const isLight = document.documentElement.classList.toggle('forum-light-mode');
+              localStorage.setItem('forum-theme', isLight ? 'light' : 'dark');
+              setIsLightMode(isLight);
+            }}
             className="w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-300 ease-in-out hover:scale-105"
             style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}
-            title="Toggle Light/Dark Mode"
+            title={isLightMode ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
           >
-            <span className="text-[14px] font-serif leading-none mt-[1px]">☼</span>
+            <span className="text-[14px] font-serif leading-none mt-[1px]">{isLightMode ? '☾' : '☼'}</span>
           </button>
 
           {/* New Topic */}

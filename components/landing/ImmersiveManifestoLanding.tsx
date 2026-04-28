@@ -3,6 +3,7 @@
 import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
 import { Scan } from "lucide-react";
+import { WorldMapBackground } from "./WorldMapBackground";
 
 // Pre-defined list of lottie files matching the narrative sections.
 // This preserves the "zero build-time bloat" since these are just string paths
@@ -172,10 +173,11 @@ const RIGHT_SIDEBAR_CONTENT = [
   }
 ];
 
-export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void } = {}) {
+export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void }) {
   
   return (
     <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-hidden">
+      <WorldMapBackground />
 
       <div className={`relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 ${onOpenScanner ? 'pb-32' : 'pb-16'}`}>
         
@@ -359,8 +361,16 @@ function CatastropheChronicle() {
   );
 }
 
+interface AkashicEntry {
+  id: string;
+  chain: string;
+  amountUsd: number;
+  storedHash: string;
+  timestamp: string;
+}
+
 function PublicAkashicLedgerSample() {
-  const [feed, setFeed] = React.useState<any[]>([]);
+  const [feed, setFeed] = React.useState<AkashicEntry[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -379,7 +389,7 @@ function PublicAkashicLedgerSample() {
         <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black flex items-center gap-2">
           <Scan size={14} /> Akashic Ledger — Public Audit Sample
         </h2>
-        <span className="text-[9px] font-mono uppercase tracking-widest text-[#00C076] animate-pulse">
+        <span className="text-[9px] font-mono uppercase tracking-widest text-black/40 animate-pulse">
           Live Feed Active
         </span>
       </div>
@@ -406,7 +416,7 @@ function PublicAkashicLedgerSample() {
                   <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-black/50">
                     ID: AKASHIC-{entry.id}
                   </span>
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-[#00C076] flex items-center gap-1">
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-black/60 flex items-center gap-1">
                     <Scan size={10} /> Verified
                   </span>
                 </div>

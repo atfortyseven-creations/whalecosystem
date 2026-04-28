@@ -30,37 +30,23 @@ interface NavItem {
     badge?: string;
     badgeColor?: string;
     dividerBefore?: string;
+    externalUrl?: string;
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    // { id: 'dashboard',    label: 'Overview',         icon: <LayoutDashboard size={17}/>, dividerBefore: 'Overview' },
-    // { id: 'watchlist',    label: 'Watchlist',        icon: <Star size={17}/> },
-    { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/>, dividerBefore: 'Overview' },
-    { id: 'gold',         label: 'Ticket Mint',      icon: <Ticket size={17}/> },
+    { id: 'gold',         label: 'Ticket Mint',      icon: <Ticket size={17}/>, dividerBefore: 'Overview' },
+    { id: 'portfolio',    label: 'Main Portfolio',   icon: <Wallet size={17}/> },
 
-    { id: 'markets',      label: 'Top Markets',      icon: <Globe size={17}/>,           dividerBefore: 'Market Data' },
-    { id: 'newpairs',     label: 'New Listings',     icon: <Flame size={17}/> },
-    { id: 'omniexplorer', label: 'Omni Explorer',    icon: <Search size={17}/> },
-    // { id: 'brc',          label: 'BRC Explorer',     icon: <Layers size={17}/> },
-
-    // { id: 'firehose',     label: 'Whale Firehose',   icon: <LineChart size={17}/>,        dividerBefore: 'Pro Analytics', badge: 'PRO' },
-    // { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <ShieldAlert size={17}/> },
-    { id: 'inst-ledger',  label: 'Inst. Ledger',     icon: <Book size={17}/>, dividerBefore: 'Pro Analytics', badge: 'PRO' },
-    { id: 'mass-transfer',label: 'Mass Transfers',   icon: <Network size={17}/> },
+    { id: 'market-data',  label: 'Market Data',      icon: <Globe size={17}/>, dividerBefore: 'Intelligence' },
+    { id: 'markets',      label: 'Top Markets',      icon: <LayoutDashboard size={17}/> },
+    { id: 'newpairs',     label: 'New Listings',     icon: <Search size={17}/> },
     { id: 'graph',        label: 'Entity Graph',     icon: <Compass size={17}/> },
-    { id: 'defi',         label: 'DeFi Yields',      icon: <Landmark size={17}/> },
-    // { id: 'polymarket',   label: 'Polymarket',       icon: <BarChart3 size={17}/> },
-    // { id: 'forge',        label: 'Cosmic Forge',     icon: <FlaskConical size={17}/> },
 
-    { id: 'portfolio',    label: 'Main Portfolio',   icon: <Wallet size={17}/>,          dividerBefore: 'Execution' },
-    // { id: 'live-port',    label: 'Quick Portfolio',  icon: <LineChart size={17}/> },
-    // { id: 'whale-port',   label: 'Whale Holdings',   icon: <Star size={17}/> },
-    { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/> },
-    { id: 'zk',           label: 'ZK Shield',        icon: <Shield size={17}/>, badge: 'PRO' },
+    { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel', externalUrl: 'https://www.humanidfi.com/news' },
+    { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <BookOpen size={17}/>, externalUrl: 'https://www.humanidfi.com/sovereign-intel' },
 
-    { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>,        dividerBefore: 'System' },
-
-    { id: 'academy',      label: 'Academy',          icon: <BookOpen size={17}/>,        dividerBefore: 'Resources' },
+    { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/>, dividerBefore: 'Execution' },
+    { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>, dividerBefore: 'System' },
     { id: 'support',      label: 'Support',          icon: <MessageSquare size={17}/> },
 ];
 
@@ -172,6 +158,12 @@ export function WhaleProShell({
     };
 
     const handleTabChange = (id: string) => {
+        const item = SIDEBAR_ITEMS.find(i => i.id === id);
+        if (item?.externalUrl) {
+            window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
+
         if (id === 'developer') {
             window.location.href = '/developer';
             return;
@@ -320,10 +312,22 @@ export function WhaleProShell({
                                             {item.badge}
                                         </span>
                                     )}
+                                    {!isCollapsed && item.externalUrl && (
+                                        <ArrowUpRight size={10} className="text-[#A0A0A0]" />
+                                    )}
                                 </button>
                             </div>
                         );
                     })}
+
+                    {!isCollapsed && (
+                        <div className="px-4 py-6 mt-4">
+                            <div className="w-full h-px bg-black/10 mb-4" />
+                            <p className="text-[9px] font-serif leading-relaxed text-[#888] text-justify opacity-80">
+                                Foundational document on pure mathematical abstraction, zero-knowledge cryptographic mechanisms, and deterministic heuristic paradigms that cement the immutable global infrastructure.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="px-2 pb-3 pt-1 shrink-0">
