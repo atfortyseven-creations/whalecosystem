@@ -326,17 +326,6 @@ export default function ConnectPage() {
         }}
       />
 
-      {/* Header */}
-      <header className="relative z-[100] h-[64px] flex items-center justify-between px-6 md:px-10 border-b border-black/[0.06] bg-white/80 backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-7 h-7" alt="Whale"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-          <span className="text-[14px] font-black uppercase tracking-tighter">Whale Alert Network</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        </div>
-      </header>
 
       {/* Main */}
       <main className="flex-1 relative z-10 flex flex-col justify-center items-center p-4 py-12 md:p-8 lg:p-12">
@@ -364,7 +353,7 @@ export default function ConnectPage() {
             <div className="relative z-10 flex flex-col h-full">
               <div className="inline-flex bg-white/90 backdrop-blur-md self-start px-5 py-3 rounded-2xl mb-3 border border-black/5 shadow-sm">
                 <h2 className="text-3xl font-black uppercase tracking-tighter leading-none">
-                  Mobile Sync
+                  Direct QR Handshake
                 </h2>
               </div>
               <div className="mb-8 border-b border-black/10 pb-4" />

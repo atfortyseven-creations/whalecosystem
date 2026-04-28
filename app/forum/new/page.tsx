@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Save } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
+
+const DRAFT_KEY = 'forum_draft_new_topic';
 
 export default function NewTopicPage() {
   const router = useRouter();
@@ -18,7 +20,33 @@ export default function NewTopicPage() {
   const [tags, setTags]             = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
+  const [draftSaved, setDraftSaved] = useState(false);
   const { signMessageAsync } = useSignMessage();
+
+  // ── Restore draft on mount ────────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.title)      setTitle(draft.title);
+        if (draft.content)    setContent(draft.content);
+        if (draft.categoryId) setCategoryId(draft.categoryId);
+        if (draft.tags)       setTags(draft.tags);
+      }
+    } catch {}
+  }, []);
+
+  // ── Auto-save draft on every change ──────────────────────────────────────
+  useEffect(() => {
+    if (!title && !content && !tags) return;
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ title, content, categoryId, tags }));
+      setDraftSaved(true);
+      const t = setTimeout(() => setDraftSaved(false), 1800);
+      return () => clearTimeout(t);
+    } catch {}
+  }, [title, content, categoryId, tags]);
 
   useEffect(() => {
     fetch('/api/forum/categories')
@@ -40,7 +68,6 @@ export default function NewTopicPage() {
     }
     setSubmitting(true);
     try {
-      // Cryptographic anchoring (Sign to Post) — optional, graceful fallback
       let finalContent = content;
       try {
         const signature = await Promise.race([
@@ -49,8 +76,6 @@ export default function NewTopicPage() {
         ]);
         finalContent = `${content}\n\n[SIGNATURE:${signature}]`;
       } catch (e: any) {
-        // If user has no wallet connected, rejects, or mobile wallet times out, continue without signature.
-        // The sovereign_handshake cookie is the primary auth gate on the server.
         console.warn('[Forum] Signature skipped or timed out:', e?.message || e);
       }
 
@@ -65,6 +90,8 @@ export default function NewTopicPage() {
         }),
       });
       if (res.ok) {
+        // Clear draft on successful post
+        try { localStorage.removeItem(DRAFT_KEY); } catch {}
         const topic = await res.json();
         router.push(`/forum/t/${topic.id}`);
       } else {
@@ -78,12 +105,36 @@ export default function NewTopicPage() {
     }
   };
 
+  const clearDraft = () => {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setTitle(''); setContent(''); setTags('');
+    if (categories.length > 0) setCategoryId(categories[0].id);
+  };
+
   return (
     <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
 
       {/* ── Header ── */}
-      <div className="mb-8">
-        <h1 className="text-[24px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>Create a New Topic</h1>
+      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="text-[24px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
+          Create a New Topic
+        </h1>
+        <div className="flex items-center gap-3">
+          {draftSaved && (
+            <span className="flex items-center gap-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-emerald-500">
+              <Save size={10} /> Draft saved
+            </span>
+          )}
+          {(title || content) && (
+            <button
+              onClick={clearDraft}
+              className="text-[10px] font-sans font-bold uppercase tracking-widest hover:opacity-100 transition-opacity opacity-50 px-3 py-1.5 rounded-sm"
+              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}
+            >
+              Clear Draft
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -148,14 +199,16 @@ export default function NewTopicPage() {
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center gap-6 mt-2">
+        <div className="flex items-center gap-6 mt-2 flex-wrap">
           <button
             onClick={submit}
             disabled={submitting}
             className="flex items-center gap-2 text-[14px] font-sans font-bold px-6 py-2.5 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
             style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
           >
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
             {submitting ? 'AWAITING SIGNATURE...' : 'SIGN & CREATE TOPIC'}
           </button>
           <Link

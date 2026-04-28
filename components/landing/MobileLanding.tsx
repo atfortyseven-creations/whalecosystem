@@ -171,14 +171,14 @@ function SigningOverlay({
 
         <div className="space-y-2">
           <h2 className="text-[26px] font-black tracking-tighter text-[#050505] leading-none">
-          {isSigning ? "Tunnel Established" : error ? "Connection Rejected" : "Validating Wallet"}
+          {isSigning ? "Tunnel Established" : error ? "Connection Rejected" : "Connecting..."}
           </h2>
           <p className="text-[12px] text-[#050505]/50 leading-relaxed">
             {error
               ? "Could not cryptographically verify the wallet."
               : isSigning
               ? "Wallet linked successfully. Validating security credentials in the Sovereign Protocol..."
-              : "Establishing encrypted tunnel with the Sovereign Network..."}
+              : "Establishing encrypted tunnel with the Sovereign Network... Please wait."}
           </p>
         </div>
 
@@ -354,9 +354,15 @@ function ConnectedScreen({
            className="w-full bg-white rounded-[24px] border border-[#E5E5E5] shadow-xl overflow-hidden flex flex-col"
         >
           {/* Purple header — live clock + verified badge */}
-          <div className="bg-gradient-to-br from-[#2D0A59] to-[#1E073B] px-6 py-6 flex items-start justify-between gap-4">
+            <div className="bg-gradient-to-br from-[#2D0A59] to-[#1E073B] px-6 py-6 flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Active Session · ECDSA Verified</p>
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Active Session · ECDSA Verified</p>
+                <div className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">Connected</span>
+                </div>
+              </div>
               <p className="text-[38px] font-black tracking-tighter text-white leading-none tabular-nums">
                 {fmtTime(now)}
               </p>
@@ -433,8 +439,8 @@ function ConnectedScreen({
           transition={{ delay: 0.22, duration: 0.6 }}
           whileTap={{ scale: 0.97 }}
           onClick={onScan}
-          className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white"
-          style={{ background: "#050505", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(5,5,5,0.45)" }}
+          className="w-full flex items-center justify-center gap-3 py-5 rounded-2xl font-black uppercase tracking-widest text-white shadow-xl"
+          style={{ background: "#2D0A59", fontSize: "12px", boxShadow: "0 24px 48px -12px rgba(45,10,89,0.45)" }}
         >
           <Scan size={18} />
           Open QR Scanner · Sync Desktop
@@ -574,29 +580,29 @@ function ConnectedScreen({
                <div className="px-6 py-6 flex flex-col gap-5">
                   <div className="bg-blue-50/50 p-4 border border-blue-100 rounded-xl">
                     <p className="text-[11px] text-blue-900 leading-relaxed font-medium">
-                      Estás viendo el panel de control soberano en tu dispositivo móvil. Tu sesión está completamente verificada y asegurada criptográficamente con los datos mostrados en pantalla.
+                      You are viewing the sovereign control panel on your mobile device. Your session is fully verified and cryptographically secured with the data shown on screen.
                     </p>
                   </div>
 
                   <div>
-                     <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]/40 mb-3">Pasos para enlazar el Terminal PC</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-[#050505]/40 mb-3">Steps to link the PC Terminal</p>
                      
                      <div className="flex flex-col gap-3">
                        <div className="flex items-start gap-3">
                          <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">1</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Abre la plataforma Whale Alert Network en el navegador de tu computadora de escritorio.</p>
+                         <p className="text-[11px] text-[#050505] leading-snug">Open the Whale Alert Network platform in your desktop browser.</p>
                        </div>
                        <div className="flex items-start gap-3">
                          <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">2</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Selecciona la opción <strong className="font-black text-[#2D0A59]">Direct QR Handshake</strong> en la pantalla de inicio del PC.</p>
+                         <p className="text-[11px] text-[#050505] leading-snug">Select the <strong className="font-black text-[#2D0A59]">Direct QR Handshake</strong> option on the PC home screen.</p>
                        </div>
                        <div className="flex items-start gap-3">
                          <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">3</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Haz click en el botón morado <strong className="font-black text-[#2D0A59]">ABRIR SCANNER QR</strong> en esta pantalla de tu teléfono móvil.</p>
+                         <p className="text-[11px] text-[#050505] leading-snug">Tap the <strong className="font-black text-[#2D0A59]">OPEN QR SCANNER</strong> button on this mobile screen.</p>
                        </div>
                        <div className="flex items-start gap-3">
                          <div className="w-5 h-5 rounded-full bg-[#2D0A59] text-white text-[10px] font-black flex items-center justify-center shrink-0">4</div>
-                         <p className="text-[11px] text-[#050505] leading-snug">Apunta la cámara al código QR que aparece en tu monitor para transferir tu sesión segura instantáneamente.</p>
+                         <p className="text-[11px] text-[#050505] leading-snug">Point your camera at the QR code on your monitor to instantly transfer your secure session.</p>
                        </div>
                      </div>
                   </div>
@@ -1158,13 +1164,21 @@ export function MobileLanding() {
           >
             <WhaleLogo className="w-6 h-6" />
           </div>
-          <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
+          <div className="flex flex-col">
+            <span className="text-[11px] font-black uppercase tracking-tight" style={{ color: INK }}>Whale Alert Network</span>
+            {isLinked && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[7px] font-black uppercase tracking-widest text-emerald-600/80">Secured · Connected</span>
+              </div>
+            )}
+          </div>
         </div>
         <button 
           onClick={() => setShowConnectOverlay(false)}
           className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/60 hover:bg-black/5 transition-colors"
         >
-          Explorar
+          Explore
         </button>
       </motion.header>
 
@@ -1317,17 +1331,17 @@ export function MobileLanding() {
                 {fallbackStatus === 'checking' ? (
                   <>
                     <Loader2 size={16} className="animate-spin text-white/70" />
-                    Sincronizando túnel...
+                    Syncing session...
                   </>
                 ) : fallbackStatus === 'failed' ? (
                   <>
                     <AlertCircle size={16} className="text-white" />
-                    Conexión no detectada
+                    Session not detected
                   </>
                 ) : (
                   <>
                     <RefreshCw size={16} />
-                    Continuar si ya conecté
+                    Already connected · Continue
                   </>
                 )}
               </motion.button>
