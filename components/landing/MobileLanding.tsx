@@ -32,28 +32,29 @@ const APPKIT_STORAGE_KEYS = [
 ];
 
 function extractAddressFromAppKit(value: string): string | null {
+  if (!value || value.length < 42) return null;
   try {
     const parsed = JSON.parse(value);
-    
-    // 1. Check wagmi v2 state
-    const accounts = parsed?.state?.connections?.value?.[0]?.[1]?.accounts;
-    if (accounts && accounts[0]) {
-      return accounts[0];
+    // All known Reown AppKit v2 + Wagmi v2 address paths
+    const possiblePaths = [
+      parsed?.state?.connections?.value?.[0]?.[1]?.accounts?.[0],
+      parsed?.state?.data?.account?.address,
+      parsed?.sessions?.[0]?.namespaces?.eip155?.accounts?.[0]?.split?.(':')?.[2],
+      parsed?.namespaces?.eip155?.accounts?.[0]?.split?.(':')?.[2],
+      parsed?.address,
+      parsed?.accounts?.[0],
+    ];
+    for (const candidate of possiblePaths) {
+      if (candidate && typeof candidate === 'string' && /^0x[a-fA-F0-9]{40}$/i.test(candidate)) {
+        return candidate.toLowerCase();
+      }
     }
-    
-    // 2. Official Reown AppKit v1 session path
-    const w3mAccounts = parsed?.sessions?.[0]?.namespaces?.eip155?.accounts;
-    if (w3mAccounts?.[0]) {
-      const addr = w3mAccounts[0].split(':')[2];
-      if (addr?.match(/^0x[a-fA-F0-9]{40}$/i)) return addr;
-    }
-  } catch { 
-    // Ignore JSON parse errors, proceed to fallback
+  } catch {
+    // Not valid JSON — fall through to regex
   }
-
-  // 3. Robust generic fallback — exactly 40 hex chars, NOT followed by more hex chars
+  // Final fallback: extract any valid Ethereum address from raw string
   const match = value.match(/0x[a-fA-F0-9]{40}(?![a-fA-F0-9])/i);
-  return match ? match[0] : null;
+  return match ? match[0].toLowerCase() : null;
 }
 
 // ── Live clock hook ───────────────────────────────────────────────────────────
@@ -640,6 +641,8 @@ export function MobileLanding() {
   // the poll would never see wagmiAddress updating when wagmi hydrates from cookies.
   const wagmiAddressRef = useRef<string | undefined>(undefined);
   useEffect(() => { wagmiAddressRef.current = wagmiAddress; }, [wagmiAddress]);
+  // Tracks active polling interval so onFocusRecheck can cancel previous runs
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isConnected = wagmiConnected;
   const address     = wagmiAddress;
@@ -726,6 +729,50 @@ export function MobileLanding() {
     // Redirecting to "/" triggers SSR User-Agent detection which can serve the wrong layout.
   }, [isLinked]);
 
+  // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
+  const onFocusRecheck = useCallback(() => {
+    if (isLinked) return;
+    // Fast path: wagmi already resolved the address
+    if (wagmiAddressRef.current) { establishSession(wagmiAddressRef.current); return; }
+    // Cancel any in-flight poll before starting a new one
+    if (pollIntervalRef.current) { clearInterval(pollIntervalRef.current); pollIntervalRef.current = null; }
+    let attempts = 0;
+    pollIntervalRef.current = setInterval(() => {
+      attempts++;
+      // Check 1: wagmi ref
+      if (wagmiAddressRef.current) {
+        clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
+        establishSession(wagmiAddressRef.current); return;
+      }
+      // Check 2: wagmi.store cookie (explicit cookieStorage)
+      try {
+        for (const cookie of document.cookie.split('; ')) {
+          if (cookie.startsWith('wagmi.store=')) {
+            const addr = extractAddressFromAppKit(decodeURIComponent(cookie.slice('wagmi.store='.length)));
+            if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
+          }
+        }
+      } catch {}
+      // Check 3: All localStorage keys (WalletConnect IndexedDB mirror)
+      try {
+        for (const key of Object.keys(localStorage)) {
+          if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            const addr = extractAddressFromAppKit(raw);
+            if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
+          }
+        }
+      } catch {}
+      // Hard 15s timeout
+      if (attempts >= 300) {
+        clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
+        setFallbackStatus('failed');
+        setTimeout(() => { setShowManualReconnect(false); setFallbackStatus('idle'); }, 2500);
+      }
+    }, 50);
+  }, [isLinked, establishSession]);
+
   useEffect(() => {
     if (!mounted || isLinked) return;
     if (isConnected && address) {
@@ -733,162 +780,79 @@ export function MobileLanding() {
     }
   }, [mounted, isConnected, address, isLinked, establishSession]);
 
-  // ── On return from native wallet app: Hardened Sovereign Wake-Sync Engine ────
-  // ARCHITECTURE NOTE: We deliberately do NOT call connectAsync() here.
-  // Reason: wagmi automatically initiates its own reconnection to WalletConnect
-  // when the page wakes up. Calling connectAsync() concurrently creates two
-  // competing connection attempts that BOTH fail with a "Already connecting"
-  // or "Connector not found" error, producing the exact deadlock the user sees.
-  //
-  // The correct strategy: fire reconnect() once to wake wagmi's internal state
-  // machine, then poll wagmiAddressRef (which updates automatically when wagmi
-  // resolves) and the storage layer as a direct disk fallback.
+  // ── forceFullReconnect — Manual sync trigger for Android Chrome ────────────
+  const forceFullReconnect = useCallback(async () => {
+    setFallbackStatus('checking');
+    try {
+      await reconnect();
+      // Give wagmi a window to hydrate from storage
+      setTimeout(() => onFocusRecheck(), 600);
+    } catch (e) {
+      console.error('[Sovereign:Recovery] Manual sync failed:', e);
+      onFocusRecheck(); // attempt polling regardless
+    }
+  }, [reconnect, onFocusRecheck]);
+
+  // ── Hardened Sovereign Wake-Sync Engine ───────────────────────────────────
   useEffect(() => {
     if (!mounted) return;
-    let pollInterval: ReturnType<typeof setInterval> | null = null;
-
-    const stopPolling = () => {
-      if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-    };
-
-    const onFocusRecheck = () => {
-      if (isLinked) return;
-
-      // Priority 1: wagmi already has the address (fastest path)
-      if (wagmiAddressRef.current) { establishSession(wagmiAddressRef.current); return; }
-
-      stopPolling();
-      let attempts = 0;
-
-      pollInterval = setInterval(() => {
-        attempts++;
-
-        // Check 1: wagmi ref (updated by the useEffect([wagmiAddress]) above)
-        if (wagmiAddressRef.current) {
-          stopPolling();
-          establishSession(wagmiAddressRef.current);
-          return;
-        }
-
-        // Check 2: Wagmi cookie (WagmiAdapter with cookieStorage)
-        try {
-          for (const cookie of document.cookie.split('; ')) {
-            if (cookie.startsWith('wagmi.store=')) {
-              const addr = extractAddressFromAppKit(decodeURIComponent(cookie.slice('wagmi.store='.length)));
-              if (addr) { stopPolling(); establishSession(addr); return; }
-            }
-          }
-        } catch {}
-
-        // Check 3: All localStorage keys (WalletConnect IndexedDB mirror)
-        try {
-          for (const key of Object.keys(localStorage)) {
-            if (APPKIT_STORAGE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
-              const raw = localStorage.getItem(key);
-              if (!raw) continue;
-              const addr = extractAddressFromAppKit(raw);
-              if (addr) { stopPolling(); establishSession(addr); return; }
-            }
-          }
-        } catch {}
-
-        // Hard 15s timeout — unblock UI if WalletConnect relay is completely dead
-        if (attempts >= 300) {
-          stopPolling();
-          setFallbackStatus('failed');
-          setTimeout(() => { setShowManualReconnect(false); setFallbackStatus('idle'); }, 2500);
-        }
-      }, 50);
-    };
-
     const handleVisibility = () => {
       if (document.visibilityState !== 'visible') return;
       // Remove lingering AppKit modal backdrop that Chrome leaves open after deep-link
       try { document.querySelector('w3m-modal')?.remove(); } catch {}
-
       if (isLinked) return;
-
-      // If the user had clicked a wallet button before leaving, kick wagmi's reconnect engine.
-      // We call reconnect() ONCE — this is a lightweight signal to wagmi to re-read IndexedDB.
-      // We do NOT call connectAsync() because wagmi is already doing that internally.
       if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
         setFallbackStatus('checking');
         try { reconnect(); } catch {}
-        // Give wagmi 800ms to hydrate from IndexedDB before we start polling storage directly
         setTimeout(onFocusRecheck, 800);
       } else {
         onFocusRecheck();
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('focus', handleVisibility);
-    // Run on mount to handle the case where the page was fully reloaded by iOS/Android
-    onFocusRecheck();
-
+    onFocusRecheck(); // Run on mount for full-reload case
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('focus', handleVisibility);
-      stopPolling();
+      if (pollIntervalRef.current) { clearInterval(pollIntervalRef.current); pollIntervalRef.current = null; }
     };
-  }, [mounted, isLinked, establishSession, reconnect]);
+  }, [mounted, isLinked, reconnect, onFocusRecheck]);
 
-  // ── CRITICAL: Persist wakeup flag in localStorage (survives full tab reload) ──
-  // When the user goes to their wallet app via deep-link, Chrome DESTROYS the tab.
-  // sessionStorage is cleared on full reload. localStorage survives.
-  // We read this flag on every mount to force reconnection even when showManualReconnect
-  // would otherwise be false.
+  // ── ULTRA-AGGRESSIVE RECOVERY — Android Chrome deep-link + iOS bfcache ─────────
+  // Covers the case where Chrome DESTROYS the tab when the user goes to their
+  // wallet app via deep-link. On return, the page is fully reloaded and neither
+  // the visibilitychange nor focus events fire — only pageshow does (bfcache).
   useEffect(() => {
-    if (!mounted) return;
-    try {
-      const pending = localStorage.getItem('sovereign_pending_wakeup');
-      if (pending === '1' && !isLinked) {
-        // Don't remove flag yet — let the wake-sync engine run first.
-        // The flag is cleared by establishSession succeeding.
-        setFallbackStatus('checking');
-        try { reconnect(); } catch {}
-        // Start polling immediately
-        setTimeout(() => {
-          // Inline focus-recheck logic
-          if (wagmiAddressRef.current && !isLinked) {
-            establishSession(wagmiAddressRef.current);
-            try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-            return;
-          }
-          let attempts = 0;
-          const poll = setInterval(() => {
-            attempts++;
-            if (wagmiAddressRef.current) {
-              clearInterval(poll);
-              establishSession(wagmiAddressRef.current);
-              try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-              return;
-            }
-            try {
-              for (const key of Object.keys(localStorage)) {
-                if (key === 'sovereign_pending_wakeup') continue;
-                const raw = localStorage.getItem(key);
-                if (!raw || raw.length < 42) continue;
-                const addr = extractAddressFromAppKit(raw);
-                if (addr) {
-                  clearInterval(poll);
-                  establishSession(addr);
-                  try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-                  return;
-                }
-              }
-            } catch {}
-            if (attempts >= 200) {
-              clearInterval(poll);
-              setFallbackStatus('idle');
-              // Don't remove flag — user may need to retry
-            }
-          }, 100);
-        }, 600);
+    if (!mounted || isLinked) return;
+    let pendingWakeup = false;
+    try { pendingWakeup = localStorage.getItem('sovereign_pending_wakeup') === '1'; } catch {}
+    if (!pendingWakeup) return;
+
+    console.log('%c[MobileWallet] 🚨 Ultra Recovery Mode Activated', 'color:#ff00ff;font-weight:bold');
+    try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
+    setShowManualReconnectRaw(true);
+    setFallbackStatus('checking');
+
+    const doRecovery = () => {
+      try { reconnect(); } catch {}
+      setTimeout(() => onFocusRecheck(), 400);
+    };
+    doRecovery();
+
+    // pageshow fires when browser restores page from bfcache (critical for deep-link returns)
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        console.log('%c[MobileWallet] Pageshow from bfcache → forcing recovery', 'color:#00ff00');
+        doRecovery();
       }
-    } catch {}
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted]);
+  }, [mounted, isLinked]);
+
+
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
@@ -992,55 +956,38 @@ export function MobileLanding() {
             Verifying your wallet session. This takes a few seconds after returning from your wallet app.
           </p>
         </div>
-        {/* Manual override — lets the user force-check the session */}
+        {/* 
+            [SOVEREIGN:ANDROID_CHROME_FIX] 
+            Amber Recovery Button — appears if session isn't automatically detected.
+            This is the "nuclear" sync button that forces wagmi to re-read its state.
+        */}
+        <motion.div 
+           initial={{ opacity: 0, y: 12 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 2 }}
+           className="w-full max-w-xs mt-4"
+        >
+          <div className="bg-black border border-amber-400 rounded-3xl p-6 text-center shadow-2xl">
+            <p className="text-amber-400 font-black uppercase tracking-widest text-[10px] mb-4">¿Ya aprobaste en tu wallet?</p>
+            <button
+              onClick={forceFullReconnect}
+              className="w-full bg-white text-black py-4 rounded-2xl text-[14px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)]"
+            >
+              Sincronizar conexión ahora
+            </button>
+            <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-widest mt-4">Solución para Android Chrome / iOS bfcache</p>
+          </div>
+        </motion.div>
+
+        {/* Original Manual Reconnect Button as secondary fallback */}
         <motion.button
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 3.5 }}
+          transition={{ delay: 4.5 }}
           disabled={fallbackStatus === 'checking'}
-          onClick={async () => {
-            setFallbackStatus('checking');
-            const checkNow = async (): Promise<string | null> => {
-              if (wagmiAddressRef.current) return wagmiAddressRef.current;
-              if (address) return address;
-              try {
-                for (const cookie of document.cookie.split('; ')) {
-                  const eqIdx = cookie.indexOf('=');
-                  if (eqIdx === -1) continue;
-                  try { const addr = extractAddressFromAppKit(decodeURIComponent(cookie.substring(eqIdx + 1))); if (addr) return addr; } catch {}
-                }
-              } catch {}
-              try {
-                for (const key of Object.keys(localStorage)) {
-                  const raw = localStorage.getItem(key);
-                  if (!raw || raw.length < 42) continue;
-                  const addr = extractAddressFromAppKit(raw);
-                  if (addr) return addr;
-                }
-              } catch {}
-              return null;
-            };
-            const found = await checkNow();
-            if (found) { establishSession(found); setFallbackStatus('idle'); return; }
-            // If not found yet, keep trying for 10s then give up
-            let tries = 0;
-            const retry = setInterval(() => {
-              tries++;
-              void (async () => {
-                const addr = await checkNow();
-                if (addr) { clearInterval(retry); establishSession(addr); setFallbackStatus('idle'); }
-                else if (tries >= 50) {
-                  clearInterval(retry);
-                  setFallbackStatus('failed');
-                  // Reset showManualReconnect so user can try again from scratch
-                  setShowManualReconnect(false);
-                  setTimeout(() => setFallbackStatus('idle'), 2000);
-                }
-              })();
-            }, 200);
-          }}
-          className={`w-full max-w-xs py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 ${
-            fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-[#050505] text-white'
+          onClick={forceFullReconnect}
+          className={`w-full max-w-xs py-4 mt-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 ${
+            fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-white/10 text-white/40 border border-white/5'
           }`}
         >
           {fallbackStatus === 'checking' ? (
@@ -1048,7 +995,7 @@ export function MobileLanding() {
           ) : fallbackStatus === 'failed' ? (
             <><AlertCircle size={16} className="text-white" />Session not detected — Go back</>
           ) : (
-            <><RefreshCw size={16} />Already connected · Continue</>
+            <><RefreshCw size={16} />Retry Polling</>
           )}
         </motion.button>
       </div>

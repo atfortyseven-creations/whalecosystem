@@ -4,7 +4,7 @@ import { useTheme } from "next-themes";
 import { CreateConnectorFn, WagmiProvider } from 'wagmi';
 import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism } from "@reown/appkit/networks";
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { cookieToInitialState } from 'wagmi'
+import { cookieToInitialState, createStorage, cookieStorage } from 'wagmi'
 import { createAppKit } from '@reown/appkit/react'
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -74,12 +74,11 @@ import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors'
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [dedicatedMainnet, dedicatedBsc, polygon, dedicatedBase, arbitrum, optimism, worldchain];
 
 export const wagmiAdapter = new WagmiAdapter({
-    // ssr:true enables cookie-based session persistence.
-    // WagmiAdapter internally uses cookieStorage when ssr:true, writing the wagmi
-    // state to an HTTP cookie so it is available synchronously on the first server
-    // render — eliminating the 1-3s IndexedDB reconnect window during which all
-    // session guards (MobileLanding, TitaniumGate) incorrectly see the user as disconnected.
     ssr: true,
+    // Explicit cookieStorage: guarantees wagmi state is available synchronously
+    // on SSR and survives Android Chrome tab destruction after deep-link redirects.
+    // Per Reown official docs (2025-2026), this must be set explicitly alongside ssr:true.
+    storage: createStorage({ storage: cookieStorage }),
     projectId,
     networks,
 })
@@ -96,21 +95,17 @@ const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https:
 
 const metadata = {
     name: 'Whale Alert Network',
-    description: 'Sovereign Institutional Intelligence',
-    url: APP_URL,
-    // Empty icons array: prevents WalletConnect relay from fetching a potentially
-    // slow/blocked icon URL during the mobile handshake (root cause of Rainbow
-    // "Connection failed" error). AppKit renders a native gradient avatar instead.
-    icons: [],
-    // ── Mobile deeplink return URL ──────────────────────────────────────────────
-    // After the user approves the connection in MetaMask/Rainbow, the wallet app
-    // calls this URL to return the user to the browser. It MUST point to the root
-    // (or /connect) where the wagmi session is read and the cookie is written.
-    // WRONG: '/connect' → user sees the login page again even after connecting.
-    // CORRECT: root URL → SmartLandingRouter reads the wagmi session → shows app.
+    description: 'Humanity Ledger — Sovereign Institutional Intelligence',
+    // CRITICAL: Must be hardcoded without trailing slash AND must match the domain
+    // registered in WalletConnect/Reown Cloud. Using window.location.origin was
+    // causing mismatches when users landed on subpaths (/sync, /connect, etc.).
+    url: 'https://humanidfi.com',
+    // Real icon URL (min 512x512) — empty array caused Rainbow "Connection failed"
+    // on some relay nodes. A valid icon prevents relay timeout on mobile handshake.
+    icons: ['https://humanidfi.com/icon.png'],
     redirect: {
         native: '',
-        universal: APP_URL,  // Same origin as metadata.url — WalletConnect validates domain match
+        universal: 'https://humanidfi.com',
     },
 }
 
