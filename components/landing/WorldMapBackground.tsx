@@ -18,9 +18,28 @@ export function WorldMapBackground() {
 
     const init = async () => {
       try {
-        // Fetch low-res GeoJSON for the world map
-        const res = await fetch("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson");
-        const geojson = await res.json();
+        // Use multiple reliable CDNs for the GeoJSON map data to prevent blocking by firewalls/adblockers
+        const mapUrls = [
+          "https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/DATA/world.geojson",
+          "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+        ];
+        
+        let geojson = null;
+        for (const url of mapUrls) {
+          try {
+            const res = await fetch(url);
+            if (res.ok) {
+              geojson = await res.json();
+              break;
+            }
+          } catch (err) {
+            console.warn(`Failed to fetch map from ${url}, trying next...`);
+          }
+        }
+        
+        if (!geojson) {
+          throw new Error("All map data sources failed.");
+        }
         
         if (isUnmounted) return;
 

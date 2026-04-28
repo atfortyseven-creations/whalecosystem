@@ -31,23 +31,28 @@ const APPKIT_STORAGE_KEYS = [
   'wagmi',
 ];
 
-// Extracts the user's wallet address from AppKit's nested localStorage structure.
-// The address lives at: sessions[0].namespaces.eip155.accounts[0] = "eip155:1:0x..."
 function extractAddressFromAppKit(value: string): string | null {
   try {
     const parsed = JSON.parse(value);
-    // Official Reown AppKit v1 session path
-    const accounts = parsed?.sessions?.[0]?.namespaces?.eip155?.accounts;
-    if (accounts?.[0]) {
-      const addr = accounts[0].split(':')[2];
+    
+    // 1. Check wagmi v2 state
+    const accounts = parsed?.state?.connections?.value?.[0]?.[1]?.accounts;
+    if (accounts && accounts[0]) {
+      return accounts[0];
+    }
+    
+    // 2. Official Reown AppKit v1 session path
+    const w3mAccounts = parsed?.sessions?.[0]?.namespaces?.eip155?.accounts;
+    if (w3mAccounts?.[0]) {
+      const addr = w3mAccounts[0].split(':')[2];
       if (addr?.match(/^0x[a-fA-F0-9]{40}$/i)) return addr;
     }
   } catch { 
     // Ignore JSON parse errors, proceed to fallback
   }
 
-  // Generic fallback — last resort
-  const match = value.match(/0x[a-fA-F0-9]{40}/i);
+  // 3. Robust generic fallback — exactly 40 hex chars, NOT followed by more hex chars
+  const match = value.match(/0x[a-fA-F0-9]{40}(?![a-fA-F0-9])/i);
   return match ? match[0] : null;
 }
 
@@ -1036,12 +1041,17 @@ export function MobileLanding() {
   // This means after signing we never need wagmi to reconnect to show the
   // ConnectedScreen. Works even if WalletConnect session drops after signing.
   if (isLinked && effectiveAddress) {
-    if (typeof window !== 'undefined') {
-      window.location.href = '/dashboard';
-    }
     return (
-      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-[#050505]/30" />
+      <div className="w-full min-h-screen bg-[#FAF9F6]">
+        <ConnectedScreen 
+           address={effectiveAddress} 
+           onScan={() => setShowScanner(true)} 
+           showScanner={showScanner} 
+           onCloseScanner={() => setShowScanner(false)} 
+           connectorName={connector?.name}
+           chainId={chainId}
+           onDisconnect={handleDisconnect}
+        />
       </div>
     );
   }

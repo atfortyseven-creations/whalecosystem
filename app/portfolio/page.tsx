@@ -49,7 +49,8 @@ function formatUSD(val: number) {
   return `$${safeToLocaleString(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function formatAddr(addr: string) {
+function formatAddr(addr: string | null | undefined) {
+  if (!addr || typeof addr !== 'string') return "—";
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
@@ -71,7 +72,7 @@ function AssetRow({ asset, idx, hidden }: { asset: any; idx: number; hidden: boo
         className="w-11 h-11 rounded-xl flex items-center justify-center font-black text-[11px] shrink-0 border"
         style={{ background: `${chainColor}14`, borderColor: `${chainColor}25`, color: chainColor }}
       >
-        {asset.symbol?.slice(0, 3) ?? "?"}
+        {typeof asset.symbol === 'string' ? asset.symbol.slice(0, 3) : "?"}
       </div>
 
       {/* Name + network */}
