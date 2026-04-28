@@ -68,7 +68,7 @@ export class EntityGraphMiner {
         const nodes: GraphNode[] = entities.map(e => ({
             id: e.address,
             group: e.category === 'MEV Bot' ? 1 : e.category === 'Institutional' ? 2 : 3,
-            label: e.label,
+            label: e.label || '',
             size: Math.max(1, (e.totalVolumeUSD || 0) / 1_000_000)
         }));
 

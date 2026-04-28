@@ -29,7 +29,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
 
     // Pre-compute isPublicPage synchronously so we can use it as the initial state.
     // This prevents the loader flash on /connect after disconnect.
-    const initialIsPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/forum'].some(
+    const initialIsPublicPage = ['/', '/connect', '/docs', '/terms', '/privacy', '/developers', '/forum'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -49,7 +49,7 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
     }, []);
     
     // Strict Whitelist: ONLY connect, docs, terms, privacy, and developers are visible to unauthenticated users.
-    const isPublicPage = ['/connect', '/docs', '/terms', '/privacy', '/developers', '/forum'].some(
+    const isPublicPage = ['/', '/connect', '/docs', '/terms', '/privacy', '/developers', '/forum'].some(
         path => path === pathname || (path !== '/' && pathname?.startsWith(path))
     );
 
@@ -74,6 +74,14 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // Failsafe: if we are in the middle of connecting/reconnecting, WAIT.
             // This prevents aggressive redirects while the wallet modal is open.
             if (isConnecting || isReconnecting) return;
+
+            // If mobile is in ultra recovery mode, WAIT for it to finish!
+            // We MUST set state to APP so that MobileLanding mounts and runs its recovery loop!
+            const isPendingWakeup = typeof localStorage !== 'undefined' && localStorage.getItem('sovereign_pending_wakeup') === '1';
+            if (isPendingWakeup) {
+                setState('APP');
+                return;
+            }
 
             // Priority 1: Wagmi is connected
             if (isConnected) {

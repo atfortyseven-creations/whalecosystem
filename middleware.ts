@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runWAF } from './lib/security/waf-engine';
 import type { JWTPayload } from 'jose';
 import { checkRateLimit, resolveTier } from './lib/security/rate-limiter';
-import { appendAuditEntry } from './lib/audit/audit-trail';
+// Removed: import { appendAuditEntry } from './lib/audit/audit-trail';
 
 // [SAFE-ENUM] Defined locally to avoid pulling in @prisma/client in Edge Runtime
 enum PlanTier {
@@ -17,6 +17,15 @@ enum PlanTier {
 // Scoped to each Edge container instance; sufficient for single-instance deployments.
 // [SECURITY FIX]: Switched from Set + setTimeout (Memory Leak in Edge) to Map + Lazy Eviction
 const replayMap = new Map<string, number>(); // <nonce, expirationTimestamp>
+
+function logAuditSafe(req: NextRequest, action: string, actor: string, ip: string, metadata: any) {
+  const url = new URL('/api/internal/audit', req.url);
+  fetch(url.toString(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-internal-audit': 'true' },
+    body: JSON.stringify({ action, actor, ip, metadata }),
+  }).catch(() => {});
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Route Matchers (Inline — replaces clerkMiddleware createRouteMatcher)
@@ -118,7 +127,7 @@ export default async function middleware(request: NextRequest) {
     // 1. HONEYPOT TRAP — Instant Block
     if (matchesPattern(pathname, HONEYPOT_PATTERNS)) {
       console.warn(`[WhaleFortress] 🚨 Honeypot hit by IP: ${ip} on route: ${pathname}`);
-      appendAuditEntry('SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname }).catch(() => {});
+      logAuditSafe(request, 'SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname });
       return new NextResponse(null, { status: 404 });
     }
 
@@ -132,7 +141,7 @@ export default async function middleware(request: NextRequest) {
         if (!limitCheck.success) {
           console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
           // Fire-and-forget audit entry — do not await to avoid adding latency
-          appendAuditEntry('SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname }).catch(() => {});
+          logAuditSafe(request, 'SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname });
           return new NextResponse(
             JSON.stringify({ error: 'SYSTEM_BUSY', message: 'Rate limit exceeded. Retry in 10s.' }),
             { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '10' } }
@@ -225,7 +234,7 @@ export default async function middleware(request: NextRequest) {
 
     if (matchesPattern(pathname, PROTECTED_PATTERNS)) {
       if (!isAuthenticated) {
-        appendAuditEntry('AUTH_FAILURE', 'anonymous', ip, { path: pathname, reason: 'NO_VALID_SESSION' }).catch(() => {});
+        logAuditSafe(request, 'AUTH_FAILURE', 'anonymous', ip, { path: pathname, reason: 'NO_VALID_SESSION' });
         if (
           pathname.startsWith('/desarrollador') ||
           pathname.startsWith('/trade') ||
