@@ -176,13 +176,34 @@ const RIGHT_SIDEBAR_CONTENT = [
 export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void }) {
   
   return (
-    <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-hidden">
-      <WorldMapBackground />
+    <div className="relative min-h-screen bg-[#FDFCF8] text-[#050505] selection:bg-black selection:text-[#FDFCF8] font-sans antialiased overflow-x-hidden">
+      
+      {/* ── Top Map & Intelligence Section ── */}
+      <section className="w-full flex flex-col items-center pb-12 pt-8 bg-[#FDFCF8] border-b border-black/10">
+        <div className="w-full max-w-7xl mx-auto flex flex-col items-center">
+          
+          <div className="mb-6 flex flex-col items-center text-center px-4">
+             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/[0.03] border border-black/5 mb-3">
+               <div className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+               <span className="text-[9px] font-black uppercase tracking-[0.25em] text-black/60">Live Intelligence</span>
+             </div>
+             <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black">
+               Global Inter-Node Capital Flow
+             </h2>
+          </div>
 
-      {/* ── BTC Transfer Legend — rendered as HTML below the canvas map ── */}
-      <div className="relative z-10 pt-6 pb-2">
-        <BtcTransferLegend />
-      </div>
+          {/* Map Container */}
+          <div className="relative w-full h-[35vh] sm:h-[45vh] lg:h-[55vh] max-h-[600px] min-h-[300px] overflow-hidden rounded-3xl border border-black/10 bg-[#f8f7f2] shadow-sm mb-6 flex items-center justify-center">
+             <WorldMapBackground />
+          </div>
+
+          {/* Legend directly underneath */}
+          <div className="w-full">
+            <BtcTransferLegend />
+          </div>
+
+        </div>
+      </section>
 
       <div className={`relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 ${onOpenScanner ? 'pb-32' : 'pb-16'}`}>
         
@@ -306,18 +327,18 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
 
       {/* Floating Scanner Panel - Always visible on mobile when onOpenScanner is provided */}
       {onOpenScanner && (
-        <div className="fixed bottom-0 left-0 w-full flex flex-col pointer-events-none z-[200]">
+        <div className="fixed bottom-0 left-0 w-full flex flex-col z-[200]">
            <div className="h-12 bg-gradient-to-t from-[#FDFCF8] via-[#FDFCF8]/90 to-transparent w-full pointer-events-none" />
-           {/* Full dock bar — pointer-events-auto so taps reach the button */}
-           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-3 pointer-events-auto" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+           {/* Full dock bar */}
+           <div className="w-full bg-[#FDFCF8] border-t border-black/10 flex justify-center py-3" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
              <button
                type="button"
                onClick={onOpenScanner}
-               className="px-10 py-3.5 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-3 rounded-none select-none touch-manipulation"
-               style={{ WebkitTapHighlightColor: 'transparent', cursor: 'pointer' }}
+               className="px-10 py-3.5 bg-black text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-3 rounded-none select-none touch-manipulation cursor-pointer"
+               style={{ WebkitTapHighlightColor: 'transparent' }}
              >
                <Scan size={13} />
-               Session Log &amp; Scan
+               Connect Wallet
              </button>
            </div>
         </div>

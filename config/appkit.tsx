@@ -78,7 +78,8 @@ export const wagmiAdapter = new WagmiAdapter({
     // Explicit cookieStorage: guarantees wagmi state is available synchronously
     // on SSR and survives Android Chrome tab destruction after deep-link redirects.
     // Per Reown official docs (2025-2026), this must be set explicitly alongside ssr:true.
-    storage: createStorage({ storage: cookieStorage }),
+    // @ts-ignore: Wagmi v2 type mismatch between AppKit and Wagmi core
+    storage: createStorage({ storage: cookieStorage as any }),
     projectId,
     networks,
 })

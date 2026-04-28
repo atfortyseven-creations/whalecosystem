@@ -62,8 +62,8 @@ export function WorldMapBackground() {
         let projection: d3.GeoProjection;
 
         const buildMap = () => {
-          const W = window.innerWidth;
-          const H = window.innerHeight;
+          const W = canvas.parentElement?.clientWidth || window.innerWidth;
+          const H = canvas.parentElement?.clientHeight || window.innerHeight;
           canvas.width  = W;
           canvas.height = H;
 
@@ -270,8 +270,8 @@ export function WorldMapBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 z-0 pointer-events-none"
-      style={{ opacity: 0.55 }}
+      className="relative w-full h-full z-0 pointer-events-none"
+      style={{ opacity: 0.8 }}
     />
   );
 }
