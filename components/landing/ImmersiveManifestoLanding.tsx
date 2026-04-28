@@ -3,7 +3,7 @@
 import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
 import { Scan } from "lucide-react";
-import { WorldMapBackground } from "./WorldMapBackground";
+import { WorldMapBackground, BtcTransferLegend } from "./WorldMapBackground";
 
 // Pre-defined list of lottie files matching the narrative sections.
 // This preserves the "zero build-time bloat" since these are just string paths
@@ -178,6 +178,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
   return (
     <div className="min-h-[100dvh] bg-[#FDFCF8] text-[#1a1a1a] selection:bg-black selection:text-white font-sans w-full relative overflow-hidden">
       <WorldMapBackground />
+
+      {/* ── BTC Transfer Legend — rendered as HTML below the canvas map ── */}
+      <div className="relative z-10 pt-6 pb-2">
+        <BtcTransferLegend />
+      </div>
 
       <div className={`relative z-10 w-full max-w-[1750px] mx-auto px-5 sm:px-8 flex justify-center gap-12 xl:gap-24 ${onOpenScanner ? 'pb-32' : 'pb-16'}`}>
         
