@@ -18,12 +18,14 @@ export function WorldMapBackground() {
 
     const init = async () => {
       try {
-        // Use multiple reliable CDNs for the GeoJSON map data to prevent blocking by firewalls/adblockers
+        // Priority 1: Local server-side proxy (no CSP issues, cached 24h)
+        // Priority 2: CDN fallbacks (in case server proxy fails)
         const mapUrls = [
+          "/api/world-map",
           "https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/DATA/world.geojson",
-          "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+          "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
         ];
-        
+
         let geojson = null;
         for (const url of mapUrls) {
           try {
@@ -32,16 +34,18 @@ export function WorldMapBackground() {
               geojson = await res.json();
               break;
             }
-          } catch (err) {
-            console.warn(`Failed to fetch map from ${url}, trying next...`);
+          } catch {
+            // Try next source
           }
         }
-        
+
         if (!geojson) {
-          throw new Error("All map data sources failed.");
+          console.warn("[WorldMap] All map sources failed — map will not render.");
+          return;
         }
-        
+
         if (isUnmounted) return;
+
 
         let dots: { x: number; y: number; r: number; phase: number; baseAlpha: number; speed: number; originalR: number }[] = [];
         let time = 0;
@@ -180,7 +184,7 @@ export function WorldMapBackground() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 z-0 pointer-events-none"
-      style={{ opacity: 0.85, mixBlendMode: 'multiply' }}
+      style={{ opacity: 0.18 }}
     />
   );
 }

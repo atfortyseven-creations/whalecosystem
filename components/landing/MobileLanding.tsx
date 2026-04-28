@@ -660,10 +660,9 @@ export function MobileLanding() {
   // Prefer linkedAddress (set in performLink) → wagmi address → cookie fallback
   const effectiveAddress = linkedAddress || address || cookieAddress || undefined;
 
-  // After wallet connection the user lands directly on the ImmersiveManifestoLanding.
-  // This matches the requested behavior for mobile flow.
-  const [showingManifesto, setShowingManifesto] = useState(true);
-  const [showConnectOverlay, setShowConnectOverlay] = useState(false);
+  // Start with connect overlay visible — like Scroll.io, users see wallet buttons immediately
+  // The ImmersiveManifesto is moved to a secondary "Learn More" link below the buttons.
+  const [showConnectOverlay, setShowConnectOverlay] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
   // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
@@ -1067,12 +1066,8 @@ export function MobileLanding() {
     );
   }
 
-  // ── Render: Default — Not connected ──────────────────────────────────────────
-  // CRITICAL: This block must be AFTER the isLinked guard above (line ~979).
-  // The wake-sync engine can set isLinked=true at any time even when
-  // showConnectOverlay is false (e.g. after a full page reload caused by the
-  // Chrome tab being killed when the user went to their wallet app).
-  // Without this early-return order, the ConnectedScreen is never shown.
+  // ── Render: Default — Not connected — DIRECT connect panel (no manifesto detour) ──
+  // CRITICAL: This block must be AFTER all isLinked guards above.
   if (!showConnectOverlay) {
     return (
       <div className="w-full min-h-screen bg-[#FDFCF8] relative">
@@ -1096,15 +1091,15 @@ export function MobileLanding() {
             </div>
             <span className="text-[11px] font-black uppercase tracking-tight text-[#050505]">Whale Alert Network</span>
           </div>
-          <button 
+          <button
             onClick={() => setShowConnectOverlay(true)}
-            className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/60 hover:text-black hover:bg-black/5 transition-colors"
+            className="px-4 py-2 rounded-full bg-[#050505] text-white text-[9px] font-black uppercase tracking-widest shadow-lg hover:bg-black/80 active:scale-95 transition-all"
           >
-            Not Connected
+            Connect Wallet
           </button>
         </motion.header>
 
-        <ImmersiveManifestoLanding />
+        <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} />
       </div>
     );
   }
@@ -1154,7 +1149,7 @@ export function MobileLanding() {
           onClick={() => setShowConnectOverlay(false)}
           className="px-3 py-1.5 rounded-full border border-black/10 text-[9px] font-black uppercase tracking-widest text-black/60 hover:bg-black/5 transition-colors"
         >
-          Cancel
+          Explorar
         </button>
       </motion.header>
 

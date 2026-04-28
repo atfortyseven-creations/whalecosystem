@@ -124,6 +124,9 @@ export default function WhaleDashboard() {
 
     const renderTabContent = () => {
         switch (activeTab) {
+            case 'market-data':
+                return <><PanelHeader icon={Globe} title="Market Overview" description="Real-time global crypto market data — prices, volume, dominance and key metrics from top assets across all major chains." accent="#0052FF" /><div className="flex flex-col gap-6 h-auto shrink-0"><DashboardErrorBoundary key="market-gainers"><GainersLosersPanel /></DashboardErrorBoundary><DashboardErrorBoundary key="market-news"><NewsOfToday /></DashboardErrorBoundary></div></>;
+
             case 'dashboard':
             case 'watchlist':
             case 'firehose':
@@ -192,7 +195,8 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={MessageSquare} title="Support" description="Contact the team directly, report a problem, or ask a question. We respond as quickly as possible to every request." accent="#050505" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key="support"><WhaleSupport /></DashboardErrorBoundary></div></>;
 
             default:
-                return null;
+                // Fallback: news panel so users never see a blank screen
+                return <><PanelHeader icon={Newspaper} title="News" description="The latest news and market analysis curated from key sources in crypto and global finance." accent="#050505" /><div className="h-[750px] shrink-0"><DashboardErrorBoundary key="news-default"><NewsOfToday /></DashboardErrorBoundary></div></>;
         }
     };
 
