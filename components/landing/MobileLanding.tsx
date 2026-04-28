@@ -796,10 +796,12 @@ export function MobileLanding() {
           }
         }
       } catch {}
-      // Hard 30s timeout (increased from 15s for slow mobile networks/relays)
       if (attempts >= 600) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         setFallbackStatus('failed');
+        // CRITICAL FIX: Do not leave the user stuck on the Reconnecting screen if it fails.
+        setShowManualReconnectRaw(false);
+        try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
       }
     }, 50);
   }, [isLinked, establishSession]);

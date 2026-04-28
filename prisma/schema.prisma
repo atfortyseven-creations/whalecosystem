@@ -698,6 +698,34 @@ model AuditLog {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// SOVEREIGN CRYPTOGRAPHIC AUDIT TRAIL
+// Immutable HMAC-SHA256 chained event log for ENISA / eIDAS 2.0 compliance.
+// Each entry's HMAC includes the previous entry's payloadHash (hash chain).
+// Any deletion or modification of entries is cryptographically detectable.
+// This table must have INSERT-ONLY permissions at the DB role level.
+// Verification: lib/audit/audit-trail.ts → verifyAuditTrailIntegrity()
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SovereignAuditLog {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  // Event classification
+  event       String   // AuditEventType — see lib/audit/audit-trail.ts
+  actor       String   // Wallet address (0x...) or system identifier
+  ip          String
+  metadata    String   @db.Text // JSON-serialized, included in payloadHash
+  // Cryptographic chain fields
+  payloadHash String   @unique // SHA-256(timestamp+event+actor+ip+metadata)
+  hmacSig     String   // HMAC-SHA256(payloadHash:prevHash, AUDIT_SECRET)
+  prevHash    String   // payloadHash of the previous entry, or 'GENESIS'
+
+  @@index([event, createdAt(sort: Desc)])
+  @@index([actor, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("sovereign_audit_log")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // STRIPE PURCHASE INTENT (anti-chargeback evidence)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1004,4 +1032,29 @@ model ForumTelemetry {
 
   @@index([action, createdAt(sort: Desc)])
   @@index([userId, createdAt(sort: Desc)])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHASE 3: PRODUCT VALIDATION & TELEMETRY (GDPR COMPLIANT)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model BetaTelemetry {
+  id              String   @id @default(uuid())
+  metricType      String   // e.g., 'HANDSHAKE_LATENCY', 'WHALE_DETECTION_LATENCY', 'WS_UPTIME'
+  value           Float    // Numeric value of the metric (e.g., milliseconds or percentage)
+  p95             Float?   // Pre-calculated P95 for aggregated flushes
+  sampleSize      Int      // Number of events aggregated in this record
+  timestamp       DateTime @default(now())
+  environment     String   @default("production") // e.g., 'staging', 'production'
+  
+  @@index([metricType, timestamp])
+}
+
+model NPSSurvey {
+  id              String   @id @default(uuid())
+  walletAddress   String   @unique // The address of the beta tester. One survey per wallet.
+  score           Int      // 0-10 NPS score
+  feedback        String?  @db.Text
+  signature       String   // EIP-191 signature of the score and feedback (preventing forgery)
+  timestamp       DateTime @default(now())
 }

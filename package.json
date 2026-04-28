@@ -22,6 +22,12 @@
     "start:solana": "npx tsx scripts/solana-worker.ts",
     "start:mesh": "npx tsx scripts/sovereign-mesh.ts",
     "start:all": "npx prisma db push --accept-data-loss && pm2-runtime start ecosystem.config.json",
+    "test": "vitest watch",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:crypto": "vitest run test/unit/crypto",
+    "test:audit": "vitest run test/unit/audit",
+    "test:resilience": "vitest run test/unit/resilience",
     "lint": "next lint",
     "audit": "slither . --print human-summary",
     "audit:prepare": "slither . --print human-summary --exclude-dependencies --solc-remaps \"@openzeppelin=node_modules/@openzeppelin\"",
@@ -240,6 +246,8 @@
   "devDependencies": {
     "@types/react-window": "^1.8.8",
     "@types/ws": "^8.18.1",
-    "concurrently": "^9.2.1"
+    "@vitest/coverage-v8": "^2.1.0",
+    "concurrently": "^9.2.1",
+    "vitest": "^2.1.0"
   }
 }

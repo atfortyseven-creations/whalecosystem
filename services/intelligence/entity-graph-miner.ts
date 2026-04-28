@@ -1,15 +1,41 @@
 import { prisma } from '@/lib/prisma';
 import neo4j from 'neo4j-driver';
-import crypto from 'crypto';
 
 /**
  * Entity Graph Miner
- * 
- * Maps flat WhaleActivity traces into a complex 3-degree Entity connection neural graph.
- * Uses Prisma as source of truth and optionally syncs with neo4j if available in environment.
- * For this environment, we output a deterministic JSON structure mapped precisely 
- * over the database entries to be consumed by the frontend D3 visualizer.
+ *
+ * Maps real WhaleActivity traces into an Entity connection graph for the D3 visualizer.
+ * Uses Prisma (PostgreSQL) as the primary source of truth for wallet nodes.
+ * Syncs with Neo4j when available for real relationship data.
+ *
+ * ZERO-SIMULATION MANDATE: This module NEVER fabricates graph links.
+ * If no real relationship data is available (Neo4j offline, no on-chain data yet),
+ * the graph is returned with an empty links array and a status flag.
+ * The UI layer is responsible for displaying an appropriate empty state.
  */
+
+export type GraphStatus = 'LIVE_NEO4J' | 'MEMORY_MATRIX_ACTIVE' | 'NO_DATA';
+
+export interface GraphResult {
+  nodes: GraphNode[];
+  links: GraphLink[];
+  status: GraphStatus;
+  nodeCount: number;
+  linkCount: number;
+}
+
+export interface GraphNode {
+  id: string;
+  group: number;
+  label: string;
+  size: number;
+}
+
+export interface GraphLink {
+  source: string;
+  target: string;
+  value: number;
+}
 
 export class EntityGraphMiner {
     private driver: any | null = null;
@@ -27,112 +53,119 @@ export class EntityGraphMiner {
         }
     }
 
-    public async mineLocalNetworkGraph() {
-        // Fetch known whales from postgres
+    /**
+     * Memory Matrix Mode (PostgreSQL-only fallback).
+     * Returns REAL wallet nodes from the database.
+     * Links are EMPTY — we never fabricate topology.
+     * The frontend renders nodes as isolated points until Neo4j provides real edges.
+     */
+    public async mineLocalNetworkGraph(): Promise<GraphResult> {
         const entities = await prisma.onChainEntity.findMany({
             take: 30,
             orderBy: { updatedAt: 'desc' }
         });
 
-        // Construct D3 Force-Directed Graph data
-        const nodes: any[] = [];
-        const links: any[] = [];
+        const nodes: GraphNode[] = entities.map(e => ({
+            id: e.address,
+            group: e.category === 'MEV Bot' ? 1 : e.category === 'Institutional' ? 2 : 3,
+            label: e.label,
+            size: Math.max(1, (e.totalVolumeUSD || 0) / 1_000_000)
+        }));
 
-        entities.forEach(e => {
-            nodes.push({
-                id: e.address,
-                group: e.category === 'MEV Bot' ? 1 : e.category === 'Institutional' ? 2 : 3,
-                label: e.label,
-                size: (e.totalVolumeUSD || 100000) / 1000000 // Bubble size ratio
-            });
-        });
-
-        // Simulate triangulations cryptographically deterministically
-        for(let i=0; i<nodes.length; i++) {
-            const seed = parseInt(nodes[i].id.slice(2, 6), 16);
-            const connectionCount = (seed % 4) + 1;
-            
-            for(let c=0; c<connectionCount; c++) {
-                const targetIdx = (i + c + (seed % 5)) % nodes.length;
-                if(i !== targetIdx) {
-                    links.push({
-                        source: nodes[i].id,
-                        target: nodes[targetIdx].id,
-                        value: (seed % 10) + 1 // Flow weight
-                    });
-                }
-            }
-        }
-
-        return { nodes, links };
+        // ZERO-SIMULATION MANDATE: No fabricated links.
+        // Links are only populated from real on-chain data via Neo4j (mineRealNetworkGraph).
+        return {
+            nodes,
+            links: [],
+            status: 'MEMORY_MATRIX_ACTIVE' as GraphStatus,
+            nodeCount: nodes.length,
+            linkCount: 0,
+        };
     }
 
-    public async mineRealNetworkGraph() {
-        if (!this.driver) throw new Error("Neo4j driver not initialized.");
+    public async mineRealNetworkGraph(): Promise<GraphResult> {
+        if (!this.driver) throw new Error('Neo4j driver not initialized.');
         const session = this.driver.session();
         try {
-            // Cypher query to pull top 50 entities and their direct relationships
             const query = `
                 MATCH (e:Entity)
                 OPTIONAL MATCH (e)-[r:TRANSFERRED]->(t:Entity)
                 WITH e, r, t
                 ORDER BY e.volumeUSD DESC
                 LIMIT 50
-                RETURN 
-                    collect(DISTINCT e) as nodes,
-                    collect(DISTINCT {source: e.address, target: t.address, value: r.amountUSD}) as links
+                RETURN
+                    collect(DISTINCT e) AS nodes,
+                    collect(DISTINCT {source: e.address, target: t.address, value: r.amountUSD}) AS links
             `;
             const result = await session.run(query);
+            if (!result.records.length) {
+                return { nodes: [], links: [], status: 'NO_DATA', nodeCount: 0, linkCount: 0 };
+            }
             const record = result.records[0];
-            
-            const rawNodes = record.get('nodes');
-            const rawLinks = record.get('links');
+            const rawNodes: any[] = record.get('nodes') ?? [];
+            const rawLinks: any[] = record.get('links') ?? [];
 
-            const nodes = rawNodes.map((n: any) => ({
+            const nodes: GraphNode[] = rawNodes.map((n: any) => ({
                 id: n.properties.address,
                 group: n.properties.category === 'MEV Bot' ? 1 : n.properties.category === 'Institutional' ? 2 : 3,
-                label: n.properties.label,
-                size: (n.properties.volumeUSD || 100000) / 1000000
+                label: n.properties.label ?? n.properties.address.slice(0, 8),
+                size: Math.max(1, (n.properties.volumeUSD || 0) / 1_000_000)
             }));
 
-            // Filter out null links (where t was null)
-            const links = rawLinks.filter((l: any) => l.target).map((l: any) => ({
-                source: l.source,
-                target: l.target,
-                value: Math.max(1, (l.value || 0) / 100000) // normalize flow weight
-            }));
+            // Only include links where both source and target are non-null real addresses
+            const links: GraphLink[] = rawLinks
+                .filter((l: any) => l.source && l.target)
+                .map((l: any) => ({
+                    source: l.source,
+                    target: l.target,
+                    value: Math.max(1, (l.value || 0) / 100_000)
+                }));
 
-            return { nodes, links };
+            return {
+                nodes,
+                links,
+                status: 'LIVE_NEO4J' as GraphStatus,
+                nodeCount: nodes.length,
+                linkCount: links.length,
+            };
         } finally {
             await session.close();
         }
     }
 
-    public async execute() {
+    public async execute(): Promise<GraphResult> {
         console.log('[GRAPH-MINER] Extrapolating wallet network vertices...');
-        let graph;
-        
+
         if (this.driver) {
             try {
                 console.log('[GRAPH-MINER] Querying Neo4j Multi-Dimensional Index...');
-                graph = await this.mineRealNetworkGraph();
+                const graph = await this.mineRealNetworkGraph();
+                console.log(`[GRAPH-MINER] LIVE Neo4j: ${graph.nodeCount} nodes, ${graph.linkCount} real relationships.`);
+                return graph;
             } catch (err: any) {
-                console.warn(`[GRAPH-MINER] Neo4j query failed (${err.message}). Falling back to Memory Matrix Mode...`);
-                graph = await this.mineLocalNetworkGraph();
+                console.warn(`[GRAPH-MINER] Neo4j unavailable (${err.message}). Activating Memory Matrix Mode (nodes only, zero fabrication).`);
+                const graph = await this.mineLocalNetworkGraph();
+                console.log(`[GRAPH-MINER] MEMORY_MATRIX: ${graph.nodeCount} nodes, 0 links (Zero-Simulation Mandate enforced).`);
+                return graph;
             }
         } else {
-            graph = await this.mineLocalNetworkGraph();
+            console.log('[GRAPH-MINER] No Neo4j driver. Memory Matrix Mode (nodes only).');
+            const graph = await this.mineLocalNetworkGraph();
+            console.log(`[GRAPH-MINER] MEMORY_MATRIX: ${graph.nodeCount} nodes, 0 links (Zero-Simulation Mandate enforced).`);
+            return graph;
         }
-        
-        console.log(`[GRAPH-MINER] Generated matrix with ${graph.nodes.length} nodes and ${graph.links.length} relationships.`);
-        return graph;
     }
 }
 
 export const graphMiner = new EntityGraphMiner();
 
-if (require.main === module) {
-    graphMiner.execute().then(async () => {
+// ESM-compatible entry point guard
+const isMain = typeof process !== 'undefined' &&
+    (process.argv[1]?.includes('entity-graph-miner') ?? false);
+
+if (isMain) {
+    graphMiner.execute().then(async (result) => {
+        console.log(`[GRAPH-MINER] Final status: ${result.status} | Nodes: ${result.nodeCount} | Links: ${result.linkCount}`);
         await prisma.$disconnect();
         process.exit(0);
     });

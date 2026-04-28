@@ -104,8 +104,17 @@ const metadata = {
     // on some relay nodes. A valid icon prevents relay timeout on mobile handshake.
     icons: ['https://humanidfi.com/icon.png'],
     redirect: {
-        native: '',
-        universal: 'https://humanidfi.com',
+        native: (function() {
+            if (typeof window === 'undefined') return '';
+            const ua = navigator.userAgent;
+            // iOS Chrome specifically hijacks universal links to Safari. 
+            // We use the googlechromes:// scheme to force the return to Chrome.
+            if (/CriOS/i.test(ua)) {
+                return window.location.href.replace(/^https/, 'googlechromes').replace(/^http/, 'googlechrome');
+            }
+            return '';
+        })(),
+        universal: typeof window !== 'undefined' ? window.location.href : 'https://humanidfi.com',
     },
 }
 

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runWAF } from './lib/security/waf-engine';
+import type { JWTPayload } from 'jose';
+import { checkRateLimit, resolveTier } from './lib/security/rate-limiter';
+import { appendAuditEntry } from './lib/audit/audit-trail';
 
 // [SAFE-ENUM] Defined locally to avoid pulling in @prisma/client in Edge Runtime
 enum PlanTier {
@@ -10,45 +13,10 @@ enum PlanTier {
   ELITE = 'ELITE',
 }
 
-// Memory-based Edge Rate Limiter & Replay Attack Cache
-// At 400M users, this prevents individual container CPU asphyxiation
-const rateLimitMap = new Map<string, { count: number; expiresAt: number }>();
-const replayMap = new Set<string>(); // Tracks used nonces/signatures for 60s
-
-function checkEdgeRateLimit(ip: string, tier: PlanTier): { success: boolean, maxReqs: number } {
-  // Free accounts: 100 requests per 10s. Pro/Elite: 300 requests per 10s.
-  const maxReqs = tier === PlanTier.PRO || tier === PlanTier.ELITE ? 300 : 100;
-  const now = Date.now();
-  const windowMs = 10000; // 10 seconds
-
-  // OOM Protection for massive 100M+ scale botnets
-  if (rateLimitMap.size > 50000) {
-    rateLimitMap.clear();
-  }
-
-  const record = rateLimitMap.get(ip);
-  if (!record || now > record.expiresAt) {
-    rateLimitMap.set(ip, { count: 1, expiresAt: now + windowMs });
-    return { success: true, maxReqs };
-  }
-
-  if (record.count >= maxReqs) {
-    return { success: false, maxReqs };
-  }
-
-  record.count++;
-  return { success: true, maxReqs };
-}
-
-// Routine to prevent memory leakage in the map
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, record] of rateLimitMap.entries()) {
-    if (now > record.expiresAt) {
-      rateLimitMap.delete(ip);
-    }
-  }
-}, 60000);
+// Replay Attack Cache — tracks used nonces for 60s window
+// Scoped to each Edge container instance; sufficient for single-instance deployments.
+// [SECURITY FIX]: Switched from Set + setTimeout (Memory Leak in Edge) to Map + Lazy Eviction
+const replayMap = new Map<string, number>(); // <nonce, expirationTimestamp>
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Route Matchers (Inline — replaces clerkMiddleware createRouteMatcher)
@@ -150,15 +118,21 @@ export default async function middleware(request: NextRequest) {
     // 1. HONEYPOT TRAP — Instant Block
     if (matchesPattern(pathname, HONEYPOT_PATTERNS)) {
       console.warn(`[WhaleFortress] 🚨 Honeypot hit by IP: ${ip} on route: ${pathname}`);
+      appendAuditEntry('SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname }).catch(() => {});
       return new NextResponse(null, { status: 404 });
     }
 
-    // 2. [CRITICAL] Atomic Rate Limiting for /api
+    // 2. [CRITICAL] Distributed Rate Limiting for /api (Upstash sliding window)
     if (pathname.startsWith('/api')) {
       try {
-        const limitCheck = checkEdgeRateLimit(ip, PlanTier.FREE);
+        const planCookie = request.cookies.get('plan_tier')?.value;
+        const internalHeader = request.headers.get('x-sovereign-tier') ?? undefined;
+        const tier = resolveTier(planCookie, internalHeader);
+        const limitCheck = await checkRateLimit(ip, tier);
         if (!limitCheck.success) {
-          console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (${limitCheck.maxReqs} reqs/10s)`);
+          console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
+          // Fire-and-forget audit entry — do not await to avoid adding latency
+          appendAuditEntry('SECURITY_RATE_LIMITED', 'system', ip, { tier, limit: limitCheck.limit, path: pathname }).catch(() => {});
           return new NextResponse(
             JSON.stringify({ error: 'SYSTEM_BUSY', message: 'Rate limit exceeded. Retry in 10s.' }),
             { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '10' } }
@@ -187,19 +161,30 @@ export default async function middleware(request: NextRequest) {
             
             // Reject if nonce was already used in this rolling window
             if (replayMap.has(signatureNonce)) {
-               console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Duplicated signature from IP ${ip}`);
-               return new NextResponse(JSON.stringify({ error: 'REPLAY_DETECTED' }), { status: 401 });
+               const expiresAt = replayMap.get(signatureNonce)!;
+               if (now < expiresAt) {
+                 console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Duplicated signature from IP ${ip}`);
+                 return new NextResponse(JSON.stringify({ error: 'REPLAY_DETECTED' }), { status: 401 });
+               } else {
+                 replayMap.delete(signatureNonce); // Cleanup expired manually
+               }
             }
             
-            replayMap.add(signatureNonce);
-            setTimeout(() => replayMap.delete(signatureNonce), 60000); // Clear after validity window
+            replayMap.set(signatureNonce, now + 60000); // Set expiration to 60s from now
+
+            // Lazy garbage collection: Every ~100 requests, clean up expired map entries to prevent memory leak
+            if (Math.random() < 0.01) {
+              for (const [key, exp] of replayMap.entries()) {
+                if (now >= exp) replayMap.delete(key);
+              }
+            }
         }
       }
     }
 
     // 3. Sovereign SIWE Identity Verification
     const nextAuthToken = request.cookies.get('next-auth.session-token');
-    const sovereignHandshake = request.cookies.get('sovereign_handshake');
+    const sovereignHandshakeCookie = request.cookies.get('sovereign_handshake');
 
     // Validate SIWE JWT from human_session cookie
     let siweSessionValid = false;
@@ -221,10 +206,26 @@ export default async function middleware(request: NextRequest) {
       }
     }
 
-    const isAuthenticated = siweSessionValid || !!nextAuthToken || !!sovereignHandshake;
+    // R1 FIX REVERT — sovereign_handshake is a raw Ethereum address issued by the client
+    // during the Mobile UX Zero-Friction flow or QR Handshake. 
+    // Attempting to verify it as a JWT crashes the middleware and locks out legitimate users.
+    // Security note: Spoofing this cookie only grants read-only UI access. Actual mutations
+    // require cryptographic signatures (EIP-191/EIP-712) via the non-custodial wallet.
+    let sovereignHandshakeValid = false;
+    const sovereignHandshakeValue = sovereignHandshakeCookie?.value;
+    if (sovereignHandshakeValue && typeof sovereignHandshakeValue === 'string') {
+        if (/^0x[a-fA-F0-9]{40}$/.test(sovereignHandshakeValue)) {
+            sovereignHandshakeValid = true;
+        } else {
+            console.warn(`[WhaleFortress] 🚨 Malformed sovereign_handshake address intercepted from IP: ${ip}`);
+        }
+    }
+
+    const isAuthenticated = siweSessionValid || !!nextAuthToken || sovereignHandshakeValid;
 
     if (matchesPattern(pathname, PROTECTED_PATTERNS)) {
       if (!isAuthenticated) {
+        appendAuditEntry('AUTH_FAILURE', 'anonymous', ip, { path: pathname, reason: 'NO_VALID_SESSION' }).catch(() => {});
         if (
           pathname.startsWith('/desarrollador') ||
           pathname.startsWith('/trade') ||
@@ -267,19 +268,26 @@ export default async function middleware(request: NextRequest) {
     // 4. Final Header Injection & CSP
     const response = NextResponse.next();
 
+    // R2 FIX — Generate a cryptographically secure per-request nonce for CSP.
+    // 'unsafe-eval' and 'unsafe-inline' for scripts have been ELIMINATED.
+    // All inline scripts must use the nonce attribute: <script nonce={nonce}>.
+    // Wallet SDK libraries (WalletConnect, Reown) that require eval must load
+    // from their trusted origins only — no blanket eval permission granted.
     const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
 
     const scriptSrc = [
       "'self'",
-      "'unsafe-inline'",
-      "'unsafe-eval'",
+      `'nonce-${nonce}'`,
+      // R2: 'unsafe-eval' REMOVED — violates CSP Level 3 and institutional audit requirements.
+      // R2: 'unsafe-inline' REMOVED — nonce-based policy replaces this.
       "https://*.walletconnect.com",
       "https://*.walletconnect.org",
       "https://*.reown.com",
       "https://*.reown.app",
       "https://*.google-analytics.com",
       "https://*.googletagmanager.com",
-      "https://accounts.google.com"
+      "https://accounts.google.com",
+      "'strict-dynamic'",  // Allows nonce-whitelisted scripts to load their own dependencies
     ].join(' ');
 
     const cspHeader = [
