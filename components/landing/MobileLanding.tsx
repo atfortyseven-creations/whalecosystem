@@ -41,12 +41,19 @@ function extractAddressFromAppKit(value: string): string | null {
       parsed?.state?.data?.account?.address,
       parsed?.sessions?.[0]?.namespaces?.eip155?.accounts?.[0]?.split?.(':')?.[2],
       parsed?.namespaces?.eip155?.accounts?.[0]?.split?.(':')?.[2],
+      // Support for WalletConnect v2 Array structure
+      parsed?.[0]?.namespaces?.eip155?.accounts?.[0]?.split?.(':')?.[2],
       parsed?.address,
       parsed?.accounts?.[0],
+      parsed?.account?.address,
     ];
     for (const candidate of possiblePaths) {
-      if (candidate && typeof candidate === 'string' && /^0x[a-fA-F0-9]{40}$/i.test(candidate)) {
-        return candidate.toLowerCase();
+      if (candidate && typeof candidate === 'string') {
+        // Clean potential "eip155:1:" prefix if split failed
+        const clean = candidate.includes(':') ? candidate.split(':').pop() : candidate;
+        if (clean && /^0x[a-fA-F0-9]{40}$/i.test(clean)) {
+          return clean.toLowerCase();
+        }
       }
     }
   } catch {
@@ -327,7 +334,7 @@ function ConnectedScreen({
           {onBack && (
             <button
               onClick={onBack}
-              title="Volver al Landing Page"
+              title="Back to Landing Page"
               className="p-1.5 -ml-2 rounded-full hover:bg-black/5 active:bg-black/10 transition-colors mr-1 cursor-pointer flex items-center gap-1"
             >
                <ArrowRight size={15} className="rotate-180" />
@@ -611,7 +618,7 @@ function ConnectedScreen({
                
                <div className="p-4 border-t border-[#F0F0F0] bg-[#FAF9F6]">
                   <button onClick={() => setShowInfoModal(false)} className="w-full py-3.5 rounded-xl bg-[#2D0A59] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#1E073B] transition-colors shadow-lg active:scale-95 duration-200">
-                    Entendido
+                    Understood
                   </button>
                </div>
             </motion.div>
@@ -744,30 +751,47 @@ export function MobileLanding() {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         establishSession(wagmiAddressRef.current); return;
       }
-      // Check 2: All cookies
+      // Check 2: All cookies (Corrected parsing)
       try {
         const cookies = document.cookie.split('; ');
         for (const cookie of cookies) {
-          const val = decodeURIComponent(cookie.split('=')[1] || '');
+          const eqIdx = cookie.indexOf('=');
+          if (eqIdx === -1) continue;
+          const val = decodeURIComponent(cookie.substring(eqIdx + 1));
           if (val) {
             const addr = extractAddressFromAppKit(val);
-            if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
+            if (addr) { 
+              console.log('[Sovereign:Sync] Found address in cookies:', addr);
+              clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
+              establishSession(addr); return; 
+            }
           }
         }
       } catch {}
-      // Check 3: All localStorage + sessionStorage keys
+      // Check 3: All localStorage + sessionStorage keys (Nuclear Scan)
       try {
         const storages = [localStorage, sessionStorage];
         for (const storage of storages) {
           for (let i = 0; i < storage.length; i++) {
             const key = storage.key(i);
             if (!key) continue;
-            const lowerKey = key.toLowerCase();
-            if (APPKIT_STORAGE_KEYS.some(k => lowerKey.includes(k)) || lowerKey.includes('store')) {
-              const raw = storage.getItem(key);
-              if (!raw) continue;
-              const addr = extractAddressFromAppKit(raw);
-              if (addr) { clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; establishSession(addr); return; }
+            const raw = storage.getItem(key);
+            if (!raw) continue;
+            
+            const addr = extractAddressFromAppKit(raw);
+            if (addr) { 
+              console.log('[Sovereign:Sync] Found address in storage key:', key, addr);
+              
+              // AUTO-REPAIR: If we found it in storage but not in cookie, write it now
+              // to satisfy TitaniumGate and establish the session immediately.
+              const hasHandshake = document.cookie.includes('sovereign_handshake=');
+              if (!hasHandshake) {
+                console.log('[Sovereign:Sync] Auto-repairing session cookie...');
+                document.cookie = `sovereign_handshake=${addr}; path=/; max-age=604800; SameSite=Lax`;
+              }
+
+              clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null; 
+              establishSession(addr); return; 
             }
           }
         }
@@ -963,48 +987,7 @@ export function MobileLanding() {
             Verifying your wallet session. This takes a few seconds after returning from your wallet app.
           </p>
         </div>
-        {/* 
-            [SOVEREIGN:ANDROID_CHROME_FIX] 
-            Amber Recovery Button — appears if session isn't automatically detected.
-            This is the "nuclear" sync button that forces wagmi to re-read its state.
-        */}
-        <motion.div 
-           initial={{ opacity: 0, y: 12 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 2 }}
-           className="w-full max-w-xs mt-4"
-        >
-          <div className="bg-black border border-amber-400 rounded-3xl p-6 text-center shadow-2xl">
-            <p className="text-amber-400 font-black uppercase tracking-widest text-[10px] mb-4">¿Ya aprobaste en tu wallet?</p>
-            <button
-              onClick={forceFullReconnect}
-              className="w-full bg-white text-black py-4 rounded-2xl text-[14px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)]"
-            >
-              Sincronizar conexión ahora
-            </button>
-            <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-widest mt-4">Solución para Android Chrome / iOS bfcache</p>
-          </div>
-        </motion.div>
-
-        {/* Original Manual Reconnect Button as secondary fallback */}
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 4.5 }}
-          disabled={fallbackStatus === 'checking'}
-          onClick={forceFullReconnect}
-          className={`w-full max-w-xs py-4 mt-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 ${
-            fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-white/10 text-white/40 border border-white/5'
-          }`}
-        >
-          {fallbackStatus === 'checking' ? (
-            <><Loader2 size={16} className="animate-spin text-white/70" />Sincronizando sesión...</>
-          ) : fallbackStatus === 'failed' ? (
-            <><AlertCircle size={16} className="text-white" />Sesión no detectada — Reintentar</>
-          ) : (
-            <><RefreshCw size={16} />Ya conecté · Continuar</>
-          )}
-        </motion.button>
+        {/* Manual sync buttons removed as per user request for full automation */}
       </div>
     );
   }
@@ -1189,118 +1172,7 @@ export function MobileLanding() {
           <p className="text-[12px] font-medium leading-relaxed max-w-[300px] mx-auto" style={{ color: MUTED }}>
             Your private key never leaves your device. Direct, on-chain connection — zero intermediaries.
           </p>
-          {/* Manual reconnect escape hatch restored per user request */}
-          <AnimatePresence>
-            {(showManualReconnect || showFallbackBtn) && (
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                disabled={fallbackStatus === 'checking'}
-                onClick={async () => {
-                  setFallbackStatus('checking');
-                  
-                  const checkSession = async () => {
-                    // Priority 0: Force wagmi to reconnect underlying SDKs (IndexedDB for WalletConnect)
-                    try { 
-                      reconnect(); 
-                      // [INSTITUTIONAL AGGRESSIVE RECOVERY]
-                      // If Wagmi wiped its store because of the deep-link reload, reconnect() does nothing.
-                      // We MUST force the walletConnect connector to initialize and read IndexedDB.
-                      const wcConnector = connectors.find(c => c.id === 'walletConnect' || c.id === 'appkit');
-                      if (wcConnector && !wagmiConnected) {
-                        const result = await connectAsync({ connector: wcConnector });
-                        if (result?.accounts?.[0]) return result.accounts[0];
-                      }
-                    } catch (e) {
-                      console.warn('[Sovereign] Aggressive recovery attempt failed:', e);
-                    }
-
-                    // Priority 1: wagmi ref (always live — avoids stale closure)
-                    if (wagmiAddressRef.current) return wagmiAddressRef.current;
-                    // Priority 2: wagmi React state (re-rendered value)
-                    if (address) return address;
-                    // Priority 3: Scan ALL cookies for any 0x address.
-                    // WagmiAdapter with cookieStorage may write to keys other than 'wagmi.store='.
-                    // We scan every cookie value and extract any valid 0x address.
-                    try {
-                      const allCookies = document.cookie.split('; ');
-                      for (const cookie of allCookies) {
-                        const eqIdx = cookie.indexOf('=');
-                        if (eqIdx === -1) continue;
-                        try {
-                          const val = decodeURIComponent(cookie.substring(eqIdx + 1));
-                          const addr = extractAddressFromAppKit(val);
-                          if (addr) return addr;
-                        } catch {}
-                      }
-                    } catch {}
-                    // Priority 4: Scan ALL localStorage values for any 0x address.
-                    // WalletConnect v2 stores session data under 'wc@2:...' keys — scan all.
-                    try {
-                      for (const key of Object.keys(localStorage)) {
-                        const raw = localStorage.getItem(key);
-                        if (!raw || raw.length < 42) continue;
-                        const addr = extractAddressFromAppKit(raw);
-                        if (addr) return addr;
-                      }
-                    } catch {}
-                    // Priority 3: Cookie fallback
-                    try {
-                      const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
-                      if (cookieMatch?.[1]) return cookieMatch[1];
-                    } catch {}
-                    return null;
-                  };
-
-                  // CRITICAL: checkSession is async — must await to get the actual address,
-                  // not a Promise object (which is always truthy and breaks establishSession).
-                  let foundAddr = await checkSession();
-                  if (foundAddr) {
-                    establishSession(foundAddr);
-                    setFallbackStatus('idle');
-                    return;
-                  }
-
-                  let attempts = 0;
-                  const poll = setInterval(() => {
-                    attempts++;
-                    // setInterval callbacks cannot be async top-level — use void async IIFE.
-                    void (async () => {
-                      const addr = await checkSession();
-                      if (addr) {
-                        clearInterval(poll);
-                        establishSession(addr);
-                        setFallbackStatus('idle');
-                      } else if (attempts >= 150) { // 30s (200ms × 150) — WC relay needs time to reconnect
-                        clearInterval(poll);
-                        setFallbackStatus('failed');
-                        setTimeout(() => setFallbackStatus('idle'), 3000);
-                      }
-                    })();
-                  }, 200);
-                }}
-                className={`mt-6 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3 disabled:opacity-90 ${fallbackStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-[#050505] text-white'}`}
-              >
-                {fallbackStatus === 'checking' ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin text-white/70" />
-                    Syncing session...
-                  </>
-                ) : fallbackStatus === 'failed' ? (
-                  <>
-                    <AlertCircle size={16} className="text-white" />
-                    Session not detected
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw size={16} />
-                    Already connected · Continue
-                  </>
-                )}
-              </motion.button>
-            )}
-          </AnimatePresence>
+          {/* Manual reconnect escape hatch removed as per user request for full automation */}
         </motion.div>
 
         {/* Wallet Buttons */}

@@ -5,7 +5,7 @@ import { parseReadmeToManifesto } from '@/lib/manifesto-parser';
 export const dynamic = 'force-dynamic';
 
 export default async function DeveloperPage() {
-  const sections = parseReadmeToManifesto();
+  const sections = parseReadmeToManifesto('WHALE_ALERT_NETWORK_PRESENTATION.md');
 
   return (
     <main>
