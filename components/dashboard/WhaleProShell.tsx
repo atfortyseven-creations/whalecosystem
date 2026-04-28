@@ -34,20 +34,26 @@ interface NavItem {
 }
 
 const SIDEBAR_ITEMS: NavItem[] = [
-    { id: 'gold',         label: 'Ticket Mint',      icon: <Ticket size={17}/>, dividerBefore: 'Overview' },
-    { id: 'portfolio',    label: 'Main Portfolio',   icon: <Wallet size={17}/> },
+    { id: 'gold',          label: 'Ticket Mint',       icon: <Ticket size={17}/>,    dividerBefore: 'Overview' },
+    { id: 'portfolio',     label: 'Main Portfolio',    icon: <Wallet size={17}/> },
 
-    { id: 'market-data',  label: 'Market Data',      icon: <Globe size={17}/>, dividerBefore: 'Intelligence' },
-    { id: 'markets',      label: 'Top Markets',      icon: <LayoutDashboard size={17}/> },
-    { id: 'newpairs',     label: 'New Listings',     icon: <Search size={17}/> },
-    { id: 'graph',        label: 'Entity Graph',     icon: <Compass size={17}/> },
+    { id: 'market-data',  label: 'Market Data',       icon: <Globe size={17}/>,     dividerBefore: 'Intelligence' },
+    { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/> },
+    { id: 'newpairs',     label: 'New Listings',      icon: <Search size={17}/> },
+    { id: 'graph',        label: 'Entity Graph',      icon: <Compass size={17}/> },
 
-    { id: 'news',         label: 'Live News',        icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel', externalUrl: 'https://www.humanidfi.com/news' },
-    { id: 'sov-intel',    label: 'Sovereign Intel',  icon: <BookOpen size={17}/>, externalUrl: 'https://www.humanidfi.com/sovereign-intel' },
+    { id: 'inst-ledger',  label: 'Whale Ledger',      icon: <Book size={17}/>,      dividerBefore: 'On-Chain Intel' },
+    { id: 'mass-transfer',label: 'Mass Transfers',    icon: <Network size={17}/> },
+    { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
+    { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
 
-    { id: 'vault',        label: 'Sovereign Vault',  icon: <Lock size={17}/>, dividerBefore: 'Execution' },
-    { id: 'logs',         label: 'Session Logs',     icon: <Database size={17}/>, dividerBefore: 'System' },
-    { id: 'support',      label: 'Support',          icon: <MessageSquare size={17}/> },
+    { id: 'news',         label: 'Live News',         icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel', externalUrl: 'https://www.humanidfi.com/news' },
+    { id: 'sov-intel',    label: 'Sovereign Intel',   icon: <BookOpen size={17}/>,  externalUrl: 'https://www.humanidfi.com/sovereign-intel' },
+    { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
+
+    { id: 'vault',        label: 'Sovereign Vault',   icon: <Lock size={17}/>,      dividerBefore: 'Execution' },
+    { id: 'logs',         label: 'Session Logs',      icon: <Database size={17}/>,  dividerBefore: 'System' },
+    { id: 'support',      label: 'Support',           icon: <MessageSquare size={17}/> },
 ];
 
 

@@ -446,16 +446,17 @@ body,
   /* Hardware acceleration removed from massive columns to prevent GPU texture memory overflow (black squares on scroll) */
 
   /* Disable absolutely all expensive backdrop-filters on mobile.
-     This is the #1 cause of 60fps drops on mobile WebKit. */
+     This is the #1 cause of 60fps drops on mobile WebKit.
+     IMPORTANT: fallback must be white/transparent — NOT dark — to avoid
+     making white landing cards appear black on mobile. */
   .backdrop-blur-sm, 
   .backdrop-blur-md, 
   .glass-vault, 
   .glass-premium, 
-  .glass-sovereign, 
-  .bg-white\/\[0\.02\] {
+  .glass-sovereign {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background-color: #0d0914 !important; /* Solid dark purple fallback */
+    /* No forced background-color here — components define their own solid fallbacks */
   }
 
   /* Disable expensive box shadows on mobile */
@@ -686,8 +687,8 @@ html.forum-light-mode {
 }
 
 :root {
-  /* Default: Dark/Purple Mode */
-  --forum-bg: #9A7BB5;
+  /* Default: Dark Mode (navy-black, NOT purple) */
+  --forum-bg: #0f0a1a;
   --forum-text: #ffffff;
   --forum-text-muted: rgba(255, 255, 255, 0.6);
   --forum-border: rgba(255, 255, 255, 0.05);

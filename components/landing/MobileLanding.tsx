@@ -281,9 +281,9 @@ function ConnectedScreen({
          }
 
          const currentSession = {
-           date: new Date().toLocaleDateString('es-ES', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }),
-           time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-           provider: connectorName || "Wallet Segura",
+           date: new Date().toLocaleDateString('en-US', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }),
+           time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+           provider: connectorName || "Secure Wallet",
            os: detectedOs
          };
          
@@ -356,7 +356,7 @@ function ConnectedScreen({
           {/* Purple header — live clock + verified badge */}
           <div className="bg-gradient-to-br from-[#2D0A59] to-[#1E073B] px-6 py-6 flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Session Activa · ECDSA Verified</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Active Session · ECDSA Verified</p>
               <p className="text-[38px] font-black tracking-tighter text-white leading-none tabular-nums">
                 {fmtTime(now)}
               </p>
@@ -365,10 +365,6 @@ function ConnectedScreen({
             <div className="flex flex-col items-end gap-2 shrink-0">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
                 <CheckCircle2 size={24} className="text-emerald-400" />
-              </div>
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/20 rounded-full">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-300">LIVE</span>
               </div>
             </div>
           </div>
@@ -385,7 +381,7 @@ function ConnectedScreen({
             <div className="bg-white px-5 py-4">
               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Balance On-Chain</p>
               <p className="text-[11px] font-black font-mono text-[#050505] truncate">
-                {fmtBalance() ?? <span className="text-[#050505]/30 animate-pulse">Cargando…</span>}
+                {fmtBalance() ?? <span className="text-[#050505]/30 animate-pulse">Loading…</span>}
               </p>
             </div>
           </div>
@@ -404,7 +400,7 @@ function ConnectedScreen({
 
           {/* Full address */}
           <div className="px-5 py-4 bg-[#FAF9F6] border-t border-[#F0F0F0]">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-2">Wallet Address · Verificado On-Chain</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-2">Wallet Address · On-Chain Verified</p>
             <div className="flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5">
               <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
               <p className="text-[11px] font-mono text-[#050505] tracking-tight break-all leading-relaxed flex-1">
@@ -538,7 +534,7 @@ function ConnectedScreen({
               
               const toast = document.createElement('div');
               toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-              toast.textContent = '✓ Terminal PC Desbloqueado';
+              toast.textContent = '✓ Desktop Terminal Unlocked';
               document.body.appendChild(toast);
               setTimeout(() => toast.remove(), 3000);
             }
@@ -568,7 +564,7 @@ function ConnectedScreen({
                    <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
                      <Info size={16} />
                    </div>
-                   <h3 className="text-[14px] font-black uppercase tracking-tight text-[#050505]">Información del Panel</h3>
+                    <h3 className="text-[14px] font-black uppercase tracking-tight text-[#050505]">Session Panel Info</h3>
                  </div>
                  <button onClick={() => setShowInfoModal(false)} className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-black/40 hover:text-black">
                    <X size={16} />
@@ -1042,11 +1038,11 @@ export function MobileLanding() {
           }`}
         >
           {fallbackStatus === 'checking' ? (
-            <><Loader2 size={16} className="animate-spin text-white/70" />Sincronizando túnel...</>
+            <><Loader2 size={16} className="animate-spin text-white/70" />Syncing session...</>
           ) : fallbackStatus === 'failed' ? (
-            <><AlertCircle size={16} className="text-white" />Conexión no detectada — Volver</>
+            <><AlertCircle size={16} className="text-white" />Session not detected — Go back</>
           ) : (
-            <><RefreshCw size={16} />Ya conecté · Continuar</>
+            <><RefreshCw size={16} />Already connected · Continue</>
           )}
         </motion.button>
       </div>
@@ -1216,11 +1212,14 @@ export function MobileLanding() {
               ECDSA · On-Chain · Non-Custodial
             </span>
           </div>
-          <h1 className="text-[2.4rem] font-black tracking-tight leading-[1.02] mb-3" style={{ color: INK }}>
-            Sovereign<br />Wallet
+          <h1 className="text-[2.6rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
+            Humanity Ledger
           </h1>
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: MUTED }}>
+            Founded by Whale Alert Network
+          </p>
           <p className="text-[12px] font-medium leading-relaxed max-w-[300px] mx-auto" style={{ color: MUTED }}>
-            Tu clave privada nunca sale de tu dispositivo. Conexión directa, on-chain, sin intermediarios.
+            Your private key never leaves your device. Direct, on-chain connection — zero intermediaries.
           </p>
           {/* Manual reconnect escape hatch restored per user request */}
           <AnimatePresence>

@@ -48,19 +48,22 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
   return (
     <>
-      <header className="sticky top-0 z-50 px-6 h-[52px] flex items-center justify-between" style={{ backgroundColor: 'var(--forum-header-bg)', borderBottom: '1px solid var(--forum-border)', backdropFilter: 'blur(12px)' }}>
+      <header className="sticky top-0 z-50 px-4 h-[52px] flex items-center justify-between" style={{ backgroundColor: 'var(--forum-header-bg)', borderBottom: '1px solid var(--forum-border)', backdropFilter: 'blur(12px)' }}>
 
-        {/* Wordmark & Date */}
-        <div className="flex items-center gap-6">
+        {/* Wordmark */}
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/forum"
-            className="text-[20px] font-sans font-black tracking-tight hover:opacity-80 transition-opacity flex items-center gap-3"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             style={{ color: 'var(--forum-text)' }}
           >
-            <span>FORUM</span>
-            <span className="text-[12px] font-mono tracking-[0.2em] px-2 py-0.5 rounded border opacity-70" style={{ borderColor: 'var(--forum-border)' }}>P2P</span>
-            <span className="text-[14px] font-serif tracking-normal opacity-90">Humanity Ledger®</span>
+            {/* "FORUM P2P" — only on md+ */}
+            <span className="hidden md:inline text-[20px] font-sans font-black tracking-tight">FORUM</span>
+            <span className="hidden md:inline text-[12px] font-mono tracking-[0.2em] px-2 py-0.5 rounded border opacity-70" style={{ borderColor: 'var(--forum-border)' }}>P2P</span>
+            {/* Brand always visible */}
+            <span className="text-[15px] font-serif tracking-normal font-bold opacity-90 truncate">Humanity Ledger®</span>
           </Link>
+          {/* SYS.DATE — sm+ only */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
             <span className="text-[10px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>SYS.DATE:</span>
             <span className="text-[11px] font-mono font-black uppercase tracking-widest" style={{ color: 'var(--forum-text)' }}>
@@ -70,7 +73,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
         </div>
 
         {/* Right controls */}
-        <div className="flex items-center gap-4" ref={menuRef}>
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0" ref={menuRef}>
 
           {/* Theme Toggle */}
           <button
@@ -86,10 +89,10 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             <span className="text-[14px] font-serif leading-none mt-[1px]">{isLightMode ? '☾' : '☼'}</span>
           </button>
 
-          {/* New Topic */}
+          {/* New Topic — hidden on mobile */}
           <Link
             href="/forum/new"
-            className="text-[12px] font-sans font-bold tracking-wide px-4 py-1.5 rounded-sm hover:opacity-80 transition-colors"
+            className="hidden sm:inline-flex text-[12px] font-sans font-bold tracking-wide px-4 py-1.5 rounded-sm hover:opacity-80 transition-colors"
             style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
           >
             + New Topic
@@ -98,7 +101,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           {/* Menu toggle */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="text-[12px] font-sans font-bold tracking-wide hover:opacity-100 transition-colors ml-2"
+            className="text-[12px] font-sans font-bold tracking-wide hover:opacity-100 transition-colors"
             style={{ color: 'var(--forum-text-muted)' }}
             aria-label="Navigation menu"
           >
@@ -108,6 +111,10 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           {/* Popover */}
           {menuOpen && (
             <div className="absolute top-[52px] right-0 w-[220px] shadow-lg z-50 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--forum-bg)', border: '1px solid var(--forum-border)', borderTop: 'none' }}>
+              {/* + New Topic on mobile only */}
+              <Link href="/forum/new" onClick={() => setMenuOpen(false)} className="sm:hidden px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors" style={{ color: 'var(--forum-text)', borderBottom: '1px solid var(--forum-border)', backgroundColor: 'var(--forum-surface)' }}>
+                + New Topic
+              </Link>
               {navLinks.map(l => (
                 <Link
                   key={l.href}
@@ -126,7 +133,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
           {/* Avatar / connect */}
           {address ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setProfileOpen(true)}
                 className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors"
@@ -149,6 +156,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           )}
         </div>
       </header>
+
 
       {/* Secondary Discourse Sub-Nav */}
       <div className="w-full shadow-sm" style={{ backgroundColor: 'var(--forum-subnav-bg)', borderBottom: '1px solid var(--forum-border)' }}>

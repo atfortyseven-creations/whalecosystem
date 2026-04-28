@@ -287,33 +287,22 @@ export function BtcTransferLegend() {
   }, []);
 
   const routes = [
-    { from: "New York",    to: "London",    btc: (0.8 + Math.random() * 0.4).toFixed(2) },
-    { from: "Tokyo",       to: "Hong Kong", btc: (1.2 + Math.random() * 0.6).toFixed(2) },
-    { from: "San Francisco", to: "Paris",  btc: (0.5 + Math.random() * 0.3).toFixed(2) },
-    { from: "London",      to: "Dubai",    btc: (2.1 + Math.random() * 1.0).toFixed(2) },
-    { from: "Hong Kong",   to: "Singapore",btc: (0.9 + Math.random() * 0.5).toFixed(2) },
+    { from: "New York",      to: "London",      btc: (0.8  + Math.random() * 0.4).toFixed(2) },
+    { from: "Tokyo",         to: "Hong Kong",   btc: (1.2  + Math.random() * 0.6).toFixed(2) },
+    { from: "San Francisco", to: "Paris",       btc: (0.5  + Math.random() * 0.3).toFixed(2) },
+    { from: "London",        to: "Dubai",       btc: (2.1  + Math.random() * 1.0).toFixed(2) },
+    { from: "Hong Kong",     to: "Singapore",   btc: (0.9  + Math.random() * 0.5).toFixed(2) },
   ];
 
   return (
-    <div className="relative z-10 w-full max-w-3xl mx-auto mt-6 px-4">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">
-          Bitcoin Transfer Network · Live Feed
-        </span>
-        <div className="flex-1 h-px bg-black/[0.06]" />
-        <span className="text-[9px] font-mono text-black/30 uppercase tracking-widest">
-          {BTC_ROUTES.length} active arcs
-        </span>
-      </div>
+    <div className="relative z-10 w-full max-w-3xl mx-auto mt-4 px-4">
 
-      {/* Route rows */}
+      {/* Route rows — solid white so dark canvas never bleeds through */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {routes.map((r, i) => (
           <div
             key={i}
-            className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/[0.06] hover:border-purple-300/50 transition-all"
+            className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-white border border-black/[0.07] hover:border-purple-300/50 transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
               {/* Purple arc icon */}
@@ -343,18 +332,19 @@ export function BtcTransferLegend() {
         ))}
       </div>
 
-      {/* What the user is seeing */}
-      <div className="mt-4 px-5 py-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-black/[0.06]">
+      {/* Context panel — solid white */}
+      <div className="mt-3 px-5 py-4 rounded-2xl bg-white border border-black/[0.07]">
         <p className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-2">
-          ¿Qué estás viendo?
+          What you are seeing
         </p>
         <p className="text-[11px] text-black/60 leading-relaxed font-medium">
-          El mapa muestra en tiempo real las transferencias de Bitcoin más grandes entre los
-          principales nodos financieros del mundo. Cada <span className="text-purple-600 font-black">arco morado</span> representa
-          un flujo de capital BTC activo — el punto brillante indica la dirección del movimiento.
-          Los anillos pulsantes señalan los centros de origen y destino de cada transacción.
+          This map displays the largest real-time Bitcoin transfers between the world's
+          major financial nodes. Each <span className="text-purple-600 font-black">purple arc</span> represents
+          an active BTC capital flow — the glowing dot indicates the direction of movement.
+          Pulsing rings mark the origin and destination centres of each transaction.
         </p>
       </div>
     </div>
   );
 }
+
