@@ -695,6 +695,8 @@ export function MobileLanding() {
     setIsLinked(true);
     setConnecting(null);
     setShowFallbackBtn(false);
+    // Clear the pending wakeup flag — session is now established.
+    try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
     // Stay on ConnectedScreen (scanner) after connection — do NOT redirect to manifesto.
     // Redirecting to "/" triggers SSR User-Agent detection which can serve the wrong layout.
   }, [isLinked]);
@@ -805,6 +807,63 @@ export function MobileLanding() {
       stopPolling();
     };
   }, [mounted, isLinked, establishSession, reconnect]);
+
+  // ── CRITICAL: Persist wakeup flag in localStorage (survives full tab reload) ──
+  // When the user goes to their wallet app via deep-link, Chrome DESTROYS the tab.
+  // sessionStorage is cleared on full reload. localStorage survives.
+  // We read this flag on every mount to force reconnection even when showManualReconnect
+  // would otherwise be false.
+  useEffect(() => {
+    if (!mounted) return;
+    try {
+      const pending = localStorage.getItem('sovereign_pending_wakeup');
+      if (pending === '1' && !isLinked) {
+        // Don't remove flag yet — let the wake-sync engine run first.
+        // The flag is cleared by establishSession succeeding.
+        setFallbackStatus('checking');
+        try { reconnect(); } catch {}
+        // Start polling immediately
+        setTimeout(() => {
+          // Inline focus-recheck logic
+          if (wagmiAddressRef.current && !isLinked) {
+            establishSession(wagmiAddressRef.current);
+            try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+            return;
+          }
+          let attempts = 0;
+          const poll = setInterval(() => {
+            attempts++;
+            if (wagmiAddressRef.current) {
+              clearInterval(poll);
+              establishSession(wagmiAddressRef.current);
+              try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+              return;
+            }
+            try {
+              for (const key of Object.keys(localStorage)) {
+                if (key === 'sovereign_pending_wakeup') continue;
+                const raw = localStorage.getItem(key);
+                if (!raw || raw.length < 42) continue;
+                const addr = extractAddressFromAppKit(raw);
+                if (addr) {
+                  clearInterval(poll);
+                  establishSession(addr);
+                  try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+                  return;
+                }
+              }
+            } catch {}
+            if (attempts >= 200) {
+              clearInterval(poll);
+              setFallbackStatus('idle');
+              // Don't remove flag — user may need to retry
+            }
+          }, 100);
+        }, 600);
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
 
   // ── Nuke rogue w3m-modal backdrop left open after mobile deep-link ───────────
   useEffect(() => {
@@ -977,27 +1036,13 @@ export function MobileLanding() {
   // This means after signing we never need wagmi to reconnect to show the
   // ConnectedScreen. Works even if WalletConnect session drops after signing.
   if (isLinked && effectiveAddress) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/dashboard';
+    }
     return (
-      <AnimatePresence mode="wait">
-        {showingManifesto ? (
-          <motion.div key="manifesto" initial={{opacity: 0}} animate={{opacity: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FDFCF8]">
-            <ImmersiveManifestoLanding onOpenScanner={() => setShowingManifesto(false)} />
-          </motion.div>
-        ) : (
-          <motion.div key="scanner" initial={{opacity: 0, scale: 0.98}} animate={{opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" }}} exit={{opacity: 0, scale: 0.98, transition: { duration: 0.2 }}} className="w-full min-h-screen bg-[#FAF9F6]">
-            <ConnectedScreen 
-               address={effectiveAddress} 
-               onScan={() => setShowScanner(true)} 
-               showScanner={showScanner} 
-               onCloseScanner={() => setShowScanner(false)} 
-               onBack={() => setShowingManifesto(true)}
-               connectorName={connector?.name}
-               chainId={chainId}
-               onDisconnect={handleDisconnect}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-[#050505]/30" />
+      </div>
     );
   }
 
@@ -1013,6 +1058,11 @@ export function MobileLanding() {
   }
 
   // ── Render: Default — Not connected ──────────────────────────────────────────
+  // CRITICAL: This block must be AFTER the isLinked guard above (line ~979).
+  // The wake-sync engine can set isLinked=true at any time even when
+  // showConnectOverlay is false (e.g. after a full page reload caused by the
+  // Chrome tab being killed when the user went to their wallet app).
+  // Without this early-return order, the ConnectedScreen is never shown.
   if (!showConnectOverlay) {
     return (
       <div className="w-full min-h-screen bg-[#FDFCF8] relative">
@@ -1283,6 +1333,9 @@ export function MobileLanding() {
                 setConnecting(walletId);
                 setShowManualReconnect(true);
                 setShowFallbackBtn(false);
+                // Persist wakeup flag so the next page load (after Chrome tab destroy) knows
+                // to immediately poll for the wallet connection.
+                try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {};
 
                 const doOpen = () => {
                   // Clear stale AppKit state that blocks reconnection.

@@ -14,10 +14,11 @@ import { useRealWalletData } from '@/hooks/useRealWalletData';
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
 
 // Helper to format wallet address in TXO format
-function formatTXO(address: string | undefined, symbol: string): string {
-    if (!address) return 'UNKNOWN';
-    if (symbol === 'ETH' || symbol === 'MATIC' || symbol === 'BNB') return 'NATIVE COIN';
-    return 'ERC-20 TOKEN';
+function formatTXO(address: string, symbol: string | undefined): string {
+    const time = new Date().getTime().toString().slice(-4);
+    const sym = (symbol || 'UNK').substring(0, 3).toUpperCase();
+    const addr = address.substring(2, 6).toUpperCase();
+    return `TXO-${addr}-${sym}-${time}`;
 }
 
 export default function PortfolioDashboard({ walletAddress }: { walletAddress?: string }) {
@@ -338,10 +339,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                 >
                                     <div className="flex items-center gap-6 relative z-10 flex-1">
                                         <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg border bg-black/5 border-black/[0.06] text-black/40 group-hover:bg-black group-hover:text-white transition-all">
-                                            {asset.symbol.slice(0, 3)}
+                                            {asset.symbol?.slice(0, 3) || '?'}
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-lg font-black text-black tracking-tight">{asset.symbol}</div>
+                                            <div className="text-lg font-black text-black tracking-tight">{asset.symbol || 'Unknown'}</div>
                                             <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{asset.network}</div>
                                         </div>
                                         <ArrowRight size={18} className="text-black/10 ml-auto mr-6 group-hover:text-[#00F2EA] transition-all" strokeWidth={2.5} />
