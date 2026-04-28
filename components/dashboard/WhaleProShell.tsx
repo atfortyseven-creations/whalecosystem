@@ -10,7 +10,7 @@ import {
     Network, Ticket, Flame, Menu,
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
-    LineChart, Lock, Book, Info, X
+    LineChart, Lock, Book, Info, X, ArrowUpRight
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';

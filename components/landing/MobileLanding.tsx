@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect } from "wagmi";
+import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
 import { Fingerprint, ArrowRight, ScanLine, Scan, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, LogOut, MessageSquare } from "lucide-react";
@@ -211,6 +211,17 @@ function SigningOverlay({
   );
 }
 
+// ── Network name from chain ID ────────────────────────────────────────────────
+function chainName(id?: number): string {
+  const MAP: Record<number, string> = {
+    1: 'Ethereum Mainnet', 10: 'Optimism', 56: 'BNB Chain',
+    137: 'Polygon', 8453: 'Base', 42161: 'Arbitrum One',
+    43114: 'Avalanche', 100: 'Gnosis', 250: 'Fantom',
+    324: 'zkSync Era', 59144: 'Linea', 1101: 'Polygon zkEVM',
+  };
+  return id ? (MAP[id] ?? `Chain ${id}`) : 'Mainnet';
+}
+
 // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
   address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect
@@ -223,11 +234,24 @@ function ConnectedScreen({
   onDisconnect?: () => void;
 }) {
   const now = useLiveClock();
-  const [connectedAt] = useState(() => new Date()); // frozen at mount time
+  const [connectedAt] = useState(() => new Date());
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [userAgentInfo, setUserAgentInfo] = useState('');
   const [screenRes, setScreenRes] = useState('');
   const [sessionHistory, setSessionHistory] = useState<any[]>([]);
+
+  // ── Real on-chain data ────────────────────────────────────────────────────
+  const { data: balance } = useBalance({ address: address as `0x${string}` });
+  const { data: ensName } = useEnsName({ address: address as `0x${string}`, chainId: 1 });
+
+  const fmtBalance = () => {
+    if (!balance) return null;
+    const val = parseFloat(balance.formatted);
+    return `${val.toFixed(4)} ${balance.symbol}`;
+  };
+
+  const checksumAddr = (addr: string) =>
+    addr ? `${addr.slice(0, 8)}…${addr.slice(-6)}` : '';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -288,14 +312,6 @@ function ConnectedScreen({
       {/* Backgrounds */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
       <WorldMapBackground />
-      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-        <motion.div
-           className="absolute"
-           style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.04 }}
-           animate={{ x: ["0%", "-3%", "0%"], y: ["0%", "-2%", "0%"] }}
-           transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
       <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
 
       {/* Fixed Header */}
@@ -330,68 +346,71 @@ function ConnectedScreen({
 
       <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
 
-        {/* ── Session Identity Card ── */}
+        {/* ── Sovereign Identity Card ── */}
         <motion.div
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ delay: 0.05, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-           className="w-full bg-white rounded-[24px] border border-[#E5E5E5] shadow-lg overflow-hidden flex flex-col"
+           className="w-full bg-white rounded-[24px] border border-[#E5E5E5] shadow-xl overflow-hidden flex flex-col"
         >
-          {/* Top bar — live clock */}
-          <div className="bg-[#2D0A59] px-6 py-6 flex items-center justify-between">
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Active Session</p>
-              <p className="text-[36px] font-black tracking-tighter text-white leading-none tabular-nums">
+          {/* Purple header — live clock + verified badge */}
+          <div className="bg-gradient-to-br from-[#2D0A59] to-[#1E073B] px-6 py-6 flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Session Activa · ECDSA Verified</p>
+              <p className="text-[38px] font-black tracking-tighter text-white leading-none tabular-nums">
                 {fmtTime(now)}
               </p>
+              <p className="text-[10px] font-medium text-white/50 capitalize mt-1">{fmtDate(now)}</p>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-              <CheckCircle2 size={28} className="text-emerald-400" />
+            <div className="flex flex-col items-end gap-2 shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                <CheckCircle2 size={24} className="text-emerald-400" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/20 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-300">LIVE</span>
+              </div>
             </div>
           </div>
 
+          {/* On-chain data row */}
           <div className="grid grid-cols-2 gap-px bg-[#F0F0F0]">
             <div className="bg-white px-5 py-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Date</p>
-              <p className="text-[11px] font-black text-[#050505] capitalize truncate">{fmtDate(now)}</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Network</p>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-violet-500" />
+                <p className="text-[11px] font-black text-[#050505] truncate">{chainName(chainId)}</p>
+              </div>
             </div>
             <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Session Open</p>
-               <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <p className="text-[11px] font-black text-[#050505]">{fmtStamp(connectedAt)}</p>
-               </div>
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Balance On-Chain</p>
+              <p className="text-[11px] font-black font-mono text-[#050505] truncate">
+                {fmtBalance() ?? <span className="text-[#050505]/30 animate-pulse">Cargando…</span>}
+              </p>
             </div>
           </div>
 
+          {/* Wallet / identity row */}
           <div className="grid grid-cols-2 gap-px bg-[#F0F0F0] border-t border-[#F0F0F0]">
-             <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Wallet Provider</p>
-               <p className="text-[11px] font-black text-[#050505] truncate">{connectorName || "Secure Wallet"}</p>
-             </div>
-             <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Network (Chain ID)</p>
-               <p className="text-[11px] font-mono text-[#050505] truncate">{chainId ? `Chain ${chainId}` : "Mainnet"}</p>
-             </div>
+            <div className="bg-white px-5 py-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Wallet Provider</p>
+              <p className="text-[11px] font-black text-[#050505] truncate">{connectorName || 'Secure Wallet'}</p>
+            </div>
+            <div className="bg-white px-5 py-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Identity (ENS)</p>
+              <p className="text-[11px] font-black text-violet-700 truncate">{ensName ?? checksumAddr(address)}</p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-px bg-[#F0F0F0] border-t border-[#F0F0F0]">
-             <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Device OS</p>
-               <p className="text-[11px] font-black text-[#050505] truncate">{userAgentInfo || "Detectando..."}</p>
-             </div>
-             <div className="bg-white px-5 py-4">
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Fingerprint</p>
-               <p className="text-[11px] font-mono text-[#050505] truncate">{screenRes || "Secure"}</p>
-             </div>
-          </div>
-
-          {/* Address full length */}
-          <div className="px-5 py-4 bg-white border-t border-[#F0F0F0]">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-1">Connected Wallet (Full Address)</p>
-            <p className="text-[12px] font-mono text-[#050505] tracking-tight break-all leading-relaxed">
-              {address}
-            </p>
+          {/* Full address */}
+          <div className="px-5 py-4 bg-[#FAF9F6] border-t border-[#F0F0F0]">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#050505]/40 mb-2">Wallet Address · Verificado On-Chain</p>
+            <div className="flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-xl px-3 py-2.5">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+              <p className="text-[11px] font-mono text-[#050505] tracking-tight break-all leading-relaxed flex-1">
+                {address}
+              </p>
+            </div>
           </div>
         </motion.div>
 
@@ -1190,11 +1209,18 @@ export function MobileLanding() {
           transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center"
         >
-          <h1 className="text-[2.2rem] font-black tracking-tight leading-[1.05] mb-3" style={{ color: INK }}>
-            Whale Alert<br />Network
+          {/* Security trust badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 mb-5">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-[0.25em] text-emerald-700">
+              ECDSA · On-Chain · Non-Custodial
+            </span>
+          </div>
+          <h1 className="text-[2.4rem] font-black tracking-tight leading-[1.02] mb-3" style={{ color: INK }}>
+            Sovereign<br />Wallet
           </h1>
-          <p className="text-[12px] font-medium leading-relaxed" style={{ color: MUTED }}>
-            Sovereign-grade blockchain intelligence. Connect your wallet to sync your session with the desktop terminal.
+          <p className="text-[12px] font-medium leading-relaxed max-w-[300px] mx-auto" style={{ color: MUTED }}>
+            Tu clave privada nunca sale de tu dispositivo. Conexión directa, on-chain, sin intermediarios.
           </p>
           {/* Manual reconnect escape hatch restored per user request */}
           <AnimatePresence>
@@ -1389,36 +1415,36 @@ export function MobileLanding() {
 
                 setTimeout(() => setConnecting(null), 3000);
                 // 400ms: deep-link returns before 1.2s on most Android devices
-                setTimeout(() => setShowFallbackBtn(true), 400);
+                setTimeout(() => setShowFallbackBtn(true), 1400);
               };
 
               return (
                 <>
-                  {/* MetaMask */}
+                  {/* MetaMask — iOS Safari + Android Chrome deep-link */}
                   <WalletOption
                     logo="/wallets/metamask.svg"
                     name="MetaMask"
-                    badge="Mobile · WalletConnect v2"
+                    badge="iOS · Android · WalletConnect v2"
                     loading={connecting === 'metamask'}
                     onClick={() => openWalletModal('metamask')}
                     delay={0.1}
                   />
 
-                  {/* Coinbase Wallet */}
+                  {/* Coinbase Wallet — native iOS/Android SDK */}
                   <WalletOption
                     logo="/wallets/coinbase.png"
                     name="Coinbase Wallet"
-                    badge="Mobile · WalletConnect v2"
+                    badge="iOS · Android · Smart Wallet"
                     loading={connecting === 'coinbase'}
                     onClick={() => openWalletModal('coinbase')}
                     delay={0.15}
                   />
 
-                  {/* Rainbow & All Wallets */}
+                  {/* Rainbow & All — universal WC v2 */}
                   <WalletOption
                     logo="/wallets/rainbow.png"
                     name="Rainbow & 550+ Wallets"
-                    badge="WalletConnect v2 · All Wallets"
+                    badge="iOS · Android · Universal WC v2"
                     loading={connecting === 'wc'}
                     onClick={() => openWalletModal('wc')}
                     delay={0.2}

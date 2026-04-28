@@ -18,7 +18,7 @@ import {
   Monitor,
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
-import { WorldMapBackground } from "./WorldMapBackground";
+import { WorldMapBackground, BtcTransferLegend } from "./WorldMapBackground";
 
 // ─── Detect mobile/tablet via UA ─────────────────────────────────────────────
 function useIsMobile() {
@@ -571,6 +571,9 @@ export default function ConnectPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* ── BTC Transfer Legend — below the map, no text on canvas ── */}
+        <BtcTransferLegend />
       </main>
 
       {/* Footer */}
