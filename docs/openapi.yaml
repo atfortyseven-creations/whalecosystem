@@ -1,0 +1,200 @@
+openapi: 3.1.0
+info:
+  title: Humanity Ledger — Zero-Trust Intelligence API
+  version: 3.0.2
+  description: |
+    Sovereign Network Architecture REST API.
+    All endpoints are protected by the TitaniumGate Zero-Trust Edge Middleware.
+    Authentication requires EIP-191 ECDSA signatures and Sovereign Handshake JWTs.
+  contact:
+    name: Humanity Ledger Security Team
+    email: security@humanityledger.io
+servers:
+  - url: https://api.humanityledger.io/v1
+    description: Production Environment (European Region)
+  - url: https://staging.humanityledger.io/v1
+    description: Staging Environment (Beta)
+  - url: http://localhost:3000/api
+    description: Local Development
+
+components:
+  securitySchemes:
+    SovereignJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT issued after successful EIP-191 signature verification.
+        Passed via HttpOnly cookie `sovereign_handshake` or Authorization header.
+    InternalHealthSecret:
+      type: apiKey
+      in: header
+      name: X-Health-Secret
+      description: Secret key for deep health checks (infrastructure probes only).
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: UNAUTHORIZED
+        message:
+          type: string
+          example: Valid sovereign session required.
+    
+    AuditEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event:
+          type: string
+          example: AUTH_SUCCESS
+        actor:
+          type: string
+          example: 0x123...
+        ip:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        payloadHash:
+          type: string
+        hmacSig:
+          type: string
+        prevHash:
+          type: string
+
+    WhaleAlert:
+      type: object
+      properties:
+        hash:
+          type: string
+        chain:
+          type: string
+          enum: [ETHEREUM, BASE, BSC, SOLANA, BITCOIN]
+        from:
+          type: string
+        to:
+          type: string
+        amountUSD:
+          type: number
+        zScore:
+          type: number
+          minimum: -10
+          maximum: 10
+        conviction:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, EXTREME]
+
+security:
+  - SovereignJWT: []
+
+paths:
+  /auth/handshake:
+    post:
+      summary: Initiate Sovereign Handshake
+      description: Validates EIP-191 signature and issues HttpOnly JWT session.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, signature, address, nonce]
+              properties:
+                message:
+                  type: string
+                signature:
+                  type: string
+                address:
+                  type: string
+                nonce:
+                  type: string
+      responses:
+        '200':
+          description: Session established
+        '401':
+          description: Signature verification failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /intelligence/whales/stream:
+    get:
+      summary: Real-time Whale Alerts (SSE)
+      description: Server-Sent Events stream for high-conviction whale movements.
+      responses:
+        '200':
+          description: Event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /intelligence/graph/neighbors/{address}:
+    get:
+      summary: Entity Graph Traversal
+      description: Returns immediate on-chain relationships for a given entity.
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Graph nodes and edges
+        '404':
+          description: Entity not found
+
+  /golden-ticket/verify:
+    post:
+      summary: Verify Golden Ticket ZK Proof
+      description: Verifies Groth16 ZK-SNARK for tier assignment without exposing wallet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proof, publicSignals, walletAddress, timestamp]
+              properties:
+                proof:
+                  type: object
+                publicSignals:
+                  type: object
+                walletAddress:
+                  type: string
+                timestamp:
+                  type: number
+      responses:
+        '200':
+          description: ZK Proof verified, tier assigned
+        '400':
+          description: Invalid proof or nullifier already consumed
+
+  /health-check:
+    get:
+      summary: System Health
+      description: Returns basic health. If `?deep=1` and secret provided, returns circuit breaker and audit trail integrity metrics.
+      security:
+        - {}
+        - InternalHealthSecret: []
+      parameters:
+        - name: deep
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+      responses:
+        '200':
+          description: System healthy
+        '207':
+          description: Degraded state (e.g. circuit breaker open)
+        '401':
+          description: Invalid health secret
