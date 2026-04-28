@@ -17,25 +17,26 @@ export function useSovereignAccount() {
         const checkHandshake = () => {
             if (typeof document === 'undefined') return;
             
-            // Fast cookie parse
-            const cookies = document.cookie.split('; ');
-            const handshakeCookie = cookies.find(row => row.startsWith('sovereign_handshake='));
-            
-            if (handshakeCookie) {
-                const address = handshakeCookie.split('=')[1];
-                if (address && address.startsWith('0x')) {
-                    setHandshakeAddress(address);
-                }
+            // Fast cookie parse — match any 0x address in sovereign_handshake cookie
+            const match = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+            if (match?.[1]) {
+                setHandshakeAddress(match[1].toLowerCase());
             } else {
                 setHandshakeAddress(null);
             }
             setIsChecking(false);
         };
 
+        // Run immediately
         checkHandshake();
         
-        // Optional: Poll for cookie changes if needed, but usually a page reload is triggered
-    }, [wagmiAccount.isConnected]);
+        // Poll every 500ms — catches cookie written by mobile QR handshake or
+        // MobileLanding.establishSession() without requiring a full page reload.
+        const poll = setInterval(checkHandshake, 500);
+        
+        return () => clearInterval(poll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Priority 1: Direct Wagmi Connection (Active Extension/Mobile App)
     if (wagmiAccount.isConnected) {
