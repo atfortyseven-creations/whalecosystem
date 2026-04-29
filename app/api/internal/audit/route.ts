@@ -12,8 +12,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { action, actor, ip, metadata } = await req.json();
-    
+    let payload;
+    try {
+      payload = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    }
+    const { action, actor, ip, metadata } = payload;
     if (action && actor && ip) {
       await appendAuditEntry(action as any, actor, ip, metadata);
     }

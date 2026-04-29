@@ -187,9 +187,10 @@ export default function ConnectPage() {
   // ── Poll QR scan ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!qrSession || syncStatus === "SYNCED") return;
+    const controller = new AbortController();
     const poll = setInterval(async () => {
       try {
-        const res = await fetch(`/api/auth/qr-session?id=${qrSession}`);
+        const res = await fetch(`/api/auth/qr-session?id=${qrSession}`, { signal: controller.signal });
         if (!res.ok) return;
         const data = await res.json();
         if (data.status === "complete" && data.address) {
@@ -198,9 +199,14 @@ export default function ConnectPage() {
           document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
           setTimeout(() => router.replace("/"), 1200);
         }
-      } catch {}
+      } catch (err: any) {
+        if (err.name !== 'AbortError') console.error(err);
+      }
     }, 2000);
-    return () => clearInterval(poll);
+    return () => {
+      clearInterval(poll);
+      controller.abort();
+    };
   }, [qrSession, syncStatus, router]);
 
   useEffect(() => {
@@ -233,7 +239,7 @@ export default function ConnectPage() {
         // Address is ready: redirect immediately.
         doHardRedirect(address);
       } else {
-        // Address not yet in React state (wagmi hydrating). Poll up to 3s.
+        // Address not yet in React state (wagmi hydrating). Poll up to 15s.
         let attempts = 0;
         const waitForAddress = setInterval(() => {
           attempts++;
@@ -241,8 +247,8 @@ export default function ConnectPage() {
           if (currentAddress?.startsWith('0x')) {
             clearInterval(waitForAddress);
             doHardRedirect(currentAddress);
-          } else if (attempts >= 15) {
-            // 3s timeout: redirect anyway, the '/' page will read the wagmi store
+          } else if (attempts >= 75) {
+            // 15s timeout: redirect anyway, the '/' page will read the wagmi store
             clearInterval(waitForAddress);
             window.location.replace("/");
           }
@@ -304,6 +310,7 @@ export default function ConnectPage() {
 
   // ── Mobile handler: AppKit opens WC deep-link → native app ───────────────
   const handleMobileWallet = useCallback(() => {
+    try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {}
     openAppKit();
   }, [openAppKit]);
 

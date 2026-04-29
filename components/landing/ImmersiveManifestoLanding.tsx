@@ -299,6 +299,9 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
         {/* ─── 50 Historic Catastrophic Events Chronicle ─── */}
         <CatastropheChronicle />
 
+        {/* ─── Strategic, Legal & Business Framework ─── */}
+        <StrategicCorporateDocumentation />
+
         </main>
 
         {/* Right Academic Column */}
@@ -400,13 +403,19 @@ function PublicAkashicLedgerSample() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    let isMounted = true;
     fetch('/api/akashic/verify')
-      .then(r => r.json())
-      .then(d => {
-        if (d.ok && d.results) setFeed(d.results);
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted) {
+          if (data && data.feed) setFeed(data.feed.slice(0, 4));
+          setLoading(false);
+        }
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => { isMounted = false; };
   }, []);
 
   return (
@@ -586,6 +595,93 @@ function ScannerDocumentation() {
         <p className="font-serif text-[12px] text-[#444] leading-relaxed text-justify">
           The signature produced by the mobile device is publicly verifiable but reveals no information whatsoever about the operator's private key. The server only stores the derived public wallet address. Any attempt to replay an old session is automatically blocked by the single-use nonce system and the 90-second validity window.
         </p>
+      </div>
+    </section>
+  );
+}
+
+function StrategicCorporateDocumentation() {
+  const phases = [
+    {
+      id: "IV",
+      title: "IP & Legal Infrastructure",
+      subtitle: "Absolute Jurisdictional Invulnerability",
+      items: [
+        { label: "IP Registration", text: "SHA-256 code hashing and Safe Creative deposition for 'Sovereign Network'. Complete patent compartmentalization for the Z-Score engine." },
+        { label: "Asymmetric NDA", text: "24-month non-circumvention clauses with liquidated damages to eliminate enterprise extraction vectors." },
+        { label: "GDPR Mastery", text: "EIP-191 authentication completely bypasses PII ingestion. No emails, no IP storage. Mathematical proof over biometric liability." },
+        { label: "Corporate Entity", text: "Formal transfer of software architecture rights to the central SL vehicle, cementing intellectual property into tangible capital." }
+      ]
+    },
+    {
+      id: "V",
+      title: "Business & Funding Matrix",
+      subtitle: "Hyper-Scalable Capital Architecture",
+      items: [
+        { label: "B2B SaaS Canvas", text: "Dual-tier revenue flow targeting institutional funds and elite retail whales via frictionless on-chain API gateways." },
+        { label: "Financial Projections", text: "18-month runway modeling with LTV/CAC ratio strictly > 4. Sub-3% projected churn on enterprise licenses." },
+        { label: "Institutional Pitch", text: "15-slide master narrative focused on 'Zero-Trust Architecture', leveraging the initial 30-user elite evaluation cohort." },
+        { label: "ENISA / CDTI", text: "Structured R&D memory targeting non-dilutive government grants for the proprietary session-reconciliation engine." }
+      ]
+    },
+    {
+      id: "VI",
+      title: "Final System Alignment",
+      subtitle: "The Master Execution Checklist",
+      items: [
+        { label: "Code Integrity", text: "TitaniumGate and Wagmi reconciliations achieved zero infinite-redirect loops. Audited and sealed." },
+        { label: "Founders Pact", text: "1-year cliff and 4-year vesting matrix mathematically enforcing alignment among core architects." },
+        { label: "Societal Constitution", text: "Notarial certification, statutory broad scope, and capital injection finalized for operational dominance." }
+      ]
+    }
+  ];
+
+  return (
+    <section className="w-full max-w-[850px] shrink-0 pt-16 pb-16 flex flex-col gap-10">
+      <div className="flex flex-col gap-4 text-center items-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black border border-black/10">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]" />
+          <span className="text-[9px] font-black uppercase tracking-[0.25em] text-[#FDFCF8]">Corporate Ready</span>
+        </div>
+        <h2 className="text-[28px] md:text-[36px] font-serif text-black leading-tight tracking-tight mt-2">
+          Strategic & Corporate <br /><span className="italic font-light text-black/60">Execution Framework</span>
+        </h2>
+        <p className="font-serif text-[13px] text-[#444] max-w-xl mx-auto leading-relaxed border-t border-b border-black/10 py-6 mt-4">
+          Sovereign Terminal is not merely a technical infrastructure. The following matrix details the absolute perfection achieved across Intellectual Property, Business Modeling, and Institutional Compliance.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-8">
+        {phases.map((phase) => (
+          <div key={phase.id} className="flex flex-col gap-[1px] bg-black border border-black shadow-sm group">
+            <div className="bg-[#111] text-[#FDFCF8] flex items-center justify-between px-6 py-4">
+              <div className="flex items-center gap-4">
+                <span className="font-mono text-[24px] font-black tracking-tighter text-[#D4AF37] opacity-80 group-hover:opacity-100 transition-opacity">
+                  {phase.id}.
+                </span>
+                <span className="font-mono text-[12px] uppercase tracking-widest font-bold">
+                  {phase.title}
+                </span>
+              </div>
+              <span className="hidden sm:block font-mono text-[9px] uppercase tracking-widest text-[#FDFCF8]/40">
+                {phase.subtitle}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[1px] bg-black">
+              {phase.items.map((item, idx) => (
+                <div key={idx} className="bg-[#fdfbf6] p-6 hover:bg-[#f5f4ef] transition-colors duration-300 flex flex-col gap-3">
+                  <span className="font-mono text-[10px] font-black uppercase tracking-widest text-black/60">
+                    {item.label}
+                  </span>
+                  <p className="font-serif text-[12px] text-[#222] leading-[1.8] text-justify">
+                    {item.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

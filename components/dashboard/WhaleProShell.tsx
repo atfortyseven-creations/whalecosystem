@@ -56,7 +56,10 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'support',      label: 'Support',           icon: <MessageSquare size={17}/> },
 ];
 
-
+const RESTRICTED_TABS = [
+    'firehose', 'sov-intel', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
+    'portfolio', 'live-port', 'whale-port', 'vault', 'zk', 'logs'
+];
 
 function PriceFlash({ value, children }: { value: string | number; children: React.ReactNode }) {
     const [flash, setFlash] = useState<'up' | 'down' | null>(null);
@@ -175,12 +178,7 @@ export function WhaleProShell({
             return;
         }
 
-        const restrictedTabs = [
-            'firehose', 'sov-intel', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
-            'portfolio', 'live-port', 'whale-port', 'vault', 'zk', 'logs'
-        ];
-        
-        if (restrictedTabs.includes(id)) {
+        if (RESTRICTED_TABS.includes(id)) {
             if (!isWalletConnected) {
                 toast.error("Connection Required", {
                     description: "You must connect a wallet to access execution and forensic layers.",
@@ -195,11 +193,7 @@ export function WhaleProShell({
 
     // Active clearance ejection monitor
     useEffect(() => {
-        const restrictedTabs = [
-            'firehose', 'sov-intel', 'inst-ledger', 'mass-transfer', 'graph', 'defi', 'polymarket', 'forge',
-            'portfolio', 'live-port', 'whale-port', 'vault', 'zk', 'logs'
-        ];
-        if (restrictedTabs.includes(activeTab)) {
+        if (RESTRICTED_TABS.includes(activeTab)) {
             if (!isWalletConnected) {
                 onTabChange('news');
                 toast.error("Session Lost", { description: "You have been disconnected." });

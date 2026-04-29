@@ -11,6 +11,7 @@
  *   - Edge cases (wrong address, corrupted sig, future timestamp)
  */
 
+// @ts-ignore - Vitest types not fully linked in strict mode
 import { describe, it, expect, beforeAll } from 'vitest';
 import { ethers } from 'ethers';
 import {
@@ -21,7 +22,7 @@ import {
   generateNonce,
   safeAddressEqual,
   buildAuthMessage,
-} from '../../lib/crypto/eip191-verify';
+} from '@/lib/crypto/eip191-verify';
 
 // ── Test fixtures ──────────────────────────────────────────────────────────────
 
@@ -177,7 +178,7 @@ describe('verifySignedPayload', () => {
   it('rejects expired payload (> 30s old)', async () => {
     const sig = await wallet.signMessage(testMessage);
     const result = verifySignedPayload(
-      { message: testMessage, signature: sig, address: walletAddress, timestamp: Date.now() - 31_000 },
+      { message: testMessage, signature: sig, address: walletAddress, timestamp: Date.now() - 31_000, nonce: 'mock-nonce' },
       30_000
     );
     expect(result.valid).toBe(false);
@@ -187,7 +188,7 @@ describe('verifySignedPayload', () => {
   it('rejects payload from the future (> 5s clock skew)', async () => {
     const sig = await wallet.signMessage(testMessage);
     const result = verifySignedPayload(
-      { message: testMessage, signature: sig, address: walletAddress, timestamp: Date.now() + 10_000 },
+      { message: testMessage, signature: sig, address: walletAddress, timestamp: Date.now() + 10_000, nonce: 'mock-nonce' },
       30_000
     );
     expect(result.valid).toBe(false);

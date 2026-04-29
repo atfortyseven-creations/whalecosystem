@@ -42,10 +42,11 @@ export function WorldMapBackground() {
           "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
         ];
 
+        const controller = new AbortController();
         let geojson: any = null;
         for (const url of mapUrls) {
           try {
-            const res = await fetch(url);
+            const res = await fetch(url, { signal: controller.signal });
             if (res.ok) { geojson = await res.json(); break; }
           } catch { /* try next */ }
         }

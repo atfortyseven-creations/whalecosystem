@@ -45,7 +45,12 @@ export class EntityGraphMiner {
         if (process.env.NEO4J_URI && process.env.NEO4J_USER) {
             this.driver = neo4j.driver(
                 process.env.NEO4J_URI,
-                neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASSWORD || '')
+                neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASSWORD || ''),
+                {
+                    connectionTimeout: 5000,
+                    maxConnectionPoolSize: 50,
+                    maxConnectionLifetime: 3600000 // 1 hour
+                }
             );
             console.log('[GRAPH-MINER] Connected to Neo4j Multi-Dimensional Index.');
         } else {

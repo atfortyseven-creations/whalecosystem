@@ -1,8 +1,9 @@
 // test/setup.ts — Global test setup for Sovereign test suite
+// @ts-ignore - Vitest types not fully linked in strict mode
 import { vi } from 'vitest';
 
 // Set required environment variables for all tests
-process.env.NODE_ENV = 'test';
+(process.env as any).NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-jwt-secret-minimum-32-chars-ok';
 process.env.NEXTAUTH_SECRET = 'test-nextauth-secret-minimum-32-chars-ok';
 process.env.AUDIT_SECRET = 'test-audit-secret-minimum-32-chars-ok';

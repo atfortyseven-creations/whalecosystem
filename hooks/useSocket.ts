@@ -44,10 +44,25 @@ export const useSocket = () => {
     // Set initial state correctly if already connected
     setIsConnected(socket.connected);
 
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !socket.connected) {
+        console.log('📡 [WebSocket] Tab became visible. Forcing reconnection...');
+        socket.connect();
+      }
+    };
+    
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
+
     return () => {
       connectionCount--;
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      }
       
       if (connectionCount === 0 && globalSocket) {
         globalSocket.disconnect();

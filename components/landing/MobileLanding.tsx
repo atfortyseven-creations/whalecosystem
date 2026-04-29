@@ -758,7 +758,8 @@ export function MobileLanding() {
         for (const cookie of cookies) {
           const eqIdx = cookie.indexOf('=');
           if (eqIdx === -1) continue;
-          const val = decodeURIComponent(cookie.substring(eqIdx + 1));
+          let val = cookie.substring(eqIdx + 1);
+          try { val = decodeURIComponent(val); } catch {}
           if (val) {
             const addr = extractAddressFromAppKit(val);
             if (addr) { 
@@ -797,7 +798,7 @@ export function MobileLanding() {
           }
         }
       } catch {}
-      if (attempts >= 600) {
+      if (attempts >= 300) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         setFallbackStatus('failed');
         // CRITICAL FIX: Do not leave the user stuck on the Reconnecting screen if it fails.
@@ -818,16 +819,17 @@ export function MobileLanding() {
   }, [mounted, isConnected, address, isLinked, establishSession]);
 
   // ── forceFullReconnect — Manual sync trigger for Android Chrome ────────────
-  const forceFullReconnect = useCallback(async () => {
+  const forceFullReconnect = useCallback(() => {
     setFallbackStatus('checking');
     try {
-      await reconnect();
-      // Give wagmi a window to hydrate from storage
-      setTimeout(() => onFocusRecheck(), 600);
+      // Fire-and-forget: do NOT await reconnect(). Awaiting blocks the polling
+      // loop, causing artificial delays if the WalletConnect relay is slow.
+      reconnect();
     } catch (e) {
       console.error('[Sovereign:Recovery] Manual sync failed:', e);
-      onFocusRecheck(); // attempt polling regardless
     }
+    // Start polling immediately!
+    onFocusRecheck();
   }, [reconnect, onFocusRecheck]);
 
   // ── Hardened Sovereign Wake-Sync Engine ───────────────────────────────────
@@ -839,8 +841,7 @@ export function MobileLanding() {
       try { document.querySelector('w3m-modal')?.remove(); } catch {}
       if (isLinked) return;
       if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
-        setFallbackStatus('checking');
-        setTimeout(onFocusRecheck, 800);
+        forceFullReconnect();
       } else {
         onFocusRecheck();
       }
@@ -871,7 +872,7 @@ export function MobileLanding() {
     setFallbackStatus('checking');
 
     const doRecovery = () => {
-      setTimeout(() => onFocusRecheck(), 400);
+      forceFullReconnect();
     };
     doRecovery();
 

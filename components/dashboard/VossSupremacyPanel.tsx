@@ -21,7 +21,7 @@ const pct = (a: number, b: number) => Math.min(100, Math.round((a / b) * 100));
 
 // ── Sub-components: Institutional Aesthetic ───────────────────────────────────
 
-function AllocationTelemetryBar({ minted, max }: { minted: number; max: number }) {
+const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ minted, max }: { minted: number; max: number }) {
   const fill = pct(minted, max);
   const remaining = max - minted;
   const isAlmostFull = remaining <= 10;
@@ -220,7 +220,7 @@ function AuthorizationSignaturePad({ onSignature, disabled, onMint, mintLabel }:
   );
 }
 
-function VerifiedLedger({ feed }: { feed: any[] }) {
+const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[] }) {
   const displayFeed = feed || [];
 
   return (
@@ -339,19 +339,25 @@ export function VossSupremacyPanel() {
   const [signatureData, setSignatureData] = useState<string>("");
   const [isMinting, setIsMinting] = useState(false);
 
-  const fetchStats = useCallback(async () => {
+  const fetchStats = useCallback(async (signal?: AbortSignal) => {
     try {
       const q = address ? `?address=${address}` : '';
-      const res = await fetch(`/api/golden-ticket/claim${q}`);
+      const res = await fetch(`/api/golden-ticket/claim${q}`, { signal });
       const json = await res.json();
       setDbStats(json);
-    } catch {}
+    } catch (err: any) {
+      if (err.name !== 'AbortError') console.error(err);
+    }
   }, [address]);
 
   useEffect(() => {
-    fetchStats();
-    const id = setInterval(fetchStats, 5000);
-    return () => clearInterval(id);
+    const controller = new AbortController();
+    fetchStats(controller.signal);
+    const id = setInterval(() => fetchStats(controller.signal), 5000);
+    return () => {
+      clearInterval(id);
+      controller.abort();
+    };
   }, [fetchStats]);
 
   const handleMint = useCallback(async () => {
