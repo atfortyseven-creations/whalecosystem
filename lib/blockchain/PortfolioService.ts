@@ -67,7 +67,54 @@ export class PortfolioService {
    */
   public async getFullPortfolio(chainId: ChainId, address: string, forceRefresh = false, preFetchedNetWorth: any = null) {
     const chain = moralisService.getChainName(chainId);
-    
+
+    // ─── EARLY GUARD: Route unsupported chains directly to RPC fallback ──────
+    // Moralis v2.2 supports: ETH(1), Polygon(137), BSC(56), Avalanche(43114),
+    // Arbitrum(42161), Optimism(10), Base(8453). All others (e.g. World Chain 480)
+    // fall through to this path to prevent mis-routed 'eth' queries & timeouts.
+    const MORALIS_SUPPORTED = new Set([1, 137, 56, 43114, 42161, 10, 8453]);
+    if (!MORALIS_SUPPORTED.has(chainId)) {
+      console.log(`[Portfolio] Chain ${chainId} not Moralis-supported — routing to RPC fallback.`);
+      try {
+        const { blockchainService } = await import('./BlockchainService');
+        const commonTokens = this.getCommonTokensForChain(chainId);
+        const rpcResult = await blockchainService.fetchPortfolio(chainId, address, commonTokens);
+        const nativeSymbol = this.getNativeSymbol(chainId);
+        const nativeBalanceFormatted = parseFloat(ethers.formatUnits(rpcResult.nativeBalance, 18));
+        const nativePriceMap = await PriceService.getBulkPrices([{
+          symbol: nativeSymbol, address: 'native', chainId
+        }]).catch(() => ({} as Record<string, any>));
+        const price = nativePriceMap[nativeSymbol.toUpperCase()]?.price || 0;
+        const nativeToken = {
+          address: 'native',
+          balance: rpcResult.nativeBalance,
+          balanceNumeric: nativeBalanceFormatted,
+          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }),
+          name: nativeSymbol,
+          symbol: nativeSymbol,
+          decimals: 18,
+          logo: null,
+          price,
+          valueUsd: nativeBalanceFormatted * price,
+          change24h: 0,
+          chainId,
+          sector: 'Layer 1',
+          isUnknown: false,
+        };
+        return {
+          chainId,
+          address,
+          nativeBalance: rpcResult.nativeBalance,
+          nativeValueUsd: nativeBalanceFormatted * price,
+          totalValueUsd: nativeBalanceFormatted * price,
+          tokens: [nativeToken],
+        };
+      } catch (rpcError: any) {
+        console.warn(`[Portfolio] RPC fallback failed for chain ${chainId}:`, rpcError.message);
+        return { chainId, address, error: 'FETCH_FAILED', nativeBalance: '0', nativeValueUsd: 0, totalValueUsd: 0, tokens: [] };
+      }
+    }
+
     try {
       console.log(`[Portfolio-Moralis] Fetching ${chain} portfolio for ${address.slice(0, 10)}...`);
       
@@ -446,12 +493,14 @@ export class PortfolioService {
     // 0. Check Redis Persistent Cache (Force skip if deepScan is requested)
     const cacheKey = `portfolio:${rawAddress}:${targetChains.join(',')}${deepScan ? ':deep' : ''}`;
     const cached = await safeRedisGet(cacheKey);
-    if (!deepScan && !forceRefresh && cached) {
+    // Guard: safeRedisGet returns the string 'TIMEOUT' on Redis timeout.
+    // Treating 'TIMEOUT' as a valid cache hit would cause JSON.parse to throw.
+    if (!deepScan && !forceRefresh && cached && cached !== 'TIMEOUT') {
       console.log(`[Portfolio] Returning persistent data for ${rawAddress}`);
       try {
         return JSON.parse(cached);
-      } catch (e) {
-        console.warn(`[Portfolio:Cache] Error parsing for ${rawAddress}, fetching fresh.`);
+      } catch {
+        // Corrupted/stale cache entry — evict silently and re-fetch.
       }
     }
 
@@ -856,7 +905,12 @@ export class PortfolioService {
   public async getCachedHistory(address: string, period: string) {
     const key = `history:${address}:${period}`;
     const cached = await safeRedisGet(key);
-    return cached ? JSON.parse(cached) : null;
+    if (!cached || cached === 'TIMEOUT') return null;
+    try {
+      return JSON.parse(cached);
+    } catch {
+      return null;
+    }
   }
 
   public async setCachedHistory(address: string, period: string, data: any) {

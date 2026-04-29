@@ -159,14 +159,15 @@ function ConnectPanel() {
           <div
             className="w-20 h-20 rounded-[1.8rem] flex items-center justify-center"
             style={{
-              background: "rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.12)",
               border: "1px solid rgba(255,255,255,0.2)",
             }}
           >
             <img
-              src="/official-whale-legendary.png"
+              src="/official-whale-monochrome.png"
               alt="Whale Alert"
-              className="w-12 h-12 object-contain drop-shadow-lg"
+              className="w-12 h-12 object-contain brightness-0 invert drop-shadow-lg"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
           </div>
 
@@ -279,6 +280,7 @@ export default function LoginPage() {
             src="/official-whale-monochrome.png"
             className="w-7 h-7 brightness-0 invert opacity-70"
             alt="Whale Alert"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
           <span className="font-black text-sm uppercase tracking-tight text-white/60">
             Whale Alert Network
