@@ -18,7 +18,6 @@ import {
   Monitor,
 } from "lucide-react";
 import { QRCodeSVG as QRCode } from "qrcode.react";
-import { WorldMapBackground, BtcTransferLegend } from "./WorldMapBackground";
 
 // ─── Detect mobile/tablet via UA ─────────────────────────────────────────────
 function useIsMobile() {
@@ -86,28 +85,35 @@ function WalletButton({
       transition={{ delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       onClick={loading ? undefined : onClick}
       disabled={loading}
-      className="group relative w-full flex items-center gap-4 p-5 bg-[#FAF9F6] hover:bg-white border border-black/[0.06] hover:border-black/12 rounded-[24px] transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-0.5 text-[#050505] disabled:opacity-50 disabled:cursor-not-allowed"
+      className="group relative w-full flex items-center gap-4 p-5 rounded-[24px] transition-all duration-300 hover:-translate-y-0.5 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+      style={{
+        background: "rgba(255,255,255,0.07)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        backdropFilter: "blur(12px)",
+      }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.07)"; }}
     >
-      <div className="w-11 h-11 rounded-xl bg-white border border-black/5 flex items-center justify-center p-2 shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0">
+      <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center p-2 shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0">
         <img
           src={logo} alt={name} className="w-full h-full object-contain"
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         />
       </div>
       <div className="flex-1 text-left min-w-0">
-        <p className="text-[13px] font-black uppercase tracking-tight truncate">
+        <p className="text-[13px] font-black uppercase tracking-tight truncate text-white">
           {loading ? "Connecting…" : name}
         </p>
-        <p className="text-[10px] font-mono text-black/40 uppercase tracking-widest mt-0.5 truncate">
+        <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-0.5 truncate">
           {badge}
         </p>
       </div>
       {loading ? (
-        <Loader2 size={14} className="animate-spin text-black/30 shrink-0" />
+        <Loader2 size={14} className="animate-spin text-white/30 shrink-0" />
       ) : extraIcon ? (
-        <span className="text-black/20 group-hover:text-black transition-colors shrink-0">{extraIcon}</span>
+        <span className="text-white/30 group-hover:text-white transition-colors shrink-0">{extraIcon}</span>
       ) : (
-        <ArrowRight size={14} className="text-black/20 group-hover:text-black group-hover:translate-x-1 transition-all shrink-0" />
+        <ArrowRight size={14} className="text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
       )}
     </motion.button>
   );
@@ -319,17 +325,19 @@ export default function ConnectPage() {
     : "";
 
   return (
-    <div className="min-h-screen w-full flex flex-col text-black font-mono overflow-auto bg-[#FAF9F6] selection:bg-black selection:text-white">
-      <WorldMapBackground />
-      {/* Wave bg */}
+    <div
+      className="min-h-screen w-full flex flex-col text-black font-mono overflow-auto selection:bg-black selection:text-white"
+      style={{
+        background: "linear-gradient(135deg, #020617 0%, #0a0f1e 40%, #050d1a 100%)",
+      }}
+    >
+      {/* Subtle grid texture */}
       <div
-        className="fixed bottom-0 left-0 right-0 h-[50vh] pointer-events-none z-0"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: "url('/olas-hokusai-4k.png')",
-          backgroundSize: "contain",
-          backgroundPosition: "bottom center",
-          backgroundRepeat: "repeat-x",
-          opacity: 0.25,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
         }}
       />
 
@@ -340,30 +348,25 @@ export default function ConnectPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`w-full my-auto ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2'} rounded-[36px] border border-black/10 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.10)] overflow-hidden`}
+          className={`w-full my-auto ${mounted && isConnected ? 'max-w-2xl grid grid-cols-1' : 'max-w-4xl grid grid-cols-1 lg:grid-cols-2'} rounded-[36px] overflow-hidden`}
+          style={{ border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 32px 80px -16px rgba(0,0,0,0.5)" }}
         >
           {/* ── LEFT: QR panel ── */}
           {!(mounted && isConnected) && (
-          <div className="relative p-8 lg:p-12 flex flex-col bg-white border-b lg:border-b-0 lg:border-r border-black/[0.08] overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none z-0"
-              style={{
-                backgroundImage: "url('/blue-cubes.png')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                opacity: 1,
-                mixBlendMode: "normal",
-                transform: "scale(1.01)", // Prevents edge bleed for max DPI
-                imageRendering: "high-quality" as any // Max DPI quality
-              }}
-            />
+          <div
+            className="relative p-8 lg:p-12 flex flex-col overflow-hidden"
+            style={{ borderRight: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
+          >
             <div className="relative z-10 flex flex-col h-full">
-              <div className="inline-flex bg-white/90 backdrop-blur-md self-start px-5 py-3 rounded-2xl mb-3 border border-black/5 shadow-sm">
-                <h2 className="text-3xl font-black uppercase tracking-tighter leading-none">
+              <div
+                className="inline-flex self-start px-5 py-3 rounded-2xl mb-3"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
+              >
+                <h2 className="text-3xl font-black uppercase tracking-tighter leading-none text-white">
                   Direct QR Handshake
                 </h2>
               </div>
-              <div className="mb-8 border-b border-black/10 pb-4" />
+              <div className="mb-8 border-b border-white/10 pb-4" />
 
               <div className="flex flex-col items-center gap-6 flex-1 justify-center">
                 <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5 flex flex-col items-center">
@@ -381,34 +384,27 @@ export default function ConnectPage() {
                   </AnimatePresence>
                   {qrSession && mounted && (
                     <div className="mt-4 flex flex-col items-center text-center gap-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-2 py-0.5 rounded">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-red-400 bg-red-900/30 px-2 py-0.5 rounded">
                         DO NOT SCAN WITH METAMASK
                       </span>
-                      <span className="text-[9px] font-mono uppercase tracking-widest text-black/40">
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-white/40">
                         Scan with native phone camera
                       </span>
-                      
                       <div className="mt-5 flex flex-col items-start text-left gap-3.5 w-full max-w-[280px]">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#050505] border-b border-black/10 w-full pb-1 mb-1">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white/70 border-b border-white/10 w-full pb-1 mb-1">
                           Authentication Protocol
                         </span>
                         <div className="flex items-start gap-2.5">
-                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] px-1.5 py-0.5 rounded mt-0.5">1</span>
-                          <span className="text-[11px] font-medium leading-relaxed text-black/70">
-                            Activate your native mobile camera application or integrated secure scanner.
-                          </span>
+                          <span className="text-[9px] font-mono bg-white/10 text-white/70 px-1.5 py-0.5 rounded mt-0.5">1</span>
+                          <span className="text-[11px] font-medium leading-relaxed text-white/50">Activate your native mobile camera application or integrated secure scanner.</span>
                         </div>
                         <div className="flex items-start gap-2.5">
-                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] px-1.5 py-0.5 rounded mt-0.5">2</span>
-                          <span className="text-[11px] font-medium leading-relaxed text-black/70">
-                            Align the viewfinder precisely with the cryptographic QR matrix presented above.
-                          </span>
+                          <span className="text-[9px] font-mono bg-white/10 text-white/70 px-1.5 py-0.5 rounded mt-0.5">2</span>
+                          <span className="text-[11px] font-medium leading-relaxed text-white/50">Align the viewfinder precisely with the cryptographic QR matrix presented above.</span>
                         </div>
                         <div className="flex items-start gap-2.5">
-                          <span className="text-[9px] font-mono bg-black/5 text-[#050505] px-1.5 py-0.5 rounded mt-0.5">3</span>
-                          <span className="text-[11px] font-medium leading-relaxed text-black/70">
-                            Acknowledge the subsequent secure deep-link prompt to finalize the session handshake.
-                          </span>
+                          <span className="text-[9px] font-mono bg-white/10 text-white/70 px-1.5 py-0.5 rounded mt-0.5">3</span>
+                          <span className="text-[11px] font-medium leading-relaxed text-white/50">Acknowledge the subsequent secure deep-link prompt to finalize the session handshake.</span>
                         </div>
                       </div>
                     </div>
@@ -430,7 +426,7 @@ export default function ConnectPage() {
 
                 {qrSession && (
                   <button onClick={() => { setQrSession(null); setSyncStatus("IDLE"); }}
-                    className="text-[9px] font-mono text-black/25 hover:text-black/50 uppercase tracking-widest transition-colors mt-4">
+                    className="text-[9px] font-mono text-white/25 hover:text-white/50 uppercase tracking-widest transition-colors mt-4">
                     Refresh QR
                   </button>
                 )}
@@ -440,25 +436,25 @@ export default function ConnectPage() {
           )}
 
           {/* ── RIGHT: Smart wallet connect ── */}
-          <div className="relative p-8 lg:p-12 flex flex-col bg-white/95 backdrop-blur-md">
+          <div
+            className="relative p-8 lg:p-12 flex flex-col"
+            style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)" }}
+          >
             <div className="relative z-10 flex flex-col h-full">
 
-              <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2">
+              <h2 className="text-3xl font-black uppercase tracking-tighter leading-none mb-2 text-white">
                 Connect Wallet
               </h2>
 
               {/* Device mode indicator — only visible pre-connection */}
               {mounted && !isConnected && (
-                <div className="flex items-center gap-1.5 mb-6 border-b border-black/10 pb-4">
+                <div className="flex items-center gap-1.5 mb-6 border-b border-white/10 pb-4">
                   {isMobile
-                    ? <Smartphone size={9} className="text-emerald-500" />
-                    : <Monitor size={9} className="text-sky-500" />
+                    ? <Smartphone size={9} className="text-emerald-400" />
+                    : <Monitor size={9} className="text-sky-400" />
                   }
-                  <span className="text-[8px] font-mono uppercase tracking-widest text-black/30">
-                    {isMobile
-                      ? "Mobile — tap to open native app"
-                      : "Desktop — opens browser extension"
-                    }
+                  <span className="text-[8px] font-mono uppercase tracking-widest text-white/30">
+                    {isMobile ? "Mobile — tap to open native app" : "Desktop — opens browser extension"}
                   </span>
                 </div>
               )}
@@ -477,36 +473,32 @@ export default function ConnectPage() {
                 >
                   <div className="relative">
                     <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20" />
-                    <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-lg relative z-10">
-                      <CheckCircle size={36} className="text-emerald-500" />
+                    <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shadow-lg relative z-10">
+                      <CheckCircle size={36} className="text-emerald-400" />
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col items-center text-center max-w-[280px]">
-                    <span className="text-[14px] font-black uppercase tracking-widest text-emerald-700">
+                    <span className="text-[14px] font-black uppercase tracking-widest text-emerald-400">
                       Identity Verified
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-600/60 break-all mt-2 px-4 py-2 bg-emerald-50/50 rounded-xl border border-emerald-100/50">
+                    <span className="text-[10px] font-mono text-emerald-400/60 break-all mt-2 px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-400/20">
                       {address}
                     </span>
                   </div>
 
                   <div className="flex flex-col items-center gap-3 mt-4">
-                    <Loader2 size={24} className="animate-spin text-black/20" />
-                    <span className="text-[11px] font-black uppercase tracking-widest text-black/40 animate-pulse">
+                    <Loader2 size={24} className="animate-spin text-white/20" />
+                    <span className="text-[11px] font-black uppercase tracking-widest text-white/40 animate-pulse">
                       Redirecting to Terminal...
                     </span>
                   </div>
 
-                  {/* Absolute Failsafe: Hardcoded Anchor Link */}
                   <div className="mt-8">
-                    <a 
-                      href="/" 
-                      className="text-[9px] font-black uppercase tracking-widest text-black/20 hover:text-black/60 underline decoration-dotted underline-offset-4 transition-colors"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.location.href = "/";
-                      }}
+                    <a
+                      href="/"
+                      className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-white/60 underline decoration-dotted underline-offset-4 transition-colors"
+                      onClick={(e) => { e.preventDefault(); window.location.href = "/"; }}
                     >
                       Click here if not redirected automatically
                     </a>
@@ -517,7 +509,7 @@ export default function ConnectPage() {
                 /* ── SKELETON ── */
                 <div className="flex flex-col gap-3 flex-1">
                   {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="w-full h-[72px] rounded-[24px] bg-black/[0.03] animate-pulse" />
+                    <div key={i} className="w-full h-[72px] rounded-[24px] bg-white/[0.05] animate-pulse" />
                   ))}
                 </div>
 
@@ -557,9 +549,9 @@ export default function ConnectPage() {
 
               {/* Security note — only when not yet connected */}
               {mounted && !isConnected && (
-                <div className="mt-6 p-4 bg-[#FAF9F6]/80 border border-black/[0.06] rounded-2xl flex items-start gap-3">
-                  <Fingerprint size={14} className="text-black/25 mt-0.5 shrink-0" />
-                  <p className="text-[9px] text-black/35 font-semibold leading-relaxed">
+                <div className="mt-6 p-4 rounded-2xl flex items-start gap-3" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <Fingerprint size={14} className="text-white/25 mt-0.5 shrink-0" />
+                  <p className="text-[9px] text-white/35 font-semibold leading-relaxed">
                     This portal does not hold custody of assets. All interactions are verified on-chain via ECDSA signature. No username. No password.
                   </p>
                 </div>
@@ -568,27 +560,29 @@ export default function ConnectPage() {
           </div>
         </motion.div>
 
-        {/* ── BTC Transfer Legend — below the map, no text on canvas ── */}
-        <BtcTransferLegend />
       </main>
 
       {/* Footer */}
-      <footer className="relative z-[100] px-8 py-6 border-t border-black/[0.04] bg-white/50 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+      <footer className="relative z-[100] px-8 py-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-3">
-          <img src="/official-whale-monochrome.png" className="w-4 h-4 opacity-30" alt=""
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-black/30">© 2026 atfortyseven-creations</span>
+          <img
+            src="/official-whale-monochrome.png"
+            className="w-4 h-4 brightness-0 invert opacity-25"
+            alt=""
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          />
+          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/25">© 2026 atfortyseven-creations</span>
         </div>
         <div className="flex items-center gap-6">
-          <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-black/25 hover:text-black transition-colors">
+          <a href="https://twitter.com/WhaleAlert" target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors">
             <Twitter size={16} />
           </a>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-black/25 hover:text-black transition-colors">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors">
             <Github size={16} />
           </a>
           <div className="flex flex-col items-end">
-            <span className="text-[8px] font-black uppercase tracking-widest text-black/30">Status: Operational</span>
-            <span className="text-[7px] font-mono text-emerald-500 uppercase tracking-widest font-bold">L1/L2 Ingress Active</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-white/25">Status: Operational</span>
+            <span className="text-[7px] font-mono text-emerald-400 uppercase tracking-widest font-bold">L1/L2 Ingress Active</span>
           </div>
         </div>
       </footer>

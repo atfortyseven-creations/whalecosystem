@@ -273,7 +273,7 @@ class WhaleDataService {
 
         try {
             const cached = await safeRedisGet(cacheKey);
-            if (cached) return JSON.parse(cached);
+            if (cached && cached !== 'TIMEOUT') return JSON.parse(cached);
 
             // Scan ETH and BNB in parallel — real data only
             const [ethMovements, bnbMovements] = await Promise.all([

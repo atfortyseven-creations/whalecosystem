@@ -16,7 +16,10 @@ export const MORALIS_CHAINS = {
   43114: 'avalanche',
   42161: 'arbitrum',
   10: 'optimism',
-  8453: 'base'
+  8453: 'base',
+  // NOTE: World Chain (480) is NOT supported by Moralis API v2.2.
+  // It is intentionally excluded so callers can detect unsupported chains
+  // and route them to the RPC fallback immediately.
 } as const;
 
 export type MoralisChain = typeof MORALIS_CHAINS[keyof typeof MORALIS_CHAINS];
@@ -74,11 +77,14 @@ export class MoralisService {
     
     // ─── Phase 1: Redis Persistent Cache ─────────────────────
     const cached = await safeRedisGet(cacheKey);
-    if (cached) {
+    // Guard: safeRedisGet returns the string 'TIMEOUT' on Redis timeout,
+    // which is NOT valid JSON. Skip the parse to avoid SyntaxErrors.
+    if (cached && cached !== 'TIMEOUT') {
       try {
         return JSON.parse(cached) as T;
-      } catch (e) {
-        console.warn(`[Moralis:Cache] Error parsing for ${endpoint}, fetching fresh.`);
+      } catch {
+        // Corrupted cache entry — evict silently and re-fetch from source.
+        // Do NOT log here to avoid log spam on every cache miss.
       }
     }
 
