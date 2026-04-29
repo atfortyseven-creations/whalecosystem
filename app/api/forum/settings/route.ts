@@ -22,8 +22,10 @@ export async function GET() {
                 orderBy: { orderIndex: 'asc' },
                 include: { _count: { select: { topics: true } } },
             }),
-            (prisma as any).user.findUnique({
+            (prisma as any).user.upsert({
                 where: { walletAddress: address },
+                create: { walletAddress: address, displayName: `User_${address.slice(2, 6)}` },
+                update: {},
                 select: {
                     displayName: true,
                     bio: true,
