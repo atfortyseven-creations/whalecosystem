@@ -76,7 +76,7 @@ const AllocationTelemetryBar = React.memo(function AllocationTelemetryBar({ mint
       </div>
     </div>
   );
-}
+});
 
 function AcademicStatCard({ label, value, icon: Icon, isApex = false }: { label: string; value: string; icon: any; isApex?: boolean }) {
   return (
@@ -328,7 +328,7 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
          </div>
       </div>
   );
-}
+});
 
 export function VossSupremacyPanel() {
   const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
