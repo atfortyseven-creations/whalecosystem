@@ -136,7 +136,8 @@ export default function TopicPage() {
                   <button onClick={deleteTopic} className="shrink-0 mt-1 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-colors bg-red-500/20 text-red-500 border border-red-500/30 hover:bg-red-500/30">Confirm</button>
                   <button onClick={() => setDeleteConfirmTarget(null)} className="shrink-0 mt-1 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-colors bg-white/5 text-[#888888] hover:text-white border border-white/10">Cancel</button>
                 </>
-                  <button
+              ) : (
+                <button
                   onClick={() => setDeleteConfirmTarget('topic')}
                   className="shrink-0 mt-1 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-colors bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20"
                 >
