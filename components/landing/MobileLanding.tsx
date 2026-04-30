@@ -542,11 +542,18 @@ function ConnectedScreen({
             const url = new URL(result);
             const sessionId = url.searchParams.get('session');
             if (sessionId && address) {
+              const pendingToast = document.createElement('div');
+              pendingToast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-[#2D0A59] text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center flex items-center justify-center gap-3';
+              pendingToast.innerHTML = '<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> <span>Linking Session...</span>';
+              document.body.appendChild(pendingToast);
+
               await fetch(`/api/auth/qr-session?id=${sessionId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ address: address }),
               });
+              
+              pendingToast.remove();
               
               const toast = document.createElement('div');
               toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
@@ -643,7 +650,7 @@ export function MobileLanding() {
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
   const { reconnect } = useReconnect();
-  const { open: rkOpenModal } = useAppKit();
+  const { open: rkOpenModal, close: rkCloseModal } = useAppKit();
 
   // ── Ref: always holds the latest wagmiAddress for use inside setInterval closures ──
   // setInterval captures variables at creation time (stale closure). Without a ref,
@@ -716,6 +723,7 @@ export function MobileLanding() {
   // ─────────────────────────────────────────────────────────────────────────────
   const establishSession = useCallback((addr: string) => {
     if (isLinked) return;
+    try { rkCloseModal(); } catch {}
     const norm = addr.toLowerCase();
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}

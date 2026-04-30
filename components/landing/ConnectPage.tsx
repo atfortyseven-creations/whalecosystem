@@ -197,7 +197,7 @@ export default function ConnectPage() {
           setSyncStatus("SYNCED");
           clearInterval(poll);
           document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
-          setTimeout(() => router.replace("/"), 1200);
+          setTimeout(() => window.location.replace("/"), 1200);
         }
       } catch (err: any) {
         if (err.name !== 'AbortError') console.error(err);

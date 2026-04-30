@@ -18,9 +18,35 @@ function PointGlobeMesh() {
   useEffect(() => {
     if (!meshRef.current) return;
 
+    // 1. SYNC: Compute exact positions immediately so the globe is visible instantly.
+    const phiAngle = Math.PI * (3 - Math.sqrt(5)); 
+    for (let i = 0; i < count; i++) {
+      const y = 1 - (i / (count - 1)) * 2; 
+      const r = Math.sqrt(1 - y * y); 
+      
+      const theta = phiAngle * i;
+      
+      const x = Math.cos(theta) * r;
+      const z = Math.sin(theta) * r;
+      
+      dummy.position.set(x * radius, y * radius, z * radius);
+      dummy.lookAt(0, 0, 0); 
+      dummy.updateMatrix();
+      
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+
+      // Default color before texture loads
+      color.set("#A0A0A0");
+      meshRef.current.setColorAt(i, color);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+    if (meshRef.current.instanceColor) {
+      meshRef.current.instanceColor.needsUpdate = true;
+    }
+
+    // 2. ASYNC: Map precise continent silhouettes using Earth mask
     const loadGlobeData = async () => {
       try {
-        // High-fidelity earth mask. Water is white, land is black.
         const response = await fetch('https://unpkg.com/three-globe/example/img/earth-water.png');
         const blob = await response.blob();
         const imgUrl = URL.createObjectURL(blob);
@@ -37,24 +63,14 @@ function PointGlobeMesh() {
           ctx.drawImage(img, 0, 0);
           const imgData = ctx.getImageData(0, 0, img.width, img.height).data;
 
-          const phiAngle = Math.PI * (3 - Math.sqrt(5)); // Golden angle
-          
           for (let i = 0; i < count; i++) {
             const y = 1 - (i / (count - 1)) * 2; 
             const r = Math.sqrt(1 - y * y); 
-            
             const theta = phiAngle * i;
-            
             const x = Math.cos(theta) * r;
             const z = Math.sin(theta) * r;
             
-            dummy.position.set(x * radius, y * radius, z * radius);
-            dummy.lookAt(0, 0, 0); 
-            dummy.updateMatrix();
-            
-            meshRef.current.setMatrixAt(i, dummy.matrix);
-
-            // Compute precise UV coordinates for perfect silhouette mapping
+            // Compute precise UV coordinates
             const lat = Math.asin(y); 
             const lon = Math.atan2(z, x); 
             
@@ -63,32 +79,29 @@ function PointGlobeMesh() {
             
             const px = Math.floor(u * img.width);
             const py = Math.floor(v * img.height);
-            // Array bounds safeguard
             const safePx = Math.max(0, Math.min(px, img.width - 1));
             const safePy = Math.max(0, Math.min(py, img.height - 1));
             
             const pixelIdx = (safePy * img.width + safePx) * 4;
             
-            // Mask threshold detection
+            // In earth-water.png, white pixels (255) are water, black pixels (0) are land.
             const isWater = imgData[pixelIdx] > 128;
             
             if (isWater) {
-              // Water: Blue points
-              color.set("#3B82F6"); 
+              color.set("#3B82F6"); // Blue for water
             } else {
-              // Land: Purple points (Sovereign Branding)
-              color.set("#6D28D9"); 
+              color.set("#6D28D9"); // Purple for continents
             }
             
             meshRef.current.setColorAt(i, color);
           }
           
-          meshRef.current.instanceMatrix.needsUpdate = true;
           if (meshRef.current.instanceColor) {
             meshRef.current.instanceColor.needsUpdate = true;
           }
           URL.revokeObjectURL(imgUrl);
         };
+        img.onerror = () => console.error("[SovereignGlobe] Image failed to load.");
       } catch (e) {
         console.error("[SovereignGlobe] Failed to map continent data", e);
       }
