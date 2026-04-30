@@ -92,10 +92,9 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           {/* New Topic — hidden on mobile */}
           <Link
             href="/forum/new"
-            className="hidden sm:inline-flex text-[12px] font-sans font-bold tracking-wide px-4 py-1.5 rounded-sm hover:opacity-80 transition-colors"
-            style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+            className="hidden sm:inline-flex text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,192,118,0.3)] hover:-translate-y-0.5 bg-[#00C076] text-black"
           >
-            + New Topic
+            + CREATE MANDATE
           </Link>
 
           {/* Menu toggle */}
@@ -113,7 +112,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             <div className="absolute top-[52px] right-0 w-[220px] shadow-lg z-50 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--forum-bg)', border: '1px solid var(--forum-border)', borderTop: 'none' }}>
               {/* + New Topic on mobile only */}
               <Link href="/forum/new" onClick={() => setMenuOpen(false)} className="sm:hidden px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors" style={{ color: 'var(--forum-text)', borderBottom: '1px solid var(--forum-border)', backgroundColor: 'var(--forum-surface)' }}>
-                + New Topic
+                + CREATE MANDATE
               </Link>
               {navLinks.map(l => (
                 <Link
@@ -159,22 +158,22 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
 
       {/* Secondary Discourse Sub-Nav */}
-      <div className="w-full shadow-sm" style={{ backgroundColor: 'var(--forum-subnav-bg)', borderBottom: '1px solid var(--forum-border)' }}>
-        <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[48px] gap-6">
-          <Link href="/forum" className="text-[13px] font-sans font-bold h-full flex items-center transition-colors" style={{ color: 'var(--forum-text)', borderBottom: '2px solid var(--forum-border)' }}>
-            Categories
+      <div className="w-full shadow-sm bg-[#050505] border-b border-white/5">
+        <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[54px] gap-8 overflow-x-auto custom-scrollbar">
+          <Link href="/forum" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-white border-b-2 border-[#00C076] whitespace-nowrap">
+            Institutional Matrix
           </Link>
-          <Link href="/forum?filter=latest" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
-            Latest
+          <Link href="/forum?filter=latest" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+            Live Feed
           </Link>
-          <Link href="/forum?filter=new" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
-            New
+          <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+            Recent Profiles
           </Link>
-          <Link href="/forum?filter=unread" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
-            Unread
+          <Link href="/forum?filter=unread" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+            Pending Review
           </Link>
-          <Link href="/forum?filter=top" className="text-[13px] font-sans font-bold hover:opacity-100 transition-colors h-full flex items-center" style={{ color: 'var(--forum-text-muted)' }}>
-            Top
+          <Link href="/forum?filter=top" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+            Highest Yield
           </Link>
         </div>
       </div>

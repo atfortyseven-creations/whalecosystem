@@ -22,6 +22,7 @@ export default function NewTopicPage() {
   const [error, setError]           = useState('');
   const [draftSaved, setDraftSaved] = useState(false);
   const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const { signMessageAsync } = useSignMessage();
 
   // ── Restore draft on mount ────────────────────────────────────────────────
@@ -129,6 +130,44 @@ export default function NewTopicPage() {
       setDocuments(documents.filter((_, i) => i !== index));
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploadingFile(true);
+    setError('');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const res = await fetch('/api/forum/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.url) {
+        const newDocs = [...documents];
+        // Automatically fill title with the original file name if empty
+        if (!newDocs[index].title) {
+          newDocs[index].title = data.fileName || file.name;
+        }
+        newDocs[index].url = data.url;
+        setDocuments(newDocs);
+      } else {
+        setError(data.error || 'FAILED TO SECURE DOCUMENT');
+      }
+    } catch (err) {
+      setError('NETWORK ERROR DURING UPLOAD');
+    } finally {
+      setUploadingFile(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
   return (
     <div className="w-full min-h-screen bg-[#050505] text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden">
       {/* Background Volumetric Lighting */}
@@ -221,13 +260,25 @@ export default function NewTopicPage() {
                 </button>
             </div>
             <p className="text-[11px] text-[#888888] mb-2 leading-relaxed">
-                Attach legal files, IPFS hashes, On-Chain CVs, or Portfolios. These will be securely injected into the signature payload and presented inside the institutional vault.
+                Attach physical files or specify IPFS CIDs. Uploaded files will be cryptographically hashed, persisted in the isolated vault, and injected directly into the signature payload.
             </p>
             {documents.map((doc, idx) => (
-                <div key={idx} className="flex gap-4 items-center">
-                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="flex-1 px-4 py-3 text-[12px] rounded-lg bg-[#050505] border border-white/10 text-white focus:border-[#00C076] outline-none" />
-                    <input type="text" placeholder="Secure URL / IPFS CID" value={doc.url} onChange={e => updateDocument(idx, 'url', e.target.value)} className="flex-1 px-4 py-3 text-[12px] font-mono rounded-lg bg-[#050505] border border-white/10 text-white focus:border-[#00C076] outline-none" />
-                    <button onClick={() => removeDocument(idx)} className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors">
+                <div key={idx} className="flex gap-4 items-center bg-[#000000] p-3 rounded-xl border border-white/5 relative group">
+                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="flex-1 px-4 py-2.5 text-[12px] rounded-lg bg-[#050505] border border-white/10 text-white focus:border-[#00C076] outline-none" />
+                    
+                    <div className="flex-1 relative flex items-center">
+                        <input type="text" placeholder="Secure URL / IPFS CID" value={doc.url} onChange={e => updateDocument(idx, 'url', e.target.value)} className="w-full px-4 py-2.5 pr-[100px] text-[12px] font-mono rounded-lg bg-[#050505] border border-white/10 text-[#00C076] focus:border-[#00C076] outline-none" />
+                        
+                        {/* Native File Upload Integration */}
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <label className="cursor-pointer bg-[#111] hover:bg-[#222] border border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-md text-white transition-colors">
+                                {uploadingFile ? 'ENCRYPTING...' : 'UPLOAD FILE'}
+                                <input type="file" className="hidden" disabled={uploadingFile} onChange={(e) => handleFileUpload(e, idx)} />
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onClick={() => removeDocument(idx)} className="p-2.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/20">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>

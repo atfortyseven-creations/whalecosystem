@@ -8,22 +8,25 @@ import * as THREE from "three";
 // ─── 1. DOT GLOBE (PERFECT SILHOUETTES WITH EARTH MASK) ──────────────────────
 function PointGlobeMesh() {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
-  // 18,000 points guarantees maximum perfection and ultra-crisp borders
-  const count = 18000; 
+  // 35,000 points guarantees maximum perfection and ultra-crisp borders (inhuman density)
+  const count = 35000; 
   const radius = 100;
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const color = useMemo(() => new THREE.Color(), []);
   
+  // Store the base state of each point
+  const isLandRef = useRef<boolean[]>(new Array(count).fill(false));
+  const flashIntensityRef = useRef<number[]>(new Array(count).fill(0));
+
   useEffect(() => {
     if (!meshRef.current) return;
 
-    // 1. SYNC: Compute exact positions immediately so the globe is visible instantly.
+    // 1. SYNC: Compute exact positions immediately
     const phiAngle = Math.PI * (3 - Math.sqrt(5)); 
     for (let i = 0; i < count; i++) {
       const y = 1 - (i / (count - 1)) * 2; 
       const r = Math.sqrt(1 - y * y); 
-      
       const theta = phiAngle * i;
       
       const x = Math.cos(theta) * r;
@@ -31,18 +34,16 @@ function PointGlobeMesh() {
       
       dummy.position.set(x * radius, y * radius, z * radius);
       dummy.lookAt(0, 0, 0); 
+      
+      // Initially scale to 0 (invisible) until mask loads
+      dummy.scale.set(0, 0, 0);
       dummy.updateMatrix();
       
       meshRef.current.setMatrixAt(i, dummy.matrix);
-
-      // Default color before texture loads
-      color.set("#A0A0A0");
-      meshRef.current.setColorAt(i, color);
+      meshRef.current.setColorAt(i, color.set("#111111"));
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
-    if (meshRef.current.instanceColor) {
-      meshRef.current.instanceColor.needsUpdate = true;
-    }
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
 
     // 2. ASYNC: Map precise continent silhouettes using Earth mask
     const loadGlobeData = async () => {
@@ -87,21 +88,29 @@ function PointGlobeMesh() {
             // In earth-water.png, white pixels (255) are water, black pixels (0) are land.
             const isWater = imgData[pixelIdx] > 128;
             
+            dummy.position.set(x * radius, y * radius, z * radius);
+            dummy.lookAt(0, 0, 0);
+
             if (isWater) {
-              color.set("#3B82F6"); // Blue for water
+              isLandRef.current[i] = false;
+              dummy.scale.set(0, 0, 0); // Hide water completely to form the exact continent silhouette
             } else {
-              color.set("#6D28D9"); // Purple for continents
+              isLandRef.current[i] = true;
+              dummy.scale.set(1, 1, 1);
+              color.set("#111111"); // Absolute black/dark dots for land
+              meshRef.current.setColorAt(i, color);
             }
             
-            meshRef.current.setColorAt(i, color);
+            dummy.updateMatrix();
+            meshRef.current.setMatrixAt(i, dummy.matrix);
           }
           
+          meshRef.current.instanceMatrix.needsUpdate = true;
           if (meshRef.current.instanceColor) {
             meshRef.current.instanceColor.needsUpdate = true;
           }
           URL.revokeObjectURL(imgUrl);
         };
-        img.onerror = () => console.error("[SovereignGlobe] Image failed to load.");
       } catch (e) {
         console.error("[SovereignGlobe] Failed to map continent data", e);
       }
@@ -110,108 +119,83 @@ function PointGlobeMesh() {
     loadGlobeData();
   }, [count, dummy, color]);
 
-  useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0005; // Idle elegance
+  // 3. REAL-TIME TRANSACTION FLASHES
+  // Inhuman perfection: flash random land points to simulate global transactions
+  useFrame((state, delta) => {
+    if (!meshRef.current) return;
+    
+    meshRef.current.rotation.y += 0.0005; // Idle elegance rotation
+
+    const landArray = isLandRef.current;
+    const flashes = flashIntensityRef.current;
+    let colorUpdated = false;
+
+    // 1. Trigger new transactions (flashes)
+    // About 10 new transactions per frame across the globe
+    for (let i = 0; i < 15; i++) {
+        const randomIdx = Math.floor(Math.random() * count);
+        if (landArray[randomIdx]) {
+            flashes[randomIdx] = 1.0; // Max intensity
+        }
+    }
+
+    // 2. Decay existing flashes and update colors
+    // Aztec Theme: Base #111111 (Black/Dark), Peak #00C076 (Emerald Green)
+    const baseColor = new THREE.Color("#111111");
+    const peakColor = new THREE.Color("#00C076");
+    const tempColor = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+        if (flashes[i] > 0) {
+            flashes[i] -= delta * 2.0; // Decay speed
+            if (flashes[i] < 0) flashes[i] = 0;
+
+            // Interpolate between base dark and peak emerald based on intensity
+            tempColor.lerpColors(baseColor, peakColor, flashes[i]);
+            meshRef.current.setColorAt(i, tempColor);
+            colorUpdated = true;
+        }
+    }
+
+    if (colorUpdated && meshRef.current.instanceColor) {
+        meshRef.current.instanceColor.needsUpdate = true;
     }
   });
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       {/* Tiny circle for high resolution */}
-      <circleGeometry args={[0.25, 8]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.7} side={THREE.DoubleSide} />
+      <circleGeometry args={[0.2, 8]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
     </instancedMesh>
-  );
-}
-
-// ─── 2. PULSING HOTSPOTS (NO ARCS) ───────────────────────────────────────────
-function Hotspot({ lat, lng, radius, activityLevel }: { lat: number, lng: number, radius: number, activityLevel: number }) {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lng + 180) * (Math.PI / 180);
-  
-  const pos = new THREE.Vector3(
-    -(radius * Math.sin(phi) * Math.cos(theta)),
-    radius * Math.cos(phi),
-    radius * Math.sin(phi) * Math.sin(theta)
-  );
-
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const [offset] = useState(() => Math.random() * 100);
-
-  // Activity logic: more activity = faster blink and larger base scale
-  const speed = 2 + activityLevel * 1.5;
-  const baseScale = 1.0 + activityLevel * 0.15;
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      const t = state.clock.elapsedTime * speed + offset;
-      const s = baseScale + Math.sin(t) * (0.3 + activityLevel * 0.05);
-      meshRef.current.scale.set(s, s, s);
-      
-      const mat = meshRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.3 + Math.abs(Math.sin(t)) * 0.7;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={pos}>
-      <sphereGeometry args={[1.2, 16, 16]} />
-      {/* Golden pulsing hotspots for Bitcoin activity */}
-      <meshBasicMaterial color="#D4AF37" transparent opacity={0.8} />
-    </mesh>
   );
 }
 
 // ─── 3. MAIN GLOBE COMPONENT ────────────────────────────────────────────────
 export function SovereignGlobe3D() {
-  const [hotspots, setHotspots] = useState<any[]>([]);
-
-  useEffect(() => {
-    // Hardcoded major global economic nodes. 
-    // Activity scale 1 (lowest) to 10 (highest).
-    const locations = [
-      { lat: 40.71, lng: -74.00, activity: 9 }, // New York
-      { lat: 51.50, lng: -0.12, activity: 8 },  // London
-      { lat: 35.68, lng: 139.76, activity: 10 },// Tokyo
-      { lat: 1.35, lng: 103.81, activity: 7 },  // Singapore
-      { lat: 25.20, lng: 55.27, activity: 8 },  // Dubai
-      { lat: 22.31, lng: 114.16, activity: 6 }, // Hong Kong
-      { lat: 48.85, lng: 2.35, activity: 5 },   // Paris
-      { lat: 37.77, lng: -122.41, activity: 9 },// San Francisco
-      { lat: -33.86, lng: 151.20, activity: 4 },// Sydney
-      { lat: -23.55, lng: -46.63, activity: 5 },// Sao Paulo
-      { lat: 50.11, lng: 8.68, activity: 7 },   // Frankfurt
-      { lat: 39.90, lng: 116.40, activity: 6 }, // Beijing
-    ];
-    setHotspots(locations);
-  }, []);
-
   return (
-    <div className="w-full h-full cursor-grab active:cursor-grabbing absolute inset-0 z-0 bg-[#FAFAFA]">
+    <div className="w-full h-full cursor-grab active:cursor-grabbing absolute inset-0 z-0 bg-[#050505]">
+      {/* Volumetric ambient background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00C076]/10 blur-[120px] rounded-full pointer-events-none" />
+      
       <Canvas
         camera={{ position: [0, 0, 240], fov: 45, near: 1, far: 2000 }}
         dpr={[1, 2]} 
         gl={{ 
           antialias: true, 
           powerPreference: "high-performance",
-          alpha: false 
+          alpha: true 
         }}
       >
-        <color attach="background" args={['#FAFAFA']} />
         <ambientLight intensity={1.5} color="#ffffff" />
 
-        <group rotation={[0.2, 0, 0]}>
+        <group rotation={[0.2, -0.5, 0]}>
           <PointGlobeMesh />
-          
-          {hotspots.map((spot, i) => (
-            <Hotspot key={i} lat={spot.lat} lng={spot.lng} radius={101} activityLevel={spot.activity} />
-          ))}
         </group>
 
         <OrbitControls 
           enablePan={false} 
-          enableZoom={true} 
+          enableZoom={false} 
           minDistance={120} 
           maxDistance={400}
           autoRotate={true}
