@@ -216,8 +216,8 @@ export function GainersLosersPanel() {
         return allRows
             .filter(r => network === 'all' || r.meta.network === network)
             .filter(r => {
-                const ticker = stripUSDT(r.symbol).toLowerCase();
-                const name = r.meta.name.toLowerCase();
+                const ticker = (r.symbol ? stripUSDT(r.symbol) : '').toLowerCase();
+                const name = (r.meta?.name || '').toLowerCase();
                 const q = search.toLowerCase();
                 return ticker.includes(q) || name.includes(q);
             })

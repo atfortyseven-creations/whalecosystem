@@ -35,8 +35,8 @@ function PointGlobeMesh() {
       dummy.position.set(x * radius, y * radius, z * radius);
       dummy.lookAt(0, 0, 0); 
       
-      // Initially scale to 0 (invisible) until mask loads
-      dummy.scale.set(0, 0, 0);
+      // Initially scale to 1 so at least a full sphere is visible if mask fails/delays
+      dummy.scale.set(1, 1, 1);
       dummy.updateMatrix();
       
       meshRef.current.setMatrixAt(i, dummy.matrix);
@@ -165,8 +165,8 @@ function PointGlobeMesh() {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       {/* Tiny circle for high resolution */}
-      <circleGeometry args={[0.2, 8]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.6} side={THREE.DoubleSide} />
+      <circleGeometry args={[0.3, 8]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
     </instancedMesh>
   );
 }

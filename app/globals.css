@@ -1179,3 +1179,26 @@ html.no-hw-accel * {
 }
 /* Note: animations still work — we just remove GPU layer hints to save VRAM */
 
+/* ── FORUM LEGACY THEME VARS ────────────────────────────────────────────────── */
+.forum-theme-root {
+  --forum-bg: #FAF9F6;
+  --forum-surface: #F0EFEA;
+  --forum-border: rgba(0, 0, 0, 0.1);
+  --forum-text: #050505;
+  --forum-text-muted: rgba(0, 0, 0, 0.5);
+  --forum-hover: rgba(0, 0, 0, 0.05);
+  --forum-button-bg: #050505;
+  --forum-button-text: #FFFFFF;
+  --forum-accent: #00C076;
+}
+.dark .forum-theme-root {
+  --forum-bg: #050505;
+  --forum-surface: #111111;
+  --forum-border: rgba(255, 255, 255, 0.1);
+  --forum-text: #FFFFFF;
+  --forum-text-muted: #888888;
+  --forum-hover: rgba(255, 255, 255, 0.05);
+  --forum-button-bg: #FFFFFF;
+  --forum-button-text: #050505;
+  --forum-accent: #00C076;
+}
