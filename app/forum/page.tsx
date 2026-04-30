@@ -9,13 +9,18 @@ function ForumHomeContent() {
   const [topics, setTopics] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const searchParams = useSearchParams();
-  const filter = searchParams.get('filter') || 'latest';
-
+  const rawFilter = searchParams.get('filter');
+  const filter = rawFilter || 'matrix';
+  const isRestricted = ['latest', 'new', 'unread', 'top'].includes(rawFilter || '');
   useEffect(() => {
-    fetch(`/api/forum/topics?limit=30&filter=${filter}`)
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setTopics(data); })
-      .catch(console.error);
+    if (!isRestricted) {
+      fetch(`/api/forum/topics?limit=30&filter=${filter === 'matrix' ? 'latest' : filter}`)
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data)) setTopics(data); })
+        .catch(console.error);
+    } else {
+      setTopics([]); // Clear topics if restricted
+    }
 
     fetch('/api/forum/categories')
       .then(r => r.json())
@@ -50,15 +55,26 @@ function ForumHomeContent() {
         {/* Right Column: Latest Activity (65% -> col-span-8) */}
         <div className="lg:col-span-8 flex flex-col">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">{filter === 'latest' ? 'Live Institutional Mandates' : filter}</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">
+              {filter === 'matrix' ? 'Institutional Matrix Overview' : filter}
+            </h2>
           </div>
 
-          <div className="flex flex-col gap-3">
-            {topics.length === 0 ? (
-              <div className="py-20 text-center text-[12px] font-black uppercase tracking-widest text-[#555]">
-                NO ACTIVE MANDATES FOUND.
-              </div>
-            ) : topics.map(topic => {
+          {isRestricted ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center bg-black/[0.02] dark:bg-white/[0.02] border border-red-500/20 rounded-2xl">
+              <svg className="w-12 h-12 text-red-500 mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <h3 className="text-[14px] font-black uppercase tracking-widest text-red-500 mb-2">Tier 1 Clearance Required</h3>
+              <p className="text-[11px] font-mono text-black/60 dark:text-white/60 max-w-sm">
+                Access to the {rawFilter?.toUpperCase()} intelligence stream is cryptographically restricted. Elevate your sovereign identity level to decrypt this sector.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {topics.length === 0 ? (
+                <div className="py-20 text-center text-[12px] font-black uppercase tracking-widest text-[#555]">
+                  NO ACTIVE PROPOSALS FOUND.
+                </div>
+              ) : topics.map(topic => {
               const activity = formatDistanceToNowStrict(new Date(topic.updatedAt || topic.createdAt), { addSuffix: false })
                 .replace(' minutes', 'm').replace(' minute', 'm')
                 .replace(' hours', 'h').replace(' hour', 'h')

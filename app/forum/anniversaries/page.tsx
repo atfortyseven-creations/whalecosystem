@@ -35,23 +35,23 @@ export default async function ForumAnniversariesPage() {
   return (
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
-      <div className="mb-8 pb-6" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-        <div className="text-[12px] font-sans font-bold mb-2" style={{ color: 'var(--forum-text-muted)' }}>FORUM / ANNIVERSARIES</div>
-        <h1 className="text-[28px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
+      <div className="mb-8 pb-6 border-b border-black/10 dark:border-white/10">
+        <div className="text-[12px] font-sans font-bold mb-2 text-black/50 dark:text-[#888888]">FORUM / ANNIVERSARIES</div>
+        <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
           {monthNames[currentMonth]}
         </h1>
-        <div className="text-[14px] font-sans mt-1" style={{ color: 'var(--forum-text-muted)' }}>JOINED THIS MONTH</div>
+        <div className="text-[14px] font-sans mt-1 text-black/50 dark:text-[#888888]">JOINED THIS MONTH</div>
       </div>
 
       {/* Table header */}
-      <div className="flex items-center pb-3 text-[12px] font-sans font-bold uppercase" style={{ borderBottom: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}>
+      <div className="flex items-center pb-3 text-[12px] font-sans font-bold uppercase border-b border-black/10 dark:border-white/10 text-black/50 dark:text-[#888888]">
         <div className="flex-1">NODE</div>
         <div className="w-24 text-right">EPOCH</div>
         <div className="w-16 text-right">YRS</div>
       </div>
 
       {users.length === 0 ? (
-        <div className="py-16 text-center text-[13px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>
+        <div className="py-16 text-center text-[13px] font-sans text-black/50 dark:text-[#888888]">
           [ NO ENTRIES FOR {monthNames[currentMonth]} ]
         </div>
       ) : users.map((u, i) => {
@@ -64,18 +64,17 @@ export default async function ForumAnniversariesPage() {
           <Link
             key={i}
             href={`/forum/u/${addr}`}
-            className="flex items-center py-4 transition-colors hover:bg-[var(--forum-hover)]"
-            style={{ borderBottom: '1px solid var(--forum-border)' }}
+            className="flex items-center py-4 transition-colors hover:bg-black/5 dark:hover:bg-[#111111] border-b border-black/10 dark:border-white/10"
           >
             <div className="flex-1 min-w-0">
-              <div className="text-[15px] font-sans font-bold truncate" style={{ color: 'var(--forum-text)' }}>
+              <div className="text-[15px] font-sans font-bold truncate text-black dark:text-white">
                 {label}
               </div>
             </div>
-            <div className="w-24 text-right text-[12px] font-sans uppercase" style={{ color: 'var(--forum-text-muted)' }}>
+            <div className="w-24 text-right text-[12px] font-sans uppercase text-black/50 dark:text-[#888888]">
               {monthNames[joined.getMonth()].slice(0,3)} {joined.getFullYear()}
             </div>
-            <div className="w-16 text-right text-[14px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>
+            <div className="w-16 text-right text-[14px] font-sans font-bold text-black dark:text-white">
               {years > 0 ? `+${years}Y` : '—'}
             </div>
           </Link>

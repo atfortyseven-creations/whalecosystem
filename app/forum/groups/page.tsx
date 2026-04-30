@@ -36,18 +36,18 @@ export default async function ForumGroupsPage() {
     <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
 
       {/* Breadcrumb & Header */}
-      <div className="mb-8 pb-4" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-        <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold" style={{ color: 'var(--forum-text-muted)' }}>
+      <div className="mb-8 pb-4 border-b border-black/10 dark:border-white/10">
+        <div className="flex items-center gap-2 mb-2 text-[12px] font-sans font-bold text-black/50 dark:text-[#888888]">
           <Link href="/forum" className="transition-colors hover:opacity-100">Forum</Link>
           <span>/</span>
-          <span style={{ color: 'var(--forum-text)' }}>Groups</span>
+          <span className="text-black dark:text-white">Groups</span>
         </div>
         <div className="flex items-center justify-between">
-            <h1 className="text-[28px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
+            <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
               Network Cohorts
             </h1>
-            <div className="text-[14px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>
-              Total: <span className="font-bold" style={{ color: 'var(--forum-text)' }}>{groupsData.TOTAL} Nodes</span>
+            <div className="text-[14px] font-sans text-black/50 dark:text-[#888888]">
+              Total: <span className="font-bold text-black dark:text-white">{groupsData.TOTAL} Nodes</span>
             </div>
         </div>
       </div>
@@ -56,18 +56,17 @@ export default async function ForumGroupsPage() {
          {groups.map(g => (
            <div
              key={g.id}
-             className="flex items-center py-4 px-4 rounded-sm transition-all duration-200 hover:bg-[var(--forum-hover)] hover:border-[#6366f1]"
-             style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}
+             className="flex items-center py-4 px-4 rounded-xl transition-all duration-200 bg-black/5 dark:bg-[#111111] border border-black/10 dark:border-white/10 hover:border-[#00C076] dark:hover:border-[#00C076]"
            >
              <div className="flex-1 min-w-0">
-               <div className="text-[16px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>
+               <div className="text-[16px] font-sans font-bold transition-colors text-black dark:text-white">
                  {g.label}
                </div>
-               <div className="text-[13px] font-sans mt-1" style={{ color: 'var(--forum-text-muted)' }}>{g.sub}</div>
+               <div className="text-[13px] font-sans mt-1 text-black/50 dark:text-[#888888]">{g.sub}</div>
              </div>
              <div className="w-24 flex items-center justify-end gap-2">
-               <span className="text-[12px] font-sans font-bold" style={{ color: 'var(--forum-text-muted)' }}>Members</span>
-               <div className="text-[18px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>
+               <span className="text-[12px] font-sans font-bold uppercase tracking-widest text-black/50 dark:text-[#888888]">Members</span>
+               <div className="text-[18px] font-sans font-black text-black dark:text-white">
                  {g.count}
                </div>
              </div>

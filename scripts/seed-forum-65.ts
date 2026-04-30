@@ -87,19 +87,30 @@ function getRandomItem(arr: any[]) {
 
 async function main() {
     console.log('🛡️ Initiating Sovereign Database Matrix...');
-    console.log('Seeding 65 Highly Realistic Institutional Personas...');
+    console.log('Seeding 65 Highly Realistic Institutional Personas and Broad Sectors...');
 
-    // 1. Fetch or create a category
-    let category = await prisma.forumCategory.findFirst();
-    if (!category) {
-        category = await prisma.forumCategory.create({
-            data: {
-                slug: 'institutional-mandates',
-                name: 'Institutional Mandates',
-                description: 'High-level deployment strategies and capital allocation RFPs.',
-                color: '#D4AF37'
-            }
-        });
+    // Delete existing records to prevent foreign key violations and reset cleanly
+    await prisma.forumNotification.deleteMany({});
+    await prisma.forumLike.deleteMany({});
+    await prisma.forumPost.deleteMany({});
+    await prisma.forumTopic.deleteMany({});
+    await prisma.forumCategory.deleteMany({});
+
+    // 1. Create 8 Normalized Academic Categories
+    const categoriesData = [
+        { slug: 'macroeconomic-analytics', name: 'Macroeconomic Analytics', description: 'Global liquidity, fiat policy, and macro-financial correlations.', color: '#4F46E5' },
+        { slug: 'protocol-governance', name: 'Protocol Governance', description: 'Consensus parameters, on-chain voting, and DAO treasury management.', color: '#059669' },
+        { slug: 'quantitative-liquidity', name: 'Quantitative Liquidity', description: 'Market making, AMM dynamics, and high-frequency deployment.', color: '#D97706' },
+        { slug: 'onchain-forensics', name: 'On-Chain Forensics', description: 'Entity tracking, dark pool analysis, and security auditing.', color: '#DC2626' },
+        { slug: 'venture-allocation', name: 'Venture Allocation', description: 'Seed-stage capital deployment and strategic acquisitions.', color: '#7C3AED' },
+        { slug: 'cryptographic-audits', name: 'Cryptographic Audits', description: 'Smart contract security, mathematical proofs, and risk mitigation.', color: '#0284C7' },
+        { slug: 'zero-knowledge', name: 'Zero-Knowledge Architecture', description: 'ZK-Rollups, privacy-preserving state transitions, and SNARKs.', color: '#DB2777' },
+        { slug: 'mev-strategies', name: 'MEV Strategies', description: 'Maximal Extractable Value, block building, and searcher dynamics.', color: '#14B8A6' }
+    ];
+
+    const categories = [];
+    for (const data of categoriesData) {
+        categories.push(await prisma.forumCategory.create({ data }));
     }
 
     const personasToCreate = 65;
@@ -146,11 +157,13 @@ async function main() {
                 .replace('{Hash}', generateRandomString(44, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))
                 .replace('{Signature}', generateRandomString(130));
 
+            const randomCategory = getRandomItem(categories);
+
             const topic = await prisma.forumTopic.create({
                 data: {
                     title: title,
                     content: content,
-                    categoryId: category.id,
+                    categoryId: randomCategory.id,
                     authorId: user.id,
                     views: Math.floor(Math.random() * 5000),
                 }

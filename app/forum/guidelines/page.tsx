@@ -27,31 +27,31 @@ export default function ForumGuidelinesPage() {
   return (
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
-      <div className="mb-8 pb-6" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-        <div className="text-[12px] font-sans font-bold mb-2" style={{ color: 'var(--forum-text-muted)' }}>FORUM / GUIDELINES</div>
-        <h1 className="text-[28px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
+      <div className="mb-8 pb-6 border-b border-black/10 dark:border-white/10">
+        <div className="text-[12px] font-sans font-bold mb-2 text-black/50 dark:text-[#888888]">FORUM / GUIDELINES</div>
+        <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
           Institutional Protocol
         </h1>
       </div>
 
       <div className="flex flex-col">
         {rules.map(r => (
-          <div key={r.n} className="flex gap-8 py-7" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-            <div className="text-[14px] font-sans font-bold w-6 shrink-0 pt-0.5" style={{ color: 'var(--forum-text-muted)' }}>{r.n}</div>
+          <div key={r.n} className="flex gap-8 py-7 border-b border-black/10 dark:border-white/10">
+            <div className="text-[14px] font-sans font-bold w-6 shrink-0 pt-0.5 text-black/50 dark:text-[#888888]">{r.n}</div>
             <div className="flex flex-col gap-2">
-              <div className="text-[15px] font-sans font-bold tracking-wide" style={{ color: 'var(--forum-text)' }}>{r.title}</div>
-              <div className="text-[15px] font-sans leading-relaxed" style={{ color: 'var(--forum-text-muted)' }}>{r.body}</div>
+              <div className="text-[15px] font-sans font-bold tracking-wide text-black dark:text-white">{r.title}</div>
+              <div className="text-[15px] font-sans leading-relaxed text-black/70 dark:text-[#888888]">{r.body}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 pt-6" style={{ borderTop: '1px solid var(--forum-border)' }}>
-        <div className="text-[11px] font-sans font-bold uppercase tracking-widest text-center" style={{ color: 'var(--forum-text-muted)', opacity: 0.5 }}>
+      <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10">
+        <div className="text-[11px] font-sans font-bold uppercase tracking-widest text-center text-black/40 dark:text-white/40">
           LAST UPDATED APRIL 2026 — SOVEREIGN CONSENSUS PROTOCOL
         </div>
-        <div className="mt-4 px-4 py-3 rounded-sm" style={{ border: '1px solid var(--forum-border)', backgroundColor: 'var(--forum-surface)' }}>
-          <div className="text-[13px] font-sans italic text-center" style={{ color: 'var(--forum-text)' }}>
+        <div className="mt-4 px-4 py-3 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-[#111111]">
+          <div className="text-[13px] font-sans italic text-center text-black dark:text-white">
             "In a trustless ecosystem, your signature is your bond."
           </div>
         </div>

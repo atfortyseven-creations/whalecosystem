@@ -43,9 +43,9 @@ function Banner({ msg, ok }: { msg: string; ok: boolean }) {
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-5">
-      <div className="flex items-center gap-3 pb-3" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-        <span style={{ color: 'var(--forum-text-muted)' }}>{icon}</span>
-        <h2 className="text-[16px] font-black uppercase tracking-widest" style={{ color: 'var(--forum-text)' }}>{title}</h2>
+      <div className="flex items-center gap-3 pb-3 border-b border-black/10 dark:border-white/10">
+        <span className="text-black/50 dark:text-[#888888]">{icon}</span>
+        <h2 className="text-[16px] font-black uppercase tracking-widest text-black dark:text-white">{title}</h2>
       </div>
       {children}
     </section>
@@ -56,14 +56,13 @@ function Section({ icon, title, children }: { icon: React.ReactNode; title: stri
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>{label}</label>
+      <label className="text-[11px] font-bold uppercase tracking-widest text-black/50 dark:text-[#888888]">{label}</label>
       {children}
     </div>
   );
 }
 
-const inputCls = "w-full px-3 py-2 rounded-lg text-[14px] font-mono outline-none transition-all focus:ring-1";
-const inputStyle = { backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' };
+const inputCls = "w-full px-3 py-2 rounded-lg text-[14px] font-mono outline-none transition-all focus:ring-1 bg-[#FAF9F6] dark:bg-[#111111] border border-black/10 dark:border-white/10 text-[#050505] dark:text-[#FAF9F6]";
 
 // ════════════════════════════════════════════════════════════════════════════
 export default function ForumSettingsPage() {
@@ -151,7 +150,7 @@ export default function ForumSettingsPage() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   if (loading) return (
-    <div className="flex items-center justify-center h-[60vh] gap-3" style={{ color: 'var(--forum-text-muted)' }}>
+    <div className="flex items-center justify-center h-[60vh] gap-3 text-black/50 dark:text-[#888888]">
       <Loader2 size={24} className="animate-spin" />
       <span className="text-[14px] font-mono">Loading forum settings…</span>
     </div>
@@ -159,8 +158,8 @@ export default function ForumSettingsPage() {
 
   if (!profile) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-      <ShieldCheck size={48} style={{ color: 'var(--forum-text-muted)' }} />
-      <p className="text-[15px] font-bold" style={{ color: 'var(--forum-text)' }}>Connect your wallet to access settings.</p>
+      <ShieldCheck size={48} className="text-black/50 dark:text-[#888888]" />
+      <p className="text-[15px] font-bold text-black dark:text-white">Connect your wallet to access settings.</p>
     </div>
   );
 
@@ -170,10 +169,10 @@ export default function ForumSettingsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[28px] font-black tracking-tight" style={{ color: 'var(--forum-text)' }}>
+          <h1 className="text-[28px] font-black tracking-tight text-black dark:text-white">
             Forum Settings
           </h1>
-          <p className="text-[13px] mt-1" style={{ color: 'var(--forum-text-muted)' }}>
+          <p className="text-[13px] mt-1 text-black/50 dark:text-[#888888]">
             Configure your forum identity, notifications, and {isAdmin ? 'community parameters.' : 'personal preferences.'}
           </p>
         </div>
@@ -218,8 +217,8 @@ export default function ForumSettingsPage() {
           />
         </Field>
         <div className="flex items-center gap-3">
-          <span className="text-[12px] font-mono px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}>
-            Tier: <strong style={{ color: 'var(--forum-text)' }}>{profile.tier ?? 'STANDARD'}</strong>
+          <span className="text-[12px] font-mono px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black/50 dark:text-[#888888]">
+            Tier: <strong className="text-black dark:text-white">{profile.tier ?? 'STANDARD'}</strong>
           </span>
           {profile.isPro && (
             <span className="text-[12px] font-black px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">⚡ PRO</span>
@@ -229,8 +228,7 @@ export default function ForumSettingsPage() {
           <button
             onClick={saveProfile}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
-            style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save Identity
@@ -245,7 +243,7 @@ export default function ForumSettingsPage() {
             { key: 'notifyOnReply', label: 'Notify me when someone replies to my topics', desc: 'Receive an in-platform notification for every new reply.' },
             { key: 'notifyOnMention', label: 'Notify me when I am @mentioned', desc: 'Triggered when another user mentions your wallet or display name.' },
           ].map(({ key, label, desc }) => (
-            <label key={key} className="flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-colors hover:bg-[var(--forum-hover)]" style={{ border: '1px solid var(--forum-border)' }}>
+            <label key={key} className="flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-colors hover:bg-black/5 dark:hover:bg-white/5 border border-black/10 dark:border-white/10">
               <input
                 type="checkbox"
                 className="mt-0.5 w-4 h-4 rounded accent-purple-600 shrink-0"
@@ -253,8 +251,8 @@ export default function ForumSettingsPage() {
                 onChange={e => setProfile(p => p && ({ ...p, [key]: e.target.checked }))}
               />
               <div>
-                <p className="text-[14px] font-bold" style={{ color: 'var(--forum-text)' }}>{label}</p>
-                <p className="text-[12px] mt-0.5" style={{ color: 'var(--forum-text-muted)' }}>{desc}</p>
+                <p className="text-[14px] font-bold text-black dark:text-white">{label}</p>
+                <p className="text-[12px] mt-0.5 text-black/50 dark:text-[#888888]">{desc}</p>
               </div>
             </label>
           ))}
@@ -263,8 +261,7 @@ export default function ForumSettingsPage() {
           <button
             onClick={saveProfile}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
-            style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save Notifications
@@ -279,7 +276,7 @@ export default function ForumSettingsPage() {
           <Section icon={<Tag size={18} />} title="Categories">
             <div className="flex flex-col gap-3">
               {categories.map(cat => (
-                <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
+                <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl bg-black/5 dark:bg-[#111111] border border-black/10 dark:border-white/10">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <input
                       type="color"
@@ -290,14 +287,12 @@ export default function ForumSettingsPage() {
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                       <input
                         className={inputCls + " text-[13px]"}
-                        style={inputStyle}
                         value={cat.name}
                         placeholder="Category name"
                         onChange={e => setCategories(p => p.map(c => c.id === cat.id ? { ...c, name: e.target.value } : c))}
                       />
                       <input
-                        className={inputCls + " text-[12px]"}
-                        style={{ ...inputStyle, opacity: 0.75 }}
+                        className={inputCls + " text-[12px] opacity-75"}
                         value={cat.description}
                         placeholder="Short description…"
                         onChange={e => setCategories(p => p.map(c => c.id === cat.id ? { ...c, description: e.target.value } : c))}
@@ -306,14 +301,13 @@ export default function ForumSettingsPage() {
                     <input
                       type="number"
                       className={inputCls + " text-[13px] w-16"}
-                      style={inputStyle}
                       value={cat.orderIndex}
                       title="Order index"
                       onChange={e => setCategories(p => p.map(c => c.id === cat.id ? { ...c, orderIndex: Number(e.target.value) } : c))}
                     />
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[11px] font-mono" style={{ color: 'var(--forum-text-muted)' }}>{cat._count?.topics ?? 0} topics</span>
+                    <span className="text-[11px] font-mono text-black/50 dark:text-[#888888]">{cat._count?.topics ?? 0} topics</span>
                     <button onClick={() => saveCategory(cat)} className="p-1.5 rounded-lg text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 transition-all" title="Save">
                       <Save size={13} />
                     </button>
@@ -326,32 +320,31 @@ export default function ForumSettingsPage() {
             </div>
 
             {/* New category form */}
-            <div className="flex flex-col gap-3 p-4 rounded-xl" style={{ border: '2px dashed var(--forum-border)' }}>
-              <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>New Category</p>
+            <div className="flex flex-col gap-3 p-4 rounded-xl border-2 border-dashed border-black/10 dark:border-white/10">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-black/50 dark:text-[#888888]">New Category</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Name">
-                  <input className={inputCls} style={inputStyle} value={newCat.name} placeholder="Governance" onChange={e => setNewCat(p => ({ ...p, name: e.target.value }))} />
+                  <input className={inputCls} value={newCat.name} placeholder="Governance" onChange={e => setNewCat(p => ({ ...p, name: e.target.value }))} />
                 </Field>
                 <Field label="Slug (URL)">
-                  <input className={inputCls} style={inputStyle} value={newCat.slug} placeholder="governance" onChange={e => setNewCat(p => ({ ...p, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))} />
+                  <input className={inputCls} value={newCat.slug} placeholder="governance" onChange={e => setNewCat(p => ({ ...p, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))} />
                 </Field>
               </div>
               <Field label="Description">
-                <input className={inputCls} style={inputStyle} value={newCat.description} placeholder="Brief description…" onChange={e => setNewCat(p => ({ ...p, description: e.target.value }))} />
+                <input className={inputCls} value={newCat.description} placeholder="Brief description…" onChange={e => setNewCat(p => ({ ...p, description: e.target.value }))} />
               </Field>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>Color</label>
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-black/50 dark:text-[#888888]">Color</label>
                   <input type="color" value={newCat.color} className="w-8 h-8 rounded-lg cursor-pointer border-0 p-0" onChange={e => setNewCat(p => ({ ...p, color: e.target.value }))} />
                 </div>
                 <Field label="Order">
-                  <input type="number" className={inputCls + " w-20"} style={inputStyle} value={newCat.orderIndex} onChange={e => setNewCat(p => ({ ...p, orderIndex: Number(e.target.value) }))} />
+                  <input type="number" className={inputCls + " w-20"} value={newCat.orderIndex} onChange={e => setNewCat(p => ({ ...p, orderIndex: Number(e.target.value) }))} />
                 </Field>
                 <button
                   onClick={createCategory}
                   disabled={addingCat}
-                  className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                  style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+                  className="ml-auto flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all disabled:opacity-50 bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
                 >
                   {addingCat ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                   Add Category
@@ -365,12 +358,11 @@ export default function ForumSettingsPage() {
             <Section icon={<Settings size={18} />} title="Moderation & Global">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Field label="Site Name">
-                  <input className={inputCls} style={inputStyle} value={global.siteName} onChange={e => setGlobal(p => p && ({ ...p, siteName: e.target.value }))} />
+                  <input className={inputCls} value={global.siteName} onChange={e => setGlobal(p => p && ({ ...p, siteName: e.target.value }))} />
                 </Field>
                 <Field label="Moderation Mode">
                   <select
-                    className={inputCls}
-                    style={{ ...inputStyle, appearance: 'none' }}
+                    className={`${inputCls} appearance-none`}
                     value={global.moderationMode}
                     onChange={e => setGlobal(p => p && ({ ...p, moderationMode: e.target.value }))}
                   >
@@ -382,18 +374,17 @@ export default function ForumSettingsPage() {
               </div>
               <Field label="Welcome Message">
                 <textarea
-                  className={inputCls}
-                  style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }}
+                  className={`${inputCls} resize-y min-h-[80px]`}
                   value={global.welcomeMessage}
                   onChange={e => setGlobal(p => p && ({ ...p, welcomeMessage: e.target.value }))}
                 />
               </Field>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Field label="Max Topics / Day">
-                  <input type="number" className={inputCls} style={inputStyle} value={global.maxTopicsPerDay} onChange={e => setGlobal(p => p && ({ ...p, maxTopicsPerDay: Number(e.target.value) }))} />
+                  <input type="number" className={inputCls} value={global.maxTopicsPerDay} onChange={e => setGlobal(p => p && ({ ...p, maxTopicsPerDay: Number(e.target.value) }))} />
                 </Field>
                 <Field label="Max Posts / Day">
-                  <input type="number" className={inputCls} style={inputStyle} value={global.maxPostsPerDay} onChange={e => setGlobal(p => p && ({ ...p, maxPostsPerDay: Number(e.target.value) }))} />
+                  <input type="number" className={inputCls} value={global.maxPostsPerDay} onChange={e => setGlobal(p => p && ({ ...p, maxPostsPerDay: Number(e.target.value) }))} />
                 </Field>
               </div>
               <div className="flex flex-col gap-3">
@@ -408,15 +399,14 @@ export default function ForumSettingsPage() {
                       checked={!!(global as any)[key]}
                       onChange={e => setGlobal(p => p && ({ ...p, [key]: e.target.checked }))}
                     />
-                    <span className="text-[14px]" style={{ color: 'var(--forum-text)' }}>{label}</span>
+                    <span className="text-[14px] text-black dark:text-white">{label}</span>
                   </label>
                 ))}
               </div>
               <div className="flex justify-end">
                 <button
                   onClick={saveGlobal}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all"
-                  style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-black uppercase tracking-widest transition-all bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white"
                 >
                   <Save size={14} /> Save Forum Config
                 </button>

@@ -40,7 +40,7 @@ function PointGlobeMesh() {
       dummy.updateMatrix();
       
       meshRef.current.setMatrixAt(i, dummy.matrix);
-      meshRef.current.setColorAt(i, color.set("#111111"));
+      meshRef.current.setColorAt(i, color.set("#888888"));
     }
     meshRef.current.instanceMatrix.needsUpdate = true;
     if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
@@ -97,7 +97,7 @@ function PointGlobeMesh() {
             } else {
               isLandRef.current[i] = true;
               dummy.scale.set(1, 1, 1);
-              color.set("#111111"); // Absolute black/dark dots for land
+              color.set("#888888"); // Neutral gray visible on both dark/light backgrounds
               meshRef.current.setColorAt(i, color);
             }
             
@@ -140,8 +140,8 @@ function PointGlobeMesh() {
     }
 
     // 2. Decay existing flashes and update colors
-    // Aztec Theme: Base #111111 (Black/Dark), Peak #00C076 (Emerald Green)
-    const baseColor = new THREE.Color("#111111");
+    // Aztec Theme: Base #888888 (Neutral), Peak #00C076 (Emerald Green)
+    const baseColor = new THREE.Color("#888888");
     const peakColor = new THREE.Color("#00C076");
     const tempColor = new THREE.Color();
 
@@ -166,7 +166,7 @@ function PointGlobeMesh() {
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       {/* Tiny circle for high resolution */}
       <circleGeometry args={[0.2, 8]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.6} side={THREE.DoubleSide} />
     </instancedMesh>
   );
 }

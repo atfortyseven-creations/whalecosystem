@@ -83,7 +83,7 @@ export default function NewTopicPage() {
         const signature = await signMessageAsync({ message: title + '\n' + finalContent });
         finalContent = `${finalContent}\n\n[SIGNATURE:${signature}]`;
       } catch (e: any) {
-        setError('CRYPTOGRAPHIC SIGNATURE REQUIRED TO SEAL MANDATE');
+        setError('CRYPTOGRAPHIC SIGNATURE REQUIRED TO SEAL PROPOSAL');
         setSubmitting(false);
         return;
       }
@@ -180,10 +180,10 @@ export default function NewTopicPage() {
         <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-black tracking-tight text-black dark:text-white flex items-center gap-3 transition-colors">
               <ShieldCheck className="text-[#00C076]" size={28} />
-              Publish Institutional Mandate
+              Initiate Strategic Proposal
             </h1>
             <p className="text-[11px] font-bold text-[#888888] uppercase tracking-[0.2em]">
-                Secure Talent Matrix • ECDSA Signature Required
+                Encrypted Resource Allocation • ECDSA Signature Required
             </p>
         </div>
         <div className="flex items-center gap-3">
@@ -197,7 +197,7 @@ export default function NewTopicPage() {
               onClick={clearDraft}
               className="text-[10px] font-black uppercase tracking-widest hover:text-black dark:hover:text-white transition-colors text-black/60 dark:text-[#888888] px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10"
             >
-              Clear Draft
+              Terminate Process
             </button>
           )}
         </div>
@@ -220,8 +220,8 @@ export default function NewTopicPage() {
         {/* ── Category + Tags ── */}
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 relative flex flex-col gap-2">
-            <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Institutional Sector</label>
-            <div className="relative">
+              <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-[#FAF9F6] mb-3 transition-colors">Strategic Sector</label>
+              <div className="relative">
                 <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
@@ -298,14 +298,23 @@ export default function NewTopicPage() {
 
         {/* ── Footer ── */}
         <div className="flex items-center gap-6 mt-6 pt-6 border-t border-black/10 dark:border-white/10 flex-wrap">
-          <button
-            onClick={submit}
-            disabled={submitting}
-            className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] px-8 py-4 rounded-xl hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,192,118,0.3)] transition-all disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-[#00C076] text-black"
-          >
-            <ShieldCheck size={16} />
-            {submitting ? 'AWAITING WALLET SIGNATURE...' : 'SEAL MANDATE ON-CHAIN'}
-          </button>
+            <button
+              onClick={submit}
+              disabled={submitting}
+              className="w-full h-[54px] bg-[#050505] dark:bg-[#FAF9F6] text-[#FAF9F6] dark:text-[#050505] rounded-xl text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#00C076] dark:hover:bg-[#00C076] hover:text-white dark:hover:text-white active:scale-[0.99] transition-all flex items-center justify-center gap-3 shadow-xl dark:shadow-[0_0_30px_rgba(250,249,246,0.1)] hover:shadow-[0_0_40px_rgba(0,192,118,0.3)] disabled:opacity-50 disabled:hover:bg-[#050505] dark:disabled:hover:bg-[#FAF9F6]"
+            >
+              {submitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 dark:border-black/30 border-t-white dark:border-t-black rounded-full animate-spin" />
+                  PROCESSING SIGNATURE...
+                </>
+              ) : (
+                <>
+                  <FileLock2 size={16} />
+                  EXECUTE CRYPTOGRAPHIC SIGNATURE
+                </>
+              )}
+            </button>
           <Link
             href="/forum"
             className="text-[11px] font-black uppercase tracking-widest transition-opacity hover:opacity-100 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white"
