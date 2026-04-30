@@ -190,19 +190,22 @@ export default function ConnectPage() {
     const controller = new AbortController();
     const poll = setInterval(async () => {
       try {
-        const res = await fetch(`/api/auth/qr-session?id=${qrSession}`, { signal: controller.signal });
+        const res = await fetch(`/api/auth/qr-session?id=${qrSession}&t=${Date.now()}`, { 
+          signal: controller.signal,
+          cache: 'no-store'
+        });
         if (!res.ok) return;
         const data = await res.json();
         if (data.status === "complete" && data.address) {
           setSyncStatus("SYNCED");
           clearInterval(poll);
           document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
-          setTimeout(() => window.location.replace("/"), 1200);
+          setTimeout(() => window.location.replace("/"), 50);
         }
       } catch (err: any) {
         if (err.name !== 'AbortError') console.error(err);
       }
-    }, 2000);
+    }, 400);
     return () => {
       clearInterval(poll);
       controller.abort();

@@ -108,6 +108,104 @@ function timerToMs(t: '15m' | '1h' | '24h' | 'never'): number | null {
     return null; // 'never'
 }
 
+function AztecSidebarItem({ item, isActive, isCollapsed, onClick }: { item: NavItem, isActive: boolean, isCollapsed: boolean, onClick: () => void }) {
+    const itemRef = useRef<HTMLButtonElement>(null);
+    const [mouse, setMouse] = useState({ x: 0, y: 0 });
+    const [isHovered, setIsHovered] = useState(false);
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!itemRef.current) return;
+        const rect = itemRef.current.getBoundingClientRect();
+        setMouse({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    };
+
+    // Aztec Network Magnetic 3D transform calculations
+    const rotateX = isHovered ? (mouse.y - 24) / -6 : 0;
+    const rotateY = isHovered ? (mouse.x - 100) / 15 : 0;
+
+    return (
+        <motion.button
+            ref={itemRef}
+            onClick={onClick}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            initial={false}
+            animate={{
+                rotateX,
+                rotateY,
+                z: isHovered ? 20 : isActive ? 8 : 0,
+                scale: isHovered ? 1.03 : isActive ? 1.01 : 1,
+            }}
+            transition={{ type: "spring", stiffness: 450, damping: 20, mass: 0.8 }}
+            style={{ transformStyle: "preserve-3d" }}
+            className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group select-none outline-none ${
+                isActive 
+                    ? 'bg-[#050505] shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-[#1A1A1A]' 
+                    : 'bg-transparent border border-transparent hover:bg-black/[0.03]'
+            }`}
+        >
+            {/* Dynamic Volumetric Lighting Layer */}
+            {isHovered && !isActive && (
+                <div 
+                    className="absolute inset-0 rounded-xl pointer-events-none opacity-50 transition-opacity duration-300"
+                    style={{ background: `radial-gradient(circle 50px at ${mouse.x}px ${mouse.y}px, rgba(0,0,0,0.06), transparent 100%)` }}
+                />
+            )}
+            
+            {/* Aztec Emerald Glow for Active Item */}
+            {isActive && (
+                <div 
+                    className="absolute inset-0 rounded-xl pointer-events-none opacity-40 transition-opacity duration-300"
+                    style={{
+                        background: isHovered ? `radial-gradient(circle 90px at ${mouse.x}px ${mouse.y}px, #00C076, transparent 100%)` : 'none',
+                        mixBlendMode: 'screen'
+                    }}
+                />
+            )}
+
+            {/* Front Extrusion Layer */}
+            <motion.div 
+                className="relative flex items-center w-full"
+                animate={{ z: isHovered ? 12 : 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                style={{ transformStyle: "preserve-3d" }}
+            >
+                {/* Active Neon Indicator */}
+                <AnimatePresence>
+                    {isActive && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 18 }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] bg-[#00C076] rounded-r-full shadow-[0_0_12px_#00C076]"
+                        />
+                    )}
+                </AnimatePresence>
+
+                <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#00C076] drop-shadow-[0_0_5px_rgba(0,192,118,0.5)]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
+                    {item.icon}
+                </span>
+
+                {!isCollapsed && (
+                    <span className={`ml-3 text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FAF9F6]' : 'text-[#555555] group-hover:text-[#050505]'}`}>
+                        {item.label}
+                    </span>
+                )}
+
+                {!isCollapsed && item.badge && (
+                    <span className={`ml-2 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-[4px] border shrink-0 transition-colors ${isActive ? 'bg-[#00C076]/20 text-[#00C076] border-[#00C076]/30 shadow-[0_0_10px_rgba(0,192,118,0.2)]' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
+                        {item.badge}
+                    </span>
+                )}
+                {!isCollapsed && item.externalUrl && (
+                    <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#00C076]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
+                )}
+            </motion.div>
+        </motion.button>
+    );
+}
+
 export function WhaleProShell({ 
     children, 
     activeTab, 
@@ -267,55 +365,18 @@ export function WhaleProShell({
                     {SIDEBAR_ITEMS.map((item, index) => {
                         const isActive = activeTab === item.id;
                         return (
-                            <div key={item.id}>
+                            <div key={item.id} style={{ perspective: 1200 }}>
                                 {item.dividerBefore && !isCollapsed && (
-                                    <div className={`px-3 ${index === 0 ? 'pt-1' : 'pt-4'} pb-1`}>
-                                        <span className="text-[8px] font-black text-[#CCCCCC] uppercase tracking-[0.2em]">
+                                    <div className={`px-3 ${index === 0 ? 'pt-1' : 'pt-5'} pb-2`}>
+                                        <span className="text-[9px] font-black text-[#A0A0A0] uppercase tracking-[0.25em]">
                                             {item.dividerBefore}
                                         </span>
                                     </div>
                                 )}
                                 {item.dividerBefore && isCollapsed && (
-                                    <div className="my-2 mx-3 h-px bg-black/10"/>
+                                    <div className="my-3 mx-3 h-px bg-black/10"/>
                                 )}
-                                <button
-                                    key={item.id}
-                                    onClick={() => handleTabChange(item.id)}
-                                    className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group transition-all duration-300 ease-out ${
-                                        isActive
-                                                ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/[0.06] transform scale-[1.02]'
-                                                : 'text-[#888888] hover:text-[#050505] hover:bg-black/[0.03] hover:scale-[1.01]'
-                                        }
-                                    `}
-                                >
-                                    {/* ── Static in-place active indicator — NO layoutId ── */}
-                                    <AnimatePresence>
-                                        {isActive && (
-                                            <motion.div
-                                                key="indicator"
-                                                initial={{ opacity: 0, scaleY: 0.3 }}
-                                                animate={{ opacity: 1, scaleY: 1 }}
-                                                exit={{ opacity: 0, scaleY: 0.3 }}
-                                                transition={{ duration: 0.12, ease: 'easeOut' }}
-                                                className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#050505] rounded-r-full"
-                                            />
-                                        )}
-                                    </AnimatePresence>
-                                    <span className={`shrink-0 ${isActive ? 'text-[#050505]' : 'text-[#888888]'}`}>{item.icon}</span>
-                                    {!isCollapsed && (
-                                        <span className={`text-[11px] font-bold uppercase tracking-wider flex-1 text-left leading-none truncate ${isActive ? 'text-[#050505]' : 'text-[#555555]'}`}>
-                                            {item.label}
-                                        </span>
-                                    )}
-                                    {!isCollapsed && item.badge && (
-                                        <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md border shrink-0 transition-colors ${isActive ? 'bg-emerald-500 text-white border-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
-                                            {item.badge}
-                                        </span>
-                                    )}
-                                    {!isCollapsed && item.externalUrl && (
-                                        <ArrowUpRight size={10} className="text-[#A0A0A0]" />
-                                    )}
-                                </button>
+                                <AztecSidebarItem item={item} isActive={isActive} isCollapsed={isCollapsed} onClick={() => handleTabChange(item.id)} />
                             </div>
                         );
                     })}

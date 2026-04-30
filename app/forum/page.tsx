@@ -24,20 +24,24 @@ function ForumHomeContent() {
   }, [filter]);
 
   return (
-    <div className="w-full max-w-[1110px] mx-auto pt-10 pb-20 px-4">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-[40px]">
+    <div className="w-full min-h-screen bg-[#050505] text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden">
+      {/* Background Volumetric Lighting */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
+      
+      <div className="max-w-[1110px] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-[60px]">
         
         {/* Left Column: Categories (35% -> col-span-4) */}
-        <div className="lg:col-span-4 flex flex-col gap-0 pt-4" style={{ borderTop: '1px solid var(--forum-border)' }}>
-          <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest mb-6" style={{ color: 'var(--forum-text-muted)' }}>Categories</h2>
+        <div className="lg:col-span-4 flex flex-col gap-0 pt-4 border-t border-white/10">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-[#555]">Sectors & Practices</h2>
           {categories.length === 0 ? (
-             <div className="py-4 text-[13px] text-white/30 font-sans">Loading categories...</div>
+             <div className="py-4 text-[13px] text-white/30 font-sans">Loading matrix...</div>
           ) : categories.map(cat => (
-            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-4 transition-colors duration-150 ease-in-out px-2 rounded-sm sm:-mx-2 hover:bg-[var(--forum-hover)]" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-              <div className="w-1 h-10 rounded-sm mr-4 mt-1" style={{ backgroundColor: cat.color || '#6366f1' }}></div>
+            <Link key={cat.id} href={`/forum/c/${cat.slug}`} className="group flex items-start py-5 transition-all duration-300 ease-in-out px-4 rounded-xl sm:-mx-4 hover:bg-white/[0.02] border border-transparent hover:border-white/5 border-b-white/5 mb-2 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]" style={{ transformStyle: 'preserve-3d' }}>
+              <div className="w-1.5 h-1.5 rounded-full mr-4 mt-2 shadow-[0_0_10px_currentColor]" style={{ backgroundColor: cat.color || '#00C076', color: cat.color || '#00C076' }}></div>
               <div className="flex flex-col">
-                <span className="text-[18.4px] font-sans font-bold transition-colors" style={{ color: 'var(--forum-text)' }}>{cat.name}</span>
-                <span className="text-[13px] mt-1 leading-[1.4] line-clamp-2" style={{ color: 'var(--forum-text-muted)' }}>{cat.description || "Discuss topics related to " + cat.name}</span>
+                <span className="text-[16px] font-black tracking-tight transition-colors text-white group-hover:text-[#00C076]">{cat.name}</span>
+                <span className="text-[12px] mt-1.5 leading-relaxed line-clamp-2 text-[#888888]">{cat.description || "Institutional mandates related to " + cat.name}</span>
               </div>
             </Link>
           ))}
@@ -45,14 +49,14 @@ function ForumHomeContent() {
 
         {/* Right Column: Latest Activity (65% -> col-span-8) */}
         <div className="lg:col-span-8 flex flex-col">
-          <div className="flex items-center justify-between pb-2 mb-4" style={{ borderBottom: '1px solid var(--forum-border)' }}>
-            <h2 className="text-[13px] font-sans font-bold uppercase tracking-widest capitalize" style={{ color: 'var(--forum-text-muted)' }}>{filter}</h2>
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">{filter === 'latest' ? 'Live Institutional Mandates' : filter}</h2>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-3">
             {topics.length === 0 ? (
-              <div className="py-16 text-center text-[13px] font-sans text-[#919191]">
-                No topics found.
+              <div className="py-20 text-center text-[12px] font-black uppercase tracking-widest text-[#555]">
+                NO ACTIVE MANDATES FOUND.
               </div>
             ) : topics.map(topic => {
               const activity = formatDistanceToNowStrict(new Date(topic.updatedAt || topic.createdAt), { addSuffix: false })
@@ -66,30 +70,32 @@ function ForumHomeContent() {
                 <Link
                   key={topic.id}
                   href={`/forum/t/${topic.id}`}
-                  className="flex items-start py-4 transition-colors duration-150 ease-in-out px-2 rounded-sm sm:-mx-2 group hover:bg-[var(--forum-hover)]"
-                  style={{ borderBottom: '1px solid var(--forum-border)' }}
+                  className="flex items-start py-5 px-5 rounded-2xl group transition-all duration-300 bg-white/[0.01] border border-white/5 hover:bg-white/[0.03] hover:border-[#00C076]/30 hover:shadow-[0_10px_30px_rgba(0,192,118,0.1)] relative overflow-hidden"
                 >
+                  {/* Hover Glow Effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-[#00C076]/5 to-transparent pointer-events-none" />
+
                   {/* Avatar */}
-                  <div className="w-[45px] shrink-0 pt-1">
-                    <div className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[10px] font-mono" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}>
-                      {topic.author?.walletAddress?.slice(2, 4).toUpperCase() || 'A'}
+                  <div className="w-[50px] shrink-0 pt-1 relative z-10">
+                    <div className="w-[40px] h-[40px] rounded-xl flex items-center justify-center text-[12px] font-black text-[#555] bg-black border border-white/10 group-hover:border-[#00C076]/50 transition-colors">
+                      {topic.author?.walletAddress?.slice(2, 4).toUpperCase() || 'ID'}
                     </div>
                   </div>
 
                   {/* Title & Badges */}
-                  <div className="flex-1 flex flex-col pr-4 min-w-0">
-                    <span className="font-sans font-semibold text-[20px] leading-[1.4] tracking-[-0.01em] break-words" style={{ color: 'var(--forum-text)' }}>
+                  <div className="flex-1 flex flex-col pr-4 min-w-0 relative z-10">
+                    <span className="font-bold text-[18px] leading-[1.3] text-white group-hover:text-[#00C076] transition-colors line-clamp-2">
                       {topic.title}
                     </span>
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <div className="flex items-center gap-2 mt-3 flex-wrap">
                       {topic.category && (
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[2px]" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: topic.category.color || '#6366f1' }} />
-                          <span className="text-[12px] font-sans font-bold" style={{ color: 'var(--forum-text)' }}>{topic.category.name}</span>
+                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black border border-white/10 group-hover:border-[#00C076]/30 transition-colors">
+                          <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: topic.category.color || '#00C076', color: topic.category.color || '#00C076' }} />
+                          <span className="text-[9px] font-black tracking-widest uppercase text-white">{topic.category.name}</span>
                         </div>
                       )}
                       {topic.tags?.map((t: any) => (
-                        <span key={t.id} className="text-[12px] font-sans before:content-['#'] before:mr-[1px] transition-colors" style={{ color: 'var(--forum-text-muted)' }}>
+                        <span key={t.id} className="text-[9px] font-bold tracking-widest uppercase bg-white/5 border border-white/5 px-2 py-0.5 rounded-md text-[#888888]">
                           {t.name}
                         </span>
                       ))}
@@ -97,9 +103,12 @@ function ForumHomeContent() {
                   </div>
 
                   {/* Stats */}
-                  <div className="w-[60px] flex flex-col items-end shrink-0 gap-1 pt-1">
-                    <span className="text-[14px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>{topic._count?.posts || 0}</span>
-                    <span className="text-[14px] font-sans" style={{ color: 'var(--forum-text-muted)' }}>{activity}</span>
+                  <div className="w-[70px] flex flex-col items-end shrink-0 gap-1 pt-1 relative z-10">
+                    <div className="flex items-center gap-1.5 text-[#555]">
+                        <span className="text-[12px] font-black">{topic._count?.posts || 0}</span>
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#444]">{activity}</span>
                   </div>
                 </Link>
               );
@@ -107,6 +116,7 @@ function ForumHomeContent() {
           </div>
         </div>
 
+      </div>
       </div>
     </div>
   );
