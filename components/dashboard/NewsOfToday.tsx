@@ -185,8 +185,8 @@ export function NewsOfToday() {
                                                     <span className="text-[#FF3B30] flex items-center gap-0.5">{a.btcBearish}% <TrendingDown size={10}/></span>
                                                 </div>
                                                 <div className="h-1.5 w-full bg-[#E5E5E5] rounded-full overflow-hidden flex">
-                                                    <div className="h-full bg-[#00C076]" style={{ width: \`\${a.btcBullish}%\` }} />
-                                                    <div className="h-full bg-[#FF3B30]" style={{ width: \`\${a.btcBearish}%\` }} />
+                                                    <div className="h-full bg-[#00C076]" style={{ width: `${a.btcBullish}%` }} />
+                                                    <div className="h-full bg-[#FF3B30]" style={{ width: `${a.btcBearish}%` }} />
                                                 </div>
                                             </div>
                                         </div>
