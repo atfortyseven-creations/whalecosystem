@@ -2,14 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ExternalLink, ShieldCheck, Clock, Loader2 } from 'lucide-react';
-import { ScrollFloat } from '@/components/ui/ScrollFloat';
-import { NewsArticleIntelligence, MarketSentiment } from '@/lib/news-intelligence';
+import { RefreshCw, ExternalLink, ShieldCheck, Clock, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import { useOmniInfrastructure } from '@/lib/api-client';
 
-// Optimized UI Article type extending the core intelligence
-export interface UINewsArticle extends NewsArticleIntelligence {
+export interface UINewsArticle {
+    id: string;
+    title: string;
     summary: string;
+    url: string;
+    source: string;
+    publishedAt: string;
+    sentiment: 'bullish' | 'bearish' | 'neutral';
+    veracityScore: number | null;
+    isFake: boolean;
+    btcBullish: number;
+    btcBearish: number;
 }
 
 function timeAgo(iso: string | Date | number) {
@@ -39,10 +46,6 @@ function getExchangeStatus() {
 }
 
 export function NewsOfToday() {
-    // =========================================================================
-    // INJECTED DATA HOOK — Zero-Mock Mandate
-    // News endpoint injected via REGISTRY.OMNI_INFRA.news
-    // =========================================================================
     const { data: rawData, isLoading: loading, refetch } = useOmniInfrastructure('news');
     const articles: UINewsArticle[] = (rawData?.articles || []).map((a: any, i: number) => ({
         id: a.id ?? String(i),
@@ -54,7 +57,8 @@ export function NewsOfToday() {
         sentiment: (['bullish', 'bearish', 'neutral'].includes(a.sentiment) ? a.sentiment : 'neutral') as any,
         veracityScore: typeof a.veracityScore === 'number' ? a.veracityScore : null,
         isFake: a.isFake ?? false,
-        tokens: a.tokens ?? []
+        btcBullish: typeof a.btcBullish === 'number' ? a.btcBullish : 50,
+        btcBearish: typeof a.btcBearish === 'number' ? a.btcBearish : 50,
     }));
 
     const [search, setSearch]     = useState('');
@@ -70,7 +74,6 @@ export function NewsOfToday() {
         a.title.toLowerCase().includes(search.toLowerCase()) ||
         a.source.toLowerCase().includes(search.toLowerCase())
     );
-
 
     return (
         <div className="w-full h-full min-h-0 p-4 md:p-6 flex flex-col text-[#050505] font-sans overflow-hidden">
@@ -138,7 +141,7 @@ export function NewsOfToday() {
                                 // Pseudo-deterministic metrics based on ID/Title
                                 const idNum = parseInt(a.id.replace(/\D/g, '')) || index;
                                 const impactScore = 50 + ((idNum * 13) % 49); 
-                                const readTime = Math.max(2, Math.floor(a.summary.length / 150));
+                                const readTime = Math.max(2, Math.floor(a.summary.length / 400));
                                 const volatility = impactScore > 85 ? 'HIGH' : impactScore > 65 ? 'MED' : 'LOW';
 
                                 return (
@@ -159,7 +162,9 @@ export function NewsOfToday() {
                                             {/* Source & Metrics Sidebar */}
                                             <div className="w-full md:w-44 shrink-0 flex flex-row md:flex-col justify-between md:justify-start items-center md:items-start gap-2">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-[11px] font-black uppercase tracking-[0.15em] text-[#050505] line-clamp-1">{a.source}</span>
+                                                    <span className={`text-[11px] font-black uppercase tracking-[0.15em] line-clamp-1 ${a.source.toLowerCase().includes('cointelegraph') ? 'text-[#FABE0F]' : 'text-[#050505]'}`}>
+                                                        {a.source}
+                                                    </span>
                                                     <span className="text-[10px] font-medium text-[#888888] font-mono">{timeAgo(a.publishedAt)}</span>
                                                 </div>
                                                 <div className="hidden md:flex flex-wrap gap-1.5 mt-2">
@@ -173,13 +178,16 @@ export function NewsOfToday() {
                                                 <h2 className="font-serif text-lg md:text-2xl font-semibold leading-snug tracking-tight text-[#050505] group-hover:text-black transition-colors">{a.title}</h2>
                                             </div>
 
-                                            {/* Sentiment Indicator */}
-                                            <div className="hidden md:flex shrink-0 w-12 justify-end items-center gap-2">
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-[8px] font-black uppercase tracking-widest text-[#888888] mb-1">Impact</span>
-                                                    <span className="font-mono text-[13px] font-black leading-none">{impactScore}</span>
+                                            {/* Sentiment Indicator (Visual Bar) */}
+                                            <div className="hidden md:flex shrink-0 w-24 flex-col gap-1.5 justify-center">
+                                                <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
+                                                    <span className="text-[#00C076] flex items-center gap-0.5"><TrendingUp size={10}/> {a.btcBullish}%</span>
+                                                    <span className="text-[#FF3B30] flex items-center gap-0.5">{a.btcBearish}% <TrendingDown size={10}/></span>
                                                 </div>
-                                                <div className={`w-1.5 h-6 rounded-full ${a.sentiment === 'bullish' ? 'bg-[#00C076]' : a.sentiment === 'bearish' ? 'bg-[#FF3B30]' : 'bg-[#E5E5E5]'}`} />
+                                                <div className="h-1.5 w-full bg-[#E5E5E5] rounded-full overflow-hidden flex">
+                                                    <div className="h-full bg-[#00C076]" style={{ width: \`\${a.btcBullish}%\` }} />
+                                                    <div className="h-full bg-[#FF3B30]" style={{ width: \`\${a.btcBearish}%\` }} />
+                                                </div>
                                             </div>
                                         </div>
 
@@ -193,7 +201,15 @@ export function NewsOfToday() {
                                                     className="overflow-hidden bg-gradient-to-b from-white to-[#FAF9F6] border-t border-black/[0.04]"
                                                 >
                                                     <div className="px-6 md:px-8 py-6 md:pl-[224px] pr-6 md:pr-12 flex flex-col space-y-6">
-                                                        <p className="font-serif text-[15px] leading-relaxed text-[#444444] text-justify">{a.summary}</p>
+                                                        
+                                                        {/* High Fidelity Institutional Text Rendering */}
+                                                        <div className="prose prose-sm max-w-none">
+                                                            {a.summary.split('\n\n').map((paragraph, i) => (
+                                                                <p key={i} className="font-serif text-[15px] leading-relaxed text-[#222222] text-justify mb-4 last:mb-0">
+                                                                    {paragraph}
+                                                                </p>
+                                                            ))}
+                                                        </div>
                                                         
                                                         {/* Institutional Data Matrix */}
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5 mt-2 border-t border-black/[0.04]">
@@ -204,18 +220,18 @@ export function NewsOfToday() {
                                                                 </span>
                                                             </div>
                                                             <div className="flex flex-col gap-1">
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Integrity Score</span>
-                                                                <span className="text-[11px] text-[#050505] font-mono font-black">{a.veracityScore ?? 'N/A'}%</span>
-                                                            </div>
-                                                            <div className="flex flex-col gap-1">
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Market Sentiment</span>
-                                                                <span className={`text-[10px] font-black uppercase tracking-widest ${a.sentiment === 'bullish' ? 'text-[#00C076]' : a.sentiment === 'bearish' ? 'text-[#FF3B30]' : 'text-[#050505]'}`}>
+                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">BTC Directional Bias</span>
+                                                                <span className={`text-[11px] font-mono font-black ${a.sentiment === 'bullish' ? 'text-[#00C076]' : a.sentiment === 'bearish' ? 'text-[#FF3B30]' : 'text-[#050505]'}`}>
                                                                     {a.sentiment.toUpperCase()}
                                                                 </span>
                                                             </div>
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Impact Velocity</span>
+                                                                <span className="text-[11px] text-[#050505] font-mono font-black">{impactScore} / 100</span>
+                                                            </div>
                                                             <div className="flex justify-end items-center">
                                                                 <a href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-2.5 bg-[#050505] text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black/80 hover:shadow-lg hover:-translate-y-0.5 transition-all w-full justify-center md:w-auto">
-                                                                    View Original <ExternalLink size={12}/>
+                                                                    Read Source <ExternalLink size={12}/>
                                                                 </a>
                                                             </div>
                                                         </div>

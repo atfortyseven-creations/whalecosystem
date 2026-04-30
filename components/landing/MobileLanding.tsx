@@ -798,14 +798,25 @@ export function MobileLanding() {
           }
         }
       } catch {}
-      if (attempts >= 300) {
+      if (attempts >= 600) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
+        // ── LAST RESORT: check if sovereign_handshake cookie was set this session ──
+        // This covers the case where establishSession ran but wagmi didn't
+        // reconnect fast enough for the poll to catch the wagmiAddressRef update.
+        try {
+          const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+          if (cookieMatch?.[1]) {
+            console.log('[Sovereign:Recovery] Cookie found after poll timeout — using it:', cookieMatch[1]);
+            establishSession(cookieMatch[1]);
+            return;
+          }
+        } catch {}
+        // Poll truly failed and no cookie — clear reconnect state cleanly
         setFallbackStatus('failed');
-        // CRITICAL FIX: Do not leave the user stuck on the Reconnecting screen if it fails.
         setShowManualReconnectRaw(false);
         try { 
           sessionStorage.removeItem('sovereign_show_reconnect');
-          localStorage.removeItem('sovereign_pending_wakeup'); // MUST CLEAR THIS OR IT LOOPS FOREVER!
+          localStorage.removeItem('sovereign_pending_wakeup');
         } catch {}
       }
     }, 50);
@@ -865,6 +876,20 @@ export function MobileLanding() {
     let pendingWakeup = false;
     try { pendingWakeup = localStorage.getItem('sovereign_pending_wakeup') === '1'; } catch {}
     if (!pendingWakeup) return;
+
+    // ── FAST PATH: sovereign_handshake cookie already exists from this session ──
+    // This means establishSession was already called and the cookie was written.
+    // No need to poll — just use the cookie address directly.
+    try {
+      const cookieMatch = document.cookie.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+      if (cookieMatch?.[1]) {
+        console.log('%c[MobileWallet] ⚡ Cookie shortcut — skipping recovery poll', 'color:#00ff00;font-weight:bold');
+        try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+        try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
+        establishSession(cookieMatch[1]);
+        return;
+      }
+    } catch {}
 
     console.log('%c[MobileWallet] 🚨 Ultra Recovery Mode Activated', 'color:#ff00ff;font-weight:bold');
     try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
