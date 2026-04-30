@@ -131,7 +131,7 @@ function PointGlobeMesh() {
     let colorUpdated = false;
 
     // 1. Trigger new transactions (flashes)
-    // About 10 new transactions per frame across the globe
+    // About 15 new transactions per frame across the globe
     for (let i = 0; i < 15; i++) {
         const randomIdx = Math.floor(Math.random() * count);
         if (landArray[randomIdx]) {
@@ -140,9 +140,9 @@ function PointGlobeMesh() {
     }
 
     // 2. Decay existing flashes and update colors
-    // Aztec Theme: Base #888888 (Neutral), Peak #00C076 (Emerald Green)
+    // Aztec Theme: Base #888888 (Neutral), Peak #8B5CF6 (Vibrant Purple for fluctuations)
     const baseColor = new THREE.Color("#888888");
-    const peakColor = new THREE.Color("#00C076");
+    const peakColor = new THREE.Color("#A855F7"); // Neon purple
     const tempColor = new THREE.Color();
 
     for (let i = 0; i < count; i++) {
@@ -150,7 +150,7 @@ function PointGlobeMesh() {
             flashes[i] -= delta * 2.0; // Decay speed
             if (flashes[i] < 0) flashes[i] = 0;
 
-            // Interpolate between base dark and peak emerald based on intensity
+            // Interpolate between base dark and peak purple based on intensity
             tempColor.lerpColors(baseColor, peakColor, flashes[i]);
             meshRef.current.setColorAt(i, tempColor);
             colorUpdated = true;
@@ -175,8 +175,8 @@ function PointGlobeMesh() {
 export function SovereignGlobe3D() {
   return (
     <div className="w-full h-full cursor-grab active:cursor-grabbing absolute inset-0 z-0 bg-transparent">
-      {/* Volumetric ambient background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00C076]/10 blur-[120px] rounded-full pointer-events-none" />
+      {/* Volumetric ambient background glow - matched to purple */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#8B5CF6]/15 blur-[120px] rounded-full pointer-events-none" />
       
       <Canvas
         camera={{ position: [0, 0, 240], fov: 45, near: 1, far: 2000 }}

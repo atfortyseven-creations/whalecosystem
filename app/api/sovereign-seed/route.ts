@@ -100,16 +100,13 @@ export async function GET() {
         await prisma.forumTopic.deleteMany({});
         await prisma.forumCategory.deleteMany({});
 
-        // 1. Create 8 Normalized Academic Categories
+        // 1. Create 5 Institutional Categories
         const categoriesData = [
-            { slug: 'macroeconomic-analytics', name: 'Macroeconomic Analytics', description: 'Global liquidity, fiat policy, and macro-financial correlations.', color: '#4F46E5', orderIndex: 1 },
-            { slug: 'protocol-governance', name: 'Protocol Governance', description: 'Consensus parameters, on-chain voting, and DAO treasury management.', color: '#059669', orderIndex: 2 },
-            { slug: 'quantitative-liquidity', name: 'Quantitative Liquidity', description: 'Market making, AMM dynamics, and high-frequency deployment.', color: '#D97706', orderIndex: 3 },
-            { slug: 'onchain-forensics', name: 'On-Chain Forensics', description: 'Entity tracking, dark pool analysis, and security auditing.', color: '#DC2626', orderIndex: 4 },
-            { slug: 'venture-allocation', name: 'Venture Allocation', description: 'Seed-stage capital deployment and strategic acquisitions.', color: '#7C3AED', orderIndex: 5 },
-            { slug: 'cryptographic-audits', name: 'Cryptographic Audits', description: 'Smart contract security, mathematical proofs, and risk mitigation.', color: '#0284C7', orderIndex: 6 },
-            { slug: 'zero-knowledge', name: 'Zero-Knowledge Architecture', description: 'ZK-Rollups, privacy-preserving state transitions, and SNARKs.', color: '#DB2777', orderIndex: 7 },
-            { slug: 'mev-strategies', name: 'MEV Strategies', description: 'Maximal Extractable Value, block building, and searcher dynamics.', color: '#14B8A6', orderIndex: 8 }
+            { slug: 'institutional-matrix', name: 'Institutional Matrix', description: 'Core strategic discussions and macroeconomic allocation.', color: '#4F46E5', orderIndex: 1 },
+            { slug: 'live-feed', name: 'Live Feed', description: 'Real-time intelligence and network anomalies.', color: '#10B981', orderIndex: 2 },
+            { slug: 'recent-profiles', name: 'Recent Profiles', description: 'New verified entities and institutional nodes.', color: '#F59E0B', orderIndex: 3 },
+            { slug: 'pending-review', name: 'Pending Review', description: 'Proposals, audits, and smart contract verification queues.', color: '#EF4444', orderIndex: 4 },
+            { slug: 'highest-yield', name: 'Highest Yield', description: 'Algorithmic stablecoins, DeFi yields, and delta-neutral strategies.', color: '#8B5CF6', orderIndex: 5 }
         ];
 
         const categories = [];
@@ -204,7 +201,7 @@ export async function GET() {
 
         return NextResponse.json({
             success: true,
-            message: 'Forum seeded with 65 Institutional Personas and 8 Cryptographic Sectors successfully.',
+            message: 'Forum seeded with 65 Institutional Personas and 5 Strategic Sectors successfully.',
             results,
         });
 
