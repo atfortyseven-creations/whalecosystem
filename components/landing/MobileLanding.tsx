@@ -319,7 +319,9 @@ function ConnectedScreen({
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
       {/* Backgrounds */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
-      <WorldMapBackground />
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <WorldMapBackground />
+      </div>
       <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
 
       {/* Fixed Header */}
@@ -731,10 +733,8 @@ export function MobileLanding() {
     setConnecting(null);
     setShowFallbackBtn(false);
     // Clear the pending wakeup flag — session is now established.
-    try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
-    
-    // Redirect to the root domain as requested by the user
-    window.location.replace('/');
+    try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
+    // Stay on /connect — user stays here and accesses the QR scanner
   }, [isLinked]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —

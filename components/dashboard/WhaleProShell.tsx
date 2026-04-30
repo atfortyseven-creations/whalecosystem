@@ -345,17 +345,16 @@ export function WhaleProShell({
                 
                 {/* ─── Top Master Bar ─── */}
                 <header className="sticky top-0 h-[56px] border-b border-black/[0.06] bg-white/70 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300">
-                    <div className="relative w-52 shrink-0">
-                        <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#888888]" />
-                        <input
-                            type="text"
-                            readOnly
-                            onFocus={() => setIsPaletteOpen(true)}
-                            onClick={() => setIsPaletteOpen(true)}
-                            placeholder="Press ⌘K to search..."
-                            className="w-full bg-transparent border border-black/10 text-black rounded-xl pl-9 pr-3 py-2 text-[10px] font-mono outline-none focus:border-[#000000] transition-all cursor-pointer"
-                        />
-                    </div>
+                    <button
+                        onClick={() => setIsPaletteOpen(true)}
+                        className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08] bg-white hover:bg-black/[0.02] hover:border-black/20 hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
+                    >
+                        <Search size={12} className="text-[#AAAAAA] group-hover:text-[#555] transition-colors shrink-0" />
+                        <span className="text-[10px] text-[#AAAAAA] group-hover:text-[#555] font-medium transition-colors hidden sm:block pr-1">Search</span>
+                        <span className="hidden sm:flex items-center gap-1 ml-0.5">
+                            <kbd className="text-[9px] font-black font-mono text-[#AAAAAA] bg-black/[0.04] border border-black/[0.08] rounded px-1.5 py-0.5 leading-none">⌘K</kbd>
+                        </span>
+                    </button>
 
                     <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 flex-1 mx-6 overflow-hidden">
                         {/* Removed LiveMarketBand */}

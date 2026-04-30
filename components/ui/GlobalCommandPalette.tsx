@@ -3,49 +3,45 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, Monitor, Terminal, Map, Shield, DollarSign,
-  Landmark, Network, Zap, Rocket, TrendingUp, Star,
-  Newspaper, Wallet, Lock, Database, FlaskConical,
-  BarChart3, Ticket, Compass, Layers, Book, HeadphonesIcon,
-  Activity, Globe
+  Search, Ticket, Wallet,
+  Globe, LayoutDashboard, Compass,
+  Book, Network, BookOpen, Landmark,
+  Newspaper, Shield, Lock, Database, MessageSquare,
+  Command
 } from "lucide-react";
 
-// ── Full tab registry — all 22 routes ─────────────────────────────────────────
+// ── Only the routes that actually exist in SIDEBAR_ITEMS ──────────────────────
 const PAGES = [
-  // ── Command ──
-  { id: "dashboard",            label: "The Terminal",         group: "Command",      icon: <Monitor size={15} /> },
-  { id: "news",                 label: "The Whale Post",        group: "Command",      icon: <Newspaper size={15} /> },
-  { id: "watchlist",            label: "Watchlist Pro",         group: "Command",      icon: <Star size={15} /> },
-  { id: "gold-ticket",          label: "Ticket Minting",        group: "Command",      icon: <Ticket size={15} /> },
-
-  // ── Markets ──
-  { id: "whale-events",         label: "Mempool Radar",         group: "Markets",      icon: <Globe size={15} /> },
-  { id: "gainers",              label: "Gainers & Losers",      group: "Markets",      icon: <TrendingUp size={15} /> },
-  { id: "new-pairs",            label: "Token Discovery",       group: "Markets",      icon: <Rocket size={15} /> },
-  { id: "omni-explorer",        label: "Omni Explorer",         group: "Markets",      icon: <Compass size={15} /> },
-  { id: "brc-explorer",         label: "BRC-20 Explorer",       group: "Markets",      icon: <Layers size={15} /> },
+  // ── Overview ──
+  { id: "gold",          label: "Ticket Mint",     group: "Overview",       icon: <Ticket size={15} /> },
+  { id: "portfolio",     label: "Main Portfolio",  group: "Overview",       icon: <Wallet size={15} /> },
 
   // ── Intelligence ──
-  { id: "neural-graph",         label: "Entity Graph",          group: "Intelligence", icon: <Network size={15} /> },
-  { id: "sovereign-intel",      label: "Voss Matrix",           group: "Intelligence", icon: <Zap size={15} /> },
-  { id: "institutional-ledger", label: "Institutional Ledger",  group: "Intelligence", icon: <Landmark size={15} /> },
-  { id: "mass-transfer",        label: "Mass Transfer Intel",   group: "Intelligence", icon: <Activity size={15} /> },
-  { id: "defi-yield",           label: "DeFi Yield Optimizer",  group: "Intelligence", icon: <FlaskConical size={15} /> },
-  { id: "polymarket",           label: "Polymarket Oracle",     group: "Intelligence", icon: <BarChart3 size={15} /> },
+  { id: "market-data",   label: "Market Data",     group: "Intelligence",   icon: <Globe size={15} /> },
+  { id: "markets",       label: "Top Markets",     group: "Intelligence",   icon: <LayoutDashboard size={15} /> },
+  { id: "newpairs",      label: "New Listings",    group: "Intelligence",   icon: <Search size={15} /> },
+  { id: "graph",         label: "Entity Graph",    group: "Intelligence",   icon: <Compass size={15} /> },
 
-  // ── Sovereignty ──
-  { id: "portfolio",            label: "Akashic Vault",         group: "Sovereignty",  icon: <Wallet size={15} /> },
-  { id: "sovereign-vault",      label: "Sovereign Vault",       group: "Sovereignty",  icon: <Lock size={15} /> },
-  { id: "zk-shield",            label: "ZK Shield Station",     group: "Sovereignty",  icon: <Shield size={15} /> },
-  { id: "whale-portfolio",      label: "Whale Portfolio",       group: "Sovereignty",  icon: <Database size={15} /> },
-  { id: "humanidfi-portfolio",  label: "HumanID Portfolio",     group: "Sovereignty",  icon: <Shield size={15} /> },
+  // ── On-Chain Intel ──
+  { id: "inst-ledger",   label: "Whale Ledger",    group: "On-Chain Intel", icon: <Book size={15} /> },
+  { id: "mass-transfer", label: "Mass Transfers",  group: "On-Chain Intel", icon: <Network size={15} /> },
+  { id: "omniexplorer",  label: "Block Explorer",  group: "On-Chain Intel", icon: <Search size={15} /> },
+  { id: "defi",          label: "DeFi Yields",     group: "On-Chain Intel", icon: <Landmark size={15} /> },
 
-  // ── Learn ──
-  { id: "academy",              label: "Whale Academy",         group: "Learn",        icon: <Book size={15} /> },
-  { id: "support",              label: "Support",               group: "Learn",        icon: <HeadphonesIcon size={15} /> },
+  // ── Sovereign Intel ──
+  { id: "news",          label: "Live News",       group: "Sovereign Intel", icon: <Newspaper size={15} />, external: true },
+  { id: "sov-intel",     label: "Sovereign Intel", group: "Sovereign Intel", icon: <BookOpen size={15} />,  external: true },
+  { id: "zk",            label: "Aztec Pipeline",  group: "Sovereign Intel", icon: <Shield size={15} /> },
+
+  // ── Execution ──
+  { id: "vault",         label: "Sovereign Vault", group: "Execution",      icon: <Lock size={15} /> },
+
+  // ── System ──
+  { id: "logs",          label: "Session Logs",    group: "System",         icon: <Database size={15} /> },
+  { id: "support",       label: "Support",         group: "System",         icon: <MessageSquare size={15} /> },
 ];
 
-const GROUPS = ["Command", "Markets", "Intelligence", "Sovereignty", "Learn"];
+const GROUPS = ["Overview", "Intelligence", "On-Chain Intel", "Sovereign Intel", "Execution", "System"];
 
 export function GlobalCommandPalette({
   isOpen,
@@ -59,7 +55,7 @@ export function GlobalCommandPalette({
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
 
-  // ── Keyboard shortcuts
+  // ── Keyboard shortcuts ──────────────────────────────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -84,7 +80,7 @@ export function GlobalCommandPalette({
       )
     : PAGES;
 
-  // Keyboard navigation
+  // ── Keyboard navigation ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
     const handle = (e: KeyboardEvent) => {
@@ -99,7 +95,6 @@ export function GlobalCommandPalette({
     return () => window.removeEventListener("keydown", handle);
   }, [isOpen, filtered, cursor, onTabChange, setIsOpen]);
 
-  // Grouped view (no query) vs flat view (query active)
   const groupedView = !query;
 
   return (
@@ -111,101 +106,119 @@ export function GlobalCommandPalette({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9999]"
+            transition={{ duration: 0.12 }}
+            className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[9999]"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Panel */}
-          <div className="fixed inset-0 pointer-events-none flex items-start justify-center pt-[12vh] z-[10000]">
+          <div className="fixed inset-0 pointer-events-none flex items-start justify-center pt-[10vh] z-[10000]">
             <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: -16 }}
+              initial={{ opacity: 0, scale: 0.97, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: -16 }}
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto w-full max-w-lg bg-white border border-[#E5E5E5] rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden flex flex-col"
+              exit={{ opacity: 0, scale: 0.97, y: -10 }}
+              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="pointer-events-auto w-full max-w-md bg-white border border-[#E8E8E8] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12),0_4px_16px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
               onClick={e => e.stopPropagation()}
-              style={{ maxHeight: "70vh" }}
+              style={{ maxHeight: "72vh" }}
             >
               {/* Search Input */}
-              <div className="flex items-center px-4 py-3.5 border-b border-[#E5E5E5] gap-3 shrink-0">
-                <Search size={16} className="text-[#050505]/30 shrink-0" />
+              <div className="flex items-center px-4 py-3 border-b border-[#F0F0F0] gap-3 shrink-0">
+                <Search size={14} className="text-[#050505]/25 shrink-0" />
                 <input
                   autoFocus
-                  className="flex-1 bg-transparent border-none outline-none text-[#050505] placeholder:text-[#050505]/25 text-[14px] font-medium"
-                  placeholder="Search sections, modules, actions..."
+                  className="flex-1 bg-transparent border-none outline-none text-[#050505] placeholder:text-[#050505]/25 text-[13px] font-medium"
+                  placeholder="Go to..."
                   value={query}
                   onChange={e => { setQuery(e.target.value); setCursor(0); }}
                 />
-                <span className="text-[9px] font-black text-[#050505]/25 uppercase tracking-widest bg-[#050505]/5 px-2 py-1 rounded-lg shrink-0">ESC</span>
+                <kbd className="text-[9px] font-black font-mono text-[#050505]/20 bg-[#050505]/[0.04] border border-[#050505]/[0.07] rounded px-1.5 py-0.5 leading-none shrink-0">
+                  ESC
+                </kbd>
               </div>
 
               {/* Results */}
-              <div className="flex-1 overflow-y-auto p-2 no-scrollbar">
+              <div className="flex-1 overflow-y-auto py-1.5 no-scrollbar">
                 {groupedView ? (
-                  // Grouped display
                   GROUPS.map(group => {
                     const items = PAGES.filter(p => p.group === group);
+                    if (!items.length) return null;
                     return (
-                      <div key={group} className="mb-1">
-                        <div className="px-3 py-1.5">
-                          <span className="text-[8px] font-black uppercase tracking-[0.25em] text-[#050505]/25">{group}</span>
+                      <div key={group} className="mb-0.5">
+                        <div className="px-4 pt-3 pb-1">
+                          <span className="text-[9px] font-black uppercase tracking-[0.22em] text-[#050505]/20">
+                            {group}
+                          </span>
                         </div>
                         {items.map(page => (
                           <button
                             key={page.id}
                             onClick={() => { onTabChange(page.id); setIsOpen(false); }}
-                            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-[#050505]/[0.04] text-left transition-colors group"
+                            className="w-full flex items-center justify-between px-4 py-2 hover:bg-[#050505]/[0.03] text-left transition-colors group"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-[#050505]/35 group-hover:text-[#050505]/70 transition-colors">{page.icon}</span>
-                              <span className="text-[13px] font-semibold text-[#050505]/80 group-hover:text-[#050505] transition-colors">{page.label}</span>
+                              <span className="text-[#050505]/30 group-hover:text-[#050505]/55 transition-colors">
+                                {page.icon}
+                              </span>
+                              <span className="text-[12.5px] font-medium text-[#050505]/65 group-hover:text-[#050505] transition-colors">
+                                {page.label}
+                              </span>
                             </div>
-                            <span className="text-[9px] uppercase font-black text-[#050505]/20 tracking-widest">→</span>
+                            {(page as any).external && (
+                              <span className="text-[9px] text-[#050505]/15 mr-1">↗</span>
+                            )}
                           </button>
                         ))}
                       </div>
                     );
                   })
                 ) : (
-                  // Flat filtered results
                   filtered.length > 0 ? (
                     filtered.map((page, i) => (
                       <button
                         key={page.id}
                         onClick={() => { onTabChange(page.id); setIsOpen(false); }}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-colors group ${
-                          i === cursor ? "bg-[#050505]/[0.06]" : "hover:bg-[#050505]/[0.04]"
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                          i === cursor ? "bg-[#050505]/[0.05]" : "hover:bg-[#050505]/[0.03]"
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="text-[#050505]/35 group-hover:text-[#050505]/70 transition-colors">{page.icon}</span>
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-[13px] font-semibold text-[#050505]/80 group-hover:text-[#050505] transition-colors">{page.label}</span>
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/25">{page.group}</span>
-                          </div>
+                        <span className="text-[#050505]/30">{page.icon}</span>
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                          <span className="text-[12.5px] font-medium text-[#050505]/80 truncate">
+                            {page.label}
+                          </span>
+                          <span className="text-[8.5px] font-black uppercase tracking-widest text-[#050505]/20">
+                            {page.group}
+                          </span>
                         </div>
-                        <span className="text-[9px] uppercase font-black text-[#050505]/20 tracking-widest">→</span>
                       </button>
                     ))
                   ) : (
                     <div className="px-4 py-10 text-center">
-                      <span className="text-[12px] font-black uppercase tracking-widest text-[#050505]/25">No results for "{query}"</span>
+                      <span className="text-[11px] font-medium text-[#050505]/25">
+                        No results for &ldquo;{query}&rdquo;
+                      </span>
                     </div>
                   )
                 )}
               </div>
 
-              {/* Footer hint */}
-              <div className="shrink-0 px-4 py-2.5 border-t border-[#E5E5E5] flex items-center justify-between">
-                <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-[#050505]/25">
-                  <span>↑↓ Navigate</span>
-                  <span>↵ Open</span>
-                  <span>ESC Close</span>
+              {/* Footer hints */}
+              <div className="shrink-0 px-4 py-2 border-t border-[#F0F0F0] flex items-center justify-between bg-[#FAFAFA]">
+                <div className="flex items-center gap-3 text-[8px] font-black uppercase tracking-widest text-[#050505]/20">
+                  <span className="flex items-center gap-1">
+                    <kbd className="bg-white border border-[#E5E5E5] rounded px-1 py-0.5 text-[7.5px] leading-none">↑↓</kbd>
+                    Navigate
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <kbd className="bg-white border border-[#E5E5E5] rounded px-1 py-0.5 text-[7.5px] leading-none">↵</kbd>
+                    Open
+                  </span>
                 </div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-[#050505]/20">
-                  {PAGES.length} modules
-                </span>
+                <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-[#050505]/15">
+                  <Command size={9} />
+                  <span>K</span>
+                </div>
               </div>
             </motion.div>
           </div>

@@ -73,8 +73,8 @@ export function WorldMapBackground() {
           mc.width = W; mc.height = H;
           const mx = mc.getContext("2d", { willReadFrequently: true })!;
 
-          projection = d3.geoMercator().fitSize([W, H * 1.35], geojson);
-          projection.translate([W / 2, H / 1.65]);
+          projection = d3.geoMercator().fitSize([W, H], geojson);
+          projection.translate([W / 2, H / 2]);
 
           const path = d3.geoPath().projection(projection).context(mx);
           mx.fillStyle = "#000";
@@ -271,8 +271,8 @@ export function WorldMapBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="relative w-full h-full z-0 pointer-events-none"
-      style={{ opacity: 0.8 }}
+      className="absolute inset-0 w-full h-full z-0 pointer-events-none"
+      style={{ opacity: 0.8, display: 'block' }}
     />
   );
 }
