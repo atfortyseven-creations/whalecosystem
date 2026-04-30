@@ -130,8 +130,8 @@ function ForumHomeContent() {
               );
             })}
           </div>
+          )}
         </div>
-
       </div>
       </div>
     </div>
