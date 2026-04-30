@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown, Save } from 'lucide-react';
+import { ChevronDown, Save, FileLock2, Plus, ShieldCheck } from 'lucide-react';
 import { useSignMessage } from 'wagmi';
 
 const DRAFT_KEY = 'forum_draft_new_topic';
@@ -21,6 +21,7 @@ export default function NewTopicPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
   const [draftSaved, setDraftSaved] = useState(false);
+  const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
   const { signMessageAsync } = useSignMessage();
 
   // ── Restore draft on mount ────────────────────────────────────────────────
@@ -69,14 +70,21 @@ export default function NewTopicPage() {
     setSubmitting(true);
     try {
       let finalContent = content;
+      
+      // Inject Secure Documents into payload
+      documents.forEach(doc => {
+        if (doc.title.trim() && doc.url.trim()) {
+            finalContent += `\n\n[SECURE_DOC:${doc.title.trim()}|${doc.url.trim()}]`;
+        }
+      });
+
       try {
-        const signature = await Promise.race([
-          signMessageAsync({ message: title + '\n' + content }),
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('SIGNATURE_TIMEOUT')), 10000))
-        ]);
-        finalContent = `${content}\n\n[SIGNATURE:${signature}]`;
+        const signature = await signMessageAsync({ message: title + '\n' + finalContent });
+        finalContent = `${finalContent}\n\n[SIGNATURE:${signature}]`;
       } catch (e: any) {
-        console.warn('[Forum] Signature skipped or timed out:', e?.message || e);
+        setError('CRYPTOGRAPHIC SIGNATURE REQUIRED TO SEAL MANDATE');
+        setSubmitting(false);
+        return;
       }
 
       const res = await fetch('/api/forum/topics', {
@@ -107,18 +115,38 @@ export default function NewTopicPage() {
 
   const clearDraft = () => {
     try { localStorage.removeItem(DRAFT_KEY); } catch {}
-    setTitle(''); setContent(''); setTags('');
+    setTitle(''); setContent(''); setTags(''); setDocuments([]);
     if (categories.length > 0) setCategoryId(categories[0].id);
   };
 
+  const addDocument = () => setDocuments([...documents, { title: '', url: '' }]);
+  const updateDocument = (index: number, key: 'title' | 'url', value: string) => {
+      const newDocs = [...documents];
+      newDocs[index][key] = value;
+      setDocuments(newDocs);
+  };
+  const removeDocument = (index: number) => {
+      setDocuments(documents.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="w-full max-w-[1110px] mx-auto py-10 px-4">
+    <div className="w-full min-h-screen bg-[#050505] text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden">
+      {/* Background Volumetric Lighting */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
+      
+      <div className="max-w-[1000px] mx-auto bg-white/[0.02] border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl p-8 md:p-12 relative z-10">
 
       {/* ── Header ── */}
-      <div className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-[24px] font-sans font-bold tracking-tight" style={{ color: 'var(--forum-text)' }}>
-          Create a New Topic
-        </h1>
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
+        <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+              <ShieldCheck className="text-[#00C076]" size={28} />
+              Publish Institutional Mandate
+            </h1>
+            <p className="text-[11px] font-bold text-[#888888] uppercase tracking-[0.2em]">
+                Secure Talent Matrix • ECDSA Signature Required
+            </p>
+        </div>
         <div className="flex items-center gap-3">
           {draftSaved && (
             <span className="flex items-center gap-1.5 text-[10px] font-sans font-bold uppercase tracking-widest text-emerald-500">
@@ -128,8 +156,7 @@ export default function NewTopicPage() {
           {(title || content) && (
             <button
               onClick={clearDraft}
-              className="text-[10px] font-sans font-bold uppercase tracking-widest hover:opacity-100 transition-opacity opacity-50 px-3 py-1.5 rounded-sm"
-              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}
+              className="text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors text-[#888888] px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10"
             >
               Clear Draft
             </button>
@@ -137,86 +164,102 @@ export default function NewTopicPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
 
         {/* ── Title ── */}
-        <div>
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Mandate / Profile Title</label>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="Type title, or paste a link here"
-            className="w-full px-4 py-3 text-[18px] font-sans font-bold rounded-sm outline-none transition-colors"
-            style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
+            placeholder="e.g. Senior ZK-Rollup Engineer or Smart Contract Audit Mandate"
+            className="w-full px-5 py-4 text-[18px] font-sans font-medium rounded-xl outline-none transition-all bg-[#111111] border border-white/10 text-white placeholder:text-[#555555] focus:border-[#00C076] focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)]"
           />
         </div>
 
         {/* ── Category + Tags ── */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <select
-              value={categoryId}
-              onChange={e => setCategoryId(e.target.value)}
-              className="w-full px-4 py-3 text-[14px] font-sans font-bold rounded-sm outline-none transition-colors cursor-pointer appearance-none"
-              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
-            >
-              <option value="" disabled style={{ backgroundColor: 'var(--forum-bg)', color: 'var(--forum-text-muted)' }}>Select a category</option>
+        <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex-1 relative flex flex-col gap-2">
+            <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Institutional Sector</label>
+            <div className="relative">
+                <select
+                value={categoryId}
+                onChange={e => setCategoryId(e.target.value)}
+                className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all cursor-pointer appearance-none bg-[#111111] border border-white/10 text-white focus:border-[#00C076] focus:bg-[#1A1A1A]"
+                >
+              <option value="" disabled className="text-[#555]">Select an operational sector</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} style={{ backgroundColor: 'var(--forum-bg)', color: 'var(--forum-text)' }}>{cat.name}</option>
+                <option key={cat.id} value={cat.id} className="bg-[#111111]">{cat.name}</option>
               ))}
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" size={16} style={{ color: 'var(--forum-text-muted)' }} />
+                </select>
+                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#555555]" size={16} />
+            </div>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 flex flex-col gap-2">
+            <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Specific Practices / Tags</label>
             <input
               type="text"
               value={tags}
               onChange={e => setTags(e.target.value)}
-              placeholder="optional tags (comma separated)"
-              className="w-full px-4 py-3 text-[14px] font-sans rounded-sm outline-none transition-colors"
-              style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
+              placeholder="e.g. Solidity, Audit, DeFi (comma separated)"
+              className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all bg-[#111111] border border-white/10 text-white placeholder:text-[#555555] focus:border-[#00C076] focus:bg-[#1A1A1A]"
             />
           </div>
         </div>
 
+        {/* ── Document Vault ── */}
+        <div className="flex flex-col gap-3 bg-white/[0.01] border border-white/5 p-6 rounded-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-l from-[#00C076]/30 to-transparent" />
+            <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 text-[#00C076]">
+                    <FileLock2 size={18} />
+                    <span className="text-[12px] font-black uppercase tracking-[0.2em] text-white">Cryptographic Document Vault</span>
+                </div>
+                <button onClick={addDocument} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00C076]/10 text-[#00C076] hover:bg-[#00C076]/20 transition-colors rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#00C076]/20">
+                    <Plus size={12} /> Add Document
+                </button>
+            </div>
+            <p className="text-[11px] text-[#888888] mb-2 leading-relaxed">
+                Attach legal files, IPFS hashes, On-Chain CVs, or Portfolios. These will be securely injected into the signature payload and presented inside the institutional vault.
+            </p>
+            {documents.map((doc, idx) => (
+                <div key={idx} className="flex gap-4 items-center">
+                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="flex-1 px-4 py-3 text-[12px] rounded-lg bg-[#050505] border border-white/10 text-white focus:border-[#00C076] outline-none" />
+                    <input type="text" placeholder="Secure URL / IPFS CID" value={doc.url} onChange={e => updateDocument(idx, 'url', e.target.value)} className="flex-1 px-4 py-3 text-[12px] font-mono rounded-lg bg-[#050505] border border-white/10 text-white focus:border-[#00C076] outline-none" />
+                    <button onClick={() => removeDocument(idx)} className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+            ))}
+        </div>
+
         {/* ── Body ── */}
-        <div>
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Mandate Briefing / Profile Summary</label>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            placeholder="Type here. Use Markdown, BBCode, or HTML to format."
-            className="w-full px-5 py-4 text-[15px] font-sans rounded-sm outline-none resize-none min-h-[320px] leading-relaxed transition-colors"
-            style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--forum-border)'; e.currentTarget.style.backgroundColor = 'var(--forum-surface)'; }}
+            placeholder="Type your institutional mandate or professional profile here. Markdown supported."
+            className="w-full px-6 py-5 text-[15px] font-serif rounded-xl outline-none resize-none min-h-[360px] leading-relaxed transition-all bg-[#111111] border border-white/10 text-white placeholder:text-[#555555] focus:border-[#00C076] focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)] custom-scrollbar"
           />
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center gap-6 mt-2 flex-wrap">
+        <div className="flex items-center gap-6 mt-6 pt-6 border-t border-white/10 flex-wrap">
           <button
             onClick={submit}
             disabled={submitting}
-            className="flex items-center gap-2 text-[14px] font-sans font-bold px-6 py-2.5 rounded-sm hover:opacity-80 transition-opacity disabled:opacity-40"
-            style={{ backgroundColor: 'var(--forum-button-bg)', color: 'var(--forum-button-text)' }}
+            className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] px-8 py-4 rounded-xl hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,192,118,0.3)] transition-all disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-[#00C076] text-black"
           >
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            {submitting ? 'AWAITING SIGNATURE...' : 'SIGN & CREATE TOPIC'}
+            <ShieldCheck size={16} />
+            {submitting ? 'AWAITING WALLET SIGNATURE...' : 'SEAL MANDATE ON-CHAIN'}
           </button>
           <Link
             href="/forum"
-            className="text-[14px] font-sans font-bold transition-opacity hover:opacity-100"
-            style={{ color: 'var(--forum-text-muted)' }}
+            className="text-[11px] font-black uppercase tracking-widest transition-opacity hover:opacity-100 text-[#888888] hover:text-white"
           >
-            Cancel
+            Abort Matrix
           </Link>
           {error && (
             <span className="text-[13px] font-sans font-bold text-red-400 ml-auto">
@@ -224,6 +267,7 @@ export default function NewTopicPage() {
             </span>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

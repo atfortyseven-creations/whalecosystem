@@ -53,6 +53,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, onClick }: {
     pctKey: string;
     currency: 'USD' | 'EUR';
     eurRate: number;
+    dominance: number;
     onClick: () => void;
 }) {
     const meta  = data.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
@@ -139,9 +140,9 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, onClick }: {
             {/* Volume */}
             <div className="px-3 text-right text-[11px] font-bold font-mono text-[#050505]">{fmtCurrency(vol)}</div>
 
-            {/* Dominance (Mocked from Volume) */}
+            {/* Dominance (Calculated Mathematically) */}
             <div className="px-3 text-right text-[11px] font-bold font-mono text-[#888888]">
-                {((vol / 1e8) % 10).toFixed(2)}%
+                {dominance.toFixed(2)}%
             </div>
 
             {/* Volatility */}
@@ -209,6 +210,7 @@ export function GainersLosersPanel() {
     }, [markets]);
 
     const pctKey = 'priceChangePercent';
+    const totalVolume = useMemo(() => allRows.reduce((sum, r) => sum + r.vol, 0), [allRows]);
 
     const filtered = useMemo(() => {
         return allRows
@@ -432,6 +434,7 @@ export function GainersLosersPanel() {
                                     pctKey="priceChangePercent"
                                     currency={currency}
                                     eurRate={eurRate}
+                                    dominance={totalVolume > 0 ? (r.vol / totalVolume) * 100 : 0}
                                     onClick={() => handleRowClick(r.symbol, r.data)}
                                 />
                             ))}

@@ -138,11 +138,12 @@ export function NewsOfToday() {
                         <div className="p-4 md:p-6 flex flex-col gap-4">
                             {filtered.map((a, index) => {
                                 const isExpanded = expandedId === a.id;
-                                // Pseudo-deterministic metrics based on ID/Title
-                                const idNum = parseInt(a.id.replace(/\D/g, '')) || index;
-                                const impactScore = 50 + ((idNum * 13) % 49); 
-                                const readTime = Math.max(2, Math.floor(a.summary.length / 400));
-                                const volatility = impactScore > 85 ? 'HIGH' : impactScore > 65 ? 'MED' : 'LOW';
+                                // Deterministic mathematical impact based on payload magnitude and semantic density
+                                const sentimentMagnitude = Math.abs(a.btcBullish - a.btcBearish);
+                                const contentDensity = a.summary.length;
+                                const impactScore = Math.min(99, Math.max(15, sentimentMagnitude + Math.floor(contentDensity / 100)));
+                                const readTime = Math.max(2, Math.floor(contentDensity / 400));
+                                const volatility = impactScore > 75 ? 'HIGH' : impactScore > 40 ? 'MED' : 'LOW';
 
                                 return (
                                     <motion.div 
