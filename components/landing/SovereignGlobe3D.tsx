@@ -46,8 +46,8 @@ function PointGlobeMesh() {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <circleGeometry args={[0.4, 8]} />
-      {/* Elegant dark dots on light background */}
-      <meshBasicMaterial color="#a0a0a0" transparent opacity={0.5} side={THREE.DoubleSide} />
+      {/* Purple dots representing the world shape */}
+      <meshBasicMaterial color="#6D28D9" transparent opacity={0.65} side={THREE.DoubleSide} />
     </instancedMesh>
   );
 }
@@ -96,19 +96,19 @@ function Arc({ startLat, startLng, endLat, endLng, color, delay }: any) {
       ref={lineRef}
       points={points}
       color={color}
-      lineWidth={1}
+      lineWidth={1.5}
       transparent
-      opacity={0.3}
+      opacity={0.6}
       dashed
-      dashScale={50}
-      dashSize={6}
+      dashScale={30}
+      dashSize={8}
       dashOffset={delay}
     />
   );
 }
 
 // ─── 3. ELEGANT NODES ────────────────────────────────────────────────────────
-function Node({ lat, lng, radius, color }: { lat: number, lng: number, radius: number, color: string }) {
+function Node({ lat, lng, radius, color, isOrigin }: { lat: number, lng: number, radius: number, color: string, isOrigin?: boolean }) {
   const phi = (90 - lat) * (Math.PI / 180);
   const theta = (lng + 180) * (Math.PI / 180);
   
@@ -120,8 +120,8 @@ function Node({ lat, lng, radius, color }: { lat: number, lng: number, radius: n
 
   return (
     <mesh position={pos}>
-      <sphereGeometry args={[1.0, 16, 16]} />
-      <meshBasicMaterial color={color} transparent opacity={0.6} />
+      <sphereGeometry args={[isOrigin ? 1.5 : 0.8, 16, 16]} />
+      <meshBasicMaterial color={isOrigin ? "#D4AF37" : color} transparent opacity={isOrigin ? 1.0 : 0.5} />
     </mesh>
   );
 }
@@ -131,15 +131,15 @@ export function SovereignGlobe3D() {
   const [arcs, setArcs] = useState<any[]>([]);
 
   useEffect(() => {
-    // Generate clean, minimalist arcs for light mode
-    const newArcs = Array.from({ length: 30 }).map((_, i) => ({
+    // Generate clean, highly visible arcs
+    const newArcs = Array.from({ length: 45 }).map((_, i) => ({
       id: i,
       startLat: (Math.random() - 0.5) * 140, 
       startLng: (Math.random() - 0.5) * 360,
       endLat: (Math.random() - 0.5) * 140,
       endLng: (Math.random() - 0.5) * 360,
-      // Minimalist light mode colors: dark greys/black to replace green/red
-      color: Math.random() > 0.5 ? "#050505" : "#444444", 
+      // High-contrast arcs: Deep purple to black
+      color: Math.random() > 0.5 ? "#2D0A59" : "#050505", 
       delay: Math.random() * 100
     }));
     setArcs(newArcs);
@@ -169,7 +169,8 @@ export function SovereignGlobe3D() {
           {arcs.map(arc => (
             <React.Fragment key={arc.id}>
               <Arc {...arc} />
-              <Node lat={arc.startLat} lng={arc.startLng} radius={100} color={arc.color} />
+              {/* Distinctive origin node (gold) to clearly show where arcs come from */}
+              <Node lat={arc.startLat} lng={arc.startLng} radius={100} color={arc.color} isOrigin={true} />
               <Node lat={arc.endLat} lng={arc.endLng} radius={100} color={arc.color} />
             </React.Fragment>
           ))}

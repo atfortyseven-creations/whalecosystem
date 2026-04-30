@@ -833,23 +833,23 @@ export function MobileLanding() {
   const forceFullReconnect = useCallback(() => {
     setFallbackStatus('checking');
     try {
-      // Fire-and-forget: do NOT await reconnect(). Awaiting blocks the polling
-      // loop, causing artificial delays if the WalletConnect relay is slow.
-      reconnect();
+      // Wagmi automatically reconnects via AppKit. Manually calling reconnect()
+      // can cause a race condition with the WalletConnect relay handshake.
+      // We just rely on AppKit's native reconnection and start polling.
     } catch (e) {
       console.error('[Sovereign:Recovery] Manual sync failed:', e);
     }
     // Start polling immediately!
     onFocusRecheck();
-  }, [reconnect, onFocusRecheck]);
+  }, [onFocusRecheck]);
 
   // ── Hardened Sovereign Wake-Sync Engine ───────────────────────────────────
   useEffect(() => {
     if (!mounted) return;
     const handleVisibility = () => {
       if (document.visibilityState !== 'visible') return;
-      // Remove lingering AppKit modal backdrop that Chrome leaves open after deep-link
-      try { document.querySelector('w3m-modal')?.remove(); } catch {}
+      // Do NOT remove w3m-modal here. AppKit manages the WebSocket connection
+      // inside the modal's WebComponent. Removing it kills the handshake.
       if (isLinked) return;
       if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
         forceFullReconnect();
