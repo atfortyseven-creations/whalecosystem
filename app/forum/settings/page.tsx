@@ -191,7 +191,6 @@ export default function ForumSettingsPage() {
           <Field label="Display Name">
             <input
               className={inputCls}
-              style={inputStyle}
               value={profile.displayName ?? ''}
               placeholder="e.g. SovereignTrader"
               onChange={e => setProfile(p => p && ({ ...p, displayName: e.target.value }))}
@@ -200,7 +199,6 @@ export default function ForumSettingsPage() {
           <Field label="Avatar URL">
             <input
               className={inputCls}
-              style={inputStyle}
               value={profile.avatarUrl ?? ''}
               placeholder="https://…/avatar.png"
               onChange={e => setProfile(p => p && ({ ...p, avatarUrl: e.target.value }))}
@@ -210,7 +208,7 @@ export default function ForumSettingsPage() {
         <Field label="Bio">
           <textarea
             className={inputCls}
-            style={{ ...inputStyle, resize: 'vertical', minHeight: 90 }}
+            style={{ resize: 'vertical', minHeight: 90 }}
             value={profile.bio ?? ''}
             placeholder="Short bio visible on your forum profile…"
             onChange={e => setProfile(p => p && ({ ...p, bio: e.target.value }))}
