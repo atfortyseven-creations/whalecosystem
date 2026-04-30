@@ -2,113 +2,118 @@
 
 import React, { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Line } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
-// ─── 1. DOT GLOBE (FIBONACCI SPHERE) ─────────────────────────────────────────
+// ─── 1. DOT GLOBE (PERFECT SILHOUETTES WITH EARTH MASK) ──────────────────────
 function PointGlobeMesh() {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
-  const count = 4000; // High fidelity points
+  // 18,000 points guarantees maximum perfection and ultra-crisp borders
+  const count = 18000; 
   const radius = 100;
 
-  // Generate dots using the Fibonacci sphere algorithm
   const dummy = useMemo(() => new THREE.Object3D(), []);
+  const color = useMemo(() => new THREE.Color(), []);
   
   useEffect(() => {
     if (!meshRef.current) return;
-    
-    const phi = Math.PI * (3 - Math.sqrt(5)); // golden angle
-    
-    for (let i = 0; i < count; i++) {
-      const y = 1 - (i / (count - 1)) * 2; // y goes from 1 to -1
-      const r = Math.sqrt(1 - y * y); // radius at y
-      
-      const theta = phi * i;
-      
-      const x = Math.cos(theta) * r;
-      const z = Math.sin(theta) * r;
-      
-      dummy.position.set(x * radius, y * radius, z * radius);
-      dummy.lookAt(0, 0, 0); // Orient flat objects to surface
-      dummy.updateMatrix();
-      
-      meshRef.current.setMatrixAt(i, dummy.matrix);
-    }
-    meshRef.current.instanceMatrix.needsUpdate = true;
-  }, [count, dummy]);
+
+    const loadGlobeData = async () => {
+      try {
+        // High-fidelity earth mask. Water is white, land is black.
+        const response = await fetch('https://unpkg.com/three-globe/example/img/earth-water.png');
+        const blob = await response.blob();
+        const imgUrl = URL.createObjectURL(blob);
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = imgUrl;
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+          ctx.drawImage(img, 0, 0);
+          const imgData = ctx.getImageData(0, 0, img.width, img.height).data;
+
+          const phiAngle = Math.PI * (3 - Math.sqrt(5)); // Golden angle
+          
+          for (let i = 0; i < count; i++) {
+            const y = 1 - (i / (count - 1)) * 2; 
+            const r = Math.sqrt(1 - y * y); 
+            
+            const theta = phiAngle * i;
+            
+            const x = Math.cos(theta) * r;
+            const z = Math.sin(theta) * r;
+            
+            dummy.position.set(x * radius, y * radius, z * radius);
+            dummy.lookAt(0, 0, 0); 
+            dummy.updateMatrix();
+            
+            meshRef.current.setMatrixAt(i, dummy.matrix);
+
+            // Compute precise UV coordinates for perfect silhouette mapping
+            const lat = Math.asin(y); 
+            const lon = Math.atan2(z, x); 
+            
+            const u = 0.5 + (lon / (2 * Math.PI));
+            const v = 0.5 - (lat / Math.PI);
+            
+            const px = Math.floor(u * img.width);
+            const py = Math.floor(v * img.height);
+            // Array bounds safeguard
+            const safePx = Math.max(0, Math.min(px, img.width - 1));
+            const safePy = Math.max(0, Math.min(py, img.height - 1));
+            
+            const pixelIdx = (safePy * img.width + safePx) * 4;
+            
+            // Mask threshold detection
+            const isWater = imgData[pixelIdx] > 128;
+            
+            if (isWater) {
+              // Water: Blue points
+              color.set("#3B82F6"); 
+            } else {
+              // Land: Purple points (Sovereign Branding)
+              color.set("#6D28D9"); 
+            }
+            
+            meshRef.current.setColorAt(i, color);
+          }
+          
+          meshRef.current.instanceMatrix.needsUpdate = true;
+          if (meshRef.current.instanceColor) {
+            meshRef.current.instanceColor.needsUpdate = true;
+          }
+          URL.revokeObjectURL(imgUrl);
+        };
+      } catch (e) {
+        console.error("[SovereignGlobe] Failed to map continent data", e);
+      }
+    };
+
+    loadGlobeData();
+  }, [count, dummy, color]);
 
   useFrame(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0005; // Slow idle rotation
+      meshRef.current.rotation.y += 0.0005; // Idle elegance
     }
   });
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <circleGeometry args={[0.4, 8]} />
-      {/* Purple dots representing the world shape */}
-      <meshBasicMaterial color="#6D28D9" transparent opacity={0.65} side={THREE.DoubleSide} />
+      {/* Tiny circle for high resolution */}
+      <circleGeometry args={[0.25, 8]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.7} side={THREE.DoubleSide} />
     </instancedMesh>
   );
 }
 
-// ─── 2. ELEGANT TRANSFER ARCS ────────────────────────────────────────────────
-function generateArc(startLat: number, startLng: number, endLat: number, endLng: number, radius: number) {
-  const phi1 = (90 - startLat) * (Math.PI / 180);
-  const theta1 = (startLng + 180) * (Math.PI / 180);
-  
-  const start = new THREE.Vector3(
-    -(radius * Math.sin(phi1) * Math.cos(theta1)),
-    radius * Math.cos(phi1),
-    radius * Math.sin(phi1) * Math.sin(theta1)
-  );
-
-  const phi2 = (90 - endLat) * (Math.PI / 180);
-  const theta2 = (endLng + 180) * (Math.PI / 180);
-  
-  const end = new THREE.Vector3(
-    -(radius * Math.sin(phi2) * Math.cos(theta2)),
-    radius * Math.cos(phi2),
-    radius * Math.sin(phi2) * Math.sin(theta2)
-  );
-
-  const distance = start.distanceTo(end);
-  const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
-  // Elevate the midpoint based on distance for a graceful arc
-  midPoint.normalize().multiplyScalar(radius + distance * 0.3);
-
-  const curve = new THREE.QuadraticBezierCurve3(start, midPoint, end);
-  return curve.getPoints(50);
-}
-
-function Arc({ startLat, startLng, endLat, endLng, color, delay }: any) {
-  const points = useMemo(() => generateArc(startLat, startLng, endLat, endLng, 100), [startLat, startLng, endLat, endLng]);
-  const lineRef = useRef<any>(null);
-
-  useFrame((state, delta) => {
-    if (lineRef.current) {
-      lineRef.current.material.dashOffset -= delta * 1.5;
-    }
-  });
-
-  return (
-    <Line
-      ref={lineRef}
-      points={points}
-      color={color}
-      lineWidth={1.5}
-      transparent
-      opacity={0.6}
-      dashed
-      dashScale={30}
-      dashSize={8}
-      dashOffset={delay}
-    />
-  );
-}
-
-// ─── 3. ELEGANT NODES ────────────────────────────────────────────────────────
-function Node({ lat, lng, radius, color, isOrigin }: { lat: number, lng: number, radius: number, color: string, isOrigin?: boolean }) {
+// ─── 2. PULSING HOTSPOTS (NO ARCS) ───────────────────────────────────────────
+function Hotspot({ lat, lng, radius, activityLevel }: { lat: number, lng: number, radius: number, activityLevel: number }) {
   const phi = (90 - lat) * (Math.PI / 180);
   const theta = (lng + 180) * (Math.PI / 180);
   
@@ -118,31 +123,55 @@ function Node({ lat, lng, radius, color, isOrigin }: { lat: number, lng: number,
     radius * Math.sin(phi) * Math.sin(theta)
   );
 
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const [offset] = useState(() => Math.random() * 100);
+
+  // Activity logic: more activity = faster blink and larger base scale
+  const speed = 2 + activityLevel * 1.5;
+  const baseScale = 1.0 + activityLevel * 0.15;
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      const t = state.clock.elapsedTime * speed + offset;
+      const s = baseScale + Math.sin(t) * (0.3 + activityLevel * 0.05);
+      meshRef.current.scale.set(s, s, s);
+      
+      const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.3 + Math.abs(Math.sin(t)) * 0.7;
+    }
+  });
+
   return (
-    <mesh position={pos}>
-      <sphereGeometry args={[isOrigin ? 1.5 : 0.8, 16, 16]} />
-      <meshBasicMaterial color={isOrigin ? "#D4AF37" : color} transparent opacity={isOrigin ? 1.0 : 0.5} />
+    <mesh ref={meshRef} position={pos}>
+      <sphereGeometry args={[1.2, 16, 16]} />
+      {/* Golden pulsing hotspots for Bitcoin activity */}
+      <meshBasicMaterial color="#D4AF37" transparent opacity={0.8} />
     </mesh>
   );
 }
 
-// ─── 4. MAIN GLOBE COMPONENT ────────────────────────────────────────────────
+// ─── 3. MAIN GLOBE COMPONENT ────────────────────────────────────────────────
 export function SovereignGlobe3D() {
-  const [arcs, setArcs] = useState<any[]>([]);
+  const [hotspots, setHotspots] = useState<any[]>([]);
 
   useEffect(() => {
-    // Generate clean, highly visible arcs
-    const newArcs = Array.from({ length: 45 }).map((_, i) => ({
-      id: i,
-      startLat: (Math.random() - 0.5) * 140, 
-      startLng: (Math.random() - 0.5) * 360,
-      endLat: (Math.random() - 0.5) * 140,
-      endLng: (Math.random() - 0.5) * 360,
-      // High-contrast arcs: Deep purple to black
-      color: Math.random() > 0.5 ? "#2D0A59" : "#050505", 
-      delay: Math.random() * 100
-    }));
-    setArcs(newArcs);
+    // Hardcoded major global economic nodes. 
+    // Activity scale 1 (lowest) to 10 (highest).
+    const locations = [
+      { lat: 40.71, lng: -74.00, activity: 9 }, // New York
+      { lat: 51.50, lng: -0.12, activity: 8 },  // London
+      { lat: 35.68, lng: 139.76, activity: 10 },// Tokyo
+      { lat: 1.35, lng: 103.81, activity: 7 },  // Singapore
+      { lat: 25.20, lng: 55.27, activity: 8 },  // Dubai
+      { lat: 22.31, lng: 114.16, activity: 6 }, // Hong Kong
+      { lat: 48.85, lng: 2.35, activity: 5 },   // Paris
+      { lat: 37.77, lng: -122.41, activity: 9 },// San Francisco
+      { lat: -33.86, lng: 151.20, activity: 4 },// Sydney
+      { lat: -23.55, lng: -46.63, activity: 5 },// Sao Paulo
+      { lat: 50.11, lng: 8.68, activity: 7 },   // Frankfurt
+      { lat: 39.90, lng: 116.40, activity: 6 }, // Beijing
+    ];
+    setHotspots(locations);
   }, []);
 
   return (
@@ -156,23 +185,14 @@ export function SovereignGlobe3D() {
           alpha: false 
         }}
       >
-        {/* Light mode background */}
         <color attach="background" args={['#FAFAFA']} />
-        
-        {/* Soft lighting for a pure, clean look */}
         <ambientLight intensity={1.5} color="#ffffff" />
-        <directionalLight position={[100, 50, 100]} intensity={1} color="#ffffff" />
 
         <group rotation={[0.2, 0, 0]}>
           <PointGlobeMesh />
           
-          {arcs.map(arc => (
-            <React.Fragment key={arc.id}>
-              <Arc {...arc} />
-              {/* Distinctive origin node (gold) to clearly show where arcs come from */}
-              <Node lat={arc.startLat} lng={arc.startLng} radius={100} color={arc.color} isOrigin={true} />
-              <Node lat={arc.endLat} lng={arc.endLng} radius={100} color={arc.color} />
-            </React.Fragment>
+          {hotspots.map((spot, i) => (
+            <Hotspot key={i} lat={spot.lat} lng={spot.lng} radius={101} activityLevel={spot.activity} />
           ))}
         </group>
 

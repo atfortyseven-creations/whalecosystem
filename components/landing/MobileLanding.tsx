@@ -1231,22 +1231,12 @@ export function MobileLanding() {
                 if (isLinked && effectiveAddress) return;
 
                 setConnecting(walletId);
-                setShowManualReconnect(true);
                 setShowFallbackBtn(false);
                 // Persist wakeup flag so the next page load (after Chrome tab destroy) knows
                 // to immediately poll for the wallet connection.
                 try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {};
 
                 const doOpen = () => {
-                  // Clear stale AppKit state that blocks reconnection.
-                  // @appkit/connection_status='disconnected' prevents AppKit from
-                  // accepting new sessions. @appkit/disconnected_connector_ids with
-                  // empty strings silently blocks the walletConnect connector.
-                  try {
-                    localStorage.removeItem('@appkit/connection_status');
-                    localStorage.removeItem('@appkit/disconnected_connector_ids');
-                  } catch {}
-
                   // In-app wallet browser detection
                   const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
                   
