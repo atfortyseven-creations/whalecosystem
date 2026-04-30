@@ -1201,12 +1201,9 @@ export function MobileLanding() {
               ECDSA · On-Chain · Non-Custodial
             </span>
           </div>
-          <h1 className="text-[2.6rem] font-black tracking-tight leading-[1.0] mb-2" style={{ color: INK }}>
-            Humanity Ledger
+          <h1 className="text-[2.6rem] sm:text-[3.2rem] font-black tracking-tight leading-[1.0] mb-2 uppercase" style={{ color: INK }}>
+            WHALE ALERT NETWORK
           </h1>
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: MUTED }}>
-            Founded by Whale Alert Network
-          </p>
           <p className="text-[12px] font-medium leading-relaxed max-w-[300px] mx-auto" style={{ color: MUTED }}>
             Your private key never leaves your device. Direct, on-chain connection — zero intermediaries.
           </p>

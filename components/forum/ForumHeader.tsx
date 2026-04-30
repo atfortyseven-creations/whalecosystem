@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { UserProfileModal } from '@/components/ui/UserProfileModal';
 import { useAccount, useEnsName, useEnsAvatar } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
+import { useTheme } from 'next-themes';
 
 export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: { address?: string; avatarUrl?: string }) {
   const { address: wagmiAddress } = useAccount();
   const address = wagmiAddress || serverAddress;
   const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [isLightMode, setIsLightMode] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,9 +24,9 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Sync icon state with real DOM class on first render
+  // Ensure hydration matches for theme
   useEffect(() => {
-    setIsLightMode(document.documentElement.classList.contains('forum-light-mode'));
+    setMounted(true);
   }, []);
 
   const [mountedDate, setMountedDate] = useState('');
@@ -48,25 +50,24 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
   return (
     <>
-      <header className="sticky top-0 z-50 px-4 h-[52px] flex items-center justify-between" style={{ backgroundColor: 'var(--forum-header-bg)', borderBottom: '1px solid var(--forum-border)', backdropFilter: 'blur(12px)' }}>
+      <header className="sticky top-0 z-50 px-4 h-[52px] flex items-center justify-between bg-white/80 dark:bg-[#050505]/80 border-b border-black/10 dark:border-white/5 backdrop-blur-md transition-colors duration-300">
 
         {/* Wordmark */}
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/forum"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            style={{ color: 'var(--forum-text)' }}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity text-black dark:text-white"
           >
             {/* "FORUM P2P" — only on md+ */}
             <span className="hidden md:inline text-[20px] font-sans font-black tracking-tight">FORUM</span>
-            <span className="hidden md:inline text-[12px] font-mono tracking-[0.2em] px-2 py-0.5 rounded border opacity-70" style={{ borderColor: 'var(--forum-border)' }}>P2P</span>
+            <span className="hidden md:inline text-[12px] font-mono tracking-[0.2em] px-2 py-0.5 rounded border border-black/10 dark:border-white/10 opacity-70">P2P</span>
             {/* Brand always visible */}
             <span className="text-[15px] font-serif tracking-normal font-bold opacity-90 truncate">Humanity Ledger®</span>
           </Link>
           {/* SYS.DATE — sm+ only */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm" style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)' }}>
-            <span className="text-[10px] font-sans font-bold uppercase tracking-widest" style={{ color: 'var(--forum-text-muted)' }}>SYS.DATE:</span>
-            <span className="text-[11px] font-mono font-black uppercase tracking-widest" style={{ color: 'var(--forum-text)' }}>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-sm bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 transition-colors">
+            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-black/60 dark:text-[#888888]">SYS.DATE:</span>
+            <span className="text-[11px] font-mono font-black uppercase tracking-widest text-black dark:text-white">
               {mountedDate || '---'}
             </span>
           </div>
@@ -76,18 +77,15 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
         <div className="flex items-center gap-2 sm:gap-4 shrink-0" ref={menuRef}>
 
           {/* Theme Toggle */}
-          <button
-            onClick={() => {
-              const isLight = document.documentElement.classList.toggle('forum-light-mode');
-              localStorage.setItem('forum-theme', isLight ? 'light' : 'dark');
-              setIsLightMode(isLight);
-            }}
-            className="w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-300 ease-in-out hover:scale-105"
-            style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text-muted)' }}
-            title={isLightMode ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-          >
-            <span className="text-[14px] font-serif leading-none mt-[1px]">{isLightMode ? '☾' : '☼'}</span>
-          </button>
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="w-8 h-8 flex items-center justify-center rounded-sm transition-all duration-300 ease-in-out hover:scale-105 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              <span className="text-[14px] font-serif leading-none mt-[1px]">{theme === 'dark' ? '☼' : '☾'}</span>
+            </button>
+          )}
 
           {/* New Topic — hidden on mobile */}
           <Link
@@ -100,8 +98,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           {/* Menu toggle */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="text-[12px] font-sans font-bold tracking-wide hover:opacity-100 transition-colors"
-            style={{ color: 'var(--forum-text-muted)' }}
+            className="text-[12px] font-sans font-bold tracking-wide hover:opacity-100 transition-colors text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white"
             aria-label="Navigation menu"
           >
             {menuOpen ? 'CLOSE' : 'MENU'}
@@ -109,9 +106,9 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
           {/* Popover */}
           {menuOpen && (
-            <div className="absolute top-[52px] right-0 w-[220px] shadow-lg z-50 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--forum-bg)', border: '1px solid var(--forum-border)', borderTop: 'none' }}>
+            <div className="absolute top-[52px] right-0 w-[220px] shadow-lg z-50 flex flex-col overflow-hidden bg-white dark:bg-[#050505] border-l border-b border-black/10 dark:border-white/5 transition-colors">
               {/* + New Topic on mobile only */}
-              <Link href="/forum/new" onClick={() => setMenuOpen(false)} className="sm:hidden px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors" style={{ color: 'var(--forum-text)', borderBottom: '1px solid var(--forum-border)', backgroundColor: 'var(--forum-surface)' }}>
+              <Link href="/forum/new" onClick={() => setMenuOpen(false)} className="sm:hidden px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors text-black dark:text-white border-b border-black/10 dark:border-white/5 bg-black/5 dark:bg-white/5">
                 + CREATE MANDATE
               </Link>
               {navLinks.map(l => (
@@ -119,10 +116,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
                   key={l.href}
                   href={l.href}
                   onClick={() => setMenuOpen(false)}
-                  className="px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors"
-                  style={{ color: 'var(--forum-text-muted)', borderBottom: '1px solid var(--forum-border)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--forum-text)'; e.currentTarget.style.backgroundColor = 'var(--forum-hover)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--forum-text-muted)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  className="px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors text-black/60 dark:text-[#888888] border-b border-black/10 dark:border-white/5 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
                 >
                   {l.label}
                 </Link>
@@ -135,8 +129,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setProfileOpen(true)}
-                className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors"
-                style={{ backgroundColor: 'var(--forum-surface)', border: '1px solid var(--forum-border)', color: 'var(--forum-text)' }}
+                className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white"
                 title={ensName || address}
               >
                 {finalAvatar
@@ -147,8 +140,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             </div>
           ) : (
             <div
-              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] px-2 py-1 rounded-sm"
-              style={{ color: 'var(--forum-text-muted)', border: '1px dashed var(--forum-border)' }}
+              className="text-[10px] font-mono font-black uppercase tracking-[0.2em] px-2 py-1 rounded-sm text-black/60 dark:text-[#888888] border border-dashed border-black/20 dark:border-white/20 transition-colors"
             >
               [ READ-ONLY ]
             </div>
@@ -158,21 +150,21 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
 
 
       {/* Secondary Discourse Sub-Nav */}
-      <div className="w-full shadow-sm bg-[#050505] border-b border-white/5">
+      <div className="w-full shadow-sm bg-white dark:bg-[#050505] border-b border-black/10 dark:border-white/5 transition-colors duration-300">
         <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[54px] gap-8 overflow-x-auto custom-scrollbar">
-          <Link href="/forum" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-white border-b-2 border-[#00C076] whitespace-nowrap">
+          <Link href="/forum" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black dark:text-white border-b-2 border-[#00C076] whitespace-nowrap">
             Institutional Matrix
           </Link>
-          <Link href="/forum?filter=latest" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=latest" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Live Feed
           </Link>
-          <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Recent Profiles
           </Link>
-          <Link href="/forum?filter=unread" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=unread" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Pending Review
           </Link>
-          <Link href="/forum?filter=top" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-[#555] hover:text-[#00C076] whitespace-nowrap">
+          <Link href="/forum?filter=top" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Highest Yield
           </Link>
         </div>

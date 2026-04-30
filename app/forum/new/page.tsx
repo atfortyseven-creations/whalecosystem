@@ -169,16 +169,16 @@ export default function NewTopicPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#050505] text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden">
+    <div className="w-full min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
       {/* Background Volumetric Lighting */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[#00C076]/10 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
       
-      <div className="max-w-[1000px] mx-auto bg-white/[0.02] border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl p-8 md:p-12 relative z-10">
+      <div className="max-w-[1000px] mx-auto bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl p-8 md:p-12 relative z-10 transition-colors duration-300">
 
       {/* ── Header ── */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-black/10 dark:border-white/10 pb-6">
         <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-black dark:text-white flex items-center gap-3 transition-colors">
               <ShieldCheck className="text-[#00C076]" size={28} />
               Publish Institutional Mandate
             </h1>
@@ -195,7 +195,7 @@ export default function NewTopicPage() {
           {(title || content) && (
             <button
               onClick={clearDraft}
-              className="text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors text-[#888888] px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10"
+              className="text-[10px] font-black uppercase tracking-widest hover:text-black dark:hover:text-white transition-colors text-black/60 dark:text-[#888888] px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10"
             >
               Clear Draft
             </button>
@@ -213,7 +213,7 @@ export default function NewTopicPage() {
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="e.g. Senior ZK-Rollup Engineer or Smart Contract Audit Mandate"
-            className="w-full px-5 py-4 text-[18px] font-sans font-medium rounded-xl outline-none transition-all bg-[#111111] border border-white/10 text-white placeholder:text-[#555555] focus:border-[#00C076] focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)]"
+            className="w-full px-5 py-4 text-[18px] font-sans font-medium rounded-xl outline-none transition-all bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-[#555555] focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)]"
           />
         </div>
 
@@ -225,11 +225,11 @@ export default function NewTopicPage() {
                 <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
-                className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all cursor-pointer appearance-none bg-[#111111] border border-white/10 text-white focus:border-[#00C076] focus:bg-[#1A1A1A]"
+                className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all cursor-pointer appearance-none bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A]"
                 >
-              <option value="" disabled className="text-[#555]">Select an operational sector</option>
+              <option value="" disabled className="text-black/40 dark:text-[#555]">Select an operational sector</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-[#111111]">{cat.name}</option>
+                <option key={cat.id} value={cat.id} className="bg-white dark:bg-[#111111] text-black dark:text-white">{cat.name}</option>
               ))}
                 </select>
                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#555555]" size={16} />
@@ -242,18 +242,18 @@ export default function NewTopicPage() {
               value={tags}
               onChange={e => setTags(e.target.value)}
               placeholder="e.g. Solidity, Audit, DeFi (comma separated)"
-              className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all bg-[#111111] border border-white/10 text-white placeholder:text-[#555555] focus:border-[#00C076] focus:bg-[#1A1A1A]"
+              className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-[#555555] focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A]"
             />
           </div>
         </div>
 
         {/* ── Document Vault ── */}
-        <div className="flex flex-col gap-3 bg-white/[0.01] border border-white/5 p-6 rounded-2xl relative overflow-hidden">
+        <div className="flex flex-col gap-3 bg-black/[0.01] dark:bg-white/[0.01] border border-black/5 dark:border-white/5 p-6 rounded-2xl relative overflow-hidden transition-colors">
             <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-l from-[#00C076]/30 to-transparent" />
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-[#00C076]">
                     <FileLock2 size={18} />
-                    <span className="text-[12px] font-black uppercase tracking-[0.2em] text-white">Cryptographic Document Vault</span>
+                    <span className="text-[12px] font-black uppercase tracking-[0.2em] text-black dark:text-white transition-colors">Cryptographic Document Vault</span>
                 </div>
                 <button onClick={addDocument} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00C076]/10 text-[#00C076] hover:bg-[#00C076]/20 transition-colors rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#00C076]/20">
                     <Plus size={12} /> Add Document
@@ -263,15 +263,15 @@ export default function NewTopicPage() {
                 Attach physical files or specify IPFS CIDs. Uploaded files will be cryptographically hashed, persisted in the isolated vault, and injected directly into the signature payload.
             </p>
             {documents.map((doc, idx) => (
-                <div key={idx} className="flex gap-4 items-center bg-[#000000] p-3 rounded-xl border border-white/5 relative group">
-                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="flex-1 px-4 py-2.5 text-[12px] rounded-lg bg-[#050505] border border-white/10 text-white focus:border-[#00C076] outline-none" />
+                <div key={idx} className="flex gap-4 items-center bg-black/5 dark:bg-[#000000] p-3 rounded-xl border border-black/5 dark:border-white/5 relative group transition-colors">
+                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="flex-1 px-4 py-2.5 text-[12px] rounded-lg bg-white dark:bg-[#050505] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] outline-none transition-colors" />
                     
                     <div className="flex-1 relative flex items-center">
-                        <input type="text" placeholder="Secure URL / IPFS CID" value={doc.url} onChange={e => updateDocument(idx, 'url', e.target.value)} className="w-full px-4 py-2.5 pr-[100px] text-[12px] font-mono rounded-lg bg-[#050505] border border-white/10 text-[#00C076] focus:border-[#00C076] outline-none" />
+                        <input type="text" placeholder="Secure URL / IPFS CID" value={doc.url} onChange={e => updateDocument(idx, 'url', e.target.value)} className="w-full px-4 py-2.5 pr-[100px] text-[12px] font-mono rounded-lg bg-white dark:bg-[#050505] border border-black/10 dark:border-white/10 text-[#00C076] focus:border-[#00C076] outline-none transition-colors" />
                         
                         {/* Native File Upload Integration */}
                         <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                            <label className="cursor-pointer bg-[#111] hover:bg-[#222] border border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-md text-white transition-colors">
+                            <label className="cursor-pointer bg-black/10 dark:bg-[#111] hover:bg-black/20 dark:hover:bg-[#222] border border-black/10 dark:border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-md text-black dark:text-white transition-colors">
                                 {uploadingFile ? 'ENCRYPTING...' : 'UPLOAD FILE'}
                                 <input type="file" className="hidden" disabled={uploadingFile} onChange={(e) => handleFileUpload(e, idx)} />
                             </label>
@@ -292,12 +292,12 @@ export default function NewTopicPage() {
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="Type your institutional mandate or professional profile here. Markdown supported."
-            className="w-full px-6 py-5 text-[15px] font-serif rounded-xl outline-none resize-none min-h-[360px] leading-relaxed transition-all bg-[#111111] border border-white/10 text-white placeholder:text-[#555555] focus:border-[#00C076] focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)] custom-scrollbar"
+            className="w-full px-6 py-5 text-[15px] font-serif rounded-xl outline-none resize-none min-h-[360px] leading-relaxed transition-all bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-[#555555] focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)] custom-scrollbar"
           />
         </div>
 
         {/* ── Footer ── */}
-        <div className="flex items-center gap-6 mt-6 pt-6 border-t border-white/10 flex-wrap">
+        <div className="flex items-center gap-6 mt-6 pt-6 border-t border-black/10 dark:border-white/10 flex-wrap">
           <button
             onClick={submit}
             disabled={submitting}
@@ -308,7 +308,7 @@ export default function NewTopicPage() {
           </button>
           <Link
             href="/forum"
-            className="text-[11px] font-black uppercase tracking-widest transition-opacity hover:opacity-100 text-[#888888] hover:text-white"
+            className="text-[11px] font-black uppercase tracking-widest transition-opacity hover:opacity-100 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white"
           >
             Abort Matrix
           </Link>

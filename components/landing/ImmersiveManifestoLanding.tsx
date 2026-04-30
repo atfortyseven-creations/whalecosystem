@@ -183,11 +183,8 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
         <div className="w-full max-w-7xl mx-auto flex flex-col items-center">
           
           <div className="mb-6 flex flex-col items-center text-center px-4">
-             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/[0.03] border border-black/5 mb-3">
-               <span className="text-[9px] font-black uppercase tracking-[0.25em] text-black/60">Whale Alert Network</span>
-             </div>
-             <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-black">
-               Global Inter-Node Capital Flow
+             <h2 className="text-[32px] sm:text-[46px] md:text-[60px] leading-[1.0] font-black uppercase tracking-tighter text-black">
+               WHALE ALERT NETWORK
              </h2>
           </div>
 

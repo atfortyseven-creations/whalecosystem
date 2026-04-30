@@ -104,13 +104,13 @@ export default function TopicPage() {
   };
 
   if (!topic) return (
-    <div className="py-20 text-center text-[13px] font-sans animate-pulse min-h-screen bg-[#050505] text-[#555]">
+    <div className="py-20 text-center text-[13px] font-sans animate-pulse min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-black/60 dark:text-[#555] transition-colors duration-300">
       Decrypting Institutional Mandate...
     </div>
   );
 
   if (topic.error) return (
-    <div className="py-20 text-center text-[13px] font-sans text-red-500 min-h-screen bg-[#050505]">
+    <div className="py-20 text-center text-[13px] font-sans text-red-500 min-h-screen bg-[#FFFDF8] dark:bg-[#050505] transition-colors duration-300">
       Mandate / Profile not found or restricted.
     </div>
   );
@@ -118,7 +118,7 @@ export default function TopicPage() {
   const isTopicAuthor = sessionAddress && topic.author?.walletAddress?.toLowerCase() === sessionAddress;
 
   return (
-    <div className="w-full min-h-screen bg-[#050505] text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden">
+    <div className="w-full min-h-screen bg-[#FFFDF8] dark:bg-[#050505] text-[#1C1917] dark:text-[#FAF9F6] selection:bg-[#00C076]/30 py-12 px-4 font-sans relative overflow-hidden transition-colors duration-300">
       {/* Background Volumetric Lighting */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#00C076]/5 blur-[150px] pointer-events-none -z-10 rounded-full mix-blend-screen" />
       
@@ -126,7 +126,7 @@ export default function TopicPage() {
       {/* Topic Header */}
       <div className="mb-10 pb-6 border-b border-white/10">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-[28px] md:text-[36px] font-black leading-[1.2] tracking-tight mb-4 flex-1 text-white">
+          <h1 className="text-[28px] md:text-[36px] font-black leading-[1.2] tracking-tight mb-4 flex-1 text-black dark:text-white transition-colors">
             {topic.title}
           </h1>
           {isTopicAuthor && (
@@ -134,7 +134,7 @@ export default function TopicPage() {
               {deleteConfirmTarget === 'topic' ? (
                 <>
                   <button onClick={deleteTopic} className="shrink-0 mt-1 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-colors bg-red-500/20 text-red-500 border border-red-500/30 hover:bg-red-500/30">Confirm</button>
-                  <button onClick={() => setDeleteConfirmTarget(null)} className="shrink-0 mt-1 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-colors bg-white/5 text-[#888888] hover:text-white border border-white/10">Cancel</button>
+                  <button onClick={() => setDeleteConfirmTarget(null)} className="shrink-0 mt-1 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg transition-colors bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white border border-black/10 dark:border-white/10">Cancel</button>
                 </>
               ) : (
                 <button
@@ -149,13 +149,13 @@ export default function TopicPage() {
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           {topic.category && (
-            <Link href={`/forum/c/${topic.category.slug}`} className="flex items-center gap-2 px-3 py-1 rounded-full transition-colors bg-white/5 border border-white/10 hover:border-[#00C076]/30">
+            <Link href={`/forum/c/${topic.category.slug}`} className="flex items-center gap-2 px-3 py-1 rounded-full transition-colors bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-[#00C076]/30">
               <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: topic.category.color || '#00C076', color: topic.category.color || '#00C076' }} />
-              <span className="text-[11px] font-black tracking-widest uppercase text-white">{topic.category.name}</span>
+              <span className="text-[11px] font-black tracking-widest uppercase text-black dark:text-white transition-colors">{topic.category.name}</span>
             </Link>
           )}
           {topic.tags?.map((tag: any) => (
-            <span key={tag.id} className="text-[11px] font-bold uppercase tracking-widest text-[#555555] bg-black px-2 py-0.5 rounded-md border border-white/5">
+            <span key={tag.id} className="text-[11px] font-bold uppercase tracking-widest text-black/60 dark:text-[#555555] bg-black/5 dark:bg-black px-2 py-0.5 rounded-md border border-black/10 dark:border-white/5 transition-colors">
               {tag.name}
             </span>
           ))}
@@ -175,14 +175,14 @@ export default function TopicPage() {
           <div id="reply-composer" className="mt-12 flex gap-6">
              <div className="w-[60px] shrink-0 hidden sm:block"></div>
              <div className="flex-1">
-                <div className="rounded-2xl overflow-hidden bg-white/[0.02] border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] focus-within:border-[#00C076]/50 transition-colors">
+                <div className="rounded-2xl overflow-hidden bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.05)] dark:shadow-[0_0_30px_rgba(0,0,0,0.5)] focus-within:border-[#00C076]/50 transition-colors">
                   <textarea
                     value={replyContent}
                     onChange={e => setReplyContent(e.target.value)}
                     placeholder="Formulate your cryptographic proposal..."
-                    className="w-full px-6 py-5 text-[14px] font-serif bg-transparent text-white focus:outline-none resize-none min-h-[160px] leading-relaxed placeholder:text-[#555] custom-scrollbar"
+                    className="w-full px-6 py-5 text-[14px] font-serif bg-transparent text-black dark:text-white focus:outline-none resize-none min-h-[160px] leading-relaxed placeholder:text-black/40 dark:placeholder:text-[#555] custom-scrollbar transition-colors"
                   />
-                  <div className="flex items-center justify-between px-6 py-4 border-t border-white/5 bg-[#050505]">
+                  <div className="flex items-center justify-between px-6 py-4 border-t border-black/10 dark:border-white/5 bg-black/5 dark:bg-[#050505] transition-colors">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={submitReply}
@@ -215,30 +215,30 @@ export default function TopicPage() {
            <div className="sticky top-[120px] border-l border-white/10 pl-8 py-2">
               <div className="flex flex-col gap-6">
                  <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#555]">Instantiated</span>
-                    <span className="text-[13px] font-bold text-white">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-[#555] transition-colors">Instantiated</span>
+                    <span className="text-[13px] font-bold text-black dark:text-white transition-colors">
                        {topic.createdAt ? format(new Date(topic.createdAt), 'MMM d, yyyy') : ''}
                     </span>
                  </div>
                  <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#555]">Latest Proposal</span>
-                    <span className="text-[13px] font-bold text-white">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-[#555] transition-colors">Latest Proposal</span>
+                    <span className="text-[13px] font-bold text-black dark:text-white transition-colors">
                        {topic.updatedAt ? formatDistanceToNowStrict(new Date(topic.updatedAt)) + ' ago' : ''}
                     </span>
                  </div>
                  <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#555]">Proposals</span>
-                    <span className="text-[13px] font-bold text-white">{topic._count?.posts || 0}</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-[#555] transition-colors">Proposals</span>
+                    <span className="text-[13px] font-bold text-black dark:text-white transition-colors">{topic._count?.posts || 0}</span>
                  </div>
                  <div className="flex flex-col gap-1">
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#555]">Institutional Views</span>
-                    <span className="text-[13px] font-bold text-white">{topic.views || 0}</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-[#555] transition-colors">Institutional Views</span>
+                    <span className="text-[13px] font-bold text-black dark:text-white transition-colors">{topic.views || 0}</span>
                  </div>
               </div>
               <div className="mt-10 pt-8 border-t border-white/10 flex gap-2">
                   <button 
                     onClick={() => document.getElementById('reply-composer')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="flex-1 text-center py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors bg-white/5 text-[#888888] hover:text-white hover:bg-white/10 border border-white/10"
+                    className="flex-1 text-center py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10"
                   >
                     Submit Proposal
                   </button>
@@ -285,7 +285,7 @@ function RenderContent({ content }: { content: string }) {
 
   return (
     <>
-      <div className="whitespace-pre-wrap font-serif text-[15px] leading-relaxed text-[#D0D0D0]">{text}</div>
+      <div className="whitespace-pre-wrap font-serif text-[15px] leading-relaxed text-black/80 dark:text-[#D0D0D0] transition-colors">{text}</div>
       
       {docs.length > 0 && (
           <div className="mt-8 flex flex-col gap-3">
@@ -293,17 +293,17 @@ function RenderContent({ content }: { content: string }) {
                   <span className="text-[#00C076]">
                       <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                   </span>
-                  <span className="text-[10px] font-black tracking-[0.2em] uppercase text-white">Cryptographic Legal Vault</span>
+                  <span className="text-[10px] font-black tracking-[0.2em] uppercase text-black dark:text-white transition-colors">Cryptographic Legal Vault</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {docs.map((doc, i) => (
-                      <a key={i} href={doc.url} target="_blank" rel="noreferrer" className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/10 hover:border-[#00C076]/50 hover:bg-[#00C076]/10 hover:shadow-[0_0_20px_rgba(0,192,118,0.15)] transition-all group">
-                          <div className="w-10 h-10 rounded-lg bg-black/50 border border-white/5 flex items-center justify-center text-[#888888] group-hover:text-[#00C076] transition-colors">
+                      <a key={i} href={doc.url} target="_blank" rel="noreferrer" className="flex items-center gap-4 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 hover:border-[#00C076]/50 hover:bg-[#00C076]/10 hover:shadow-[0_0_20px_rgba(0,192,118,0.15)] transition-all group">
+                          <div className="w-10 h-10 rounded-lg bg-black/5 dark:bg-black/50 border border-black/10 dark:border-white/5 flex items-center justify-center text-black/60 dark:text-[#888888] group-hover:text-[#00C076] transition-colors">
                               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                           </div>
                           <div className="flex flex-col min-w-0">
-                              <span className="text-[13px] font-bold text-white truncate">{doc.title}</span>
-                              <span className="text-[10px] text-[#555] font-mono truncate">{doc.url}</span>
+                              <span className="text-[13px] font-bold text-black dark:text-white truncate transition-colors">{doc.title}</span>
+                              <span className="text-[10px] text-black/60 dark:text-[#555] font-mono truncate transition-colors">{doc.url}</span>
                           </div>
                       </a>
                   ))}
@@ -377,13 +377,13 @@ function PostRow({
   const likeCount = entity.likes?.length || 0;
 
   return (
-    <div className="flex gap-6 py-8 border-b border-white/5">
+    <div className="flex gap-6 py-8 border-b border-black/10 dark:border-white/5 transition-colors">
       
       {/* Left Sidebar (Author) */}
       <div className="w-[60px] shrink-0 hidden sm:flex flex-col items-center">
         <Link href={`/forum/u/${addr}`}>
           <div
-            className="w-[45px] h-[45px] rounded-xl flex items-center justify-center text-[14px] font-black overflow-hidden bg-white/5 text-[#888888] border border-white/10 hover:border-white/30 transition-colors"
+            className="w-[45px] h-[45px] rounded-xl flex items-center justify-center text-[14px] font-black overflow-hidden bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] border border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 transition-colors"
           >
             {!imgError && entity.author?.avatarUrl
               ? <img 
@@ -402,7 +402,7 @@ function PostRow({
       <div className="flex-1 min-w-0 flex flex-col">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <Link href={`/forum/u/${addr}`} className="text-[15px] font-bold hover:text-[#00C076] transition-colors text-white">
+            <Link href={`/forum/u/${addr}`} className="text-[15px] font-bold hover:text-[#00C076] transition-colors text-black dark:text-white">
               {label}
             </Link>
             {entity.author?.isPro && (
@@ -412,14 +412,14 @@ function PostRow({
               <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-[#00C076]/20 text-[#00C076] px-2 py-0.5 rounded-sm border border-[#00C076]/30">ISSUER</span>
             )}
             {entity.author?.bio && (
-              <span className="text-[12px] text-[#555] ml-1">
+              <span className="text-[12px] text-black/60 dark:text-[#555] ml-1 transition-colors">
                  • {entity.author.bio}
               </span>
             )}
           </div>
           <div className="flex items-center gap-3">
-             <span className="text-[11px] font-bold text-[#555] uppercase tracking-widest">{time}</span>
-             <span className="text-[11px] font-black text-[#333]">#{index}</span>
+             <span className="text-[11px] font-bold text-black/60 dark:text-[#555] uppercase tracking-widest transition-colors">{time}</span>
+             <span className="text-[11px] font-black text-black/40 dark:text-[#333] transition-colors">#{index}</span>
           </div>
         </div>
 
@@ -428,17 +428,17 @@ function PostRow({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-6 mt-auto border-t border-white/5 pt-4">
+        <div className="flex items-center gap-6 mt-auto border-t border-black/10 dark:border-white/5 pt-4 transition-colors">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${liked ? 'text-[#00C076]' : 'text-[#555] hover:text-white'}`}
+            className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${liked ? 'text-[#00C076]' : 'text-black/60 dark:text-[#555] hover:text-black dark:hover:text-white'}`}
           >
             <svg className="w-4 h-4" fill={liked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
             {likeCount > 0 && likeCount} ENDORSE
           </button>
           <button
             onClick={() => document.getElementById('reply-composer')?.scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors text-[#555] hover:text-white"
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors text-black/60 dark:text-[#555] hover:text-black dark:hover:text-white"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
             PROPOSE
@@ -452,7 +452,7 @@ function PostRow({
                   <button onClick={handleDelete} className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-md transition-colors bg-red-500/20 text-red-500 border border-red-500/30 hover:bg-red-500/30" disabled={deleting}>
                     Confirm
                   </button>
-                  <button onClick={() => setConfirmingDelete(false)} className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-md transition-colors bg-white/5 text-[#888888] hover:text-white border border-white/10" disabled={deleting}>
+                  <button onClick={() => setConfirmingDelete(false)} className="text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-md transition-colors bg-black/5 dark:bg-white/5 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white border border-black/10 dark:border-white/10" disabled={deleting}>
                     Cancel
                   </button>
                 </>

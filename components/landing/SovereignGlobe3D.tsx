@@ -174,7 +174,7 @@ function PointGlobeMesh() {
 // ─── 3. MAIN GLOBE COMPONENT ────────────────────────────────────────────────
 export function SovereignGlobe3D() {
   return (
-    <div className="w-full h-full cursor-grab active:cursor-grabbing absolute inset-0 z-0 bg-[#050505]">
+    <div className="w-full h-full cursor-grab active:cursor-grabbing absolute inset-0 z-0 bg-transparent">
       {/* Volumetric ambient background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#00C076]/10 blur-[120px] rounded-full pointer-events-none" />
       
