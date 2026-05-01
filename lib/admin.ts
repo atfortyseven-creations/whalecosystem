@@ -1,7 +1,15 @@
+// ── SOVEREIGN ADMIN REGISTRY ────────────────────────────────────────────────
+// SECURITY: Uses server-only ADMIN_WALLET_ADDRESS env var (no NEXT_PUBLIC_ prefix).
+// The NEXT_PUBLIC_ prefix would expose admin wallet to the client-side bundle,
+// making admin identity enumeration trivial for any attacker.
+// Set ADMIN_WALLET_ADDRESS in your Railway/Vercel dashboard secrets.
 export const ADMIN_WALLETS = [
-  (process.env.NEXT_PUBLIC_ADMIN_WALLET || "").toLowerCase(),
-  "0x78831c25c86ea2a78a6127fc2ccb95e612d87b4a" // Sovereign Supreme Admin
+  (process.env.ADMIN_WALLET_ADDRESS || '').toLowerCase(),
 ].filter(Boolean);
+
+if (ADMIN_WALLETS.length === 0) {
+  console.error('[SECURITY CRITICAL] ADMIN_WALLET_ADDRESS env var is not set. All admin routes will be inaccessible.');
+}
 
 export function isAdmin(walletAddress?: string): boolean {
   if (!walletAddress) return false;

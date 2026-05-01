@@ -343,7 +343,19 @@ export default async function middleware(request: NextRequest) {
     return response;
 
   } catch (err: any) {
+    // [SECURITY FIX] Fail-CLOSED: On unhandled middleware exceptions, deny access
+    // to protected routes rather than silently passing all requests through.
+    // Fail-Open was exploitable: an attacker who triggers a middleware crash
+    // could bypass WAF, rate limiting, auth checks, and honeypot detection.
     console.error('⨯ [WhaleFortress:Critical] 💀 Zero-Crash Safeguard:', err.message);
+    const { pathname } = request.nextUrl;
+    if (matchesPattern(pathname, PROTECTED_PATTERNS) || pathname.startsWith('/api/admin')) {
+        return new NextResponse(
+            JSON.stringify({ error: 'SERVICE_UNAVAILABLE', message: 'Security subsystem error. Please try again.' }),
+            { status: 503, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
+    // For public pages, pass through to avoid total site blackout
     return NextResponse.next();
   }
 }

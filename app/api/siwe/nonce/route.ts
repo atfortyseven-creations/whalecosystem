@@ -3,7 +3,29 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_req: NextRequest) {
+// In-memory rate limit: max 10 nonce requests per IP per minute
+const nonceRequests = new Map<string, { count: number; resetAt: number }>();
+
+function isNonceRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const WINDOW_MS = 60 * 1000;
+    const MAX = 10;
+    const record = nonceRequests.get(ip);
+    if (!record || now > record.resetAt) {
+        nonceRequests.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+        return false;
+    }
+    if (record.count >= MAX) return true;
+    record.count += 1;
+    return false;
+}
+
+export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+  if (isNonceRateLimited(ip)) {
+    return new NextResponse('Too Many Requests', { status: 429 });
+  }
+
   const nonce = generateNonce(); // Cryptographically secure nonce (8+ chars)
 
   const res = new NextResponse(nonce, {
@@ -15,9 +37,9 @@ export async function GET(_req: NextRequest) {
   res.cookies.set('siwe-nonce', nonce, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     path: '/',
-    maxAge: 60 * 10, // 10 minutes — nonce expires after one use window
+    maxAge: 60 * 5, // 5 minutes — tighter window
   });
 
   return res;

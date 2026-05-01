@@ -19,7 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ─── STAGE 2: BUILD DEPENDENCIES ─────────────────────────────────────────────
 FROM runtime AS build-base
 
-# Consolidate all build-time tools into one layer
+# Consolidate all build-time tools into one layer.
+# Retry loop: if the mirror has a transient 404 (e.g. linux-libc-dev removed mid-roll),
+# re-run apt-get update to pick up the refreshed index and retry the install.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6-dev \
     python3 \
@@ -32,6 +34,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     pkg-config \
     libssl-dev \
+    || (echo "[build-base] apt-get install failed — refreshing package index and retrying..." \
+        && sleep 15 \
+        && apt-get update \
+        && apt-get install -y --no-install-recommends \
+            libc6-dev \
+            python3 \
+            make \
+            g++ \
+            gcc \
+            cmake \
+            git \
+            build-essential \
+            wget \
+            pkg-config \
+            libssl-dev) \
     && rm -rf /var/lib/apt/lists/*
 
 # ─── STAGE 3: INSTALL DEPENDENCIES ───────────────────────────────────────────
