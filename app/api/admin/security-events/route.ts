@@ -34,8 +34,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const severity = searchParams.get('severity');
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const rawLimit = parseInt(searchParams.get('limit') || '100');
+    const limit = Math.min(rawLimit, 500); // Hard cap at 500 to prevent DoS
+    const rawOffset = parseInt(searchParams.get('offset') || '0');
+    const offset = Math.max(0, rawOffset); // Prevent negative offset
 
     try {
         // Build where clause

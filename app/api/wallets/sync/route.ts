@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 /**
  * POST /api/wallets/sync
@@ -8,14 +8,18 @@ import { cookies } from 'next/headers';
  */
 export async function POST(req: NextRequest) {
     try {
-        const cookieStore = await cookies();
-        const userAddress = cookieStore.get('sovereign_handshake')?.value;
-
-        if (!userAddress) {
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
             return NextResponse.json({ error: 'Identity not initialized' }, { status: 401 });
         }
+        const userAddress = validation.userId;
 
         const { wallets } = await req.json(); // { address: string, label: string }[]
+
+        // Hard cap: prevent DoS via massive wallet array injection
+        if (!Array.isArray(wallets) || wallets.length > 50) {
+            return NextResponse.json({ error: 'Invalid or oversized wallet list (max 50)' }, { status: 400 });
+        }
 
         // Find or Create user
         let user = await prisma.user.findUnique({
@@ -63,14 +67,13 @@ export async function POST(req: NextRequest) {
  * GET /api/wallets/sync
  * RESTORATION LAYER: Fetches all saved wallets for the current identity.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const cookieStore = await cookies();
-        const userAddress = cookieStore.get('sovereign_handshake')?.value;
-
-        if (!userAddress) {
-            return NextResponse.json({ wallets: [] }); 
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+        const userAddress = validation.userId;
 
         const user = await prisma.user.findUnique({
             where: { walletAddress: userAddress },

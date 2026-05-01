@@ -1,23 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 export const dynamic = 'force-dynamic';
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const cookieStore = await cookies();
-    const address = cookieStore.get('sovereign_handshake')?.value;
-    if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const validation = await validateSecureRequest(req);
+    if (!validation.valid || !validation.userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { id: postId } = await params;
 
     // Resolve the user
     const user = await prisma.user.findUnique({
-      where: { walletAddress: address },
+      where: { walletAddress: validation.userId! },
       select: { id: true },
     });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });

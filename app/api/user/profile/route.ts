@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 const updateProfileSchema = z.object({
   walletAddress: z.string().min(10),
@@ -18,9 +19,13 @@ const updateProfileSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
+    const validation = await validateSecureRequest(req);
+
     const { searchParams } = new URL(req.url);
     const walletAddress = searchParams.get('walletAddress');
     if (!walletAddress) return NextResponse.json({ error: 'walletAddress required' }, { status: 400 });
+
+    const isOwner = validation.valid && validation.userId?.toLowerCase() === walletAddress.toLowerCase();
 
     // Try extended schema first, fall back to base columns
     let user: any = null;
@@ -42,6 +47,18 @@ export async function GET(req: NextRequest) {
     }
 
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    // Strip private fields if not owner
+    if (!isOwner) {
+        delete user.theme;
+        delete user.currency;
+        delete user.language;
+        delete user.displayUnit;
+        delete user.gasPreset;
+        delete user.mevProtection;
+        delete user.stealthMode;
+    }
+
     return NextResponse.json({ success: true, data: user });
   } catch (error: any) {
     console.error('[API] GET User Profile Error:', error);
@@ -51,11 +68,20 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const validation = await validateSecureRequest(req);
+    if (!validation.valid || !validation.userId) {
+        return NextResponse.json({ error: 'Unauthorized: Authentication required to modify profile.' }, { status: 401 });
+    }
+
     const body = await req.json();
     const result = updateProfileSchema.safeParse(body);
     if (!result.success) return NextResponse.json({ error: 'Invalid payload', details: result.error.format() }, { status: 400 });
 
     const { walletAddress, displayName, avatarUrl, bio, theme, currency, language, displayUnit, gasPreset, mevProtection, stealthMode } = result.data;
+
+    if (validation.userId.toLowerCase() !== walletAddress.toLowerCase()) {
+        return NextResponse.json({ error: 'Forbidden: You can only modify your own profile.' }, { status: 403 });
+    }
 
     // Try full upsert with all profile columns
     try {

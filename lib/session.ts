@@ -130,16 +130,40 @@ export async function setSessionCookies(accessToken: string, refreshToken: strin
 }
 
 /**
- * Get session from cookies
+ * Get session from cookies.
+ * Supports TWO token formats:
+ * 1. SIWE sovereign session: cookie 'human_session', JWT payload { sub, address, clearance }
+ * 2. Email/legacy session:   cookie 'human.access-token', JWT payload { userId, email, type }
  */
 export async function getSession(): Promise<SessionPayload | null> {
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get('human.access-token')?.value;
 
-    if (!accessToken) {
-        return null;
+    // ── Priority 1: SIWE sovereign session ──────────────────────────────────
+    const siweToken = cookieStore.get('human_session')?.value;
+    if (siweToken) {
+        try {
+            const verified = await jwtVerify(siweToken, JWT_SECRET);
+            const payload = verified.payload as any;
+            // Normalize SIWE payload → SessionPayload shape
+            const siweUserId = payload.address || payload.sub;
+            if (siweUserId) {
+                return {
+                    userId: siweUserId.toLowerCase(),
+                    email: '',
+                    type: 'access',
+                    sub: payload.sub,
+                    exp: payload.exp,
+                    iat: payload.iat,
+                };
+            }
+        } catch {
+            // Expired or invalid SIWE token — fall through to email session
+        }
     }
 
+    // ── Priority 2: Email/legacy access token ────────────────────────────────
+    const accessToken = cookieStore.get('human.access-token')?.value;
+    if (!accessToken) return null;
     return await verifyToken(accessToken);
 }
 

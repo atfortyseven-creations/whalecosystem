@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown, Save, FileLock2, Plus, ShieldCheck } from 'lucide-react';
-import { useSignMessage } from 'wagmi';
+import { useSignMessage, useAccount } from 'wagmi';
 
 const DRAFT_KEY = 'forum_draft_new_topic';
 
@@ -24,6 +24,7 @@ export default function NewTopicPage() {
   const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
   const { signMessageAsync } = useSignMessage();
+  const { isConnected } = useAccount();
 
   // ── Restore draft on mount ────────────────────────────────────────────────
   useEffect(() => {
@@ -66,6 +67,10 @@ export default function NewTopicPage() {
     setError('');
     if (!title.trim() || !content.trim() || !categoryId) {
       setError('Title, category, and content are required.');
+      return;
+    }
+    if (!isConnected) {
+      setError('WALLET CONNECTION REQUIRED TO INITIATE MANDATE.');
       return;
     }
     setSubmitting(true);

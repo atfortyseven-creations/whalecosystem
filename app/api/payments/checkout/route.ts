@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICE_IDS } from '@/lib/payments/stripe';
 import { prisma } from '@/lib/prisma';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 /**
  * Elite Checkout Tunnel
@@ -9,9 +10,15 @@ import { prisma } from '@/lib/prisma';
  */
 export async function POST(req: NextRequest) {
     try {
-        const { tier, userId, isAnnual } = await req.json();
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
+            return NextResponse.json({ error: 'Unauthorized: Authentication required to initialize checkout.' }, { status: 401 });
+        }
 
-        if (!tier || !userId || !PRICE_IDS[tier]) {
+        const { tier, isAnnual } = await req.json();
+        const userId = validation.userId;
+
+        if (!tier || !PRICE_IDS[tier]) {
             return NextResponse.json({ error: 'Invalid plan tier or missing user context' }, { status: 400 });
         }
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 /**
  * GET /api/admin/emails - Ver todos los correos registrados
@@ -14,16 +14,13 @@ import { authOptions } from '@/lib/auth';
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    const { searchParams } = new URL(request.url);
-    const secret = searchParams.get('secret');
-
-    // Authentication: Require session OR secret key bypass
-    if (!session?.user?.email && secret !== 'human_admin_2026') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const cookieStore = await cookies();
+    const address = cookieStore.get('sovereign_handshake')?.value;
+    if (!isAdmin(address)) {
+      return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
     }
 
+    const { searchParams } = new URL(request.url);
     const source = searchParams.get('source');
     const exportFormat = searchParams.get('export');
 

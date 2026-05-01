@@ -189,14 +189,17 @@ export async function POST(req: NextRequest) {
     if (!invoice.subscription) return NextResponse.json({ ok: true });
 
     const stripeSub = await stripe.subscriptions.retrieve(invoice.subscription as string);
+    const sovereignUserId = stripeSub.metadata?.sovereign_user_id || invoice.metadata?.sovereign_user_id;
 
-    await db.subscription.updateMany({
-      where: { status: 'ACTIVE' }, // Narrowed by stripeSubscriptionId if model has it
-      data: {
-        expiresAt:  new Date((stripeSub as any).current_period_end * 1000),
-        updatedAt:  new Date(),
-      },
-    });
+    if (sovereignUserId) {
+      await db.subscription.updateMany({
+        where: { userId: sovereignUserId, status: 'ACTIVE' },
+        data: {
+          expiresAt:  new Date((stripeSub as any).current_period_end * 1000),
+          updatedAt:  new Date(),
+        },
+      });
+    }
 
     console.log('[WAC Webhook] Subscription renewed:', invoice.subscription);
   }

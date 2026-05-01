@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 // ── Field name bridge: store key → DB column ──────────────────────────────────
 const STORE_TO_DB: Record<string, string> = {
@@ -46,11 +46,13 @@ const SAFE_COLUMNS = [
     'theme', 'currency', 'language'
 ];
 
-export async function GET() {
+export async function GET(req: any) {
     try {
-        const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const address = validation.userId;
 
         let user: any = null;
         try {
@@ -98,11 +100,13 @@ export async function GET() {
     }
 }
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: any) {
     try {
-        const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const address = validation.userId;
 
         const body = await req.json();
 

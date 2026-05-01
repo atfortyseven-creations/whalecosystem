@@ -22,11 +22,11 @@ export function BtcTransferLegend() {
   }, []);
 
   const routes = [
-    { from: "New York",      to: "London",      btc: (124.5  + Math.random() * 40.2).toFixed(2) },
-    { from: "Tokyo",         to: "Hong Kong",   btc: (89.2   + Math.random() * 20.6).toFixed(2) },
-    { from: "San Francisco", to: "Paris",       btc: (45.8   + Math.random() * 15.3).toFixed(2) },
-    { from: "London",        to: "Dubai",       btc: (210.1  + Math.random() * 55.0).toFixed(2) },
-    { from: "Hong Kong",     to: "Singapore",   btc: (67.9   + Math.random() * 12.5).toFixed(2) },
+    { from: "New York",      to: "London",      btc: (124.5  + Math.random() * 40.2).toFixed(2), latency: "12ms", conf: "6/6", type: "OTC Desk" },
+    { from: "Tokyo",         to: "Hong Kong",   btc: (89.2   + Math.random() * 20.6).toFixed(2), latency: "8ms",  conf: "Unconfirmed", type: "Exchange" },
+    { from: "San Francisco", to: "Paris",       btc: (45.8   + Math.random() * 15.3).toFixed(2), latency: "14ms", conf: "2/6", type: "Whale Wallet" },
+    { from: "London",        to: "Dubai",       btc: (210.1  + Math.random() * 55.0).toFixed(2), latency: "11ms", conf: "6/6", type: "Institutional" },
+    { from: "Hong Kong",     to: "Singapore",   btc: (67.9   + Math.random() * 12.5).toFixed(2), latency: "6ms",  conf: "1/6", type: "Dark Pool" },
   ];
 
   return (
@@ -58,24 +58,48 @@ export function BtcTransferLegend() {
                 {r.from} <span className="opacity-40">→</span> {r.to}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-[10px] font-black font-mono text-[#050505]">
-                {r.btc} BTC
-              </span>
-            </div>
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black font-mono text-[#050505]">
+                  {r.btc} BTC
+                </span>
+                <span className="text-[8px] font-mono text-black/40 uppercase">
+                  {r.type} • {r.latency} • {r.conf}
+                </span>
+              </div>
           </div>
         ))}
       </div>
 
       {/* Context panel — solid white */}
-      <div className="mt-3 px-5 py-4 rounded-2xl bg-white border border-black/[0.07]">
-        <p className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-2">
-          Global Flow Dynamics
-        </p>
-        <p className="text-[11px] text-black/60 leading-relaxed font-medium">
-          This map visualizes high-volume institutional liquidity transfers across major financial nodes.
-          Interact with the 3D topology to track the directional velocity of Bitcoin capital flows in real-time.
-        </p>
+      <div className="mt-3 px-5 py-4 rounded-2xl bg-white border border-black/[0.07] flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-2">
+            Global Flow Dynamics
+          </p>
+          <p className="text-[11px] text-black/60 leading-relaxed font-medium max-w-lg">
+            This map visualizes high-volume institutional liquidity transfers across major financial nodes.
+            Interact with the 3D topology to track the directional velocity of Bitcoin capital flows in real-time.
+            The visualization utilizes 150,000 spatial points to ensure absolute rendering perfection of continents and global endpoints.
+          </p>
+        </div>
+        
+        {/* Added relevant statistics panel */}
+        <div className="flex gap-4 shrink-0 bg-black/[0.03] p-3 rounded-xl border border-black/[0.05]">
+           <div className="flex flex-col">
+              <span className="text-[8px] font-bold text-black/40 uppercase tracking-wider mb-1">Network Load</span>
+              <span className="text-xs font-mono font-black text-[#050505]">98.4%</span>
+           </div>
+           <div className="w-[1px] bg-black/10"></div>
+           <div className="flex flex-col">
+              <span className="text-[8px] font-bold text-black/40 uppercase tracking-wider mb-1">Active Nodes</span>
+              <span className="text-xs font-mono font-black text-[#050505]">14,208</span>
+           </div>
+           <div className="w-[1px] bg-black/10"></div>
+           <div className="flex flex-col">
+              <span className="text-[8px] font-bold text-black/40 uppercase tracking-wider mb-1">Hashrate</span>
+              <span className="text-xs font-mono font-black text-[#050505]">654 EH/s</span>
+           </div>
+        </div>
       </div>
     </div>
   );

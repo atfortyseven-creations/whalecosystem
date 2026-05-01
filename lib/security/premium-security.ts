@@ -148,17 +148,12 @@ export async function validateSecureRequest(
 }> {
   // SOVEREIGN: Use SIWE session token as primary auth mechanism
   const session = await getSession();
-  const web3Address = req.headers.get('x-web3-address');
-  
-  let userId = session?.userId;
-  if (!userId && web3Address && /^0x[a-fA-F0-9]{40}$/.test(web3Address)) {
-    userId = web3Address.toLowerCase();
-  }
+  const userId = session?.userId;
 
-  console.log(`[AUTH-DEBUG] sessionUserId: ${session?.userId}, web3Address: ${web3Address}, final userId: ${userId}`);
+  console.log(`[AUTH-DEBUG] sessionUserId: ${userId}`);
   
   if (!userId) {
-    console.warn('[AUTH-DEBUG] No userId found in request');
+    console.warn('[AUTH-DEBUG] No valid SIWE session found in request');
     return { valid: false, error: 'Unauthorized' };
   }
 

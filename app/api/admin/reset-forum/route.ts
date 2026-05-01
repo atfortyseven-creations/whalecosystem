@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 export async function GET(req: Request) {
   try {
+    const cookieStore = await cookies();
+    const address = cookieStore.get('sovereign_handshake')?.value;
+    if (!isAdmin(address)) {
+        return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+    }
+
     console.log('Resetting forum...');
     
     // Delete all posts

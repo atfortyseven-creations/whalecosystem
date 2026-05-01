@@ -13,13 +13,11 @@ export async function POST(req: NextRequest) {
 
     // ─── INSTITUTIONAL AUTHENTICATION RESOLUTION ─────────────────────────────
     const hasHandshakeCookie = req.cookies.get('sovereign_handshake')?.value;
-    let userId = walletAddress || hasHandshakeCookie || (session as any)?.user?.email;
+    let rawUserId = walletAddress || hasHandshakeCookie || (session as any)?.user?.email;
+    let userId = rawUserId ? rawUserId.toLowerCase() : undefined;
 
     if (signature && message && walletAddress) {
-      if (signature === '0x_mobile_wc_verified_tunnel') {
-          console.log(`[Security:Handshake] Mobile tunnel verified for ${walletAddress}`);
-      } else {
-          try {
+      try {
             const isValid = await verifyMessage({
                 address: walletAddress as `0x${string}`,
                 message: message,
@@ -36,7 +34,6 @@ export async function POST(req: NextRequest) {
             console.error(`[Security:Handshake:Error]`, e.message);
             return NextResponse.json({ error: 'Indentity verification error: Invalid payload.' }, { status: 400 });
           }
-      }
     } else if (!(session as any)?.user?.email && !hasHandshakeCookie) {
       // If no signature/message AND no session AND no handshake cookie, we reject.
       return NextResponse.json({ error: 'Unauthorized: Cryptographic Handshake required.' }, { status: 401 });
