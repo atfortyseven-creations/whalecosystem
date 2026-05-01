@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { UserProfileModal } from '@/components/ui/UserProfileModal';
+import { useRouter } from 'next/navigation';
 import { useAccount, useEnsName, useEnsAvatar } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
 import { useTheme } from 'next-themes';
@@ -10,8 +10,8 @@ import { useTheme } from 'next-themes';
 export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: { address?: string; avatarUrl?: string }) {
   const { address: wagmiAddress } = useAccount();
   const address = wagmiAddress || serverAddress;
+  const router = useRouter();
   const [menuOpen,    setMenuOpen]    = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -41,10 +41,9 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
   const navLinks = [
     { href: '/forum',               label: 'TOPICS'       },
     { href: '/forum/users',         label: 'USERS'        },
-    { href: '/forum/badges',        label: 'BADGES'       },
     { href: '/forum/groups',        label: 'GROUPS'       },
     { href: '/forum/guidelines',    label: 'GUIDELINES'   },
-    { href: '/forum/anniversaries', label: 'ANNIVERSARIES'},
+    { href: '/forum/anniversaries', label: 'NEW ARRIVALS' },
     { href: '/forum/settings',      label: 'SETTINGS'     },
   ];
 
@@ -128,7 +127,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           {address ? (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setProfileOpen(true)}
+                onClick={() => router.push('/forum/settings')}
                 className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center text-[10px] font-mono font-black shrink-0 transition-colors bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white"
                 title={ensName || address}
               >
@@ -169,8 +168,6 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
           </Link>
         </div>
       </div>
-
-      <UserProfileModal isOpen={profileOpen} onClose={() => { setProfileOpen(false); window.location.reload(); }} />
     </>
   );
 }

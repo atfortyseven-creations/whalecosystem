@@ -228,12 +228,9 @@ export default function ConnectPage() {
     // correct authenticated layout immediately.
     const doHardRedirect = (addr: string | undefined) => {
       setPendingId(null);
-      // Write cookie with the REAL address. Never fall back to a placeholder.
-      const cookieAddr = addr?.startsWith('0x') ? addr.toLowerCase() : null;
-      if (cookieAddr) {
-        document.cookie = `sovereign_handshake=${cookieAddr}; path=/; max-age=604800; SameSite=Lax`;
-      }
-      // Full page reload so the server reads the fresh cookie.
+      // Removed premature cookie writing here.
+      // The sovereign_handshake cookie MUST be set by the LinkedGate signature step,
+      // NOT immediately upon connection. This ensures the user sees the "Sign the contract" screen.
       window.location.replace("/");
     };
 
