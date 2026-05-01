@@ -15,7 +15,7 @@ import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe'
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
     || process.env.NEXT_PUBLIC_WC_PROJECT_ID
-    || '093232b25784a0694c642ad54a6331fa'; // Whale Alert Network production project
+    || 'dd0819151fda02095518d0ffb20c64a0'; // Whale Alert Network production project
 if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
     if (typeof window !== 'undefined') {
         console.warn('[WalletConnect] Using hardcoded project ID. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.');
@@ -104,19 +104,6 @@ const metadata = {
     // Real icon URL (min 512x512) — empty array caused Rainbow "Connection failed"
     // on some relay nodes. A valid icon prevents relay timeout on mobile handshake.
     icons: ['https://humanidfi.com/icon.png'],
-    redirect: {
-        native: (function() {
-            if (typeof window === 'undefined') return '';
-            const ua = navigator.userAgent;
-            // iOS Chrome specifically hijacks universal links to Safari. 
-            // We use the googlechromes:// scheme to force the return to Chrome.
-            if (/CriOS/i.test(ua)) {
-                return window.location.href.replace(/^https/, 'googlechromes').replace(/^http/, 'googlechrome');
-            }
-            return '';
-        })(),
-        universal: typeof window !== 'undefined' ? window.location.href : 'https://humanidfi.com',
-    },
 }
 
 // ── 1-Click Auth: SIWE Configuration
