@@ -39,7 +39,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
   const finalAvatar = ensAvatar || dbAvatarUrl;
 
   const navLinks = [
-    { href: '/forum',               label: 'TOPICS'       },
+    { href: '/forum',               label: 'CATEGORIES'   },
     { href: '/forum/users',         label: 'USERS'        },
     { href: '/forum/groups',        label: 'GROUPS'       },
     { href: '/forum/guidelines',    label: 'GUIDELINES'   },
@@ -91,7 +91,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             href="/forum/new"
             className="hidden sm:inline-flex text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,192,118,0.3)] hover:-translate-y-0.5 bg-[#00C076] text-black"
           >
-            + CREATE MANDATE
+            + NEW TOPIC
           </Link>
 
           {/* Menu toggle */}
@@ -108,7 +108,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             <div className="absolute top-[52px] right-0 w-[220px] shadow-lg z-50 flex flex-col overflow-hidden bg-white dark:bg-[#050505] border-l border-b border-black/10 dark:border-white/5 transition-colors">
               {/* + New Topic on mobile only */}
               <Link href="/forum/new" onClick={() => setMenuOpen(false)} className="sm:hidden px-5 py-3.5 text-[10px] font-sans font-bold uppercase tracking-[0.2em] transition-colors text-black dark:text-white border-b border-black/10 dark:border-white/5 bg-black/5 dark:bg-white/5">
-                + CREATE MANDATE
+                + NEW TOPIC
               </Link>
               {navLinks.map(l => (
                 <Link
@@ -152,19 +152,19 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
       <div className="w-full shadow-sm bg-white dark:bg-[#050505] border-b border-black/10 dark:border-white/5 transition-colors duration-300">
         <div className="max-w-[1110px] mx-auto px-4 flex items-center h-[54px] gap-8 overflow-x-auto custom-scrollbar">
           <Link href="/forum" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black dark:text-white border-b-2 border-[#00C076] whitespace-nowrap">
-            Institutional Matrix
+            Categories
           </Link>
           <Link href="/forum?filter=latest" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Live Feed
+            Latest Posts
           </Link>
           <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Recent Profiles
+            New Members
           </Link>
           <Link href="/forum?filter=unread" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Pending Review
+            Unread
           </Link>
           <Link href="/forum?filter=top" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            Highest Yield
+            Top Posts
           </Link>
         </div>
       </div>

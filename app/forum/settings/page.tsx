@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, User, Bell, Tag, Settings, Plus, Trash2, Save, Loader2, Check, AlertTriangle } from 'lucide-react';
+import { SIWEPanel } from '@/components/auth/SIWEAuthGate';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 interface Category {
@@ -157,9 +158,8 @@ export default function ForumSettingsPage() {
   );
 
   if (!profile) return (
-    <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-      <ShieldCheck size={48} className="text-black/50 dark:text-[#888888]" />
-      <p className="text-[15px] font-bold text-black dark:text-white">Connect your wallet to access settings.</p>
+    <div className="flex flex-col items-center justify-center h-[60vh] gap-4 w-full">
+      <SIWEPanel inline onAuthenticated={() => window.location.reload()} />
     </div>
   );
 

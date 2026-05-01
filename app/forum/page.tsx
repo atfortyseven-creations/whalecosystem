@@ -11,7 +11,7 @@ function ForumHomeContent() {
   const searchParams = useSearchParams();
   const rawFilter = searchParams.get('filter');
   const filter = rawFilter || 'matrix';
-  const isRestricted = ['latest', 'new', 'unread', 'top'].includes(rawFilter || '');
+  const isRestricted = false; // Removed hardcoded restriction
   useEffect(() => {
     if (!isRestricted) {
       fetch(`/api/forum/topics?limit=30&filter=${filter === 'matrix' ? 'latest' : filter}`)
@@ -38,7 +38,7 @@ function ForumHomeContent() {
         
         {/* Left Column: Categories (35% -> col-span-4) */}
         <div className="lg:col-span-4 flex flex-col gap-0 pt-4 border-t border-white/10">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-[#555]">Sectors & Practices</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-[#555]">Categories</h2>
           {categories.length === 0 ? (
              <div className="py-4 text-[13px] text-black/40 dark:text-white/30 font-sans">Loading matrix...</div>
           ) : categories.map(cat => (
@@ -46,7 +46,7 @@ function ForumHomeContent() {
               <div className="w-1.5 h-1.5 rounded-full mr-4 mt-2 shadow-[0_0_10px_currentColor]" style={{ backgroundColor: cat.color || '#00C076', color: cat.color || '#00C076' }}></div>
               <div className="flex flex-col">
                 <span className="text-[16px] font-black tracking-tight transition-colors text-black dark:text-white group-hover:text-[#00C076]">{cat.name}</span>
-                <span className="text-[12px] mt-1.5 leading-relaxed line-clamp-2 text-[#888888]">{cat.description || "Institutional mandates related to " + cat.name}</span>
+                <span className="text-[12px] mt-1.5 leading-relaxed line-clamp-2 text-[#888888]">{cat.description || "Topics related to " + cat.name}</span>
               </div>
             </Link>
           ))}
@@ -56,7 +56,7 @@ function ForumHomeContent() {
         <div className="lg:col-span-8 flex flex-col">
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#555]">
-              {filter === 'matrix' ? 'Institutional Matrix Overview' : filter}
+              {filter === 'matrix' ? 'Categories Overview' : filter}
             </h2>
           </div>
 
@@ -65,14 +65,14 @@ function ForumHomeContent() {
               <svg className="w-12 h-12 text-red-500 mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
               <h3 className="text-[14px] font-black uppercase tracking-widest text-red-500 mb-2">Tier 1 Clearance Required</h3>
               <p className="text-[11px] font-mono text-black/60 dark:text-white/60 max-w-sm">
-                Access to the {rawFilter?.toUpperCase()} intelligence stream is cryptographically restricted. Elevate your sovereign identity level to decrypt this sector.
+                Access to {rawFilter?.toUpperCase()} is restricted. Please log in to view this section.
               </p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
               {topics.length === 0 ? (
                 <div className="py-20 text-center text-[12px] font-black uppercase tracking-widest text-[#555]">
-                  NO ACTIVE PROPOSALS FOUND.
+                  NO ACTIVE TOPICS FOUND.
                 </div>
               ) : topics.map(topic => {
               const activity = formatDistanceToNowStrict(new Date(topic.updatedAt || topic.createdAt), { addSuffix: false })
