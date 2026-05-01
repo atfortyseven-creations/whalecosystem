@@ -1,20 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 export const dynamic = 'force-dynamic';
 
 // ── Helper: resolve caller's address ────────────────────────────────────────
-async function getCallerAddress(): Promise<string | null> {
-    const cookieStore = await cookies();
-    return cookieStore.get('sovereign_handshake')?.value ?? null;
+async function getCallerAddress(req: NextRequest): Promise<string | null> {
+    const validation = await validateSecureRequest(req);
+    return validation.valid && validation.userId ? validation.userId : null;
 }
 
 // ── GET /api/forum/settings ─────────────────────────────────────────────────
 // Returns: categories list + global forum config
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
-        const address = await getCallerAddress();
+        const address = await getCallerAddress(req);
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const [categories, userRow] = await Promise.all([
@@ -74,9 +74,9 @@ export async function GET() {
 //   "create_category"   → { name, slug, description, color, orderIndex }
 //   "delete_category"   → { id }
 //   "update_global"     → { siteName, welcomeMessage, moderationMode, allowGuestRead, requireApproval, maxTopicsPerDay, maxPostsPerDay }
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const address = await getCallerAddress();
+        const address = await getCallerAddress(req);
         if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();

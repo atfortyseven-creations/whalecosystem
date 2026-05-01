@@ -39,6 +39,11 @@ const unlocks = [
 
 export async function GET(req: NextRequest) {
     try {
+        const authHeader = req.headers.get('authorization');
+        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+            return NextResponse.json({ error: 'Unauthorized CRON execution' }, { status: 401 });
+        }
+        
         console.log("[CRON] Executing Hourly Supply Alerts...");
         
         // Find subscribers who want hourly supply dilution alerts

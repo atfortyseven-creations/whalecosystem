@@ -7,7 +7,9 @@ export const runtime = 'nodejs';
 export async function POST(req: Request) {
   // Simple internal security check to prevent external spam
   const isInternal = req.headers.get('x-internal-audit');
-  if (isInternal !== 'true') {
+  const expectedSecret = process.env.AUDIT_SECRET || 'true';
+  
+  if (!isInternal || isInternal !== expectedSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

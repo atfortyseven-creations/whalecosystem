@@ -27,9 +27,9 @@ const CARD  = "#FFFFFF";
 
 // ── Chain color map ──────────────────────────────────────────────────────────
 const CHAIN_COLORS: Record<string, string> = {
-  "Ethereum": "#627EEA", "Base": "#0052FF", "Arbitrum One": "#12AAFF",
-  "OP Mainnet": "#FF0420", "Polygon": "#8247E5", "BNB Smart Chain": "#F0B90B",
-  "Avalanche": "#E84142", "Solana": "#9945FF",
+  "Ethereum": "#627EEA", "Base": "#0052FF", "Arbitrum One": "#12AAFF", "Arbitrum": "#12AAFF",
+  "OP Mainnet": "#FF0420", "Optimism": "#FF0420", "Polygon": "#8247E5", "BNB Smart Chain": "#F0B90B",
+  "Avalanche": "#E84142", "Solana": "#9945FF", "World Chain": "#000000",
 };
 
 // ── Supported networks for Switch Network ────────────────────────────────────

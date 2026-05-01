@@ -12,8 +12,42 @@ if (!JWT_SECRET_STR) {
 }
 const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STR || 'build-fallback-secret');
 
+// ── Brute-Force Protection: In-memory rate limiter ──────────────────────────
+// Max 5 failed attempts per IP within a 15-minute window.
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): { allowed: boolean; retryAfterMs: number } {
+    const now = Date.now();
+    const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+    const MAX_ATTEMPTS = 5;
+
+    const record = loginAttempts.get(ip);
+    if (!record || now > record.resetAt) {
+        loginAttempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+        return { allowed: true, retryAfterMs: 0 };
+    }
+    if (record.count >= MAX_ATTEMPTS) {
+        return { allowed: false, retryAfterMs: record.resetAt - now };
+    }
+    record.count += 1;
+    return { allowed: true, retryAfterMs: 0 };
+}
+
 export async function POST(req: NextRequest) {
     try {
+        // Brute-force check before touching DB
+        const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+        const rateCheck = checkRateLimit(ip);
+        if (!rateCheck.allowed) {
+            return NextResponse.json(
+                { success: false, message: 'Too many login attempts. Try again later.' },
+                { 
+                    status: 429,
+                    headers: { 'Retry-After': String(Math.ceil(rateCheck.retryAfterMs / 1000)) }
+                }
+            );
+        }
+
         await connectMongoDB();
 
         const { email, password } = await req.json();
@@ -68,11 +102,11 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // Set HTTP-only cookie
+        // Set HTTP-only cookie — strict sameSite to prevent CSRF on admin panel
         response.cookies.set("admin_token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            sameSite: "strict",
             maxAge: 60 * 60 * 24, // 24 hours
             path: "/",
         });

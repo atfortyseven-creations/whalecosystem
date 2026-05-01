@@ -133,8 +133,23 @@ function inMemoryRateCheck(key: string, max: number, windowSec: number): boolean
 // Instead of full cleanup, we use a size limit (LRU-ish) and passive cleanup.
 function maybeGC() {
   if (ipWindows.size > MAX_WAF_CACHE) {
-    // Aggressive clear if cache balloons unexpectedly
-    ipWindows.clear();
+    // Delete only expired entries to avoid completely resetting the WAF during DDoS.
+    const now = Date.now();
+    for (const [key, window] of ipWindows.entries()) {
+      if (now > window.resetAt) {
+        ipWindows.delete(key);
+      }
+    }
+    // If still too large (active DDoS scanning new IPs), aggressively truncate oldest 
+    // to prevent memory exhaustion, but keep the majority of the rate-limit history intact.
+    if (ipWindows.size > MAX_WAF_CACHE) {
+      let toDelete = ipWindows.size - MAX_WAF_CACHE + 100;
+      for (const key of ipWindows.keys()) {
+        ipWindows.delete(key);
+        toDelete--;
+        if (toDelete <= 0) break;
+      }
+    }
   }
 }
 

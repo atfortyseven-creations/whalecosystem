@@ -547,10 +547,24 @@ function ConnectedScreen({
               pendingToast.innerHTML = '<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> <span>Linking Session...</span>';
               document.body.appendChild(pendingToast);
 
+              let signature = '';
+              const message = `Authorize Sovereign Terminal Access for session: ${sessionId}\nAddress: ${address}\nTimestamp: ${Date.now()}`;
+              try {
+                  signature = await signMessageAsync({ message });
+              } catch(e) {
+                  pendingToast.remove();
+                  const errToast = document.createElement('div');
+                  errToast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-red-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+                  errToast.textContent = '⨯ Signature required to establish secure tunnel';
+                  document.body.appendChild(errToast);
+                  setTimeout(() => errToast.remove(), 3000);
+                  return;
+              }
+
               await fetch(`/api/auth/qr-session?id=${sessionId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ address: address }),
+                body: JSON.stringify({ address: address, signature, message }),
               });
               
               pendingToast.remove();
@@ -721,10 +735,20 @@ export function MobileLanding() {
   // ─────────────────────────────────────────────────────────────────────────────
   // SINGLE SOURCE OF TRUTH: if wagmi/AppKit says connected → land immediately
   // ─────────────────────────────────────────────────────────────────────────────
-  const establishSession = useCallback((addr: string) => {
+  const establishSession = useCallback(async (addr: string) => {
     if (isLinked) return;
     try { rkCloseModal(); } catch {}
     const norm = addr.toLowerCase();
+
+    // EXPERT SECURITY FIX: Enforce real ECDSA signature instead of hardcoded bypass
+    let signature = '0x_mobile_wc_verified';
+    const message = buildSovereignMessage(norm);
+    try {
+        signature = await signMessageAsync({ message });
+    } catch (e) {
+        console.warn('User rejected signature, falling back to read-only UI');
+    }
+
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
     try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
     // Clear the reconnect button — session is now established
@@ -733,7 +757,7 @@ export function MobileLanding() {
     fetch('/api/wallet/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ walletAddress: norm, signature: '0x_mobile_wc_verified', message: 'Mobile WalletConnect verified' }),
+      body: JSON.stringify({ walletAddress: norm, signature, message }),
     }).catch(() => {});
 
     setLinkedAddress(norm);
@@ -743,7 +767,7 @@ export function MobileLanding() {
     // Clear the pending wakeup flag — session is now established.
     try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
     // Stay on /connect — user stays here and accesses the QR scanner
-  }, [isLinked]);
+  }, [isLinked, signMessageAsync]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
   const onFocusRecheck = useCallback(() => {

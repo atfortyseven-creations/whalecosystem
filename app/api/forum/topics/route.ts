@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
 import { isAdmin } from '@/lib/admin';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,11 +52,13 @@ export async function GET(req: Request) {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
-        const cookieStore = await cookies();
-        const address = cookieStore.get('sovereign_handshake')?.value;
-        if (!address) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const address = validation.userId;
 
         // Upsert user — create them if they don't exist yet.
         const user = await prisma.user.upsert({

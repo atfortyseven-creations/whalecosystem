@@ -8,8 +8,8 @@ import * as THREE from "three";
 // ─── 1. DOT GLOBE (PERFECT SILHOUETTES WITH EARTH MASK) ──────────────────────
 function PointGlobeMesh() {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
-  // 35,000 points guarantees maximum perfection and ultra-crisp borders (inhuman density)
-  const count = 35000; 
+  // 150,000 points guarantees absolute maximum perfection, elegance, and ultra-crisp borders
+  const count = 150000; 
   const radius = 100;
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -164,8 +164,8 @@ function PointGlobeMesh() {
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      {/* Tiny circle for high resolution */}
-      <circleGeometry args={[0.3, 8]} />
+      {/* Tiny circle for absolute maximum resolution and elegance */}
+      <circleGeometry args={[0.08, 8]} />
       <meshBasicMaterial color="#ffffff" transparent opacity={0.9} side={THREE.DoubleSide} />
     </instancedMesh>
   );
@@ -187,9 +187,9 @@ export function SovereignGlobe3D() {
           alpha: true 
         }}
       >
-        <ambientLight intensity={1.5} color="#ffffff" />
+        <ambientLight intensity={2.0} color="#ffffff" />
 
-        <group rotation={[0.2, -0.5, 0]}>
+        <group rotation={[0.2, -0.5, 0]} scale={[0.31, 0.31, 0.31]}>
           <PointGlobeMesh />
         </group>
 

@@ -79,7 +79,27 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user || !session.user.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email }
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
         const { id } = await req.json();
+
+        // Ensure the API key belongs to the user
+        const apiKey = await prisma.apiKey.findUnique({ where: { id } });
+        if (!apiKey || apiKey.userId !== user.walletAddress) {
+            return NextResponse.json({ error: 'API Key not found or forbidden' }, { status: 403 });
+        }
+
         await prisma.apiKey.update({
             where: { id },
             data: { isActive: false }

@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { validateSecureRequest } from '@/lib/security/premium-security';
 
 export async function GET(req: NextRequest) {
     try {
-        const { searchParams } = new URL(req.url);
-        const address = searchParams.get('address');
-
-        if (!address) {
-            return NextResponse.json({ error: 'Missing address' }, { status: 400 });
+        const validation = await validateSecureRequest(req);
+        if (!validation.valid || !validation.userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        const { searchParams } = new URL(req.url);
+        const requestedAddress = searchParams.get('address');
+
+        // Enforce strict owner-only access — users cannot view others' PnL
+        if (!requestedAddress || requestedAddress.toLowerCase() !== validation.userId.toLowerCase()) {
+            return NextResponse.json({ error: 'Forbidden: You can only view your own positions.' }, { status: 403 });
+        }
+
+        const address = requestedAddress;
 
         const positions = await prisma.exchangePosition.findMany({
             where: { userId: address, status: 'OPEN' }

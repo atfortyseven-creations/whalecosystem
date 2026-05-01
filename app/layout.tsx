@@ -112,6 +112,7 @@ export default async function RootLayout({
 }) {
   const headersList = await headers();
   const cookies = headersList.get('cookie');
+  const nonce = headersList.get('x-nonce') || '';
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -184,7 +185,7 @@ export default async function RootLayout({
             Runs BEFORE any script so WalletConnect pairing data can be stored.
             In iOS Safari Private, localStorage quota is 0 — this patches it
             with sessionStorage so WC v2 sessions survive within the tab. */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: `(function(){
   try{
     window.localStorage.setItem('__sovereign_probe__','1');
     window.localStorage.removeItem('__sovereign_probe__');
@@ -199,6 +200,7 @@ export default async function RootLayout({
   }
 })();` }} />
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />

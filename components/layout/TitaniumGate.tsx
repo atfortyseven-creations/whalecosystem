@@ -75,13 +75,9 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // This prevents aggressive redirects while the wallet modal is open.
             if (isConnecting || isReconnecting) return;
 
-            // If mobile is in ultra recovery mode, WAIT for it to finish!
-            // We MUST set state to APP so that MobileLanding mounts and runs its recovery loop!
-            const isPendingWakeup = typeof localStorage !== 'undefined' && localStorage.getItem('sovereign_pending_wakeup') === '1';
-            if (isPendingWakeup) {
-                setState('APP');
-                return;
-            }
+            // [EXPERT SECURITY FIX] Removed sovereign_pending_wakeup bypass.
+            // Relying on localStorage for gating allowed a permanent UI bypass to protected routes.
+            // If the user is genuinely recovering, isConnecting/isReconnecting will hold the gate.
 
             // Priority 1: Wagmi is connected
             if (isConnected) {

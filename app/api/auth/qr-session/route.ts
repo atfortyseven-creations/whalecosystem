@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { safeRedisGet, safeRedisSet, redisClient } from '@/lib/redis/client';
+import { verifyMessage } from 'viem';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,7 +12,17 @@ export async function POST(request: Request) {
     if (id) {
         try {
             const body = await request.json();
-            if (body && body.address) {
+            if (body && body.address && body.signature && body.message) {
+                try {
+                    const isValid = await verifyMessage({
+                        address: body.address as `0x${string}`,
+                        message: body.message,
+                        signature: body.signature as `0x${string}`
+                    });
+                    if (!isValid) throw new Error("Invalid signature");
+                } catch(e) {
+                    return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
+                }
                 await safeRedisSet(`qr:${id}`, JSON.stringify({ 
                     status: 'SUCCESS', 
                     address: body.address 

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,11 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(req: Request) {
   try {
+    const cookieStore = await cookies();
+    const address = cookieStore.get('sovereign_handshake')?.value;
+    if (!isAdmin(address)) {
+        return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+    }
     // Find all topics
     const allTopics = await (prisma as any).forumTopic.findMany({
       select: { id: true, title: true },

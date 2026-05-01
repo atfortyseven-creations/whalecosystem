@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,6 +89,12 @@ function getRandomItem(arr: any[]) {
 
 export async function GET() {
     try {
+        const cookieStore = await cookies();
+        const address = cookieStore.get('sovereign_handshake')?.value;
+        if (!isAdmin(address)) {
+            return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+        }
+
         console.log('🛡️ Initiating Sovereign Database Matrix...');
         
         const results: Record<string, number> = {
