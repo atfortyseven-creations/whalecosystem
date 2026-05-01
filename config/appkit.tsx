@@ -2,14 +2,15 @@
 
 import { useTheme } from "next-themes";
 import { CreateConnectorFn, WagmiProvider } from 'wagmi';
-import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism } from "@reown/appkit/networks";
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { cookieToInitialState, createStorage, cookieStorage } from 'wagmi'
-import { createAppKit } from '@reown/appkit/react'
+import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism, bsc } from "@reown/appkit/networks";
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+import { cookieToInitialState, createStorage, cookieStorage } from 'wagmi';
+import { createAppKit } from '@reown/appkit/react';
 import { ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
 // @ts-ignore - Supress missing module error until user runs npm install
-import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe'
+import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
 
 // 1. Get projectId — Falls back to real project ID so the app renders even without the env var.
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
@@ -44,7 +45,6 @@ const dedicatedMainnet = {
     }
 };
 
-import { bsc } from "@reown/appkit/networks";
 const dedicatedBsc = {
     ...bsc,
     rpcUrls: {
@@ -68,8 +68,6 @@ const worldchain: AppKitNetwork = {
         default: { name: 'Worldscan', url: 'https://worldscan.org' }
     }
 } as any;
-
-import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors'
 
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [dedicatedMainnet, dedicatedBsc, polygon, dedicatedBase, arbitrum, optimism, worldchain];
 
