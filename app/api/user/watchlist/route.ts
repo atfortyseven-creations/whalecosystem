@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
 
         const [rawTokens, rawWallets] = await Promise.all([
             prisma.watchlist.findMany({ where: { userId: userUuid }, orderBy: { addedAt: 'desc' } }),
-            prisma.watchedWallet.findMany({ where: { userId: authWallet }, orderBy: { createdAt: 'desc' } }),
+            prisma.watchedWallet.findMany({ where: { userId: userUuid }, orderBy: { createdAt: 'desc' } }),
         ]);
 
         const symbols = rawTokens.map(t => t.symbol);
@@ -121,11 +121,11 @@ export async function POST(req: NextRequest) {
         }
 
         if (type === 'WALLET') {
-            const count = await prisma.watchedWallet.count({ where: { userId: authWallet } });
+            const count = await prisma.watchedWallet.count({ where: { userId: userUuid } });
             if (count >= 50) return NextResponse.json({ error: 'Watchlist limit reached (50 wallets max)' }, { status: 403 });
 
             const wallet = await prisma.watchedWallet.create({
-                data: { userId: authWallet, address, label: label || 'Unknown Entity' },
+                data: { userId: userUuid, address, label: label || 'Unknown Entity' },
             });
             return NextResponse.json(enrichWallet(wallet));
         }
@@ -157,7 +157,7 @@ export async function DELETE(req: NextRequest) {
         if (type === 'TOKEN') {
             await prisma.watchlist.delete({ where: { id, userId: userUuid } });
         } else if (type === 'WALLET') {
-            await prisma.watchedWallet.delete({ where: { id, userId: authWallet } });
+            await prisma.watchedWallet.delete({ where: { id, userId: userUuid } });
         }
 
         return NextResponse.json({ success: true });

@@ -50,10 +50,7 @@ export async function GET(req: NextRequest) {
         const subscribers = await prisma.emailSubscriber.findMany({
             where: {
                 subscribed: true,
-                frequency: 'hourly',
-                topics: {
-                    has: 'supply-dilution'
-                }
+                frequency: 'hourly'
             }
         });
 

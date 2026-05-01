@@ -36,14 +36,14 @@ export async function POST(req: NextRequest) {
         for (const w of wallets) {
             await prisma.watchedWallet.upsert({
                 where: { 
-                    userId_walletAddress: {
+                    userId_address: {
                         userId: user.id,
-                        walletAddress: w.address
+                        address: w.address
                     }
                 },
                 create: {
                     userId: user.id,
-                    walletAddress: w.address,
+                    address: w.address,
                     label: w.label || 'Generated Intel'
                 },
                 update: {
@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ 
             wallets: wallets.map(w => ({
-                address: w.walletAddress,
+                address: w.address,
                 label: w.label
             }))
         });

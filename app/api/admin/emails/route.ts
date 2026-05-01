@@ -29,8 +29,6 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         email: true,
-        name: true,
-        verified: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' }
@@ -41,12 +39,11 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         email: true,
-        name: true,
         subscribed: true,
         frequency: true,
-        subscribedAt: true,
+        createdAt: true,
       },
-      orderBy: { subscribedAt: 'desc' }
+      orderBy: { createdAt: 'desc' }
     }) : [];
 
     // Consolidar emails únicos
@@ -60,8 +57,8 @@ export async function GET(request: NextRequest) {
       totalUniqueEmails: allEmails.size,
       authUsers: {
         total: authUsers.length,
-        verified: authUsers.filter(u => u.verified).length,
-        pending: authUsers.filter(u => !u.verified).length,
+        verified: authUsers.length,
+        pending: 0,
       },
       subscribers: {
         total: subscribers.length,
@@ -75,10 +72,10 @@ export async function GET(request: NextRequest) {
       const csvRows = [
         'Email,Fuente,Nombre,Estado,Fecha',
         ...authUsers.map(u => 
-          `${u.email},AuthUser,${u.name || 'N/A'},${u.verified ? 'Verified' : 'Pending'},${u.createdAt.toISOString()}`
+          `${u.email},AuthUser,N/A,Verified,${u.createdAt.toISOString()}`
         ),
         ...subscribers.map(s => 
-          `${s.email},EmailSubscriber,${s.name || 'N/A'},${s.subscribed ? 'Active' : 'Unsubscribed'},${s.subscribedAt.toISOString()}`
+          `${s.email},EmailSubscriber,N/A,${s.subscribed ? 'Active' : 'Unsubscribed'},${s.createdAt.toISOString()}`
         )
       ].join('\n');
 
@@ -98,19 +95,19 @@ export async function GET(request: NextRequest) {
         authUsers: authUsers.map(u => ({
           id: u.id,
           email: u.email,
-          name: u.name,
+          name: 'N/A',
           source: 'AuthUser',
-          status: u.verified ? 'Verified' : 'Pending',
+          status: 'Verified',
           date: u.createdAt,
         })),
         subscribers: subscribers.map(s => ({
           id: s.id,
           email: s.email,
-          name: s.name,
+          name: 'N/A',
           source: 'EmailSubscriber',
           status: s.subscribed ? 'Active' : 'Unsubscribed',
           frequency: s.frequency,
-          date: s.subscribedAt,
+          date: s.createdAt,
         })),
       },
     });

@@ -232,7 +232,7 @@ function chainName(id?: number): string {
 
 // ── Connected Screen ──────────────────────────────────────────────────────────
 function ConnectedScreen({
-  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect
+  address, onScan, showScanner, onCloseScanner, onBack, connectorName, chainId, onDisconnect, signMessageAsync
 }: {
   address: string; onScan: () => void;
   showScanner: boolean; onCloseScanner: () => void;
@@ -240,6 +240,7 @@ function ConnectedScreen({
   connectorName?: string;
   chainId?: number;
   onDisconnect?: () => void;
+  signMessageAsync?: any;
 }) {
   const now = useLiveClock();
   const [connectedAt] = useState(() => new Date());
@@ -319,9 +320,6 @@ function ConnectedScreen({
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
       {/* Backgrounds */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <WorldMapBackground />
-      </div>
       <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
 
       {/* Fixed Header */}
@@ -1080,6 +1078,7 @@ export function MobileLanding() {
            connectorName={connector?.name}
            chainId={chainId}
            onDisconnect={handleDisconnect}
+           signMessageAsync={signMessageAsync}
         />
       </div>
     );
@@ -1141,8 +1140,9 @@ export function MobileLanding() {
       {/* Layer 0: ivory base */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
 
-      {/* Layer 1: cosmic pattern */}
+      {/* Layer 1: cosmic pattern and globe */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
+        <WorldMapBackground />
         <motion.div
           className="absolute"
           style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.045 }}

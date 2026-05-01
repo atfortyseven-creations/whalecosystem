@@ -138,6 +138,7 @@ model User {
   notifyOnMention  Boolean @default(true)
 
   clerkId      String? @unique
+  email        String? @unique
   snxAccountId String? @unique
 
   watchlists       Watchlist[]
@@ -159,6 +160,86 @@ model User {
   @@index([tier, lastActive(sort: Desc)]) // Consulta de usuarios activos por tier
   @@index([isPro, createdAt(sort: Desc)]) // Funnel de conversión Pro
   @@index([createdAt(sort: Desc)]) // Registro cronológico general
+
+  apiKeys            ApiKey[]
+  watchedWallets     WatchedWallet[]
+  exchangePositions  ExchangePosition[]
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  userId    String
+  plan      String   @default("whale")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  @@index([userId, isActive])
+}
+
+model AuthUser {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String?
+  passwordHash     String?
+  walletAddress    String?   @unique
+  verified         Boolean   @default(false)
+  verificationCode String?
+  codeExpiresAt    DateTime?
+  totpSecret       String?   @db.Text
+  backupCodes      String[]  @default([])
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([email])
+  @@index([walletAddress])
+}
+
+model EmailSubscriber {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  subscribed  Boolean  @default(true)
+  frequency   String   @default("hourly")
+  createdAt   DateTime @default(now())
+}
+
+model WatchedWallet {
+  id        String   @id @default(uuid())
+  userId    String
+  address   String
+  label     String   @default("Generated Intel")
+  lastValue Float    @default(0)
+  metadata  Json?    // breakdown from stats engine
+  lastCheck DateTime?
+  tags      String[] @default([])
+  forensics Json?
+  category  String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, address])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model ExchangePosition {
+  id            String   @id @default(uuid())
+  userId        String
+  exchange      String
+  symbol        String
+  size          Float
+  entryPrice    Float
+  markPrice     Float
+  unrealizedPnl Float
+  status        String   @default("OPEN")
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [walletAddress], onDelete: Cascade)
+
+  @@index([userId, status])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1057,4 +1138,57 @@ model NPSSurvey {
   feedback        String?  @db.Text
   signature       String   // EIP-191 signature of the score and feedback (preventing forgery)
   timestamp       DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUTH: EMAIL VERIFICATION CODES
+// Used by /api/auth/signup, /api/auth/verify, /api/auth/verify-code
+// ─────────────────────────────────────────────────────────────────────────────
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  code      String
+  userId    String
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId, used])
+  @@index([code])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUDIT TRAIL: SOVEREIGN OPERATIONS LOG
+// Used by /api/forum/topics, /api/forum/posts, /api/user/settings,
+//          /api/premium/watched-wallets
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String   // e.g. 'WATCH_WALLET_ADDED', 'FORUM_POST_CREATED'
+  resource  String   // e.g. 'watched_wallet', 'forum_post'
+  metadata  Json?
+  ipAddress String?
+  timestamp DateTime @default(now())
+
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([action, timestamp(sort: Desc)])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ON-CHAIN INTELLIGENCE CACHE
+// Used by /api/premium/watched-wallets GET (global intelligence merge)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model WalletIntelligence {
+  id        String   @id @default(uuid())
+  address   String   @unique
+  forensics Json?    // Risk signals, entity labels, etc.
+  category  String?  // 'EXCHANGE', 'WHALE', 'DEFI', 'UNKNOWN'
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([address])
+  @@index([category])
 }

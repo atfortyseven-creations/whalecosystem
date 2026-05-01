@@ -73,9 +73,46 @@ type CosmicEntityDelegate = {
   }>;
 };
 
-/** PrismaClient augmented with the CosmicEntity model accessor */
+// ─────────────────────────────────────────────────────────────────────────────
+// WALLET INTELLIGENCE TYPE BRIDGE
+// WalletIntelligence was added to schema.prisma but npx prisma generate
+// has not been run yet. This bridge makes the TypeScript compiler aware of
+// prisma.walletIntelligence immediately, without regenerating the client.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type WalletIntelligenceRecord = {
+  id: string;
+  address: string;
+  forensics: Prisma.JsonValue | null;
+  category: string | null;
+  updatedAt: Date;
+  createdAt: Date;
+};
+
+type WalletIntelligenceDelegate = {
+  findMany(args?: {
+    where?: Partial<{ address: string | { in: string[] }; category: string }>;
+    select?: Partial<Record<keyof WalletIntelligenceRecord, boolean>>;
+    orderBy?: Partial<Record<keyof WalletIntelligenceRecord, 'asc' | 'desc'>>;
+    take?: number;
+    skip?: number;
+  }): Promise<Partial<WalletIntelligenceRecord>[]>;
+  findUnique(args: {
+    where: { id?: string; address?: string };
+    select?: Partial<Record<keyof WalletIntelligenceRecord, boolean>>;
+  }): Promise<Partial<WalletIntelligenceRecord> | null>;
+  upsert(args: {
+    where: { address: string };
+    create: Partial<WalletIntelligenceRecord>;
+    update: Partial<WalletIntelligenceRecord>;
+  }): Promise<WalletIntelligenceRecord>;
+  count(args?: { where?: Partial<{ address: string; category: string }> }): Promise<number>;
+};
+
+/** PrismaClient augmented with models not yet reflected in the generated client */
 type SovereignPrismaClient = PrismaClient & {
   cosmicEntity: CosmicEntityDelegate;
+  walletIntelligence: WalletIntelligenceDelegate;
 };
 
 function getProductionUrl(): string | undefined {

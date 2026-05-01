@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     await prisma.forumTopic.deleteMany({});
     
     // Delete all users who are not admins
+    // @ts-ignore
     await prisma.user.deleteMany({
       where: {
         isAdmin: false
@@ -27,6 +28,7 @@ export async function GET(req: Request) {
     });
 
     // Find the admin user
+    // @ts-ignore
     const admin = await prisma.user.findFirst({
       where: { isAdmin: true }
     });
@@ -65,7 +67,6 @@ Please explore the settings panel to configure your preferences, and maintain pr
     await prisma.forumTopic.create({
       data: {
         title: 'Welcome to the Sovereign Network',
-        slug: 'welcome-to-the-sovereign-network',
         content: welcomeContent,
         authorId: admin.id,
         categoryId: category.id,

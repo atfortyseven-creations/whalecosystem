@@ -31,10 +31,13 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. MASTER SECURITY: Tier-Based Wallet Limits
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.upsert({
         where: { walletAddress: userId },
-        select: { tier: true }
+        create: { walletAddress: userId, tier: 'HUMAN', lastActive: new Date() },
+        update: { lastActive: new Date() },
+        select: { id: true, tier: true }
     });
+    const userUuid = user.id;
 
     // Cast to any to bypass stale prisma client type overlap error if present
     const userTier = (user?.tier as any);
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
     
     if (!isPremium) {
         const walletCount = await prisma.watchedWallet.count({
-            where: { userId }
+            where: { userId: userUuid }
         });
 
         if (walletCount >= 3) {
@@ -81,29 +84,13 @@ export async function POST(req: NextRequest) {
 
     console.log(`[POST-WALLET] Adding wallet for userId: ${userId}, address: ${address}, label: ${label || 'Anonymous Whale'}`);
 
-    // 1.5. GUARDIAN: Ensure User Exists (Fix for FK Constraint Error)
-    try {
-        await prisma.user.upsert({
-            where: { walletAddress: userId },
-            create: { 
-                walletAddress: userId,
-                tier: 'HUMAN',
-                lastActive: new Date()
-            },
-            update: { lastActive: new Date() }
-        });
-    } catch (dbErr: any) {
-        console.warn(`[DATABASE-DEGRADED] User upsert failed: ${dbErr.message}. Operating in Safe Mode.`);
-        // Continue - if DB is down, we skip persistence but allow UI flow
-    }
-
     // 2. Persist with Advanced Resilience [SENIOR-LEVEL ATOMICITY]
     try {
         const wallet = await prisma.$transaction(async (tx) => {
             const newWallet = await tx.watchedWallet.upsert({
-                where: { userId_address: { userId, address } },
+                where: { userId_address: { userId: userUuid, address } },
                 update: { label, lastValue: totalValue, metadata: metadata as any, lastCheck: new Date() },
-                create: { userId, address, label, lastValue: totalValue, metadata: metadata as any, tags: body.tags || [] }
+                create: { userId: userUuid, address, label, lastValue: totalValue, metadata: metadata as any, tags: body.tags || [] }
             });
 
             await tx.auditLog.create({
@@ -153,14 +140,24 @@ export async function GET(req: NextRequest) {
     const userId = validation.userId!;
     const web3Address = req.headers.get('x-web3-address')?.toLowerCase();
 
-    // 🔥 [LEGENDARY PERSISTENCE]
-    // Fetch wallets for BOTH the primary ID (Clerk) and the secondary ID (Web3 Guest)
-    // This prevents data loss during login/logout transitions.
-    const userIds = [userId];
-    if (web3Address && web3Address !== userId) userIds.push(web3Address);
+    // Resolve primary User UUID from walletAddress
+    const primaryUser = await prisma.user.findUnique({
+        where: { walletAddress: userId },
+        select: { id: true }
+    });
+    const primaryUuid = primaryUser?.id || userId;
+
+    const userUuids = [primaryUuid];
+    if (web3Address && web3Address !== userId) {
+        const secondaryUser = await prisma.user.findUnique({
+            where: { walletAddress: web3Address },
+            select: { id: true }
+        });
+        if (secondaryUser) userUuids.push(secondaryUser.id);
+    }
 
     const wallets = await prisma.watchedWallet.findMany({
-      where: { userId: { in: userIds } },
+      where: { userId: { in: userUuids } },
       orderBy: { createdAt: 'desc' },
     });
 
