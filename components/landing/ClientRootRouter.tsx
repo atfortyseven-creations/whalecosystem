@@ -71,6 +71,17 @@ export function ClientRootRouter() {
                 style={{ color: "rgba(10,10,10,0.85)" }}
               >
                 <span>Forum</span>
+              </Link>
+              <div
+                className="w-px h-3"
+                style={{ backgroundColor: "rgba(10,10,10,0.1)" }}
+              />
+              <Link
+                href="/careers"
+                className="font-mono text-[8px] uppercase tracking-[0.35em] transition-colors duration-300 flex items-center gap-2"
+                style={{ color: "rgba(10,10,10,0.85)" }}
+              >
+                <span>Careers</span>
                 <span
                   className="font-mono text-[8px]"
                   style={{ color: "rgba(10,10,10,0.3)" }}
