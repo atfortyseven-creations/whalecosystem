@@ -806,7 +806,9 @@ export function MobileLanding() {
           }
         }
       } catch {}
-      if (attempts >= 600) {
+      
+      // Increased polling limit from 600 (30s) to 1200 (60s) to give WalletConnect more time
+      if (attempts >= 1200) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         // ── LAST RESORT: check if sovereign_handshake cookie was set this session ──
         // This covers the case where establishSession ran but wagmi didn't
@@ -820,6 +822,7 @@ export function MobileLanding() {
           }
         } catch {}
         // Poll truly failed and no cookie — clear reconnect state cleanly
+        console.warn('[Sovereign:Recovery] Polling timeout reached. Handshake failed.');
         setFallbackStatus('failed');
         setShowManualReconnectRaw(false);
         try { 
@@ -859,7 +862,14 @@ export function MobileLanding() {
       // Do NOT remove w3m-modal here. AppKit manages the WebSocket connection
       // inside the modal's WebComponent. Removing it kills the handshake.
       if (isLinked) return;
-      if (sessionStorage.getItem('sovereign_show_reconnect') === '1') {
+      
+      const isPending = localStorage.getItem('sovereign_pending_wakeup') === '1';
+      const isReconnecting = sessionStorage.getItem('sovereign_show_reconnect') === '1';
+
+      if (isPending || isReconnecting) {
+        console.log('%c[MobileWallet] User returned to active tab — forcing recovery UI', 'color:#00ff00');
+        setShowManualReconnectRaw(true);
+        try { sessionStorage.setItem('sovereign_show_reconnect', '1'); } catch {}
         forceFullReconnect();
       } else {
         onFocusRecheck();
@@ -873,7 +883,7 @@ export function MobileLanding() {
       window.removeEventListener('focus', handleVisibility);
       if (pollIntervalRef.current) { clearInterval(pollIntervalRef.current); pollIntervalRef.current = null; }
     };
-  }, [mounted, isLinked, reconnect, onFocusRecheck]);
+  }, [mounted, isLinked, reconnect, onFocusRecheck, forceFullReconnect]);
 
   // ── ULTRA-AGGRESSIVE RECOVERY — Android Chrome deep-link + iOS bfcache ─────────
   // Covers the case where Chrome DESTROYS the tab when the user goes to their
