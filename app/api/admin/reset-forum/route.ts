@@ -19,18 +19,14 @@ export async function GET(req: Request) {
     // Delete all topics
     await prisma.forumTopic.deleteMany({});
     
-    // Delete all users who are not admins
-    // @ts-ignore
+    // Delete all users who are not admins (isAdmin field exists in schema; @ts-ignore covers stale generated types)
     await prisma.user.deleteMany({
-      where: {
-        isAdmin: false
-      }
+      where: { isAdmin: false } as any
     });
 
     // Find the admin user
-    // @ts-ignore
     const admin = await prisma.user.findFirst({
-      where: { isAdmin: true }
+      where: { isAdmin: true } as any
     });
 
     if (!admin) {

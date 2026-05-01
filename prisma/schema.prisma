@@ -180,49 +180,69 @@ model ApiKey {
 }
 
 model AuthUser {
-  id               String    @id @default(uuid())
-  email            String    @unique
-  name             String?
-  passwordHash     String?
-  walletAddress    String?   @unique
-  verified         Boolean   @default(false)
-  verificationCode String?
-  codeExpiresAt    DateTime?
-  totpSecret       String?   @db.Text
-  backupCodes      String[]  @default([])
-  lastLoginAt      DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                  String    @id @default(uuid())
+  email               String    @unique
+  name                String?
+  passwordHash        String?
+  walletAddress       String?   @unique
+  verified            Boolean   @default(false)
+  verificationCode    String?
+  codeExpiresAt       DateTime?
+  totpSecret          String?   @db.Text
+  backupCodes         String[]  @default([])
+  lastLoginAt         DateTime?
+  recoveryEmail       String?
+  encryptedPrivateKey String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  securityEvents SecurityEvent[]
 
   @@index([email])
   @@index([walletAddress])
 }
 
 model EmailSubscriber {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  subscribed  Boolean  @default(true)
-  frequency   String   @default("hourly")
-  createdAt   DateTime @default(now())
+  id               String   @id @default(uuid())
+  email            String   @unique
+  frequency        String   @default("weekly") // "daily", "weekly", "monthly"
+  subscribed       Boolean  @default(true)
+  unsubscribeToken String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([subscribed])
+  @@index([createdAt])
 }
 
 model WatchedWallet {
-  id        String   @id @default(uuid())
-  userId    String
-  address   String
-  label     String   @default("Generated Intel")
-  lastValue Float    @default(0)
-  metadata  Json?    // breakdown from stats engine
-  lastCheck DateTime?
-  tags      String[] @default([])
-  forensics Json?
-  category  String?
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  userId        String
+  address       String   @default("") // Normalized: 0x... or bc1... or SOL pubkey
+  label         String   @default("Anonymous Whale")
+  tags          String[] @default([])
+  lastValue     Float    @default(0)
+  change24h     Float    @default(0)
+  pnl24h        Float    @default(0)
+  txCount       Int      @default(0)
+  riskScore     Float    @default(50)
+  activityScore Float    @default(0)
+  isWhale       Boolean  @default(false)
+  isSmart       Boolean  @default(false)
+  alertsEnabled Boolean  @default(false)
+  metadata      Json? // Stats breakdown cache
+  forensics     Json? // Forensic analysis result
+  category      String? // Exchange|Whale|MEV|Fund etc.
+  identityTier  String? // LEGENDARY|ELITE|SOVEREIGN etc.
+  lastCheck     DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, address])
   @@index([userId, createdAt(sort: Desc)])
+  @@index([address])
 }
 
 model ExchangePosition {
@@ -598,31 +618,8 @@ model BRCStandard {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// EMAIL SUBSCRIBERS
-// Referenced by: /api/newsletter/subscribe, /api/alerts/subscribe,
-// /api/subscribe, /api/cron/supply-alerts, /api/admin/emails
-// FIX: This model was MISSING from schema.prisma, causing Prisma P1009 runtime
-// crashes on every newsletter subscription operation in production.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model EmailSubscriber {
-  id               String   @id @default(uuid())
-  email            String   @unique
-  frequency        String   @default("weekly") // "daily", "weekly", "monthly"
-  subscribed       Boolean  @default(true)
-  unsubscribeToken String?  @unique
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@index([subscribed])
-  @@index([createdAt])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // TELEGRAM ALERTS
 // Referenced by: /api/telegram/connect, /api/cron/*, webhook handlers
-// FIX: This model was MISSING from schema.prisma, causing Prisma P1009 runtime
-// crashes every time a user attempted to configure Telegram alerts.
 // ─────────────────────────────────────────────────────────────────────────────
 
 model TelegramAlert {
@@ -635,24 +632,6 @@ model TelegramAlert {
   updatedAt     DateTime @updatedAt
 
   @@index([walletAddress])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPATIBILITY POLYFILLS FOR EXTENDED API ROUTES (FIX BUILD CRASHES)
-// These models satisfy TS and Prisma Client generated types for legacy or 
-// parallel API routes that query these models.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model AuthUser {
-  id                  String   @id @default(uuid())
-  email               String   @unique
-  walletAddress       String?  @unique
-  recoveryEmail       String?
-  encryptedPrivateKey String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  securityEvents SecurityEvent[]
 }
 
 model SecurityEvent {
@@ -731,34 +710,6 @@ model AlertRule {
   condition String
   threshold Float
   isActive  Boolean @default(true)
-}
-
-model WatchedWallet {
-  id            String   @id @default(uuid())
-  userId        String
-  address       String   @default("") // Normalized: 0x... or bc1... or SOL pubkey
-  label         String   @default("Anonymous Whale")
-  tags          String[] @default([])
-  lastValue     Float    @default(0)
-  change24h     Float    @default(0)
-  pnl24h        Float    @default(0)
-  txCount       Int      @default(0)
-  riskScore     Float    @default(50)
-  activityScore Float    @default(0)
-  isWhale       Boolean  @default(false)
-  isSmart       Boolean  @default(false)
-  alertsEnabled Boolean  @default(false)
-  metadata      Json? // Stats breakdown cache
-  forensics     Json? // Forensic analysis result
-  category      String? // Exchange|Whale|MEV|Fund etc.
-  identityTier  String? // LEGENDARY|ELITE|SOVEREIGN etc.
-  lastCheck     DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
-
-  @@unique([userId, address])
-  @@index([userId, createdAt(sort: Desc)])
-  @@index([address])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1155,25 +1106,6 @@ model VerificationCode {
 
   @@index([userId, used])
   @@index([code])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AUDIT TRAIL: SOVEREIGN OPERATIONS LOG
-// Used by /api/forum/topics, /api/forum/posts, /api/user/settings,
-//          /api/premium/watched-wallets
-// ─────────────────────────────────────────────────────────────────────────────
-
-model AuditLog {
-  id        String   @id @default(uuid())
-  userId    String
-  action    String   // e.g. 'WATCH_WALLET_ADDED', 'FORUM_POST_CREATED'
-  resource  String   // e.g. 'watched_wallet', 'forum_post'
-  metadata  Json?
-  ipAddress String?
-  timestamp DateTime @default(now())
-
-  @@index([userId, timestamp(sort: Desc)])
-  @@index([action, timestamp(sort: Desc)])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
