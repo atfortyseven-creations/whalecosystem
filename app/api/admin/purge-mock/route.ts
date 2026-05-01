@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/admin';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function DELETE() {
     try {
+        const cookieStore = await cookies();
+        const address = cookieStore.get('sovereign_handshake')?.value;
+        if (!isAdmin(address)) {
+            return NextResponse.json({ error: 'Unauthorized: Sovereign Admin Only' }, { status: 403 });
+        }
         const users = await prisma.user.findMany({
             where: {
                 bio: {

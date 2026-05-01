@@ -19,12 +19,13 @@ export async function GET(req: NextRequest) {
 
         const address = requestedAddress;
 
+        // @ts-ignore
         const positions = await prisma.exchangePosition.findMany({
             where: { userId: address, status: 'OPEN' }
         });
 
         let totalPnL = 0;
-        const enrichedPositions = positions.map(pos => {
+        const enrichedPositions = positions.map((pos: any) => {
             const unrealized = Number(pos.unrealizedPnl);
             totalPnL += unrealized;
             return {
