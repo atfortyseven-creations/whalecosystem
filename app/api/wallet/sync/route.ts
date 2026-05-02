@@ -43,10 +43,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized: No identity resolved.' }, { status: 401 });
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized: No wallet or session found' }, { status: 401 });
-    }
-
     // Ensure User exists in DB for foreign key constraints
     const existingUser = await prisma.user.findUnique({ where: { walletAddress: userId } });
     if (!existingUser) {
@@ -70,10 +66,55 @@ export async function POST(req: NextRequest) {
         result = await cashier.syncUserBalance(userId, userId);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
         success: true,
         ...(result || {})
     });
+
+    // ── Mint Sovereign JWT (human_session) ───────────────────────────────────
+    try {
+        const { mintJWT } = await import('@/lib/jwt');
+        const sessionToken = await mintJWT({
+            sub: userId,
+            address: userId,
+            clearance: 'SOVEREIGN',
+            tier: existingUser?.tier || 'FREE',
+            kycStatus: existingUser?.kycStatus || 'UNVERIFIED',
+            humanityScore: existingUser?.humanityScore || 0,
+            issuedAt: new Date().toISOString()
+        });
+
+        response.cookies.set('human_session', sessionToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 604800, // 7 days
+        });
+
+        // Cache tier in Redis for 10 min (Edge Middleware Rate Limiting)
+        const { safeRedisSet } = await import('@/lib/redis/client');
+        await safeRedisSet(`tier:${userId}`, JSON.stringify({
+            tier: existingUser?.tier || 'FREE',
+            kycStatus: existingUser?.kycStatus || 'UNVERIFIED',
+            humanityScore: existingUser?.humanityScore || 0
+        }), 'EX', 600);
+
+    } catch (jwtErr) {
+        console.error('[WalletSync] Failed to mint human_session:', jwtErr);
+    }
+
+    // Clean backend architecture: issue the identity cookie directly from the server
+    // after cryptographic verification, reducing client-side trust.
+    response.cookies.set('sovereign_handshake', userId, {
+        path: '/',
+        maxAge: 604800, // 7 days
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: false // false so the frontend can read it if needed, but issued by backend
+    });
+
+    return response;
 
   } catch (error: any) {
     console.error('Wallet Sync Error:', error);

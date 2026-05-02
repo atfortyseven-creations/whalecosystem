@@ -6,9 +6,24 @@ export async function PUT(req: Request, { params }: { params: Promise<{ address:
     try {
         const { address } = await params;
         const cookieStore = await cookies();
-        const sessionAddress = cookieStore.get('sovereign_handshake')?.value;
+        const sessionToken = cookieStore.get('human_session')?.value;
+        if (!sessionToken) {
+            return NextResponse.json({ error: 'Unauthorized: missing secure session' }, { status: 401 });
+        }
+
+        let sessionAddress = '';
+        try {
+            const { jwtVerify } = await import('jose');
+            const _rawJwtSecret = process.env.JWT_SECRET || 'dev-only-not-for-production-jwt-secret-change-me';
+            const JWT_SECRET = new TextEncoder().encode(_rawJwtSecret);
+            const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
+            sessionAddress = (payload.sub || payload.address) as string;
+        } catch (e) {
+            return NextResponse.json({ error: 'Unauthorized: invalid secure session' }, { status: 401 });
+        }
+
         if (!sessionAddress || sessionAddress.toLowerCase() !== address.toLowerCase()) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized: session mismatch' }, { status: 401 });
         }
 
         const body = await req.json();
