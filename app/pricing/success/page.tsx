@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
+import { CheckCircle, ShieldCheck, ArrowRight, Zap, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function PricingSuccessPage() {
+function SuccessContent() {
     const [mounted, setMounted] = useState(false);
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('session_id');
@@ -73,5 +73,17 @@ export default function PricingSuccessPage() {
                 </div>
             </motion.div>
         </div>
+    );
+}
+
+export default function PricingSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
+                <Loader2 className="animate-spin text-[#00C076]" size={32} />
+            </div>
+        }>
+            <SuccessContent />
+        </Suspense>
     );
 }

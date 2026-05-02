@@ -112,7 +112,7 @@ const FAQS = [
   }
 ];
 
-export default function PricingPage() {
+function PricingContent() {
   const { isConnected, isSovereignHandshake } = useSovereignAccount();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -336,5 +336,17 @@ export default function PricingPage() {
 
       </main>
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#00C076]" size={32} />
+      </div>
+    }>
+      <PricingContent />
+    </React.Suspense>
   );
 }
