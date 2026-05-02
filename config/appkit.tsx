@@ -9,8 +9,7 @@ import { createAppKit } from '@reown/appkit/react';
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
-// @ts-ignore - Supress missing module error until user runs npm install
-import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
+// siweConfig imports removed — AppKit SIWE flow disabled in favour of custom EIP-191 signing
 
 // 1. Get projectId — Falls back to real project ID so the app renders even without the env var.
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
@@ -104,51 +103,13 @@ const metadata = {
     icons: ['https://humanidfi.com/icon.png'],
 }
 
-// ── 1-Click Auth: SIWE Configuration
-const siweConfig = createSIWEConfig({
-  getMessageParams: async () => ({
-    domain: typeof window !== 'undefined' ? window.location.host : 'humanidfi.com',
-    uri: typeof window !== 'undefined' ? window.location.origin : APP_URL,
-    chains: networks.map(n => n.id) as number[],
-    statement: 'Authenticate into the Whale Alert Sovereign Network. This request will not trigger a blockchain transaction or cost any gas fees.'
-  }),
-  createMessage: ({ address, ...args }: any) => formatMessage(args, address),
-  getNonce: async () => {
-    const res = await fetch('/api/siwe/nonce', { cache: 'no-store' });
-    if (!res.ok) throw new Error('Failed to get nonce');
-    return res.text();
-  },
-  getSession: async () => {
-    try {
-        const res = await fetch('/api/siwe/session');
-        if (!res.ok) throw new Error('Failed to get session');
-        const data = await res.json();
-        return data && data.address && data.chainId ? { address: data.address, chainId: data.chainId } : null;
-    } catch {
-        return null;
-    }
-  },
-  verifyMessage: async ({ message, signature }: { message: string, signature: string }) => {
-    try {
-      const res = await fetch('/api/siwe/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, signature })
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
-  },
-  signOut: async () => {
-    try {
-      await fetch('/api/siwe/logout');
-      return true;
-    } catch {
-      return false;
-    }
-  }
-});
+// ── NOTE: siweConfig intentionally removed.
+// The cryptographic signature flow is managed exclusively by:
+//   - MobileLanding.tsx → establishSession() on mobile
+//   - LinkedGate.tsx → SignContractStep on desktop
+// Defining siweConfig here — even without passing it to createAppKit —
+// was causing AppKit to fire its own internal SIWE modal simultaneously
+// with our establishSession(), resulting in "Error signing message" on mobile.
 
 // ── CRITICAL: createAppKit must be called at module level (not inside window check).
 // Reown AppKit hooks (useAppKit, useAppKitAccount, etc.) are used during SSR in
