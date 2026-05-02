@@ -10,9 +10,7 @@ interface QRScannerModalProps {
   onClose: () => void;
   onScan?: (data: string) => void;
   address?: string;
-  // Optional: if provided, the component signs the QR session message before
-  // submitting to /api/auth/qr-session, providing full EIP-191 verification.
-  signMessageAsync?: (args: { message: string }) => Promise<string>;
+  signMessageAsync?: any;
 }
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
@@ -214,7 +212,7 @@ function ScannedOverlay() {
 export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress, signMessageAsync }: QRScannerModalProps) {
   const { address } = useAccount();
 
-  const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
+  const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error' | 'signing'>('idle');
   const [errMsg, setErrMsg]   = useState('');
   const [tab, setTab]         = useState<'camera' | 'file'>('camera');
   const [fileLoading, setFileLoading] = useState(false);
@@ -277,21 +275,40 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       const sessionId = url.searchParams.get('session');
 
       if (sessionId && addr) {
-        // ── EIP-191 Sign: prove wallet ownership before unlocking desktop ──
-        let signature = '';
-        let message = '';
+        let signature: string | undefined;
+        let message: string | undefined;
+
         if (signMessageAsync) {
-          message = `Authorize Sovereign Terminal Access for session: ${sessionId}\nAddress: ${addr}\nTimestamp: ${Date.now()}`;
           try {
+            setStatus('signing');
+            
+            message = [
+              '═══════════════════════════════',
+              '  Whale Alert Network',
+              '  SOVEREIGN ACCESS PROTOCOL',
+              '═══════════════════════════════',
+              '',
+              `Identity: ${addr.toLowerCase()}`,
+              `Nonce: ${Date.now()}`,
+              `Network: WHALE_TERMINAL_V4`,
+              '',
+              'By signing you confirm that',
+              'you are the sole owner of this',
+              'address and authorize access',
+              'to the institutional terminal.',
+              '═══════════════════════════════',
+            ].join('\n');
+
             signature = await signMessageAsync({ message });
-          } catch {
-            setErrMsg('Signature required to establish the secure tunnel. Please approve in your wallet.');
+          } catch (e) {
+            setErrMsg('Signature rejected. Please try again.');
             setStatus('error');
-            hasScannedRef.current = false; // allow retry
+            hasScannedRef.current = false;
             return;
           }
         }
 
+        // The API validates identity via the signature if provided, else falls back to cookie.
         const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -303,6 +320,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           hasScannedRef.current = false; // allow retry
           return;
         }
+        
+        setStatus('success');
       } else if (!addr) {
         setErrMsg('Connect your wallet before scanning.');
         setStatus('error');
@@ -485,11 +504,10 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
               {tab === 'camera' && (
                 <>
                   <div className="relative w-full h-[320px] rounded-[20px] overflow-hidden bg-black flex items-center justify-center shadow-inner">
-                    {/* The html5-qrcode library injects the video here */}
-                    <div
+                      <div
                       id="qr-reader"
                       className="absolute inset-0 w-full h-full"
-                      style={{ display: status === 'error' || status === 'success' ? 'none' : 'block' }}
+                      style={{ display: status === 'error' || status === 'success' || status === 'signing' ? 'none' : 'block' }}
                     />
 
                     {/* Animated perimeter scan line — perfectly centered now */}
@@ -510,6 +528,22 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   <AnimatePresence>
                     {status === 'success' && <ScannedOverlay />}
                   </AnimatePresence>
+
+                  {/* Signing overlay */}
+                  {status === 'signing' && (
+                    <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center gap-4">
+                      <Shield size={30} className="mx-auto text-red-400 opacity-60" />
+                      <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">
+                        SIGNATURE REQUIRED TO ESTABLISH THE SECURE TUNNEL. PLEASE APPROVE IN YOUR WALLET.
+                      </p>
+                      <button
+                        onClick={handleRetry}
+                        className="text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2.5 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  )}
 
                   {/* Error overlay */}
                   {status === 'error' && (
