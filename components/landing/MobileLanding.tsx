@@ -804,8 +804,9 @@ export function MobileLanding() {
         }
       } catch {}
       
-      // Increased polling limit from 600 (30s) to 1200 (60s) to give WalletConnect more time
-      if (attempts >= 1200) {
+      // Increased polling limit to 120 (60s at 500ms intervals) to give WalletConnect more time
+      // Polling frequency reduced from 50ms to 500ms to prevent thermal throttling and CPU spikes.
+      if (attempts >= 120) {
         clearInterval(pollIntervalRef.current!); pollIntervalRef.current = null;
         // ── LAST RESORT: check if sovereign_handshake cookie was set this session ──
         // This covers the case where establishSession ran but wagmi didn't
@@ -827,7 +828,7 @@ export function MobileLanding() {
           localStorage.removeItem('sovereign_pending_wakeup');
         } catch {}
       }
-    }, 50);
+    }, 500);
   }, [isLinked, establishSession]);
 
   useEffect(() => {

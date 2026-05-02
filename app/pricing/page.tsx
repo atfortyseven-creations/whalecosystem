@@ -10,105 +10,110 @@ const PRICING_TIERS = [
   {
     id: 'starter',
     name: 'Standard',
-    price: '$0',
-    billing: 'Mensual / Facturación Anual Disponible',
-    target: 'Para uso individual y académico',
-    description: 'Acceso fundacional a la red Sovereign con telemetría básica y soporte comunitario.',
+    price: '€0',
+    billing: 'Monthly / Annual Billing Available',
+    target: 'For individual researchers and academics',
+    description: 'Foundational access to the Sovereign network with basic telemetry, community support, and core identity verification.',
     features: [
-      'Acceso al Terminal Base',
-      'Actualización de red cada 5 min',
-      'Acceso de lectura a datos históricos',
-      'Soporte comunitario estándar',
-      'Identidad soberana básica'
+      'Access to Base Terminal Interface',
+      'Network state updates (5 min latency)',
+      'Read-only historical data access',
+      'Standard community forum support',
+      'Basic sovereign identity profile',
+      'Public endpoint API limits (100 req/day)'
     ],
-    buttonText: 'Empezar Gratis'
+    buttonText: 'Start for Free'
   },
   {
     id: 'pro',
     name: 'Professional',
-    price: '$59',
-    billing: 'Usuario / Mes',
-    target: 'Para analistas y operadores del mercado',
-    description: 'Telemetría avanzada en tiempo real con herramientas de análisis de grado institucional.',
+    price: '€59',
+    billing: 'Per User / Month',
+    target: 'For market analysts and active operators',
+    description: 'Real-time advanced telemetry with institutional-grade analytics tools, premium data feeds, and algorithmic pattern recognition.',
     highlight: true,
     features: [
-      'Streaming de datos sin latencia',
-      'Consultas avanzadas en la red',
-      'Acceso de lectura y escritura',
-      'Soporte técnico prioritario (24h)',
-      'Analíticas de seguridad extendidas',
-      'Hasta 15 alertas personalizadas'
+      'Zero-latency data streaming',
+      'Advanced on-chain network queries',
+      'Read and write database access',
+      'Priority technical support (24/7)',
+      'Extended security analytics & alerts',
+      'Up to 15 custom anomaly alerts',
+      'Proprietary predictive models access',
+      'API access (10,000 req/day)'
     ],
-    buttonText: 'Adquirir Licencia Pro'
+    buttonText: 'Acquire Pro License'
   },
   {
     id: 'Elite',
     name: 'Enterprise',
-    price: '$199',
-    billing: 'Usuario / Mes',
-    target: 'Para instituciones y fondos de cobertura',
-    description: 'Rendimiento sin restricciones, límites expandidos y soporte Elite para alta frecuencia.',
+    price: '€199',
+    billing: 'Per User / Month',
+    target: 'For institutions and hedge funds',
+    description: 'Unrestricted performance, expanded rate limits, dedicated account management, and Elite support for high-frequency operations.',
     features: [
-      'Firehose de datos ilimitado',
-      'Consultas complejas ilimitadas',
-      'Gestor de cuenta dedicado',
-      'Integración total vía API / Webhook',
-      'Alertas de mercado ilimitadas',
-      'SLA garantizado del 99.99%'
+      'Unlimited data firehose access',
+      'Unrestricted complex queries',
+      'Dedicated account manager',
+      'Full API / Webhook integration',
+      'Unlimited custom market alerts',
+      'Guaranteed 99.99% SLA uptime',
+      'Custom smart contract indexing',
+      'Private node infrastructure'
     ],
-    buttonText: 'Adquirir Licencia Enterprise'
+    buttonText: 'Acquire Enterprise License'
   }
 ];
 
 const PLATFORM_BENEFITS = [
   {
-    title: 'Infraestructura de Alta Frecuencia',
-    description: 'Procesamiento de datos sin latencia, respaldado por una arquitectura distribuida de última generación.',
+    title: 'High-Frequency Infrastructure',
+    description: 'Zero-latency data processing powered by a state-of-the-art distributed architecture, ensuring you never miss a market movement.',
     icon: <Zap size={22} className="text-[#00C076]" />
   },
   {
-    title: 'Seguridad Criptográfica',
-    description: 'Validación en cadena mediante firmas ECDSA. La red nunca custodia sus activos.',
+    title: 'Cryptographic Security',
+    description: 'On-chain validation through ECDSA signatures. The network never custodies your assets, ensuring absolute sovereignty and trustless operation.',
     icon: <Lock size={22} className="text-[#00C076]" />
   },
   {
-    title: 'Registro Inmutable',
-    description: 'Todas las transacciones y anomalías del mercado se registran en un ledger permanente y auditable.',
+    title: 'Immutable Ledger',
+    description: 'All transactions, market anomalies, and intelligence updates are recorded on a permanent, auditable, and decentralized ledger.',
     icon: <Database size={22} className="text-[#00C076]" />
   },
   {
-    title: 'Consenso Global',
-    description: 'Visualización tridimensional de datos a través de una esfera de Fibonacci de alta precisión.',
+    title: 'Global Consensus Network',
+    description: 'High-precision tridimensional data visualization through a Fibonacci sphere, aggregating global intelligence in real-time.',
     icon: <Globe size={22} className="text-[#00C076]" />
   },
   {
-    title: 'Grado Institucional',
-    description: 'Diseñado específicamente para cubrir las estrictas normativas de fondos y corporaciones.',
+    title: 'Institutional Grade',
+    description: 'Purpose-built to meet the strict regulatory frameworks and compliance standards of hedge funds, family offices, and corporate entities.',
     icon: <Building2 size={22} className="text-[#00C076]" />
   },
   {
-    title: 'Análisis Multidimensional',
-    description: 'Identificación de patrones mediante modelos matemáticos y telemetría algorítmica avanzada.',
+    title: 'Multidimensional Analytics',
+    description: 'Pattern recognition driven by advanced mathematical models, machine learning algorithms, and real-time algorithmic telemetry.',
     icon: <BarChart3 size={22} className="text-[#00C076]" />
   }
 ];
 
 const FAQS = [
   {
-    question: "¿Cómo se gestiona el cobro de la suscripción?",
-    answer: "Los pagos se procesan de forma segura a través de Stripe, nuestra pasarela de pagos institucionales. Puede cancelar o modificar su plan en cualquier momento desde su panel de control soberano."
+    question: "How is the subscription billing managed?",
+    answer: "Payments are securely processed through Stripe, our institutional payment gateway. You can seamlessly manage, cancel, or modify your tier at any time directly from your sovereign dashboard."
   },
   {
-    question: "¿Es necesario conectar mi wallet para ver los planes?",
-    answer: "Sí. Sovereign opera bajo un modelo de Identidad Soberana estricto. Su wallet (firma ECDSA) es su única forma de acceso y facturación; no requerimos correo electrónico ni contraseñas."
+    question: "Do I need to connect my wallet to view the plans?",
+    answer: "Yes. Sovereign operates under a strict Sovereign Identity model. Your wallet (ECDSA signature) acts as your singular access point and billing identity; we do not require legacy email/password combinations."
   },
   {
-    question: "¿Puedo mejorar mi plan a mitad de mes?",
-    answer: "Absolutamente. El sistema prorrateará automáticamente el costo restante del mes y activará inmediatamente sus nuevos límites de frecuencia y acceso API."
+    question: "Can I upgrade my tier mid-month?",
+    answer: "Absolutely. The system will automatically prorate the remaining cost of the month and instantly provision your new frequency limits and API access without any downtime."
   },
   {
-    question: "¿Existe una garantía de reembolso?",
-    answer: "Dado que las licencias proporcionan acceso inmediato a datos propietarios y telemetría de alta frecuencia, no ofrecemos reembolsos. Le recomendamos iniciar con el plan Standard para evaluar la red."
+    question: "Is there a refund policy available?",
+    answer: "Because our licenses provide immediate access to proprietary data sets and high-frequency telemetry, we do not offer refunds. We recommend starting with the Standard tier to evaluate the network's capabilities."
   }
 ];
 
@@ -121,8 +126,8 @@ function PricingContent() {
   // Check for cancelation redirect
   useEffect(() => {
     if (searchParams.get('canceled')) {
-      toast.error('Proceso cancelado', {
-        description: 'La configuración de la licencia no ha sido completada.'
+      toast.error('Process canceled', {
+        description: 'The license setup has not been completed.'
       });
       router.replace('/pricing');
     }
@@ -130,23 +135,23 @@ function PricingContent() {
 
   const handleSubscribe = async (planId: string) => {
     if (!isConnected || !isSovereignHandshake) {
-      toast.error('Autenticación Requerida', {
-        description: 'Debe conectar y firmar con su identidad soberana para acceder a la pasarela.',
+      toast.error('Authentication Required', {
+        description: 'You must connect and sign with your sovereign identity to access the gateway.',
       });
       router.push('/connect');
       return;
     }
 
     if (planId === 'starter') {
-      toast.success('Acceso Verificado', {
-        description: 'Usted ya cuenta con los permisos de la licencia Standard.',
+      toast.success('Access Verified', {
+        description: 'You already have the permissions of the Standard license.',
       });
       router.push('/dashboard');
       return;
     }
 
     setLoadingTier(planId);
-    const toastId = toast.loading('Inicializando pasarela corporativa cifrada...');
+    const toastId = toast.loading('Initializing encrypted corporate gateway...');
 
     try {
       const response = await fetch('/api/payment/create-subscription', {
@@ -162,19 +167,19 @@ function PricingContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Fallo en la inicialización de la pasarela de pago');
+        throw new Error(data.error || 'Failed to initialize payment gateway');
       }
 
-      toast.success('Conexión segura establecida. Redirigiendo...', { id: toastId });
+      toast.success('Secure connection established. Redirecting...', { id: toastId });
       
       if (data.url) {
         window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Subscription error:', error);
-      toast.error('Transacción Interrumpida', {
+      toast.error('Transaction Interrupted', {
         id: toastId,
-        description: error.message || 'Se produjo un problema al procesar su solicitud. Inténtelo de nuevo.',
+        description: error.message || 'There was a problem processing your request. Please try again.',
       });
     } finally {
       setLoadingTier(null);
@@ -193,16 +198,16 @@ function PricingContent() {
         <header className="flex flex-col items-center text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C076]/10 border border-[#00C076]/20 mb-6 shadow-sm">
             <Shield size={14} className="text-[#00C076]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Licencias de Uso Soberano</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Sovereign Use Licenses</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-[#050505] mb-8 max-w-5xl leading-[1.1]">
-            Inteligencia Corporativa.<br className="hidden md:block" />
-            <span className="text-[#050505]/30">Calibrada para Escalar.</span>
+            Command the Data Singularity.<br className="hidden md:block" />
+            <span className="text-[#050505]/30">Unleash Sovereign Intelligence.</span>
           </h1>
           
           <p className="text-lg md:text-xl text-[#050505]/60 max-w-3xl leading-relaxed font-medium">
-            Seleccione la estructura de datos que mejor se adapte a sus requisitos operativos. Desde la investigación académica individual hasta el despliegue analítico de alta frecuencia para corporaciones.
+            Select the data framework that best adapts to your operational requirements. From individual academic research to high-frequency algorithmic deployment for corporate entities.
           </p>
         </header>
 
@@ -219,7 +224,7 @@ function PricingContent() {
             >
               {tier.highlight && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-[#050505] px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
-                  Estándar Corporativo
+                  Corporate Standard
                 </div>
               )}
 
@@ -232,7 +237,7 @@ function PricingContent() {
                     {tier.price}
                   </span>
                   <span className={`text-sm font-bold ${tier.highlight ? 'text-white/40' : 'text-black/30'}`}>
-                    /mes
+                    /mo
                   </span>
                 </div>
                 <p className={`text-sm font-semibold mb-2 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]'}`}>
@@ -282,10 +287,10 @@ function PricingContent() {
         <section className="mb-32">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#050505] mb-6">
-              Arquitectura de Grado Institucional
+              Institutional Grade Architecture
             </h2>
             <p className="text-lg text-[#050505]/60 max-w-3xl mx-auto">
-              Nuestra plataforma ha sido desarrollada desde sus cimientos para satisfacer las exigencias de latencia y fiabilidad requeridas por el sector empresarial de alto rendimiento.
+              Our platform has been developed from the ground up to meet the strict latency and reliability requirements demanded by the high-performance enterprise sector.
             </p>
           </div>
 
@@ -313,13 +318,13 @@ function PricingContent() {
             <div className="lg:w-1/3">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-6">
                 <HelpCircle size={14} className="text-[#00C076]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Soporte y Dudas</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Support & Queries</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 leading-tight">
-                Preguntas<br />Frecuentes
+                Frequently Asked<br />Questions
               </h2>
               <p className="text-white/50 text-lg">
-                Resolvemos las cuestiones operativas y administrativas más comunes. Para soporte dedicado, acceda al terminal.
+                We resolve the most common operational and administrative questions. For dedicated support, please access the terminal.
               </p>
             </div>
             

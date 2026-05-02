@@ -57,10 +57,11 @@ export function useSIWE(): UseSIWEReturn {
       // ── Step 2: Build SIWE message ──────────────────────────────────────────
       const domain = window.location.host;
       const origin = window.location.origin;
+      const checksummedAddress = (await import('viem')).getAddress(address);
 
       const message = new SiweMessage({
         domain,
-        address,
+        address: checksummedAddress,
         statement: "Authenticate into the Whale Alert Sovereign Network. This request will not trigger a blockchain transaction or cost any gas fees.",
         uri: origin,
         version: "1",

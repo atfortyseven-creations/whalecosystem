@@ -12,17 +12,31 @@ export async function POST(request: Request) {
     if (id) {
         try {
             const body = await request.json();
-            if (body && body.address && body.signature && body.message) {
-                try {
-                    const isValid = await verifyMessage({
-                        address: body.address as `0x${string}`,
-                        message: body.message,
-                        signature: body.signature as `0x${string}`
-                    });
-                    if (!isValid) throw new Error("Invalid signature");
-                } catch(e) {
-                    return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
+            if (body && body.address) {
+                // ── Path A: Full EIP-191 signature provided → verify cryptographically ──
+                if (body.signature && body.message) {
+                    try {
+                        const isValid = await verifyMessage({
+                            address: body.address as `0x${string}`,
+                            message: body.message,
+                            signature: body.signature as `0x${string}`
+                        });
+                        if (!isValid) throw new Error("Invalid signature");
+                    } catch(e) {
+                        return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
+                    }
+                } else {
+                    // ── Path B: No signature → validate via sovereign_handshake cookie ──
+                    // The user already completed EIP-191 auth during establishSession().
+                    // The cookie proves their identity without requiring a second wallet popup.
+                    const cookieHeader = request.headers.get('cookie') || '';
+                    const cookieMatch = cookieHeader.match(/sovereign_handshake=(0x[0-9a-fA-F]{40,})/i);
+                    const cookieAddress = cookieMatch?.[1]?.toLowerCase();
+                    if (!cookieAddress || cookieAddress !== body.address.toLowerCase()) {
+                        return NextResponse.json({ error: 'Unauthorized: no valid session cookie' }, { status: 401 });
+                    }
                 }
+
                 await safeRedisSet(`qr:${id}`, JSON.stringify({ 
                     status: 'SUCCESS', 
                     address: body.address 
