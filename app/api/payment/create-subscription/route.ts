@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { planId, userEmail } = body;
+    const { planId, userEmail, returnUrl } = body;
 
     if (!planId || !PLAN_PRICE_IDS[planId]) {
       return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
@@ -129,10 +129,14 @@ export async function POST(req: NextRequest) {
         terms_of_service_acceptance: {
           message: '⚠️ Al proceder, aceptas que NO hay reembolsos. La API key se activa inmediatamente. En caso de disputa, suspendemos el servicio y enviamos evidencia de uso a Stripe.',
         },
-        submit: { message: 'Tu API key se activará en segundos tras el pago.' },
+        submit: { message: 'Tu acceso premium se activará en segundos tras el pago.' },
       },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api-marketplace/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/api-marketplace?canceled=true`,
+      success_url: returnUrl 
+         ? `${process.env.NEXT_PUBLIC_APP_URL}${returnUrl}/success?session_id={CHECKOUT_SESSION_ID}` 
+         : `${process.env.NEXT_PUBLIC_APP_URL}/api-marketplace/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:  returnUrl 
+         ? `${process.env.NEXT_PUBLIC_APP_URL}${returnUrl}?canceled=true`
+         : `${process.env.NEXT_PUBLIC_APP_URL}/api-marketplace?canceled=true`,
       metadata: {
         plan_id: planId,
         sovereign_user_id: userId,

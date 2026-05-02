@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAccount, useConnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useRouter } from "next/navigation";
+import { useUIStore } from "@/lib/store/ui-store";
+import { SignContractStep } from "@/components/shared/LinkedGate";
 import { toast } from "sonner";
 import {
   ArrowRight,
@@ -119,7 +121,9 @@ export default function ConnectPage() {
   const isMobile = useIsMobile();
   const { isConnected, address } = useAccount();
   const { connect, connectors, isPending, isError, error } = useConnect();
+  const { disconnect } = useDisconnect();
   const { open: openAppKit } = useAppKit();
+  const { isLinked, setLinked } = useUIStore();
 
   const [mounted, setMounted] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
@@ -226,33 +230,14 @@ export default function ConnectPage() {
     // new sovereign_handshake cookie we just set. window.location.replace
     // forces a full HTTP round-trip so SSR can read the cookie and serve the
     // correct authenticated layout immediately.
-    const doHardRedirect = (addr: string | undefined) => {
+    const doHardRedirect = () => {
       setPendingId(null);
-      // Removed premature cookie writing here.
-      // The sovereign_handshake cookie MUST be set by the LinkedGate signature step,
-      // NOT immediately upon connection. This ensures the user sees the "Sign the contract" screen.
       router.replace("/");
     };
 
     const enforceRedirect = () => {
-      if (address?.startsWith('0x')) {
-        // Address is ready: redirect immediately.
-        doHardRedirect(address);
-      } else {
-        // Address not yet in React state (wagmi hydrating). Poll up to 15s.
-        let attempts = 0;
-        const waitForAddress = setInterval(() => {
-          attempts++;
-          const currentAddress = (window as any).__wagmiAddress__ ?? address;
-          if (currentAddress?.startsWith('0x')) {
-            clearInterval(waitForAddress);
-            doHardRedirect(currentAddress);
-          } else if (attempts >= 75) {
-            // 15s timeout: redirect anyway, the '/' page will read the wagmi store
-            clearInterval(waitForAddress);
-            router.replace("/");
-          }
-        }, 200);
+      if (isLinked) {
+        doHardRedirect();
       }
     };
 
@@ -270,7 +255,16 @@ export default function ConnectPage() {
     } else {
       enforceRedirect();
     }
-  }, [isConnected, mounted, address]);
+  }, [isConnected, mounted, isLinked, router]);
+
+  // ── Mobile Redirect ───────────────────────────────────────────────────────
+  // Mobile users have their own standalone UI on the landing page (MobileLanding.tsx).
+  // If they somehow land on /connect, redirect them to the landing page immediately.
+  useEffect(() => {
+    if (mounted && isMobile) {
+      router.replace("/");
+    }
+  }, [mounted, isMobile, router]);
 
 
   // ── Desktop handler: EIP-6963 extension lookup ───────────────────────────
@@ -448,7 +442,23 @@ export default function ConnectPage() {
               {/* SOVEREIGN CONNECTED STATE                               */}
               {/* AGGRESSIVE AUTO-REDIRECT ENFORCEMENT                    */}
               {/* ─────────────────────────────────────────────────────── */}
-              {mounted && isConnected ? (
+              {mounted && isConnected && !isLinked ? (
+                <motion.div
+                  key="sign-contract"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col flex-1"
+                >
+                  <SignContractStep 
+                    onSigned={() => setLinked(true)} 
+                    onDisconnect={() => {
+                       try { disconnect(); } catch {}
+                       setLinked(false);
+                    }} 
+                  />
+                </motion.div>
+              ) : mounted && isLinked ? (
                 <motion.div
                   key="connected-state"
                   initial={{ opacity: 0, scale: 0.95 }}
