@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronDown, Save, FileLock2, Plus, ShieldCheck } from 'lucide-react';
 import { useSignMessage, useAccount } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 const DRAFT_KEY = 'forum_draft_new_topic';
 
@@ -24,7 +25,7 @@ export default function NewTopicPage() {
   const [documents, setDocuments]   = useState<{ title: string, url: string }[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
   const { signMessageAsync } = useSignMessage();
-  const { isConnected } = useAccount();
+  const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
 
   // ── Restore draft on mount ────────────────────────────────────────────────
   useEffect(() => {
@@ -85,17 +86,35 @@ export default function NewTopicPage() {
       });
 
       try {
-        const signature = await signMessageAsync({ message: title + '\n' + finalContent });
-        finalContent = `${finalContent}\n\n[SIGNATURE:${signature}]`;
+        if (!isSovereignHandshake) {
+            const signature = await signMessageAsync({ message: title + '\n' + finalContent });
+            finalContent = `${finalContent}\n\n[SIGNATURE:${signature}]`;
+        } else {
+            finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
+        }
       } catch (e: any) {
         setError('CRYPTOGRAPHIC SIGNATURE REQUIRED TO SEAL PROPOSAL');
         setSubmitting(false);
         return;
       }
 
+      // Fetch CSRF token for premium security
+      let csrfToken = '';
+      try {
+          const csrfRes = await fetch('/api/auth/csrf', {
+              headers: { 'x-web3-address': address || '' }
+          });
+          const csrfData = await csrfRes.json();
+          csrfToken = csrfData.token;
+      } catch (e) {}
+
       const res = await fetch('/api/forum/topics', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'x-csrf-token': csrfToken,
+            'x-web3-address': address || ''
+        },
         body: JSON.stringify({
           title,
           content: finalContent,

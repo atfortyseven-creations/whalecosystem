@@ -163,8 +163,23 @@ export async function getSession(): Promise<SessionPayload | null> {
 
     // ── Priority 2: Email/legacy access token ────────────────────────────────
     const accessToken = cookieStore.get('human.access-token')?.value;
-    if (!accessToken) return null;
-    return await verifyToken(accessToken);
+    if (accessToken) {
+        const verified = await verifyToken(accessToken);
+        if (verified) return verified;
+    }
+
+    // ── Priority 3: Sovereign QR Handshake ──────────────────────────────────
+    const handshakeToken = cookieStore.get('sovereign_handshake')?.value;
+    if (handshakeToken && /^0x[a-fA-F0-9]{40}$/.test(handshakeToken)) {
+        return {
+            userId: handshakeToken.toLowerCase(),
+            email: '',
+            type: 'access',
+            sub: handshakeToken.toLowerCase()
+        };
+    }
+
+    return null;
 }
 
 /**

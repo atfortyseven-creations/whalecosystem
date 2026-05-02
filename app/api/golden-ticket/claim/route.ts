@@ -87,9 +87,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Malformed wallet address — must be 40 hex chars with 0x prefix' }, { status: 400 });
     }
 
-    if (!cryptoSignature || typeof cryptoSignature !== 'string') {
-        return NextResponse.json({ error: 'Missing or malformed cryptographic signature' }, { status: 400 });
-    }
+
 
     // ── Payload size guard (DoS protection) ──────────────────────────────────
     // signatureData is a canvas image data URL (base64). Cap to 10KB max.
@@ -134,19 +132,29 @@ export async function POST(req: NextRequest) {
     } catch { /* Rate limit failure is non-fatal — allow request */ }
 
     try {
-        // ── Verify ECDSA signature ownership ─────────────────────────────────
-        try {
-            const isValidSig = await verifyMessage({
-                address:   walletAddress as `0x${string}`,
-                message:   `WHALE ALERT NETWORK GOLD ACCESS: ${walletAddress}`,
-                signature: cryptoSignature as `0x${string}`,
-            });
-            if (!isValidSig) {
-                console.warn(JSON.stringify({ level: 'SECURITY', event: 'INVALID_SIGNATURE', ip, address }));
-                return NextResponse.json({ error: 'Cryptographic signature is invalid or forged' }, { status: 401 });
+        // ── Verify Session or ECDSA signature ownership ────────────────────────
+        const { getSession } = await import('@/lib/session');
+        const session = await getSession();
+        
+        const isSessionAuthenticated = session?.userId?.toLowerCase() === address;
+
+        if (!isSessionAuthenticated) {
+            if (!cryptoSignature || typeof cryptoSignature !== 'string') {
+                return NextResponse.json({ error: 'Missing cryptographic signature and no active session found' }, { status: 401 });
             }
-        } catch {
-            return NextResponse.json({ error: 'Failed to verify cryptographic signature' }, { status: 401 });
+            try {
+                const isValidSig = await verifyMessage({
+                    address:   walletAddress as `0x${string}`,
+                    message:   `WHALE ALERT NETWORK GOLD ACCESS: ${walletAddress}`,
+                    signature: cryptoSignature as `0x${string}`,
+                });
+                if (!isValidSig) {
+                    console.warn(JSON.stringify({ level: 'SECURITY', event: 'INVALID_SIGNATURE', ip, address }));
+                    return NextResponse.json({ error: 'Cryptographic signature is invalid or forged' }, { status: 401 });
+                }
+            } catch {
+                return NextResponse.json({ error: 'Failed to verify cryptographic signature' }, { status: 401 });
+            }
         }
 
         // ── Fast-path: check for existing claim ───────────────────────────────
