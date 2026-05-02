@@ -137,9 +137,10 @@ model User {
   notifyOnReply    Boolean @default(true)
   notifyOnMention  Boolean @default(true)
 
-  clerkId      String? @unique
-  email        String? @unique
-  snxAccountId String? @unique
+  clerkId          String? @unique
+  email            String? @unique
+  snxAccountId     String? @unique
+  stripeCustomerId String? @unique
 
   watchlists       Watchlist[]
   alerts           Alert[]

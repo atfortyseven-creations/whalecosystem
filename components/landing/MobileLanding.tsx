@@ -534,6 +534,11 @@ function ConnectedScreen({
         onClose={onCloseScanner}
         address={address}
         onScan={async (result: string) => {
+          if ((window as any).__qrScannedLock) return;
+          (window as any).__qrScannedLock = true;
+          // Release the lock after 5 seconds to allow scanning again if it failed
+          setTimeout(() => { (window as any).__qrScannedLock = false; }, 5000);
+
           onCloseScanner();
           try {
             const url = new URL(result);

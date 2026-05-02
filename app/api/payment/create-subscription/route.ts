@@ -72,24 +72,24 @@ export async function POST(req: NextRequest) {
       });
       customerId = customer.id;
 
-      // Store Stripe customer ID back on the user record
+      // Store Stripe customer ID back on the user record.
+      // Non-blocking: if the update fails for any reason it never crashes the payment flow.
       if (dbUser) {
         await prisma.user.update({
           where: { walletAddress: userId },
-          data: { stripeCustomerId: customerId } as any,
-        });
+          data: { stripeCustomerId: customerId },
+        }).catch(() => {});
       }
     }
 
-    // ─── Check for existing active subscription ───────────────────────────
-    // NOTE: The schema model is `subscription` (not `apiSubscription`)
-    const existingSub = await (prisma as any).subscription.findFirst({
+    // ─── Check for existing active subscription ───────────────────────────────
+    const existingSub = await prisma.subscription.findFirst({
       where: { userId: dbUser?.walletAddress || userId, status: 'ACTIVE' },
     });
 
     if (existingSub) {
       return NextResponse.json({
-        error: `Ya tienes una suscripción activa al plan ${existingSub.tier}. Gestiona tu plan desde el portal de cliente.`
+        error: `You already have an active ${existingSub.tier} subscription. Manage your plan from the billing portal.`
       }, { status: 409 });
     }
 
