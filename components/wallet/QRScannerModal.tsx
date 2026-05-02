@@ -10,6 +10,9 @@ interface QRScannerModalProps {
   onClose: () => void;
   onScan?: (data: string) => void;
   address?: string;
+  // Optional: if provided, the component signs the QR session message before
+  // submitting to /api/auth/qr-session, providing full EIP-191 verification.
+  signMessageAsync?: (args: { message: string }) => Promise<string>;
 }
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
@@ -208,7 +211,7 @@ function ScannedOverlay() {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress }: QRScannerModalProps) {
+export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress, signMessageAsync }: QRScannerModalProps) {
   const { address } = useAccount();
 
   const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
@@ -230,10 +233,16 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
   const scannerRef    = useRef<any>(null);
   const initTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitingRef  = useRef(false);
+  // CRITICAL LOCK: prevents handleSuccess from firing multiple times at 4fps
+  // html5-qrcode fires the success callback on every frame that contains a valid
+  // QR code. Without this guard, the user receives 3-4 signature prompts before
+  // destroyScanner() resolves asynchronously and stops the camera loop.
+  const hasScannedRef = useRef(false);
 
   // ─── Core cleanup ─────────────────────────────────────────────────────────
   const destroyScanner = useCallback(async () => {
     isInitingRef.current = false;
+    hasScannedRef.current = false; // reset so scanner can be reused after closing and reopening
     if (initTimerRef.current) {
       clearTimeout(initTimerRef.current);
       initTimerRef.current = null;
@@ -246,6 +255,10 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
 
   // ─── Successful scan handler ───────────────────────────────────────────────
   const handleSuccess = useCallback(async (decodedText: string) => {
+    // ATOMIC LOCK: first call wins, all subsequent calls from the camera loop are ignored
+    if (hasScannedRef.current) return;
+    hasScannedRef.current = true;
+
     await destroyScanner();
     setStatus('success');
 
@@ -264,19 +277,36 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       const sessionId = url.searchParams.get('session');
 
       if (sessionId && addr) {
+        // ── EIP-191 Sign: prove wallet ownership before unlocking desktop ──
+        let signature = '';
+        let message = '';
+        if (signMessageAsync) {
+          message = `Authorize Sovereign Terminal Access for session: ${sessionId}\nAddress: ${addr}\nTimestamp: ${Date.now()}`;
+          try {
+            signature = await signMessageAsync({ message });
+          } catch {
+            setErrMsg('Signature required to establish the secure tunnel. Please approve in your wallet.');
+            setStatus('error');
+            hasScannedRef.current = false; // allow retry
+            return;
+          }
+        }
+
         const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ address: addr }),
+          body:    JSON.stringify({ address: addr, signature, message }),
         });
         if (!res.ok) {
           setErrMsg('Handshake failed. Refresh the QR code on your desktop terminal.');
           setStatus('error');
+          hasScannedRef.current = false; // allow retry
           return;
         }
       } else if (!addr) {
         setErrMsg('Connect your wallet before scanning.');
         setStatus('error');
+        hasScannedRef.current = false; // allow retry
         return;
       }
     } catch {

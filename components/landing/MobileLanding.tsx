@@ -533,53 +533,15 @@ function ConnectedScreen({
         isOpen={showScanner}
         onClose={onCloseScanner}
         address={address}
-        onScan={async (result: string) => {
-          if ((window as any).__qrScannedLock) return;
-          (window as any).__qrScannedLock = true;
-          // Release the lock after 5 seconds to allow scanning again if it failed
-          setTimeout(() => { (window as any).__qrScannedLock = false; }, 5000);
-
-          onCloseScanner();
-          try {
-            const url = new URL(result);
-            const sessionId = url.searchParams.get('session');
-            if (sessionId && address) {
-              const pendingToast = document.createElement('div');
-              pendingToast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-[#2D0A59] text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center flex items-center justify-center gap-3';
-              pendingToast.innerHTML = '<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg> <span>Linking Session...</span>';
-              document.body.appendChild(pendingToast);
-
-              let signature = '';
-              const message = `Authorize Sovereign Terminal Access for session: ${sessionId}\nAddress: ${address}\nTimestamp: ${Date.now()}`;
-              try {
-                  signature = await signMessageAsync({ message });
-              } catch(e) {
-                  pendingToast.remove();
-                  const errToast = document.createElement('div');
-                  errToast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-red-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-                  errToast.textContent = '⨯ Signature required to establish secure tunnel';
-                  document.body.appendChild(errToast);
-                  setTimeout(() => errToast.remove(), 3000);
-                  return;
-              }
-
-              await fetch(`/api/auth/qr-session?id=${sessionId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ address: address, signature, message }),
-              });
-              
-              pendingToast.remove();
-              
-              const toast = document.createElement('div');
-              toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-              toast.textContent = '✓ Desktop Terminal Unlocked';
-              document.body.appendChild(toast);
-              setTimeout(() => toast.remove(), 3000);
-            }
-          } catch(e) {
-            console.error('Invalid QR URL', e);
-          }
+        signMessageAsync={signMessageAsync}
+        onScan={(_result: string) => {
+          // The /api/auth/qr-session handshake + EIP-191 signature is completed
+          // atomically inside QRScannerModal.handleSuccess before this fires.
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+          toast.textContent = '✓ Desktop Terminal Unlocked';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3000);
         }}
       />
 
@@ -988,26 +950,36 @@ export function MobileLanding() {
     }
   }, [isLinked]);
 
-  // ── QR session fulfillment (desktop scan) ────────────────────────────────────
+  // ── QR session fulfillment when user arrives via ?session= param ─────────────
+  // This handles: desktop generated QR → user scanned on mobile → mobile redirected
+  // with ?session=ID → mobile is now logged in and needs to confirm the handshake.
   useEffect(() => {
     if (!isLinked || !address || !sessionParam) return;
     const key = `fulfilled_session_${sessionParam}`;
     if (sessionStorage.getItem(key)) return;
-    fetch(`/api/auth/qr-session?id=${sessionParam}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address }),
-    }).then(res => {
-      if (res.ok) {
-        sessionStorage.setItem(key, 'true');
-        const t = document.createElement('div');
-        t.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
-        t.textContent = '✓ Desktop Terminal Unlocked';
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 4000);
-      }
-    }).catch(() => {});
-  }, [isLinked, address, sessionParam]);
+
+    // Sign then fulfill — API requires EIP-191 proof
+    const message = `Authorize Sovereign Terminal Access for session: ${sessionParam}\nAddress: ${address}\nTimestamp: ${Date.now()}`;
+    signMessageAsync({ message })
+      .then((signature) =>
+        fetch(`/api/auth/qr-session?id=${sessionParam}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address, signature, message }),
+        })
+      )
+      .then(res => {
+        if (res.ok) {
+          sessionStorage.setItem(key, 'true');
+          const t = document.createElement('div');
+          t.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';
+          t.textContent = '✓ Desktop Terminal Unlocked';
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 4000);
+        }
+      })
+      .catch(() => {}); // Non-blocking — user already authenticated, this is convenience sync
+  }, [isLinked, address, sessionParam]); // signMessageAsync intentionally omitted — stable wagmi ref
 
 
 
