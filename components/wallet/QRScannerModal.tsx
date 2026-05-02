@@ -263,39 +263,59 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     
     // Cookie fallback
     if (!addr && typeof document !== 'undefined') {
-      const match = document.cookie.match(new RegExp('(^| )sovereign_session=([^;]+)'));
+      const match = document.cookie.match(new RegExp('(^| )sovereign_handshake=([^;]+)'));
       if (match) {
-        try { addr = JSON.parse(decodeURIComponent(match[2])).address; } catch {}
+        addr = match[2];
       }
     }
 
     try {
-      const url       = new URL(decodedText);
-      const sessionId = url.searchParams.get('session');
+      // 1. Parse QR Data
+      const { uuid, ephemeralPub } = JSON.parse(decodedText);
+      if (!uuid || !ephemeralPub) throw new Error('Invalid Sovereign QR');
 
-      if (sessionId && addr) {
-        // The API validates identity via sovereign_handshake cookie if no signature is provided
-        const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ address: addr }),
-        });
-        if (!res.ok) {
-          setErrMsg('Handshake failed. Refresh the QR code on your desktop terminal.');
-          setStatus('error');
-          hasScannedRef.current = false; // allow retry
-          return;
-        }
-        
-        setStatus('success');
-      } else if (!addr) {
-        setErrMsg('Connect your wallet before scanning.');
+      // 2. Obtener JWT desde servidor (HttpOnly protegido)
+      const exportRes = await fetch('/api/auth/export-jwt', { credentials: 'include' });
+      if (!exportRes.ok) {
+        setErrMsg('Not authenticated on mobile.');
+        setStatus('error');
+        hasScannedRef.current = false;
+        return;
+      }
+      const { jwt } = await exportRes.json();
+
+      // 3. Generar ephemeral keypair del mobile y derivar shared secret con X25519
+      const { generateX25519KeyPair, deriveSharedSecret, encryptAESGCM } = await import('@/lib/web-crypto');
+      const pair = await generateX25519KeyPair();
+      const shared = await deriveSharedSecret(pair.privateKey, ephemeralPub);
+      
+      // 4. Encriptar el JWT con AES-GCM
+      const { encryptedPayload, iv, tag } = await encryptAESGCM(shared, jwt);
+
+      // 5. Enviar al backend junto con el mobilePub para que el desktop pueda desencriptar
+      const res = await fetch('/api/auth/qr-session', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ uuid, encryptedPayload, iv, tag, mobilePub: pair.publicKey }),
+        credentials: 'include',
+      });
+      
+      if (!res.ok) {
+        setErrMsg('Handshake failed. Refresh the QR code on your desktop terminal.');
         setStatus('error');
         hasScannedRef.current = false; // allow retry
         return;
       }
-    } catch {
+      
+      setStatus('success');
+
+    } catch (e) {
+      console.error(e);
       // Non-handshake QR — pass through anyway
+      setStatus('error');
+      setErrMsg('Invalid QR code format for Sovereign Handshake.');
+      hasScannedRef.current = false;
+      return;
     }
 
     onScanRef.current?.(decodedText);

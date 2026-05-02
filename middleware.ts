@@ -134,9 +134,19 @@ export default async function middleware(request: NextRequest) {
     // 2. [CRITICAL] Distributed Rate Limiting for /api (Upstash sliding window)
     if (pathname.startsWith('/api')) {
       try {
-        const planCookie = request.cookies.get('plan_tier')?.value;
-        const internalHeader = request.headers.get('x-sovereign-tier') ?? undefined;
-        const tier = resolveTier(planCookie, internalHeader);
+        let tier = 'FREE';
+        const address = request.cookies.get('sovereign_handshake')?.value;
+        if (address && typeof address === 'string' && address.startsWith('0x')) {
+           const { safeRedisGet } = await import('./lib/redis/client');
+           const cached = await safeRedisGet(`tier:${address.toLowerCase()}`);
+           if (cached) {
+               try {
+                   const data = JSON.parse(cached);
+                   if (data.tier) tier = data.tier;
+               } catch(e) {}
+           }
+        }
+
         const limitCheck = await checkRateLimit(ip, tier);
         if (!limitCheck.success) {
           console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
@@ -197,20 +207,18 @@ export default async function middleware(request: NextRequest) {
 
     // Validate SIWE JWT from human_session cookie
     let siweSessionValid = false;
+    let userTier = 'FREE'; // Default tier
     const humanSessionCookie = request.cookies.get('human_session')?.value;
     if (humanSessionCookie) {
       try {
-        const { jwtVerify } = await import('jose');
-        const rawSecret = process.env.JWT_SECRET;
-        if (!rawSecret) {
-          console.error('[WhaleFortress:CRITICAL] JWT_SECRET not set. All session cookies treated as invalid.');
-          siweSessionValid = false;
-        } else {
-          const JWT_KEY = new TextEncoder().encode(rawSecret);
-          await jwtVerify(humanSessionCookie, JWT_KEY);
-          siweSessionValid = true;
+        const { verifyJWT } = await import('./lib/jwt');
+        const payload = await verifyJWT(humanSessionCookie);
+        siweSessionValid = true;
+        if (payload.tier) {
+          userTier = payload.tier as string;
         }
-      } catch {
+      } catch (err) {
+        // console.error('[WhaleFortress] JWT validation failed', err);
         siweSessionValid = false;
       }
     }
@@ -323,6 +331,8 @@ export default async function middleware(request: NextRequest) {
       'Permissions-Policy': 'camera=(self), microphone=(), geolocation=(), payment=(self)',
       'Expect-CT': 'enforce, max-age=86400',
       'X-Permitted-Cross-Domain-Policies': 'none',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
     };
 
     const isInternalRoute = matchesPattern(pathname, PROTECTED_PATTERNS) || pathname.startsWith('/api');
