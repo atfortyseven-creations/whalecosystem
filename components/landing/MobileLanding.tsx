@@ -533,9 +533,8 @@ function ConnectedScreen({
         isOpen={showScanner}
         onClose={onCloseScanner}
         address={address}
-        signMessageAsync={signMessageAsync}
         onScan={(_result: string) => {
-          // The /api/auth/qr-session handshake + EIP-191 signature is completed
+          // The /api/auth/qr-session handshake is completed
           // atomically inside QRScannerModal.handleSuccess before this fires.
           const toast = document.createElement('div');
           toast.className = 'fixed top-6 left-4 right-4 z-[99999] bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest px-5 py-4 rounded-2xl shadow-xl text-center';

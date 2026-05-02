@@ -10,7 +10,6 @@ interface QRScannerModalProps {
   onClose: () => void;
   onScan?: (data: string) => void;
   address?: string;
-  signMessageAsync?: any;
 }
 
 // ─── css injected once into <head> so it never re-runs ───────────────────────
@@ -209,7 +208,7 @@ function ScannedOverlay() {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress, signMessageAsync }: QRScannerModalProps) {
+export default function QRScannerModal({ isOpen, onClose, onScan, address: externalAddress }: QRScannerModalProps) {
   const { address } = useAccount();
 
   const [status, setStatus]   = useState<'idle' | 'scanning' | 'success' | 'error' | 'signing'>('idle');
@@ -275,44 +274,11 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
       const sessionId = url.searchParams.get('session');
 
       if (sessionId && addr) {
-        let signature: string | undefined;
-        let message: string | undefined;
-
-        if (signMessageAsync) {
-          try {
-            setStatus('signing');
-            
-            message = [
-              '═══════════════════════════════',
-              '  Whale Alert Network',
-              '  SOVEREIGN ACCESS PROTOCOL',
-              '═══════════════════════════════',
-              '',
-              `Identity: ${addr.toLowerCase()}`,
-              `Nonce: ${Date.now()}`,
-              `Network: WHALE_TERMINAL_V4`,
-              '',
-              'By signing you confirm that',
-              'you are the sole owner of this',
-              'address and authorize access',
-              'to the institutional terminal.',
-              '═══════════════════════════════',
-            ].join('\n');
-
-            signature = await signMessageAsync({ message });
-          } catch (e) {
-            setErrMsg('Signature rejected. Please try again.');
-            setStatus('error');
-            hasScannedRef.current = false;
-            return;
-          }
-        }
-
-        // The API validates identity via the signature if provided, else falls back to cookie.
+        // The API validates identity via sovereign_handshake cookie if no signature is provided
         const res = await fetch(`/api/auth/qr-session?id=${sessionId}`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ address: addr, signature, message }),
+          body:    JSON.stringify({ address: addr }),
         });
         if (!res.ok) {
           setErrMsg('Handshake failed. Refresh the QR code on your desktop terminal.');
@@ -528,22 +494,6 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   <AnimatePresence>
                     {status === 'success' && <ScannedOverlay />}
                   </AnimatePresence>
-
-                  {/* Signing overlay */}
-                  {status === 'signing' && (
-                    <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center gap-4">
-                      <Shield size={30} className="mx-auto text-red-400 opacity-60" />
-                      <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">
-                        SIGNATURE REQUIRED TO ESTABLISH THE SECURE TUNNEL. PLEASE APPROVE IN YOUR WALLET.
-                      </p>
-                      <button
-                        onClick={handleRetry}
-                        className="text-[9px] font-black uppercase tracking-[0.2em] px-5 py-2.5 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors"
-                      >
-                        Retry
-                      </button>
-                    </div>
-                  )}
 
                   {/* Error overlay */}
                   {status === 'error' && (
