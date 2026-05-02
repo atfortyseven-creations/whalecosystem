@@ -10,7 +10,7 @@ import {
   Lock, ExternalLink, Activity, Network, Hash, Focus,
   Clock, CheckCircle, Orbit, PenTool, ShieldCheck, X, ScanFace, FileSignature, Globe, Cpu, Zap
 } from 'lucide-react';
-import { useUIStore } from '@/lib/store/ui-store';
+import { useRouter } from 'next/navigation';
 
 // ── Contract Params ───────────────────────────────────────────────────────────
 const MAX_SUPPLY = 200;
@@ -343,7 +343,7 @@ const VerifiedLedger = React.memo(function VerifiedLedger({ feed }: { feed: any[
 export function VossSupremacyPanel() {
   const { address, isConnected, isSovereignHandshake } = useSovereignAccount();
   const { isConnected: isWagmiConnected } = useAccount();
-  const { openConnectModal } = useUIStore();
+  const router = useRouter();
   const { signMessage, isPending: isSigning } = useSignMessage();
   const [dbStats, setDbStats] = useState<any>(null);
   const [signatureData, setSignatureData] = useState<string>("");
@@ -371,12 +371,12 @@ export function VossSupremacyPanel() {
   }, [fetchStats]);
 
   const handleMint = useCallback(async () => {
-    if (!isConnected) { openConnectModal(); return; }
+    if (!isConnected) { router.push('/connect'); return; }
     if (!isWagmiConnected) {
       toast.error('Local web3 validation required', {
         description: 'Your current session is passive. Full connection required for ticket allocation.',
       });
-      openConnectModal();
+      router.push('/connect');
       return;
     }
 
@@ -430,7 +430,7 @@ export function VossSupremacyPanel() {
         }
       }
     );
-  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, openConnectModal, fetchStats, isWagmiConnected]);
+  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats, isWagmiConnected]);
 
   const hasTicket = dbStats?.ticket || false;
 

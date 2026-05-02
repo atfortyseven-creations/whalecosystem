@@ -24,10 +24,7 @@ const BillionWhaleNotification = dynamic(
   () => import('@/components/shared/UtilityPanels').then(m => ({ default: m.BillionWhaleNotification })),
   { ssr: false }
 );
-const ConnectWalletModal = dynamic(
-  () => import('@/components/shared/ConnectWalletModal').then(m => ({ default: m.ConnectWalletModal })),
-  { ssr: false }
-);
+
 const LinkedGate = dynamic(
   () => import('@/components/shared/LinkedGate').then(m => ({ default: m.LinkedGate })),
   { ssr: false }
@@ -259,7 +256,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <ConnectWalletModal />
 
       <TitaniumGate>
         {!pathname.startsWith('/news') && <UniversalEliteWallpaper />}

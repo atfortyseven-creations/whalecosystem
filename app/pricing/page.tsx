@@ -1,229 +1,256 @@
-import React from 'react';
-import Link from 'next/link';
+"use client";
+
+import React, { useState } from 'react';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock } from 'lucide-react';
+import { useUIStore } from '@/lib/store/ui-store';
 
 const PRICING_TIERS = [
   {
-    id: 'free',
-    name: 'Sovereign Free',
+    id: 'starter',
+    name: 'Sovereign Starter',
     price: '$0',
-    target: 'Viral X / Retail',
-    credits: '2,500',
-    multiplier: '1.5x (Max)',
+    billing: 'Free Forever',
+    target: 'Individuals & Researchers',
+    description: 'Perfect for getting started with the Sovereign platform and exploring the core network intelligence.',
     features: [
-      'Refresh data: 5 min',
-      'Neo4j Hops: Max 2',
-      'Humanity Multiplier: Up to 1.5x',
-      'Sovereign Forum: Read Only',
-      'Alerts: None'
-    ]
+      'Basic Network Access',
+      'Standard Refresh Rate (5 min)',
+      'Read-Only Access to Core Data',
+      'Standard Community Support',
+      'Basic Identity Verification'
+    ],
+    buttonText: 'Initialize Free Access'
   },
   {
     id: 'pro',
-    name: 'Sovereign Pro',
+    name: 'Sovereign Professional',
     price: '$59',
-    billing: '$49/mo billed annually (17% off)',
-    target: 'Traders / Builders',
-    credits: '8,000',
-    multiplier: '3.0x (Max)',
-    extra: '$0.012 per extra credit',
+    billing: 'per user / month',
+    target: 'Traders & Analysts',
+    description: 'Advanced telemetry and real-time intelligence for professionals who need actionable insights.',
     highlight: true,
     features: [
-      'Refresh data: Real-time SSE',
-      'Neo4j Hops: Up to 5',
-      'Humanity Multiplier: Up to 3.0x',
-      'Sovereign Forum: Read + Signed Write',
-      'Alerts: Up to 15 (Telegram/Discord)'
-    ]
+      'Real-Time Data Streaming',
+      'Advanced Network Queries',
+      'Full Read & Write Access',
+      'Priority Customer Support',
+      'Advanced Security Analytics',
+      'Up to 15 Custom Alerts'
+    ],
+    buttonText: 'Upgrade to Professional'
   },
   {
-    id: 'elite',
-    name: 'Sovereign Elite',
+    id: 'Elite',
+    name: 'Sovereign Enterprise',
     price: '$199',
-    billing: '$159/mo billed annually (20% off)',
-    target: 'KOLs / Small Institutions',
-    credits: '30,000',
-    multiplier: '4.0x (Max)',
-    extra: '$0.009 per extra credit',
+    billing: 'per user / month',
+    target: 'Institutions & Funds',
+    description: 'Maximum performance, unlimited scaling, and elite support for institutional market operators.',
     features: [
-      'Refresh data: Real-time + WS',
-      'Neo4j Hops: Unlimited (7+)',
-      'Humanity Multiplier: Up to 4.0x',
-      'Sovereign Forum: Featured + Bounties',
-      'Alerts: Unlimited + Webhooks'
-    ]
+      'Unrestricted Data Firehose',
+      'Unlimited Complex Queries',
+      'Dedicated Account Manager',
+      'API & Webhook Integration',
+      'Unlimited Custom Alerts',
+      'Custom SLA & Compliance'
+    ],
+    buttonText: 'Contact Enterprise Sales'
   }
 ];
 
-const CONSUMPTION_MATRIX = [
-  { action: 'Login / sovereign_handshake', cost: '0', reason: 'Zero friction access' },
-  { action: 'Basic Query (Postgres)', cost: '1', reason: 'Standard ledger reads' },
-  { action: 'Live WebSocket (1 min)', cost: '2', reason: 'Singleton reference counting' },
-  { action: 'Z-Score Anomaly & EVM Thermo', cost: '6', reason: 'Heavy computation' },
-  { action: 'Multi-Hop Neo4j (3-7 hops)', cost: '8-12', reason: 'Graph traversal (Memory Matrix)' },
-  { action: 'Post in Sovereign Forum', cost: '-15', reason: 'Network effects reward' }
+const PLATFORM_BENEFITS = [
+  {
+    title: 'Institutional Grade Security',
+    description: 'Cryptographically secured architecture ensuring your data and identity remain uncompromised.',
+    icon: <Lock size={20} className="text-[#050505]" />
+  },
+  {
+    title: 'Real-Time Telemetry',
+    description: 'Zero-latency data processing powered by our advanced distributed network infrastructure.',
+    icon: <Zap size={20} className="text-[#050505]" />
+  },
+  {
+    title: 'Immutable Ledger',
+    description: 'All transactions and verifications are permanently recorded on our high-speed sovereign ledger.',
+    icon: <Database size={20} className="text-[#050505]" />
+  }
 ];
 
 export default function PricingPage() {
+  const { isConnected, address } = useSovereignAccount();
+  const router = useRouter();
+  const { openConnectModal } = useUIStore();
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  const handleSubscribe = async (planId: string) => {
+    if (!isConnected) {
+      toast.error('Authentication Required', {
+        description: 'Please connect your identity to access the billing portal.',
+      });
+      router.push('/connect');
+      return;
+    }
+
+    if (planId === 'starter') {
+      toast.success('Starter Access Verified', {
+        description: 'You are already authenticated with basic access.',
+      });
+      router.push('/dashboard');
+      return;
+    }
+
+    setLoadingTier(planId);
+    const toastId = toast.loading('Initializing secure payment gateway...');
+
+    try {
+      const response = await fetch('/api/payment/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId,
+          userEmail: '', // Handled by Stripe
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initialize payment');
+      }
+
+      toast.success('Gateway secured. Redirecting...', { id: toastId });
+      
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error('Subscription error:', error);
+      toast.error('Transaction Failed', {
+        id: toastId,
+        description: error.message || 'There was an issue processing your request. Please try again.',
+      });
+    } finally {
+      setLoadingTier(null);
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-[#FDFCF8] text-[#050505] selection:bg-black selection:text-[#FDFCF8] font-sans antialiased overflow-x-hidden pt-32 pb-24">
-      <div className="w-full max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-16">
+    <div className="min-h-screen bg-[#FDFCF8] text-[#050505] font-sans selection:bg-[#050505] selection:text-[#FDFCF8] pt-28 pb-24">
+      <div className="w-full max-w-6xl mx-auto px-6">
         
-        {/* ─── Header ─── */}
-        <header className="flex flex-col gap-6 text-center mb-4">
-          <div className="flex justify-center mb-2">
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black/5 border border-black/10 backdrop-blur-sm cursor-default">
-              <span className="text-[11px] font-medium uppercase tracking-widest text-black/80 font-mono">Sovereign Credits V4.0</span>
-            </div>
+        {/* ── Header ── */}
+        <header className="flex flex-col items-center text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 border border-black/10 mb-6">
+            <Shield size={14} className="text-[#050505]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#050505]">Sovereign Network Pricing</span>
           </div>
-          <h1 className="text-[40px] md:text-[56px] font-sans font-medium text-black leading-[1.1] tracking-tight">
-            Absolute Sovereignty.
-            <br className="hidden md:block"/>
-            <span className="font-serif italic font-light text-black/60"> Cryptographically Signed.</span>
+          
+          <h1 className="text-4xl md:text-6xl font-medium tracking-tight text-[#050505] mb-6 max-w-4xl">
+            Institutional Intelligence.<br className="hidden md:block" />
+            <span className="text-black/40">Accessible for everyone.</span>
           </h1>
-          <p className="font-serif text-[16px] text-[#444] max-w-2xl mx-auto leading-[1.8] mt-4">
-            Nansen charges you to read. Dune charges you to query. We reward you to exist. 
-            Your cryptographic signature is your membership. Read the matrix before the market does.
+          
+          <p className="text-base md:text-lg text-[#050505]/60 max-w-2xl leading-relaxed">
+            Choose the access level that aligns with your operational requirements. From individual research to full-scale enterprise deployments.
           </p>
         </header>
 
-        {/* ─── Pricing Tiers ─── */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* ── Pricing Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-24">
           {PRICING_TIERS.map((tier) => (
             <div 
-              key={tier.id} 
-              className={`flex flex-col rounded-2xl border transition-all duration-300 relative ${
+              key={tier.id}
+              className={`relative flex flex-col rounded-3xl transition-all duration-300 ${
                 tier.highlight 
-                  ? 'bg-black border-black text-[#FDFCF8] shadow-2xl scale-[1.02] z-10' 
-                  : 'bg-[#fdfbf6] border-black/10 hover:border-black/30'
+                  ? 'bg-[#050505] text-[#FDFCF8] shadow-2xl scale-105 z-10' 
+                  : 'bg-white border border-[#E5E5E5] text-[#050505] hover:border-black/30'
               }`}
             >
               {tier.highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#00C076] text-black px-4 py-1 rounded-full font-mono text-[9px] font-bold uppercase tracking-widest">
-                  Terminal Standard
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-[#050505] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md">
+                  Recommended
                 </div>
               )}
-              
-              <div className="p-8 border-b border-white/10">
-                <h3 className={`font-mono text-[12px] font-bold uppercase tracking-widest mb-6 ${tier.highlight ? 'text-[#00C076]' : 'text-black/60'}`}>
+
+              <div className="p-8 border-b border-black/5">
+                <h3 className={`text-[12px] font-bold uppercase tracking-widest mb-2 ${tier.highlight ? 'text-white/60' : 'text-black/50'}`}>
                   {tier.name}
                 </h3>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className={`text-[48px] font-sans font-medium leading-none ${tier.highlight ? 'text-white' : 'text-black'}`}>
+                <div className="flex items-end gap-2 mb-4">
+                  <span className={`text-5xl font-medium tracking-tighter ${tier.highlight ? 'text-white' : 'text-black'}`}>
                     {tier.price}
                   </span>
-                  <span className={`font-mono text-[12px] uppercase tracking-widest ${tier.highlight ? 'text-white/40' : 'text-black/40'}`}>
-                    / mo
+                  <span className={`text-[12px] font-medium pb-1 ${tier.highlight ? 'text-white/50' : 'text-black/40'}`}>
+                    {tier.billing}
                   </span>
                 </div>
-                {tier.billing && (
-                  <p className={`font-mono text-[10px] uppercase tracking-widest mt-2 ${tier.highlight ? 'text-white/60' : 'text-black/50'}`}>
-                    {tier.billing}
-                  </p>
-                )}
-                
-                <div className="mt-8 flex flex-col gap-3">
-                  <div className={`flex items-center justify-between p-3 rounded-lg ${tier.highlight ? 'bg-white/5' : 'bg-black/5'}`}>
-                    <span className="font-mono text-[10px] uppercase tracking-widest opacity-70">Base Credits</span>
-                    <span className="font-mono text-[12px] font-bold">{tier.credits}</span>
-                  </div>
-                  <div className={`flex items-center justify-between p-3 rounded-lg ${tier.highlight ? 'bg-[#00C076]/10 text-[#00C076]' : 'bg-black/5 text-black'}`}>
-                    <span className="font-mono text-[10px] uppercase tracking-widest opacity-80">Humanity Multiplier</span>
-                    <span className="font-mono text-[12px] font-bold">{tier.multiplier}</span>
-                  </div>
-                </div>
+                <p className={`text-[13px] leading-relaxed ${tier.highlight ? 'text-white/70' : 'text-black/60'}`}>
+                  {tier.description}
+                </p>
               </div>
 
               <div className="p-8 flex-1 flex flex-col">
-                <ul className="flex flex-col gap-4 mb-8 flex-1">
-                  {tier.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${tier.highlight ? 'bg-[#00C076]' : 'bg-black/40'}`} />
-                      <span className={`font-serif text-[14px] leading-relaxed ${tier.highlight ? 'text-white/80' : 'text-[#444]'}`}>
+                <ul className="flex flex-col gap-4 flex-1 mb-8">
+                  {tier.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <CheckCircle2 size={18} className={`shrink-0 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]'}`} />
+                      <span className={`text-[14px] leading-snug ${tier.highlight ? 'text-white/90' : 'text-[#050505]'}`}>
                         {feature}
                       </span>
                     </li>
                   ))}
                 </ul>
-                <button 
-                  className={`w-full py-4 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest transition-all ${
-                    tier.highlight 
-                      ? 'bg-[#00C076] text-black hover:bg-[#00d683]' 
-                      : 'bg-black/5 text-black hover:bg-black hover:text-white'
+
+                <button
+                  onClick={() => handleSubscribe(tier.id)}
+                  disabled={loadingTier === tier.id}
+                  className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all ${
+                    tier.highlight
+                      ? 'bg-white text-[#050505] hover:bg-[#FDFCF8] hover:scale-[1.02]'
+                      : 'bg-[#050505] text-white hover:bg-[#1A1A1A] hover:scale-[1.02]'
                   }`}
                 >
-                  {tier.id === 'free' ? 'Initialize Handshake' : 'Upgrade Protocol'}
+                  {loadingTier === tier.id ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <>
+                      {tier.buttonText}
+                      <ArrowRight size={14} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
           ))}
-        </section>
+        </div>
 
-        {/* ─── Humanity Ledger Engine ─── */}
-        <section className="flex flex-col md:flex-row items-stretch overflow-hidden rounded-2xl border border-black/10 bg-[#fdfbf6] shadow-sm mt-8">
-          <div className="w-full md:w-[380px] bg-black text-[#FDFCF8] flex flex-col justify-center p-10 shrink-0 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#00C076]/20 to-transparent rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-            <h3 className="font-sans text-[28px] font-medium mb-4 text-white relative z-10">
-              The Humanity Ledger
-            </h3>
-            <p className="font-serif text-[15px] leading-[1.8] text-white/70 relative z-10">
-              Our ultimate anti-sybil engine. Your cryptographic reputation dictates your power. 
-              The more you verify, post, and analyze natively, the higher your multiplier scales. 
-              Lock-in is no longer a credit card; it is your identity.
+        {/* ── Platform Benefits ── */}
+        <section className="bg-white rounded-3xl border border-[#E5E5E5] p-10 md:p-16">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-medium tracking-tight text-[#050505] mb-4">
+              Enterprise-Grade Architecture
+            </h2>
+            <p className="text-[#050505]/60 max-w-2xl mx-auto">
+              Our platform is built from the ground up to support high-frequency operations, providing unparalleled reliability and security for our institutional clients.
             </p>
           </div>
-          <div className="flex-1 p-10 flex flex-col justify-center bg-white">
-            <h4 className="font-mono text-[11px] font-bold uppercase tracking-widest text-black/40 mb-6">Multiplier Matrix</h4>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-black/5 pb-4">
-                <span className="font-serif text-[15px] text-[#222]">Score 0 - 30 (Verified Sybil)</span>
-                <span className="font-mono text-[13px] font-bold text-black/60">1.0x Base</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-black/5 pb-4">
-                <span className="font-serif text-[15px] text-[#222]">Score 31 - 65 (Active Operator)</span>
-                <span className="font-mono text-[13px] font-bold text-black/80">2.0x Boost</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-black/5 pb-4">
-                <span className="font-serif text-[15px] text-[#222]">Score 66 - 85 (Sovereign Node)</span>
-                <span className="font-mono text-[13px] font-bold text-[#00C076]">3.0x Boost</span>
-              </div>
-              <div className="flex items-center justify-between pt-2">
-                <span className="font-serif text-[15px] font-bold text-black">Score 86 - 100 (Elite Architect)</span>
-                <span className="font-mono text-[14px] font-black text-[#00C076]">4.0x Max Yield</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* ─── Credit Consumption ─── */}
-        <section className="flex flex-col relative w-full pt-8 mb-8">
-          <div className="w-full pb-4 mb-6 flex items-end justify-between border-b border-black/10">
-            <h2 className="text-[20px] font-medium font-sans text-black">
-              Zero-Simulation Metering
-            </h2>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-black/40">BullMQ Atomic Validation</span>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b-[1.5px] border-black">
-                  <th className="py-4 px-2 font-mono text-[11px] font-bold uppercase tracking-widest text-black/50">Execution Payload</th>
-                  <th className="py-4 px-2 font-mono text-[11px] font-bold uppercase tracking-widest text-black/50">Cost (Credits)</th>
-                  <th className="py-4 px-2 font-mono text-[11px] font-bold uppercase tracking-widest text-black/50">Architectural Justification</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CONSUMPTION_MATRIX.map((item, idx) => (
-                  <tr key={idx} className="border-b border-black/10 hover:bg-black/5 transition-colors">
-                    <td className="py-5 px-2 font-sans text-[15px] font-medium text-black">{item.action}</td>
-                    <td className={`py-5 px-2 font-mono text-[13px] font-bold ${item.cost.startsWith('-') ? 'text-[#00C076]' : 'text-black'}`}>
-                      {item.cost}
-                    </td>
-                    <td className="py-5 px-2 font-serif text-[14px] text-[#555]">{item.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {PLATFORM_BENEFITS.map((benefit, idx) => (
+              <div key={idx} className="flex flex-col items-center text-center p-6 rounded-2xl bg-[#FAF9F6] border border-[#E5E5E5]">
+                <div className="w-12 h-12 rounded-xl bg-white border border-[#E5E5E5] flex items-center justify-center mb-4 shadow-sm">
+                  {benefit.icon}
+                </div>
+                <h3 className="text-base font-medium text-[#050505] mb-2">{benefit.title}</h3>
+                <p className="text-[13px] text-[#050505]/60 leading-relaxed">
+                  {benefit.description}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 

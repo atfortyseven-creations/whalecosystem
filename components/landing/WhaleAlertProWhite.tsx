@@ -341,7 +341,6 @@ export function WhaleAlertProWhite() {
   // Wallet integration
   const router = useRouter();
   const { isConnected } = useAccount();
-  const openConnectModal = useUIStore(s => s.openConnectModal);
 
   React.useEffect(() => { setMounted(true); }, []);
 
@@ -350,9 +349,9 @@ export function WhaleAlertProWhite() {
     if (isConnected) {
       router.push('/dashboard');
     } else {
-      openConnectModal();
+      router.push('/connect');
     }
-  }, [isConnected, router, openConnectModal]);
+  }, [isConnected, router]);
 
   React.useEffect(() => {
     const update = () => setCurrentTime(new Date().toISOString().slice(11, 19) + " UTC");

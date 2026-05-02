@@ -200,7 +200,7 @@ export default function ConnectPage() {
           setSyncStatus("SYNCED");
           clearInterval(poll);
           document.cookie = `sovereign_handshake=${data.address}; path=/; max-age=604800; SameSite=Lax`;
-          setTimeout(() => window.location.replace("/"), 50);
+          setTimeout(() => router.replace("/"), 50);
         }
       } catch (err: any) {
         if (err.name !== 'AbortError') console.error(err);
@@ -231,7 +231,7 @@ export default function ConnectPage() {
       // Removed premature cookie writing here.
       // The sovereign_handshake cookie MUST be set by the LinkedGate signature step,
       // NOT immediately upon connection. This ensures the user sees the "Sign the contract" screen.
-      window.location.replace("/");
+      router.replace("/");
     };
 
     const enforceRedirect = () => {
@@ -250,7 +250,7 @@ export default function ConnectPage() {
           } else if (attempts >= 75) {
             // 15s timeout: redirect anyway, the '/' page will read the wagmi store
             clearInterval(waitForAddress);
-            window.location.replace("/");
+            router.replace("/");
           }
         }, 200);
       }
@@ -480,13 +480,12 @@ export default function ConnectPage() {
                   </div>
 
                   <div className="mt-8">
-                    <a
-                      href="/"
+                    <button
                       className="text-[9px] font-black uppercase tracking-widest text-[#050505]/40 hover:text-[#050505] underline decoration-dotted underline-offset-4 transition-colors"
-                      onClick={(e) => { e.preventDefault(); window.location.href = "/"; }}
+                      onClick={(e) => { e.preventDefault(); router.replace("/"); }}
                     >
                       Click here if not redirected automatically
-                    </a>
+                    </button>
                   </div>
                 </motion.div>
 
