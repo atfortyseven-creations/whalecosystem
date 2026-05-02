@@ -26,12 +26,15 @@ export default function CareersPage() {
         
         <header className="flex flex-col gap-6 text-center mb-0">
           <h1 className="text-[36px] md:text-[48px] font-serif text-black leading-[1.1] tracking-tight">
-            Whale Alert <br/><span className="italic font-light">Network</span>
+            Whale Alert Network <br/><span className="italic font-light text-black/60">Jobs</span>
           </h1>
           <div className="flex justify-center mt-2 mb-2">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black border border-black/10">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] shadow-[0_0_8px_#00C076] animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#FDFCF8]">WE ARE HIRING!</span>
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-black/5 hover:bg-black/10 border border-black/10 transition-colors duration-300 backdrop-blur-sm cursor-default">
+              <div className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </div>
+              <span className="text-[11px] font-medium uppercase tracking-widest text-black/80 font-mono">We are hiring</span>
             </div>
           </div>
           <p className="font-serif text-[14px] text-[#444] max-w-xl mx-auto leading-[1.8] border-t border-b border-black/10 py-6 mt-4">
@@ -40,23 +43,23 @@ export default function CareersPage() {
         </header>
 
         {/* ─── Culture Pillars ─── */}
-        <section className="flex flex-col relative w-full mb-0">
-          <div className="w-full border-b-[1.5px] border-black pb-3 mb-6 flex items-end">
-            <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-              The Sovereign Protocol — Core Philosophy
+        <section className="flex flex-col relative w-full mb-4 pt-4">
+          <div className="w-full pb-4 mb-8 flex items-end justify-between border-b border-black/10">
+            <h2 className="text-[18px] font-medium font-sans text-black">
+              Core Philosophy
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[1px] bg-black border border-black shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {CULTURE_PILLARS.map((pillar) => (
-              <div key={pillar.id} className="bg-[#fdfbf6] p-6 hover:bg-[#f5f4ef] transition-colors duration-300 flex flex-col gap-4">
-                <span className="font-mono text-[24px] font-black tracking-tighter text-black/20">
-                  {pillar.id}.
+              <div key={pillar.id} className="flex flex-col gap-3 group">
+                <span className="font-mono text-[14px] font-medium text-black/30 group-hover:text-[#00C076] transition-colors duration-300">
+                  {pillar.id}
                 </span>
                 <div className="flex flex-col gap-2">
-                  <h3 className="font-mono text-[10px] font-black uppercase tracking-widest text-black">
+                  <h3 className="font-sans text-[20px] font-medium text-black">
                     {pillar.title}
                   </h3>
-                  <p className="font-serif text-[12px] text-[#333] leading-[1.8] text-justify">
+                  <p className="font-serif text-[14px] text-[#444] leading-[1.8]">
                     {pillar.text}
                   </p>
                 </div>
@@ -66,65 +69,76 @@ export default function CareersPage() {
         </section>
 
         {/* ─── Perimeter Defense & Engineering (Context) ─── */}
-        <section className="flex flex-col relative w-full mb-4">
-           <div className="flex flex-col sm:flex-row items-stretch gap-[1px] bg-black border border-black shadow-sm">
-             <div className="w-full sm:w-[280px] bg-[#111] text-[#FDFCF8] flex flex-col justify-center p-8 shrink-0">
-               <h3 className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] mb-4 text-[#D4AF37]">
+        <section className="flex flex-col relative w-full mb-8 pt-8">
+           <div className="flex flex-col sm:flex-row items-stretch overflow-hidden rounded-2xl border border-black/10 bg-[#fdfbf6] shadow-sm">
+             <div className="w-full sm:w-[320px] bg-black text-[#FDFCF8] flex flex-col justify-center p-8 sm:p-10 shrink-0 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/10 to-transparent rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+               <h3 className="font-sans text-[24px] font-medium mb-4 text-white relative z-10">
                  Engineering the Abyss
                </h3>
-               <p className="font-serif text-[12px] leading-[1.8] text-white/70 text-justify">
-                 Our technical perimeter extends from deep mempool parsing to cross-chain liquidity reconstruction. We do not hire standard developers; we seek cryptographic architects capable of reading the matrix.
+               <p className="font-serif text-[14px] leading-[1.8] text-white/70 relative z-10">
+                 Our technical perimeter extends from deep mempool parsing to cross-chain liquidity reconstruction. We seek cryptographic architects capable of reading the matrix.
                </p>
              </div>
-             <div className="flex-1 bg-[#fdfbf6] p-8 flex flex-col justify-center">
-                <ul className="flex flex-col gap-6">
-                  <li className="flex items-start gap-4">
-                    <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mt-1">01</span>
-                    <p className="font-serif text-[13px] text-[#222] leading-relaxed"><strong>Unmatched Autonomy:</strong> Operate with elite tactical freedom. You dictate your execution flow.</p>
+             <div className="flex-1 p-8 sm:p-10 flex flex-col justify-center">
+                <ul className="flex flex-col gap-8">
+                  <li className="flex items-start gap-5">
+                    <span className="font-mono text-[12px] font-medium text-black/30 mt-1">01</span>
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-sans text-[16px] font-medium text-black">Unmatched Autonomy</h4>
+                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Operate with elite tactical freedom. You dictate your execution flow.</p>
+                    </div>
                   </li>
-                  <li className="flex items-start gap-4">
-                    <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mt-1">02</span>
-                    <p className="font-serif text-[13px] text-[#222] leading-relaxed"><strong>Top-Tier Compensation:</strong> Base salaries positioned in the 95th percentile, strictly paid in stablecoins or fiat per preference.</p>
+                  <li className="flex items-start gap-5">
+                    <span className="font-mono text-[12px] font-medium text-black/30 mt-1">02</span>
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-sans text-[16px] font-medium text-black">Top-Tier Compensation</h4>
+                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Base salaries positioned in the 95th percentile, strictly paid in stablecoins or fiat per preference.</p>
+                    </div>
                   </li>
-                  <li className="flex items-start gap-4">
-                    <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 mt-1">03</span>
-                    <p className="font-serif text-[13px] text-[#222] leading-relaxed"><strong>Institutional Reach:</strong> Your architecture will directly index the portfolios of the largest global sovereign funds and entities.</p>
+                  <li className="flex items-start gap-5">
+                    <span className="font-mono text-[12px] font-medium text-black/30 mt-1">03</span>
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-sans text-[16px] font-medium text-black">Institutional Reach</h4>
+                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Your architecture will directly index the portfolios of the largest global sovereign funds and entities.</p>
+                    </div>
                   </li>
                 </ul>
              </div>
            </div>
         </section>
 
-        {/* ─── Active Mandates ─── */}
-        <section className="flex flex-col relative w-full">
-          <div className="w-full border-b-[1.5px] border-black pb-3 mb-6 flex items-end justify-between">
-            <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
-              Active Mandates
+        {/* ─── Open Positions ─── */}
+        <section className="flex flex-col relative w-full pt-8">
+          <div className="w-full pb-4 mb-4 flex items-end justify-between border-b border-black/10">
+            <h2 className="text-[18px] font-medium font-sans text-black">
+              Open Positions
             </h2>
-            <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/40">
-              1 Open Position
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-md bg-black/5 text-black/60 text-[10px] font-bold font-mono uppercase tracking-widest">
+                1 Role
+              </span>
+            </div>
           </div>
           
-          <div className="flex flex-col gap-[1px] bg-black border border-black shadow-sm">
-            <Link href="/careers/web3-educator" className="bg-[#fdfbf6] flex flex-col sm:flex-row items-stretch group overflow-hidden focus:outline-none cursor-pointer hover:bg-[#f5f4ef] transition-colors duration-300">
-              <div className="w-full sm:w-[160px] bg-[#f5f4ef] group-hover:bg-[#eceae3] border-b sm:border-b-0 sm:border-r border-black/10 flex flex-col items-center justify-center p-6 shrink-0 transition-colors duration-300">
-                <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-black/50 mb-2">REMOTE</span>
-                <span className="font-mono text-[10px] font-black tracking-widest text-[#0066FF] opacity-80 group-hover:opacity-100 transition-opacity">GLOBAL</span>
-              </div>
-              <div className="flex-1 p-6 md:p-8 flex flex-col justify-center">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-[10px] font-black uppercase tracking-widest text-black">
-                    Senior Web3 Educator
-                  </span>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/40 bg-black/5 px-2 py-0.5 border border-black/10">
-                    FULL-TIME
-                  </span>
-                </div>
-                <p className="font-serif text-[13px] text-[#333] leading-[1.8] text-justify max-w-lg">
-                  Architect the educational perimeter of the Sovereign Terminal. Translate complex zero-knowledge proofs, on-chain intelligence heuristics, and decentralized finance paradigms into accessible mastery.
-                </p>
-              </div>
+          <div className="flex flex-col">
+            <Link href="/careers/web3-educator" className="group flex flex-col sm:flex-row sm:items-center justify-between py-6 px-5 -mx-5 rounded-xl hover:bg-black/5 transition-all duration-300">
+               <div className="flex flex-col gap-2">
+                 <h3 className="font-sans text-[20px] font-medium text-black group-hover:text-[#00C076] transition-colors">Senior Web3 Educator</h3>
+                 <div className="flex items-center gap-3 font-mono text-[11px] text-black/50 uppercase tracking-widest">
+                   <span>Education</span>
+                   <span>·</span>
+                   <span>Remote</span>
+                   <span>·</span>
+                   <span>Global</span>
+                 </div>
+               </div>
+               <div className="mt-4 sm:mt-0 flex items-center gap-5">
+                 <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-black/40">Full-Time</span>
+                 <span className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center text-black/30 group-hover:bg-black group-hover:border-black group-hover:text-white transition-all duration-300">
+                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                 </span>
+               </div>
             </Link>
           </div>
         </section>
