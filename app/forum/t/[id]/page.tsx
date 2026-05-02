@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistanceToNowStrict, format } from 'date-fns';
 import { useSignMessage } from 'wagmi';
+import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 
 export default function TopicPage() {
   const { id } = useParams();
@@ -14,18 +15,14 @@ export default function TopicPage() {
   const [submitting, setSubmitting]     = useState(false);
   const [replyError, setReplyError]     = useState('');
   const [replyDraftSaved, setReplyDraftSaved] = useState(false);
-  const [sessionAddress, setSessionAddress] = useState<string | null>(null);
   const { signMessageAsync } = useSignMessage();
   const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<string | null>(null);
+  
+  const { address } = useSovereignAccount();
+  const sessionAddress = address?.toLowerCase() || null;
 
   // Draft persistence key is scoped per topic so different threads have independent drafts
   const replyDraftKey = id ? `forum_draft_reply_${id}` : null;
-
-  // Read current user's address from cookie (client-side)
-  useEffect(() => {
-    const match = document.cookie.match(/sovereign_handshake=([^;]+)/);
-    if (match) setSessionAddress(match[1].toLowerCase());
-  }, []);
 
   // Restore reply draft on mount (after topic id is known)
   useEffect(() => {
@@ -75,9 +72,21 @@ export default function TopicPage() {
         return;
       }
 
+      let csrfToken = '';
+      try {
+          const csrfRes = await fetch('/api/auth/csrf', {
+              headers: { 'x-web3-address': sessionAddress || '' }
+          });
+          csrfToken = (await csrfRes.json()).token;
+      } catch (e) {}
+
       const res = await fetch('/api/forum/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-csrf-token': csrfToken,
+          'x-web3-address': sessionAddress || ''
+        },
         body: JSON.stringify({ topicId: id, content: finalContent }),
       });
       if (res.ok) {
@@ -98,7 +107,22 @@ export default function TopicPage() {
 
   const deleteTopic = async () => {
     setDeleteConfirmTarget(null);
-    const res = await fetch(`/api/forum/topics/${id}`, { method: 'DELETE' });
+    
+    let csrfToken = '';
+    try {
+        const csrfRes = await fetch('/api/auth/csrf', {
+            headers: { 'x-web3-address': sessionAddress || '' }
+        });
+        csrfToken = (await csrfRes.json()).token;
+    } catch (e) {}
+
+    const res = await fetch(`/api/forum/topics/${id}`, { 
+      method: 'DELETE',
+      headers: {
+        'x-csrf-token': csrfToken,
+        'x-web3-address': sessionAddress || ''
+      }
+    });
     if (res.ok) router.push('/forum');
     else setReplyError('COULD NOT TERMINATE TOPIC');
   };
@@ -348,9 +372,21 @@ function PostRow({
 
   const handleLike = async () => {
     try {
+      let csrfToken = '';
+      try {
+          const csrfRes = await fetch('/api/auth/csrf', {
+              headers: { 'x-web3-address': sessionAddress || '' }
+          });
+          csrfToken = (await csrfRes.json()).token;
+      } catch (e) {}
+
       const res = await fetch('/api/forum/likes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-csrf-token': csrfToken,
+          'x-web3-address': sessionAddress || ''
+        },
         body: JSON.stringify(type === 'topic' ? { topicId: entity.id } : { postId: entity.id }),
       });
       if (res.ok) { setLiked(l => !l); onLike(); }
@@ -361,10 +397,24 @@ function PostRow({
     setConfirmingDelete(false);
     setDeleting(true);
     try {
+      let csrfToken = '';
+      try {
+          const csrfRes = await fetch('/api/auth/csrf', {
+              headers: { 'x-web3-address': sessionAddress || '' }
+          });
+          csrfToken = (await csrfRes.json()).token;
+      } catch (e) {}
+
       const endpoint = type === 'topic'
         ? `/api/forum/topics/${entity.id}`
         : `/api/forum/posts/${entity.id}`;
-      const res = await fetch(endpoint, { method: 'DELETE' });
+      const res = await fetch(endpoint, { 
+        method: 'DELETE',
+        headers: {
+          'x-csrf-token': csrfToken,
+          'x-web3-address': sessionAddress || ''
+        }
+      });
       if (res.ok) onDeleted();
       else alert('Could not delete.');
     } catch {
