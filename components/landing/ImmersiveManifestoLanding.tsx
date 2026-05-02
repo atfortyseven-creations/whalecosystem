@@ -173,7 +173,7 @@ const RIGHT_SIDEBAR_CONTENT = [
   }
 ];
 
-export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: () => void }) {
+export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { onOpenScanner?: () => void, hideMap?: boolean }) {
   
   return (
     <div className="relative min-h-screen bg-[#FDFCF8] text-[#050505] selection:bg-black selection:text-[#FDFCF8] font-sans antialiased overflow-x-hidden">
@@ -189,9 +189,11 @@ export function ImmersiveManifestoLanding({ onOpenScanner }: { onOpenScanner?: (
           </div>
 
           {/* Map Container */}
-          <div className="relative w-full h-[35vh] sm:h-[45vh] lg:h-[55vh] max-h-[600px] min-h-[300px] overflow-hidden rounded-3xl border border-black/10 bg-[#f8f7f2] shadow-sm mb-6 flex items-center justify-center">
-             <WorldMapBackground />
-          </div>
+          {!hideMap && (
+            <div className="relative w-full h-[35vh] sm:h-[45vh] lg:h-[55vh] max-h-[600px] min-h-[300px] overflow-hidden rounded-3xl border border-black/10 bg-[#f8f7f2] shadow-sm mb-6 flex items-center justify-center">
+               <WorldMapBackground />
+            </div>
+          )}
 
           {/* Legend directly underneath */}
           <div className="w-full">

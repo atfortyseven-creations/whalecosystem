@@ -398,7 +398,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6]/96 backdrop-blur-2xl overflow-y-auto py-10"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6] overflow-y-auto py-10"
         >
           {/* Close button */}
           <button

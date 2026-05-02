@@ -164,6 +164,35 @@ model User {
   apiKeys            ApiKey[]
   watchedWallets     WatchedWallet[]
   exchangePositions  ExchangePosition[]
+
+  // Sovereign Credits & Humanity Ledger (SaaS V4.0)
+  creditsBalance     Int             @default(2500)
+  humanityScore      Int             @default(0)
+  creditLedgers      CreditLedger[]
+  humanityEvents     HumanityEvent[]
+}
+
+model CreditLedger {
+  id          String   @id @default(uuid())
+  userId      String
+  amount      Int      // Negative for usage, positive for top-up
+  action      String   // E.g., 'NEO4J_QUERY', 'Z_SCORE_THERMO'
+  description String?
+  timestamp   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, timestamp(sort: Desc)])
+}
+
+model HumanityEvent {
+  id          String   @id @default(uuid())
+  userId      String
+  eventType   String   // E.g., 'EIP191_SIGNATURE', 'FORUM_POST'
+  points      Int
+  timestamp   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, timestamp(sort: Desc)])
 }
 
 model ApiKey {

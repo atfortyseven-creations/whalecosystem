@@ -81,7 +81,6 @@ const DynamicQRScannerModal = dynamic(
 );
 
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
-import { WorldMapBackground } from "./WorldMapBackground";
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const IVORY = "#FAF9F6";
@@ -1128,7 +1127,7 @@ export function MobileLanding() {
           </button>
         </motion.header>
 
-        <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} />
+        <ImmersiveManifestoLanding onOpenScanner={() => setShowConnectOverlay(true)} hideMap={true} />
       </div>
     );
   }
@@ -1140,9 +1139,8 @@ export function MobileLanding() {
       {/* Layer 0: ivory base */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
 
-      {/* Layer 1: cosmic pattern and globe */}
+      {/* Layer 1: Cosmic pattern background */}
       <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
-        <WorldMapBackground />
         <motion.div
           className="absolute"
           style={{ inset: "-20%", backgroundImage: "url('/patron-cosmico-4k.png')", backgroundSize: "140%", backgroundRepeat: "repeat", opacity: 0.045 }}

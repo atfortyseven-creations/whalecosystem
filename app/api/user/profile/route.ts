@@ -34,7 +34,8 @@ export async function GET(req: NextRequest) {
         where: { walletAddress },
         select: { 
           id: true, walletAddress: true, displayName: true, avatarUrl: true, bio: true, isPro: true, tier: true,
-          theme: true, currency: true, language: true, displayUnit: true, gasPreset: true, mevProtection: true, stealthMode: true
+          theme: true, currency: true, language: true, displayUnit: true, gasPreset: true, mevProtection: true, stealthMode: true,
+          creditsBalance: true, humanityScore: true
         }
       });
     } catch {
