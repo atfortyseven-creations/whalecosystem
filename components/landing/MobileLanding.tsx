@@ -667,6 +667,7 @@ export function MobileLanding() {
   // setInterval captures variables at creation time (stale closure). Without a ref,
   // the poll would never see wagmiAddress updating when wagmi hydrates from cookies.
   const wagmiAddressRef = useRef<string | undefined>(undefined);
+  const isSigningRef = useRef(false);
   useEffect(() => { wagmiAddressRef.current = wagmiAddress; }, [wagmiAddress]);
   // Tracks active polling interval so onFocusRecheck can cancel previous runs
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -734,6 +735,9 @@ export function MobileLanding() {
   // ─────────────────────────────────────────────────────────────────────────────
   const establishSession = useCallback(async (addr: string) => {
     if (isLinked) return;
+    if (isSigningRef.current) return;
+    
+    isSigningRef.current = true;
     try { rkCloseModal(); } catch {}
     const norm = addr.toLowerCase();
 
@@ -744,6 +748,8 @@ export function MobileLanding() {
         signature = await signMessageAsync({ message });
     } catch (e) {
         console.warn('User rejected signature, falling back to read-only UI');
+        isSigningRef.current = false;
+        return; // Prevent further execution if signature fails
     }
 
     document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
@@ -763,6 +769,9 @@ export function MobileLanding() {
     setShowFallbackBtn(false);
     // Clear the pending wakeup flag — session is now established.
     try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
+    
+    // Unlock signing state
+    isSigningRef.current = false;
     // Stay on /connect — user stays here and accesses the QR scanner
   }, [isLinked, signMessageAsync]);
 

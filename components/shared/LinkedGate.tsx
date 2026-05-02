@@ -117,7 +117,7 @@ const PC_WALLETS: PCWallet[] = [
 ];
 
 // ─── SIGN CONTRACT OVERLAY ──────────────────────────────────────────────────
-function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; onDisconnect: () => void }) {
+export function SignContractStep({ onSigned, onDisconnect }: { onSigned: () => void; onDisconnect: () => void }) {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { reconnect } = useReconnect();
