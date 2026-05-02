@@ -312,7 +312,7 @@ export function GoldTicketPanel() {
     if (!isConnected) { router.push('/connect'); return; }
 
     // If user has only a cookie/QR session, they have no wagmi connector → cannot sign
-    if (!isWagmiConnected) {
+    if (!isWagmiConnected && !isSovereignHandshake) {
       toast.error('Wallet connection required for signing', {
         description: 'Your current session cannot sign transactions. Click to connect a Web3 wallet (MetaMask, WalletConnect, or Google Auth).',
         duration: 6000,
@@ -328,50 +328,58 @@ export function GoldTicketPanel() {
     if (isMinting || isSigning) return;
 
     setIsMinting(true);
-    const toastId = toast.loading('Awaiting wallet signature...');
 
-    signMessage(
-      { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
-      {
-        onSuccess: async (cryptoSignature: string) => {
-          toast.dismiss(toastId);
-          const t2 = toast.loading('Encoding Institutional Identity...');
-          try {
-            const res = await fetch('/api/golden-ticket/claim', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                walletAddress: address,
-                cryptoSignature,
-                signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
-              })
-            });
-            toast.dismiss(t2);
-            const json = await res.json();
-            if (res.ok) {
-              toast.success('Access Granted — Welcome to the Genesis Ledger ✓');
-              fetchStats();
-            } else if (res.status === 409) {
-              toast.info('You already hold a Genesis Ticket.');
-              fetchStats();
-            } else {
-              toast.error(`Mint failed: ${json.error || 'Unknown server error'}`);
-            }
-          } catch (e) {
-            toast.dismiss(t2);
-            toast.error('Server error saving your ticket. Try again.');
-          } finally {
+    const performClaim = async (cryptoSig?: string) => {
+      const t2 = toast.loading('Encoding Institutional Identity...');
+      try {
+        const res = await fetch('/api/golden-ticket/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            walletAddress: address,
+            cryptoSignature: cryptoSig,
+            signatureData: JSON.stringify({ signature: signatureData, timestamp: new Date().toISOString() })
+          })
+        });
+        toast.dismiss(t2);
+        const json = await res.json();
+        if (res.ok) {
+          toast.success('Access Granted — Welcome to the Genesis Ledger ✓');
+          fetchStats();
+        } else if (res.status === 409) {
+          toast.info('You already hold a Genesis Ticket.');
+          fetchStats();
+        } else {
+          toast.error(`Mint failed: ${json.error || 'Unknown server error'}`);
+        }
+      } catch (e) {
+        toast.dismiss(t2);
+        toast.error('Server error saving your ticket. Try again.');
+      } finally {
+        setIsMinting(false);
+      }
+    };
+
+    if (isSovereignHandshake && !isWagmiConnected) {
+      performClaim(); // Bypass Wagmi signMessage, backend will auth via session cookie
+    } else {
+      const toastId = toast.loading('Awaiting wallet signature...');
+      signMessage(
+        { message: `WHALE ALERT NETWORK GOLD ACCESS: ${address}` },
+        {
+          onSuccess: async (cryptoSignature: string) => {
+            toast.dismiss(toastId);
+            await performClaim(cryptoSignature);
+          },
+          onError: (err: any) => {
+            toast.dismiss(toastId);
+            toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
             setIsMinting(false);
           }
-        },
-        onError: (err: any) => {
-          toast.dismiss(toastId);
-          toast.error(`Signature failed: ${err?.shortMessage || err?.message || 'User rejected or wallet error'}`);
-          setIsMinting(false);
         }
-      }
-    );
-  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats]);
+      );
+    }
+  }, [isConnected, isWagmiConnected, isSovereignHandshake, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats]);
 
   const hasTicket = dbStats?.ticket || false;
 

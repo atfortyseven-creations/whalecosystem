@@ -47,7 +47,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
     { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
 
-    { id: 'news',         label: 'Live News',         icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel', externalUrl: 'https://www.humanidfi.com/news' },
+    { id: 'news',         label: 'Live News',         icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel' },
     { id: 'sov-intel',    label: 'Sovereign Intel',   icon: <BookOpen size={17}/>,  externalUrl: 'https://www.humanidfi.com/sovereign-intel' },
     { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
 
@@ -335,7 +335,7 @@ export function WhaleProShell({
             )}
         </AnimatePresence>
 
-        <div className={`flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] opacity-5 pointer-events-none' : ''}`}>
+        <div className={`flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
 
             
             {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
