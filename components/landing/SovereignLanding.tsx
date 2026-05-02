@@ -128,7 +128,6 @@ function ParticleBackground() {
 export function SovereignLanding() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const openConnectModal = useUIStore(s => s.openConnectModal);
   const { isConnected, connector } = useSovereignAccount();
   
   useEffect(() => { setMounted(true); }, []);
@@ -177,7 +176,7 @@ export function SovereignLanding() {
                </button>
              </div>
           ) : (
-            <button onClick={() => openConnectModal()} className="relative group overflow-hidden rounded-lg">
+            <button onClick={() => router.push('/connect')} className="relative group overflow-hidden rounded-lg">
                <div className="absolute inset-0 bg-gradient-to-r from-[#00f5ff] to-[#9f00ff] opacity-80 group-hover:opacity-100 transition-opacity" />
                <div className="relative h-9 px-6 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest text-white border border-white/10 rounded-lg group-hover:border-transparent transition-colors">
                   <Fingerprint size={14} /> Connect Identity
@@ -300,7 +299,7 @@ export function SovereignLanding() {
                        {connector?.id || 'Connected'} / 0xSOVEREIGN...
                      </div>
                    ) : (
-                     <button onClick={() => openConnectModal()} className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
+                     <button onClick={() => router.push('/connect')} className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors">
                        Initialize Identity
                      </button>
                    )}

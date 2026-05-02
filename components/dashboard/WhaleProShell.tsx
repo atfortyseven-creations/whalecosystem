@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-import { useUIStore } from '@/lib/store/ui-store';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useMarketStream } from '@/context/MarketStreamContext';
 import { GlobalCommandPalette } from '@/components/ui/GlobalCommandPalette';
@@ -224,7 +224,7 @@ export function WhaleProShell({
     const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const { setSettingsOpen, autoDisconnectTimer, stealthMode } = useSettingsStore();
-    const { openConnectModal } = useUIStore();
+    const router = useRouter();
     const { disconnect } = useDisconnect();
 
     const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
@@ -282,7 +282,7 @@ export function WhaleProShell({
                     description: "You must connect a wallet to access execution and forensic layers.",
                     duration: 4000
                 });
-                openConnectModal();
+                router.push('/connect');
                 return;
             }
         }

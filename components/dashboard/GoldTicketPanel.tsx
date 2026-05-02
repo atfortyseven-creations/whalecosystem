@@ -14,7 +14,7 @@ import {
   Clock, CheckCircle2, Flame, PenTool, ShieldCheck, ArrowRight
 } from 'lucide-react';
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
-import { useUIStore } from '@/lib/store/ui-store';
+import { useRouter } from 'next/navigation';
 
 // ── Contract ──────────────────────────────────────────────────────────────────
 const CONTRACT = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
@@ -286,7 +286,7 @@ function GlobalLedger({ feed }: { feed: any[] }) {
 export function GoldTicketPanel() {
   const { address, isConnected, chainId, isSovereignHandshake } = useSovereignAccount();
   const { isConnected: isWagmiConnected } = useAccount(); // Real wagmi connector state
-  const { openConnectModal } = useUIStore();
+  const router = useRouter();
   const { switchChain } = useSwitchChain();
   const { signMessage, isPending: isSigning } = useSignMessage();
   const [dbStats, setDbStats] = useState<any>(null);
@@ -309,7 +309,7 @@ export function GoldTicketPanel() {
   }, [fetchStats]);
 
   const handleMint = useCallback(async () => {
-    if (!isConnected) { openConnectModal(); return; }
+    if (!isConnected) { router.push('/connect'); return; }
 
     // If user has only a cookie/QR session, they have no wagmi connector → cannot sign
     if (!isWagmiConnected) {
@@ -317,7 +317,7 @@ export function GoldTicketPanel() {
         description: 'Your current session cannot sign transactions. Click to connect a Web3 wallet (MetaMask, WalletConnect, or Google Auth).',
         duration: 6000,
       });
-      openConnectModal();
+      router.push('/connect');
       return;
     }
 
@@ -371,7 +371,7 @@ export function GoldTicketPanel() {
         }
       }
     );
-  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, openConnectModal, fetchStats]);
+  }, [isConnected, signatureData, isMinting, isSigning, address, signMessage, router, fetchStats]);
 
   const hasTicket = dbStats?.ticket || false;
 
