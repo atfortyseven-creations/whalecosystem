@@ -8,5 +8,13 @@ export async function GET(req: NextRequest) {
   const data = await safeRedisGet(`qr-session:${uuid}`);
   if (!data) return NextResponse.json({ pending: true });
   
-  return NextResponse.json(JSON.parse(data));
+  if (data === "TIMEOUT") {
+    return NextResponse.json({ error: "TIMEOUT" }, { status: 408 });
+  }
+
+  try {
+    return NextResponse.json(JSON.parse(data));
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid session data' }, { status: 500 });
+  }
 }

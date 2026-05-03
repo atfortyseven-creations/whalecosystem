@@ -43,8 +43,10 @@ export class BlockchainService {
       
       // Elite-grade Fallback Provider
       // Connects to multiple RPCs and switches automatically if one fails.
-      const providers = config.rpcUrls.map((url, index) => ({
-        provider: new ethers.JsonRpcProvider(url, undefined, { staticNetwork: true }),
+      const validUrls = config.rpcUrls.filter(url => url && url.length > 5 && !url.includes('undefined'));
+      
+      const providers = validUrls.map((url, index) => ({
+        provider: new ethers.JsonRpcProvider(url, config.chainId, { staticNetwork: true }),
         priority: index + 1, // Higher priority for Alchemy/Primary
         stallTimeout: index === 0 ? 500 : 2000,
       }));

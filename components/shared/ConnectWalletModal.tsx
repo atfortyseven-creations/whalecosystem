@@ -14,7 +14,7 @@ export function ConnectWalletModal() {
     const { connect, connectors } = useConnect();
     const { open: openAppKit } = useAppKit();
     const [view, setView] = useState<'selection' | 'qr' | 'ledger'>('selection');
-    const [qrSession, setQrSession] = useState<string | null>(null);
+    const [qrData, setQrData] = useState<string | null>(null);
     const [isPolling, setIsPolling] = useState(false);
     const [ledgerLoading, setLedgerLoading] = useState(false);
 
@@ -26,7 +26,7 @@ export function ConnectWalletModal() {
         if (!isConnectModalOpen) {
             setTimeout(() => {
                 setView('selection');
-                setQrSession(null);
+                setQrData(null);
                 setIsPolling(false);
                 setLedgerLoading(false);
             }, 300);
@@ -80,14 +80,19 @@ export function ConnectWalletModal() {
         setView('qr');
         setIsPolling(true);
         try {
-            const res = await fetch('/api/auth/qr-session', { method: 'POST' });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.sessionId) {
-                    setQrSession(data.sessionId);
-                    sessionStorage.setItem('pending_qr_session', data.sessionId);
-                }
-            }
+            const { generateX25519KeyPair } = await import('@/lib/web-crypto');
+            const pair = await generateX25519KeyPair();
+            const sessId = typeof crypto !== 'undefined' && crypto.randomUUID 
+                ? crypto.randomUUID() 
+                : (Math.random().toString(36).substring(2, 15) + Date.now().toString(36));
+            
+            const payload = JSON.stringify({ 
+                uuid: sessId, 
+                ephemeralPub: pair.publicKey, 
+                isECDH: pair.isECDH, 
+                expires: Date.now() + 300000 
+            });
+            setQrData(payload);
         } catch (e) {
             console.error('Failed to get QR session', e);
             setIsPolling(false);
@@ -232,9 +237,9 @@ export function ConnectWalletModal() {
                                     </div>
 
                                     <div className="relative p-6 bg-white border border-[#050505]/10 rounded-[32px] shadow-sm">
-                                            {qrSession ? (
+                                            {qrData ? (
                                                 <QRCodeSVG 
-                                                    value={`${window.location.origin}/connect?session=${qrSession}`}
+                                                    value={qrData}
                                                     size={200}
                                                     level="H"
                                                     bgColor="#FFFFFF"
