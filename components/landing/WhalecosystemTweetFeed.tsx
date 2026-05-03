@@ -130,11 +130,11 @@ export function WhalecosystemTweetFeed({
               <Twitter size={14} className="text-[#1d9bf0]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[11px] font-black uppercase tracking-widest text-white/80">
+              <span className={`text-[11px] font-black uppercase tracking-widest ${theme === 'dark' ? 'text-white/80' : 'text-black/80'}`}>
                 @whalecosystem
               </span>
-              <span className="text-[9px] font-mono text-[#00f5ff]/60 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-[#00f5ff] animate-pulse inline-block" />
+              <span className={`text-[9px] font-mono flex items-center gap-1 ${theme === 'dark' ? 'text-[#00f5ff]/60' : 'text-[#1d9bf0]/80'}`}>
+                <span className={`w-1 h-1 rounded-full animate-pulse inline-block ${theme === 'dark' ? 'bg-[#00f5ff]' : 'bg-[#1d9bf0]'}`} />
                 Live Feed
               </span>
             </div>
@@ -143,20 +143,20 @@ export function WhalecosystemTweetFeed({
             {status === "error" && (
               <button
                 onClick={() => setRetryCount(c => c + 1)}
-                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                className={`p-1.5 rounded-lg border transition-colors ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white/40' : 'bg-black/5 hover:bg-black/10 border-black/10 text-black/40'}`}
                 title="Retry loading tweets"
               >
-                <RefreshCw size={11} className="text-white/40" />
+                <RefreshCw size={11} className="currentColor" />
               </button>
             )}
             <a
               href="https://twitter.com/whalecosystem"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-[#1d9bf0]/20 border border-white/10 hover:border-[#1d9bf0]/30 transition-all"
+              className={`p-1.5 rounded-lg border transition-all ${theme === 'dark' ? 'bg-white/5 hover:bg-[#1d9bf0]/20 border-white/10 hover:border-[#1d9bf0]/30 text-white/40' : 'bg-black/5 hover:bg-[#1d9bf0]/10 border-black/10 hover:border-[#1d9bf0]/30 text-black/40'}`}
               title="Open @whalecosystem on Twitter"
             >
-              <ExternalLink size={11} className="text-white/40 hover:text-[#1d9bf0]" />
+              <ExternalLink size={11} className="hover:text-[#1d9bf0] currentColor" />
             </a>
           </div>
         </div>
@@ -164,7 +164,7 @@ export function WhalecosystemTweetFeed({
 
       {/* ── Widget Container ── */}
       <div
-        className="relative flex-1 rounded-xl overflow-hidden border border-white/5 bg-black/20"
+        className={`relative flex-1 rounded-xl overflow-hidden border ${theme === 'dark' ? 'border-white/5 bg-black/20' : 'border-black/5 bg-[#FDFCF8]'}`}
         style={{ minHeight: height }}
       >
         {/* Loading overlay */}
@@ -175,24 +175,24 @@ export function WhalecosystemTweetFeed({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-black/40 backdrop-blur-sm"
+              className={`absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 backdrop-blur-sm ${theme === 'dark' ? 'bg-black/40' : 'bg-white/60'}`}
             >
               {/* Skeleton tweet lines */}
               <div className="flex flex-col gap-3 w-full px-4">
                 {[0.9, 0.7, 0.8, 0.6, 0.75].map((w, i) => (
                   <div key={i} className="flex flex-col gap-1.5">
                     <div
-                      className="h-2 rounded-full bg-white/10 animate-pulse"
+                      className={`h-2 rounded-full animate-pulse ${theme === 'dark' ? 'bg-white/10' : 'bg-black/10'}`}
                       style={{ width: `${w * 100}%`, animationDelay: `${i * 0.1}s` }}
                     />
                     <div
-                      className="h-2 rounded-full bg-white/[0.06] animate-pulse"
+                      className={`h-2 rounded-full animate-pulse ${theme === 'dark' ? 'bg-white/[0.06]' : 'bg-black/[0.06]'}`}
                       style={{ width: `${(w - 0.15) * 100}%`, animationDelay: `${i * 0.1 + 0.05}s` }}
                     />
                   </div>
                 ))}
               </div>
-              <span className="text-[9px] font-mono uppercase tracking-widest text-white/30 mt-2">
+              <span className={`text-[9px] font-mono uppercase tracking-widest mt-2 ${theme === 'dark' ? 'text-white/30' : 'text-black/30'}`}>
                 Loading feed…
               </span>
             </motion.div>

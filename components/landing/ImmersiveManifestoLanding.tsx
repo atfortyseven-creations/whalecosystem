@@ -3,6 +3,7 @@
 import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
 import { Scan } from "lucide-react";
+import { WhalecosystemTweetFeed } from "./WhalecosystemTweetFeed";
 import { WorldMapBackground, BtcTransferLegend } from "./WorldMapBackground";
 
 // Pre-defined list of lottie files matching the narrative sections.
@@ -299,6 +300,18 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
 
         {/* ─── Strategic, Legal & Business Framework ─── */}
         <StrategicCorporateDocumentation />
+
+        {/* ─── Live Twitter Feed ─── */}
+        <section className="w-full max-w-[850px] shrink-0 pt-4 pb-0 flex flex-col gap-6">
+          <div className="border-b-[1.5px] border-black pb-3 mb-0 flex items-end">
+            <h2 className="text-[12px] font-bold font-mono tracking-[0.2em] uppercase text-black">
+              Live Intelligence — @whalecosystem
+            </h2>
+          </div>
+          <div className="bg-[#fdfbf6] border border-black shadow-sm p-4 w-full">
+            <WhalecosystemTweetFeed theme="light" height={600} />
+          </div>
+        </section>
 
         </main>
 
