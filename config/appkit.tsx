@@ -60,6 +60,7 @@ const worldchain: AppKitNetwork = {
     caipNetworkId: 'eip155:480',
     chainNamespace: 'eip155',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+    rpcUrls: {
         default: { http: [process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : "https://worldchain-mainnet.g.alchemy.com/public"] }
     },
     blockExplorers: {

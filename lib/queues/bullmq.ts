@@ -42,7 +42,7 @@ const stripeWorker = new Worker('stripe-webhook', async (job) => {
           tier: planId.toUpperCase(),
           stripeCustomerId: customerId as string,
           stripeSubscriptionId: subscriptionId as string,
-        },
+        } as any,
       });
 
       // Update Redis cache & emit mesh bus event
@@ -73,7 +73,7 @@ const stripeWorker = new Worker('stripe-webhook', async (job) => {
         data: {
           tier: 'FREE',
           stripeSubscriptionId: null,
-        },
+        } as any,
       });
       
       await redisClient.setex(`tier:${dbUser.walletAddress}`, 600, 'FREE');
