@@ -151,32 +151,35 @@ sequenceDiagram
     end
 ```
 
-### 6. Mobile-Desktop Session Synchronization
-Through an intricate mesh of Server-Sent Events (SSE) elegantly coupled with WebSockets, we empower a QR code scan on an external wallet device to unequivocally hydrate the desktop environment in a matter of milliseconds.
+### 6. Mobile-Desktop Session Synchronization (X25519 QR Mesh)
+Through an intricate Zero-Trust QR Mesh handshake, we execute an ephemeral X25519 key exchange coupled with AES-GCM encryption. A QR code scan on an external wallet device securely tunnels the EIP-191 signature back to the desktop without exposing payloads to Man-in-the-Middle (MitM) attacks, unequivocally hydrating the desktop environment in milliseconds.
 
 ```mermaid
 sequenceDiagram
     participant Mobile Wallet
     participant Redis Cluster
     participant Desktop Terminal
-    Desktop Terminal->>Redis Cluster: Request QR Session Lock
-    Redis Cluster-->>Desktop Terminal: Session ID & SSE Connection
-    Mobile Wallet->>Redis Cluster: Submit EIP-191 Signed Payload
-    Redis Cluster->>Desktop Terminal: Emit 'SESSION_SYNCED'
-    Desktop Terminal->>Desktop Terminal: Atomic Redirection to Dashboard
+    Desktop Terminal->>Desktop Terminal: Generate Ephemeral X25519 Keypair
+    Desktop Terminal->>Redis Cluster: Request QR Session Lock (Pub Key)
+    Redis Cluster-->>Desktop Terminal: Session UUID & SSE Connection
+    Mobile Wallet->>Redis Cluster: Read Pub Key & Generate Shared Secret
+    Mobile Wallet->>Redis Cluster: Submit AES-GCM Encrypted EIP-191 Payload
+    Redis Cluster->>Desktop Terminal: Emit Encrypted 'SESSION_SYNCED'
+    Desktop Terminal->>Desktop Terminal: Decrypt Payload & Atomic Redirection
 ```
 
-### 7. Cryptographic Message Signatures (EIP-191)
-We enforce the validation of asynchronous handshakes via EIP-191 signatures, guaranteeing that the user holds absolute sovereignty over their private key without necessitating the execution of a monetary on-chain transaction.
+### 7. EdDSA Asymmetric Session Issuance (Ed25519)
+We enforce the validation of asynchronous handshakes via EIP-191 signatures and subsequently mint session JWTs using Ed25519 (EdDSA) asymmetric cryptography. By deprecating legacy symmetric HS256 algorithms, our Edge middleware mathematically guarantees session integrity without ever risking secret key exposure.
 
 ```mermaid
 graph TD
     A[Raw Auth String] --> B[Prefix: \x19Ethereum Signed Message:\n]
     B --> C[Keccak256 Hash]
-    C --> D[Secp256k1 Signature via Wallet]
-    D --> E{ECDSA Recover}
-    E -->|Matches Public Key| F[Verified]
-    E -->|Mismatch| G[Rejected]
+    C --> D[Secp256k1 Signature via Mobile Wallet]
+    D --> E{ECDSA ecrecover}
+    E -->|Matches Public Key| F[Mint EdDSA JWT Session]
+    E -->|Mismatch| G[Rejected & Logged]
+    F --> H[Edge Middleware verifyJWT]
 ```
 
 ### 8. State Reconciliation and Persistence (Redis)
@@ -262,16 +265,18 @@ graph LR
     C -->|Undefined| F[Fallback WalletConnect QR]
 ```
 
-### 14. Institutional Session Persistence (`sovereign_handshake`)
-The `sovereign_handshake` cookie cryptographically enshrines the session within a `SameSite=Lax` context. Ergo, should iOS or Android arbitrarily suspend the Chrome tab in the background, the identity is instantaneously resurrected upon bringing the process back to the foreground, sparing the user from an exhausting re-signature process.
+### 14. Institutional Session Persistence & Middleware Hardening
+The `sovereign_handshake` cookie cryptographically enshrines the session within a `SameSite=Lax` context. Furthermore, our Edge Middleware dynamically extracts the user's `tier` from the EdDSA JWT to enforce instantaneous Redis-backed rate-limiting. The perimeter is fortified with extreme Cross-Origin-Opener-Policy (COOP) and Cross-Origin-Embedder-Policy (COEP) headers, neutralizing spectrum and isolation attacks.
 
 ```mermaid
 flowchart TD
-    AppBackground[OS Suspends App] --> RAM[RAM Frozen]
-    RAM --> AppForeground[OS Resumes App]
-    AppForeground --> ReadCookie[Read SameSite Cookie]
-    ReadCookie -->|Signature Valid| Resume[Resume WebSocket]
-    ReadCookie -->|Expired| Prompt[Request Silent Re-Auth]
+    AppForeground[OS Resumes App / Request Made] --> ReadCookie[Read SameSite Cookie]
+    ReadCookie -->|EdDSA Signature Valid| ExtractTier[Extract User Tier]
+    ExtractTier --> RateLimit{Redis Rate Limit Check}
+    RateLimit -->|Under Limit| InjectHeaders[Inject COOP/COEP Headers]
+    RateLimit -->|Exceeded| Drop[429 Too Many Requests]
+    InjectHeaders --> Render[Render Protected Route]
+    ReadCookie -->|Expired/Invalid| Prompt[Force Re-Auth / 401]
 ```
 
 ---
@@ -393,14 +398,17 @@ graph LR
 
 ## Phase VI: Distributed Communications Network
 
-### 23. The Sovereign Forum
-A digital agora for P2P communication, fundamentally devoid of centralized user databases. Moderation and identity derivation are inextricably linked to the cryptographically proven ownership of the *wallet*.
+### 23. The Sovereign Forum & MiCA Privacy-by-Void
+A digital agora for P2P communication, fundamentally devoid of centralized user databases. Moderation and identity derivation are inextricably linked to the cryptographically proven ownership of the *wallet*. We strictly adhere to MiCA Art 72 (Right to Be Forgotten) via our Privacy-by-Void architecture, executing deterministic data wipes verified solely by irreversible SHA-256 entity hashes.
 
 ```mermaid
 graph TD
     Wallet[Ethereum Wallet] -->|Signs Message| Forum[Sovereign Forum UI]
     Forum -->|Sends EIP-191 Payload| Server[Stateless API]
-    Server -->|Verify Signer| Postgres[(Append-Only Log)]
+    Server -->|Verify EdDSA Session| Postgres[(Append-Only Log)]
+    Postgres -.->|MiCA Art 72 Trigger| Wipe[Wipe PDI Data]
+    Wipe --> Hash[Generate SHA-256 Entity Hash]
+    Hash --> Audit[(Compliance Ledger)]
 ```
 
 ### 24. Signed Payloads and Non-Repudiation
