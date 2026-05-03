@@ -176,7 +176,7 @@ const RIGHT_SIDEBAR_CONTENT = [
 export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { onOpenScanner?: () => void, hideMap?: boolean }) {
   
   return (
-    <div className="relative min-h-screen bg-[#FDFCF8] text-[#050505] selection:bg-black selection:text-[#FDFCF8] font-sans antialiased overflow-x-hidden">
+    <div className="relative min-h-[100dvh] bg-[#FDFCF8] text-[#050505] selection:bg-black selection:text-[#FDFCF8] font-sans antialiased overflow-x-hidden">
       
       {/* ── Top Map & Intelligence Section ── */}
       <section className="w-full flex flex-col items-center pb-12 pt-8 bg-[#FDFCF8] border-b border-black/10">

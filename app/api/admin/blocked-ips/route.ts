@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
+import { verifyJWT } from '@/lib/jwt';
 import {
     redisClient,
     safeRedisGet,
@@ -8,10 +8,6 @@ import {
     safeRedisSAdd,
     safeRedisSMembers,
 } from '@/lib/redis/client';
-
-// JWT_SECRET is validated at request time so that `next build`
-// can compile this route without the variable in the build environment.
-const JWT_SECRET = process.env.JWT_SECRET ?? '';
 
 const BLOCKED_IP_PREFIX = 'sovereign:blocked_ip:';
 const BLOCKED_IP_INDEX  = 'sovereign:blocked_ip_index';
@@ -25,12 +21,11 @@ interface BlockedIPEntry {
 
 // ─── Admin authentication ────────────────────────────────────────────────────
 async function isAdminAuthenticated(): Promise<boolean> {
-    if (!JWT_SECRET) return false;
     try {
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token');
         if (!adminToken) return false;
-        await jwtVerify(adminToken.value, new TextEncoder().encode(JWT_SECRET));
+        await verifyJWT(adminToken.value);
         return true;
     } catch {
         return false;

@@ -1,5 +1,5 @@
 export async function generateX25519KeyPair() {
-  const keyPair = await crypto.subtle.generateKey({ name: 'X25519' }, true, ['deriveKey', 'deriveBits']);
+  const keyPair = (await crypto.subtle.generateKey({ name: 'X25519' }, true, ['deriveKey', 'deriveBits'])) as CryptoKeyPair;
   const pubRaw = await crypto.subtle.exportKey('raw', keyPair.publicKey);
   const privRaw = await crypto.subtle.exportKey('raw', keyPair.privateKey);
   return {
@@ -32,8 +32,13 @@ export async function decryptAESGCM(sharedSecret: ArrayBuffer, encryptedPayload:
   return new TextDecoder().decode(decrypted);
 }
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array) {
+  const u8 = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < u8.length; i++) {
+    binary += String.fromCharCode(u8[i]);
+  }
+  return btoa(binary);
 }
 
 function base64ToArrayBuffer(base64: string) {

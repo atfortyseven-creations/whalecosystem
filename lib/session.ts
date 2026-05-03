@@ -142,8 +142,8 @@ export async function getSession(): Promise<SessionPayload | null> {
     const siweToken = cookieStore.get('human_session')?.value;
     if (siweToken) {
         try {
-            const verified = await jwtVerify(siweToken, JWT_SECRET);
-            const payload = verified.payload as any;
+            const { verifyJWT } = await import('@/lib/jwt');
+            const payload = await verifyJWT(siweToken);
             // Normalize SIWE payload → SessionPayload shape
             const siweUserId = payload.address || payload.sub;
             if (siweUserId) {

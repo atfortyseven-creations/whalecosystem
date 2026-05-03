@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
 import { PrismaClient } from "@prisma/client";
 import { clearSessionCookies } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { verifyJWT } from "@/lib/jwt";
 
 export async function POST(request: NextRequest) {
     const cookieStore = await cookies();
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
     if (token) {
         try {
             // Verify and extract session ID from JWT
-            const verified = await jwtVerify(token.value, new TextEncoder().encode(JWT_SECRET));
-            const sessionId = verified.payload.sessionId as string;
+            const payload = await verifyJWT(token.value);
+            const sessionId = payload.sessionId as string;
 
             // Delete session from database
             if (sessionId) {

@@ -316,7 +316,7 @@ function ConnectedScreen({
   const fmtStamp  = (d: Date) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
       {/* Backgrounds */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6]" />
       <div className="fixed top-0 inset-x-0 h-28 z-[2] pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(250,249,246,1) 0%, transparent 100%)" }} />
@@ -351,7 +351,7 @@ function ConnectedScreen({
         </button>
       </motion.header>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-12 gap-5 max-w-[440px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-4 pt-28 pb-[calc(2rem+env(safe-area-inset-bottom))] gap-5 max-w-[440px] w-full mx-auto">
 
         {/* ── Sovereign Identity Card ── */}
         <motion.div
@@ -1054,7 +1054,7 @@ export function MobileLanding() {
   // ConnectedScreen. Works even if WalletConnect session drops after signing.
   if (isLinked && effectiveAddress) {
     return (
-      <div className="w-full min-h-screen bg-[#FAF9F6]">
+      <div className="w-full min-h-[100dvh] bg-[#FAF9F6]">
         <ConnectedScreen 
            address={effectiveAddress} 
            onScan={() => setShowScanner(true)} 
@@ -1084,7 +1084,7 @@ export function MobileLanding() {
   // CRITICAL: This block must be AFTER all isLinked guards above.
   if (!showConnectOverlay) {
     return (
-      <div className="w-full min-h-screen bg-[#FDFCF8] relative">
+      <div className="w-full min-h-[100dvh] bg-[#FDFCF8] relative">
         <motion.header
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1120,7 +1120,7 @@ export function MobileLanding() {
 
   // ── Render: Connect Overlay ────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden font-sans flex flex-col" style={{ backgroundColor: IVORY, color: INK }}>
 
       {/* Layer 0: ivory base */}
       <div className="fixed inset-0 z-0 bg-[#FAF9F6] pointer-events-none" />
@@ -1203,7 +1203,7 @@ export function MobileLanding() {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-12 gap-8 max-w-[440px] w-full mx-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-5 pt-32 pb-[calc(2rem+env(safe-area-inset-bottom))] gap-8 max-w-[440px] w-full mx-auto">
 
         {/* Hero */}
         <motion.div
@@ -1359,7 +1359,7 @@ export function MobileLanding() {
           <div className="absolute inset-0 bg-[#020202]/85" />
         </div>
 
-        <footer className="relative z-10 w-full px-6 pt-16 pb-12 flex flex-col gap-10">
+        <footer className="relative z-10 w-full px-6 pt-16 pb-[calc(3rem+env(safe-area-inset-bottom))] flex flex-col gap-10">
           
           {/* Upper: Branding */}
           <div className="flex flex-col gap-3 text-center items-center">

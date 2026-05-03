@@ -13,10 +13,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ address:
 
         let sessionAddress = '';
         try {
-            const { jwtVerify } = await import('jose');
-            const _rawJwtSecret = process.env.JWT_SECRET || 'dev-only-not-for-production-jwt-secret-change-me';
-            const JWT_SECRET = new TextEncoder().encode(_rawJwtSecret);
-            const { payload } = await jwtVerify(sessionToken, JWT_SECRET);
+            const { verifyJWT } = await import('@/lib/jwt');
+            const payload = await verifyJWT(sessionToken);
             sessionAddress = (payload.sub || payload.address) as string;
         } catch (e) {
             return NextResponse.json({ error: 'Unauthorized: invalid secure session' }, { status: 401 });

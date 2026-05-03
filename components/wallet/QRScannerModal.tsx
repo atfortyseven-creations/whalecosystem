@@ -433,12 +433,12 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6] overflow-y-auto py-10"
+          className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#FAF9F6] overflow-y-auto py-[calc(2.5rem+env(safe-area-inset-top))] pb-[calc(2.5rem+env(safe-area-inset-bottom))]"
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
+            className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
             aria-label="Close scanner"
           >
             <X size={22} />

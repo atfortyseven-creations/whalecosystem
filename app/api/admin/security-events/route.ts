@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET && process.env.SKIP_ENV_VALIDATION !== 'true') {
-    throw new Error("CRITICAL: JWT_SECRET environment variable is missing");
-}
+import { verifyJWT } from '@/lib/jwt';
 
 // Simple admin authentication check
 async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
@@ -17,7 +13,7 @@ async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
     }
 
     try {
-        await jwtVerify(adminToken.value, new TextEncoder().encode(JWT_SECRET));
+        await verifyJWT(adminToken.value);
         return true;
     } catch {
         return false;
