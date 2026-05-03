@@ -80,12 +80,29 @@ export async function POST(req: NextRequest) {
     // ── 3. Mint a sovereign JWT for this wallet address ────────────────────
     // This JWT will be sent (encrypted) to the desktop and used to establish
     // the desktop session via /api/auth/qr-hydrate.
+    const { prisma } = await import('@/lib/prisma');
+    
+    // Ensure the user exists so foreign keys and tiers don't break
+    const existingUser = await prisma.user.upsert({
+      where: { walletAddress: walletAddress.toLowerCase() },
+      update: { lastActive: new Date() },
+      create: {
+        walletAddress: walletAddress.toLowerCase(),
+        tier: 'INITIATE',
+        lastActive: new Date()
+      }
+    });
+    
     const jwt = await mintJWT({
       sub: walletAddress,
       address: walletAddress,
-      tier: 'FREE',
+      clearance: 'SOVEREIGN',
+      tier: existingUser?.tier || 'FREE',
+      kycStatus: 'UNVERIFIED',
+      humanityScore: existingUser?.humanityScore || 0,
       iss: 'whale-alert-network',
       source: 'qr-mobile-handshake',
+      issuedAt: new Date().toISOString()
     });
 
     // ── 4. Package and store in Redis ──────────────────────────────────────

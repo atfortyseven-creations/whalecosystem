@@ -71,6 +71,8 @@ export async function POST(req: NextRequest) {
         ...(result || {})
     });
 
+    const kycStatus = 'UNVERIFIED';
+
     // ── Mint Sovereign JWT (human_session) ───────────────────────────────────
     try {
         const { mintJWT } = await import('@/lib/jwt');
@@ -79,7 +81,7 @@ export async function POST(req: NextRequest) {
             address: userId,
             clearance: 'SOVEREIGN',
             tier: existingUser?.tier || 'FREE',
-            kycStatus: existingUser?.kycStatus || 'UNVERIFIED',
+            kycStatus: kycStatus,
             humanityScore: existingUser?.humanityScore || 0,
             issuedAt: new Date().toISOString()
         });
@@ -96,7 +98,7 @@ export async function POST(req: NextRequest) {
         const { safeRedisSet } = await import('@/lib/redis/client');
         await safeRedisSet(`tier:${userId}`, JSON.stringify({
             tier: existingUser?.tier || 'FREE',
-            kycStatus: existingUser?.kycStatus || 'UNVERIFIED',
+            kycStatus: kycStatus,
             humanityScore: existingUser?.humanityScore || 0
         }), 'EX', 600);
 

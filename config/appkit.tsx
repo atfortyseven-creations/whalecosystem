@@ -60,8 +60,7 @@ const worldchain: AppKitNetwork = {
     caipNetworkId: 'eip155:480',
     chainNamespace: 'eip155',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-    rpcUrls: {
-        default: { http: [`https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "YOUR_ALCHEMY_KEY"}`] }
+        default: { http: [process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : "https://worldchain-mainnet.g.alchemy.com/public"] }
     },
     blockExplorers: {
         default: { name: 'Worldscan', url: 'https://worldscan.org' }
@@ -94,13 +93,13 @@ const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https:
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Humanity Ledger — Sovereign Institutional Intelligence',
-    // CRITICAL: Must be hardcoded without trailing slash AND must match the domain
-    // registered in WalletConnect/Reown Cloud. Using window.location.origin was
-    // causing mismatches when users landed on subpaths (/sync, /connect, etc.).
-    url: 'https://humanidfi.com',
+    // CRITICAL: We now use APP_URL (window.location.origin) to guarantee the domain 
+    // exactly matches the browser's origin. This prevents wallets from auto-rejecting 
+    // the signature request due to domain mismatch (e.g. www vs non-www).
+    url: APP_URL,
     // Real icon URL (min 512x512) — empty array caused Rainbow "Connection failed"
     // on some relay nodes. A valid icon prevents relay timeout on mobile handshake.
-    icons: ['https://humanidfi.com/icon.png'],
+    icons: [`${APP_URL}/icon.png`],
 }
 
 // ── NOTE: siweConfig intentionally removed.

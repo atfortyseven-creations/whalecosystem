@@ -99,6 +99,16 @@ export default async function middleware(request: NextRequest) {
                     request.headers.get('cf-ipcountry') ||
                     'UNKNOWN';
 
+    // ── LAYER -1.5: ENFORCE STRICT DOMAIN FOR WALLETCONNECT CLOUD VERIFY ────────
+    // If the user lands on www, WalletConnect Cloud might reject their signature
+    // or flag the connection as suspicious because the project is registered
+    // under the bare domain. We force a redirect to the bare domain.
+    if (request.nextUrl.hostname.startsWith('www.')) {
+      const url = request.nextUrl.clone();
+      url.hostname = url.hostname.replace('www.', '');
+      return NextResponse.redirect(url, { status: 308 });
+    }
+
     // ── LAYER 0: OWASP WAF ENGINE (Before EVERYTHING) ──────────────────────
     const wafBlock = await runWAF(request);
     if (wafBlock) return wafBlock;

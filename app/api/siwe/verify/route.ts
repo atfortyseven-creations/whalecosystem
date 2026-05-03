@@ -61,9 +61,9 @@ export async function POST(req: NextRequest) {
       chainId: fields.chainId,
       domain: fields.domain,
       issuedAt: fields.issuedAt,
-      clearance: 'SOVEREIGN', // Institutional-grade access level
+      clearance: 'SOVEREIGN',
       tier: user?.tier || 'FREE',
-      kycStatus: user?.kycStatus || 'UNVERIFIED',
+      kycStatus: 'UNVERIFIED',
       humanityScore: user?.humanityScore || 0,
     });
 
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const { safeRedisSet } = await import('@/lib/redis/client');
     await safeRedisSet(`tier:${fields.address.toLowerCase()}`, JSON.stringify({
         tier: user?.tier || 'FREE',
-        kycStatus: user?.kycStatus || 'UNVERIFIED',
+        kycStatus: 'UNVERIFIED',
         humanityScore: user?.humanityScore || 0
     }), 'EX', 600);
 

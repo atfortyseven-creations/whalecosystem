@@ -323,9 +323,8 @@ export const blockchainService = new BlockchainService([
     chainId: ChainId.WORLDCHAIN,
     name: 'World Chain',
     rpcUrls: [
-      'https://go.getblock.io/889c09939a894084931a2f6417724a9e', // GetBlock Primary
-      `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
-      'https://rpc.worldchain.org' 
+      process.env.NEXT_PUBLIC_ALCHEMY_API_KEY ? `https://worldchain-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}` : 'https://worldchain-mainnet.g.alchemy.com/public',
+      'https://worldchain-mainnet.g.alchemy.com/public'
     ],
     bundlerUrl: `https://api.pimlico.io/v2/480/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`,
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },

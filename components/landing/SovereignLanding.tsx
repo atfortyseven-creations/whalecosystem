@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { usePerformanceMode, shouldRenderFrame } from '@/hooks/usePerformanceMode';
-import { WhalecosystemTweetFeed } from './WhalecosystemTweetFeed';
 
 // ── Particle Canvas Background ──
 function ParticleBackground() {
@@ -306,14 +305,7 @@ export function SovereignLanding() {
                    )}
                 </div>
 
-                {/* ── @whalecosystem Live Twitter Feed ── */}
-                <div className="flex flex-col gap-2 flex-1 min-h-0 overflow-hidden">
-                  <WhalecosystemTweetFeed
-                    height={360}
-                    showHeader={true}
-                    theme="dark"
-                  />
-                </div>
+
 
             </div>
         </aside>
