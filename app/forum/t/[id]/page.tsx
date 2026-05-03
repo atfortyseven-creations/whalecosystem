@@ -77,8 +77,18 @@ export default function TopicPage() {
           const csrfRes = await fetch('/api/auth/csrf', {
               headers: { 'x-web3-address': sessionAddress || '' }
           });
-          csrfToken = (await csrfRes.json()).token;
-      } catch (e) {}
+          if (!csrfRes.ok) throw new Error('CSRF fetch failed');
+          const contentType = csrfRes.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+              csrfToken = (await csrfRes.json()).token;
+          } else {
+              throw new Error("Invalid CSRF response");
+          }
+      } catch (e) {
+          setReplyError('SESSION EXPIRED. PLEASE RECONNECT WALLET.');
+          setSubmitting(false);
+          return;
+      }
 
       const res = await fetch('/api/forum/posts', {
         method: 'POST',
@@ -113,8 +123,17 @@ export default function TopicPage() {
         const csrfRes = await fetch('/api/auth/csrf', {
             headers: { 'x-web3-address': sessionAddress || '' }
         });
-        csrfToken = (await csrfRes.json()).token;
-    } catch (e) {}
+        if (!csrfRes.ok) throw new Error('CSRF fetch failed');
+        const contentType = csrfRes.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            csrfToken = (await csrfRes.json()).token;
+        } else {
+            throw new Error("Invalid CSRF response");
+        }
+    } catch (e) {
+        setReplyError('SESSION EXPIRED. PLEASE RECONNECT WALLET.');
+        return;
+    }
 
     const res = await fetch(`/api/forum/topics/${id}`, { 
       method: 'DELETE',
@@ -377,8 +396,17 @@ function PostRow({
           const csrfRes = await fetch('/api/auth/csrf', {
               headers: { 'x-web3-address': sessionAddress || '' }
           });
-          csrfToken = (await csrfRes.json()).token;
-      } catch (e) {}
+          if (!csrfRes.ok) throw new Error('CSRF fetch failed');
+          const contentType = csrfRes.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+              csrfToken = (await csrfRes.json()).token;
+          } else {
+              throw new Error("Invalid CSRF response");
+          }
+      } catch (e) {
+          alert('SESSION EXPIRED. PLEASE RECONNECT WALLET.');
+          return;
+      }
 
       const res = await fetch('/api/forum/likes', {
         method: 'POST',
@@ -402,8 +430,18 @@ function PostRow({
           const csrfRes = await fetch('/api/auth/csrf', {
               headers: { 'x-web3-address': sessionAddress || '' }
           });
-          csrfToken = (await csrfRes.json()).token;
-      } catch (e) {}
+          if (!csrfRes.ok) throw new Error('CSRF fetch failed');
+          const contentType = csrfRes.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+              csrfToken = (await csrfRes.json()).token;
+          } else {
+              throw new Error("Invalid CSRF response");
+          }
+      } catch (e) {
+          alert('SESSION EXPIRED. PLEASE RECONNECT WALLET.');
+          setDeleting(false);
+          return;
+      }
 
       const endpoint = type === 'topic'
         ? `/api/forum/topics/${entity.id}`

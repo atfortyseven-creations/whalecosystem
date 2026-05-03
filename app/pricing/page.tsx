@@ -131,6 +131,7 @@ function PricingContent() {
   const searchParams = useSearchParams();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState<string>('FREE');
+  const [isTierLoaded, setIsTierLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchTier() {
@@ -144,6 +145,8 @@ function PricingContent() {
         }
       } catch (e) {
         console.error("Failed to fetch session tier");
+      } finally {
+        setIsTierLoaded(true);
       }
     }
     fetchTier();
@@ -313,14 +316,14 @@ function PricingContent() {
                   ) : (
                     <button
                       onClick={() => handleSubscribe(tier.id)}
-                      disabled={loadingTier === tier.id}
+                      disabled={!isTierLoaded || loadingTier === tier.id}
                       className={`w-full py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 ${
                         tier.highlight
-                          ? 'bg-[#00C076] text-[#050505] hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(0,192,118,0.3)]'
-                          : 'bg-[#050505] text-white hover:bg-black/80 hover:shadow-lg'
+                          ? 'bg-[#00C076] text-[#050505] hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(0,192,118,0.3)] disabled:opacity-70'
+                          : 'bg-[#050505] text-white hover:bg-black/80 hover:shadow-lg disabled:opacity-70'
                       }`}
                     >
-                      {loadingTier === tier.id ? (
+                      {loadingTier === tier.id || !isTierLoaded ? (
                         <Loader2 size={18} className="animate-spin" />
                       ) : (
                         <>
