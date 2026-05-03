@@ -4,28 +4,36 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle } from 'lucide-react';
+import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings } from 'lucide-react';
+import { createCheckoutSession, createCustomerPortalSession } from '@/app/actions/stripe';
+
+const TIER_HIERARCHY: Record<string, number> = {
+  'FREE': 0,
+  'STARTER': 1,
+  'PRO': 2,
+  'ELITE': 3
+};
 
 const PRICING_TIERS = [
   {
-    id: 'starter',
-    name: 'Standard',
-    price: '€0',
-    billing: 'Monthly / Annual Billing Available',
+    id: 'STARTER',
+    name: 'Starter',
+    price: '€19',
+    billing: 'Monthly',
     target: 'For individual researchers and academics',
-    description: 'Foundational access to the Sovereign network with basic telemetry, community support, and core identity verification.',
+    description: 'Foundational access to the Sovereign network with 1 min latency, community support, and core identity verification.',
     features: [
       'Access to Base Terminal Interface',
-      'Network state updates (5 min latency)',
-      'Read-only historical data access',
+      'Network state updates (1 min latency)',
+      '3 Custom Anomaly Alerts',
       'Standard community forum support',
       'Basic sovereign identity profile',
-      'Public endpoint API limits (100 req/day)'
+      'API limits (1,000 req/day)'
     ],
-    buttonText: 'Start for Free'
+    buttonText: 'Acquire Starter License'
   },
   {
-    id: 'pro',
+    id: 'PRO',
     name: 'Professional',
     price: '€59',
     billing: 'Per User / Month',
@@ -45,7 +53,7 @@ const PRICING_TIERS = [
     buttonText: 'Acquire Pro License'
   },
   {
-    id: 'Elite',
+    id: 'ELITE',
     name: 'Enterprise',
     price: '€199',
     billing: 'Per User / Month',
@@ -100,12 +108,12 @@ const PLATFORM_BENEFITS = [
 
 const FAQS = [
   {
-    question: "How is the subscription billing managed?",
+    question: "How is the Institutional License Lease managed?",
     answer: "Payments are securely processed through Stripe, our institutional payment gateway. You can seamlessly manage, cancel, or modify your tier at any time directly from your sovereign dashboard."
   },
   {
     question: "Do I need to connect my wallet to view the plans?",
-    answer: "Yes. Sovereign operates under a strict Sovereign Identity model. Your wallet (ECDSA signature) acts as your singular access point and billing identity; we do not require legacy email/password combinations."
+    answer: "Yes. Sovereign Terminal operates under a strict Zero-Trust Sovereign Identity model. Your wallet (ECDSA signature) acts as your singular access point and billing identity."
   },
   {
     question: "Can I upgrade my tier mid-month?",
@@ -113,7 +121,7 @@ const FAQS = [
   },
   {
     question: "Is there a refund policy available?",
-    answer: "Because our licenses provide immediate access to proprietary data sets and high-frequency telemetry, we do not offer refunds. We recommend starting with the Standard tier to evaluate the network's capabilities."
+    answer: "No. Because our licenses provide immediate access to proprietary data sets and high-frequency telemetry, we do not offer refunds. We comply with EU DSA regulations by providing a one-click cancellation portal, but past execution cycles are non-refundable."
   }
 ];
 
@@ -122,58 +130,78 @@ function PricingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [currentTier, setCurrentTier] = useState<string>('FREE');
+
+  useEffect(() => {
+    async function fetchTier() {
+      try {
+        const res = await fetch('/api/auth/session', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.user?.tier) {
+            setCurrentTier(data.user.tier.toUpperCase());
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch session tier");
+      }
+    }
+    fetchTier();
+  }, [isConnected, isSovereignHandshake]);
+
+  // Active Tier Check
+  // Note: user.tier is expected to be 'FREE', 'STARTER', 'PRO', or 'ELITE'
+  const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
 
   // Check for cancelation redirect
   useEffect(() => {
     if (searchParams.get('canceled')) {
-      toast.error('Process canceled', {
-        description: 'The license setup has not been completed.'
+      toast.error('Transaction Canceled', {
+        description: 'The Institutional License setup was not completed.'
       });
       router.replace('/pricing');
     }
   }, [searchParams, router]);
 
+  const handlePortalAccess = async () => {
+    setLoadingTier('PORTAL');
+    const toastId = toast.loading('Initializing encrypted billing portal...');
+    try {
+      const res = await createCustomerPortalSession();
+      if (res?.url) window.location.href = res.url;
+    } catch (error: any) {
+      toast.error('Portal Access Failed', { id: toastId, description: error.message });
+      setLoadingTier(null);
+    }
+  };
+
   const handleSubscribe = async (planId: string) => {
     if (!isConnected || !isSovereignHandshake) {
-      toast.error('Authentication Required', {
-        description: 'You must connect and sign with your sovereign identity to access the gateway.',
+      toast.error('Zero-Trust Authentication Required', {
+        description: 'You must connect and sign with your sovereign identity to execute a transaction.',
       });
       router.push('/connect');
       return;
     }
 
-    if (planId === 'starter') {
-      toast.success('Access Verified', {
-        description: 'You already have the permissions of the Standard license.',
+    const targetTierLevel = TIER_HIERARCHY[planId] || 0;
+
+    if (currentTierLevel >= targetTierLevel) {
+      toast.info('License Hierarchy Verified', {
+        description: `You already hold a ${currentTier} or higher license. No upgrade required.`,
       });
-      router.push('/dashboard');
       return;
     }
 
     setLoadingTier(planId);
-    const toastId = toast.loading('Initializing encrypted corporate gateway...');
+    const toastId = toast.loading(`Initializing encrypted channel for ${planId} license...`);
 
     try {
-      const response = await fetch('/api/payment/create-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          planId,
-          userEmail: '', // Stripe collect
-          returnUrl: '/pricing'
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to initialize payment gateway');
-      }
-
+      const res = await createCheckoutSession(planId);
       toast.success('Secure connection established. Redirecting...', { id: toastId });
       
-      if (data.url) {
-        window.location.href = data.url;
+      if (res?.url) {
+        window.location.href = res.url;
       }
     } catch (error: any) {
       console.error('Subscription error:', error);
@@ -181,7 +209,6 @@ function PricingContent() {
         id: toastId,
         description: error.message || 'There was a problem processing your request. Please try again.',
       });
-    } finally {
       setLoadingTier(null);
     }
   };
@@ -198,7 +225,7 @@ function PricingContent() {
         <header className="flex flex-col items-center text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C076]/10 border border-[#00C076]/20 mb-6 shadow-sm">
             <Shield size={14} className="text-[#00C076]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Sovereign Use Licenses</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Institutional License Leases</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-[#050505] mb-8 max-w-5xl leading-[1.1]">
@@ -206,81 +233,107 @@ function PricingContent() {
             <span className="text-[#050505]/30">Unleash Sovereign Intelligence.</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-[#050505]/60 max-w-3xl leading-relaxed font-medium">
-            Select the data framework that best adapts to your operational requirements. From individual academic research to high-frequency algorithmic deployment for corporate entities.
+          <p className="text-lg md:text-xl text-[#050505]/60 max-w-3xl leading-relaxed font-medium mb-10">
+            Select the algorithmic framework that best adapts to your operational requirements. From standard telemetry to high-frequency zero-latency deployment for hedge funds.
           </p>
+
+          {currentTierLevel > 0 && (
+            <button
+              onClick={handlePortalAccess}
+              disabled={loadingTier === 'PORTAL'}
+              className="px-6 py-3 bg-[#050505] text-[#FDFCF8] rounded-full text-xs font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
+            >
+              {loadingTier === 'PORTAL' ? <Loader2 size={16} className="animate-spin" /> : <Settings size={16} />}
+              Manage {currentTier} License
+            </button>
+          )}
         </header>
 
         {/* ── Estructura de Precios ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-32 relative z-10">
-          {PRICING_TIERS.map((tier) => (
-            <div 
-              key={tier.id}
-              className={`relative flex flex-col rounded-[2rem] transition-all duration-500 ${
-                tier.highlight 
-                  ? 'bg-[#050505] text-[#FDFCF8] shadow-2xl md:-translate-y-4' 
-                  : 'bg-white border border-[#050505]/10 text-[#050505] hover:shadow-lg'
-              }`}
-            >
-              {tier.highlight && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-[#050505] px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
-                  Corporate Standard
+          {PRICING_TIERS.map((tier) => {
+            const isDowngrade = currentTierLevel >= (TIER_HIERARCHY[tier.id] || 0);
+            
+            return (
+              <div 
+                key={tier.id}
+                className={`relative flex flex-col rounded-[2rem] transition-all duration-500 ${
+                  tier.highlight 
+                    ? 'bg-[#050505] text-[#FDFCF8] shadow-2xl md:-translate-y-4' 
+                    : 'bg-white border border-[#050505]/10 text-[#050505] hover:shadow-lg'
+                }`}
+              >
+                {tier.highlight && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-[#050505] px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
+                    Corporate Standard
+                  </div>
+                )}
+
+                <div className="p-8 md:p-10 border-b border-black/5">
+                  <h3 className={`text-sm font-black uppercase tracking-[0.2em] mb-4 ${tier.highlight ? 'text-white/50' : 'text-black/40'}`}>
+                    {tier.name}
+                  </h3>
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className={`text-6xl font-medium tracking-tighter ${tier.highlight ? 'text-white' : 'text-black'}`}>
+                      {tier.price}
+                    </span>
+                    <span className={`text-sm font-bold ${tier.highlight ? 'text-white/40' : 'text-black/30'}`}>
+                      /mo
+                    </span>
+                  </div>
+                  <p className={`text-sm font-semibold mb-2 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]'}`}>
+                    {tier.target}
+                  </p>
+                  <p className={`text-sm leading-relaxed ${tier.highlight ? 'text-white/60' : 'text-black/60'}`}>
+                    {tier.description}
+                  </p>
                 </div>
-              )}
 
-              <div className="p-8 md:p-10 border-b border-black/5">
-                <h3 className={`text-sm font-black uppercase tracking-[0.2em] mb-4 ${tier.highlight ? 'text-white/50' : 'text-black/40'}`}>
-                  {tier.name}
-                </h3>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className={`text-6xl font-medium tracking-tighter ${tier.highlight ? 'text-white' : 'text-black'}`}>
-                    {tier.price}
-                  </span>
-                  <span className={`text-sm font-bold ${tier.highlight ? 'text-white/40' : 'text-black/30'}`}>
-                    /mo
-                  </span>
-                </div>
-                <p className={`text-sm font-semibold mb-2 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]'}`}>
-                  {tier.target}
-                </p>
-                <p className={`text-sm leading-relaxed ${tier.highlight ? 'text-white/60' : 'text-black/60'}`}>
-                  {tier.description}
-                </p>
-              </div>
+                <div className="p-8 md:p-10 flex-1 flex flex-col bg-white/[0.02]">
+                  <ul className="flex flex-col gap-5 flex-1 mb-10">
+                    {tier.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-3.5">
+                        <CheckCircle2 size={20} className={`shrink-0 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]/30'}`} />
+                        <span className={`text-[15px] font-medium leading-snug ${tier.highlight ? 'text-white/90' : 'text-[#050505]/80'}`}>
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
 
-              <div className="p-8 md:p-10 flex-1 flex flex-col bg-white/[0.02]">
-                <ul className="flex flex-col gap-5 flex-1 mb-10">
-                  {tier.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3.5">
-                      <CheckCircle2 size={20} className={`shrink-0 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]/30'}`} />
-                      <span className={`text-[15px] font-medium leading-snug ${tier.highlight ? 'text-white/90' : 'text-[#050505]/80'}`}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={() => handleSubscribe(tier.id)}
-                  disabled={loadingTier === tier.id}
-                  className={`w-full py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 ${
-                    tier.highlight
-                      ? 'bg-[#00C076] text-[#050505] hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(0,192,118,0.3)]'
-                      : 'bg-[#050505] text-white hover:bg-black/80 hover:shadow-lg'
-                  }`}
-                >
-                  {loadingTier === tier.id ? (
-                    <Loader2 size={18} className="animate-spin" />
+                  {isDowngrade ? (
+                    <button
+                      disabled
+                      className={`w-full py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 opacity-50 cursor-not-allowed ${
+                        tier.highlight ? 'bg-[#00C076] text-[#050505]' : 'bg-black/10 text-black/50'
+                      }`}
+                    >
+                      {currentTier === tier.id ? 'Current License' : 'Access Included'}
+                    </button>
                   ) : (
-                    <>
-                      {tier.buttonText}
-                      <ArrowRight size={16} />
-                    </>
+                    <button
+                      onClick={() => handleSubscribe(tier.id)}
+                      disabled={loadingTier === tier.id}
+                      className={`w-full py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 ${
+                        tier.highlight
+                          ? 'bg-[#00C076] text-[#050505] hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(0,192,118,0.3)]'
+                          : 'bg-[#050505] text-white hover:bg-black/80 hover:shadow-lg'
+                      }`}
+                    >
+                      {loadingTier === tier.id ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <>
+                          {tier.buttonText}
+                          <ArrowRight size={16} />
+                        </>
+                      )}
+                    </button>
                   )}
-                </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* ── Beneficios de la Arquitectura ── */}
