@@ -390,7 +390,7 @@ export default function ConnectPage() {
                       </motion.div>
                     ) : qrSession && mounted ? (
                       <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                        <QRCode value={qrUrl} size={180} level="H" bgColor="#FFFFFF" fgColor="#050505" />
+                        <QRCode value={qrData} size={180} level="H" bgColor="#FFFFFF" fgColor="#050505" />
                       </motion.div>
                     ) : (
                       <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }}

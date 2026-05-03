@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 const PLAN_PRICE_IDS: Record<string, string> = {
   STARTER: process.env.STRIPE_PRICE_STARTER || 'price_starter_live_2026',
   PRO:     process.env.STRIPE_PRICE_PRO     || 'price_pro_live_2026',
-  ELITE:   process.env.STRIPE_PRICE_ELITE   || 'price_elite_live_2026',
+  ELITE:   process.env.STRIPE_PRICE_ELITE   || process.env.STRIPE_PRICE_INSTITUTIONAL || 'price_elite_live_2026',
 };
 
 const PLAN_NAMES: Record<string, string> = {
