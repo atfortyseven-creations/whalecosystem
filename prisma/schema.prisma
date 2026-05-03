@@ -98,7 +98,7 @@ model User {
   avatarUrl         String?  @db.Text
   bio               String?  @db.Text
   isPro             Boolean  @default(false)
-  tier              String   @default("basic")
+  tier              String   @default("FREE")
   lastActive        DateTime @default(now())
   goldTicketTokenId String?
   createdAt         DateTime @default(now())
@@ -137,10 +137,11 @@ model User {
   notifyOnReply    Boolean @default(true)
   notifyOnMention  Boolean @default(true)
 
-  clerkId          String? @unique
-  email            String? @unique
-  snxAccountId     String? @unique
-  stripeCustomerId String? @unique
+  clerkId                String? @unique
+  email                  String? @unique
+  snxAccountId           String? @unique
+  stripeCustomerId       String? @unique
+  stripeSubscriptionId   String? @unique
 
   watchlists       Watchlist[]
   alerts           Alert[]

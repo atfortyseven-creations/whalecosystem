@@ -12,19 +12,25 @@ export async function generateX25519KeyPair() {
     keyPair = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveKey', 'deriveBits'])) as CryptoKeyPair;
   }
   
-  const pubRaw = await crypto.subtle.exportKey('raw', keyPair.publicKey);
-  const privRaw = await crypto.subtle.exportKey('raw', keyPair.privateKey);
+  // Export as JWK to avoid 'raw' export errors on private keys (especially ECDH)
+  const pubJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+  const privJwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+  
   return {
-    publicKey: arrayBufferToBase64(pubRaw),
-    privateKey: arrayBufferToBase64(privRaw),
+    publicKey: btoa(JSON.stringify(pubJwk)),
+    privateKey: btoa(JSON.stringify(privJwk)),
     isECDH
   };
 }
 
 export async function deriveSharedSecret(privateKeyB64: string, publicKeyB64: string, isECDH: boolean = false) {
   const algo = isECDH ? { name: 'ECDH', namedCurve: 'P-256' } : { name: 'X25519' };
-  const priv = await crypto.subtle.importKey('raw', base64ToArrayBuffer(privateKeyB64), algo, false, ['deriveBits']);
-  const pub = await crypto.subtle.importKey('raw', base64ToArrayBuffer(publicKeyB64), algo, false, []);
+  
+  const privJwk = JSON.parse(atob(privateKeyB64));
+  const pubJwk = JSON.parse(atob(publicKeyB64));
+  
+  const priv = await crypto.subtle.importKey('jwk', privJwk, algo, false, ['deriveBits']);
+  const pub = await crypto.subtle.importKey('jwk', pubJwk, algo, false, []);
   
   return await crypto.subtle.deriveBits(isECDH ? { name: 'ECDH', public: pub } : { name: 'X25519', public: pub }, priv, 256);
 }
@@ -36,7 +42,7 @@ export async function encryptAESGCM(sharedSecret: ArrayBuffer, data: string) {
   return {
     encryptedPayload: arrayBufferToBase64(encrypted),
     iv: arrayBufferToBase64(iv),
-    tag: arrayBufferToBase64(encrypted.slice(encrypted.byteLength - 16)), // último tag
+    tag: arrayBufferToBase64(encrypted.slice(encrypted.byteLength - 16)),
   };
 }
 
