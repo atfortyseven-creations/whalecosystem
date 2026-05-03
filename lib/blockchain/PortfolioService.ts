@@ -634,9 +634,9 @@ export class PortfolioService {
       chainsToQuery.map(async (id) => {
           const fetchPromise = this.getFullPortfolio(id, address, forceRefresh, netWorthData);
           
-          // 4s timeout per chain to ensure snappy login
+          // 8.5s timeout per chain to ensure snappy login but allow for RPC fallbacks
           const timeoutPromise = new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 4000)
+              setTimeout(() => reject(new Error('CHAIN_TIMEOUT')), 8500)
           );
 
           try {
