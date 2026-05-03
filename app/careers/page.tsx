@@ -1,5 +1,33 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Careers | Sovereign Intelligence Network',
+  description: 'Join the core team architecting the definitive standard for on-chain intelligence. We decode global financial entropy through stochastic filtering and zero-knowledge paradigms.',
+  openGraph: {
+    title: 'Careers | Sovereign Intelligence Network',
+    description: 'Engineering the Abyss. Join the core team and build the future of absolute cryptographic transparency.',
+    url: 'https://sovereign.network/careers',
+    siteName: 'Sovereign Intelligence Network',
+    images: [
+      {
+        url: '/models/update/3d-shape-glowing-with-bright-holographic-colors.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Sovereign Intelligence Network Careers',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Careers | Sovereign Intelligence Network',
+    description: 'Engineering the Abyss. Join the core team.',
+    images: ['/models/update/3d-shape-glowing-with-bright-holographic-colors.jpg'],
+  },
+};
 
 const CULTURE_PILLARS = [
   {

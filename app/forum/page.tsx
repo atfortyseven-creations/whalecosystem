@@ -12,6 +12,8 @@ function ForumHomeContent() {
   const rawFilter = searchParams.get('filter');
   const filter = rawFilter || 'matrix';
   const isRestricted = false; // Removed hardcoded restriction
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
   useEffect(() => {
     if (!isRestricted) {
       fetch(`/api/forum/topics?limit=30&filter=${filter === 'matrix' ? 'latest' : filter}`)
@@ -124,7 +126,7 @@ function ForumHomeContent() {
                         <span className="text-[12px] font-black">{topic._count?.posts || 0}</span>
                         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                     </div>
-                    <span className="text-[10px] font-bold text-black/60 dark:text-[#444]">{activity}</span>
+                    <span className="text-[10px] font-bold text-black/60 dark:text-[#444]">{isMounted ? activity : ''}</span>
                   </div>
                 </Link>
               );

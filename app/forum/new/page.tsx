@@ -98,15 +98,24 @@ export default function NewTopicPage() {
         return;
       }
 
-      // Fetch CSRF token for premium security
       let csrfToken = '';
       try {
           const csrfRes = await fetch('/api/auth/csrf', {
               headers: { 'x-web3-address': address || '' }
           });
-          const csrfData = await csrfRes.json();
-          csrfToken = csrfData.token;
-      } catch (e) {}
+          if (!csrfRes.ok) throw new Error('CSRF fetch failed');
+          const contentType = csrfRes.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+              const csrfData = await csrfRes.json();
+              csrfToken = csrfData.token;
+          } else {
+              throw new Error("Invalid CSRF response");
+          }
+      } catch (e) {
+          setError('SESSION EXPIRED. PLEASE RECONNECT WALLET.');
+          setSubmitting(false);
+          return;
+      }
 
       const res = await fetch('/api/forum/topics', {
         method: 'POST',

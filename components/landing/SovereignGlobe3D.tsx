@@ -9,7 +9,7 @@ import * as THREE from "three";
 // Perfectly crafted Fibonacci sphere using NASA's Blue Marble topology mask.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const POINT_COUNT = 150_000; 
+const POINT_COUNT = 45_000; 
 const GLOBE_RADIUS = 1.0;
 
 function PointGlobeMesh() {
@@ -173,10 +173,10 @@ function PointGlobeMesh() {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, POINT_COUNT]}>
       {/* 
-        Perfect circles (32 segments) ensure no "blocky" or "hexagonal" artifacts.
-        Scale 0.010 is ultra-fine for institutional clarity.
+        Optimized polygon count for mobile/unplugged hardware.
+        Increased size slightly to compensate for lower density.
       */}
-      <circleGeometry args={[0.010, 32]} />
+      <circleGeometry args={[0.016, 16]} />
       <meshBasicMaterial 
         vertexColors 
         transparent 

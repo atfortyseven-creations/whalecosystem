@@ -259,9 +259,21 @@ export function WhaleProShell({
         };
     }, [autoDisconnectTimer]);
 
-    const unlockSession = () => {
-        setIsSessionLocked(false);
-        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    const unlockSession = async () => {
+        try {
+            // Re-verify session cryptographically with the server before unlocking UI
+            const res = await fetch('/api/auth/session', { cache: 'no-store' });
+            if (!res.ok) throw new Error('Session Expired');
+            const data = await res.json();
+            if (!data?.user?.userId) throw new Error('No valid session');
+            
+            setIsSessionLocked(false);
+            if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+        } catch (e) {
+            toast.error("Session Expired", { description: "Your cryptographic lease has timed out." });
+            disconnect();
+            router.push('/connect');
+        }
     };
 
     const handleTabChange = (id: string) => {
@@ -297,7 +309,8 @@ export function WhaleProShell({
                 toast.error("Session Lost", { description: "You have been disconnected." });
             }
         }
-    }, [isWalletConnected, activeTab, onTabChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isWalletConnected, activeTab]);
 
 
 
