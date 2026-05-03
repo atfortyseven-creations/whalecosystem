@@ -259,61 +259,147 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     await destroyScanner();
     setStatus('success');
 
-    let addr = addressRef.current || extAddrRef.current;
-    
-    // Cookie fallback
-    if (!addr && typeof document !== 'undefined') {
-      const match = document.cookie.match(new RegExp('(^| )sovereign_handshake=([^;]+)'));
-      if (match) {
-        addr = match[2];
-      }
-    }
+    const addr = addressRef.current || extAddrRef.current ||
+      (() => {
+        // Cookie fallback — reads sovereign_handshake set after wallet sign
+        if (typeof document !== 'undefined') {
+          const m = document.cookie.match(/sovereign_handshake=(0x[a-fA-F0-9]{40})/i);
+          return m?.[1] ?? null;
+        }
+        return null;
+      })();
 
     try {
-      // 1. Parse QR Data
-      const { uuid, ephemeralPub } = JSON.parse(decodedText);
-      if (!uuid || !ephemeralPub) throw new Error('Invalid Sovereign QR');
+      // ── Step 1: Parse QR — support BOTH URL format (new) and JSON (legacy) ──
+      let uuid: string | null = null;
+      let ephemeralPub: string | null = null;
+      let isECDH = false;
 
-      // 2. Obtener JWT desde servidor (HttpOnly protegido)
-      const exportRes = await fetch('/api/auth/export-jwt', { credentials: 'include' });
-      if (!exportRes.ok) {
-        setErrMsg('Not authenticated on mobile.');
+      // Try URL format first (new — native camera compatible)
+      try {
+        const url = new URL(decodedText);
+        uuid = url.searchParams.get('uuid');
+        const rawPub = url.searchParams.get('pub');
+        ephemeralPub = rawPub ? decodeURIComponent(rawPub) : null;
+        isECDH = url.searchParams.get('ecdh') === '1';
+
+        // Expiry check
+        const exp = url.searchParams.get('exp');
+        if (exp && Date.now() > parseInt(exp, 10)) {
+          setErrMsg('QR code expired. Refresh it on the desktop terminal.');
+          setStatus('error');
+          hasScannedRef.current = false;
+          return;
+        }
+      } catch {
+        // Not a URL — try legacy JSON format
+        try {
+          const parsed = JSON.parse(decodedText);
+          uuid = parsed.uuid ?? null;
+          ephemeralPub = parsed.ephemeralPub ?? null;
+          isECDH = parsed.isECDH ?? false;
+        } catch {
+          setErrMsg('QR code not recognized. Make sure you scan the Whale Alert Network desktop QR.');
+          setStatus('error');
+          hasScannedRef.current = false;
+          return;
+        }
+      }
+
+      if (!uuid || !ephemeralPub) {
+        setErrMsg('Invalid QR code: missing session data. Please refresh the desktop QR.');
         setStatus('error');
         hasScannedRef.current = false;
         return;
       }
-      const { jwt } = await exportRes.json();
 
-      // 3. Generar ephemeral keypair del mobile y derivar shared secret con X25519
+      // ── Step 2: Generate mobile ephemeral keypair ──────────────────────────
       const { generateX25519KeyPair, deriveSharedSecret, encryptAESGCM } = await import('@/lib/web-crypto');
-      const pair = await generateX25519KeyPair();
-      const shared = await deriveSharedSecret(pair.privateKey, ephemeralPub);
-      
-      // 4. Encriptar el JWT con AES-GCM
-      const { encryptedPayload, iv, tag } = await encryptAESGCM(shared, jwt);
+      const mobilePair = await generateX25519KeyPair();
 
-      // 5. Enviar al backend junto con el mobilePub para que el desktop pueda desencriptar
-      const res = await fetch('/api/auth/qr-session', {
-        method:  'POST',
+      // ── Step 3: Derive shared secret and get a JWT to encrypt ─────────────
+      // The JWT we send to the desktop proves mobile's identity.
+      // We derive sharedSecret = X25519(mobile.priv, desktop.pub)
+      // Desktop will decrypt using X25519(desktop.priv, mobile.pub) — same secret.
+      const shared = await deriveSharedSecret(mobilePair.privateKey, ephemeralPub, isECDH);
+
+      // Try to get JWT from human_session cookie via export-jwt first,
+      // then fall back to qr-mobile-link which mints a fresh one.
+      let jwt: string | null = null;
+      let useServerMint = false;
+
+      try {
+        const exportRes = await fetch('/api/auth/export-jwt', { credentials: 'include' });
+        if (exportRes.ok) {
+          const exportData = await exportRes.json();
+          jwt = exportData.jwt ?? null;
+        }
+      } catch {
+        // Network error — fall through to server mint
+      }
+
+      if (!jwt) {
+        // Mobile doesn't have human_session yet (first-time QR scan).
+        // Use qr-mobile-link which mints from sovereign_handshake cookie.
+        useServerMint = true;
+      }
+
+      // ── Step 4: Encrypt the JWT (if we have one) ──────────────────────────
+      // If we're using server-mint mode, qr-mobile-link handles encryption
+      // server-side AND stores in Redis in one shot. We skip client encryption.
+      let encryptedPayload: string;
+      let iv: string;
+      let tag: string | null = null;
+
+      if (!useServerMint && jwt) {
+        const encrypted = await encryptAESGCM(shared, jwt);
+        encryptedPayload = encrypted.encryptedPayload;
+        iv = encrypted.iv;
+        tag = encrypted.tag;
+      } else {
+        // Placeholder values — qr-mobile-link will create the real ones server-side
+        encryptedPayload = 'server-minted';
+        iv = 'server-minted';
+      }
+
+      // ── Step 5: POST to backend to complete the handshake ─────────────────
+      const endpoint = '/api/auth/qr-mobile-link';
+      const res = await fetch(endpoint, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ uuid, encryptedPayload, iv, tag, mobilePub: pair.publicKey }),
+        body: JSON.stringify({
+          uuid,
+          encryptedPayload,
+          iv,
+          tag,
+          mobilePub: mobilePair.publicKey,
+        }),
         credentials: 'include',
       });
-      
+
       if (!res.ok) {
-        setErrMsg('Handshake failed. Refresh the QR code on your desktop terminal.');
+        const errBody = await res.json().catch(() => ({}));
+        const errText = errBody.error || 'Handshake failed';
+
+        if (res.status === 401) {
+          setErrMsg('Wallet not connected. Connect your wallet first, then scan the QR code.');
+        } else {
+          setErrMsg(`${errText}. Refresh the QR on your desktop and try again.`);
+        }
         setStatus('error');
-        hasScannedRef.current = false; // allow retry
+        hasScannedRef.current = false;
         return;
       }
-      
+
+      // If server minted, also set human_session locally from the response cookie
+      // (browser will auto-store it since fetch with credentials:include handles cookies)
+
       setStatus('success');
 
-    } catch (e) {
-      console.error(e);
-      // Non-handshake QR — pass through anyway
+    } catch (e: any) {
+      console.error('[QRScanner] Unexpected error:', e);
+      setErrMsg('An unexpected error occurred. Please try again.');
       setStatus('error');
-      setErrMsg('Invalid QR code format for Sovereign Handshake.');
       hasScannedRef.current = false;
       return;
     }
@@ -327,34 +413,95 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
     if (isInitingRef.current || scannerRef.current) return;
     isInitingRef.current = true;
 
+    // ── CRITICAL iOS FIX: Explicit getUserMedia permission request ────────────
+    // iOS Safari and WKWebView (MetaMask/Coinbase in-app browser) require an
+    // explicit getUserMedia call BEFORE html5-qrcode.start() — otherwise the
+    // camera access prompt never appears and the scanner silently fails.
+    // This also warms up the camera stream, reducing startup latency on Android.
+    let permissionGranted = false;
+    let warmStream: MediaStream | null = null;
     try {
-      const { Html5Qrcode } = await import('html5-qrcode');
-      const scanner = new Html5Qrcode('qr-reader');
-      scannerRef.current = scanner;
+      warmStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' }, // Rear camera preferred
+          width:  { ideal: 1280 },
+          height: { ideal: 720  },
+        },
+        audio: false,
+      });
+      permissionGranted = true;
+      // Keep the stream alive but stop tracks — html5-qrcode will open its own
+      warmStream.getTracks().forEach(t => t.stop());
+      warmStream = null;
+    } catch (permErr: any) {
+      isInitingRef.current = false;
+      if (permErr?.name === 'NotAllowedError' || permErr?.name === 'PermissionDeniedError') {
+        setErrMsg('Camera permission denied. Please allow camera access in your browser settings and try again.');
+      } else if (permErr?.name === 'NotFoundError') {
+        setErrMsg('No camera found on this device. Use the Gallery tab to upload a QR image.');
+      } else {
+        setErrMsg('Unable to access camera. Try the Gallery tab to upload a QR screenshot.');
+      }
+      setStatus('error');
+      return;
+    }
 
-      await scanner.start(
-        { facingMode: "environment" },
-        { fps: 4 }, // optimized for CPU thermal throttling
-        (text: string) => { handleSuccess(text); },
-        (_err: unknown) => { /* frame errors ignored */ }
-      );
+    // ── Start html5-qrcode with optimal settings ──────────────────────────────
+    let attempts = 0;
+    const MAX_ATTEMPTS = 3;
 
-      setStatus('scanning');
-    } catch {
+    const tryStart = async (facingMode: 'environment' | 'user'): Promise<boolean> => {
       try {
-        if (scannerRef.current) {
-          await scannerRef.current.start(
-            { facingMode: "user" },
-            { fps: 4 }, // optimized for CPU thermal throttling
-            (text: string) => { handleSuccess(text); },
-            (_err: unknown) => {}
-          );
-          setStatus('scanning');
-          return;
-        }
-      } catch (e2) {}
+        const { Html5Qrcode } = await import('html5-qrcode');
+        // Ensure the container DOM node exists before starting
+        const container = document.getElementById('qr-reader');
+        if (!container) return false;
 
-      setErrMsg('Camera permission required for Sovereign Sync.');
+        const scanner = new Html5Qrcode('qr-reader');
+        scannerRef.current = scanner;
+
+        await scanner.start(
+          {
+            facingMode,
+          },
+          {
+            fps: 8,               // Higher fps for faster detection on modern phones
+            qrbox: { width: 240, height: 240 }, // Fixed viewfinder — matches ScanLine SVG
+            aspectRatio: 1.0,
+            disableFlip: false,   // Allow mirrored QR codes (some screens invert)
+            formatsToSupport: [0], // QR_CODE only — faster than scanning all barcode types
+          },
+          (text: string) => { handleSuccess(text); },
+          (_err: unknown) => { /* per-frame decode errors are expected and ignored */ }
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    // Attempt 1: rear camera (environment)
+    let started = await tryStart('environment');
+
+    // Attempt 2: front camera fallback (user)
+    if (!started) {
+      if (scannerRef.current) {
+        try { await scannerRef.current.clear(); } catch {}
+        scannerRef.current = null;
+      }
+      started = await tryStart('user');
+    }
+
+    if (started) {
+      setStatus('scanning');
+      isInitingRef.current = false;
+    } else {
+      // Both camera modes failed — last resort: show error
+      if (scannerRef.current) {
+        try { await scannerRef.current.clear(); } catch {}
+        scannerRef.current = null;
+      }
+      setErrMsg('Could not start camera. Try the Gallery tab to upload a QR screenshot instead.');
       setStatus('error');
       isInitingRef.current = false;
     }

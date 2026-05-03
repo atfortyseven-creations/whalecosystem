@@ -150,10 +150,7 @@ export async function validateSecureRequest(
   const session = await getSession();
   const userId = session?.userId;
 
-  console.log(`[AUTH-DEBUG] sessionUserId: ${userId}`);
-  
   if (!userId) {
-    console.warn('[AUTH-DEBUG] No valid SIWE session found in request');
     return { valid: false, error: 'Unauthorized' };
   }
 

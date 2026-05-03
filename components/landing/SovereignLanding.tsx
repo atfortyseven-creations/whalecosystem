@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { usePerformanceMode, shouldRenderFrame } from '@/hooks/usePerformanceMode';
+import { WhalecosystemTweetFeed } from './WhalecosystemTweetFeed';
 
 // ── Particle Canvas Background ──
 function ParticleBackground() {
@@ -305,23 +306,13 @@ export function SovereignLanding() {
                    )}
                 </div>
 
-                {/* Live Feed Stream Tracker */}
-                <div className="flex flex-col gap-3 flex-1">
-                   <div className="flex items-center justify-between">
-                     <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Data Stream</span>
-                     <span className="flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00f5ff] opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00f5ff]"></span>
-                     </span>
-                   </div>
-                   <div className="flex-1 rounded-xl bg-black/40 border border-white/5 p-4 flex flex-col gap-3 overflow-hidden mask-fade-bottom">
-                      {/* Fake stream items */}
-                      <StreamItem text="Syncing EVM..." />
-                      <StreamItem text="Validating block 1948332..." />
-                      <StreamItem text="Detected anomalous signature." highlight />
-                      <StreamItem text="Parsing calldata..." />
-                      <StreamItem text="Awaiting next ping..." />
-                   </div>
+                {/* ── @whalecosystem Live Twitter Feed ── */}
+                <div className="flex flex-col gap-2 flex-1 min-h-0 overflow-hidden">
+                  <WhalecosystemTweetFeed
+                    height={360}
+                    showHeader={true}
+                    theme="dark"
+                  />
                 </div>
 
             </div>

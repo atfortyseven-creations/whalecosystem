@@ -188,10 +188,32 @@ export default function ConnectPage() {
           ? crypto.randomUUID() 
           : (Math.random().toString(36).substring(2, 15) + Date.now().toString(36));
       setQrSession(sessId);
-      
-      const payload = JSON.stringify({ uuid: sessId, ephemeralPub: pair.publicKey, isECDH: pair.isECDH, expires: Date.now() + 300000 });
-      setQrData(payload);
+
+      // ── CRITICAL FIX: QR must be a valid HTTPS URL, NOT raw JSON ──────────
+      // iOS/Android native cameras only display deep-link prompts for URLs.
+      // Raw JSON QR codes show as unclickable plain text — users have no idea
+      // what to do with them. A URL format means:
+      //   1. Native camera detects "Open in Safari/Chrome" → user taps it
+      //   2. The mobile browser opens the app at /connect with the QR params
+      //   3. MobileEnforcer stores the params and triggers in-app handshake
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.humanidfi.com';
+      const expiresAt = Date.now() + 300000; // 5 minutes
+      const qrUrl = new URL('/connect', origin);
+      qrUrl.searchParams.set('uuid', sessId);
+      qrUrl.searchParams.set('pub', encodeURIComponent(pair.publicKey));
+      qrUrl.searchParams.set('ecdh', pair.isECDH ? '1' : '0');
+      qrUrl.searchParams.set('exp', String(expiresAt));
+      setQrData(qrUrl.toString());
       setSyncStatus("AWAITING");
+
+      // Auto-refresh QR after 4.5 minutes (before the 5-min Redis TTL expires)
+      // to ensure the desktop never silently waits on a dead session.
+      const refreshTimer = setTimeout(() => {
+        setQrSession(null);
+        setSyncStatus("IDLE");
+      }, 270000); // 4.5 min
+      return () => clearTimeout(refreshTimer);
+
     } catch (e: any) {
       console.error('Failed to init ephemeral keys:', e);
       setErrorMessage(e.message || "Failed to initialize Web Crypto API.");
@@ -214,38 +236,76 @@ export default function ConnectPage() {
           setSyncStatus("SYNCED");
           clearInterval(poll);
           
-          const { deriveSharedSecret, decryptAESGCM } = await import('@/lib/web-crypto');
-          const qrPayload = JSON.parse(qrData);
-          // Note: In a real scenario the mobile generates its own ephemeral pair and sends its public key back,
-          // but here we are using the public key from the QR as a simplistic shared secret derivation 
-          // because the user blueprint says "pub del QR ya conocido" or expects the mobile to send it.
-          // Wait: `data` from `qr-poll` should include `mobilePub` if mobile generated a keypair.
-          // Let's assume the user implementation just uses the desktop's pub key for derivation on both sides 
-          // or mobile sends its pub key. The blueprint from user says:
-          // `const shared = await deriveSharedSecret(ephemeral!.privateKey, /* pub del QR ya conocido */);`
-          // Actually, if mobile encrypts, it uses desktop pub key + mobile priv key.
-          // Desktop decrypts using desktop priv key + mobile pub key.
-          // So `data` MUST contain `mobilePub`.
-          const mobilePub = data.mobilePub || qrPayload.ephemeralPub; 
-          
-          const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, qrPayload.isECDH);
-          const jwt = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
+          let jwt: string | null = null;
 
-          // HIDRATACIÓN SEGURA (nunca document.cookie en cliente)
-          await fetch('/api/auth/qr-hydrate', {
+          // ── Strategy 1: ECDH decryption (preferred) ──────────────────────
+          // Mobile encrypted the JWT with the shared secret derived from:
+          //   mobile.priv × desktop.pub  ≡  desktop.priv × mobile.pub
+          try {
+            const { deriveSharedSecret, decryptAESGCM } = await import('@/lib/web-crypto');
+            // Parse the QR URL to get the isECDH flag
+            let isECDHFlag = false;
+            try {
+              const qrUrl = new URL(qrData);
+              isECDHFlag = qrUrl.searchParams.get('ecdh') === '1';
+            } catch {
+              // Legacy JSON format fallback
+              try { isECDHFlag = JSON.parse(qrData).isECDH ?? false; } catch {}
+            }
+            const mobilePub = data.mobilePub;
+            if (mobilePub) {
+              const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, isECDHFlag);
+              const decrypted = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
+              // Validate it looks like a JWT (three base64url segments)
+              if (decrypted && decrypted.split('.').length === 3) {
+                jwt = decrypted;
+              }
+            }
+          } catch (decryptErr) {
+            console.warn('[QRPoll] ECDH decryption failed, trying server fallback:', decryptErr);
+          }
+
+          // ── Strategy 2: Server-minted JWT fallback ────────────────────────
+          // /api/auth/qr-mobile-link stores a `serverJwt` alongside the encrypted
+          // payload as a fallback for iOS X25519 key format edge cases.
+          if (!jwt && data.serverJwt) {
+            try {
+              const { verifyJWT } = await import('@/lib/jwt');
+              await verifyJWT(data.serverJwt); // Validate it's legit before using
+              jwt = data.serverJwt;
+              console.log('[QRPoll] Using server-minted JWT fallback');
+            } catch {
+              console.warn('[QRPoll] Server JWT fallback also invalid');
+            }
+          }
+
+          if (!jwt) {
+            console.error('[QRPoll] Both decryption strategies failed. Aborting hydration.');
+            setSyncStatus("ERROR");
+            return;
+          }
+
+          // ── Hydrate the desktop session (HttpOnly cookie via server) ──────
+          const hydrateRes = await fetch('/api/auth/qr-hydrate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jwt }),
           });
 
-          setTimeout(() => window.location.replace("/"), 100);
+          if (hydrateRes.ok) {
+            setTimeout(() => window.location.replace("/"), 100);
+          } else {
+            console.error('[QRPoll] Hydration failed:', await hydrateRes.text());
+            setSyncStatus("ERROR");
+          }
         }
       } catch (err: any) {
-        console.error('Decryption failed:', err);
+        console.error('[QRPoll] Poll error:', err?.message);
       }
     }, 1000);
     return () => clearInterval(poll);
   }, [qrSession, ephemeral, qrData, syncStatus]);
+
 
   useEffect(() => {
     if (!mounted || !isConnected) return;
