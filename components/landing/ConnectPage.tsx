@@ -127,7 +127,8 @@ export default function ConnectPage() {
 
   const [mounted, setMounted] = useState(false);
   const [qrSession, setQrSession] = useState<string | null>(null);
-  const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED">("IDLE");
+  const [syncStatus, setSyncStatus] = useState<"IDLE" | "AWAITING" | "SYNCED" | "ERROR">("IDLE");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   // ── Surface errors ────────────────────────────────────────────────────────
@@ -183,15 +184,18 @@ export default function ConnectPage() {
       const pair = await generateX25519KeyPair();
       setEphemeral(pair);
       
-      const sessId = crypto.randomUUID();
+      const sessId = typeof crypto !== 'undefined' && crypto.randomUUID 
+          ? crypto.randomUUID() 
+          : (Math.random().toString(36).substring(2, 15) + Date.now().toString(36));
       setQrSession(sessId);
       
-      const payload = JSON.stringify({ uuid: sessId, ephemeralPub: pair.publicKey, expires: Date.now() + 300000 });
+      const payload = JSON.stringify({ uuid: sessId, ephemeralPub: pair.publicKey, isECDH: pair.isECDH, expires: Date.now() + 300000 });
       setQrData(payload);
       setSyncStatus("AWAITING");
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to init ephemeral keys:', e);
-      setSyncStatus("IDLE");
+      setErrorMessage(e.message || "Failed to initialize Web Crypto API.");
+      setSyncStatus("ERROR");
     }
   }, []);
 
@@ -224,7 +228,7 @@ export default function ConnectPage() {
           // So `data` MUST contain `mobilePub`.
           const mobilePub = data.mobilePub || qrPayload.ephemeralPub; 
           
-          const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub);
+          const shared = await deriveSharedSecret(ephemeral.privateKey, mobilePub, qrPayload.isECDH);
           const jwt = await decryptAESGCM(shared, data.encryptedPayload, data.iv);
 
           // HIDRATACIÓN SEGURA (nunca document.cookie en cliente)
@@ -378,7 +382,13 @@ export default function ConnectPage() {
               <div className="flex flex-col items-center gap-6 flex-1 justify-center">
                 <div className="p-5 bg-white rounded-[28px] shadow-sm border border-black/5 flex flex-col items-center">
                   <AnimatePresence mode="wait">
-                    {qrSession && mounted ? (
+                    {syncStatus === "ERROR" ? (
+                      <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-[180px] h-[180px] flex flex-col items-center justify-center bg-red-50 text-red-600 rounded-xl border border-red-200 p-4 text-center">
+                        <span className="text-[10px] font-black uppercase tracking-widest mb-2">Cryptographic Failure</span>
+                        <span className="text-[9px] font-mono leading-tight">{errorMessage}</span>
+                        <span className="text-[9px] font-mono mt-4 text-red-400">Use HTTPS or localhost.</span>
+                      </motion.div>
+                    ) : qrSession && mounted ? (
                       <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                         <QRCode value={qrUrl} size={180} level="H" bgColor="#FFFFFF" fgColor="#050505" />
                       </motion.div>
