@@ -157,7 +157,12 @@ export default async function middleware(request: NextRequest) {
            }
         }
 
-        const limitCheck = await checkRateLimit(ip, tier);
+         const VALID_TIERS = ['FREE', 'STANDARD', 'STARTER', 'PRO', 'ELITE'] as const;
+         type ValidTier = typeof VALID_TIERS[number];
+         const resolvedTier: ValidTier = (VALID_TIERS as readonly string[]).includes(tier)
+           ? (tier as ValidTier)
+           : 'FREE';
+         const limitCheck = await checkRateLimit(ip, resolvedTier);
         if (!limitCheck.success) {
           console.warn(`[WhaleFortress] 🚨 DDoS Protection: IP ${ip} Rate Limited (tier: ${tier}, limit: ${limitCheck.limit} reqs/10s)`);
           // Fire-and-forget audit entry — do not await to avoid adding latency

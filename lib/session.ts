@@ -143,12 +143,12 @@ export async function getSession(): Promise<SessionPayload | null> {
     if (siweToken) {
         try {
             const { verifyJWT } = await import('@/lib/jwt');
-            const payload = await verifyJWT(siweToken);
+            const payload = await verifyJWT(siweToken) as any;
             // Normalize SIWE payload → SessionPayload shape
             const siweUserId = payload.address || payload.sub;
             if (siweUserId) {
                 return {
-                    userId: siweUserId.toLowerCase(),
+                    userId: (siweUserId as string).toLowerCase(),
                     email: '',
                     type: 'access',
                     sub: payload.sub,

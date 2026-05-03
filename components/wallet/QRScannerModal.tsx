@@ -470,7 +470,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
             aspectRatio: 1.0,
             disableFlip: false,   // Allow mirrored QR codes (some screens invert)
             formatsToSupport: [0], // QR_CODE only — faster than scanning all barcode types
-          },
+          } as any,
           (text: string) => { handleSuccess(text); },
           (_err: unknown) => { /* per-frame decode errors are expected and ignored */ }
         );
