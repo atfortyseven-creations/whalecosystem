@@ -12,7 +12,7 @@ export function SettingsEnforcer() {
     const { address: sovereignAddress } = useWalletStore();
     const walletAddress = eoaAddress || sovereignAddress;
 
-    const { theme, currency, language, showBalances, allowAnalytics, testnetMode } = useSettingsStore();
+    const { theme, currency, showBalances, allowAnalytics, testnetMode } = useSettingsStore();
 
     // Enforce Theme (Dark mode classes on HTML)
     useEffect(() => {
@@ -43,7 +43,6 @@ export function SettingsEnforcer() {
                         useSettingsStore.setState({
                             theme: data.theme,
                             currency: data.currency,
-                            language: data.language,
                             showBalances: data.showBalances,
                             allowAnalytics: data.allowAnalytics,
                             testnetMode: data.testnetMode
@@ -62,13 +61,13 @@ export function SettingsEnforcer() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        walletAddress, theme, currency, language, showBalances, allowAnalytics, testnetMode
+                        walletAddress, theme, currency, showBalances, allowAnalytics, testnetMode
                     })
                 }).catch(console.error);
             }, 1000); // 1s sync debounce
             return () => clearTimeout(timeout);
         }
-    }, [walletAddress, theme, currency, language, showBalances, allowAnalytics, testnetMode]);
+    }, [walletAddress, theme, currency, showBalances, allowAnalytics, testnetMode]);
 
 
     return (

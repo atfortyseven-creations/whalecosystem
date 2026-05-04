@@ -3,43 +3,29 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { safeStorage } from '@/lib/security/safe-storage';
 
 export interface SovereignSettings {
-    // 1-3. General / Aesthetic
+    // 1. General / Aesthetic
     theme: 'light' | 'dark' | 'system';
     currency: 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CHF';
-    language: 'es-ES' | 'en-US' | 'zh-CN';
     
-    // 4. Density
+    // 2. Density
     layoutDensity: 'relaxed' | 'compact' | 'dense';
     density?: string; // Legacy compat
     
-    // 5-7. Network
-    rpcNode: 'sovereign_local' | 'infura_premium' | 'alchemy_mainnet';
+    // 3. Network
     testnetMode: boolean;
-    websocketHealthPing: boolean;
 
-    // 8-10. Sonar
-    whaleThreshold: number;
-    whaleAlertThreshold?: number; // Legacy compat
+    // 4. Sonar
     audioAlerts: boolean;
     soundEffects?: boolean; // Legacy compat
-    hapticFeedback: boolean;
 
-    // 11-15. Privacy & Security
+    // 5-8. Privacy & Security
     stealthMode: boolean;
     showBalances: boolean;
     allowAnalytics: boolean;
     autoDisconnectTimer: '15m' | '1h' | '24h' | 'never';
     inactivityLockMinutes?: number; // Legacy compat
-    biometricEnforcement: boolean;
 
-    // 16-18. Execution
-    mempoolSniffer: boolean;
-    maxGasFee: number;
-    maxSlippage?: number; // Legacy compat
-    mevProtection: boolean;
-
-    // 19-20. Visualization & Hardware
-    portfolioGraphDefault: 'line' | 'candle';
+    // 9. Visualization & Hardware
     hardwareAcceleration: boolean;
 }
 
@@ -56,23 +42,13 @@ export interface SettingsState extends SovereignSettings {
     // Individual setters for backwards compatibility
     setTheme: (theme: SettingsState['theme']) => void;
     setCurrency: (currency: SettingsState['currency']) => void;
-    setLanguage: (language: SettingsState['language']) => void;
     setLayoutDensity: (density: SettingsState['layoutDensity']) => void;
-    setRpcNode: (node: SettingsState['rpcNode']) => void;
     setTestnetMode: (mode: boolean) => void;
-    setWebsocketHealthPing: (val: boolean) => void;
-    setWhaleThreshold: (threshold: number) => void;
     setAudioAlerts: (audio: boolean) => void;
-    setHapticFeedback: (val: boolean) => void;
     setStealthMode: (stealth: boolean) => void;
     setShowBalances: (show: boolean) => void;
     setAllowAnalytics: (allow: boolean) => void;
     setAutoDisconnectTimer: (timer: SettingsState['autoDisconnectTimer']) => void;
-    setBiometricEnforcement: (val: boolean) => void;
-    setMempoolSniffer: (val: boolean) => void;
-    setMaxGasFee: (val: number) => void;
-    setMevProtection: (val: boolean) => void;
-    setPortfolioGraphDefault: (val: SettingsState['portfolioGraphDefault']) => void;
     setHardwareAcceleration: (val: boolean) => void;
     setSettingsOpen: (open: boolean) => void;
     clearAppData: () => void;
@@ -117,23 +93,13 @@ export const useSettingsStore = create<SettingsState>()(
             // Default Values
             theme: 'light',
             currency: 'USD',
-            language: 'en-US',
             layoutDensity: 'compact',
-            rpcNode: 'sovereign_local',
             testnetMode: false,
-            websocketHealthPing: true,
-            whaleThreshold: 1000000,
             audioAlerts: true,
-            hapticFeedback: true,
             stealthMode: false,
             showBalances: true,
             allowAnalytics: false,
             autoDisconnectTimer: '1h',
-            biometricEnforcement: false,
-            mempoolSniffer: true,
-            maxGasFee: 300,
-            mevProtection: true,
-            portfolioGraphDefault: 'candle',
             hardwareAcceleration: true,
 
             settings: null,
@@ -178,23 +144,13 @@ export const useSettingsStore = create<SettingsState>()(
 
             setTheme: (val) => get().updateSetting('theme', val),
             setCurrency: (val) => get().updateSetting('currency', val),
-            setLanguage: (val) => get().updateSetting('language', val),
             setLayoutDensity: (val) => get().updateSetting('layoutDensity', val),
-            setRpcNode: (val) => get().updateSetting('rpcNode', val),
             setTestnetMode: (val) => get().updateSetting('testnetMode', val),
-            setWebsocketHealthPing: (val) => get().updateSetting('websocketHealthPing', val),
-            setWhaleThreshold: (val) => get().updateSetting('whaleThreshold', val),
             setAudioAlerts: (val) => get().updateSetting('audioAlerts', val),
-            setHapticFeedback: (val) => get().updateSetting('hapticFeedback', val),
             setStealthMode: (val) => get().updateSetting('stealthMode', val),
             setShowBalances: (val) => get().updateSetting('showBalances', val),
             setAllowAnalytics: (val) => get().updateSetting('allowAnalytics', val),
             setAutoDisconnectTimer: (val) => get().updateSetting('autoDisconnectTimer', val),
-            setBiometricEnforcement: (val) => get().updateSetting('biometricEnforcement', val),
-            setMempoolSniffer: (val) => get().updateSetting('mempoolSniffer', val),
-            setMaxGasFee: (val) => get().updateSetting('maxGasFee', val),
-            setMevProtection: (val) => get().updateSetting('mevProtection', val),
-            setPortfolioGraphDefault: (val) => get().updateSetting('portfolioGraphDefault', val),
             setHardwareAcceleration: (val) => get().updateSetting('hardwareAcceleration', val),
 
             setSettingsOpen: (isSettingsOpen) => set({ isSettingsOpen }),
@@ -212,23 +168,13 @@ export const useSettingsStore = create<SettingsState>()(
             partialize: (state) => ({
                 theme: state.theme,
                 currency: state.currency,
-                language: state.language,
                 layoutDensity: state.layoutDensity,
-                rpcNode: state.rpcNode,
                 testnetMode: state.testnetMode,
-                websocketHealthPing: state.websocketHealthPing,
-                whaleThreshold: state.whaleThreshold,
                 audioAlerts: state.audioAlerts,
-                hapticFeedback: state.hapticFeedback,
                 stealthMode: state.stealthMode,
                 showBalances: state.showBalances,
                 allowAnalytics: state.allowAnalytics,
                 autoDisconnectTimer: state.autoDisconnectTimer,
-                biometricEnforcement: state.biometricEnforcement,
-                mempoolSniffer: state.mempoolSniffer,
-                maxGasFee: state.maxGasFee,
-                mevProtection: state.mevProtection,
-                portfolioGraphDefault: state.portfolioGraphDefault,
                 hardwareAcceleration: state.hardwareAcceleration
             })
         }

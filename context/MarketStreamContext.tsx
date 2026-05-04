@@ -31,23 +31,7 @@ export const useMarketStream = () => useContext(MarketStreamContext);
 
 // ── Client-side synthetic bootstrap so the UI is never empty on first paint ──
 function buildSyntheticMap(): Map<string, MarketData> {
-    const BASE: [string, number][] = [
-        ['BTCUSDT', 83500], ['ETHUSDT', 1610], ['BNBUSDT', 585],
-        ['SOLUSDT', 122],   ['XRPUSDT', 0.53],  ['ADAUSDT', 0.46],
-        ['DOGEUSDT', 0.16], ['AVAXUSDT', 20.5],  ['LINKUSDT', 11],
-        ['DOTUSDT', 5.2],   ['SUIUSDT', 0.85],   ['PEPEUSDT', 0.0000098],
-    ];
-    const m = new Map<string, MarketData>();
-    BASE.forEach(([sym, base]) => {
-        m.set(sym, {
-            symbol: sym,
-            lastPrice: base.toFixed(sym === 'BTCUSDT' || sym === 'ETHUSDT' ? 2 : 4),
-            priceChangePercent: "0.00",
-            quoteVolume: (base * 1000).toFixed(2),
-            source: 'client-deterministic',
-        });
-    });
-    return m;
+    return new Map<string, MarketData>();
 }
 
 export const MarketStreamProvider = ({ children }: { children: ReactNode }) => {
