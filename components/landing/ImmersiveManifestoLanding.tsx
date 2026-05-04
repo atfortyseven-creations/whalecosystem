@@ -4,6 +4,7 @@ import React from "react";
 import { OptimizedLocalLottie } from "./OptimizedLocalLottie";
 import { Scan } from "lucide-react";
 import { WorldMapBackground, BtcTransferLegend } from "./WorldMapBackground";
+import { WhalecosystemTweetFeed } from "./WhalecosystemTweetFeed";
 
 // Pre-defined list of lottie files matching the narrative sections.
 // This preserves the "zero build-time bloat" since these are just string paths
@@ -300,7 +301,10 @@ export function ImmersiveManifestoLanding({ onOpenScanner, hideMap = false }: { 
         {/* ─── Strategic, Legal & Business Framework ─── */}
         <StrategicCorporateDocumentation />
 
-
+        {/* ─── Live Ecosystem Intel ─── */}
+        <div className="w-full flex flex-col pt-12 pb-8">
+          <WhalecosystemTweetFeed />
+        </div>
 
         </main>
 

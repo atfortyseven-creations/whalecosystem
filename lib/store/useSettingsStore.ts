@@ -58,6 +58,22 @@ const applyDOMClasses = (state: Partial<SovereignSettings>) => {
     if (typeof document === 'undefined') return;
     const html = document.documentElement;
 
+    // ── Theme Enforcement ───────────────────────────────────────────────────
+    if (state.theme) {
+        if (state.theme === 'dark') {
+            html.classList.add('dark');
+        } else if (state.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            // System fallback
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        }
+    }
+
     // ── UI Density ──────────────────────────────────────────────────────────
     if (state.layoutDensity || state.density) {
         const d = state.layoutDensity || state.density;
