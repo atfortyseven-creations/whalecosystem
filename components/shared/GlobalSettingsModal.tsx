@@ -16,17 +16,15 @@ type TabKey = 'general' | 'network' | 'sonar' | 'privacy' | 'execution' | 'displ
 
 export function GlobalSettingsModal() {
     const { 
-        theme, currency, language, layoutDensity, rpcNode, testnetMode, websocketHealthPing,
-        whaleThreshold, audioAlerts, hapticFeedback, 
-        stealthMode, showBalances, allowAnalytics, autoDisconnectTimer, biometricEnforcement,
-        mempoolSniffer, maxGasFee, mevProtection,
-        portfolioGraphDefault, hardwareAcceleration, isSettingsOpen,
+        theme, currency, layoutDensity, testnetMode,
+        audioAlerts, 
+        stealthMode, showBalances, allowAnalytics, autoDisconnectTimer,
+        hardwareAcceleration, isSettingsOpen,
         
-        setCurrency, setLanguage, setLayoutDensity, setRpcNode, setTestnetMode, setWebsocketHealthPing,
-        setWhaleThreshold, setAudioAlerts, setHapticFeedback,
-        setStealthMode, setShowBalances, setAllowAnalytics, setAutoDisconnectTimer, setBiometricEnforcement,
-        setMempoolSniffer, setMaxGasFee, setMevProtection,
-        setPortfolioGraphDefault, setHardwareAcceleration, setSettingsOpen, clearAppData
+        setCurrency, setLayoutDensity, setTestnetMode,
+        setAudioAlerts, 
+        setStealthMode, setShowBalances, setAllowAnalytics, setAutoDisconnectTimer,
+        setHardwareAcceleration, setSettingsOpen, clearAppData
     } = useSettingsStore();
 
     // Wrapped setters that also fire a confirmation toast
@@ -86,7 +84,7 @@ export function GlobalSettingsModal() {
                                 </div>
                                 <div>
                                     <h2 className="text-[12px] font-black text-[#050505] uppercase tracking-widest">Settings</h2>
-                                    <p className="text-[9px] text-[#888888] font-mono">20 Core Parameters</p>
+                                    <p className="text-[9px] text-[#888888] font-mono">Core Parameters</p>
                                 </div>
                                 <button onClick={() => setSettingsOpen(false)} className="md:hidden ml-auto p-2"><X size={18} /></button>
                             </div>
@@ -137,15 +135,6 @@ export function GlobalSettingsModal() {
                                                             <option value="CHF">CHF — Swiss Franc</option>
                                                         </SelectBox>
                                                     </div>
-                                                    {/* 3 */}
-                                                    <div className="flex-1 p-4 bg-white border border-[#E5E5E5] rounded-xl">
-                                                        <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block">3. Terminal Language</label>
-                                                        <SelectBox value={language} onChange={(e) => set(setLanguage, 'Language')(e.target.value as any)}>
-                                                            <option value="en-US">English (US)</option>
-                                                            <option value="es-ES">Español (ES)</option>
-                                                            <option value="zh-CN">Chinese (Mandarin)</option>
-                                                        </SelectBox>
-                                                    </div>
                                                 </div>
                                                 {/* 4 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
@@ -171,32 +160,12 @@ export function GlobalSettingsModal() {
                                             <SectionTitle title="Network Intelligence" subtitle="Configure Web3 providers and fallback rules." />
                                             <div className="space-y-4">
                                                 {/* 5 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
-                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 block flex items-center gap-2">5. RPC Data Node <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">REQUIRES RELOAD</span></label>
-                                                    <div className="space-y-2">
-                                                        <RadioOption group="rpc" id="sovereign_local" checked={rpcNode === 'sovereign_local'} onChange={() => { setRpcNode('sovereign_local'); toast.success('RPC: Sovereign Local — reload to apply', { duration: 3000, position: 'bottom-right' }); }} label="Sovereign Local Node" subtitle="Zero-latency WebSocket stream" />
-                                                        <RadioOption group="rpc" id="infura_premium" checked={rpcNode === 'infura_premium'} onChange={() => { setRpcNode('infura_premium'); toast.success('RPC: Infura Premium — reload to apply', { duration: 3000, position: 'bottom-right' }); }} label="Infura Premium" subtitle="Standard WSS fallback" />
-                                                        <RadioOption group="rpc" id="alchemy_mainnet" checked={rpcNode === 'alchemy_mainnet'} onChange={() => { setRpcNode('alchemy_mainnet'); toast.success('RPC: Alchemy Mainnet — reload to apply', { duration: 3000, position: 'bottom-right' }); }} label="Alchemy Mainnet" subtitle="Mempool extraction layer" />
-                                                    </div>
-                                                </div>
-                                                {/* 6 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div>
-                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">6. Testnet Analytics <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
+                                                        <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">5. Testnet Analytics <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
                                                         <span className="text-[10px] text-[#888888] block mt-1">Index Sepolia/Goerli</span>
                                                     </div>
                                                     <Toggle enabled={testnetMode} setEnabled={(v) => { setTestnetMode(v); toast.success(`Testnet mode ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 3000, position: 'bottom-right' }); }} />
-                                                </div>
-                                                {/* 7 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Radio size={14}/></div>
-                                                       <div>
-                                                          <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">7. WebSocket Keepalive <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span>
-                                                          <span className="text-[10px] text-[#888888] block mt-1">Send ping layer to prevent drops</span>
-                                                       </div>
-                                                    </div>
-                                                    <Toggle enabled={websocketHealthPing} setEnabled={(v) => { setWebsocketHealthPing(v); toast.success(`WS keepalive ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 2500, position: 'bottom-right' }); }} />
                                                 </div>
                                             </div>
                                         </TabContentWrapper>
@@ -207,34 +176,15 @@ export function GlobalSettingsModal() {
                                             <SectionTitle title="Sonar Configuration" subtitle="Define limits for whale transaction tracking." />
                                             <div className="space-y-4">
                                                 {/* 8 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl">
-                                                    <label className="text-[10px] font-black uppercase text-[#888888] tracking-widest mb-3 flex justify-between">
-                                                        <span>8. Minimum Discovery Load</span>
-                                                        <span className="text-black">${whaleThreshold.toLocaleString()}</span>
-                                                    </label>
-                                                    <input type="range" min="100000" max="50000000" step="100000" value={whaleThreshold} onChange={(e) => setWhaleThreshold(Number(e.target.value))} className="w-full h-2 bg-[#E5E5E5] rounded-lg appearance-none cursor-pointer accent-black" />
-                                                </div>
-                                                {/* 9 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                        <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Volume2 size={14}/></div>
                                                        <div>
-                                                           <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">9. Radar Audio Alerts</span>
+                                                           <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">8. Radar Audio Alerts</span>
                                                            <span className="text-[10px] text-[#888888] block mt-1">Play beep on trigger</span>
                                                        </div>
                                                     </div>
                                                     <Toggle enabled={audioAlerts} setEnabled={(v) => { setAudioAlerts(v); toast.success(`Audio alerts ${v ? 'enabled' : 'muted'}`, { duration: 1800, position: 'bottom-right' }); }} />
-                                                </div>
-                                                {/* 10 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Crosshair size={14}/></div>
-                                                       <div>
-                                                           <span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">10. Haptic Feedback</span>
-                                                           <span className="text-[10px] text-[#888888] block mt-1">Phone vibrate on execution</span>
-                                                       </div>
-                                                    </div>
-                                                    <Toggle enabled={hapticFeedback} setEnabled={setHapticFeedback} />
                                                 </div>
                                             </div>
                                         </TabContentWrapper>
@@ -268,18 +218,10 @@ export function GlobalSettingsModal() {
                                                     </div>
                                                     <Toggle enabled={allowAnalytics} setEnabled={setAllowAnalytics} />
                                                 </div>
-                                                 {/* 14 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="p-2 border border-[#E5E5E5] rounded"><Fingerprint size={14} className="text-black" /></div>
-                                                        <div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">14. Biometric Locking</span><span className="text-[10px] text-[#888888] block mt-1">Enforce FaceID on start</span></div>
-                                                    </div>
-                                                    <Toggle enabled={biometricEnforcement} setEnabled={setBiometricEnforcement} />
-                                                </div>
-                                                {/* 15 (Action) */}
+                                                {/* 14 (Action) */}
                                                 <div className="pt-4 border-t border-[#E5E5E5]">
                                                     <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                       <div className="flex items-center gap-3"><div className="p-2 border border-[#E5E5E5] rounded bg-[#FAF9F6]"><HardDrive size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">15. Clear Terminal Cache</span><span className="text-[10px] text-[#888888] block mt-1">Purge graph queries & cache</span></div></div>
+                                                       <div className="flex items-center gap-3"><div className="p-2 border border-[#E5E5E5] rounded bg-[#FAF9F6]"><HardDrive size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">14. Clear Terminal Cache</span><span className="text-[10px] text-[#888888] block mt-1">Purge graph queries & cache</span></div></div>
                                                        <button onClick={() => { if(confirm("Purge application cache?")) clearAppData(); }} className="px-4 py-2 border border-[#FF3B30] text-[#FF3B30] text-[9px] font-black uppercase rounded-lg hover:bg-[#FF3B30] hover:text-white transition-all">Purge</button>
                                                     </div>
                                                 </div>
@@ -300,20 +242,7 @@ export function GlobalSettingsModal() {
                                                         ))}
                                                     </div>
                                                 </div>
-                                                {/* 17 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Network size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block flex items-center gap-2">17. Mempool Sniffer <span className="text-[8px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-black tracking-widest">RELOAD</span></span><span className="text-[10px] text-[#888888] block mt-1">Scan unconfirmed TXNs</span></div>
-                                                    </div>
-                                                    <Toggle enabled={mempoolSniffer} setEnabled={(v) => { setMempoolSniffer(v); toast.success(`Mempool sniffer ${v ? 'enabled' : 'disabled'} — reload to apply`, { duration: 3000, position: 'bottom-right' }); }} />
-                                                </div>
-                                                {/* 18 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Shield size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">18. MEV Protection</span><span className="text-[10px] text-[#888888] block mt-1">Use private flashbots</span></div>
-                                                    </div>
-                                                    <Toggle enabled={mevProtection} setEnabled={setMevProtection} />
-                                                </div>
+
                                             </div>
                                         </TabContentWrapper>
                                     )}
@@ -322,21 +251,10 @@ export function GlobalSettingsModal() {
                                         <TabContentWrapper key="display">
                                             <SectionTitle title="Display & Hardware" subtitle="Graphics rendering and chart visualization settings." />
                                             <div className="space-y-4">
-                                                {/* 19 */}
+                                                {/* 17 */}
                                                 <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><BarChart2 size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">19. Default Chart</span><span className="text-[10px] text-[#888888] block mt-1">Portfolio visualization</span></div>
-                                                    </div>
-                                                    <div className="flex bg-[#FAF9F6] border border-[#E5E5E5] rounded-lg p-1">
-                                                        {(['line', 'candle'] as const).map(d => (
-                                                            <button key={d} onClick={() => setPortfolioGraphDefault(d)} className={`px-4 py-1.5 rounded text-[9px] font-black uppercase transition-all ${portfolioGraphDefault === d ? 'bg-black text-white shadow' : 'text-[#888888] hover:text-black'}`}>{d}</button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                {/* 20 */}
-                                                <div className="p-4 bg-white border border-[#E5E5E5] rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Monitor size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">20. Hardware Acceleration</span><span className="text-[10px] text-[#888888] block mt-1">Allow WebGL / GPU graph</span></div>
+                                                       <div className="p-2 border border-[#E5E5E5] bg-[#FAF9F6] rounded"><Monitor size={14}/></div><div><span className="text-[11px] font-black text-[#050505] uppercase tracking-wider block">17. Hardware Acceleration</span><span className="text-[10px] text-[#888888] block mt-1">Allow WebGL / GPU graph</span></div>
                                                     </div>
                                                     <Toggle enabled={hardwareAcceleration} setEnabled={setHardwareAcceleration} />
                                                 </div>

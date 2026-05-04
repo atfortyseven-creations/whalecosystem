@@ -1202,3 +1202,21 @@ html.no-hw-accel * {
   --forum-button-text: #050505;
   --forum-accent: #00C076;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   SOVEREIGN DYNAMIC SETTINGS CLASSES
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Show Balances: hide-balances class */
+html.hide-balances .balance-value,
+html.hide-balances [data-balance],
+html.hide-balances .privacy-sensitive {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Hardware Acceleration: disable GPU compositing hints */
+html.no-hw-accel * {
+  will-change: auto !important;
+}

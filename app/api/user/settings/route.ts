@@ -6,30 +6,19 @@ import { validateSecureRequest } from '@/lib/security/premium-security';
 const STORE_TO_DB: Record<string, string> = {
     theme:                  'theme',
     currency:               'currency',
-    language:               'language',
     showBalances:           'showBalances',
     stealthMode:            'stealthMode',
     allowAnalytics:         'allowAnalytics',
-    mevProtection:          'mevProtection',
     testnetMode:            'testnetMode',
     audioAlerts:            'soundEffects',
-    whaleThreshold:         'whaleAlertThreshold',
     autoDisconnectTimer:    'autoDisconnectTimer',
     layoutDensity:          'layoutDensity',
-    rpcNode:                'rpcNode',
-    websocketHealthPing:    'websocketHealthPing',
-    hapticFeedback:         'hapticFeedback',
-    biometricEnforcement:   'biometricEnforcement',
-    mempoolSniffer:         'mempoolSniffer',
-    maxGasFee:              'maxGasFee',
-    portfolioGraphDefault:  'portfolioGraphDefault',
     hardwareAcceleration:   'hardwareAcceleration',
 };
 
 // ── DB column → store key (reverse map for GET) ───────────────────────────────
 const DB_TO_STORE: Record<string, string> = {
     soundEffects:        'audioAlerts',
-    whaleAlertThreshold: 'whaleThreshold',
 };
 
 function mapDbToStore(data: Record<string, any>): Record<string, any> {
@@ -43,7 +32,7 @@ function mapDbToStore(data: Record<string, any>): Record<string, any> {
 
 // ── Safe columns guaranteed to exist in every DB schema version ──────────────
 const SAFE_COLUMNS = [
-    'theme', 'currency', 'language'
+    'theme', 'currency'
 ];
 
 export async function GET(req: any) {
@@ -59,14 +48,11 @@ export async function GET(req: any) {
             user = await (prisma as any).user.findUnique({
                 where: { walletAddress: address },
                 select: {
-                    theme: true, currency: true, language: true,
+                    theme: true, currency: true,
                     showBalances: true, stealthMode: true, allowAnalytics: true,
-                    mevProtection: true, testnetMode: true,
-                    soundEffects: true, whaleAlertThreshold: true,
+                    testnetMode: true, soundEffects: true,
                     autoDisconnectTimer: true, layoutDensity: true,
-                    rpcNode: true, websocketHealthPing: true, hapticFeedback: true,
-                    biometricEnforcement: true, mempoolSniffer: true,
-                    maxGasFee: true, portfolioGraphDefault: true, hardwareAcceleration: true,
+                    hardwareAcceleration: true,
                 },
             });
         } catch {
@@ -75,9 +61,9 @@ export async function GET(req: any) {
                 user = await prisma.user.findUnique({
                     where: { walletAddress: address },
                     select: {
-                        theme: true, currency: true, language: true,
+                        theme: true, currency: true,
                         showBalances: true, stealthMode: true,
-                        allowAnalytics: true, mevProtection: true,
+                        allowAnalytics: true,
                     },
                 });
             } catch {
@@ -87,7 +73,6 @@ export async function GET(req: any) {
                     select: {
                         theme: true,
                         currency: true,
-                        language: true,
                     },
                 });
             }
@@ -115,12 +100,7 @@ export async function PATCH(req: any) {
         for (const storeKey of Object.keys(body)) {
             const dbKey = STORE_TO_DB[storeKey];
             if (!dbKey) continue;
-            const val = body[storeKey];
-            if (dbKey === 'whaleAlertThreshold' || dbKey === 'maxGasFee') {
-                updateData[dbKey] = parseFloat(val);
-            } else {
-                updateData[dbKey] = val;
-            }
+            updateData[dbKey] = body[storeKey];
         }
 
         if (Object.keys(updateData).length === 0) {

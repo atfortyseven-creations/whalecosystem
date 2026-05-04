@@ -18,7 +18,7 @@ export default function TopicPage() {
   const { signMessageAsync } = useSignMessage();
   const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<string | null>(null);
   
-  const { address } = useSovereignAccount();
+  const { address, isSovereignHandshake } = useSovereignAccount();
   const sessionAddress = address?.toLowerCase() || null;
 
   // Draft persistence key is scoped per topic so different threads have independent drafts
@@ -64,8 +64,12 @@ export default function TopicPage() {
       // the signature request, we post without a signature rather than blocking.
       let finalContent = replyContent;
       try {
-        const signature = await signMessageAsync({ message: replyContent });
-        finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
+        if (!isSovereignHandshake) {
+            const signature = await signMessageAsync({ message: replyContent });
+            finalContent = `${replyContent}\n\n[SIGNATURE:${signature}]`;
+        } else {
+            finalContent = `${replyContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
+        }
       } catch (e: any) {
         setReplyError('CRYPTOGRAPHIC SIGNATURE REQUIRED');
         setSubmitting(false);
