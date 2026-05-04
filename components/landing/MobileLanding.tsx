@@ -81,6 +81,7 @@ const DynamicQRScannerModal = dynamic(
 );
 
 import { ImmersiveManifestoLanding } from "./ImmersiveManifestoLanding";
+import { WhalecosystemTweetFeed } from "./WhalecosystemTweetFeed";
 
 // ── Colour tokens ─────────────────────────────────────────────────────────────
 const IVORY = "#FAF9F6";
@@ -526,6 +527,16 @@ function ConnectedScreen({
                ))
              )}
           </div>
+        </motion.div>
+
+        {/* ─── Live Ecosystem Intel ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="w-full flex flex-col pt-8 pb-4"
+        >
+          <WhalecosystemTweetFeed />
         </motion.div>
       </main>
 
