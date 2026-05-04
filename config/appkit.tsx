@@ -15,7 +15,7 @@ import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
     || process.env.NEXT_PUBLIC_WC_PROJECT_ID
-    || 'dd0819151fda02095518d0ffb20c64a0'; // Whale Alert Network production project
+    || 'bf1083a298e7222c838266166b12b2ba'; // Whale Alert Network production project
 if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
     if (typeof window !== 'undefined') {
         console.warn('[WalletConnect] Using hardcoded project ID. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.');
@@ -87,7 +87,7 @@ const queryClient = new QueryClient()
 
 // CRITICAL: metadata.url MUST match EXACTLY the domain registered in WalletConnect/Reown Cloud.
 //
-// WalletConnect Cloud allowlist (project dd0819151fda02095518d0ffb20c64a0) contains:
+// WalletConnect Cloud allowlist (project bf1083a298e7222c838266166b12b2ba) contains:
 //   - humanidfi.com
 //   - https://humanidfi.com
 //   - www.humanidfi.com  (added 2026-05-05)
