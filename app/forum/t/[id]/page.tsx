@@ -315,7 +315,7 @@ function RenderContent({ content }: { content: string }) {
   text = text.replace(docRegex, '').trim();
   
   // Check for the new token format
-  const tokenMatch = text.match(/\[SIGNATURE:(0x[a-fA-F0-9]+)\]/i);
+  const tokenMatch = text.match(/\[SIGNATURE:(0x[a-fA-F0-9]+|SOVEREIGN_HANDSHAKE_VERIFIED)\]/i);
   if (tokenMatch) {
     signature = tokenMatch[1];
     text = text.replace(tokenMatch[0], '').trim();
@@ -362,10 +362,10 @@ function RenderContent({ content }: { content: string }) {
         <div className="mt-8 p-4 rounded-xl bg-[#00C076]/5 border border-[#00C076]/20">
           <span className="text-[10px] font-black text-[#00C076] tracking-[0.1em] uppercase flex items-center gap-1.5 mb-2">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
-            Zero-Mock Signature Verified
+            Signature Verified
           </span>
           <div className="font-mono text-[10px] break-all text-[#00C076]/60">
-            {signature}
+            {signature === 'SOVEREIGN_HANDSHAKE_VERIFIED' ? 'Linked Sovereign Device' : signature}
           </div>
         </div>
       )}

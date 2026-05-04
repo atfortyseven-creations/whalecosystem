@@ -14,23 +14,23 @@ const MENU_ITEMS = [
   {
     label: "Analytics", href: "#",
     subItems: [
-      { label: "Intelligence", description: "On-chain analytics and graphing.", href: "/dashboard?tab=graph" },
-      { label: "Transaction History", description: "Complete history of all wallet actions.", href: "/dashboard?tab=inst-ledger" },
+      { label: "Intelligence", description: "On-chain analytics and graphing.", href: "/sovereign-intel" },
+      { label: "Transaction History", description: "Complete history of all wallet actions.", href: "/ledger" },
     ]
   },
-  { label: "Global News", href: "/dashboard?tab=news", description: "Curated market and crypto news." },
+  { label: "Global News", href: "/news", description: "Curated market and crypto news." },
   {
     label: "Assets", href: "#",
     subItems: [
-      { label: "Cold Wallet", description: "Secure long-term asset storage.", href: "/dashboard?tab=vault" },
+      { label: "Cold Wallet", description: "Secure long-term asset storage.", href: "/portfolio" },
     ]
   },
   {
     label: "Ecosystem", href: "#",
     subItems: [
-      { label: "Academy", description: "Educational courses and articles.", href: "/dashboard?tab=academy" },
+      { label: "Academy", description: "Educational courses and articles.", href: "/academy" },
       { label: "Developers", description: "API links and system architecture.", href: "/developer" },
-      { label: "Support", description: "Help center and system status.", href: "/dashboard?tab=support" },
+      { label: "Support", description: "Help center and system status.", href: "/support" },
     ]
   },
   { label: "Forum", href: "/forum" },

@@ -1212,13 +1212,7 @@ export function MobileLanding() {
           transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center"
         >
-          {/* Security trust badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 mb-5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-[0.25em] text-emerald-700">
-              ECDSA · On-Chain · Non-Custodial
-            </span>
-          </div>
+          {/* Security trust badge removed */}
           <h1 className="text-[2.6rem] sm:text-[3.2rem] font-black tracking-tight leading-[1.0] mb-2 uppercase" style={{ color: INK }}>
             WHALE ALERT NETWORK
           </h1>
@@ -1376,16 +1370,33 @@ export function MobileLanding() {
              <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#8A94A6]/70 text-center">
                 Establish Academic Correspondence
              </p>
-             <div className="flex flex-col overflow-hidden rounded border border-white/10 bg-[#050505]/70 w-full max-w-[320px] mx-auto shadow-xl">
+             <form onSubmit={(e) => {
+                 e.preventDefault();
+                 const email = (e.target as any).email.value;
+                 if (!email) return;
+                 const btn = (e.target as any).querySelector('button');
+                 btn.innerHTML = 'Sending...';
+                 btn.disabled = true;
+                 fetch('/api/subscribe', {
+                     method: 'POST',
+                     body: JSON.stringify({ email })
+                 }).then(() => {
+                     btn.innerHTML = 'Subscribed';
+                 }).catch(() => {
+                     btn.innerHTML = 'Error';
+                     btn.disabled = false;
+                 });
+             }} className="flex flex-col overflow-hidden rounded border border-white/10 bg-[#050505]/70 w-full max-w-[320px] mx-auto shadow-xl">
                 <input
+                   name="email"
                    type="email"
                    placeholder="ENTER SECURE EMAIL"
                    className="bg-transparent px-4 py-3 outline-none font-mono text-[10px] tracking-widest text-[#E0E0E0] placeholder:text-[#545F73] text-center"
                 />
-                <button className="px-4 py-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EAEAEA] text-[#0A0A0A] hover:bg-white transition-colors active:scale-95">
+                <button type="submit" className="px-4 py-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EAEAEA] text-[#0A0A0A] hover:bg-white transition-colors active:scale-95 disabled:opacity-50">
                    Subscribe
                 </button>
-             </div>
+             </form>
           </div>
 
           <div className="w-full h-px bg-white/5" />
