@@ -89,20 +89,17 @@ const queryClient = new QueryClient()
 // We must use window.location.origin EXACTLY. If the user is on humanidfi.com (no www),
 // redirecting them to www.humanidfi.com breaks the WalletConnect connection because
 // IndexedDB/localStorage pairing sessions are isolated per subdomain.
-// Using a strict hardcoded production URL. WalletConnect Cloud and Mobile Wallets 
-// will SILENTLY reject the session proposal if the URL is an IP address (e.g. 192.168.1.x)
-// or an HTTP localhost during development. If the session is rejected, the AppKit 
-// "Open" button won't have a valid wc:// URI and will do absolutely nothing.
-const APP_URL = 'https://humanidfi.com';
+// Dynamic origin guarantees exact domain match (www vs non-www) for Android App Links validation
+const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
 
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Humanity Ledger — Sovereign Institutional Intelligence',
-    // CRITICAL: Must be a valid public HTTPS URL.
+    // MUST match exact origin or Android Chrome blocks the Intent
     url: APP_URL,
-    // Real icon URL (min 512x512) — empty array caused Rainbow "Connection failed"
-    // on some relay nodes. A valid icon prevents relay timeout on mobile handshake.
-    icons: [`${APP_URL}/whale-logo.png`],
+    // Using an ultra-lightweight SVG (4KB) to guarantee the WalletConnect Relay 
+    // accepts the session proposal. Icons > 100KB can cause silent drops!
+    icons: [`${APP_URL}/f_log.svg`],
 }
 
 // ── NOTE: siweConfig intentionally removed.

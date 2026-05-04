@@ -715,7 +715,10 @@ export function MobileLanding() {
     if (isSigningRef.current) return;
     
     isSigningRef.current = true;
-    try { rkCloseModal(); } catch {}
+    
+    // We intentionally DO NOT call rkCloseModal() here anymore.
+    // Calling close before signMessageAsync() hides the crucial AppKit UI 
+    // that gives the user the 'Open Wallet to Sign' deep link button!
     const norm = addr.toLowerCase();
 
     // EXPERT SECURITY FIX: Enforce real ECDSA signature instead of hardcoded bypass
