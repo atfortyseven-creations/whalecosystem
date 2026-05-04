@@ -1268,18 +1268,16 @@ export function MobileLanding() {
                   rkOpenModal();
                 };
 
-                // Only disconnect a STALE session (wagmi thinks connected but user is NOT linked).
-                // This prevents killing a valid active session before opening the modal.
-                if (wagmiConnected && !isLinked) {
-                  try { disconnect(); } catch {}
-                  setTimeout(doOpen, 300);
-                } else {
-                  doOpen();
-                }
+                // CRITICAL: Do NOT pre-disconnect before opening AppKit modal.
+                // Calling disconnect() before rkOpenModal() resets the WalletConnect
+                // relay session, causing the 'Open' button in the wallet deep-link
+                // modal to tap but do nothing (relay has no session to resume).
+                // Instead, open the modal directly and let AppKit manage any stale session.
+                doOpen();
 
-                setTimeout(() => setConnecting(null), 3000);
-                // 400ms: deep-link returns before 1.2s on most Android devices
-                setTimeout(() => setShowFallbackBtn(true), 1400);
+                setTimeout(() => setConnecting(null), 5000);
+                // Show fallback button after 3.5s (enough time for deep-link to return)
+                setTimeout(() => setShowFallbackBtn(true), 3500);
               };
 
               return (

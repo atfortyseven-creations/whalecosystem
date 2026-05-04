@@ -85,21 +85,42 @@ export const config = wagmiAdapter.wagmiConfig
 
 const queryClient = new QueryClient()
 
-// CRITICAL: metadata.url MUST match a domain registered in WalletConnect/Reown Cloud.
-// We must use window.location.origin EXACTLY. If the user is on humanidfi.com (no www),
-// redirecting them to www.humanidfi.com breaks the WalletConnect connection because
-// IndexedDB/localStorage pairing sessions are isolated per subdomain.
-// Dynamic origin guarantees exact domain match (www vs non-www) for Android App Links validation
-const APP_URL = typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com';
+// CRITICAL: metadata.url MUST match EXACTLY the domain registered in WalletConnect/Reown Cloud.
+//
+// WalletConnect Cloud allowlist (project dd0819151fda02095518d0ffb20c64a0) contains:
+//   - humanidfi.com
+//   - https://humanidfi.com
+//   - www.humanidfi.com  (added 2026-05-05)
+//
+// WHY this is non-trivial:
+//   createAppKit() is called at MODULE LEVEL. In Next.js SSR, window is undefined
+//   so we cannot use window.location.origin. We need a build-time constant.
+//   When the URL in metadata doesn't match what's registered in cloud.reown.com,
+//   the WalletConnect relay silently rejects the session proposal — causing the
+//   'Open' button in the wallet deep-link modal to tap but do NOTHING.
+//
+// Using https://humanidfi.com (no www) as canonical — it is the base allowlisted entry.
+const CANONICAL_APP_URL = 'https://humanidfi.com';
+
+// Runtime override: in local dev, use the actual origin so previews work.
+// In production builds this constant is evaluated once at module load (SSR=server).
+const APP_URL = (() => {
+    // SSR path: window doesn't exist — return the canonical registered URL
+    if (typeof window === 'undefined') return CANONICAL_APP_URL;
+    const origin = window.location.origin;
+    // Any humanidfi.com variant → normalise to the exact registered URL (no www)
+    if (origin.includes('humanidfi.com')) return CANONICAL_APP_URL;
+    // Railway preview or localhost: use the actual origin
+    return origin;
+})();
 
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Humanity Ledger — Sovereign Institutional Intelligence',
-    // MUST match exact origin or Android Chrome blocks the Intent
+    // MUST match exactly the URL registered in https://cloud.reown.com
     url: APP_URL,
-    // Using an ultra-lightweight SVG (4KB) to guarantee the WalletConnect Relay 
-    // accepts the session proposal. Icons > 100KB can cause silent drops!
-    icons: [`${APP_URL}/f_log.svg`],
+    // SVG icon — ultra-lightweight to prevent WalletConnect relay silent drops (>100KB causes drops)
+    icons: [`${CANONICAL_APP_URL}/f_log.svg`],
 }
 
 // ── NOTE: siweConfig intentionally removed.
