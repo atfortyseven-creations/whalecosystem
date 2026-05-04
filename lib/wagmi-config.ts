@@ -26,7 +26,7 @@ export const config = createConfig({
                 name: 'WhaleAlert ID.fi',
                 description: 'The Sovereign Identity & Prediction Market Suite',
                 url: 'https://humanidfi.com',
-                icons: ['/official-whale-legendary.png'],
+                icons: ['https://humanidfi.com/official-whale-legendary.png'],
             }
         }),
         coinbaseWallet({ 

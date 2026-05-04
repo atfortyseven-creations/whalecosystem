@@ -100,7 +100,7 @@ const metadata = {
     url: APP_URL,
     // Real icon URL (min 512x512) — empty array caused Rainbow "Connection failed"
     // on some relay nodes. A valid icon prevents relay timeout on mobile handshake.
-    icons: [`${APP_URL}/icon.png`],
+    icons: [`${APP_URL}/whale-logo.png`],
 }
 
 // ── NOTE: siweConfig intentionally removed.
