@@ -3,19 +3,19 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Careers | Sovereign Intelligence Network',
-  description: 'Join the core team architecting the definitive standard for on-chain intelligence. We decode global financial entropy through stochastic filtering and zero-knowledge paradigms.',
+  title: 'Careers | Whale Alert Network',
+  description: 'Join the team building the most trusted on-chain intelligence platform for traders and institutions. We are remote, async, and growing.',
   openGraph: {
-    title: 'Careers | Sovereign Intelligence Network',
-    description: 'Engineering the Abyss. Join the core team and build the future of absolute cryptographic transparency.',
+    title: 'Join the Team | Whale Alert Network',
+    description: 'Help us build the clearest window into on-chain activity. Remote-first, fast-moving, and well-compensated.',
     url: 'https://sovereign.network/careers',
-    siteName: 'Sovereign Intelligence Network',
+    siteName: 'Whale Alert Network',
     images: [
       {
         url: '/models/update/3d-shape-glowing-with-bright-holographic-colors.jpg',
         width: 1200,
         height: 630,
-        alt: 'Sovereign Intelligence Network Careers',
+        alt: 'Careers at Whale Alert Network',
       },
     ],
     locale: 'en_US',
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Careers | Sovereign Intelligence Network',
-    description: 'Engineering the Abyss. Join the core team.',
+    title: 'Careers | Whale Alert Network',
+    description: 'Help us build the clearest window into on-chain activity.',
     images: ['/models/update/3d-shape-glowing-with-bright-holographic-colors.jpg'],
   },
 };
@@ -32,18 +32,18 @@ export const metadata: Metadata = {
 const CULTURE_PILLARS = [
   {
     id: "01",
-    title: "Zero-Knowledge Culture",
-    text: "We value what you can mathematically prove, not your corporate pedigree. Meritocracy at the protocol layer."
+    title: "Your work speaks for itself",
+    text: "We care about what you build, not where you went to school or what your LinkedIn says. Great work is the only credential that matters here."
   },
   {
     id: "02",
-    title: "Asymmetric Velocity",
-    text: "We ship institutional-grade infrastructure faster than legacy finance convenes a board meeting. Execution is everything."
+    title: "We ship fast",
+    text: "Small teams, clear ownership, quick decisions. We ship working software over lengthy planning cycles, and we trust everyone to move without permission."
   },
   {
     id: "03",
-    title: "Absolute Sovereignty",
-    text: "Fully remote. Fully asynchronous. We provide the highest tier of compensation for the highest tier of autonomy."
+    title: "Work from anywhere",
+    text: "Fully remote, fully async. We hire the best people regardless of location, and we pay them competitively — in fiat or stablecoins, your choice."
   }
 ];
 
@@ -66,7 +66,7 @@ export default function CareersPage() {
             </div>
           </div>
           <p className="font-serif text-[14px] text-[#444] max-w-xl mx-auto leading-[1.8] border-t border-b border-black/10 py-6 mt-4">
-            We are architecting the definitive standard for on-chain intelligence. We decode global financial entropy through stochastic filtering and zero-knowledge paradigms. Join the core team and build the future of absolute cryptographic transparency.
+            We are a small, focused team building the most trusted on-chain intelligence platform for traders and institutions. If you want to work on hard problems, ship fast, and see your work used by thousands of people every day — we would love to hear from you.
           </p>
         </header>
 
@@ -102,10 +102,10 @@ export default function CareersPage() {
              <div className="w-full sm:w-[320px] bg-black text-[#FDFCF8] flex flex-col justify-center p-8 sm:p-10 shrink-0 relative overflow-hidden">
                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/10 to-transparent rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
                <h3 className="font-sans text-[24px] font-medium mb-4 text-white relative z-10">
-                 Engineering the Abyss
+                 Build something that matters
                </h3>
                <p className="font-serif text-[14px] leading-[1.8] text-white/70 relative z-10">
-                 Our technical perimeter extends from deep mempool parsing to cross-chain liquidity reconstruction. We seek cryptographic architects capable of reading the matrix.
+                 We track billions in on-chain capital every day. Your code runs in production from day one, used by traders, funds, and analysts making real decisions with real money.
                </p>
              </div>
              <div className="flex-1 p-8 sm:p-10 flex flex-col justify-center">
@@ -113,22 +113,22 @@ export default function CareersPage() {
                   <li className="flex items-start gap-5">
                     <span className="font-mono text-[12px] font-medium text-black/30 mt-1">01</span>
                     <div className="flex flex-col gap-1">
-                      <h4 className="font-sans text-[16px] font-medium text-black">Unmatched Autonomy</h4>
-                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Operate with elite tactical freedom. You dictate your execution flow.</p>
+                      <h4 className="font-sans text-[16px] font-medium text-black">Real ownership from day one</h4>
+                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">No micromanagement, no bloated processes. You own your work end to end and make your own calls.</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-5">
                     <span className="font-mono text-[12px] font-medium text-black/30 mt-1">02</span>
                     <div className="flex flex-col gap-1">
-                      <h4 className="font-sans text-[16px] font-medium text-black">Top-Tier Compensation</h4>
-                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Base salaries positioned in the 95th percentile, strictly paid in stablecoins or fiat per preference.</p>
+                      <h4 className="font-sans text-[16px] font-medium text-black">Competitive compensation</h4>
+                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Top-of-market salaries ($80k–$160k depending on role and experience). Paid in fiat or stablecoins, fully your preference.</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-5">
                     <span className="font-mono text-[12px] font-medium text-black/30 mt-1">03</span>
                     <div className="flex flex-col gap-1">
-                      <h4 className="font-sans text-[16px] font-medium text-black">Institutional Reach</h4>
-                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Your architecture will directly index the portfolios of the largest global sovereign funds and entities.</p>
+                      <h4 className="font-sans text-[16px] font-medium text-black">Real impact, real scale</h4>
+                      <p className="font-serif text-[14px] text-[#444] leading-[1.7]">Your work will be used by thousands of traders and institutions tracking on-chain activity in real time, every single day.</p>
                     </div>
                   </li>
                 </ul>

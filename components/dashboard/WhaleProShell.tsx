@@ -223,6 +223,18 @@ export function WhaleProShell({
     const [isSessionLocked, setIsSessionLocked] = useState(false);
     const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    // ── True Desktop Detection ────────────────────────────────────────────────
+    // Uses hardware screen.width (not viewport) so narrowing the browser window
+    // on a PC does NOT trigger the mobile nav. Only real mobile devices (screen
+    // width < 1024px on physical hardware) see the bottom navigation bar.
+    const [isTrueDesktop, setIsTrueDesktop] = useState(true);
+    useEffect(() => {
+        const check = () => setIsTrueDesktop(window.screen.width >= 1024);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
+
     const { setSettingsOpen, autoDisconnectTimer, stealthMode } = useSettingsStore();
     const router = useRouter();
     const { disconnect } = useDisconnect();
@@ -351,11 +363,13 @@ export function WhaleProShell({
         <div className={`flex fixed inset-0 bg-[#FAF9F6] text-[#050505] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
 
             
-            {/* ─── Persistent Pro Sidebar (Desktop Only) ─── */}
+            {/* ─── Persistent Pro Sidebar (True Desktop Only) ─── */}
+            {/* isTrueDesktop uses screen.width (hardware), not viewport, so     */}
+            {/* narrowing the browser window on a PC keeps the sidebar visible.  */}
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 240 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="hidden md:flex sticky top-0 h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shrink-0"
+                className={`${isTrueDesktop ? 'flex' : 'hidden'} sticky top-0 h-full border-r border-[#E5E5E5] bg-[#FAF9F6] flex-col z-50 shrink-0`}
             >
                 {/* Logo area */}
                 {!isCollapsed && (
@@ -488,7 +502,9 @@ export function WhaleProShell({
                 </main>
 
                 {/* ─── Bottom Tab Navigation (Mobile Only) ─── */}
-                <nav className="md:hidden h-16 border-t border-black/10 bg-white flex items-center justify-around px-2 shrink-0 z-50" style={{ minHeight: '64px', maxHeight: '64px' }}>
+                {/* Only renders on real mobile hardware (screen.width < 1024).  */}
+                {/* Narrowing a PC browser window will NOT show this nav bar.    */}
+                <nav className={`${isTrueDesktop ? 'hidden' : 'flex'} h-16 border-t border-black/10 bg-white items-center justify-around px-2 shrink-0 z-50`} style={{ minHeight: '64px', maxHeight: '64px' }}>
                     {[
                         { id: 'news', icon: <Newspaper size={20} />, label: 'News' },
                         { id: 'markets', icon: <Globe size={20} />, label: 'Markets' },

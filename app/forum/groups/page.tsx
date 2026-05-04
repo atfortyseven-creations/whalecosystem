@@ -26,10 +26,10 @@ export default async function ForumGroupsPage() {
   }
 
   const groups = [
-    { id: 'ELITE',    label: 'Elite Matrix',        sub: 'Full node-level access',              count: groupsData.ELITE    },
-    { id: 'PRO',      label: 'Institutional Pro',   sub: 'MEV & DeFi yield signal access',      count: groupsData.PRO      },
-    { id: 'STANDARD', label: 'Standard Operators',  sub: 'On-chain telemetry verified',         count: groupsData.STANDARD },
-    { id: 'FREE',     label: 'Public Observers',    sub: 'Public consensus network',            count: groupsData.FREE     },
+    { id: 'ELITE',    label: 'Enterprise Members',    sub: 'Full platform access — all features unlocked',  count: groupsData.ELITE    },
+    { id: 'PRO',      label: 'Professional Members',  sub: 'Advanced analytics and real-time data access',  count: groupsData.PRO      },
+    { id: 'STANDARD', label: 'Explorer Members',      sub: 'Market data and community access',               count: groupsData.STANDARD },
+    { id: 'FREE',     label: 'Free Members',           sub: 'Forum and news access',                          count: groupsData.FREE     },
   ];
 
   return (
@@ -44,10 +44,10 @@ export default async function ForumGroupsPage() {
         </div>
         <div className="flex items-center justify-between">
             <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
-              Network Cohorts
+              Member Groups
             </h1>
             <div className="text-[14px] font-sans text-black/50 dark:text-[#888888]">
-              Total: <span className="font-bold text-black dark:text-white">{groupsData.TOTAL} Nodes</span>
+              Total: <span className="font-bold text-black dark:text-white">{groupsData.TOTAL} Members</span>
             </div>
         </div>
       </div>
