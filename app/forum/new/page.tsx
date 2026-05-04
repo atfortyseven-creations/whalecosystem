@@ -71,7 +71,7 @@ export default function NewTopicPage() {
       return;
     }
     if (!isConnected) {
-      setError('WALLET CONNECTION REQUIRED TO INITIATE MANDATE.');
+      setError('Please connect your wallet to post.');
       return;
     }
     setSubmitting(true);
@@ -93,7 +93,7 @@ export default function NewTopicPage() {
             finalContent = `${finalContent}\n\n[SIGNATURE:SOVEREIGN_HANDSHAKE_VERIFIED]`;
         }
       } catch (e: any) {
-        setError('CRYPTOGRAPHIC SIGNATURE REQUIRED TO SEAL PROPOSAL');
+        setError('Signing failed. Please try again.');
         setSubmitting(false);
         return;
       }
@@ -112,7 +112,7 @@ export default function NewTopicPage() {
               throw new Error("Invalid CSRF response");
           }
       } catch (e) {
-          setError('SESSION EXPIRED. PLEASE RECONNECT WALLET.');
+          setError('Your session expired. Please reconnect your wallet.');
           setSubmitting(false);
           return;
       }
@@ -190,10 +190,10 @@ export default function NewTopicPage() {
         newDocs[index].url = data.url;
         setDocuments(newDocs);
       } else {
-        setError(data.error || 'FAILED TO SECURE DOCUMENT');
+        setError(data.error || 'Upload failed. Please try again.');
       }
     } catch (err) {
-      setError('NETWORK ERROR DURING UPLOAD');
+      setError('Upload failed due to a network error.');
     } finally {
       setUploadingFile(false);
       // Reset input
@@ -213,10 +213,10 @@ export default function NewTopicPage() {
         <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-black tracking-tight text-black dark:text-white flex items-center gap-3 transition-colors">
               <ShieldCheck className="text-[#00C076]" size={28} />
-              Initiate Strategic Proposal
+              Start a New Discussion
             </h1>
             <p className="text-[11px] font-bold text-[#888888] uppercase tracking-[0.2em]">
-                Encrypted Resource Allocation • ECDSA Signature Required
+                Your post will be signed with your connected wallet
             </p>
         </div>
         <div className="flex items-center gap-3">
@@ -230,7 +230,7 @@ export default function NewTopicPage() {
               onClick={clearDraft}
               className="text-[10px] font-black uppercase tracking-widest hover:text-black dark:hover:text-white transition-colors text-black/60 dark:text-[#888888] px-4 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10"
             >
-              Terminate Process
+              Clear draft
             </button>
           )}
         </div>
@@ -240,12 +240,12 @@ export default function NewTopicPage() {
 
         {/* ── Title ── */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Mandate / Profile Title</label>
+          <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Title</label>
           <input
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="e.g. Senior ZK-Rollup Engineer or Smart Contract Audit Mandate"
+            placeholder="What do you want to discuss?"
             className="w-full px-5 py-4 text-[18px] font-sans font-medium rounded-xl outline-none transition-all bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-[#555555] focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)]"
           />
         </div>
@@ -253,14 +253,14 @@ export default function NewTopicPage() {
         {/* ── Category + Tags ── */}
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-1 relative flex flex-col gap-2">
-              <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-[#FAF9F6] mb-3 transition-colors">Strategic Sector</label>
+              <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-[#050505] dark:text-[#FAF9F6] mb-3 transition-colors">Category</label>
               <div className="relative">
                 <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
                 className="w-full px-5 py-4 text-[14px] font-sans font-medium rounded-xl outline-none transition-all cursor-pointer appearance-none bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A]"
                 >
-              <option value="" disabled className="text-black/40 dark:text-[#555]">Select an operational sector</option>
+              <option value="" disabled className="text-black/40 dark:text-[#555]">Select a category</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id} className="bg-white dark:bg-[#111111] text-black dark:text-white">{cat.name}</option>
               ))}
@@ -269,7 +269,7 @@ export default function NewTopicPage() {
             </div>
           </div>
           <div className="flex-1 flex flex-col gap-2">
-            <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Specific Practices / Tags</label>
+            <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Tags</label>
             <input
               type="text"
               value={tags}
@@ -286,14 +286,14 @@ export default function NewTopicPage() {
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-[#00C076]">
                     <FileLock2 size={18} />
-                    <span className="text-[12px] font-black uppercase tracking-[0.2em] text-black dark:text-white transition-colors">Cryptographic Document Vault</span>
+                    <span className="text-[12px] font-black uppercase tracking-[0.2em] text-black dark:text-white transition-colors">Attachments</span>
                 </div>
                 <button onClick={addDocument} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00C076]/10 text-[#00C076] hover:bg-[#00C076]/20 transition-colors rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#00C076]/20">
                     <Plus size={12} /> Add Document
                 </button>
             </div>
             <p className="text-[11px] text-[#888888] mb-2 leading-relaxed">
-                Attach physical files or specify IPFS CIDs. Uploaded files will be cryptographically hashed, persisted in the isolated vault, and injected directly into the signature payload.
+                Attach files or paste a link. Uploaded files are stored securely and embedded in your post.
             </p>
             {documents.map((doc, idx) => (
                 <div key={idx} className="flex gap-4 items-center bg-black/5 dark:bg-[#000000] p-3 rounded-xl border border-black/5 dark:border-white/5 relative group transition-colors">
@@ -305,7 +305,7 @@ export default function NewTopicPage() {
                         {/* Native File Upload Integration */}
                         <div className="absolute right-2 top-1/2 -translate-y-1/2">
                             <label className="cursor-pointer bg-black/10 dark:bg-[#111] hover:bg-black/20 dark:hover:bg-[#222] border border-black/10 dark:border-white/10 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-md text-black dark:text-white transition-colors">
-                                {uploadingFile ? 'ENCRYPTING...' : 'UPLOAD FILE'}
+                                {uploadingFile ? 'Uploading...' : 'Upload File'}
                                 <input type="file" className="hidden" disabled={uploadingFile} onChange={(e) => handleFileUpload(e, idx)} />
                             </label>
                         </div>
@@ -320,11 +320,11 @@ export default function NewTopicPage() {
 
         {/* ── Body ── */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Mandate Briefing / Profile Summary</label>
+          <label className="text-[10px] font-black text-[#888888] uppercase tracking-[0.2em] px-1">Your message</label>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            placeholder="Type your institutional mandate or professional profile here. Markdown supported."
+            placeholder="Write your post here. Markdown is supported."
             className="w-full px-6 py-5 text-[15px] font-serif rounded-xl outline-none resize-none min-h-[360px] leading-relaxed transition-all bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-[#555555] focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A] focus:shadow-[0_0_20px_rgba(0,192,118,0.1)] custom-scrollbar"
           />
         </div>
@@ -339,12 +339,12 @@ export default function NewTopicPage() {
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 dark:border-black/30 border-t-white dark:border-t-black rounded-full animate-spin" />
-                  PROCESSING SIGNATURE...
+                  Publishing...
                 </>
               ) : (
                 <>
                   <FileLock2 size={16} />
-                  EXECUTE CRYPTOGRAPHIC SIGNATURE
+                  Post Now
                 </>
               )}
             </button>
@@ -352,7 +352,7 @@ export default function NewTopicPage() {
             href="/forum"
             className="text-[11px] font-black uppercase tracking-widest transition-opacity hover:opacity-100 text-black/60 dark:text-[#888888] hover:text-black dark:hover:text-white"
           >
-            Abort Matrix
+            Cancel
           </Link>
           {error && (
             <span className="text-[13px] font-sans font-bold text-red-400 ml-auto">

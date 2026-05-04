@@ -13,13 +13,25 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export function EntityGraphVis() {
     const svgRef = useRef<SVGSVGElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [selectedNode, setSelectedNode] = useState<any>(null);
     const [isHeuristic, setIsHeuristic] = useState(false);
+    // mountKey increments on every mount, forcing SWR to bypass the stale cache
+    // and do a fresh network fetch each time the user opens the Entity Graph tab.
+    const [mountKey, setMountKey] = useState(0);
 
-    const { data: matrixData, isLoading } = useSWR('/api/intelligence/graph', fetcher, { 
-        refreshInterval: 0, // Disabled to prevent graph from resetting zoom and disappearing periodically
-        revalidateOnFocus: false 
-    });
+    const { data: matrixData, isLoading, mutate } = useSWR(
+        `/api/intelligence/graph?t=${mountKey}`,
+        fetcher,
+        { refreshInterval: 0, revalidateOnFocus: false }
+    );
+
+    // Force a fresh fetch every time this component mounts (tab activation)
+    useEffect(() => {
+        setMountKey(Date.now());
+        mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const isOffline = !matrixData?.graph?.nodes?.length || matrixData?.degraded;
 
@@ -34,8 +46,20 @@ export function EntityGraphVis() {
 
         if (!svgRef.current || !nodes.length) return;
 
-        const width = svgRef.current.parentElement?.clientWidth || 800;
-        const height = svgRef.current.parentElement?.clientHeight || 600;
+        // ── ResizeObserver guard ────────────────────────────────────────────────
+        // When this tab is first activated, the SVG parent container may not yet
+        // have been laid out by the browser (clientWidth = 0). We observe the
+        // container with ResizeObserver and only start the D3 simulation once we
+        // get real non-zero dimensions, preventing the invisible-graph bug.
+        const parent = svgRef.current.parentElement;
+        if (!parent) return;
+
+        let cleanupFn: (() => void) | null = null;
+        let hasRun = false;
+
+        const runD3 = (width: number, height: number) => {
+            if (hasRun || !svgRef.current) return;
+            hasRun = true;
 
         const d3Nodes = nodes.map(d => ({ ...d }));
         const d3Links = links.map(d => ({ ...d }));
@@ -97,30 +121,54 @@ export function EntityGraphVis() {
             .style("font-family", "monospace")
             .style("text-transform", "uppercase");
 
-        simulation.on("tick", () => {
-            link.attr("x1", (d: any) => (d.source as any).x)
-                .attr("y1", (d: any) => (d.source as any).y)
-                .attr("x2", (d: any) => (d.target as any).x)
-                .attr("y2", (d: any) => (d.target as any).y);
+            simulation.on("tick", () => {
+                link.attr("x1", (d: any) => (d.source as any).x)
+                    .attr("y1", (d: any) => (d.source as any).y)
+                    .attr("x2", (d: any) => (d.target as any).x)
+                    .attr("y2", (d: any) => (d.target as any).y);
 
-            node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
-            label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
-        });
+                node.attr("cx", (d: any) => d.x).attr("cy", (d: any) => d.y);
+                label.attr("x", (d: any) => d.x).attr("y", (d: any) => d.y);
+            });
 
-        // Memory/CPU Leak Prevention via Page Visibility API
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
+            // Memory/CPU Leak Prevention via Page Visibility API
+            const handleVisibilityChange = () => {
+                if (document.hidden) {
+                    simulation.stop();
+                } else {
+                    simulation.alpha(0.3).restart();
+                }
+            };
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
+            cleanupFn = () => {
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
                 simulation.stop();
-            } else {
-                simulation.alpha(0.3).restart();
-            }
+            };
         };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        return () => { 
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            simulation.stop(); 
-        };
+        // Try immediately with current dimensions
+        const immediateW = parent.clientWidth || 0;
+        const immediateH = parent.clientHeight || 0;
+        if (immediateW > 0 && immediateH > 0) {
+            runD3(immediateW, immediateH);
+        } else {
+            // Dimensions not ready — wait for layout via ResizeObserver
+            const ro = new ResizeObserver((entries) => {
+                for (const entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (width > 0 && height > 0) {
+                        ro.disconnect();
+                        runD3(width, height);
+                        break;
+                    }
+                }
+            });
+            ro.observe(parent);
+            cleanupFn = () => { ro.disconnect(); };
+        }
+
+        return () => { if (cleanupFn) cleanupFn(); };
     }, [matrixData, isOffline]);
 
     return (

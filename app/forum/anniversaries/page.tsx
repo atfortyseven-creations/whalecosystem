@@ -36,23 +36,23 @@ export default async function ForumAnniversariesPage() {
     <div className="flex flex-col w-full max-w-[860px] mx-auto py-10 px-4">
 
       <div className="mb-8 pb-6 border-b border-black/10 dark:border-white/10">
-        <div className="text-[12px] font-sans font-bold mb-2 text-black/50 dark:text-[#888888]">FORUM / ANNIVERSARIES</div>
+        <div className="text-[12px] font-sans font-bold mb-2 text-black/50 dark:text-[#888888]">FORUM / NEW MEMBERS</div>
         <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
           {monthNames[currentMonth]}
         </h1>
-        <div className="text-[14px] font-sans mt-1 text-black/50 dark:text-[#888888]">JOINED THIS MONTH</div>
+        <div className="text-[14px] font-sans mt-1 text-black/50 dark:text-[#888888]">Joined this month</div>
       </div>
 
       {/* Table header */}
       <div className="flex items-center pb-3 text-[12px] font-sans font-bold uppercase border-b border-black/10 dark:border-white/10 text-black/50 dark:text-[#888888]">
-        <div className="flex-1">NODE</div>
-        <div className="w-24 text-right">EPOCH</div>
-        <div className="w-16 text-right">YRS</div>
+        <div className="flex-1">MEMBER</div>
+        <div className="w-24 text-right">JOINED</div>
+        <div className="w-16 text-right">SINCE</div>
       </div>
 
       {users.length === 0 ? (
         <div className="py-16 text-center text-[13px] font-sans text-black/50 dark:text-[#888888]">
-          [ NO ENTRIES FOR {monthNames[currentMonth]} ]
+          No new members joined in {monthNames[currentMonth]} yet.
         </div>
       ) : users.map((u, i) => {
         const joined = new Date(u.createdAt);
@@ -75,7 +75,7 @@ export default async function ForumAnniversariesPage() {
               {monthNames[joined.getMonth()].slice(0,3)} {joined.getFullYear()}
             </div>
             <div className="w-16 text-right text-[14px] font-sans font-bold text-black dark:text-white">
-              {years > 0 ? `+${years}Y` : '—'}
+              {years > 0 ? `${years}y` : 'New'}
             </div>
           </Link>
         );

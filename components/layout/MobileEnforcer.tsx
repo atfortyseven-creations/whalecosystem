@@ -186,12 +186,14 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
     // ── MOBILE ZONE ──────────────────────────────────────────────────────────
     if (isMobile) {
         // ─── [DIRECT ACCESS ROUTES] ───────────────────────────────────────────
-        // Routes that must always render their own page regardless of connection
-        // state. Adding /news here is critical: the News Terminal handles its own
-        // auth/paywall internally — the MobileEnforcer must NOT intercept it.
+        // These are PUBLIC or informational routes that render normally on mobile.
+        // ⚠️  PC-ONLY routes (/dashboard, /portfolio, /settings, /sovereign-intel,
+        //     /predictions, /vip, /whalepost) are intentionally EXCLUDED here.
+        //     A mobile user — even with a connected wallet — must NOT reach those
+        //     pages because they are designed exclusively for the PC terminal.
+        //     They will stay on MobileSovereignLanding as intended.
         const DIRECT_ACCESS_ROUTES = [
             '/news',
-            '/dashboard',
             '/connect',
             '/docs',
             '/faq',
@@ -200,22 +202,12 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/terms',
             '/legal',
             '/forum',
-            '/portfolio',
-            '/whalepost',
-            '/settings',
-            '/sovereign-intel',
-            '/predictions',
-            '/vip',
-            // ── PUBLIC ROUTES: Always render full page regardless of auth state ──
-            // Needed so users arriving from Twitter/external links (e.g. job offers)
-            // can read the full page content without being forced to the wallet login.
             '/careers',
             '/pricing',
             '/company',
             '/about',
             '/product',
             '/academy',
-            '/legal',
             '/support',
             '/status',
         ];

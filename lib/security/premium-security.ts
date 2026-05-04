@@ -146,9 +146,21 @@ export async function validateSecureRequest(
   userId?: string;
   error?: string;
 }> {
-  // SOVEREIGN: Use SIWE session token as primary auth mechanism
+  // PRIMARY: SIWE session JWT (full desktop auth flow)
   const session = await getSession();
-  const userId = session?.userId;
+  let userId = session?.userId;
+
+  // FALLBACK: sovereign_handshake cookie (mobile QR auth flow)
+  // This allows users who connected via mobile wallet to also call
+  // authenticated forum and API endpoints without a full SIWE JWT.
+  if (!userId) {
+    const sovereignHandshake = req.cookies.get('sovereign_handshake')?.value;
+    const webAddress = req.headers.get('x-web3-address');
+    const rawAddress = sovereignHandshake || webAddress;
+    if (rawAddress && /^0x[a-fA-F0-9]{40}$/.test(rawAddress)) {
+      userId = rawAddress.toLowerCase();
+    }
+  }
 
   if (!userId) {
     return { valid: false, error: 'Unauthorized' };

@@ -4,23 +4,23 @@ export default function ForumGuidelinesPage() {
   const rules = [
     {
       n: '01',
-      title: 'ABSOLUTE SIGNAL — ZERO NOISE',
-      body: 'All transmissions must contribute actionable intelligence, structural analysis, or cryptographic research. Low-effort posts and speculative noise without data backing will be removed by the moderation consensus.',
+      title: 'Keep it substantive',
+      body: 'Share analysis, research, trade ideas, or questions that add real value for other members. Low-effort posts, memes, and content-free commentary will be removed.',
     },
     {
       n: '02',
-      title: 'ZERO-TOLERANCE FOR MANIPULATION',
-      body: 'Coordinated market manipulation, false signal broadcasting, and Sybil attacks are strictly prohibited. The Entity Graph actively monitors cross-account coordination. Violators will have their access permanently revoked.',
+      title: 'No market manipulation or spam',
+      body: 'Do not coordinate pump-and-dump activity, post misleading signals, or create multiple accounts to game the community. Violations result in a permanent ban.',
     },
     {
       n: '03',
-      title: 'CRYPTOGRAPHIC VERIFICATION',
-      body: 'Claims regarding MEV strategies, on-chain yields, and execution logic must be backed by verified on-chain transactions or Zero-Knowledge proofs. Do not trust; verify.',
+      title: 'Support your claims with data',
+      body: 'If you make a bold on-chain claim, back it up with transaction hashes, verified sources, or reproducible analysis. Unsupported assertions lower the quality of discussion for everyone.',
     },
     {
       n: '04',
-      title: 'PROFESSIONAL DISCOURSE',
-      body: 'Debate ideas, not individuals. Ad hominem attacks and harassment degrade the quality of the intelligence network. Maintain an institutional and respectful tone at all times.',
+      title: 'Be respectful',
+      body: 'Debate ideas, not people. Personal attacks, harassment, and abusive language are not tolerated. Disagreement is welcome; disrespect is not.',
     },
   ];
 
@@ -30,7 +30,7 @@ export default function ForumGuidelinesPage() {
       <div className="mb-8 pb-6 border-b border-black/10 dark:border-white/10">
         <div className="text-[12px] font-sans font-bold mb-2 text-black/50 dark:text-[#888888]">FORUM / GUIDELINES</div>
         <h1 className="text-[28px] font-sans font-black uppercase tracking-tight text-black dark:text-white">
-          Institutional Protocol
+          Community Guidelines
         </h1>
       </div>
 
@@ -48,11 +48,11 @@ export default function ForumGuidelinesPage() {
 
       <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10">
         <div className="text-[11px] font-sans font-bold uppercase tracking-widest text-center text-black/40 dark:text-white/40">
-          LAST UPDATED APRIL 2026 — SOVEREIGN CONSENSUS PROTOCOL
+          LAST UPDATED APRIL 2026
         </div>
         <div className="mt-4 px-4 py-3 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-[#111111]">
           <div className="text-[13px] font-sans italic text-center text-black dark:text-white">
-            "In a trustless ecosystem, your signature is your bond."
+            "A community is only as good as its worst-tolerated behaviour. We set the bar high."
           </div>
         </div>
       </div>

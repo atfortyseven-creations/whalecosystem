@@ -17,59 +17,59 @@ const TIER_HIERARCHY: Record<string, number> = {
 const PRICING_TIERS = [
   {
     id: 'STARTER',
-    name: 'Starter',
+    name: 'Explorer',
     price: '€19',
     billing: 'Monthly',
-    target: 'For individual researchers and academics',
-    description: 'Foundational access to the Sovereign network with 1 min latency, community support, and core identity verification.',
+    target: 'For individual traders and researchers',
+    description: 'Everything you need to start tracking the crypto market. Real-time data, alerts, and community access in one place.',
     features: [
-      'Access to Base Terminal Interface',
-      'Network state updates (1 min latency)',
-      '3 Custom Anomaly Alerts',
-      'Standard community forum support',
-      'Basic sovereign identity profile',
-      'API limits (1,000 req/day)'
+      'Access to the full trading terminal',
+      'Market updates (1 min refresh)',
+      '3 custom price & whale alerts',
+      'Community forum access',
+      'On-chain identity profile',
+      'API access (1,000 requests/day)'
     ],
-    buttonText: 'Acquire Starter License'
+    buttonText: 'Get Started'
   },
   {
     id: 'PRO',
     name: 'Professional',
     price: '€59',
-    billing: 'Per User / Month',
-    target: 'For market analysts and active operators',
-    description: 'Real-time advanced telemetry with institutional-grade analytics tools, premium data feeds, and algorithmic pattern recognition.',
+    billing: 'Per user / month',
+    target: 'For active traders and analysts',
+    description: 'Real-time streaming, advanced on-chain analytics, and priority support — everything a serious trader needs.',
     highlight: true,
     features: [
-      'Zero-latency data streaming',
-      'Advanced on-chain network queries',
-      'Read and write database access',
-      'Priority technical support (24/7)',
+      'Real-time data streaming (zero delay)',
+      'Advanced on-chain analytics',
+      'Full read & write API access',
+      'Priority support — 24/7',
       'Extended security analytics & alerts',
-      'Up to 15 custom anomaly alerts',
-      'Proprietary predictive models access',
-      'API access (10,000 req/day)'
+      'Up to 15 custom alerts',
+      'Predictive market models',
+      'API access (10,000 requests/day)'
     ],
-    buttonText: 'Acquire Pro License'
+    buttonText: 'Go Professional'
   },
   {
     id: 'ELITE',
     name: 'Enterprise',
     price: '€199',
-    billing: 'Per User / Month',
-    target: 'For institutions and hedge funds',
-    description: 'Unrestricted performance, expanded rate limits, dedicated account management, and Elite support for high-frequency operations.',
+    billing: 'Per user / month',
+    target: 'For institutions and trading firms',
+    description: 'Unlimited data access, a dedicated account manager, and SLA-backed uptime. Built for teams that cannot afford downtime.',
     features: [
       'Unlimited data firehose access',
-      'Unrestricted complex queries',
+      'No query limits or rate caps',
       'Dedicated account manager',
-      'Full API / Webhook integration',
-      'Unlimited custom market alerts',
-      'Guaranteed 99.99% SLA uptime',
+      'Full API & Webhook integration',
+      'Unlimited custom alerts',
+      '99.99% uptime SLA guarantee',
       'Custom smart contract indexing',
       'Private node infrastructure'
     ],
-    buttonText: 'Acquire Enterprise License'
+    buttonText: 'Contact Sales'
   }
 ];
 
@@ -108,20 +108,20 @@ const PLATFORM_BENEFITS = [
 
 const FAQS = [
   {
-    question: "How is the Institutional License Lease managed?",
-    answer: "Payments are securely processed through Stripe, our institutional payment gateway. You can seamlessly manage, cancel, or modify your tier at any time directly from your sovereign dashboard."
+    question: "How does billing work?",
+    answer: "Payments are securely processed through Stripe. You can manage, upgrade, downgrade, or cancel your plan at any time directly from your account dashboard."
   },
   {
-    question: "Do I need to connect my wallet to view the plans?",
-    answer: "Yes. Sovereign Terminal operates under a strict Zero-Trust Sovereign Identity model. Your wallet (ECDSA signature) acts as your singular access point and billing identity."
+    question: "Do I need to connect a wallet?",
+    answer: "Yes. Whale Alert Network uses your wallet as your login and billing identity. It only takes a few seconds to connect — no email or password needed."
   },
   {
-    question: "Can I upgrade my tier mid-month?",
-    answer: "Absolutely. The system will automatically prorate the remaining cost of the month and instantly provision your new frequency limits and API access without any downtime."
+    question: "Can I upgrade mid-month?",
+    answer: "Absolutely. The system automatically prorates the remaining cost and upgrades your access immediately — no downtime, no waiting."
   },
   {
-    question: "Is there a refund policy available?",
-    answer: "No. Because our licenses provide immediate access to proprietary data sets and high-frequency telemetry, we do not offer refunds. We comply with EU DSA regulations by providing a one-click cancellation portal, but past execution cycles are non-refundable."
+    question: "Is there a refund policy?",
+    answer: "Because plans provide immediate access to live data and analytics, we don't offer refunds on past billing cycles. However, you can cancel at any time and your access continues until the end of the paid period."
   }
 ];
 
@@ -180,8 +180,8 @@ function PricingContent() {
 
   const handleSubscribe = async (planId: string) => {
     if (!isConnected || !isSovereignHandshake) {
-      toast.error('Zero-Trust Authentication Required', {
-        description: 'You must connect and sign with your sovereign identity to execute a transaction.',
+      toast.error('Connect your wallet to subscribe', {
+        description: 'Please connect your wallet first — it only takes a few seconds.',
       });
       router.push('/connect');
       return;
@@ -190,25 +190,25 @@ function PricingContent() {
     const targetTierLevel = TIER_HIERARCHY[planId] || 0;
 
     if (currentTierLevel >= targetTierLevel) {
-      toast.info('License Hierarchy Verified', {
-        description: `You already hold a ${currentTier} or higher license. No upgrade required.`,
+      toast.info('You\'re already on this plan or higher', {
+        description: `Your current plan already includes everything in ${planId}.`,
       });
       return;
     }
 
     setLoadingTier(planId);
-    const toastId = toast.loading(`Initializing encrypted channel for ${planId} license...`);
+    const toastId = toast.loading(`Setting up your ${planId} plan...`);
 
     try {
       const res = await createCheckoutSession(planId);
-      toast.success('Secure connection established. Redirecting...', { id: toastId });
+      toast.success('Redirecting to checkout...', { id: toastId });
       
       if (res?.url) {
         window.location.href = res.url;
       }
     } catch (error: any) {
       console.error('Subscription error:', error);
-      toast.error('Transaction Interrupted', {
+      toast.error('Something went wrong', {
         id: toastId,
         description: error.message || 'There was a problem processing your request. Please try again.',
       });
@@ -224,20 +224,20 @@ function PricingContent() {
 
       <main className="w-full max-w-7xl mx-auto px-6 py-16 md:py-24">
         
-        {/* ── Encabezado Institucional ── */}
+        {/* ── Hero ── */}
         <header className="flex flex-col items-center text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C076]/10 border border-[#00C076]/20 mb-6 shadow-sm">
             <Shield size={14} className="text-[#00C076]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Institutional License Leases</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Simple, Transparent Pricing</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-[#050505] mb-8 max-w-5xl leading-[1.1]">
-            Command the Data Singularity.<br className="hidden md:block" />
-            <span className="text-[#050505]/30">Unleash Sovereign Intelligence.</span>
+            The right plan for<br className="hidden md:block" />
+            <span className="text-[#050505]/30">every trader.</span>
           </h1>
           
           <p className="text-lg md:text-xl text-[#050505]/60 max-w-3xl leading-relaxed font-medium mb-10">
-            Select the algorithmic framework that best adapts to your operational requirements. From standard telemetry to high-frequency zero-latency deployment for hedge funds.
+            Join over 2,000 traders and analysts already using Whale Alert Network to track the largest on-chain movements in real time. Start free, scale as you grow.
           </p>
 
           {currentTierLevel > 0 && (
@@ -247,12 +247,37 @@ function PricingContent() {
               className="px-6 py-3 bg-[#050505] text-[#FDFCF8] rounded-full text-xs font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
             >
               {loadingTier === 'PORTAL' ? <Loader2 size={16} className="animate-spin" /> : <Settings size={16} />}
-              Manage {currentTier} License
+              Manage My Plan
             </button>
           )}
         </header>
 
-        {/* ── Estructura de Precios ── */}
+        {/* ── Pricing Cards ── */}
+        {/* FREE tier anchor card — makes paid plans feel like natural upgrades */}
+        <div className="mb-6">
+          <div className="rounded-[2rem] border border-[#050505]/10 bg-white p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div>
+              <div className="text-sm font-black uppercase tracking-[0.2em] text-black/40 mb-1">Free</div>
+              <div className="text-3xl font-bold tracking-tight text-[#050505] mb-1">€0 <span className="text-base font-medium text-black/30">/month</span></div>
+              <p className="text-sm text-black/50 font-medium">Browse market data, read the forum, and explore the platform at no cost.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {['Live news feed', 'Market overview', 'Forum access', 'On-chain explorer'].map(f => (
+                <span key={f} className="flex items-center gap-1.5 text-xs text-black/50 font-semibold">
+                  <CheckCircle2 size={13} className="text-black/20" /> {f}
+                </span>
+              ))}
+            </div>
+            <div className="shrink-0">
+              {currentTierLevel === 0 ? (
+                <span className="px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest bg-black/5 text-black/40">Current Plan</span>
+              ) : (
+                <span className="px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest bg-black/5 text-black/40">Included</span>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-32 relative z-10">
           {PRICING_TIERS.map((tier) => {
             const isDowngrade = currentTierLevel >= (TIER_HIERARCHY[tier.id] || 0);
@@ -268,7 +293,7 @@ function PricingContent() {
               >
                 {tier.highlight && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00C076] text-[#050505] px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
-                    Corporate Standard
+                    Most Popular
                   </div>
                 )}
 
@@ -311,7 +336,7 @@ function PricingContent() {
                         tier.highlight ? 'bg-[#00C076] text-[#050505]' : 'bg-black/10 text-black/50'
                       }`}
                     >
-                      {currentTier === tier.id ? 'Current License' : 'Access Included'}
+                      {currentTier === tier.id ? 'Your Current Plan' : 'Already Included'}
                     </button>
                   ) : (
                     <button
@@ -339,14 +364,14 @@ function PricingContent() {
           })}
         </div>
 
-        {/* ── Beneficios de la Arquitectura ── */}
+        {/* ── Platform Benefits ── */}
         <section className="mb-32">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#050505] mb-6">
-              Institutional Grade Architecture
+              Built for serious traders
             </h2>
             <p className="text-lg text-[#050505]/60 max-w-3xl mx-auto">
-              Our platform has been developed from the ground up to meet the strict latency and reliability requirements demanded by the high-performance enterprise sector.
+              Every feature on the platform is built around one goal: giving you a clear, fast, and reliable view of what's happening on-chain before anyone else.
             </p>
           </div>
 
@@ -374,13 +399,13 @@ function PricingContent() {
             <div className="lg:w-1/3">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-6">
                 <HelpCircle size={14} className="text-[#00C076]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Support & Queries</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Common Questions</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 leading-tight">
                 Frequently Asked<br />Questions
               </h2>
               <p className="text-white/50 text-lg">
-                We resolve the most common operational and administrative questions. For dedicated support, please access the terminal.
+                Can't find your answer here? Reach us directly through the Support section inside the platform.
               </p>
             </div>
             

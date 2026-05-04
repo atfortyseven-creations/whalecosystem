@@ -158,7 +158,7 @@ export function ForumHeader({ address: serverAddress, avatarUrl: dbAvatarUrl }: 
             Latest Posts
           </Link>
           <Link href="/forum?filter=new" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
-            New Members
+            New Posts
           </Link>
           <Link href="/forum?filter=unread" className="text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center transition-colors text-black/60 dark:text-[#555] hover:text-[#00C076] whitespace-nowrap">
             Unread

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isAdmin } from '@/lib/admin';
 import { validateSecureRequest } from '@/lib/security/premium-security';
-import { deductCredits } from '@/lib/credits/metering';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,16 +88,7 @@ export async function POST(req: NextRequest) {
         }
 
         const isUserAdmin = isAdmin(address);
-
-        // --- SaaS V4.0 Metering: Charge for Topic Creation ---
-        if (!isUserAdmin) {
-            try {
-                await deductCredits(user.id, 'FORUM_TOPIC_CREATION', 100, `Created Topic: ${title.substring(0, 30)}`);
-            } catch (err: any) {
-                return NextResponse.json({ error: err.message }, { status: 402 }); // 402 Payment Required
-            }
-        }
-        // -----------------------------------------------------
+        void isUserAdmin; // Admin flag preserved for future gating logic
 
         const newTopic = await (prisma as any).forumTopic.create({
             data: {
