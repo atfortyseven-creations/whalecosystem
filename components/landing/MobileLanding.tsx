@@ -1032,31 +1032,8 @@ export function MobileLanding() {
 
   if (!mounted) return null;
 
-  // ── Render: Reconnecting — user returned from wallet app, wagmi not yet hydrated ──
-  // showManualReconnect is set to true when a wallet button is clicked and persisted
-  // to sessionStorage so it survives the WalletConnect deep-link page reload.
-  // We show a fullscreen reconnecting overlay instead of the wallet-button screen
-  // to prevent the user from accidentally clicking a wallet button again (redirect loop).
-  // BUG FIX: isLinked must be checked FIRST. Without this guard, when wagmi resolves
-  // the session and setIsLinked(true) fires, the reconnect overlay would remain on
-  // screen because showManualReconnect is still true in that render cycle,
-  // permanently blocking the ConnectedScreen from being displayed.
-  if (showManualReconnect && !isLinked) {
-    return (
-      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex flex-col items-center justify-center gap-8 p-8">
-        <div className="w-20 h-20 rounded-[2rem] bg-white border border-black/8 shadow-lg flex items-center justify-center">
-          <Loader2 size={30} className="animate-spin text-[#050505]/40" />
-        </div>
-        <div className="text-center space-y-2 max-w-xs">
-          <h2 className="text-[22px] font-black tracking-tighter text-[#050505] leading-none">Reconnecting…</h2>
-          <p className="text-[12px] text-[#050505]/50 leading-relaxed">
-            Verifying your wallet session. This takes a few seconds after returning from your wallet app.
-          </p>
-        </div>
-        {/* Manual sync buttons removed as per user request for full automation */}
-      </div>
-    );
-  }
+  // (The previous showManualReconnect full-screen overlay was removed to prevent 
+  // blocking the AppKit modal if visibility changes while the user is still selecting a wallet)
 
   // ── Render: Session exists — show immediately using cookie address ──────────
   // We NEVER wait for wagmi to reconnect. The cookie IS the source of truth.
@@ -1260,9 +1237,6 @@ export function MobileLanding() {
 
                 setConnecting(walletId);
                 setShowFallbackBtn(false);
-                // Persist wakeup flag so the next page load (after Chrome tab destroy) knows
-                // to immediately poll for the wallet connection.
-                try { localStorage.setItem('sovereign_pending_wakeup', '1'); } catch {};
 
                 const doOpen = () => {
                   // In-app wallet browser detection
