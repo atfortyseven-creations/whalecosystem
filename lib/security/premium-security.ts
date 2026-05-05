@@ -55,7 +55,7 @@ export async function verifyPremiumAccess(userId: string): Promise<{
 // SECURITY LAYER 6: CSRF Protection
 // ============================================
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET || 'dev-only-fallback-key-do-not-use-in-prod';
 
 export function generateCSRFToken(userId: string): string {
   const timestamp = Date.now();

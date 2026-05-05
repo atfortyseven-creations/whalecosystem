@@ -10,8 +10,8 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const categorySlug = searchParams.get('category');
         const tag = searchParams.get('tag');
-        const rawLimit = parseInt(searchParams.get('limit') || '30');
-        const limit = Math.min(rawLimit, 50); // Hard cap at 50 to prevent DoS
+        const rawLimit = parseInt(searchParams.get('limit') || '30', 10);
+        const limit = Math.min(isNaN(rawLimit) ? 30 : rawLimit, 50); // Hard cap at 50 to prevent DoS
         const filter = searchParams.get('filter') || 'latest';
         const cursor = searchParams.get('cursor');
 

@@ -189,10 +189,10 @@ export default async function middleware(request: NextRequest) {
             const txTime = parseInt(txTimestamp, 10);
             const now = Date.now();
             
-            // Reject if older than 60 seconds (Replay window expired)
-            if (now - txTime > 60000) {
-               console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Expired payload from IP ${ip}`);
-               return new NextResponse(JSON.stringify({ error: 'PAYLOAD_EXPIRED' }), { status: 401 });
+            // Reject if older than 60 seconds or more than 5 seconds in the future
+            if (now - txTime > 60000 || now - txTime < -5000) {
+               console.warn(`[WhaleFortress] 🚨 REPLAY ATTACK BLOCKED: Invalid payload timestamp from IP ${ip}`);
+               return new NextResponse(JSON.stringify({ error: 'PAYLOAD_EXPIRED_OR_INVALID' }), { status: 401 });
             }
             
             // Reject if nonce was already used in this rolling window
