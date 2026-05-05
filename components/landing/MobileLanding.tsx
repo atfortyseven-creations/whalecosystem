@@ -708,52 +708,27 @@ export function MobileLanding() {
   }, []);
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // SINGLE SOURCE OF TRUTH: if wagmi/AppKit says connected → land immediately
+  // SINGLE SOURCE OF TRUTH: if AppKit SIWE verifies session, cookie is set
   // ─────────────────────────────────────────────────────────────────────────────
   const establishSession = useCallback(async (addr: string) => {
     if (isLinked) return;
-    if (isSigningRef.current) return;
     
-    isSigningRef.current = true;
-    
-    // We intentionally DO NOT call rkCloseModal() here anymore.
-    // Calling close before signMessageAsync() hides the crucial AppKit UI 
-    // that gives the user the 'Open Wallet to Sign' deep link button!
     const norm = addr.toLowerCase();
-
-    // EXPERT SECURITY FIX: Enforce real ECDSA signature instead of hardcoded bypass
-    let signature = '0x_mobile_wc_verified';
-    const message = buildSovereignMessage(norm);
-    try {
-        signature = await signMessageAsync({ message });
-    } catch (e) {
-        console.warn('User rejected signature, falling back to read-only UI');
-        isSigningRef.current = false;
-        return; // Prevent further execution if signature fails
-    }
-
-    document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
-    try { sessionStorage.setItem(`sovereign_signed_${norm}`, 'true'); } catch {}
-    // Clear the reconnect button — session is now established
-    try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
-    setShowManualReconnectRaw(false);
-    fetch('/api/wallet/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ walletAddress: norm, signature, message }),
-    }).catch(() => {});
-
-    setLinkedAddress(norm);
-    setIsLinked(true);
-    setConnecting(null);
-    setShowFallbackBtn(false);
-    // Clear the pending wakeup flag — session is now established.
-    try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
     
-    // Unlock signing state
-    isSigningRef.current = false;
-    // Stay on /connect — user stays here and accesses the QR scanner
-  }, [isLinked, signMessageAsync]);
+    // Check if SIWE set the handshake cookie
+    const hasHandshake = document.cookie.includes('sovereign_handshake=');
+    if (hasHandshake) {
+      setLinkedAddress(norm);
+      setIsLinked(true);
+      setConnecting(null);
+      setShowFallbackBtn(false);
+      try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
+      try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
+      setShowManualReconnectRaw(false);
+    } else {
+      // Not signed yet via SIWE, wait for it
+    }
+  }, [isLinked]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
   const onFocusRecheck = useCallback(() => {
@@ -1065,8 +1040,19 @@ export function MobileLanding() {
   // in the same React batch. Shown only for a fraction of a second max.
   if (isConnected && address && !isLinked) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] bg-[#FAF9F6] flex flex-col items-center justify-center p-8 text-center space-y-6">
         <Loader2 size={32} className="animate-spin text-[#050505]/30" />
+        <h3 className="font-serif text-2xl font-bold tracking-tight text-[#050505]">Awaiting Cryptographic Signature</h3>
+        <p className="text-[12px] text-[#050505]/60 font-medium">
+          Your wallet is connected, but the secure handshake is pending.<br/>
+          Please check your wallet to sign the verification message.
+        </p>
+        <button 
+           onClick={() => disconnect()}
+           className="mt-8 font-mono text-[10px] uppercase tracking-widest text-[#ef4444] font-bold border border-red-500/20 bg-red-500/5 px-6 py-3 rounded-full"
+        >
+          Cancel & Disconnect
+        </button>
       </div>
     );
   }

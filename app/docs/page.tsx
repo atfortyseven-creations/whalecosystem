@@ -1,244 +1,193 @@
 "use client";
 
-import React, { useState } from 'react';
-import { BookOpen, Terminal, Database, ShieldCheck, Cpu, Globe, Search, Network, Workflow, Zap } from 'lucide-react';
+import React from 'react';
+import { Book, Code, Terminal, Database, Server, Hexagon, Layers, Activity, Lock, Globe } from 'lucide-react';
 
 export default function DocsPage() {
-    const [searchQuery, setSearchQuery] = useState("");
-    
     return (
-        <div 
-            style={{ backgroundColor: "#FDFCF8", color: "#1a1a1a", minHeight: "100vh" }} 
-            className="w-full overflow-x-hidden font-sans selection:bg-[#1a1a1a] selection:text-[#FDFCF8]"
-        >
+        <div className="w-full overflow-x-hidden font-sans selection:bg-[#1a1a1a] selection:text-[#FAF9F6]" style={{ backgroundColor: "#FAF9F6", color: "#0A0A0A", minHeight: "100vh" }}>
             <div className="w-full max-w-[1200px] mx-auto pt-32 pb-40 px-6 lg:px-12 flex flex-col items-start">
                 
                 {/* ── TOPOGRAPHY ── */}
-                <div style={{ color: "#777" }} className="font-mono text-[10px] font-bold tracking-[0.4em] uppercase mb-8">
-                    Architectural Treatise • Section D-1
+                <div style={{ color: "#0044CC" }} className="font-mono text-[10px] font-bold tracking-[0.4em] uppercase mb-8 flex items-center gap-3">
+                    <Book size={14} /> Master Node Documentation • Section D-1
                 </div>
                 
-                <h1 
-                    style={{ color: "#050505", fontFamily: "'Georgia', serif" }} 
-                    className="text-5xl md:text-7xl font-normal tracking-tight leading-[1.05] mb-6"
-                >
-                    Technical Specifications.
+                <h1 style={{ fontFamily: "'Georgia', serif" }} className="text-5xl md:text-7xl font-normal tracking-tight leading-[1.05] mb-6 text-[#0A0A0A]">
+                    Sovereign Technical Compendium
                 </h1>
                 
-                <div className="flex items-center gap-6 mb-12">
-                    <p style={{ color: "#555" }} className="font-mono text-sm uppercase tracking-widest m-0 font-bold">
-                        Version: Sovereign Master Node 4.2.0
-                    </p>
-                    <a 
-                        href="/developer" 
-                        className="bg-[#1a1a1a] text-[#FDFCF8] font-mono text-xs font-bold uppercase tracking-wider py-2 px-6 rounded-md hover:bg-[#333] transition-colors"
-                    >
-                        View Full Manifesto
-                    </a>
-                </div>
+                <p className="font-mono text-sm mb-24 uppercase tracking-widest font-bold text-black/40">
+                    Version 6.2.0 • Institutional Build
+                </p>
 
-                {/* ── SEARCH BAR ── */}
-                <div className="w-full max-w-2xl mb-24 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#999]" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="Search the sovereign archives..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-[#FFFFFF] border border-black/10 rounded-xl py-4 pl-12 pr-4 text-[#1a1a1a] font-mono text-sm focus:outline-none focus:border-black transition-colors shadow-sm"
-                        style={{ outline: "none" }}
-                    />
-                    {searchQuery && (
-                        <div className="absolute top-full mt-2 w-full bg-[#FFFFFF] border border-black/10 rounded-xl p-4 z-10 text-sm text-[#555] font-mono shadow-lg">
-                            Press Enter to query the Akashic Ledger for &quot;{searchQuery}&quot;...
-                        </div>
-                    )}
-                </div>
-
-                {/* ── MODULE CARDS ── */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-24">
-                    <div style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(0, 0, 0, 0.08)" }} className="p-8 rounded-2xl shadow-sm">
-                        <Terminal style={{ color: "#1a1a1a" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight">EVM Ingestion Layer</h3>
-                        <p style={{ color: "#555" }} className="text-xs font-mono leading-relaxed uppercase tracking-wide">
-                            WebSockets bound to multi-rpc clusters, extracting blocks asynchronously with Archive Node escalation fallbacks.
+                {/* ── CARDS ── */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-32">
+                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
+                        <Terminal className="mb-6 text-black" size={24} strokeWidth={1.5} />
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">Core Architecture</h3>
+                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
+                            Understanding the Next.js Edge Runtime, Neo4j AuraDB integration, and the proprietary Wagmi/Viem transaction dispatchers.
                         </p>
                     </div>
-                    <div style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(0, 0, 0, 0.08)" }} className="p-8 rounded-2xl shadow-sm">
-                        <Database style={{ color: "#1a1a1a" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight">Akashic State Engine</h3>
-                        <p style={{ color: "#555" }} className="text-xs font-mono leading-relaxed uppercase tracking-wide">
-                            PostgreSQL coupled with Prisma ORM. Topologies persisted with zero latency and secured by Merkle Tree proofs.
+                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
+                        <Hexagon className="mb-6 text-black" size={24} strokeWidth={1.5} />
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">Smart Contracts</h3>
+                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
+                            ABIs, deployed addresses, and functional specifications for the Golden Ticket NFT and the Akashic Ledger system.
                         </p>
                     </div>
-                    <div style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(0, 0, 0, 0.08)" }} className="p-8 rounded-2xl shadow-sm">
-                        <Network style={{ color: "#1a1a1a" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight">Neo4j Cypher Graph</h3>
-                        <p style={{ color: "#555" }} className="text-xs font-mono leading-relaxed uppercase tracking-wide">
-                            Mass Transfer 3-Hop heuristic engine linking decentralized liquidity pools to isolated cold storage matrices.
+                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
+                        <Code className="mb-6 text-black" size={24} strokeWidth={1.5} />
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">API Integration</h3>
+                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
+                            Interfacing with the Sovereign WebSocket endpoints, rate limits, and securing your REST payloads via cryptographic nonces.
                         </p>
                     </div>
-                    <div style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(0, 0, 0, 0.08)" }} className="p-8 rounded-2xl shadow-sm">
-                        <Zap style={{ color: "#1a1a1a" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight">Chaos Monkey Protocol</h3>
-                        <p style={{ color: "#555" }} className="text-xs font-mono leading-relaxed uppercase tracking-wide">
-                            Active circuit breakers testing RPC resiliency through injected Redis latency and forced memory dropouts.
-                        </p>
-                    </div>
-                    <div style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(0, 0, 0, 0.08)" }} className="p-8 rounded-2xl shadow-sm">
-                        <ShieldCheck style={{ color: "#1a1a1a" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight">MEV Flashbots Shield</h3>
-                        <p style={{ color: "#555" }} className="text-xs font-mono leading-relaxed uppercase tracking-wide">
-                            Absolute Sovereignty via Private Mempool routing, establishing total resistance against sandwich and front-running attacks.
-                        </p>
-                    </div>
-                    <div style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(0, 0, 0, 0.08)" }} className="p-8 rounded-2xl shadow-sm">
-                        <Workflow style={{ color: "#1a1a1a" }} size={24} strokeWidth={1.5} className="mb-6" />
-                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight">Zero-Mock Architecture</h3>
-                        <p style={{ color: "#555" }} className="text-xs font-mono leading-relaxed uppercase tracking-wide">
-                            Every component renders exclusively from live cryptographic states. Falsified fallback UI patterns have been eradicated.
+                    <div className="bg-white border border-black/10 p-8 rounded-sm shadow-sm hover:shadow-md transition-shadow">
+                        <Layers className="mb-6 text-black" size={24} strokeWidth={1.5} />
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-tight text-black">Node Operations</h3>
+                        <p className="text-xs font-mono leading-relaxed uppercase tracking-wide text-black/50">
+                            Hardware requirements, Docker orchestration, and PM2 process management for deploying your own Master Node instance.
                         </p>
                     </div>
                 </div>
 
-                {/* ── CORE TEXT SECTIONS ── */}
-                <div className="flex flex-col gap-20 w-full max-w-4xl mx-auto">
+                {/* ── SECTIONS ── */}
+                <div className="flex flex-col gap-24 w-full max-w-[900px] mx-auto font-serif">
                     
                     {/* SECTION 1 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            01.
-                        </div>
+                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
+                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">01</div>
                         <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Abstract Configuration & Zero-Mock Integrity
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed mb-4 text-justify">
-                                The Whale Alert Network operates as a high-fidelity intelligence canvas structured via Next.js 15 and optimized through GPU-accelerated CSS rendering. State management transcends local buffers, securing the absolute mathematical coherence of the user's intelligence topology. 
-                            </p>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed text-justify">
-                                Under the **Zero-Mock Mandate**, the entire infrastructure has been purged of simulated environments. The UI components (e.g., `VossSupremacyPanel.tsx`) natively handle empty states, displaying "NO INSTITUTIONAL CLEARANCES ISSUED" until authentic, real-time data is actively ingested from the blockchain. The interface strictly reflects cryptographic reality.
-                            </p>
+                            <h2 className="text-3xl font-normal mb-8 text-black">System Architecture Overview</h2>
+                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
+                                <p>
+                                    The Sovereign Master Node is a full-stack, decentralized intelligence and execution platform. It transcends traditional dApp architectures by fusing an aggressive Next.js App Router (running strictly on Edge and Node.js primitives) with a deeply integrated Neo4j Graph Database for high-velocity data modeling.
+                                </p>
+                                <p>
+                                    The client-side infrastructure leverages React Server Components to pre-render heavy cryptographic logic securely on the server, drastically reducing the JavaScript payload delivered to the client. Real-time DOM updates are handled by Framer Motion, ensuring mathematical fluidity at 60 frames per second, whilst global state is synchronized via Zustand combined with Wagmi's reactive hooks.
+                                </p>
+                                <p>
+                                    This hybrid topology—where heavy computation occurs in the Vercel/Railway backend, and only deterministic rendering commands are dispatched to the client—ensures that the Terminal remains impenetrable, highly performant, and resistant to client-side memory exhaustion when processing millions of localized graph nodes.
+                                </p>
+                            </div>
                         </div>
                     </section>
 
                     {/* SECTION 2 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            02.
-                        </div>
+                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
+                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">02</div>
                         <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Event Synthesis & Archive Node Escalation
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed mb-6 text-justify">
-                                Blockchain interactions contain immense stochastic noise. Our algorithm filters transactional artifacts through conditional heuristics (Z-score variations, liquidity pool drain signatures) allowing only empirically significant "Whale Events" to penetrate the visualization layer. The `ResilientProvider` architecture multiplexes RPC calls, and crucially, intercepts "missing trie node" errors to dynamically route historical queries to deep-state Archive Nodes, preventing indexer stalls.
-                            </p>
-                            <div style={{ backgroundColor: "#F5F3EC", borderLeft: "4px solid #1a1a1a" }} className="p-6 rounded-lg font-mono text-xs overflow-x-auto text-[#333]">
-                                <code>
-                                    <span style={{ color: "#000", fontWeight: "bold" }}>import</span> {'{ BlockchainListener }'} <span style={{ color: "#000", fontWeight: "bold" }}>from</span> <span style={{ color: "#555" }}>'@/lib/blockchain/ingestion'</span>;<br/><br/>
-                                    <span style={{ color: "#000", fontWeight: "bold" }}>const</span> filterNoise = (tx: Entity) =&gt; {'{'}<br/>
-                                    &nbsp;&nbsp;<span style={{ color: "#000", fontWeight: "bold" }}>if</span> (tx.volume &lt; THRESHOLD) <span style={{ color: "#000", fontWeight: "bold" }}>return</span> <span style={{ color: "#555" }}>false</span>;<br/>
-                                    &nbsp;&nbsp;<span style={{ color: "#000", fontWeight: "bold" }}>return</span> verifyMerkleProof(tx);<br/>
-                                    {'};'}
-                                </code>
+                            <h2 className="text-3xl font-normal mb-8 text-black">The Neo4j Akashic Ledger</h2>
+                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
+                                <p>
+                                    The intelligence capabilities of the Terminal are powered entirely by Neo4j AuraDB. Traditional relational databases (SQL) and document stores (NoSQL) fail catastrophically when attempting to model complex, multi-hop decentralized exchange routing, institutional wallet clustering, and recursive MEV extraction patterns.
+                                </p>
+                                <p>
+                                    By utilizing Cypher query language over a native property graph, we can execute 5-hop pathfinding algorithms across millions of Ethereum addresses in single-digit milliseconds. The graph schema consists of `(:Wallet)`, `(:SmartContract)`, `(:Transaction)`, and `(:Token)` nodes connected by strongly typed edges such as `[:TRANSFERRED]`, `[:SWAPPED]`, and `[:VOTED]`.
+                                </p>
+                                <div className="p-6 my-8 bg-black/5 border border-black/10 rounded-sm">
+                                    <p className="font-mono text-[13px] text-black/70">
+                                        MATCH (w:Wallet)-[t:TRANSFERRED]-&gt;(sc:SmartContract)<br/>
+                                        WHERE w.classification = 'WHALE' AND sc.protocol = 'UNISWAP_V3'<br/>
+                                        RETURN w, t, sc LIMIT 100;
+                                    </p>
+                                </div>
+                                <p>
+                                    This infrastructure allows the Sovereign Master Node to visualize institutional liquidity flows in real-time, effectively creating a "Dark Forest Radar" for the mempool.
+                                </p>
                             </div>
                         </div>
                     </section>
 
                     {/* SECTION 3 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            03.
-                        </div>
+                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
+                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">03</div>
                         <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Cryptographic Provenance (Merkle Trees)
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed text-justify">
-                                The Akashic Ledger is continuously hashed using SHA-256 Merkle Tree cryptography (`lib/blockchain/merkle.ts`). This structure provides absolute, mathematically unforgeable Proofs-of-Inclusion. External intelligence auditors can mathematically verify that a specific Mass Transfer event was registered by the Sovereign Terminal without downloading the entire PostgreSQL database state.
-                            </p>
-                        </div>
-                    </section>
-
-                    {/* SECTION 4 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            04.
-                        </div>
-                        <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Absolute Sovereignty (MEV Shield)
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed text-justify">
-                                To protect protocol operations from malicious mempool actors, sensitive transactions executed by the Terminal are routed through Flashbots and Eden Private Mempools (`lib/blockchain/mev.ts`). This prevents block-builder sandwich attacks and front-running bots from extracting value from our administrative maneuvers, achieving true, absolute operational sovereignty.
-                            </p>
-                        </div>
-                    </section>
-                    {/* SECTION 5 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            05.
-                        </div>
-                        <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Real-time Memory Topology & WebSocket Architecture
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed mb-6 text-justify">
-                                The Sovereign Terminal abandons traditional REST polling mechanics in favor of a full-duplex WebSocket architecture binding the EVM ingestion workers directly to the client's React Virtual DOM. This `Memory Topology` bypasses standard database disk-write latency, pushing state changes directly from the `BlockchainListener` memory buffer to the frontend at sub-15ms intervals. PostgreSQL acts strictly as a persistent ledger for historical queries, never as a middleman for real-time telemetry.
-                            </p>
-                            <div style={{ backgroundColor: "#F5F3EC", borderLeft: "4px solid #1a1a1a" }} className="p-6 rounded-lg font-mono text-xs overflow-x-auto text-[#333]">
-                                <code>
-                                    <span style={{ color: "#000", fontWeight: "bold" }}>// Real-time Event Broadcaster (whale-worker.ts)</span><br/><br/>
-                                    <span style={{ color: "#000", fontWeight: "bold" }}>const</span> wsClients = <span style={{ color: "#000", fontWeight: "bold" }}>new</span> Set&lt;WebSocket&gt;();<br/>
-                                    <span style={{ color: "#000", fontWeight: "bold" }}>export function</span> broadcast(event: SovereignEvent) {'{'}<br/>
-                                    &nbsp;&nbsp;<span style={{ color: "#000", fontWeight: "bold" }}>const</span> payload = JSON.stringify(event);<br/>
-                                    &nbsp;&nbsp;wsClients.forEach((client) =&gt; {'{'}<br/>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "#000", fontWeight: "bold" }}>if</span> (client.readyState === WebSocket.OPEN) client.send(payload);<br/>
-                                    &nbsp;&nbsp;{'}'});<br/>
-                                    {'}'}
-                                </code>
+                            <h2 className="text-3xl font-normal mb-8 text-black">Cryptographic Authentication (SIWE)</h2>
+                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
+                                <p>
+                                    The Terminal rejects traditional username/password paradigms. All authentication is exclusively managed through EIP-4361: Sign-In with Ethereum (SIWE). When an operator initiates a connection, the server generates a cryptographically secure nonce. The local wallet signs a standardized message containing this nonce, the URI, and a timestamp.
+                                </p>
+                                <p>
+                                    Upon validation by the backend (using `viem/utils` to recover the signer's address from the ECSDA signature), an HttpOnly JSON Web Token (JWT) is minted. This token is bound to the specific Ethereum address and cannot be hijacked via cross-site scripting (XSS).
+                                </p>
+                                <p>
+                                    This guarantees that interactions within the Terminal—such as deploying smart contracts, interacting with the Forum, or accessing Premium intelligence tiers—are irrevocably tethered to a verifiable on-chain identity without compromising absolute anonymity.
+                                </p>
                             </div>
                         </div>
                     </section>
 
-                    {/* SECTION 6 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            06.
-                        </div>
+                    {/* SECTION 4 */}
+                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
+                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">04</div>
                         <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Heuristic API Limiting & Threat Mitigation
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed text-justify">
-                                Our API edge nodes (`app/api/`) implement mathematically rigorous heuristic rate limiting backed by Redis volatile memory. Rather than simply enforcing static limits per IP, the system analyzes the *velocity* and *breadth* of the request footprint. If a single IP subnet requests `Golden Ticket` claims for multiple distinct wallet addresses within a condensed temporal window, the Neo4j Sybil detection algorithm classifies the node as a threat and enforces a strict, unappealable 3600-second ban across the entire Redis cluster.
-                            </p>
+                            <h2 className="text-3xl font-normal mb-8 text-black">Golden Ticket & Sovereign Identity Contracts</h2>
+                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
+                                <p>
+                                    The protocol relies on several foundational smart contracts deployed on Base network (an Ethereum L2). The primary access-control mechanism is the <strong>Golden Ticket ERC-721 Contract</strong>. This non-fungible token grants perpetual, uncensorable access to the Premium Intelligence tiers of the Terminal.
+                                </p>
+                                <p>
+                                    The smart contract implements a deterministic bonding curve for minting, meaning early institutional adopters secure access at a lower capital requirement. The contract also integrates ERC-2981 for on-chain royalty enforcement and leverages custom ReentrancyGuard modules to prevent vector attacks during minting phases.
+                                </p>
+                                <p>
+                                    All contract ABIs (Application Binary Interfaces) and TypeChain bindings are stored locally in the `contracts/` directory, ensuring that the Terminal interacts with the blockchain using perfectly typed TypeScript interfaces, eliminating runtime decoding errors.
+                                </p>
+                            </div>
                         </div>
                     </section>
 
-                    {/* SECTION 7 */}
-                    <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-                        <div style={{ color: "#ccc" }} className="font-mono text-3xl md:text-4xl font-bold shrink-0">
-                            07.
-                        </div>
+                    {/* SECTION 5 */}
+                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
+                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">05</div>
                         <div>
-                            <h2 style={{ fontFamily: "'Georgia', serif" }} className="text-3xl font-normal mb-6">
-                                Deployment Pipeline & Infrastructure Resilience
-                            </h2>
-                            <p style={{ color: "#333", fontSize: "1.05rem" }} className="font-serif leading-relaxed text-justify">
-                                The Sovereign Terminal is packaged and deployed via a highly optimized 5-stage Dockerfile pipeline, executing strictly on Railway's institutional infrastructure. The build phase entirely excludes development dependencies (`npm ci --only=production`), utilizes `Next.js standalone` output mode to drastically minimize image weight, and employs PM2 cluster mode to dynamically load-balance incoming telemetry across available CPU cores. This guarantees maximum horizontal scalability under severe duress.
-                            </p>
+                            <h2 className="text-3xl font-normal mb-8 text-black">Node Deployment & Self-Hosting</h2>
+                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
+                                <p>
+                                    For institutional actors desiring absolute sovereignty, the Terminal can be deployed on proprietary bare-metal servers. The system is fully containerized using Docker, allowing for rapid orchestration via Docker Compose or Kubernetes.
+                                </p>
+                                <p>
+                                    <strong>Hardware Prerequisites:</strong><br/>
+                                    • Processing: Dedicated 8-Core CPU (Minimum)<br/>
+                                    • Memory: 32GB ECC RAM (Required for local Neo4j instances)<br/>
+                                    • Storage: 2TB NVMe SSD (For synchronized RPC nodes and graph persistence)<br/>
+                                    • Network: 1Gbps Dedicated Uplink
+                                </p>
+                                <p>
+                                    To deploy, administrators must configure the `.env` file with their specific Alchemy/Infura RPC endpoints, WalletConnect Cloud IDs, and Neo4j authentication credentials. Once configured, running the `start.sh` or `SovereignVault_RUN.bat` scripts will initialize the PM2 daemon or Docker containers, spinning up the Next.js runtime, the Redis cache, and the WebSocket servers concurrently.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* SECTION 6 */}
+                    <section className="flex flex-col md:flex-row gap-8 md:gap-16">
+                        <div className="font-mono text-3xl md:text-5xl font-bold shrink-0 text-black/10">06</div>
+                        <div>
+                            <h2 className="text-3xl font-normal mb-8 text-black">API Limitations & WebSockets</h2>
+                            <div className="space-y-6 text-[#1a1a1a] text-[18px] leading-[1.8] tracking-[0.01em]">
+                                <p>
+                                    The Terminal provides a robust internal API for data fetching, but external access is strictly throttled by the Web Application Firewall (WAF) outlined in the middleware. 
+                                </p>
+                                <p>
+                                    Live market data and orderbook streams are delivered exclusively via secure WebSockets (WSS). Clients must initiate a handshake using an authorized session token. The WebSocket server (managed via custom Next.js route handlers and Socket.io) broadcasts incremental delta updates rather than full state objects, drastically reducing bandwidth consumption and ensuring ultra-low latency execution feedback.
+                                </p>
+                                <p>
+                                    Unrecognized socket connections or connections failing the cryptographic heartbeat challenge are abruptly terminated without response.
+                                </p>
+                            </div>
                         </div>
                     </section>
 
                 </div>
 
                 {/* ── FOOTER MARK ── */}
-                <div className="w-full flex flex-col items-center justify-center mt-32 pt-16 border-t border-black/10">
-                    <Globe style={{ color: "#1a1a1a", opacity: 0.2 }} size={48} className="mb-6" />
-                    <p style={{ color: "#777" }} className="font-mono text-xs uppercase tracking-[0.2em] font-bold text-center">
-                        Sovereign Master Node · Core Infrastructure
+                <div className="w-full flex flex-col items-center justify-center mt-40 pt-16 border-t border-black/10">
+                    <Globe className="mb-6 text-black/20" size={48} />
+                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold text-center text-black/40">
+                        Sovereign Master Node · Technical Documentation D-1
                     </p>
                 </div>
             </div>

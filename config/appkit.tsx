@@ -6,10 +6,11 @@ import { AppKitNetwork, mainnet, base, arbitrum, polygon, optimism, bsc } from "
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { cookieToInitialState, createStorage, cookieStorage } from 'wagmi';
 import { createAppKit } from '@reown/appkit/react';
+import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { metaMask, injected, walletConnect, safe } from 'wagmi/connectors';
-// siweConfig imports removed — AppKit SIWE flow disabled in favour of custom EIP-191 signing
+// SIWE Config will be defined below
 
 // 1. Get projectId — Falls back to real project ID so the app renders even without the env var.
 // Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in Railway for clean env separation.
@@ -123,13 +124,51 @@ const metadata = {
     icons: [`${CANONICAL_APP_URL}/f_log.svg`],
 }
 
-// ── NOTE: siweConfig intentionally removed.
-// The cryptographic signature flow is managed exclusively by:
-//   - MobileLanding.tsx → establishSession() on mobile
-//   - LinkedGate.tsx → SignContractStep on desktop
-// Defining siweConfig here — even without passing it to createAppKit —
-// was causing AppKit to fire its own internal SIWE modal simultaneously
-// with our establishSession(), resulting in "Error signing message" on mobile.
+// ── 1-Click Auth (SIWE) Configuration ──
+// Natively integrated with WalletConnect to bundle connection and signature
+// in a single wallet prompt. Crucial for bypassing Android tab-discard loops.
+const siweConfig = createSIWEConfig({
+  getMessageParams: async () => ({
+    domain: typeof window !== 'undefined' ? window.location.host : 'humanidfi.com',
+    uri: typeof window !== 'undefined' ? window.location.origin : 'https://humanidfi.com',
+    chains: [1, 10, 56, 137, 8453, 42161, 480],
+    statement: 'Sign in to Sovereign Intelligence Platform'
+  }),
+  createMessage: ({ address, ...args }) => formatMessage(args, address),
+  getNonce: async () => {
+    const res = await fetch('/api/siwe/nonce', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch nonce');
+    return await res.text();
+  },
+  getSession: async () => {
+    try {
+      const res = await fetch('/api/siwe/session', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return { address: data.address, chainId: data.chainId };
+    } catch {
+      return null;
+    }
+  },
+  verifyMessage: async ({ message, signature }) => {
+    try {
+      const res = await fetch('/api/siwe/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, signature })
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  },
+  signOut: async () => {
+    try {
+      await fetch('/api/siwe/logout');
+    } catch {}
+    return true;
+  }
+});
 
 // ── CRITICAL: createAppKit must be called at module level (not inside window check).
 // Reown AppKit hooks (useAppKit, useAppKitAccount, etc.) are used during SSR in
@@ -147,7 +186,7 @@ try {
             networks,
             projectId,
             metadata,
-            // siweConfig disabled to prevent OS passcode crashes on mobile wallets during 1-click auth
+            siweConfig,
             // ── allowUnsupportedChain: prevents AppKit from auto-triggering the
             // "Switch Network" modal when the user's wallet is on a network not
             // in our list. Network switching is handled exclusively in Portfolio.
