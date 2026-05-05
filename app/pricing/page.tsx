@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings, Mail } from 'lucide-react';
 import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { useAppKit } from '@reown/appkit/react';
 import { parseEther } from 'viem';
 
 const TIER_HIERARCHY: Record<string, number> = {
@@ -145,6 +146,7 @@ function PricingContent() {
   // Wagmi hooks for on-chain transaction
   const { sendTransaction, data: txHash, isPending: isTxPending } = useSendTransaction();
   const { isLoading: isWaitingForReceipt, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const { open } = useAppKit();
 
   useEffect(() => {
     async function fetchTier() {
@@ -216,11 +218,20 @@ function PricingContent() {
   };
 
   const handleSubscribeClick = (planId: string) => {
-    if (!isConnected || !isSovereignHandshake) {
+    if (!isConnected && !address) {
       toast.error('Connect your wallet to subscribe', {
         description: 'Please connect your wallet first — it only takes a few seconds.',
       });
-      router.push('/connect');
+      open();
+      return;
+    }
+
+    // If they are on a mocked QR session, Wagmi has no real connector to sign a tx.
+    if (isSovereignHandshake) {
+      toast.info('Secure Payment Tunnel Required', {
+        description: 'You are logged in via Mobile Sync. Please connect your wallet to this browser to process the on-chain transaction.',
+      });
+      open();
       return;
     }
 
