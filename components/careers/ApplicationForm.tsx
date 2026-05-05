@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Loader2, CheckCircle2, AlertTriangle, Send } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertTriangle, Send, ShieldCheck } from 'lucide-react';
 
 interface ApplicationFormProps {
   role: string;
@@ -49,37 +49,43 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center bg-black/[0.02] border border-black/10">
-        <CheckCircle2 size={48} className="text-[#00C076] mb-6" />
-        <h3 className="font-serif text-[24px] text-black mb-2">Application Secured</h3>
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/60 max-w-md mx-auto leading-relaxed">
-          Your dossier for the {role} mandate has been cryptographically received. Our institutional core team will evaluate your profile and contact you shortly.
+      <div className="flex flex-col items-center justify-center p-16 text-center bg-white border border-black/10 rounded-[32px] shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-[#00C076]/10 flex items-center justify-center mb-6">
+           <CheckCircle2 size={32} className="text-[#00C076]" />
+        </div>
+        <h3 className="font-sans text-[28px] font-black tracking-tight text-[#050505] mb-4">Application Secured</h3>
+        <p className="font-serif text-[15px] text-[#050505]/70 max-w-md mx-auto leading-relaxed">
+          Your dossier for the <strong className="font-sans font-bold text-[#050505]">{role}</strong> mandate has been cryptographically received. Our institutional core team will evaluate your profile and establish contact shortly.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="mb-8">
-        <h2 className="text-[20px] font-serif text-black mb-2">Initialize Handshake</h2>
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/50">
-          Submit your cryptographic identity and portfolio for the {role} position.
+    <div className="flex flex-col w-full bg-white border border-black/10 p-8 sm:p-12 rounded-[32px] shadow-[0_10px_40px_rgba(0,0,0,0.02)]">
+      <div className="mb-10 flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-[#00C076] mb-2">
+           <ShieldCheck size={16} />
+           <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em]">Secure Gateway</span>
+        </div>
+        <h2 className="text-[28px] font-black tracking-tight text-[#050505]">Initialize Handshake</h2>
+        <p className="font-serif text-[15px] text-[#050505]/60 max-w-lg">
+          Submit your professional identity and portfolio for the <strong className="font-sans font-bold text-[#050505]">{role}</strong> position.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-8">
         
         {status === 'error' && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 text-red-700">
-            <AlertTriangle size={16} />
-            <span className="font-mono text-[10px] uppercase tracking-widest">{errorMsg}</span>
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+            <AlertTriangle size={18} />
+            <span className="font-mono text-[11px] font-bold uppercase tracking-widest">{errorMsg}</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="name" className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-black/60">Sovereign Name</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="flex flex-col gap-2.5">
+            <label htmlFor="name" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/60">Sovereign Name</label>
             <input 
               required
               id="name"
@@ -87,12 +93,12 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
               type="text" 
               value={formData.name}
               onChange={handleChange}
-              placeholder="Satoshi Nakamoto"
-              className="w-full bg-[#fdfbf6] border border-black/20 p-3.5 font-sans text-[13px] outline-none focus:border-black transition-colors"
+              placeholder="e.g. Satoshi Nakamoto"
+              className="w-full bg-[#FAF9F6] border border-black/10 rounded-xl p-4 font-sans text-[14px] outline-none focus:border-black/40 focus:bg-white transition-all shadow-sm"
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-black/60">Comms Vector (Email)</label>
+          <div className="flex flex-col gap-2.5">
+            <label htmlFor="email" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/60">Comms Vector (Email)</label>
             <input 
               required
               id="email"
@@ -101,13 +107,13 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
               value={formData.email}
               onChange={handleChange}
               placeholder="satoshi@genesis.block"
-              className="w-full bg-[#fdfbf6] border border-black/20 p-3.5 font-sans text-[13px] outline-none focus:border-black transition-colors"
+              className="w-full bg-[#FAF9F6] border border-black/10 rounded-xl p-4 font-sans text-[14px] outline-none focus:border-black/40 focus:bg-white transition-all shadow-sm"
             />
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="portfolio" className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-black/60">On-Chain Portfolio / GitHub</label>
+        <div className="flex flex-col gap-2.5">
+          <label htmlFor="portfolio" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/60">On-Chain Portfolio / GitHub</label>
           <input 
             required
             id="portfolio"
@@ -116,12 +122,12 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
             value={formData.portfolio}
             onChange={handleChange}
             placeholder="https://github.com/..."
-            className="w-full bg-[#fdfbf6] border border-black/20 p-3.5 font-sans text-[13px] outline-none focus:border-black transition-colors"
+            className="w-full bg-[#FAF9F6] border border-black/10 rounded-xl p-4 font-sans text-[14px] outline-none focus:border-black/40 focus:bg-white transition-all shadow-sm"
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="motivation" className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-black/60">Academic Directive (Cover Letter)</label>
+        <div className="flex flex-col gap-2.5">
+          <label htmlFor="motivation" className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]/60">Academic Directive (Cover Letter)</label>
           <textarea 
             required
             id="motivation"
@@ -130,25 +136,25 @@ export function ApplicationForm({ role }: ApplicationFormProps) {
             value={formData.motivation}
             onChange={handleChange}
             placeholder="Detail your experience in Web3 education and why you align with the Sovereign Terminal architecture..."
-            className="w-full bg-[#fdfbf6] border border-black/20 p-3.5 font-sans text-[13px] outline-none focus:border-black transition-colors resize-y min-h-[120px]"
+            className="w-full bg-[#FAF9F6] border border-black/10 rounded-xl p-4 font-sans text-[14px] outline-none focus:border-black/40 focus:bg-white transition-all resize-y min-h-[140px] shadow-sm leading-relaxed"
           />
         </div>
 
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-end mt-2">
           <button 
             type="submit"
             disabled={status === 'submitting'}
-            className="group relative flex items-center gap-3 bg-black text-[#FDFCF8] px-8 py-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center justify-center gap-3 bg-[#050505] text-[#FAF9F6] px-10 py-4 rounded-xl font-mono text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:bg-[#1A1A1A] hover:scale-105 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-lg w-full sm:w-auto"
           >
             {status === 'submitting' ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
                 Validating Proof...
               </>
             ) : (
               <>
                 Transmit Protocol
-                <Send size={14} className="group-hover:translate-x-1 transition-transform" />
+                <Send size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </>
             )}
           </button>
