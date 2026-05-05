@@ -252,7 +252,7 @@ function PricingContent() {
     
     // Process on-chain transaction
     sendTransaction({
-      to: process.env.NEXT_PUBLIC_TREASURY_WALLET as \`0x\${string}\` || '0x000000000000000000000000000000000000dEaD',
+      to: process.env.NEXT_PUBLIC_TREASURY_WALLET as `0x${string}` || '0x000000000000000000000000000000000000dEaD',
       value: parseEther(priceEth),
     }, {
       onError: (error) => {
