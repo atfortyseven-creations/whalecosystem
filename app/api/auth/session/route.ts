@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
         if (walletAddress) {
           const user = await prisma.user.findUnique({
             where: { walletAddress: walletAddress.toLowerCase() },
-            include: { subscription: true },
+          });
+          const subscription = await prisma.subscription.findUnique({
+            where: { userId: walletAddress.toLowerCase() }
           });
           const userTransactions = await prisma.transaction.findMany({
             where: { fromAddress: walletAddress.toLowerCase(), type: 'SUBSCRIPTION_PAYMENT' },
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
               tier: user?.tier || (payload.tier as string) || 'FREE',
               humanityScore: user?.humanityScore || 0,
               walletAddress: walletAddress.toLowerCase(),
-              subscription: user?.subscription || null,
+              subscription: subscription || null,
               transactions: userTransactions || [],
             },
           });
@@ -42,7 +44,9 @@ export async function GET(request: NextRequest) {
     if (handshake && /^0x[a-fA-F0-9]{40}$/.test(handshake)) {
       const user = await prisma.user.findUnique({
         where: { walletAddress: handshake.toLowerCase() },
-        include: { subscription: true },
+      });
+      const subscription = await prisma.subscription.findUnique({
+        where: { userId: handshake.toLowerCase() }
       });
       const userTransactions = await prisma.transaction.findMany({
         where: { fromAddress: handshake.toLowerCase(), type: 'SUBSCRIPTION_PAYMENT' },
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         authenticated: !!user,
         user: user
-          ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: user.subscription, transactions: userTransactions }
+          ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: subscription, transactions: userTransactions }
           : null,
       });
     }
