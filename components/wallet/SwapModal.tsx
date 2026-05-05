@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowDown, Settings, Loader2, RefreshCw, Zap, Sparkles, Route } from "lucide-react";
-import { useAccount, useBalance, useWriteContract, useWaitForTransactionReceipt, useChainId } from "wagmi";
+import { useAccount, useBalance, useWriteContract, useChainId } from "wagmi";
 import { parseUnits, formatUnits } from "viem";
 import { useEliteSwap } from "@/hooks/useEliteSwap";
 import { toast } from "sonner";

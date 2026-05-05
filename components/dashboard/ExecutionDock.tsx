@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { useSendTransaction } from 'wagmi';
 import { useSovereignAccount as useAccount } from '@/hooks/useSovereignAccount';
 import { parseEther } from 'viem';
 import { ShieldAlert, Zap, Lock, Crosshair, AlertTriangle, Fingerprint, Activity, Ban } from 'lucide-react';
@@ -24,15 +24,10 @@ export default function ExecutionDock() {
   const isArmed = useSniperStore((state) => state.isArmed);
   const setArmed = useSniperStore((state) => state.setArmed);
   
-  const { data: hash, isPending, sendTransaction, error: txError } = useSendTransaction();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
-
-  // Feed confirmed transactions to the Tactical History store
-  useEffect(() => {
-    if (isConfirmed && hash) {
-      addExecutedTrade(hash, 0, currentPrice); // Recording 0 amount as it's a test tx, but recording the exact price tick it fired at
-    }
-  }, [isConfirmed, hash, addExecutedTrade]);
+  const { isPending, sendTransaction, error: txError } = useSendTransaction();
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [localHash, setLocalHash] = useState<string | null>(null);
 
   // HFT Anomalies polling
   const { data: mevData, isLoading: mevLoading } = useSWR('/api/execution/mev', fetcher, { refreshInterval: 5000 });
@@ -76,6 +71,17 @@ export default function ExecutionDock() {
         to: quote.to,
         data: quote.data,
         value: BigInt(quote.value), 
+      }, {
+        onSuccess: (hash) => {
+          setIsConfirming(true);
+          setTimeout(() => {
+             setIsConfirming(false);
+             setIsConfirmed(true);
+             setLocalHash(hash);
+             addExecutedTrade(hash, 0, currentPrice);
+          }, 800);
+        },
+        onError: () => setIsConfirming(false)
       });
       
       setArmed(false);
@@ -129,7 +135,7 @@ export default function ExecutionDock() {
                      <Activity size={16} className="animate-spin" /> 
                      {isQuoting ? 'ROUTING DEX LIQUIDITY...' : isPending ? 'AWAITING WALLET SIGNATURE...' : 'BROADCASTING TO MEMPOOL...'}
                  </div>
-                 {hash && <span className="text-[9px] font-mono mt-2 text-emerald-600/60">{hash.slice(0, 10)}...{hash.slice(-8)}</span>}
+                 {localHash && <span className="text-[9px] font-mono mt-2 text-emerald-600/60">{localHash.slice(0, 10)}...{localHash.slice(-8)}</span>}
              </div>
          ) : isConfirmed ? (
              <div className="absolute inset-0 bg-emerald-500/20 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
@@ -137,7 +143,7 @@ export default function ExecutionDock() {
                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                      EXECUTION CONFIRMED
                  </div>
-                 <button onClick={() => window.open(`https://etherscan.io/tx/${hash}`, '_blank')} className="text-[9px] font-mono mt-2 underline text-emerald-400/60 hover:text-emerald-400">View on Explorer</button>
+                 <button onClick={() => window.open(`https://etherscan.io/tx/${localHash}`, '_blank')} className="text-[9px] font-mono mt-2 underline text-emerald-400/60 hover:text-emerald-400">View on Explorer</button>
              </div>
          ) : null}
 

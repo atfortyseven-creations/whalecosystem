@@ -5,7 +5,7 @@ import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings, Mail } from 'lucide-react';
-import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { useSendTransaction } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { parseEther } from 'viem';
 
@@ -144,8 +144,8 @@ function PricingContent() {
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   // Wagmi hooks for on-chain transaction
-  const { sendTransaction, data: txHash, isPending: isTxPending } = useSendTransaction();
-  const { isLoading: isWaitingForReceipt, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const { sendTransaction, isPending: isTxPending } = useSendTransaction();
+  const [isConfirmingBackend, setIsConfirmingBackend] = useState(false);
   const { open } = useAppKit();
 
   useEffect(() => {
@@ -167,49 +167,6 @@ function PricingContent() {
     }
     fetchTier();
   }, [isConnected, isSovereignHandshake]);
-
-  // Handle successful transaction
-  useEffect(() => {
-    if (isTxSuccess && txHash && selectedPlanId && address) {
-      const confirmPayment = async () => {
-        try {
-          const priceEth = TIER_PRICES[selectedPlanId][billingCycle];
-          const res = await fetch('/api/payment/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              txHash,
-              planId: selectedPlanId,
-              billingCycle,
-              priceEth,
-              email: emailInput,
-              walletAddress: address
-            })
-          });
-          
-          if (res.ok) {
-            toast.success('Transaction Confirmed!', {
-              description: 'Your invoice has been sent to your email. Redirecting to your panel...',
-            });
-            setTimeout(() => {
-              router.push('/dashboard?tab=billing');
-            }, 2000);
-          } else {
-            throw new Error('Backend failed to confirm payment');
-          }
-        } catch (error) {
-          toast.error('Verification Error', {
-            description: 'Transaction was successful but verification failed. Please contact support.'
-          });
-        } finally {
-          setLoadingTier(null);
-          setIsEmailModalOpen(false);
-        }
-      };
-
-      confirmPayment();
-    }
-  }, [isTxSuccess, txHash, selectedPlanId, address, emailInput, router, billingCycle]);
 
   const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
 
@@ -271,8 +228,45 @@ function PricingContent() {
         setLoadingTier(null);
         setIsEmailModalOpen(false);
       },
-      onSuccess: () => {
-        toast.loading('Transaction submitted, waiting for confirmation...', { id: 'tx-toast' });
+      onSuccess: async (hash) => {
+        setIsConfirmingBackend(true);
+        toast.loading('Transaction submitted, confirming access...', { id: 'tx-toast' });
+        
+        try {
+          const res = await fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              txHash: hash,
+              planId: selectedPlanId,
+              billingCycle,
+              priceEth,
+              email: emailInput,
+              walletAddress: address
+            })
+          });
+          
+          if (res.ok) {
+            toast.success('Access Granted!', {
+              id: 'tx-toast',
+              description: 'Your payment was submitted and access granted. Redirecting...',
+            });
+            setTimeout(() => {
+              router.push('/dashboard?tab=billing');
+            }, 2000);
+          } else {
+            throw new Error('Backend failed to confirm payment');
+          }
+        } catch (error) {
+          toast.error('Verification Error', {
+            id: 'tx-toast',
+            description: 'Transaction submitted but verification failed. Please contact support.'
+          });
+        } finally {
+          setLoadingTier(null);
+          setIsEmailModalOpen(false);
+          setIsConfirmingBackend(false);
+        }
       }
     });
   };
@@ -330,10 +324,10 @@ function PricingContent() {
 
                 <button 
                   type="submit"
-                  disabled={isTxPending || isWaitingForReceipt}
+                  disabled={isTxPending || isConfirmingBackend}
                   className="w-full py-4 bg-[#050505] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-70"
                 >
-                  {(isTxPending || isWaitingForReceipt) ? (
+                  {(isTxPending || isConfirmingBackend) ? (
                     <><Loader2 className="animate-spin" size={18} /> Processing On-Chain...</>
                   ) : (
                     <>Sign & Pay <ArrowRight size={18} /></>
