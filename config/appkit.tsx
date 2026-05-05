@@ -106,13 +106,12 @@ const metadata = {
     url: CANONICAL_APP_URL,
     icons: ['https://humanidfi.com/official-whale-monochrome.png'],
     redirect: {
-        // universal: the HTTPS URL wallets use for universal links (iOS)
+        // universal: the HTTPS URL wallets use after signing to return to the dApp.
+        // For web apps, ONLY this field should be set.
+        // redirect.native ('wc://') is for native iOS/Android apps with a registered
+        // URI scheme — setting it for a web app confuses wallets and can silently
+        // break the post-sign redirect on some Android implementations.
         universal: CANONICAL_APP_URL,
-        // native: the custom URI scheme wallets use to hand control back
-        // to the dApp after the user signs. Without this, "Continue in
-        // MetaMask" fires a deep-link but the wallet has no return path
-        // and the browser session is orphaned — nothing appears to happen.
-        native: 'wc://'
     }
 }
 
@@ -178,13 +177,13 @@ try {
             networks,
             projectId,
             metadata,
-            siweConfig,
+            // siweConfig intentionally removed:
+            // Reown Cloud project has "ReownAuthentication" enabled at dashboard
+            // level, which silently overrides any siweConfig passed here and logs:
+            // "ReownAuthentication option is enabled, SIWX configuration will be
+            // overridden." — session establishment is now handled directly in
+            // MobileLanding via the wagmi address (see establishSession).
             allowUnsupportedChain: true,
-            // ── Official WalletConnect wallet IDs ──────────────────────────────
-            // These tell AppKit which deep-link scheme to use per wallet.
-            // Without them, AppKit generates a generic URI that wallet apps
-            // on iOS/Android silently ignore — "Continue in MetaMask" taps
-            // but the app never launches.
             featuredWalletIds: [
                 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
                 '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow

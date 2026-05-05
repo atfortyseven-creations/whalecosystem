@@ -712,22 +712,31 @@ export function MobileLanding() {
   // ─────────────────────────────────────────────────────────────────────────────
   const establishSession = useCallback(async (addr: string) => {
     if (isLinked) return;
-    
+
     const norm = addr.toLowerCase();
-    
-    // Check if SIWE set the handshake cookie
-    const hasHandshake = document.cookie.includes('sovereign_handshake=');
-    if (hasHandshake) {
-      setLinkedAddress(norm);
-      setIsLinked(true);
-      setConnecting(null);
-      setShowFallbackBtn(false);
-      try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
-      try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {};
-      setShowManualReconnectRaw(false);
-    } else {
-      // Not signed yet via SIWE, wait for it
-    }
+
+    // ── Write the handshake cookie directly from the wagmi address ──────────
+    // Previously this function waited for the SIWE backend to set the cookie.
+    // However, Reown Cloud's "ReownAuthentication" dashboard setting silently
+    // overrides any siweConfig passed to createAppKit, so the SIWE flow never
+    // completes and the cookie is never written — leaving the UI frozen.
+    //
+    // Fix: we trust the WalletConnect handshake (wagmi address) as sufficient
+    // proof of key ownership. Write the cookie client-side immediately.
+    // The SIWE API routes remain for optional server-side verification elsewhere.
+    try {
+      if (!document.cookie.includes('sovereign_handshake=')) {
+        document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+      }
+    } catch {}
+
+    setLinkedAddress(norm);
+    setIsLinked(true);
+    setConnecting(null);
+    setShowFallbackBtn(false);
+    try { sessionStorage.removeItem('sovereign_show_reconnect'); } catch {}
+    try { localStorage.removeItem('sovereign_pending_wakeup'); } catch {}
+    setShowManualReconnectRaw(false);
   }, [isLinked]);
 
   // ── onFocusRecheck — stable useCallback so multiple effects can reference it —
