@@ -119,6 +119,78 @@ const PanelHeader = ({
     );
 };
 
+// ── Under Development Panel ───────────────────────────────────────────────────
+// Displayed for modules that are being prepared for release.
+// Design: premium, minimal, institutional — consistent with the terminal aesthetic.
+const UnderDevelopmentPanel = ({
+    title,
+    subtitle,
+    icon: Icon,
+    accent = '#050505',
+}: {
+    title: string;
+    subtitle: string;
+    icon: any;
+    accent?: string;
+}) => (
+    <div className="flex flex-col items-center justify-center min-h-[520px] w-full select-none">
+        {/* Ambient glow */}
+        <div
+            className="relative flex items-center justify-center mb-10"
+            style={{ filter: `drop-shadow(0 0 48px ${accent}30)` }}
+        >
+            {/* Outer pulse ring */}
+            <div
+                className="absolute rounded-full animate-ping opacity-[0.06]"
+                style={{ width: 96, height: 96, background: accent }}
+            />
+            {/* Inner static ring */}
+            <div
+                className="absolute rounded-full opacity-[0.10]"
+                style={{ width: 72, height: 72, background: accent }}
+            />
+            {/* Icon container */}
+            <div
+                className="relative w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{
+                    background: `${accent}0D`,
+                    border: `1px solid ${accent}25`,
+                }}
+            >
+                <Icon size={22} strokeWidth={1.4} style={{ color: accent }} />
+            </div>
+        </div>
+
+        {/* Text block */}
+        <div className="flex flex-col items-center gap-3 max-w-[380px] text-center">
+            <p
+                className="text-[9px] font-black uppercase tracking-[0.35em] mb-1"
+                style={{ color: `${accent}99` }}
+            >
+                Module Status
+            </p>
+            <h2
+                className="text-[22px] font-black tracking-tight leading-none text-[#050505]"
+                style={{ fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}
+            >
+                {title}
+            </h2>
+            <p className="text-[12px] text-[#050505]/40 font-medium leading-relaxed">
+                {subtitle}
+            </p>
+
+            {/* Divider */}
+            <div className="w-8 h-px bg-black/10 my-2" />
+
+            {/* Formal notice */}
+            <div className="px-5 py-3.5 rounded-xl border border-black/[0.07] bg-white/70 text-[10px] font-medium text-[#050505]/50 leading-relaxed">
+                This module is currently under development and is not yet available.
+                It will be released in a forthcoming platform update.
+            </div>
+        </div>
+    </div>
+);
+
 export default function WhaleDashboard() {
     const [activeTab, setActiveTab] = useState<string>('news');
 
@@ -154,7 +226,9 @@ export default function WhaleDashboard() {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'market-data':
-                return <><PanelHeader icon={Globe} title="Market Overview" description="Real-time global crypto market data — prices, volume, dominance and key metrics from top assets across all major chains." accent="#0052FF" /><div className="flex flex-col gap-6 h-auto shrink-0"><DashboardErrorBoundary key={`market-gainers-${refreshKey}`}><GainersLosersPanel /></DashboardErrorBoundary><DashboardErrorBoundary key={`market-news-${refreshKey}`}><NewsOfToday /></DashboardErrorBoundary></div></>;
+                return <UnderDevelopmentPanel title="Market Overview" subtitle="Comprehensive real-time global market data" icon={Globe} accent="#0052FF" />;
+
+
 
             case 'dashboard':
             case 'watchlist':
@@ -179,10 +253,14 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={Ticket} title="Access Pass" description="Mint your institutional clearance pass to unlock advanced analytics, private data feeds, and exclusive platform features." accent="#D4AF37" /><div className="flex-1 min-h-[950px] shrink-0"><DashboardErrorBoundary key={`gold-${refreshKey}`}><VossSupremacyPanel /></DashboardErrorBoundary></div></>;
 
             case 'markets':
-                return <><PanelHeader icon={Globe} title="Markets" description="Top performing and worst performing crypto assets. Price changes, volume, and market capitalisation at a glance." accent="#0052FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`gainers-${refreshKey}`}><GainersLosersPanel /></DashboardErrorBoundary></div></>;
+                return <UnderDevelopmentPanel title="Top Markets" subtitle="Price performance, volume and capitalisation across leading assets" icon={Globe} accent="#0052FF" />;
+
+
 
             case 'newpairs':
-                return <><PanelHeader icon={Flame} title="New Listings" description="Tokens listed on decentralised exchanges in the last 24 hours. Be among the first to spot new trading opportunities." accent="#FF6B35" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`new-pairs-${refreshKey}`}><NewPairsTable /></DashboardErrorBoundary></div></>;
+                return <UnderDevelopmentPanel title="New Listings" subtitle="Tokens recently listed on decentralised exchanges" icon={Flame} accent="#FF6B35" />;
+
+
 
             case 'omniexplorer':
                 return <><PanelHeader icon={Search} title="Block Explorer" description="Search any wallet address, transaction, or block across multiple blockchains. Verify on-chain activity instantly." accent="#050505" /><div className="flex-1 min-h-[750px] shrink-0"><DashboardErrorBoundary key={`omni-explorer-${refreshKey}`}><OmniExplorer /></DashboardErrorBoundary></div></>;
@@ -197,7 +275,9 @@ export default function WhaleDashboard() {
                 return <><PanelHeader icon={Network} title="Mass Transfers" description="Coordinated or unusually large token movements across multiple wallets. Spot potential market-moving events early." accent="#9945FF" /><div className="h-[700px] shrink-0"><DashboardErrorBoundary key={`mass-transfer-${refreshKey}`}><MassTransferIntel /></DashboardErrorBoundary></div></>;
 
             case 'graph':
-                return <><PanelHeader icon={Compass} title="Entity Graph" description="The connections between wallets and entities as an interactive network map. Understand relationships and fund flows visually." accent="#9945FF" /><div className="flex-1 min-h-[900px] shrink-0"><DashboardErrorBoundary key={`neural-graph-${refreshKey}`}><EntityGraphVis /></DashboardErrorBoundary></div></>;
+                return <UnderDevelopmentPanel title="Entity Graph" subtitle="Interactive network map of wallet relationships and capital flows" icon={Compass} accent="#9945FF" />;
+
+
 
             case 'defi':
                 return <><PanelHeader icon={Landmark} title="DeFi Yields" description="Interest rates and returns across decentralised finance protocols. Find the best places to put your assets to work." accent="#00C076" /><div className="flex-1 min-h-[800px] shrink-0"><DashboardErrorBoundary key={`defi-yield-${refreshKey}`}><DeFiYieldPanel /></DashboardErrorBoundary></div></>;
