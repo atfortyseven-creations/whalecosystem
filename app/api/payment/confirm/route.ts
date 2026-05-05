@@ -42,18 +42,35 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Update Database (User Tier & Email)
-    const user = await prisma.user.upsert({
-      where: { walletAddress: walletAddress.toLowerCase() },
-      update: {
-        tier: planId,
-        ...(email && { email: email }) // Update email if provided
-      },
-      create: {
-        walletAddress: walletAddress.toLowerCase(),
-        tier: planId,
-        ...(email && { email: email })
+    let user;
+    try {
+      user = await prisma.user.upsert({
+        where: { walletAddress: walletAddress.toLowerCase() },
+        update: {
+          tier: planId,
+          ...(email && { email: email }) // Update email if provided
+        },
+        create: {
+          walletAddress: walletAddress.toLowerCase(),
+          tier: planId,
+          ...(email && { email: email })
+        }
+      });
+    } catch (e: any) {
+      if (e.code === 'P2002') {
+        // Unique constraint failed, likely on email. Fallback without email.
+        user = await prisma.user.upsert({
+          where: { walletAddress: walletAddress.toLowerCase() },
+          update: { tier: planId },
+          create: {
+            walletAddress: walletAddress.toLowerCase(),
+            tier: planId
+          }
+        });
+      } else {
+        throw e;
       }
-    });
+    }
 
     // 3. Update or Create Subscription Record
     await prisma.subscription.upsert({
@@ -122,8 +139,9 @@ export async function POST(request: NextRequest) {
           </div>
         `;
 
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
         await resend.emails.send({
-          from: 'billing@sovereign-intelligence.com',
+          from: `Sovereign Billing <${fromEmail}>`,
           to: email,
           subject: `Invoice: ${TIER_NAMES[planId] || planId} Plan Payment Confirmed`,
           html: invoiceHtml,
