@@ -42,7 +42,6 @@ const PROTECTED_PATTERNS = [
   '/trade(.*)',
   '/settings(.*)',
   '/favorites(.*)',
-  '/desarrollador(.*)',
   '/api/user/wallet(.*)',
   '/api/wallet/history(.*)',
 ];
