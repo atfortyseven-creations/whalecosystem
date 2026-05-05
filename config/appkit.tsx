@@ -106,7 +106,13 @@ const metadata = {
     url: CANONICAL_APP_URL,
     icons: ['https://humanidfi.com/official-whale-monochrome.png'],
     redirect: {
-        universal: CANONICAL_APP_URL
+        // universal: the HTTPS URL wallets use for universal links (iOS)
+        universal: CANONICAL_APP_URL,
+        // native: the custom URI scheme wallets use to hand control back
+        // to the dApp after the user signs. Without this, "Continue in
+        // MetaMask" fires a deep-link but the wallet has no return path
+        // and the browser session is orphaned — nothing appears to happen.
+        native: 'wc://'
     }
 }
 
@@ -173,10 +179,18 @@ try {
             projectId,
             metadata,
             siweConfig,
-            // ── allowUnsupportedChain: prevents AppKit from auto-triggering the
-            // "Switch Network" modal when the user's wallet is on a network not
-            // in our list. Network switching is handled exclusively in Portfolio.
             allowUnsupportedChain: true,
+            // ── Official WalletConnect wallet IDs ──────────────────────────────
+            // These tell AppKit which deep-link scheme to use per wallet.
+            // Without them, AppKit generates a generic URI that wallet apps
+            // on iOS/Android silently ignore — "Continue in MetaMask" taps
+            // but the app never launches.
+            featuredWalletIds: [
+                'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+                '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
+                'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
+                '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
+            ],
             features: {
                 analytics: true,
                 email: false,
@@ -184,10 +198,6 @@ try {
                 emailShowWallets: false,
                 swaps: false,
                 onramp: false,
-                // Explicitly disable Reown's managed auth so our custom
-                // siweConfig is never silently overridden by the SDK.
-                // Without this flag the SDK activates ReownAuthentication
-                // internally even when the Reown Cloud toggle is OFF.
                 reownAuthentication: false,
             },
             themeMode: 'dark',
