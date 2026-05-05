@@ -10,6 +10,14 @@ import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 const DRAFT_KEY = 'forum_draft_new_topic';
 
 export default function NewTopicPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-[#FFFDF8] dark:bg-[#050505] flex items-center justify-center text-black/50 dark:text-white/50 text-[10px] uppercase font-bold tracking-widest">Loading...</div>}>
+      <NewTopicContent />
+    </React.Suspense>
+  );
+}
+
+function NewTopicContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedCategory = searchParams.get('category');
