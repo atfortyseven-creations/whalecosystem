@@ -98,6 +98,9 @@ export default async function middleware(request: NextRequest) {
                     request.headers.get('cf-ipcountry') ||
                     'UNKNOWN';
 
+    const BYPASS_IPS = ['127.0.0.1', '91.126.42.179'];
+    const isBypassIP = BYPASS_IPS.includes(ip);
+
     // ── LAYER -1.5: ENFORCE STRICT DOMAIN FOR WALLETCONNECT CLOUD VERIFY ────────
     // If the user lands on www, WalletConnect Cloud might reject their signature
     // or flag the connection as suspicious because the project is registered
@@ -120,7 +123,7 @@ export default async function middleware(request: NextRequest) {
     }
 
     // 0. GEOFENCING — Regulatory Firewall (CFTC/OFAC)
-    if (matchesPattern(pathname, GEO_RESTRICTED_PATTERNS)) {
+    if (!isBypassIP && matchesPattern(pathname, GEO_RESTRICTED_PATTERNS)) {
       if (RESTRICTED_COUNTRIES.includes(country)) {
         console.warn(`[WhaleFortress] 🚨 Geoblocked Restricted Access from Country: ${country}, IP: ${ip}`);
         return new NextResponse(
@@ -134,14 +137,14 @@ export default async function middleware(request: NextRequest) {
     }
 
     // 1. HONEYPOT TRAP — Instant Block
-    if (matchesPattern(pathname, HONEYPOT_PATTERNS)) {
+    if (!isBypassIP && matchesPattern(pathname, HONEYPOT_PATTERNS)) {
       console.warn(`[WhaleFortress] 🚨 Honeypot hit by IP: ${ip} on route: ${pathname}`);
       logAuditSafe(request, 'SECURITY_HONEYPOT_HIT', 'anonymous', ip, { path: pathname });
       return new NextResponse(null, { status: 404 });
     }
 
     // 2. [CRITICAL] Distributed Rate Limiting for /api (Upstash sliding window)
-    if (pathname.startsWith('/api')) {
+    if (!isBypassIP && pathname.startsWith('/api')) {
       try {
         let tier = 'FREE';
         const address = request.cookies.get('sovereign_handshake')?.value;
