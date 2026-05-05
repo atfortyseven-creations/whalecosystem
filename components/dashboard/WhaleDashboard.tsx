@@ -11,6 +11,7 @@ import {
 
 import { WhaleProShell }          from '@/components/dashboard/WhaleProShell';
 import { DashboardErrorBoundary }  from '@/components/dashboard/DashboardErrorBoundary';
+import { useSearchParams } from 'next/navigation';
 
 // ── Active panels (visible to users) ──────────────────────────────────────────
 import { NewPairsTable }           from '@/components/dashboard/NewPairsTable';
@@ -193,7 +194,16 @@ const UnderDevelopmentPanel = ({
 );
 
 export default function WhaleDashboard() {
-    const [activeTab, setActiveTab] = useState<string>('news');
+    const searchParams = useSearchParams();
+    const initialTab = searchParams.get('tab') || 'news';
+    const [activeTab, setActiveTab] = useState<string>(initialTab);
+
+    React.useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     // ── Panel Refresh Key ────────────────────────────────────────────────
     // Every time the user switches tabs OR returns to the page after it was
