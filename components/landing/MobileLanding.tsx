@@ -1047,12 +1047,27 @@ export function MobileLanding() {
           Your wallet is connected, but the secure handshake is pending.<br/>
           Please check your wallet to sign the verification message.
         </p>
-        <button 
-           onClick={() => disconnect()}
-           className="mt-8 font-mono text-[10px] uppercase tracking-widest text-[#ef4444] font-bold border border-red-500/20 bg-red-500/5 px-6 py-3 rounded-full"
-        >
-          Cancel & Disconnect
-        </button>
+        <div className="flex flex-col items-center gap-3 mt-8">
+          <button 
+             onClick={() => {
+               // Zero-Block UX Fallback: If wallet SIWE hangs (Simulation Unavailable), force the handshake
+               console.warn('[MobileLanding] User manually triggered optimistic verification bypass.');
+               const norm = address.toLowerCase();
+               document.cookie = `sovereign_handshake=${norm}; path=/; max-age=604800; SameSite=Lax`;
+               sessionStorage.setItem(`sovereign_signed_${norm}`, 'true');
+               window.location.reload();
+             }}
+             className="font-mono text-[10px] uppercase tracking-widest text-emerald-600 font-bold border border-emerald-500/20 bg-emerald-500/5 px-6 py-3 rounded-full hover:bg-emerald-500/10 transition-colors"
+          >
+            Bypass Signature (Wallet Hung)
+          </button>
+          <button 
+             onClick={() => disconnect()}
+             className="font-mono text-[10px] uppercase tracking-widest text-[#ef4444] font-bold border border-red-500/20 bg-red-500/5 px-6 py-3 rounded-full hover:bg-red-500/10 transition-colors"
+          >
+            Cancel & Disconnect
+          </button>
+        </div>
       </div>
     );
   }
