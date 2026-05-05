@@ -106,7 +106,6 @@ const metadata = {
     url: CANONICAL_APP_URL,
     icons: ['https://humanidfi.com/official-whale-monochrome.png'],
     redirect: {
-        native: 'humanidfi://',
         universal: CANONICAL_APP_URL
     }
 }
@@ -185,6 +184,11 @@ try {
                 emailShowWallets: false,
                 swaps: false,
                 onramp: false,
+                // Explicitly disable Reown's managed auth so our custom
+                // siweConfig is never silently overridden by the SDK.
+                // Without this flag the SDK activates ReownAuthentication
+                // internally even when the Reown Cloud toggle is OFF.
+                reownAuthentication: false,
             },
             themeMode: 'dark',
             themeVariables: {
