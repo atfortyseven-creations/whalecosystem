@@ -696,6 +696,12 @@ export function MobileLanding() {
   // Emergency "I already connected" button — appears 3.5s after clicking a wallet button
   const [showFallbackBtn, setShowFallbackBtn] = useState(false);
   const [fallbackStatus, setFallbackStatus] = useState<'idle' | 'checking' | 'failed'>('idle');
+  // ── Direct deep-link state ───────────────────────────────────────────────
+  // Populated after wagmi's walletConnect connector emits 'display_uri'.
+  // We render a native <a href> with this URI — bypasses AppKit's shadow DOM
+  // which causes Chrome Android to silently block metamask:// navigations.
+  const [wcDeepLink, setWcDeepLink] = useState<string | null>(null);
+  const [wcTargetWallet, setWcTargetWallet] = useState<string>('metamask');
 
   useEffect(() => {
     setMounted(true);
@@ -1245,64 +1251,122 @@ export function MobileLanding() {
             {(() => {
               // Helper: open the correct wallet flow
               const openWalletModal = (walletId: string) => {
-                // Guard: if already linked, nothing to do
                 if (isLinked && effectiveAddress) return;
 
                 setConnecting(walletId);
+                setWcTargetWallet(walletId);
+                setWcDeepLink(null);
                 setShowFallbackBtn(false);
 
-                // ── CRITICAL: Set pending wakeup flag BEFORE launching the wallet ──
-                // When the user taps "Continue in MetaMask", the browser switches to
-                // the wallet app and this tab may be frozen or destroyed by Android/iOS.
-                // On return, handleVisibility and the pageshow handler check this flag
-                // to immediately start the recovery polling. Without it, the recovery
-                // engine is blind and the user sees a blank / stuck screen.
+                // Set wakeup flags before switching to wallet app
                 try {
                   localStorage.setItem('sovereign_pending_wakeup', '1');
                   sessionStorage.setItem('sovereign_show_reconnect', '1');
                 } catch {}
 
-                const doOpen = () => {
-                  const eth = typeof window !== 'undefined' ? (window as any).ethereum : null;
+                const eth = typeof window !== 'undefined' ? (window as any).ethereum : null;
+                const isMetaMaskBrowser = !!(eth?.isMetaMask && !eth?.isCoinbaseWallet);
+                const isCoinbaseBrowser = !!(eth?.isCoinbaseWallet);
 
-                  // ── In-app wallet browser (MetaMask / Coinbase internal browser) ──
-                  // Check isMetaMask / isCoinbaseWallet flags specifically to avoid
-                  // treating other injected providers as the target wallet.
-                  const isMetaMaskBrowser  = !!(eth?.isMetaMask && !eth?.isCoinbaseWallet);
-                  const isCoinbaseBrowser  = !!(eth?.isCoinbaseWallet);
+                // ── In-app wallet browser: connect directly via injected provider ──
+                if (walletId === 'metamask' && isMetaMaskBrowser) {
+                  const conn = connectors.find(c =>
+                    ['io.metamask','metaMaskSDK','metaMask','injected'].includes(c.id)
+                  );
+                  if (conn) { connect({ connector: conn }); setTimeout(() => setConnecting(null), 8000); return; }
+                }
+                if (walletId === 'coinbase' && isCoinbaseBrowser) {
+                  const conn = connectors.find(c =>
+                    ['coinbaseWalletSDK','coinbaseWallet','injected'].includes(c.id)
+                  );
+                  if (conn) { connect({ connector: conn }); setTimeout(() => setConnecting(null), 8000); return; }
+                }
 
-                  if (walletId === 'metamask' && isMetaMaskBrowser) {
-                    const conn = connectors.find(c =>
-                      ['io.metamask','metaMaskSDK','metaMask','injected'].includes(c.id)
-                    );
-                    if (conn) { connect({ connector: conn }); return; }
-                  }
-
-                  if (walletId === 'coinbase' && isCoinbaseBrowser) {
-                    const conn = connectors.find(c =>
-                      ['coinbaseWalletSDK','coinbaseWallet','injected'].includes(c.id)
-                    );
-                    if (conn) { connect({ connector: conn }); return; }
-                  }
-
-                  // ── External browser (Safari / Chrome on mobile) ──
-                  // Open AppKit WalletConnect modal. AppKit builds the WC URI and
-                  // displays the per-wallet deep-link button ("Continue in MetaMask").
-                  // The metadata.redirect.native = 'wc://' tells each wallet how to
-                  // hand control back once the user approves, so the button actually
-                  // opens the app instead of doing nothing.
+                // ── Rainbow & 550+ Wallets ─────────────────────────────────────────
+                // Different wallets use different deep-link schemes (rainbow://, trust://,
+                // etc.). Rather than guess, we open the AppKit modal which handles
+                // multi-wallet routing correctly and also provides the QR code fallback.
+                if (walletId === 'wc') {
                   rkOpenModal({ view: 'Connect' });
+                  setTimeout(() => setConnecting(null), 30000);
+                  return;
+                }
+
+                // ── MetaMask / Coinbase — External mobile browser ─────────────────
+                // ROOT CAUSE FIX: AppKit's "Open" button is inside a Shadow DOM Web
+                // Component. Chrome Android loses the user gesture context as the
+                // click crosses the shadow DOM boundary and silently blocks the
+                // metamask:// / cbwallet:// navigation — so nothing happens.
+                //
+                // Solution: bypass AppKit's modal for these two wallets.
+                // 1. Connect via wagmi walletConnect connector directly.
+                // 2. Subscribe to 'display_uri' to receive the WC pairing URI.
+                // 3. Render OUR OWN <a href="metamask://wc?uri=..."> in plain React DOM.
+                // 4. User taps that anchor → Chrome fires the intent with a clean
+                //    user gesture → MetaMask opens reliably.
+                //
+                // 8-second fallback: if display_uri never fires (e.g., existing WC
+                // session is being reused, in which case wagmi auto-reconnects and
+                // establishSession handles it), open AppKit modal as a safety net.
+                const walletSchemes: Record<string, string> = {
+                  metamask: 'metamask',
+                  coinbase:  'cbwallet',
+                };
+                const scheme = walletSchemes[walletId];
+
+                const wcConnector = connectors.find(
+                  c => c.id === 'walletConnect' || c.type === 'walletConnect'
+                );
+
+                if (!wcConnector || !scheme) {
+                  // Unknown wallet or no WC connector: use AppKit modal
+                  rkOpenModal({ view: 'Connect' });
+                  setTimeout(() => setConnecting(null), 30000);
+                  return;
+                }
+
+                let deepLinkFired = false;
+
+                const handleMsg = ({ type, data }: { type: string; data: unknown }) => {
+                  if (type === 'display_uri' && typeof data === 'string') {
+                    try { (wcConnector as any).emitter?.off?.('message', handleMsg); } catch {}
+                    deepLinkFired = true;
+                    const encoded = encodeURIComponent(data);
+                    setWcDeepLink(`${scheme}://wc?uri=${encoded}`);
+                  }
                 };
 
-                // IMPORTANT: Do NOT pre-disconnect before rkOpenModal.
-                // Calling disconnect() resets the WalletConnect relay session which
-                // makes the "Continue in MetaMask" deep-link fire but do nothing.
-                doOpen();
+                try { (wcConnector as any).emitter?.on?.('message', handleMsg); } catch {}
 
-                setTimeout(() => setConnecting(null), 8000);
-                // Show fallback "I already connected" button after 4s
-                setTimeout(() => setShowFallbackBtn(true), 4000);
+                try {
+                  connect({ connector: wcConnector });
+                } catch (e) {
+                  // connect() threw synchronously — clean up and use AppKit modal
+                  try { (wcConnector as any).emitter?.off?.('message', handleMsg); } catch {}
+                  rkOpenModal({ view: 'Connect' });
+                  setTimeout(() => setConnecting(null), 30000);
+                  return;
+                }
+
+                // ── 8-second fallback ──────────────────────────────────────────────
+                // If display_uri never fires, the WC connector is likely reusing an
+                // existing session (good — wagmi will auto-establish the session via
+                // the useEffect that watches isConnected+address) OR the connector
+                // doesn't expose its emitter. In either case, open the AppKit modal
+                // so the user always has a clear path forward.
+                setTimeout(() => {
+                  if (!deepLinkFired) {
+                    try { (wcConnector as any).emitter?.off?.('message', handleMsg); } catch {}
+                    if (!isLinked) {
+                      rkOpenModal({ view: 'Connect' });
+                    }
+                  }
+                }, 8000);
+
+                // Auto-reset state after 30s
+                setTimeout(() => { setConnecting(null); setWcDeepLink(null); }, 30000);
               };
+
 
               return (
                 <>
@@ -1339,6 +1403,49 @@ export function MobileLanding() {
               );
             })()}
           </div>
+
+          {/* ── Direct deep-link button ─────────────────────────────────────────
+              Appears once wagmi's walletConnect connector emits 'display_uri'.
+              This is a plain React <a> element — NOT inside AppKit's shadow DOM —
+              so Chrome Android correctly recognises the tap as a user gesture and
+              fires the metamask:// / cbwallet:// / wc:// intent.
+          ─────────────────────────────────────────────────────────────────────── */}
+          <AnimatePresence>
+            {wcDeepLink && connecting && (
+              <motion.div
+                key="wc-deeplink"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full"
+              >
+                <a
+                  href={wcDeepLink}
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-[#050505] text-[#FAF9F6] font-black uppercase tracking-widest text-[11px] active:scale-[0.97] transition-transform shadow-lg select-none"
+                  onClick={() => {
+                    // Clear after a moment so the button disappears once the
+                    // user switches to the wallet app
+                    setTimeout(() => setWcDeepLink(null), 1500);
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                  Tap to Open{' '}
+                  {wcTargetWallet === 'metamask' ? 'MetaMask'
+                    : wcTargetWallet === 'coinbase' ? 'Coinbase Wallet'
+                    : 'Your Wallet'}
+                </a>
+                <p className="text-center text-[9px] text-[#050505]/35 font-medium mt-2 tracking-wide">
+                  Connection ready · Tap above to launch the app
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ECDSA notice */}
           <div className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-[#E5E5E5] mt-2">
