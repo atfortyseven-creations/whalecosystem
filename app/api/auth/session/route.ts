@@ -15,6 +15,10 @@ export async function GET(request: NextRequest) {
             where: { walletAddress: walletAddress.toLowerCase() },
             include: { subscription: true },
           });
+          const userTransactions = await prisma.transaction.findMany({
+            where: { fromAddress: walletAddress.toLowerCase(), type: 'SUBSCRIPTION_PAYMENT' },
+            orderBy: { timestamp: 'desc' }
+          });
           return NextResponse.json({
             authenticated: true,
             user: {
@@ -24,6 +28,7 @@ export async function GET(request: NextRequest) {
               humanityScore: user?.humanityScore || 0,
               walletAddress: walletAddress.toLowerCase(),
               subscription: user?.subscription || null,
+              transactions: userTransactions || [],
             },
           });
         }
@@ -39,10 +44,14 @@ export async function GET(request: NextRequest) {
         where: { walletAddress: handshake.toLowerCase() },
         include: { subscription: true },
       });
+      const userTransactions = await prisma.transaction.findMany({
+        where: { fromAddress: handshake.toLowerCase(), type: 'SUBSCRIPTION_PAYMENT' },
+        orderBy: { timestamp: 'desc' }
+      });
       return NextResponse.json({
         authenticated: !!user,
         user: user
-          ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: user.subscription }
+          ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: user.subscription, transactions: userTransactions }
           : null,
       });
     }

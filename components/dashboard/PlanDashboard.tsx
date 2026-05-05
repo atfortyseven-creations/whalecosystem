@@ -17,6 +17,7 @@ interface UserData {
   email: string | null;
   humanityScore: number;
   subscription?: SubscriptionData | null;
+  transactions?: any[];
 }
 
 export function PlanDashboard() {
@@ -197,7 +198,7 @@ export function PlanDashboard() {
           On-Chain Invoices
         </h3>
         
-        {!sub ? (
+        {!userData.transactions || userData.transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 bg-black/5 rounded-2xl border border-black/5 border-dashed">
             <AlertCircle size={24} className="text-black/20 mb-3" />
             <p className="text-sm font-medium text-black/50">No on-chain payments found.</p>
@@ -211,24 +212,34 @@ export function PlanDashboard() {
                   <th className="pb-3 pr-4">Date</th>
                   <th className="pb-3 px-4">Plan (Cycle)</th>
                   <th className="pb-3 px-4">Status</th>
-                  <th className="pb-3 px-4">Expires</th>
-                  <th className="pb-3 pl-4">Invoice</th>
+                  <th className="pb-3 px-4">Amount</th>
+                  <th className="pb-3 pl-4">Transaction / Invoice</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-black/5 last:border-0 hover:bg-black/[0.02] transition-colors">
-                  <td className="py-4 pr-4 font-medium text-black/80">{sub?.createdAt ? new Date(sub.createdAt).toLocaleDateString() : ''}</td>
-                  <td className="py-4 px-4 font-bold text-black">{formattedTier} <span className="text-[10px] font-medium text-black/40 ml-1">({cycle})</span></td>
-                  <td className="py-4 px-4">
-                    <span className={`px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded-md border ${sub?.status === 'ACTIVE' && !isExpired ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20' : 'bg-red-50 text-red-500 border-red-100'}`}>
-                      {isExpired ? 'EXPIRED' : sub?.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 font-mono text-black/60">{expiresString}</td>
-                  <td className="py-4 pl-4 text-xs font-medium">
-                    {userData?.email ? <span className="text-black/50">Sent to {userData.email}</span> : <span className="text-black/30">No email set</span>}
-                  </td>
-                </tr>
+                {userData.transactions.map((tx, idx) => (
+                  <tr key={tx.id || idx} className="border-b border-black/5 last:border-0 hover:bg-black/[0.02] transition-colors">
+                    <td className="py-4 pr-4 font-medium text-black/80">{new Date(tx.timestamp || Date.now()).toLocaleDateString()}</td>
+                    <td className="py-4 px-4 font-bold text-black">{tx.metadata?.planId || 'Unknown'} <span className="text-[10px] font-medium text-black/40 ml-1">({tx.metadata?.billingCycle || 'N/A'})</span></td>
+                    <td className="py-4 px-4">
+                      <span className={`px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded-md border ${tx.status === 'CONFIRMED' ? 'bg-[#00C076]/10 text-[#00C076] border-[#00C076]/20' : 'bg-red-50 text-red-500 border-red-100'}`}>
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-mono text-black/60">{tx.amount} {tx.token}</td>
+                    <td className="py-4 pl-4 flex flex-col gap-1">
+                      <a 
+                        href={`https://etherscan.io/tx/${tx.txHash}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-mono text-blue-600 hover:underline flex items-center gap-1"
+                      >
+                        {tx.txHash.slice(0, 8)}...{tx.txHash.slice(-6)}
+                      </a>
+                      {tx.metadata?.email ? <span className="text-[10px] text-black/40">Sent to {tx.metadata.email}</span> : <span className="text-[10px] text-black/30">No email set</span>}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

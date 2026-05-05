@@ -24,12 +24,21 @@ export async function POST(request: NextRequest) {
     console.log(`[Payment] Verifying tx ${txHash} for wallet ${walletAddress} (Plan: ${planId}, Cycle: ${billingCycle})`);
 
     // 1. Calculate Expiration Date
+    const existingSub = await prisma.subscription.findUnique({
+      where: { userId: walletAddress.toLowerCase() }
+    });
+
     const now = new Date();
-    const expiresAt = new Date();
+    let baseDate = now;
+    if (existingSub && existingSub.status === 'ACTIVE' && existingSub.expiresAt > now) {
+      baseDate = new Date(existingSub.expiresAt);
+    }
+
+    const expiresAt = new Date(baseDate);
     if (billingCycle === 'annual') {
-      expiresAt.setFullYear(now.getFullYear() + 1);
+      expiresAt.setFullYear(baseDate.getFullYear() + 1);
     } else {
-      expiresAt.setMonth(now.getMonth() + 1);
+      expiresAt.setMonth(baseDate.getMonth() + 1);
     }
 
     // 2. Update Database (User Tier & Email)
