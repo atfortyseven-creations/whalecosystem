@@ -25,6 +25,7 @@ import { WhaleSupport }            from '@/components/dashboard/WhaleSupport';
 import InstitutionalLedger         from '@/components/dashboard/InstitutionalLedger';
 import { MassTransferIntel }       from '@/components/dashboard/MassTransferIntel';
 import { SessionLogsPanel }        from '@/components/dashboard/SessionLogsPanel';
+import { PlanDashboard }           from '@/components/dashboard/PlanDashboard';
 
 // ── Hidden panels (commented out — re-enable with sidebar items) ───────────────
 // import { PremiumMatrixStack }   from '@/components/premium/PremiumMatrixStack';
@@ -242,6 +243,9 @@ export default function WhaleDashboard() {
                         <span className="text-[9px] font-mono">Contact administrator to re-enable this section</span>
                     </div>
                 );
+
+            case 'billing':
+                return <><PanelHeader icon={LayoutDashboard} title="Billing & Plan" description="Manage your on-chain plan and view cryptographic invoices." accent="#00C076" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`billing-${refreshKey}`}><PlanDashboard /></DashboardErrorBoundary></div></>;
 
             case 'zk':
                 return <><PanelHeader icon={Shield} title="ZK Shield" description="Monitor Aztec Network's zero-knowledge rollup pipeline. Visualise pending proofs and mempool activity." accent="#9945FF" /><div className="flex-1 min-h-[850px] shrink-0"><DashboardErrorBoundary key={`zk-shield-${refreshKey}`}><AztecMempoolSpace /></DashboardErrorBoundary></div></>;

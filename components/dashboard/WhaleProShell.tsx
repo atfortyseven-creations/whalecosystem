@@ -10,7 +10,7 @@ import {
     Network, Ticket, Flame, Menu,
     BookOpen, Database, MessageSquare,
     Landmark, Compass,
-    LineChart, Lock, Book, Info, X, ArrowUpRight
+    LineChart, Lock, Book, Info, X, ArrowUpRight, CreditCard
 } from 'lucide-react';
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -36,6 +36,7 @@ interface NavItem {
 const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'gold',          label: 'Ticket Mint',       icon: <Ticket size={17}/>,    dividerBefore: 'Overview' },
     { id: 'portfolio',     label: 'Main Portfolio',    icon: <Wallet size={17}/> },
+    { id: 'billing',       label: 'Billing & Plan',    icon: <CreditCard size={17}/> },
 
     { id: 'market-data',  label: 'Market Data',       icon: <Globe size={17}/>,     dividerBefore: 'Intelligence' },
     { id: 'markets',      label: 'Top Markets',       icon: <LayoutDashboard size={17}/> },

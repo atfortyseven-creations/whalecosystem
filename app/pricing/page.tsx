@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useSovereignAccount } from '@/hooks/useSovereignAccount';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings } from 'lucide-react';
-import { createCheckoutSession, createCustomerPortalSession } from '@/app/actions/stripe';
+import { CheckCircle2, Shield, Loader2, ArrowRight, Zap, Database, Lock, Globe, Building2, BarChart3, HelpCircle, Settings, Mail } from 'lucide-react';
+import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
 
 const TIER_HIERARCHY: Record<string, number> = {
   'FREE': 0,
@@ -14,12 +15,16 @@ const TIER_HIERARCHY: Record<string, number> = {
   'ELITE': 3
 };
 
+const TIER_PRICES: Record<string, { monthly: string, annual: string }> = {
+  'STARTER': { monthly: '0.005', annual: '0.05' }, 
+  'PRO': { monthly: '0.015', annual: '0.15' },
+  'ELITE': { monthly: '0.05', annual: '0.5' }
+};
+
 const PRICING_TIERS = [
   {
     id: 'STARTER',
     name: 'Explorer',
-    price: '€19',
-    billing: 'Monthly',
     target: 'For individual traders and researchers',
     description: 'Everything you need to start tracking the crypto market. Real-time data, alerts, and community access in one place.',
     features: [
@@ -35,8 +40,6 @@ const PRICING_TIERS = [
   {
     id: 'PRO',
     name: 'Professional',
-    price: '€59',
-    billing: 'Per user / month',
     target: 'For active traders and analysts',
     description: 'Real-time streaming, advanced on-chain analytics, and priority support — everything a serious trader needs.',
     highlight: true,
@@ -55,8 +58,6 @@ const PRICING_TIERS = [
   {
     id: 'ELITE',
     name: 'Enterprise',
-    price: '€199',
-    billing: 'Per user / month',
     target: 'For institutions and trading firms',
     description: 'Unlimited data access, a dedicated account manager, and SLA-backed uptime. Built for teams that cannot afford downtime.',
     features: [
@@ -109,29 +110,41 @@ const PLATFORM_BENEFITS = [
 const FAQS = [
   {
     question: "How does billing work?",
-    answer: "Payments are securely processed through Stripe. You can manage, upgrade, downgrade, or cancel your plan at any time directly from your account dashboard."
+    answer: "Payments are processed entirely on-chain via your connected Web3 wallet. Once the transaction is confirmed, your account tier is updated instantly and an invoice is emailed to you."
   },
   {
     question: "Do I need to connect a wallet?",
-    answer: "Yes. Whale Alert Network uses your wallet as your login and billing identity. It only takes a few seconds to connect — no email or password needed."
+    answer: "Yes. Sovereign Intelligence uses your wallet as your primary login and billing identity. It only takes a few seconds to connect — no password needed."
   },
   {
-    question: "Can I upgrade mid-month?",
-    answer: "Absolutely. The system automatically prorates the remaining cost and upgrades your access immediately — no downtime, no waiting."
+    question: "How are invoices sent?",
+    answer: "During the checkout process, you will be prompted to provide your Gmail or email address. A cryptographic invoice will be sent there automatically after the block is mined."
   },
   {
     question: "Is there a refund policy?",
-    answer: "Because plans provide immediate access to live data and analytics, we don't offer refunds on past billing cycles. However, you can cancel at any time and your access continues until the end of the paid period."
+    answer: "Because plans provide immediate access to live proprietary data and analytics on-chain, we don't offer refunds on past billing cycles. Your subscription is immutable."
   }
 ];
 
 function PricingContent() {
-  const { isConnected, isSovereignHandshake } = useSovereignAccount();
+  const { isConnected, isSovereignHandshake, address } = useSovereignAccount();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState<string>('FREE');
   const [isTierLoaded, setIsTierLoaded] = useState<boolean>(false);
+  
+  // Billing cycle state
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+
+  // Email Modal State
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+
+  // Wagmi hooks for on-chain transaction
+  const { sendTransaction, data: txHash, isPending: isTxPending } = useSendTransaction();
+  const { isLoading: isWaitingForReceipt, isSuccess: isTxSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
   useEffect(() => {
     async function fetchTier() {
@@ -140,7 +153,8 @@ function PricingContent() {
         if (res.ok) {
           const data = await res.json();
           if (data?.user?.tier) {
-            setCurrentTier(data.user.tier.toUpperCase());
+            setCurrentTier(data.user.tier.split('_')[0].toUpperCase()); // normalize tier name
+            if (data?.user?.email) setEmailInput(data.user.email);
           }
         }
       } catch (e) {
@@ -152,33 +166,56 @@ function PricingContent() {
     fetchTier();
   }, [isConnected, isSovereignHandshake]);
 
-  // Active Tier Check
-  // Note: user.tier is expected to be 'FREE', 'STARTER', 'PRO', or 'ELITE'
+  // Handle successful transaction
+  useEffect(() => {
+    if (isTxSuccess && txHash && selectedPlanId && address) {
+      const confirmPayment = async () => {
+        try {
+          const priceEth = TIER_PRICES[selectedPlanId][billingCycle];
+          const res = await fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              txHash,
+              planId: selectedPlanId,
+              billingCycle,
+              priceEth,
+              email: emailInput,
+              walletAddress: address
+            })
+          });
+          
+          if (res.ok) {
+            toast.success('Transaction Confirmed!', {
+              description: 'Your invoice has been sent to your email. Redirecting to your panel...',
+            });
+            setTimeout(() => {
+              router.push('/dashboard?tab=billing');
+            }, 2000);
+          } else {
+            throw new Error('Backend failed to confirm payment');
+          }
+        } catch (error) {
+          toast.error('Verification Error', {
+            description: 'Transaction was successful but verification failed. Please contact support.'
+          });
+        } finally {
+          setLoadingTier(null);
+          setIsEmailModalOpen(false);
+        }
+      };
+
+      confirmPayment();
+    }
+  }, [isTxSuccess, txHash, selectedPlanId, address, emailInput, router, billingCycle]);
+
   const currentTierLevel = TIER_HIERARCHY[currentTier] || 0;
 
-  // Check for cancelation redirect
-  useEffect(() => {
-    if (searchParams.get('canceled')) {
-      toast.error('Transaction Canceled', {
-        description: 'The Institutional License setup was not completed.'
-      });
-      router.replace('/pricing');
-    }
-  }, [searchParams, router]);
-
-  const handlePortalAccess = async () => {
-    setLoadingTier('PORTAL');
-    const toastId = toast.loading('Initializing encrypted billing portal...');
-    try {
-      const res = await createCustomerPortalSession();
-      if (res?.url) window.location.href = res.url;
-    } catch (error: any) {
-      toast.error('Portal Access Failed', { id: toastId, description: error.message });
-      setLoadingTier(null);
-    }
+  const handlePortalAccess = () => {
+    router.push('/dashboard?tab=billing');
   };
 
-  const handleSubscribe = async (planId: string) => {
+  const handleSubscribeClick = (planId: string) => {
     if (!isConnected || !isSovereignHandshake) {
       toast.error('Connect your wallet to subscribe', {
         description: 'Please connect your wallet first — it only takes a few seconds.',
@@ -188,7 +225,6 @@ function PricingContent() {
     }
 
     const targetTierLevel = TIER_HIERARCHY[planId] || 0;
-
     if (currentTierLevel >= targetTierLevel) {
       toast.info('You\'re already on this plan or higher', {
         description: `Your current plan already includes everything in ${planId}.`,
@@ -196,24 +232,38 @@ function PricingContent() {
       return;
     }
 
-    setLoadingTier(planId);
-    const toastId = toast.loading(`Setting up your ${planId} plan...`);
+    setSelectedPlanId(planId);
+    setIsEmailModalOpen(true);
+  };
 
-    try {
-      const res = await createCheckoutSession(planId);
-      toast.success('Redirecting to checkout...', { id: toastId });
-      
-      if (res?.url) {
-        window.location.href = res.url;
-      }
-    } catch (error: any) {
-      console.error('Subscription error:', error);
-      toast.error('Something went wrong', {
-        id: toastId,
-        description: error.message || 'There was a problem processing your request. Please try again.',
-      });
-      setLoadingTier(null);
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput || !emailInput.includes('@')) {
+      toast.error('Invalid Email', { description: 'Please enter a valid email address.' });
+      return;
     }
+    if (!selectedPlanId) return;
+
+    const priceEth = TIER_PRICES[selectedPlanId][billingCycle];
+    if (!priceEth) return;
+
+    setLoadingTier(selectedPlanId);
+    toast.loading('Please confirm the transaction in your wallet...', { id: 'tx-toast' });
+    
+    // Process on-chain transaction
+    sendTransaction({
+      to: process.env.NEXT_PUBLIC_TREASURY_WALLET as \`0x\${string}\` || '0x000000000000000000000000000000000000dEaD',
+      value: parseEther(priceEth),
+    }, {
+      onError: (error) => {
+        toast.error('Transaction Failed', { id: 'tx-toast', description: error.message || 'User rejected the request' });
+        setLoadingTier(null);
+        setIsEmailModalOpen(false);
+      },
+      onSuccess: () => {
+        toast.loading('Transaction submitted, waiting for confirmation...', { id: 'tx-toast' });
+      }
+    });
   };
 
   return (
@@ -222,13 +272,73 @@ function PricingContent() {
       {/* ── Navbar Spacer ── */}
       <div className="h-24 w-full bg-[#FDFCF8] border-b border-black/5" />
 
-      <main className="w-full max-w-7xl mx-auto px-6 py-16 md:py-24">
+      <main className="w-full max-w-7xl mx-auto px-6 py-16 md:py-24 relative">
         
+        {/* Email Invoice Modal */}
+        {isEmailModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-black/10 relative">
+              <button 
+                onClick={() => { setIsEmailModalOpen(false); setLoadingTier(null); }}
+                className="absolute top-4 right-4 text-black/40 hover:text-black"
+              >
+                ✕
+              </button>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-[#00C076]/10 text-[#00C076] rounded-2xl flex items-center justify-center">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Billing Invoice</h3>
+                  <p className="text-sm text-black/50">Where should we send your receipt?</p>
+                </div>
+              </div>
+              <form onSubmit={handleEmailSubmit}>
+                <div className="mb-6">
+                  <label className="block text-xs font-black uppercase tracking-widest text-black/40 mb-2">Email Address</label>
+                  <input 
+                    type="email"
+                    required
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    placeholder="Enter your Gmail..."
+                    className="w-full px-4 py-3 bg-black/5 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C076] font-medium"
+                  />
+                </div>
+                
+                <div className="mb-6 bg-black/5 p-4 rounded-xl border border-black/10">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-bold text-black/60">Selected Plan:</span>
+                    <span className="text-sm font-black uppercase tracking-widest text-black">{selectedPlanId} ({billingCycle})</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-bold text-black/60">Total Cost:</span>
+                    <span className="text-lg font-black text-[#00C076]">{selectedPlanId ? TIER_PRICES[selectedPlanId][billingCycle] : ''} ETH</span>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  disabled={isTxPending || isWaitingForReceipt}
+                  className="w-full py-4 bg-[#050505] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black/80 transition-all disabled:opacity-70"
+                >
+                  {(isTxPending || isWaitingForReceipt) ? (
+                    <><Loader2 className="animate-spin" size={18} /> Processing On-Chain...</>
+                  ) : (
+                    <>Sign & Pay <ArrowRight size={18} /></>
+                  )}
+                </button>
+                <p className="text-center text-xs text-black/40 mt-4 font-medium">Fully decentralized payment. No intermediaries.</p>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* ── Hero ── */}
-        <header className="flex flex-col items-center text-center mb-20">
+        <header className="flex flex-col items-center text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00C076]/10 border border-[#00C076]/20 mb-6 shadow-sm">
             <Shield size={14} className="text-[#00C076]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">Simple, Transparent Pricing</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00C076]">100% On-Chain Billing</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-[#050505] mb-8 max-w-5xl leading-[1.1]">
@@ -243,22 +353,36 @@ function PricingContent() {
           {currentTierLevel > 0 && (
             <button
               onClick={handlePortalAccess}
-              disabled={loadingTier === 'PORTAL'}
-              className="px-6 py-3 bg-[#050505] text-[#FDFCF8] rounded-full text-xs font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
+              className="px-6 py-3 bg-[#050505] text-[#FDFCF8] rounded-full text-xs font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2 hover:bg-black/80 transition-colors mb-6"
             >
-              {loadingTier === 'PORTAL' ? <Loader2 size={16} className="animate-spin" /> : <Settings size={16} />}
-              Manage My Plan
+              <Settings size={16} />
+              Manage My Plan Panel
             </button>
           )}
+
+          {/* Billing Toggle */}
+          <div className="flex items-center gap-4 bg-white border border-black/10 p-1.5 rounded-full shadow-sm">
+            <button 
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-black text-white' : 'text-black/50 hover:text-black'}`}
+            >
+              Monthly
+            </button>
+            <button 
+              onClick={() => setBillingCycle('annual')}
+              className={`px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === 'annual' ? 'bg-[#00C076] text-black' : 'text-black/50 hover:text-black'}`}
+            >
+              Annually <span className={`text-[10px] px-2 py-0.5 rounded-full ${billingCycle === 'annual' ? 'bg-black/10' : 'bg-[#00C076]/20 text-[#00C076]'}`}>Save 16%</span>
+            </button>
+          </div>
         </header>
 
         {/* ── Pricing Cards ── */}
-        {/* FREE tier anchor card — makes paid plans feel like natural upgrades */}
         <div className="mb-6">
           <div className="rounded-[2rem] border border-[#050505]/10 bg-white p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <div className="text-sm font-black uppercase tracking-[0.2em] text-black/40 mb-1">Free</div>
-              <div className="text-3xl font-bold tracking-tight text-[#050505] mb-1">€0 <span className="text-base font-medium text-black/30">/month</span></div>
+              <div className="text-3xl font-bold tracking-tight text-[#050505] mb-1">0 ETH <span className="text-base font-medium text-black/30">/ forever</span></div>
               <p className="text-sm text-black/50 font-medium">Browse market data, read the forum, and explore the platform at no cost.</p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -281,6 +405,7 @@ function PricingContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-32 relative z-10">
           {PRICING_TIERS.map((tier) => {
             const isDowngrade = currentTierLevel >= (TIER_HIERARCHY[tier.id] || 0);
+            const price = TIER_PRICES[tier.id][billingCycle];
             
             return (
               <div 
@@ -302,11 +427,11 @@ function PricingContent() {
                     {tier.name}
                   </h3>
                   <div className="flex items-baseline gap-2 mb-4">
-                    <span className={`text-6xl font-medium tracking-tighter ${tier.highlight ? 'text-white' : 'text-black'}`}>
-                      {tier.price}
+                    <span className={`text-5xl lg:text-6xl font-medium tracking-tighter ${tier.highlight ? 'text-white' : 'text-black'}`}>
+                      {price}
                     </span>
-                    <span className={`text-sm font-bold ${tier.highlight ? 'text-white/40' : 'text-black/30'}`}>
-                      /mo
+                    <span className={`text-sm font-bold uppercase tracking-widest ${tier.highlight ? 'text-[#00C076]' : 'text-black/40'}`}>
+                      ETH <br/><span className="text-[10px]">/ {billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
                     </span>
                   </div>
                   <p className={`text-sm font-semibold mb-2 ${tier.highlight ? 'text-[#00C076]' : 'text-[#050505]'}`}>
@@ -340,7 +465,7 @@ function PricingContent() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleSubscribe(tier.id)}
+                      onClick={() => handleSubscribeClick(tier.id)}
                       disabled={!isTierLoaded || loadingTier === tier.id}
                       className={`w-full py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 ${
                         tier.highlight

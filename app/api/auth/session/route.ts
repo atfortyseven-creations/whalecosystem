@@ -13,16 +13,17 @@ export async function GET(request: NextRequest) {
         if (walletAddress) {
           const user = await prisma.user.findUnique({
             where: { walletAddress: walletAddress.toLowerCase() },
-            select: { walletAddress: true, tier: true, humanityScore: true, createdAt: true },
+            include: { subscription: true },
           });
           return NextResponse.json({
             authenticated: true,
             user: {
               id: walletAddress,
-              email: '',
+              email: user?.email || '',
               tier: user?.tier || (payload.tier as string) || 'FREE',
               humanityScore: user?.humanityScore || 0,
               walletAddress: walletAddress.toLowerCase(),
+              subscription: user?.subscription || null,
             },
           });
         }
@@ -36,12 +37,12 @@ export async function GET(request: NextRequest) {
     if (handshake && /^0x[a-fA-F0-9]{40}$/.test(handshake)) {
       const user = await prisma.user.findUnique({
         where: { walletAddress: handshake.toLowerCase() },
-        select: { walletAddress: true, tier: true, humanityScore: true, createdAt: true },
+        include: { subscription: true },
       });
       return NextResponse.json({
         authenticated: !!user,
         user: user
-          ? { id: handshake, email: '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress }
+          ? { id: handshake, email: user.email || '', tier: user.tier, humanityScore: user.humanityScore, walletAddress: user.walletAddress, subscription: user.subscription }
           : null,
       });
     }
