@@ -47,7 +47,7 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'omniexplorer', label: 'Block Explorer',    icon: <Search size={17}/> },
     { id: 'defi',         label: 'DeFi Yields',       icon: <Landmark size={17}/> },
 
-    { id: 'news',         label: 'Live News',         icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel' },
+    { id: 'news',         label: 'News',              icon: <Newspaper size={17}/>, dividerBefore: 'Sovereign Intel' },
     { id: 'sov-intel',    label: 'Sovereign Intel',   icon: <BookOpen size={17}/>,  externalUrl: 'https://www.humanidfi.com/sovereign-intel' },
     { id: 'zk',           label: 'Aztec Pipeline',    icon: <Shield size={17}/> },
 

@@ -29,7 +29,7 @@ const PAGES = [
   { id: "defi",          label: "DeFi Yields",     group: "On-Chain Intel", icon: <Landmark size={15} /> },
 
   // ── Sovereign Intel ──
-  { id: "news",          label: "Live News",       group: "Sovereign Intel", icon: <Newspaper size={15} />, external: true },
+  { id: "news",          label: "News",            group: "Sovereign Intel", icon: <Newspaper size={15} />, external: true },
   { id: "sov-intel",     label: "Sovereign Intel", group: "Sovereign Intel", icon: <BookOpen size={15} />,  external: true },
   { id: "zk",            label: "Aztec Pipeline",  group: "Sovereign Intel", icon: <Shield size={15} /> },
 
