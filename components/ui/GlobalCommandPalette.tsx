@@ -22,26 +22,26 @@ const PAGES = [
   { id: "newpairs",      label: "New Listings",    group: "Intelligence",   icon: <Search size={15} /> },
   { id: "graph",         label: "Entity Graph",    group: "Intelligence",   icon: <Compass size={15} /> },
 
-  // ── On-Chain Intel ──
-  { id: "inst-ledger",   label: "Whale Ledger",    group: "On-Chain Intel", icon: <Book size={15} /> },
-  { id: "mass-transfer", label: "Mass Transfers",  group: "On-Chain Intel", icon: <Network size={15} /> },
-  { id: "omniexplorer",  label: "Block Explorer",  group: "On-Chain Intel", icon: <Search size={15} /> },
-  { id: "defi",          label: "DeFi Yields",     group: "On-Chain Intel", icon: <Landmark size={15} /> },
+  // ── Blockchain Data ──
+  { id: "inst-ledger",   label: "Institutional Ledger",    group: "Blockchain Data", icon: <Book size={15} /> },
+  { id: "mass-transfer", label: "Mass Transfers",  group: "Blockchain Data", icon: <Network size={15} /> },
+  { id: "omniexplorer",  label: "Block Explorer",  group: "Blockchain Data", icon: <Search size={15} /> },
+  { id: "defi",          label: "DeFi Yields",     group: "Blockchain Data", icon: <Landmark size={15} /> },
 
-  // ── Sovereign Intel ──
-  { id: "news",          label: "News",            group: "Sovereign Intel", icon: <Newspaper size={15} />, external: true },
-  { id: "sov-intel",     label: "Sovereign Intel", group: "Sovereign Intel", icon: <BookOpen size={15} />,  external: true },
-  { id: "zk",            label: "Aztec Pipeline",  group: "Sovereign Intel", icon: <Shield size={15} /> },
+  // ── Premium Insights ──
+  { id: "news",          label: "News",            group: "Premium Insights", icon: <Newspaper size={15} />, external: true },
+  { id: "sov-intel",     label: "Research Reports", group: "Premium Insights", icon: <BookOpen size={15} />,  external: true },
+  { id: "zk",            label: "Privacy Network",  group: "Premium Insights", icon: <Shield size={15} /> },
 
   // ── Execution ──
-  { id: "vault",         label: "Sovereign Vault", group: "Execution",      icon: <Lock size={15} /> },
+  { id: "vault",         label: "Secure Vault", group: "Execution",      icon: <Lock size={15} /> },
 
   // ── System ──
-  { id: "logs",          label: "Session Logs",    group: "System",         icon: <Database size={15} /> },
+  { id: "logs",          label: "Activity Logs",    group: "System",         icon: <Database size={15} /> },
   { id: "support",       label: "Support",         group: "System",         icon: <MessageSquare size={15} /> },
 ];
 
-const GROUPS = ["Overview", "Intelligence", "On-Chain Intel", "Sovereign Intel", "Execution", "System"];
+const GROUPS = ["Overview", "Intelligence", "Blockchain Data", "Premium Insights", "Execution", "System"];
 
 export function GlobalCommandPalette({
   isOpen,

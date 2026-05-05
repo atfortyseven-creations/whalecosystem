@@ -59,7 +59,7 @@ export function PlanDashboard() {
       <div className="flex flex-col items-center justify-center h-full min-h-[500px] text-center px-4">
         <Shield size={48} className="text-black/10 mb-4" />
         <h2 className="text-2xl font-bold mb-2">Authentication Required</h2>
-        <p className="text-black/50 mb-6 max-w-md">Connect your wallet to access your cryptographic billing and plan information.</p>
+        <p className="text-black/50 mb-6 max-w-md">Connect your wallet to access your billing and plan information.</p>
         <button onClick={() => router.push('/connect')} className="px-6 py-3 bg-black text-white rounded-xl font-bold hover:bg-black/80 transition-all">
           Connect Wallet
         </button>
@@ -96,13 +96,13 @@ export function PlanDashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-[#050505] flex items-center gap-3">
             <LayoutDashboard size={28} className="text-[#00C076]" />
-            Sovereign Billing Panel
+            Billing & Plans
           </h1>
-          <p className="text-sm text-black/50 mt-1">Manage your connected wallet, plan tier, and transaction history.</p>
+          <p className="text-sm text-black/50 mt-1">Manage your subscription, billing details, and payment history.</p>
         </div>
-        <div className="flex items-center gap-2 bg-[#00C076]/10 px-4 py-2 rounded-full border border-[#00C076]/20">
+        <div className="flex items-center gap-2 bg-[#00C076]/10 px-4 py-2 rounded-full border border-[#00C076]/20 hidden md:flex">
           <div className="w-2 h-2 rounded-full bg-[#00C076] animate-pulse" />
-          <span className="text-xs font-bold text-[#00C076] uppercase tracking-widest">Network Live</span>
+          <span className="text-xs font-bold text-[#00C076] uppercase tracking-widest">System Operational</span>
         </div>
       </div>
 
@@ -114,7 +114,7 @@ export function PlanDashboard() {
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 relative z-10">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-black/40 mb-1">Current Cryptographic Plan</p>
+              <p className="text-xs font-black uppercase tracking-widest text-black/40 mb-1">Current Plan</p>
               <h2 className="text-4xl font-bold text-black">{formattedTier} <span className="text-lg text-black/30 font-medium">/ TIER</span></h2>
               {!isFree && (
                 <div className="flex items-center gap-2 mt-2">
@@ -145,15 +145,15 @@ export function PlanDashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-            <div className="bg-black/5 p-4 rounded-2xl flex flex-col gap-1">
+            <div className="bg-black/5 p-4 rounded-2xl flex flex-col gap-1 overflow-hidden">
               <span className="text-xs font-bold uppercase tracking-wider text-black/40">Connected Wallet</span>
-              <span className="font-mono text-sm">{address}</span>
+              <span className="font-mono text-sm truncate">{address}</span>
             </div>
-            <div className="bg-black/5 p-4 rounded-2xl flex flex-col gap-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-black/40">Registered Email (Invoice)</span>
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="text-black/40" />
-                <span className="text-sm font-medium">{userData.email || 'None provided'}</span>
+            <div className="bg-black/5 p-4 rounded-2xl flex flex-col gap-1 overflow-hidden">
+              <span className="text-xs font-bold uppercase tracking-wider text-black/40">Registered Email</span>
+              <div className="flex items-center gap-2 overflow-hidden">
+                <Mail size={14} className="text-black/40 shrink-0" />
+                <span className="text-sm font-medium truncate">{userData.email || 'None provided'}</span>
               </div>
             </div>
           </div>
@@ -162,29 +162,29 @@ export function PlanDashboard() {
         {/* Humanity Score / Perks */}
         <div className="bg-black text-white rounded-3xl p-8 shadow-xl flex flex-col justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Network Authority</p>
+            <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Account Score</p>
             <div className="flex items-baseline gap-2 mb-6">
               <span className="text-4xl font-bold">{userData.humanityScore}</span>
               <span className="text-sm text-white/40 font-medium">score</span>
             </div>
             
             <p className="text-sm text-white/60 leading-relaxed mb-6">
-              Your humanity score represents your trust weight within the Sovereign ecosystem. Pro users accumulate score faster.
+              Your account score represents your reputation. Premium users accumulate score faster.
             </p>
           </div>
 
           <div className="space-y-3 border-t border-white/10 pt-6">
             <div className="flex items-center gap-3 text-sm font-medium text-white/80">
               <Zap size={16} className="text-[#00C076]" />
-              {isFree ? 'Standard API Access' : 'Zero-Latency RPC Access'}
+              {isFree ? 'Standard Access' : 'Priority Support'}
             </div>
             <div className="flex items-center gap-3 text-sm font-medium text-white/80">
               <Globe size={16} className="text-[#00C076]" />
-              {isFree ? 'Public Forum Read/Write' : 'Private Whale Channels'}
+              {isFree ? 'Public Forums' : 'Exclusive Community Access'}
             </div>
             <div className="flex items-center gap-3 text-sm font-medium text-white/80">
               <Shield size={16} className="text-[#00C076]" />
-              {isFree ? 'Basic Alerts' : 'Advanced Cryptographic Security'}
+              {isFree ? 'Basic Security' : 'Advanced Security Features'}
             </div>
           </div>
         </div>
@@ -193,16 +193,21 @@ export function PlanDashboard() {
 
       {/* Transaction History */}
       <div className="bg-white rounded-3xl p-8 border border-black/10 mt-2 shadow-sm">
-        <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-          <CreditCard size={20} className="text-black/40" />
-          On-Chain Invoices
-        </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <CreditCard size={20} className="text-black/40" />
+            Payment History
+          </h3>
+          <span className="text-xs text-black/50 bg-black/5 px-3 py-1.5 rounded-lg border border-black/5 font-medium">
+            Invoices & receipts are sent to your email upon purchase.
+          </span>
+        </div>
         
         {!userData.transactions || userData.transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 bg-black/5 rounded-2xl border border-black/5 border-dashed">
             <AlertCircle size={24} className="text-black/20 mb-3" />
-            <p className="text-sm font-medium text-black/50">No on-chain payments found.</p>
-            <p className="text-xs text-black/30 mt-1">Upgrade your plan to see invoices here.</p>
+            <p className="text-sm font-medium text-black/50">No payments found.</p>
+            <p className="text-xs text-black/30 mt-1">When you purchase a plan, your invoice will be sent to your email.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
