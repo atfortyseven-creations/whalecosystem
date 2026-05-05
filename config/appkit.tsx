@@ -103,15 +103,9 @@ const CANONICAL_APP_URL = 'https://humanidfi.com';
 const metadata = {
     name: 'Whale Alert Network',
     description: 'Humanity Ledger — Sovereign Institutional Intelligence',
-    // ALWAYS use the verified domain to prevent Relay rejection
     url: CANONICAL_APP_URL,
-    // Use a reliable absolute URL for the icon. Some wallets (like Trust Wallet)
-    // will crash or reject the connection if the icon is an invalid SVG or missing.
-    icons: ['https://avatars.githubusercontent.com/u/37784886'],
-    // CRITICAL: The redirect object is required by many mobile wallets to successfully
-    // return focus to the dApp after the user signs the message or approves connection.
+    icons: ['https://humanidfi.com/official-whale-monochrome.png'],
     redirect: {
-        native: 'humanidfi://',
         universal: CANONICAL_APP_URL
     }
 }
