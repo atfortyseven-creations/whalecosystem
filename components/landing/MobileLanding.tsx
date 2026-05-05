@@ -1234,7 +1234,7 @@ export function MobileLanding() {
               ────────────────────────────────────────────────────────────────── */}
           <div className="w-full flex flex-col gap-3">
             {(() => {
-              // Helper: clear any stale wagmi/AppKit session then open the modal
+              // Helper: open the correct wallet flow
               const openWalletModal = (walletId: string) => {
                 // Guard: if already linked, nothing to do
                 if (isLinked && effectiveAddress) return;
@@ -1242,43 +1242,57 @@ export function MobileLanding() {
                 setConnecting(walletId);
                 setShowFallbackBtn(false);
 
+                // ── CRITICAL: Set pending wakeup flag BEFORE launching the wallet ──
+                // When the user taps "Continue in MetaMask", the browser switches to
+                // the wallet app and this tab may be frozen or destroyed by Android/iOS.
+                // On return, handleVisibility and the pageshow handler check this flag
+                // to immediately start the recovery polling. Without it, the recovery
+                // engine is blind and the user sees a blank / stuck screen.
+                try {
+                  localStorage.setItem('sovereign_pending_wakeup', '1');
+                  sessionStorage.setItem('sovereign_show_reconnect', '1');
+                } catch {}
+
                 const doOpen = () => {
-                  // In-app wallet browser detection
-                  const hasEthereum = typeof window !== 'undefined' && !!(window as any).ethereum;
-                  
-                  // Prioritized injected provider detection based on selected wallet
-                  let targetIds: string[] = [];
-                  if (walletId === 'metamask') {
-                    targetIds = ['io.metamask', 'metaMaskSDK', 'metaMask', 'injected'];
-                  } else if (walletId === 'coinbase') {
-                    targetIds = ['coinbaseWalletSDK', 'coinbaseWallet', 'injected'];
-                  } else {
-                    targetIds = ['injected'];
+                  const eth = typeof window !== 'undefined' ? (window as any).ethereum : null;
+
+                  // ── In-app wallet browser (MetaMask / Coinbase internal browser) ──
+                  // Check isMetaMask / isCoinbaseWallet flags specifically to avoid
+                  // treating other injected providers as the target wallet.
+                  const isMetaMaskBrowser  = !!(eth?.isMetaMask && !eth?.isCoinbaseWallet);
+                  const isCoinbaseBrowser  = !!(eth?.isCoinbaseWallet);
+
+                  if (walletId === 'metamask' && isMetaMaskBrowser) {
+                    const conn = connectors.find(c =>
+                      ['io.metamask','metaMaskSDK','metaMask','injected'].includes(c.id)
+                    );
+                    if (conn) { connect({ connector: conn }); return; }
                   }
 
-                  // Find the exact matching connector
-                  const specificConn = connectors.find(c => targetIds.includes(c.id));
-                  
-                  if (hasEthereum && specificConn) {
-                    connect({ connector: specificConn });
-                    return;
+                  if (walletId === 'coinbase' && isCoinbaseBrowser) {
+                    const conn = connectors.find(c =>
+                      ['coinbaseWalletSDK','coinbaseWallet','injected'].includes(c.id)
+                    );
+                    if (conn) { connect({ connector: conn }); return; }
                   }
 
-                  // External browser (Chrome, Safari) — open AppKit modal.
-                  // AppKit handles WalletConnect deep-links to MetaMask, Rainbow, etc.
-                  rkOpenModal();
+                  // ── External browser (Safari / Chrome on mobile) ──
+                  // Open AppKit WalletConnect modal. AppKit builds the WC URI and
+                  // displays the per-wallet deep-link button ("Continue in MetaMask").
+                  // The metadata.redirect.native = 'wc://' tells each wallet how to
+                  // hand control back once the user approves, so the button actually
+                  // opens the app instead of doing nothing.
+                  rkOpenModal({ view: 'Connect' });
                 };
 
-                // CRITICAL: Do NOT pre-disconnect before opening AppKit modal.
-                // Calling disconnect() before rkOpenModal() resets the WalletConnect
-                // relay session, causing the 'Open' button in the wallet deep-link
-                // modal to tap but do nothing (relay has no session to resume).
-                // Instead, open the modal directly and let AppKit manage any stale session.
+                // IMPORTANT: Do NOT pre-disconnect before rkOpenModal.
+                // Calling disconnect() resets the WalletConnect relay session which
+                // makes the "Continue in MetaMask" deep-link fire but do nothing.
                 doOpen();
 
-                setTimeout(() => setConnecting(null), 5000);
-                // Show fallback button after 3.5s (enough time for deep-link to return)
-                setTimeout(() => setShowFallbackBtn(true), 3500);
+                setTimeout(() => setConnecting(null), 8000);
+                // Show fallback "I already connected" button after 4s
+                setTimeout(() => setShowFallbackBtn(true), 4000);
               };
 
               return (
