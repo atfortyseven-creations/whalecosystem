@@ -33,9 +33,7 @@ export async function POST(req: Request) {
     await prisma.emailSubscriber.create({
       data: {
         email,
-        name,
         subscribed: true,
-        topics: ['updates', 'news'], // Default topics
       }
     });
 
