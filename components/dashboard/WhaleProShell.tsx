@@ -296,7 +296,7 @@ export function WhaleProShell({
         }
 
         if (id === 'developer') {
-            window.location.href = '/developer';
+            window.location.href = '/developers';
             return;
         }
 
