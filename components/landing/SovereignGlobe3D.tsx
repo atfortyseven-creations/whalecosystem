@@ -5,9 +5,9 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
-// ─── SOVEREIGN GLOBE — High-Fidelity Continental Dot Sphere ──────────────────
-// Fibonacci sphere filtered against an earth land mask.
-// Multiple CORS-safe texture fallbacks to guarantee land detection works.
+// ─── GLOBE — High-Fidelity Continental Dot Sphere ────────────────────────────
+// Uses an internal geographic bounding-box land mask (no external files needed).
+// Each entry: [latMin, latMax, lonMin, lonMax]
 // ─────────────────────────────────────────────────────────────────────────────
 
 const POINT_COUNT = 60000;
@@ -16,13 +16,57 @@ const BG_COLOR = "#FAF9F6";
 const DOT_COLOR = "#3F3F46";
 const DOT_SIZE = 0.005;
 
-// CORS-safe land mask URLs (tried in order until one loads successfully).
-// The specular map has bright oceans (R≈255) and dark land (R≈0).
-const TEXTURE_CANDIDATES = [
-  "/earth_specular.jpg",                                                                // Local public/ (fastest, no CORS)
-  "https://unpkg.com/three@0.160.0/examples/textures/planets/earth_specular_2048.jpg", // unpkg CDN
-  "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/textures/planets/earth_specular_2048.jpg",
+// ─── LAND BOUNDING BOXES — simplified continental polygons ───────────────────
+// Each row: [latMin, latMax, lonMin, lonMax]
+// Multiple rows per continent to approximate irregular coastlines.
+const LAND_BOXES: [number, number, number, number][] = [
+  // ── NORTH AMERICA ──────────────────────────────────────────────────────────
+  [25, 70, -170, -50],    // mainland
+  [15, 30, -120, -80],    // Mexico / Central Am.
+  [5,  20, -90,  -65],    // Central America
+  [10, 25, -85,  -60],    // Caribbean coast
+  [55, 72, -170, -120],   // Alaska
+  // ── SOUTH AMERICA ──────────────────────────────────────────────────────────
+  [-55, 13, -82, -34],    // full mainland
+  [-5,  10, -82, -60],    // broad equatorial
+  // ── EUROPE ─────────────────────────────────────────────────────────────────
+  [36, 60, -10, 30],      // W + Central Europe
+  [60, 71, 5,   30],      // Scandinavia
+  [60, 71, -25, 5],       // Iceland / Faroe area (approx)
+  [36, 42, 26,  45],      // Turkey / Caucasus
+  [40, 60, 30,  60],      // Eastern Europe / W Russia
+  // ── AFRICA ─────────────────────────────────────────────────────────────────
+  [-35, 37, -18, 52],     // full mainland
+  [-25, -10, 42, 52],     // Horn / east coast
+  // ── ASIA ───────────────────────────────────────────────────────────────────
+  [5,  75, 26,  180],     // broad Asia
+  [1,  10, 100, 120],     // SE Asia peninsula
+  [-8, 6,  95,  141],     // Indonesia / Malaysia (approx)
+  [25, 55, 100, 145],     // China / Japan
+  [30, 50, 40,  75],      // Middle East / Central Asia
+  [55, 75, 60,  180],     // Siberia
+  [20, 40, 55,  80],      // Indian subcontinent W
+  [8,  28, 70,  100],     // Indian subcontinent E
+  // ── OCEANIA ────────────────────────────────────────────────────────────────
+  [-44, -10, 112, 155],   // Australia
+  [-47, -34, 165, 178],   // New Zealand S
+  [-34, -34, 172, 178],   // New Zealand N
+  [-10, 0,   141, 160],   // Papua New Guinea
+  // ── GREENLAND ──────────────────────────────────────────────────────────────
+  [60, 84, -55, -15],
+  // ── ANTARCTICA ─────────────────────────────────────────────────────────────
+  [-90, -65, -180, 180],
 ];
+
+/** Returns true if (lat, lon) falls inside any land bounding box */
+function isLand(latDeg: number, lonDeg: number): boolean {
+  for (const [latMin, latMax, lonMin, lonMax] of LAND_BOXES) {
+    if (latDeg >= latMin && latDeg <= latMax && lonDeg >= lonMin && lonDeg <= lonMax) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // ─── VISITOR COUNTRIES — lat/lon/scale for every region ──────────────────────
 const VISITOR_COUNTRIES = [
@@ -83,87 +127,33 @@ function PointGlobeMesh() {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const color = useMemo(() => new THREE.Color(DOT_COLOR), []);
-  const [pixelData, setPixelData] = useState<Uint8ClampedArray | null>(null);
-  const [imageWidth, setImageWidth] = useState(0);
-  const [imageHeight, setImageHeight] = useState(0);
-  const [ready, setReady] = useState(false);
 
-  // Try each texture URL in sequence until one loads
   useEffect(() => {
-    let cancelled = false;
-
-    const tryLoad = (urls: string[], index: number) => {
-      if (index >= urls.length) {
-        // All failed — render full sphere (better than blank)
-        if (!cancelled) setReady(true);
-        return;
-      }
-
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = urls[index];
-
-      img.onload = () => {
-        if (cancelled) return;
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) throw new Error("no ctx");
-          ctx.drawImage(img, 0, 0);
-          const data = ctx.getImageData(0, 0, img.width, img.height);
-          setPixelData(data.data);
-          setImageWidth(img.width);
-          setImageHeight(img.height);
-          setReady(true);
-        } catch {
-          tryLoad(urls, index + 1);
-        }
-      };
-
-      img.onerror = () => tryLoad(urls, index + 1);
-    };
-
-    tryLoad(TEXTURE_CANDIDATES, 0);
-    return () => { cancelled = true; };
-  }, []);
-
-  // Build Fibonacci sphere filtered to land pixels
-  useEffect(() => {
-    if (!meshRef.current || !ready) return;
+    if (!meshRef.current) return;
 
     const PHI = Math.PI * (3 - Math.sqrt(5));
     let validIndex = 0;
 
     for (let i = 0; i < POINT_COUNT; i++) {
-      const y = 1 - (i / (POINT_COUNT - 1)) * 2;
+      const y = 1 - (i / (POINT_COUNT - 1)) * 2;          // [-1, +1]
       const r = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = PHI * i;
       const x = Math.cos(theta) * r;
       const z = Math.sin(theta) * r;
 
-      let isLand = true; // fallback when no texture
+      // Convert Cartesian → geographic coordinates
+      const latDeg = Math.asin(Math.max(-1, Math.min(1, y))) * (180 / Math.PI);
+      const lonDeg = Math.atan2(z, x) * (180 / Math.PI);
 
-      if (pixelData && imageWidth > 0) {
-        const u = 0.5 + Math.atan2(z, x) / (2 * Math.PI);
-        const v = 0.5 - Math.asin(Math.max(-1, Math.min(1, y))) / Math.PI;
-        const px = Math.min(imageWidth - 1, Math.floor(u * imageWidth));
-        const py = Math.min(imageHeight - 1, Math.floor(v * imageHeight));
-        const rVal = pixelData[(py * imageWidth + px) * 4];
-        // Specular map: ocean = bright (R > 100), land = dark (R < 50)
-        isLand = rVal < 100;
-      }
+      if (!isLand(latDeg, lonDeg)) continue;
 
-      if (isLand) {
-        dummy.position.set(x * GLOBE_RADIUS, y * GLOBE_RADIUS, z * GLOBE_RADIUS);
-        dummy.lookAt(0, 0, 0);
-        dummy.scale.setScalar(1);
-        dummy.updateMatrix();
-        meshRef.current.setMatrixAt(validIndex, dummy.matrix);
-        meshRef.current.setColorAt(validIndex, color);
-        validIndex++;
-      }
+      dummy.position.set(x * GLOBE_RADIUS, y * GLOBE_RADIUS, z * GLOBE_RADIUS);
+      dummy.lookAt(0, 0, 0);
+      dummy.scale.setScalar(1);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(validIndex, dummy.matrix);
+      meshRef.current.setColorAt(validIndex, color);
+      validIndex++;
     }
 
     // Zero out unused instances
@@ -177,7 +167,7 @@ function PointGlobeMesh() {
     meshRef.current.count = POINT_COUNT;
     meshRef.current.instanceMatrix.needsUpdate = true;
     if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
-  }, [ready, pixelData, imageWidth, imageHeight, dummy, color]);
+  }, [dummy, color]);
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, POINT_COUNT]}>
@@ -197,7 +187,6 @@ function PointGlobeMesh() {
 function VisitorMarkers() {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  const markerColor = useMemo(() => new THREE.Color("#22D3EE"), []);
 
   useEffect(() => {
     if (!meshRef.current) return;
@@ -227,7 +216,7 @@ function VisitorMarkers() {
       const z = GLOBE_RADIUS * Math.cos(latR) * Math.sin(lonR);
       const pulse = 1 + Math.sin(t * 2.5 + i * 0.8) * 0.35;
       dummy.position.set(x * 1.022, y * 1.022, z * 1.022);
-      dummy.scale.setScalar(c.scale * pulse); // scale drives size; geometry radius is 0.009
+      dummy.scale.setScalar(c.scale * pulse);
       dummy.updateMatrix();
       meshRef.current.setMatrixAt(i, dummy.matrix);
     });

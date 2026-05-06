@@ -10,7 +10,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════╝
  */
 
-export type GbChain = 'eth' | 'sol' | 'polygon' | 'bsc' | 'arb' | 'base';
+export type GbChain = 'eth' | 'sol' | 'polygon' | 'bsc' | 'arb' | 'base' | 'op' | 'world' | 'avax' | 'hyperevm' | 'bera';
 export type GbProtocol = 'rpc' | 'wss';
 
 export interface GbEndpoint {
@@ -85,6 +85,21 @@ export const GB_REGISTRY: GbEndpoint[] = [
   // CUENTA 11 — BASE
   ep(23, 11, 'base', 'rpc', 'GB_BASE_RPC_1'),
   ep(24, 11, 'base', 'wss', 'GB_BASE_WSS_1'),
+
+  // CUENTA 12 — OPTIMISM
+  ep(25, 12, 'op', 'rpc', 'GB_OP_RPC_1'),
+
+  // CUENTA 13 — AVALANCHE
+  ep(26, 13, 'avax', 'rpc', 'GB_AVAX_RPC_1'),
+
+  // CUENTA 14 — WORLDCHAIN
+  ep(27, 14, 'world', 'rpc', 'GB_WORLD_RPC_1'),
+
+  // CUENTA 15 — HYPEREVM
+  ep(28, 15, 'hyperevm', 'rpc', 'GB_HYPEREVM_RPC_1'),
+
+  // CUENTA 16 — BERACHAIN
+  ep(29, 16, 'bera', 'rpc', 'GB_BERA_RPC_1'),
 ];
 
 // ─── CU CIRCUIT BREAKER — Anti-Ban ───────────────────────────────────────────
@@ -224,12 +239,17 @@ export function getCoveredChains(): GbChain[] {
 }
 
 export const CU_BUDGET: Record<GbChain, number> = {
-  eth:     3 * 550_000,
-  sol:     2 * 550_000,
-  polygon: 2 * 550_000,
-  bsc:     2 * 550_000,
-  arb:     1 * 550_000,
-  base:    1 * 550_000,
+  eth:      3 * 550_000,
+  sol:      2 * 550_000,
+  polygon:  2 * 550_000,
+  bsc:      2 * 550_000,
+  arb:      1 * 550_000,
+  base:     1 * 550_000,
+  op:       1 * 550_000,
+  avax:     1 * 550_000,
+  world:    1 * 550_000,
+  hyperevm: 1 * 550_000,
+  bera:     1 * 550_000,
 };
 
 export function getTotalCuBudget(): number {
